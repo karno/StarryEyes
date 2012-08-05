@@ -32,7 +32,7 @@ namespace StarryEyes.Albireo.Data
                     {
                         return;
                     }
-                    else if (d < 0)
+                    else if (d > 0)
                     {
                         trace.Push(new Tuple<AVLTreeLeaf, Direction>(current, Direction.Left));
                         if (current.LeftLeaf != null)
@@ -75,12 +75,10 @@ namespace StarryEyes.Albireo.Data
                         }
                         else if (tuple.Item1.Label == AVLLabel.R)
                         {
-                            if (node.RightLeaf.Label == AVLLabel.R)
-                                node = SimpleLeftTurn(node);
-                            else if (node.RightLeaf.Label == AVLLabel.L)
+                            if (node.RightLeaf.Label == AVLLabel.L)
                                 node = DoubleRightTurn(node);
-                            else // invalid operation
-                                throw new InvalidOperationException("Cannot solve the invalid state.(RIGHT TURN)");
+                            else
+                                node = SimpleLeftTurn(node);
                         }
                         else
                         {
@@ -97,12 +95,10 @@ namespace StarryEyes.Albireo.Data
                         }
                         else if (tuple.Item1.Label == AVLLabel.L)
                         {
-                            if (node.LeftLeaf.Label == AVLLabel.L)
-                                node = SimpleRightTurn(node);
-                            else if (node.LeftLeaf.Label == AVLLabel.R)
+                            if (node.LeftLeaf.Label == AVLLabel.R)
                                 node = DoubleLeftTurn(node);
-                            else // invalid operation
-                                throw new InvalidOperationException("Cannot solve the invalid state.(RIGHT TURN)");
+                            else
+                                node = SimpleRightTurn(node);
                         }
                         else
                         {
@@ -153,7 +149,7 @@ namespace StarryEyes.Albireo.Data
                         // found
                         break;
                     }
-                    else if (d < 0)
+                    else if (d > 0)
                     {
                         trace.Push(new Tuple<AVLTreeLeaf, Direction>(current, Direction.Left));
 
@@ -177,8 +173,10 @@ namespace StarryEyes.Albireo.Data
                 var parent = trace.Peek();
                 if (current.LeftLeaf != null && current.RightLeaf != null)
                 {
-                    trace.Push(new Tuple<AVLTreeLeaf, Direction>(current, Direction.Left));
                     // has two children
+                    trace.Push(new Tuple<AVLTreeLeaf, Direction>(current, Direction.Left));
+
+                    // get most right element in the left sub-tree
                     var child = current.LeftLeaf;
                     while (child.RightLeaf != null)
                     {
@@ -186,7 +184,11 @@ namespace StarryEyes.Albireo.Data
                         child = child.RightLeaf;
                     }
                     // remove most-right children
-                    trace.Peek().Item1.RightLeaf = child.LeftLeaf;
+                    var peek = trace.Peek();
+                    if (peek.Item2 == Direction.Left)
+                        trace.Peek().Item1.LeftLeaf = child.LeftLeaf;
+                    else
+                        trace.Peek().Item1.RightLeaf = child.LeftLeaf;
                     current.Value = child.Value;
                 }
                 else
@@ -421,7 +423,6 @@ namespace StarryEyes.Albireo.Data
             get { return false; }
         }
 
-
         public IEnumerator<T> GetEnumerator()
         {
             return new AVLEnumerator(this); 
@@ -465,7 +466,10 @@ namespace StarryEyes.Albireo.Data
 
             public T Current
             {
-                get { return trace.Count > 0 ? trace.Peek().Item1.Value : default(T); }
+                get
+                {
+                    return trace.Count > 0 ? trace.Peek().Item1.Value : default(T);
+                }
             }
 
             public void Dispose() { }
@@ -501,9 +505,9 @@ namespace StarryEyes.Albireo.Data
                         } while (leaf != null);
                         return true;
                     }
-                    else
+                    else 
                     {
-                        while (trace.Peek().Item2 == Direction.Right)
+                        while (trace.Count > 0 && trace.Peek().Item2 == Direction.Right)
                             trace.Pop();
                     }
                     return trace.Count > 0;

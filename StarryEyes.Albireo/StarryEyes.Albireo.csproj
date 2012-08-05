@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Data\AVLTree.cs" />
+    <Compile Include="Data\ComparableKeyValuePair.cs" />
     <Compile Include="Data\TreeLeaf.cs" />
     <Compile Include="Fx\EnumerableFx.cs" />
     <Compile Include="Fx\ObservableFx.cs" />
