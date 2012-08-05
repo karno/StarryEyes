@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
 using System.Windows;
 
 using Livet;
@@ -18,14 +14,6 @@ namespace StarryEyes.Mystique
         {
             DispatcherHelper.UIDispatcher = Dispatcher;
             //AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
-            var avltree = new StarryEyes.Albireo.Data.AVLTree<long>();
-            Enumerable.Range(1, 50).ForEach(i => avltree.Add(i));
-            avltree.ForEach(i => System.Diagnostics.Debug.WriteLine(i));
-            Enumerable.Range(1, 50).Where(i => i % 3 == 0).Where(i => !avltree.Remove(i)).ForEach(i => System.Diagnostics.Debug.WriteLine("FAIL!!!:" + i));
-            avltree.ForEach(i => System.Diagnostics.Debug.WriteLine(i));
-            Enumerable.Range(1, 10).Select(i => i * 10).ForEach(i => avltree.Add(i));
-            avltree.ForEach(i => System.Diagnostics.Debug.WriteLine(i));
-
         }
 
         //集約エラーハンドラ

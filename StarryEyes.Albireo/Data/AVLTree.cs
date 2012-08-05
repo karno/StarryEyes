@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace StarryEyes.Albireo.Data
 {
@@ -110,15 +108,10 @@ namespace StarryEyes.Albireo.Data
                     if (trace.Count > 0)
                     {
                         var peek = trace.Peek();
-                        switch (peek.Item2)
-                        {
-                            case Direction.Left:
-                                peek.Item1.LeftLeaf = node;
-                                break;
-                            case Direction.Right:
-                                peek.Item1.RightLeaf = node;
-                                break;
-                        }
+                        if (peek.Item2 == Direction.Left)
+                            peek.Item1.LeftLeaf = node;
+                        else
+                            peek.Item1.RightLeaf = node;
                     }
                     else
                     {
@@ -196,21 +189,16 @@ namespace StarryEyes.Albireo.Data
                     // has a child or no children
                     AVLTreeLeaf leaf = null;
                     if (current.LeftLeaf != null)
-                        leaf = current.RightLeaf;
-                    else if (current.RightLeaf != null)
                         leaf = current.LeftLeaf;
+                    else if (current.RightLeaf != null)
+                        leaf = current.RightLeaf;
                     else // has no children
                         leaf = null;
 
-                    switch (parent.Item2)
-                    {
-                        case Direction.Left:
-                            parent.Item1.LeftLeaf = leaf;
-                            break;
-                        case Direction.Right:
-                            parent.Item1.RightLeaf = leaf;
-                            break;
-                    }
+                    if (parent.Item2 == Direction.Left)
+                        parent.Item1.LeftLeaf = leaf;
+                    else
+                        parent.Item1.RightLeaf = leaf;
                 }
                 
                 // rotate and balance
@@ -236,7 +224,7 @@ namespace StarryEyes.Albireo.Data
                             else
                             {
                                 node = SimpleLeftTurn(node);
-                                breakLoop = node.Label != AVLLabel.E;
+                                breakLoop = node.Label == AVLLabel.L;
                             }
                         }
                         else
@@ -257,7 +245,7 @@ namespace StarryEyes.Albireo.Data
                         {
                             if (node.LeftLeaf.Label == AVLLabel.R)
                             {
-                                node = DoubleRightTurn(node);
+                                node = DoubleLeftTurn(node);
                             }
                             else
                             {
@@ -276,15 +264,10 @@ namespace StarryEyes.Albireo.Data
                     if (trace.Count > 0)
                     {
                         var peek = trace.Peek();
-                        switch (peek.Item2)
-                        {
-                            case Direction.Left:
-                                peek.Item1.LeftLeaf = node;
-                                break;
-                            case Direction.Right:
-                                peek.Item1.RightLeaf = node;
-                                break;
-                        }
+                        if (peek.Item2 == Direction.Left)
+                            peek.Item1.LeftLeaf = node;
+                        else
+                            peek.Item1.RightLeaf = node;
                     }
                     else
                     {
@@ -306,8 +289,8 @@ namespace StarryEyes.Albireo.Data
             newtop.LeftLeaf = leaf;
             if (newtop.Label == AVLLabel.E)
             {
-                newtop.Label = AVLLabel.R;
-                leaf.Label = AVLLabel.L;
+                newtop.Label = AVLLabel.L;
+                leaf.Label = AVLLabel.R;
             }
             else
             {
@@ -387,7 +370,7 @@ namespace StarryEyes.Albireo.Data
                 {
                     return true;
                 }
-                else if (d < 0)
+                else if (d > 0)
                 {
                     if (current.LeftLeaf != null)
                         current = current.LeftLeaf;
