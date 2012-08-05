@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ReactiveOAuth.SL</name>
+    </assembly>
+    <members>
+        <member name="T:Codeplex.OAuth.TokenResponse`1">
+            <summary>OAuth Response</summary>
+        </member>
+        <member name="M:Codeplex.OAuth.Utility.UrlEncode(System.String)">
+            <summary>Escape RFC3986 String</summary>
+        </member>
+        <member name="T:Codeplex.OAuth.MethodType">
+            <summary>WebRequest HttpMethodType</summary>
+        </member>
+        <member name="M:Codeplex.OAuth.MethodTypeExtensions.ToUpperString(Codeplex.OAuth.MethodType)">
+            <summary>convert to UPPERCASE string</summary>
+        </member>
+        <member name="T:Codeplex.OAuth.Token">
+            <summary>represents OAuth Token</summary>
+        </member>
+        <member name="T:Codeplex.OAuth.AccessToken">
+            <summary>represents OAuth AccessToken</summary>
+        </member>
+        <member name="T:Codeplex.OAuth.RequestToken">
+            <summary>represents OAuth RequestToken</summary>
+        </member>
+        <member name="T:Codeplex.OAuth.OAuthClient">
+            <summary>access protected resource client</summary>
+        </member>
+        <member name="M:Codeplex.OAuth.OAuthClient.GetResponse">
+            <summary>asynchronus GetResponse</summary>
+        </member>
+        <member name="M:Codeplex.OAuth.OAuthClient.GetResponseText">
+            <summary>asynchronus GetResponse and return ResponseText</summary>
+        </member>
+        <member name="M:Codeplex.OAuth.OAuthClient.GetResponseLines">
+            <summary>asynchronus GetResponse and return onelines</summary>
+        </member>
+        <member name="T:Codeplex.OAuth.OAuthAuthorizer">
+            <summary>OAuth Authorization Client</summary>
+        </member>
+        <member name="M:Codeplex.OAuth.OAuthAuthorizer.BuildAuthorizeUrl(System.String,Codeplex.OAuth.RequestToken)">
+            <summary>construct AuthrizeUrl + RequestTokenKey</summary>
+        </member>
+        <member name="M:Codeplex.OAuth.OAuthAuthorizer.GetRequestToken(System.String,Codeplex.OAuth.Parameter[])">
+            <summary>asynchronus get RequestToken</summary>
+            <param name="otherParameters">need parameters except consumer_key,timestamp,nonce,signature,signature_method,version</param>
+        </member>
+        <member name="M:Codeplex.OAuth.OAuthAuthorizer.GetRequestToken(System.String,System.Collections.Generic.IEnumerable{Codeplex.OAuth.Parameter})">
+            <summary>asynchronus get RequestToken</summary>
+            <param name="otherParameters">need parameters except consumer_key,timestamp,nonce,signature,signature_method,version</param>
+        </member>
+        <member name="M:Codeplex.OAuth.OAuthAuthorizer.GetAccessToken(System.String,Codeplex.OAuth.RequestToken,System.String)">
+            <summary>asynchronus get GetAccessToken</summary>
+        </member>
+        <member name="M:Codeplex.OAuth.OAuthAuthorizer.GetAccessToken(System.String,System.String,System.String,System.String)">
+            <summary>asynchronus get GetAccessToken for xAuth</summary>
+        </member>
+        <member name="T:Codeplex.OAuth.Parameter">
+            <summary>represents query parameter(Key and Value)</summary>
+        </member>
+        <member name="M:Codeplex.OAuth.Parameter.ToString">
+            <summary>UrlEncode(Key)=UrlEncode(Value)</summary>
+        </member>
+        <member name="T:Codeplex.OAuth.ParameterCollection">
+            <summary>represents query parameter(Key and Value) collection</summary>
+        </member>
+        <member name="M:Codeplex.OAuth.ParametersExtension.ToQueryParameter(System.Collections.Generic.IEnumerable{Codeplex.OAuth.Parameter})">
+            <summary>convert urlencoded querystring</summary>
+        </member>
+    </members>
+</doc>

@@ -1,0 +1,136 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{7E909D43-7BAD-4885-9983-2FF0030D5A5E}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>StarryEyes.SweetLady</RootNamespace>
+    <AssemblyName>Nuclear.Fusion</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.4.5.5\lib\net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="ReactiveOAuth">
+      <HintPath>..\packages\ReactiveOAuth.0.4.0.0\lib\Net40\ReactiveOAuth.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Interactive, Version=1.1.10823.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Ix_Experimental-Main.1.1.10823\lib\Net4\System.Interactive.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reactive, Version=1.0.10621.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Rx-Main.1.0.11226\lib\Net4\System.Reactive.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Api\ApiEndpoint.cs" />
+    <Compile Include="Api\Parsing\JsonFormats\ConfigurationJson.cs" />
+    <Compile Include="Api\Parsing\JsonFormats\CoordinatesJson.cs" />
+    <Compile Include="Api\Parsing\JsonFormats\DirectMessageJson.cs" />
+    <Compile Include="Api\Parsing\JsonFormats\EntityJson.cs" />
+    <Compile Include="Api\Parsing\JsonFormats\FriendshipJson.cs" />
+    <Compile Include="Api\Parsing\JsonFormats\IdsJson.cs" />
+    <Compile Include="Api\Parsing\JsonFormats\LanguageJson.cs" />
+    <Compile Include="Api\Parsing\JsonFormats\ListCollectionsJson.cs" />
+    <Compile Include="Api\Parsing\JsonFormats\ListJson.cs" />
+    <Compile Include="Api\Parsing\JsonFormats\LookupInfoJson.cs" />
+    <Compile Include="Api\Parsing\JsonFormats\SavedSearchJson.cs" />
+    <Compile Include="Api\Parsing\JsonFormats\SearchJson.cs" />
+    <Compile Include="Api\Parsing\JsonFormats\SearchTweetJson.cs" />
+    <Compile Include="Api\Parsing\JsonFormats\StreamingAdditionalJson.cs" />
+    <Compile Include="Api\Parsing\JsonFormats\StreamingEventJson.cs" />
+    <Compile Include="Api\Parsing\JsonFormats\TrendAvailableInfoJson.cs" />
+    <Compile Include="Api\Parsing\JsonFormats\TrendInfoJson.cs" />
+    <Compile Include="Api\Parsing\JsonFormats\TweetJson.cs" />
+    <Compile Include="Api\Parsing\JsonFormats\UserCollectionJson.cs" />
+    <Compile Include="Api\Parsing\JsonFormats\UserJson.cs" />
+    <Compile Include="Api\Parsing\Parser.cs" />
+    <Compile Include="Api\Rest\Accounting.cs" />
+    <Compile Include="Api\Rest\DirectMessages.cs" />
+    <Compile Include="Api\Rest\Favorites.cs" />
+    <Compile Include="Api\Rest\Help.cs" />
+    <Compile Include="Api\Rest\Lists.cs" />
+    <Compile Include="Api\Rest\Relations.cs" />
+    <Compile Include="Api\Rest\Search.cs" />
+    <Compile Include="Api\Rest\Timelines.cs" />
+    <Compile Include="Api\Rest\Trends.cs" />
+    <Compile Include="Api\Rest\Tweets.cs" />
+    <Compile Include="Api\Rest\Users.cs" />
+    <Compile Include="Api\Streaming\UserStreams.cs" />
+    <Compile Include="Authorize\AuthenticateInfo.cs" />
+    <Compile Include="Model\TwitterActivity.cs" />
+    <Compile Include="Model\TwitterEntity.cs" />
+    <Compile Include="Model\TwitterList.cs" />
+    <Compile Include="Model\TwitterStatus.cs" />
+    <Compile Include="Model\TwitterStreamingElement.cs" />
+    <Compile Include="Model\TwitterUser.cs" />
+    <Compile Include="Net\ImageResolver.cs" />
+    <Compile Include="Net\MultipartableOAuthClient.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Scrapping\InstapaperApi.cs" />
+    <Compile Include="Scrapping\PocketApi.cs" />
+    <Compile Include="Scrapping\ReadabilityApi.cs" />
+    <Compile Include="Scrapping\ScrappingService.cs" />
+    <Compile Include="Util\HttpUtility.cs" />
+    <Compile Include="Util\ObservableEx.cs" />
+    <Compile Include="Util\UnixEpoch.cs" />
+    <Compile Include="Util\XmlParser.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Nuclear.Fusion.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\StarryEyes.Albireo\StarryEyes.Albireo.csproj">
+      <Project>{C2740802-BD1C-4B70-9B3A-F69DAE505827}</Project>
+      <Name>StarryEyes.Vivid</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\StarryEyes.Vanille\StarryEyes.Vanille.csproj">
+      <Project>{7C1764E1-AF06-48A8-8590-09500A363118}</Project>
+      <Name>StarryEyes.Vanille</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
