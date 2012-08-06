@@ -7,16 +7,15 @@ namespace StarryEyes.SweetLady.DataModel
     public class TwitterActivity
     {
         /// <summary>
+        /// Internal ID
+        /// </summary>
+        public long InternalId { get; set; }
+
+        /// <summary>
         /// Time of activity created at
         /// </summary>
         [DataMember]
         public DateTime CreatedAt { get; set; }
-
-        /// <summary>
-        /// Internal identification number
-        /// </summary>
-        [DataMember]
-        public long InternalId { get; set; }
 
         /// <summary>
         /// Activity type

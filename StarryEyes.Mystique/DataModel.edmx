@@ -1,0 +1,532 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="2.0" xmlns:edmx="http://schemas.microsoft.com/ado/2008/10/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="KrileLocalDb.Store" Alias="Self" Provider="System.Data.SQLite" ProviderManifestToken="ISO8601" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/02/edm/ssdl">
+        <EntityContainer Name="KrileLocalDbStoreContainer">
+          <EntitySet Name="Activity" EntityType="KrileLocalDb.Store.Activity" store:Type="Tables" />
+          <EntitySet Name="Entity" EntityType="KrileLocalDb.Store.Entity" store:Type="Tables" />
+          <EntitySet Name="Status" EntityType="KrileLocalDb.Store.Status" store:Type="Tables" />
+          <EntitySet Name="User" EntityType="KrileLocalDb.Store.User" store:Type="Tables" />
+          <AssociationSet Name="FK_Activity_0" Association="KrileLocalDb.Store.FK_Activity_0">
+            <End Role="User" EntitySet="User" />
+            <End Role="Activity" EntitySet="Activity" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Activity_1" Association="KrileLocalDb.Store.FK_Activity_1">
+            <End Role="User" EntitySet="User" />
+            <End Role="Activity" EntitySet="Activity" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Activity_2" Association="KrileLocalDb.Store.FK_Activity_2">
+            <End Role="Status" EntitySet="Status" />
+            <End Role="Activity" EntitySet="Activity" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Entity_0" Association="KrileLocalDb.Store.FK_Entity_0">
+            <End Role="Status" EntitySet="Status" />
+            <End Role="Entity" EntitySet="Entity" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Status_0" Association="KrileLocalDb.Store.FK_Status_0">
+            <End Role="Status" EntitySet="Status" />
+            <End Role="Status1" EntitySet="Status" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Status_1" Association="KrileLocalDb.Store.FK_Status_1">
+            <End Role="User" EntitySet="User" />
+            <End Role="Status" EntitySet="Status" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Status_2" Association="KrileLocalDb.Store.FK_Status_2">
+            <End Role="User" EntitySet="User" />
+            <End Role="Status" EntitySet="Status" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="Activity">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="integer" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="CreatedAt" Type="datetime" Nullable="false" />
+          <Property Name="Activity" Type="int" Nullable="false" />
+          <Property Name="SourceUserId" Type="integer" Nullable="false" />
+          <Property Name="TargetUserId" Type="integer" Nullable="false" />
+          <Property Name="TargetStatusId" Type="integer" />
+        </EntityType>
+        <EntityType Name="Entity">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="integer" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="StatusId" Type="integer" Nullable="false" />
+          <Property Name="EntityType" Type="int" Nullable="false" />
+          <Property Name="DisplayText" Type="nvarchar" Nullable="false" />
+          <Property Name="OriginalText" Type="nvarchar" Nullable="false" />
+          <Property Name="MediaUrl" Type="nvarchar" Nullable="false" />
+          <Property Name="StartIndex" Type="int" Nullable="false" />
+          <Property Name="EndIndex" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Status">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="integer" Nullable="false" />
+          <Property Name="StatusType" Type="int" Nullable="false" />
+          <Property Name="IsDataLacking" Type="bit" Nullable="false" />
+          <Property Name="UserId" Type="integer" Nullable="false" />
+          <Property Name="Text" Type="nvarchar" Nullable="false" />
+          <Property Name="CreatedAt" Type="datetime" Nullable="false" />
+          <Property Name="IsFavored" Type="bit" Nullable="false" />
+          <Property Name="Source" Type="nvarchar" Nullable="false" />
+          <Property Name="InReplyToStatusId" Type="integer" />
+          <Property Name="InReplyToUserId" Type="integer" />
+          <Property Name="InReplyToScreenName" Type="nvarchar" />
+          <Property Name="RetweetedOriginalId" Type="integer" />
+          <Property Name="Longitude" Type="real" />
+          <Property Name="Latitude" Type="real" />
+          <Property Name="RecipientId" Type="integer" />
+        </EntityType>
+        <EntityType Name="User">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="integer" Nullable="false" />
+          <Property Name="ScreenName" Type="nvarchar" Nullable="false" />
+          <Property Name="IsDataLacking" Type="bit" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" Nullable="false" />
+          <Property Name="Description" Type="nvarchar" Nullable="false" />
+          <Property Name="Location" Type="nvarchar" Nullable="false" />
+          <Property Name="Url" Type="nvarchar" Nullable="false" />
+          <Property Name="ProfileImageUri" Type="nvarchar" Nullable="false" />
+          <Property Name="IsProtected" Type="bit" Nullable="false" />
+          <Property Name="IsVerified" Type="bit" Nullable="false" />
+          <Property Name="IsTranslator" Type="bit" Nullable="false" />
+          <Property Name="IsContributorsEnabled" Type="bit" Nullable="false" />
+          <Property Name="IsGeoEnabled" Type="bit" Nullable="false" />
+          <Property Name="StatusesCount" Type="integer" Nullable="false" />
+          <Property Name="FriendsCount" Type="integer" Nullable="false" />
+          <Property Name="FollowersCount" Type="integer" Nullable="false" />
+          <Property Name="FavoritesCount" Type="integer" Nullable="false" />
+          <Property Name="ListedCount" Type="integer" Nullable="false" />
+          <Property Name="Language" Type="nvarchar" Nullable="false" />
+          <Property Name="CreatedAt" Type="datetime" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_Activity_0">
+          <End Role="User" Type="KrileLocalDb.Store.User" Multiplicity="1" />
+          <End Role="Activity" Type="KrileLocalDb.Store.Activity" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Activity">
+              <PropertyRef Name="SourceUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Activity_1">
+          <End Role="User" Type="KrileLocalDb.Store.User" Multiplicity="1" />
+          <End Role="Activity" Type="KrileLocalDb.Store.Activity" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Activity">
+              <PropertyRef Name="TargetUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Activity_2">
+          <End Role="Status" Type="KrileLocalDb.Store.Status" Multiplicity="0..1" />
+          <End Role="Activity" Type="KrileLocalDb.Store.Activity" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Status">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Activity">
+              <PropertyRef Name="TargetStatusId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Entity_0">
+          <End Role="Status" Type="KrileLocalDb.Store.Status" Multiplicity="1" />
+          <End Role="Entity" Type="KrileLocalDb.Store.Entity" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Status">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Entity">
+              <PropertyRef Name="StatusId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Status_0">
+          <End Role="Status" Type="KrileLocalDb.Store.Status" Multiplicity="0..1" />
+          <End Role="Status1" Type="KrileLocalDb.Store.Status" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Status">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Status1">
+              <PropertyRef Name="RetweetedOriginalId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Status_1">
+          <End Role="User" Type="KrileLocalDb.Store.User" Multiplicity="0..1" />
+          <End Role="Status" Type="KrileLocalDb.Store.Status" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Status">
+              <PropertyRef Name="RecipientId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Status_2">
+          <End Role="User" Type="KrileLocalDb.Store.User" Multiplicity="1" />
+          <End Role="Status" Type="KrileLocalDb.Store.Status" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Status">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="KrileLocalDb" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+        <EntityContainer Name="LocalDatabase" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Activities" EntityType="KrileLocalDb.Activity" />
+          <EntitySet Name="Entities" EntityType="KrileLocalDb.Entity" />
+          <EntitySet Name="Status" EntityType="KrileLocalDb.Status" />
+          <EntitySet Name="Users" EntityType="KrileLocalDb.User" />
+          <AssociationSet Name="FK_Activity_0" Association="KrileLocalDb.FK_Activity_0">
+            <End Role="User" EntitySet="Users" />
+            <End Role="Activity" EntitySet="Activities" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Activity_1" Association="KrileLocalDb.FK_Activity_1">
+            <End Role="User" EntitySet="Users" />
+            <End Role="Activity" EntitySet="Activities" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Activity_2" Association="KrileLocalDb.FK_Activity_2">
+            <End Role="Status" EntitySet="Status" />
+            <End Role="Activity" EntitySet="Activities" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Entity_0" Association="KrileLocalDb.FK_Entity_0">
+            <End Role="Status" EntitySet="Status" />
+            <End Role="Entity" EntitySet="Entities" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Status_0" Association="KrileLocalDb.FK_Status_0">
+            <End Role="User" EntitySet="Users" />
+            <End Role="Status" EntitySet="Status" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Status_1" Association="KrileLocalDb.FK_Status_1">
+            <End Role="User" EntitySet="Users" />
+            <End Role="Status" EntitySet="Status" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Status_01" Association="KrileLocalDb.FK_Status_01">
+            <End Role="Status" EntitySet="Status" />
+            <End Role="Original" EntitySet="Status" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="Activity">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" />
+          <Property Name="ActivityKind" Type="Int32" Nullable="false" />
+          <Property Name="SourceUserId" Type="Int64" Nullable="false" />
+          <Property Name="TargetUserId" Type="Int64" Nullable="false" />
+          <Property Name="TargetStatusId" Type="Int64" />
+          <NavigationProperty Name="SourceUser" Relationship="KrileLocalDb.FK_Activity_0" FromRole="Activity" ToRole="User" />
+          <NavigationProperty Name="TargetUser" Relationship="KrileLocalDb.FK_Activity_1" FromRole="Activity" ToRole="User" />
+          <NavigationProperty Name="TargetStatus" Relationship="KrileLocalDb.FK_Activity_2" FromRole="Activity" ToRole="Status" />
+        </EntityType>
+        <EntityType Name="Entity">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int64" Nullable="false" />
+          <Property Name="StatusId" Type="Int64" Nullable="false" />
+          <Property Name="EntityType" Type="Int32" Nullable="false" />
+          <Property Name="DisplayText" Type="String" Nullable="false" MaxLength="2147483647" Unicode="true" FixedLength="false" />
+          <Property Name="OriginalText" Type="String" Nullable="false" MaxLength="2147483647" Unicode="true" FixedLength="false" />
+          <Property Name="MediaUrl" Type="String" Nullable="false" MaxLength="2147483647" Unicode="true" FixedLength="false" />
+          <Property Name="StartIndex" Type="Int32" Nullable="false" />
+          <Property Name="EndIndex" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Status" Relationship="KrileLocalDb.FK_Entity_0" FromRole="Entity" ToRole="Status" />
+        </EntityType>
+        <EntityType Name="Status">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int64" Nullable="false" />
+          <Property Name="StatusType" Type="Int32" Nullable="false" />
+          <Property Name="IsDataLacking" Type="Boolean" Nullable="false" />
+          <Property Name="UserId" Type="Int64" Nullable="false" />
+          <Property Name="Text" Type="String" Nullable="false" MaxLength="2147483647" Unicode="true" FixedLength="false" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" />
+          <Property Name="IsFavored" Type="Boolean" Nullable="false" />
+          <Property Name="Source" Type="String" Nullable="false" MaxLength="2147483647" Unicode="true" FixedLength="false" />
+          <Property Name="InReplyToStatusId" Type="Int64" />
+          <Property Name="InReplyToUserId" Type="Int64" />
+          <Property Name="InReplyToScreenName" Type="String" MaxLength="2147483647" Unicode="true" FixedLength="false" />
+          <Property Name="RetweetedOriginalId" Type="Int64" />
+          <Property Name="Latitude" Type="Single" />
+          <Property Name="RecipientId" Type="Int64" />
+          <NavigationProperty Name="Activities" Relationship="KrileLocalDb.FK_Activity_2" FromRole="Status" ToRole="Activity" />
+          <NavigationProperty Name="Entities" Relationship="KrileLocalDb.FK_Entity_0" FromRole="Status" ToRole="Entity" />
+          <NavigationProperty Name="User" Relationship="KrileLocalDb.FK_Status_0" FromRole="Status" ToRole="User" />
+          <NavigationProperty Name="Recipient" Relationship="KrileLocalDb.FK_Status_1" FromRole="Status" ToRole="User" />
+          <NavigationProperty Name="Retweets" Relationship="KrileLocalDb.FK_Status_01" FromRole="Status" ToRole="Original" />
+          <NavigationProperty Name="RetweetedOriginal" Relationship="KrileLocalDb.FK_Status_01" FromRole="Original" ToRole="Status" />
+          <Property Type="Single" Name="Longitude" />
+        </EntityType>
+        <EntityType Name="User">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int64" Nullable="false" />
+          <Property Name="ScreenName" Type="String" Nullable="false" MaxLength="2147483647" Unicode="true" FixedLength="false" />
+          <Property Name="IsDataLacking" Type="Boolean" Nullable="false" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="2147483647" Unicode="true" FixedLength="false" />
+          <Property Name="Description" Type="String" Nullable="false" MaxLength="2147483647" Unicode="true" FixedLength="false" />
+          <Property Name="Location" Type="String" Nullable="false" MaxLength="2147483647" Unicode="true" FixedLength="false" />
+          <Property Name="Url" Type="String" Nullable="false" MaxLength="2147483647" Unicode="true" FixedLength="false" />
+          <Property Name="ProfileImageUri" Type="String" Nullable="false" MaxLength="2147483647" Unicode="true" FixedLength="false" />
+          <Property Name="IsProtected" Type="Boolean" Nullable="false" />
+          <Property Name="IsVerified" Type="Boolean" Nullable="false" />
+          <Property Name="IsTranslator" Type="Boolean" Nullable="false" />
+          <Property Name="IsContributorsEnabled" Type="Boolean" Nullable="false" />
+          <Property Name="IsGeoEnabled" Type="Boolean" Nullable="false" />
+          <Property Name="StatusesCount" Type="Int64" Nullable="false" />
+          <Property Name="FriendsCount" Type="Int64" Nullable="false" />
+          <Property Name="FollowersCount" Type="Int64" Nullable="false" />
+          <Property Name="FavoritesCount" Type="Int64" Nullable="false" />
+          <Property Name="ListedCount" Type="Int64" Nullable="false" />
+          <Property Name="Language" Type="String" Nullable="false" MaxLength="2147483647" Unicode="true" FixedLength="false" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" />
+          <NavigationProperty Name="Activities" Relationship="KrileLocalDb.FK_Activity_0" FromRole="User" ToRole="Activity" />
+          <NavigationProperty Name="ReceiptActivities" Relationship="KrileLocalDb.FK_Activity_1" FromRole="User" ToRole="Activity" />
+          <NavigationProperty Name="Status" Relationship="KrileLocalDb.FK_Status_0" FromRole="User" ToRole="Status" />
+          <NavigationProperty Name="ReceivedMessages" Relationship="KrileLocalDb.FK_Status_1" FromRole="User" ToRole="Status" />
+        </EntityType>
+        <Association Name="FK_Activity_0">
+          <End Role="User" Type="KrileLocalDb.User" Multiplicity="1" />
+          <End Role="Activity" Type="KrileLocalDb.Activity" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Activity">
+              <PropertyRef Name="SourceUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Activity_1">
+          <End Role="User" Type="KrileLocalDb.User" Multiplicity="1" />
+          <End Role="Activity" Type="KrileLocalDb.Activity" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Activity">
+              <PropertyRef Name="TargetUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Activity_2">
+          <End Role="Status" Type="KrileLocalDb.Status" Multiplicity="0..1" />
+          <End Role="Activity" Type="KrileLocalDb.Activity" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Status">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Activity">
+              <PropertyRef Name="TargetStatusId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Entity_0">
+          <End Role="Status" Type="KrileLocalDb.Status" Multiplicity="1" >
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Entity" Type="KrileLocalDb.Entity" Multiplicity="*" >
+          </End>
+          <ReferentialConstraint>
+            <Principal Role="Status">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Entity">
+              <PropertyRef Name="StatusId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Status_0">
+          <End Role="User" Type="KrileLocalDb.User" Multiplicity="1" />
+          <End Role="Status" Type="KrileLocalDb.Status" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Status">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Status_1">
+          <End Role="User" Type="KrileLocalDb.User" Multiplicity="0..1" />
+          <End Role="Status" Type="KrileLocalDb.Status" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Status">
+              <PropertyRef Name="RecipientId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Status_01">
+          <End Type="KrileLocalDb.Status" Role="Status" Multiplicity="0..1" >
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="KrileLocalDb.Status" Role="Original" Multiplicity="*" >
+          </End>
+          <ReferentialConstraint>
+            <Principal Role="Status">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Original">
+              <PropertyRef Name="RetweetedOriginalId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2008/09/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="KrileLocalDbStoreContainer" CdmEntityContainer="LocalDatabase">
+          <EntitySetMapping Name="Activities"><EntityTypeMapping TypeName="KrileLocalDb.Activity"><MappingFragment StoreEntitySet="Activity">
+            <ScalarProperty Name="Id" ColumnName="Id" />
+            <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+            <ScalarProperty Name="ActivityKind" ColumnName="Activity" />
+            <ScalarProperty Name="SourceUserId" ColumnName="SourceUserId" />
+            <ScalarProperty Name="TargetUserId" ColumnName="TargetUserId" />
+            <ScalarProperty Name="TargetStatusId" ColumnName="TargetStatusId" />
+          </MappingFragment></EntityTypeMapping></EntitySetMapping>
+          <EntitySetMapping Name="Entities"><EntityTypeMapping TypeName="KrileLocalDb.Entity"><MappingFragment StoreEntitySet="Entity">
+            <ScalarProperty Name="Id" ColumnName="Id" />
+            <ScalarProperty Name="StatusId" ColumnName="StatusId" />
+            <ScalarProperty Name="EntityType" ColumnName="EntityType" />
+            <ScalarProperty Name="DisplayText" ColumnName="DisplayText" />
+            <ScalarProperty Name="OriginalText" ColumnName="OriginalText" />
+            <ScalarProperty Name="MediaUrl" ColumnName="MediaUrl" />
+            <ScalarProperty Name="StartIndex" ColumnName="StartIndex" />
+            <ScalarProperty Name="EndIndex" ColumnName="EndIndex" />
+          </MappingFragment></EntityTypeMapping></EntitySetMapping>
+          <EntitySetMapping Name="Status"><EntityTypeMapping TypeName="KrileLocalDb.Status"><MappingFragment StoreEntitySet="Status">
+            <ScalarProperty Name="Longitude" ColumnName="Longitude" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+            <ScalarProperty Name="StatusType" ColumnName="StatusType" />
+            <ScalarProperty Name="IsDataLacking" ColumnName="IsDataLacking" />
+            <ScalarProperty Name="UserId" ColumnName="UserId" />
+            <ScalarProperty Name="Text" ColumnName="Text" />
+            <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+            <ScalarProperty Name="IsFavored" ColumnName="IsFavored" />
+            <ScalarProperty Name="Source" ColumnName="Source" />
+            <ScalarProperty Name="InReplyToStatusId" ColumnName="InReplyToStatusId" />
+            <ScalarProperty Name="InReplyToUserId" ColumnName="InReplyToUserId" />
+            <ScalarProperty Name="InReplyToScreenName" ColumnName="InReplyToScreenName" />
+            <ScalarProperty Name="RetweetedOriginalId" ColumnName="RetweetedOriginalId" />
+            <ScalarProperty Name="Latitude" ColumnName="Latitude" />
+            <ScalarProperty Name="RecipientId" ColumnName="RecipientId" />
+          </MappingFragment></EntityTypeMapping></EntitySetMapping>
+          <EntitySetMapping Name="Users"><EntityTypeMapping TypeName="KrileLocalDb.User"><MappingFragment StoreEntitySet="User">
+            <ScalarProperty Name="Id" ColumnName="Id" />
+            <ScalarProperty Name="ScreenName" ColumnName="ScreenName" />
+            <ScalarProperty Name="IsDataLacking" ColumnName="IsDataLacking" />
+            <ScalarProperty Name="Name" ColumnName="Name" />
+            <ScalarProperty Name="Description" ColumnName="Description" />
+            <ScalarProperty Name="Location" ColumnName="Location" />
+            <ScalarProperty Name="Url" ColumnName="Url" />
+            <ScalarProperty Name="ProfileImageUri" ColumnName="ProfileImageUri" />
+            <ScalarProperty Name="IsProtected" ColumnName="IsProtected" />
+            <ScalarProperty Name="IsVerified" ColumnName="IsVerified" />
+            <ScalarProperty Name="IsTranslator" ColumnName="IsTranslator" />
+            <ScalarProperty Name="IsContributorsEnabled" ColumnName="IsContributorsEnabled" />
+            <ScalarProperty Name="IsGeoEnabled" ColumnName="IsGeoEnabled" />
+            <ScalarProperty Name="StatusesCount" ColumnName="StatusesCount" />
+            <ScalarProperty Name="FriendsCount" ColumnName="FriendsCount" />
+            <ScalarProperty Name="FollowersCount" ColumnName="FollowersCount" />
+            <ScalarProperty Name="FavoritesCount" ColumnName="FavoritesCount" />
+            <ScalarProperty Name="ListedCount" ColumnName="ListedCount" />
+            <ScalarProperty Name="Language" ColumnName="Language" />
+            <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+          </MappingFragment></EntityTypeMapping></EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2008/10/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="True" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="True" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams>
+      <Diagram Name="DataModel">
+        <EntityTypeShape EntityType="KrileLocalDb.Activity" Width="1.5" PointX="5.25" PointY="3.875" Height="3.0043749999999996" IsExpanded="true" />
+        <EntityTypeShape EntityType="KrileLocalDb.Entity" Width="1.5" PointX="5.25" PointY="8" Height="3.0043749999999996" IsExpanded="true" />
+        <EntityTypeShape EntityType="KrileLocalDb.Status" Width="1.5" PointX="3" PointY="6.875" Height="5.566875" IsExpanded="true" />
+        <EntityTypeShape EntityType="KrileLocalDb.User" Width="1.5" PointX="0.75" PointY="2.625" Height="6.2075000000000014" IsExpanded="true" />
+        <AssociationConnector Association="KrileLocalDb.FK_Activity_0" ManuallyRouted="false">
+          <ConnectorPoint PointX="2.25" PointY="5.34375" />
+          <ConnectorPoint PointX="3.6666666666666665" PointY="5.3437499999999991" />
+          <ConnectorPoint PointX="3.8333333333333335" PointY="5.34375" />
+          <ConnectorPoint PointX="5.25" PointY="5.34375" />
+        </AssociationConnector>
+        <AssociationConnector Association="KrileLocalDb.FK_Activity_1" ManuallyRouted="false">
+          <ConnectorPoint PointX="2.25" PointY="6.0338516666666662" />
+          <ConnectorPoint PointX="3.6666666666666665" PointY="6.0338516666666653" />
+          <ConnectorPoint PointX="3.8333333333333335" PointY="6.0338516666666662" />
+          <ConnectorPoint PointX="5.25" PointY="6.0338516666666662" />
+        </AssociationConnector>
+        <AssociationConnector Association="KrileLocalDb.FK_Activity_2" ManuallyRouted="false">
+          <ConnectorPoint PointX="3.75" PointY="6.875" />
+          <ConnectorPoint PointX="3.75" PointY="4.5781225" />
+          <ConnectorPoint PointX="5.25" PointY="4.5781225" />
+        </AssociationConnector>
+        <AssociationConnector Association="KrileLocalDb.FK_Entity_0" ManuallyRouted="false">
+          <ConnectorPoint PointX="4.5" PointY="9.5021875" />
+          <ConnectorPoint PointX="5.25" PointY="9.5021875" />
+        </AssociationConnector>
+        <AssociationConnector Association="KrileLocalDb.FK_Status_0" ManuallyRouted="false">
+          <ConnectorPoint PointX="2.25" PointY="8.21591796875" />
+          <ConnectorPoint PointX="3" PointY="8.21591796875" />
+        </AssociationConnector>
+        <AssociationConnector Association="KrileLocalDb.FK_Status_1" ManuallyRouted="false">
+          <ConnectorPoint PointX="2.25" PointY="7.482958984375" />
+          <ConnectorPoint PointX="3" PointY="7.482958984375" />
+        </AssociationConnector>
+        <AssociationConnector Association="KrileLocalDb.FK_Status_01" >
+          <ConnectorPoint PointX="3.5319230769230767" PointY="12.441875" />
+          <ConnectorPoint PointX="3.5319230769230767" PointY="12.691875" />
+          <ConnectorPoint PointX="3.9784615384615383" PointY="12.691875" />
+          <ConnectorPoint PointX="3.9784615384615383" PointY="12.441875" />
+        </AssociationConnector>
+      </Diagram>
+    </Diagrams>
+  </Designer>
+</edmx:Edmx>

@@ -3,6 +3,11 @@ using System.Reactive.Subjects;
 using StarryEyes.SweetLady.DataModel;
 using StarryEyes.Vanille.DataStore;
 using StarryEyes.Vanille.DataStore.Simple;
+using System.Collections.Generic;
+using System.Reactive.Linq;
+using System.Threading;
+using System.Linq.Expressions;
+using System.Linq;
 
 namespace StarryEyes.Mystique.Models.Store
 {
@@ -11,12 +16,7 @@ namespace StarryEyes.Mystique.Models.Store
     /// </summary>
     public static class StatusStore
     {
-        /// <summary>
-        /// Core data store.
-        /// </summary>
-        private static DataStoreBase<long, TwitterStatus> store;
-
-        #region publish block 
+        #region publish block
 
         private static Subject<StatusNotification> statusPublisher = new Subject<StatusNotification>();
 
@@ -27,62 +27,44 @@ namespace StarryEyes.Mystique.Models.Store
 
         #endregion
 
-        static StatusStore()
+        class StatusStoreInternal : StoreBase<TwitterStatus, Status>
         {
-            store = new SimpleDataStore<long, TwitterStatus>(status => status.Id);
+            protected override long KeyProvider(TwitterStatus item)
+            {
+                return item.Id;
+            }
+
+            protected override void WriteItem(TwitterStatus item)
+            {
+                Database.Status.AddObject(item.ToDbStatus());
+            }
+
+            protected override TwitterStatus FindItem(long id)
+            {
+                return Database.Status.Where(s => s.Id == id)
+                    .Take(1)
+                    .Select(s => s.ToTwitterStatus())
+                    .FirstOrDefault();
+            }
+
+            protected override IEnumerable<TwitterStatus> FindItems(Expression<Func<Status, bool>> predicate)
+            {
+                throw new NotImplementedException();
+            }
+
+            protected override void DeleteItem(long key)
+            {
+                throw new NotImplementedException();
+            }
         }
 
-        /// <summary>
-        /// Store the status.
-        /// </summary>
-        /// <param name="status">storing status</param>
-        /// <param name="publish">flag of publish to subscribing children</param>
-        public static void Store(TwitterStatus status, bool publish = true)
+        private static StatusStoreInternal store = new StatusStoreInternal();
+
+        public static void Store(TwitterStatus status)
         {
-            if (publish)
-                statusPublisher.OnNext(new StatusNotification()
-                {
-                    IsAdded = true,
-                    StatusId = status.Id,
-                    Status = status
-                });
-            store.Store(status);
+            throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// Get a status.
-        /// </summary>
-        /// <param name="id">status id</param>
-        /// <returns>a status (or empty)</returns>
-        public static IObservable<TwitterStatus> Get(long id)
-        {
-            return store.Get(id);
-        }
-
-        /// <summary>
-        /// Find statuses.
-        /// </summary>
-        /// <param name="predicate">predicate for finding status</param>
-        /// <returns>statuses</returns>
-        public static IObservable<TwitterStatus> Find(Func<TwitterStatus, bool> predicate)
-        {
-            return store.Find(predicate);
-        }
-
-        /// <summary>
-        /// Remove status.
-        /// </summary>
-        /// <param name="id"></param>
-        public static void Remove(long id, bool publish = true)
-        {
-            if (publish)
-                statusPublisher.OnNext(new StatusNotification()
-                {
-                    IsAdded = false,
-                    StatusId = id
-                });
-            store.Remove(id);
-        }
     }
 
     public class StatusNotification

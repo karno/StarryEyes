@@ -26,6 +26,11 @@ namespace StarryEyes.SweetLady.DataModel
         }
 
         /// <summary>
+        /// Internal ID
+        /// </summary>
+        public long InternalId { get; set; }
+
+        /// <summary>
         /// Type of this entity.
         /// </summary>
         [DataMember]
