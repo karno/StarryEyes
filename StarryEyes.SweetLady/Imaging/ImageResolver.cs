@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Text.RegularExpressions;
 
-namespace StarryEyes.SweetLady.Net
+namespace StarryEyes.SweetLady.Imaging
 {
     public static class ImageResolver
     {

@@ -23,6 +23,22 @@ namespace StarryEyes.SweetLady.Net
             AccessToken = token;
         }
 
+
+        private bool _isUseOAuthEcho = false;
+        private string _serviceProvider = null;
+        private string _realm = null;
+        public MultipartableOAuthClient AsOAuthEcho(
+            string serviceProvider = "https://api.twitter.com/1/account/verify_credentials.json",
+            string realm = "http://api.twitter.com/")
+        {
+            if (_isUseOAuthEcho)
+                throw new InvalidOperationException("OAuth Echo is already initialized.");
+            this._serviceProvider = serviceProvider;
+            this._realm = realm;
+            _isUseOAuthEcho = true;
+            return this;
+        }
+
         private WebRequest CreateRequest()
         {
             var parameters = ConstructBasicParameters(Url, MethodType, AccessToken);
@@ -74,13 +90,28 @@ namespace StarryEyes.SweetLady.Net
 
     public class UploadContent
     {
+        public static UploadContent FromBinary(string name, string dummyFileName, byte[] imageBinary)
+        {
+            return new UploadContent(name, dummyFileName,
+                new Dictionary<string, string>()
+                {
+                    {"Content-Type", "application/octet/stream"},
+                    {"Content-Transfer-Encoding", "binary"}
+                }, (s, sw) =>
+                {
+                    sw.Flush();
+                    s.Write(imageBinary, 0, imageBinary.Length);
+                    s.Flush();
+                    sw.WriteLine();
+                });
+        }
+
         public UploadContent(string name, string text)
         {
             this.Name = name;
             this.Writer = (_, sw) =>
             {
                 sw.WriteLine(text);
-                sw.Flush();
             };
         }
 
