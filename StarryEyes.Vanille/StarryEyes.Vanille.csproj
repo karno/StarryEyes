@@ -65,7 +65,12 @@
     <Compile Include="Serialization\BinarySerialization.cs" />
     <Compile Include="Serialization\IBinarySerializable.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\StarryEyes.Albireo\StarryEyes.Albireo.csproj">
+      <Project>{C2740802-BD1C-4B70-9B3A-F69DAE505827}</Project>
+      <Name>StarryEyes.Albireo</Name>
+    </ProjectReference>
+  </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>

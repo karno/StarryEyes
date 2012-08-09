@@ -37,7 +37,6 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                 .ToArray();
         }
 
-
         /// <summary>
         /// Add item or update item
         /// </summary>
@@ -49,17 +48,31 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                 .Subscribe();
         }
 
+        /// <summary>
+        /// Get a item from key.
+        /// </summary>
+        /// <param name="key">find key</param>
+        /// <returns>found item or empty.</returns>
         public override IObservable<TValue> Get(TKey key)
         {
             return GetChunk(key).Get(key);
         }
 
+        /// <summary>
+        /// Find items with a predicate.
+        /// </summary>
+        /// <param name="predicate">find predicate</param>
+        /// <returns>observable sequence</returns>
         public override IObservable<TValue> Find(Func<TValue, bool> predicate)
         {
             return chunks.ToObservable()
                 .SelectMany(c => c.Find(predicate));
         }
 
+        /// <summary>
+        /// Remove item from data store.
+        /// </summary>
+        /// <param name="key">removing item's key.</param>
         public override void Remove(TKey key)
         {
             GetChunk(key).Remove(key);

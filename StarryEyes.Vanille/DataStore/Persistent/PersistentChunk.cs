@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Threading;
 using StarryEyes.Vanille.Serialization;
 
 namespace StarryEyes.Vanille.DataStore.Persistent
@@ -23,8 +25,11 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         private LinkedList<TValue> deadlyCaches = new LinkedList<TValue>();
         private object deadlyCachesLocker = new object();
 
+        private ReaderWriterLockSlim driveLocker = new ReaderWriterLockSlim();
         private PersistentDrive<TKey, TValue> persistentDrive;
-        private object driveLocker = new object();
+        private Thread writeBackWorker;
+        private object writeBackSync = new object();
+        private bool writeBackThreadAlive = true;
 
         /// <summary>
         /// initialize persistent chunk.
@@ -34,11 +39,12 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         public PersistentChunk(PersistentDataStore<TKey, TValue> parent,string baseDirectoryPath)
         {
             this._parent = parent;
-            lock (driveLocker)
+            using (AcquireDriveLock(true))
             {
                 this.persistentDrive = new PersistentDrive<TKey, TValue>(baseDirectoryPath);
             }
-        }
+            this.writeBackWorker = new Thread(WriteBackProc);
+       }
 
         /// <summary>
         /// add or update cache item.
@@ -98,6 +104,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// <param name="value">add value</param>
         private void AddToDeadly(TKey key, TValue value)
         {
+            bool writeBackRequired = false;
             lock (deadlyCachesLocker)
             {
                 var dnode = FindNodeByKey(deadlyCaches, key);
@@ -105,8 +112,15 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                     dnode.Value = value;
                 else
                     deadlyCaches.AddFirst(value);
+                writeBackRequired = deadlyCaches.Count > deadlyToKillThreshold;
             }
-            CheckWriteback();
+            if (writeBackRequired)
+            {
+                lock (writeBackSync)
+                {
+                    Monitor.Pulse(writeBackSync);
+                }
+            }
         }
 
         /// <summary>
@@ -126,27 +140,72 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                 .FirstOrDefault();
         }
 
-        /// <summary>
-        /// check deadly cache length and write-back it to persistent drive.
-        /// </summary>
-        private void CheckWriteback()
+        private void WriteBackProc()
         {
-            lock (deadlyCachesLocker)
+            while (writeBackThreadAlive)
             {
-                if (deadlyCaches.Count <= deadlyToKillThreshold)
+                lock (writeBackSync)
+                {
+                    Monitor.Wait(writeBackSync);
+                }
+                if (!writeBackThreadAlive)
                     return;
-                // store them
-
-                // TODO: Implementation
-                throw new NotImplementedException();
-
-                // clear deadly cache
-                deadlyCaches.Clear();
+                List<LinkedListNode<TValue>> workingCopy = null;
+                lock(deadlyCachesLocker)
+                {
+                    EnumerableEx.Generate(
+                        deadlyCaches.First,
+                        node => node.Next != null,
+                        node => node.Next,
+                        node => node)
+                        .ForEach(workingCopy.Add);
+                }
+                Thread.Sleep(0);
+                using (AcquireDriveLock(true))
+                {
+                    workingCopy
+                        .Select(n => n.Value)
+                        .ForEach(v => persistentDrive.Store(_parent.GetKey(v), v));
+                }
+                Thread.Sleep(0);
+                lock (deadlyCachesLocker)
+                {
+                    workingCopy.ForEach(n => deadlyCaches.Remove(n));
+                }
+                Thread.Sleep(0);
+            }
+        }
+        
+        /// <summary>
+        /// Acquire read/write lock for deadly cache.
+        /// </summary>
+        /// <param name="writeLock"></param>
+        /// <returns></returns>
+        private IDisposable AcquireDriveLock(bool writeLock = false)
+        {
+            if (writeLock)
+            {
+                driveLocker.EnterWriteLock();
+                return Disposable.Create(() => driveLocker.ExitWriteLock());
+            }
+            else
+            {
+                driveLocker.EnterReadLock();
+                return Disposable.Create(() => driveLocker.ExitReadLock());
             }
         }
 
+        /// <summary>
+        /// remove item from persistent chunk
+        /// </summary>
+        /// <param name="key">delete item key</param>
         public void Remove(TKey key)
         {
+            /*
+             * DELETE STRATEGY:
+             * 1: add DeletedItems collection
+             * 2: when write-backing to persistent drive, deleted items are also write-back into it.
+             */
             lock (deletedItemKeyLocker)
             {
                 if (!deletedItems.Contains(key))
@@ -154,6 +213,9 @@ namespace StarryEyes.Vanille.DataStore.Persistent
             }
         }
 
+        /// <summary>
+        /// Get item from persistent chunk.
+        /// </summary>
         public IObservable<TValue> Get(TKey key)
         {
             return Observable.Start(() =>
@@ -161,26 +223,41 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                 lock (deletedItemKeyLocker)
                 {
                     if (deletedItems.Contains(key))
-                        return default(TValue);
+                        return Observable.Empty<TValue>();
                 }
                 lock (aliveCachesLocker)
                 {
                     var node = FindNodeByKey(aliveCaches, key);
                     if (node != null)
-                        return node.Value;
+                        return Observable.Return(node.Value);
                 }
                 lock (deadlyCachesLocker)
                 {
                     var node = FindNodeByKey(deadlyCaches, key);
                     if (node != null)
-                        return node.Value;
+                        return Observable.Return(node.Value);
                 }
                 // disk access
-                throw new NotImplementedException();
+                using (AcquireDriveLock())
+                {
+                    try
+                    {
+                        return Observable.Return(persistentDrive.Load(key));
+                    }
+                    catch
+                    {
+                        return Observable.Empty<TValue>();
+                    }
+                }
             })
-            .Where(v => v != null);
+            .SelectMany(_ => _);
         }
 
+        /// <summary>
+        /// Find item with predicate
+        /// </summary>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
         public IObservable<TValue> Find(Func<TValue, bool> predicate)
         {
             return
@@ -200,9 +277,9 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                 }))
                 .Concat(Observable.Start<TValue[]>(() =>
                 {
-                    lock (driveLocker)
+                    using (AcquireDriveLock())
                     {
-                        throw new NotImplementedException();
+                        return persistentDrive.Find(predicate).ToArray();
                     }
                 }))
                 .SelectMany(_ => _)
@@ -214,7 +291,12 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// </summary>
         public void Dispose()
         {
-            lock (driveLocker)
+            writeBackThreadAlive = false;
+            lock (writeBackSync)
+            {
+                Monitor.Pulse(writeBackSync);
+            }
+            using (AcquireDriveLock(true))
             {
                 persistentDrive.Dispose();
             }

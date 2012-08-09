@@ -122,7 +122,19 @@ namespace StarryEyes.Vanille.DataStore.Persistent
             int readFrom;
             if (!tableOfContents.TryGetValue(key, out readFrom))
                 throw new KeyNotFoundException("Not found key in this persistent drive.");
-            var bytes = LoadInternal(readFrom);
+            return Load(readFrom);
+        }
+
+        public IEnumerable<TValue> Find(Func<TValue, bool> predicate)
+        {
+            return tableOfContents.Values
+                .Select(Load)
+                .Where(predicate);
+        }
+
+        private TValue Load(int index)
+        {
+            var bytes = LoadInternal(index);
             int length = BitConverter.ToInt32(bytes, 0);
             var ret = new TValue();
             using (var br = new BinaryReader(new MemoryStream(bytes, 4, length, false)))
@@ -200,7 +212,8 @@ namespace StarryEyes.Vanille.DataStore.Persistent
             while (true)
             {
                 fs.Seek(offset * PacketSize, SeekOrigin.Begin);
-                fs.Read(buffer, cursor, PacketSize);
+                if (fs.Read(buffer, cursor, PacketSize) != PacketSize) //  corrupted
+                    throw new IOException("Internal File System is corrupted!");
                 cursor += PacketSize;
 
                 // determine next packet index

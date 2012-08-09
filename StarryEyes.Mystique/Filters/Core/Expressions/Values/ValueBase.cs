@@ -6,7 +6,7 @@ namespace StarryEyes.Mystique.Filters.Core.Expressions.Values
     {
         public abstract KQExpressionType[] TransformableTypes { get; }
 
-        public Expression GetExpressionFor(KQExpressionType type);
+        public abstract Expression GetExpressionFor(KQExpressionType type);
 
         public abstract string ToQuery();
     }
