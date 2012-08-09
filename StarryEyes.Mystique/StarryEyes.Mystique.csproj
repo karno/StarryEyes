@@ -127,12 +127,15 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>DataModel.edmx</DependentUpon>
     </Compile>
+    <Compile Include="Filters\Core\Expressions\KQExpressionType.cs" />
+    <Compile Include="Filters\Core\Expressions\Values\ValueBase.cs" />
     <Compile Include="Filters\Core\KQExpressionBase.cs" />
     <Compile Include="Filters\Core\Expressions\KQExpressionPair.cs" />
     <Compile Include="Filters\Core\Expressions\Operators\KQOperatorBase.cs" />
     <Compile Include="Filters\Core\IKQExpression.cs" />
     <Compile Include="Filters\Core\KQuery.cs" />
     <Compile Include="Filters\Core\KQSourceBase.cs" />
+    <Compile Include="Filters\Core\KrileQueryException.cs" />
     <Compile Include="Models\Common\AccountData.cs" />
     <Compile Include="Models\Operations\IObservableRunnable.cs" />
     <Compile Include="Kernel\QueryCompiler.cs" />
@@ -199,9 +202,7 @@
     <Content Include="InfrastructureAssemblies\Microsoft.Expression.Interactions.dll" />
     <Content Include="InfrastructureAssemblies\System.Windows.Interactivity.dll" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Filters\Core\Expressions\Types\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\StarryEyes.Albireo\StarryEyes.Albireo.csproj">
       <Project>{C2740802-BD1C-4B70-9B3A-F69DAE505827}</Project>

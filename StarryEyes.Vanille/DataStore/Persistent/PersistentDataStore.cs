@@ -12,7 +12,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
     public sealed class PersistentDataStore<TKey, TValue> :
         DataStoreBase<TKey, TValue> where TValue : IBinarySerializable, new()
     {
-        private PersistenceChunk<TKey, TValue>[] chunks = null;
+        private PersistentChunk<TKey, TValue>[] chunks = null;
         private int chunkNum;
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         {
             this.chunkNum = chunkNum;
             this.chunks = Enumerable.Range(0, chunkNum)
-                .Select(_ => new PersistenceChunk<TKey, TValue>(this, baseDirectoryPath))
+                .Select(_ => new PersistentChunk<TKey, TValue>(this, baseDirectoryPath))
                 .ToArray();
         }
 
@@ -65,7 +65,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
             GetChunk(key).Remove(key);
         }
 
-        private PersistenceChunk<TKey, TValue> GetChunk(TKey key)
+        private PersistentChunk<TKey, TValue> GetChunk(TKey key)
         {
             return chunks[key.GetHashCode() % chunkNum];
         }

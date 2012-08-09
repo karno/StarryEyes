@@ -37,7 +37,7 @@ namespace StarryEyes.SweetLady.Imaging
             {
                 using (var reader = new StringReader(s))
                 {
-                    var doc = XDocument.Load(new StringReader(s));
+                    var doc = XDocument.Load(reader);
                     return doc.Element("rsp").Element("mediaurl").ParseString();
                 }
             })

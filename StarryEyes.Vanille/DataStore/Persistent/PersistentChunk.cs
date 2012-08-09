@@ -6,7 +6,7 @@ using StarryEyes.Vanille.Serialization;
 
 namespace StarryEyes.Vanille.DataStore.Persistent
 {
-    internal class PersistenceChunk<TKey, TValue> : 
+    internal class PersistentChunk<TKey, TValue> : 
         IDisposable where TValue : IBinarySerializable, new()
     {
         const int aliveToDeadlyThreshold = 1024;
@@ -31,7 +31,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// </summary>
         /// <param name="parent">chunk holder</param>
         /// <param name="baseDirectoryPath">base directory path for making db structure</param>
-        public PersistenceChunk(PersistentDataStore<TKey, TValue> parent,string baseDirectoryPath)
+        public PersistentChunk(PersistentDataStore<TKey, TValue> parent,string baseDirectoryPath)
         {
             this._parent = parent;
             lock (driveLocker)

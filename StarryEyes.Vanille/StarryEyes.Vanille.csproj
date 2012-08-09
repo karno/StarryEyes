@@ -56,11 +56,12 @@
     <Compile Include="DataStore\DataStoreBase.cs" />
     <Compile Include="DataStore\Distributed\DistributedDataStore.cs" />
     <Compile Include="DataStore\Distributed\DistributionChunk.cs" />
-    <Compile Include="DataStore\Persistent\PersistenceChunk.cs" />
+    <Compile Include="DataStore\Persistent\PersistentChunk.cs" />
     <Compile Include="DataStore\Persistent\PersistentDrive.cs" />
     <Compile Include="DataStore\Persistent\PersistentDataStore.cs" />
     <Compile Include="DataStore\Simple\SimpleDataStore.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Serialization\BinarySerializableCollection.cs" />
     <Compile Include="Serialization\BinarySerialization.cs" />
     <Compile Include="Serialization\IBinarySerializable.cs" />
   </ItemGroup>
