@@ -1,4 +1,6 @@
 ﻿using System.Linq;
+using System;
+using StarryEyes.SweetLady.DataModel;
 
 namespace StarryEyes.Mystique.Filters.Core
 {
@@ -13,9 +15,9 @@ namespace StarryEyes.Mystique.Filters.Core
             return "from " + Sources.Select(s => s.ToQuery()).JoinString(", ") + " where " + PredicateTree.ToQuery();
         }
 
-        public System.Tuple<System.Func<SweetLady.DataModel.TwitterStatus, bool>, System.Linq.Expressions.Expression<System.Func<Status, bool>>> GetExpression()
+        public bool Eval(TwitterStatus status)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
     }
 }

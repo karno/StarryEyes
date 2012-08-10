@@ -17,6 +17,8 @@ namespace StarryEyes.Mystique.Kernel
         {
             Properties.Settings.Default.Reset();
         }
+
+        public static SettingItemStruct<bool> IsPowerUser = new SettingItemStruct<bool>("IsPowerUser", false);
     }
 
     public class SettingItem<T> where T : class

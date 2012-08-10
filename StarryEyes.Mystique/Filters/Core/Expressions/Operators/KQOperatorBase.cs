@@ -15,10 +15,12 @@ namespace StarryEyes.Mystique.Filters.Core.Expressions.Operators
 
         public abstract string ToQuery();
 
-        public abstract Tuple<Func<TwitterStatus, bool>, Expression<Func<Status, bool>>> GetExpression();
+        public  bool Eval(TwitterStatus status)
+        {
+            var type = KQExpressionUtil.CheckDecide(LeftValue.TransformableTypes, RightValue.TransformableTypes, this.TransformableTypes);
+            return EvalInternal(status, type);
+        }
 
-        protected abstract Func<TwitterStatus, bool> GenerateLambda(KQExpressionType type);
-
-        protected abstract Expression<Func<Status, bool>> GenerateExpression(KQExpressionType type);
+        protected abstract bool EvalInternal(TwitterStatus status, KQExpressionType type);
     }
 }

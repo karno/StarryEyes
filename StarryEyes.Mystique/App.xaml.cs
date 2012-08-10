@@ -2,6 +2,10 @@
 using System.Windows;
 
 using Livet;
+using System.Diagnostics;
+using System.Reflection;
+using System.Net;
+using StarryEyes.Mystique.Models.Store;
 
 namespace StarryEyes.Mystique
 {
@@ -13,21 +17,129 @@ namespace StarryEyes.Mystique
         private void Application_Startup(object sender, StartupEventArgs e)
         {
             DispatcherHelper.UIDispatcher = Dispatcher;
-            //AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
+            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
+            Application.Current.Exit += (_, __) => AppFinalize(true);
+            // Initialize core
+            ServicePointManager.DefaultConnectionLimit = Int32.MaxValue; // Limit Break!
+
+
+        }
+
+        /// <summary>
+        /// アプリケーションのファイナライズ
+        /// </summary>
+        /// <param name="shutdown">アプリケーションが正しく終了している状態か</param>
+        void AppFinalize(bool shutdown)
+        {
+            if (shutdown)
+            {
+                // 正規の終了
+            }
+            // コアストレージのシャットダウン
+            StatusStore.Shutdown();
         }
 
         //集約エラーハンドラ
-        //private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
-        //{
-        //    //TODO:ロギング処理など
-        //    MessageBox.Show(
-        //        "不明なエラーが発生しました。アプリケーションを終了します。",
-        //        "エラー",
-        //        MessageBoxButton.OK,
-        //        MessageBoxImage.Error);
-        //
-        //    Environment.Exit(1);
-        //}
+        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            // TODO:ロギング処理など
+
+            // アプリケーション ファイナライズ
+            this.AppFinalize(false);
+
+            Environment.Exit(-1);
+        }
+
+        #region Definitions
+
+        public static bool IsOperatingSystemSupported
+        {
+            get
+            {
+                return Environment.OSVersion.Version.Major == 6;
+            }
+        }
+
+        public static string ExeFilePath
+        {
+            get
+            {
+                return Process.GetCurrentProcess().MainModule.FileName;
+            }
+        }
+
+        public static FileVersionInfo GetVersion()
+        {
+            return FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location);
+        }
+
+        public static string GetFormattedVersion()
+        {
+            var ver = GetVersion();
+            return ver.FileMajorPart + "." + ver.FileMinorPart + "." + ver.FileBuildPart + FileKind(ver.FilePrivatePart);
+        }
+
+        public static bool IsNightlyVersion
+        {
+            get
+            {
+                return GetVersion().FilePrivatePart >= 1;
+            }
+        }
+
+        private static string FileKind(int value)
+        {
+            switch (value)
+            {
+                case 0:
+                    return String.Empty;
+                case 1:
+                    return " BETA"; // release test version
+                case 2:
+                    return " UNSTABLE"; // periodic test version
+                case 3:
+                    return " NIGHTMARE"; // under construction version
+                default:
+                    return " #" + value;
+            }
+        }
+
+        public static double GetNumericVersion()
+        {
+            var lvobj = GetVersion();
+            var lvstr = (lvobj.FileMajorPart * 1000 + lvobj.FileMinorPart).ToString() + "." + lvobj.FileBuildPart.ToString();
+            return Double.Parse(lvstr);
+        }
+
+        public static readonly string KeyAssignDirectory = "assigns";
+
+        public static readonly string MediaDirectory = "media";
+
+        public static readonly string PluginDirectory = "plugins";
+
+        public static readonly string FeedbackAppName = "reporter.exe";
+
+        public static readonly string UpdateFileName = "kup.exe";
+
+        public static readonly string DefaultStatusMessage = "完了";
+
+        public static readonly string RemoteVersionXml = "http://update.starwing.net/starryeyes/update.xml";
+
+        public static readonly string PublicKeyFile = "kup.pub";
+
+        public static readonly string MentionWavFile = "mention.wav";
+
+        public static readonly string NewReceiveWavFile = "new.wav";
+
+        public static readonly string DirectMessageWavFile = "directmessage.wav";
+
+        public static readonly string EventWavFile = "event.wav";
+
+        public static readonly string ReleaseNoteUrl = "http://krile.starwing.net/updates.html";
+
+        public static string KampaUrl = "http://krile.starwing.net/kampa.html";
+
+        #endregion
 
         #region Triggers
 

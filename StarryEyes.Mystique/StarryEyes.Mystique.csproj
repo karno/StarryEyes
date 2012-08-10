@@ -122,11 +122,6 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="DataModel.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>DataModel.edmx</DependentUpon>
-    </Compile>
     <Compile Include="Filters\Core\Expressions\KQExpressionType.cs" />
     <Compile Include="Filters\Core\Expressions\Values\ValueBase.cs" />
     <Compile Include="Filters\Core\KQExpressionBase.cs" />
@@ -137,6 +132,11 @@
     <Compile Include="Filters\Core\KQSourceBase.cs" />
     <Compile Include="Filters\Core\KrileQueryException.cs" />
     <Compile Include="Models\Common\AccountData.cs" />
+    <Compile Include="Models\Connection\Batch\BatchConnectionBase.cs" />
+    <Compile Include="Models\Connection\ConnectionBase.cs" />
+    <Compile Include="Models\Connection\ConnectionManager.cs" />
+    <Compile Include="Models\Connection\Continuous\ContinuousConnectionBase.cs" />
+    <Compile Include="Models\Connection\Continuous\UserStreamsConnection.cs" />
     <Compile Include="Models\Operations\IObservableRunnable.cs" />
     <Compile Include="Kernel\QueryCompiler.cs" />
     <Compile Include="Kernel\Setting.cs" />
@@ -152,10 +152,9 @@
     <Compile Include="Models\Operations\TweetOperation.cs" />
     <Compile Include="Models\Operations\UpdateProfileOperation.cs" />
     <Compile Include="Models\Store\AccountDataStore.cs" />
-    <Compile Include="Models\Store\EntityConverter.cs" />
+    <Compile Include="Models\Store\EventStore.cs" />
     <Compile Include="Models\Store\StatusStore.cs" />
     <Compile Include="Models\Common\LeakyCollection.cs" />
-    <Compile Include="Models\Store\StoreBase.cs" />
     <Compile Include="Models\Tab\TabBackEnd.cs" />
     <Compile Include="Models\Tab\TabInfo.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
@@ -183,10 +182,6 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="app.config" />
-    <EntityDeploy Include="DataModel.edmx">
-      <Generator>EntityModelCodeGenerator</Generator>
-      <LastGenOutput>DataModel.Designer.cs</LastGenOutput>
-    </EntityDeploy>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

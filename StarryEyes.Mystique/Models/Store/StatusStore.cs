@@ -8,6 +8,8 @@ using System.Reactive.Linq;
 using System.Threading;
 using System.Linq.Expressions;
 using System.Linq;
+using StarryEyes.Vanille.DataStore.Persistent;
+using System.IO;
 
 namespace StarryEyes.Mystique.Models.Store
 {
@@ -27,44 +29,41 @@ namespace StarryEyes.Mystique.Models.Store
 
         #endregion
 
-        class StatusStoreInternal : StoreBase<TwitterStatus, Status>
+        private static DataStoreBase<long, TwitterStatus> store = new PersistentDataStore<long, TwitterStatus>
+            (_ => _.Id,
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Krile", "StarryEyes", "store"));
+
+        public static void Store(TwitterStatus status, bool publish = true)
         {
-            protected override long KeyProvider(TwitterStatus item)
-            {
-                return item.Id;
-            }
-
-            protected override void WriteItem(TwitterStatus item)
-            {
-                Database.Status.AddObject(item.ToDbStatus());
-            }
-
-            protected override TwitterStatus FindItem(long id)
-            {
-                return Database.Status.Where(s => s.Id == id)
-                    .Take(1)
-                    .Select(s => s.ToTwitterStatus())
-                    .FirstOrDefault();
-            }
-
-            protected override IEnumerable<TwitterStatus> FindItems(Expression<Func<Status, bool>> predicate)
-            {
-                throw new NotImplementedException();
-            }
-
-            protected override void DeleteItem(long key)
-            {
-                throw new NotImplementedException();
-            }
+            if (publish)
+                statusPublisher.OnNext(new StatusNotification()
+                {
+                    IsAdded = true,
+                    Status = status,
+                    StatusId = status.Id
+                });
+            store.Store(status);
         }
 
-        private static StatusStoreInternal store = new StatusStoreInternal();
-
-        public static void Store(TwitterStatus status)
+        public static IObservable<TwitterStatus> Get(long id)
         {
-            throw new NotImplementedException();
+            return store.Get(id);
         }
 
+        public static IObservable<TwitterStatus> Find(Func<TwitterStatus, bool> predicate)
+        {
+            return store.Find(predicate);
+        }
+
+        public static void Remove(long id)
+        {
+            store.Remove(id);
+        }
+
+        internal static void Shutdown()
+        {
+            store.Dispose();
+        }
     }
 
     public class StatusNotification

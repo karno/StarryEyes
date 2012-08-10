@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq.Expressions;
-using StarryEyes.SweetLady.DataModel;
+﻿using StarryEyes.SweetLady.DataModel;
 
 namespace StarryEyes.Mystique.Filters.Core
 {
@@ -8,6 +6,6 @@ namespace StarryEyes.Mystique.Filters.Core
     {
         public abstract string ToQuery();
 
-        public abstract Tuple<Func<TwitterStatus, bool>, Expression<Func<Status, bool>>> GetExpression();
+        public abstract bool Eval(TwitterStatus status);
     }
 }
