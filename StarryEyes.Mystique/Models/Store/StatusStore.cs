@@ -1,15 +1,10 @@
 ﻿using System;
+using System.IO;
+using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using StarryEyes.SweetLady.DataModel;
 using StarryEyes.Vanille.DataStore;
-using StarryEyes.Vanille.DataStore.Simple;
-using System.Collections.Generic;
-using System.Reactive.Linq;
-using System.Threading;
-using System.Linq.Expressions;
-using System.Linq;
 using StarryEyes.Vanille.DataStore.Persistent;
-using System.IO;
 
 namespace StarryEyes.Mystique.Models.Store
 {
@@ -30,8 +25,7 @@ namespace StarryEyes.Mystique.Models.Store
         #endregion
 
         private static DataStoreBase<long, TwitterStatus> store = new PersistentDataStore<long, TwitterStatus>
-            (_ => _.Id,
-            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Krile", "StarryEyes", "store"));
+            (_ => _.Id, Path.Combine(App.DataStorePath, "statuses"));
 
         public static void Store(TwitterStatus status, bool publish = true)
         {
@@ -43,11 +37,13 @@ namespace StarryEyes.Mystique.Models.Store
                     StatusId = status.Id
                 });
             store.Store(status);
+            UserStore.Store(status.User);
         }
 
         public static IObservable<TwitterStatus> Get(long id)
         {
-            return store.Get(id);
+            return store.Get(id)
+                .Do(_ => Store(_, false)); // add to local cache
         }
 
         public static IObservable<TwitterStatus> Find(Func<TwitterStatus, bool> predicate)
@@ -55,8 +51,10 @@ namespace StarryEyes.Mystique.Models.Store
             return store.Find(predicate);
         }
 
-        public static void Remove(long id)
+        public static void Remove(long id, bool publish = true)
         {
+            if (publish)
+                statusPublisher.OnNext(new StatusNotification() { IsAdded = false, StatusId = id });
             store.Remove(id);
         }
 

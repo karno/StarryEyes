@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>StarryEyes.Vanille</RootNamespace>
-    <AssemblyName>Nuclear.Energy</AssemblyName>
+    <AssemblyName>StarryEyes.Vanille</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

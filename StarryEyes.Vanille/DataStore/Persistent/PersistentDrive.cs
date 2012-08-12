@@ -130,6 +130,17 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         }
 
         /// <summary>
+        /// Get Next Index of Packets.
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<int> GetNextIndexOfPackets()
+        {
+            return Enumerable.Range(0, nextIndexOfPackets.Keys.Max())
+                .Select(i => nextIndexOfPackets.ContainsKey(i) ? nextIndexOfPackets[i] : Enumerable.Repeat(Empty, ChunkSize))
+                .SelectMany(_ => _);
+        }
+
+        /// <summary>
         /// Get Table of Contents.
         /// </summary>
         public IDictionary<TKey, int> GetTableOfContents()
@@ -326,7 +337,9 @@ namespace StarryEyes.Vanille.DataStore.Persistent
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            fs.Flush();
+            fs.Close();
+            fs = null;
         }
     }
 }

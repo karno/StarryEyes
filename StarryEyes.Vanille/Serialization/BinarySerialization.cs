@@ -97,11 +97,27 @@ namespace StarryEyes.Vanille.Serialization
             writer.Write(value.ToFileTime());
         }
 
+        public static void Write(this BinaryWriter writer, IEnumerable<long> items)
+        {
+            var array = items.ToArray();
+            writer.Write(array.Length);
+            array.ForEach(i => writer.Write(i));
+        }
+
         public static void Write<T>(this BinaryWriter writer, IEnumerable<T> item) where T : IBinarySerializable, new()
         {
             var ia = item.ToArray();
             writer.Write(ia.Length);
             item.ForEach(i => i.Serialize(writer));
+        }
+
+        public static IEnumerable<long> ReadIds(this BinaryReader reader)
+        {
+            int num = reader.ReadInt32();
+            for (int i = 0; i < num; i++)
+            {
+                yield return reader.ReadInt64();
+            }
         }
 
         public static IEnumerable<T> ReadCollection<T>(this BinaryReader reader) where T : IBinarySerializable, new()

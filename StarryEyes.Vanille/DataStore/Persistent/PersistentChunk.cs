@@ -5,6 +5,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
 using StarryEyes.Vanille.Serialization;
+using System.IO;
 
 namespace StarryEyes.Vanille.DataStore.Persistent
 {
@@ -35,16 +36,34 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// initialize persistent chunk.
         /// </summary>
         /// <param name="parent">chunk holder</param>
-        /// <param name="baseDirectoryPath">base directory path for making db structure</param>
-        public PersistentChunk(PersistentDataStore<TKey, TValue> parent,string baseDirectoryPath)
+        /// <param name="dbFilePath">file path for storing data</param>
+        public PersistentChunk(PersistentDataStore<TKey, TValue> parent, string dbFilePath)
         {
             this._parent = parent;
             using (AcquireDriveLock(true))
             {
-                this.persistentDrive = new PersistentDrive<TKey, TValue>(baseDirectoryPath);
+                this.persistentDrive = new PersistentDrive<TKey, TValue>(dbFilePath);
             }
             this.writeBackWorker = new Thread(WriteBackProc);
-       }
+        }
+
+        /// <summary>
+        /// Initialize persistent chunk with previous data.
+        /// </summary>
+        /// <param name="parent">chunk holder</param>
+        /// <param name="dbFilePath">file path for storing data</param>
+        /// <param name="tableOfContents"></param>
+        /// <param name="nextIndexOfPackets"></param>
+        public PersistentChunk(PersistentDataStore<TKey, TValue> parent, string dbFilePath,
+            IDictionary<TKey, int> tableOfContents, IEnumerable<int> nextIndexOfPackets)
+        {
+            this._parent = parent;
+            using (AcquireDriveLock(true))
+            {
+                this.persistentDrive = new PersistentDrive<TKey, TValue>(dbFilePath, tableOfContents, nextIndexOfPackets);
+            }
+            this.writeBackWorker = new Thread(WriteBackProc);
+        }
 
         /// <summary>
         /// add or update cache item.
@@ -287,6 +306,25 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         }
 
         /// <summary>
+        /// Get table of contents dictionary
+        /// </summary>
+        public IDictionary<TKey, int> GetTableOfContents()
+        {
+            lock (driveLocker)
+            {
+                return new Dictionary<TKey, int>(persistentDrive.GetTableOfContents());
+            }
+        }
+
+        public IEnumerable<int> GetNextIndexOfPacketsArray()
+        {
+            lock (driveLocker)
+            {
+                return persistentDrive.GetNextIndexOfPackets().ToArray();
+            }
+        }
+
+        /// <summary>
         /// clean up all resources.
         /// </summary>
         public void Dispose()
@@ -296,8 +334,20 @@ namespace StarryEyes.Vanille.DataStore.Persistent
             {
                 Monitor.Pulse(writeBackSync);
             }
+            List<TValue> workingCopy = new List<TValue>();
+            // write all data to persistent store
+            lock (aliveCachesLocker)
+            {
+                workingCopy.AddRange(aliveCaches);
+            }
+            lock (deadlyCachesLocker)
+            {
+                workingCopy.AddRange(deadlyCaches);
+            }
             using (AcquireDriveLock(true))
             {
+                workingCopy
+                    .ForEach(v => persistentDrive.Store(_parent.GetKey(v), v));
                 persistentDrive.Dispose();
             }
         }

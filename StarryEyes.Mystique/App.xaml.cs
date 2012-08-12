@@ -6,6 +6,8 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Net;
 using StarryEyes.Mystique.Models.Store;
+using System.Configuration;
+using System.IO;
 
 namespace StarryEyes.Mystique
 {
@@ -20,9 +22,8 @@ namespace StarryEyes.Mystique
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
             Application.Current.Exit += (_, __) => AppFinalize(true);
             // Initialize core
+            ServicePointManager.Expect100Continue = false; // disable expect 100 continue for User Streams connection.
             ServicePointManager.DefaultConnectionLimit = Int32.MaxValue; // Limit Break!
-
-
         }
 
         /// <summary>
@@ -65,6 +66,23 @@ namespace StarryEyes.Mystique
             get
             {
                 return Process.GetCurrentProcess().MainModule.FileName;
+            }
+        }
+
+        public static string ConfigurationPath
+        {
+            get
+            {
+                return ConfigurationManager.OpenExeConfiguration(
+                    ConfigurationUserLevel.PerUserRoamingAndLocal).FilePath;
+            }
+        }
+
+        public static string DataStorePath
+        {
+            get
+            {
+                return Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(ConfigurationPath)), "store");
             }
         }
 

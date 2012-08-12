@@ -15,14 +15,21 @@ namespace StarryEyes.Mystique.Models.Store
     {
         #region publish block
 
-        private static Subject<StatusNotification> statusPublisher = new Subject<StatusNotification>();
+        private static Subject<TwitterStreamingElement> eventPublisher = new Subject<TwitterStreamingElement>();
 
-        public static IObservable<StatusNotification> StatusPublisher
+        public static IObservable<TwitterStreamingElement> EventPublisher
         {
-            get { return statusPublisher; }
+            get { return eventPublisher; }
         }
 
         #endregion
+
+        // イベントどうしよう。
+
+        internal static void Store(TwitterStreamingElement elem)
+        {
+            eventPublisher.OnNext(elem);
+        }
     }
 
     public class StoredTwitterStreamingElement

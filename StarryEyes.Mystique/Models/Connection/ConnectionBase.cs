@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using StarryEyes.Mystique.Models.Hub;
 using StarryEyes.SweetLady.Authorize;
 
 namespace StarryEyes.Mystique.Models.Connection
@@ -12,6 +10,21 @@ namespace StarryEyes.Mystique.Models.Connection
         protected AuthenticateInfo AuthInfo
         {
             get { return _authInfo; }
+        }
+
+        protected void RaiseInfoNotification(string abst, string description, bool isWarning = false)
+        {
+            InformationHub.PublishInformation(
+                new Information(isWarning ? InformationKind.Warning : InformationKind.Notify,
+                    "@" + _authInfo.UnreliableScreenName + " - " + abst, description));
+        }
+
+        protected void RaiseErrorNotification(string abst, string desc, string fixName, Action fix)
+        {
+            InformationHub.PublishInformation(
+                new Information(InformationKind.Error,
+                    "@" + _authInfo.UnreliableScreenName + " - " + abst, desc,
+                    fixName, fix));
         }
 
         public ConnectionBase(AuthenticateInfo authInfo)

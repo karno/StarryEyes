@@ -103,6 +103,18 @@ namespace StarryEyes.SweetLady.DataModel
         public double? Latitude { get; set; }
 
         /// <summary>
+        /// Favorited users IDs.
+        /// </summary>
+        [DataMember]
+        public long[] FavoritedUsers { get; set; }
+
+        /// <summary>
+        /// Retweeted users IDs.
+        /// </summary>
+        [DataMember]
+        public long[] RetweetedUsers { get; set; }
+
+        /// <summary>
         /// Status which represents original of this(retweeted) tweet
         /// </summary>
         [DataMember]
@@ -155,6 +167,12 @@ namespace StarryEyes.SweetLady.DataModel
             writer.Write(RetweetedOriginalId);
             writer.Write(Latitude);
             writer.Write(Longitude);
+            writer.Write(FavoritedUsers != null);
+            if (FavoritedUsers != null)
+                writer.Write(FavoritedUsers);
+            writer.Write(RetweetedUsers != null);
+            if (RetweetedUsers != null)
+                writer.Write(RetweetedUsers);
             writer.Write(RetweetedOriginal);
             writer.Write(Recipient);
             writer.Write(Entities);
@@ -178,6 +196,10 @@ namespace StarryEyes.SweetLady.DataModel
             RetweetedOriginalId = reader.ReadNullableLong();
             Latitude = reader.ReadNullableDouble();
             Longitude = reader.ReadNullableDouble();
+            if (reader.ReadBoolean())
+                FavoritedUsers = reader.ReadIds().ToArray();
+            if (reader.ReadBoolean())
+                RetweetedUsers = reader.ReadIds().ToArray();
             RetweetedOriginal = reader.ReadObject<TwitterStatus>();
             Recipient = reader.ReadObject<TwitterUser>();
             Entities = reader.ReadCollection<TwitterEntity>().ToArray();

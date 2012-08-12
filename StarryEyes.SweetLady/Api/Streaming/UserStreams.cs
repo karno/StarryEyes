@@ -47,7 +47,7 @@ namespace StarryEyes.SweetLady.Api.Streaming
                         .Deserialize<T>(jtr)));
         }
 
-        private static TwitterStreamingElement TrySpawn(this ITwitterStreamingElementSpawnable s)
+        private static TwitterStreamingElement CheckSpawn(this ITwitterStreamingElementSpawnable s)
         {
             if (s == null)
                 return null;
@@ -87,15 +87,15 @@ namespace StarryEyes.SweetLady.Api.Streaming
                                 {
                                     TrackLimit = track.track,
                                 };
-                            return s.DeserializeJson<StreamingAdditionalJson>().TrySpawn();
+                            return s.DeserializeJson<StreamingAdditionalJson>().CheckSpawn();
                         case DataModel.EventType.Follow:
                         case DataModel.EventType.Unfollow:
                         case DataModel.EventType.Blocked:
                         case DataModel.EventType.Unblocked:
-                            return s.DeserializeJson<StreamingUserEventJson>().TrySpawn();
+                            return s.DeserializeJson<StreamingUserEventJson>().CheckSpawn();
                         case DataModel.EventType.Favorite:
                         case DataModel.EventType.Unfavorite:
-                            return s.DeserializeJson<StreamingTweetEventJson>().TrySpawn();
+                            return s.DeserializeJson<StreamingTweetEventJson>().CheckSpawn();
                         case DataModel.EventType.ListCreated:
                         case DataModel.EventType.ListUpdated:
                         case DataModel.EventType.ListDeleted:
@@ -103,7 +103,7 @@ namespace StarryEyes.SweetLady.Api.Streaming
                         case DataModel.EventType.ListUnsubscribed:
                         case DataModel.EventType.ListMemberAdded:
                         case DataModel.EventType.ListMemberRemoved:
-                            return s.DeserializeJson<StreamingEventJson>().TrySpawn();
+                            return s.DeserializeJson<StreamingEventJson>().CheckSpawn();
                         default:
                             System.Diagnostics.Debug.WriteLine("undecodable:" + s);
                             return null;

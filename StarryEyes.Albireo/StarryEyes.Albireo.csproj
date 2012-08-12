@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>StarryEyes.Albireo</RootNamespace>
-    <AssemblyName>Nuclear.Core</AssemblyName>
+    <AssemblyName>StarryEyes.Albireo</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

@@ -7,11 +7,11 @@ using System.Windows;
 // アセンブリに関する一般情報は以下の属性セットをとおして制御されます。
 // アセンブリに関連付けられている情報を変更するには、
 // これらの属性値を変更してください。
-[assembly: AssemblyTitle("Nuclear.Airkraft")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Krile StarryEyes")]
+[assembly: AssemblyDescription("Next-Generation twitter client")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Nuclear.Airkraft")]
+[assembly: AssemblyCompany("Krile Project")]
+[assembly: AssemblyProduct("Krile StarryEyes")]
 [assembly: AssemblyCopyright("Copyright c  2011")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
