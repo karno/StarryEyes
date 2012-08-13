@@ -72,6 +72,17 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         }
 
         /// <summary>
+        /// Get amount of items.
+        /// </summary>
+        public override int Count
+        {
+            get
+            {
+                return chunks.Select(c => c.Count).Sum();
+            }
+        }
+
+        /// <summary>
         /// Add item or update item
         /// </summary>
         /// <param name="value">store item</param>

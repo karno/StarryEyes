@@ -20,6 +20,11 @@ namespace StarryEyes.Vanille.DataStore.Simple
 
         public SimpleDataStore(Func<TValue, TKey> keyProvider) : base(keyProvider) { }
 
+        public override int Count
+        {
+            get { lock (dictLock) { return dictionary.Count; } }
+        }
+
         public override void Store(TValue value)
         {
             lock (dictLock)

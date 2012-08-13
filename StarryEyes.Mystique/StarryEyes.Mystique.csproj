@@ -138,6 +138,7 @@
     <Compile Include="Models\Connection\ConnectionManager.cs" />
     <Compile Include="Models\Connection\UserStreamsConnection.cs" />
     <Compile Include="Models\Hub\InformationHub.cs" />
+    <Compile Include="Models\Hub\StatisticHub.cs" />
     <Compile Include="Models\Operations\IObservableRunnable.cs" />
     <Compile Include="Filters\QueryCompiler.cs" />
     <Compile Include="Settings\AccountSetting.cs" />

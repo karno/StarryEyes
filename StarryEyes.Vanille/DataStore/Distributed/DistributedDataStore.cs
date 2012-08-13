@@ -14,6 +14,11 @@ namespace StarryEyes.Vanille.DataStore.Distributed
             this.distribution = distribution;
         }
 
+        public override int Count
+        {
+            get { throw new NotImplementedException(); }
+        }
+
         public override void Store(TValue value)
         {
             throw new NotImplementedException();

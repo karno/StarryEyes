@@ -66,6 +66,34 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         }
 
         /// <summary>
+        /// get amount of chunk items
+        /// </summary>
+        public int Count
+        {
+            get
+            {
+                int amount = 0;
+                lock (aliveCachesLocker)
+                {
+                    amount += aliveCaches.Count;
+                }
+                lock (deadlyCachesLocker)
+                {
+                    amount += deadlyCaches.Count;
+                }
+                lock (deletedItemKeyLocker)
+                {
+                    amount -= deletedItems.Count;
+                }
+                lock (driveLocker)
+                {
+                    amount += persistentDrive.Count;
+                }
+                return amount;
+            }
+        }
+
+        /// <summary>
         /// add or update cache item.
         /// </summary>
         /// <param name="key">add key</param>

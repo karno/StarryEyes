@@ -5,6 +5,7 @@ using System.Reactive.Subjects;
 using StarryEyes.SweetLady.DataModel;
 using StarryEyes.Vanille.DataStore;
 using StarryEyes.Vanille.DataStore.Persistent;
+using System.Threading;
 
 namespace StarryEyes.Mystique.Models.Store
 {
@@ -24,8 +25,19 @@ namespace StarryEyes.Mystique.Models.Store
 
         #endregion
 
-        private static DataStoreBase<long, TwitterStatus> store = new PersistentDataStore<long, TwitterStatus>
-            (_ => _.Id, Path.Combine(App.DataStorePath, "statuses"));
+        private static DataStoreBase<long, TwitterStatus> store;
+
+        static StatusStore()
+        {
+            // initialize
+            store = new PersistentDataStore<long, TwitterStatus>
+                (_ => _.Id, Path.Combine(App.DataStorePath, "statuses"));
+        }
+
+        public static int Count
+        {
+            get { return store.Count; }
+        }
 
         public static void Store(TwitterStatus status, bool publish = true)
         {

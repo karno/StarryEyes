@@ -29,6 +29,11 @@ namespace StarryEyes.Vanille.DataStore
         }
 
         /// <summary>
+        /// Get stored data count.
+        /// </summary>
+        public abstract int Count { get; }
+
+        /// <summary>
         /// store a value.
         /// </summary>
         /// <param name="value">storing value</param>

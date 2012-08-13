@@ -24,6 +24,8 @@ namespace StarryEyes.Vanille.DataStore.Persistent
 
         // niop is delimited per 1024 packets(= 1 chunks).
         private SortedDictionary<int, List<int>> nextIndexOfPackets;
+        
+        // start index resolver
         private SortedDictionary<TKey, int> tableOfContents;
 
         /// <summary>
@@ -53,6 +55,14 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                 .ForEach(i => SetNextIndexOfPackets(i.Key, i.Value));
             this.path = path;
             PrepareFile(true);
+        }
+
+        /// <summary>
+        /// Get amount of stored items.
+        /// </summary>
+        public int Count
+        {
+            get { return tableOfContents.Count; }
         }
 
         /// <summary>
@@ -155,6 +165,9 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// <param name="value">store value</param>
         public void Store(TKey key, TValue value)
         {
+            // remove old data, if existed.
+            Remove(key);
+
             // serialize data
             var ms = new MemoryStream();
             ms.Write(new byte[4], 0, 4); // add empty 4 bytes (placeholder)
