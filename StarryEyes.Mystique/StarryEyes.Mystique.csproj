@@ -139,8 +139,9 @@
     <Compile Include="Models\Connection\UserStreamsConnection.cs" />
     <Compile Include="Models\Hub\InformationHub.cs" />
     <Compile Include="Models\Operations\IObservableRunnable.cs" />
-    <Compile Include="Kernel\QueryCompiler.cs" />
-    <Compile Include="Kernel\Setting.cs" />
+    <Compile Include="Filters\QueryCompiler.cs" />
+    <Compile Include="Settings\AccountSetting.cs" />
+    <Compile Include="Settings\Setting.cs" />
     <Compile Include="Models\Operations\DeleteOperation.cs" />
     <Compile Include="Models\Operations\DirectMessageOperation.cs" />
     <Compile Include="Models\Operations\FavoriteOperation.cs" />
@@ -186,7 +187,7 @@
     <None Include="app.config" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
+      <Generator>PublicSettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />

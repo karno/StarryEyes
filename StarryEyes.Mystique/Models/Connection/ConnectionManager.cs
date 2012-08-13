@@ -11,6 +11,14 @@ namespace StarryEyes.Mystique.Models.Connection
         private static SortedDictionary<long, ConnectionGroup> connectionGroups;
 
         private static SortedDictionary<string, LinkedList<UserStreamsConnection>> trackResolver;
+
+        /// <summary>
+        /// Update connection states.<para />
+        /// Apply current setting params, maintain the connections.
+        /// </summary>
+        public static void Update()
+        {
+        }
     }
 
     public class ConnectionGroup

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Linq.Expressions;
 
-namespace StarryEyes.Mystique.Kernel
+namespace StarryEyes.Mystique.Settings
 {
     public static class Setting
     {
