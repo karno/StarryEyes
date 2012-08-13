@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Linq.Expressions;
+﻿using System.Collections.Generic;
 
 namespace StarryEyes.Mystique.Settings
 {
@@ -19,6 +15,9 @@ namespace StarryEyes.Mystique.Settings
         }
 
         public static SettingItemStruct<bool> IsPowerUser = new SettingItemStruct<bool>("IsPowerUser", false);
+
+        public static SettingItem<List<AccountSetting>> Accounts =
+            new SettingItem<List<AccountSetting>>("Accounts", new List<AccountSetting>());
     }
 
     public class SettingItem<T> where T : class
