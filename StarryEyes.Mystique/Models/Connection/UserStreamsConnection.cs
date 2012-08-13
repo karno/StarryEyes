@@ -14,6 +14,8 @@ namespace StarryEyes.Mystique.Models.Connection.Continuous
 {
     public sealed class UserStreamsConnection : ConnectionBase
     {
+        public const int MaxTrackingKeywordBytes = 60;
+        public const int MaxTrackingKeywordCounts = 100;
         private enum BackOffMode
         {
             None,
@@ -33,6 +35,9 @@ namespace StarryEyes.Mystique.Models.Connection.Continuous
             set { trackKeywords = value.ToArray(); }
         }
 
+        /// <summary>
+        /// User Streams is connected
+        /// </summary>
         public bool IsConnected
         {
             get { return _connection != null; }

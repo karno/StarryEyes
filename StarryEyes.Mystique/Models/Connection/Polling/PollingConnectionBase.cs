@@ -12,5 +12,7 @@ namespace StarryEyes.Mystique.Models.Connection.Polling
     public abstract class PollingConnectionBase : ConnectionBase
     {
         public PollingConnectionBase(AuthenticateInfo ai) : base(ai) { }
+
+        protected abstract void DoReceive();
     }
 }
