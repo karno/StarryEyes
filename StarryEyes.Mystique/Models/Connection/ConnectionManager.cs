@@ -9,14 +9,20 @@ using StarryEyes.Mystique.Settings;
 
 namespace StarryEyes.Mystique.Models.Connection
 {
+    /// <summary>
+    /// Provides management for connect to twitter.
+    /// </summary>
     public static class ConnectionManager
     {
         private static object connectionGroupsLocker = new object();
-        private static SortedDictionary<long, ConnectionGroup> connectionGroups;
+        private static SortedDictionary<long, ConnectionGroup> connectionGroups =
+            new SortedDictionary<long, ConnectionGroup>();
 
         private static object trackingLocker = new object();
-        private static SortedDictionary<string, UserStreamsConnection> trackResolver;
-        private static SortedDictionary<string, int> trackReferenceCount;
+        private static SortedDictionary<string, UserStreamsConnection> trackResolver =
+            new SortedDictionary<string, UserStreamsConnection>();
+        private static SortedDictionary<string, int> trackReferenceCount =
+            new SortedDictionary<string, int>();
 
         /// <summary>
         /// Update connection states.<para />
@@ -60,7 +66,7 @@ namespace StarryEyes.Mystique.Models.Connection
             }
         }
 
-        public static UserStreamsConnection GetMostSuitableConnection()
+        private static UserStreamsConnection GetMostSuitableConnection()
         {
             lock (connectionGroupsLocker)
             {
@@ -100,7 +106,10 @@ namespace StarryEyes.Mystique.Models.Connection
         }
     }
 
-    public sealed class ConnectionGroup : IDisposable
+    /// <summary>
+    /// Groups of connection.
+    /// </summary>
+    internal sealed class ConnectionGroup : IDisposable
     {
         private long userId;
         public long UserId

@@ -5,6 +5,9 @@ using StarryEyes.Mystique.Models.Store;
 
 namespace StarryEyes.Mystique.Models.Hub
 {
+    /// <summary>
+    /// Provides statistics functionalities.
+    /// </summary>
     public static class StatisticHub
     {
         static StatisticHub()
@@ -36,6 +39,9 @@ namespace StarryEyes.Mystique.Models.Hub
             estimatedGrossTweetCount = StatusStore.Count;
         }
 
+        /// <summary>
+        /// Work procedure
+        /// </summary>
         private static void UpdateStatisticWorkProc()
         {
             while (isThreadAlive)
@@ -61,18 +67,24 @@ namespace StarryEyes.Mystique.Models.Hub
             }
         }
 
+        /// <summary>
+        /// Events callbacked when statistics parameters are updated.
+        /// </summary>
         public static event Action OnStatisticsParamsUpdated;
 
+        private static int estimatedGrossTweetCount = 0;
         /// <summary>
         /// Gross tweet count (ESTIMATED, not ACTUAL)
         /// </summary>
-        private static int estimatedGrossTweetCount = 0;
         public static int EstimatedGrossTweetCount
         {
             get { return StatisticHub.estimatedGrossTweetCount; }
         }
 
         private static double tweetsPerSeconds = 0;
+        /// <summary>
+        /// Tweets per seconds, estimated.
+        /// </summary>
         public static double TweetsPerSeconds
         {
             get { return StatisticHub.tweetsPerSeconds; }

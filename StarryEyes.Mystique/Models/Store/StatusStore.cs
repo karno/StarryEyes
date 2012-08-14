@@ -34,11 +34,20 @@ namespace StarryEyes.Mystique.Models.Store
                 (_ => _.Id, Path.Combine(App.DataStorePath, "statuses"));
         }
 
+        /// <summary>
+        /// Get stored status counts.<para />
+        /// If you want this param, please consider using StatisticsHub instead of this.
+        /// </summary>
         public static int Count
         {
             get { return store.Count; }
         }
 
+        /// <summary>
+        /// Store a tweet.
+        /// </summary>
+        /// <param name="status">storing status</param>
+        /// <param name="publish">flag of publish status for other listening children</param>
         public static void Store(TwitterStatus status, bool publish = true)
         {
             if (publish)
@@ -52,17 +61,32 @@ namespace StarryEyes.Mystique.Models.Store
             UserStore.Store(status.User);
         }
 
+        /// <summary>
+        /// Get tweet.
+        /// </summary>
+        /// <param name="id">find id</param>
+        /// <returns>contains a tweet or empty observable.</returns>
         public static IObservable<TwitterStatus> Get(long id)
         {
             return store.Get(id)
                 .Do(_ => Store(_, false)); // add to local cache
         }
 
+        /// <summary>
+        /// Find tweets.
+        /// </summary>
+        /// <param name="predicate">find predicate</param>
+        /// <returns>results observable sequence.</returns>
         public static IObservable<TwitterStatus> Find(Func<TwitterStatus, bool> predicate)
         {
             return store.Find(predicate);
         }
 
+        /// <summary>
+        /// Remove tweet from store.
+        /// </summary>
+        /// <param name="id">removing tweet's id</param>
+        /// <param name="publish">publish removing notification to children</param>
         public static void Remove(long id, bool publish = true)
         {
             if (publish)
@@ -70,6 +94,9 @@ namespace StarryEyes.Mystique.Models.Store
             store.Remove(id);
         }
 
+        /// <summary>
+        /// Shutdwon store.
+        /// </summary>
         internal static void Shutdown()
         {
             store.Dispose();
