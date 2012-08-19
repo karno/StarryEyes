@@ -32,6 +32,7 @@ namespace StarryEyes.Mystique.Models.Store
             // initialize
             store = new PersistentDataStore<long, TwitterStatus>
                 (_ => _.Id, Path.Combine(App.DataStorePath, "statuses"));
+            App.OnApplicationFinalize += Shutdown;
         }
 
         /// <summary>
@@ -95,7 +96,7 @@ namespace StarryEyes.Mystique.Models.Store
         }
 
         /// <summary>
-        /// Shutdwon store.
+        /// Shutdown store.
         /// </summary>
         internal static void Shutdown()
         {

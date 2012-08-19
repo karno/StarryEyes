@@ -33,6 +33,10 @@ namespace StarryEyes.Mystique.Models.Hub
         private static void StopThread()
         {
             isThreadAlive = false;
+            lock (statisticsWorkProcSync)
+            {
+                Monitor.Pulse(statisticsWorkProcSync);
+            }
         }
 
         private static void UpdateStatistics()

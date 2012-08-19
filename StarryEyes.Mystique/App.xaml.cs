@@ -41,9 +41,9 @@ namespace StarryEyes.Mystique
             if (shutdown)
             {
                 // 正規の終了
+                RaiseApplicationExit();
             }
-            // コアストレージのシャットダウン
-            StatusStore.Shutdown();
+            RaiseApplicationFinalize();
         }
 
         //集約エラーハンドラ
