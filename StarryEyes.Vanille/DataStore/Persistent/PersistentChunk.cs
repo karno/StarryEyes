@@ -45,6 +45,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                 this.persistentDrive = new PersistentDrive<TKey, TValue>(dbFilePath);
             }
             this.writeBackWorker = new Thread(WriteBackProc);
+            this.writeBackWorker.Start();
         }
 
         /// <summary>
@@ -63,6 +64,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                 this.persistentDrive = new PersistentDrive<TKey, TValue>(dbFilePath, tableOfContents, nextIndexOfPackets);
             }
             this.writeBackWorker = new Thread(WriteBackProc);
+            this.writeBackWorker.Start();
         }
 
         /// <summary>
@@ -178,6 +180,8 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// <returns>actual node or null reference</returns>
         private LinkedListNode<TValue> FindNodeByKey(LinkedList<TValue> list, TKey key)
         {
+            if(list.First == null)
+                return null;
             return EnumerableEx.Generate(
                 list.First,
                 node => node.Next != null,
@@ -198,7 +202,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                 if (!writeBackThreadAlive)
                     return;
                 List<LinkedListNode<TValue>> workingCopy = null;
-                lock(deadlyCachesLocker)
+                lock (deadlyCachesLocker)
                 {
                     EnumerableEx.Generate(
                         deadlyCaches.First,

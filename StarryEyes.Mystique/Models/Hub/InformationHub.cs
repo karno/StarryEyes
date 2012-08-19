@@ -23,12 +23,14 @@ namespace StarryEyes.Mystique.Models.Hub
         /// Initialize information
         /// </summary>
         /// <param name="kind">InformationKind.Notify or InformationKind.Warning</param>
+        /// <param name="id">identification string, this used for remove duplication.</param>
         /// <param name="header">one-liner description</param>
         /// <param name="detail">detail description</param>
-        public Information(InformationKind kind, string header, string detail)
+        public Information(InformationKind kind, string id, string header, string detail)
         {
             if (kind == InformationKind.Error)
                 throw new ArgumentException("you should use another overload.");
+            this.Id = id;
             this.Kind = kind;
             this.Header = header;
             this.Detail = detail;
@@ -38,15 +40,17 @@ namespace StarryEyes.Mystique.Models.Hub
         /// Initialize information
         /// </summary>
         /// <param name="kind">InformationKind.Error</param>
+        /// <param name="id">identification string, this used for remove duplication.</param>
         /// <param name="header">one-liner description</param>
         /// <param name="detail">detail description</param>
         /// <param name="actionDesc">description of the action</param>
         /// <param name="act">fix action</param>
-        public Information(InformationKind kind, string header, string detail,
+        public Information(InformationKind kind, string id, string header, string detail,
             string actionDesc, Action act)
         {
             if (kind != InformationKind.Error)
                 throw new ArgumentException("you should use another overload.");
+            this.Id = id;
             this.Kind = kind;
             this.Header = header;
             this.Detail = detail;
@@ -58,6 +62,12 @@ namespace StarryEyes.Mystique.Models.Hub
         /// Kind of information
         /// </summary>
         public InformationKind Kind { get; set; }
+
+        /// <summary>
+        /// Id of this information.<para />
+        /// If information arrive has duplicated id, new one will replaces old one.
+        /// </summary>
+        public string Id { get; set; }
 
         /// <summary>
         /// Header description

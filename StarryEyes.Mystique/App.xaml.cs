@@ -8,6 +8,7 @@ using System.Net;
 using StarryEyes.Mystique.Models.Store;
 using System.Configuration;
 using System.IO;
+using StarryEyes.SweetLady.Api;
 
 namespace StarryEyes.Mystique
 {
@@ -21,6 +22,11 @@ namespace StarryEyes.Mystique
             DispatcherHelper.UIDispatcher = Dispatcher;
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
             Application.Current.Exit += (_, __) => AppFinalize(true);
+
+            // Set CK/CS for accessing twitter.
+            ApiEndpoint.ConsumerKey = ConsumerKey;
+            ApiEndpoint.ConsumerSecret = ConsumerSecret;
+
             // Initialize core
             ServicePointManager.Expect100Continue = false; // disable expect 100 continue for User Streams connection.
             ServicePointManager.DefaultConnectionLimit = Int32.MaxValue; // Limit Break!
@@ -52,6 +58,10 @@ namespace StarryEyes.Mystique
         }
 
         #region Definitions
+
+        internal static string ConsumerKey = "HzbATXmr3JpNXRPDNtkXww";
+
+        internal static string ConsumerSecret = "BfBH1h68S45X4kAlVdJAoopbEIEyF43kaRQe1vC2po";
 
         public static bool IsOperatingSystemSupported
         {

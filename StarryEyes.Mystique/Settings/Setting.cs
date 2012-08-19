@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Configuration;
 
 namespace StarryEyes.Mystique.Settings
 {
@@ -16,6 +17,8 @@ namespace StarryEyes.Mystique.Settings
 
         public static SettingItemStruct<bool> IsPowerUser = new SettingItemStruct<bool>("IsPowerUser", false);
 
+        public static SettingItem<string> ExternalBrowserPath = new SettingItem<string>("ExternalBrowserPath", null);
+
         public static SettingItem<List<AccountSetting>> Accounts =
             new SettingItem<List<AccountSetting>>("Accounts", new List<AccountSetting>());
     }
@@ -28,9 +31,11 @@ namespace StarryEyes.Mystique.Settings
             get { return _name; }
         }
 
+        private T _defaultValue;
         public SettingItem(string name, T defaultValue)
         {
             this._name = name;
+            this._defaultValue = defaultValue;
         }
 
         private T valueCache;
@@ -38,8 +43,15 @@ namespace StarryEyes.Mystique.Settings
         {
             get
             {
-                return valueCache ??
-                    (valueCache = Properties.Settings.Default[Name] as T);
+                try
+                {
+                    return valueCache ??
+                        (valueCache = Properties.Settings.Default[Name] as T);
+                }
+                catch (SettingsPropertyNotFoundException)
+                {
+                    return _defaultValue;
+                }
             }
             set
             {
@@ -58,9 +70,11 @@ namespace StarryEyes.Mystique.Settings
             get { return _name; }
         }
 
+        private T _defaultValue;
         public SettingItemStruct(string name, T defaultValue)
         {
             this._name = name;
+            this._defaultValue = defaultValue;
         }
 
         private T? valueCache;
@@ -68,8 +82,15 @@ namespace StarryEyes.Mystique.Settings
         {
             get
             {
-                return valueCache ??
-                    (valueCache = (T)Properties.Settings.Default[Name]).Value;
+                try
+                {
+                    return valueCache ??
+                        (valueCache = (T)Properties.Settings.Default[Name]).Value;
+                }
+                catch (SettingsPropertyNotFoundException)
+                {
+                    return _defaultValue;
+                }
             }
             set
             {

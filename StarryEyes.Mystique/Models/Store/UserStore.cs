@@ -21,7 +21,7 @@ namespace StarryEyes.Mystique.Models.Store
             store.Store(user);
             lock (snResolverLocker)
             {
-                screenNameResolver.Add(user.ScreenName, user.Id);
+                screenNameResolver[user.ScreenName] = user.Id;
             }
         }
 

@@ -63,7 +63,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// <param name="path"></param>
         private void EnsurePath(string path)
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(path));
+            Directory.CreateDirectory(path);
         }
 
         private string GeneratePath(string basePath, int index)
@@ -135,7 +135,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
 
         private PersistentChunk<TKey, TValue> GetChunk(TKey key)
         {
-            return chunks[key.GetHashCode() % chunkNum];
+            return chunks[Math.Abs(key.GetHashCode()) % chunkNum];
         }
 
         protected override void Dispose(bool disposing)

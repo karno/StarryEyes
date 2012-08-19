@@ -49,6 +49,7 @@ namespace StarryEyes.Mystique.Models.Connection.Continuous
         /// </summary>
         public void Connect()
         {
+            CheckDisposed();
             Disconnect();
             _connection = this.AuthInfo.ConnectToUserStreams(trackKeywords)
                 .Do(_ => currentBackOffMode = BackOffMode.None) // initialize back-off
@@ -81,6 +82,7 @@ namespace StarryEyes.Mystique.Models.Connection.Continuous
                         StatusStore.Remove(elem.DeletedId.Value);
                     if (elem.TrackLimit != null)
                         this.RaiseInfoNotification(
+                            "UserStreams_TrackLimit_" + AuthInfo.UnreliableScreenName,
                             "タイムラインの速度が速すぎます。",
                             "ユーザーストリームの取得漏れが起きています。(" + elem.TrackLimit + " 件)");
                     break;
@@ -193,8 +195,13 @@ namespace StarryEyes.Mystique.Models.Connection.Continuous
 
         private void RaiseDisconnectedByError(string header, string detail)
         {
-            this.RaiseErrorNotification(header, detail,
-                "再接続", () => Connect());
+            this.RaiseErrorNotification("UserStreams_Reconnection_" + AuthInfo.UnreliableScreenName,
+                header, detail,
+                "再接続", () =>
+                {
+                    if (!IsDisposed)
+                        Connect();
+                });
         }
 
         protected override void Dispose(bool disposing)

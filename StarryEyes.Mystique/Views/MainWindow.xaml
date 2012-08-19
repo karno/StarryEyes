@@ -23,8 +23,14 @@
         <i:EventTrigger EventName="Closed">
             <l:DataContextDisposeAction />
         </i:EventTrigger>
+        <l:InteractionMessageTrigger Messenger="{Binding Messenger}">
+        	<l:TransitionInteractionMessageAction/>
+        </l:InteractionMessageTrigger>
         <!--  WindowのCloseキャンセル処理に対応する場合は、WindowCloseCancelBehaviorの使用を検討してください  -->
     </i:Interaction.Triggers>
 
-    <Grid />
+    <Grid >
+    	<Button Content="Auth" HorizontalAlignment="Left" Margin="8,8,0,0" VerticalAlignment="Top" Width="189" Height="33" Command="{Binding StartReceiveCommand, Mode=OneWay}"/>
+    	<TextBlock HorizontalAlignment="Left" Margin="8,45,0,0" TextWrapping="Wrap" Text="{Binding StatusCount, Mode=OneWay}" VerticalAlignment="Top"/>
+    </Grid>
 </Window>

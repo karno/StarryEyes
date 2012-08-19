@@ -10,10 +10,13 @@ namespace StarryEyes.Mystique.Models.Connection.Polling
     /// </summary>
     public abstract class PollingConnectionBase : ConnectionBase
     {
-        private static event Action OnTimerTick;
-
+        /// <summary>
+        /// internal disposables holder
+        /// </summary>
         private CompositeDisposable _disposablesHolder = new CompositeDisposable();
+
         private int _currentTick = 0;
+
         public PollingConnectionBase(AuthenticateInfo ai)
             : base(ai)
         {
@@ -25,8 +28,12 @@ namespace StarryEyes.Mystique.Models.Connection.Polling
                 .Subscribe(_ => OnTick()));
         }
 
+        /// <summary>
+        /// On time callback
+        /// </summary>
         private void OnTick()
         {
+            if (!IsActivated) return;
             _currentTick++;
             if (_currentTick > IntervalSec)
             {
@@ -38,6 +45,11 @@ namespace StarryEyes.Mystique.Models.Connection.Polling
         protected abstract int IntervalSec { get; }
 
         protected abstract void DoReceive();
+
+        /// <summary>
+        /// Set whether this connection is activated.
+        /// </summary>
+        public bool IsActivated { get; set; }
 
         protected override void Dispose(bool disposing)
         {

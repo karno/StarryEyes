@@ -6,6 +6,7 @@ using StarryEyes.Mystique.Models.Connection.Continuous;
 using System.Reactive.Disposables;
 using StarryEyes.SweetLady.Authorize;
 using StarryEyes.Mystique.Settings;
+using StarryEyes.Mystique.Models.Hub;
 
 namespace StarryEyes.Mystique.Models.Connection
 {
@@ -24,6 +25,13 @@ namespace StarryEyes.Mystique.Models.Connection
         private static SortedDictionary<string, int> trackReferenceCount =
             new SortedDictionary<string, int>();
 
+        // tracked keywords relied on stopped/removed streamings.
+        private static List<string> danglingKeywords = new List<string>();
+        public static IEnumerable<string> DanglingKeywords
+        {
+            get { return ConnectionManager.danglingKeywords.AsEnumerable(); }
+        }
+
         /// <summary>
         /// Update connection states.<para />
         /// Apply current setting params, maintain the connections.
@@ -31,6 +39,82 @@ namespace StarryEyes.Mystique.Models.Connection
         /// <param name="enforceReconnection">all user streams connection will be reconnected with enforced</param>
         public static void Update(bool enforceReconnection = false)
         {
+            // create look-up dictionary.
+            var settings = Setting.Accounts.Value.ToLookup(k => k.UserId);
+            lock (connectionGroupsLocker)
+            {
+                // determine removed users ids and finalize for each.
+                connectionGroups.Values
+                    .Select(g => g.UserId)
+                    .Where(g => !settings.Contains(g))
+                    .Select(s => connectionGroups[s])
+                    .ToArray() // freeze once
+                    .Do(c => connectionGroups.Remove(c.UserId))
+                    .Do(c =>
+                    {
+                        var con = c.UserStreamsConnection;
+                        if (con != null && con.TrackKeywords != null)
+                        {
+                            con.TrackKeywords.ForEach(s => danglingKeywords.Add(s));
+                        }
+                    })
+                    .ForEach(c => c.Dispose());
+
+                // determine cancelled streamings
+                connectionGroups.Values
+                    .Where(c => c.IsUserStreamsEnabled &&
+                        !settings[c.UserId].First().IsUserStreamsEnabled)
+                    .Do(c =>
+                    {
+                        var con = c.UserStreamsConnection;
+                        if (con != null && con.TrackKeywords != null)
+                        {
+                            con.TrackKeywords.ForEach(s => danglingKeywords.Add(s));
+                        }
+                    })
+                    .ForEach(c => c.IsUserStreamsEnabled = false);
+
+                // connects new.
+                // dangling keywords are mostly assigned for it.
+                settings.Select(s => s.Key)
+                    .Except(connectionGroups.Keys)
+                    .Select(i => new ConnectionGroup(i))
+                    .Do(g => connectionGroups.Add(g.UserId, g))
+                    .Where(g => settings[g.UserId].First().IsUserStreamsEnabled)
+                    .ForEach(f =>
+                    {
+                        // take danglings
+                        var assign = danglingKeywords
+                            .Take(UserStreamsConnection.MaxTrackingKeywordCounts);
+                        f.UserStreamsStartsWith(assign);
+                        // update dangling list.
+                        danglingKeywords = danglingKeywords
+                            .Skip(UserStreamsConnection.MaxTrackingKeywordCounts)
+                            .ToList();
+                    });
+
+                if (danglingKeywords.Count > 0 || enforceReconnection)
+                {
+                    // if dangling keywords existed, assign them.
+                    connectionGroups.Values
+                        .Select(c => c.UserStreamsConnection)
+                        .Where(u => u != null)
+                        .Where(u => u.TrackKeywords.Count() < UserStreamsConnection.MaxTrackingKeywordCounts || enforceReconnection)
+                        .OrderBy(u => u.TrackKeywords.Count())
+                        .TakeWhile(_ => danglingKeywords.Count > 0 || enforceReconnection)
+                        .ForEach(f =>
+                        {
+                            var assignable = UserStreamsConnection.MaxTrackingKeywordCounts - f.TrackKeywords.Count();
+                            f.TrackKeywords = f.TrackKeywords.Concat(danglingKeywords.Take(assignable));
+                            // reconnect this
+                            f.Connect();
+                            danglingKeywords = danglingKeywords.Skip(assignable).ToList();
+                        });
+                }
+            }
+            // dangling keywords should be resolved as null.
+            danglingKeywords.ForEach(s => trackResolver[s] = null);
+            NotifyDanglings();
         }
 
         /// <summary>
@@ -38,8 +122,7 @@ namespace StarryEyes.Mystique.Models.Connection
         /// </summary>
         /// <param name="keyword">adding keyword</param>
         /// <param name="reconnectImmediate">reconnect user streams immediately if required.</param>
-        /// <returns>if successfully added, returns true.</returns>
-        public static bool AddTrackKeyword(string keyword, bool reconnectImmediate = true)
+        public static void AddTrackKeyword(string keyword, bool reconnectImmediate = true)
         {
             lock (trackingLocker)
             {
@@ -47,7 +130,6 @@ namespace StarryEyes.Mystique.Models.Connection
                 {
                     // already registered.
                     trackReferenceCount[keyword]++;
-                    return true;
                 }
                 else
                 {
@@ -55,14 +137,35 @@ namespace StarryEyes.Mystique.Models.Connection
                     // connect
                     var connection = GetMostSuitableConnection();
                     if (connection == null)
-                        return false;
-                    trackResolver.Add(keyword, connection);
-                    connection.TrackKeywords =
-                        connection.TrackKeywords.Append(new[] { keyword });
-                    if (reconnectImmediate)
-                        connection.Connect();
-                    return true;
+                    {
+                        danglingKeywords.Add(keyword);
+                        trackResolver.Add(keyword, null);
+                    }
+                    else
+                    {
+                        trackResolver.Add(keyword, connection);
+                        connection.TrackKeywords =
+                            connection.TrackKeywords.Append(new[] { keyword });
+                        if (reconnectImmediate)
+                            connection.Connect();
+                    }
                 }
+                NotifyDanglings();
+            }
+        }
+
+        /// <summary>
+        /// Notify dangling state.
+        /// </summary>
+        private static void NotifyDanglings()
+        {
+            if (danglingKeywords.Count > 0)
+            {
+                InformationHub.PublishInformation(
+                    new Information(InformationKind.Error,
+                        "ConnectionManager_Danglings",
+                        "受信されていないトラッキング キーワードがあります。",
+                        "トラッキング キーワードに対し、ユーザーストリーム接続数が不足しています。"));
             }
         }
 
@@ -97,10 +200,13 @@ namespace StarryEyes.Mystique.Models.Connection
                 {
                     trackReferenceCount.Remove(keyword);
                     var tracked = trackResolver[keyword];
-                    trackResolver.Remove(keyword);
-                    tracked.TrackKeywords = tracked.TrackKeywords.Except(new[] { keyword });
-                    if (reconnectImmediate)
-                        tracked.Connect();
+                    if (tracked != null) // if track-resolver bind key to null value, that's dangling word.
+                    {
+                        trackResolver.Remove(keyword);
+                        tracked.TrackKeywords = tracked.TrackKeywords.Except(new[] { keyword });
+                        if (reconnectImmediate)
+                            tracked.Connect();
+                    }
                 }
             }
         }
@@ -140,6 +246,19 @@ namespace StarryEyes.Mystique.Models.Connection
             get { return userStreams; }
         }
 
+        public void UserStreamsStartsWith(IEnumerable<string> trackKeywords)
+        {
+            CheckDispose();
+            if (IsUserStreamsEnabled)
+                return;
+            userStreams = new UserStreamsConnection(AuthInfo);
+            userStreams.TrackKeywords = trackKeywords;
+            userStreams.Connect();
+        }
+
+        /// <summary>
+        /// Get/Set User Streams state.
+        /// </summary>
         public bool IsUserStreamsEnabled
         {
             get
