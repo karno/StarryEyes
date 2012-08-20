@@ -177,7 +177,7 @@ namespace StarryEyes.SweetLady.DataModel
             FavoritesCount = reader.ReadInt64();
             ListedCount = reader.ReadInt64();
             Language = reader.ReadString();
-            if (IsDataLacking)
+            if (!IsDataLacking)
                 CreatedAt = reader.ReadDateTime();
         }
     }
