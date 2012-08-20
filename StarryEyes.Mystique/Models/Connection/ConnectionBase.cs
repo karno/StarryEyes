@@ -40,14 +40,17 @@ namespace StarryEyes.Mystique.Models.Connection
 
         public void Dispose()
         {
-            CheckDisposed();
-            Dispose(true);
-            GC.SuppressFinalize(this);
+            if (!_disposed)
+            {
+                Dispose(true);
+                GC.SuppressFinalize(this);
+            }
         }
 
         ~ConnectionBase()
         {
-            Dispose(false);
+            if (!_disposed)
+                Dispose(false);
         }
 
         protected virtual void Dispose(bool disposing)

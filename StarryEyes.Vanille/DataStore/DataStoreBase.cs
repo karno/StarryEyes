@@ -73,7 +73,7 @@ namespace StarryEyes.Vanille.DataStore
         /// </summary>
         public void Dispose()
         {
-            CheckDisposed();
+            if (_disposed) return;
             _disposed = true;
             Dispose(true);
             GC.SuppressFinalize(this);

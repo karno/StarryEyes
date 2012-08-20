@@ -135,7 +135,6 @@ namespace StarryEyes.Mystique.ViewModels
         }
         #endregion
 
-
         #region ExecuteFilterCommand
         private ViewModelCommand _ExecuteFilterCommand;
 
@@ -167,7 +166,6 @@ namespace StarryEyes.Mystique.ViewModels
                 });
         }
         #endregion
-
 
         protected override void Dispose(bool disposing)
         {

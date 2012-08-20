@@ -292,7 +292,6 @@ namespace StarryEyes.Mystique.Models.Connection
 
         public void Dispose()
         {
-            CheckDispose();
             _isDisposed = true;
             this.Dispose(true);
             GC.SuppressFinalize(this);
@@ -308,8 +307,9 @@ namespace StarryEyes.Mystique.Models.Connection
         {
             if (userStreams != null)
             {
-                userStreams.Dispose();
+                var disposal = userStreams;
                 userStreams = null;
+                disposal.Dispose();
             }
         }
     }
