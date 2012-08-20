@@ -224,7 +224,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         private TValue Load(int index)
         {
             var bytes = LoadInternal(index);
-            int length = BitConverter.ToInt32(bytes, 0);
+            var length = BitConverter.ToInt32(bytes, 0);
             var ret = new TValue();
             using (var br = new BinaryReader(new MemoryStream(bytes, 4, length, false)))
                 ret.Deserialize(br);
@@ -285,6 +285,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                 // get next writable offset
                 var newOffset = GetNextEmptyIndex(offset);
                 SetNextIndexOfPackets(offset, newOffset);
+                offset = newOffset; // move to next
             }
         }
 
