@@ -192,6 +192,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
 
         private void WriteBackProc()
         {
+            List<LinkedListNode<TValue>> workingCopy = new List<LinkedListNode<TValue>>();
             while (true)
             {
                 lock (writeBackSync)
@@ -202,7 +203,6 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                 if (!writeBackThreadAlive)
                     return;
                 System.Diagnostics.Debug.WriteLine("write-backing...");
-                List<LinkedListNode<TValue>> workingCopy = new List<LinkedListNode<TValue>>();
                 lock (deadlyCachesLocker)
                 {
                     EnumerableEx.Generate(
@@ -225,6 +225,10 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                 {
                     workingCopy.ForEach(n => deadlyCaches.Remove(n));
                 }
+                // release memory
+                workingCopy.Clear();
+
+                GC.Collect(); // collect garbage.
                 Thread.Sleep(0);
             }
         }
