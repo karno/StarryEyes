@@ -55,7 +55,16 @@ namespace StarryEyes.Mystique.Models.Connection.Continuous
                 .Do(_ => currentBackOffMode = BackOffMode.None) // initialize back-off
                 .Subscribe(
                 _ => Register(_),
-                ex => HandleException(ex));
+                ex => HandleException(ex),
+                () =>
+                {
+                    if (_connection != null)
+                    {
+                        // make reconnect.
+                        Disconnect();
+                        Connect();
+                    }
+                });
         }
 
         /// <summary>
@@ -65,8 +74,9 @@ namespace StarryEyes.Mystique.Models.Connection.Continuous
         {
             if (_connection != null)
             {
-                _connection.Dispose();
+                var disposal = _connection;
                 _connection = null;
+                disposal.Dispose();
             }
         }
 
