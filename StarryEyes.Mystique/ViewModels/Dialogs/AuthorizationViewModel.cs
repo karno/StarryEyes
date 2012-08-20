@@ -48,13 +48,13 @@ namespace StarryEyes.Mystique.ViewModels.Dialogs
                 },
                 ex =>
                 {
-                    this.Messenger.RaiseAsync(new InformationMessage(
+                    this.Messenger.Raise(new InformationMessage(
                         "Twitterとの通信が正しくできませんでした。" + Environment.NewLine +
                         "しつこく何度も試してみるのも良いと思いますが、こういう場合は" + Environment.NewLine +
                         "すこし時間を置いて試していただくほうがよろしいかと思います。" + Environment.NewLine +
                         "(PCの時計が大幅にずれている時も認証ができないことがあります。)",
                         "認証失敗", System.Windows.MessageBoxImage.Error, null));
-                    this.Messenger.RaiseAsync(new WindowActionMessage(null, WindowAction.Close));
+                    this.Messenger.Raise(new WindowActionMessage(null, WindowAction.Close));
                 });
         }
 
@@ -121,12 +121,12 @@ namespace StarryEyes.Mystique.ViewModels.Dialogs
                     var id = long.Parse(r.ExtraData["user_id"].First());
                     var sn = r.ExtraData["screen_name"].First();
                     returnSubject.OnNext(new AuthenticateInfo(id, sn, r.Token));
-                    this.Messenger.RaiseAsync(new WindowActionMessage(null, WindowAction.Close));
+                    this.Messenger.Raise(new WindowActionMessage(null, WindowAction.Close));
                 },
                 ex =>
                 {
                     CurrentAuthenticationStep = AuthenticationStep.WaitingPinInput;
-                    this.Messenger.RaiseAsync(new InformationMessage(
+                    this.Messenger.Raise(new InformationMessage(
                         "Twitterからアクセス許可をもらえませんでした。" + Environment.NewLine +
                         "もう一度お試しいただくか、再度暗証番号を取得し直してください。" + Environment.NewLine +
                         "(PCの時計が大幅にずれている時も認証ができないことがあります。)",

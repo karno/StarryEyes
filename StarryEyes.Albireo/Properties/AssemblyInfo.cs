@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // アセンブリに関する一般情報は以下の属性セットをとおして制御されます。
 // アセンブリに関連付けられている情報を変更するには、
 // これらの属性値を変更してください。
-[assembly: AssemblyTitle("Krile StarryEyes Data and Extensions Library")]
-[assembly: AssemblyDescription("Provides implementation of data structure and extension methods.")]
+[assembly: AssemblyTitle("StarryEyes.Albireo")]
+[assembly: AssemblyDescription("Krile StarryEyes Data and Extensions Library")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Krile Project")]
+[assembly: AssemblyCompany("Krile")]
 [assembly: AssemblyProduct("Krile StarryEyes")]
-[assembly: AssemblyCopyright("Copyright ©  2012 Karno")]
+[assembly: AssemblyCopyright("Copyright© 2012 Karno")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

@@ -162,7 +162,7 @@ namespace StarryEyes.Mystique.Models.Connection
             if (danglingKeywords.Count > 0)
             {
                 InformationHub.PublishInformation(
-                    new Information(InformationKind.Error,
+                    new Information(InformationKind.Warning,
                         "ConnectionManager_Danglings",
                         "受信されていないトラッキング キーワードがあります。",
                         "トラッキング キーワードに対し、ユーザーストリーム接続数が不足しています。"));

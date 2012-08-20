@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // アセンブリに関する一般情報は以下の属性セットをとおして制御されます。
 // アセンブリに関連付けられている情報を変更するには、
 // これらの属性値を変更してください。
-[assembly: AssemblyTitle("Krile StarryEyes Twitter Library")]
-[assembly: AssemblyDescription("Provides Twitter API implementations.")]
+[assembly: AssemblyTitle("StarryEyes.SweetLady")]
+[assembly: AssemblyDescription("Twitter Library")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Krile Project")]
+[assembly: AssemblyCompany("Krile")]
 [assembly: AssemblyProduct("Krile StarryEyes")]
-[assembly: AssemblyCopyright("Copyright ©  2012 Karno")]
+[assembly: AssemblyCopyright("Copyright© 2012 Karno")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

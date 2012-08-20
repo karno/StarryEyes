@@ -24,13 +24,33 @@
             <l:DataContextDisposeAction />
         </i:EventTrigger>
         <l:InteractionMessageTrigger Messenger="{Binding Messenger}">
-        	<l:TransitionInteractionMessageAction/>
+            <l:TransitionInteractionMessageAction />
         </l:InteractionMessageTrigger>
         <!--  WindowのCloseキャンセル処理に対応する場合は、WindowCloseCancelBehaviorの使用を検討してください  -->
     </i:Interaction.Triggers>
 
-    <Grid >
-    	<Button Content="Auth" HorizontalAlignment="Left" Margin="8,8,0,0" VerticalAlignment="Top" Width="189" Height="33" Command="{Binding StartReceiveCommand, Mode=OneWay}"/>
-    	<TextBlock HorizontalAlignment="Left" Margin="8,45,0,0" TextWrapping="Wrap" Text="{Binding StatusCount, Mode=OneWay}" VerticalAlignment="Top"/>
+    <Grid>
+        <Button Width="189"
+                Height="33"
+                Margin="8,8,0,0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Command="{Binding StartReceiveCommand,
+                                  Mode=OneWay}"
+                Content="Auth" />
+        <TextBlock Margin="8,45,0,0"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Top">
+            <Run Text="{Binding StatusCount, Mode=OneWay}" />
+            <Run Text="tweets / " />
+            <Run Text="{Binding TweetsPerMinutes, Mode=OneWay}" />
+            <Run Text="tpm" />
+        </TextBlock>
+        <TextBlock Margin="8,70,8,0"
+                   HorizontalAlignment="Stretch"
+                   VerticalAlignment="Top"
+                   Text="{Binding RecentReceivedBody,
+                                  Mode=OneWay}"
+                   TextWrapping="Wrap" />
     </Grid>
 </Window>

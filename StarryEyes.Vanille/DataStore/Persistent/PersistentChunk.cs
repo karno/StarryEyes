@@ -5,7 +5,6 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
 using StarryEyes.Vanille.Serialization;
-using System.IO;
 
 namespace StarryEyes.Vanille.DataStore.Persistent
 {
@@ -30,7 +29,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         private PersistentDrive<TKey, TValue> persistentDrive;
         private Thread writeBackWorker;
         private object writeBackSync = new object();
-        private bool writeBackThreadAlive = true;
+        private volatile bool writeBackThreadAlive = true;
 
         /// <summary>
         /// initialize persistent chunk.
@@ -193,15 +192,17 @@ namespace StarryEyes.Vanille.DataStore.Persistent
 
         private void WriteBackProc()
         {
-            while (writeBackThreadAlive)
+            while (true)
             {
                 lock (writeBackSync)
                 {
-                    Monitor.Wait(writeBackSync);
+                    if (writeBackThreadAlive)
+                        Monitor.Wait(writeBackSync);
                 }
                 if (!writeBackThreadAlive)
                     return;
-                List<LinkedListNode<TValue>> workingCopy = null;
+                System.Diagnostics.Debug.WriteLine("write-backing...");
+                List<LinkedListNode<TValue>> workingCopy = new List<LinkedListNode<TValue>>();
                 lock (deadlyCachesLocker)
                 {
                     EnumerableEx.Generate(
@@ -212,6 +213,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                         .ForEach(workingCopy.Add);
                 }
                 Thread.Sleep(0);
+                System.Diagnostics.Debug.WriteLine("write-back " + workingCopy.Count + " objects.");
                 using (AcquireDriveLock(true))
                 {
                     workingCopy
@@ -361,11 +363,12 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// </summary>
         public void Dispose()
         {
-            writeBackThreadAlive = false;
             lock (writeBackSync)
             {
+                writeBackThreadAlive = false;
                 Monitor.Pulse(writeBackSync);
             }
+            System.Threading.Thread.Sleep(0);
             List<TValue> workingCopy = new List<TValue>();
             // write all data to persistent store
             lock (aliveCachesLocker)

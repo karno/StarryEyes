@@ -12,7 +12,6 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         const int ChunkSize = 1024;
 
         const int Empty = -1;
-        const int EndOfIndexOfPackets = -2;
 
         private string path;
         public string Path
@@ -36,6 +35,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         {
             this.tableOfContents = new SortedDictionary<TKey, int>();
             this.nextIndexOfPackets = new SortedDictionary<int, List<int>>();
+            SetNextIndexOfPackets(0, 0); // index 0 is reserved for the parity.
             this.path = path;
             PrepareFile(false);
         }
@@ -87,10 +87,10 @@ namespace StarryEyes.Vanille.DataStore.Persistent
             else
             {
                 // chunk not found, create new
-                var list = new List<int>(Enumerable.Range(Empty, ChunkSize)); // init chunk with Empty recode
+                var list = new List<int>(Enumerable.Repeat(Empty, ChunkSize)); // init chunk with Empty recode
                 list[key] = next;
                 // add chunk to niop-tree
-                this.nextIndexOfPackets.Add(chunk, list);
+                this.nextIndexOfPackets[chunk] = list;
             }
         }
 
@@ -110,8 +110,9 @@ namespace StarryEyes.Vanille.DataStore.Persistent
             }
             else
             {
-                // pseudo END (data corrupted?)
-                return EndOfIndexOfPackets;
+                // chunk is not existed yet.
+                // -> treat as empty.
+                return Empty;
             }
         }
 
@@ -183,7 +184,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
 
             // get index for storing data
             int writeTo = GetNextEmptyIndex(0);
-            tableOfContents.Add(key, writeTo);
+            tableOfContents[key] = writeTo;
 
             // store
             StoreInternal(bytes, writeTo);
@@ -198,7 +199,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         public TValue Load(TKey key)
         {
             int readFrom;
-            if (!tableOfContents.TryGetValue(key, out readFrom))
+            if (!tableOfContents.TryGetValue(key, out readFrom) || readFrom < 0)
                 throw new KeyNotFoundException("Not found key in this persistent drive.");
             return Load(readFrom);
         }
@@ -244,8 +245,10 @@ namespace StarryEyes.Vanille.DataStore.Persistent
             {
                 // clear all packets table.
                 var newidx = GetNextIndexOfPackets(idx);
+                if (newidx == Empty) return false; // already removed
                 SetNextIndexOfPackets(idx, Empty);
-            } while (idx != 0);
+                idx = newidx;
+            } while (idx > 0);
             // OK
             return true;
         }
@@ -273,10 +276,10 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                 // move cursor
                 cursor += PacketSize;
 
-                if (cursor < data.Length)
+                if (cursor > data.Length)
                 {
                     SetNextIndexOfPackets(offset, 0); // finalize (mark as EOP)
-                    break; // write completed
+                    return; // write completed
                 }
 
                 // get next writable offset
@@ -299,8 +302,6 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                 {
                     case Empty: // empty block
                         return current;
-                    case EndOfIndexOfPackets: // EIOP
-                        return nextIndexOfPackets.Count; // next block
                     default:
                         current++; // continue loop
                         break;

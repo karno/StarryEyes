@@ -29,12 +29,12 @@ namespace StarryEyes.Mystique.Models.Hub
 
         private static Thread workThread;
         private static object statisticsWorkProcSync = new object();
-        private static bool isThreadAlive = true;
+        private static volatile bool isThreadAlive = true;
         private static void StopThread()
         {
-            isThreadAlive = false;
             lock (statisticsWorkProcSync)
             {
+                isThreadAlive = false;
                 Monitor.Pulse(statisticsWorkProcSync);
             }
         }
@@ -53,13 +53,14 @@ namespace StarryEyes.Mystique.Models.Hub
             {
                 lock (statisticsWorkProcSync)
                 {
+                    if (!isThreadAlive) return;
                     Monitor.Wait(statisticsWorkProcSync);
                 }
                 if (!isThreadAlive) return;
                 // update statistics params
                 var previousGross = estimatedGrossTweetCount;
-                var previousTimestamp = DateTime.Now;
                 estimatedGrossTweetCount = StatusStore.Count;
+                var previousTimestamp = timestamp;
                 timestamp = DateTime.Now;
                 var duration = (timestamp - previousTimestamp).TotalSeconds;
                 if (duration > 0)

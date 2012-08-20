@@ -10,11 +10,18 @@ namespace StarryEyes.Mystique.Models.Store
 {
     public static class UserStore
     {
-        private static DataStoreBase<long, TwitterUser> store = new PersistentDataStore<long, TwitterUser>
-            (_ => _.Id, Path.Combine(App.DataStorePath, "users"), 8);
+        private static DataStoreBase<long, TwitterUser> store;
 
         private static object snResolverLocker = new object();
         private static SortedDictionary<string, long> screenNameResolver = new SortedDictionary<string, long>();
+
+        static UserStore()
+        {
+            // initialize store
+            store = new PersistentDataStore<long, TwitterUser>
+                (_ => _.Id, Path.Combine(App.DataStorePath, "users"), 16);
+            App.OnApplicationFinalize += Shutdown;
+        }
 
         public static void Store(TwitterUser user)
         {

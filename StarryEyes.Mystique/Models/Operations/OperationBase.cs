@@ -41,7 +41,7 @@ namespace StarryEyes.Mystique.Models.Operations
             if (wex != null && wex.Response != null)
             {
                 return Observable.Return(wex.Response)
-                    .ObserveOn(Scheduler.ThreadPool)
+                    .ObserveOn(TaskPoolScheduler.Default)
                     .SelectMany(r => r.DownloadStringAsync())
                     .Select(s => ParseErrorMessage(s));
             }

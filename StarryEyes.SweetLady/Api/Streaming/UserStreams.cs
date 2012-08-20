@@ -24,10 +24,11 @@ namespace StarryEyes.SweetLady.Api.Streaming
             }.Parametalize();
             return info.GetOAuthClient(useGzip: false)
                 .SetEndpoint(EndpointUserStreams)
+                .SetParameters(param)
                 .GetResponse()
                 .SelectMany(res => res.DownloadStringLineAsync())
                 .Where(s => !String.IsNullOrEmpty(s))
-                .ObserveOn(Scheduler.ThreadPool)
+                .ObserveOn(TaskPoolScheduler.Default)
                 .ParseStreamingElement();
         }
 

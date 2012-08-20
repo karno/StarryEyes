@@ -7,13 +7,13 @@ namespace System.Reactive.Linq
     {
         public static IObservable<T> Retry<T>(this IObservable<T> source, int retryCount, TimeSpan delaySpan)
         {
-            return source.Retry<T, Exception>(retryCount, null, delaySpan, Scheduler.ThreadPool);
+            return source.Retry<T, Exception>(retryCount, null, delaySpan, TaskPoolScheduler.Default);
         }
 
         public static IObservable<T> Retry<T, TException>(this IObservable<T> source, int retryCount, Action<TException> exAction, TimeSpan delaySpan)
             where TException : Exception
         {
-            return source.Retry(retryCount, exAction, delaySpan, Scheduler.ThreadPool);
+            return source.Retry(retryCount, exAction, delaySpan, TaskPoolScheduler.Default);
         }
 
         public static IObservable<T> Retry<T, TException>(this IObservable<T> source, int retryCount, Action<TException> exAction, TimeSpan delaySpan, IScheduler scheduler)

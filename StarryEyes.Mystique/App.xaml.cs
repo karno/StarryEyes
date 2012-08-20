@@ -20,7 +20,7 @@ namespace StarryEyes.Mystique
         private void Application_Startup(object sender, StartupEventArgs e)
         {
             DispatcherHelper.UIDispatcher = Dispatcher;
-            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
+            // AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
             Application.Current.Exit += (_, __) => AppFinalize(true);
 
             // Set CK/CS for accessing twitter.
@@ -40,9 +40,11 @@ namespace StarryEyes.Mystique
         {
             if (shutdown)
             {
+                System.Diagnostics.Debug.WriteLine("App Normal Exit");
                 // 正規の終了
                 RaiseApplicationExit();
             }
+            System.Diagnostics.Debug.WriteLine("App Finalize");
             RaiseApplicationFinalize();
         }
 

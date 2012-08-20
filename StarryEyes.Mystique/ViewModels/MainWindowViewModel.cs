@@ -64,17 +64,41 @@ namespace StarryEyes.Mystique.ViewModels
     {
         public void Initialize()
         {
-            StatisticsHub.OnStatisticsParamsUpdated += () => RaisePropertyChanged(() => StatusCount);
+            StatisticsHub.OnStatisticsParamsUpdated += () =>
+            {
+                RaisePropertyChanged(() => StatusCount);
+                RaisePropertyChanged(() => TweetsPerMinutes);
+            };
+            ConnectionManager.AddTrackKeyword("http");
             if (Setting.Accounts.Value.Count > 0)
             {
                 ConnectionManager.Update();
             }
+            StatusStore.StatusPublisher
+                .Where(_ => _.IsAdded)
+                .Select(_ => _.Status)
+                .Subscribe(_ => RecentReceivedBody = _.Text);
         }
 
+        private string _recentReceivedBody = String.Empty;
+        public string RecentReceivedBody
+        {
+            get { return _recentReceivedBody; }
+            set
+            {
+                _recentReceivedBody = value;
+                RaisePropertyChanged(() => RecentReceivedBody);
+            }
+        }
 
         public int StatusCount
         {
             get { return StatisticsHub.EstimatedGrossTweetCount; }
+        }
+
+        public double TweetsPerMinutes
+        {
+            get { return StatisticsHub.TweetsPerSeconds * 60; }
         }
 
         #region StartReceiveCommand
@@ -110,5 +134,9 @@ namespace StarryEyes.Mystique.ViewModels
         }
         #endregion
 
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+        }
     }
 }
