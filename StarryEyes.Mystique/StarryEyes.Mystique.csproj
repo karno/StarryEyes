@@ -125,7 +125,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Views\Utils\BooleanConverters.cs" />
+    <Compile Include="Views\Utils\CollectionExistsToVisibleConverter.cs" />
     <Compile Include="Views\Utils\ConverterBase.cs" />
+    <Compile Include="Views\Utils\StringToVisibleConverter.cs" />
     <Page Include="Simple Styles.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
