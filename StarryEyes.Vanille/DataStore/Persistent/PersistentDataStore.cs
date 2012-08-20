@@ -1,9 +1,10 @@
 ﻿using System;
-using System.Linq;
-using System.Reactive.Linq;
-using StarryEyes.Vanille.Serialization;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Reactive.Linq;
+using System.Threading.Tasks;
+using StarryEyes.Vanille.Serialization;
 
 namespace StarryEyes.Vanille.DataStore.Persistent
 {
@@ -141,7 +142,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
-            chunks.ForEach(c => c.Dispose());
+            chunks.ForEach(c => Task.Factory.StartNew(() => c.Dispose()));
         }
     }
 }
