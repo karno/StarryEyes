@@ -16,6 +16,7 @@ using StarryEyes.Mystique.Settings;
 using StarryEyes.Mystique.Models.Store;
 using StarryEyes.Mystique.Models.Hub;
 using StarryEyes.Mystique.Models.Connection;
+using System.Diagnostics;
 
 namespace StarryEyes.Mystique.ViewModels
 {
@@ -133,6 +134,40 @@ namespace StarryEyes.Mystique.ViewModels
                 auth, TransitionMode.Modal, null));
         }
         #endregion
+
+
+        #region ExecuteFilterCommand
+        private ViewModelCommand _ExecuteFilterCommand;
+
+        public ViewModelCommand ExecuteFilterCommand
+        {
+            get
+            {
+                if (_ExecuteFilterCommand == null)
+                {
+                    _ExecuteFilterCommand = new ViewModelCommand(ExecuteFilter);
+                }
+                return _ExecuteFilterCommand;
+            }
+        }
+
+        public void ExecuteFilter()
+        {
+            var sw = new Stopwatch();
+            System.Diagnostics.Debug.WriteLine("start finding...");
+            sw.Start();
+            int _count = 0;
+            StatusStore.Find(t => t.Text.Contains("@")) // find contains hashtags
+                .Subscribe(_ => _count++,
+                () =>
+                {
+                    sw.Stop();
+                    System.Diagnostics.Debug.WriteLine("find completed. Elapsed:" + sw.Elapsed.TotalSeconds + " sec,");
+                    System.Diagnostics.Debug.WriteLine("gross count: " + _count + " records.");
+                });
+        }
+        #endregion
+
 
         protected override void Dispose(bool disposing)
         {

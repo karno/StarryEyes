@@ -30,7 +30,7 @@
     </i:Interaction.Triggers>
 
     <Grid>
-        <Button Width="189"
+        <Button Width="200"
                 Height="33"
                 Margin="8,8,0,0"
                 HorizontalAlignment="Left"
@@ -38,6 +38,14 @@
                 Command="{Binding StartReceiveCommand,
                                   Mode=OneWay}"
                 Content="Auth" />
+        <Button Width="200"
+                Height="33"
+                Margin="208,8,0,0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Command="{Binding ExecuteFilterCommand,
+                                  Mode=OneWay}"
+                Content="Execute Find" />
         <TextBlock Margin="8,45,0,0"
                    HorizontalAlignment="Left"
                    VerticalAlignment="Top">

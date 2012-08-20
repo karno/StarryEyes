@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using StarryEyes.Mystique.Models.Connection.Continuous;
-using System.Reactive.Disposables;
-using StarryEyes.SweetLady.Authorize;
-using StarryEyes.Mystique.Settings;
 using StarryEyes.Mystique.Models.Hub;
+using StarryEyes.Mystique.Settings;
+using StarryEyes.SweetLady.Authorize;
 
 namespace StarryEyes.Mystique.Models.Connection
 {
@@ -309,7 +307,10 @@ namespace StarryEyes.Mystique.Models.Connection
         private void Dispose(bool disposing)
         {
             if (userStreams != null)
+            {
                 userStreams.Dispose();
+                userStreams = null;
+            }
         }
     }
 }
