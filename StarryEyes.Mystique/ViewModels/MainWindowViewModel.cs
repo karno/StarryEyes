@@ -102,6 +102,17 @@ namespace StarryEyes.Mystique.ViewModels
             get { return StatisticsHub.TweetsPerSeconds * 60; }
         }
 
+        private string _queryResult;
+        public string QueryResult
+        {
+            get { return _queryResult; }
+            set
+            {
+                _queryResult = value;
+                RaisePropertyChanged(() => QueryResult);
+            }
+        }
+
         #region StartReceiveCommand
         private ViewModelCommand _StartReceiveCommand;
 
@@ -152,8 +163,8 @@ namespace StarryEyes.Mystique.ViewModels
 
         public void ExecuteFilter()
         {
+            QueryResult = "querying...";
             var sw = new Stopwatch();
-            System.Diagnostics.Debug.WriteLine("start finding...");
             sw.Start();
             int _count = 0;
             StatusStore.Find(t => t.Text.Contains("@")) // find contains hashtags
@@ -161,8 +172,7 @@ namespace StarryEyes.Mystique.ViewModels
                 () =>
                 {
                     sw.Stop();
-                    System.Diagnostics.Debug.WriteLine("find completed. Elapsed:" + sw.Elapsed.TotalSeconds + " sec,");
-                    System.Diagnostics.Debug.WriteLine("gross count: " + _count + " records.");
+                    QueryResult = "Completed! (" + sw.Elapsed.TotalSeconds.ToString("0.00") + " sec, " + _count + " records hot.)";
                 });
         }
         #endregion

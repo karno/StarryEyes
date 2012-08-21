@@ -52,7 +52,8 @@
             <Run Text="{Binding StatusCount, Mode=OneWay}" />
             <Run Text="tweets / " />
             <Run Text="{Binding TweetsPerMinutes, Mode=OneWay}" />
-            <Run Text="tpm" />
+            <Run Text="tpm / " />
+            <Run Text="{Binding QueryResult, Mode=OneWay}" />
         </TextBlock>
         <TextBlock Margin="8,70,8,0"
                    HorizontalAlignment="Stretch"
