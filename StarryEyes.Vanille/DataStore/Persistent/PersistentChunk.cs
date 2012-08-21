@@ -20,9 +20,11 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         private object deletedItemKeyLocker = new object();
 
         private LinkedList<TValue> aliveCaches = new LinkedList<TValue>();
+        private SortedDictionary<TKey, LinkedListNode<TValue>> aliveCacheFinder = new SortedDictionary<TKey, LinkedListNode<TValue>>();
         private object aliveCachesLocker = new object();
 
         private LinkedList<TValue> deadlyCaches = new LinkedList<TValue>();
+        private SortedDictionary<TKey, LinkedListNode<TValue>> deadlyCacheFinder = new SortedDictionary<TKey, LinkedListNode<TValue>>();
         private object deadlyCachesLocker = new object();
 
         private ReaderWriterLockSlim driveLocker = new ReaderWriterLockSlim();
@@ -112,25 +114,30 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         private void AddToAlive(TKey key, TValue value)
         {
             bool overflow = false;
+            TKey deadlyKey = default(TKey);
             TValue deadlyItem = default(TValue);
             lock (aliveCachesLocker)
             {
                 // alive cache
-                var node = FindNodeByKey(aliveCaches, key);
-                if (node != null)
+                LinkedListNode<TValue> node;
+                if (!aliveCacheFinder.TryGetValue(key, out node))
+                {
+                    node = new LinkedListNode<TValue>(value);
+                    aliveCaches.AddFirst(node);
+                    aliveCacheFinder.Add(key, node);
+                }
+                else
                 {
                     node.Value = value; // replace previous
                     aliveCaches.Remove(node);
                     aliveCaches.AddFirst(node); // move node to top
                 }
-                else
-                {
-                    aliveCaches.AddFirst(value); // add top
-                }
                 if (aliveCaches.Count > aliveToDeadlyThreshold)
                 {
                     overflow = true;
                     deadlyItem = aliveCaches.Last.Value;
+                    deadlyKey = _parent.GetKey(deadlyItem);
+                    aliveCacheFinder.Remove(deadlyKey);
                     aliveCaches.RemoveLast();
                 }
             }
@@ -142,7 +149,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
             }
 
             if (overflow)
-                AddToDeadly(_parent.GetKey(deadlyItem), deadlyItem);
+                AddToDeadly(deadlyKey, deadlyItem);
         }
 
         /// <summary>
@@ -155,11 +162,17 @@ namespace StarryEyes.Vanille.DataStore.Persistent
             bool writeBackRequired = false;
             lock (deadlyCachesLocker)
             {
-                var dnode = FindNodeByKey(deadlyCaches, key);
-                if (dnode != null)
+                LinkedListNode<TValue> dnode;
+                if (deadlyCacheFinder.TryGetValue(key, out dnode))
+                {
                     dnode.Value = value;
+                }
                 else
-                    deadlyCaches.AddFirst(value);
+                {
+                    dnode = new LinkedListNode<TValue>(value);
+                    deadlyCaches.AddFirst(dnode);
+                    deadlyCacheFinder.Add(key, dnode);
+                }
                 writeBackRequired = deadlyCaches.Count > deadlyToKillThreshold;
             }
             if (writeBackRequired)
@@ -169,25 +182,6 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                     Monitor.Pulse(writeBackSync);
                 }
             }
-        }
-
-        /// <summary>
-        /// Find linked list node by a key
-        /// </summary>
-        /// <param name="list">target list</param>
-        /// <param name="key">search key</param>
-        /// <returns>actual node or null reference</returns>
-        private LinkedListNode<TValue> FindNodeByKey(LinkedList<TValue> list, TKey key)
-        {
-            if(list.First == null)
-                return null;
-            return EnumerableEx.Generate(
-                list.First,
-                node => node.Next != null,
-                node => node.Next,
-                node => node)
-                .Where(i => _parent.GetKey(i.Value).Equals(key))
-                .FirstOrDefault();
         }
 
         private void WriteBackProc()
@@ -223,7 +217,11 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                 Thread.Sleep(0);
                 lock (deadlyCachesLocker)
                 {
-                    workingCopy.ForEach(n => deadlyCaches.Remove(n));
+                    workingCopy.ForEach(n =>
+                    {
+                        deadlyCaches.Remove(n);
+                        deadlyCacheFinder.Remove(_parent.GetKey(n.Value));
+                    });
                 }
                 // release memory
                 workingCopy.Clear();
@@ -284,14 +282,14 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                 }
                 lock (aliveCachesLocker)
                 {
-                    var node = FindNodeByKey(aliveCaches, key);
-                    if (node != null)
+                    LinkedListNode<TValue> node;
+                    if (aliveCacheFinder.TryGetValue(key, out node))
                         return Observable.Return(node.Value);
                 }
                 lock (deadlyCachesLocker)
                 {
-                    var node = FindNodeByKey(deadlyCaches, key);
-                    if (node != null)
+                    LinkedListNode<TValue> node;
+                    if (deadlyCacheFinder.TryGetValue(key, out node))
                         return Observable.Return(node.Value);
                 }
                 // disk access
