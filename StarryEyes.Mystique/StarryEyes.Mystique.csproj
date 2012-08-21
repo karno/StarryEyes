@@ -125,6 +125,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Filters\Core\Expressions\Operators\KQOperatorEquals.cs" />
+    <Compile Include="Models\Timeline\TimelineDataProvider.cs" />
     <Compile Include="Views\Utils\BooleanConverters.cs" />
     <Compile Include="Views\Utils\CollectionExistsToVisibleConverter.cs" />
     <Compile Include="Views\Utils\ConverterBase.cs" />
@@ -147,12 +149,12 @@
     </Compile>
     <Compile Include="Filters\Core\Expressions\KQExpressionType.cs" />
     <Compile Include="Filters\Core\Expressions\Values\ValueBase.cs" />
-    <Compile Include="Filters\Core\KQExpressionBase.cs" />
+    <Compile Include="Filters\Core\Expressions\KQExpressionBase.cs" />
     <Compile Include="Filters\Core\Expressions\KQExpressionPair.cs" />
     <Compile Include="Filters\Core\Expressions\Operators\KQOperatorBase.cs" />
-    <Compile Include="Filters\Core\IKQExpression.cs" />
+    <Compile Include="Filters\Core\IKQueryElement.cs" />
     <Compile Include="Filters\Core\KQuery.cs" />
-    <Compile Include="Filters\Core\KQSourceBase.cs" />
+    <Compile Include="Filters\Core\Sources\KQSourceBase.cs" />
     <Compile Include="Filters\Core\KrileQueryException.cs" />
     <Compile Include="Helpers\BrowserHelper.cs" />
     <Compile Include="Models\Common\AccountData.cs" />

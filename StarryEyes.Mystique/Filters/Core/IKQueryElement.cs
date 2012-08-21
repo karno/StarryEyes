@@ -1,13 +1,14 @@
-﻿using StarryEyes.SweetLady.DataModel;
+﻿using System;
+using StarryEyes.SweetLady.DataModel;
 
 namespace StarryEyes.Mystique.Filters.Core
 {
-    public interface IKQExpression
+    public interface IKQueryElement
     {
         /// <summary>
-        /// Get filter delegate and expression tree
+        /// Get filter delegate
         /// </summary>
-        bool Eval(TwitterStatus status);
+        Func<TwitterStatus, bool> GetEvaluator();
 
         /// <summary>
         /// Get query expression.

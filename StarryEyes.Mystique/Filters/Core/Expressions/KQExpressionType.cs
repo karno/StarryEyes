@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace StarryEyes.Mystique.Filters.Core.Expressions
 {
@@ -24,7 +23,7 @@ namespace StarryEyes.Mystique.Filters.Core.Expressions
         /// </summary>
         String,
         /// <summary>
-        /// Element of a set
+        /// Element is a value of the sets
         /// </summary>
         Element,
         /// <summary>
@@ -35,6 +34,15 @@ namespace StarryEyes.Mystique.Filters.Core.Expressions
 
     public static class KQExpressionUtil
     {
+        public static KQExpressionType Fix(IEnumerable<KQExpressionType> candidates)
+        {
+            var types = new[] { KQExpressionType.Boolean, KQExpressionType.Numeric, KQExpressionType.String, KQExpressionType.Element, KQExpressionType.Set };
+            var ret = types.Intersect(candidates).First();
+            if (ret == KQExpressionType.Invalid)
+                throw new KrileQueryException("Can't fix expression type.");
+            return ret;
+        }
+
         public static KQExpressionType CheckDecide(
             KQExpressionType[] leftAvailable,
             KQExpressionType[] rightAvailable,

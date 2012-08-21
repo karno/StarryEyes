@@ -1,10 +1,10 @@
-﻿using System.Linq;
-using System;
+﻿using System;
+using System.Linq;
 using StarryEyes.SweetLady.DataModel;
 
 namespace StarryEyes.Mystique.Filters.Core
 {
-    public sealed class KQuery : IKQExpression
+    public sealed class KQuery : IKQueryElement
     {
         public KQSourceBase[] Sources;
 
@@ -15,9 +15,9 @@ namespace StarryEyes.Mystique.Filters.Core
             return "from " + Sources.Select(s => s.ToQuery()).JoinString(", ") + " where " + PredicateTree.ToQuery();
         }
 
-        public bool Eval(TwitterStatus status)
+        public Func<TwitterStatus, bool> GetEvaluator()
         {
-            throw new NotImplementedException();
+            return _ => Sources.Any(s => GetEvaluator()(_)) && PredicateTree.GetEvaluator()(_);
         }
     }
 }

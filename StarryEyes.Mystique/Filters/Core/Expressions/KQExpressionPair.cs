@@ -1,4 +1,5 @@
-﻿using StarryEyes.SweetLady.DataModel;
+﻿using System;
+using StarryEyes.SweetLady.DataModel;
 
 namespace StarryEyes.Mystique.Filters.Core.Expressions
 {
@@ -12,13 +13,12 @@ namespace StarryEyes.Mystique.Filters.Core.Expressions
 
         public KQExpressionBase RightExpr { get; set; }
 
-        public override bool Eval(TwitterStatus status)
+        public override Func<TwitterStatus, bool> GetEvaluator()
         {
-            bool isNegated = IsNegated;
             if (IsAnd)
-                return LeftExpr.Eval(status) != IsNegated && RightExpr.Eval(status) != IsNegated;
+                return _ => LeftExpr.GetEvaluator()(_) != IsNegated && RightExpr.GetEvaluator()(_) != IsNegated;
             else
-                return LeftExpr.Eval(status) != IsNegated || RightExpr.Eval(status) != IsNegated;
+                return _ => LeftExpr.GetEvaluator()(_) != IsNegated || RightExpr.GetEvaluator()(_) != IsNegated;
         }
 
         public override string ToQuery()
