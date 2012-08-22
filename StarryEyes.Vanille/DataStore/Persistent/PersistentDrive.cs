@@ -6,7 +6,9 @@ using StarryEyes.Vanille.Serialization;
 
 namespace StarryEyes.Vanille.DataStore.Persistent
 {
-    internal class PersistentDrive<TKey, TValue> : IDisposable where TValue : IBinarySerializable, new()
+    internal class PersistentDrive<TKey, TValue> : IDisposable
+        where TKey : IComparable<TKey>
+        where TValue : IBinarySerializable, new()
     {
         const int PacketSize = 512;
         const int ChunkSize = 1024;
@@ -23,7 +25,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
 
         // niop is delimited per 1024 packets(= 1 chunks).
         private SortedDictionary<int, List<int>> nextIndexOfPackets;
-        
+
         // start index resolver
         private SortedDictionary<TKey, int> tableOfContents;
 
@@ -209,11 +211,20 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// </summary>
         /// <param name="predicate">find predicate</param>
         /// <returns>value sequence</returns>
-        public IEnumerable<TValue> Find(Func<TValue, bool> predicate)
+        public IEnumerable<TValue> Find(Func<TValue, bool> predicate, FindRange<TKey> range, int? maxCountOfItems)
         {
-            return tableOfContents.Values
-                .Select(Load)
-                .Where(predicate);
+            IEnumerable<int> indexes;
+            if (range != null)
+            {
+                indexes = tableOfContents
+                    .CheckRange(range, _ => _.Key)
+                    .Select(_ => _.Value);
+            }
+            else
+            {
+                indexes = tableOfContents.Values;
+            }
+            return indexes.Select(Load).Where(predicate).Take(maxCountOfItems);
         }
 
         /// <summary>
@@ -239,7 +250,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         public bool Remove(TKey key)
         {
             int idx;
-            if(!tableOfContents.TryGetValue(key, out idx))
+            if (!tableOfContents.TryGetValue(key, out idx))
                 return false; // not found
             do
             {
@@ -320,7 +331,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
             // data reading buffer
             var buffer = new byte[PacketSize];
             // return data buffer
-            var rstream = new MemoryStream(); 
+            var rstream = new MemoryStream();
 
             // read size
             int read = 0;

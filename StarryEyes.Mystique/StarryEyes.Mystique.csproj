@@ -126,6 +126,10 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Filters\Core\Expressions\Operators\KQOperatorEquals.cs" />
+    <Compile Include="Filters\Core\Expressions\Operators\KQOperatorNotEquals.cs" />
+    <Compile Include="Filters\Core\Expressions\Values\BuiltIns\UserRepresentation.cs" />
+    <Compile Include="Filters\Core\Expressions\Values\Immediates\NumericValue.cs" />
+    <Compile Include="Filters\Core\Expressions\Values\Immediates\StringValue.cs" />
     <Compile Include="Models\Timeline\TimelineDataProvider.cs" />
     <Compile Include="Views\Utils\BooleanConverters.cs" />
     <Compile Include="Views\Utils\CollectionExistsToVisibleConverter.cs" />

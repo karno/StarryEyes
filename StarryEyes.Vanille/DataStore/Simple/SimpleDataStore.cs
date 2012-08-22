@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using StarryEyes.Vanille.Serialization;
 using System.Reactive.Linq;
+using StarryEyes.Vanille.Serialization;
 
 namespace StarryEyes.Vanille.DataStore.Simple
 {
@@ -12,8 +11,9 @@ namespace StarryEyes.Vanille.DataStore.Simple
     /// </summary>
     /// <typeparam name="TKey">Key of value</typeparam>
     /// <typeparam name="TValue">actual store item</typeparam>
-    public class SimpleDataStore<TKey, TValue>
-        : DataStoreBase<TKey, TValue> where TValue : IBinarySerializable, new()
+    public class SimpleDataStore<TKey, TValue> : DataStoreBase<TKey, TValue>
+        where TKey : IComparable<TKey>
+        where TValue : IBinarySerializable, new()
     {
         private object dictLock = new object();
         private Dictionary<TKey, TValue> dictionary = new Dictionary<TKey, TValue>();
@@ -49,13 +49,16 @@ namespace StarryEyes.Vanille.DataStore.Simple
             .SelectMany(_ => _);
         }
 
-        public override IObservable<TValue> Find(Func<TValue, bool> predicate)
+        public override IObservable<TValue> Find(Func<TValue, bool> predicate, FindRange<TKey> range = null, int? maxCountOfItems = null)
         {
             return Observable.Start(() =>
             {
                 lock (dictLock)
                 {
-                    return dictionary.Values.Where(predicate).ToArray();
+                    return dictionary.Values.Where(predicate)
+                        .CheckRange(range, GetKey)
+                        .Take(maxCountOfItems)
+                        .ToArray();
                 }
             })
             .SelectMany(_ => _);

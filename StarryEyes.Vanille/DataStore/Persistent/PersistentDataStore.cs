@@ -12,8 +12,9 @@ namespace StarryEyes.Vanille.DataStore.Persistent
     /// provide automated serialization service.
     /// </summary>
     /// <typeparam name="TValue">serialization content type</typeparam>
-    public sealed class PersistentDataStore<TKey, TValue> :
-        DataStoreBase<TKey, TValue> where TValue : IBinarySerializable, new()
+    public sealed class PersistentDataStore<TKey, TValue> : DataStoreBase<TKey, TValue>
+        where TKey : IComparable<TKey>
+        where TValue : IBinarySerializable, new()
     {
         private PersistentChunk<TKey, TValue>[] chunks = null;
         private int chunkNum;
@@ -44,8 +45,8 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                 var tna = tocniops.ToArray();
                 if (tna.Length != chunkNum)
                     throw new ArgumentException("ToC/NIoPs array length is not suitable.");
-                this.chunks =                     Enumerable.Range(0, chunkNum)
-                    .Zip(tna, (_, t) => new{Index = _, ToPNIoPs = t})
+                this.chunks = Enumerable.Range(0, chunkNum)
+                    .Zip(tna, (_, t) => new { Index = _, ToPNIoPs = t })
                     .Select(_ => new PersistentChunk<TKey, TValue>(this,
                         GeneratePath(baseDirectoryPath, _.Index), _.ToPNIoPs.Item1, _.ToPNIoPs.Item2))
                     .ToArray();
@@ -108,11 +109,14 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// Find items with a predicate.
         /// </summary>
         /// <param name="predicate">find predicate</param>
+        /// <param name="range">finding id range</param>
+        /// <param name="maxCountOfItems">max count of returning items</param>
         /// <returns>observable sequence</returns>
-        public override IObservable<TValue> Find(Func<TValue, bool> predicate)
+        public override IObservable<TValue> Find(Func<TValue, bool> predicate, FindRange<TKey> range = null, int? maxCountOfItems = null)
         {
             return chunks.ToObservable()
-                .SelectMany(c => c.Find(predicate));
+                .SelectMany(c => c.Find(predicate, range, maxCountOfItems))
+                .Take(maxCountOfItems);
         }
 
         /// <summary>

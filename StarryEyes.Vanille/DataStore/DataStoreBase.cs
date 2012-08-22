@@ -3,8 +3,9 @@ using StarryEyes.Vanille.Serialization;
 
 namespace StarryEyes.Vanille.DataStore
 {
-    public abstract class DataStoreBase<TKey, TValue>
-        : IDisposable where TValue : IBinarySerializable, new()
+    public abstract class DataStoreBase<TKey, TValue> : IDisposable
+        where TKey : IComparable<TKey>
+        where TValue : IBinarySerializable, new()
     {
         private Func<TValue, TKey> _keyProvider = null;
         private bool _disposed;
@@ -51,7 +52,7 @@ namespace StarryEyes.Vanille.DataStore
         /// this method may very slow.
         /// </summary>
         /// <returns>all stored data</returns>
-        public abstract IObservable<TValue> Find(Func<TValue, bool> predicate);
+        public abstract IObservable<TValue> Find(Func<TValue, bool> predicate, FindRange<TKey> range = null, int? maxCountOfItems = null);
 
         /// <summary>
         /// remove stored data from storage.

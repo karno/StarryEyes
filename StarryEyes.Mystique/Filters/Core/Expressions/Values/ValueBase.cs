@@ -27,7 +27,7 @@ namespace StarryEyes.Mystique.Filters.Core.Expressions.Values
             throw new KrileQueryException("Unsupported transforms to element.");
         }
 
-        public virtual IEnumerable<long> GetSetValue(TwitterStatus status)
+        public virtual ICollection<long> GetSetValue(TwitterStatus status)
         {
             throw new KrileQueryException("Unsupported transforms to set.");
         }

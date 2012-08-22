@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 using StarryEyes.SweetLady.DataModel;
+using StarryEyes.Mystique.Filters.Core.Expressions.Values.Immediates;
 
 namespace StarryEyes.Mystique.Filters.Core.Expressions.Operators
 {
@@ -28,12 +30,74 @@ namespace StarryEyes.Mystique.Filters.Core.Expressions.Operators
                 case KQExpressionType.Numeric:
                     return _ => LeftValue.GetNumericValue(_) == RightValue.GetNumericValue(_);
                 case KQExpressionType.String:
-                    return _ => LeftValue.GetStringValue(_) == RightValue.GetStringValue(_);
+                    var side = StringArgumentSide.None;
+                    // determine side of argument
+                    if (LeftValue is StringValue)
+                        side = StringArgumentSide.Left;
+                    else if (RightValue is StringValue)
+                        side = StringArgumentSide.Right;
+                    return _ => StringMatch(LeftValue.GetStringValue(_), RightValue.GetStringValue(_), side);
                 case KQExpressionType.Element:
                     return _ => LeftValue.GetElementValue(_) == RightValue.GetElementValue(_);
                 default:
                     throw new KrileQueryException("Unsupported type on equals :" + type.ToString());
             }
+        }
+
+        public static bool StringMatch(string left, string right, StringArgumentSide side)
+        {
+            if (side == StringArgumentSide.None)
+                return left == right;
+            if (side == StringArgumentSide.Left)
+            {
+                // set right as argument.
+                var cons = right;
+                right = left;
+                left = cons;
+            }
+            if (right.StartsWith("/"))
+            {
+                // regex
+                try
+                {
+                    return Regex.IsMatch(left, right.Substring(1));
+                }
+                catch // format error?
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                var startsWith = right.StartsWith("^");
+                var endsWith = right.EndsWith("$");
+                if (startsWith && endsWith)
+                {
+                    return left.Equals(right.Substring(1, right.Length - 2),
+                        StringComparison.CurrentCultureIgnoreCase);
+                }
+                else if (startsWith)
+                {
+                    return left.StartsWith(right.Substring(1),
+                        StringComparison.CurrentCultureIgnoreCase);
+                }
+                else if (endsWith)
+                {
+                    return left.EndsWith(right.Substring(right.Length - 1),
+                        StringComparison.CurrentCultureIgnoreCase);
+                }
+                else
+                {
+                    return left.IndexOf(right, StringComparison.CurrentCultureIgnoreCase) >= 0;
+                }
+            }
+        }
+
+        public enum StringArgumentSide
+        {
+            Left,
+            Right,
+            None,
         }
     }
 }

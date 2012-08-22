@@ -62,6 +62,7 @@ namespace StarryEyes.Mystique.Models.Connection.Continuous
                     {
                         // make reconnect.
                         Disconnect();
+                        System.Diagnostics.Debug.WriteLine("***Auto reconnect***");
                         Connect();
                     }
                 });
@@ -166,8 +167,8 @@ namespace StarryEyes.Mystique.Models.Connection.Continuous
                             case (HttpStatusCode)420:
                                 // ERR: Too many connections
                                 // (other client is already connected?)
-                                RaiseDisconnectedByError("他のクライアントとユーザーストリーム接続が競合しています。",
-                                    "このアカウントのユーザーストリーム接続をオフにするか、競合している他のクライアントのユーザーストリーム接続を停止してください。");
+                                RaiseDisconnectedByError("ユーザーストリーム接続が制限されています。",
+                                    "Krileが多重起動していないか確認してください。短時間に何度も接続を試みていた場合は、しばらく待つと再接続できるようになります。");
                                 return;
                         }
                     }

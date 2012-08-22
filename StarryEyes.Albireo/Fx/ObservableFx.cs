@@ -82,6 +82,5 @@ namespace System.Reactive.Linq
                 yield return source;
             }
         }
-
     }
 }
