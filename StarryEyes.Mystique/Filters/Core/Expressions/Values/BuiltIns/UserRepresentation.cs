@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using StarryEyes.Albireo.Data;
 using StarryEyes.Mystique.Models.Common;
 using StarryEyes.Mystique.Models.Store;
 using StarryEyes.Mystique.Settings;
@@ -10,6 +11,8 @@ namespace StarryEyes.Mystique.Filters.Core.Expressions.Values.BuiltIns
 {
     public abstract class UserRepresentationBase
     {
+        public abstract ICollection<long> User { get; }
+
         public abstract ICollection<long> Followings { get; }
 
         public abstract ICollection<long> Followers { get; }
@@ -19,6 +22,16 @@ namespace StarryEyes.Mystique.Filters.Core.Expressions.Values.BuiltIns
 
     public sealed class UserAny : UserRepresentationBase
     {
+        public override ICollection<long> User
+        {
+            get
+            {
+                var accounts = new AVLTree<long>();
+                Setting.Accounts.Value.ForEach(a => accounts.Add(a.UserId));
+                return new PseudoCollection<long>(id => accounts.Contains(id));
+            }
+        }
+
         public override ICollection<long> Followers
         {
             get
@@ -68,6 +81,17 @@ namespace StarryEyes.Mystique.Filters.Core.Expressions.Values.BuiltIns
             _adata = AccountDataStore.GetAccountData(_userId);
         }
 
+        public override ICollection<long> User
+        {
+            get
+            {
+                if (_adata == null)
+                    return new List<long>();
+                else
+                    return new PseudoCollection<long>(_ => _adata.AccountId == _);
+            }
+        }
+
         public override ICollection<long> Followings
         {
             get
@@ -95,6 +119,20 @@ namespace StarryEyes.Mystique.Filters.Core.Expressions.Values.BuiltIns
             throw new NotImplementedException();
         }
     }
+
+    public sealed class User : ValueBase
+    {
+        public override KQExpressionType[] TransformableTypes
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public override string ToQuery()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
 
     public sealed class UserFollowings : ValueBase
     {

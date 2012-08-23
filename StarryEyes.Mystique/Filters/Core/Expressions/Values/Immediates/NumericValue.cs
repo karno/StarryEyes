@@ -21,11 +21,6 @@ namespace StarryEyes.Mystique.Filters.Core.Expressions.Values.Immediates
             return _value;
         }
 
-        public override long GetElementValue(TwitterStatus @unused)
-        {
-            return _value;
-        }
-
         public override string ToQuery()
         {
             return _value.ToString();

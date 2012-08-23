@@ -23,11 +23,7 @@ namespace StarryEyes.Mystique.Filters.Core.Expressions
         /// </summary>
         String,
         /// <summary>
-        /// Element is a value of the sets
-        /// </summary>
-        Element,
-        /// <summary>
-        /// Set (has 0~N Elements)
+        /// Numerical set (has 0~N Elements)
         /// </summary>
         Set,
     }

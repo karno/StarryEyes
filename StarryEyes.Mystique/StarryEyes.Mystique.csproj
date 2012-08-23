@@ -125,8 +125,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Filters\Core\Expressions\Operators\KQOperatorEquals.cs" />
-    <Compile Include="Filters\Core\Expressions\Operators\KQOperatorNotEquals.cs" />
+    <Compile Include="Filters\Core\Expressions\Operators\KQOperatorComparison.cs" />
+    <Compile Include="Filters\Core\Expressions\Operators\KQOperatorEqualnesses.cs" />
+    <Compile Include="Filters\Core\Expressions\Operators\KQOperatorSets.cs" />
     <Compile Include="Filters\Core\Expressions\Values\BuiltIns\UserRepresentation.cs" />
     <Compile Include="Filters\Core\Expressions\Values\Immediates\NumericValue.cs" />
     <Compile Include="Filters\Core\Expressions\Values\Immediates\StringValue.cs" />
