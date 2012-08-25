@@ -10,7 +10,7 @@ using StarryEyes.SweetLady.DataModel;
 using StarryEyes.Mystique.Models.Store;
 using StarryEyes.Mystique.Models.Hub;
 
-namespace StarryEyes.Mystique.Models.Connection.Continuous
+namespace StarryEyes.Mystique.Models.Connection.Essentials
 {
     public sealed class UserStreamsConnection : ConnectionBase
     {
@@ -22,6 +22,9 @@ namespace StarryEyes.Mystique.Models.Connection.Continuous
             Network,
             Protocol,
         }
+
+        public event Action<bool> IsConnectionAliveEvent;
+
         private BackOffMode currentBackOffMode = BackOffMode.None;
         private long currentBackOffWaitCount = 0;
 
@@ -66,6 +69,7 @@ namespace StarryEyes.Mystique.Models.Connection.Continuous
                         Connect();
                     }
                 });
+            RaiseIsConnectedEvent(true);
         }
 
         /// <summary>
@@ -78,6 +82,7 @@ namespace StarryEyes.Mystique.Models.Connection.Continuous
                 var disposal = _connection;
                 _connection = null;
                 disposal.Dispose();
+                RaiseIsConnectedEvent(false);
             }
         }
 
@@ -202,6 +207,13 @@ namespace StarryEyes.Mystique.Models.Connection.Continuous
                 Observable.Timer(TimeSpan.FromMilliseconds(currentBackOffWaitCount))
                     .Subscribe(_ => Connect());
             }
+        }
+
+        private void RaiseIsConnectedEvent(bool connected)
+        {
+            var handler = IsConnectionAliveEvent;
+            if (handler != null)
+                handler(connected);
         }
 
         private void RaiseDisconnectedByError(string header, string detail)

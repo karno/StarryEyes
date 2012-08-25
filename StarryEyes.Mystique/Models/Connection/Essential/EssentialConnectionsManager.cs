@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using StarryEyes.Mystique.Models.Connection.Continuous;
+using StarryEyes.Mystique.Models.Connection.Polling;
 using StarryEyes.Mystique.Models.Hub;
 using StarryEyes.Mystique.Settings;
 using StarryEyes.SweetLady.Authorize;
 
-namespace StarryEyes.Mystique.Models.Connection
+namespace StarryEyes.Mystique.Models.Connection.Essentials
 {
     /// <summary>
     /// Provides management for connect to twitter.
     /// </summary>
-    public static class ConnectionManager
+    public static class EssentialConnectionsManager
     {
         private static object connectionGroupsLocker = new object();
         private static SortedDictionary<long, ConnectionGroup> connectionGroups =
@@ -27,7 +27,7 @@ namespace StarryEyes.Mystique.Models.Connection
         private static List<string> danglingKeywords = new List<string>();
         public static IEnumerable<string> DanglingKeywords
         {
-            get { return ConnectionManager.danglingKeywords.AsEnumerable(); }
+            get { return danglingKeywords.AsEnumerable(); }
         }
 
         /// <summary>
@@ -116,6 +116,21 @@ namespace StarryEyes.Mystique.Models.Connection
         }
 
         /// <summary>
+        /// Notify dangling state.
+        /// </summary>
+        private static void NotifyDanglings()
+        {
+            if (danglingKeywords.Count > 0)
+            {
+                InformationHub.PublishInformation(
+                    new Information(InformationKind.Warning,
+                        "ConnectionManager_UserStreamsTrackDanglings",
+                        "受信されていないトラッキング キーワードがあります。",
+                        "トラッキング キーワードに対し、ユーザーストリーム接続数が不足しています。"));
+            }
+        }
+
+        /// <summary>
         /// Add tracking keywords.
         /// </summary>
         /// <param name="keyword">adding keyword</param>
@@ -149,21 +164,6 @@ namespace StarryEyes.Mystique.Models.Connection
                     }
                 }
                 NotifyDanglings();
-            }
-        }
-
-        /// <summary>
-        /// Notify dangling state.
-        /// </summary>
-        private static void NotifyDanglings()
-        {
-            if (danglingKeywords.Count > 0)
-            {
-                InformationHub.PublishInformation(
-                    new Information(InformationKind.Warning,
-                        "ConnectionManager_Danglings",
-                        "受信されていないトラッキング キーワードがあります。",
-                        "トラッキング キーワードに対し、ユーザーストリーム接続数が不足しています。"));
             }
         }
 
@@ -232,9 +232,16 @@ namespace StarryEyes.Mystique.Models.Connection
             }
         }
 
+        private EssentialTimelinesReceiver receiver;
+        public EssentialTimelinesReceiver EssentialsReceiver
+        {
+            get { return receiver; }
+        }
+
         public ConnectionGroup(long id)
         {
             this.userId = id;
+            receiver = new EssentialTimelinesReceiver(AuthInfo);
         }
 
         // essential connections
@@ -247,11 +254,17 @@ namespace StarryEyes.Mystique.Models.Connection
         public void UserStreamsStartsWith(IEnumerable<string> trackKeywords)
         {
             CheckDispose();
-            if (IsUserStreamsEnabled)
+            if (IsUserStreamsEnabled) // already connected
                 return;
             userStreams = new UserStreamsConnection(AuthInfo);
+            userStreams.IsConnectionAliveEvent += UserStreamsStateChanged;
             userStreams.TrackKeywords = trackKeywords;
             userStreams.Connect();
+        }
+
+        private void UserStreamsStateChanged(bool state)
+        {
+            // TODO: Implementation
         }
 
         /// <summary>
@@ -311,6 +324,7 @@ namespace StarryEyes.Mystique.Models.Connection
                 userStreams = null;
                 disposal.Dispose();
             }
+            receiver.Dispose();
         }
     }
 }

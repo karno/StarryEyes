@@ -3,7 +3,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using StarryEyes.SweetLady.Authorize;
 
-namespace StarryEyes.Mystique.Models.Connection.Polling
+namespace StarryEyes.Mystique.Models.Connection
 {
     /// <summary>
     /// Periodically receiving task

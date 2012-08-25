@@ -3,7 +3,7 @@ using StarryEyes.Mystique.Models.Store;
 using StarryEyes.SweetLady.Api.Rest;
 using StarryEyes.SweetLady.Authorize;
 
-namespace StarryEyes.Mystique.Models.Connection.Polling
+namespace StarryEyes.Mystique.Models.Connection.Essentials
 {
     /// <summary>
     /// receives Home/Mentions/Direct Messages
@@ -16,14 +16,25 @@ namespace StarryEyes.Mystique.Models.Connection.Polling
         protected override int IntervalSec
         {
             // TODO: set this parameter via setting UI.
-            get { return 60; }
+            get { return 20; }
         }
 
+        private int latch = 0;
         protected override void DoReceive()
         {
-            ReceiveHomeTimeline(this.AuthInfo);
-            ReceiveMentionTimeline(this.AuthInfo);
-            ReceiveMessages(this.AuthInfo);
+            latch = (latch + 1) % 3;
+            switch (latch)
+            {
+                case 0:
+                    ReceiveHomeTimeline(this.AuthInfo);
+                    break;
+                case 1:
+                    ReceiveMentionTimeline(this.AuthInfo);
+                    break;
+                case 2:
+                    ReceiveMessages(this.AuthInfo);
+                    break;
+            }
         }
 
         public static void ReceiveHomeTimeline(AuthenticateInfo info)

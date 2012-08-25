@@ -143,6 +143,7 @@
     <Compile Include="Filters\Core\Expressions\Values\Statuses\StatusesUtil.cs" />
     <Compile Include="Filters\Core\Expressions\Values\Statuses\Strings.cs" />
     <Compile Include="Filters\Core\Parsing\QueryCompiler.cs" />
+    <Compile Include="Models\Connection\Extend\ListReceiver.cs" />
     <Compile Include="Models\Timeline\TimelineDataProvider.cs" />
     <Compile Include="Views\Utils\BooleanConverters.cs" />
     <Compile Include="Views\Utils\CollectionExistsToVisibleConverter.cs" />
@@ -175,11 +176,11 @@
     <Compile Include="Filters\Core\KrileQueryException.cs" />
     <Compile Include="Helpers\BrowserHelper.cs" />
     <Compile Include="Models\Common\AccountData.cs" />
-    <Compile Include="Models\Connection\Polling\EssentialTimelinesReceiver.cs" />
-    <Compile Include="Models\Connection\Polling\PollingConnectionBase.cs" />
+    <Compile Include="Models\Connection\Essential\EssentialTimelinesReceiver.cs" />
+    <Compile Include="Models\Connection\PollingConnectionBase.cs" />
     <Compile Include="Models\Connection\ConnectionBase.cs" />
-    <Compile Include="Models\Connection\ConnectionManager.cs" />
-    <Compile Include="Models\Connection\UserStreamsConnection.cs" />
+    <Compile Include="Models\Connection\Essential\EssentialConnectionsManager.cs" />
+    <Compile Include="Models\Connection\Essential\UserStreamsConnection.cs" />
     <Compile Include="Models\Hub\InformationHub.cs" />
     <Compile Include="Models\Hub\StatisticsHub.cs" />
     <Compile Include="Models\Operations\IObservableRunnable.cs" />

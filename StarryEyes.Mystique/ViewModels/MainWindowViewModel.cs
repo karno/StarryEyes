@@ -17,6 +17,7 @@ using StarryEyes.Mystique.Models.Store;
 using StarryEyes.Mystique.Models.Hub;
 using StarryEyes.Mystique.Models.Connection;
 using System.Diagnostics;
+using StarryEyes.Mystique.Models.Connection.Essentials;
 
 namespace StarryEyes.Mystique.ViewModels
 {
@@ -72,7 +73,7 @@ namespace StarryEyes.Mystique.ViewModels
             };
             if (Setting.Accounts.Value.Count > 0)
             {
-                ConnectionManager.Update();
+                EssentialConnectionsManager.Update();
             }
             StatusStore.StatusPublisher
                 .Where(_ => _.IsAdded)
@@ -137,7 +138,7 @@ namespace StarryEyes.Mystique.ViewModels
                     AuthenticateInfo = _,
                     IsUserStreamsEnabled = true
                 });
-                ConnectionManager.Update();
+                EssentialConnectionsManager.Update();
             });
             this.Messenger.RaiseAsync(new TransitionMessage(
                 typeof(AuthorizationWindow),
@@ -166,8 +167,18 @@ namespace StarryEyes.Mystique.ViewModels
             var sw = new Stopwatch();
             sw.Start();
             int _count = 0;
-            StatusStore.Find(t => t.Text.Contains("@")) // find contains hashtags
-                .Subscribe(_ => _count++,
+            var op = new StarryEyes.Mystique.Filters.Core.Expressions.Operators.KQOperatorGreaterThan();
+            op.LeftValue = new StarryEyes.Mystique.Filters.Core.Expressions.Values.Statuses.UserFavroites();
+            op.RightValue = new StarryEyes.Mystique.Filters.Core.Expressions.Values.Statuses.UserStatuses();
+            System.Diagnostics.Debug.WriteLine(op.ToQuery());
+            // op.RightValue = new StarryEyes.Mystique.Filters.Core.Expressions.Values.Immediates.NumericValue(10000);
+            var func = op.GetEvaluator();
+            StatusStore.Find(func) // t.Text.Contains("@")) // find contains hashtags
+                .Subscribe(_ =>
+                {
+                    _count++;
+                    System.Diagnostics.Debug.WriteLine(_.ToString() + " / " + _.User.FavoritesCount);
+                },
                 () =>
                 {
                     sw.Stop();

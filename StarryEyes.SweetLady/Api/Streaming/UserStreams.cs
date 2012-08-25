@@ -18,10 +18,13 @@ namespace StarryEyes.SweetLady.Api.Streaming
         public static IObservable<TwitterStreamingElement> ConnectToUserStreams(this AuthenticateInfo info,
             IEnumerable<string> trackKeywords = null)
         {
-            var param = new Dictionary<string, object>()
+            var paradic = new Dictionary<string, object>();
+            var tracks = trackKeywords != null ? trackKeywords.Distinct().JoinString(",") : null;
+            if (!String.IsNullOrWhiteSpace(tracks))
             {
-                {"track", trackKeywords != null ? trackKeywords.JoinString(",") : null},
-            }.Parametalize();
+                paradic.Add("track", tracks);
+            }
+            var param = paradic.Parametalize();
             return info.GetOAuthClient(useGzip: false)
                 .SetEndpoint(EndpointUserStreams)
                 .SetParameters(param)

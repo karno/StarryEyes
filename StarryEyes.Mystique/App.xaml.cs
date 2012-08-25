@@ -81,12 +81,47 @@ namespace StarryEyes.Mystique
             }
         }
 
+        public static ExecutionMode ExecutionMode
+        {
+            get
+            {
+                switch (ConfigurationManager.AppSettings["ExecutionMode"])
+                {
+                    case "standalone":
+                    case "Standalone":
+                    case "portable":
+                    case "Portable":
+                        return Mystique.ExecutionMode.Standalone;
+
+                    case "roaming":
+                    case "Roaming":
+                        return Mystique.ExecutionMode.Default;
+
+                    default:
+                        return Mystique.ExecutionMode.Default;
+                }
+            }
+        }
+
         public static string ConfigurationPath
         {
             get
             {
-                return ConfigurationManager.OpenExeConfiguration(
-                    ConfigurationUserLevel.PerUserRoamingAndLocal).FilePath;
+                switch (ExecutionMode)
+                {
+                    case Mystique.ExecutionMode.Standalone:
+                        return Path.GetDirectoryName(ExeFilePath);
+                    case Mystique.ExecutionMode.Roaming:
+                        return Path.Combine(
+                            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                            "Krile");
+                    case Mystique.ExecutionMode.Default:
+                    default:
+                        // setting hold in "Local"
+                        return Path.Combine(
+                            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                            "Krile");
+                }
             }
         }
 
@@ -94,7 +129,7 @@ namespace StarryEyes.Mystique
         {
             get
             {
-                return Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(ConfigurationPath)), "store");
+                return Path.Combine(ConfigurationPath, "store");
             }
         }
 
@@ -106,7 +141,7 @@ namespace StarryEyes.Mystique
         public static string GetFormattedVersion()
         {
             var ver = GetVersion();
-            return ver.FileMajorPart + "." + ver.FileMinorPart + "." + ver.FileBuildPart + FileKind(ver.FilePrivatePart);
+            return ver.FileMajorPart + "." + ver.FileMinorPart + "." + ver.FilePrivatePart + FileKind(ver.FileBuildPart);
         }
 
         public static bool IsNightlyVersion
@@ -224,5 +259,12 @@ namespace StarryEyes.Mystique
         }
 
         #endregion
+    }
+
+    public enum ExecutionMode
+    {
+        Default,
+        Roaming,
+        Standalone,
     }
 }
