@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
-using System.Security.Cryptography;
 
 namespace System.Linq
 {
     public static class EnumerableFx
     {
+        private static Random _rng = new Random();
+
         public static IEnumerable<T> Append<T>(this IEnumerable<T> source, params T[] item)
         {
             return source.Concat(item);
@@ -12,23 +13,10 @@ namespace System.Linq
 
         public static IOrderedEnumerable<TSource> Shuffle<TSource>(this IEnumerable<TSource> source)
         {
-            return Shuffle(source, new RNGCryptoServiceProvider());
-        }
-
-        public static IOrderedEnumerable<TSource> Shuffle<TSource>(this IEnumerable<TSource> source,
-            RandomNumberGenerator rng)
-        {
             if (source == null)
                 throw new ArgumentNullException("source");
 
-            var bytes = new byte[4];
-
-            return source.OrderBy(delegate(TSource e)
-            {
-                rng.GetBytes(bytes);
-
-                return BitConverter.ToInt32(bytes, 0);
-            });
+            return source.OrderBy(_ => _rng.Next());
         }
 
         public static IEnumerable<T> WhereDo<T>(this IEnumerable<T> source, Func<T, bool> condition, Action<T> passed)
