@@ -9,22 +9,22 @@ namespace StarryEyes.Mystique.Filters.Core.Expressions.Values
 
         public virtual bool GetBooleanValue(TwitterStatus status)
         {
-            throw new KrileQueryException("Unsupported transforms to boolean.");
+            throw new KrileQueryException("Unsupported transforms to boolean: " + ToQuery());
         }
 
         public virtual long GetNumericValue(TwitterStatus status)
         {
-            throw new KrileQueryException("Unsupported transforms to numeric.");
+            throw new KrileQueryException("Unsupported transforms to numeric: " + ToQuery());
         }
 
         public virtual string GetStringValue(TwitterStatus status)
         {
-            throw new KrileQueryException("Unsupported transforms to string.");
+            throw new KrileQueryException("Unsupported transforms to string: " + ToQuery());
         }
 
         public virtual ICollection<long> GetSetValue(TwitterStatus status)
         {
-            throw new KrileQueryException("Unsupported transforms to set.");
+            throw new KrileQueryException("Unsupported transforms to set: " + ToQuery());
         }
         
         public abstract string ToQuery();

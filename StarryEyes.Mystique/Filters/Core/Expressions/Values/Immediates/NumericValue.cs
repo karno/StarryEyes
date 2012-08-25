@@ -13,7 +13,7 @@ namespace StarryEyes.Mystique.Filters.Core.Expressions.Values.Immediates
 
         public override KQExpressionType[] TransformableTypes
         {
-            get { return new[] { KQExpressionType.Numeric, KQExpressionType.Element }; }
+            get { return new[] { KQExpressionType.Numeric }; }
         }
 
         public override long GetNumericValue(TwitterStatus @unused)

@@ -30,9 +30,14 @@ namespace StarryEyes.Mystique.Filters.Core.Expressions
 
     public static class KQExpressionUtil
     {
+        public static bool Assert(KQExpressionType type, params IEnumerable<KQExpressionType>[] checks)
+        {
+            return checks.All(_ => _.Contains(type));
+        }
+
         public static KQExpressionType Fix(IEnumerable<KQExpressionType> candidates)
         {
-            var types = new[] { KQExpressionType.Boolean, KQExpressionType.Numeric, KQExpressionType.String, KQExpressionType.Element, KQExpressionType.Set };
+            var types = new[] { KQExpressionType.Boolean, KQExpressionType.Numeric, KQExpressionType.String, KQExpressionType.Set };
             var ret = types.Intersect(candidates).First();
             if (ret == KQExpressionType.Invalid)
                 throw new KrileQueryException("Can't fix expression type.");
@@ -44,7 +49,7 @@ namespace StarryEyes.Mystique.Filters.Core.Expressions
             KQExpressionType[] rightAvailable,
             KQExpressionType[] operatorAvailable)
         {
-            var types = new[] { KQExpressionType.Boolean, KQExpressionType.Numeric, KQExpressionType.String, KQExpressionType.Element, KQExpressionType.Set };
+            var types = new[] { KQExpressionType.Boolean, KQExpressionType.Numeric, KQExpressionType.String, KQExpressionType.Set };
             var intersect = types.Intersect(leftAvailable).Intersect(operatorAvailable).Intersect(rightAvailable)
                 .Concat(new[] { KQExpressionType.Invalid })
                 .First();

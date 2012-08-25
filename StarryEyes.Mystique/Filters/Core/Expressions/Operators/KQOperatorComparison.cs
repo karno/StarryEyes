@@ -13,10 +13,9 @@ namespace StarryEyes.Mystique.Filters.Core.Expressions.Operators
         public override Func<TwitterStatus, bool> GetEvaluator()
         {
             // assert type
-            KQExpressionUtil.CheckDecide(
-                LeftValue.TransformableTypes,
-                RightValue.TransformableTypes,
-                new[] { KQExpressionType.Numeric });
+            if (!KQExpressionUtil.Assert(KQExpressionType.Numeric,
+                LeftValue.TransformableTypes, RightValue.TransformableTypes))
+                throw new KrileQueryException("Unsupported type in operator <. Both sides must be numeric.");
             return _ => LeftValue.GetNumericValue(_) < RightValue.GetNumericValue(_);
 
         }
@@ -32,10 +31,9 @@ namespace StarryEyes.Mystique.Filters.Core.Expressions.Operators
         public override Func<TwitterStatus, bool> GetEvaluator()
         {
             // assert type
-            KQExpressionUtil.CheckDecide(
-                LeftValue.TransformableTypes,
-                RightValue.TransformableTypes,
-                new[] { KQExpressionType.Numeric });
+            if (!KQExpressionUtil.Assert(KQExpressionType.Numeric,
+                LeftValue.TransformableTypes, RightValue.TransformableTypes))
+                throw new KrileQueryException("Unsupported type in operator <=. Both sides must be numeric.");
             return _ => LeftValue.GetNumericValue(_) <= RightValue.GetNumericValue(_);
         }
     }
@@ -50,10 +48,9 @@ namespace StarryEyes.Mystique.Filters.Core.Expressions.Operators
         public override Func<TwitterStatus, bool> GetEvaluator()
         {
             // assert type
-            KQExpressionUtil.CheckDecide(
-                LeftValue.TransformableTypes,
-                RightValue.TransformableTypes,
-                new[] { KQExpressionType.Numeric });
+            if (!KQExpressionUtil.Assert(KQExpressionType.Numeric,
+                LeftValue.TransformableTypes, RightValue.TransformableTypes))
+                throw new KrileQueryException("Unsupported type in operator >. Both sides must be numeric.");
             return _ => LeftValue.GetNumericValue(_) > RightValue.GetNumericValue(_);
         }
     }
@@ -62,16 +59,15 @@ namespace StarryEyes.Mystique.Filters.Core.Expressions.Operators
     {
         public override string ToQuery()
         {
-            return LeftValue.ToQuery() + " > " + RightValue.ToQuery();
+            return LeftValue.ToQuery() + " >= " + RightValue.ToQuery();
         }
 
         public override Func<TwitterStatus, bool> GetEvaluator()
         {
             // assert type
-            KQExpressionUtil.CheckDecide(
-                LeftValue.TransformableTypes,
-                RightValue.TransformableTypes,
-                new[] { KQExpressionType.Numeric });
+            if (!KQExpressionUtil.Assert(KQExpressionType.Numeric,
+                LeftValue.TransformableTypes, RightValue.TransformableTypes))
+                throw new KrileQueryException("Unsupported type in operator >=. Both sides must be numeric.");
             return _ => LeftValue.GetNumericValue(_) >= RightValue.GetNumericValue(_);
         }
     }

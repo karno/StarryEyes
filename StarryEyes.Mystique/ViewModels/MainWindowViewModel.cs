@@ -70,7 +70,6 @@ namespace StarryEyes.Mystique.ViewModels
                 RaisePropertyChanged(() => StatusCount);
                 RaisePropertyChanged(() => TweetsPerMinutes);
             };
-            ConnectionManager.AddTrackKeyword("http");
             if (Setting.Accounts.Value.Count > 0)
             {
                 ConnectionManager.Update();

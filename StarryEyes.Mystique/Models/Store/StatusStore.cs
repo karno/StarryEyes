@@ -77,10 +77,11 @@ namespace StarryEyes.Mystique.Models.Store
         /// Find tweets.
         /// </summary>
         /// <param name="predicate">find predicate</param>
+        /// <param name="range">finding range</param>
         /// <returns>results observable sequence.</returns>
-        public static IObservable<TwitterStatus> Find(Func<TwitterStatus, bool> predicate)
+        public static IObservable<TwitterStatus> Find(Func<TwitterStatus, bool> predicate, FindRange<long> range = null, int? count = null)
         {
-            return store.Find(predicate);
+            return store.Find(predicate, range, count);
         }
 
         /// <summary>

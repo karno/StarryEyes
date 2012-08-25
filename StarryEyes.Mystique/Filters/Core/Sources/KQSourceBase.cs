@@ -11,5 +11,15 @@ namespace StarryEyes.Mystique.Filters.Core
         public abstract string ToQuery();
 
         public abstract Func<TwitterStatus, bool> GetEvaluator();
+
+        /// <summary>
+        /// Activate dependency receiving method.
+        /// </summary>
+        public virtual void Activate() { }
+
+        /// <summary>
+        /// Deactivate dependency receiving method.
+        /// </summary>
+        public virtual void Deactivate() { }
     }
 }

@@ -43,6 +43,8 @@ namespace StarryEyes.Mystique.Filters.Core.Expressions.Operators
 
         public static bool StringMatch(string left, string right, StringArgumentSide side)
         {
+            if (left == null || right == null) // null value is not accepted.
+                return false;
             if (side == StringArgumentSide.None)
                 return left == right;
             if (side == StringArgumentSide.Left)

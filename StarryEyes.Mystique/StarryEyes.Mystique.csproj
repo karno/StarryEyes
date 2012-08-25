@@ -127,10 +127,22 @@
     </ApplicationDefinition>
     <Compile Include="Filters\Core\Expressions\Operators\KQOperatorComparison.cs" />
     <Compile Include="Filters\Core\Expressions\Operators\KQOperatorEqualnesses.cs" />
+    <Compile Include="Filters\Core\Expressions\Operators\KQOperatorImmediates.cs" />
     <Compile Include="Filters\Core\Expressions\Operators\KQOperatorSets.cs" />
-    <Compile Include="Filters\Core\Expressions\Values\BuiltIns\UserRepresentation.cs" />
+    <Compile Include="Filters\Core\Expressions\Values\BuiltIns\PseudoCollection.cs" />
+    <Compile Include="Filters\Core\Expressions\Values\BuiltIns\BuiltInUserAny.cs" />
+    <Compile Include="Filters\Core\Expressions\Values\BuiltIns\BuiltInUserSpecified.cs" />
+    <Compile Include="Filters\Core\Expressions\Values\BuiltIns\BuiltInUserRepresentationBase.cs" />
+    <Compile Include="Filters\Core\Expressions\Values\BuiltIns\Values.cs" />
     <Compile Include="Filters\Core\Expressions\Values\Immediates\NumericValue.cs" />
     <Compile Include="Filters\Core\Expressions\Values\Immediates\StringValue.cs" />
+    <Compile Include="Filters\Core\Expressions\Values\Statuses\Booleans.cs" />
+    <Compile Include="Filters\Core\Expressions\Values\Statuses\Complexes.cs" />
+    <Compile Include="Filters\Core\Expressions\Values\Statuses\Numerics.cs" />
+    <Compile Include="Filters\Core\Expressions\Values\Statuses\Sets.cs" />
+    <Compile Include="Filters\Core\Expressions\Values\Statuses\StatusesUtil.cs" />
+    <Compile Include="Filters\Core\Expressions\Values\Statuses\Strings.cs" />
+    <Compile Include="Filters\Core\Parsing\QueryCompiler.cs" />
     <Compile Include="Models\Timeline\TimelineDataProvider.cs" />
     <Compile Include="Views\Utils\BooleanConverters.cs" />
     <Compile Include="Views\Utils\CollectionExistsToVisibleConverter.cs" />

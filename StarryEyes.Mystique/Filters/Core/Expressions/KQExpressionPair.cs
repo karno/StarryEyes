@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using StarryEyes.SweetLady.DataModel;
 
 namespace StarryEyes.Mystique.Filters.Core.Expressions
@@ -9,24 +11,22 @@ namespace StarryEyes.Mystique.Filters.Core.Expressions
 
         public bool IsAnd { get; set; }
 
-        public KQExpressionBase LeftExpr { get; set; }
-
-        public KQExpressionBase RightExpr { get; set; }
+        public IEnumerable<KQExpressionBase> Expressions { get; set; }
 
         public override Func<TwitterStatus, bool> GetEvaluator()
         {
+            var evals = Expressions.Select(expr => expr.GetEvaluator());
             if (IsAnd)
-                return _ => LeftExpr.GetEvaluator()(_) != IsNegated && RightExpr.GetEvaluator()(_) != IsNegated;
+                return _ => evals.All(e => e(_) != IsNegated);
             else
-                return _ => LeftExpr.GetEvaluator()(_) != IsNegated || RightExpr.GetEvaluator()(_) != IsNegated;
+                return _ => evals.Any(e => e(_) != IsNegated);
         }
 
         public override string ToQuery()
         {
-            return (IsNegated ? "!" : "") +
-                "(" + LeftExpr.ToQuery() +
-                (IsAnd ? " && " : " || ") +
-                RightExpr.ToQuery() + ")";
+            return (IsNegated ? "!" : "") + "(" +
+                Expressions.Select(_ => _.ToQuery()).JoinString(IsAnd ? " && " : " || ")
+                + ")";
         }
     }
 }
