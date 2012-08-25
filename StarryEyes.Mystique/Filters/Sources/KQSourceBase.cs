@@ -1,12 +1,12 @@
 ﻿using System;
 using StarryEyes.SweetLady.DataModel;
 
-namespace StarryEyes.Mystique.Filters.Core
+namespace StarryEyes.Mystique.Filters.Sources
 {
     /// <summary>
     /// Tweets source of status
     /// </summary>
-    public abstract class KQSourceBase : IFilterQueryElement
+    public abstract class FilterSourceBase : IFilterQueryElement
     {
         public abstract string ToQuery();
 

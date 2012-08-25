@@ -32,14 +32,14 @@ namespace StarryEyes.Mystique.Filters.Expressions.Operators
 
     public abstract class FilterSingleValueOperator : FilterOperatorBase
     {
-        public ValueBase Value { get; set; }
+        public FilterOperatorBase Value { get; set; }
     }
 
     public abstract class FilterTwoValueOperator : FilterOperatorBase
     {
-        public ValueBase LeftValue { get; set; }
+        public FilterOperatorBase LeftValue { get; set; }
 
-        public ValueBase RightValue { get; set; }
+        public FilterOperatorBase RightValue { get; set; }
 
         public override string ToQuery()
         {

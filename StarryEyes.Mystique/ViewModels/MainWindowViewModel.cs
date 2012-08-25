@@ -167,9 +167,12 @@ namespace StarryEyes.Mystique.ViewModels
             var sw = new Stopwatch();
             sw.Start();
             int _count = 0;
+            var rv = new StarryEyes.Mystique.Filters.Expressions.Operators.FilterOperatorPlus();
+            rv.LeftValue =  new StarryEyes.Mystique.Filters.Expressions.Values.Statuses.UserStatuses();
+            rv.RightValue = new StarryEyes.Mystique.Filters.Expressions.Values.Immediates.NumericValue(100000);
             var op = new StarryEyes.Mystique.Filters.Expressions.Operators.FilterOperatorGreaterThan();
             op.LeftValue = new StarryEyes.Mystique.Filters.Expressions.Values.Statuses.UserFavroites();
-            op.RightValue = new StarryEyes.Mystique.Filters.Expressions.Values.Statuses.UserStatuses();
+            op.RightValue = rv;
             System.Diagnostics.Debug.WriteLine(op.ToQuery());
             // op.RightValue = new StarryEyes.Mystique.Filters.Expressions.Values.Immediates.NumericValue(10000);
             var func = op.GetBooleanValueProvider();

@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Linq;
-using StarryEyes.Mystique.Filters.Core;
 using StarryEyes.Mystique.Filters.Expressions;
+using StarryEyes.Mystique.Filters.Sources;
 using StarryEyes.SweetLady.DataModel;
 
 namespace StarryEyes.Mystique.Filters
 {
     public sealed class FilterQuery : IFilterQueryElement
     {
-        public KQSourceBase[] Sources;
+        public FilterSourceBase[] Sources;
 
         public FilterExpressionRoot PredicateTreeRoot;
 

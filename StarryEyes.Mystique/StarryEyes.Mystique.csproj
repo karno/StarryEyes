@@ -125,6 +125,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Filters\Expressions\Operators\OperatorArithmetics.cs" />
     <Compile Include="Filters\Expressions\Operators\OperatorComparison.cs" />
     <Compile Include="Filters\Expressions\Operators\OperatorConcatenates.cs" />
     <Compile Include="Filters\Expressions\Operators\OperatorEqualnesses.cs" />
