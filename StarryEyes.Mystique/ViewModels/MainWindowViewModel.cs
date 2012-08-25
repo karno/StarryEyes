@@ -167,12 +167,12 @@ namespace StarryEyes.Mystique.ViewModels
             var sw = new Stopwatch();
             sw.Start();
             int _count = 0;
-            var op = new StarryEyes.Mystique.Filters.Core.Expressions.Operators.KQOperatorGreaterThan();
-            op.LeftValue = new StarryEyes.Mystique.Filters.Core.Expressions.Values.Statuses.UserFavroites();
-            op.RightValue = new StarryEyes.Mystique.Filters.Core.Expressions.Values.Statuses.UserStatuses();
+            var op = new StarryEyes.Mystique.Filters.Expressions.Operators.FilterOperatorGreaterThan();
+            op.LeftValue = new StarryEyes.Mystique.Filters.Expressions.Values.Statuses.UserFavroites();
+            op.RightValue = new StarryEyes.Mystique.Filters.Expressions.Values.Statuses.UserStatuses();
             System.Diagnostics.Debug.WriteLine(op.ToQuery());
-            // op.RightValue = new StarryEyes.Mystique.Filters.Core.Expressions.Values.Immediates.NumericValue(10000);
-            var func = op.GetEvaluator();
+            // op.RightValue = new StarryEyes.Mystique.Filters.Expressions.Values.Immediates.NumericValue(10000);
+            var func = op.GetBooleanValueProvider();
             StatusStore.Find(func) // t.Text.Contains("@")) // find contains hashtags
                 .Subscribe(_ =>
                 {

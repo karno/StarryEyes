@@ -125,24 +125,26 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Filters\Core\Expressions\Operators\KQOperatorComparison.cs" />
-    <Compile Include="Filters\Core\Expressions\Operators\KQOperatorEqualnesses.cs" />
-    <Compile Include="Filters\Core\Expressions\Operators\KQOperatorImmediates.cs" />
-    <Compile Include="Filters\Core\Expressions\Operators\KQOperatorSets.cs" />
-    <Compile Include="Filters\Core\Expressions\Values\BuiltIns\PseudoCollection.cs" />
-    <Compile Include="Filters\Core\Expressions\Values\BuiltIns\BuiltInUserAny.cs" />
-    <Compile Include="Filters\Core\Expressions\Values\BuiltIns\BuiltInUserSpecified.cs" />
-    <Compile Include="Filters\Core\Expressions\Values\BuiltIns\BuiltInUserRepresentationBase.cs" />
-    <Compile Include="Filters\Core\Expressions\Values\BuiltIns\Values.cs" />
-    <Compile Include="Filters\Core\Expressions\Values\Immediates\NumericValue.cs" />
-    <Compile Include="Filters\Core\Expressions\Values\Immediates\StringValue.cs" />
-    <Compile Include="Filters\Core\Expressions\Values\Statuses\Booleans.cs" />
-    <Compile Include="Filters\Core\Expressions\Values\Statuses\Complexes.cs" />
-    <Compile Include="Filters\Core\Expressions\Values\Statuses\Numerics.cs" />
-    <Compile Include="Filters\Core\Expressions\Values\Statuses\Sets.cs" />
-    <Compile Include="Filters\Core\Expressions\Values\Statuses\StatusesUtil.cs" />
-    <Compile Include="Filters\Core\Expressions\Values\Statuses\Strings.cs" />
-    <Compile Include="Filters\Core\Parsing\QueryCompiler.cs" />
+    <Compile Include="Filters\Expressions\Operators\OperatorComparison.cs" />
+    <Compile Include="Filters\Expressions\Operators\OperatorConcatenates.cs" />
+    <Compile Include="Filters\Expressions\Operators\OperatorEqualnesses.cs" />
+    <Compile Include="Filters\Expressions\Operators\OperatorImmediates.cs" />
+    <Compile Include="Filters\Expressions\Operators\OperatorSets.cs" />
+    <Compile Include="Filters\Expressions\Values\BuiltIns\PseudoCollection.cs" />
+    <Compile Include="Filters\Expressions\Values\BuiltIns\BuiltInUserAny.cs" />
+    <Compile Include="Filters\Expressions\Values\BuiltIns\BuiltInUserSpecified.cs" />
+    <Compile Include="Filters\Expressions\Values\BuiltIns\BuiltInUserRepresentationBase.cs" />
+    <Compile Include="Filters\Expressions\Values\BuiltIns\Values.cs" />
+    <Compile Include="Filters\Expressions\Values\Immediates\NumericValue.cs" />
+    <Compile Include="Filters\Expressions\Values\Immediates\StringValue.cs" />
+    <Compile Include="Filters\Expressions\Values\Statuses\Booleans.cs" />
+    <Compile Include="Filters\Expressions\Values\Statuses\Complexes.cs" />
+    <Compile Include="Filters\Expressions\Values\Statuses\Numerics.cs" />
+    <Compile Include="Filters\Expressions\Values\Statuses\Sets.cs" />
+    <Compile Include="Filters\Expressions\Values\Statuses\StatusesUtil.cs" />
+    <Compile Include="Filters\Expressions\Values\Statuses\Strings.cs" />
+    <Compile Include="Filters\KQExpressionBase.cs" />
+    <Compile Include="Filters\Parsing\QueryCompiler.cs" />
     <Compile Include="Models\Connection\Extend\ListReceiver.cs" />
     <Compile Include="Models\Timeline\TimelineDataProvider.cs" />
     <Compile Include="Views\Utils\BooleanConverters.cs" />
@@ -165,15 +167,14 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Filters\Core\Expressions\KQExpressionType.cs" />
-    <Compile Include="Filters\Core\Expressions\Values\ValueBase.cs" />
-    <Compile Include="Filters\Core\Expressions\KQExpressionBase.cs" />
-    <Compile Include="Filters\Core\Expressions\KQExpressionPair.cs" />
-    <Compile Include="Filters\Core\Expressions\Operators\KQOperatorBase.cs" />
-    <Compile Include="Filters\Core\IKQueryElement.cs" />
-    <Compile Include="Filters\Core\KQuery.cs" />
-    <Compile Include="Filters\Core\Sources\KQSourceBase.cs" />
-    <Compile Include="Filters\Core\KrileQueryException.cs" />
+    <Compile Include="Filters\Expressions\FilterExpressionType.cs" />
+    <Compile Include="Filters\Expressions\Values\ValueBase.cs" />
+    <Compile Include="Filters\Expressions\FilterExpressionBase.cs" />
+    <Compile Include="Filters\Expressions\Operators\FilterOperatorBase.cs" />
+    <Compile Include="Filters\IFilterQueryElement.cs" />
+    <Compile Include="Filters\FilterQuery.cs" />
+    <Compile Include="Filters\Sources\KQSourceBase.cs" />
+    <Compile Include="Filters\FilterQueryException.cs" />
     <Compile Include="Helpers\BrowserHelper.cs" />
     <Compile Include="Models\Common\AccountData.cs" />
     <Compile Include="Models\Connection\Essential\EssentialTimelinesReceiver.cs" />
