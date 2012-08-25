@@ -19,7 +19,7 @@ namespace StarryEyes.Mystique.Models.Store
         {
             // initialize store
             store = new PersistentDataStore<long, TwitterUser>
-                (_ => _.Id, Path.Combine(App.DataStorePath, "users"), 16);
+                (_ => _.Id, _ => _, Path.Combine(App.DataStorePath, "users"), 16);
             App.OnApplicationFinalize += Shutdown;
         }
 
