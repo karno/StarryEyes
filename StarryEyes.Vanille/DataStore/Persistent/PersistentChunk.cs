@@ -342,8 +342,8 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                     lock (aliveCachesLocker)
                     {
                         return aliveCaches
-                            .Where(v => predicate(v))
                             .CheckRange(range, _parent.GetKey)
+                            .Where(v => predicate(v))
                             .Take(maxCountOfItems)
                             .ToArray();
                     }
@@ -354,8 +354,8 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                     {
                         return deadlyCaches
                             .Select(v => v.Item)
-                            .Where(v => predicate(v))
                             .CheckRange(range, _parent.GetKey)
+                            .Where(v => predicate(v))
                             .Take(maxCountOfItems)
                             .ToArray();
                     }
