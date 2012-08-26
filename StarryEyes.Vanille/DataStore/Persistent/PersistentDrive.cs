@@ -6,7 +6,7 @@ using StarryEyes.Vanille.Serialization;
 
 namespace StarryEyes.Vanille.DataStore.Persistent
 {
-    internal class PersistentDrive<TKey, TValue> : IDisposable
+    internal class PersistentDrive<TKey, TValue> :IDisposable 
         where TKey : IComparable<TKey>
         where TValue : IBinarySerializable, new()
     {
@@ -148,7 +148,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// <returns></returns>
         public IEnumerable<int> GetNextIndexOfPackets()
         {
-            return Enumerable.Range(0, nextIndexOfPackets.Keys.Max())
+            return Enumerable.Range(0, nextIndexOfPackets.Keys.Max() + 1)
                 .Select(i => nextIndexOfPackets.ContainsKey(i) ? nextIndexOfPackets[i] : Enumerable.Repeat(Empty, ChunkSize))
                 .SelectMany(_ => _);
         }

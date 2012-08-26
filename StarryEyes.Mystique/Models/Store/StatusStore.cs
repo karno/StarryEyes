@@ -6,6 +6,7 @@ using StarryEyes.SweetLady.DataModel;
 using StarryEyes.Vanille.DataStore;
 using StarryEyes.Vanille.DataStore.Persistent;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace StarryEyes.Mystique.Models.Store
 {
@@ -24,6 +25,8 @@ namespace StarryEyes.Mystique.Models.Store
         }
 
         #endregion
+
+        private static bool _isInShutdown = false;
 
         private static DataStoreBase<long, TwitterStatus> store;
 
@@ -51,6 +54,7 @@ namespace StarryEyes.Mystique.Models.Store
         /// <param name="publish">flag of publish status for other listening children</param>
         public static void Store(TwitterStatus status, bool publish = true)
         {
+            if (_isInShutdown) return;
             if (publish)
                 statusPublisher.OnNext(new StatusNotification()
                 {
@@ -69,6 +73,7 @@ namespace StarryEyes.Mystique.Models.Store
         /// <returns>contains a tweet or empty observable.</returns>
         public static IObservable<TwitterStatus> Get(long id)
         {
+            if (_isInShutdown) return Observable.Empty<TwitterStatus>();
             return store.Get(id)
                 .Do(_ => Store(_, false)); // add to local cache
         }
@@ -81,6 +86,7 @@ namespace StarryEyes.Mystique.Models.Store
         /// <returns>results observable sequence.</returns>
         public static IObservable<TwitterStatus> Find(Func<TwitterStatus, bool> predicate, FindRange<long> range = null, int? count = null)
         {
+            if (_isInShutdown) return Observable.Empty<TwitterStatus>();
             return store.Find(predicate, range, count);
         }
 
@@ -91,6 +97,7 @@ namespace StarryEyes.Mystique.Models.Store
         /// <param name="publish">publish removing notification to children</param>
         public static void Remove(long id, bool publish = true)
         {
+            if (_isInShutdown) return;
             if (publish)
                 statusPublisher.OnNext(new StatusNotification() { IsAdded = false, StatusId = id });
             store.Remove(id);
@@ -101,7 +108,10 @@ namespace StarryEyes.Mystique.Models.Store
         /// </summary>
         internal static void Shutdown()
         {
+            _isInShutdown = true;
             store.Dispose();
+            var pds = (PersistentDataStore<long, TwitterStatus>)store;
+            StoreOnMemoryObjectPersistence<long>.MakePersistent("status", pds.GetToCNIoPs());
         }
     }
 
