@@ -3,14 +3,14 @@ using StarryEyes.Mystique.Models.Store;
 using StarryEyes.SweetLady.Api.Rest;
 using StarryEyes.SweetLady.Authorize;
 
-namespace StarryEyes.Mystique.Models.Connection.Essentials
+namespace StarryEyes.Mystique.Models.Connection.UserDependency
 {
     /// <summary>
     /// receives Home/Mentions/Direct Messages
     /// </summary>
-    public class EssentialTimelinesReceiver : PollingConnectionBase
+    public class UserTimelinesReceiver : PollingConnectionBase
     {
-        public EssentialTimelinesReceiver(AuthenticateInfo info)
+        public UserTimelinesReceiver(AuthenticateInfo info)
             : base(info) { }
 
         protected override int IntervalSec

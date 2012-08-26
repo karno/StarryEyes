@@ -17,7 +17,7 @@ using StarryEyes.Mystique.Models.Store;
 using StarryEyes.Mystique.Models.Hub;
 using StarryEyes.Mystique.Models.Connection;
 using System.Diagnostics;
-using StarryEyes.Mystique.Models.Connection.Essentials;
+using StarryEyes.Mystique.Models.Connection.UserDependency;
 
 namespace StarryEyes.Mystique.ViewModels
 {
@@ -73,7 +73,7 @@ namespace StarryEyes.Mystique.ViewModels
             };
             if (Setting.Accounts.Value.Count > 0)
             {
-                EssentialConnectionsManager.Update();
+                UserDependencyConnectionsManager.Update();
             }
             StatusStore.StatusPublisher
                 .Where(_ => _.IsAdded)
@@ -138,7 +138,7 @@ namespace StarryEyes.Mystique.ViewModels
                     AuthenticateInfo = _,
                     IsUserStreamsEnabled = true
                 });
-                EssentialConnectionsManager.Update();
+                UserDependencyConnectionsManager.Update();
             });
             this.Messenger.RaiseAsync(new TransitionMessage(
                 typeof(AuthorizationWindow),

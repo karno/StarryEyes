@@ -65,7 +65,10 @@ namespace StarryEyes.Mystique.Models.Hub
                 var duration = (timestamp - previousTimestamp).TotalSeconds;
                 if (duration > 0)
                 {
-                    tweetsPerSeconds = (estimatedGrossTweetCount - previousGross) / duration;
+                    // current period of tweets per seconds
+                    var cptps = (estimatedGrossTweetCount - previousGross) / duration;
+                    // smoothing: 99.2:0.8
+                    tweetsPerSeconds = (tweetsPerSeconds * 0.992) + (cptps * 0.008);
                 }
                 var handler = OnStatisticsParamsUpdated;
                 if (handler != null)

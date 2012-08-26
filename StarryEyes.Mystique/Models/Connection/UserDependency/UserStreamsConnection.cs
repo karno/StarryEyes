@@ -10,12 +10,16 @@ using StarryEyes.SweetLady.DataModel;
 using StarryEyes.Mystique.Models.Store;
 using StarryEyes.Mystique.Models.Hub;
 
-namespace StarryEyes.Mystique.Models.Connection.Essentials
+namespace StarryEyes.Mystique.Models.Connection.UserDependency
 {
     public sealed class UserStreamsConnection : ConnectionBase
     {
         public const int MaxTrackingKeywordBytes = 60;
         public const int MaxTrackingKeywordCounts = 100;
+
+        const int HardErrorRetryMaxCount = 3;
+        int hardErrorRetryCount = 0;
+
         private enum BackOffMode
         {
             None,
@@ -88,6 +92,7 @@ namespace StarryEyes.Mystique.Models.Connection.Essentials
 
         private void Register(TwitterStreamingElement elem)
         {
+            hardErrorRetryCount = 0; // initialize error count
             switch (elem.EventType)
             {
                 case EventType.Undefined:
@@ -152,14 +157,22 @@ namespace StarryEyes.Mystique.Models.Connection.Essentials
                         {
                             case HttpStatusCode.Unauthorized:
                                 // ERR: Unauthorized, invalid OAuth request?
-                                RaiseDisconnectedByError("ユーザー認証が行えません。",
-                                    "PCの時刻設定が正しいか確認してください。回復しない場合は、OAuth認証を再度行ってください。");
-                                return;
+                                if (CheckHardError())
+                                {
+                                    RaiseDisconnectedByError("ユーザー認証が行えません。",
+                                        "PCの時刻設定が正しいか確認してください。回復しない場合は、OAuth認証を再度行ってください。");
+                                    return;
+                                }
+                                break;
                             case HttpStatusCode.Forbidden:
                             case HttpStatusCode.NotFound:
-                                RaiseDisconnectedByError("ユーザーストリーム接続が一時的、または恒久的に利用できなくなっています。",
-                                    "エンドポイントへの接続時にアクセスが拒否されたか、またはエンドポイントが削除されています。");
-                                return;
+                                if (CheckHardError())
+                                {
+                                    RaiseDisconnectedByError("ユーザーストリーム接続が一時的、または恒久的に利用できなくなっています。",
+                                        "エンドポイントへの接続時にアクセスが拒否されたか、またはエンドポイントが削除されています。");
+                                    return;
+                                }
+                                break;
                             case HttpStatusCode.NotAcceptable:
                             case HttpStatusCode.RequestEntityTooLarge:
                                 RaiseDisconnectedByError("トラックしているキーワードが長すぎるか、不正な可能性があります。",
@@ -172,9 +185,13 @@ namespace StarryEyes.Mystique.Models.Connection.Essentials
                             case (HttpStatusCode)420:
                                 // ERR: Too many connections
                                 // (other client is already connected?)
-                                RaiseDisconnectedByError("ユーザーストリーム接続が制限されています。",
-                                    "Krileが多重起動していないか確認してください。短時間に何度も接続を試みていた場合は、しばらく待つと再接続できるようになります。");
-                                return;
+                                if (CheckHardError())
+                                {
+                                    RaiseDisconnectedByError("ユーザーストリーム接続が制限されています。",
+                                        "Krileが多重起動していないか確認してください。短時間に何度も接続を試みていた場合は、しばらく待つと再接続できるようになります。");
+                                    return;
+                                }
+                                break;
                         }
                     }
                     // else -> backoff
@@ -207,6 +224,15 @@ namespace StarryEyes.Mystique.Models.Connection.Essentials
                 Observable.Timer(TimeSpan.FromMilliseconds(currentBackOffWaitCount))
                     .Subscribe(_ => Connect());
             }
+        }
+
+        private bool CheckHardError()
+        {
+            hardErrorRetryCount++;
+            if (hardErrorRetryCount > HardErrorRetryMaxCount)
+                return true;
+            else
+                return false;
         }
 
         private void RaiseIsConnectedEvent(bool connected)

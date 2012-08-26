@@ -6,12 +6,12 @@ using StarryEyes.Mystique.Models.Hub;
 using StarryEyes.Mystique.Settings;
 using StarryEyes.SweetLady.Authorize;
 
-namespace StarryEyes.Mystique.Models.Connection.Essentials
+namespace StarryEyes.Mystique.Models.Connection.UserDependency
 {
     /// <summary>
     /// Provides management for connect to twitter.
     /// </summary>
-    public static class EssentialConnectionsManager
+    public static class UserDependencyConnectionsManager
     {
         private static object connectionGroupsLocker = new object();
         private static SortedDictionary<long, ConnectionGroup> connectionGroups =
@@ -232,8 +232,8 @@ namespace StarryEyes.Mystique.Models.Connection.Essentials
             }
         }
 
-        private EssentialTimelinesReceiver receiver;
-        public EssentialTimelinesReceiver EssentialsReceiver
+        private UserTimelinesReceiver receiver;
+        public UserTimelinesReceiver EssentialsReceiver
         {
             get { return receiver; }
         }
@@ -241,7 +241,8 @@ namespace StarryEyes.Mystique.Models.Connection.Essentials
         public ConnectionGroup(long id)
         {
             this.userId = id;
-            receiver = new EssentialTimelinesReceiver(AuthInfo);
+            receiver = new UserTimelinesReceiver(AuthInfo);
+            receiver.IsActivated = true;
         }
 
         // essential connections

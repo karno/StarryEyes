@@ -178,11 +178,11 @@
     <Compile Include="Filters\FilterQueryException.cs" />
     <Compile Include="Helpers\BrowserHelper.cs" />
     <Compile Include="Models\Common\AccountData.cs" />
-    <Compile Include="Models\Connection\Essential\EssentialTimelinesReceiver.cs" />
+    <Compile Include="Models\Connection\UserDependency\UserTimelinesReceiver.cs" />
     <Compile Include="Models\Connection\PollingConnectionBase.cs" />
     <Compile Include="Models\Connection\ConnectionBase.cs" />
-    <Compile Include="Models\Connection\Essential\EssentialConnectionsManager.cs" />
-    <Compile Include="Models\Connection\Essential\UserStreamsConnection.cs" />
+    <Compile Include="Models\Connection\UserDependency\UserDependencyConnectionsManager.cs" />
+    <Compile Include="Models\Connection\UserDependency\UserStreamsConnection.cs" />
     <Compile Include="Models\Hub\InformationHub.cs" />
     <Compile Include="Models\Hub\StatisticsHub.cs" />
     <Compile Include="Models\Operations\IObservableRunnable.cs" />
