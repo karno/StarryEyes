@@ -13,7 +13,7 @@ namespace StarryEyes.Mystique.Filters.Expressions.Values.BuiltIns
             get
             {
                 var accounts = new AVLTree<long>();
-                Setting.Accounts.Value.ForEach(a => accounts.Add(a.UserId));
+                Setting.Accounts.ForEach(a => accounts.Add(a.UserId));
                 return new PseudoCollection<long>(id => accounts.Contains(id));
             }
         }

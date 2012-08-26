@@ -1,13 +1,70 @@
-﻿using System.Collections.Generic;
-using System.Configuration;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Xaml;
+using StarryEyes.Mystique.Models.Hub;
+using System.Linq;
 
 namespace StarryEyes.Mystique.Settings
 {
     public static class Setting
     {
+        static SortedDictionary<string, object> settingValueHolder;
+
         static Setting()
         {
-            Properties.Settings.Default.Upgrade();
+            LoadSettings();
+        }
+
+        private static void LoadSettings()
+        {
+            if (File.Exists(App.ConfigurationFilePath))
+            {
+                try
+                {
+                    using (var fs = File.Open(App.ConfigurationFilePath, FileMode.Open, FileAccess.Read))
+                    {
+                        settingValueHolder = new SortedDictionary<string, object>(
+                            XamlServices.Load(fs) as IDictionary<string, object>);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    try
+                    {
+                        var cpfn = "Krile_CorruptedConfig_" + Path.GetRandomFileName() + ".xml";
+                        File.Copy(App.ConfigurationFilePath, Path.Combine(
+                            Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
+                            cpfn));
+                        settingValueHolder = new SortedDictionary<string, object>();
+                        InformationHub.PublishInformation(new Information(InformationKind.Warning,
+                            "SETTING_LOAD_ERROR",
+                            "設定が読み込めません。バックアップをデスクトップに作成し、設定を初期化しました。",
+                            "バックアップ設定ファイルは " + cpfn + " として作成されました。" + Environment.NewLine +
+                            "あなた自身で原因の特定と修復が可能な場合は、修復した設定ファイルを元のディレクトリに配置し直すことで設定を回復できるかもしれません。" + Environment.NewLine +
+                            "元のディレクトリ: " + App.ConfigurationFilePath + Environment.NewLine +
+                            "送出された例外: " + ex.ToString()));
+                    }
+                    catch(Exception exi)
+                    {
+                        Environment.FailFast(
+                            "設定ファイルの緊急バックアップ ストアが行えませんでした。", exi);
+                        return;
+                    }
+                }
+            }
+            else
+            {
+                settingValueHolder = new SortedDictionary<string, object>();
+            }
+        }
+
+        public static void Save()
+        {
+            using (var fs = File.Open(App.ConfigurationFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+            {
+                XamlServices.Save(fs, settingValueHolder);
+            }
         }
 
         public static void Clear()
@@ -19,85 +76,101 @@ namespace StarryEyes.Mystique.Settings
 
         public static SettingItem<string> ExternalBrowserPath = new SettingItem<string>("ExternalBrowserPath", null);
 
-        public static SettingItem<List<AccountSetting>> Accounts =
-            new SettingItem<List<AccountSetting>>("Accounts", new List<AccountSetting>());
+        private static SettingItem<List<AccountSetting>> accounts = new SettingItem<List<AccountSetting>>("Accounts", new List<AccountSetting>());
+
+        public static IEnumerable<AccountSetting> Accounts
+        {
+            get { return accounts.Value; }
+            set { accounts.Value = value.ToList(); }
+        }
+
+        public class SettingItem<T> where T : class
+        {
+            private string _name;
+            public string Name
+            {
+                get { return _name; }
+            }
+
+            private T _defaultValue;
+            private bool _autoSave;
+            public SettingItem(string name, T defaultValue, bool autoSave = true)
+            {
+                this._name = name;
+                this._defaultValue = defaultValue;
+                this._autoSave = autoSave;
+            }
+
+            private T valueCache;
+            public T Value
+            {
+                get
+                {
+                    try
+                    {
+                        return valueCache ??
+                            (valueCache = settingValueHolder[Name] as T);
+                    }
+                    catch
+                    {
+                        return _defaultValue;
+                    }
+                }
+                set
+                {
+                    valueCache = value;
+                    settingValueHolder[Name] = value;
+                    if (_autoSave)
+                    {
+                        Save();
+                    }
+                }
+            }
+        }
+
+        public class SettingItemStruct<T> where T : struct
+        {
+            private string _name;
+            public string Name
+            {
+                get { return _name; }
+            }
+
+            private T _defaultValue;
+            private bool _autoSave;
+            public SettingItemStruct(string name, T defaultValue, bool autoSave = true)
+            {
+                this._name = name;
+                this._defaultValue = defaultValue;
+                this._autoSave = autoSave;
+            }
+
+            private T? valueCache;
+            public T Value
+            {
+                get
+                {
+                    try
+                    {
+                        return valueCache ??
+                            (valueCache = (T)settingValueHolder[Name]).Value;
+                    }
+                    catch
+                    {
+                        return _defaultValue;
+                    }
+                }
+                set
+                {
+                    valueCache = value;
+                    settingValueHolder[Name] = value;
+                    if (_autoSave)
+                    {
+                        Save();
+                    }
+                }
+            }
+        }
     }
 
-    public class SettingItem<T> where T : class
-    {
-        private string _name;
-        public string Name
-        {
-            get { return _name; }
-        }
-
-        private T _defaultValue;
-        public SettingItem(string name, T defaultValue)
-        {
-            this._name = name;
-            this._defaultValue = defaultValue;
-        }
-
-        private T valueCache;
-        public T Value
-        {
-            get
-            {
-                try
-                {
-                    return valueCache ??
-                        (valueCache = Properties.Settings.Default[Name] as T);
-                }
-                catch (SettingsPropertyNotFoundException)
-                {
-                    return _defaultValue;
-                }
-            }
-            set
-            {
-                valueCache = value;
-                Properties.Settings.Default[Name] = value;
-                Properties.Settings.Default.Save();
-            }
-        }
-    }
-
-    public class SettingItemStruct<T> where T : struct
-    {
-        private string _name;
-        public string Name
-        {
-            get { return _name; }
-        }
-
-        private T _defaultValue;
-        public SettingItemStruct(string name, T defaultValue)
-        {
-            this._name = name;
-            this._defaultValue = defaultValue;
-        }
-
-        private T? valueCache;
-        public T Value
-        {
-            get
-            {
-                try
-                {
-                    return valueCache ??
-                        (valueCache = (T)Properties.Settings.Default[Name]).Value;
-                }
-                catch (SettingsPropertyNotFoundException)
-                {
-                    return _defaultValue;
-                }
-            }
-            set
-            {
-                valueCache = value;
-                Properties.Settings.Default[Name] = value;
-                Properties.Settings.Default.Save();
-            }
-        }
-    }
 }

@@ -71,7 +71,7 @@ namespace StarryEyes.Mystique.ViewModels
                 RaisePropertyChanged(() => StatusCount);
                 RaisePropertyChanged(() => TweetsPerMinutes);
             };
-            if (Setting.Accounts.Value.Count > 0)
+            if (Setting.Accounts.Count() > 0)
             {
                 UserDependencyConnectionsManager.Update();
             }
@@ -133,11 +133,12 @@ namespace StarryEyes.Mystique.ViewModels
             var auth = new AuthorizationViewModel();
             auth.AuthorizeObservable.Subscribe(_ =>
             {
-                Setting.Accounts.Value.Add(new AccountSetting()
-                {
-                    AuthenticateInfo = _,
-                    IsUserStreamsEnabled = true
-                });
+                Setting.Accounts = Setting.Accounts.Append(
+                    new AccountSetting()
+                    {
+                        AuthenticateInfo = _,
+                        IsUserStreamsEnabled = true
+                    });
                 UserDependencyConnectionsManager.Update();
             });
             this.Messenger.RaiseAsync(new TransitionMessage(

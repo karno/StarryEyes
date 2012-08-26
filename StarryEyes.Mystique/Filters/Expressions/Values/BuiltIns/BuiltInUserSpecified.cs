@@ -14,7 +14,7 @@ namespace StarryEyes.Mystique.Filters.Expressions.Values.BuiltIns
 
         public UserSpecified(string screenName)
         {
-            _userId = Setting.Accounts.Value
+            _userId = Setting.Accounts
                 .Where(u => u.AuthenticateInfo.UnreliableScreenName == screenName)
                 .Select(u => u.UserId)
                 .FirstOrDefault();

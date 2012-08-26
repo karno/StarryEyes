@@ -1,8 +1,10 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Runtime.Serialization;
 using System.Xml.Serialization;
 using Codeplex.OAuth;
 using StarryEyes.SweetLady.DataModel;
+using System.Linq;
 
 namespace StarryEyes.SweetLady.Authorize
 {
@@ -28,7 +30,7 @@ namespace StarryEyes.SweetLady.Authorize
         /// <summary>
         /// Token and secret
         /// </summary>
-        [IgnoreDataMember, XmlIgnore]
+        [IgnoreDataMember, XmlIgnore, DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public AccessToken AccessToken
         {
             get { return _accessToken; }
@@ -44,7 +46,7 @@ namespace StarryEyes.SweetLady.Authorize
             get { return AccessToken.Key + Environment.NewLine + AccessToken.Secret; }
             set
             {
-                var splited = value.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+                var splited = value.Split(Environment.NewLine.ToArray(), StringSplitOptions.RemoveEmptyEntries);
                 AccessToken = new AccessToken(splited[0], splited[1]);
             }
         }
@@ -85,7 +87,7 @@ namespace StarryEyes.SweetLady.Authorize
         /// <summary>
         /// Provide exact profile image uri, but this property is unreliable.
         /// </summary>
-        [IgnoreDataMember, XmlIgnore]
+        [IgnoreDataMember, XmlIgnore, DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Uri UnreliableProfileImageUri
         {
             get
@@ -108,25 +110,25 @@ namespace StarryEyes.SweetLady.Authorize
         /// <summary>
         /// Rate Limiting max value per period
         /// </summary>
-        [XmlIgnore, IgnoreDataMember]
+        [IgnoreDataMember, XmlIgnore, DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public int RateLimitMax { get; set; }
 
         /// <summary>
         /// Rate limiting remain value of current period
         /// </summary>
-        [XmlIgnore, IgnoreDataMember]
+        [IgnoreDataMember, XmlIgnore, DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public int RateLimitRemaining { get; set; }
 
         /// <summary>
         /// Time next period of rate limit..
         /// </summary>
-        [XmlIgnore, IgnoreDataMember]
+        [IgnoreDataMember, XmlIgnore, DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public DateTime RateLimitReset { get; set; }
 
         /// <summary>
         /// Exact info
         /// </summary>
-        [XmlIgnore, IgnoreDataMember]
+        [IgnoreDataMember, XmlIgnore, DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public TwitterUser UserInfo { get; set; }
     }
 }

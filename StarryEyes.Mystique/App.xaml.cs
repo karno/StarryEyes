@@ -103,7 +103,7 @@ namespace StarryEyes.Mystique
             }
         }
 
-        public static string ConfigurationPath
+        public static string ConfigurationDirectoryPath
         {
             get
             {
@@ -125,11 +125,19 @@ namespace StarryEyes.Mystique
             }
         }
 
+        public static string ConfigurationFilePath
+        {
+            get
+            {
+                return Path.Combine(ConfigurationDirectoryPath, "krile.xml");
+            }
+        }
+
         public static string DataStorePath
         {
             get
             {
-                return Path.Combine(ConfigurationPath, "store");
+                return Path.Combine(ConfigurationDirectoryPath, "store");
             }
         }
 

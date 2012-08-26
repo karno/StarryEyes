@@ -37,21 +37,21 @@ namespace StarryEyes.Mystique.Models.Connection.UserDependency
             }
         }
 
-        public static void ReceiveHomeTimeline(AuthenticateInfo info)
+        public static void ReceiveHomeTimeline(AuthenticateInfo info, long? max_id = null)
         {
-            info.GetHomeTimeline(count: 100, include_rts: true, include_entities: true)
+            info.GetHomeTimeline(count: 100, include_rts: true, include_entities: true, max_id: max_id)
                 .Subscribe(t => StatusStore.Store(t));
         }
 
-        public static void ReceiveMentionTimeline(AuthenticateInfo info)
+        public static void ReceiveMentionTimeline(AuthenticateInfo info, long? max_id = null)
         {
-            info.GetMentions(count: 100, include_rts: false)
+            info.GetMentions(count: 100, include_rts: false, max_id: max_id)
                 .Subscribe(t => StatusStore.Store(t));
         }
 
-        public static void ReceiveMessages(AuthenticateInfo info)
+        public static void ReceiveMessages(AuthenticateInfo info, long? max_id = null)
         {
-            info.GetDirectMessages(count: 50)
+            info.GetDirectMessages(count: 50, max_id: max_id)
                 .Subscribe(t => StatusStore.Store(t));
         }
     }

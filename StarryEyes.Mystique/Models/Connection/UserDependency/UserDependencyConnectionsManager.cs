@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using StarryEyes.Mystique.Models.Connection.Polling;
 using StarryEyes.Mystique.Models.Hub;
 using StarryEyes.Mystique.Settings;
 using StarryEyes.SweetLady.Authorize;
@@ -14,14 +13,14 @@ namespace StarryEyes.Mystique.Models.Connection.UserDependency
     public static class UserDependencyConnectionsManager
     {
         private static object connectionGroupsLocker = new object();
-        private static SortedDictionary<long, ConnectionGroup> connectionGroups =
-            new SortedDictionary<long, ConnectionGroup>();
+        private static SortedDictionary<long, ConnectionGroup> connectionGroups
+            = new SortedDictionary<long, ConnectionGroup>();
 
         private static object trackingLocker = new object();
-        private static SortedDictionary<string, UserStreamsConnection> trackResolver =
-            new SortedDictionary<string, UserStreamsConnection>();
-        private static SortedDictionary<string, int> trackReferenceCount =
-            new SortedDictionary<string, int>();
+        private static SortedDictionary<string, UserStreamsConnection> trackResolver
+            = new SortedDictionary<string, UserStreamsConnection>();
+        private static SortedDictionary<string, int> trackReferenceCount
+            = new SortedDictionary<string, int>();
 
         // tracked keywords relied on stopped/removed streamings.
         private static List<string> danglingKeywords = new List<string>();
@@ -38,7 +37,7 @@ namespace StarryEyes.Mystique.Models.Connection.UserDependency
         public static void Update(bool enforceReconnection = false)
         {
             // create look-up dictionary.
-            var settings = Setting.Accounts.Value.ToLookup(k => k.UserId);
+            var settings = Setting.Accounts.ToLookup(k => k.UserId);
             lock (connectionGroupsLocker)
             {
                 // determine removed users ids and finalize for each.
@@ -225,7 +224,7 @@ namespace StarryEyes.Mystique.Models.Connection.UserDependency
         {
             get
             {
-                return Setting.Accounts.Value
+                return Setting.Accounts
                     .Select(a => a.AuthenticateInfo)
                     .Where(i => i.Id == UserId)
                     .FirstOrDefault();

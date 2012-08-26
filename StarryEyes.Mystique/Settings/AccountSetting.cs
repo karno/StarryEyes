@@ -12,6 +12,7 @@ namespace StarryEyes.Mystique.Settings
         /// <summary>
         /// User ID
         /// </summary>
+        [DataMember]
         public long UserId
         {
             get { return AuthenticateInfo.Id; }

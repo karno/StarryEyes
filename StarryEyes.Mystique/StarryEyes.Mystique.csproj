@@ -147,6 +147,7 @@
     <Compile Include="Filters\KQExpressionBase.cs" />
     <Compile Include="Filters\Parsing\QueryCompiler.cs" />
     <Compile Include="Models\Connection\Extend\ListReceiver.cs" />
+    <Compile Include="Models\Connection\Extend\SearchReceiver.cs" />
     <Compile Include="Models\Timeline\TimelineDataProvider.cs" />
     <Compile Include="Views\Utils\BooleanConverters.cs" />
     <Compile Include="Views\Utils\CollectionExistsToVisibleConverter.cs" />
