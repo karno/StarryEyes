@@ -116,7 +116,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         {
             return chunks.ToObservable()
                 .SelectMany(c => c.Find(predicate, range, maxCountOfItems))
-                .Take(maxCountOfItems);
+                .Take2(maxCountOfItems);
         }
 
         /// <summary>

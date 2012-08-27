@@ -3,57 +3,95 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Xaml;
+using StarryEyes.Vanille.Serialization;
 
 namespace StarryEyes.Mystique.Models.Store
 {
-    public static class StoreOnMemoryObjectPersistence<T>
+    public static class StoreOnMemoryObjectPersistence
     {
+        private static string GetDataStoreFileName(string key)
+        {
+            return Path.Combine(App.DataStorePath, key + ".dbm"); // database master
+        }
+
         /// <summary>
         /// Persistent Table of Contents/Next Index of Packets enumerable.
         /// </summary>
         /// <param name="key">persistence key</param>
         /// <param name="tocniops">ToC/NIoP enumerable</param>
-        public static void MakePersistent(string key, IEnumerable<Tuple<IDictionary<T, int>, IEnumerable<int>>> tocniops)
+        public static void MakePersistent(string key, IEnumerable<Tuple<IDictionary<long, int>, IEnumerable<int>>> tocniops)
         {
-            var fn = Path.Combine(App.DataStorePath, key + ".dsx"); // deflated serialized xaml
-            var sd = tocniops.Select(s => new ToCAndNIoP<T>(s)).ToList();
-            using (var fs = new FileStream(fn, FileMode.Create, FileAccess.ReadWrite))
-            using (var cs = new DeflateStream(fs, CompressionMode.Compress))
+            var sd = tocniops.Select(s => new ToCAndNIoP(s)).ToList();
+            using (var fs = new FileStream(GetDataStoreFileName(key), FileMode.Create, FileAccess.ReadWrite))
             {
-                XamlServices.Save(cs, sd);
+                BinarySerialization.SerializeCollection(fs, sd);
             }
         }
 
-        public static IEnumerable<Tuple<IDictionary<T, int>, IEnumerable<int>>> GetPersistentData(string key)
+        public static bool IsPersistentDataExited(string key)
         {
-            var fn = Path.Combine(App.DataStorePath, key + ".dsx");
-            using (var fs = new FileStream(fn, FileMode.Open, FileAccess.ReadWrite))
-            using (var cs = new DeflateStream(fs, CompressionMode.Decompress))
+            return File.Exists(GetDataStoreFileName(key));
+        }
+
+        public static IEnumerable<Tuple<IDictionary<long, int>, IEnumerable<int>>> GetPersistentData(string key)
+        {
+            using (var fs = new FileStream(GetDataStoreFileName(key), FileMode.Open, FileAccess.ReadWrite))
             {
-                return ((XamlServices.Load(cs) as List<ToCAndNIoP<T>>) ?? new List<ToCAndNIoP<T>>())
-                    .Select(t => t.GetToCNIoP());
+                return BinarySerialization.DeserializeCollection<ToCAndNIoP>(fs)
+                    .Select(s => s.GetToCNIoP());
             }
         }
     }
 
-    public class ToCAndNIoP<T>
+    public class ToCAndNIoP : IBinarySerializable
     {
-        public ToCAndNIoP() { }
-
-        public ToCAndNIoP(Tuple<IDictionary<T, int>, IEnumerable<int>> tocniop)
+        public ToCAndNIoP()
         {
-            TableOfContents = new Dictionary<T, int>(tocniop.Item1);
+            TableOfContents = new Dictionary<long, int>();
+            NextIndexOfPackets = new List<int>();
+        }
+
+        public ToCAndNIoP(Tuple<IDictionary<long, int>, IEnumerable<int>> tocniop)
+        {
+            TableOfContents = new Dictionary<long, int>(tocniop.Item1);
             NextIndexOfPackets = new List<int>(tocniop.Item2);
         }
 
-        public Dictionary<T, int> TableOfContents { get; set; }
+        public Dictionary<long, int> TableOfContents { get; set; }
 
         public List<int> NextIndexOfPackets { get; set; }
 
-        public Tuple<IDictionary<T, int>, IEnumerable<int>> GetToCNIoP()
+        public Tuple<IDictionary<long, int>, IEnumerable<int>> GetToCNIoP()
         {
-            return new Tuple<IDictionary<T, int>, IEnumerable<int>>(TableOfContents, NextIndexOfPackets);
+            return new Tuple<IDictionary<long, int>, IEnumerable<int>>(TableOfContents, NextIndexOfPackets);
+        }
+
+        public void Serialize(BinaryWriter writer)
+        {
+            writer.Write(TableOfContents.Count);
+            TableOfContents.ForEach(kvp =>
+            {
+                writer.Write(kvp.Key);
+                writer.Write(kvp.Value);
+            });
+            writer.Write(NextIndexOfPackets.Count);
+            NextIndexOfPackets.ForEach(i => writer.Write(i));
+        }
+
+        public void Deserialize(BinaryReader reader)
+        {
+            int count = reader.ReadInt32();
+            for (int i = 0; i < count; i++)
+            {
+                var key = reader.ReadInt64();
+                var value = reader.ReadInt32();
+                TableOfContents.Add(key, value);
+            }
+            count = reader.ReadInt32();
+            for (int i = 0; i < count; i++)
+            {
+                NextIndexOfPackets.Add(reader.ReadInt32());
+            }
         }
     }
 }

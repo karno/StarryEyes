@@ -344,7 +344,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                         return aliveCaches
                             .CheckRange(range, _parent.GetKey)
                             .Where(v => predicate(v))
-                            .Take(maxCountOfItems)
+                            .Take2(maxCountOfItems)
                             .ToArray();
                     }
                 })
@@ -356,7 +356,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                             .Select(v => v.Item)
                             .CheckRange(range, _parent.GetKey)
                             .Where(v => predicate(v))
-                            .Take(maxCountOfItems)
+                            .Take2(maxCountOfItems)
                             .ToArray();
                     }
                 }))
@@ -370,7 +370,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                     }
                 }))
                 .SelectMany(_ => _)
-                .Take(maxCountOfItems)
+                .Take2(maxCountOfItems)
                 .Distinct(v => _parent.GetKey(v));
         }
 

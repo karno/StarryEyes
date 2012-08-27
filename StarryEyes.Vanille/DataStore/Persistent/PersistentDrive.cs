@@ -68,6 +68,63 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         }
 
         /// <summary>
+        /// Prepare file for storage
+        /// </summary>
+        /// <param name="isInitializedWithToc">load-mode flag</param>
+        private void PrepareFile(bool isInitializedWithToc)
+        {
+            if (isInitializedWithToc)
+            {
+                fs = File.Open(path, FileMode.Open, FileAccess.ReadWrite);
+                // verify toc and niop-table
+
+                // TODO: use parity, it is existed at index #0.
+                if (!VerifyToCNIoPParity(LoadInternal(0)))
+                {
+                    // if invalid, throw exception
+                    fs.Close();
+                    throw new IOException("Index table verification failed.");
+                }
+            }
+            else
+            {
+                // initialize file by empty data.
+                fs = File.Open(path, FileMode.Create, FileAccess.ReadWrite);
+            }
+        }
+
+        /// <summary>
+        /// Get ToC/NIoP Parity bytes.
+        /// </summary>
+        /// <returns>parity</returns>
+        private byte[] GetToCNIoPParity()
+        {
+            // 64bit
+            long tocParity = 0;
+            tableOfContents
+                .Select(kvp => (long)kvp.Value)
+                .ForEach(i => tocParity ^= i << (int)(i % 5));
+            // 64bit
+            long niopParity = 0;
+            nextIndexOfPackets
+                .SelectMany(kvp => kvp.Value.Select(v => (long)(v + kvp.Key * ChunkSize)))
+                .ForEach(i => niopParity ^= i << (int)(i % 5));
+            return BitConverter.GetBytes(tocParity).Concat(BitConverter.GetBytes(niopParity)).ToArray();
+        }
+
+        /// <summary>
+        /// Verify ToC/NIoP.
+        /// </summary>
+        /// <param name="parity">parity</param>
+        /// <returns>if verified, return true</returns>
+        private bool VerifyToCNIoPParity(byte[] parity)
+        {
+            // 128bit parity
+            var comparate = GetToCNIoPParity();
+            return comparate.SequenceEqual(parity.Take(16));
+        }
+
+        /// <summary>
         /// Set next index for specified index
         /// </summary>
         /// <param name="index">set index</param>
@@ -86,7 +143,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                 // chunk found
                 curChunk[key] = next;
             }
-            else
+            else if (next != Empty) // if a chunk is not exited, niops in a chunk are treated as empty.
             {
                 // chunk not found, create new
                 var list = new List<int>(Enumerable.Repeat(Empty, ChunkSize)); // init chunk with Empty recode
@@ -117,31 +174,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                 return Empty;
             }
         }
-
-        /// <summary>
-        /// Prepare file for storage
-        /// </summary>
-        /// <param name="isInitializedWithToc">load-mode flag</param>
-        private void PrepareFile(bool isInitializedWithToc)
-        {
-            if (isInitializedWithToc)
-            {
-                fs = File.Open(path, FileMode.Open, FileAccess.ReadWrite);
-                // verify toc and niop-table
-
-                // TODO: use parity, it is existed at index #0.
-
-                // if invalid, throw exception
-                // fs.Close();
-                // throw new IOException("Index table verification failed.");
-            }
-            else
-            {
-                // initialize file by empty data.
-                fs = File.Open(path, FileMode.Create, FileAccess.ReadWrite);
-            }
-        }
-
+       
         /// <summary>
         /// Get Next Index of Packets.
         /// </summary>
@@ -224,7 +257,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
             {
                 indexes = tableOfContents.Values;
             }
-            return indexes.Select(Load).Where(predicate).Take(maxCountOfItems);
+            return indexes.Select(Load).Where(predicate).Take2(maxCountOfItems);
         }
 
         /// <summary>
@@ -361,8 +394,17 @@ namespace StarryEyes.Vanille.DataStore.Persistent
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Store the parity bits.
+        /// </summary>
+        public void StoreParity()
+        {
+            StoreInternal(GetToCNIoPParity(), 0);
+        }
+
         public void Dispose()
         {
+            StoreParity();
             fs.Flush();
             fs.Close();
             fs = null;

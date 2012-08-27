@@ -33,8 +33,17 @@ namespace StarryEyes.Mystique.Models.Store
         static StatusStore()
         {
             // initialize
-            store = new PersistentDataStore<long, TwitterStatus>
-                (_ => _.Id, Path.Combine(App.DataStorePath, "statuses"));
+            if (StoreOnMemoryObjectPersistence.IsPersistentDataExited("statuses"))
+            {
+                store = new PersistentDataStore<long, TwitterStatus>
+                    (_ => _.Id, Path.Combine(App.DataStorePath, "statuses"),
+                    tocniops: StoreOnMemoryObjectPersistence.GetPersistentData("statuses"));
+            }
+            else
+            {
+                store = new PersistentDataStore<long, TwitterStatus>
+                    (_ => _.Id, Path.Combine(App.DataStorePath, "statuses"));
+            }
             App.OnApplicationFinalize += Shutdown;
         }
 
@@ -111,7 +120,7 @@ namespace StarryEyes.Mystique.Models.Store
             _isInShutdown = true;
             store.Dispose();
             var pds = (PersistentDataStore<long, TwitterStatus>)store;
-            StoreOnMemoryObjectPersistence<long>.MakePersistent("status", pds.GetToCNIoPs());
+            StoreOnMemoryObjectPersistence.MakePersistent("statuses", pds.GetToCNIoPs());
         }
     }
 

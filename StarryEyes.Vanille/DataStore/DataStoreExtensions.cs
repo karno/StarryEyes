@@ -25,7 +25,7 @@ namespace StarryEyes.Vanille.DataStore
                 return collection.Where(v => range.IsIn(keyProvider(v)));
         }
 
-        internal static IEnumerable<T> Take<T>(this IEnumerable<T> collection, int? count)
+        internal static IEnumerable<T> Take2<T>(this IEnumerable<T> collection, int? count)
         {
             if (count == null)
                 return collection;
@@ -33,7 +33,7 @@ namespace StarryEyes.Vanille.DataStore
                 return collection.Take(count.Value);
         }
 
-        internal static IObservable<T> Take<T>(this IObservable<T> collection, int? count)
+        internal static IObservable<T> Take2<T>(this IObservable<T> collection, int? count)
         {
             if (count == null)
                 return collection;

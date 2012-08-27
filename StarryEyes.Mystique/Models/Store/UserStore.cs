@@ -9,6 +9,7 @@ using System.Xaml;
 using System.Threading.Tasks;
 using System.Threading;
 using System.IO.Compression;
+using System.Linq;
 
 namespace StarryEyes.Mystique.Models.Store
 {
@@ -24,8 +25,18 @@ namespace StarryEyes.Mystique.Models.Store
         static UserStore()
         {
             // initialize store
-            store = new PersistentDataStore<long, TwitterUser>
-                (_ => _.Id, Path.Combine(App.DataStorePath, "users"), 16);
+            if (StoreOnMemoryObjectPersistence.IsPersistentDataExited("users"))
+            {
+                store = new PersistentDataStore<long, TwitterUser>
+                    (_ => _.Id, Path.Combine(App.DataStorePath, "users"), 16,
+                    tocniops: StoreOnMemoryObjectPersistence.GetPersistentData("users"));
+            }
+            else
+            {
+                store = new PersistentDataStore<long, TwitterUser>
+                    (_ => _.Id, Path.Combine(App.DataStorePath, "users"), 16);
+            }
+            LoadScreenNameResolverCache();
             App.OnApplicationFinalize += Shutdown;
         }
 
@@ -83,14 +94,44 @@ namespace StarryEyes.Mystique.Models.Store
             _isInShutdown = true;
             store.Dispose();
             var pds = (PersistentDataStore<long, TwitterUser>)store;
-            StoreOnMemoryObjectPersistence<long>.MakePersistent("user", pds.GetToCNIoPs());
-            // save screen name resolve cache
-            using (var fs = new FileStream(
-                Path.Combine(App.DataStorePath, "snrcache.dsx"), // deflated serialized xaml
+            StoreOnMemoryObjectPersistence.MakePersistent("users", pds.GetToCNIoPs());
+            SaveScreenNameResolverCache();
+        }
+
+        private static readonly string ScreenNameResolverCacheFile = 
+            Path.Combine(App.DataStorePath, "snrcache.dat");
+
+        private static void SaveScreenNameResolverCache()
+        {
+            using (var fs = new FileStream(ScreenNameResolverCacheFile,
                 FileMode.Create, FileAccess.ReadWrite))
-            using (var cs = new DeflateStream(fs, CompressionMode.Compress))
+            using (var bw = new BinaryWriter(fs))
             {
-                XamlServices.Save(cs, screenNameResolver);
+                bw.Write(screenNameResolver.Count);
+                screenNameResolver.ForEach(k =>
+                {
+                    bw.Write(k.Key);
+                    bw.Write(k.Value);
+                });
+            }
+        }
+
+        private static void LoadScreenNameResolverCache()
+        {
+            if (File.Exists(ScreenNameResolverCacheFile))
+            {
+                using (var fs = new FileStream(ScreenNameResolverCacheFile,
+                    FileMode.Open, FileAccess.Read))
+                using (var br = new BinaryReader(fs))
+                {
+                    int count = br.ReadInt32();
+                    for (int i = 0; i < count; i++)
+                    {
+                        var key = br.ReadString();
+                        var value = br.ReadInt64();
+                        screenNameResolver.Add(key, value);
+                    }
+                }
             }
         }
     }
