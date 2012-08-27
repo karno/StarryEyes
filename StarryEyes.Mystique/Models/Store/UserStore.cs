@@ -8,6 +8,7 @@ using StarryEyes.Vanille.DataStore.Persistent;
 using System.Xaml;
 using System.Threading.Tasks;
 using System.Threading;
+using System.IO.Compression;
 
 namespace StarryEyes.Mystique.Models.Store
 {
@@ -24,7 +25,7 @@ namespace StarryEyes.Mystique.Models.Store
         {
             // initialize store
             store = new PersistentDataStore<long, TwitterUser>
-                (_ => _.Id, _ => _, Path.Combine(App.DataStorePath, "users"), 16);
+                (_ => _.Id, Path.Combine(App.DataStorePath, "users"), 16);
             App.OnApplicationFinalize += Shutdown;
         }
 
@@ -83,11 +84,13 @@ namespace StarryEyes.Mystique.Models.Store
             store.Dispose();
             var pds = (PersistentDataStore<long, TwitterUser>)store;
             StoreOnMemoryObjectPersistence<long>.MakePersistent("user", pds.GetToCNIoPs());
-            using (var snf = new FileStream(
-                Path.Combine(App.DataStorePath, "snresolve.cache"),
+            // save screen name resolve cache
+            using (var fs = new FileStream(
+                Path.Combine(App.DataStorePath, "snrcache.dsx"), // deflated serialized xaml
                 FileMode.Create, FileAccess.ReadWrite))
+            using (var cs = new DeflateStream(fs, CompressionMode.Compress))
             {
-                XamlServices.Save(snf, screenNameResolver);
+                XamlServices.Save(cs, screenNameResolver);
             }
         }
     }

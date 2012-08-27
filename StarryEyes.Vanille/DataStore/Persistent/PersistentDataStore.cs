@@ -17,7 +17,6 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         where TValue : IBinarySerializable, new()
     {
         private PersistentChunk<TKey, TValue>[] chunks = null;
-        private Func<TKey, long> chunkHashResolver;
         private int chunkNum;
 
         /// <summary>
@@ -35,12 +34,11 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// <param name="baseDirectoryPath">path for serialize objects</param>
         /// <param name="chunkNum">cache separate count</param>
         /// <param name="tocniops">ToC/NIoPs</param>
-        public PersistentDataStore(Func<TValue, TKey> keyProvider, Func<TKey, long> chunkHashResolver, string baseDirectoryPath, int chunkNum = 32,
+        public PersistentDataStore(Func<TValue, TKey> keyProvider, string baseDirectoryPath, int chunkNum = 32,
             IEnumerable<Tuple<IDictionary<TKey, int>, IEnumerable<int>>> tocniops = null)
             : base(keyProvider)
         {
             this.chunkNum = chunkNum;
-            this.chunkHashResolver = chunkHashResolver;
             EnsurePath(baseDirectoryPath);
             if (tocniops != null)
             {
@@ -142,7 +140,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
 
         private PersistentChunk<TKey, TValue> GetChunk(TKey key)
         {
-            return chunks[chunkHashResolver(key) % chunkNum];
+            return chunks[key.GetHashCode() % chunkNum];
         }
 
         protected override void Dispose(bool disposing)
