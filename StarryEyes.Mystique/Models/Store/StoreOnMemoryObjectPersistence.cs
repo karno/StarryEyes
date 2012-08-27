@@ -55,6 +55,30 @@ namespace StarryEyes.Mystique.Models.Store
         {
             TableOfContents = new Dictionary<long, int>(tocniop.Item1);
             NextIndexOfPackets = new List<int>(tocniop.Item2);
+            OptimizeNextIndexOfPackets();
+        }
+
+        private void OptimizeNextIndexOfPackets()
+        {
+            // -1 is empty record.
+
+            int idx = NextIndexOfPackets.Count - 1;
+            // determine first not -1 index from last
+            while (idx >= 0 && NextIndexOfPackets[idx] == -1)
+                idx--;
+            if (idx == -1)
+            {
+                // not found
+                NextIndexOfPackets.Clear();
+                return;
+            }
+            else
+            {
+                idx++;
+                // trim tail '-1's
+                if (idx > 0 && idx < NextIndexOfPackets.Count)
+                    NextIndexOfPackets.RemoveRange(idx, NextIndexOfPackets.Count - idx);
+            }
         }
 
         public Dictionary<long, int> TableOfContents { get; set; }
