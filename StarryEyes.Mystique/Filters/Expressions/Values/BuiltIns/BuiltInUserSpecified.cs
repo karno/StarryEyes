@@ -9,11 +9,13 @@ namespace StarryEyes.Mystique.Filters.Expressions.Values.BuiltIns
 {
     public sealed class UserSpecified : UserRepresentationBase
     {
+        string _originalScreenName;
         long _userId;
         AccountData _adata;
 
         public UserSpecified(string screenName)
         {
+            _originalScreenName = screenName;
             _userId = Setting.Accounts
                 .Where(u => u.AuthenticateInfo.UnreliableScreenName == screenName)
                 .Select(u => u.UserId)
@@ -32,7 +34,7 @@ namespace StarryEyes.Mystique.Filters.Expressions.Values.BuiltIns
             _adata = AccountDataStore.GetAccountData(_userId);
         }
 
-        public override ICollection<long> User
+        public override ICollection<long> Users
         {
             get
             {
@@ -67,7 +69,15 @@ namespace StarryEyes.Mystique.Filters.Expressions.Values.BuiltIns
 
         public override string ToQuery()
         {
-            throw new NotImplementedException();
+            if (String.IsNullOrEmpty(_originalScreenName))
+                return _userId.ToString();
+            else
+                return _originalScreenName;
+        }
+
+        public override long UserId
+        {
+            get { return _userId; }
         }
     }
 }

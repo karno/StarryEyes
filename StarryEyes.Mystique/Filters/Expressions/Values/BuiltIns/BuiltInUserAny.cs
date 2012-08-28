@@ -8,7 +8,7 @@ namespace StarryEyes.Mystique.Filters.Expressions.Values.BuiltIns
 {
     public sealed class UserAny : UserRepresentationBase
     {
-        public override ICollection<long> User
+        public override ICollection<long> Users
         {
             get
             {
@@ -39,6 +39,11 @@ namespace StarryEyes.Mystique.Filters.Expressions.Values.BuiltIns
         public override string ToQuery()
         {
             return "*";
+        }
+
+        public override long UserId
+        {
+            get { return 0; } // an representive user is not existed.
         }
     }
 }

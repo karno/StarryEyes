@@ -73,7 +73,7 @@ namespace StarryEyes.Mystique.ViewModels
             };
             if (Setting.Accounts.Count() > 0)
             {
-                UserDependencyConnectionsManager.Update();
+                UserBaseConnectionsManager.Update();
             }
             StatusStore.StatusPublisher
                 .Where(_ => _.IsAdded)
@@ -139,7 +139,7 @@ namespace StarryEyes.Mystique.ViewModels
                         AuthenticateInfo = _,
                         IsUserStreamsEnabled = true
                     });
-                UserDependencyConnectionsManager.Update();
+                UserBaseConnectionsManager.Update();
             });
             this.Messenger.RaiseAsync(new TransitionMessage(
                 typeof(AuthorizationWindow),

@@ -1,6 +1,7 @@
 ﻿using System;
-using StarryEyes.SweetLady.DataModel;
 using System.Collections.Generic;
+using System.Linq;
+using StarryEyes.SweetLady.DataModel;
 
 namespace StarryEyes.Mystique.Filters.Expressions.Values.Statuses
 {
@@ -93,6 +94,7 @@ namespace StarryEyes.Mystique.Filters.Expressions.Values.Statuses
             {
                 yield return FilterExpressionType.Numeric;
                 yield return FilterExpressionType.String;
+                yield return FilterExpressionType.Set;
             }
         }
 
@@ -108,6 +110,13 @@ namespace StarryEyes.Mystique.Filters.Expressions.Values.Statuses
             return _ => _.StatusType == StatusType.Tweet ?
                 _.GetOriginal().InReplyToScreenName ?? string.Empty : 
                 _.Recipient.ScreenName;
+        }
+
+        public override Func<TwitterStatus, ICollection<long>> GetSetValueProvider()
+        {
+            return _ => _.StatusType == StatusType.Tweet ?
+                FilterSystemUtil.InReplyToUsers(_).ToList() :
+                new[] { _.Recipient.Id }.ToList();
         }
 
         public override string ToQuery()

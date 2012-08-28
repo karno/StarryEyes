@@ -10,7 +10,7 @@ namespace StarryEyes.Mystique.Models.Connection.UserDependency
     /// <summary>
     /// Provides management for connect to twitter.
     /// </summary>
-    public static class UserDependencyConnectionsManager
+    public static class UserBaseConnectionsManager
     {
         private static object connectionGroupsLocker = new object();
         private static SortedDictionary<long, ConnectionGroup> connectionGroups
@@ -129,12 +129,19 @@ namespace StarryEyes.Mystique.Models.Connection.UserDependency
             }
         }
 
+        private static bool _reconnectImmediate = false;
+        public static bool ReconnectImmediate
+        {
+            get { return UserBaseConnectionsManager._reconnectImmediate; }
+            set { UserBaseConnectionsManager._reconnectImmediate = value; }
+        }
+
         /// <summary>
         /// Add tracking keywords.
         /// </summary>
         /// <param name="keyword">adding keyword</param>
         /// <param name="reconnectImmediate">reconnect user streams immediately if required.</param>
-        public static void AddTrackKeyword(string keyword, bool reconnectImmediate = true)
+        public static void AddTrackKeyword(string keyword, bool? reconnectImmediate = null)
         {
             lock (trackingLocker)
             {
@@ -158,7 +165,7 @@ namespace StarryEyes.Mystique.Models.Connection.UserDependency
                         trackResolver.Add(keyword, connection);
                         connection.TrackKeywords =
                             connection.TrackKeywords.Append(new[] { keyword });
-                        if (reconnectImmediate)
+                        if (reconnectImmediate ?? ReconnectImmediate)
                             connection.Connect();
                     }
                 }
@@ -184,7 +191,7 @@ namespace StarryEyes.Mystique.Models.Connection.UserDependency
         /// </summary>
         /// <param name="keyword">removing keyword</param>
         /// <param name="reconnectImmediate">reconnect user streams immediately if required.</param>
-        public static void RemoveTrackKeyword(string keyword, bool reconnectImmediate = true)
+        public static void RemoveTrackKeyword(string keyword, bool? reconnectImmediate = null)
         {
             lock (trackingLocker)
             {
@@ -201,7 +208,7 @@ namespace StarryEyes.Mystique.Models.Connection.UserDependency
                     {
                         trackResolver.Remove(keyword);
                         tracked.TrackKeywords = tracked.TrackKeywords.Except(new[] { keyword });
-                        if (reconnectImmediate)
+                        if (reconnectImmediate ?? ReconnectImmediate)
                             tracked.Connect();
                     }
                 }

@@ -37,7 +37,7 @@ namespace StarryEyes.Mystique.Models.Connection.Extend
             }
         }
 
-        private static void RemoveSearchQuery(string query)
+        public static void RemoveSearchQuery(string query)
         {
             lock (searchLocker)
             {

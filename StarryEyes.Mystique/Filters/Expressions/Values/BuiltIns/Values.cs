@@ -14,12 +14,25 @@ namespace StarryEyes.Mystique.Filters.Expressions.Values.BuiltIns
 
         public override IEnumerable<FilterExpressionType> SupportedTypes
         {
-            get { yield return FilterExpressionType.Set; }
+            get
+            {
+                if (_representation.UserId != 0)
+                    yield return FilterExpressionType.Numeric;
+                yield return FilterExpressionType.Set;
+            }
+        }
+
+        public override Func<TwitterStatus, long> GetNumericValueProvider()
+        {
+            if (_representation.UserId != 0)
+                return _ => _representation.UserId;
+            else
+                return base.GetNumericValueProvider();
         }
 
         public override Func<TwitterStatus, ICollection<long>> GetSetValueProvider()
         {
-            return _ => _representation.User;
+            return _ => _representation.Users;
         }
 
         public override string ToQuery()
@@ -27,7 +40,6 @@ namespace StarryEyes.Mystique.Filters.Expressions.Values.BuiltIns
             return _representation.ToQuery();
         }
     }
-
 
     public sealed class UserFollowings : ValueBase
     {

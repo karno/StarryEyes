@@ -6,7 +6,7 @@ using StarryEyes.SweetLady.DataModel;
 
 namespace StarryEyes.Mystique.Filters
 {
-    public sealed class FilterQuery : IFilterQueryElement
+    public sealed class FilterQuery
     {
         public FilterSourceBase[] Sources;
 
@@ -14,7 +14,24 @@ namespace StarryEyes.Mystique.Filters
 
         public string ToQuery()
         {
-            return "from " + Sources.Select(s => s.ToQuery()).JoinString(", ") + " where " + PredicateTreeRoot.ToQuery();
+            return "from " + Sources.GroupBy(s => s.FilterKey)
+                .Select(g => g.Distinct(_ => _.FilterValue))
+                .Select(f => {
+                    if (f.Count() == 1)
+                    {
+                        var item = f.First();
+                        if (String.IsNullOrEmpty(item.FilterValue))
+                            return item.FilterKey;
+                        else
+                            return item.FilterKey + ": " + item.FilterValue;
+                    }
+                    else
+                    {
+                        return f.First().FilterKey + ": " + f.Select(fs => fs.FilterValue).JoinString(", ");
+                    }
+                })
+                .JoinString(", ") +
+                " where " + PredicateTreeRoot.ToQuery();
         }
 
         public Func<TwitterStatus, bool> GetEvaluator()
