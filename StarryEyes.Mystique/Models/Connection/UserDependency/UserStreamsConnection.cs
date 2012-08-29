@@ -221,9 +221,30 @@ namespace StarryEyes.Mystique.Models.Connection.UserDependency
                         return;
                     }
                 }
-                Observable.Timer(TimeSpan.FromMilliseconds(currentBackOffWaitCount))
-                    .Subscribe(_ => Connect());
             }
+            else
+            {
+                currentBackOffMode = BackOffMode.None;
+                if (currentBackOffWaitCount == 110)
+                {
+                    RaiseDisconnectedByError("ユーザーストリーム接続が何らかのエラーの頻発で停止しました。",
+                        "Twitterが不安定な状態になっているか、仕様が変更された可能性があります: " + ex.Message);
+                    return;
+                }
+                if (currentBackOffWaitCount >= 108 && currentBackOffWaitCount <= 109)
+                {
+                    currentBackOffWaitCount++;
+                }
+                else
+                {
+                    currentBackOffWaitCount = 108; // wait shortly
+                }
+            }
+            System.Diagnostics.Debug.WriteLine("*** USER STREAMS error ***" + Environment.NewLine + ex);
+            System.Diagnostics.Debug.WriteLine(" -> reconnect.");
+            // parsing error, auto-reconnect
+            Observable.Timer(TimeSpan.FromMilliseconds(currentBackOffWaitCount))
+                .Subscribe(_ => Connect());
         }
 
         private bool CheckHardError()

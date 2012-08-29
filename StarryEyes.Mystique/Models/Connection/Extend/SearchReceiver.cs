@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using StarryEyes.SweetLady.Authorize;
-using StarryEyes.Mystique.Settings;
 using StarryEyes.Mystique.Models.Hub;
+using StarryEyes.Mystique.Settings;
 using StarryEyes.SweetLady.Api.Rest;
-using StarryEyes.Mystique.Models.Store;
 
 namespace StarryEyes.Mystique.Models.Connection.Extend
 {
@@ -82,7 +78,7 @@ namespace StarryEyes.Mystique.Models.Connection.Extend
                 return;
             }
             authInfo.SearchTweets(query, max_id: max_id)
-                .Subscribe(_ => StatusStore.Store(_));
+                .RegisterToStore();
         }
     }
 }

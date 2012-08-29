@@ -153,6 +153,7 @@
     <Compile Include="Filters\Sources\FilterMessages.cs" />
     <Compile Include="Filters\Sources\FilterSearch.cs" />
     <Compile Include="Filters\Sources\FilterTrack.cs" />
+    <Compile Include="Models\Connection\ConnectionUtil.cs" />
     <Compile Include="Models\Connection\Extend\ListReceiver.cs" />
     <Compile Include="Models\Connection\Extend\SearchReceiver.cs" />
     <Compile Include="Models\Store\StoreOnMemoryObjectPersistence.cs" />

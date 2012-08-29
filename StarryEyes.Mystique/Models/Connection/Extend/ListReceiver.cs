@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using StarryEyes.Mystique.Models.Hub;
-using StarryEyes.Mystique.Models.Store;
 using StarryEyes.Mystique.Settings;
 using StarryEyes.SweetLady.Api.Rest;
 using StarryEyes.SweetLady.Authorize;
@@ -99,7 +98,7 @@ namespace StarryEyes.Mystique.Models.Connection.Polling
         public static void DoReceive(AuthenticateInfo info, ListInfo list, long? max_id = null)
         {
             info.GetListStatuses(slug: list.Slug, owner_screen_name: list.OwnerScreenName, max_id: max_id)
-                .Subscribe(t => StatusStore.Store(t));
+                .RegisterToStore();
         }
     
     }
