@@ -6,9 +6,9 @@ namespace StarryEyes.Mystique.Filters.Sources
     /// <summary>
     /// General filter.
     /// </summary>
-    public class FilterGeneral : FilterSourceBase
+    public class FilterLocal : FilterSourceBase
     {
-        public FilterGeneral() { }
+        public FilterLocal() { }
 
         public override Func<TwitterStatus, bool> GetEvaluator()
         {
@@ -17,7 +17,7 @@ namespace StarryEyes.Mystique.Filters.Sources
 
         public override string FilterKey
         {
-            get { return "general"; }
+            get { return "local"; }
         }
 
         public override string FilterValue

@@ -25,8 +25,6 @@ namespace StarryEyes.Mystique
         private void Application_Startup(object sender, StartupEventArgs e)
         {
             DispatcherHelper.UIDispatcher = Dispatcher;
-            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
-            Application.Current.Exit += (_, __) => AppFinalize(true);
 
             // Check run duplication
             string mutexStr = null;
@@ -44,8 +42,12 @@ namespace StarryEyes.Mystique
             if (appMutex.WaitOne(0, false) == false)
             {
                 MessageBox.Show("Krileは既に起動しています。");
+                Environment.Exit(0);
                 return;
             }
+
+            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
+            Application.Current.Exit += (_, __) => AppFinalize(true);
 
             // Set CK/CS for accessing twitter.
             ApiEndpoint.ConsumerKey = ConsumerKey;

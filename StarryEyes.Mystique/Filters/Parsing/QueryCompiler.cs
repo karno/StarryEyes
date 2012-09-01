@@ -42,7 +42,8 @@ namespace StarryEyes.Mystique.Filters.Parsing
 
         private static readonly IDictionary<string, Type> FilterSourceResolver = new SortedDictionary<string, Type>()
         {
-            { "general", typeof(FilterGeneral) },
+            { "local", typeof(FilterLocal) },
+            { "all", typeof(FilterLocal) },
             { "home", typeof(FilterHome) },
             { "list", typeof(FilterList) },
             { "mention", typeof(FilterMentions) },

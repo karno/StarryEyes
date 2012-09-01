@@ -12,6 +12,8 @@ using StarryEyes.Mystique.Settings;
 using StarryEyes.Mystique.ViewModels.Dialogs;
 using StarryEyes.Mystique.Views.Dialogs;
 using StarryEyes.Mystique.Filters.Parsing;
+using StarryEyes.SweetLady.DataModel;
+using System.Collections.Generic;
 
 namespace StarryEyes.Mystique.ViewModels
 {
@@ -171,28 +173,29 @@ namespace StarryEyes.Mystique.ViewModels
         {
             QueryResult = "querying...";
             var sw = new Stopwatch();
-            sw.Start();
             int _count = 0;
             try
             {
                 var filter = QueryCompiler.Compile(_query);
                 var func = filter.GetEvaluator();
                 System.Diagnostics.Debug.WriteLine(filter.ToQuery());
+                List<TwitterStatus> result = new List<TwitterStatus>();
+                sw.Start();
                 StatusStore.Find(func) // t.Text.Contains("@")) // find contains hashtags
                     .Subscribe(_ =>
                     {
                         _count++;
-                        System.Diagnostics.Debug.WriteLine(_.ToString() + " / " + _.User.FavoritesCount);
+                        result.Add(_);
                     },
                     () =>
                     {
                         sw.Stop();
+                        result.OrderBy(_ => _.CreatedAt).ForEach(_ => System.Diagnostics.Debug.WriteLine(_));
                         QueryResult = "Completed! (" + sw.Elapsed.TotalSeconds.ToString("0.00") + " sec, " + _count + " records hot.)";
                     });
             }
             catch(Exception ex)
             {
-                sw.Stop();
                 QueryResult = ex.ToString();
             }
         }
