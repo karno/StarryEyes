@@ -30,7 +30,7 @@ namespace StarryEyes.Mystique.Models.Store
 
         private static DataStoreBase<long, TwitterStatus> store;
 
-        static StatusStore()
+        public static void Initialize()
         {
             // initialize
             if (StoreOnMemoryObjectPersistence.IsPersistentDataExited("statuses"))

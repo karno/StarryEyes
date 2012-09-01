@@ -71,6 +71,7 @@
       <HintPath>..\packages\ReactiveOAuth.0.4.0.0\lib\Net40\ReactiveOAuth.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.Entity" />
@@ -138,7 +139,6 @@
     <Compile Include="Filters\Expressions\Operators\OperatorEqualnesses.cs" />
     <Compile Include="Filters\Expressions\Operators\OperatorImmediates.cs" />
     <Compile Include="Filters\Expressions\Operators\OperatorSets.cs" />
-    <Compile Include="Filters\Expressions\Values\Locals\PseudoCollection.cs" />
     <Compile Include="Filters\Expressions\Values\Locals\UserAny.cs" />
     <Compile Include="Filters\Expressions\Values\Locals\UserSpecified.cs" />
     <Compile Include="Filters\Expressions\Values\Locals\UserRepresentationBase.cs" />
@@ -163,8 +163,10 @@
     <Compile Include="Models\Connection\ConnectionUtil.cs" />
     <Compile Include="Models\Connection\Extend\ListReceiver.cs" />
     <Compile Include="Models\Connection\Extend\SearchReceiver.cs" />
+    <Compile Include="Models\Plugins\PluginManager.cs" />
     <Compile Include="Models\Store\StoreOnMemoryObjectPersistence.cs" />
     <Compile Include="Models\Timeline\TimelineDataProvider.cs" />
+    <Compile Include="Plugins\IPlugin.cs" />
     <Compile Include="Views\Utils\BooleanConverters.cs" />
     <Compile Include="Views\Utils\CollectionExistsToVisibleConverter.cs" />
     <Compile Include="Views\Utils\ConverterBase.cs" />

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using StarryEyes.Mystique.Filters.Expressions.Values.Immediates;
 using StarryEyes.SweetLady.DataModel;
-using System.Linq;
 
 namespace StarryEyes.Mystique.Filters.Expressions.Operators
 {

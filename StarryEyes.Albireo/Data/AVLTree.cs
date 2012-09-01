@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace StarryEyes.Albireo.Data
 {
@@ -9,6 +10,13 @@ namespace StarryEyes.Albireo.Data
     /// <typeparam name="T">Item class</typeparam>
     public sealed class AVLTree<T> : ICollection<T> where T : IComparable<T>
     {
+        public AVLTree() { }
+
+        public AVLTree(IEnumerable<T> initial)
+        {
+            initial.ForEach(Add);
+        }
+
         private int count = 0;
 
         private AVLTreeLeaf root;

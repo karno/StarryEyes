@@ -29,8 +29,9 @@ namespace StarryEyes.Mystique.Filters.Expressions.Values.Statuses
             get { yield return FilterExpressionType.String; }
         }
 
-       public override Func<TwitterStatus, string> GetStringValueProvider()
+        public override Func<TwitterStatus, string> GetStringValueProvider()
         {
+            // Using not original.
             return _ => _.Source;
         }
 

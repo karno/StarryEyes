@@ -61,7 +61,7 @@ namespace StarryEyes.Mystique.Filters.Expressions.Values.Statuses
         public override Func<TwitterStatus, ICollection<long>> GetSetValueProvider()
         {
             return _ => _.StatusType == StatusType.Tweet ?
-                FilterSystemUtil.InReplyToUsers(_).ToList() :
+                FilterSystemUtil.InReplyToUsers(_.GetOriginal()).ToList() :
                 new[] { _.Recipient.Id }.ToList();
         }
 

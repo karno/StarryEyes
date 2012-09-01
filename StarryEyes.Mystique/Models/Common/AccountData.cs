@@ -1,5 +1,7 @@
 ﻿using System;
 using StarryEyes.Albireo.Data;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace StarryEyes.Mystique.Models.Common
 {
@@ -48,6 +50,20 @@ namespace StarryEyes.Mystique.Models.Common
 
         private object followingsLocker = new object();
         private AVLTree<long> followings = new AVLTree<long>();
+
+        /// <summary>
+        /// Get all followings.
+        /// </summary>
+        public IEnumerable<long> Followings
+        {
+            get
+            {
+                lock (followingsLocker)
+                {
+                    return followings.ToArray();
+                }
+            }
+        }
 
         /// <summary>
         /// Check is following user(a.k.a. friends)
@@ -109,6 +125,20 @@ namespace StarryEyes.Mystique.Models.Common
         private AVLTree<long> followers = new AVLTree<long>();
 
         /// <summary>
+        /// Get all followers.
+        /// </summary>
+        public IEnumerable<long> Followers
+        {
+            get
+            {
+                lock (followersLocker)
+                {
+                    return followers.ToArray();
+                }
+            }
+        }
+
+        /// <summary>
         /// Check is followed user(a.k.a. follower)
         /// </summary>
         /// <param name="id">his/her id</param>
@@ -166,6 +196,20 @@ namespace StarryEyes.Mystique.Models.Common
 
         private object blockingsLocker = new object();
         private AVLTree<long> blockings = new AVLTree<long>();
+
+        /// <summary>
+        /// Get all blockings
+        /// </summary>
+        public IEnumerable<long> Blockings
+        {
+            get
+            {
+                lock (blockingsLocker)
+                {
+                    return blockings.ToArray();
+                }
+            }
+        }
 
         /// <summary>
         /// Check someone is blocked me

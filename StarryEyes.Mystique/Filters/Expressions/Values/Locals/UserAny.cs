@@ -14,7 +14,7 @@ namespace StarryEyes.Mystique.Filters.Expressions.Values.Locals
             {
                 var accounts = new AVLTree<long>();
                 Setting.Accounts.ForEach(a => accounts.Add(a.UserId));
-                return new PseudoCollection<long>(id => accounts.Contains(id));
+                return accounts;
             }
         }
 
@@ -22,8 +22,11 @@ namespace StarryEyes.Mystique.Filters.Expressions.Values.Locals
         {
             get
             {
-                return new PseudoCollection<long>(id => AccountDataStore.GetAccountDatas()
-                    .Any(_ => _.IsFollowedBy(id)));
+                var followers = new AVLTree<long>();
+                Setting.Accounts
+                    .SelectMany(a => AccountDataStore.GetAccountData(a.UserId).Followings)
+                    .ForEach(followers.Add);
+                return followers;
             }
         }
 
@@ -31,8 +34,11 @@ namespace StarryEyes.Mystique.Filters.Expressions.Values.Locals
         {
             get
             {
-                return new PseudoCollection<long>(id => AccountDataStore.GetAccountDatas()
-                    .Any(_ => _.IsFollowing(id)));
+                var followings = new AVLTree<long>();
+                Setting.Accounts
+                    .SelectMany(a => AccountDataStore.GetAccountData(a.UserId).Followings)
+                    .ForEach(followings.Add);
+                return followings;
             }
         }
 

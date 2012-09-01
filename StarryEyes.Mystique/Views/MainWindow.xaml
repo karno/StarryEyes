@@ -40,7 +40,7 @@
                 Content="Auth" />
         <Button Width="200"
                 Height="33"
-                Margin="208,8,0,0"
+                Margin="8,124,0,0"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Top"
                 Command="{Binding ExecuteFilterCommand,
@@ -52,8 +52,7 @@
             <Run Text="{Binding StatusCount, Mode=OneWay}" />
             <Run Text="tweets / " />
             <Run Text="{Binding TweetsPerMinutes, Mode=OneWay}" />
-            <Run Text="tpm / " />
-            <Run Text="{Binding QueryResult, Mode=OneWay}" />
+            <Run Text="tpm" />
         </TextBlock>
         <TextBlock Margin="8,70,8,0"
                    HorizontalAlignment="Stretch"
@@ -61,5 +60,26 @@
                    Text="{Binding RecentReceivedBody,
                                   Mode=OneWay}"
                    TextWrapping="Wrap" />
+        <TextBlock Name="textBlock1"
+                   Height="23"
+                   Margin="8,97,0,0"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Top"
+                   Text="query:" />
+        <TextBox Name="textBox1"
+                 Width="442"
+                 Height="24"
+                 Margin="0,94,8,0"
+                 HorizontalAlignment="Right"
+                 VerticalAlignment="Top"
+                 Text="{Binding Query,
+                                UpdateSourceTrigger=PropertyChanged}" />
+        <TextBlock Name="textBlock2"
+                   Height="23"
+                   Margin="8,163,0,0"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Top"
+                   Text="{Binding QueryResult,
+                                  Mode=OneWay}" />
     </Grid>
 </Window>

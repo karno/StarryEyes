@@ -59,4 +59,23 @@ namespace StarryEyes.Mystique.Filters.Expressions.Values.Statuses
             return "is_retweeted";
         }
     }
+
+    public sealed class StatusIsRetweet : ValueBase
+    {
+        public override IEnumerable<FilterExpressionType> SupportedTypes
+        {
+            get { yield return FilterExpressionType.Boolean; }
+        }
+
+        public override Func<TwitterStatus, bool> GetBooleanValueProvider()
+        {
+            return _ => _.RetweetedOriginal != null;
+        }
+
+        public override string ToQuery()
+        {
+            return "is_retweet";
+        }
+    }
+
 }

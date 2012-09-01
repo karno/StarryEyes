@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Xaml;
 using StarryEyes.Mystique.Models.Hub;
-using System.Linq;
 
 namespace StarryEyes.Mystique.Settings
 {
@@ -11,12 +11,7 @@ namespace StarryEyes.Mystique.Settings
     {
         static SortedDictionary<string, object> settingValueHolder;
 
-        static Setting()
-        {
-            LoadSettings();
-        }
-
-        private static void LoadSettings()
+        public static void LoadSettings()
         {
             if (File.Exists(App.ConfigurationFilePath))
             {

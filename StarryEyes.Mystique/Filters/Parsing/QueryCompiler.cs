@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using StarryEyes.Mystique.Filters.Expressions;
 using StarryEyes.Mystique.Filters.Expressions.Operators;
-using StarryEyes.Mystique.Filters.Sources;
 using StarryEyes.Mystique.Filters.Expressions.Values;
 using StarryEyes.Mystique.Filters.Expressions.Values.Immediates;
-using StarryEyes.Mystique.Filters.Expressions.Values.Users;
 using StarryEyes.Mystique.Filters.Expressions.Values.Locals;
 using StarryEyes.Mystique.Filters.Expressions.Values.Statuses;
+using StarryEyes.Mystique.Filters.Expressions.Values.Users;
+using StarryEyes.Mystique.Filters.Sources;
 
 namespace StarryEyes.Mystique.Filters.Parsing
 {
@@ -156,7 +156,7 @@ namespace StarryEyes.Mystique.Filters.Parsing
             switch (reader.LookAhead().Type)
             {
                 case TokenType.OperatorAnd:
-                    return generate(TokenType.OperatorAnd, new FilterOperatorOr());
+                    return generate(TokenType.OperatorAnd, new FilterOperatorAnd());
                 default:
                     return left;
             }
@@ -498,6 +498,10 @@ namespace StarryEyes.Mystique.Filters.Parsing
                 case "isDirectMessage":
                 case "is_direct_message":
                     return new StatusIsDirectMessage();
+                case "retweet":
+                case "isRetweet":
+                case "is_retweet":
+                    return new StatusIsRetweet();
                 case "favorited":
                 case "isFavorited":
                 case "is_favorited":

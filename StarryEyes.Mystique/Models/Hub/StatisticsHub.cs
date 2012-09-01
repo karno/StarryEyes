@@ -10,7 +10,7 @@ namespace StarryEyes.Mystique.Models.Hub
     /// </summary>
     public static class StatisticsHub
     {
-        static StatisticsHub()
+        public static void Initialize()
         {
             Observable.Interval(TimeSpan.FromSeconds(0.5))
                 .Subscribe(_ =>

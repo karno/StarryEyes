@@ -1,15 +1,18 @@
 ﻿using System;
-using System.Windows;
-
-using Livet;
-using System.Diagnostics;
-using System.Reflection;
-using System.Net;
-using StarryEyes.Mystique.Models.Store;
 using System.Configuration;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Net;
+using System.Reflection;
+using System.Windows;
+using Livet;
+using StarryEyes.Mystique.Models.Hub;
+using StarryEyes.Mystique.Models.Plugins;
+using StarryEyes.Mystique.Models.Store;
+using StarryEyes.Mystique.Settings;
 using StarryEyes.SweetLady.Api;
-using StarryEyes.Mystique.Filters.Parsing;
+using System.Threading;
 
 namespace StarryEyes.Mystique
 {
@@ -18,23 +21,31 @@ namespace StarryEyes.Mystique
     /// </summary>
     public partial class App : Application
     {
+        private static Mutex appMutex;
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            var filter = QueryCompiler.Compile("from general, home:\"karno\", \"karnoroid\", mentions where user <- *.following || to -> * || user.id != local.karno && user.followers <= 30000 * (10 + 3)");
-
-            System.Diagnostics.Debug.WriteLine(filter.ToQuery());
-            try
-            {
-                var eval = filter.GetEvaluator();
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine(ex.ToString());
-            }
-
             DispatcherHelper.UIDispatcher = Dispatcher;
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
             Application.Current.Exit += (_, __) => AppFinalize(true);
+
+            // Check run duplication
+            string mutexStr = null;
+            switch (ExecutionMode)
+            {
+                case Mystique.ExecutionMode.Default:
+                case Mystique.ExecutionMode.Roaming:
+                    mutexStr = ExecutionMode.ToString();
+                    break;
+                case Mystique.ExecutionMode.Standalone:
+                    mutexStr = "Standalone_" + ExeFilePath;
+                    break;
+            }
+            appMutex = new Mutex(true, "Krile_StarryEyes_" + mutexStr);
+            if (appMutex.WaitOne(0, false) == false)
+            {
+                MessageBox.Show("Krileは既に起動しています。");
+                return;
+            }
 
             // Set CK/CS for accessing twitter.
             ApiEndpoint.ConsumerKey = ConsumerKey;
@@ -43,6 +54,22 @@ namespace StarryEyes.Mystique
             // Initialize core
             ServicePointManager.Expect100Continue = false; // disable expect 100 continue for User Streams connection.
             ServicePointManager.DefaultConnectionLimit = Int32.MaxValue; // Limit Break!
+
+            // Load plugins
+            PluginManager.Load();
+
+            // Load settings
+            Setting.LoadSettings();
+
+            // Initialize core systems
+            StatusStore.Initialize();
+            UserStore.Initialize();
+            StatisticsHub.Initialize();
+
+            // Activate plugins
+            PluginManager.LoadedPlugins.ForEach(p => p.Initialize());
+
+            RaiseSystemReady();
         }
 
         /// <summary>
@@ -59,6 +86,7 @@ namespace StarryEyes.Mystique
             }
             System.Diagnostics.Debug.WriteLine("App Finalize");
             RaiseApplicationFinalize();
+            appMutex.ReleaseMutex();
         }
 
         //集約エラーハンドラ

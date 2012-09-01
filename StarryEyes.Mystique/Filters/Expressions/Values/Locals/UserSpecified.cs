@@ -4,6 +4,7 @@ using System.Linq;
 using StarryEyes.Mystique.Models.Common;
 using StarryEyes.Mystique.Models.Store;
 using StarryEyes.Mystique.Settings;
+using StarryEyes.Albireo.Data;
 
 namespace StarryEyes.Mystique.Filters.Expressions.Values.Locals
 {
@@ -41,7 +42,7 @@ namespace StarryEyes.Mystique.Filters.Expressions.Values.Locals
                 if (_adata == null)
                     return new List<long>();
                 else
-                    return new PseudoCollection<long>(_ => _adata.AccountId == _);
+                    return new List<long>(new[] { _adata.AccountId });
             }
         }
 
@@ -52,7 +53,7 @@ namespace StarryEyes.Mystique.Filters.Expressions.Values.Locals
                 if (_adata == null)
                     return new List<long>(); // returns empty list
                 else
-                    return new PseudoCollection<long>(_ => _adata.IsFollowing(_));
+                    return new AVLTree<long>(_adata.Followings);
             }
         }
 
@@ -63,7 +64,7 @@ namespace StarryEyes.Mystique.Filters.Expressions.Values.Locals
                 if (_adata == null)
                     return new List<long>();
                 else
-                    return new PseudoCollection<long>(_ => _adata.IsFollowedBy(_));
+                    return new AVLTree<long>(_adata.Followers);
             }
         }
 

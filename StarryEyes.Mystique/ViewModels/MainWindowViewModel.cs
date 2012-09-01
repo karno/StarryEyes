@@ -11,6 +11,7 @@ using StarryEyes.Mystique.Models.Store;
 using StarryEyes.Mystique.Settings;
 using StarryEyes.Mystique.ViewModels.Dialogs;
 using StarryEyes.Mystique.Views.Dialogs;
+using StarryEyes.Mystique.Filters.Parsing;
 
 namespace StarryEyes.Mystique.ViewModels
 {
@@ -95,6 +96,17 @@ namespace StarryEyes.Mystique.ViewModels
             get { return StatisticsHub.TweetsPerSeconds * 60; }
         }
 
+        private string _query;
+        public string Query
+        {
+            get { return _query; }
+            set
+            {
+                _query = value;
+                RaisePropertyChanged(() => Query);
+            }
+        }
+
         private string _queryResult;
         public string QueryResult
         {
@@ -161,26 +173,28 @@ namespace StarryEyes.Mystique.ViewModels
             var sw = new Stopwatch();
             sw.Start();
             int _count = 0;
-            var rv = new StarryEyes.Mystique.Filters.Expressions.Operators.FilterOperatorPlus();
-            rv.LeftValue =  new StarryEyes.Mystique.Filters.Expressions.Values.Users.UserStatuses();
-            rv.RightValue = new StarryEyes.Mystique.Filters.Expressions.Values.Immediates.NumericValue(100000);
-            var op = new StarryEyes.Mystique.Filters.Expressions.Operators.FilterOperatorGreaterThan();
-            op.LeftValue = new StarryEyes.Mystique.Filters.Expressions.Values.Users.UserFavroites();
-            op.RightValue = rv;
-            System.Diagnostics.Debug.WriteLine(op.ToQuery());
-            // op.RightValue = new StarryEyes.Mystique.Filters.Expressions.Values.Immediates.NumericValue(10000);
-            var func = op.GetBooleanValueProvider();
-            StatusStore.Find(func) // t.Text.Contains("@")) // find contains hashtags
-                .Subscribe(_ =>
-                {
-                    _count++;
-                    System.Diagnostics.Debug.WriteLine(_.ToString() + " / " + _.User.FavoritesCount);
-                },
-                () =>
-                {
-                    sw.Stop();
-                    QueryResult = "Completed! (" + sw.Elapsed.TotalSeconds.ToString("0.00") + " sec, " + _count + " records hot.)";
-                });
+            try
+            {
+                var filter = QueryCompiler.Compile(_query);
+                var func = filter.GetEvaluator();
+                System.Diagnostics.Debug.WriteLine(filter.ToQuery());
+                StatusStore.Find(func) // t.Text.Contains("@")) // find contains hashtags
+                    .Subscribe(_ =>
+                    {
+                        _count++;
+                        System.Diagnostics.Debug.WriteLine(_.ToString() + " / " + _.User.FavoritesCount);
+                    },
+                    () =>
+                    {
+                        sw.Stop();
+                        QueryResult = "Completed! (" + sw.Elapsed.TotalSeconds.ToString("0.00") + " sec, " + _count + " records hot.)";
+                    });
+            }
+            catch(Exception ex)
+            {
+                sw.Stop();
+                QueryResult = ex.ToString();
+            }
         }
         #endregion
 

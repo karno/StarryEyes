@@ -22,7 +22,7 @@ namespace StarryEyes.Mystique.Models.Store
 
         private static bool _isInShutdown = false;
 
-        static UserStore()
+        public static void Initialize()
         {
             // initialize store
             if (StoreOnMemoryObjectPersistence.IsPersistentDataExited("users"))
