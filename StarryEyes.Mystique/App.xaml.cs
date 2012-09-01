@@ -9,6 +9,7 @@ using StarryEyes.Mystique.Models.Store;
 using System.Configuration;
 using System.IO;
 using StarryEyes.SweetLady.Api;
+using StarryEyes.Mystique.Filters.Parsing;
 
 namespace StarryEyes.Mystique
 {
@@ -19,6 +20,18 @@ namespace StarryEyes.Mystique
     {
         private void Application_Startup(object sender, StartupEventArgs e)
         {
+            var filter = QueryCompiler.Compile("from general, home:\"karno\", \"karnoroid\", mentions where user <- *.following || to -> * || user.id != local.karno && user.followers <= 30000 * (10 + 3)");
+
+            System.Diagnostics.Debug.WriteLine(filter.ToQuery());
+            try
+            {
+                var eval = filter.GetEvaluator();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.ToString());
+            }
+
             DispatcherHelper.UIDispatcher = Dispatcher;
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
             Application.Current.Exit += (_, __) => AppFinalize(true);

@@ -27,5 +27,13 @@ namespace StarryEyes.Mystique.Filters
                         }
                     }).Where(_ => _ != 0);
         }
+
+        public static TwitterStatus GetOriginal(this TwitterStatus status)
+        {
+            if (status.RetweetedOriginal != null)
+                return status.RetweetedOriginal;
+            else
+                return status;
+        }
     }
 }

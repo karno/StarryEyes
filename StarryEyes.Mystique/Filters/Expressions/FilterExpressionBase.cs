@@ -25,5 +25,4 @@ namespace StarryEyes.Mystique.Filters.Expressions
             return Operator.GetBooleanValueProvider();
         }
     }
-
 }

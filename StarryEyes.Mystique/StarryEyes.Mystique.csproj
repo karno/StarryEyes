@@ -125,27 +125,34 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Filters\Expressions\Values\Users\Booleans.cs" />
+    <Compile Include="Filters\Expressions\Values\Users\Complexes.cs" />
+    <Compile Include="Filters\Expressions\Values\Users\Numerics.cs" />
+    <Compile Include="Filters\Expressions\Values\Users\Strings.cs" />
+    <Compile Include="Filters\Parsing\Escaping.cs" />
+    <Compile Include="Filters\Parsing\Token.cs" />
+    <Compile Include="Filters\Parsing\Tokenizer.cs" />
     <Compile Include="Filters\Expressions\Operators\OperatorArithmetics.cs" />
     <Compile Include="Filters\Expressions\Operators\OperatorComparison.cs" />
     <Compile Include="Filters\Expressions\Operators\OperatorConcatenates.cs" />
     <Compile Include="Filters\Expressions\Operators\OperatorEqualnesses.cs" />
     <Compile Include="Filters\Expressions\Operators\OperatorImmediates.cs" />
     <Compile Include="Filters\Expressions\Operators\OperatorSets.cs" />
-    <Compile Include="Filters\Expressions\Values\BuiltIns\PseudoCollection.cs" />
-    <Compile Include="Filters\Expressions\Values\BuiltIns\BuiltInUserAny.cs" />
-    <Compile Include="Filters\Expressions\Values\BuiltIns\BuiltInUserSpecified.cs" />
-    <Compile Include="Filters\Expressions\Values\BuiltIns\BuiltInUserRepresentationBase.cs" />
-    <Compile Include="Filters\Expressions\Values\BuiltIns\Values.cs" />
+    <Compile Include="Filters\Expressions\Values\Locals\PseudoCollection.cs" />
+    <Compile Include="Filters\Expressions\Values\Locals\UserAny.cs" />
+    <Compile Include="Filters\Expressions\Values\Locals\UserSpecified.cs" />
+    <Compile Include="Filters\Expressions\Values\Locals\UserRepresentationBase.cs" />
+    <Compile Include="Filters\Expressions\Values\Locals\Values.cs" />
     <Compile Include="Filters\Expressions\Values\Immediates\NumericValue.cs" />
     <Compile Include="Filters\Expressions\Values\Immediates\StringValue.cs" />
     <Compile Include="Filters\Expressions\Values\Statuses\Booleans.cs" />
     <Compile Include="Filters\Expressions\Values\Statuses\Complexes.cs" />
     <Compile Include="Filters\Expressions\Values\Statuses\Numerics.cs" />
     <Compile Include="Filters\Expressions\Values\Statuses\Sets.cs" />
-    <Compile Include="Filters\Expressions\Values\Statuses\StatusesUtil.cs" />
     <Compile Include="Filters\Expressions\Values\Statuses\Strings.cs" />
     <Compile Include="Filters\FilterSystemUtil.cs" />
     <Compile Include="Filters\Parsing\QueryCompiler.cs" />
+    <Compile Include="Filters\Parsing\TokenReader.cs" />
     <Compile Include="Filters\Sources\FilterList.cs" />
     <Compile Include="Filters\Sources\FilterMentions.cs" />
     <Compile Include="Filters\Sources\FilterGeneral.cs" />
@@ -195,7 +202,6 @@
     <Compile Include="Models\Hub\InformationHub.cs" />
     <Compile Include="Models\Hub\StatisticsHub.cs" />
     <Compile Include="Models\Operations\IObservableRunnable.cs" />
-    <Compile Include="Filters\QueryCompiler.cs" />
     <Compile Include="Settings\AccountSetting.cs" />
     <Compile Include="Settings\Setting.cs" />
     <Compile Include="Models\Operations\DeleteOperation.cs" />

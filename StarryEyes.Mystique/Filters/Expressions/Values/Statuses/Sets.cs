@@ -4,7 +4,7 @@ using StarryEyes.SweetLady.DataModel;
 
 namespace StarryEyes.Mystique.Filters.Expressions.Values.Statuses
 {
-    public sealed class StatusFavoriteds : ValueBase
+    public sealed class StatusFavorers : ValueBase
     {
         public override IEnumerable<FilterExpressionType>  SupportedTypes
         {
@@ -21,11 +21,11 @@ namespace StarryEyes.Mystique.Filters.Expressions.Values.Statuses
 
         public override string ToQuery()
         {
-            return "favorited";
+            return "favorers";
         }
     }
 
-    public sealed class StatusRetweeteds : ValueBase
+    public sealed class StatusRetweeters : ValueBase
     {
         public override IEnumerable<FilterExpressionType> SupportedTypes
         {
@@ -42,7 +42,7 @@ namespace StarryEyes.Mystique.Filters.Expressions.Values.Statuses
 
         public override string ToQuery()
         {
-            return "retweeted";
+            return "retweeters";
         }
     }
 }

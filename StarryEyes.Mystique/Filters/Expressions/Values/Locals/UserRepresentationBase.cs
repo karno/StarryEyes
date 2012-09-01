@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace StarryEyes.Mystique.Filters.Expressions.Values.BuiltIns
+namespace StarryEyes.Mystique.Filters.Expressions.Values.Locals
 {
     public abstract class UserRepresentationBase
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace StarryEyes.Mystique.Filters.Expressions.Values.BuiltIns
+namespace StarryEyes.Mystique.Filters.Expressions.Values.Locals
 {
     class PseudoCollection<T> : ICollection<T>
     {

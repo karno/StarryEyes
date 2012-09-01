@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using StarryEyes.Mystique.Filters.Expressions.Values.Immediates;
 using StarryEyes.SweetLady.DataModel;
+using System.Linq;
 
 namespace StarryEyes.Mystique.Filters.Expressions.Operators
 {
@@ -19,10 +20,18 @@ namespace StarryEyes.Mystique.Filters.Expressions.Operators
             {
                 FilterExpressionType.Boolean,
                 FilterExpressionType.Numeric,
-                FilterExpressionType.String
+                FilterExpressionType.String,
+                FilterExpressionType.Set,
             };
-            var type = FilterExpressionUtil.CheckDecide(
-                LeftValue.SupportedTypes, supportedTypes, RightValue.SupportedTypes);
+            var intersect = LeftValue.SupportedTypes.Intersect(RightValue.SupportedTypes);
+            if (intersect.Count() == 0)
+                throw new FilterQueryException("Value type is mismatched. Can't compare each other." + Environment.NewLine +
+                    "Left argument is: " + LeftValue.SupportedTypes
+                    .Select(t => t.ToString()).JoinString(", ") + Environment.NewLine +
+                    "Right argument is: " + RightValue.SupportedTypes
+                    .Select(t => t.ToString()).JoinString(", "),
+                    this.ToQuery());
+            var type = supportedTypes.Intersect(intersect).First();
             switch (type)
             {
                 case FilterExpressionType.Boolean:
@@ -44,7 +53,8 @@ namespace StarryEyes.Mystique.Filters.Expressions.Operators
                     var rsp = RightValue.GetStringValueProvider();
                     return _ => StringMatch(lsp(_), rsp(_), side);
                 default:
-                    throw new FilterQueryException("Unsupported type on equals :" + type.ToString());
+                    throw new FilterQueryException("Unsupported type on equals :" + type.ToString(),
+                        this.ToQuery());
             }
         }
 

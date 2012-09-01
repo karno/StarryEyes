@@ -4,7 +4,7 @@ using StarryEyes.Albireo.Data;
 using StarryEyes.Mystique.Models.Store;
 using StarryEyes.Mystique.Settings;
 
-namespace StarryEyes.Mystique.Filters.Expressions.Values.BuiltIns
+namespace StarryEyes.Mystique.Filters.Expressions.Values.Locals
 {
     public sealed class UserAny : UserRepresentationBase
     {

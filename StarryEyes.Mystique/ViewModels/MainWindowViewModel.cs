@@ -1,23 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.ComponentModel;
-
+using System.Reactive.Linq;
 using Livet;
 using Livet.Commands;
 using Livet.Messaging;
-using Livet.Messaging.IO;
-using Livet.Messaging.Windows;
-using StarryEyes.Mystique.Views.Dialogs;
-using StarryEyes.Mystique.ViewModels.Dialogs;
-using System.Reactive.Linq;
-using StarryEyes.Mystique.Settings;
-using StarryEyes.Mystique.Models.Store;
-using StarryEyes.Mystique.Models.Hub;
-using StarryEyes.Mystique.Models.Connection;
-using System.Diagnostics;
 using StarryEyes.Mystique.Models.Connection.UserDependency;
+using StarryEyes.Mystique.Models.Hub;
+using StarryEyes.Mystique.Models.Store;
+using StarryEyes.Mystique.Settings;
+using StarryEyes.Mystique.ViewModels.Dialogs;
+using StarryEyes.Mystique.Views.Dialogs;
 
 namespace StarryEyes.Mystique.ViewModels
 {
@@ -169,10 +162,10 @@ namespace StarryEyes.Mystique.ViewModels
             sw.Start();
             int _count = 0;
             var rv = new StarryEyes.Mystique.Filters.Expressions.Operators.FilterOperatorPlus();
-            rv.LeftValue =  new StarryEyes.Mystique.Filters.Expressions.Values.Statuses.UserStatuses();
+            rv.LeftValue =  new StarryEyes.Mystique.Filters.Expressions.Values.Users.UserStatuses();
             rv.RightValue = new StarryEyes.Mystique.Filters.Expressions.Values.Immediates.NumericValue(100000);
             var op = new StarryEyes.Mystique.Filters.Expressions.Operators.FilterOperatorGreaterThan();
-            op.LeftValue = new StarryEyes.Mystique.Filters.Expressions.Values.Statuses.UserFavroites();
+            op.LeftValue = new StarryEyes.Mystique.Filters.Expressions.Values.Users.UserFavroites();
             op.RightValue = rv;
             System.Diagnostics.Debug.WriteLine(op.ToQuery());
             // op.RightValue = new StarryEyes.Mystique.Filters.Expressions.Values.Immediates.NumericValue(10000);

@@ -1,8 +1,8 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using StarryEyes.Mystique.Models.Store;
 using StarryEyes.SweetLady.DataModel;
-using System.Collections.Generic;
-using System;
 
 namespace StarryEyes.Mystique.Filters.Expressions.Values.Statuses
 {
@@ -12,7 +12,6 @@ namespace StarryEyes.Mystique.Filters.Expressions.Values.Statuses
         {
             get { yield return FilterExpressionType.Boolean; }
         }
-
 
         public override Func<TwitterStatus, bool> GetBooleanValueProvider()
         {
@@ -39,11 +38,11 @@ namespace StarryEyes.Mystique.Filters.Expressions.Values.Statuses
 
         public override string ToQuery()
         {
-            return "favorited";
+            return "is_favorited";
         }
     }
 
-    public sealed class UserIsProtected : ValueBase
+    public sealed class StatusIsRetweeted : ValueBase
     {
         public override IEnumerable<FilterExpressionType> SupportedTypes
         {
@@ -52,84 +51,12 @@ namespace StarryEyes.Mystique.Filters.Expressions.Values.Statuses
 
         public override Func<TwitterStatus, bool> GetBooleanValueProvider()
         {
-            return _ => _.User.IsProtected;
+            return _ => AccountDataStore.GetAccountDatas().Any(ad => _.RetweetedUsers.Contains(ad.AccountId));
         }
 
         public override string ToQuery()
         {
-            return "user.is_protected";
-        }
-    }
-
-    public sealed class UserIsVerified : ValueBase
-    {
-        public override IEnumerable<FilterExpressionType> SupportedTypes
-        {
-            get { yield return FilterExpressionType.Boolean; }
-        }
-
-        public override Func<TwitterStatus, bool> GetBooleanValueProvider()
-        {
-            return _ => _.User.IsVerified;
-        }
-
-        public override string ToQuery()
-        {
-            return "user.is_verified";
-        }
-    }
-
-    public sealed class UserIsTranslator : ValueBase
-    {
-        public override IEnumerable<FilterExpressionType> SupportedTypes
-        {
-            get { yield return FilterExpressionType.Boolean; }
-        }
-
-        public override Func<TwitterStatus, bool> GetBooleanValueProvider()
-        {
-            return _ => _.User.IsTranslator;
-        }
-
-        public override string ToQuery()
-        {
-            return "user.is_translator";
-        }
-    }
-
-    public sealed class UserIsContributorsEnabled : ValueBase
-    {
-        public override IEnumerable<FilterExpressionType> SupportedTypes
-        {
-            get { yield return FilterExpressionType.Boolean; }
-        }
-
-        public override Func<TwitterStatus, bool> GetBooleanValueProvider()
-        {
-            return _ => _.User.IsContributorsEnabled;
-        }
-
-        public override string ToQuery()
-        {
-            return "user.is_contributors_enabled";
-        }
-    }
-
-    public sealed class UserIsGeoEnabled : ValueBase
-    {
-        public override IEnumerable<FilterExpressionType> SupportedTypes
-        {
-            get { yield return FilterExpressionType.Boolean; }
-        }
-
-        public override Func<TwitterStatus, bool> GetBooleanValueProvider()
-        {
-            return _ => _.User.IsGeoEnabled;
-        }
-
-        public override string ToQuery()
-        {
-            return "user.is_geo_enabled";
+            return "is_retweeted";
         }
     }
 }

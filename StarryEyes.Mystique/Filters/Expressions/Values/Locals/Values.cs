@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using StarryEyes.SweetLady.DataModel;
 
-namespace StarryEyes.Mystique.Filters.Expressions.Values.BuiltIns
+namespace StarryEyes.Mystique.Filters.Expressions.Values.Locals
 {
-    public sealed class User : ValueBase
+    public sealed class LocalUser : ValueBase
     {
         private UserRepresentationBase _representation;
-        public User(UserRepresentationBase representation)
+        public LocalUser(UserRepresentationBase representation)
         {
             this._representation = representation;
         }
@@ -41,10 +41,10 @@ namespace StarryEyes.Mystique.Filters.Expressions.Values.BuiltIns
         }
     }
 
-    public sealed class UserFollowings : ValueBase
+    public sealed class LocalUserFollowings : ValueBase
     {
         private UserRepresentationBase _representation;
-        public UserFollowings(UserRepresentationBase representation)
+        public LocalUserFollowings(UserRepresentationBase representation)
         {
             this._representation = representation;
         }
@@ -65,10 +65,10 @@ namespace StarryEyes.Mystique.Filters.Expressions.Values.BuiltIns
         }
     }
 
-    public sealed class UserFollowers : ValueBase
+    public sealed class LocalUserFollowers : ValueBase
     {
         private UserRepresentationBase _representation;
-        public UserFollowers(UserRepresentationBase representation)
+        public LocalUserFollowers(UserRepresentationBase representation)
         {
             this._representation = representation;
         }

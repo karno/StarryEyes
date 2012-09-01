@@ -6,7 +6,7 @@ using StarryEyes.SweetLady.DataModel;
 
 namespace StarryEyes.Mystique.Filters.Expressions.Operators
 {
-    public sealed class OperatorConcatenateAnd : FilterTwoValueOperator
+    public sealed class FilterOperatorAnd : FilterTwoValueOperator
     {
         protected override string OperatorString
         {
@@ -28,7 +28,7 @@ namespace StarryEyes.Mystique.Filters.Expressions.Operators
         }
     }
 
-    public sealed class OperatorConcatenateOr : FilterTwoValueOperator
+    public sealed class FilterOperatorOr : FilterTwoValueOperator
     {
         protected override string OperatorString
         {

@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using StarryEyes.SweetLady.DataModel;
 
-namespace StarryEyes.Mystique.Filters.Expressions.Values.Statuses
+namespace StarryEyes.Mystique.Filters.Expressions.Values.Users
 {
-    public sealed class StatusInReplyTo : ValueBase
+    public sealed class User : ValueBase
     {
         public override IEnumerable<FilterExpressionType> SupportedTypes
         {
@@ -18,21 +17,21 @@ namespace StarryEyes.Mystique.Filters.Expressions.Values.Statuses
 
         public override Func<TwitterStatus, long> GetNumericValueProvider()
         {
-            return _ => _.GetOriginal().InReplyToStatusId.GetValueOrDefault(-1);
+            return _ => _.GetOriginal().User.Id;
         }
 
         public override Func<TwitterStatus, string> GetStringValueProvider()
         {
-            return _ => _.GetOriginal().InReplyToScreenName ?? string.Empty;
+            return _ => _.GetOriginal().User.ScreenName;
         }
 
         public override string ToQuery()
         {
-            return "in_reply_to";
+            return "user";
         }
     }
 
-    public sealed class StatusTo : ValueBase
+    public sealed class Retweeter : ValueBase
     {
         public override IEnumerable<FilterExpressionType> SupportedTypes
         {
@@ -40,34 +39,22 @@ namespace StarryEyes.Mystique.Filters.Expressions.Values.Statuses
             {
                 yield return FilterExpressionType.Numeric;
                 yield return FilterExpressionType.String;
-                yield return FilterExpressionType.Set;
             }
         }
 
         public override Func<TwitterStatus, long> GetNumericValueProvider()
         {
-            return _ => _.StatusType == StatusType.Tweet ?
-                _.GetOriginal().InReplyToUserId.GetValueOrDefault(-1) :
-                _.Recipient.Id;
+            return _ => _.RetweetedOriginal != null ? _.User.Id : -1;
         }
 
         public override Func<TwitterStatus, string> GetStringValueProvider()
         {
-            return _ => _.StatusType == StatusType.Tweet ?
-                _.GetOriginal().InReplyToScreenName ?? string.Empty : 
-                _.Recipient.ScreenName;
-        }
-
-        public override Func<TwitterStatus, ICollection<long>> GetSetValueProvider()
-        {
-            return _ => _.StatusType == StatusType.Tweet ?
-                FilterSystemUtil.InReplyToUsers(_).ToList() :
-                new[] { _.Recipient.Id }.ToList();
+            return _ => _.RetweetedOriginal != null ? _.User.ScreenName : String.Empty;
         }
 
         public override string ToQuery()
         {
-            return "to";
+            return "retweeter";
         }
     }
 }

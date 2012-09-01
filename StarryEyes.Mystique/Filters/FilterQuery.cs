@@ -27,7 +27,7 @@ namespace StarryEyes.Mystique.Filters
                     }
                     else
                     {
-                        return f.First().FilterKey + ": " + f.Select(fs => fs.FilterValue).JoinString(", ");
+                        return f.First().FilterKey + ": " + f.Select(fs => "\"" + fs.FilterValue + "\"").JoinString(", ");
                     }
                 })
                 .JoinString(", ") +
@@ -36,7 +36,9 @@ namespace StarryEyes.Mystique.Filters
 
         public Func<TwitterStatus, bool> GetEvaluator()
         {
-            return _ => Sources.Any(s => GetEvaluator()(_)) && PredicateTreeRoot.GetEvaluator()(_);
+            var sourcesEvals = Sources.Select(s => s.GetEvaluator());
+            var predEvals = PredicateTreeRoot.GetEvaluator();
+            return _ => sourcesEvals.Any(f => f(_)) && predEvals(_);
         }
     }
 }

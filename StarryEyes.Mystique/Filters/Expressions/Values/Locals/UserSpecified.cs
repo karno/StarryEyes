@@ -5,7 +5,7 @@ using StarryEyes.Mystique.Models.Common;
 using StarryEyes.Mystique.Models.Store;
 using StarryEyes.Mystique.Settings;
 
-namespace StarryEyes.Mystique.Filters.Expressions.Values.BuiltIns
+namespace StarryEyes.Mystique.Filters.Expressions.Values.Locals
 {
     public sealed class UserSpecified : UserRepresentationBase
     {
@@ -70,9 +70,9 @@ namespace StarryEyes.Mystique.Filters.Expressions.Values.BuiltIns
         public override string ToQuery()
         {
             if (String.IsNullOrEmpty(_originalScreenName))
-                return _userId.ToString();
+                return "local.#" + _userId.ToString();
             else
-                return _originalScreenName;
+                return "local." + _originalScreenName;
         }
 
         public override long UserId
