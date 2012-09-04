@@ -29,5 +29,11 @@ namespace StarryEyes.Mystique.Settings
         /// </summary>
         [DataMember]
         public bool IsUserStreamsEnabled { get; set; }
+
+        /// <summary>
+        /// If set 0, fallback is disabled.
+        /// </summary>
+        [DataMember]
+        public long FallbackNext { get; set; }
     }
 }

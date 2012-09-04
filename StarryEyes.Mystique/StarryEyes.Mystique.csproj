@@ -55,10 +55,16 @@
     <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
     <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Livet">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>InfrastructureAssemblies\Livet.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro">
+      <HintPath>..\packages\MahApps.Metro.0.9.9.45-ALPHA\lib\net40\MahApps.Metro.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Expression.Interactions">
       <SpecificVersion>False</SpecificVersion>
@@ -75,6 +81,7 @@
     <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Interactive, Version=1.1.10823.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Ix_Experimental-Main.1.1.10823\lib\Net4\System.Interactive.dll</HintPath>
     </Reference>
@@ -102,9 +109,8 @@
     </Reference>
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
-    <Reference Include="System.Windows.Interactivity">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>InfrastructureAssemblies\System.Windows.Interactivity.dll</HintPath>
+    <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.0.9.9.45-ALPHA\lib\net40\System.Windows.Interactivity.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -113,6 +119,9 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="TaskDialog">
+      <HintPath>..\packages\WPFTaskDialog.1.5.4573.21132\lib\net40-Client\TaskDialog.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
@@ -155,7 +164,7 @@
     <Compile Include="Filters\Parsing\TokenReader.cs" />
     <Compile Include="Filters\Sources\FilterList.cs" />
     <Compile Include="Filters\Sources\FilterMentions.cs" />
-    <Compile Include="Filters\Sources\FilterGeneral.cs" />
+    <Compile Include="Filters\Sources\FilterLocal.cs" />
     <Compile Include="Filters\Sources\FilterHome.cs" />
     <Compile Include="Filters\Sources\FilterMessages.cs" />
     <Compile Include="Filters\Sources\FilterSearch.cs" />
@@ -167,10 +176,15 @@
     <Compile Include="Models\Store\StoreOnMemoryObjectPersistence.cs" />
     <Compile Include="Models\Timeline\TimelineDataProvider.cs" />
     <Compile Include="Plugins\IPlugin.cs" />
+    <Compile Include="Views\Messaging\Behaviors\TaskDialogInteractionMessageAction.cs" />
+    <Compile Include="Views\Messaging\TaskDialogMessage.cs" />
     <Compile Include="Views\Utils\BooleanConverters.cs" />
     <Compile Include="Views\Utils\CollectionExistsToVisibleConverter.cs" />
     <Compile Include="Views\Utils\ConverterBase.cs" />
     <Compile Include="Views\Utils\StringToVisibleConverter.cs" />
+    <Compile Include="Views\WindowParts\InputArea.xaml.cs">
+      <DependentUpon>InputArea.xaml</DependentUpon>
+    </Compile>
     <Page Include="Simple Styles.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -233,6 +247,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Views\WindowParts\InputArea.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -253,6 +271,9 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="app.config" />
+    <None Include="app.manifest">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>PublicSettingsSingleFileGenerator</Generator>

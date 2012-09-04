@@ -1,33 +1,45 @@
-﻿<Window x:Class="StarryEyes.Mystique.Views.Dialogs.AuthorizationWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
-        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-        xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:v="clr-namespace:StarryEyes.Mystique.Views.Dialogs"
-        xmlns:vm="clr-namespace:StarryEyes.Mystique.ViewModels.Dialogs"
-        Title="Twitterへ認証"
-        Width="330"
-        Height="120"
-        mc:Ignorable="d" WindowStyle="ToolWindow" ResizeMode="NoResize" ShowInTaskbar="False">
-    <Window.Resources>
-    	<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-    	<l:VisibilityAndBooleanConverter x:Key="VisibilityAndBooleanConverter" />
-    </Window.Resources>
-
-    <Window.DataContext>
+﻿<Controls:MetroWindow x:Class="StarryEyes.Mystique.Views.Dialogs.AuthorizationWindow"
+                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                      xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+                      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                      xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
+                      xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+                      xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"
+                      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                      xmlns:StarryEyes_Mystique_Views_Messaging_Behaviors="clr-namespace:StarryEyes.Mystique.Views.Messaging.Behaviors"
+                      xmlns:v="clr-namespace:StarryEyes.Mystique.Views.Dialogs"
+                      xmlns:vm="clr-namespace:StarryEyes.Mystique.ViewModels.Dialogs"
+                      Title="Twitterへ認証"
+                      Width="320"
+                      Height="116"
+                      ResizeMode="NoResize"
+                      ShowIconOnTitleBar="False"
+                      ShowInTaskbar="False"
+                      ShowMaxRestoreButton="False"
+                      ShowMinButton="False"
+                      WindowStartupLocation="CenterOwner"
+                      WindowStyle="ToolWindow"
+                      mc:Ignorable="d">
+    <Controls:MetroWindow.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colours.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+            <l:VisibilityAndBooleanConverter x:Key="VisibilityAndBooleanConverter" />
+        </ResourceDictionary>
+    </Controls:MetroWindow.Resources>
+    <Controls:MetroWindow.DataContext>
         <vm:AuthorizationViewModel />
-    </Window.DataContext>
-
+    </Controls:MetroWindow.DataContext>
     <i:Interaction.Triggers>
-
         <!--  WindowのContentRenderedイベントのタイミングでViewModelのInitializeメソッドが呼ばれます  -->
         <i:EventTrigger EventName="ContentRendered">
             <l:LivetCallMethodAction MethodName="Initialize" MethodTarget="{Binding}" />
         </i:EventTrigger>
-
         <!--  Windowが閉じたタイミングでViewModelのDisposeメソッドが呼ばれます  -->
         <i:EventTrigger EventName="Closed">
             <l:DataContextDisposeAction />
@@ -38,22 +50,21 @@
         <l:InteractionMessageTrigger Messenger="{Binding Messenger}">
             <l:WindowInteractionMessageAction />
         </l:InteractionMessageTrigger>
-
+        <l:InteractionMessageTrigger Messenger="{Binding Messenger}">
+            <StarryEyes_Mystique_Views_Messaging_Behaviors:TaskDialogInteractionMessageAction />
+        </l:InteractionMessageTrigger>
         <!--  WindowのCloseキャンセル処理に対応する場合は、WindowCloseCancelBehaviorの使用を検討してください  -->
-
     </i:Interaction.Triggers>
-
     <Grid>
         <TextBlock Margin="10,10,0,0"
                    HorizontalAlignment="Left"
                    VerticalAlignment="Top"
-                   Text="Twitterへログインし、アクセスを許可してください。
-&#10;その後に表示された番号を入力してください。"
+                   Text="Twitterへログインし、アクセスを許可してください。 &#10;その後に表示された番号を入力してください。"
                    TextWrapping="Wrap" />
-        <TextBox Width="180"
-                 Margin="10,0,0,10"
-                 HorizontalAlignment="Left"
+        <TextBox Margin="12,0,114,10.564"
                  VerticalAlignment="Bottom"
+                 VerticalContentAlignment="Center"
+                 Controls:TextboxHelper.Watermark="Enter PIN"
                  Text="{Binding Pin,
                                 Mode=TwoWay,
                                 UpdateSourceTrigger=PropertyChanged}"
@@ -64,26 +75,39 @@
                 VerticalAlignment="Bottom"
                 Command="{Binding VerifyPinCommand,
                                   Mode=OneWay}"
-                Content="OK" />
-        <Grid x:Name="ProcessingOverwrap" Visibility="{Binding IsNegotiating, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}">
-            <Grid.Background>
-                <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}" />
-            </Grid.Background>
-            <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition />
-            </Grid.RowDefinitions>
-            <TextBlock HorizontalAlignment="Center"
-                       VerticalAlignment="Bottom"
-                       Foreground="Black"
-                       Text="Twitterと通信しています……"
-                       TextAlignment="Center"
-                       TextWrapping="Wrap" />
-            <ProgressBar Grid.Row="1"
-                         Height="8"
-                         Margin="20,0"
-                         VerticalAlignment="Top"
-                         IsIndeterminate="True" />
+                Content="OK"
+                Style="{DynamicResource SquareButtonStyle}" />
+        <Grid x:Name="ProcessingOverwrap"
+              Background="White"
+              Visibility="{Binding IsNegotiating,
+                                   Converter={StaticResource BooleanToVisibilityConverter},
+                                   Mode=OneWay}">
+            <Grid Margin="16,0,0,0"
+                  HorizontalAlignment="Left"
+                  VerticalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Controls:ProgressRing Grid.RowSpan="2"
+                                       HorizontalAlignment="Left"
+                                       VerticalAlignment="Center"
+                                       IsActive="True"
+                                       d:LayoutOverrides="GridBox">
+                    <Controls:ProgressRing.Foreground>
+                        <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.HotTrackColorKey}}" />
+                    </Controls:ProgressRing.Foreground>
+                </Controls:ProgressRing>
+                <TextBlock Grid.Column="1"
+                           Margin="12,0,0,0"
+                           HorizontalAlignment="Left"
+                           VerticalAlignment="Center"
+                           Foreground="Black"
+                           Text="Twitterと通信しています..."
+                           TextAlignment="Center"
+                           TextWrapping="Wrap"
+                           d:LayoutOverrides="HorizontalAlignment, GridBox" />
+            </Grid>
         </Grid>
     </Grid>
-</Window>
+</Controls:MetroWindow>

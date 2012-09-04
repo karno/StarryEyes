@@ -10,6 +10,7 @@ using Livet.Messaging;
 using Livet.Messaging.Windows;
 using StarryEyes.Mystique.Helpers;
 using StarryEyes.SweetLady.Authorize;
+using StarryEyes.Mystique.Views.Messaging;
 
 namespace StarryEyes.Mystique.ViewModels.Dialogs
 {
@@ -48,13 +49,17 @@ namespace StarryEyes.Mystique.ViewModels.Dialogs
                 },
                 ex =>
                 {
-                    this.Messenger.Raise(new InformationMessage(
-                        "Twitterとの通信が正しくできませんでした。" + Environment.NewLine +
-                        "しつこく何度も試してみるのも良いと思いますが、こういう場合は" + Environment.NewLine +
-                        "すこし時間を置いて試していただくほうがよろしいかと思います。" + Environment.NewLine +
-                        "(PCの時計が大幅にずれている時も認証ができないことがあります。)",
-                        "認証失敗", System.Windows.MessageBoxImage.Error, null));
-                    this.Messenger.Raise(new WindowActionMessage(null, WindowAction.Close));
+                    this.Messenger.Raise(new TaskDialogMessage(
+                        new TaskDialogInterop.TaskDialogOptions()
+                        {
+                            Title = "認証失敗",
+                            MainIcon = TaskDialogInterop.VistaTaskDialogIcon.Error,
+                            MainInstruction = "Twitterと正しく通信できませんでした。",
+                            Content = "何度も繰り返し発生する場合は、しばらく時間を置いて試してみてください。",
+                            CommonButtons = TaskDialogInterop.TaskDialogCommonButtons.Close,
+                            FooterIcon = TaskDialogInterop.VistaTaskDialogIcon.Information,
+                            FooterText = "コンピュータの時計が大幅にずれている場合も認証が行えないことがあります。"
+                        }));
                 });
         }
 
@@ -126,11 +131,17 @@ namespace StarryEyes.Mystique.ViewModels.Dialogs
                 ex =>
                 {
                     CurrentAuthenticationStep = AuthenticationStep.WaitingPinInput;
-                    this.Messenger.Raise(new InformationMessage(
-                        "Twitterからアクセス許可をもらえませんでした。" + Environment.NewLine +
-                        "もう一度お試しいただくか、再度暗証番号を取得し直してください。" + Environment.NewLine +
-                        "(PCの時計が大幅にずれている時も認証ができないことがあります。)",
-                        "アクセス許可取得失敗", System.Windows.MessageBoxImage.Error, null));
+                    this.Messenger.Raise(new TaskDialogMessage(
+                        new TaskDialogInterop.TaskDialogOptions()
+                        {
+                            Title = "アクセス許可取得失敗",
+                            MainIcon = TaskDialogInterop.VistaTaskDialogIcon.Error,
+                            MainInstruction = "アカウントを認証できませんでした。",
+                            Content = "PINを確認しもう一度入力するか、最初からやり直してみてください。",
+                            CommonButtons = TaskDialogInterop.TaskDialogCommonButtons.Close,
+                            FooterIcon = TaskDialogInterop.VistaTaskDialogIcon.Information,
+                            FooterText = "コンピュータの時計が大幅にずれている場合も認証が行えないことがあります。"
+                        }));
                 });
         }
         #endregion

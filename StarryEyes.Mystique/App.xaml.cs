@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Threading;
 using System.Windows;
 using Livet;
 using StarryEyes.Mystique.Models.Hub;
@@ -12,7 +13,6 @@ using StarryEyes.Mystique.Models.Plugins;
 using StarryEyes.Mystique.Models.Store;
 using StarryEyes.Mystique.Settings;
 using StarryEyes.SweetLady.Api;
-using System.Threading;
 
 namespace StarryEyes.Mystique
 {
@@ -25,6 +25,7 @@ namespace StarryEyes.Mystique
         private void Application_Startup(object sender, StartupEventArgs e)
         {
             DispatcherHelper.UIDispatcher = Dispatcher;
+            return;
 
             // Check run duplication
             string mutexStr = null;
