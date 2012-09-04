@@ -38,6 +38,24 @@ namespace StarryEyes.Mystique.Filters.Parsing
             }
         }
 
+        public static FilterExpressionRoot CompileFilters(string query)
+        {
+            try
+            {
+                var tokens = Tokenizer.Tokenize(query);
+                // from (sources) where (filters)
+                return CompileFilters(tokens);
+            }
+            catch (FilterQueryException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new FilterQueryException("Query compilation failed. " + ex.Message, query, ex);
+            }
+        }
+
         #region sources compiler
 
         private static readonly IDictionary<string, Type> FilterSourceResolver = new SortedDictionary<string, Type>()

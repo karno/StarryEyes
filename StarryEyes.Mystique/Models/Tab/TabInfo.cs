@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.ComponentModel;
+using StarryEyes.Albireo.Data;
+using StarryEyes.Mystique.Filters;
+using StarryEyes.Mystique.Filters.Parsing;
+using StarryEyes.Mystique.Models.Hub;
 
 namespace StarryEyes.Mystique.Models.Tab
 {
@@ -10,14 +13,18 @@ namespace StarryEyes.Mystique.Models.Tab
     /// </summary>
     public class TabInfo
     {
-        private List<long> bindingAccountIds = new List<long>();
+        /// <summary>
+        /// Name of this tab.
+        /// </summary>
+        private string Name { get; set; }
+
+        private AVLTree<long> bindingAccountIds = new AVLTree<long>();
         /// <summary>
         /// Binding accounts ids
         /// </summary>
-        public List<long> BindingAccountIds
+        public ICollection<long> BindingAccountIds
         {
             get { return bindingAccountIds; }
-            set { bindingAccountIds = value; }
         }
 
         private List<string> bindingHashtags = new List<string>();
@@ -29,13 +36,39 @@ namespace StarryEyes.Mystique.Models.Tab
             get { return bindingHashtags; }
             set { bindingHashtags = value; }
         }
-    
-        // TODO: QueryDescription, Filtering
-        public void F()
+
+        private FilterQuery filterQuery = null;
+        /// <summary>
+        /// Filter query info
+        /// </summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public FilterQuery FilterQuery
         {
-            var data = from src in "data"
-                       where src > 0
-                       select src;
+            get { return filterQuery; }
+            set { filterQuery = value; }
+        }
+
+        /// <summary>
+        /// Filter querified string
+        /// </summary>
+        public string FilterQueryString
+        {
+            get { return filterQuery.ToQuery(); }
+            set
+            {
+                try
+                {
+                    filterQuery = QueryCompiler.Compile(value);
+                }
+                catch (FilterQueryException fex)
+                {
+                    InformationHub.PublishInformation(new Information(InformationKind.Warning,
+                        "TABINFO_QUERY_CORRUPTED_" + Name,
+                        "クエリが壊れています。",
+                        "タブ " + Name + " のクエリは破損しているため、フィルタが初期化されました。" + Environment.NewLine +
+                        "送出された例外: " + fex.ToString()));
+                }
+            }
         }
     }
 }

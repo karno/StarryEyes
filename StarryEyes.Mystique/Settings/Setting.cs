@@ -40,10 +40,10 @@ namespace StarryEyes.Mystique.Settings
                             "元のディレクトリ: " + App.ConfigurationFilePath + Environment.NewLine +
                             "送出された例外: " + ex.ToString()));
                     }
-                    catch(Exception exi)
+                    catch(Exception ex_)
                     {
                         Environment.FailFast(
-                            "設定ファイルの緊急バックアップ ストアが行えませんでした。", exi);
+                            "設定ファイルの緊急バックアップ ストアが行えませんでした。", ex_);
                         return;
                     }
                 }

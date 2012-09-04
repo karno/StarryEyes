@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using StarryEyes.Vanille.Serialization;
 
@@ -28,7 +27,7 @@ namespace StarryEyes.Mystique.Models.Store
             }
         }
 
-        public static bool IsPersistentDataExited(string key)
+        public static bool IsPersistentDataExisted(string key)
         {
             return File.Exists(GetDataStoreFileName(key));
         }

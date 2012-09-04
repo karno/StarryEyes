@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using StarryEyes.SweetLady.DataModel;
-using Livet;
+using System.Reactive.Linq;
+using StarryEyes.Mystique.Filters;
 using StarryEyes.Mystique.Models.Store;
+using StarryEyes.SweetLady.DataModel;
+using StarryEyes.Vanille.DataStore;
 
 namespace StarryEyes.Mystique.Models.Tab
 {
@@ -13,35 +12,66 @@ namespace StarryEyes.Mystique.Models.Tab
     /// </summary>
     public class TabBackEnd 
     {
-        ObservableSynchronizedCollection<TwitterStatus> backendCollection = new ObservableSynchronizedCollection<TwitterStatus>();
+        int ChunkCount = 50;
 
-        public TabBackEnd()
+        private Func<TwitterStatus, bool> evaluator = _ => false;
+        private FilterQuery filterQuery;
+        public FilterQuery FilterQuery
         {
-        }
-
-        /// <summary>
-        /// Initialize collection and start receiving and filtering
-        /// </summary>
-        public void Initialize()
-        {
-            StatusStore.StatusPublisher.Subscribe(notify =>
+            get { return filterQuery; }
+            set
             {
-                // add or remove backend collection and visible collection
-            });
+                if (this.filterQuery != value)
+                {
+                    value.Deactivate();
+                    filterQuery = value;
+                    if (filterQuery != null)
+                    {
+                        filterQuery.Activate();
+                        evaluator = filterQuery.GetEvaluator();
+                    }
+                    else
+                    {
+                        evaluator = _ => false;
+                    }
+                    ReFilter();
+                }
+            }
+        }
+
+        public void ReFilter()
+        {
+            var handler = OnCollectionInvalidateRequired;
+            if (handler != null)
+                handler();
         }
 
         /// <summary>
-        /// Notify this tab is closed.
+        /// Notify collection invalidated.
         /// </summary>
-        public void Close()
+        public event Action OnCollectionInvalidateRequired;
+
+        public void Deactivate()
         {
+            filterQuery.Deactivate();
         }
 
-        /// <summary>
-        /// Notify this tab is revived.
-        /// </summary>
-        public void Revive()
+        public void Activate()
         {
+            filterQuery.Activate();
+        }
+
+        public IObservable<StatusNotification> GetFilteredStream()
+        {
+            return StatusStore.StatusPublisher
+                .Where(sn => !sn.IsAdded || evaluator(sn.Status));
+        }
+
+        public IObservable<TwitterStatus> Get(long? maxId)
+        {
+            return StatusStore.Find(evaluator,
+                maxId != null ? FindRange<long>.By(maxId.Value) : null,
+                ChunkCount);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace StarryEyes.Mystique.Models.Hub
 {
@@ -7,13 +8,36 @@ namespace StarryEyes.Mystique.Models.Hub
     /// </summary>
     public static class InformationHub
     {
+        static InformationHub()
+        {
+            App.OnUserInterfaceReady += DispatchQueue;
+        }
+
+        private static bool isUiReady = false;
+        private static void DispatchQueue()
+        {
+            isUiReady = true;
+            if (localQueue == null) return;
+            var q = localQueue;
+            localQueue = null;
+            while (q.Count > 0)
+                PublishInformation(q.Dequeue());
+        }
+
+        private static Queue<Information> localQueue = new Queue<Information>();
+
         internal static event Action<Information> OnInformationPublished;
 
         public static void PublishInformation(Information information)
         {
-            var handler = OnInformationPublished;
-            if (handler != null)
-                handler(information);
+            if (!isUiReady)
+                localQueue.Enqueue(information);
+            else
+            {
+                var handler = OnInformationPublished;
+                if (handler != null)
+                    handler(information);
+            }
         }
     }
 

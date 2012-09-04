@@ -7,6 +7,7 @@ using StarryEyes.Vanille.DataStore;
 using StarryEyes.Vanille.DataStore.Persistent;
 using System.Threading;
 using System.Threading.Tasks;
+using StarryEyes.Mystique.Models.Hub;
 
 namespace StarryEyes.Mystique.Models.Store
 {
@@ -33,13 +34,24 @@ namespace StarryEyes.Mystique.Models.Store
         public static void Initialize()
         {
             // initialize
-            if (StoreOnMemoryObjectPersistence.IsPersistentDataExited("statuses"))
+            if (StoreOnMemoryObjectPersistence.IsPersistentDataExisted("statuses"))
             {
-                store = new PersistentDataStore<long, TwitterStatus>
-                    (_ => _.Id, Path.Combine(App.DataStorePath, "statuses"),
-                    tocniops: StoreOnMemoryObjectPersistence.GetPersistentData("statuses"));
+                try
+                {
+                    store = new PersistentDataStore<long, TwitterStatus>
+                        (_ => _.Id, Path.Combine(App.DataStorePath, "statuses"),
+                        tocniops: StoreOnMemoryObjectPersistence.GetPersistentData("statuses"));
+                }
+                catch (Exception ex)
+                {
+                    InformationHub.PublishInformation(new Information(InformationKind.Warning,
+                        "STATUSSTORE_INIT_FAILED",
+                        "ステータス データベースが破損しています。",
+                        "読み込み時にエラーが発生したため、データベースを初期化しました。" + Environment.NewLine +
+                        "送出された例外: " + ex.ToString()));
+                }
             }
-            else
+            if (store == null)
             {
                 store = new PersistentDataStore<long, TwitterStatus>
                     (_ => _.Id, Path.Combine(App.DataStorePath, "statuses"));

@@ -6,17 +6,26 @@ using StarryEyes.SweetLady.DataModel;
 
 namespace StarryEyes.Mystique.Filters
 {
-    public sealed class FilterQuery
+    public sealed class FilterQuery : IEquatable<FilterQuery>
     {
-        public FilterSourceBase[] Sources;
+        public event Action OnInvalidateRequired;
+        private void RaiseInvalidateRequired()
+        {
+            var handler = OnInvalidateRequired;
+            if (handler != null)
+                handler();
+        }
 
-        public FilterExpressionRoot PredicateTreeRoot;
+        public FilterSourceBase[] Sources { get; set; }
+
+        public FilterExpressionRoot PredicateTreeRoot { get; set; }
 
         public string ToQuery()
         {
             return "from " + Sources.GroupBy(s => s.FilterKey)
                 .Select(g => g.Distinct(_ => _.FilterValue))
-                .Select(f => {
+                .Select(f =>
+                {
                     if (f.Count() == 1)
                     {
                         var item = f.First();
@@ -39,6 +48,41 @@ namespace StarryEyes.Mystique.Filters
             var sourcesEvals = Sources.Select(s => s.GetEvaluator());
             var predEvals = PredicateTreeRoot.GetEvaluator();
             return _ => sourcesEvals.Any(f => f(_)) && predEvals(_);
+        }
+
+        public bool Equals(FilterQuery other)
+        {
+            if (other == null) return false;
+            return this.ToQuery() == other.ToQuery();
+        }
+
+        // override object.Equals
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as FilterQuery);
+        }
+
+        // override object.GetHashCode
+        public override int GetHashCode()
+        {
+            return ToQuery().GetHashCode();
+        }
+
+        public override string ToString()
+        {
+            return ToQuery();
+        }
+
+        public void Deactivate()
+        {
+            if (Sources != null)
+                Sources.ForEach(s => s.Deactivate());
+        }
+
+        public void Activate()
+        {
+            if (Sources != null)
+                Sources.ForEach(s => s.Activate());
         }
     }
 }

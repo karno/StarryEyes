@@ -25,7 +25,7 @@ namespace StarryEyes.Mystique.Models.Store
         public static void Initialize()
         {
             // initialize store
-            if (StoreOnMemoryObjectPersistence.IsPersistentDataExited("users"))
+            if (StoreOnMemoryObjectPersistence.IsPersistentDataExisted("users"))
             {
                 store = new PersistentDataStore<long, TwitterUser>
                     (_ => _.Id, Path.Combine(App.DataStorePath, "users"), 16,

@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using StarryEyes.Mystique.Models.Connection.Polling;
 using StarryEyes.SweetLady.DataModel;
-using System.Reactive.Linq;
 
 namespace StarryEyes.Mystique.Filters.Sources
 {
@@ -38,6 +34,21 @@ namespace StarryEyes.Mystique.Filters.Sources
         public override string FilterValue
         {
             get { return _listInfo.OwnerScreenName + "/" + _listInfo.Slug; }
+        }
+
+        private bool isActivated = false;
+        public override void Activate()
+        {
+            if (isActivated) return;
+            isActivated = true;
+            ListReceiver.StartReceive(_listInfo);
+        }
+
+        public override void Deactivate()
+        {
+            if (!isActivated) return;
+            isActivated = false;
+            ListReceiver.StopReceive(_listInfo);
         }
     }
 }
