@@ -100,6 +100,7 @@
     <Compile Include="Authorize\AuthenticateInfo.cs" />
     <Compile Include="Imaging\ImageUploaderBase.cs" />
     <Compile Include="Imaging\TwitPicUploader.cs" />
+    <Compile Include="Imaging\TwitterPhotoUploader.cs" />
     <Compile Include="Imaging\YFrogUploader.cs" />
     <Compile Include="Model\TwitterActivity.cs" />
     <Compile Include="Model\TwitterEntity.cs" />

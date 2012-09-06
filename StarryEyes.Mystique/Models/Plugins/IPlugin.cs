@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace StarryEyes.Mystique.Plugins
+namespace StarryEyes.Mystique.Models.Plugins
 {
     /// <summary>
     /// Interface for Krile StarryEyes

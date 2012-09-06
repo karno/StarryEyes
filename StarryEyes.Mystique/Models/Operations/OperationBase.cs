@@ -11,14 +11,19 @@ namespace StarryEyes.Mystique.Models.Operations
     {
         public OperationBase() { }
 
-        private Subject<T> resultHandler;
-        /// <summary>
-        /// Run operation via operation queue.<para />
-        /// (do not call this method from your code. this is an infrastructural method.)
-        /// </summary>
-        internal IObservable<T> Run()
+        private Subject<T> resultHandler = new Subject<T>();
+        protected Subject<T> ResultHandler
         {
-            return (resultHandler = new Subject<T>());
+            get { return resultHandler; }
+        }
+
+        /// <summary>
+        /// Run operation via operation queue.
+        /// </summary>
+        internal IObservable<T> Run(OperationPriority priority = OperationPriority.Middle)
+        {
+            OperationQueueRunner.Enqueue(this, priority);
+            return resultHandler;
         }
 
         /// <summary>

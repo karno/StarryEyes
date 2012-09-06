@@ -6,6 +6,7 @@ using StarryEyes.SweetLady.Authorize;
 using StarryEyes.SweetLady.DataModel;
 using System.Windows.Media.Imaging;
 using System.IO;
+using StarryEyes.Mystique.Settings;
 namespace StarryEyes.Mystique.Models.Operations
 {
     public class TweetOperation : OperationBase<TwitterStatus>
@@ -50,36 +51,27 @@ namespace StarryEyes.Mystique.Models.Operations
             return ExecPost()
                 .Catch((Exception ex) =>
                 {
-                    /* fallback logic, unimplemented
                     return
                         GetExceptionDetail(ex)
-                        .Select(s =>
+                        .SelectMany(s =>
                         {
-                            long? fallbackId;
-                            AuthenticateInfo fallbackAccount;
+                            AccountSetting cas;
+                            AccountSetting fallbackAccount;
                             if (s.Contains("User is over daily status update limit.") &&
-                                (fallbackId = Setting.GetRelatedInfo(this.AuthInfo).FallbackNext).HasValue &&
-                                (fallbackAccount = Setting.Accounts.Where(i => i.Id == fallbackId.Value).FirstOrDefault()) != null &&
-                                (_originalAuthInfo == null || _originalAuthInfo.Id != fallbackAccount.Id))
+                                (cas = Setting.LookupAccountSetting(this.AuthInfo.Id)) != null &&
+                                (fallbackAccount = Setting.LookupAccountSetting(cas.FallbackNext)) != null)
                             {
                                 // Post limit, go fallback
-                                ShowToast("@" + this.AuthInfo.UnreliableScreenName + " is over daily status update limit.",
-                                    "FALLBACK");
                                 if (this._originalAuthInfo != null)
                                     this._originalAuthInfo = AuthInfo;
-                                this.AuthInfo = fallbackAccount;
-                                Twittaholic.UnlockStatic();
-                                OperationQueueRunner.Dispatch(this);
-                                return new Unit();
+                                this.AuthInfo = fallbackAccount.AuthenticateInfo;
+                                return this.Run(OperationPriority.High);
                             }
                             else
                             {
-                                ShowToast(s, "TWEET ERROR");
-                                throw ex;
+                                return Observable.Throw<TwitterStatus>(ex);
                             }
                         });
-                    */
-                    return Observable.Throw<TwitterStatus>(ex);
                 });
         }
 
@@ -95,11 +87,9 @@ namespace StarryEyes.Mystique.Models.Operations
             }
             if (IsImageAttachEnabled)
             {
-                // TODO: Impl
                 return AuthInfo.UpdateWithMedia(this.Status,
                     this.AttachedImageBin, "twitter_picture", false,
                     reply, geo_lat, geo_long);
-                // , sendInBackground: true);
             }
             else
             {

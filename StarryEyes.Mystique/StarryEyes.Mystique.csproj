@@ -176,14 +176,17 @@
     <Compile Include="Filters\Sources\FilterMessages.cs" />
     <Compile Include="Filters\Sources\FilterSearch.cs" />
     <Compile Include="Filters\Sources\FilterTrack.cs" />
+    <Compile Include="Helpers\RegexHelper.cs" />
     <Compile Include="Models\Connection\ConnectionUtil.cs" />
     <Compile Include="Models\Connection\Extend\ListReceiver.cs" />
     <Compile Include="Models\Connection\Extend\SearchReceiver.cs" />
+    <Compile Include="Models\Plugins\ImageUploaderManager.cs" />
     <Compile Include="Models\Plugins\PluginManager.cs" />
+    <Compile Include="Models\Post\PostUtil.cs" />
     <Compile Include="Models\Store\StoreOnMemoryObjectPersistence.cs" />
     <Compile Include="Models\Tab\ColumnInfo.cs" />
     <Compile Include="Models\Tab\TabManager.cs" />
-    <Compile Include="Plugins\IPlugin.cs" />
+    <Compile Include="Models\Plugins\IPlugin.cs" />
     <Compile Include="Views\Messaging\Behaviors\TaskDialogInteractionMessageAction.cs" />
     <Compile Include="Views\Messaging\TaskDialogMessage.cs" />
     <Compile Include="Views\Utils\BooleanConverters.cs" />
@@ -217,7 +220,6 @@
     <Compile Include="Filters\Sources\FilterSourceBase.cs" />
     <Compile Include="Filters\FilterQueryException.cs" />
     <Compile Include="Helpers\BrowserHelper.cs" />
-    <Compile Include="Models\Common\AccountData.cs" />
     <Compile Include="Models\Connection\UserDependency\UserTimelinesReceiver.cs" />
     <Compile Include="Models\Connection\PollingConnectionBase.cs" />
     <Compile Include="Models\Connection\ConnectionBase.cs" />
@@ -242,7 +244,6 @@
     <Compile Include="Models\Store\AccountDataStore.cs" />
     <Compile Include="Models\Store\EventStore.cs" />
     <Compile Include="Models\Store\StatusStore.cs" />
-    <Compile Include="Models\Common\LeakyCollection.cs" />
     <Compile Include="Models\Store\UserStore.cs" />
     <Compile Include="Models\Tab\TabBackEnd.cs" />
     <Compile Include="Models\Tab\TabInfo.cs" />

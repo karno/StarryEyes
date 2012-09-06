@@ -205,5 +205,22 @@ namespace StarryEyes.Mystique.ViewModels
         {
             base.Dispose(disposing);
         }
+
+        private string _postText = "";
+        public string PostText
+        {
+            get { return _postText; }
+            set
+            {
+                _postText = value;
+                RaisePropertyChanged(() => PostText);
+                RaisePropertyChanged(() => PostTextLength);
+            }
+        }
+
+        public int PostTextLength
+        {
+            get { return StarryEyes.Mystique.Models.Post.PostUtil.CountText(PostText); }
+        }
     }
 }

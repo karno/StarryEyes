@@ -79,6 +79,11 @@ namespace StarryEyes.Mystique.Settings
             set { accounts.Value = value.ToList(); }
         }
 
+        public static AccountSetting LookupAccountSetting(long id)
+        {
+            return accounts.Value.Where(a => a.UserId == id).FirstOrDefault();
+        }
+
         public class SettingItem<T> where T : class
         {
             private string _name;

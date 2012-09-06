@@ -14,21 +14,6 @@ namespace StarryEyes.SweetLady.Imaging
             string status, byte[] attachedImageBin, long? in_reply_to_status_id = null,
             double? geo_lat = null, double? geo_long = null);
 
-        /// <summary>
-        /// Serialize uploader info
-        /// </summary>
-        public virtual string SerializeInfo()
-        {
-            return String.Empty;
-        }
-
-        /// <summary>
-        /// Deserialize uploader info
-        /// </summary>
-        public virtual void DeserializeInfo(string serializationInfo)
-        {
-        }
-
         protected IObservable<TwitterStatus> Update(AuthenticateInfo info,
             string status, long? inReplyToId, long? geoLat, long? geoLong)
         {
@@ -37,7 +22,7 @@ namespace StarryEyes.SweetLady.Imaging
 
         public virtual int UrlLengthPerImages
         {
-            get { return 20; }
+            get { return 20; } // if HTTPS, this param is 21.
         }
     }
 }
