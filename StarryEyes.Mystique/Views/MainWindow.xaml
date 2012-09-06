@@ -104,5 +104,6 @@
                Margin="0,163,8,0"
                VerticalAlignment="Top"
                Content="{Binding PostTextLength, Mode=OneWay}" HorizontalAlignment="Right" />
+        <CheckBox Content="Automatic escape URL" HorizontalAlignment="Left" Margin="8,0,0,103.37" VerticalAlignment="Bottom" IsChecked="{Binding IsAutoEscapeEnabled}"/>
     </Grid>
 </Controls:MetroWindow>

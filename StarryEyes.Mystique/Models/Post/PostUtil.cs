@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 using StarryEyes.Mystique.Helpers;
 
 namespace StarryEyes.Mystique.Models.Post
@@ -24,17 +21,27 @@ namespace StarryEyes.Mystique.Models.Post
                     else
                         return RegexHelper.TwitterUrlTLDRegex.Tokenize(s.Item1);
                 })
-                .SelectMany(s =>
-                {
-                    if (s.Item2) // URL matched
-                        return new[] { s };
-                    else
-                        return RegexHelper.TwitterUrlCCTLDRegex.Tokenize(s.Item1);
-                })
                 .Sum(s => s.Item2 ?
                     (s.Item1.StartsWith("https", StringComparison.CurrentCultureIgnoreCase) ?
                     HttpsUrlLength : HttpUrlLength) :
                     s.Item1.Length);
+        }
+
+        public static string AutoEscape(string text)
+        {
+            return RegexHelper.UrlRegex.Tokenize(text)
+                .Select(s =>
+                {
+                    if (s.Item2) // URL matched
+                        return s;
+                    else
+                        return new Tuple<string, bool>(
+                            RegexHelper.TwitterUrlTLDRegex.Replace(s.Item1,
+                            match => match.Groups[1].Value + " " + match.Groups[2].Value
+                            ), true);
+                })
+                .Select(s => s.Item1)
+                .JoinString("");
         }
     }
 }

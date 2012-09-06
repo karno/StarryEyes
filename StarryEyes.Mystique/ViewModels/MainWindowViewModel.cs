@@ -194,7 +194,7 @@ namespace StarryEyes.Mystique.ViewModels
                         QueryResult = "Completed! (" + sw.Elapsed.TotalSeconds.ToString("0.00") + " sec, " + _count + " records hot.)";
                     });
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 QueryResult = ex.ToString();
             }
@@ -215,12 +215,34 @@ namespace StarryEyes.Mystique.ViewModels
                 _postText = value;
                 RaisePropertyChanged(() => PostText);
                 RaisePropertyChanged(() => PostTextLength);
+                if (IsAutoEscapeEnabled)
+                    AutoEscape();
             }
+        }
+
+        private void AutoEscape()
+        {
+            var newText = StarryEyes.Mystique.Models.Post.PostUtil.AutoEscape(PostText);
+            if (newText != PostText)
+                PostText = newText;
         }
 
         public int PostTextLength
         {
             get { return StarryEyes.Mystique.Models.Post.PostUtil.CountText(PostText); }
+        }
+
+        private bool _isAutoEscapeEnabled = false;
+        public bool IsAutoEscapeEnabled
+        {
+            get { return _isAutoEscapeEnabled; }
+            set
+            {
+                _isAutoEscapeEnabled = value;
+                RaisePropertyChanged(() => IsAutoEscapeEnabled);
+                if (value)
+                    AutoEscape();
+            }
         }
     }
 }

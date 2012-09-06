@@ -87,15 +87,8 @@ namespace StarryEyes.Mystique.Helpers
         /// This is for the URL which is not the URL but be treated as the URL by Fucking Twitter.
         /// </summary>
         public static Regex TwitterUrlTLDRegex = new Regex(
-            "[-A-Za-z0-9_\\.]+\\.(" + TLD.JoinString("|") + ")" +
-            "[-A-Za-z0-9\\/_\\.!~\\*'\\(\\)%]*", RegexOptions.Compiled | RegexOptions.Singleline);
-
-        /// <summary>
-        /// This is for the URL which is not the URL but be treated as the URL by Stupid Twitter.
-        /// </summary>
-        public static Regex TwitterUrlCCTLDRegex = new Regex(
-            "[-A-Za-z0-9_\\.]+\\.[A-Za-z0-9]+\\.(" + ccTLD.JoinString("|") + ")" +
-            "[-A-Za-z0-9\\/_\\.!~\\*'\\(\\)%]*", RegexOptions.Singleline); // option COMPILED makes too slow start.
+            "([-a-z0-9_\\.]+)(\\.((" + TLD.JoinString("|") + ")|([a-z0-9]+\\.(" +ccTLD.JoinString("|") + ")))" +
+            "[-a-z0-9\\/_\\.!~\\*'\\(\\)%]*)", RegexOptions.Singleline | RegexOptions.IgnoreCase);
 
         /// <summary>
         /// ハッシュタグ用のregex
