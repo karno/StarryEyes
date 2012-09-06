@@ -8,11 +8,11 @@ namespace StarryEyes.Mystique.Models.Tab
     {
         private static Stack<TabInfo> closedTabsStack = new Stack<TabInfo>();
 
-        private static ObservableSynchronizedCollection<ObservableSynchronizedCollection<TabInfo>> Tabs =
+        private static ObservableSynchronizedCollection<ObservableSynchronizedCollection<TabInfo>> tabs =
             new ObservableSynchronizedCollection<ObservableSynchronizedCollection<TabInfo>>();
-        internal static ObservableSynchronizedCollection<ObservableSynchronizedCollection<TabInfo>> Tabs1
+        internal static ObservableSynchronizedCollection<ObservableSynchronizedCollection<TabInfo>> Tabs
         {
-            get { return TabManager.Tabs; }
+            get { return TabManager.tabs; }
         }
 
         /// <summary>
@@ -21,7 +21,7 @@ namespace StarryEyes.Mystique.Models.Tab
         /// <returns></returns>
         internal static IEnumerable<ColumnInfo> GetColumnInfoData()
         {
-            foreach (var tab in Tabs)
+            foreach (var tab in tabs)
             {
                 yield return new ColumnInfo() { Tabs = new List<TabInfo>(tab) };
             }
@@ -45,11 +45,11 @@ namespace StarryEyes.Mystique.Models.Tab
         /// <param name="tabIndex">tab index</param>
         public static void GetTabInfoIndexes(TabInfo info, out int colIndex, out int tabIndex)
         {
-            for (int ci = 0; ci < Tabs.Count; ci++)
+            for (int ci = 0; ci < tabs.Count; ci++)
             {
-                for (int ti = 0; ti < Tabs[ci].Count; ti++)
+                for (int ti = 0; ti < tabs[ci].Count; ti++)
                 {
-                    if (Tabs[ci][ti] == info)
+                    if (tabs[ci][ti] == info)
                     {
                         colIndex = ci;
                         tabIndex = ti;
@@ -81,13 +81,13 @@ namespace StarryEyes.Mystique.Models.Tab
             if (fromColumnIndex == destColumnIndex)
             {
                 // in-column moving
-                Tabs[fromColumnIndex].Move(fromTabIndex, destTabIndex);
+                tabs[fromColumnIndex].Move(fromTabIndex, destTabIndex);
             }
             else
             {
-                var tab = Tabs[fromColumnIndex][fromTabIndex];
-                Tabs[fromColumnIndex].RemoveAt(fromTabIndex);
-                Tabs[destColumnIndex].Insert(destTabIndex, tab);
+                var tab = tabs[fromColumnIndex][fromTabIndex];
+                tabs[fromColumnIndex].RemoveAt(fromTabIndex);
+                tabs[destColumnIndex].Insert(destTabIndex, tab);
             }
         }
 
@@ -105,16 +105,16 @@ namespace StarryEyes.Mystique.Models.Tab
         /// </summary>
         public static void CreateTab(TabInfo info, int columnIndex)
         {
-            if (columnIndex > Tabs.Count) // column index is only for existed or new column
-                throw new ArgumentOutOfRangeException("columnIndex", "currently " + Tabs.Count + " columns are created. so, you can't set this parameter as " + columnIndex  + ".");
-            if (columnIndex == Tabs.Count)
+            if (columnIndex > tabs.Count) // column index is only for existed or new column
+                throw new ArgumentOutOfRangeException("columnIndex", "currently " + tabs.Count + " columns are created. so, you can't set this parameter as " + columnIndex  + ".");
+            if (columnIndex == tabs.Count)
             {
                 // create new
                 CreateColumn(info);
             }
             else
             {
-                Tabs[columnIndex].Add(info);
+                tabs[columnIndex].Add(info);
                 info.FilterQuery.Activate();
             }
         }
@@ -125,7 +125,7 @@ namespace StarryEyes.Mystique.Models.Tab
         /// <param name="info">initial created tab</param>
         public static void CreateColumn(TabInfo info)
         {
-            Tabs.Add(new ObservableSynchronizedCollection<TabInfo>(new[] { info }));
+            tabs.Add(new ObservableSynchronizedCollection<TabInfo>(new[] { info }));
             info.FilterQuery.Activate();
         }
 
@@ -134,10 +134,10 @@ namespace StarryEyes.Mystique.Models.Tab
         /// </summary>
         public static void CloseTab(int colIndex, int tabIndex)
         {
-            var ti = Tabs[colIndex][tabIndex];
+            var ti = tabs[colIndex][tabIndex];
             ti.FilterQuery.Deactivate();
             closedTabsStack.Push(ti);
-            Tabs[colIndex].RemoveAt(tabIndex);
+            tabs[colIndex].RemoveAt(tabIndex);
         }
 
         /// <summary>
