@@ -105,5 +105,6 @@
                VerticalAlignment="Top"
                Content="{Binding PostTextLength, Mode=OneWay}" HorizontalAlignment="Right" />
         <CheckBox Content="Automatic escape URL" HorizontalAlignment="Left" Margin="8,0,0,103.37" VerticalAlignment="Bottom" IsChecked="{Binding IsAutoEscapeEnabled}"/>
+        <Button Content="POST" HorizontalAlignment="Right" Margin="0,193,8,0" Width="75" VerticalAlignment="Top" Command="{Binding PostCommand, Mode=OneWay}"/>
     </Grid>
 </Controls:MetroWindow>

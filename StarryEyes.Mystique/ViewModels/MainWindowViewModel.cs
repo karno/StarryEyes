@@ -14,6 +14,8 @@ using StarryEyes.Mystique.Views.Dialogs;
 using StarryEyes.Mystique.Filters.Parsing;
 using StarryEyes.SweetLady.DataModel;
 using System.Collections.Generic;
+using StarryEyes.Mystique.Models.Operations;
+using StarryEyes.Mystique.Views.Messaging;
 
 namespace StarryEyes.Mystique.ViewModels
 {
@@ -244,5 +246,46 @@ namespace StarryEyes.Mystique.ViewModels
                     AutoEscape();
             }
         }
+
+        #region PostCommand
+        private ViewModelCommand _PostCommand;
+
+        public ViewModelCommand PostCommand
+        {
+            get
+            {
+                if (_PostCommand == null)
+                {
+                    _PostCommand = new ViewModelCommand(Post);
+                }
+                return _PostCommand;
+            }
+        }
+
+        public void Post()
+        {
+            var tweetop = new TweetOperation();
+            tweetop.Status = PostText;
+            PostText = String.Empty;
+            tweetop.AuthInfo = Setting.Accounts.First().AuthenticateInfo;
+            tweetop.Run().Subscribe(_ => this.Messenger.Raise(new TaskDialogMessage(
+                new TaskDialogInterop.TaskDialogOptions()
+                {
+                    Title = "Tweeted!",
+                    MainInstruction = "Tweeted successfully.",
+                    ExpandedInfo = _.ToString(),
+                    CommonButtons = TaskDialogInterop.TaskDialogCommonButtons.Close
+                })),
+                ex => this.Messenger.Raise(new TaskDialogMessage(
+                    new TaskDialogInterop.TaskDialogOptions()
+                    {
+                        Title = "Tweet Failed",
+                        MainInstruction = "Tweet is failed: " + ex.Message,
+                        ExpandedInfo = ex.ToString(),
+                        CommonButtons = TaskDialogInterop.TaskDialogCommonButtons.Close
+                    })));
+        }
+        #endregion
+
     }
 }

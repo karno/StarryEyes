@@ -73,9 +73,6 @@
     <Reference Include="Parseq, Version=1.3.0.1, Culture=neutral, PublicKeyToken=434716041f21e3ab, processorArchitecture=MSIL">
       <HintPath>..\packages\Parseq.1.3.0.1\lib\net40\Parseq.dll</HintPath>
     </Reference>
-    <Reference Include="ReactiveOAuth">
-      <HintPath>..\packages\ReactiveOAuth.0.4.0.0\lib\Net40\ReactiveOAuth.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -300,6 +297,10 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <ProjectReference Include="..\..\ReactiveOAuth\ReactiveOAuth\ReactiveOAuth.csproj">
+      <Project>{C20883A2-C104-45EF-BADE-A888328981EB}</Project>
+      <Name>ReactiveOAuth</Name>
+    </ProjectReference>
     <ProjectReference Include="..\StarryEyes.Albireo\StarryEyes.Albireo.csproj">
       <Project>{C2740802-BD1C-4B70-9B3A-F69DAE505827}</Project>
       <Name>StarryEyes.Vivid</Name>

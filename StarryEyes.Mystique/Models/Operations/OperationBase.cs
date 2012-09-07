@@ -70,7 +70,7 @@ namespace StarryEyes.Mystique.Models.Operations
             var connectable = RunCore().Publish();
             connectable.Subscribe(resultHandler);
             connectable.Subscribe(subject);
-            connectable.Publish();
+            connectable.Connect();
             return subject.Select(_ => new Unit());
         }
     }

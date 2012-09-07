@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Threading;
+using System.Reactive.Concurrency;
 
 namespace StarryEyes.Mystique.Models.Operations
 {
@@ -22,7 +23,7 @@ namespace StarryEyes.Mystique.Models.Operations
 
         private static int runningConcurrency = 0;
 
-        private static Mutex operationQueueMutex = new Mutex(false, "HAILPRISM_OPERATION_QUEUE_MUTEX");
+        private static Mutex operationQueueMutex = new Mutex(false, "STARRYEYES_OPERATION_QUEUE_MUTEX");
 
         private static Queue<IRunnerQueueable> highPriorityQueue = new Queue<IRunnerQueueable>();
 
@@ -66,7 +67,7 @@ namespace StarryEyes.Mystique.Models.Operations
             }
             else
             {
-                Observable.Start(() => IssueOperations())
+                Observable.Start(() => IssueOperations(), new NewThreadScheduler())
                     .Finally(() => Interlocked.Decrement(ref runningConcurrency))
                     .Subscribe();
             }

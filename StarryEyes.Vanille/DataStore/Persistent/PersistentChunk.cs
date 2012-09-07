@@ -12,8 +12,8 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         where TKey : IComparable<TKey>
         where TValue : IBinarySerializable, new()
     {
-        const int aliveToDeadlyThreshold = 1024;
-        const int deadlyToKillThreshold = 512;
+        const int aliveToDeadlyThreshold = 256;
+        const int deadlyToKillThreshold = 128;
 
         private PersistentDataStore<TKey, TValue> _parent;
 

@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarryEyes.Vanille", "Starr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarryEyes.Albireo", "StarryEyes.Albireo\StarryEyes.Albireo.csproj", "{C2740802-BD1C-4B70-9B3A-F69DAE505827}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactiveOAuth", "..\ReactiveOAuth\ReactiveOAuth\ReactiveOAuth.csproj", "{C20883A2-C104-45EF-BADE-A888328981EB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -59,6 +61,16 @@ Global
 		{C2740802-BD1C-4B70-9B3A-F69DAE505827}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{C2740802-BD1C-4B70-9B3A-F69DAE505827}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{C2740802-BD1C-4B70-9B3A-F69DAE505827}.Release|x86.ActiveCfg = Release|Any CPU
+		{C20883A2-C104-45EF-BADE-A888328981EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C20883A2-C104-45EF-BADE-A888328981EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C20883A2-C104-45EF-BADE-A888328981EB}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{C20883A2-C104-45EF-BADE-A888328981EB}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{C20883A2-C104-45EF-BADE-A888328981EB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C20883A2-C104-45EF-BADE-A888328981EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C20883A2-C104-45EF-BADE-A888328981EB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C20883A2-C104-45EF-BADE-A888328981EB}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{C20883A2-C104-45EF-BADE-A888328981EB}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{C20883A2-C104-45EF-BADE-A888328981EB}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

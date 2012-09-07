@@ -25,7 +25,7 @@ namespace StarryEyes.Mystique
         private void Application_Startup(object sender, StartupEventArgs e)
         {
             DispatcherHelper.UIDispatcher = Dispatcher;
-            return;
+            // return;
 
             // Check run duplication
             string mutexStr = null;
@@ -54,7 +54,7 @@ namespace StarryEyes.Mystique
             ApiEndpoint.ConsumerKey = ConsumerKey;
             ApiEndpoint.ConsumerSecret = ConsumerSecret;
 
-            // Initialize core
+            // Initialize service points
             ServicePointManager.Expect100Continue = false; // disable expect 100 continue for User Streams connection.
             ServicePointManager.DefaultConnectionLimit = Int32.MaxValue; // Limit Break!
 
