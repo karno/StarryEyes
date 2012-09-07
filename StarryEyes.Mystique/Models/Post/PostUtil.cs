@@ -35,7 +35,7 @@ namespace StarryEyes.Mystique.Models.Post
                     if (s.Item2) // URL matched
                         return s;
                     else
-                        return new Tuple<string, bool>(
+                        return Tuple.Create(
                             RegexHelper.TwitterUrlTLDRegex.Replace(s.Item1,
                             match => match.Groups[1].Value + " " + match.Groups[2].Value
                             ), true);

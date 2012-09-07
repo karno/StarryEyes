@@ -40,7 +40,7 @@ namespace StarryEyes.Albireo.Data
                     }
                     else if (d > 0)
                     {
-                        trace.Push(new Tuple<AVLTreeLeaf, Direction>(current, Direction.Left));
+                        trace.Push(Tuple.Create(current, Direction.Left));
                         if (current.LeftLeaf != null)
                         {
                             current = current.LeftLeaf;
@@ -53,7 +53,7 @@ namespace StarryEyes.Albireo.Data
                     }
                     else
                     {
-                        trace.Push(new Tuple<AVLTreeLeaf, Direction>(current, Direction.Right));
+                        trace.Push(Tuple.Create(current, Direction.Right));
                         if (current.RightLeaf != null)
                         {
                             current = current.RightLeaf;
@@ -152,7 +152,7 @@ namespace StarryEyes.Albireo.Data
                     }
                     else if (d > 0)
                     {
-                        trace.Push(new Tuple<AVLTreeLeaf, Direction>(current, Direction.Left));
+                        trace.Push(Tuple.Create(current, Direction.Left));
 
                         if (current.LeftLeaf != null)
                             current = current.LeftLeaf;
@@ -161,7 +161,7 @@ namespace StarryEyes.Albireo.Data
                     }
                     else
                     {
-                        trace.Push(new Tuple<AVLTreeLeaf, Direction>(current, Direction.Right));
+                        trace.Push(Tuple.Create(current, Direction.Right));
 
                         if (current.RightLeaf != null)
                             current = current.RightLeaf;
@@ -175,13 +175,13 @@ namespace StarryEyes.Albireo.Data
                 if (current.LeftLeaf != null && current.RightLeaf != null)
                 {
                     // has two children
-                    trace.Push(new Tuple<AVLTreeLeaf, Direction>(current, Direction.Left));
+                    trace.Push(Tuple.Create(current, Direction.Left));
 
                     // get most right element in the left sub-tree
                     var child = current.LeftLeaf;
                     while (child.RightLeaf != null)
                     {
-                        trace.Push(new Tuple<AVLTreeLeaf, Direction>(child, Direction.Right));
+                        trace.Push(Tuple.Create(child, Direction.Right));
                         child = child.RightLeaf;
                     }
                     // remove most-right children
@@ -477,7 +477,7 @@ namespace StarryEyes.Albireo.Data
                     AVLTreeLeaf leaf = target.root;
                     do
                     {
-                        trace.Push(new Tuple<AVLTreeLeaf, Direction>(leaf, Direction.Left));
+                        trace.Push(Tuple.Create(leaf, Direction.Left));
                         leaf = leaf.LeftLeaf;
                     } while (leaf != null) ;
                     return trace.Count > 0;
@@ -487,11 +487,11 @@ namespace StarryEyes.Albireo.Data
                     var leaf = trace.Pop().Item1;
                     if (leaf.RightLeaf != null)
                     {
-                        trace.Push(new Tuple<AVLTreeLeaf, Direction>(leaf, Direction.Right));
+                        trace.Push(Tuple.Create(leaf, Direction.Right));
                         leaf = leaf.RightLeaf;
                         do
                         {
-                            trace.Push(new Tuple<AVLTreeLeaf, Direction>(leaf, Direction.Left));
+                            trace.Push(Tuple.Create(leaf, Direction.Left));
                             leaf = leaf.LeftLeaf;
                         } while (leaf != null);
                         return true;

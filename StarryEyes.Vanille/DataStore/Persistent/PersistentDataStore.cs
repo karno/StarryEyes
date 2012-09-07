@@ -134,8 +134,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// <returns>ToC/NIoPs</returns>
         public IEnumerable<Tuple<IDictionary<TKey, int>, IEnumerable<int>>> GetToCNIoPs()
         {
-            return chunks.Select(c => new Tuple<IDictionary<TKey, int>, IEnumerable<int>>(
-                c.GetTableOfContents(), c.GetNextIndexOfPacketsArray()));
+            return chunks.Select(c => Tuple.Create(c.GetTableOfContents(), c.GetNextIndexOfPacketsArray()));
         }
 
         private PersistentChunk<TKey, TValue> GetChunk(TKey key)

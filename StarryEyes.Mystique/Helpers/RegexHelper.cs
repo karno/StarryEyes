@@ -121,11 +121,11 @@ namespace StarryEyes.Mystique.Helpers
             return separated.Split(new[] { '>' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Split('<'))
                 .SelectMany(s => 
                 s.Length == 1 ?
-                new[]{ new Tuple<string, bool>(UnescapeInnerEntity(s[0]), false) } :
+                new[]{ Tuple.Create(UnescapeInnerEntity(s[0]), false) }:
                 new[] 
                 {
-                    new Tuple<string, bool>(UnescapeInnerEntity(s[0]), false), 
-                    new Tuple<string, bool>(UnescapeInnerEntity(s[1]), true) 
+                    Tuple.Create(UnescapeInnerEntity(s[0]), false),
+                    Tuple.Create(UnescapeInnerEntity(s[1]), true)
                 })
                 .Where(t => !String.IsNullOrEmpty(t.Item1));
         }

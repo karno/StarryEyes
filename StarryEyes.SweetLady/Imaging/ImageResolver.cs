@@ -61,7 +61,7 @@ namespace StarryEyes.SweetLady.Imaging
                         return null;
                 })
                 .Where(t => t != null && t.resolved != null && Uri.IsWellFormedUriString(t.resolved, UriKind.Absolute))
-                .Select(u => new Tuple<Uri, Uri>(new Uri(u.resolved), new Uri(u.original)));
+                .Select(u => Tuple.Create(new Uri(u.resolved), new Uri(u.original)));
         }
     }
 }
