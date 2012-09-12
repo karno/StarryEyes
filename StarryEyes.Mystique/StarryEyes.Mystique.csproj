@@ -17,6 +17,8 @@
     <WarningLevel>4</WarningLevel>
     <ExpressionBlendVersion>4.0.30816.0</ExpressionBlendVersion>
     <Utf8Output>true</Utf8Output>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -297,9 +299,13 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <ProjectReference Include="..\ReactiveOAuth\ReactiveOAuth.csproj">
+      <Project>{C20883A2-C104-45EF-BADE-A888328981EB}</Project>
+      <Name>ReactiveOAuth</Name>
+    </ProjectReference>
     <ProjectReference Include="..\StarryEyes.Albireo\StarryEyes.Albireo.csproj">
       <Project>{C2740802-BD1C-4B70-9B3A-F69DAE505827}</Project>
-      <Name>StarryEyes.Vivid</Name>
+      <Name>StarryEyes.Albireo</Name>
     </ProjectReference>
     <ProjectReference Include="..\StarryEyes.Vanille\StarryEyes.Vanille.csproj">
       <Project>{7C1764E1-AF06-48A8-8590-09500A363118}</Project>
@@ -311,6 +317,7 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
