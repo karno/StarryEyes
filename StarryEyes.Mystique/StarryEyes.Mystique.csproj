@@ -297,10 +297,6 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <ProjectReference Include="..\..\ReactiveOAuth\ReactiveOAuth\ReactiveOAuth.csproj">
-      <Project>{C20883A2-C104-45EF-BADE-A888328981EB}</Project>
-      <Name>ReactiveOAuth</Name>
-    </ProjectReference>
     <ProjectReference Include="..\StarryEyes.Albireo\StarryEyes.Albireo.csproj">
       <Project>{C2740802-BD1C-4B70-9B3A-F69DAE505827}</Project>
       <Name>StarryEyes.Vivid</Name>
