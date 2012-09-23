@@ -16,6 +16,7 @@ namespace StarryEyes.Mystique.Models.Tab
     {
         public readonly int TimelineChunkCount = 250;
 
+        private object _sicLocker = new object();
         private AVLTree<long> _statusIdCache;
         private Func<TwitterStatus, bool> _evaluator;
         private Func<long?, int, IObservable<TwitterStatus>> _fetcher;
@@ -45,18 +46,30 @@ namespace StarryEyes.Mystique.Models.Tab
 
         private void AddStatus(TwitterStatus status)
         {
-            if (_statusIdCache.AddDistinct(status.Id))
+            bool add = false;
+            lock (_sicLocker)
+            {
+                add = _statusIdCache.AddDistinct(status.Id);
+            }
+            if (add)
             {
                 // add
                 _statuses.Insert(
                     i => i.TakeWhile(_ => _.CreatedAt > status.CreatedAt).Count(),
                     status);
+                if (_statusIdCache.Count > TimelineChunkCount)
+                    TrimTimeline();
             }
         }
 
         private void RemoveStatus(long id)
         {
-            if (_statusIdCache.Remove(id))
+            bool remove = false;
+            lock (_sicLocker)
+            {
+                remove = _statusIdCache.Remove(id);
+            }
+            if (remove)
             {
                 // remove
                 _statuses.RemoveWhere(s => s.Id == id);
@@ -98,12 +111,32 @@ namespace StarryEyes.Mystique.Models.Tab
         private void TrimTimeline()
         {
             if (_isSuppressTimelineTrimming) return;
+            if (_statuses.Count > TimelineChunkCount) return;
+            var lastCreatedAt = _statuses[TimelineChunkCount].CreatedAt;
+            List<long> removedIds = new List<long>();
+            _statuses.RemoveWhere(t =>
+            {
+                if (t.CreatedAt < lastCreatedAt)
+                {
+                    removedIds.Add(t.Id);
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            });
+            lock (_sicLocker)
+            {
+                removedIds.ForEach(i => _statusIdCache.Remove(i));
+            }
         }
 
         public void Dispose()
         {
-            _statuses.Clear();
             _disposable.Dispose();
+            _statusIdCache.Clear();
+            _statuses.Clear();
         }
     }
 }
