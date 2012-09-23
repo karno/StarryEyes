@@ -224,14 +224,14 @@ namespace StarryEyes.Mystique.ViewModels
 
         private void AutoEscape()
         {
-            var newText = StarryEyes.Mystique.Models.Post.PostUtil.AutoEscape(PostText);
+            var newText = StarryEyes.Mystique.Models.StatusTextUtil.AutoEscape(PostText);
             if (newText != PostText)
                 PostText = newText;
         }
 
         public int PostTextLength
         {
-            get { return StarryEyes.Mystique.Models.Post.PostUtil.CountText(PostText); }
+            get { return StarryEyes.Mystique.Models.StatusTextUtil.CountText(PostText); }
         }
 
         private bool _isAutoEscapeEnabled = false;

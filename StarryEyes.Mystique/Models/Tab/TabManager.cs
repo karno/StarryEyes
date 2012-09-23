@@ -115,7 +115,7 @@ namespace StarryEyes.Mystique.Models.Tab
             else
             {
                 tabs[columnIndex].Add(info);
-                info.FilterQuery.Activate();
+                info.Activate();
             }
         }
 
@@ -126,7 +126,7 @@ namespace StarryEyes.Mystique.Models.Tab
         public static void CreateColumn(TabInfo info)
         {
             tabs.Add(new ObservableSynchronizedCollection<TabInfo>(new[] { info }));
-            info.FilterQuery.Activate();
+            info.Activate();
         }
 
         /// <summary>
@@ -135,7 +135,7 @@ namespace StarryEyes.Mystique.Models.Tab
         public static void CloseTab(int colIndex, int tabIndex)
         {
             var ti = tabs[colIndex][tabIndex];
-            ti.FilterQuery.Deactivate();
+            ti.Deactivate();
             closedTabsStack.Push(ti);
             tabs[colIndex].RemoveAt(tabIndex);
         }
@@ -154,7 +154,7 @@ namespace StarryEyes.Mystique.Models.Tab
         public static void ReviveTab()
         {
             var ti = closedTabsStack.Pop();
-            ti.FilterQuery.Activate();
+            ti.Activate();
             CreateTab(ti);
         }
 

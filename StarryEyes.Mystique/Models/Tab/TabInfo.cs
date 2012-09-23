@@ -1,10 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Reactive.Linq;
 using StarryEyes.Albireo.Data;
 using StarryEyes.Mystique.Filters;
 using StarryEyes.Mystique.Filters.Parsing;
 using StarryEyes.Mystique.Models.Hub;
+using StarryEyes.Mystique.Models.Store;
+using StarryEyes.SweetLady.DataModel;
+using StarryEyes.Vanille.DataStore;
+using System.Reactive;
+using System.Reactive.Disposables;
+using Livet;
 
 namespace StarryEyes.Mystique.Models.Tab
 {
@@ -16,7 +23,7 @@ namespace StarryEyes.Mystique.Models.Tab
         /// <summary>
         /// Name of this tab.
         /// </summary>
-        private string Name { get; set; }
+        public string Name { get; set; }
 
         private AVLTree<long> bindingAccountIds = new AVLTree<long>();
         /// <summary>
@@ -37,6 +44,7 @@ namespace StarryEyes.Mystique.Models.Tab
             set { bindingHashtags = value; }
         }
 
+        private Func<TwitterStatus, bool> evaluator = _ => false;
         private FilterQuery filterQuery = null;
         /// <summary>
         /// Filter query info
@@ -45,7 +53,19 @@ namespace StarryEyes.Mystique.Models.Tab
         public FilterQuery FilterQuery
         {
             get { return filterQuery; }
-            set { filterQuery = value; }
+            set
+            {
+                if (_isActivated)
+                    throw new InvalidOperationException("タブ情報がアクティブな状態のままフィルタクエリの交換を行うことはできません。");
+                if (this.filterQuery != value)
+                {
+                    filterQuery = value;
+                    if (filterQuery != null)
+                        evaluator = filterQuery.GetEvaluator();
+                    else
+                        evaluator = _ => false;
+                }
+            }
         }
 
         /// <summary>
@@ -70,5 +90,76 @@ namespace StarryEyes.Mystique.Models.Tab
                 }
             }
         }
+
+        /// <summary>
+        /// Notify collection was invalidated totally.
+        /// </summary>
+        public event Action OnCollectionInvalidateRequired;
+
+        public IObservable<StatusNotification> GetFilteredStream()
+        {
+            return StatusStore.StatusPublisher
+                .Where(sn => !sn.IsAdded || evaluator(sn.Status));
+        }
+
+        public IObservable<TwitterStatus> GetChunk(long? maxId, int chunkCount)
+        {
+            return StatusStore.Find(evaluator,
+                maxId != null ? FindRange<long>.By(maxId.Value) : null,
+                chunkCount);
+        }
+
+        private bool _isActivated = false;
+        public bool IsActivated
+        {
+            get { return _isActivated; }
+        }
+
+        /// <summary>
+        /// タブ情報をアクティベートします。<para />
+        /// フィルタクエリをアクティベートし、タイムラインを生成し、<para />
+        /// ストリームの読み込みを開始します。
+        /// </summary>
+        /// <returns></returns>
+        public IObservable<Unit> Activate()
+        {
+            return Observable.Defer(() => Observable.Return(new Unit()))
+                .Do(_ =>
+                {
+                    if (!_isActivated)
+                    {
+                        if (this.filterQuery != null)
+                            this.filterQuery.Activate();
+                        if (this._timeline != null)
+                            this._timeline.Dispose();
+                        this._timeline = new Timeline(evaluator, GetChunk);
+                        if (!_isActivated && this.filterQuery != null)
+                            this.filterQuery.Activate();
+                    }
+                    _isActivated = true;
+                });
+        }
+
+        public void Deactivate()
+        {
+            if (_isActivated)
+            {
+                if (this.filterQuery != null)
+                    this.filterQuery.Deactivate();
+                if (this._timeline != null)
+                {
+                    this._timeline.Dispose();
+                    this._timeline = null;
+                }
+            }
+            _isActivated = false;
+        }
+
+        private Timeline _timeline = null;
+        public Timeline Timeline
+        {
+            get { return _timeline; }
+        }
+
     }
 }

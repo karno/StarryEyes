@@ -2,9 +2,9 @@
 using System.Linq;
 using StarryEyes.Mystique.Helpers;
 
-namespace StarryEyes.Mystique.Models.Post
+namespace StarryEyes.Mystique.Models
 {
-    public static class PostUtil
+    public static class StatusTextUtil
     {
         public const int MaxTextLength = 140;
 

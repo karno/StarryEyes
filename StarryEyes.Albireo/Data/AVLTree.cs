@@ -23,6 +23,11 @@ namespace StarryEyes.Albireo.Data
 
         public void Add(T item)
         {
+            AddDistinct(item);
+        }
+
+        public bool AddDistinct(T item)
+        {
             if (count == 0)
             {
                 root = new AVLTreeLeaf() { Value = item, Label = AVLLabel.E };
@@ -36,7 +41,7 @@ namespace StarryEyes.Albireo.Data
                     int d = current.Value.CompareTo(item);
                     if (d == 0) // this item is already inserted.
                     {
-                        return;
+                        return false;
                     }
                     else if (d > 0)
                     {
@@ -129,6 +134,7 @@ namespace StarryEyes.Albireo.Data
                 }
             }
             count++;
+            return true;
         }
 
         public bool Remove(T item)

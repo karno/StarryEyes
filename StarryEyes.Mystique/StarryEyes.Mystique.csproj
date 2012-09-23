@@ -179,19 +179,30 @@
     <Compile Include="Models\Connection\ConnectionUtil.cs" />
     <Compile Include="Models\Connection\Extend\ListReceiver.cs" />
     <Compile Include="Models\Connection\Extend\SearchReceiver.cs" />
+    <Compile Include="Models\ObservableSynchronizedCollectionEx.cs" />
     <Compile Include="Models\Plugins\ImageUploaderManager.cs" />
     <Compile Include="Models\Plugins\PluginManager.cs" />
-    <Compile Include="Models\Post\PostUtil.cs" />
+    <Compile Include="Models\StatusTextUtil.cs" />
     <Compile Include="Models\Store\StoreOnMemoryObjectPersistence.cs" />
     <Compile Include="Models\Tab\ColumnInfo.cs" />
     <Compile Include="Models\Tab\TabManager.cs" />
     <Compile Include="Models\Plugins\IPlugin.cs" />
+    <Compile Include="Models\Tab\Timeline.cs" />
+    <Compile Include="ViewModels\WindowParts\BackpanelViewModel.cs" />
+    <Compile Include="ViewModels\WindowParts\Timeline\StatusViewModel.cs" />
+    <Compile Include="ViewModels\WindowParts\Timeline\TabViewModel.cs" />
     <Compile Include="Views\Messaging\Behaviors\TaskDialogInteractionMessageAction.cs" />
     <Compile Include="Views\Messaging\TaskDialogMessage.cs" />
     <Compile Include="Views\Utils\BooleanConverters.cs" />
     <Compile Include="Views\Utils\CollectionExistsToVisibleConverter.cs" />
     <Compile Include="Views\Utils\ConverterBase.cs" />
     <Compile Include="Views\Utils\StringToVisibleConverter.cs" />
+    <Compile Include="Views\WindowParts\Backpanel.xaml.cs">
+      <DependentUpon>Backpanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\WindowParts\Frontpanel.xaml.cs">
+      <DependentUpon>Frontpanel.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\WindowParts\InputArea.xaml.cs">
       <DependentUpon>InputArea.xaml</DependentUpon>
     </Compile>
@@ -244,7 +255,6 @@
     <Compile Include="Models\Store\EventStore.cs" />
     <Compile Include="Models\Store\StatusStore.cs" />
     <Compile Include="Models\Store\UserStore.cs" />
-    <Compile Include="Models\Tab\TabBackEnd.cs" />
     <Compile Include="Models\Tab\TabInfo.cs" />
     <Compile Include="ViewModels\Dialogs\AuthorizationViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
@@ -255,6 +265,14 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Views\WindowParts\Backpanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\WindowParts\Frontpanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\WindowParts\InputArea.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
