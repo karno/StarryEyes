@@ -30,10 +30,7 @@ namespace StarryEyes.Mystique.Filters
 
         public static TwitterStatus GetOriginal(this TwitterStatus status)
         {
-            if (status.RetweetedOriginal != null)
-                return status.RetweetedOriginal;
-            else
-                return status;
+            return status.RetweetedOriginal ?? status;
         }
     }
 }

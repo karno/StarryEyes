@@ -1,6 +1,6 @@
-﻿using StarryEyes.SweetLady.DataModel;
+﻿using System.Linq;
+using StarryEyes.SweetLady.DataModel;
 using StarryEyes.SweetLady.Util;
-using System.Linq;
 
 namespace StarryEyes.SweetLady.Api.Parsing.JsonFormats
 {
@@ -21,6 +21,8 @@ namespace StarryEyes.SweetLady.Api.Parsing.JsonFormats
         public string in_reply_to_user_id_str { get; set; }
 
         public UserJson user { get; set; }
+
+        public IdJson current_user_retweet { get; set; }
 
         public string in_reply_to_screen_name { get; set; }
 

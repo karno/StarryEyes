@@ -72,6 +72,7 @@
     <Compile Include="Api\Parsing\JsonFormats\DirectMessageJson.cs" />
     <Compile Include="Api\Parsing\JsonFormats\EntityJson.cs" />
     <Compile Include="Api\Parsing\JsonFormats\FriendshipJson.cs" />
+    <Compile Include="Api\Parsing\JsonFormats\IdJson.cs" />
     <Compile Include="Api\Parsing\JsonFormats\IdsJson.cs" />
     <Compile Include="Api\Parsing\JsonFormats\LanguageJson.cs" />
     <Compile Include="Api\Parsing\JsonFormats\ListCollectionsJson.cs" />

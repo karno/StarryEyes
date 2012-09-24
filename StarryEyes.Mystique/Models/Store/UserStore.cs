@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reactive.Linq;
 using StarryEyes.SweetLady.DataModel;
 using StarryEyes.Vanille.DataStore;
 using StarryEyes.Vanille.DataStore.Persistent;
-using System.Xaml;
-using System.Threading.Tasks;
-using System.Threading;
-using System.IO.Compression;
-using System.Linq;
 
 namespace StarryEyes.Mystique.Models.Store
 {

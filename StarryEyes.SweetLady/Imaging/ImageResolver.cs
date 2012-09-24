@@ -18,6 +18,7 @@ namespace StarryEyes.SweetLady.Imaging
             {
                 {"http://twitpic.com/", s => "http://twitpic.com/show/full/" + s.Substring(19)},
                 {"http://yfrog.com/", s => s + ":medium"},
+                {"http://twitter.yfrog.com/", s => s.Replace("twitter", "") + ":medium"},
                 {"http://pckles.com/", s => s + ".png"},
                 {"http://pckl.es/", s => s + ".png"},
                 {"http://p.twipple.jp", s => "http://p.twipple.jp/show/orig/" + s.Substring(20)},

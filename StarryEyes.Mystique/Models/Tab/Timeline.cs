@@ -15,6 +15,7 @@ namespace StarryEyes.Mystique.Models.Tab
     public class Timeline : IDisposable
     {
         public readonly int TimelineChunkCount = 250;
+        public readonly int TimelineChunkCountBounce = 50;
 
         private object _sicLocker = new object();
         private AVLTree<long> _statusIdCache;
@@ -57,7 +58,7 @@ namespace StarryEyes.Mystique.Models.Tab
                 _statuses.Insert(
                     i => i.TakeWhile(_ => _.CreatedAt > status.CreatedAt).Count(),
                     status);
-                if (_statusIdCache.Count > TimelineChunkCount)
+                if (_statusIdCache.Count > TimelineChunkCount + TimelineChunkCountBounce)
                     TrimTimeline();
             }
         }

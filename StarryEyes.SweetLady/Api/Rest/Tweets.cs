@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using StarryEyes.SweetLady.Api.Parsing;
+using StarryEyes.SweetLady.Api.Parsing.JsonFormats;
 using StarryEyes.SweetLady.Authorize;
 using StarryEyes.SweetLady.DataModel;
 using StarryEyes.SweetLady.Net;
@@ -26,6 +27,24 @@ namespace StarryEyes.SweetLady.Api.Rest
                 .GetResponse()
                 .UpdateRateLimitInfo(info)
                 .ReadUsers();
+        }
+
+        public static IObservable<long> GetMyRetweetId(this AuthenticateInfo info,
+            long id)
+        {
+            var param = new Dictionary<string, object>()
+            {
+                {"include_entities", true},
+                {"include_my_retweet", true},
+            }.Parametalize();
+            return info.GetOAuthClient()
+                .SetParameters(param)
+                .SetEndpoint(ApiEndpoint.EndpointApiV1.JoinUrl("/statuses/show/" + id + ".json"))
+                .GetResponse()
+                .UpdateRateLimitInfo(info)
+                .ReadString()
+                .DeserializeJson<TweetJson>()
+                .Select(s => s.current_user_retweet != null ? long.Parse(s.current_user_retweet.id_str) : 0);
         }
 
         public static IObservable<long> GetRetweeetedByIds(this AuthenticateInfo info,

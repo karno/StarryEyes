@@ -82,5 +82,14 @@ namespace System.Reactive.Linq
                 yield return source;
             }
         }
+
+        public static IObservable<T> ConcatIfEmpty<T>(this IObservable<T> source, Func<IObservable<T>> next)
+        {
+            return source
+                .Materialize()
+                .Select((n, i) => (n.Kind == NotificationKind.OnCompleted && i == 0) ? next().Materialize(): Observable.Return(n))
+                .SelectMany(ns => ns)
+                .Dematerialize();
+        }
     }
 }

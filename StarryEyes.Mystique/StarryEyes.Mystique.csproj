@@ -179,6 +179,8 @@
     <Compile Include="Models\Connection\ConnectionUtil.cs" />
     <Compile Include="Models\Connection\Extend\ListReceiver.cs" />
     <Compile Include="Models\Connection\Extend\SearchReceiver.cs" />
+    <Compile Include="Models\Hub\StoreHub.cs" />
+    <Compile Include="Models\Hub\UIHub.cs" />
     <Compile Include="Models\ObservableSynchronizedCollectionEx.cs" />
     <Compile Include="Models\Plugins\ImageUploaderManager.cs" />
     <Compile Include="Models\Plugins\PluginManager.cs" />
@@ -191,6 +193,7 @@
     <Compile Include="ViewModels\WindowParts\BackpanelViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Timeline\StatusViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Timeline\TabViewModel.cs" />
+    <Compile Include="ViewModels\WindowParts\Timeline\UserViewModel.cs" />
     <Compile Include="Views\Messaging\Behaviors\TaskDialogInteractionMessageAction.cs" />
     <Compile Include="Views\Messaging\TaskDialogMessage.cs" />
     <Compile Include="Views\Utils\BooleanConverters.cs" />

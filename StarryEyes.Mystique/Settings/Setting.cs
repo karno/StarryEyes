@@ -84,6 +84,14 @@ namespace StarryEyes.Mystique.Settings
             return accounts.Value.Where(a => a.UserId == id).FirstOrDefault();
         }
 
+        #region Timeline display and action
+
+        public static SettingItemStruct<bool> AllowFavoriteMyself = new SettingItemStruct<bool>("AllowFavoriteMyself", false);
+
+        #endregion
+
+        #region Setting infrastructure
+
         public class SettingItem<T> where T : class
         {
             private string _name;
@@ -171,6 +179,8 @@ namespace StarryEyes.Mystique.Settings
                 }
             }
         }
+
+        #endregion
     }
 
 }

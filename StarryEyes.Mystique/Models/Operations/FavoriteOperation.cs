@@ -16,23 +16,19 @@ namespace StarryEyes.Mystique.Models.Operations
 
         public bool IsAddFavorite { get; set; }
 
-        private Action cancelHandler;
-        private Action completeHandler;
         public FavoriteOperation() { }
-        public FavoriteOperation(AuthenticateInfo info, TwitterStatus status, bool add, Action cancel, Action completed)
+
+        public FavoriteOperation(AuthenticateInfo info, TwitterStatus status, bool add)
         {
             AuthInfo = info;
             TargetId = status.Id;
             DescriptionText = status.ToString();
             IsAddFavorite = add;
-            cancelHandler = cancel;
-            completeHandler = completed;
         }
 
         protected override IObservable<TwitterStatus> RunCore()
         {
             return ExecFavorite()
-                .Do(_ => { if (completeHandler != null)  completeHandler(); })
                 .Catch((Exception ex) =>
                 {
                     return GetExceptionDetail(ex)
