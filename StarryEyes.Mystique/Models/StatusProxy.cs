@@ -21,6 +21,35 @@ namespace StarryEyes.Mystique.Models
         private static SortedDictionary<long, WeakReference> _staticCache = new SortedDictionary<long, WeakReference>();
         private static ConcurrentDictionary<long, object> _generateLock = new ConcurrentDictionary<long, object>();
 
+        public static void UpdateStatusInfo(TwitterStatus status,
+            Action<StatusProxy> ifCacheIsAlive, Action<TwitterStatus> ifCacheIsDead)
+        {
+            var lockerobj = _generateLock.GetOrAdd(status.Id, new object());
+            try
+            {
+                lock (lockerobj)
+                {
+                    StatusProxy _proxy = null;
+                    WeakReference wr = null;
+                    lock (_staticCacheLock)
+                    {
+                        _staticCache.TryGetValue(status.Id, out wr);
+                    }
+                    if (wr != null)
+                        _proxy = (StatusProxy)wr.Target;
+
+                    if (_proxy != null)
+                        ifCacheIsAlive(_proxy);
+                    else
+                        ifCacheIsDead(status);
+                }
+            }
+            finally
+            {
+                _generateLock.TryRemove(status.Id, out lockerobj);
+            }
+        }
+
         public static StatusProxy GetIfCacheIsAlive(long id)
         {
             StatusProxy _proxy = null;
@@ -117,7 +146,6 @@ namespace StarryEyes.Mystique.Models
         {
             get { return __fuwrap; }
         }
-
 
         public void AddFavoritedUser(long userId)
         {
