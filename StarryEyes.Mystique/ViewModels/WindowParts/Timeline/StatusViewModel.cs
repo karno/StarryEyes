@@ -10,16 +10,14 @@ using StarryEyes.SweetLady.Authorize;
 using System.Reactive.Linq;
 using StarryEyes.Mystique.Models.Store;
 using System.Reactive;
+using StarryEyes.Mystique.Models;
 
 namespace StarryEyes.Mystique.ViewModels.WindowParts.Timeline
 {
     public class StatusViewModel : ViewModel
     {
-        private TwitterStatus _status;
-        public TwitterStatus Status
-        {
-            get { return _status; }
-        }
+        public StatusProxy StatusProxy { get; private set; }
+        public TwitterStatus Status { get { return StatusProxy.Status; } }
 
         private long[] _bindingAccounts;
         public IEnumerable<long> BindingAccounts
@@ -34,46 +32,43 @@ namespace StarryEyes.Mystique.ViewModels.WindowParts.Timeline
 
         public StatusViewModel(TwitterStatus status, IEnumerable<long> initialBoundAccounts)
         {
-            this._status = status;
+            this.StatusProxy = StatusProxy.Get(status);
             this._bindingAccounts = initialBoundAccounts.ToArray();
         }
 
         private UserViewModel _user;
         public UserViewModel User
         {
-            get { return _user ?? (_user = new UserViewModel((_status.RetweetedOriginal ?? _status).User)); }
+            get { return _user ?? (_user = new UserViewModel((Status.RetweetedOriginal ?? Status).User)); }
         }
 
         private UserViewModel _retweeter;
         public UserViewModel Retweeter
         {
-            get { return _retweeter ?? (_retweeter = new UserViewModel(_status.User)); }
+            get { return _retweeter ?? (_retweeter = new UserViewModel(Status.User)); }
         }
 
         private UserViewModel _recipient;
         public UserViewModel Recipient
         {
-            get { return _recipient ?? (_recipient = new UserViewModel(_status.Recipient)); }
+            get { return _recipient ?? (_recipient = new UserViewModel(Status.Recipient)); }
         }
 
         public bool IsDirectMessage
         {
-            get { return _status.StatusType == StatusType.DirectMessage; }
+            get { return Status.StatusType == StatusType.DirectMessage; }
         }
 
         public bool IsRetweet
         {
-            get { return _status.RetweetedOriginal != null; }
+            get { return Status.RetweetedOriginal != null; }
         }
 
         public bool IsFavorited
         {
             get
             {
-                lock (_favoritedsLock)
-                {
-                    return _bindingAccounts.All(l => _favoritedUsersDic.ContainsKey(l));
-                }
+                return StatusProxy.IsFavorited(_bindingAccounts);
             }
         }
 
@@ -81,10 +76,7 @@ namespace StarryEyes.Mystique.ViewModels.WindowParts.Timeline
         {
             get
             {
-                lock (_retweetedsLock)
-                {
-                    return _bindingAccounts.All(l => _retweetedUsersDic.ContainsKey(l));
-                }
+                return StatusProxy.IsRetweeted(_bindingAccounts);
             }
         }
 
@@ -122,113 +114,14 @@ namespace StarryEyes.Mystique.ViewModels.WindowParts.Timeline
 
         public bool IsMyself
         {
-            get { return Setting.Accounts.Any(a => a.UserId == _status.User.Id); }
+            get { return Setting.Accounts.Any(a => a.UserId == Status.User.Id); }
         }
 
         public bool IsMyselfStrict
         {
             get
             {
-                return this._bindingAccounts.Length == 1 && this._bindingAccounts[0] == _status.User.Id;
-            }
-        }
-
-        private object _favoritedsLock = new object();
-        private SortedDictionary<long, UserViewModel> _favoritedUsersDic = new SortedDictionary<long, UserViewModel>();
-        private DispatcherCollection<UserViewModel> _favoritedUsers = new DispatcherCollection<UserViewModel>(DispatcherHelper.UIDispatcher);
-        private ReadOnlyDispatcherCollection<UserViewModel> __fuwrap;
-        public ReadOnlyDispatcherCollection<UserViewModel> FavoritedUsers
-        {
-            get { return __fuwrap ?? (__fuwrap = new ReadOnlyDispatcherCollection<UserViewModel>(_favoritedUsers)); }
-        }
-
-        public void AddFavoritedUser(long userId)
-        {
-            StoreHub.GetUser(userId).Subscribe(AddFavoritedUser);
-        }
-
-        public void AddFavoritedUser(TwitterUser user)
-        {
-            UserViewModel _add = null;
-            lock (_favoritedsLock)
-            {
-                if (!_favoritedUsersDic.ContainsKey(user.Id))
-                {
-                    _add = new UserViewModel(user);
-                    _favoritedUsersDic.Add(user.Id, _add);
-                    this._status.FavoritedUsers = this._status.FavoritedUsers.Append(user.Id).ToArray();
-                }
-            }
-            if (_add != null)
-            {
-                DispatcherHelper.BeginInvoke(() => _favoritedUsers.Add(_add));
-                StatusStore.Store(this._status);
-            }
-        }
-
-        public void RemoveFavoritedUser(long id)
-        {
-            UserViewModel _remove = null;
-            lock (_favoritedsLock)
-            {
-                if (_favoritedUsersDic.TryGetValue(id, out _remove))
-                    this._status.FavoritedUsers = this._status.FavoritedUsers.Except(new[] { id }).ToArray();
-
-            }
-            if (_remove != null)
-            {
-                DispatcherHelper.BeginInvoke(() => _favoritedUsers.Remove(_remove));
-                StatusStore.Store(this._status);
-            }
-        }
-
-        private object _retweetedsLock = new object();
-        private SortedDictionary<long, UserViewModel> _retweetedUsersDic = new SortedDictionary<long, UserViewModel>();
-        private DispatcherCollection<UserViewModel> _retweetedUsers = new DispatcherCollection<UserViewModel>(DispatcherHelper.UIDispatcher);
-        private ReadOnlyDispatcherCollection<UserViewModel> __ruwrap;
-        public ReadOnlyDispatcherCollection<UserViewModel> RetweetedUsers
-        {
-            get { return __ruwrap ?? (__ruwrap = new ReadOnlyDispatcherCollection<UserViewModel>(_retweetedUsers)); }
-        }
-
-        public void AddRetweetedUser(long userId)
-        {
-            StoreHub.GetUser(userId).Subscribe(AddRetweetedUser);
-        }
-
-        public void AddRetweetedUser(TwitterUser user)
-        {
-            UserViewModel _add = null;
-            lock (_retweetedsLock)
-            {
-                if (!_retweetedUsersDic.ContainsKey(user.Id))
-                {
-                    _add = new UserViewModel(user);
-                    _retweetedUsersDic.Add(user.Id, _add);
-                    this._status.RetweetedUsers = this._status.RetweetedUsers.Append(user.Id).ToArray();
-                }
-            }
-            if (_add != null)
-            {
-                DispatcherHelper.BeginInvoke(() => _retweetedUsers.Add(_add));
-                // update persistent info
-                StatusStore.Store(this._status);
-            }
-        }
-
-        public void RemoveRetweetedUser(long id)
-        {
-            UserViewModel _remove = null;
-            lock (_retweetedsLock)
-            {
-                if (_retweetedUsersDic.TryGetValue(id, out _remove))
-                    this._status.RetweetedUsers = this._status.RetweetedUsers.Except(new[] { id }).ToArray();
-            }
-            if (_remove != null)
-            {
-                DispatcherHelper.BeginInvoke(() => _retweetedUsers.Remove(_remove));
-                // update persistent info
-                StatusStore.Store(this._status);
+                return this._bindingAccounts.Length == 1 && this._bindingAccounts[0] == Status.User.Id;
             }
         }
 
@@ -258,20 +151,20 @@ namespace StarryEyes.Mystique.ViewModels.WindowParts.Timeline
             {
                 // remove favorite
                 addFav = false;
-                expected = a => RemoveFavoritedUser(a.Id);
-                onFail = a => AddFavoritedUser(a.Id);
+                expected = a => StatusProxy.RemoveFavoritedUser(a.Id);
+                onFail = a => StatusProxy.AddFavoritedUser(a.Id);
             }
             else
             {
                 addFav = true;
-                expected = a => AddFavoritedUser(a.Id);
-                onFail = a => RemoveFavoritedUser(a.Id);
+                expected = a => StatusProxy.AddFavoritedUser(a.Id);
+                onFail = a => StatusProxy.RemoveFavoritedUser(a.Id);
             }
 
             GetImmediateAccounts()
                 .ToObservable()
                 .Do(expected)
-                .SelectMany(a => new FavoriteOperation(a, this._status, addFav)
+                .SelectMany(a => new FavoriteOperation(a, this.Status, addFav)
                     .Run()
                     .Catch((Exception ex) =>
                     {
@@ -306,21 +199,21 @@ namespace StarryEyes.Mystique.ViewModels.WindowParts.Timeline
             {
                 // remove favorite
                 retweet = false;
-                expected = a => RemoveRetweetedUser(a.Id);
-                onFail = a => AddRetweetedUser(a.Id);
+                expected = a => StatusProxy.RemoveRetweetedUser(a.Id);
+                onFail = a => StatusProxy.AddRetweetedUser(a.Id);
             }
             else
             {
                 retweet = true;
-                expected = a => AddRetweetedUser(a.Id);
-                onFail = a => RemoveRetweetedUser(a.Id);
+                expected = a => StatusProxy.AddRetweetedUser(a.Id);
+                onFail = a => StatusProxy.RemoveRetweetedUser(a.Id);
             }
 
             GetImmediateAccounts()
                 .ToObservable()
                 .Do(expected)
                 .Select(a =>
-                    new RetweetOperation(a, this._status, retweet)
+                    new RetweetOperation(a, this.Status, retweet)
                     .Run()
                     .Catch((Exception ex) =>
                     {

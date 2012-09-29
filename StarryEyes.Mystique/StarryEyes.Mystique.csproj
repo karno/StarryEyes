@@ -184,6 +184,7 @@
     <Compile Include="Models\ObservableSynchronizedCollectionEx.cs" />
     <Compile Include="Models\Plugins\ImageUploaderManager.cs" />
     <Compile Include="Models\Plugins\PluginManager.cs" />
+    <Compile Include="Models\StatusProxy.cs" />
     <Compile Include="Models\StatusTextUtil.cs" />
     <Compile Include="Models\Store\StoreOnMemoryObjectPersistence.cs" />
     <Compile Include="Models\Tab\ColumnInfo.cs" />

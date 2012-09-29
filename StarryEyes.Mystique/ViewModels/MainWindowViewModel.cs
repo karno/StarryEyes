@@ -16,6 +16,7 @@ using StarryEyes.SweetLady.DataModel;
 using System.Collections.Generic;
 using StarryEyes.Mystique.Models.Operations;
 using StarryEyes.Mystique.Views.Messaging;
+using StarryEyes.Mystique.ViewModels.WindowParts.Timeline;
 
 namespace StarryEyes.Mystique.ViewModels
 {
@@ -76,7 +77,8 @@ namespace StarryEyes.Mystique.ViewModels
             StatusStore.StatusPublisher
                 .Where(_ => _.IsAdded)
                 .Select(_ => _.Status)
-                .Subscribe(_ => RecentReceivedBody = _.Text);
+                .Select(_ => new StatusViewModel(_, Setting.Accounts.Select(a => a.UserId)))
+                .Subscribe(_ => RecentReceivedBody = _.Status.Text);
         }
 
         private string _recentReceivedBody = String.Empty;
