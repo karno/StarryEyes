@@ -8,8 +8,8 @@
     <ProjectGuid>{7E909D43-7BAD-4885-9983-2FF0030D5A5E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>StarryEyes.SweetLady</RootNamespace>
-    <AssemblyName>StarryEyes.SweetLady</AssemblyName>
+    <RootNamespace>StarryEyes.Moon</RootNamespace>
+    <AssemblyName>StarryEyes.Moon</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>

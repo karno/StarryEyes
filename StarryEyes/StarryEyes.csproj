@@ -8,7 +8,7 @@
     <ProjectGuid>{3BF1F46A-B095-40EC-A89D-A34EBBACA966}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>StarryEyes.Mystique</RootNamespace>
+    <RootNamespace>StarryEyes</RootNamespace>
     <AssemblyName>Krile</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
