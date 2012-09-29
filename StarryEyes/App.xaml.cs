@@ -72,6 +72,9 @@ namespace StarryEyes
             // Activate plugins
             PluginManager.LoadedPlugins.ForEach(p => p.Initialize());
 
+            // Activate scripts
+            ScriptingManager.ExecuteScripts();
+
             RaiseSystemReady();
         }
 
@@ -235,6 +238,8 @@ namespace StarryEyes
         public static readonly string MediaDirectory = "media";
 
         public static readonly string PluginDirectory = "plugins";
+
+        public static readonly string ScriptDirectiory = "scripts";
 
         public static readonly string FeedbackAppName = "reporter.exe";
 

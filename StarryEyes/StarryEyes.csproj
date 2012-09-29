@@ -72,9 +72,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>InfrastructureAssemblies\Microsoft.Expression.Interactions.dll</HintPath>
     </Reference>
-    <Reference Include="Parseq, Version=1.3.0.1, Culture=neutral, PublicKeyToken=434716041f21e3ab, processorArchitecture=MSIL">
-      <HintPath>..\packages\Parseq.1.3.0.1\lib\net40\Parseq.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -132,9 +129,6 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="Yacq">
-      <HintPath>..\packages\Yacq.1.11\lib\net40\Yacq.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -184,6 +178,7 @@
     <Compile Include="Models\ObservableSynchronizedCollectionEx.cs" />
     <Compile Include="Models\Plugins\ImageUploaderManager.cs" />
     <Compile Include="Models\Plugins\PluginManager.cs" />
+    <Compile Include="Models\Plugins\ScriptingManager.cs" />
     <Compile Include="Models\StatusProxy.cs" />
     <Compile Include="Models\StatusTextUtil.cs" />
     <Compile Include="Models\Store\StoreOnMemoryObjectPersistence.cs" />
