@@ -17,6 +17,8 @@ using System.Collections.Generic;
 using StarryEyes.Models.Operations;
 using StarryEyes.Views.Messaging;
 using StarryEyes.ViewModels.WindowParts.Timeline;
+using StarryEyes.Views.Helpers;
+using StarryEyes.Helpers;
 
 namespace StarryEyes.ViewModels
 {
@@ -78,19 +80,54 @@ namespace StarryEyes.ViewModels
                 .Where(_ => _.IsAdded)
                 .Select(_ => _.Status)
                 .Select(_ => new StatusViewModel(_, Setting.Accounts.Select(a => a.UserId)))
-                .Subscribe(_ => RecentReceivedBody = _.Status.Text);
+                .Subscribe(_ => RecentReceived = _.Status);
         }
 
-        private string _recentReceivedBody = String.Empty;
-        public string RecentReceivedBody
+        private TwitterStatus _recentReceived = null;
+        public TwitterStatus RecentReceived
         {
-            get { return _recentReceivedBody; }
+            get { return _recentReceived; }
             set
             {
-                _recentReceivedBody = value;
-                RaisePropertyChanged(() => RecentReceivedBody);
+                _recentReceived = value;
+                RaisePropertyChanged(() => RecentReceived);
             }
         }
+
+
+        #region OpenLinkCommand
+        private ListenerCommand<string> _OpenLinkCommand;
+
+        public ListenerCommand<string> OpenLinkCommand
+        {
+            get
+            {
+                if (_OpenLinkCommand == null)
+                {
+                    _OpenLinkCommand = new ListenerCommand<string>(OpenLink);
+                }
+                return _OpenLinkCommand;
+            }
+        }
+
+        public void OpenLink(string parameter)
+        {
+            var param = RichTextBoxHelper.ResolveInternalUrl(parameter);
+            switch (param.Item1)
+            {
+                case LinkType.User:
+                    BrowserHelper.Open("http://twitter.com/" + param.Item2);
+                    break;
+                case LinkType.Hash:
+                    BrowserHelper.Open("http://twitter.com/search/?q=" + param.Item2);
+                    break;
+                case LinkType.Url:
+                    BrowserHelper.Open(param.Item2);
+                    break;
+            }
+        }
+        #endregion
+
 
         public int StatusCount
         {

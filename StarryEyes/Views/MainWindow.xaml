@@ -4,6 +4,7 @@
                       xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
                       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                       xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
+                      xmlns:helper="clr-namespace:StarryEyes.Views.Helpers"
                       xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
                       xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -78,12 +79,15 @@
                    HorizontalAlignment="Left"
                    VerticalAlignment="Top"><Run Text="{Binding StatusCount, Mode=OneWay}" /><Run Text=" " /><Run Text="tweets / " /><Run Text=" " /><Run Text="{Binding TweetsPerMinutes, Mode=OneWay}" /><Run Text=" " /><Run Text="tpm" />
         </TextBlock>
-        <TextBlock Margin="8,70,8,0"
-                   HorizontalAlignment="Stretch"
-                   VerticalAlignment="Top"
-                   Text="{Binding RecentReceivedBody,
-                                  Mode=OneWay}"
-                   TextWrapping="Wrap" />
+        <RichTextBox Margin="8,70,8,0"
+                     HorizontalAlignment="Stretch"
+                     VerticalAlignment="Top"
+                     BorderBrush="{x:Null}"
+                     BorderThickness="0"
+                     helper:RichTextBoxHelper.LinkNavigationCommand="{Binding OpenLinkCommand}"
+                     helper:RichTextBoxHelper.TwitterStatus="{Binding RecentReceived}"
+                     IsDocumentEnabled="True"
+                     IsReadOnly="True" />
         <TextBlock x:Name="textBlock1"
                    Height="23"
                    Margin="8,97,0,0"
@@ -107,6 +111,7 @@
                  Height="24"
                  Margin="8,163,48,0"
                  VerticalAlignment="Top"
+                 SpellCheck.IsEnabled="True"
                  Text="{Binding PostText,
                                 Mode=TwoWay,
                                 UpdateSourceTrigger=PropertyChanged}" />

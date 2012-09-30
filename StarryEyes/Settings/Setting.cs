@@ -31,6 +31,7 @@ namespace StarryEyes.Settings
                         File.Copy(App.ConfigurationFilePath, Path.Combine(
                             Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
                             cpfn));
+                        File.Delete(App.ConfigurationFilePath);
                         settingValueHolder = new SortedDictionary<string, object>();
                         InformationHub.PublishInformation(new Information(InformationKind.Warning,
                             "SETTING_LOAD_ERROR",

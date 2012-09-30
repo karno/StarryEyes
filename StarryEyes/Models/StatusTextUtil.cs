@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using StarryEyes.Helpers;
+using System.Collections.Generic;
 
 namespace StarryEyes.Models
 {
@@ -43,5 +44,91 @@ namespace StarryEyes.Models
                 .Select(s => s.Item1)
                 .JoinString("");
         }
+
+        private static string HtmlEscape(string raw)
+        {
+            return raw.Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;").Replace("\"", "&quot;");
+        }
+
+        private static string HtmlUnescape(string escaped)
+        {
+            return escaped.Replace("&quot;", "\"").Replace("&lt;", "<").Replace("&gt;", ">").Replace("&amp;", "&");
+        }
+
+        /// <summary>
+        /// 文字列をトークン化します。
+        /// </summary>
+        public static IEnumerable<TextToken> Tokenize(string raw)
+        {
+            if (String.IsNullOrEmpty(raw)) yield break;
+            var escaped = HtmlEscape(HtmlUnescape(raw));
+            escaped = RegexHelper.UrlRegex.Replace(escaped, (m) =>
+            {
+                // # => &sharp; (ハッシュタグで再識別されることを防ぐ)
+                var repl = m.Groups[1].Value.Replace("#", "&sharp;");
+                return "<U>" + repl + "<";
+            });
+            escaped = RegexHelper.AtRegex.Replace(escaped, "<A>@$1<");
+            escaped = RegexHelper.HashRegex.Replace(escaped, (m) =>
+            {
+                if (m.Groups.Count > 0)
+                {
+                    return "<H>" + m.Groups[0].Value + "<";
+                }
+                else
+                {
+                    return m.Value;
+                }
+            });
+            var splitted = escaped.Split(new[] { '<' }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var s in splitted)
+            {
+                if (s.Contains('>'))
+                {
+                    var kind = s[0];
+                    var body = HtmlUnescape(s.Substring(2));
+                    switch (kind)
+                    {
+                        case 'U':
+                            // &sharp; => #
+                            yield return new TextToken(TokenKind.Url, body.Replace("&sharp;", "#"));
+                            break;
+                        case 'A':
+                            yield return new TextToken(TokenKind.AtLink, body);
+                            break;
+                        case 'H':
+                            yield return new TextToken(TokenKind.Hashtag, body);
+                            break;
+                        default:
+                            throw new InvalidOperationException("invalid grouping:" + kind.ToString());
+                    }
+                }
+                else
+                {
+                    yield return new TextToken(TokenKind.Text, HtmlUnescape(s));
+                }
+            }
+        }
+    }
+
+    public class TextToken
+    {
+        public TextToken(TokenKind tknd, string tkstr)
+        {
+            Kind = tknd;
+            Text = tkstr;
+        }
+
+        public TokenKind Kind { get; set; }
+
+        public string Text { get; set; }
+    }
+
+    public enum TokenKind
+    {
+        Text,
+        Url,
+        Hashtag,
+        AtLink,
     }
 }

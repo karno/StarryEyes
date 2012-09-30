@@ -190,6 +190,7 @@
     <Compile Include="ViewModels\WindowParts\Timeline\StatusViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Timeline\TabViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Timeline\UserViewModel.cs" />
+    <Compile Include="Views\Helpers\RichTextBoxHelper.cs" />
     <Compile Include="Views\Messaging\Behaviors\TaskDialogInteractionMessageAction.cs" />
     <Compile Include="Views\Messaging\TaskDialogMessage.cs" />
     <Compile Include="Views\Utils\BooleanConverters.cs" />

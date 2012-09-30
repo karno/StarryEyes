@@ -26,7 +26,9 @@ namespace StarryEyes.Models.Plugins
         internal static void ExecuteScripts()
         {
             var path = Path.Combine(Path.GetDirectoryName(App.ExeFilePath), App.ScriptDirectiory);
-            Directory.GetFiles(path)
+            if (!Directory.Exists(path))
+                Directory.CreateDirectory(path);
+            Directory.EnumerateFiles(path)
                 .ForEach(file =>
                 {
                     var ext = Path.GetExtension(file).TrimStart('.').ToLower();
