@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
+using System.IO;
 
 namespace StarryEyes.Models.Plugins
 {
@@ -31,6 +32,7 @@ namespace StarryEyes.Models.Plugins
         {
             try
             {
+                Directory.CreateDirectory(Path.Combine(Path.GetDirectoryName(App.ExeFilePath), App.PluginDirectory));
                 var catalog = new DirectoryCatalog("plugins");
                 var container = new CompositionContainer(catalog);
                 var capsule = new PluginLoader();
