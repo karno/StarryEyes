@@ -15,17 +15,27 @@ namespace StarryEyes.Models.Hub
                 handler(authInfos, bindHashtags);
         }
 
-        public static event Action<string, CursorPosition, TwitterStatus> OnSetTextRequested;
-        public static void SetText(string body = null, CursorPosition curpos = CursorPosition.End,
-            TwitterStatus inReplyTo = null, bool focusToInputArea = true)
+        public static event Action<IEnumerable<AuthenticateInfo>, string, CursorPosition, TwitterStatus> OnSetTextRequested;
+        public static void SetText(IEnumerable<AuthenticateInfo> infos = null, string body = null,
+            CursorPosition curpos = CursorPosition.End, TwitterStatus inReplyTo = null, bool focusToInputArea = true)
         {
             if (String.IsNullOrWhiteSpace(body))
                 body = String.Empty;
 
             var handler = OnSetTextRequested;
             if (handler != null)
-                handler(body, curpos, inReplyTo);
+                handler(infos, body, curpos, inReplyTo);
 
+            if (focusToInputArea)
+                SetFocusTo(FocusRequest.Tweet);
+        }
+
+        public static event Action<IEnumerable<AuthenticateInfo>, TwitterUser> OnDirectMessageRequested;
+        public static void SetDirectMessage(IEnumerable<AuthenticateInfo> infos, TwitterUser recipient, bool focusToInputArea = true)
+        {
+            var handler = OnDirectMessageRequested;
+            if (handler != null)
+                handler(infos, recipient);
             if (focusToInputArea)
                 SetFocusTo(FocusRequest.Tweet);
         }
@@ -96,5 +106,13 @@ namespace StarryEyes.Models.Hub
         Delete,
         ReportAsSpam,
         Mute,
+    }
+
+    public enum AccountSelectionAction
+    {
+        Favorite,
+        Retweet,
+        FavoriteAndRetweet,
+        Stealing,
     }
 }

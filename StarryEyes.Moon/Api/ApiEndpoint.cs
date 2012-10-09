@@ -29,12 +29,12 @@ namespace StarryEyes.Moon.Api
         /// <summary>
         /// Set consumer key.
         /// </summary>
-        public static string ConsumerKey { get; set; }
+        public static string DefaultConsumerKey { get; set; }
 
         /// <summary>
         /// Set consumer secret.
         /// </summary>
-        public static string ConsumerSecret { get; set; }
+        public static string DefaultConsumerSecret { get; set; }
 
         /// <summary>
         /// Get OAuth client.
@@ -43,15 +43,20 @@ namespace StarryEyes.Moon.Api
         /// <returns></returns>
         internal static OAuthClient GetOAuthClient(this AuthenticateInfo info, bool useGzip = true)
         {
+            OAuthClient client = info.AccessToken.GetOAuthClient(
+                info.OverridedConsumerKey, info.OverridedConsumerSecret);
             if (useGzip)
-                return info.AccessToken.GetOAuthClient().UseGZip();
+                return client.UseGZip();
             else
-                return info.AccessToken.GetOAuthClient();
+                return client;
         }
 
-        internal static OAuthClient GetOAuthClient(this AccessToken token)
+        internal static OAuthClient GetOAuthClient(this AccessToken token,
+            string overrideConsumerKey, string overrideConsumerSecret)
         {
-            return new OAuthClient(ConsumerKey, ConsumerSecret, token)
+            return new OAuthClient(overrideConsumerKey ?? DefaultConsumerKey,
+                overrideConsumerSecret ?? DefaultConsumerSecret,
+                token)
             {
                 ApplyBeforeRequest = req => req.UserAgent = USER_AGENT_STR
             };

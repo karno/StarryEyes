@@ -41,7 +41,7 @@ namespace StarryEyes.Settings
                             "元のディレクトリ: " + App.ConfigurationFilePath + Environment.NewLine +
                             "送出された例外: " + ex.ToString()));
                     }
-                    catch(Exception ex_)
+                    catch (Exception ex_)
                     {
                         Environment.FailFast(
                             "設定ファイルの緊急バックアップ ストアが行えませんでした。", ex_);
@@ -68,11 +68,14 @@ namespace StarryEyes.Settings
             Properties.Settings.Default.Reset();
         }
 
-        public static SettingItemStruct<bool> IsPowerUser = new SettingItemStruct<bool>("IsPowerUser", false);
+        public static SettingItemStruct<bool> IsPowerUser =
+            new SettingItemStruct<bool>("IsPowerUser", false);
 
-        public static SettingItem<string> ExternalBrowserPath = new SettingItem<string>("ExternalBrowserPath", null);
+        public static SettingItem<string> ExternalBrowserPath =
+            new SettingItem<string>("ExternalBrowserPath", null);
 
-        private static SettingItem<List<AccountSetting>> accounts = new SettingItem<List<AccountSetting>>("Accounts", new List<AccountSetting>());
+        private static SettingItem<List<AccountSetting>> accounts =
+            new SettingItem<List<AccountSetting>>("Accounts", new List<AccountSetting>());
 
         public static IEnumerable<AccountSetting> Accounts
         {
@@ -88,6 +91,13 @@ namespace StarryEyes.Settings
         #region Timeline display and action
 
         public static SettingItemStruct<bool> AllowFavoriteMyself = new SettingItemStruct<bool>("AllowFavoriteMyself", false);
+
+        #endregion
+
+        #region Accounting
+
+        public static SettingItemStruct<bool> IsBacktrackFallback =
+             new SettingItemStruct<bool>("IsBacktrackFallback", true);
 
         #endregion
 
@@ -183,5 +193,4 @@ namespace StarryEyes.Settings
 
         #endregion
     }
-
 }

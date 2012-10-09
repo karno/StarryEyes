@@ -1,17 +1,15 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using StarryEyes.Moon.DataModel;
-using System.Collections.Concurrent;
 using System.Threading;
-using StarryEyes.Settings;
-using StarryEyes.Models.Hub;
 using Livet;
-using StarryEyes.ViewModels.WindowParts.Timeline;
+using StarryEyes.Models.Hub;
 using StarryEyes.Models.Store;
-using System.Collections.Specialized;
-using System.Windows.Threading;
+using StarryEyes.Moon.Authorize;
+using StarryEyes.Moon.DataModel;
+using StarryEyes.Settings;
+using StarryEyes.ViewModels.WindowParts.Timeline;
 
 namespace StarryEyes.Models
 {
@@ -121,7 +119,7 @@ namespace StarryEyes.Models
             }
         }
 
-        public TwitterStatus Status{get; private set;}
+        public TwitterStatus Status { get; private set; }
 
         private StatusProxy(TwitterStatus status)
         {
@@ -251,6 +249,40 @@ namespace StarryEyes.Models
             lock (_retweetedsLock)
             {
                 return ids.All(_retweetedUsersDic.ContainsKey);
+            }
+        }
+
+        public IEnumerable<AuthenticateInfo> GetSuitableReplyAccount()
+        {
+            var uid = this.Status.InReplyToUserId.GetValueOrDefault();
+            if (this.Status.StatusType == StatusType.DirectMessage)
+                uid = this.Status.Recipient.Id;
+            var info = Setting.LookupAccountSetting(uid);
+            if (info != null)
+            {
+                return new[] { BacktrackFallback(info.AuthenticateInfo) };
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public AuthenticateInfo BacktrackFallback(AuthenticateInfo info)
+        {
+            if (!Setting.IsBacktrackFallback.Value)
+                return info;
+            var cinfo = info;
+            while (true)
+            {
+                var backtrack = Setting.Accounts.Where(i => i.FallbackNext == cinfo.Id)
+                    .FirstOrDefault();
+                if (backtrack == null)
+                    return cinfo;
+                else if (backtrack.UserId == info.Id)
+                    return info;
+                else
+                    cinfo = backtrack.AuthenticateInfo;
             }
         }
     }

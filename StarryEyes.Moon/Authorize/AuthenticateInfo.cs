@@ -84,6 +84,28 @@ namespace StarryEyes.Moon.Authorize
             set { _unreliableProfileImageUriString = value; }
         }
 
+        private string _overridedConsumerKey;
+        /// <summary>
+        /// Provide overridden consumer key info.
+        /// </summary>
+        [DataMember]
+        public string OverridedConsumerKey
+        {
+            get { return _overridedConsumerKey; }
+            set { _overridedConsumerKey = String.IsNullOrWhiteSpace(value) ? null : value; }
+        }
+
+        private string _overridedConsumerSecret;
+        /// <summary>
+        /// Provide overridden consumer secret info.
+        /// </summary>
+        [DataMember]
+        public string OverridedConsumerSecret
+        {
+            get { return _overridedConsumerSecret; }
+            set { _overridedConsumerSecret = String.IsNullOrWhiteSpace(value) ? null : value; }
+        }
+
         /// <summary>
         /// Provide exact profile image uri, but this property is unreliable.
         /// </summary>

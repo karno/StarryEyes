@@ -187,6 +187,7 @@
     <Compile Include="Models\Plugins\IPlugin.cs" />
     <Compile Include="Models\Tab\Timeline.cs" />
     <Compile Include="ViewModels\WindowParts\BackpanelViewModel.cs" />
+    <Compile Include="ViewModels\WindowParts\InputArea\InputAreaViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Timeline\StatusViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Timeline\TabViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Timeline\UserViewModel.cs" />

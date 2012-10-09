@@ -152,7 +152,7 @@ namespace StarryEyes.Moon.Api.Rest
                         {"place_id", place_id},
                         {"display_coordinates", display_coordinates},
                     }.Parametalize();
-                    return new MultipartableOAuthClient(ApiEndpoint.ConsumerKey, ApiEndpoint.ConsumerSecret, info.AccessToken)
+                    return new MultipartableOAuthClient(ApiEndpoint.DefaultConsumerKey, ApiEndpoint.DefaultConsumerSecret, info.AccessToken)
                         {
                             Url = ApiEndpoint.EndpointUpload.JoinUrl("/statuses/update_with_media.json"),
                         }

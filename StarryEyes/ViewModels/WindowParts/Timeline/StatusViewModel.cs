@@ -211,11 +211,13 @@ namespace StarryEyes.ViewModels.WindowParts.Timeline
 
         public void Reply()
         {
-            UIHub.SetText("@" + this.User.ScreenName, inReplyTo: this.Status);
+            UIHub.SetText(infos: StatusProxy.GetSuitableReplyAccount(),
+                body: "@" + this.User.ScreenName, inReplyTo: this.Status);
         }
 
         public void DirectMessage()
         {
+            UIHub.SetDirectMessage(StatusProxy.GetSuitableReplyAccount(), this.Status.User);
         }
 
         #endregion

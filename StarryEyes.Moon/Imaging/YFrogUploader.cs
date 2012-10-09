@@ -26,7 +26,7 @@ namespace StarryEyes.Moon.Imaging
             {
                 {"key", ApplicationKey},
             }.Parametalize();
-            return new MultipartableOAuthClient(ApiEndpoint.ConsumerKey, ApiEndpoint.ConsumerSecret, authInfo.AccessToken)
+            return new MultipartableOAuthClient(ApiEndpoint.DefaultConsumerKey, ApiEndpoint.DefaultConsumerSecret, authInfo.AccessToken)
             {
                 Url = ApiEndpointUriString,
             }

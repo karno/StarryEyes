@@ -51,8 +51,8 @@ namespace StarryEyes
             Application.Current.Exit += (_, __) => AppFinalize(true);
 
             // Set CK/CS for accessing twitter.
-            ApiEndpoint.ConsumerKey = ConsumerKey;
-            ApiEndpoint.ConsumerSecret = ConsumerSecret;
+            ApiEndpoint.DefaultConsumerKey = ConsumerKey;
+            ApiEndpoint.DefaultConsumerSecret = ConsumerSecret;
 
             // Initialize service points
             ServicePointManager.Expect100Continue = false; // disable expect 100 continue for User Streams connection.
