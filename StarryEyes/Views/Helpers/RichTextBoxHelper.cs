@@ -57,7 +57,7 @@ namespace StarryEyes.Views.Helpers
                 var paragraph = new Paragraph();
                 // generate contents
                 if (status.IsDataLacking)
-                    GenerateInlines(o, (status.RetweetedOriginal != null ? status.RetweetedOriginal.Text : status.Text))
+                    GenerateInlines(o, (status.Text))
                         .ForEach(i => paragraph.Inlines.Add(i));
                 else
                     GenerateInlines(o, status).ForEach(i => paragraph.Inlines.Add(i));

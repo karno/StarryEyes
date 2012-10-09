@@ -17,7 +17,17 @@ namespace StarryEyes.ViewModels.WindowParts.Timeline
     public class StatusViewModel : ViewModel
     {
         public StatusProxy StatusProxy { get; private set; }
-        public TwitterStatus Status { get { return StatusProxy.Status; } }
+        public TwitterStatus OriginalStatus { get { return StatusProxy.Status; } }
+        public TwitterStatus Status
+        {
+            get
+            {
+                if (StatusProxy.Status.RetweetedOriginal != null)
+                    return StatusProxy.Status.RetweetedOriginal;
+                else
+                    return StatusProxy.Status;
+            }
+        }
 
         private long[] _bindingAccounts;
         public IEnumerable<long> BindingAccounts
