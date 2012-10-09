@@ -137,21 +137,6 @@ namespace StarryEyes.ViewModels.WindowParts.Timeline
 
         #region Execution commands
 
-        #region ToggleFavoriteImmediateCommand
-        private Livet.Commands.ViewModelCommand _ToggleFavoriteImmediateCommand;
-
-        public Livet.Commands.ViewModelCommand ToggleFavoriteImmediateCommand
-        {
-            get
-            {
-                if (_ToggleFavoriteImmediateCommand == null)
-                {
-                    _ToggleFavoriteImmediateCommand = new Livet.Commands.ViewModelCommand(ToggleFavoriteImmediate);
-                }
-                return _ToggleFavoriteImmediateCommand;
-            }
-        }
-
         public void ToggleFavoriteImmediate()
         {
             bool addFav = false;
@@ -182,22 +167,6 @@ namespace StarryEyes.ViewModels.WindowParts.Timeline
                         return Observable.Empty<TwitterStatus>();
                     }))
                 .Subscribe();
-        }
-        #endregion
-
-        #region ToggleRetweetImmediateCommand
-        private Livet.Commands.ViewModelCommand _ToggleRetweetImmediateCommand;
-
-        public Livet.Commands.ViewModelCommand ToggleRetweetImmediateCommand
-        {
-            get
-            {
-                if (_ToggleRetweetImmediateCommand == null)
-                {
-                    _ToggleRetweetImmediateCommand = new Livet.Commands.ViewModelCommand(ToggleRetweetImmediate);
-                }
-                return _ToggleRetweetImmediateCommand;
-            }
         }
 
         public void ToggleRetweetImmediate()
@@ -232,13 +201,21 @@ namespace StarryEyes.ViewModels.WindowParts.Timeline
                     }))
                 .Subscribe();
         }
-        #endregion
 
         private IEnumerable<AuthenticateInfo> GetImmediateAccounts()
         {
             return Setting.Accounts
                 .Where(a => _bindingAccounts.Contains(a.UserId))
                 .Select(a => a.AuthenticateInfo);
+        }
+
+        public void Reply()
+        {
+            UIHub.SetText("@" + this.User.ScreenName, inReplyTo: this.Status);
+        }
+
+        public void DirectMessage()
+        {
         }
 
         #endregion
