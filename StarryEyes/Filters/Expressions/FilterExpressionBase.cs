@@ -15,7 +15,10 @@ namespace StarryEyes.Filters.Expressions
 
         public override string ToQuery()
         {
-            return Operator.ToQuery();
+            if (Operator == null)
+                return "()";
+            else
+                return Operator.ToQuery();
         }
 
         public Func<TwitterStatus, bool> GetEvaluator()

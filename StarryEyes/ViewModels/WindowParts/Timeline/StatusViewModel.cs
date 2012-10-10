@@ -16,16 +16,16 @@ namespace StarryEyes.ViewModels.WindowParts.Timeline
 {
     public class StatusViewModel : ViewModel
     {
-        public StatusProxy StatusProxy { get; private set; }
-        public TwitterStatus OriginalStatus { get { return StatusProxy.Status; } }
+        public StatusModel Model { get; private set; }
+        public TwitterStatus OriginalStatus { get { return Model.Status; } }
         public TwitterStatus Status
         {
             get
             {
-                if (StatusProxy.Status.RetweetedOriginal != null)
-                    return StatusProxy.Status.RetweetedOriginal;
+                if (Model.Status.RetweetedOriginal != null)
+                    return Model.Status.RetweetedOriginal;
                 else
-                    return StatusProxy.Status;
+                    return Model.Status;
             }
         }
 
@@ -42,7 +42,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timeline
 
         public StatusViewModel(TwitterStatus status, IEnumerable<long> initialBoundAccounts)
         {
-            this.StatusProxy = StatusProxy.Get(status);
+            this.Model = StatusModel.Get(status);
             this._bindingAccounts = initialBoundAccounts.ToArray();
         }
 
@@ -78,7 +78,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timeline
         {
             get
             {
-                return StatusProxy.IsFavorited(_bindingAccounts);
+                return Model.IsFavorited(_bindingAccounts);
             }
         }
 
@@ -86,7 +86,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timeline
         {
             get
             {
-                return StatusProxy.IsRetweeted(_bindingAccounts);
+                return Model.IsRetweeted(_bindingAccounts);
             }
         }
 
@@ -122,6 +122,14 @@ namespace StarryEyes.ViewModels.WindowParts.Timeline
             }
         }
 
+        public bool CanDelete
+        {
+            get
+            {
+                return this.IsDirectMessage || Setting.Accounts.Any(a => a.UserId == OriginalStatus.User.Id);
+            }
+        }
+
         public bool IsMyself
         {
             get { return Setting.Accounts.Any(a => a.UserId == Status.User.Id); }
@@ -137,29 +145,24 @@ namespace StarryEyes.ViewModels.WindowParts.Timeline
 
         #region Execution commands
 
-        public void ToggleFavoriteImmediate()
+        private void Favorite(IEnumerable<AuthenticateInfo> infos, bool add)
         {
-            bool addFav = false;
             Action<AuthenticateInfo> expected = null;
             Action<AuthenticateInfo> onFail = null;
-            if (IsFavorited)
+            if (add)
             {
-                // remove favorite
-                addFav = false;
-                expected = a => StatusProxy.RemoveFavoritedUser(a.Id);
-                onFail = a => StatusProxy.AddFavoritedUser(a.Id);
+                expected = a => Model.AddFavoritedUser(a.Id);
+                onFail = a => Model.RemoveFavoritedUser(a.Id);
             }
             else
             {
-                addFav = true;
-                expected = a => StatusProxy.AddFavoritedUser(a.Id);
-                onFail = a => StatusProxy.RemoveFavoritedUser(a.Id);
+                expected = a => Model.RemoveFavoritedUser(a.Id);
+                onFail = a => Model.AddFavoritedUser(a.Id);
             }
 
-            GetImmediateAccounts()
-                .ToObservable()
+            infos.ToObservable()
                 .Do(expected)
-                .SelectMany(a => new FavoriteOperation(a, this.Status, addFav)
+                .SelectMany(a => new FavoriteOperation(a, this.Status, add)
                     .Run()
                     .Catch((Exception ex) =>
                     {
@@ -169,30 +172,24 @@ namespace StarryEyes.ViewModels.WindowParts.Timeline
                 .Subscribe();
         }
 
-        public void ToggleRetweetImmediate()
+        private void Retweet(IEnumerable<AuthenticateInfo> infos, bool add)
         {
-            bool retweet = false;
             Action<AuthenticateInfo> expected = null;
             Action<AuthenticateInfo> onFail = null;
-            if (IsRetweeted)
+            if (add)
             {
-                // remove favorite
-                retweet = false;
-                expected = a => StatusProxy.RemoveRetweetedUser(a.Id);
-                onFail = a => StatusProxy.AddRetweetedUser(a.Id);
+                expected = a => Model.AddRetweetedUser(a.Id);
+                onFail = a => Model.RemoveRetweetedUser(a.Id);
             }
             else
             {
-                retweet = true;
-                expected = a => StatusProxy.AddRetweetedUser(a.Id);
-                onFail = a => StatusProxy.RemoveRetweetedUser(a.Id);
+                expected = a => Model.RemoveRetweetedUser(a.Id);
+                onFail = a => Model.AddRetweetedUser(a.Id);
             }
-
-            GetImmediateAccounts()
-                .ToObservable()
+            infos.ToObservable()
                 .Do(expected)
                 .Select(a =>
-                    new RetweetOperation(a, this.Status, retweet)
+                    new RetweetOperation(a, this.Status, add)
                     .Run()
                     .Catch((Exception ex) =>
                     {
@@ -200,6 +197,44 @@ namespace StarryEyes.ViewModels.WindowParts.Timeline
                         return Observable.Empty<TwitterStatus>();
                     }))
                 .Subscribe();
+        }
+
+        public void ToggleFavoriteImmediate()
+        {
+            Favorite(GetImmediateAccounts(), !IsFavorited);
+        }
+
+        public void ToggleRetweetImmediate()
+        {
+            Retweet(GetImmediateAccounts(), !IsRetweeted);
+        }
+
+        public void FavoriteAndRetweetImmediate()
+        {
+            var accounts = GetImmediateAccounts()
+                .ToObservable()
+                .Publish();
+            if (!IsFavorited)
+                accounts.Do(a => Model.AddFavoritedUser(a.Id))
+                    .SelectMany(a => new FavoriteOperation(a, this.Status, true)
+                    .Run()
+                    .Catch((Exception ex) =>
+                    {
+                        Model.RemoveFavoritedUser(a.Id);
+                        return Observable.Empty<TwitterStatus>();
+                    }))
+                    .Subscribe();
+            if (!IsRetweeted)
+                accounts.Do(a => Model.AddRetweetedUser(a.Id))
+                    .SelectMany(a => new RetweetOperation(a, this.Status, true)
+                    .Run()
+                    .Catch((Exception ex) =>
+                    {
+                        Model.RemoveRetweetedUser(a.Id);
+                        return Observable.Empty<TwitterStatus>();
+                    }))
+                    .Subscribe();
+            accounts.Connect();
         }
 
         private IEnumerable<AuthenticateInfo> GetImmediateAccounts()
@@ -209,15 +244,80 @@ namespace StarryEyes.ViewModels.WindowParts.Timeline
                 .Select(a => a.AuthenticateInfo);
         }
 
+        public void ToggleFavorite()
+        {
+            var favoriteds = Setting.Accounts
+                .Where(a => Model.IsFavorited(a.UserId))
+                .Select(a => a.AuthenticateInfo)
+                .ToArray();
+            MainWindowModel.ExecuteAccountSelectAction(AccountSelectionAction.Favorite,
+                favoriteds,
+                infos =>
+                {
+                    var adds = infos.Except(favoriteds);
+                    Favorite(adds, true);
+                    var rmvs = favoriteds.Except(infos);
+                    Favorite(rmvs, false);
+                });
+        }
+
+        public void ToggleRetweet()
+        {
+            var retweeteds = Setting.Accounts
+                .Where(a => Model.IsRetweeted(a.UserId))
+                .Select(a => a.AuthenticateInfo)
+                .ToArray();
+            MainWindowModel.ExecuteAccountSelectAction(AccountSelectionAction.Retweet,
+                retweeteds,
+                infos =>
+                {
+                    var adds = infos.Except(retweeteds);
+                    Retweet(adds, true);
+                    var rmvs = retweeteds.Except(infos);
+                    Favorite(rmvs, false);
+                });
+        }
+
         public void Reply()
         {
-            UIHub.SetText(infos: StatusProxy.GetSuitableReplyAccount(),
+            InputAreaModel.SetText(infos: Model.GetSuitableReplyAccount(),
                 body: "@" + this.User.ScreenName, inReplyTo: this.Status);
         }
 
         public void DirectMessage()
         {
-            UIHub.SetDirectMessage(StatusProxy.GetSuitableReplyAccount(), this.Status.User);
+            InputAreaModel.SetDirectMessage(Model.GetSuitableReplyAccount(), this.Status.User);
+        }
+
+        public void Delete()
+        {
+            AuthenticateInfo info = null;
+            if (IsDirectMessage)
+            {
+                var ids = new[] { this.Status.User.Id, this.Status.Recipient.Id };
+                info = ids
+                    .Select(Setting.LookupAccountSetting)
+                    .Where(_ => _ != null)
+                    .Select(_ => _.AuthenticateInfo)
+                    .FirstOrDefault();
+            }
+            else
+            {
+                var ai = Setting.LookupAccountSetting(this.OriginalStatus.User.Id);
+                if (ai != null)
+                {
+                    info = ai.AuthenticateInfo;
+                }
+            }
+            if (info != null)
+            {
+                new DeleteOperation(info, this.OriginalStatus)
+                .Run()
+                .Subscribe(_ => StatusStore.Remove(_.Id),
+                ex => InformationHub.PublishInformation(new Information(InformationKind.Error,
+                    "ERR_DELETE_MSG_" + this.Status.Id, "ステータスを削除できませんでした。", ex.Message,
+                    "再試行", Delete)));
+            }
         }
 
         #endregion

@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Xaml;
 using StarryEyes.Models.Hub;
+using StarryEyes.Filters.Expressions;
+using StarryEyes.Filters.Parsing;
 
 namespace StarryEyes.Settings
 {
@@ -90,6 +92,8 @@ namespace StarryEyes.Settings
 
         #region Timeline display and action
 
+        public static FilterSettingItem Muteds = new FilterSettingItem("Muteds");
+
         public static SettingItemStruct<bool> AllowFavoriteMyself = new SettingItemStruct<bool>("AllowFavoriteMyself", false);
 
         #endregion
@@ -102,6 +106,48 @@ namespace StarryEyes.Settings
         #endregion
 
         #region Setting infrastructure
+
+        public class FilterSettingItem
+        {
+            private string _name;
+            public string Name
+            {
+                get { return _name; }
+            }
+
+            private bool _autoSave;
+            public FilterSettingItem(string name, bool autoSave = true)
+            {
+                this._name = name;
+                this._autoSave = autoSave;
+            }
+
+            private FilterExpressionBase _expression;
+            public FilterExpressionBase Value
+            {
+                get
+                {
+                    try
+                    {
+                        return _expression ??
+                            (_expression = QueryCompiler.CompileFilters(settingValueHolder[Name] as string));
+                    }
+                    catch
+                    {
+                        return new FilterExpressionRoot();
+                    }
+                }
+                set
+                {
+                    _expression = value;
+                    settingValueHolder[Name] = value.ToQuery();
+                    if (_autoSave)
+                    {
+                        Save();
+                    }
+                }
+            }
+        }
 
         public class SettingItem<T> where T : class
         {

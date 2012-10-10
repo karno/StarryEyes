@@ -7,39 +7,6 @@ namespace StarryEyes.Models.Hub
 {
     public static class UIHub
     {
-        public static event Action<IEnumerable<AuthenticateInfo>, IEnumerable<string>> OnTextBindRequested;
-        public static void SetTextBind(IEnumerable<AuthenticateInfo> authInfos, IEnumerable<string> bindHashtags)
-        {
-            var handler = OnTextBindRequested;
-            if (handler != null)
-                handler(authInfos, bindHashtags);
-        }
-
-        public static event Action<IEnumerable<AuthenticateInfo>, string, CursorPosition, TwitterStatus> OnSetTextRequested;
-        public static void SetText(IEnumerable<AuthenticateInfo> infos = null, string body = null,
-            CursorPosition curpos = CursorPosition.End, TwitterStatus inReplyTo = null, bool focusToInputArea = true)
-        {
-            if (String.IsNullOrWhiteSpace(body))
-                body = String.Empty;
-
-            var handler = OnSetTextRequested;
-            if (handler != null)
-                handler(infos, body, curpos, inReplyTo);
-
-            if (focusToInputArea)
-                SetFocusTo(FocusRequest.Tweet);
-        }
-
-        public static event Action<IEnumerable<AuthenticateInfo>, TwitterUser> OnDirectMessageRequested;
-        public static void SetDirectMessage(IEnumerable<AuthenticateInfo> infos, TwitterUser recipient, bool focusToInputArea = true)
-        {
-            var handler = OnDirectMessageRequested;
-            if (handler != null)
-                handler(infos, recipient);
-            if (focusToInputArea)
-                SetFocusTo(FocusRequest.Tweet);
-        }
-
         public static event Action<FocusRequest> OnFocusRequested;
         public static void SetFocusTo(FocusRequest req)
         {
@@ -63,13 +30,9 @@ namespace StarryEyes.Models.Hub
             if (handler != null)
                 handler(req);
         }
+
     }
 
-    public enum CursorPosition
-    {
-        Begin,
-        End,
-    }
 
     public enum FocusRequest
     {
@@ -108,11 +71,4 @@ namespace StarryEyes.Models.Hub
         Mute,
     }
 
-    public enum AccountSelectionAction
-    {
-        Favorite,
-        Retweet,
-        FavoriteAndRetweet,
-        Stealing,
-    }
 }

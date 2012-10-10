@@ -13,28 +13,28 @@ using StarryEyes.ViewModels.WindowParts.Timeline;
 
 namespace StarryEyes.Models
 {
-    public class StatusProxy
+    public class StatusModel
     {
         private static object _staticCacheLock = new object();
         private static SortedDictionary<long, WeakReference> _staticCache = new SortedDictionary<long, WeakReference>();
         private static ConcurrentDictionary<long, object> _generateLock = new ConcurrentDictionary<long, object>();
 
         public static void UpdateStatusInfo(TwitterStatus status,
-            Action<StatusProxy> ifCacheIsAlive, Action<TwitterStatus> ifCacheIsDead)
+            Action<StatusModel> ifCacheIsAlive, Action<TwitterStatus> ifCacheIsDead)
         {
             var lockerobj = _generateLock.GetOrAdd(status.Id, new object());
             try
             {
                 lock (lockerobj)
                 {
-                    StatusProxy _proxy = null;
+                    StatusModel _proxy = null;
                     WeakReference wr = null;
                     lock (_staticCacheLock)
                     {
                         _staticCache.TryGetValue(status.Id, out wr);
                     }
                     if (wr != null)
-                        _proxy = (StatusProxy)wr.Target;
+                        _proxy = (StatusModel)wr.Target;
 
                     if (_proxy != null)
                         ifCacheIsAlive(_proxy);
@@ -48,40 +48,40 @@ namespace StarryEyes.Models
             }
         }
 
-        public static StatusProxy GetIfCacheIsAlive(long id)
+        public static StatusModel GetIfCacheIsAlive(long id)
         {
-            StatusProxy _proxy = null;
+            StatusModel _proxy = null;
             WeakReference wr = null;
             lock (_staticCacheLock)
             {
                 _staticCache.TryGetValue(id, out wr);
             }
             if (wr != null)
-                _proxy = (StatusProxy)wr.Target;
+                _proxy = (StatusModel)wr.Target;
             return _proxy;
         }
 
-        public static StatusProxy Get(TwitterStatus status)
+        public static StatusModel Get(TwitterStatus status)
         {
             var lockerobj = _generateLock.GetOrAdd(status.Id, new object());
             try
             {
                 lock (lockerobj)
                 {
-                    StatusProxy _proxy = null;
+                    StatusModel _proxy = null;
                     WeakReference wr = null;
                     lock (_staticCacheLock)
                     {
                         _staticCache.TryGetValue(status.Id, out wr);
                     }
                     if (wr != null)
-                        _proxy = (StatusProxy)wr.Target;
+                        _proxy = (StatusModel)wr.Target;
 
                     if (_proxy != null)
                         return _proxy;
 
                     // not alived/not cached yet
-                    _proxy = new StatusProxy(status);
+                    _proxy = new StatusModel(status);
                     wr = new WeakReference(_proxy);
                     lock (_staticCacheLock)
                     {
@@ -121,7 +121,7 @@ namespace StarryEyes.Models
 
         public TwitterStatus Status { get; private set; }
 
-        private StatusProxy(TwitterStatus status)
+        private StatusModel(TwitterStatus status)
         {
             this.Status = status;
             status.FavoritedUsers.Guard().ForEach(AddFavoritedUser);

@@ -15,18 +15,13 @@ namespace StarryEyes.Models.Operations
 
         public bool IsDirectMessage { get; set; }
 
-        private Action cancelHandler;
-        private Action completeHandler;
-
         public DeleteOperation() { }
-        public DeleteOperation(AuthenticateInfo info, TwitterStatus status, Action cancel, Action completed)
+        public DeleteOperation(AuthenticateInfo info, TwitterStatus status)
         {
             AuthInfo = info;
             TargetId = status.Id;
             DescriptionText = status.ToString();
             IsDirectMessage = status.StatusType == StatusType.DirectMessage;
-            cancelHandler = cancel;
-            completeHandler = completed;
         }
 
         protected override IObservable<TwitterStatus> RunCore()

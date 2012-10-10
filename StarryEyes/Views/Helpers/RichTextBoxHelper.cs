@@ -58,9 +58,9 @@ namespace StarryEyes.Views.Helpers
                 // generate contents
                 if (status.IsDataLacking)
                     GenerateInlines(o, (status.Text))
-                        .ForEach(i => paragraph.Inlines.Add(i));
+                        .ForEach(paragraph.Inlines.Add);
                 else
-                    GenerateInlines(o, status).ForEach(i => paragraph.Inlines.Add(i));
+                    GenerateInlines(o, status).ForEach(paragraph.Inlines.Add);
                 richText.Document.Blocks.Clear();
                 richText.Document.Blocks.Add(paragraph);
             }));

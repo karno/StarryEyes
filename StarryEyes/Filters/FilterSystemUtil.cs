@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using StarryEyes.Filters.Expressions.Operators;
 using StarryEyes.Moon.DataModel;
 
 namespace StarryEyes.Filters
@@ -31,6 +30,24 @@ namespace StarryEyes.Filters
         public static TwitterStatus GetOriginal(this TwitterStatus status)
         {
             return status.RetweetedOriginal ?? status;
+        }
+
+        public static FilterOperatorBase And(this FilterOperatorBase left,FilterOperatorBase right)
+        {
+            return new FilterOperatorAnd()
+            {
+                LeftValue = left,
+                RightValue = right
+            };
+        }
+
+        public static FilterOperatorBase Or(this FilterOperatorBase left, FilterOperatorBase right)
+        {
+            return new FilterOperatorOr()
+            {
+                LeftValue = left,
+                RightValue = right
+            };
         }
     }
 }
