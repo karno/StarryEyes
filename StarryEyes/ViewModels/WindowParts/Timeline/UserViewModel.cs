@@ -1,14 +1,16 @@
 ﻿using Livet;
+using StarryEyes.Models;
 using StarryEyes.Moon.DataModel;
 
 namespace StarryEyes.ViewModels.WindowParts.Timeline
 {
     public class UserViewModel : ViewModel
     {
-        public TwitterUser User { get; private set; }
+        public UserModel Model { get; private set; }
+        public TwitterUser User { get { return Model.User; } }
         public UserViewModel(TwitterUser user)
         {
-            this.User = user;
+            this.Model = UserModel.Get(user);
         }
 
         public string ScreenName

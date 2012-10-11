@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using StarryEyes.Filters.Expressions.Values;
 using StarryEyes.Moon.DataModel;
 
 namespace StarryEyes.Filters.Expressions.Operators

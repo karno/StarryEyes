@@ -13,6 +13,13 @@ using Livet.Messaging.Windows;
 
 using StarryEyes.Models;
 using StarryEyes.Models.Tab;
+using System.Reactive.Linq;
+using System.Reactive;
+using StarryEyes.Settings;
+using StarryEyes.Moon.Api.Rest;
+using System.Collections.ObjectModel;
+using System.Reactive.Disposables;
+using StarryEyes.Moon.DataModel;
 
 namespace StarryEyes.ViewModels.WindowParts.Timeline
 {
@@ -21,34 +28,37 @@ namespace StarryEyes.ViewModels.WindowParts.Timeline
     /// </summary>
     public class TabViewModel : ViewModel
     {
-        private TabInfo tabInfo;
-        public TabInfo TabInfo
+        private TabModel _model;
+        public TabModel Model
         {
-            get { return tabInfo; }
-            set { tabInfo = value; }
+            get { return _model; }
+            set { _model = value; }
         }
 
-        public TabViewModel(TabInfo tabInfo)
+        public TabViewModel(TabModel tabModel)
         {
-            this.tabInfo = tabInfo;
+            this._model = tabModel;
+            this._readonlyTimeline = ViewModelHelper.CreateReadOnlyDispatcherCollection<TwitterStatus, StatusViewModel>(
+                tabModel.Timeline.Statuses, _ => new StatusViewModel(_, _model.BindingAccountIds),
+                DispatcherHelper.UIDispatcher);
+            this.CompositeDisposable.Add(_readonlyTimeline);
+            this.CompositeDisposable.Add(Disposable.Create(() => tabModel.Deactivate()));
         }
 
         public string Name
         {
-            get { return tabInfo.Name; }
+            get { return _model.Name; }
             set
             {
-                tabInfo.Name = value;
+                _model.Name = value;
                 RaisePropertyChanged(() => Name);
             }
         }
 
-        private object _timelineLocker = new object();
-        private DispatcherCollection<StatusViewModel> _timeline
-            = new DispatcherCollection<StatusViewModel>(DispatcherHelper.UIDispatcher);
-        public DispatcherCollection<StatusViewModel> Timeline
+        private readonly ReadOnlyDispatcherCollection<StatusViewModel> _readonlyTimeline;
+        public ReadOnlyDispatcherCollection<StatusViewModel> Timeline
         {
-            get { return _timeline; }
+            get { return _readonlyTimeline; }
         }
 
         private bool _isLoading = false;
@@ -62,32 +72,38 @@ namespace StarryEyes.ViewModels.WindowParts.Timeline
             }
         }
 
-        #region ReadMoreCommand
-        private ViewModelCommand _ReadMoreCommand;
-
-        public ViewModelCommand ReadMoreCommand
+        public void ReadMore()
         {
-            get
-            {
-                if (_ReadMoreCommand == null)
-                {
-                    _ReadMoreCommand = new ViewModelCommand(ReadMore);
-                }
-                return _ReadMoreCommand;
-            }
+            ReadMore(_model.Timeline.Statuses.Select(_ => _.Id).Min());
         }
 
-        public void ReadMore()
+        public void ReadMore(long id)
         {
             this.IsSuppressTimelineAutoTrim = true;
             this.IsLoading = true;
-
+            Model.Timeline.ReadMore(id)
+                .Finally(() => this.IsLoading = false)
+                .OnErrorResumeNext(Observable.Empty<Unit>())
+                .Subscribe();
         }
-        #endregion
+
+        public void ReadMoreFromWeb(long? id)
+        {
+            this.IsSuppressTimelineAutoTrim = true;
+            this.IsLoading = true;
+            Model.ReceiveTimelines(id)
+                .Finally(() => this.IsLoading = false)
+                .OnErrorResumeNext(Observable.Empty<Unit>())
+                .Subscribe();
+        }
 
         #region Call by code-behind
 
-        public bool IsSuppressTimelineAutoTrim { get; set; }
+        public bool IsSuppressTimelineAutoTrim
+        {
+            get { return Model.Timeline.IsSuppressTimelineTrimming; }
+            set { Model.Timeline.IsSuppressTimelineTrimming = value; }
+        }
 
         #endregion
     }

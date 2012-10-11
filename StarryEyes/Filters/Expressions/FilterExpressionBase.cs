@@ -1,6 +1,6 @@
 ﻿using System;
-using StarryEyes.Moon.DataModel;
 using StarryEyes.Filters.Expressions.Operators;
+using StarryEyes.Moon.DataModel;
 
 namespace StarryEyes.Filters.Expressions
 {
@@ -15,10 +15,7 @@ namespace StarryEyes.Filters.Expressions
 
         public override string ToQuery()
         {
-            if (Operator == null)
-                return "()";
-            else
-                return Operator.ToQuery();
+            return Operator == null ? "()" : Operator.ToQuery();
         }
 
         public Func<TwitterStatus, bool> GetEvaluator()

@@ -7,6 +7,6 @@ namespace StarryEyes.Models.Tab
     /// </summary>
     public class ColumnInfo
     {
-        public List<TabInfo> Tabs { get; set; }
+        public List<TabModel> Tabs { get; set; }
     }
 }

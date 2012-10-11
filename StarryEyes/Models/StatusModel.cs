@@ -27,17 +27,17 @@ namespace StarryEyes.Models
             {
                 lock (lockerobj)
                 {
-                    StatusModel _proxy = null;
+                    StatusModel _model = null;
                     WeakReference wr = null;
                     lock (_staticCacheLock)
                     {
                         _staticCache.TryGetValue(status.Id, out wr);
                     }
                     if (wr != null)
-                        _proxy = (StatusModel)wr.Target;
+                        _model = (StatusModel)wr.Target;
 
-                    if (_proxy != null)
-                        ifCacheIsAlive(_proxy);
+                    if (_model != null)
+                        ifCacheIsAlive(_model);
                     else
                         ifCacheIsDead(status);
                 }
@@ -50,15 +50,15 @@ namespace StarryEyes.Models
 
         public static StatusModel GetIfCacheIsAlive(long id)
         {
-            StatusModel _proxy = null;
+            StatusModel _model = null;
             WeakReference wr = null;
             lock (_staticCacheLock)
             {
                 _staticCache.TryGetValue(id, out wr);
             }
             if (wr != null)
-                _proxy = (StatusModel)wr.Target;
-            return _proxy;
+                _model = (StatusModel)wr.Target;
+            return _model;
         }
 
         public static StatusModel Get(TwitterStatus status)
@@ -68,26 +68,26 @@ namespace StarryEyes.Models
             {
                 lock (lockerobj)
                 {
-                    StatusModel _proxy = null;
+                    StatusModel _model = null;
                     WeakReference wr = null;
                     lock (_staticCacheLock)
                     {
                         _staticCache.TryGetValue(status.Id, out wr);
                     }
                     if (wr != null)
-                        _proxy = (StatusModel)wr.Target;
+                        _model = (StatusModel)wr.Target;
 
-                    if (_proxy != null)
-                        return _proxy;
+                    if (_model != null)
+                        return _model;
 
-                    // not alived/not cached yet
-                    _proxy = new StatusModel(status);
-                    wr = new WeakReference(_proxy);
+                    // cache is dead/not cached yet
+                    _model = new StatusModel(status);
+                    wr = new WeakReference(_model);
                     lock (_staticCacheLock)
                     {
                         _staticCache[status.Id] = wr;
                     }
-                    return _proxy;
+                    return _model;
                 }
             }
             finally
@@ -96,7 +96,7 @@ namespace StarryEyes.Models
             }
         }
 
-        public static void SweepGarbages()
+        public static void CollectGarbages()
         {
             long[] values = null;
             lock (_staticCacheLock)
@@ -126,24 +126,15 @@ namespace StarryEyes.Models
             this.Status = status;
             status.FavoritedUsers.Guard().ForEach(AddFavoritedUser);
             status.RetweetedUsers.Guard().ForEach(AddRetweetedUser);
-
-            __fuwrap = new ReadOnlyDispatcherCollection<UserViewModel>(
-                new DispatcherCollection<UserViewModel>(
-                    _favoritedUsers, DispatcherHelper.UIDispatcher));
-            __ruwrap = new ReadOnlyDispatcherCollection<UserViewModel>(
-                new DispatcherCollection<UserViewModel>(
-                    _retweetedUsers, DispatcherHelper.UIDispatcher));
         }
 
         private object _favoritedsLock = new object();
-        private SortedDictionary<long, UserViewModel> _favoritedUsersDic = new SortedDictionary<long, UserViewModel>();
-        private ObservableSynchronizedCollection<UserViewModel> _favoritedUsers = new ObservableSynchronizedCollection<UserViewModel>();
-
-        private ReadOnlyDispatcherCollection<UserViewModel> __fuwrap;
-        public ReadOnlyDispatcherCollection<UserViewModel> FavoritedUsers
+        private readonly SortedDictionary<long, TwitterUser> _favoritedUsersDic = new SortedDictionary<long, TwitterUser>();
+        private readonly ObservableSynchronizedCollection<TwitterUser> _favoritedUsers = new ObservableSynchronizedCollection<TwitterUser>();
+        public ObservableSynchronizedCollection<TwitterUser> FavoritedUsers
         {
-            get { return __fuwrap; }
-        }
+            get { return _favoritedUsers; }
+        } 
 
         public void AddFavoritedUser(long userId)
         {
@@ -152,48 +143,46 @@ namespace StarryEyes.Models
 
         public void AddFavoritedUser(TwitterUser user)
         {
-            UserViewModel _add = null;
+            bool added = false;
             lock (_favoritedsLock)
             {
                 if (!_favoritedUsersDic.ContainsKey(user.Id))
                 {
-                    _add = new UserViewModel(user);
-                    _favoritedUsersDic.Add(user.Id, _add);
+                    _favoritedUsersDic.Add(user.Id, user);
                     this.Status.FavoritedUsers = this.Status.FavoritedUsers.Append(user.Id).ToArray();
+                    added = true;
                 }
             }
-            if (_add != null)
+            if (added)
             {
-                _favoritedUsers.Add(_add);
+                _favoritedUsers.Add(user);
                 StatusStore.Store(this.Status);
             }
         }
 
         public void RemoveFavoritedUser(long id)
         {
-            UserViewModel _remove = null;
+            TwitterUser remove = null;
             lock (_favoritedsLock)
             {
-                if (_favoritedUsersDic.TryGetValue(id, out _remove))
+                if (_favoritedUsersDic.TryGetValue(id, out remove))
                     this.Status.FavoritedUsers = this.Status.FavoritedUsers.Except(new[] { id }).ToArray();
 
             }
-            if (_remove != null)
+            if (remove != null)
             {
-                _favoritedUsers.Remove(_remove);
+                _favoritedUsers.Remove(remove);
                 StatusStore.Store(this.Status);
             }
         }
 
         private object _retweetedsLock = new object();
-        private SortedDictionary<long, UserViewModel> _retweetedUsersDic = new SortedDictionary<long, UserViewModel>();
-        private ObservableSynchronizedCollection<UserViewModel> _retweetedUsers = new ObservableSynchronizedCollection<UserViewModel>();
-
-        private ReadOnlyDispatcherCollection<UserViewModel> __ruwrap;
-        public ReadOnlyDispatcherCollection<UserViewModel> RetweetedUsers
+        private readonly SortedDictionary<long, TwitterUser> _retweetedUsersDic = new SortedDictionary<long,TwitterUser>();
+        private readonly ObservableSynchronizedCollection<TwitterUser> _retweetedUsers = new ObservableSynchronizedCollection<TwitterUser>();
+        public ObservableSynchronizedCollection<TwitterUser> RetweetedUsers
         {
-            get { return __ruwrap; }
-        }
+            get { return _retweetedUsers; }
+        } 
 
         public void AddRetweetedUser(long userId)
         {
@@ -202,19 +191,19 @@ namespace StarryEyes.Models
 
         public void AddRetweetedUser(TwitterUser user)
         {
-            UserViewModel _add = null;
+            bool added = false;
             lock (_retweetedsLock)
             {
                 if (!_retweetedUsersDic.ContainsKey(user.Id))
                 {
-                    _add = new UserViewModel(user);
-                    _retweetedUsersDic.Add(user.Id, _add);
+                    _retweetedUsersDic.Add(user.Id, user);
                     this.Status.RetweetedUsers = this.Status.RetweetedUsers.Append(user.Id).ToArray();
+                    added = true;
                 }
             }
-            if (_add != null)
+            if(added)
             {
-                _retweetedUsers.Add(_add);
+                _retweetedUsers.Add(user);
                 // update persistent info
                 StatusStore.Store(this.Status);
             }
@@ -222,15 +211,15 @@ namespace StarryEyes.Models
 
         public void RemoveRetweetedUser(long id)
         {
-            UserViewModel _remove = null;
+            TwitterUser remove = null;
             lock (_retweetedsLock)
             {
-                if (_retweetedUsersDic.TryGetValue(id, out _remove))
+                if (_retweetedUsersDic.TryGetValue(id, out remove))
                     this.Status.RetweetedUsers = this.Status.RetweetedUsers.Except(new[] { id }).ToArray();
             }
-            if (_remove != null)
+            if (remove != null)
             {
-                _retweetedUsers.Remove(_remove);
+                _retweetedUsers.Remove(remove);
                 // update persistent info
                 StatusStore.Store(this.Status);
             }

@@ -44,6 +44,10 @@ namespace StarryEyes.ViewModels.WindowParts.Timeline
         {
             this.Model = StatusModel.Get(status);
             this._bindingAccounts = initialBoundAccounts.ToArray();
+            this._retweetedUsers = ViewModelHelper.CreateReadOnlyDispatcherCollection<TwitterUser, UserViewModel>(
+                Model.RetweetedUsers, _ => new UserViewModel(_), DispatcherHelper.UIDispatcher);
+            this._favoritedUsers = ViewModelHelper.CreateReadOnlyDispatcherCollection<TwitterUser, UserViewModel>(
+                Model.FavoritedUsers, _ => new UserViewModel(_), DispatcherHelper.UIDispatcher);
         }
 
         private UserViewModel _user;
@@ -63,6 +67,18 @@ namespace StarryEyes.ViewModels.WindowParts.Timeline
         {
             get { return _recipient ?? (_recipient = new UserViewModel(Status.Recipient)); }
         }
+
+        private readonly ReadOnlyDispatcherCollection<UserViewModel> _retweetedUsers;
+        public ReadOnlyDispatcherCollection<UserViewModel> RetweetedUsers
+        {
+            get { return _retweetedUsers; }
+        }
+
+        private readonly ReadOnlyDispatcherCollection<UserViewModel> _favoritedUsers;
+        public ReadOnlyDispatcherCollection<UserViewModel> FavoritedUsers
+        {
+            get { return _favoritedUsers; }
+        } 
 
         public bool IsDirectMessage
         {
@@ -140,6 +156,17 @@ namespace StarryEyes.ViewModels.WindowParts.Timeline
             get
             {
                 return this._bindingAccounts.Length == 1 && this._bindingAccounts[0] == Status.User.Id;
+            }
+        }
+
+        private bool _isSelected;
+        public bool IsSelected
+        {
+            get { return _isSelected; }
+            set
+            {
+                _isSelected = value;
+                RaisePropertyChanged(() => IsSelected);
             }
         }
 

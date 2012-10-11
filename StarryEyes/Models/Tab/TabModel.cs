@@ -12,13 +12,16 @@ using StarryEyes.Vanille.DataStore;
 using System.Reactive;
 using System.Reactive.Disposables;
 using Livet;
+using System.Linq;
+using StarryEyes.Moon.Authorize;
+using StarryEyes.Filters.Sources;
 
 namespace StarryEyes.Models.Tab
 {
     /// <summary>
     /// Hold tab information for spawning tab.
     /// </summary>
-    public class TabInfo
+    public class TabModel
     {
         /// <summary>
         /// Name of this tab.
@@ -42,6 +45,12 @@ namespace StarryEyes.Models.Tab
         {
             get { return bindingHashtags; }
             set { bindingHashtags = value; }
+        }
+
+        private TimelineModel _timeline = null;
+        public TimelineModel Timeline
+        {
+            get { return _timeline; }
         }
 
         private Func<TwitterStatus, bool> evaluator = _ => false;
@@ -91,22 +100,11 @@ namespace StarryEyes.Models.Tab
             }
         }
 
-        /// <summary>
-        /// Notify collection was invalidated totally.
-        /// </summary>
-        public event Action OnCollectionInvalidateRequired;
-
-        public IObservable<StatusNotification> GetFilteredStream()
+        private void InvalidateCollection()
         {
-            return StatusStore.StatusPublisher
-                .Where(sn => !sn.IsAdded || evaluator(sn.Status));
-        }
-
-        public IObservable<TwitterStatus> GetChunk(long? maxId, int chunkCount)
-        {
-            return StatusStore.Find(evaluator,
-                maxId != null ? FindRange<long>.By(maxId.Value) : null,
-                chunkCount);
+            var oldt = this._timeline;
+            _timeline = new TimelineModel(evaluator, GetChunk);
+            oldt.Dispose();
         }
 
         private bool _isActivated = false;
@@ -132,12 +130,22 @@ namespace StarryEyes.Models.Tab
                             this.filterQuery.Activate();
                         if (this._timeline != null)
                             this._timeline.Dispose();
-                        this._timeline = new Timeline(evaluator, GetChunk);
-                        if (!_isActivated && this.filterQuery != null)
+                        this._timeline = new TimelineModel(evaluator, GetChunk);
+                        if (this.filterQuery != null)
+                        {
                             this.filterQuery.Activate();
+                            this.filterQuery.OnInvalidateRequired += InvalidateCollection;
+                        }
                     }
                     _isActivated = true;
                 });
+        }
+
+        private IObservable<TwitterStatus> GetChunk(long? maxId, int chunkCount)
+        {
+            return StatusStore.Find(evaluator,
+                maxId != null ? FindRange<long>.By(maxId.Value) : null,
+                chunkCount);
         }
 
         public void Deactivate()
@@ -145,7 +153,10 @@ namespace StarryEyes.Models.Tab
             if (_isActivated)
             {
                 if (this.filterQuery != null)
+                {
                     this.filterQuery.Deactivate();
+                    this.filterQuery.OnInvalidateRequired += InvalidateCollection;
+                }
                 if (this._timeline != null)
                 {
                     this._timeline.Dispose();
@@ -155,11 +166,13 @@ namespace StarryEyes.Models.Tab
             _isActivated = false;
         }
 
-        private Timeline _timeline = null;
-        public Timeline Timeline
+        public IObservable<Unit> ReceiveTimelines(long? maxId)
         {
-            get { return _timeline; }
+            return FilterQuery.Sources
+                .ToObservable()
+                .SelectMany(_ => _.Receive(maxId))
+                .Do(_ => StatusStore.Store(_))
+                .OfType<Unit>();
         }
-
     }
 }

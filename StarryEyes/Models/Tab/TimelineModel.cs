@@ -1,18 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using StarryEyes.Moon.DataModel;
-using Livet;
-using System.Reactive.Disposables;
 using System.Reactive;
-using StarryEyes.Models.Store;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using Livet;
 using StarryEyes.Albireo.Data;
+using StarryEyes.Models.Store;
+using StarryEyes.Moon.DataModel;
 
 namespace StarryEyes.Models.Tab
 {
-    public class Timeline : IDisposable
+    public class TimelineModel : IDisposable
     {
         public readonly int TimelineChunkCount = 250;
         public readonly int TimelineChunkCountBounce = 50;
@@ -23,7 +22,7 @@ namespace StarryEyes.Models.Tab
         private Func<long?, int, IObservable<TwitterStatus>> _fetcher;
         private CompositeDisposable _disposable;
 
-        public Timeline(Func<TwitterStatus, bool> evaluator,
+        public TimelineModel(Func<TwitterStatus, bool> evaluator,
             Func<long?, int, IObservable<TwitterStatus>> fetcher)
         {
             this._evaluator = evaluator;
@@ -77,7 +76,7 @@ namespace StarryEyes.Models.Tab
             }
         }
 
-        private ObservableSynchronizedCollectionEx<TwitterStatus> _statuses
+        private readonly ObservableSynchronizedCollectionEx<TwitterStatus> _statuses
             = new ObservableSynchronizedCollectionEx<TwitterStatus>();
         public ObservableSynchronizedCollectionEx<TwitterStatus> Statuses
         {
@@ -87,11 +86,8 @@ namespace StarryEyes.Models.Tab
         public IObservable<Unit> ReadMore(long? maxId)
         {
             return Observable.Defer(() => this._fetcher(maxId, TimelineChunkCount))
-                .Select(_ =>
-                {
-                    this.AddStatus(_);
-                    return new Unit();
-                });
+                .Do(this.AddStatus)
+                .OfType<Unit>();
         }
 
         private bool _isSuppressTimelineTrimming = false;

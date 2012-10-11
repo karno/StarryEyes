@@ -188,7 +188,8 @@
     <Compile Include="Models\Tab\ColumnInfo.cs" />
     <Compile Include="Models\Tab\TabManager.cs" />
     <Compile Include="Models\Plugins\IPlugin.cs" />
-    <Compile Include="Models\Tab\Timeline.cs" />
+    <Compile Include="Models\Tab\TimelineModel.cs" />
+    <Compile Include="Models\UserModel.cs" />
     <Compile Include="ViewModels\WindowParts\BackpanelViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\InputArea\InputAreaViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Timeline\StatusViewModel.cs" />
@@ -259,7 +260,7 @@
     <Compile Include="Models\Store\EventStore.cs" />
     <Compile Include="Models\Store\StatusStore.cs" />
     <Compile Include="Models\Store\UserStore.cs" />
-    <Compile Include="Models\Tab\TabInfo.cs" />
+    <Compile Include="Models\Tab\TabModel.cs" />
     <Compile Include="ViewModels\Dialogs\AuthorizationViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="Views\Dialogs\AuthorizationWindow.xaml.cs">

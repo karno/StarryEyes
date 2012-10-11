@@ -94,7 +94,6 @@ namespace StarryEyes.ViewModels
             }
         }
 
-
         #region OpenLinkCommand
         private ListenerCommand<string> _OpenLinkCommand;
 
@@ -127,7 +126,6 @@ namespace StarryEyes.ViewModels
             }
         }
         #endregion
-
 
         public int StatusCount
         {

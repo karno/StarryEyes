@@ -6,11 +6,11 @@ namespace StarryEyes.Models.Tab
 {
     public static class TabManager
     {
-        private static Stack<TabInfo> closedTabsStack = new Stack<TabInfo>();
+        private static Stack<TabModel> closedTabsStack = new Stack<TabModel>();
 
-        private static ObservableSynchronizedCollection<ObservableSynchronizedCollection<TabInfo>> tabs =
-            new ObservableSynchronizedCollection<ObservableSynchronizedCollection<TabInfo>>();
-        internal static ObservableSynchronizedCollection<ObservableSynchronizedCollection<TabInfo>> Tabs
+        private static ObservableSynchronizedCollection<ObservableSynchronizedCollection<TabModel>> tabs =
+            new ObservableSynchronizedCollection<ObservableSynchronizedCollection<TabModel>>();
+        internal static ObservableSynchronizedCollection<ObservableSynchronizedCollection<TabModel>> Tabs
         {
             get { return TabManager.tabs; }
         }
@@ -23,7 +23,7 @@ namespace StarryEyes.Models.Tab
         {
             foreach (var tab in tabs)
             {
-                yield return new ColumnInfo() { Tabs = new List<TabInfo>(tab) };
+                yield return new ColumnInfo() { Tabs = new List<TabModel>(tab) };
             }
         }
 
@@ -43,7 +43,7 @@ namespace StarryEyes.Models.Tab
         /// <param name="info">tab info</param>
         /// <param name="colIndex">column index</param>
         /// <param name="tabIndex">tab index</param>
-        public static void GetTabInfoIndexes(TabInfo info, out int colIndex, out int tabIndex)
+        public static void GetTabInfoIndexes(TabModel info, out int colIndex, out int tabIndex)
         {
             for (int ci = 0; ci < tabs.Count; ci++)
             {
@@ -66,7 +66,7 @@ namespace StarryEyes.Models.Tab
         /// <param name="info"></param>
         /// <param name="columnIndex"></param>
         /// <param name="tabIndex"></param>
-        public static void MoveTo(TabInfo info, int columnIndex, int tabIndex)
+        public static void MoveTo(TabModel info, int columnIndex, int tabIndex)
         {
             int fci, fti;
             GetTabInfoIndexes(info, out fci, out fti);
@@ -95,7 +95,7 @@ namespace StarryEyes.Models.Tab
         /// Create tab
         /// </summary>
         /// <param name="info">tab information</param>
-        public static void CreateTab(TabInfo info)
+        public static void CreateTab(TabModel info)
         {
             CreateTab(info, _currentFocusColumn);
         }
@@ -103,7 +103,7 @@ namespace StarryEyes.Models.Tab
         /// <summary>
         /// Create tab into specified column
         /// </summary>
-        public static void CreateTab(TabInfo info, int columnIndex)
+        public static void CreateTab(TabModel info, int columnIndex)
         {
             if (columnIndex > tabs.Count) // column index is only for existed or new column
                 throw new ArgumentOutOfRangeException("columnIndex", "currently " + tabs.Count + " columns are created. so, you can't set this parameter as " + columnIndex  + ".");
@@ -123,9 +123,9 @@ namespace StarryEyes.Models.Tab
         /// Create column
         /// </summary>
         /// <param name="info">initial created tab</param>
-        public static void CreateColumn(TabInfo info)
+        public static void CreateColumn(TabModel info)
         {
-            tabs.Add(new ObservableSynchronizedCollection<TabInfo>(new[] { info }));
+            tabs.Add(new ObservableSynchronizedCollection<TabModel>(new[] { info }));
             info.Activate();
         }
 
