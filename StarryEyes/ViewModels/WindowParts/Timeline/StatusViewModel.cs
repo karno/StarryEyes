@@ -16,6 +16,12 @@ namespace StarryEyes.ViewModels.WindowParts.Timeline
 {
     public class StatusViewModel : ViewModel
     {
+        private readonly TabViewModel parent;
+        public TabViewModel Parent
+        {
+            get { return parent; }
+        } 
+
         public StatusModel Model { get; private set; }
         public TwitterStatus OriginalStatus { get { return Model.Status; } }
         public TwitterStatus Status
@@ -40,8 +46,9 @@ namespace StarryEyes.ViewModels.WindowParts.Timeline
             }
         }
 
-        public StatusViewModel(TwitterStatus status, IEnumerable<long> initialBoundAccounts)
+        public StatusViewModel(TabViewModel parent, TwitterStatus status, IEnumerable<long> initialBoundAccounts)
         {
+            this.parent = parent;
             this.Model = StatusModel.Get(status);
             this._bindingAccounts = initialBoundAccounts.ToArray();
             this._retweetedUsers = ViewModelHelper.CreateReadOnlyDispatcherCollection<TwitterUser, UserViewModel>(
@@ -165,8 +172,12 @@ namespace StarryEyes.ViewModels.WindowParts.Timeline
             get { return _isSelected; }
             set
             {
-                _isSelected = value;
-                RaisePropertyChanged(() => IsSelected);
+                if (_isSelected != value)
+                {
+                    _isSelected = value;
+                    RaisePropertyChanged(() => IsSelected);
+                    Parent.OnSelectionUpdated();
+                }
             }
         }
 

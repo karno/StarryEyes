@@ -39,7 +39,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timeline
         {
             this._model = tabModel;
             this._readonlyTimeline = ViewModelHelper.CreateReadOnlyDispatcherCollection<TwitterStatus, StatusViewModel>(
-                tabModel.Timeline.Statuses, _ => new StatusViewModel(_, _model.BindingAccountIds),
+                tabModel.Timeline.Statuses, _ => new StatusViewModel(this, _, _model.BindingAccountIds),
                 DispatcherHelper.UIDispatcher);
             this.CompositeDisposable.Add(_readonlyTimeline);
             this.CompositeDisposable.Add(Disposable.Create(() => tabModel.Deactivate()));
@@ -103,6 +103,26 @@ namespace StarryEyes.ViewModels.WindowParts.Timeline
         {
             get { return Model.Timeline.IsSuppressTimelineTrimming; }
             set { Model.Timeline.IsSuppressTimelineTrimming = value; }
+        }
+
+        #endregion
+
+        #region Selection Control
+
+        public bool IsSelectedStatusExisted
+        {
+            get { return Timeline.Where(_ => _.IsSelected).FirstOrDefault() != null; }
+        }
+
+        public void OnSelectionUpdated()
+        {
+            RaisePropertyChanged(() => IsSelectedStatusExisted);
+            // TODO: Impl
+        }
+
+        public void DeselectAll()
+        {
+            Timeline.ForEach(s => s.IsSelected = false);
         }
 
         #endregion
