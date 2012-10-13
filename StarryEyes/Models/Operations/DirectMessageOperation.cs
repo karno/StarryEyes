@@ -1,15 +1,24 @@
 ﻿using System;
 using System.Net;
 using System.Reactive.Linq;
+using StarryEyes.Models.Store;
 using StarryEyes.Moon.Api.Rest;
 using StarryEyes.Moon.Authorize;
 using StarryEyes.Moon.DataModel;
-using StarryEyes.Models.Store;
 
 namespace StarryEyes.Models.Operations
 {
     public class DirectMessageOperation : OperationBase<TwitterStatus>
     {
+        public DirectMessageOperation() { }
+
+        public DirectMessageOperation(AuthenticateInfo info, TwitterUser target, string text)
+        {
+            this.AuthInfo = info;
+            this.TargetUserId = target.Id;
+            this.Text = text;
+        }
+
         public AuthenticateInfo AuthInfo { get; set; }
 
         public string Text { get; set; }

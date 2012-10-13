@@ -9,7 +9,7 @@ using StarryEyes.Models.Store;
 using StarryEyes.Moon.Authorize;
 using StarryEyes.Moon.DataModel;
 using StarryEyes.Settings;
-using StarryEyes.ViewModels.WindowParts.Timeline;
+using StarryEyes.ViewModels.WindowParts.Timelines;
 
 namespace StarryEyes.Models
 {
@@ -246,7 +246,7 @@ namespace StarryEyes.Models
             var uid = this.Status.InReplyToUserId.GetValueOrDefault();
             if (this.Status.StatusType == StatusType.DirectMessage)
                 uid = this.Status.Recipient.Id;
-            var info = Setting.LookupAccountSetting(uid);
+            var info = AccountsStore.GetAccountSetting(uid);
             if (info != null)
             {
                 return new[] { BacktrackFallback(info.AuthenticateInfo) };

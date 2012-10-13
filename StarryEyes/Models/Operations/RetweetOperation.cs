@@ -5,6 +5,7 @@ using StarryEyes.Moon.Authorize;
 using StarryEyes.Moon.DataModel;
 using StarryEyes.Settings;
 using System.Net;
+using StarryEyes.Models.Store;
 
 namespace StarryEyes.Models.Operations
 {
@@ -43,8 +44,8 @@ namespace StarryEyes.Models.Operations
                                 AccountSetting cas;
                                 AccountSetting fallbackAccount;
                                 if (s.Contains("Wow, that's a lot of Twittering! You have reached your limit of updates for the day.") &&
-                                    (cas = Setting.LookupAccountSetting(this.AuthInfo.Id)) != null &&
-                                    (fallbackAccount = Setting.LookupAccountSetting(cas.FallbackNext)) != null)
+                                    (cas = AccountsStore.GetAccountSetting(this.AuthInfo.Id)) != null &&
+                                    (fallbackAccount = AccountsStore.GetAccountSetting(cas.FallbackNext)) != null)
                                 {
                                     // Post limit, go fallback
                                     if (this._originalAuthInfo != null)

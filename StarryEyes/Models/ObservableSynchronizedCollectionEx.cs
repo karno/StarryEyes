@@ -256,6 +256,25 @@ namespace Livet
         }
 
         /// <summary>
+        /// コレクションの内容を指定したアイテムで置換します。
+        /// </summary>
+        /// <param name="items">新しく配置するアイテムのコレクション</param>
+        public void Replace(IEnumerable<T> items)
+        {
+            ReadAndWriteWithLockAction(() =>
+            {
+                _list.Clear();
+                items.ForEach(_list.Add);
+            },
+            () =>
+            {
+                OnPropertyChanged("Count");
+                OnPropertyChanged("Item[]");
+                OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+            });
+        }
+
+        /// <summary>
         /// 指定されたインデックスの要素を指定されたインデックスに移動します。
         /// </summary>
         /// <param name="oldIndex">移動したい要素のインデックス</param>

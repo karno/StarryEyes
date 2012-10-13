@@ -28,7 +28,7 @@ namespace StarryEyes.Models.Tab
         /// </summary>
         public string Name { get; set; }
 
-        private AVLTree<long> bindingAccountIds = new AVLTree<long>();
+        private readonly AVLTree<long> bindingAccountIds = new AVLTree<long>();
         /// <summary>
         /// Binding accounts ids
         /// </summary>
@@ -41,17 +41,13 @@ namespace StarryEyes.Models.Tab
         /// <summary>
         /// Binding hashtags
         /// </summary>
-        public List<string> BindingHashtags
+        public IEnumerable<string> BindingHashtags
         {
-            get { return bindingHashtags; }
-            set { bindingHashtags = value; }
+            get { return bindingHashtags ?? Enumerable.Empty<string>(); }
+            set { bindingHashtags = (value ?? Enumerable.Empty<string>()).ToList(); }
         }
 
-        private TimelineModel _timeline = null;
-        public TimelineModel Timeline
-        {
-            get { return _timeline; }
-        }
+        public TimelineModel Timeline { get; private set; }
 
         private Func<TwitterStatus, bool> evaluator = _ => false;
         private FilterQuery filterQuery = null;
@@ -64,7 +60,7 @@ namespace StarryEyes.Models.Tab
             get { return filterQuery; }
             set
             {
-                if (_isActivated)
+                if (IsActivated)
                     throw new InvalidOperationException("タブ情報がアクティブな状態のままフィルタクエリの交換を行うことはできません。");
                 if (this.filterQuery != value)
                 {
@@ -102,16 +98,12 @@ namespace StarryEyes.Models.Tab
 
         private void InvalidateCollection()
         {
-            var oldt = this._timeline;
-            _timeline = new TimelineModel(evaluator, GetChunk);
+            var oldt = this.Timeline;
+            Timeline = new TimelineModel(evaluator, GetChunk);
             oldt.Dispose();
         }
 
-        private bool _isActivated = false;
-        public bool IsActivated
-        {
-            get { return _isActivated; }
-        }
+        public bool IsActivated { get; private set; }
 
         /// <summary>
         /// タブ情報をアクティベートします。<para />
@@ -124,20 +116,20 @@ namespace StarryEyes.Models.Tab
             return Observable.Defer(() => Observable.Return(new Unit()))
                 .Do(_ =>
                 {
-                    if (!_isActivated)
+                    if (!IsActivated)
                     {
                         if (this.filterQuery != null)
                             this.filterQuery.Activate();
-                        if (this._timeline != null)
-                            this._timeline.Dispose();
-                        this._timeline = new TimelineModel(evaluator, GetChunk);
+                        if (this.Timeline != null)
+                            this.Timeline.Dispose();
+                        this.Timeline = new TimelineModel(evaluator, GetChunk);
                         if (this.filterQuery != null)
                         {
                             this.filterQuery.Activate();
                             this.filterQuery.OnInvalidateRequired += InvalidateCollection;
                         }
                     }
-                    _isActivated = true;
+                    IsActivated = true;
                 });
         }
 
@@ -150,20 +142,20 @@ namespace StarryEyes.Models.Tab
 
         public void Deactivate()
         {
-            if (_isActivated)
+            if (IsActivated)
             {
                 if (this.filterQuery != null)
                 {
                     this.filterQuery.Deactivate();
                     this.filterQuery.OnInvalidateRequired += InvalidateCollection;
                 }
-                if (this._timeline != null)
+                if (this.Timeline != null)
                 {
-                    this._timeline.Dispose();
-                    this._timeline = null;
+                    this.Timeline.Dispose();
+                    this.Timeline = null;
                 }
             }
-            _isActivated = false;
+            IsActivated = false;
         }
 
         public IObservable<Unit> ReceiveTimelines(long? maxId)

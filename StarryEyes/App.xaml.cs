@@ -13,6 +13,7 @@ using StarryEyes.Models.Plugins;
 using StarryEyes.Models.Store;
 using StarryEyes.Settings;
 using StarryEyes.Moon.Api;
+using StarryEyes.Models;
 
 namespace StarryEyes
 {
@@ -24,8 +25,8 @@ namespace StarryEyes
         private static Mutex appMutex;
         private void Application_Startup(object sender, StartupEventArgs e)
         {
+            // initialize dispatcher helper
             DispatcherHelper.UIDispatcher = Dispatcher;
-            // return;
 
             // Check run duplication
             string mutexStr = null;
@@ -67,6 +68,7 @@ namespace StarryEyes
             // Initialize core systems
             StatusStore.Initialize();
             UserStore.Initialize();
+            AccountsStore.Initialize();
             StatisticsHub.Initialize();
 
             // Activate plugins

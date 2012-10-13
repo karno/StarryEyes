@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Livet;
+using System.Linq;
 
 namespace StarryEyes.Models.Tab
 {
@@ -21,10 +22,7 @@ namespace StarryEyes.Models.Tab
         /// <returns></returns>
         internal static IEnumerable<ColumnInfo> GetColumnInfoData()
         {
-            foreach (var tab in tabs)
-            {
-                yield return new ColumnInfo() { Tabs = new List<TabModel>(tab) };
-            }
+            return  tabs.Select(t => new ColumnInfo(t));
         }
 
         private static int _currentFocusColumn = 0;

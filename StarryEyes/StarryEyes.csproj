@@ -66,7 +66,7 @@
       <HintPath>InfrastructureAssemblies\Livet.dll</HintPath>
     </Reference>
     <Reference Include="MahApps.Metro, Version=0.9.0.0, Culture=neutral, PublicKeyToken=f4fb5a3c4d1e5b4f, processorArchitecture=MSIL">
-      <HintPath>..\packages\MahApps.Metro.0.9.9.48-ALPHA\lib\net40\MahApps.Metro.dll</HintPath>
+      <HintPath>..\packages\MahApps.Metro.0.9.9.54-ALPHA\lib\net40\MahApps.Metro.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Expression.Interactions">
       <SpecificVersion>False</SpecificVersion>
@@ -112,7 +112,7 @@
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
     <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\MahApps.Metro.0.9.9.48-ALPHA\lib\net40\System.Windows.Interactivity.dll</HintPath>
+      <HintPath>..\packages\MahApps.Metro.0.9.9.54-ALPHA\lib\net40\System.Windows.Interactivity.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -175,7 +175,6 @@
     <Compile Include="Models\Connection\Extend\ListReceiver.cs" />
     <Compile Include="Models\Connection\Extend\SearchReceiver.cs" />
     <Compile Include="Models\Hub\StoreHub.cs" />
-    <Compile Include="Models\Hub\UIHub.cs" />
     <Compile Include="Models\InputAreaModel.cs" />
     <Compile Include="Models\MainWindowModel.cs" />
     <Compile Include="Models\ObservableSynchronizedCollectionEx.cs" />
@@ -184,20 +183,24 @@
     <Compile Include="Models\Plugins\ScriptingManager.cs" />
     <Compile Include="Models\StatusModel.cs" />
     <Compile Include="Models\StatusTextUtil.cs" />
+    <Compile Include="Models\Store\AccountsStore.cs" />
     <Compile Include="Models\Store\StoreOnMemoryObjectPersistence.cs" />
     <Compile Include="Models\Tab\ColumnInfo.cs" />
     <Compile Include="Models\Tab\TabManager.cs" />
     <Compile Include="Models\Plugins\IPlugin.cs" />
     <Compile Include="Models\Tab\TimelineModel.cs" />
     <Compile Include="Models\UserModel.cs" />
+    <Compile Include="ViewModels\WindowParts\AccountSelectorViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\BackpanelViewModel.cs" />
-    <Compile Include="ViewModels\WindowParts\InputArea\InputAreaViewModel.cs" />
-    <Compile Include="ViewModels\WindowParts\Timeline\StatusViewModel.cs" />
-    <Compile Include="ViewModels\WindowParts\Timeline\TabViewModel.cs" />
-    <Compile Include="ViewModels\WindowParts\Timeline\UserViewModel.cs" />
+    <Compile Include="ViewModels\WindowParts\InputAreas\InputAreaViewModel.cs" />
+    <Compile Include="ViewModels\WindowParts\Timelines\StatusViewModel.cs" />
+    <Compile Include="ViewModels\WindowParts\Timelines\TabViewModel.cs" />
+    <Compile Include="ViewModels\WindowParts\Timelines\UserViewModel.cs" />
     <Compile Include="Views\Helpers\RichTextBoxHelper.cs" />
     <Compile Include="Views\Messaging\Behaviors\TaskDialogInteractionMessageAction.cs" />
+    <Compile Include="Views\Messaging\Behaviors\TextBoxSetCaretMessageAction.cs" />
     <Compile Include="Views\Messaging\TaskDialogMessage.cs" />
+    <Compile Include="Views\Messaging\TextBoxSetCaretMessage.cs" />
     <Compile Include="Views\Utils\BooleanConverters.cs" />
     <Compile Include="Views\Utils\CollectionExistsToVisibleConverter.cs" />
     <Compile Include="Views\Utils\ConverterBase.cs" />
@@ -210,6 +213,18 @@
     </Compile>
     <Compile Include="Views\WindowParts\InputArea.xaml.cs">
       <DependentUpon>InputArea.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\WindowParts\OperationAccountSelectOverwrap.xaml.cs">
+      <DependentUpon>OperationAccountSelectOverwrap.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\WindowParts\SearchOverwrap.xaml.cs">
+      <DependentUpon>SearchOverwrap.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\WindowParts\SettingPanel.xaml.cs">
+      <DependentUpon>SettingPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\WindowParts\StatusArea.xaml.cs">
+      <DependentUpon>StatusArea.xaml</DependentUpon>
     </Compile>
     <Page Include="Simple Styles.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -256,7 +271,7 @@
     <Compile Include="Models\Operations\SearchQueryOperation.cs" />
     <Compile Include="Models\Operations\TweetOperation.cs" />
     <Compile Include="Models\Operations\UpdateProfileOperation.cs" />
-    <Compile Include="Models\Store\AccountDataStore.cs" />
+    <Compile Include="Models\Store\AccountRelationDataStore.cs" />
     <Compile Include="Models\Store\EventStore.cs" />
     <Compile Include="Models\Store\StatusStore.cs" />
     <Compile Include="Models\Store\UserStore.cs" />
@@ -279,6 +294,22 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\WindowParts\InputArea.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\WindowParts\OperationAccountSelectOverwrap.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\WindowParts\SearchOverwrap.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\WindowParts\SettingPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\WindowParts\StatusArea.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -320,7 +351,9 @@
     <Content Include="InfrastructureAssemblies\Microsoft.Expression.Interactions.dll" />
     <Content Include="InfrastructureAssemblies\System.Windows.Interactivity.dll" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Views\WindowParts\Timelines\" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ReactiveOAuth\ReactiveOAuth.csproj">
       <Project>{C20883A2-C104-45EF-BADE-A888328981EB}</Project>

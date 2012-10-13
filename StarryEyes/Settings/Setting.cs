@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xaml;
-using StarryEyes.Models.Hub;
 using StarryEyes.Filters.Expressions;
 using StarryEyes.Filters.Parsing;
+using StarryEyes.Models.Hub;
+using StarryEyes.Moon.Imaging;
 
 namespace StarryEyes.Settings
 {
@@ -79,15 +80,33 @@ namespace StarryEyes.Settings
         private static SettingItem<List<AccountSetting>> accounts =
             new SettingItem<List<AccountSetting>>("Accounts", new List<AccountSetting>());
 
-        public static IEnumerable<AccountSetting> Accounts
+        internal static IEnumerable<AccountSetting> Accounts
         {
             get { return accounts.Value; }
             set { accounts.Value = value.ToList(); }
         }
 
-        public static AccountSetting LookupAccountSetting(long id)
+        private static SettingItemStruct<int> imageUploaderService =
+            new SettingItemStruct<int>("ImageUploaderService", 0);
+
+        public static ImageUploaderService ImageUploaderService
         {
-            return accounts.Value.Where(a => a.UserId == id).FirstOrDefault();
+            get { return (ImageUploaderService)imageUploaderService.Value; }
+            set { imageUploaderService.Value = (int)value; }
+        }
+
+        public static ImageUploaderBase GetImageUploader()
+        {
+            switch (ImageUploaderService)
+            {
+                case Settings.ImageUploaderService.TwitPic:
+                    return new TwitPicUploader();
+                case Settings.ImageUploaderService.YFrog:
+                    return new YFrogUploader();
+                case Settings.ImageUploaderService.TwitterOfficial:
+                default:
+                    return new TwitterPhotoUploader();
+            }
         }
 
         #region Timeline display and action
@@ -95,6 +114,12 @@ namespace StarryEyes.Settings
         public static FilterSettingItem Muteds = new FilterSettingItem("Muteds");
 
         public static SettingItemStruct<bool> AllowFavoriteMyself = new SettingItemStruct<bool>("AllowFavoriteMyself", false);
+
+        #endregion
+
+        #region Input control
+
+        public static SettingItemStruct<bool> IsUrlAutoEscapeEnabled = new SettingItemStruct<bool>("IsUrlAutoEscapeEnabled", false);
 
         #endregion
 
@@ -109,6 +134,8 @@ namespace StarryEyes.Settings
 
         public class FilterSettingItem
         {
+            public event Action<FilterExpressionBase> OnValueChanged;
+
             private string _name;
             public string Name
             {
@@ -145,12 +172,17 @@ namespace StarryEyes.Settings
                     {
                         Save();
                     }
+                    var handler = OnValueChanged;
+                    if (handler != null)
+                        OnValueChanged(value);
                 }
             }
         }
 
         public class SettingItem<T> where T : class
         {
+            public event Action<T> OnValueChanged;
+
             private string _name;
             public string Name
             {
@@ -189,12 +221,17 @@ namespace StarryEyes.Settings
                     {
                         Save();
                     }
+                    var handler = OnValueChanged;
+                    if (handler != null)
+                        OnValueChanged(value);
                 }
             }
         }
 
         public class SettingItemStruct<T> where T : struct
         {
+            public event Action<T> OnValueChanged;
+
             private string _name;
             public string Name
             {
@@ -233,10 +270,20 @@ namespace StarryEyes.Settings
                     {
                         Save();
                     }
+                    var handler = OnValueChanged;
+                    if (handler != null)
+                        OnValueChanged(value);
                 }
             }
         }
 
         #endregion
+    }
+
+    public enum ImageUploaderService
+    {
+        TwitterOfficial,
+        TwitPic,
+        YFrog,
     }
 }

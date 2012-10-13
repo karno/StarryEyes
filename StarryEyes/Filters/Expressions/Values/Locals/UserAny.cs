@@ -24,7 +24,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
             {
                 var followers = new AVLTree<long>();
                 Setting.Accounts
-                    .SelectMany(a => AccountDataStore.GetAccountData(a.UserId).Followings)
+                    .SelectMany(a => AccountRelationDataStore.GetAccountData(a.UserId).Followings)
                     .ForEach(followers.Add);
                 return followers;
             }
@@ -36,7 +36,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
             {
                 var followings = new AVLTree<long>();
                 Setting.Accounts
-                    .SelectMany(a => AccountDataStore.GetAccountData(a.UserId).Followings)
+                    .SelectMany(a => AccountRelationDataStore.GetAccountData(a.UserId).Followings)
                     .ForEach(followings.Add);
                 return followings;
             }

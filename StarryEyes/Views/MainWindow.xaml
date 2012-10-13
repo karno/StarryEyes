@@ -134,5 +134,11 @@
                 Command="{Binding PostCommand,
                                   Mode=OneWay}"
                 Content="POST" />
+        <Button Width="80"
+                Height="16"
+                Margin="8,0,0,0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Bottom"
+                Content="backpanel" />
     </Grid>
 </Controls:MetroWindow>

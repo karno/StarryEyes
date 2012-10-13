@@ -31,7 +31,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 
         private void GetAccountData()
         {
-            _adata = AccountDataStore.GetAccountData(_userId);
+            _adata = AccountRelationDataStore.GetAccountData(_userId);
         }
 
         public override ICollection<long> Users

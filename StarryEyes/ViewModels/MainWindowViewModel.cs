@@ -16,7 +16,7 @@ using StarryEyes.Moon.DataModel;
 using System.Collections.Generic;
 using StarryEyes.Models.Operations;
 using StarryEyes.Views.Messaging;
-using StarryEyes.ViewModels.WindowParts.Timeline;
+using StarryEyes.ViewModels.WindowParts.Timelines;
 using StarryEyes.Views.Helpers;
 using StarryEyes.Helpers;
 
@@ -79,7 +79,7 @@ namespace StarryEyes.ViewModels
             StatusStore.StatusPublisher
                 .Where(_ => _.IsAdded)
                 .Select(_ => _.Status)
-                .Select(_ => new StatusViewModel(_, Setting.Accounts.Select(a => a.UserId)))
+                .Select(_ => new StatusViewModel(null,_, Setting.Accounts.Select(a => a.UserId)))
                 .Subscribe(_ => RecentReceived = _.Status);
         }
 

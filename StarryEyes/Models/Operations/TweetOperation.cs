@@ -1,48 +1,63 @@
 using System;
-using System.Reactive;
+using System.IO;
 using System.Reactive.Linq;
+using System.Windows.Media.Imaging;
+using StarryEyes.Models.Store;
 using StarryEyes.Moon.Api.Rest;
 using StarryEyes.Moon.Authorize;
 using StarryEyes.Moon.DataModel;
-using System.Windows.Media.Imaging;
-using System.IO;
 using StarryEyes.Settings;
+
 namespace StarryEyes.Models.Operations
 {
     public class TweetOperation : OperationBase<TwitterStatus>
     {
+        public TweetOperation() { }
+
+        public TweetOperation(AuthenticateInfo info,
+            string status,
+            TwitterStatus inReplyTo,
+            GeoLocationInfo geoLocation,
+            BitmapSource image)
+        {
+            this.AuthInfo = info;
+            this.Status = status;
+            this.InReplyTo = inReplyTo != null ? inReplyTo.Id : 0;
+            this.GeoLocation = GeoLocation;
+            this.AttachedImage = image;
+        }
+
         public AuthenticateInfo AuthInfo { get; set; }
 
         public string Status { get; set; }
 
         public long InReplyTo { get; set; }
 
-        public bool IsGeoLocationEnabled { get; set; }
-
-        public double GeoLat { get; set; }
-
-        public double GeoLong { get; set; }
-
-        public bool IsImageAttachEnabled { get; set; }
-
-        public byte[] AttachedImageBin { get; set; }
+        public GeoLocationInfo GeoLocation { get; set; }
 
         private AuthenticateInfo _originalAuthInfo { get; set; }
 
+        private byte[] attachedImageBin;
+        private BitmapSource _originalBitmapSource;
         public BitmapSource AttachedImage
         {
+            get
+            {
+                return _originalBitmapSource;
+            }
             set
             {
+                _originalBitmapSource = value;
                 if (value == null) 
                 {
-                    AttachedImageBin = new byte[0];
+                    attachedImageBin = new byte[0];
                     return;
                 }
                 var ms = new MemoryStream();
                 var encoder = new PngBitmapEncoder();
                 encoder.Frames.Add(BitmapFrame.Create(value));
                 encoder.Save(ms);
-                AttachedImageBin = ms.ToArray();
+                attachedImageBin = ms.ToArray();
             }
         }
 
@@ -58,8 +73,8 @@ namespace StarryEyes.Models.Operations
                             AccountSetting cas;
                             AccountSetting fallbackAccount;
                             if (s.Contains("User is over daily status update limit.") &&
-                                (cas = Setting.LookupAccountSetting(this.AuthInfo.Id)) != null &&
-                                (fallbackAccount = Setting.LookupAccountSetting(cas.FallbackNext)) != null)
+                                (cas = AccountsStore.GetAccountSetting(this.AuthInfo.Id)) != null &&
+                                (fallbackAccount = AccountsStore.GetAccountSetting(cas.FallbackNext)) != null)
                             {
                                 // Post limit, go fallback
                                 if (this._originalAuthInfo != null)
@@ -80,21 +95,27 @@ namespace StarryEyes.Models.Operations
             long? reply = InReplyTo == 0 ? null : (long?)InReplyTo;
             double? geo_lat = null;
             double? geo_long = null;
-            if (IsGeoLocationEnabled)
+            if (GeoLocation != null)
             {
-                geo_lat = this.GeoLat;
-                geo_long = this.GeoLong;
+                geo_lat = GeoLocation.Latitude;
+                geo_long = GeoLocation.Longitude;
             }
-            if (IsImageAttachEnabled)
+            if (AttachedImage != null)
             {
-                return AuthInfo.UpdateWithMedia(this.Status,
-                    this.AttachedImageBin, "twitter_picture", false,
-                    reply, geo_lat, geo_long);
+                return Setting.GetImageUploader()
+                    .Upload(this.AuthInfo, this.Status,
+                    this.attachedImageBin, reply, geo_lat, geo_long);
             }
             else
             {
                 return AuthInfo.Update(this.Status, reply, geo_lat, geo_long);
             }
         }
+    }
+
+    public class GeoLocationInfo
+    {
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
     }
 }
