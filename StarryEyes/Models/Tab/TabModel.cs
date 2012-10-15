@@ -87,7 +87,7 @@ namespace StarryEyes.Models.Tab
                 }
                 catch (FilterQueryException fex)
                 {
-                    InformationHub.PublishInformation(new Information(InformationKind.Warning,
+                    AppInformationHub.PublishInformation(new AppInformation(AppInformationKind.Warning,
                         "TABINFO_QUERY_CORRUPTED_" + Name,
                         "クエリが壊れています。",
                         "タブ " + Name + " のクエリは破損しているため、フィルタが初期化されました。" + Environment.NewLine +

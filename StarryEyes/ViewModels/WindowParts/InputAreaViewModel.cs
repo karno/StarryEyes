@@ -14,7 +14,7 @@ using StarryEyes.Views.Messaging;
 using System.Windows.Media.Imaging;
 using StarryEyes.Models.Operations;
 
-namespace StarryEyes.ViewModels.WindowParts.InputAreas
+namespace StarryEyes.ViewModels.WindowParts
 {
     public class InputAreaViewModel : ViewModel
     {

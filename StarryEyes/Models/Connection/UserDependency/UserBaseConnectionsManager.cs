@@ -121,8 +121,8 @@ namespace StarryEyes.Models.Connection.UserDependency
         {
             if (danglingKeywords.Count > 0)
             {
-                InformationHub.PublishInformation(
-                    new Information(InformationKind.Warning,
+                AppInformationHub.PublishInformation(
+                    new AppInformation(AppInformationKind.Warning,
                         "ConnectionManager_UserStreamsTrackDanglings",
                         "受信されていないトラッキング キーワードがあります。",
                         "トラッキング キーワードに対し、ユーザーストリーム接続数が不足しています。"));

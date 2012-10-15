@@ -6,9 +6,9 @@ namespace StarryEyes.Models.Hub
     /// <summary>
     /// Publish/Manage application internal information.
     /// </summary>
-    public static class InformationHub
+    public static class AppInformationHub
     {
-        static InformationHub()
+        static AppInformationHub()
         {
             App.OnUserInterfaceReady += DispatchQueue;
         }
@@ -24,11 +24,11 @@ namespace StarryEyes.Models.Hub
                 PublishInformation(q.Dequeue());
         }
 
-        private static Queue<Information> localQueue = new Queue<Information>();
+        private static Queue<AppInformation> localQueue = new Queue<AppInformation>();
 
-        internal static event Action<Information> OnInformationPublished;
+        internal static event Action<AppInformation> OnInformationPublished;
 
-        public static void PublishInformation(Information information)
+        public static void PublishInformation(AppInformation information)
         {
             if (!isUiReady)
                 localQueue.Enqueue(information);
@@ -41,7 +41,7 @@ namespace StarryEyes.Models.Hub
         }
     }
 
-    public sealed class Information
+    public sealed class AppInformation
     {
         /// <summary>
         /// Initialize information
@@ -50,9 +50,9 @@ namespace StarryEyes.Models.Hub
         /// <param name="id">identification string, this used for remove duplication.</param>
         /// <param name="header">one-liner description</param>
         /// <param name="detail">detail description</param>
-        public Information(InformationKind kind, string id, string header, string detail)
+        public AppInformation(AppInformationKind kind, string id, string header, string detail)
         {
-            if (kind == InformationKind.Error)
+            if (kind == AppInformationKind.Error)
                 throw new ArgumentException("you should use another overload.");
             this.Id = id;
             this.Kind = kind;
@@ -69,10 +69,10 @@ namespace StarryEyes.Models.Hub
         /// <param name="detail">detail description</param>
         /// <param name="actionDesc">description of the action</param>
         /// <param name="act">fix action</param>
-        public Information(InformationKind kind, string id, string header, string detail,
+        public AppInformation(AppInformationKind kind, string id, string header, string detail,
             string actionDesc, Action act)
         {
-            if (kind != InformationKind.Error)
+            if (kind != AppInformationKind.Error)
                 throw new ArgumentException("you should use another overload.");
             this.Id = id;
             this.Kind = kind;
@@ -85,7 +85,7 @@ namespace StarryEyes.Models.Hub
         /// <summary>
         /// Kind of information
         /// </summary>
-        public InformationKind Kind { get; set; }
+        public AppInformationKind Kind { get; set; }
 
         /// <summary>
         /// Id of this information.<para />
@@ -108,7 +108,7 @@ namespace StarryEyes.Models.Hub
         /// </summary>
         public bool IsUserActionRequired
         {
-            get { return Kind == InformationKind.Error; }
+            get { return Kind == AppInformationKind.Error; }
         }
 
         /// <summary>
@@ -122,7 +122,7 @@ namespace StarryEyes.Models.Hub
         public string ActionDescription { get; set; }
     }
 
-    public enum InformationKind
+    public enum AppInformationKind
     {
         /// <summary>
         /// User action is not required.

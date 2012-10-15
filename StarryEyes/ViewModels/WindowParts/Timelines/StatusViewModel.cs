@@ -359,7 +359,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                 new DeleteOperation(info, this.OriginalStatus)
                 .Run()
                 .Subscribe(_ => StatusStore.Remove(_.Id),
-                ex => InformationHub.PublishInformation(new Information(InformationKind.Error,
+                ex => AppInformationHub.PublishInformation(new AppInformation(AppInformationKind.Error,
                     "ERR_DELETE_MSG_" + this.Status.Id, "ステータスを削除できませんでした。", ex.Message,
                     "再試行", Delete)));
             }

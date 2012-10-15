@@ -44,7 +44,7 @@ namespace StarryEyes.Models.Store
                 }
                 catch (Exception ex)
                 {
-                    InformationHub.PublishInformation(new Information(InformationKind.Warning,
+                    AppInformationHub.PublishInformation(new AppInformation(AppInformationKind.Warning,
                         "STATUSSTORE_INIT_FAILED",
                         "ステータス データベースが破損しています。",
                         "読み込み時にエラーが発生したため、データベースを初期化しました。" + Environment.NewLine +

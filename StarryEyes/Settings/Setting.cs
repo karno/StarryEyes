@@ -36,7 +36,7 @@ namespace StarryEyes.Settings
                             cpfn));
                         File.Delete(App.ConfigurationFilePath);
                         settingValueHolder = new SortedDictionary<string, object>();
-                        InformationHub.PublishInformation(new Information(InformationKind.Warning,
+                        AppInformationHub.PublishInformation(new AppInformation(AppInformationKind.Warning,
                             "SETTING_LOAD_ERROR",
                             "設定が読み込めません。バックアップをデスクトップに作成し、設定を初期化しました。",
                             "バックアップ設定ファイルは " + cpfn + " として作成されました。" + Environment.NewLine +

@@ -23,7 +23,7 @@ namespace StarryEyes.Models.Connection.Polling
             if (ai != null)
                 StartReceive(ai.AuthenticateInfo, info);
             else
-                InformationHub.PublishInformation(new Information(InformationKind.Warning,
+                AppInformationHub.PublishInformation(new AppInformation(AppInformationKind.Warning,
                     "LIST_RECEIVER_NOT_FOUND_" + info.ToString(),
                     "リストを受信するアカウントが検索できません。(対象リスト: " + info.ToString() + ")",
                     "リストをどのアカウントで受信するのか分かりませんでした。" + Environment.NewLine +

@@ -71,7 +71,7 @@ namespace StarryEyes.Models.Connection.Extend
             var authInfo = Setting.Accounts.Shuffle().Select(s => s.AuthenticateInfo).FirstOrDefault();
             if (authInfo == null)
             {
-                InformationHub.PublishInformation(new Information(InformationKind.Warning,
+                AppInformationHub.PublishInformation(new AppInformation(AppInformationKind.Warning,
                     "SEARCH_RECEIVE_ACCOUNT_NOT_FOUND",
                     "アカウントが存在しないため、検索タイムラインを受信できません。",
                     "アカウントを一つ以上登録してください。"));
