@@ -89,6 +89,7 @@ namespace StarryEyes.Moon.Api.Streaming
                             if (track != null && track.track != 0)
                                 return new TwitterStreamingElement()
                                 {
+                                    EventType = DataModel.EventType.LimitationInfo,
                                     TrackLimit = track.track,
                                 };
                             return s.DeserializeJson<StreamingAdditionalJson>().CheckSpawn();

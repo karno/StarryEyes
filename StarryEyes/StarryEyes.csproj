@@ -171,6 +171,8 @@
     <Compile Include="Filters\Sources\FilterTrack.cs" />
     <Compile Include="Helpers\RegexHelper.cs" />
     <Compile Include="Models\BackpanelModel.cs" />
+    <Compile Include="Models\Backpanel\GeneralEvent.cs" />
+    <Compile Include="Models\Backpanel\TwitterEvent.cs" />
     <Compile Include="Models\Connection\ConnectionUtil.cs" />
     <Compile Include="Models\Connection\Extend\ListReceiver.cs" />
     <Compile Include="Models\Connection\Extend\SearchReceiver.cs" />
@@ -181,7 +183,6 @@
     <Compile Include="Models\Plugins\ImageUploaderManager.cs" />
     <Compile Include="Models\Plugins\PluginManager.cs" />
     <Compile Include="Models\Plugins\ScriptingManager.cs" />
-    <Compile Include="Models\StatusAreaModel.cs" />
     <Compile Include="Models\StatusModel.cs" />
     <Compile Include="Models\StatusTextUtil.cs" />
     <Compile Include="Models\Store\AccountsStore.cs" />
