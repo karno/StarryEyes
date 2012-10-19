@@ -81,6 +81,10 @@ namespace StarryEyes.ViewModels
                 .Select(_ => _.Status)
                 .Select(_ => new StatusViewModel(null,_, Setting.Accounts.Select(a => a.UserId)))
                 .Subscribe(_ => RecentReceived = _.Status);
+            var kovm = new KeyOverrideViewModel();
+            this.Messenger.RaiseAsync(new TransitionMessage(
+                typeof(KeyOverrideWindow),
+                kovm, TransitionMode.Modal, null));
         }
 
         private TwitterStatus _recentReceived = null;

@@ -51,10 +51,6 @@ namespace StarryEyes
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
             Application.Current.Exit += (_, __) => AppFinalize(true);
 
-            // Set CK/CS for accessing twitter.
-            ApiEndpoint.DefaultConsumerKey = ConsumerKey;
-            ApiEndpoint.DefaultConsumerSecret = ConsumerSecret;
-
             // Initialize service points
             ServicePointManager.Expect100Continue = false; // disable expect 100 continue for User Streams connection.
             ServicePointManager.DefaultConnectionLimit = Int32.MaxValue; // Limit Break!
@@ -64,6 +60,10 @@ namespace StarryEyes
 
             // Load settings
             Setting.LoadSettings();
+
+            // Set CK/CS for accessing twitter.
+            ApiEndpoint.DefaultConsumerKey = Setting.GlobalConsumerKey.Value ?? ConsumerKey;
+            ApiEndpoint.DefaultConsumerSecret = Setting.GlobalConsumerSecret.Value ?? ConsumerSecret;
 
             // Initialize core systems
             StatusStore.Initialize();

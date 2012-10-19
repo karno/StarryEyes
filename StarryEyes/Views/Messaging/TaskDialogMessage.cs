@@ -1,25 +1,30 @@
-﻿using System;
-using System.Windows;
+﻿using System.Windows;
 using Livet.Messaging;
 using TaskDialogInterop;
 
 namespace StarryEyes.Views.Messaging
 {
-    public class TaskDialogMessage : InteractionMessage
+    public class TaskDialogMessage : ResponsiveInteractionMessage<TaskDialogResult>
     {
         public TaskDialogOptions Options { get; private set; }
 
-        public Action<TaskDialogResult> ResultHandler { get; private set; }
-
-        public TaskDialogMessage(TaskDialogOptions options, Action<TaskDialogResult> resultHandler = null)
+        public TaskDialogMessage(TaskDialogOptions options)
+            : base()
         {
             this.Options = options;
-            this.ResultHandler = resultHandler;
+        }
+        public TaskDialogMessage(string messageKey, TaskDialogOptions options)
+            : base(messageKey)
+        {
+            this.Options = options;
         }
 
         protected override Freezable CreateInstanceCore()
         {
-            return new TaskDialogMessage(Options, ResultHandler);
+            return new TaskDialogMessage(this.MessageKey, this.Options)
+            {
+                Response = this.Response,
+            };
         }
     }
 }

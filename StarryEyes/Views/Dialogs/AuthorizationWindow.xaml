@@ -27,6 +27,7 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colours.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/FlatButton.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
             <l:VisibilityAndBooleanConverter x:Key="VisibilityAndBooleanConverter" />
@@ -61,7 +62,7 @@
                    VerticalAlignment="Top"
                    Text="Twitterへログインし、アクセスを許可してください。 &#10;その後に表示された番号を入力してください。"
                    TextWrapping="Wrap" />
-        <TextBox Margin="12,0,114,10.564"
+        <TextBox Margin="12,0,114,10"
                  VerticalAlignment="Bottom"
                  VerticalContentAlignment="Center"
                  Controls:TextboxHelper.Watermark="Enter PIN"
@@ -70,15 +71,24 @@
                                 UpdateSourceTrigger=PropertyChanged}"
                  TextWrapping="Wrap" />
         <Button Width="100"
-                Margin="0,0,10,10"
+                Height="32"
+                Margin="0,0,10,7"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Bottom"
                 Command="{Binding VerifyPinCommand,
                                   Mode=OneWay}"
                 Content="OK"
-                Style="{DynamicResource SquareButtonStyle}" />
+                Padding="0,0,0,-3">
+            <Button.Foreground>
+                <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.HighlightTextColorKey}}" />
+            </Button.Foreground>
+            <Button.Background>
+                <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.HighlightColorKey}}" />
+            </Button.Background>
+        </Button>
         <Grid x:Name="ProcessingOverwrap"
               Background="White"
+              d:IsHidden="True"
               Visibility="{Binding IsNegotiating,
                                    Converter={StaticResource BooleanToVisibilityConverter},
                                    Mode=OneWay}">

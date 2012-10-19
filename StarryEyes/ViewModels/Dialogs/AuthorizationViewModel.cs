@@ -11,17 +11,17 @@ using Livet.Messaging.Windows;
 using StarryEyes.Helpers;
 using StarryEyes.Moon.Authorize;
 using StarryEyes.Views.Messaging;
+using StarryEyes.Settings;
 
 namespace StarryEyes.ViewModels.Dialogs
 {
     public class AuthorizationViewModel : ViewModel
     {
-        const string RequestTokenEndpoint = "https://api.twitter.com/oauth/request_token";
-        const string AuthorizationEndpoint = "https://api.twitter.com/oauth/authorize";
-        const string AccessTokenEndpoint = "https://api.twitter.com/oauth/access_token";
+        public const string RequestTokenEndpoint = "https://api.twitter.com/oauth/request_token";
+        public const string AuthorizationEndpoint = "https://api.twitter.com/oauth/authorize";
+        public const string AccessTokenEndpoint = "https://api.twitter.com/oauth/access_token";
 
         private Subject<AuthenticateInfo> returnSubject = new Subject<AuthenticateInfo>();
-
         public IObservable<AuthenticateInfo> AuthorizeObservable
         {
             get { return returnSubject; }

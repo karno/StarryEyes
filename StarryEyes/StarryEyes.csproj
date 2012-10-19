@@ -192,6 +192,7 @@
     <Compile Include="Models\Plugins\IPlugin.cs" />
     <Compile Include="Models\Tab\TimelineModel.cs" />
     <Compile Include="Models\UserModel.cs" />
+    <Compile Include="ViewModels\Dialogs\KeyOverrideViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\AccountSelectorViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\BackpanelViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\InputAreaViewModel.cs" />
@@ -199,6 +200,10 @@
     <Compile Include="ViewModels\WindowParts\Timelines\StatusViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Timelines\TabViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Timelines\UserViewModel.cs" />
+    <Compile Include="Views\Behaviors\Planerator.cs" />
+    <Compile Include="Views\Dialogs\KeyOverrideWindow.xaml.cs">
+      <DependentUpon>KeyOverrideWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Helpers\RichTextBoxHelper.cs" />
     <Compile Include="Views\Messaging\Behaviors\TaskDialogInteractionMessageAction.cs" />
     <Compile Include="Views\Messaging\Behaviors\TextBoxSetCaretMessageAction.cs" />
@@ -234,6 +239,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\Dialogs\AuthorizationWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Dialogs\KeyOverrideWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

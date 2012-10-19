@@ -15,8 +15,7 @@ namespace StarryEyes.Views.Messaging.Behaviors
             var options = tdm.Options;
             options.Owner = Window.GetWindow(this.AssociatedObject);
             var result = TaskDialog.Show(options);
-            if (tdm.ResultHandler != null)
-                tdm.ResultHandler(result);
+            tdm.Response = result;
         }
     }
 }

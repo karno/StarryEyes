@@ -74,8 +74,7 @@ namespace StarryEyes.Settings
         public static SettingItemStruct<bool> IsPowerUser =
             new SettingItemStruct<bool>("IsPowerUser", false);
 
-        public static SettingItem<string> ExternalBrowserPath =
-            new SettingItem<string>("ExternalBrowserPath", null);
+        #region Authentication and accounts
 
         private static SettingItem<List<AccountSetting>> accounts =
             new SettingItem<List<AccountSetting>>("Accounts", new List<AccountSetting>());
@@ -85,6 +84,36 @@ namespace StarryEyes.Settings
             get { return accounts.Value; }
             set { accounts.Value = value.ToList(); }
         }
+
+        public static SettingItem<string> GlobalConsumerKey =
+            new SettingItem<string>("GlobalConsumerKey", null);
+
+        public static SettingItem<string> GlobalConsumerSecret =
+            new SettingItem<string>("GlobalConsumerSecret", null);
+
+        public static SettingItemStruct<bool> IsBacktrackFallback =
+             new SettingItemStruct<bool>("IsBacktrackFallback", true);
+
+        #endregion
+
+        #region Timeline display and action
+
+        public static FilterSettingItem Muteds = new FilterSettingItem("Muteds");
+
+        public static SettingItemStruct<bool> AllowFavoriteMyself = new SettingItemStruct<bool>("AllowFavoriteMyself", false);
+
+        #endregion
+
+        #region Input control
+
+        public static SettingItemStruct<bool> IsUrlAutoEscapeEnabled = new SettingItemStruct<bool>("IsUrlAutoEscapeEnabled", false);
+
+        #endregion
+
+        #region Outer and Third Party services
+
+        public static SettingItem<string> ExternalBrowserPath =
+            new SettingItem<string>("ExternalBrowserPath", null);
 
         private static SettingItemStruct<int> imageUploaderService =
             new SettingItemStruct<int>("ImageUploaderService", 0);
@@ -108,25 +137,6 @@ namespace StarryEyes.Settings
                     return new TwitterPhotoUploader();
             }
         }
-
-        #region Timeline display and action
-
-        public static FilterSettingItem Muteds = new FilterSettingItem("Muteds");
-
-        public static SettingItemStruct<bool> AllowFavoriteMyself = new SettingItemStruct<bool>("AllowFavoriteMyself", false);
-
-        #endregion
-
-        #region Input control
-
-        public static SettingItemStruct<bool> IsUrlAutoEscapeEnabled = new SettingItemStruct<bool>("IsUrlAutoEscapeEnabled", false);
-
-        #endregion
-
-        #region Accounting
-
-        public static SettingItemStruct<bool> IsBacktrackFallback =
-             new SettingItemStruct<bool>("IsBacktrackFallback", true);
 
         #endregion
 
