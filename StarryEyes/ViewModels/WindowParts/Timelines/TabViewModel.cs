@@ -42,7 +42,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                 tabModel.Timeline.Statuses, _ => new StatusViewModel(this, _, _model.BindingAccountIds),
                 DispatcherHelper.UIDispatcher);
             this.CompositeDisposable.Add(_readonlyTimeline);
-            this.CompositeDisposable.Add(Disposable.Create(() => tabModel.Deactivate()));
+            this.CompositeDisposable.Add(() => tabModel.Deactivate());
         }
 
         public string Name

@@ -140,6 +140,12 @@ namespace StarryEyes.Settings
 
         #endregion
 
+        #region Krile internal state
+
+        public static SettingItem<string> LastImageOpenDir = new SettingItem<string>("LastImageOpenDir", Environment.GetFolderPath(Environment.SpecialFolder.MyPictures));
+
+        #endregion
+
         #region Setting infrastructure
 
         public class FilterSettingItem

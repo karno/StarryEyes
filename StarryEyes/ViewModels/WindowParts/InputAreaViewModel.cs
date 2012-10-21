@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Device.Location;
 using System.Linq;
-using System.Text;
+using System.Windows.Media.Imaging;
 using Livet;
+using Livet.EventListeners;
+using Livet.Messaging.IO;
 using StarryEyes.Models;
+using StarryEyes.Models.Operations;
 using StarryEyes.Moon.Authorize;
 using StarryEyes.Moon.DataModel;
-using Livet.EventListeners;
-using StarryEyes.ViewModels.WindowParts.Timelines;
 using StarryEyes.Settings;
-using Livet.Messaging;
+using StarryEyes.ViewModels.WindowParts.Timelines;
 using StarryEyes.Views.Messaging;
-using System.Windows.Media.Imaging;
-using StarryEyes.Models.Operations;
 
 namespace StarryEyes.ViewModels.WindowParts
 {
@@ -107,6 +107,17 @@ namespace StarryEyes.ViewModels.WindowParts
             get { return _attachedImage != null; }
         }
 
+        private bool _isLocationEnabled = false;
+        public bool IsLocationEnabled
+        {
+            get { return _isLocationEnabled; }
+            set
+            {
+                _isLocationEnabled = value;
+                RaisePropertyChanged(() => IsLocationEnabled);
+            }
+        }
+
         private LocationDescriptionViewModel _attachedLocation = null;
         public LocationDescriptionViewModel AttachedLocation
         {
@@ -122,12 +133,6 @@ namespace StarryEyes.ViewModels.WindowParts
         public bool IsLocationAttached
         {
             get { return _attachedLocation != null; }
-        }
-
-        private void UpdateTextCount()
-        {
-            RaisePropertyChanged(() => TextCount);
-            RaisePropertyChanged(() => CanSend);
         }
 
         public int TextCount
@@ -155,6 +160,11 @@ namespace StarryEyes.ViewModels.WindowParts
             }
         }
 
+        private GeoCoordinateWatcher geoWatcher;
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public InputAreaViewModel()
         {
             this._accountSelector = new AccountSelectorViewModel();
@@ -212,6 +222,27 @@ namespace StarryEyes.ViewModels.WindowParts
                         OverrideSelectedAccounts(infos);
                         DirectMessageTo = new UserViewModel(user);
                     }));
+
+            geoWatcher = new GeoCoordinateWatcher(GeoPositionAccuracy.Default);
+            geoWatcher.StatusChanged += (_, e) =>
+            {
+                if (e.Status != GeoPositionStatus.Ready)
+                {
+                    this.IsLocationEnabled = true;
+                }
+                else
+                {
+                    this.IsLocationEnabled = false;
+                    this.AttachedLocation = null;
+                }
+            };            this.CompositeDisposable.Add(geoWatcher);
+            geoWatcher.Start();
+        }
+
+        private void UpdateTextCount()
+        {
+            RaisePropertyChanged(() => TextCount);
+            RaisePropertyChanged(() => CanSend);
         }
 
         public void OverrideSelectedAccounts(IEnumerable<AuthenticateInfo> infos)
@@ -243,6 +274,38 @@ namespace StarryEyes.ViewModels.WindowParts
             ApplyBaseSelectedAccounts();
         }
 
+        public void AttachImage()
+        {
+            var msg = new OpeningFileSelectionMessage();
+            msg.Filter = "画像ファイル|*.jpg;*.jpeg;*.jpe;*.png;*.gif;*.bmp;*.dib|全てのファイル|*.*";
+            msg.InitialDirectory = Setting.LastImageOpenDir.Value;
+            msg.MultiSelect = false;
+            msg.Title = "添付する画像ファイルを指定";
+            this.Messenger.GetResponseAsync(msg, m =>
+            {
+                if (m.Response.Length > 0)
+                {
+                    this.AttachedImage = new ImageDescriptionViewModel(m.Response[0]);
+                }
+            });
+        }
+
+        public void DetachImage()
+        {
+            this.AttachedImage = null;
+        }
+
+        public void AttachLocation()
+        {
+            this.AttachedLocation = new LocationDescriptionViewModel(
+                geoWatcher.Position.Location);
+        }
+
+        public void DetachLocation()
+        {
+            this.AttachedLocation = null;
+        }
+
         public void Send()
         {
             var currentAccounts = this.AccountSelector.SelectedAccounts.ToArray();
@@ -268,11 +331,25 @@ namespace StarryEyes.ViewModels.WindowParts
 
     public class ImageDescriptionViewModel : ViewModel
     {
+        public ImageDescriptionViewModel(string p)
+        {
+            this.Source = new BitmapImage(new Uri(p));
+        }
+
         public BitmapImage Source { get; set; }
     }
 
     public class LocationDescriptionViewModel : ViewModel
     {
+        public LocationDescriptionViewModel(GeoCoordinate geoCoordinate)
+        {
+            this.Location = new GeoLocationInfo()
+            {
+                Latitude = geoCoordinate.Latitude,
+                Longitude = geoCoordinate.Longitude,
+            };
+        }
+
         public GeoLocationInfo Location { get; set; }
     }
 }

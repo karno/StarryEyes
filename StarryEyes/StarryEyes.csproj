@@ -78,6 +78,7 @@
     <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Device" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Interactive, Version=1.1.10823.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Ix_Experimental-Main.1.1.10823\lib\Net4\System.Interactive.dll</HintPath>
@@ -374,6 +375,10 @@
     <ProjectReference Include="..\StarryEyes.Albireo\StarryEyes.Albireo.csproj">
       <Project>{C2740802-BD1C-4B70-9B3A-F69DAE505827}</Project>
       <Name>StarryEyes.Albireo</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\StarryEyes.Nightmare\StarryEyes.Nightmare.csproj">
+      <Project>{3A78CEB3-A112-4A66-8724-BFF2BFA9182B}</Project>
+      <Name>StarryEyes.Nightmare</Name>
     </ProjectReference>
     <ProjectReference Include="..\StarryEyes.Vanille\StarryEyes.Vanille.csproj">
       <Project>{7C1764E1-AF06-48A8-8590-09500A363118}</Project>

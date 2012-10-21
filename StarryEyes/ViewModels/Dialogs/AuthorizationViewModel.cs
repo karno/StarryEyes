@@ -29,7 +29,7 @@ namespace StarryEyes.ViewModels.Dialogs
 
         public AuthorizationViewModel()
         {
-            this.CompositeDisposable.Add(Disposable.Create(() => returnSubject.OnCompleted()));
+            this.CompositeDisposable.Add(() => returnSubject.OnCompleted());
         }
 
         private OAuthAuthorizer authorizer;
