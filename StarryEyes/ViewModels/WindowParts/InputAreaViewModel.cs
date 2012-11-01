@@ -37,10 +37,10 @@ namespace StarryEyes.ViewModels.WindowParts
             get { return _bindingHashtags; }
         }
 
-        private readonly ReadOnlyDispatcherCollection<TweetInputInfoViewModel> _stashedInputs;
-        public ReadOnlyDispatcherCollection<TweetInputInfoViewModel> StashedInputs
+        private readonly ReadOnlyDispatcherCollection<TweetInputInfoViewModel> _draftedInputs;
+        public ReadOnlyDispatcherCollection<TweetInputInfoViewModel> DraftedInputs
         {
-            get { return _stashedInputs; }
+            get { return _draftedInputs; }
         }
 
         private readonly ReadOnlyDispatcherCollection<TweetInputInfoViewModel> _failedInputs;
@@ -255,6 +255,17 @@ namespace StarryEyes.ViewModels.WindowParts
             this._accountSelector = new AccountSelectorViewModel();
             this._bindingHashtags = ViewModelHelper.CreateReadOnlyDispatcherCollection(
                 InputAreaModel.BindingHashtags, _ => _, DispatcherHelper.UIDispatcher);
+            this.CompositeDisposable.Add(_bindingHashtags);
+            this._draftedInputs = ViewModelHelper.CreateReadOnlyDispatcherCollection(
+                InputAreaModel.Drafts,
+                _ => new TweetInputInfoViewModel(this, _, vm => InputAreaModel.Drafts.Remove(vm)),
+                DispatcherHelper.UIDispatcher);
+            this.CompositeDisposable.Add(_draftedInputs);
+            this._failedInputs = ViewModelHelper.CreateReadOnlyDispatcherCollection(
+                InputAreaModel.FailedPosts,
+                _ => new TweetInputInfoViewModel(this, _, vm => InputAreaModel.FailedPosts.Remove(vm)),
+                DispatcherHelper.UIDispatcher);
+            this.CompositeDisposable.Add(_failedInputs);
             this._accountSelector.OnSelectedAccountsChanged += () =>
             {
                 if (!_isSuppressAccountChangeRelay)
@@ -420,6 +431,17 @@ namespace StarryEyes.ViewModels.WindowParts
             this.AttachedLocation = null;
         }
 
+        public void BindHashtag(string hashtag)
+        {
+            if (!InputAreaModel.BindingHashtags.Contains(hashtag))
+                InputAreaModel.BindingHashtags.Add(hashtag);
+        }
+
+        public void UnbindHashtag(string hashtag)
+        {
+            InputAreaModel.BindingHashtags.Remove(hashtag);
+        }
+
         public void Send()
         {
             if (!CanSend)
@@ -544,10 +566,10 @@ namespace StarryEyes.ViewModels.WindowParts
 
         public TweetInputInfo Model { get; private set; }
 
-        private Func<TweetInputInfo> _removeHandler;
+        private Action<TweetInputInfo> _removeHandler;
 
         public TweetInputInfoViewModel(InputAreaViewModel parent, 
-            TweetInputInfo info, Func<TweetInputInfo> removeHandler)
+            TweetInputInfo info, Action<TweetInputInfo> removeHandler)
         {
             this.Parent = parent;
             this.Model = info;
@@ -562,18 +584,18 @@ namespace StarryEyes.ViewModels.WindowParts
 
         public void Writeback()
         {
-            _removeHandler();
+            _removeHandler(this.Model);
             Parent.InputInfo = this.Model;
         }
 
         public void Remove()
         {
-            _removeHandler();
+            _removeHandler(this.Model);
         }
 
         public void Send()
         {
-            _removeHandler();
+            _removeHandler(this.Model);
             Parent.Send(this.Model);
         }
     }
