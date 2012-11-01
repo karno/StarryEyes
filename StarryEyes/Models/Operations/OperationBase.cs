@@ -22,8 +22,11 @@ namespace StarryEyes.Models.Operations
         /// </summary>
         internal IObservable<T> Run(OperationPriority priority = OperationPriority.Middle)
         {
-            OperationQueueRunner.Enqueue(this, priority);
-            return resultHandler;
+            return Observable.Defer(() =>
+            {
+                OperationQueueRunner.Enqueue(this, priority);
+                return resultHandler;
+            });
         }
 
         /// <summary>
@@ -31,7 +34,7 @@ namespace StarryEyes.Models.Operations
         /// </summary>
         public IObservable<T> RunImmediate()
         {
-            return Observable.Start(() => RunCore())
+            return Observable.Defer(() => Observable.Start(() => RunCore()))
                 .SelectMany(_ => _);
         }
 
@@ -42,18 +45,21 @@ namespace StarryEyes.Models.Operations
 
         protected IObservable<string> GetExceptionDetail(Exception ex)
         {
-            var wex = ex as WebException;
-            if (wex != null && wex.Response != null)
-            {
-                return Observable.Return(wex.Response)
-                    .ObserveOn(TaskPoolScheduler.Default)
-                    .SelectMany(r => r.DownloadStringAsync())
-                    .Select(s => ParseErrorMessage(s));
-            }
-            else
-            {
-                return Observable.Return(ex.Message);
-            }
+            return Observable.Defer(() =>
+                {
+                    var wex = ex as WebException;
+                    if (wex != null && wex.Response != null)
+                    {
+                        return Observable.Return(wex.Response)
+                            .ObserveOn(TaskPoolScheduler.Default)
+                            .SelectMany(r => r.DownloadStringAsync())
+                            .Select(s => ParseErrorMessage(s));
+                    }
+                    else
+                    {
+                        return Observable.Return(ex.Message);
+                    }
+                });
         }
 
         private string ParseErrorMessage(string error)

@@ -2,17 +2,21 @@
 using System.Collections.Generic;
 using System.Device.Location;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows.Media.Imaging;
 using Livet;
 using Livet.EventListeners;
 using Livet.Messaging.IO;
+using StarryEyes.Helpers;
 using StarryEyes.Models;
 using StarryEyes.Models.Operations;
+using StarryEyes.Models.Store;
 using StarryEyes.Moon.Authorize;
 using StarryEyes.Moon.DataModel;
 using StarryEyes.Settings;
 using StarryEyes.ViewModels.WindowParts.Timelines;
 using StarryEyes.Views.Messaging;
+using TaskDialogInterop;
 
 namespace StarryEyes.ViewModels.WindowParts
 {
@@ -33,13 +37,52 @@ namespace StarryEyes.ViewModels.WindowParts
             get { return _bindingHashtags; }
         }
 
-        private string _inputText = String.Empty;
-        public string InputText
+        private readonly ReadOnlyDispatcherCollection<TweetInputInfoViewModel> _stashedInputs;
+        public ReadOnlyDispatcherCollection<TweetInputInfoViewModel> StashedInputs
         {
-            get { return _inputText; }
+            get { return _stashedInputs; }
+        }
+
+        private readonly ReadOnlyDispatcherCollection<TweetInputInfoViewModel> _failedInputs;
+        public ReadOnlyDispatcherCollection<TweetInputInfoViewModel> FailedInputs
+        {
+            get { return _failedInputs; }
+        } 
+
+        private TweetInputInfo _inputInfo = null;
+        public TweetInputInfo InputInfo
+        {
+            get
+            {
+                if (_inputInfo == null)
+                    ClearInput();
+                return _inputInfo;
+            }
             set
             {
-                _inputText = value;
+                _inputInfo = value;
+                OverrideSelectedAccounts(value.AuthInfos);
+                RaisePropertyChanged(() => InputInfo);
+                RaisePropertyChanged(() => InputText);
+                RaisePropertyChanged(() => InReplyTo);
+                RaisePropertyChanged(() => IsInReplyToEnabled);
+                RaisePropertyChanged(() => DirectMessageTo);
+                RaisePropertyChanged(() => IsDirectMessageEnabled);
+                RaisePropertyChanged(() => AttachedImage);
+                RaisePropertyChanged(() => IsImageAttached);
+                RaisePropertyChanged(() => AttachedLocation);
+                RaisePropertyChanged(() => IsLocationAttached);
+                RaisePropertyChanged(() => TextCount);
+                RaisePropertyChanged(() => CanSend);
+            }
+        }
+
+        public string InputText
+        {
+            get { return InputInfo.Text; }
+            set
+            {
+                InputInfo.Text = value;
                 RaisePropertyChanged(() => InputText);
                 UpdateTextCount();
             }
@@ -55,13 +98,35 @@ namespace StarryEyes.ViewModels.WindowParts
             }
         }
 
-        private StatusViewModel _inReplyTo = null;
+        private StatusViewModel _inReplyToViewModelCache = null;
         public StatusViewModel InReplyTo
         {
-            get { return _inReplyTo; }
+            get
+            {
+                if (InputInfo.InReplyTo == null)
+                {
+                    return null;
+                }
+                
+                if (_inReplyToViewModelCache == null ||
+                    _inReplyToViewModelCache.Status.Id != InputInfo.InReplyTo.Id)
+                {
+                    _inReplyToViewModelCache = new StatusViewModel(InputInfo.InReplyTo);
+                }
+                return _inReplyToViewModelCache;
+            }
             set
             {
-                _inReplyTo = value;
+                if (value == null)
+                {
+                    _inReplyToViewModelCache = null;
+                    InputInfo.InReplyTo = null;
+                }
+                else
+                {
+                    _inReplyToViewModelCache = value;
+                    InputInfo.InReplyTo = value.Status;
+                }
                 RaisePropertyChanged(() => InReplyTo);
                 RaisePropertyChanged(() => IsInReplyToEnabled);
             }
@@ -69,16 +134,38 @@ namespace StarryEyes.ViewModels.WindowParts
 
         public bool IsInReplyToEnabled
         {
-            get { return _inReplyTo != null; }
+            get { return InputInfo.InReplyTo != null; }
         }
 
-        private UserViewModel _directMessageTo = null;
+        private UserViewModel _directMessageToCache = null;
         public UserViewModel DirectMessageTo
         {
-            get { return _directMessageTo; }
+            get
+            {
+                if (InputInfo.MessageRecipient == null)
+                {
+                    return null;
+                }
+
+                if (_directMessageToCache == null ||
+                    _directMessageToCache.User.Id != InputInfo.MessageRecipient.Id)
+                {
+                    _directMessageToCache = new UserViewModel(InputInfo.MessageRecipient);
+                }
+                return _directMessageToCache;
+            }
             set
             {
-                _directMessageTo = value;
+                if (value == null)
+                {
+                    InputInfo.MessageRecipient = null;
+                    _directMessageToCache = null;
+                }
+                else
+                {
+                    InputInfo.MessageRecipient = value.User;
+                    _directMessageToCache = value;
+                }
                 RaisePropertyChanged(() => DirectMessageTo);
                 RaisePropertyChanged(() => IsDirectMessageEnabled);
             }
@@ -86,16 +173,15 @@ namespace StarryEyes.ViewModels.WindowParts
 
         public bool IsDirectMessageEnabled
         {
-            get { return _directMessageTo != null; }
+            get { return InputInfo.MessageRecipient != null; }
         }
         
-        private ImageDescriptionViewModel _attachedImage = null;
         public ImageDescriptionViewModel AttachedImage
         {
-            get { return _attachedImage; }
+            get { return new ImageDescriptionViewModel(InputInfo.AttachedImage); }
             set
             {
-                _attachedImage = value;
+                InputInfo.AttachedImage = value.Source;
                 RaisePropertyChanged(() => AttachedImage);
                 RaisePropertyChanged(() => IsImageAttached);
                 UpdateTextCount();
@@ -104,7 +190,7 @@ namespace StarryEyes.ViewModels.WindowParts
 
         public bool IsImageAttached
         {
-            get { return _attachedImage != null; }
+            get { return InputInfo.AttachedImage != null; }
         }
 
         private bool _isLocationEnabled = false;
@@ -118,13 +204,12 @@ namespace StarryEyes.ViewModels.WindowParts
             }
         }
 
-        private LocationDescriptionViewModel _attachedLocation = null;
         public LocationDescriptionViewModel AttachedLocation
         {
-            get { return _attachedLocation; }
+            get { return new LocationDescriptionViewModel(InputInfo.AttachedGeoInfo); }
             set
             {
-                _attachedLocation = value;
+                InputInfo.AttachedGeoInfo = value.Location;
                 RaisePropertyChanged(() => AttachedLocation);
                 RaisePropertyChanged(() => IsLocationAttached);
             }
@@ -132,7 +217,7 @@ namespace StarryEyes.ViewModels.WindowParts
 
         public bool IsLocationAttached
         {
-            get { return _attachedLocation != null; }
+            get { return InputInfo.AttachedGeoInfo != null; }
         }
 
         public int TextCount
@@ -178,6 +263,7 @@ namespace StarryEyes.ViewModels.WindowParts
                     InputAreaModel.BindingAuthInfos.Replace(this._accountSelector.SelectedAccounts);
                     _baseSelectedAccounts = InputAreaModel.BindingAuthInfos.Select(_ => _.Id).ToArray();
                 }
+                InputInfo.AuthInfos = this.AccountSelector.SelectedAccounts;
                 UpdateTextCount();
             };
             this.CompositeDisposable.Add(_accountSelector);
@@ -235,7 +321,8 @@ namespace StarryEyes.ViewModels.WindowParts
                     this.IsLocationEnabled = false;
                     this.AttachedLocation = null;
                 }
-            };            this.CompositeDisposable.Add(geoWatcher);
+            };
+            this.CompositeDisposable.Add(geoWatcher);
             geoWatcher.Start();
         }
 
@@ -261,17 +348,44 @@ namespace StarryEyes.ViewModels.WindowParts
 
         public void ClearInReplyTo()
         {
-            InReplyTo = null;
+            this.InReplyTo = null;
+        }
+
+        public void ClearDirectMessage()
+        {
+            this.DirectMessageTo = null;
         }
 
         public void ClearInput()
         {
-            InReplyTo = null;
-            DirectMessageTo = null;
-            AttachedImage = null;
-            AttachedLocation = null;
-            InputText = String.Empty;
+            this._inputInfo = new TweetInputInfo();
             ApplyBaseSelectedAccounts();
+            RaisePropertyChanged(() => InputInfo);
+            RaisePropertyChanged(() => InputText);
+            RaisePropertyChanged(() => InReplyTo);
+            RaisePropertyChanged(() => IsInReplyToEnabled);
+            RaisePropertyChanged(() => DirectMessageTo);
+            RaisePropertyChanged(() => IsDirectMessageEnabled);
+            RaisePropertyChanged(() => AttachedImage);
+            RaisePropertyChanged(() => IsImageAttached);
+            RaisePropertyChanged(() => AttachedLocation);
+            RaisePropertyChanged(() => IsLocationAttached);
+            RaisePropertyChanged(() => TextCount);
+            RaisePropertyChanged(() => CanSend);
+        }
+
+        public void AmendPreviousOne()
+        {
+            if (InputInfo.PostedTweets != null) return; // amending now.
+            if (!String.IsNullOrEmpty(InputText) || this.IsImageAttached)
+                StashInDraft();
+            InputInfo = InputAreaModel.PreviousPosted;
+        }
+
+        public void StashInDraft()
+        {
+            InputAreaModel.Drafts.Add(this.InputInfo);
+            ClearInput();
         }
 
         public void AttachImage()
@@ -308,24 +422,85 @@ namespace StarryEyes.ViewModels.WindowParts
 
         public void Send()
         {
-            var currentAccounts = this.AccountSelector.SelectedAccounts.ToArray();
-            if (IsDirectMessageEnabled)
+            if (!CanSend)
             {
-                InputAreaModel.SendMessage(
-                    this.AccountSelector.SelectedAccounts.ToArray(),
-                    this.InputText,
-                    DirectMessageTo.User);
+                // can't send now.
+                RaisePropertyChanged(() => CanSend);
+                return;
             }
-            else
+            if (InputInfo.PostedTweets != null && Setting.IsWarnAmendTweet.Value)
             {
-                InputAreaModel.SendStatus(
-                    this.AccountSelector.SelectedAccounts.ToArray(),
-                    this.InputText,
-                    InReplyTo != null ? InReplyTo.Status : null,
-                    AttachedImage != null ? AttachedImage.Source : null,
-                    AttachedLocation != null ? AttachedLocation.Location : null);
+                // amend mode
+                var amend = this.Messenger.GetResponse(new TaskDialogMessage(
+                    new TaskDialogInterop.TaskDialogOptions()
+                    {
+                        Title = "ツイートの訂正",
+                        MainIcon = VistaTaskDialogIcon.Information,
+                        Content = "直前に投稿されたツイートを削除し、投稿し直します。" + Environment.NewLine +
+                        "(削除に失敗した場合でも投稿は行われます。)",
+                        ExpandedInfo = "削除されるツイート: " +
+                        InputInfo.PostedTweets.First().Item2.ToString() +
+                        (InputInfo.PostedTweets.Count() > 1 ?
+                        Environment.NewLine + "(" + (InputInfo.PostedTweets.Count() - 1) + " 件のツイートも同時に削除されます)" : ""),
+                        VerificationText = "次回から表示しない",
+                        CommonButtons = TaskDialogCommonButtons.OKCancel,
+                    }));
+                Setting.IsWarnAmendTweet.Value = amend.Response.VerificationChecked.GetValueOrDefault();
+                if (amend.Response.Result == TaskDialogSimpleResult.Cancel)
+                    return;
             }
+            if (!CheckInput())
+                return;
+            this.Send(InputInfo);
             ClearInput();
+        }
+
+        private bool CheckInput()
+        {
+            if (InReplyTo != null && Setting.IsWarnReplyFromThirdAccount.Value)
+            {
+                // warn third reply
+ 
+                // filters screen names which were replied
+                var replies = RegexHelper.AtRegex.Matches(InReplyTo.Status.Text)
+                    .Cast<Match>()
+                    .Select(_ => _.Value.Substring(1))
+                    .Where(_ => !String.IsNullOrEmpty(_))
+                    .Distinct()
+                    .ToArray();
+
+                // check third-reply mistake.
+                if (!AccountsStore.Accounts.Select(_ => _.AuthenticateInfo.UnreliableScreenName).Any(replies.Contains) &&
+                    InputInfo.AuthInfos.Select(_ => _.UnreliableScreenName).Any(replies.Contains))
+                {
+                    var thirdreply = this.Messenger.GetResponse(
+                        new TaskDialogMessage(new TaskDialogOptions()
+                        {
+                            Title = "割込みリプライ警告",
+                            MainIcon = VistaTaskDialogIcon.Warning,
+                            Content = "違うアカウントから会話を継続しようとしています。" + Environment.NewLine +
+                            "投稿してもよろしいですか？",
+                            VerificationText = "次回から表示しない",
+                            CommonButtons = TaskDialogCommonButtons.OKCancel,
+                        }));
+                    Setting.IsWarnReplyFromThirdAccount.Value = thirdreply.Response.VerificationChecked.GetValueOrDefault();
+                    if (thirdreply.Response.Result == TaskDialogSimpleResult.Cancel)
+                        return false;
+                }
+            }
+            return true;
+        }
+
+        internal void Send(TweetInputInfo inputInfo)
+        {
+            inputInfo.Send()
+                .Subscribe(_ =>
+                {
+                    if (_.PostedTweets != null)
+                        InputAreaModel.PreviousPosted = _;
+                    else
+                        InputAreaModel.FailedPosts.Add(_);
+                });
         }
     }
 
@@ -334,6 +509,11 @@ namespace StarryEyes.ViewModels.WindowParts
         public ImageDescriptionViewModel(string p)
         {
             this.Source = new BitmapImage(new Uri(p));
+        }
+
+        public ImageDescriptionViewModel(BitmapImage image)
+        {
+            this.Source = image;
         }
 
         public BitmapImage Source { get; set; }
@@ -350,6 +530,51 @@ namespace StarryEyes.ViewModels.WindowParts
             };
         }
 
+        public LocationDescriptionViewModel(GeoLocationInfo locInfo)
+        {
+            this.Location = locInfo;
+        }
+
         public GeoLocationInfo Location { get; set; }
+    }
+
+    public class TweetInputInfoViewModel : ViewModel
+    {
+        public InputAreaViewModel Parent { get; private set; }
+
+        public TweetInputInfo Model { get; private set; }
+
+        private Func<TweetInputInfo> _removeHandler;
+
+        public TweetInputInfoViewModel(InputAreaViewModel parent, 
+            TweetInputInfo info, Func<TweetInputInfo> removeHandler)
+        {
+            this.Parent = parent;
+            this.Model = info;
+            this._removeHandler = removeHandler;
+        }
+
+        public IEnumerable<AuthenticateInfo> AuthenticateInfos { get { return Model.AuthInfos; } }
+
+        public string Text { get { return Model.Text; } }
+
+        public Exception ThrownException { get { return Model.ThrownException; } }
+
+        public void Writeback()
+        {
+            _removeHandler();
+            Parent.InputInfo = this.Model;
+        }
+
+        public void Remove()
+        {
+            _removeHandler();
+        }
+
+        public void Send()
+        {
+            _removeHandler();
+            Parent.Send(this.Model);
+        }
     }
 }

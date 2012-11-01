@@ -13,7 +13,7 @@ namespace StarryEyes.ViewModels.Dialogs
 {
     public class KeyOverrideViewModel : ViewModel
     {
-        private string _overrideConsumerKey;
+        private string _overrideConsumerKey = String.Empty;
         public string OverrideConsumerKey
         {
             get { return _overrideConsumerKey; }
@@ -27,7 +27,7 @@ namespace StarryEyes.ViewModels.Dialogs
             }
         }
 
-        private string _overrideConsumerSecret;
+        private string _overrideConsumerSecret = String.Empty;
         public string OverrideConsumerSecret
         {
             get { return _overrideConsumerSecret; }
@@ -91,7 +91,7 @@ namespace StarryEyes.ViewModels.Dialogs
 
         public void SkipAuthorize()
         {
-            if (Setting.GlobalConsumerKey == null && Setting.GlobalConsumerSecret == null)
+            if (String.IsNullOrEmpty(Setting.GlobalConsumerKey.Value) && String.IsNullOrEmpty(Setting.GlobalConsumerSecret.Value))
             {
                 this.Messenger.GetResponseAsync(new TaskDialogMessage(
                     new TaskDialogInterop.TaskDialogOptions()
@@ -99,11 +99,10 @@ namespace StarryEyes.ViewModels.Dialogs
                         Title = "APIキー設定のスキップ",
                         MainIcon = TaskDialogInterop.VistaTaskDialogIcon.Warning,
                         MainInstruction = "APIキーの設定をスキップしますか？",
-                        Content = "キーを設定しない場合、いくつかの制限が適用されます。" + Environment.NewLine +
+                        Content = "スキップする場合、いくつか制限が適用されます。" + Environment.NewLine +
                         "後からもキーを設定できますが、その際にすべてのアカウントを認証しなおす必要があります。",
                         CommonButtons = TaskDialogInterop.TaskDialogCommonButtons.OKCancel,
-                        FooterIcon = TaskDialogInterop.VistaTaskDialogIcon.Warning,
-                        FooterText = "APIキーの状況によってはアカウントが登録できないことがあります。" + Environment.NewLine +
+                        ExpandedInfo = "APIキーの状況によってはアカウントが登録できないことがあります。" + Environment.NewLine +
                         "また、最大登録可能アカウント数も制限されます。"
                     }), m =>
                     {
@@ -113,6 +112,10 @@ namespace StarryEyes.ViewModels.Dialogs
                         }
                     });
             }
+            else
+            {
+                this.Messenger.Raise(new WindowActionMessage(null, WindowAction.Close));
+            }
         }
 
         private void UpdateEndpointKey()
@@ -121,7 +124,6 @@ namespace StarryEyes.ViewModels.Dialogs
             ApiEndpoint.DefaultConsumerSecret = Setting.GlobalConsumerSecret.Value ?? App.ConsumerSecret;
             AccountsStore.Accounts.Clear();
         }
-
 
         #region OpenApiKeyHelpCommand
         private Livet.Commands.ViewModelCommand _OpenApiKeyHelpCommand;

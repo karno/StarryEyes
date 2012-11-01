@@ -11,7 +11,7 @@
                       xmlns:StarryEyes_Views_Messaging_Behaviors="clr-namespace:StarryEyes.Views.Messaging.Behaviors"
                       Title="Twitter APIキーの設定"
                       Width="460"
-                      Height="200"
+                      Height="220"
                       ResizeMode="NoResize"
                       ShowInTaskbar="False"
                       WindowStartupLocation="CenterOwner"
@@ -41,21 +41,18 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto"/>
             <RowDefinition />
             <RowDefinition Height="48" />
         </Grid.RowDefinitions>
-        <TextBlock Margin="8"
+        <TextBlock Margin="7.5,8,8.5,0"
                    FontSize="16"
                    TextWrapping="Wrap"
-                   d:LayoutOverrides="Height">
-            <Run Language="ja-jp" Text="Krileを使いこなすために、APIキーを設定してください。" />
-        </TextBlock>
-        <Border BorderThickness="0,0,0,1">
-            <Border.BorderBrush>
-                <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlDarkDarkColorKey}}" />
-            </Border.BorderBrush>
-        </Border>
-        <Grid Grid.Row="1" VerticalAlignment="Top">
+                   d:LayoutOverrides="Height" Foreground="Black"><Run Language="ja-jp" Text="API キー" /></TextBlock>
+        <TextBlock Margin="8,0,8,4"
+        	TextWrapping="Wrap"
+        	Foreground="Black" d:LayoutOverrides="Height" Grid.Row="1" Text="API キーを登録することで、より快適にKrileを利用することができます。スキップすることもできますが、一部制限が適用される場合があります。"/>
+        <Grid Grid.Row="2" VerticalAlignment="Top">
             <Grid.RowDefinitions>
                 <RowDefinition />
                 <RowDefinition />
@@ -93,7 +90,7 @@
                      TextWrapping="Wrap"
                      d:LayoutOverrides="Height" />
         </Grid>
-        <Button Grid.Row="2"
+        <Button Grid.Row="3"
                 Width="100"
                 Margin="0,8,8,8"
                 HorizontalAlignment="Right"
@@ -105,7 +102,7 @@
                 </i:EventTrigger>
             </i:Interaction.Triggers>
         </Button>
-        <Button Grid.Row="2"
+        <Button Grid.Row="3"
                 Width="100"
                 Margin="0,8,112,8"
                 HorizontalAlignment="Right"
@@ -118,7 +115,7 @@
                 </i:EventTrigger>
             </i:Interaction.Triggers>
         </Button>
-        <TextBlock Grid.Row="2"
+        <TextBlock Grid.Row="3"
                    Margin="8,17.24,216,12.76"
                    TextWrapping="Wrap">
             <Hyperlink Command="{Binding OpenApiKeyHelpCommand}">

@@ -108,6 +108,10 @@ namespace StarryEyes.Settings
 
         public static SettingItemStruct<bool> IsUrlAutoEscapeEnabled = new SettingItemStruct<bool>("IsUrlAutoEscapeEnabled", false);
 
+        public static SettingItemStruct<bool> IsWarnAmendTweet = new SettingItemStruct<bool>("IsWarnAmendTweet", true);
+
+        public static SettingItemStruct<bool> IsWarnReplyFromThirdAccount = new SettingItemStruct<bool>("IsWarnReplyFromThirdAccount", true);
+
         #endregion
 
         #region Outer and Third Party services
