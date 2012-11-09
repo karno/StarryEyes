@@ -112,6 +112,8 @@ namespace StarryEyes.Settings
 
         public static SettingItemStruct<bool> IsWarnReplyFromThirdAccount = new SettingItemStruct<bool>("IsWarnReplyFromThirdAccount", true);
 
+        public static SettingItemStruct<TweetBoxClosingAction> TweetBoxClosingAction = new SettingItemStruct<TweetBoxClosingAction>("TweetBoxClosingAction", Settings.TweetBoxClosingAction.Confirm);
+
         #endregion
 
         #region Outer and Third Party services
@@ -298,6 +300,13 @@ namespace StarryEyes.Settings
         }
 
         #endregion
+    }
+
+    public enum TweetBoxClosingAction
+    {
+        Confirm,
+        SaveToDraft,
+        Discard,
     }
 
     public enum ImageUploaderService

@@ -43,11 +43,21 @@ namespace StarryEyes.ViewModels.WindowParts
             get { return _draftedInputs; }
         }
 
-        private readonly ReadOnlyDispatcherCollection<TweetInputInfoViewModel> _failedInputs;
-        public ReadOnlyDispatcherCollection<TweetInputInfoViewModel> FailedInputs
+        private bool _isOpening = false;
+        public bool IsOpening
         {
-            get { return _failedInputs; }
-        } 
+            get { return _isOpening; }
+            set
+            {
+                if (_isOpening == value) return;
+                _isOpening = value;
+                RaisePropertyChanged(() => IsOpening);
+                if (value)
+                    this.Messenger.RaiseAsync(new GoToStateMessage("Open"));
+                else
+                    this.Messenger.RaiseAsync(new GoToStateMessage("Close"));
+            }
+        }
 
         private TweetInputInfo _inputInfo = null;
         public TweetInputInfo InputInfo
@@ -261,11 +271,6 @@ namespace StarryEyes.ViewModels.WindowParts
                 _ => new TweetInputInfoViewModel(this, _, vm => InputAreaModel.Drafts.Remove(vm)),
                 DispatcherHelper.UIDispatcher);
             this.CompositeDisposable.Add(_draftedInputs);
-            this._failedInputs = ViewModelHelper.CreateReadOnlyDispatcherCollection(
-                InputAreaModel.FailedPosts,
-                _ => new TweetInputInfoViewModel(this, _, vm => InputAreaModel.FailedPosts.Remove(vm)),
-                DispatcherHelper.UIDispatcher);
-            this.CompositeDisposable.Add(_failedInputs);
             this._accountSelector.OnSelectedAccountsChanged += () =>
             {
                 if (!_isSuppressAccountChangeRelay)
@@ -295,7 +300,8 @@ namespace StarryEyes.ViewModels.WindowParts
                 _ => InputAreaModel.OnSetTextRequested -= _,
                 (infos, body, cursor, inReplyTo) =>
                 {
-                    ClearInput();
+                    OpenInput(false);
+                    CheckClearInput();
                     OverrideSelectedAccounts(infos);
                     InputText = body;
                     InReplyTo = new StatusViewModel(inReplyTo);
@@ -315,7 +321,8 @@ namespace StarryEyes.ViewModels.WindowParts
                     _ => InputAreaModel.OnSendDirectMessageRequested -= _,
                     (infos, user) =>
                     {
-                        ClearInput();
+                        OpenInput(false);
+                        CheckClearInput();
                         OverrideSelectedAccounts(infos);
                         DirectMessageTo = new UserViewModel(user);
                     }));
@@ -365,6 +372,80 @@ namespace StarryEyes.ViewModels.WindowParts
         public void ClearDirectMessage()
         {
             this.DirectMessageTo = null;
+        }
+
+        public void OpenInput()
+        {
+            this.OpenInput(true);
+        }
+
+        public void OpenInput(bool restorePreviousStashed)
+        {
+            this.IsOpening = true;
+            if (restorePreviousStashed && InputAreaModel.Drafts.Count > 0)
+            {
+                var last = InputAreaModel.Drafts[InputAreaModel.Drafts.Count - 1];
+                InputAreaModel.Drafts.RemoveAt(InputAreaModel.Drafts.Count - 1);
+                this.InputInfo = last;
+            }
+        }
+
+        public void CloseInput()
+        {
+            if (!this.IsOpening) return;
+            CheckClearInput();
+        }
+
+        private void CheckClearInput()
+        {
+            if (!String.IsNullOrWhiteSpace(InputText) ||
+                this.IsImageAttached)
+            {
+                var action = Setting.TweetBoxClosingAction.Value;
+                if (action == TweetBoxClosingAction.Confirm)
+                {
+                    var msg = this.Messenger.GetResponse(new TaskDialogMessage(
+                        new TaskDialogOptions()
+                        {
+                            AllowDialogCancellation = true,
+                            CommonButtons = TaskDialogCommonButtons.YesNoCancel,
+                            Content = "現在の内容を下書きに保存しますか？",
+                            MainIcon = VistaTaskDialogIcon.Information,
+                            Title = "下書きへの保存",
+                            VerificationText = "次回から表示しない"
+                        }));
+                    switch(msg.Response.Result)
+                    {
+                        case TaskDialogSimpleResult.Yes:
+                            action = TweetBoxClosingAction.SaveToDraft;
+                            break;
+                        case TaskDialogSimpleResult.No:
+                            action = TweetBoxClosingAction.Discard;
+                            break;
+                        default:
+                            return;
+                    }
+                    if (msg.Response.VerificationChecked.GetValueOrDefault())
+                    {
+                        Setting.TweetBoxClosingAction.Value = action;
+                    }
+                }
+                switch(action)
+                {
+                    case TweetBoxClosingAction.Discard:
+                        ClearInput();
+                        break;
+                    case TweetBoxClosingAction.SaveToDraft:
+                        StashInDraft();
+                        break;
+                    default:
+                        throw new InvalidOperationException("Invalid return value:" + action.ToString());
+                }
+            }
+            else
+            {
+                ClearInput();
+            }
         }
 
         public void ClearInput()
@@ -521,7 +602,7 @@ namespace StarryEyes.ViewModels.WindowParts
                     if (_.PostedTweets != null)
                         InputAreaModel.PreviousPosted = _;
                     else
-                        InputAreaModel.FailedPosts.Add(_);
+                        InputAreaModel.Drafts.Add(_);
                 });
         }
     }
@@ -579,6 +660,11 @@ namespace StarryEyes.ViewModels.WindowParts
         public IEnumerable<AuthenticateInfo> AuthenticateInfos { get { return Model.AuthInfos; } }
 
         public string Text { get { return Model.Text; } }
+
+        public bool IsFailedTweetInputInfo
+        {
+            get { return Model.ThrownException != null; }
+        }
 
         public Exception ThrownException { get { return Model.ThrownException; } }
 

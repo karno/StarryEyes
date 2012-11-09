@@ -34,13 +34,6 @@ namespace StarryEyes.Models
             get { return InputAreaModel._bindingHashtags; }
         }
 
-        private static readonly ObservableSynchronizedCollection<TweetInputInfo> _failedPosts =
-            new ObservableSynchronizedCollection<TweetInputInfo>();
-        public static ObservableSynchronizedCollection<TweetInputInfo> FailedPosts
-        {
-            get { return InputAreaModel._failedPosts; }
-        }
-
         private static readonly ObservableSynchronizedCollection<TweetInputInfo> _drafts =
             new ObservableSynchronizedCollection<TweetInputInfo>();
         public static ObservableSynchronizedCollection<TweetInputInfo> Drafts
