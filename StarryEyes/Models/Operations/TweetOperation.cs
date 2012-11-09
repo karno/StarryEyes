@@ -2,10 +2,11 @@ using System;
 using System.IO;
 using System.Reactive.Linq;
 using System.Windows.Media.Imaging;
-using StarryEyes.Models.Store;
 using StarryEyes.Breezy.Api.Rest;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
+using StarryEyes.Models.Backpanel.PostEvents;
+using StarryEyes.Models.Store;
 using StarryEyes.Settings;
 
 namespace StarryEyes.Models.Operations
@@ -48,7 +49,7 @@ namespace StarryEyes.Models.Operations
             set
             {
                 _originalBitmapSource = value;
-                if (value == null) 
+                if (value == null)
                 {
                     attachedImageBin = new byte[0];
                     return;
@@ -80,11 +81,12 @@ namespace StarryEyes.Models.Operations
                                 if (this._originalAuthInfo != null)
                                     this._originalAuthInfo = AuthInfo;
                                 this.AuthInfo = fallbackAccount.AuthenticateInfo;
+                                BackpanelModel.RegisterEvent(new FallbackedEvent(this.AuthInfo, fallbackAccount.AuthenticateInfo));
                                 return this.Run(OperationPriority.High);
                             }
                             else
                             {
-                                return Observable.Throw<TwitterStatus>(ex);
+                                return Observable.Throw<TwitterStatus>(new TweetFailedException(s, ex));
                             }
                         });
                 });
@@ -117,5 +119,15 @@ namespace StarryEyes.Models.Operations
     {
         public double Latitude { get; set; }
         public double Longitude { get; set; }
+    }
+
+    [Serializable]
+    public class TweetFailedException : Exception
+    {
+        public TweetFailedException(string message, Exception inner) : base(message, inner) { }
+        protected TweetFailedException(
+          System.Runtime.Serialization.SerializationInfo info,
+          System.Runtime.Serialization.StreamingContext context)
+            : base(info, context) { }
     }
 }

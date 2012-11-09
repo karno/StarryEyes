@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive;
+using System.Reactive.Linq;
+using System.Windows.Media.Imaging;
 using Livet;
-using StarryEyes.Models.Store;
-using StarryEyes.Models.Tab;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Models.Operations;
-using System.Windows.Media.Imaging;
-using System.Reactive.Linq;
-using System.Reactive;
+using StarryEyes.Models.Store;
+using StarryEyes.Models.Tab;
 
 namespace StarryEyes.Models
 {
@@ -173,6 +173,25 @@ namespace StarryEyes.Models
         /// Thrown Exception in previous trial.
         /// </summary>
         public Exception ThrownException { get; set; }
+
+        /// <summary>
+        /// Get exception readable info, if available.
+        /// </summary>
+        public string ThrownExceptionMessage
+        {
+            get
+            {
+                var ex =  this.ThrownException as TweetFailedException;
+                if (ex != null)
+                {
+                    return ex.Message;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
 
         /// <summary>
         /// Attached geo-location info.

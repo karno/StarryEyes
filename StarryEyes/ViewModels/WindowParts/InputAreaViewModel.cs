@@ -11,6 +11,7 @@ using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Helpers;
 using StarryEyes.Models;
+using StarryEyes.Models.Backpanel.PostEvents;
 using StarryEyes.Models.Operations;
 using StarryEyes.Models.Store;
 using StarryEyes.Settings;
@@ -540,11 +541,12 @@ namespace StarryEyes.ViewModels.WindowParts
                         Title = "ツイートの訂正",
                         MainIcon = VistaTaskDialogIcon.Information,
                         Content = "直前に投稿されたツイートを削除し、投稿し直します。" + Environment.NewLine +
-                        "(削除に失敗した場合でも投稿は行われます。)",
+                            "(削除に失敗した場合でも投稿は行われます。)",
                         ExpandedInfo = "削除されるツイート: " +
                         InputInfo.PostedTweets.First().Item2.ToString() +
                         (InputInfo.PostedTweets.Count() > 1 ?
-                        Environment.NewLine + "(" + (InputInfo.PostedTweets.Count() - 1) + " 件のツイートも同時に削除されます)" : ""),
+                            Environment.NewLine + "(" + (InputInfo.PostedTweets.Count() - 1) + 
+                            " 件のツイートも同時に削除されます)" : ""),
                         VerificationText = "次回から表示しない",
                         CommonButtons = TaskDialogCommonButtons.OKCancel,
                     }));
@@ -573,8 +575,12 @@ namespace StarryEyes.ViewModels.WindowParts
                     .ToArray();
 
                 // check third-reply mistake.
-                if (!AccountsStore.Accounts.Select(_ => _.AuthenticateInfo.UnreliableScreenName).Any(replies.Contains) &&
-                    InputInfo.AuthInfos.Select(_ => _.UnreliableScreenName).Any(replies.Contains))
+                if (!AccountsStore.Accounts
+                        .Select(_ => _.AuthenticateInfo.UnreliableScreenName)
+                        .Any(replies.Contains) &&
+                    InputInfo.AuthInfos
+                        .Select(_ => _.UnreliableScreenName)
+                        .Any(replies.Contains))
                 {
                     var thirdreply = this.Messenger.GetResponse(
                         new TaskDialogMessage(new TaskDialogOptions()
@@ -600,10 +606,44 @@ namespace StarryEyes.ViewModels.WindowParts
                 .Subscribe(_ =>
                 {
                     if (_.PostedTweets != null)
+                    {
                         InputAreaModel.PreviousPosted = _;
+                        BackpanelModel.RegisterEvent(new PostSucceededEvent(_));
+                    }
                     else
-                        InputAreaModel.Drafts.Add(_);
+                    {
+                        var result = AnalysisFailedReason(_);
+                        if (result.Item1)
+                            InputAreaModel.Drafts.Add(_);
+                        BackpanelModel.RegisterEvent(new PostFailedEvent(_, result.Item2));
+                    }
                 });
+        }
+
+        private Tuple<bool, string> AnalysisFailedReason(TweetInputInfo info)
+        {
+            if (info == null)
+                throw new ArgumentNullException("info");
+            if (info.ThrownException == null)
+                throw new ArgumentException("info.ThrownException is null.");
+            var msg = info.ThrownExceptionMessage;
+            if (msg != null)
+            {
+                if (msg.Contains("duplicate"))
+                {
+                    return Tuple.Create(false, "直近のツイートと重複しています。");
+                }
+                if (msg.Contains("User is over daily update limit."))
+                {
+                    return Tuple.Create(true, "POST規制されています。");
+                }
+                // TODO: Implement more cases.
+                return Tuple.Create(true, msg);
+            }
+            else
+            {
+                return Tuple.Create(true, info.ThrownException.Message);
+            }
         }
     }
 
