@@ -9,6 +9,9 @@ using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Models.Store;
 using StarryEyes.Models.Hub;
+using StarryEyes.Models.Backpanel;
+using StarryEyes.Models.Backpanel.TwitterEvents;
+using StarryEyes.Models.Backpanel.SystemEvents;
 
 namespace StarryEyes.Models.Connection.UserDependency
 {
@@ -125,7 +128,7 @@ namespace StarryEyes.Models.Connection.UserDependency
                         return;
                     }
                     if (isFollowed)
-                        EventStore.Store(elem);// send to event store
+                        RegisterEvent(elem);
                     break;
                 case EventType.Blocked:
                     if (elem.EventSourceUser.Id != AuthInfo.Id) return;
@@ -136,8 +139,41 @@ namespace StarryEyes.Models.Connection.UserDependency
                     AuthInfo.GetAccountData().RemoveBlocking(elem.EventTargetUser.Id);
                     break;
                 default:
-                    EventStore.Store(elem);
+                    RegisterEvent(elem);
                     break;
+            }
+        }
+
+        private void RegisterEvent(TwitterStreamingElement elem)
+        {
+            BackpanelEventBase ev = null;
+            switch(elem.EventType)
+            {
+                case EventType.Blocked:
+                    ev = new BlockedEvent(elem.EventSourceUser, elem.EventTargetUser);
+                    break;
+                case EventType.Unblocked:
+                    ev = new UnblockedEvent(elem.EventSourceUser, elem.EventTargetUser);
+                    break;
+                case EventType.Favorite:
+                    ev = new FavoritedEvent(elem.EventSourceUser, elem.EventTargetTweet);
+                    break;
+                case EventType.Unfavorite:
+                    ev = new UnfavoritedEvent(elem.EventSourceUser, elem.EventTargetTweet);
+                    break;
+                case EventType.Follow:
+                    ev = new FollowedEvent(elem.EventSourceUser, elem.EventTargetUser);
+                    break;
+                case EventType.Unfollow:
+                    ev = new UnfollowedEvent(elem.EventSourceUser, elem.EventTargetUser);
+                    break;
+                case EventType.LimitationInfo:
+                    ev = new TrackLimitEvent(this.AuthInfo, elem.TrackLimit.GetValueOrDefault());
+                    break;
+            }
+            if (ev != null)
+            {
+                BackpanelModel.RegisterEvent(ev);
             }
         }
 

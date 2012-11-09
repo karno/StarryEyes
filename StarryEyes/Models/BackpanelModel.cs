@@ -16,6 +16,8 @@ namespace StarryEyes.Models
 
         #region Event management
 
+        public const int TwitterEventMaxHoldCount = 256;
+
         private static readonly ObservableSynchronizedCollection<TwitterEventBase> _twitterEvents =
             new ObservableSynchronizedCollection<TwitterEventBase>();
         public static ObservableSynchronizedCollection<TwitterEventBase> TwitterEvents
@@ -31,7 +33,11 @@ namespace StarryEyes.Models
                 OnEventRegistered(ev);
             var te = ev as TwitterEventBase;
             if (te != null)
-                _twitterEvents.Add(te);
+            {
+                _twitterEvents.Insert(0, te);
+                if (_twitterEvents.Count > TwitterEventMaxHoldCount)
+                    _twitterEvents.RemoveAt(_twitterEvents.Count - 1);
+            }
         }
 
         #endregion

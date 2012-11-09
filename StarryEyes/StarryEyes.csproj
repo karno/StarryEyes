@@ -305,7 +305,6 @@
     <Compile Include="Models\Operations\TweetOperation.cs" />
     <Compile Include="Models\Operations\UpdateProfileOperation.cs" />
     <Compile Include="Models\Store\AccountRelationDataStore.cs" />
-    <Compile Include="Models\Store\EventStore.cs" />
     <Compile Include="Models\Store\StatusStore.cs" />
     <Compile Include="Models\Store\UserStore.cs" />
     <Compile Include="Models\Tab\TabModel.cs" />
