@@ -211,8 +211,10 @@
       <DependentUpon>KeyOverrideWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Helpers\RichTextBoxHelper.cs" />
+    <Compile Include="Views\Messaging\Behaviors\GoToStateInteractionMessageAction.cs" />
     <Compile Include="Views\Messaging\Behaviors\TaskDialogInteractionMessageAction.cs" />
-    <Compile Include="Views\Messaging\Behaviors\TextBoxSetCaretMessageAction.cs" />
+    <Compile Include="Views\Messaging\Behaviors\TextBoxSetCaretInteractionMessageAction.cs" />
+    <Compile Include="Views\Messaging\GoToStateMessage.cs" />
     <Compile Include="Views\Messaging\TaskDialogMessage.cs" />
     <Compile Include="Views\Messaging\TextBoxSetCaretMessage.cs" />
     <Compile Include="Views\Utils\BooleanConverters.cs" />

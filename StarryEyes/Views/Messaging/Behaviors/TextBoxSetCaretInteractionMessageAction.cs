@@ -3,7 +3,7 @@ using Livet.Behaviors.Messaging;
 
 namespace StarryEyes.Views.Messaging.Behaviors
 {
-    public class TextBoxSetCaretMessageAction : InteractionMessageAction<TextBox>
+    public class TextBoxSetCaretInteractionMessageAction : InteractionMessageAction<TextBox>
     {
         protected override void InvokeAction(Livet.Messaging.InteractionMessage message)
         {
