@@ -3,9 +3,9 @@ using System.Linq;
 using System.Reactive.Linq;
 using StarryEyes.Models.Store;
 using StarryEyes.Settings;
-using StarryEyes.Moon.Api.Rest;
-using StarryEyes.Moon.Authorize;
-using StarryEyes.Moon.DataModel;
+using StarryEyes.Breezy.Api.Rest;
+using StarryEyes.Breezy.Authorize;
+using StarryEyes.Breezy.DataModel;
 
 namespace StarryEyes.Models.Hub
 {

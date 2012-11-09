@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using StarryEyes.Moon.Authorize;
+using StarryEyes.Breezy.Authorize;
 
 namespace StarryEyes.Models.Connection
 {

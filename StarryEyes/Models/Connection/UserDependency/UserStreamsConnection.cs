@@ -4,9 +4,9 @@ using System.Linq;
 using System.Net;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using StarryEyes.Moon.Api.Streaming;
-using StarryEyes.Moon.Authorize;
-using StarryEyes.Moon.DataModel;
+using StarryEyes.Breezy.Api.Streaming;
+using StarryEyes.Breezy.Authorize;
+using StarryEyes.Breezy.DataModel;
 using StarryEyes.Models.Store;
 using StarryEyes.Models.Hub;
 

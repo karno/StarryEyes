@@ -1,6 +1,6 @@
 ﻿using System;
 using StarryEyes.Models.Connection.UserDependency;
-using StarryEyes.Moon.DataModel;
+using StarryEyes.Breezy.DataModel;
 
 namespace StarryEyes.Filters.Sources
 {

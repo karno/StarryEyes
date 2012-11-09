@@ -6,8 +6,8 @@ using System.Threading;
 using Livet;
 using StarryEyes.Models.Hub;
 using StarryEyes.Models.Store;
-using StarryEyes.Moon.Authorize;
-using StarryEyes.Moon.DataModel;
+using StarryEyes.Breezy.Authorize;
+using StarryEyes.Breezy.DataModel;
 using StarryEyes.Settings;
 using StarryEyes.ViewModels.WindowParts.Timelines;
 

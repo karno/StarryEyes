@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using StarryEyes.Models.Store;
-using StarryEyes.Moon.DataModel;
+using StarryEyes.Breezy.DataModel;
 
 namespace StarryEyes.Filters.Expressions.Values.Statuses
 {

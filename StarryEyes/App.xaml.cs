@@ -12,7 +12,7 @@ using StarryEyes.Models.Hub;
 using StarryEyes.Models.Plugins;
 using StarryEyes.Models.Store;
 using StarryEyes.Settings;
-using StarryEyes.Moon.Api;
+using StarryEyes.Breezy.Api;
 using StarryEyes.Models;
 
 namespace StarryEyes

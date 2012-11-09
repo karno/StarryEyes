@@ -9,7 +9,7 @@ using Livet.Commands;
 using Livet.Messaging;
 using Livet.Messaging.Windows;
 using StarryEyes.Helpers;
-using StarryEyes.Moon.Authorize;
+using StarryEyes.Breezy.Authorize;
 using StarryEyes.Views.Messaging;
 using StarryEyes.Settings;
 

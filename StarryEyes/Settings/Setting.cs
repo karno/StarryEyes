@@ -6,7 +6,7 @@ using System.Xaml;
 using StarryEyes.Filters.Expressions;
 using StarryEyes.Filters.Parsing;
 using StarryEyes.Models.Hub;
-using StarryEyes.Moon.Imaging;
+using StarryEyes.Breezy.Imaging;
 
 namespace StarryEyes.Settings
 {

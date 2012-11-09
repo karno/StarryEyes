@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using StarryEyes.Models.Hub;
 using StarryEyes.Settings;
-using StarryEyes.Moon.Authorize;
+using StarryEyes.Breezy.Authorize;
 
 namespace StarryEyes.Models.Connection.UserDependency
 {

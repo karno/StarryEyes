@@ -7,13 +7,13 @@ using StarryEyes.Filters;
 using StarryEyes.Filters.Parsing;
 using StarryEyes.Models.Hub;
 using StarryEyes.Models.Store;
-using StarryEyes.Moon.DataModel;
+using StarryEyes.Breezy.DataModel;
 using StarryEyes.Vanille.DataStore;
 using System.Reactive;
 using System.Reactive.Disposables;
 using Livet;
 using System.Linq;
-using StarryEyes.Moon.Authorize;
+using StarryEyes.Breezy.Authorize;
 using StarryEyes.Filters.Sources;
 
 namespace StarryEyes.Models.Tab

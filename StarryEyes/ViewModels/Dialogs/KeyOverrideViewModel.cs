@@ -4,7 +4,7 @@ using Codeplex.OAuth;
 using Livet;
 using Livet.Messaging.Windows;
 using StarryEyes.Models.Store;
-using StarryEyes.Moon.Api;
+using StarryEyes.Breezy.Api;
 using StarryEyes.Settings;
 using StarryEyes.Views.Messaging;
 using StarryEyes.Helpers;

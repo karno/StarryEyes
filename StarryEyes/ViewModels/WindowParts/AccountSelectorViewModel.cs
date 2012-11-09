@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Livet;
 using StarryEyes.Models.Store;
-using StarryEyes.Moon.Authorize;
+using StarryEyes.Breezy.Authorize;
 using StarryEyes.Settings;
 
 namespace StarryEyes.ViewModels.WindowParts

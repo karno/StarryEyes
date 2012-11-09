@@ -16,10 +16,10 @@ using StarryEyes.Models.Tab;
 using System.Reactive.Linq;
 using System.Reactive;
 using StarryEyes.Settings;
-using StarryEyes.Moon.Api.Rest;
+using StarryEyes.Breezy.Api.Rest;
 using System.Collections.ObjectModel;
 using System.Reactive.Disposables;
-using StarryEyes.Moon.DataModel;
+using StarryEyes.Breezy.DataModel;
 
 namespace StarryEyes.ViewModels.WindowParts.Timelines
 {

@@ -1,6 +1,6 @@
 ﻿using System;
 using StarryEyes.Models.Hub;
-using StarryEyes.Moon.Authorize;
+using StarryEyes.Breezy.Authorize;
 
 namespace StarryEyes.Models.Connection
 {

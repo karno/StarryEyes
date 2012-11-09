@@ -1,6 +1,6 @@
 ﻿using Livet;
 using StarryEyes.Models;
-using StarryEyes.Moon.DataModel;
+using StarryEyes.Breezy.DataModel;
 
 namespace StarryEyes.ViewModels.WindowParts.Timelines
 {

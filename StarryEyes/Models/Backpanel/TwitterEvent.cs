@@ -1,6 +1,6 @@
 ﻿using StarryEyes.Models.Store;
-using StarryEyes.Moon.Authorize;
-using StarryEyes.Moon.DataModel;
+using StarryEyes.Breezy.Authorize;
+using StarryEyes.Breezy.DataModel;
 
 namespace StarryEyes.Models.Backpanel
 {

@@ -2,8 +2,8 @@
 using System.Linq;
 using System.Reactive.Linq;
 using StarryEyes.Models.Store;
-using StarryEyes.Moon.Api.Rest;
-using StarryEyes.Moon.DataModel;
+using StarryEyes.Breezy.Api.Rest;
+using StarryEyes.Breezy.DataModel;
 
 namespace StarryEyes.Filters.Sources
 {

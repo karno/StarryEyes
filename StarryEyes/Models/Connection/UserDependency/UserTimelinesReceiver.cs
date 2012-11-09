@@ -1,7 +1,7 @@
 ﻿using System;
 using StarryEyes.Models.Store;
-using StarryEyes.Moon.Api.Rest;
-using StarryEyes.Moon.Authorize;
+using StarryEyes.Breezy.Api.Rest;
+using StarryEyes.Breezy.Authorize;
 
 namespace StarryEyes.Models.Connection.UserDependency
 {

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Documents;
-using StarryEyes.Moon.Util;
+using StarryEyes.Breezy.Util;
 using System.Windows.Input;
-using StarryEyes.Moon.DataModel;
+using StarryEyes.Breezy.DataModel;
 using System.Windows.Controls;
 using StarryEyes.Models;
 

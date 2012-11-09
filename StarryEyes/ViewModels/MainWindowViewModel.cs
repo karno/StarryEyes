@@ -12,7 +12,7 @@ using StarryEyes.Settings;
 using StarryEyes.ViewModels.Dialogs;
 using StarryEyes.Views.Dialogs;
 using StarryEyes.Filters.Parsing;
-using StarryEyes.Moon.DataModel;
+using StarryEyes.Breezy.DataModel;
 using System.Collections.Generic;
 using StarryEyes.Models.Operations;
 using StarryEyes.Views.Messaging;

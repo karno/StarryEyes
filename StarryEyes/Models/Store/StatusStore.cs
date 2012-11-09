@@ -2,7 +2,7 @@
 using System.IO;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using StarryEyes.Moon.DataModel;
+using StarryEyes.Breezy.DataModel;
 using StarryEyes.Vanille.DataStore;
 using StarryEyes.Vanille.DataStore.Persistent;
 using System.Threading;

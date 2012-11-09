@@ -1,5 +1,5 @@
 ﻿using System.Runtime.Serialization;
-using StarryEyes.Moon.Authorize;
+using StarryEyes.Breezy.Authorize;
 
 namespace StarryEyes.Settings
 {

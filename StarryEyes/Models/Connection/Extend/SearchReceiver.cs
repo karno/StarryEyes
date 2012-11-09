@@ -2,7 +2,7 @@
 using System.Linq;
 using StarryEyes.Models.Hub;
 using StarryEyes.Settings;
-using StarryEyes.Moon.Api.Rest;
+using StarryEyes.Breezy.Api.Rest;
 
 namespace StarryEyes.Models.Connection.Extend
 {

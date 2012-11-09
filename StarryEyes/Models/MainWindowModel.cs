@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using StarryEyes.Filters.Expressions;
-using StarryEyes.Moon.Authorize;
-using StarryEyes.Moon.DataModel;
+using StarryEyes.Breezy.Authorize;
+using StarryEyes.Breezy.DataModel;
 
 namespace StarryEyes.Models
 {

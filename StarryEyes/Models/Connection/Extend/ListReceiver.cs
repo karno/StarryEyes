@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using StarryEyes.Models.Hub;
 using StarryEyes.Settings;
-using StarryEyes.Moon.Api.Rest;
-using StarryEyes.Moon.Authorize;
+using StarryEyes.Breezy.Api.Rest;
+using StarryEyes.Breezy.Authorize;
 
 namespace StarryEyes.Models.Connection.Polling
 {
