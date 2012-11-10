@@ -1,5 +1,5 @@
 ﻿
-namespace StarryEyes.Models.Backpanel
+namespace StarryEyes.Models.Backpanels
 {
     /// <summary>
     /// A Event that contains related action.
@@ -9,6 +9,6 @@ namespace StarryEyes.Models.Backpanel
         /// <summary>
         /// Execute related action.
         /// </summary>
-        public void Execute() { }
+        public abstract void Execute();
     }
 }

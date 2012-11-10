@@ -11,7 +11,7 @@ using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Helpers;
 using StarryEyes.Models;
-using StarryEyes.Models.Backpanel.PostEvents;
+using StarryEyes.Models.Backpanels.PostEvents;
 using StarryEyes.Models.Operations;
 using StarryEyes.Models.Store;
 using StarryEyes.Settings;

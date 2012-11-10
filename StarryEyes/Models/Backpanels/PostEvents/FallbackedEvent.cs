@@ -7,7 +7,7 @@ using System.Windows.Media;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Views;
 
-namespace StarryEyes.Models.Backpanel.PostEvents
+namespace StarryEyes.Models.Backpanels.PostEvents
 {
     public sealed class FallbackedEvent : BackpanelEventBase
     {

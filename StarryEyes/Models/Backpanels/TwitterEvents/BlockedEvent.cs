@@ -1,7 +1,7 @@
 ﻿using StarryEyes.Breezy.DataModel;
 using StarryEyes.Views;
 
-namespace StarryEyes.Models.Backpanel.TwitterEvents
+namespace StarryEyes.Models.Backpanels.TwitterEvents
 {
     public sealed class BlockedEvent : TwitterEventBase
     {

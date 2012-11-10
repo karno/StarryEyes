@@ -1,7 +1,7 @@
 ﻿using StarryEyes.Breezy.Authorize;
 using StarryEyes.Views;
 
-namespace StarryEyes.Models.Backpanel.SystemEvents
+namespace StarryEyes.Models.Backpanels.SystemEvents
 {
     public sealed class TrackLimitEvent : BackpanelEventBase
     {

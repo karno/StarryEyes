@@ -4,7 +4,7 @@ using System.Windows.Interop;
 
 namespace StarryEyes.Nightmare.Windows
 {
-    public static class WindowNativeExtension
+    public static class NativeMethods
     {
         [StructLayout(LayoutKind.Sequential)]
         struct POINT

@@ -192,22 +192,31 @@ namespace StarryEyes
             }
         }
 
-        public static FileVersionInfo GetVersion()
+        private static FileVersionInfo _version;
+        public static FileVersionInfo Version
         {
-            return FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location);
+            get
+            {
+                return _version ??
+                    (_version = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location));
+            }
         }
 
-        public static string GetFormattedVersion()
+        public static string FormattedVersion
         {
-            var ver = GetVersion();
-            return ver.FileMajorPart + "." + ver.FileMinorPart + "." + ver.FilePrivatePart + FileKind(ver.FileBuildPart);
+            get
+            {
+                return Version.FileMajorPart + "." +
+                    Version.FileMinorPart + "." +
+                    Version.FilePrivatePart + FileKind(Version.FileBuildPart);
+            }
         }
 
         public static bool IsNightlyVersion
         {
             get
             {
-                return GetVersion().FilePrivatePart >= 1;
+                return Version.FilePrivatePart >= 1;
             }
         }
 
@@ -228,11 +237,14 @@ namespace StarryEyes
             }
         }
 
-        public static double GetNumericVersion()
+        public static double NumericVersion
         {
-            var lvobj = GetVersion();
-            var lvstr = (lvobj.FileMajorPart * 1000 + lvobj.FileMinorPart).ToString() + "." + lvobj.FileBuildPart.ToString();
-            return Double.Parse(lvstr);
+            get
+            {
+                var lvstr = (Version.FileMajorPart * 1000 + Version.FileMinorPart).ToString() + "." +
+                    Version.FilePrivatePart.ToString();
+                return Double.Parse(lvstr);
+            }
         }
 
         public static readonly string KeyAssignDirectory = "assigns";
@@ -263,7 +275,7 @@ namespace StarryEyes
 
         public static readonly string ReleaseNoteUrl = "http://krile.starwing.net/updates.html";
 
-        public static string KampaUrl = "http://krile.starwing.net/kampa.html";
+        public static readonly string KampaUrl = "http://krile.starwing.net/kampa.html";
 
         #endregion
 

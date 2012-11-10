@@ -59,11 +59,14 @@ namespace StarryEyes.Models.Store
         /// Get all existed datas.
         /// </summary>
         /// <returns></returns>
-        public static IEnumerable<AccountData> GetAccountDatas()
+        public static IEnumerable<AccountData> AccountDatas
         {
-            lock (storeLocker)
+            get
             {
-                return store.Values.ToArray();
+                lock (storeLocker)
+                {
+                    return store.Values.ToArray();
+                }
             }
         }
     }

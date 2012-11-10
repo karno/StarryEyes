@@ -19,6 +19,7 @@ using StarryEyes.Views.Messaging;
 using StarryEyes.ViewModels.WindowParts.Timelines;
 using StarryEyes.Views.Helpers;
 using StarryEyes.Helpers;
+using StarryEyes.ViewModels.WindowParts;
 
 namespace StarryEyes.ViewModels
 {
@@ -65,6 +66,23 @@ namespace StarryEyes.ViewModels
      */
     public class MainWindowViewModel : ViewModel
     {
+        #region Included viewmodels
+
+        private readonly BackpanelViewModel _backpanelViewModel;
+        public BackpanelViewModel BackpanelViewModel
+        {
+            get { return _backpanelViewModel; }
+        } 
+
+
+        #endregion
+
+        public MainWindowViewModel()
+        {
+            this.CompositeDisposable.Add(_backpanelViewModel = new BackpanelViewModel());
+            _backpanelViewModel.Initialize();
+        }
+
         public void Initialize()
         {
             StatisticsHub.OnStatisticsParamsUpdated += () =>

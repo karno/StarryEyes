@@ -9,9 +9,9 @@ using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Models.Store;
 using StarryEyes.Models.Hub;
-using StarryEyes.Models.Backpanel;
-using StarryEyes.Models.Backpanel.TwitterEvents;
-using StarryEyes.Models.Backpanel.SystemEvents;
+using StarryEyes.Models.Backpanels;
+using StarryEyes.Models.Backpanels.TwitterEvents;
+using StarryEyes.Models.Backpanels.SystemEvents;
 
 namespace StarryEyes.Models.Connection.UserDependency
 {

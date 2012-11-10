@@ -1,6 +1,6 @@
 ﻿using StarryEyes.Views;
 
-namespace StarryEyes.Models.Backpanel.PostEvents
+namespace StarryEyes.Models.Backpanels.PostEvents
 {
     public sealed class PostSucceededEvent : BackpanelEventBase
     {

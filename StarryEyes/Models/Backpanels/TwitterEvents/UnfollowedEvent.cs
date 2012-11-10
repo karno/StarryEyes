@@ -1,7 +1,7 @@
 ﻿using System.Windows.Media;
 using StarryEyes.Breezy.DataModel;
 
-namespace StarryEyes.Models.Backpanel.TwitterEvents
+namespace StarryEyes.Models.Backpanels.TwitterEvents
 {
     public sealed class UnfollowedEvent : TwitterEventBase
     {

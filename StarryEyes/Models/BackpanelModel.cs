@@ -1,7 +1,7 @@
 ﻿using System;
 using Livet;
-using StarryEyes.Models.Backpanel;
-using StarryEyes.Models.Backpanel.TwitterEvents;
+using StarryEyes.Models.Backpanels;
+using StarryEyes.Models.Backpanels.TwitterEvents;
 
 namespace StarryEyes.Models
 {

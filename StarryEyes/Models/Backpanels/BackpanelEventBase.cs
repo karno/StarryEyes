@@ -1,6 +1,6 @@
 ﻿using System.Windows.Media;
 
-namespace StarryEyes.Models.Backpanel
+namespace StarryEyes.Models.Backpanels
 {
     /// <summary>
     /// Represents event.

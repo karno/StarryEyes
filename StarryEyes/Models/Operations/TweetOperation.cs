@@ -5,7 +5,7 @@ using System.Windows.Media.Imaging;
 using StarryEyes.Breezy.Api.Rest;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
-using StarryEyes.Models.Backpanel.PostEvents;
+using StarryEyes.Models.Backpanels.PostEvents;
 using StarryEyes.Models.Store;
 using StarryEyes.Settings;
 
