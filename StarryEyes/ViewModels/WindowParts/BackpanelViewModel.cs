@@ -144,7 +144,7 @@ namespace StarryEyes.ViewModels.WindowParts
 
         public string Detail
         {
-            get { return SourceEvent.Detail; }
+            get { return SourceEvent.Detail.Replace("\r", "").Replace("\n", " "); }
         }
     }
 
