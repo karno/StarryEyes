@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Device.Location;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Windows.Media.Imaging;
-using Livet;
+﻿using Livet;
 using Livet.EventListeners;
 using Livet.Messaging.IO;
 using StarryEyes.Breezy.Authorize;
@@ -16,6 +10,12 @@ using StarryEyes.Models.Store;
 using StarryEyes.Settings;
 using StarryEyes.ViewModels.WindowParts.Timelines;
 using StarryEyes.Views.Messaging;
+using System;
+using System.Collections.Generic;
+using System.Device.Location;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Windows.Media.Imaging;
 using TaskDialogInterop;
 
 namespace StarryEyes.ViewModels.WindowParts
@@ -41,6 +41,30 @@ namespace StarryEyes.ViewModels.WindowParts
         public ReadOnlyDispatcherCollection<TweetInputInfoViewModel> DraftedInputs
         {
             get { return _draftedInputs; }
+        }
+
+        private readonly ReadOnlyDispatcherCollection<AuthenticateInfoViewModel> _bindingAuthInfos;
+        public ReadOnlyDispatcherCollection<AuthenticateInfoViewModel> BindingAuthInfos
+        {
+            get { return _bindingAuthInfos; }
+        }
+
+        public int AuthInfoGridRowColumn
+        {
+            get
+            {
+                return (int)Math.Ceiling(Math.Sqrt(Math.Max(_bindingAuthInfos.Count, 1)));
+            }
+        }
+
+        public string AuthInfoScreenNames
+        {
+            get
+            {
+                if (_bindingAuthInfos.Count == 0)
+                    return "アカウントは選択されていません。";
+                return _bindingAuthInfos.Select(_ => _.ScreenName).JoinString(", ") + "が選択されています。";
+            }
         }
 
         private bool _isOpening = false;
@@ -117,7 +141,7 @@ namespace StarryEyes.ViewModels.WindowParts
                 {
                     return null;
                 }
-                
+
                 if (_inReplyToViewModelCache == null ||
                     _inReplyToViewModelCache.Status.Id != InputInfo.InReplyTo.Id)
                 {
@@ -185,7 +209,7 @@ namespace StarryEyes.ViewModels.WindowParts
         {
             get { return InputInfo.MessageRecipient != null; }
         }
-        
+
         public ImageDescriptionViewModel AttachedImage
         {
             get { return new ImageDescriptionViewModel(InputInfo.AttachedImage); }
@@ -263,14 +287,25 @@ namespace StarryEyes.ViewModels.WindowParts
         public InputAreaViewModel()
         {
             this._accountSelector = new AccountSelectorViewModel();
-            this._bindingHashtags = ViewModelHelper.CreateReadOnlyDispatcherCollection(
-                InputAreaModel.BindingHashtags, _ => _, DispatcherHelper.UIDispatcher);
-            this.CompositeDisposable.Add(_bindingHashtags);
-            this._draftedInputs = ViewModelHelper.CreateReadOnlyDispatcherCollection(
+
+            this.CompositeDisposable.Add(this._bindingHashtags =
+                ViewModelHelper.CreateReadOnlyDispatcherCollection(
+                InputAreaModel.BindingHashtags,
+                _ => _,
+                DispatcherHelper.UIDispatcher));
+
+            this.CompositeDisposable.Add(this._draftedInputs =
+                ViewModelHelper.CreateReadOnlyDispatcherCollection(
                 InputAreaModel.Drafts,
                 _ => new TweetInputInfoViewModel(this, _, vm => InputAreaModel.Drafts.Remove(vm)),
-                DispatcherHelper.UIDispatcher);
-            this.CompositeDisposable.Add(_draftedInputs);
+                DispatcherHelper.UIDispatcher));
+
+            this.CompositeDisposable.Add(this._bindingAuthInfos =
+                ViewModelHelper.CreateReadOnlyDispatcherCollection(
+                InputAreaModel.BindingAuthInfos,
+                _ => new AuthenticateInfoViewModel(_),
+                DispatcherHelper.UIDispatcher));
+
             this._accountSelector.OnSelectedAccountsChanged += () =>
             {
                 if (!_isSuppressAccountChangeRelay)
@@ -280,6 +315,7 @@ namespace StarryEyes.ViewModels.WindowParts
                     _baseSelectedAccounts = InputAreaModel.BindingAuthInfos.Select(_ => _.Id).ToArray();
                 }
                 InputInfo.AuthInfos = this.AccountSelector.SelectedAccounts;
+                RaisePropertyChanged(() => AuthInfoGridRowColumn);
                 UpdateTextCount();
             };
             this.CompositeDisposable.Add(_accountSelector);
@@ -414,7 +450,7 @@ namespace StarryEyes.ViewModels.WindowParts
                             Title = "下書きへの保存",
                             VerificationText = "次回から表示しない"
                         }));
-                    switch(msg.Response.Result)
+                    switch (msg.Response.Result)
                     {
                         case TaskDialogSimpleResult.Yes:
                             action = TweetBoxClosingAction.SaveToDraft;
@@ -430,7 +466,7 @@ namespace StarryEyes.ViewModels.WindowParts
                         Setting.TweetBoxClosingAction.Value = action;
                     }
                 }
-                switch(action)
+                switch (action)
                 {
                     case TweetBoxClosingAction.Discard:
                         ClearInput();
@@ -544,7 +580,7 @@ namespace StarryEyes.ViewModels.WindowParts
                         ExpandedInfo = "削除されるツイート: " +
                         InputInfo.PostedTweets.First().Item2.ToString() +
                         (InputInfo.PostedTweets.Count() > 1 ?
-                            Environment.NewLine + "(" + (InputInfo.PostedTweets.Count() - 1) + 
+                            Environment.NewLine + "(" + (InputInfo.PostedTweets.Count() - 1) +
                             " 件のツイートも同時に削除されます)" : ""),
                         VerificationText = "次回から表示しない",
                         CommonButtons = TaskDialogCommonButtons.OKCancel,
@@ -564,7 +600,7 @@ namespace StarryEyes.ViewModels.WindowParts
             if (InReplyTo != null && Setting.IsWarnReplyFromThirdAccount.Value)
             {
                 // warn third reply
- 
+
                 // filters screen names which were replied
                 var replies = RegexHelper.AtRegex.Matches(InReplyTo.Status.Text)
                     .Cast<Match>()
@@ -688,7 +724,7 @@ namespace StarryEyes.ViewModels.WindowParts
 
         private Action<TweetInputInfo> _removeHandler;
 
-        public TweetInputInfoViewModel(InputAreaViewModel parent, 
+        public TweetInputInfoViewModel(InputAreaViewModel parent,
             TweetInputInfo info, Action<TweetInputInfo> removeHandler)
         {
             this.Parent = parent;
@@ -722,6 +758,35 @@ namespace StarryEyes.ViewModels.WindowParts
         {
             _removeHandler(this.Model);
             Parent.Send(this.Model);
+        }
+    }
+
+    public class AuthenticateInfoViewModel : ViewModel
+    {
+        private readonly AuthenticateInfo _authInfo;
+        public AuthenticateInfo AuthInfo
+        {
+            get { return _authInfo; }
+        }
+
+        public AuthenticateInfoViewModel(AuthenticateInfo info)
+        {
+            this._authInfo = info;
+        }
+
+        public Uri ProfileImageUri
+        {
+            get { return _authInfo.UnreliableProfileImageUri; }
+        }
+
+        public string ScreenName
+        {
+            get { return _authInfo.UnreliableScreenName; }
+        }
+
+        public long Id
+        {
+            get { return _authInfo.Id; }
         }
     }
 }
