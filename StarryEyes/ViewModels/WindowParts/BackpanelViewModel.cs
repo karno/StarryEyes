@@ -18,6 +18,7 @@ using StarryEyes.Models.Backpanels.TwitterEvents;
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
+using StarryEyes.Settings;
 
 namespace StarryEyes.ViewModels.WindowParts
 {
@@ -102,11 +103,12 @@ namespace StarryEyes.ViewModels.WindowParts
                     ev = _waitingEvents.Dequeue();
                 }
                 CurrentEvent = new BackpanelEventViewModel(ev);
-                Thread.Sleep(200);
+                Thread.Sleep(Setting.EventDispatchMinimumMSec.Value);
                 lock (_syncLock)
                 {
                     if (_waitingEvents.Count == 0)
-                        Monitor.Wait(_syncLock, 2300);
+                        Monitor.Wait(_syncLock,
+                            Setting.EventDispatchMaximumMSec.Value - Setting.EventDispatchMinimumMSec.Value);
                     if (_waitingEvents.Count == 0)
                         CurrentEvent = null;
                 }

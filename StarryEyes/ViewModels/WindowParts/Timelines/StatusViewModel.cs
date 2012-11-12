@@ -22,8 +22,19 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             get { return parent; }
         } 
 
+        /// <summary>
+        /// Represents status model.
+        /// </summary>
         public StatusModel Model { get; private set; }
+
+        /// <summary>
+        /// Represents ORIGINAL status. (if this status is retweet, this property represents a status which contains retweeted_original.)
+        /// </summary>
         public TwitterStatus OriginalStatus { get { return Model.Status; } }
+
+        /// <summary>
+        /// Represents status. (if this status is retweet, this property represents retweeted_original.)
+        /// </summary>
         public TwitterStatus Status
         {
             get
@@ -154,13 +165,13 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         {
             get
             {
-                return this.IsDirectMessage || Setting.Accounts.Any(a => a.UserId == OriginalStatus.User.Id);
+                return this.IsDirectMessage || AccountsStore.AccountIds.Contains(OriginalStatus.User.Id);
             }
         }
 
         public bool IsMyself
         {
-            get { return Setting.Accounts.Any(a => a.UserId == Status.User.Id); }
+            get { return AccountsStore.AccountIds.Contains(Status.User.Id); }
         }
 
         public bool IsMyselfStrict
@@ -282,14 +293,14 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         private IEnumerable<AuthenticateInfo> GetImmediateAccounts()
         {
-            return Setting.Accounts
+            return AccountsStore.Accounts
                 .Where(a => _bindingAccounts.Contains(a.UserId))
                 .Select(a => a.AuthenticateInfo);
         }
 
         public void ToggleFavorite()
         {
-            var favoriteds = Setting.Accounts
+            var favoriteds = AccountsStore.Accounts
                 .Where(a => Model.IsFavorited(a.UserId))
                 .Select(a => a.AuthenticateInfo)
                 .ToArray();
@@ -307,7 +318,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public void ToggleRetweet()
         {
-            var retweeteds = Setting.Accounts
+            var retweeteds = AccountsStore.Accounts
                 .Where(a => Model.IsRetweeted(a.UserId))
                 .Select(a => a.AuthenticateInfo)
                 .ToArray();

@@ -30,7 +30,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
                 return base.GetNumericValueProvider();
         }
 
-        public override Func<TwitterStatus, ICollection<long>> GetSetValueProvider()
+        public override Func<TwitterStatus, IReadOnlyCollection<long>> GetSetValueProvider()
         {
             return _ => _representation.Users;
         }
@@ -54,7 +54,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
             get { yield return FilterExpressionType.Set; }
         }
 
-        public override Func<TwitterStatus, ICollection<long>> GetSetValueProvider()
+        public override Func<TwitterStatus, IReadOnlyCollection<long>> GetSetValueProvider()
         {
             return _ => _representation.Followings;
         }
@@ -78,7 +78,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
             get { yield return FilterExpressionType.Set; }
         }
 
-        public override Func<TwitterStatus, ICollection<long>> GetSetValueProvider()
+        public override Func<TwitterStatus, IReadOnlyCollection<long>> GetSetValueProvider()
         {
             return _ => _representation.Followers;
         }

@@ -6,11 +6,11 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
     {
         public abstract long UserId { get; }
 
-        public abstract ICollection<long> Users { get; }
+        public abstract IReadOnlyCollection<long> Users { get; }
 
-        public abstract ICollection<long> Followings { get; }
+        public abstract IReadOnlyCollection<long> Followings { get; }
 
-        public abstract ICollection<long> Followers { get; }
+        public abstract IReadOnlyCollection<long> Followers { get; }
 
         public abstract string ToQuery();
     }

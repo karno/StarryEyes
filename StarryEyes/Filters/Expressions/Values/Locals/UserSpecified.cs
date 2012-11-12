@@ -16,7 +16,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
         public UserSpecified(string screenName)
         {
             _originalScreenName = screenName;
-            _userId = Setting.Accounts
+            _userId = AccountsStore.Accounts
                 .Where(u => u.AuthenticateInfo.UnreliableScreenName == screenName)
                 .Select(u => u.UserId)
                 .FirstOrDefault();
@@ -34,7 +34,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
             _adata = AccountRelationDataStore.GetAccountData(_userId);
         }
 
-        public override ICollection<long> Users
+        public override IReadOnlyCollection<long> Users
         {
             get
             {
@@ -45,7 +45,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
             }
         }
 
-        public override ICollection<long> Followings
+        public override IReadOnlyCollection<long> Followings
         {
             get
             {
@@ -56,7 +56,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
             }
         }
 
-        public override ICollection<long> Followers
+        public override IReadOnlyCollection<long> Followers
         {
             get
             {

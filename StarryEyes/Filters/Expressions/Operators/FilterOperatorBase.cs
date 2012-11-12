@@ -23,7 +23,7 @@ namespace StarryEyes.Filters.Expressions.Operators
             throw new FilterQueryException("Unsupported transforms to string.", ToQuery());
         }
 
-        public virtual Func<TwitterStatus, ICollection<long>> GetSetValueProvider()
+        public virtual Func<TwitterStatus, IReadOnlyCollection<long>> GetSetValueProvider()
         {
             throw new FilterQueryException("Unsupported transforms to set.", ToQuery());
         }

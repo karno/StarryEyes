@@ -8,7 +8,7 @@ namespace StarryEyes.Albireo.Data
     /// Implementation of the AVLTree.
     /// </summary>
     /// <typeparam name="T">Item class</typeparam>
-    public sealed class AVLTree<T> : ICollection<T> where T : IComparable<T>
+    public sealed class AVLTree<T> : ICollection<T>, IReadOnlyCollection<T> where T : IComparable<T>
     {
         public AVLTree() { }
 
@@ -214,7 +214,7 @@ namespace StarryEyes.Albireo.Data
                     else
                         parent.Item1.RightLeaf = leaf;
                 }
-                
+
                 // rotate and balance
                 while (trace.Count > 0)
                 {
@@ -422,7 +422,7 @@ namespace StarryEyes.Albireo.Data
 
         public IEnumerator<T> GetEnumerator()
         {
-            return new AVLEnumerator(this); 
+            return new AVLEnumerator(this);
         }
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
@@ -485,7 +485,7 @@ namespace StarryEyes.Albireo.Data
                     {
                         trace.Push(Tuple.Create(leaf, Direction.Left));
                         leaf = leaf.LeftLeaf;
-                    } while (leaf != null) ;
+                    } while (leaf != null);
                     return trace.Count > 0;
                 }
                 else // trace
@@ -502,7 +502,7 @@ namespace StarryEyes.Albireo.Data
                         } while (leaf != null);
                         return true;
                     }
-                    else 
+                    else
                     {
                         while (trace.Count > 0 && trace.Peek().Item2 == Direction.Right)
                             trace.Pop();
@@ -516,6 +516,5 @@ namespace StarryEyes.Albireo.Data
                 trace.Clear();
             }
         }
-
     }
 }

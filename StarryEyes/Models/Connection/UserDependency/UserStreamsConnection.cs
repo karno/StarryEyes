@@ -12,6 +12,7 @@ using StarryEyes.Models.Hub;
 using StarryEyes.Models.Backpanels;
 using StarryEyes.Models.Backpanels.TwitterEvents;
 using StarryEyes.Models.Backpanels.SystemEvents;
+using StarryEyes.Settings;
 
 namespace StarryEyes.Models.Connection.UserDependency
 {
@@ -101,14 +102,19 @@ namespace StarryEyes.Models.Connection.UserDependency
                 case EventType.Undefined:
                     // deliver tweet or something.
                     if (elem.Status != null)
+                    {
                         StatusStore.Store(elem.Status);
+                        // notify status
+                        if (elem.Status.RetweetedOriginal != null &&
+                            AccountsStore.AccountIds.Contains(elem.Status.RetweetedOriginal.User.Id) &&
+                            !Setting.Muteds.Evaluator(elem.Status) &&
+                            (!Setting.ApplyMuteToRetweetOriginals.Value || !Setting.Muteds.Evaluator(elem.Status.RetweetedOriginal)))
+                        {
+                            BackpanelModel.RegisterEvent(new RetweetedEvent(elem.Status.User, elem.Status.RetweetedOriginal));
+                        }
+                    }
                     if (elem.DeletedId != null)
                         StatusStore.Remove(elem.DeletedId.Value);
-                    if (elem.TrackLimit != null)
-                        this.RaiseInfoNotification(
-                            "UserStreams_TrackLimit_" + AuthInfo.UnreliableScreenName,
-                            "タイムラインの速度が速すぎます。",
-                            "ユーザーストリームの取得漏れが起きています。(" + elem.TrackLimit + " 件)");
                     break;
                 case EventType.Follow:
                 case EventType.Unfollow:

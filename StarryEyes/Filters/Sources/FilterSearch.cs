@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Reactive.Linq;
-using StarryEyes.Models.Connection.Extend;
-using StarryEyes.Settings;
 using StarryEyes.Breezy.Api.Rest;
 using StarryEyes.Breezy.DataModel;
+using StarryEyes.Models.Connection.Extend;
+using StarryEyes.Models.Store;
 
 namespace StarryEyes.Filters.Sources
 {
@@ -23,7 +23,7 @@ namespace StarryEyes.Filters.Sources
 
         protected override IObservable<TwitterStatus> ReceiveSink(long? max_id)
         {
-            return Observable.Defer(() => Setting.Accounts.Shuffle().Take(1).ToObservable())
+            return Observable.Defer(() => AccountsStore.Accounts.Shuffle().Take(1).ToObservable())
                 .SelectMany(a => a.AuthenticateInfo.SearchTweets(_query));
         }
 

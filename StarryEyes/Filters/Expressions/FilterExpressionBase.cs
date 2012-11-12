@@ -20,6 +20,8 @@ namespace StarryEyes.Filters.Expressions
 
         public Func<TwitterStatus, bool> GetEvaluator()
         {
+            if (Operator == null)
+                return _ => false;
             if (!FilterExpressionUtil.Assert(FilterExpressionType.Boolean, Operator.SupportedTypes))
                 throw new FilterQueryException("Unsupported evaluating as boolean.", Operator.ToQuery());
             return Operator.GetBooleanValueProvider();

@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using StarryEyes.Models.Hub;
-using StarryEyes.Settings;
 using StarryEyes.Breezy.Api.Rest;
+using StarryEyes.Models.Hub;
+using StarryEyes.Models.Store;
 
 namespace StarryEyes.Models.Connection.Extend
 {
@@ -68,7 +68,7 @@ namespace StarryEyes.Models.Connection.Extend
 
         public static void DoReceive(string query, long? max_id = null)
         {
-            var authInfo = Setting.Accounts.Shuffle().Select(s => s.AuthenticateInfo).FirstOrDefault();
+            var authInfo = AccountsStore.Accounts.Shuffle().Select(s => s.AuthenticateInfo).FirstOrDefault();
             if (authInfo == null)
             {
                 AppInformationHub.PublishInformation(new AppInformation(AppInformationKind.Warning,

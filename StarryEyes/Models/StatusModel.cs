@@ -264,7 +264,7 @@ namespace StarryEyes.Models
             var cinfo = info;
             while (true)
             {
-                var backtrack = Setting.Accounts.Where(i => i.FallbackNext == cinfo.Id)
+                var backtrack = AccountsStore.Accounts.Where(i => i.FallbackNext == cinfo.Id)
                     .FirstOrDefault();
                 if (backtrack == null)
                     return cinfo;

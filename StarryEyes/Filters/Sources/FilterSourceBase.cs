@@ -55,9 +55,9 @@ namespace StarryEyes.Filters.Sources
         protected IEnumerable<AuthenticateInfo> GetAccountsFromString(string screenName)
         {
             if (String.IsNullOrEmpty(screenName))
-                return Setting.Accounts.Select(i => i.AuthenticateInfo);
+                return AccountsStore.Accounts.Select(i => i.AuthenticateInfo);
             else
-                return Setting.Accounts
+                return AccountsStore.Accounts
                     .Select(i => i.AuthenticateInfo)
                     .Where(i => FilterOperatorEquals.StringMatch(i.UnreliableScreenName, screenName,
                         FilterOperatorEquals.StringArgumentSide.Right));

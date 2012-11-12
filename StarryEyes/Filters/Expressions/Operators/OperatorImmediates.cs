@@ -50,7 +50,7 @@ namespace StarryEyes.Filters.Expressions.Operators
             return _inner.GetNumericValueProvider();
         }
 
-        public override Func<TwitterStatus, ICollection<long>> GetSetValueProvider()
+        public override Func<TwitterStatus, IReadOnlyCollection<long>> GetSetValueProvider()
         {
             return _inner.GetSetValueProvider();
         }

@@ -37,7 +37,7 @@ namespace StarryEyes.Models.Hub
 
         public static IObservable<AuthenticateInfo> GetRandomAuthInfo()
         {
-            return Observable.Defer(() => Observable.Return(Setting.Accounts.Shuffle().FirstOrDefault()))
+            return Observable.Defer(() => Observable.Return(AccountsStore.Accounts.Shuffle().FirstOrDefault()))
                 .Where(_ => _ != null)
                 .Select(_ => _.AuthenticateInfo);
         }

@@ -22,7 +22,7 @@ namespace StarryEyes.Filters.Expressions.Operators
             }
         }
 
-        public override Func<TwitterStatus, ICollection<long>> GetSetValueProvider()
+        public override Func<TwitterStatus, IReadOnlyCollection<long>> GetSetValueProvider()
         {
             if (!FilterExpressionUtil.Assert(FilterExpressionType.Set, LeftValue.SupportedTypes, RightValue.SupportedTypes))
                 throw new FilterQueryException("Each side of expression is must be convertable to long.", this.ToQuery());
@@ -58,7 +58,7 @@ namespace StarryEyes.Filters.Expressions.Operators
             }
         }
 
-        public override Func<TwitterStatus, ICollection<long>> GetSetValueProvider()
+        public override Func<TwitterStatus, IReadOnlyCollection<long>> GetSetValueProvider()
         {
             if (!FilterExpressionUtil.Assert(FilterExpressionType.Set, LeftValue.SupportedTypes, RightValue.SupportedTypes))
                 throw new FilterQueryException("Each side of expression is must be convertable to long.", this.ToQuery());
@@ -94,7 +94,7 @@ namespace StarryEyes.Filters.Expressions.Operators
             }
         }
 
-        public override Func<TwitterStatus, ICollection<long>> GetSetValueProvider()
+        public override Func<TwitterStatus, IReadOnlyCollection<long>> GetSetValueProvider()
         {
             if (!FilterExpressionUtil.Assert(FilterExpressionType.Set, LeftValue.SupportedTypes, RightValue.SupportedTypes))
                 throw new FilterQueryException("Each side of expression is must be convertable to long.", this.ToQuery());
@@ -130,7 +130,7 @@ namespace StarryEyes.Filters.Expressions.Operators
             }
         }
 
-        public override Func<TwitterStatus, ICollection<long>> GetSetValueProvider()
+        public override Func<TwitterStatus, IReadOnlyCollection<long>> GetSetValueProvider()
         {
             if (!FilterExpressionUtil.Assert(FilterExpressionType.Set, LeftValue.SupportedTypes, RightValue.SupportedTypes))
                 throw new FilterQueryException("Each side of expression is must be convertable to long.", this.ToQuery());

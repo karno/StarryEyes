@@ -90,14 +90,14 @@ namespace StarryEyes.ViewModels
                 RaisePropertyChanged(() => StatusCount);
                 RaisePropertyChanged(() => TweetsPerMinutes);
             };
-            if (Setting.Accounts.Count() > 0)
+            if (AccountsStore.Accounts.Count() > 0)
             {
                 UserBaseConnectionsManager.Update();
             }
             StatusStore.StatusPublisher
                 .Where(_ => _.IsAdded)
                 .Select(_ => _.Status)
-                .Select(_ => new StatusViewModel(null,_, Setting.Accounts.Select(a => a.UserId)))
+                .Select(_ => new StatusViewModel(null,_, AccountsStore.Accounts.Select(a => a.UserId)))
                 .Subscribe(_ => RecentReceived = _.Status);
             var kovm = new KeyOverrideViewModel();
             this.Messenger.RaiseAsync(new TransitionMessage(
@@ -201,7 +201,7 @@ namespace StarryEyes.ViewModels
             var auth = new AuthorizationViewModel();
             auth.AuthorizeObservable.Subscribe(_ =>
             {
-                Setting.Accounts = Setting.Accounts.Append(
+                AccountsStore.Accounts.Add(
                     new AccountSetting()
                     {
                         AuthenticateInfo = _,
@@ -326,7 +326,7 @@ namespace StarryEyes.ViewModels
             var tweetop = new TweetOperation();
             tweetop.Status = PostText;
             PostText = String.Empty;
-            tweetop.AuthInfo = Setting.Accounts.First().AuthenticateInfo;
+            tweetop.AuthInfo = AccountsStore.Accounts.First().AuthenticateInfo;
             tweetop.Run().Subscribe(_ => this.Messenger.Raise(new TaskDialogMessage(
                 new TaskDialogInterop.TaskDialogOptions()
                 {

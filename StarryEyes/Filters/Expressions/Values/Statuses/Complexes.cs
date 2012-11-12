@@ -58,7 +58,7 @@ namespace StarryEyes.Filters.Expressions.Values.Statuses
                 _.Recipient.ScreenName;
         }
 
-        public override Func<TwitterStatus, ICollection<long>> GetSetValueProvider()
+        public override Func<TwitterStatus, IReadOnlyCollection<long>> GetSetValueProvider()
         {
             return _ => _.StatusType == StatusType.Tweet ?
                 FilterSystemUtil.InReplyToUsers(_.GetOriginal()).ToList() :

@@ -14,7 +14,7 @@ namespace StarryEyes.Filters.Expressions.Values.Statuses
             }
         }
 
-        public override Func<TwitterStatus, ICollection<long>> GetSetValueProvider()
+        public override Func<TwitterStatus, IReadOnlyCollection<long>> GetSetValueProvider()
         {
             return _ => _.FavoritedUsers ?? new long[0];
         }
@@ -35,7 +35,7 @@ namespace StarryEyes.Filters.Expressions.Values.Statuses
             }
         }
 
-        public override Func<TwitterStatus, ICollection<long>> GetSetValueProvider()
+        public override Func<TwitterStatus, IReadOnlyCollection<long>> GetSetValueProvider()
         {
             return _ => _.RetweetedUsers ?? new long[0];
         }

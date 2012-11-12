@@ -4,6 +4,7 @@ using System.Linq;
 using StarryEyes.Models.Hub;
 using StarryEyes.Settings;
 using StarryEyes.Breezy.Authorize;
+using StarryEyes.Models.Store;
 
 namespace StarryEyes.Models.Connection.UserDependency
 {
@@ -37,7 +38,7 @@ namespace StarryEyes.Models.Connection.UserDependency
         public static void Update(bool enforceReconnection = false)
         {
             // create look-up dictionary.
-            var settings = Setting.Accounts.ToLookup(k => k.UserId);
+            var settings = AccountsStore.Accounts.ToLookup(k => k.UserId);
             lock (connectionGroupsLocker)
             {
                 // determine removed users ids and finalize for each.
@@ -231,7 +232,7 @@ namespace StarryEyes.Models.Connection.UserDependency
         {
             get
             {
-                return Setting.Accounts
+                return AccountsStore.Accounts
                     .Select(a => a.AuthenticateInfo)
                     .Where(i => i.Id == UserId)
                     .FirstOrDefault();

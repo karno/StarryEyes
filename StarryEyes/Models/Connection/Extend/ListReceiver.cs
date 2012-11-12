@@ -5,6 +5,7 @@ using StarryEyes.Models.Hub;
 using StarryEyes.Settings;
 using StarryEyes.Breezy.Api.Rest;
 using StarryEyes.Breezy.Authorize;
+using StarryEyes.Models.Store;
 
 namespace StarryEyes.Models.Connection.Polling
 {
@@ -18,7 +19,7 @@ namespace StarryEyes.Models.Connection.Polling
 
         public static void StartReceive(ListInfo info)
         {
-            var ai = Setting.Accounts.Where(aset => aset.AuthenticateInfo.UnreliableScreenName == info.OwnerScreenName)
+            var ai = AccountsStore.Accounts.Where(aset => aset.AuthenticateInfo.UnreliableScreenName == info.OwnerScreenName)
                 .FirstOrDefault();
             if (ai != null)
                 StartReceive(ai.AuthenticateInfo, info);
@@ -34,7 +35,7 @@ namespace StarryEyes.Models.Connection.Polling
 
         public static void StartReceive(string receiverScreenName, ListInfo info)
         {
-            var ai = Setting.Accounts.Where(aset => aset.AuthenticateInfo.UnreliableScreenName == receiverScreenName)
+            var ai = AccountsStore.Accounts.Where(aset => aset.AuthenticateInfo.UnreliableScreenName == receiverScreenName)
                 .FirstOrDefault();
             if (ai != null)
                 StartReceive(ai.AuthenticateInfo, info);

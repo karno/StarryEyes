@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xaml;
+using StarryEyes.Albireo.Data;
+using StarryEyes.Breezy.DataModel;
+using StarryEyes.Breezy.Imaging;
 using StarryEyes.Filters.Expressions;
 using StarryEyes.Filters.Parsing;
 using StarryEyes.Models.Hub;
-using StarryEyes.Breezy.Imaging;
 
 namespace StarryEyes.Settings
 {
@@ -71,27 +73,27 @@ namespace StarryEyes.Settings
             Properties.Settings.Default.Reset();
         }
 
-        public static SettingItemStruct<bool> IsPowerUser =
+        public static readonly SettingItemStruct<bool> IsPowerUser =
             new SettingItemStruct<bool>("IsPowerUser", false);
 
         #region Authentication and accounts
 
-        private static SettingItem<List<AccountSetting>> accounts =
+        private static readonly SettingItem<List<AccountSetting>> accounts =
             new SettingItem<List<AccountSetting>>("Accounts", new List<AccountSetting>());
 
-        internal static IEnumerable<AccountSetting> Accounts
+        internal static IEnumerable<AccountSetting> _AccountsInternalDataStore
         {
             get { return accounts.Value; }
             set { accounts.Value = value.ToList(); }
         }
 
-        public static SettingItem<string> GlobalConsumerKey =
+        public static readonly SettingItem<string> GlobalConsumerKey =
             new SettingItem<string>("GlobalConsumerKey", null);
 
-        public static SettingItem<string> GlobalConsumerSecret =
+        public static readonly SettingItem<string> GlobalConsumerSecret =
             new SettingItem<string>("GlobalConsumerSecret", null);
 
-        public static SettingItemStruct<bool> IsBacktrackFallback =
+        public static readonly SettingItemStruct<bool> IsBacktrackFallback =
              new SettingItemStruct<bool>("IsBacktrackFallback", true);
 
         #endregion
@@ -100,28 +102,28 @@ namespace StarryEyes.Settings
 
         public static FilterSettingItem Muteds = new FilterSettingItem("Muteds");
 
-        public static SettingItemStruct<bool> AllowFavoriteMyself = new SettingItemStruct<bool>("AllowFavoriteMyself", false);
+        public static readonly SettingItemStruct<bool> AllowFavoriteMyself = new SettingItemStruct<bool>("AllowFavoriteMyself", false);
 
         #endregion
 
         #region Input control
 
-        public static SettingItemStruct<bool> IsUrlAutoEscapeEnabled = new SettingItemStruct<bool>("IsUrlAutoEscapeEnabled", false);
+        public static readonly SettingItemStruct<bool> IsUrlAutoEscapeEnabled = new SettingItemStruct<bool>("IsUrlAutoEscapeEnabled", false);
 
-        public static SettingItemStruct<bool> IsWarnAmendTweet = new SettingItemStruct<bool>("IsWarnAmendTweet", true);
+        public static readonly SettingItemStruct<bool> IsWarnAmendTweet = new SettingItemStruct<bool>("IsWarnAmendTweet", true);
 
-        public static SettingItemStruct<bool> IsWarnReplyFromThirdAccount = new SettingItemStruct<bool>("IsWarnReplyFromThirdAccount", true);
+        public static readonly SettingItemStruct<bool> IsWarnReplyFromThirdAccount = new SettingItemStruct<bool>("IsWarnReplyFromThirdAccount", true);
 
-        public static SettingItemStruct<TweetBoxClosingAction> TweetBoxClosingAction = new SettingItemStruct<TweetBoxClosingAction>("TweetBoxClosingAction", Settings.TweetBoxClosingAction.Confirm);
+        public static readonly SettingItemStruct<TweetBoxClosingAction> TweetBoxClosingAction = new SettingItemStruct<TweetBoxClosingAction>("TweetBoxClosingAction", Settings.TweetBoxClosingAction.Confirm);
 
         #endregion
 
         #region Outer and Third Party services
 
-        public static SettingItem<string> ExternalBrowserPath =
+        public static readonly SettingItem<string> ExternalBrowserPath =
             new SettingItem<string>("ExternalBrowserPath", null);
 
-        private static SettingItemStruct<int> imageUploaderService =
+        private static readonly SettingItemStruct<int> imageUploaderService =
             new SettingItemStruct<int>("ImageUploaderService", 0);
 
         public static ImageUploaderService ImageUploaderService
@@ -146,9 +148,19 @@ namespace StarryEyes.Settings
 
         #endregion
 
+        #region High-level configurations
+
+        public static readonly SettingItemStruct<bool> ApplyMuteToRetweetOriginals = new SettingItemStruct<bool>("ApplyMuteToRetweetOriginals", true);
+
+        public static readonly SettingItemStruct<int> EventDispatchMinimumMSec = new SettingItemStruct<int>("EventDispatchMinimumMSec", 200);
+
+        public static readonly SettingItemStruct<int> EventDispatchMaximumMSec = new SettingItemStruct<int>("EventDispatchMaximumMSec", 3000);
+
+        #endregion
+
         #region Krile internal state
 
-        public static SettingItem<string> LastImageOpenDir = new SettingItem<string>("LastImageOpenDir", Environment.GetFolderPath(Environment.SpecialFolder.MyPictures));
+        public static readonly SettingItem<string> LastImageOpenDir = new SettingItem<string>("LastImageOpenDir", Environment.GetFolderPath(Environment.SpecialFolder.MyPictures));
 
         #endregion
 
@@ -171,8 +183,8 @@ namespace StarryEyes.Settings
                 this._autoSave = autoSave;
             }
 
-            private FilterExpressionBase _expression;
-            public FilterExpressionBase Value
+            private FilterExpressionRoot _expression;
+            public FilterExpressionRoot Value
             {
                 get
                 {
@@ -190,6 +202,7 @@ namespace StarryEyes.Settings
                 {
                     _expression = value;
                     settingValueHolder[Name] = value.ToQuery();
+                    _evaluatorCache = null;
                     if (_autoSave)
                     {
                         Save();
@@ -198,6 +211,12 @@ namespace StarryEyes.Settings
                     if (handler != null)
                         OnValueChanged(value);
                 }
+            }
+
+            private Func<TwitterStatus, bool> _evaluatorCache = null;
+            public Func<TwitterStatus, bool> Evaluator
+            {
+                get { return _evaluatorCache ?? (_evaluatorCache = Value.GetEvaluator());}
             }
         }
 
@@ -232,7 +251,7 @@ namespace StarryEyes.Settings
                     }
                     catch
                     {
-                        return _defaultValue;
+                        return valueCache = _defaultValue;
                     }
                 }
                 set
@@ -281,7 +300,7 @@ namespace StarryEyes.Settings
                     }
                     catch
                     {
-                        return _defaultValue;
+                        return (valueCache = _defaultValue).Value;
                     }
                 }
                 set
