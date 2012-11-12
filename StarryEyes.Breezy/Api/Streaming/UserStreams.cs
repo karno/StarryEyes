@@ -69,7 +69,7 @@ namespace StarryEyes.Breezy.Api.Streaming
                     eventType = (desz == null ? null : desz.event_kind).ToEventType();
                     switch (eventType)
                     {
-                        case EventType.Undefined:
+                        case EventType.Empty:
                             var tweet = s.DeserializeJson<TweetJson>();
                             if (tweet != null && tweet.id_str != null)
                                 return new TwitterStreamingElement()

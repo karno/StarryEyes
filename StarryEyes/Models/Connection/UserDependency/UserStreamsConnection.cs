@@ -99,7 +99,7 @@ namespace StarryEyes.Models.Connection.UserDependency
             hardErrorRetryCount = 0; // initialize error count
             switch (elem.EventType)
             {
-                case EventType.Undefined:
+                case EventType.Empty:
                     // deliver tweet or something.
                     if (elem.Status != null)
                     {
@@ -176,6 +176,8 @@ namespace StarryEyes.Models.Connection.UserDependency
                 case EventType.LimitationInfo:
                     ev = new TrackLimitEvent(this.AuthInfo, elem.TrackLimit.GetValueOrDefault());
                     break;
+                default:
+                    return;
             }
             if (ev != null)
             {

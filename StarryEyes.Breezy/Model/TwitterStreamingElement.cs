@@ -6,7 +6,7 @@ namespace StarryEyes.Breezy.DataModel
     {
         public TwitterStreamingElement()
         {
-            EventType = DataModel.EventType.Undefined;
+            EventType = DataModel.EventType.Empty;
         }
 
         public EventType EventType { get; set; }
@@ -35,7 +35,7 @@ namespace StarryEyes.Breezy.DataModel
         public static EventType ToEventType(this string eventString)
         {
             if (String.IsNullOrEmpty(eventString))
-                return EventType.Undefined;
+                return EventType.Empty;
             switch (eventString)
             {
                 case "follow":
@@ -73,6 +73,10 @@ namespace StarryEyes.Breezy.DataModel
 
     public enum EventType
     {
+        /// <summary>
+        /// Empty data
+        /// </summary>
+        Empty,
         /// <summary>
         /// Following
         /// </summary>

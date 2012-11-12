@@ -10,7 +10,7 @@ namespace StarryEyes.Breezy.Api.Parsing.JsonFormats
         {
             return new TwitterStreamingElement()
             {
-                EventType = DataModel.EventType.Undefined,
+                EventType = DataModel.EventType.Empty,
                 Enumeration = friends,
             };
         }
@@ -26,7 +26,7 @@ namespace StarryEyes.Breezy.Api.Parsing.JsonFormats
         {
             return new TwitterStreamingElement()
             {
-                EventType = EventType.Undefined,
+                EventType = EventType.Empty,
                 DeletedId = (status != null ? long.Parse(status.id_str) :
                             (direct_message != null ? long.Parse(status.id_str) : 0)),
             };
