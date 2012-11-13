@@ -87,10 +87,16 @@ namespace StarryEyes.Breezy.Api.Rest
         public static IObservable<TwitterStatus> ShowDirectMessage(this AuthenticateInfo info,
             long id)
         {
+            var param = new Dictionary<string, object>()
+            {
+                {"id", id}
+            }.Parametalize();
             return info.GetOAuthClient()
-                .SetEndpoint(ApiEndpoint.EndpointApiV1a.JoinUrl("/direct_messages/show/" + id + ".json"))
+                .SetEndpoint(ApiEndpoint.EndpointApiV1a.JoinUrl("/direct_messages/show.json"))
                 .SetMethodType(Codeplex.OAuth.MethodType.Get)
+                .SetParameters(param)
                 .GetResponse()
+                .UpdateRateLimitInfo(info)
                 .ReadDirectMessage();
         }
     }

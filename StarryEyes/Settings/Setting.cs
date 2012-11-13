@@ -156,6 +156,8 @@ namespace StarryEyes.Settings
 
         public static readonly SettingItemStruct<int> EventDispatchMaximumMSec = new SettingItemStruct<int>("EventDispatchMaximumMSec", 3000);
 
+        public static readonly SettingItemStruct<int> RESTReceivePeriod = new SettingItemStruct<int>("RESTReceivePeriod", 90);
+
         #endregion
 
         #region Krile internal state

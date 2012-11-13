@@ -22,7 +22,7 @@ namespace StarryEyes.Breezy.Api.Rest
                 {"include_entities", include_entities}
             }.Parametalize();
             return info.GetOAuthClient()
-                .SetEndpoint(ApiEndpoint.EndpointApiV1a.JoinUrl("/favorites.json"))
+                .SetEndpoint(ApiEndpoint.EndpointApiV1a.JoinUrl("/favorites/list.json"))
                 .SetParameters(param)
                 .GetResponse()
                 .UpdateRateLimitInfo(info)

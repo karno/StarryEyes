@@ -1,7 +1,6 @@
-﻿using System;
-using StarryEyes.Models.Store;
-using StarryEyes.Breezy.Api.Rest;
+﻿using StarryEyes.Breezy.Api.Rest;
 using StarryEyes.Breezy.Authorize;
+using StarryEyes.Settings;
 
 namespace StarryEyes.Models.Connection.UserDependency
 {
@@ -15,8 +14,7 @@ namespace StarryEyes.Models.Connection.UserDependency
 
         protected override int IntervalSec
         {
-            // TODO: set this parameter via setting UI.
-            get { return 20; }
+            get { return Setting.RESTReceivePeriod.Value; }
         }
 
         private int latch = 0;

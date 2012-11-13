@@ -8,7 +8,8 @@ namespace StarryEyes.Models.Connection
     {
         public static void RegisterToStore(this IObservable<TwitterStatus> observable)
         {
-            observable.Subscribe(_ => StatusStore.Store(_), ex => System.Diagnostics.Debug.WriteLine(ex));
+            observable
+                .Subscribe(_ => StatusStore.Store(_), ex => System.Diagnostics.Debug.WriteLine(ex));
         }
     }
 }

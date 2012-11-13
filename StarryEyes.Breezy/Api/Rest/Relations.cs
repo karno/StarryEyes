@@ -124,20 +124,19 @@ namespace StarryEyes.Breezy.Api.Rest
             long? user_id = null, string screen_name = null,
             bool? device = null, bool? retweets = null)
         {
-            throw new NotImplementedException();
-        }
-
-        public static IObservable<long> GetNoRetweetIds(this AuthenticateInfo info)
-        {
             var param = new Dictionary<string, object>()
             {
-                {"stringify_ids", true}
+                {"user_id", user_id},
+                {"screen_name", screen_name},
+                {"device", device},
+                {"retweets", retweets}
             }.Parametalize();
             return info.GetOAuthClient()
-                .SetEndpoint(ApiEndpoint.EndpointApiV1a.JoinUrl("/friendships/no_retweet_ids.json"))
+                .SetEndpoint(ApiEndpoint.EndpointApiV1a.JoinUrl("/friendships/update.json"))
                 .SetParameters(param)
                 .GetResponse()
-                .ReadIdsArray();
+                .ReadString()
+                .DeserializeJson<FriendshipJson>();
         }
 
         private static IObservable<long> GetIdsAllSink(this AuthenticateInfo info,

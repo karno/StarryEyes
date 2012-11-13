@@ -81,7 +81,7 @@ namespace StarryEyes.Breezy.Api.Rest
             }.Parametalize();
             return info.GetOAuthClient()
                 .SetParameters(param)
-                .SetEndpoint(ApiEndpoint.EndpointApiV1a.JoinUrl("/statuses/mentions.json"))
+                .SetEndpoint(ApiEndpoint.EndpointApiV1a.JoinUrl("/statuses/mentions_timeline.json"))
                 .GetResponse()
                 .UpdateRateLimitInfo(info)
                 .ReadTimeline();

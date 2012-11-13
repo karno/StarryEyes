@@ -23,6 +23,7 @@ namespace StarryEyes.Breezy.Api.Rest
                 .SetEndpoint(ApiEndpoint.EndpointApiV1a.JoinUrl("/users/lookup.json"))
                 .SetParameters(param)
                 .GetResponse()
+                .UpdateRateLimitInfo(info)
                 .ReadUsers();
         }
 
@@ -42,6 +43,7 @@ namespace StarryEyes.Breezy.Api.Rest
                 .SetEndpoint(ApiEndpoint.EndpointApiV1a.JoinUrl("/users/search.json"))
                 .SetParameters(param)
                 .GetResponse()
+                .UpdateRateLimitInfo(info)
                 .ReadUsers();
         }
 
@@ -58,10 +60,11 @@ namespace StarryEyes.Breezy.Api.Rest
                 .SetEndpoint(ApiEndpoint.EndpointApiV1a.JoinUrl("/users/show.json"))
                 .SetParameters(param)
                 .GetResponse()
+                .UpdateRateLimitInfo(info)
                 .ReadUser();
         }
 
-        // APIs for contributors are unimplemented. fuck!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // APIs for contributors are unimplemented. fuck the contributor API!!!!!!!!!!!!!!!!!!!!!!!!!!
 
         // suggestions are unimplemented. Is that useful? I'm wondering it!!!!!!!!!!!!
     }

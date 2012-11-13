@@ -183,5 +183,10 @@
             </Border>
 
         </Grid>
+        <TextBlock Margin="213,132,0,0"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Top"
+                   Text="{Binding QueryResult}"
+                   TextWrapping="Wrap" />
     </Grid>
 </Controls:MetroWindow>

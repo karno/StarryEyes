@@ -122,7 +122,7 @@ namespace StarryEyes.Breezy.Api.Rest
                     }.Parametalize();
                     return new MultipartableOAuthClient(ApiEndpoint.DefaultConsumerKey, ApiEndpoint.DefaultConsumerSecret, info.AccessToken)
                         {
-                            Url = ApiEndpoint.EndpointUpload.JoinUrl("/statuses/update_with_media.json"),
+                            Url = ApiEndpoint.EndpointApiV1a.JoinUrl("/statuses/update_with_media.json"),
                         }
                         .GetResponse(param.Select(p => new UploadContent(p.Key, p.Value))
                             .Append(new UploadContent("media[]", imageFileName,

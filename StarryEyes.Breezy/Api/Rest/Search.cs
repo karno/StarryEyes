@@ -13,7 +13,7 @@ namespace StarryEyes.Breezy.Api.Rest
 
         public static IObservable<TwitterStatus> SearchTweets(this AuthenticateInfo info,
             string query, string geocode = null, string lang = null, string locale = null,
-            int page = 1, SearchResultType result_type = SearchResultType.mixed, int result_per_page = 100, string until = null,
+            int page = 1, SearchResultType result_type = SearchResultType.mixed, int count = 100, string until = null,
             long? since_id = null, long? max_id = null, bool include_entities = true)
         {
             var param = new Dictionary<string, object>()
@@ -22,16 +22,15 @@ namespace StarryEyes.Breezy.Api.Rest
                 {"geocode", geocode},
                 {"lang", lang},
                 {"locale", locale},
-                {"page", page},
                 {"result_type", result_type.ToString()},
-                {"rpp", result_per_page},
+                {"count", count},
                 {"until", until},
                 {"since_id", since_id},
                 {"max_id", max_id},
                 {"include_entities", include_entities}
             }.Parametalize();
             return info.GetOAuthClient()
-                .SetEndpoint(ApiEndpoint.EndpointSearch.JoinUrl("/search.json"))
+                .SetEndpoint(ApiEndpoint.EndpointApiV1a.JoinUrl("search/tweets.json"))
                 .SetParameters(param)
                 .GetResponse()
                 .UpdateRateLimitInfo(info)
@@ -46,7 +45,7 @@ namespace StarryEyes.Breezy.Api.Rest
         public static IObservable<SavedSearchJson> GetSavedSearchs(this AuthenticateInfo info)
         {
             return info.GetOAuthClient()
-                .SetEndpoint(ApiEndpoint.EndpointApiV1a.JoinUrl("/saved_searches.json"))
+                .SetEndpoint(ApiEndpoint.EndpointApiV1a.JoinUrl("/saved_searches/list.json"))
                 .GetResponse()
                 .UpdateRateLimitInfo(info)
                 .ReadString()

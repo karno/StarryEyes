@@ -14,10 +14,6 @@ namespace StarryEyes.Breezy.Api
 
         public static readonly string EndpointApiV1a = "https://api.twitter.com/1.1/";
 
-        public static readonly string EndpointSearch = "https://search.twitter.com/";
-
-        public static readonly string EndpointUpload = "https://upload.twitter.com/1.1/";
-
         public static string JoinUrl(this string endpoint, string url)
         {
             if (url.StartsWith("/"))

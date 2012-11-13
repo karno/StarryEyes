@@ -241,7 +241,7 @@ namespace StarryEyes.ViewModels
                 System.Diagnostics.Debug.WriteLine(filter.ToQuery());
                 List<TwitterStatus> result = new List<TwitterStatus>();
                 sw.Start();
-                StatusStore.Find(func) // t.Text.Contains("@")) // find contains hashtags
+                StatusStore.Find(func)
                     .Subscribe(_ =>
                     {
                         _count++;
@@ -250,8 +250,8 @@ namespace StarryEyes.ViewModels
                     () =>
                     {
                         sw.Stop();
-                        result.OrderBy(_ => _.CreatedAt).ForEach(_ => System.Diagnostics.Debug.WriteLine(_));
                         QueryResult = "Completed! (" + sw.Elapsed.TotalSeconds.ToString("0.00") + " sec, " + _count + " records hot.)";
+                        result.OrderBy(_ => _.CreatedAt).ForEach(_ => System.Diagnostics.Debug.WriteLine(_));
                     });
             }
             catch (Exception ex)

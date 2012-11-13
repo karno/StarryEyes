@@ -21,7 +21,7 @@ namespace StarryEyes.Breezy.Api.Rest
                 {"screen_name", screen_name},
             }.Parametalize();
             return info.GetOAuthClient()
-                .SetEndpoint(ApiEndpoint.EndpointApiV1a.JoinUrl("/lists/all.json"))
+                .SetEndpoint(ApiEndpoint.EndpointApiV1a.JoinUrl("/lists/list.json"))
                 .SetParameters(param)
                 .GetResponse()
                 .UpdateRateLimitInfo(info)

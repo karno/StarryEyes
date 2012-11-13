@@ -20,6 +20,8 @@ namespace StarryEyes.Breezy.Api.Parsing
         public static IObservable<WebResponse> UpdateRateLimitInfo(
             this IObservable<WebResponse> resp, AuthenticateInfo authenticator)
         {
+            return resp;
+            /*
             return resp.Do(r =>
             {
                 int rl;
@@ -32,6 +34,7 @@ namespace StarryEyes.Breezy.Api.Parsing
                 if (long.TryParse(r.Headers["X-RateLimit-Reset"], out rlr))
                     authenticator.RateLimitReset = UnixEpoch.GetDateTimeByUnixEpoch(rlr);
             });
+            */
         }
 
         #endregion

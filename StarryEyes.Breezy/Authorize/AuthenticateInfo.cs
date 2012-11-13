@@ -1,10 +1,10 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Xml.Serialization;
 using Codeplex.OAuth;
 using StarryEyes.Breezy.DataModel;
-using System.Linq;
 
 namespace StarryEyes.Breezy.Authorize
 {
@@ -128,24 +128,6 @@ namespace StarryEyes.Breezy.Authorize
                 }
             }
         }
-
-        /// <summary>
-        /// Rate Limiting max value per period
-        /// </summary>
-        [IgnoreDataMember, XmlIgnore, DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public int RateLimitMax { get; set; }
-
-        /// <summary>
-        /// Rate limiting remain value of current period
-        /// </summary>
-        [IgnoreDataMember, XmlIgnore, DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public int RateLimitRemaining { get; set; }
-
-        /// <summary>
-        /// Time next period of rate limit..
-        /// </summary>
-        [IgnoreDataMember, XmlIgnore, DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public DateTime RateLimitReset { get; set; }
 
         /// <summary>
         /// Exact info

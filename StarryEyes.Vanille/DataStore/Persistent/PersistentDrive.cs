@@ -257,7 +257,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
             {
                 indexes = tableOfContents.Values;
             }
-            return indexes.Select(Load).Where(predicate).Take2(maxCountOfItems);
+            return indexes.Select(Load).Where(predicate).TakeNullable(maxCountOfItems);
         }
 
         /// <summary>

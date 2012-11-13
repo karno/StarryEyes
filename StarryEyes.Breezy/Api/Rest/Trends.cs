@@ -14,10 +14,11 @@ namespace StarryEyes.Breezy.Api.Rest
         {
             var param = new Dictionary<string, object>()
             {
+                {"id", woeid},
                 {"exclude", exclude_hashtags}
             }.Parametalize();
             return info.GetOAuthClient()
-                .SetEndpoint(ApiEndpoint.EndpointApiV1a.JoinUrl("/trends/" + woeid + ".json"))
+                .SetEndpoint(ApiEndpoint.EndpointApiV1a.JoinUrl("/trends/place.json"))
                 .SetParameters(param)
                 .GetResponse()
                 .UpdateRateLimitInfo(info)
@@ -46,10 +47,12 @@ namespace StarryEyes.Breezy.Api.Rest
                 .SelectMany(_ => _);
         }
 
-        public static IObservable<TrendAvailableInfoJson> GetAvailableTrends()
+        public static IObservable<TrendAvailableInfoJson> GetAvailableTrends(this AuthenticateInfo info)
         {
-            var req = HttpWebRequest.Create(ApiEndpoint.EndpointApiV1a.JoinUrl("/trends/available.json"));
-            return Observable.FromAsyncPattern<WebResponse>(req.BeginGetResponse, req.EndGetResponse)()
+            return info.GetOAuthClient()
+                .SetEndpoint(ApiEndpoint.EndpointApiV1a.JoinUrl("/trends/available.json"))
+                .GetResponse()
+                .UpdateRateLimitInfo(info)
                 .ReadString()
                 .DeserializeJsonArray<TrendAvailableInfoJson>()
                 .Where(_ => _ != null)

@@ -57,7 +57,7 @@ namespace StarryEyes.Vanille.DataStore.Simple
                 {
                     return dictionary.Values.Where(predicate)
                         .CheckRange(range, GetKey)
-                        .Take2(maxCountOfItems)
+                        .TakeNullable(maxCountOfItems)
                         .ToArray();
                 }
             })
