@@ -175,6 +175,7 @@
     <Compile Include="Filters\Sources\FilterMessages.cs" />
     <Compile Include="Filters\Sources\FilterSearch.cs" />
     <Compile Include="Filters\Sources\FilterTrack.cs" />
+    <Compile Include="Helpers\FreezableHelper.cs" />
     <Compile Include="Helpers\RegexHelper.cs" />
     <Compile Include="Models\BackpanelModel.cs" />
     <Compile Include="Models\Backpanels\BackpanelActionEventBase.cs" />

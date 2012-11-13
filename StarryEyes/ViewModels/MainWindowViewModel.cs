@@ -1,25 +1,24 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Linq;
 using Livet;
 using Livet.Commands;
 using Livet.Messaging;
+using StarryEyes.Breezy.DataModel;
+using StarryEyes.Filters.Parsing;
 using StarryEyes.Models.Connection.UserDependency;
 using StarryEyes.Models.Hub;
+using StarryEyes.Models.Operations;
 using StarryEyes.Models.Store;
 using StarryEyes.Settings;
 using StarryEyes.ViewModels.Dialogs;
-using StarryEyes.Views.Dialogs;
-using StarryEyes.Filters.Parsing;
-using StarryEyes.Breezy.DataModel;
-using System.Collections.Generic;
-using StarryEyes.Models.Operations;
-using StarryEyes.Views.Messaging;
-using StarryEyes.ViewModels.WindowParts.Timelines;
-using StarryEyes.Views.Helpers;
-using StarryEyes.Helpers;
 using StarryEyes.ViewModels.WindowParts;
+using StarryEyes.ViewModels.WindowParts.Timelines;
+using StarryEyes.Views.Dialogs;
+using StarryEyes.Views.Helpers;
+using StarryEyes.Views.Messaging;
 
 namespace StarryEyes.ViewModels
 {

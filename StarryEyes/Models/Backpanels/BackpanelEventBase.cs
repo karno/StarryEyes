@@ -13,6 +13,12 @@ namespace StarryEyes.Models.Backpanels
         public abstract string Title { get; }
 
         /// <summary>
+        /// Image title of the event.<para />
+        /// If not available, returns null value.
+        /// </summary>
+        public virtual ImageSource TitleImage { get { return null; } }
+
+        /// <summary>
         /// Detail description of the event.
         /// </summary>
         public abstract string Detail { get; }

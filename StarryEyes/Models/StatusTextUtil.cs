@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Linq;
-using StarryEyes.Helpers;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace StarryEyes.Models
 {

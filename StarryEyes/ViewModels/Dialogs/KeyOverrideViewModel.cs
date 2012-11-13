@@ -3,11 +3,10 @@ using System.Reactive.Linq;
 using Codeplex.OAuth;
 using Livet;
 using Livet.Messaging.Windows;
-using StarryEyes.Models.Store;
 using StarryEyes.Breezy.Api;
+using StarryEyes.Models.Store;
 using StarryEyes.Settings;
 using StarryEyes.Views.Messaging;
-using StarryEyes.Helpers;
 
 namespace StarryEyes.ViewModels.Dialogs
 {

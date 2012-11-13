@@ -1,23 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.ComponentModel;
-
-using Livet;
-using Livet.Commands;
-using Livet.Messaging;
-using Livet.Messaging.IO;
-using Livet.EventListeners;
-using Livet.Messaging.Windows;
-
-using StarryEyes.Models;
-using StarryEyes.Models.Backpanels;
-using System.Windows.Media;
-using StarryEyes.Models.Backpanels.TwitterEvents;
-using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Media;
+using Livet;
+using Livet.EventListeners;
+using StarryEyes.Models;
+using StarryEyes.Models.Backpanels;
+using StarryEyes.Models.Backpanels.TwitterEvents;
 using StarryEyes.Settings;
 
 namespace StarryEyes.ViewModels.WindowParts
@@ -142,6 +132,16 @@ namespace StarryEyes.ViewModels.WindowParts
         public string Title
         {
             get { return SourceEvent.Title; }
+        }
+
+        public ImageSource TitleImage
+        {
+            get { return SourceEvent.TitleImage; }
+        }
+
+        public bool IsImageAvailable
+        {
+            get { return SourceEvent.TitleImage != null; }
         }
 
         public string Detail

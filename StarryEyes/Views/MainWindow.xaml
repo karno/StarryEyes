@@ -24,6 +24,7 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <Utils:BooleanToInvisibleConverter x:Key="BooleanToInvisibleConverter" />
             <Utils:BooleanToVisibleConverter x:Key="BooleanToVisibleConverter" />
         </ResourceDictionary>
     </Controls:MetroWindow.Resources>
@@ -149,11 +150,23 @@
                     <SolidColorBrush Color="{Binding BackpanelViewModel.CurrentEvent.Background, Mode=OneWay}" />
                 </Border.Background>
                 <StackPanel Orientation="Horizontal">
+                    <Image Width="16"
+                           Height="16"
+                           Margin="8,8,4,8"
+                           VerticalAlignment="Center"
+                           Source="{Binding BackpanelViewModel.CurrentEvent.TitleImage,
+                                            Mode=OneWay}"
+                           Visibility="{Binding BackpanelViewModel.CurrentEvent.IsImageAvailable,
+                                                Converter={StaticResource BooleanToVisibleConverter},
+                                                Mode=OneWay}" />
                     <TextBlock Margin="8,8,4,8"
                                VerticalAlignment="Center"
                                FontWeight="Bold"
                                Text="{Binding BackpanelViewModel.CurrentEvent.Title,
-                                              Mode=OneWay}">
+                                              Mode=OneWay}"
+                               Visibility="{Binding BackpanelViewModel.CurrentEvent.IsImageAvailable,
+                                                    Converter={StaticResource BooleanToInvisibleConverter},
+                                                    Mode=OneWay}">
                         <TextBlock.Foreground>
                             <SolidColorBrush Color="{Binding BackpanelViewModel.CurrentEvent.Foreground, Mode=OneWay}" />
                         </TextBlock.Foreground>

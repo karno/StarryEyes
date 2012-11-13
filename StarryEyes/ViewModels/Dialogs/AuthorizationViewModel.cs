@@ -1,17 +1,13 @@
 ﻿using System;
 using System.Linq;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Codeplex.OAuth;
 using Livet;
 using Livet.Commands;
-using Livet.Messaging;
 using Livet.Messaging.Windows;
-using StarryEyes.Helpers;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Views.Messaging;
-using StarryEyes.Settings;
 
 namespace StarryEyes.ViewModels.Dialogs
 {

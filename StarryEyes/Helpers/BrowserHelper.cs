@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using StarryEyes.Settings;
 
-namespace StarryEyes.Helpers
+namespace StarryEyes
 {
     public static class BrowserHelper
     {

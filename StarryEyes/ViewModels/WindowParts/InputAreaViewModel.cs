@@ -9,7 +9,6 @@ using Livet.EventListeners;
 using Livet.Messaging.IO;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
-using StarryEyes.Helpers;
 using StarryEyes.Models;
 using StarryEyes.Models.Backpanels.PostEvents;
 using StarryEyes.Models.Operations;
