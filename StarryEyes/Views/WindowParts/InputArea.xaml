@@ -98,13 +98,35 @@
                     <TextBlock Grid.Column="1"
                                Margin="4,0,4,0"
                                Foreground="Green"
-                               Text="3件の下書きがあります。" />
-                    <ProgressBar Grid.Column="2"
-                                 Width="60"
-                                 VerticalAlignment="Center"
-                                 Maximum="128"
-                                 ToolTip="規制の目安は 12ツイート/36分 です。"
-                                 Value="12" />
+                               Visibility="{Binding IsDraftsExisted,
+                                                    Converter={StaticResource BooleanToVisibleConverter}}">
+                        <Run Text="{Binding DraftCount}" />
+                        <Run Text="件の下書きがあります" />
+                    </TextBlock>
+                    <Grid Grid.Column="2"
+                          Width="{Binding MaxControlWidth}"
+                          Height="12"
+                          Background="DimGray"
+                          Visibility="{Binding IsPostLimitPredictionEnabled,
+                                               Converter={StaticResource BooleanToVisibleConverter}}">
+                        <Grid Width="{Binding ControlWidth}"
+                              VerticalAlignment="Stretch"
+                              Background="Blue" />
+                        <Grid.ToolTip>
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock>
+                                    <Run Text="規制までのこり" />
+                                    <Run Text="{Binding RemainUpdate, Mode=OneWay}" />
+                                    <Run Text="ツイート" />
+                                </TextBlock>
+                                <TextBlock>
+                                    <Run Text="約" />
+                                    <Run Text="{Binding WindowTime, Mode=OneWay}" />
+                                    <Run Text="分で1ツイート分回復します。" />
+                                </TextBlock>
+                            </StackPanel>
+                        </Grid.ToolTip>
+                    </Grid>
                 </Grid>
             </Border>
         </Grid>

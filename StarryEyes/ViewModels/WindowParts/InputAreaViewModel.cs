@@ -279,6 +279,16 @@ namespace StarryEyes.ViewModels.WindowParts
             }
         }
 
+        public bool IsDraftsExisted
+        {
+            get { return _draftedInputs.Count > 0; }
+        }
+
+        public int DraftCount
+        {
+            get { return _draftedInputs.Count; }
+        }
+
         #region Post limit prediction properties
 
         public bool IsPostLimitPredictionEnabled
@@ -293,7 +303,7 @@ namespace StarryEyes.ViewModels.WindowParts
 
         public int RemainUpdate
         {
-            get { return 0; }
+            get { return 32; }
         }
 
         public int MaxUpdate
@@ -306,6 +316,16 @@ namespace StarryEyes.ViewModels.WindowParts
         /// </summary>
         private void UpdatePostLimitPredictionState()
         {
+        }
+
+        public int MaxControlWidth
+        {
+            get { return 80; }
+        }
+
+        public int ControlWidth
+        {
+            get { return (int)((double)MaxControlWidth * RemainUpdate / MaxUpdate); }
         }
 
         #endregion
@@ -330,6 +350,13 @@ namespace StarryEyes.ViewModels.WindowParts
                 InputAreaModel.Drafts,
                 _ => new TweetInputInfoViewModel(this, _, vm => InputAreaModel.Drafts.Remove(vm)),
                 DispatcherHelper.UIDispatcher));
+
+            this.CompositeDisposable.Add(new CollectionChangedEventListener(this._draftedInputs,
+                (o, ev) =>
+                {
+                    RaisePropertyChanged(() => DraftCount);
+                    RaisePropertyChanged(() => IsDraftsExisted);
+                }));
 
             this.CompositeDisposable.Add(this._bindingAuthInfos =
                 ViewModelHelper.CreateReadOnlyDispatcherCollection(
