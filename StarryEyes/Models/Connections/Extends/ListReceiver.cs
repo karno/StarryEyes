@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using StarryEyes.Models.Hub;
-using StarryEyes.Settings;
 using StarryEyes.Breezy.Api.Rest;
 using StarryEyes.Breezy.Authorize;
-using StarryEyes.Models.Store;
+using StarryEyes.Models.Hubs;
+using StarryEyes.Models.Stores;
 
-namespace StarryEyes.Models.Connection.Polling
+namespace StarryEyes.Models.Connections.Extends
 {
     public sealed class ListReceiver : PollingConnectionBase
     {
@@ -68,7 +67,7 @@ namespace StarryEyes.Models.Connection.Polling
             {
                 if (!listReceiverReferenceCount.ContainsKey(info))
                     return;
-                if(--listReceiverReferenceCount[info] == 0)
+                if (--listReceiverReferenceCount[info] == 0)
                 {
                     // dispose connection
                     listReceiverReferenceCount.Remove(info);
@@ -81,7 +80,8 @@ namespace StarryEyes.Models.Connection.Polling
         }
 
         private ListInfo _receive;
-        private ListReceiver(AuthenticateInfo ainfo, ListInfo linfo) : base(ainfo)
+        private ListReceiver(AuthenticateInfo ainfo, ListInfo linfo)
+            : base(ainfo)
         {
             _receive = linfo;
         }
@@ -101,7 +101,7 @@ namespace StarryEyes.Models.Connection.Polling
             info.GetListStatuses(slug: list.Slug, owner_screen_name: list.OwnerScreenName, max_id: max_id)
                 .RegisterToStore();
         }
-    
+
     }
 
     public class ListInfo : IEquatable<ListInfo>
@@ -125,9 +125,9 @@ namespace StarryEyes.Models.Connection.Polling
         {
             return OwnerScreenName.GetHashCode() ^ Slug.GetHashCode();
         }
-    
-        public override string  ToString()
-{
+
+        public override string ToString()
+        {
             return OwnerScreenName + "/" + Slug;
         }
     }

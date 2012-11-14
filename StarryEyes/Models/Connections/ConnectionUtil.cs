@@ -1,8 +1,8 @@
 ﻿using System;
-using StarryEyes.Models.Store;
+using StarryEyes.Models.Stores;
 using StarryEyes.Breezy.DataModel;
 
-namespace StarryEyes.Models.Connection
+namespace StarryEyes.Models.Connections
 {
     internal static class ConnectionUtil
     {

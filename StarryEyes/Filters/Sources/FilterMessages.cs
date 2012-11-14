@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reactive.Linq;
-using StarryEyes.Models.Store;
+using StarryEyes.Models.Stores;
 using StarryEyes.Breezy.Api.Rest;
 using StarryEyes.Breezy.DataModel;
 

@@ -8,7 +8,7 @@ using StarryEyes.Breezy.DataModel;
 using StarryEyes.Breezy.Imaging;
 using StarryEyes.Filters.Expressions;
 using StarryEyes.Filters.Parsing;
-using StarryEyes.Models.Hub;
+using StarryEyes.Models.Hubs;
 
 namespace StarryEyes.Settings
 {
@@ -158,6 +158,10 @@ namespace StarryEyes.Settings
 
         public static readonly SettingItemStruct<int> RESTReceivePeriod = new SettingItemStruct<int>("RESTReceivePeriod", 90);
 
+        public static readonly SettingItemStruct<int> PostWindowTimeSec = new SettingItemStruct<int>("PostWindowTimeSec", 10800);
+
+        public static readonly SettingItemStruct<int> PostLimitPerWindow = new SettingItemStruct<int>("PostLimitPerWindow", 128);
+
         #endregion
 
         #region Krile internal state
@@ -218,7 +222,7 @@ namespace StarryEyes.Settings
             private Func<TwitterStatus, bool> _evaluatorCache = null;
             public Func<TwitterStatus, bool> Evaluator
             {
-                get { return _evaluatorCache ?? (_evaluatorCache = Value.GetEvaluator());}
+                get { return _evaluatorCache ?? (_evaluatorCache = Value.GetEvaluator()); }
             }
         }
 

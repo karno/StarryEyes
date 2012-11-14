@@ -7,7 +7,7 @@ using StarryEyes.Breezy.DataModel;
 using StarryEyes.Vanille.DataStore;
 using StarryEyes.Vanille.DataStore.Persistent;
 
-namespace StarryEyes.Models.Store
+namespace StarryEyes.Models.Stores
 {
     public static class UserStore
     {

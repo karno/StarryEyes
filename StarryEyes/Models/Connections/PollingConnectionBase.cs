@@ -3,7 +3,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using StarryEyes.Breezy.Authorize;
 
-namespace StarryEyes.Models.Connection
+namespace StarryEyes.Models.Connections
 {
     /// <summary>
     /// Periodically receiving task

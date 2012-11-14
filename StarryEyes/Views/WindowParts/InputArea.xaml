@@ -103,7 +103,7 @@
                                  Width="60"
                                  VerticalAlignment="Center"
                                  Maximum="128"
-                                 ToolTip="ALPS: 規制の目安は 12ツイート/36分 です。"
+                                 ToolTip="規制の目安は 12ツイート/36分 です。"
                                  Value="12" />
                 </Grid>
             </Border>

@@ -26,7 +26,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         private object aliveCachesLocker = new object();
 
         private LinkedList<PersistentItem<TValue>> deadlyCaches = new LinkedList<PersistentItem<TValue>>();
-        private SortedDictionary<TKey, LinkedListNode<PersistentItem<TValue>>> deadlyCacheFinder = 
+        private SortedDictionary<TKey, LinkedListNode<PersistentItem<TValue>>> deadlyCacheFinder =
             new SortedDictionary<TKey, LinkedListNode<PersistentItem<TValue>>>();
         private object deadlyCachesLocker = new object();
 
@@ -202,7 +202,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
 
         private void WriteBackProc()
         {
-            List<LinkedListNode<PersistentItem<TValue>>> workingCopy = 
+            List<LinkedListNode<PersistentItem<TValue>>> workingCopy =
                 new List<LinkedListNode<PersistentItem<TValue>>>();
             while (true)
             {
@@ -334,43 +334,42 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// </summary>
         /// <param name="predicate"></param>
         /// <returns></returns>
-        public IObservable<TValue> Find(Func<TValue, bool> predicate, FindRange<TKey> range, int? maxCountOfItems)
+        public IObservable<TValue> Find(Func<TValue, bool> predicate, FindRange<TKey> range)
         {
             return
-                Observable.Start(() =>
-                {
-                    lock (aliveCachesLocker)
+                Observable.Defer(() => Observable.Merge(
+                    Observable.Start(() =>
                     {
-                        return aliveCaches
-                            .CheckRange(range, _parent.GetKey)
-                            .Where(v => predicate(v))
-                            .TakeNullable(maxCountOfItems)
-                            .ToArray();
-                    }
-                })
-                .Concat(Observable.Start(() =>
-                {
-                    lock (deadlyCachesLocker)
+                        lock (aliveCachesLocker)
+                        {
+                            return aliveCaches
+                                .CheckRange(range, _parent.GetKey)
+                                .Where(v => predicate(v))
+                                .ToArray();
+                        }
+
+                    }),
+                    Observable.Start(() =>
                     {
-                        return deadlyCaches
-                            .Select(v => v.Item)
-                            .CheckRange(range, _parent.GetKey)
-                            .Where(v => predicate(v))
-                            .TakeNullable(maxCountOfItems)
-                            .ToArray();
-                    }
-                }))
-                .Concat(Observable.Start<TValue[]>(() =>
-                {
-                    using (AcquireDriveLock())
+                        lock (deadlyCachesLocker)
+                        {
+                            return deadlyCaches
+                                .Select(v => v.Item)
+                                .CheckRange(range, _parent.GetKey)
+                                .Where(v => predicate(v))
+                                .ToArray();
+                        }
+                    }),
+                    Observable.Start<TValue[]>(() =>
                     {
-                        return persistentDrive
-                            .Find(predicate, range, maxCountOfItems)
-                            .ToArray();
-                    }
-                }))
+                        using (AcquireDriveLock())
+                        {
+                            return persistentDrive
+                                .Find(predicate, range)
+                                .ToArray();
+                        }
+                    })))
                 .SelectMany(_ => _)
-                .TakeNullable(maxCountOfItems)
                 .Distinct(v => _parent.GetKey(v));
         }
 

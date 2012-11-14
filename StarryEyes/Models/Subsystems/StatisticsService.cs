@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Reactive.Linq;
 using System.Threading;
-using StarryEyes.Models.Store;
+using StarryEyes.Models.Stores;
 
-namespace StarryEyes.Models.Hub
+namespace StarryEyes.Models.Subsystems
 {
     /// <summary>
     /// Provides statistics functionalities.
     /// </summary>
-    public static class StatisticsHub
+    public static class StatisticsService
     {
         public static void Initialize()
         {
@@ -87,7 +87,7 @@ namespace StarryEyes.Models.Hub
         /// </summary>
         public static int EstimatedGrossTweetCount
         {
-            get { return StatisticsHub.estimatedGrossTweetCount; }
+            get { return StatisticsService.estimatedGrossTweetCount; }
         }
 
         private static double tweetsPerSeconds = 0;
@@ -96,7 +96,7 @@ namespace StarryEyes.Models.Hub
         /// </summary>
         public static double TweetsPerSeconds
         {
-            get { return StatisticsHub.tweetsPerSeconds; }
+            get { return StatisticsService.tweetsPerSeconds; }
         }
     }
 }

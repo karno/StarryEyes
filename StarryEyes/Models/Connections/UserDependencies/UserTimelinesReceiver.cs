@@ -2,7 +2,7 @@
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Settings;
 
-namespace StarryEyes.Models.Connection.UserDependency
+namespace StarryEyes.Models.Connections.UserDependencies
 {
     /// <summary>
     /// receives Home/Mentions/Direct Messages

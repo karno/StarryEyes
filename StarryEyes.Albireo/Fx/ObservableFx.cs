@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Reactive.Concurrency;
 
 namespace System.Reactive.Linq
@@ -87,8 +88,56 @@ namespace System.Reactive.Linq
         {
             return source
                 .Materialize()
-                .Select((n, i) => (n.Kind == NotificationKind.OnCompleted && i == 0) ? next().Materialize(): Observable.Return(n))
+                .Select((n, i) => (n.Kind == NotificationKind.OnCompleted && i == 0) ? next().Materialize() : Observable.Return(n))
                 .SelectMany(ns => ns)
+                .Dematerialize();
+        }
+
+        public static IObservable<T> OrderBy<T, TKey>(this IObservable<T> observable,
+            Func<T, TKey> keySelector)
+        {
+            List<Notification<T>> material = new List<Notification<T>>();
+            return observable.Materialize()
+                .Select(_ =>
+                {
+                    switch (_.Kind)
+                    {
+                        case NotificationKind.OnError:
+                            return EnumerableEx.Return(_);
+                        case NotificationKind.OnNext:
+                            material.Add(_);
+                            break;
+                        case NotificationKind.OnCompleted:
+                            return material.OrderBy(i => keySelector(i.Value))
+                                .Concat(EnumerableEx.Return(_));
+                    }
+                    return Enumerable.Empty<Notification<T>>();
+                })
+                .SelectMany(_ => _)
+                .Dematerialize();
+        }
+
+        public static IObservable<T> OrderByDescending<T, TKey>(this IObservable<T> observable,
+            Func<T, TKey> keySelector)
+        {
+            List<Notification<T>> material = new List<Notification<T>>();
+            return observable.Materialize()
+                .Select(_ =>
+                {
+                    switch (_.Kind)
+                    {
+                        case NotificationKind.OnError:
+                            return EnumerableEx.Return(_);
+                        case NotificationKind.OnNext:
+                            material.Add(_);
+                            break;
+                        case NotificationKind.OnCompleted:
+                            return material.OrderByDescending(i => keySelector(i.Value))
+                                .Concat(EnumerableEx.Return(_));
+                    }
+                    return Enumerable.Empty<Notification<T>>();
+                })
+                .SelectMany(_ => _)
                 .Dematerialize();
         }
     }

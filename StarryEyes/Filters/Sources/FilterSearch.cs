@@ -3,8 +3,8 @@ using System.Linq;
 using System.Reactive.Linq;
 using StarryEyes.Breezy.Api.Rest;
 using StarryEyes.Breezy.DataModel;
-using StarryEyes.Models.Connection.Extend;
-using StarryEyes.Models.Store;
+using StarryEyes.Models.Connections.Extends;
+using StarryEyes.Models.Stores;
 
 namespace StarryEyes.Filters.Sources
 {

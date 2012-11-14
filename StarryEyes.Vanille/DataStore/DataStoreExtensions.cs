@@ -24,21 +24,5 @@ namespace StarryEyes.Vanille.DataStore
             else
                 return collection.Where(v => range.IsIn(keyProvider(v)));
         }
-
-        internal static IEnumerable<T> TakeNullable<T>(this IEnumerable<T> collection, int? count)
-        {
-            if (count == null)
-                return collection;
-            else
-                return collection.Take(count.Value);
-        }
-
-        internal static IObservable<T> TakeNullable<T>(this IObservable<T> collection, int? count)
-        {
-            if (count == null)
-                return collection;
-            else
-                return collection.Take(count.Value);
-        }
     }
 }

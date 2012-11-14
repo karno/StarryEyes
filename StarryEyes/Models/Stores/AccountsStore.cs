@@ -5,7 +5,7 @@ using Livet;
 using StarryEyes.Albireo.Data;
 using StarryEyes.Settings;
 
-namespace StarryEyes.Models.Store
+namespace StarryEyes.Models.Stores
 {
     public static class AccountsStore
     {

@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using StarryEyes.Vanille.Serialization;
 
-namespace StarryEyes.Models.Store
+namespace StarryEyes.Models.Stores
 {
     public static class StoreOnMemoryObjectPersistence
     {

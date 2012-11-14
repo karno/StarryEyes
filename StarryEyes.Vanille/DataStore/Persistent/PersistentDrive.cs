@@ -6,7 +6,7 @@ using StarryEyes.Vanille.Serialization;
 
 namespace StarryEyes.Vanille.DataStore.Persistent
 {
-    internal class PersistentDrive<TKey, TValue> :IDisposable 
+    internal class PersistentDrive<TKey, TValue> : IDisposable
         where TKey : IComparable<TKey>
         where TValue : IBinarySerializable, new()
     {
@@ -174,7 +174,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                 return Empty;
             }
         }
-       
+
         /// <summary>
         /// Get Next Index of Packets.
         /// </summary>
@@ -244,7 +244,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// </summary>
         /// <param name="predicate">find predicate</param>
         /// <returns>value sequence</returns>
-        public IEnumerable<TValue> Find(Func<TValue, bool> predicate, FindRange<TKey> range, int? maxCountOfItems)
+        public IEnumerable<TValue> Find(Func<TValue, bool> predicate, FindRange<TKey> range)
         {
             IEnumerable<int> indexes;
             if (range != null)
@@ -257,7 +257,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
             {
                 indexes = tableOfContents.Values;
             }
-            return indexes.Select(Load).Where(predicate).TakeNullable(maxCountOfItems);
+            return indexes.Select(Load).Where(predicate);
         }
 
         /// <summary>

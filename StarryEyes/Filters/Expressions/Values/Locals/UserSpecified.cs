@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using StarryEyes.Albireo.Data;
-using StarryEyes.Models.Store;
+using StarryEyes.Models.Stores;
 using StarryEyes.Settings;
 
 namespace StarryEyes.Filters.Expressions.Values.Locals

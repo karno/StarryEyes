@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Livet;
-using StarryEyes.Models.Store;
+using StarryEyes.Models.Stores;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Settings;
 

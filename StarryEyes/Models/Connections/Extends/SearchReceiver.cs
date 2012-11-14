@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using StarryEyes.Breezy.Api.Rest;
+using StarryEyes.Models.Hubs;
+using StarryEyes.Models.Stores;
+using System.Collections.Generic;
 using System.Linq;
-using StarryEyes.Breezy.Api.Rest;
-using StarryEyes.Models.Hub;
-using StarryEyes.Models.Store;
 
-namespace StarryEyes.Models.Connection.Extend
+namespace StarryEyes.Models.Connections.Extends
 {
     public sealed class SearchReceiver : PollingConnectionBase
     {
@@ -26,7 +26,7 @@ namespace StarryEyes.Models.Connection.Extend
                 else
                 {
                     searchReferenceCount.Add(query, 1);
-                    var receiver =new SearchReceiver(query);
+                    var receiver = new SearchReceiver(query);
                     receiver.IsActivated = true;
                     searchReceiverResolver.Add(query, receiver);
                 }

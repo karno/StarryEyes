@@ -1,19 +1,19 @@
-﻿using System;
+﻿using Livet;
+using StarryEyes.Breezy.Api;
+using StarryEyes.Models.Plugins;
+using StarryEyes.Models.Stores;
+using StarryEyes.Models.Subsystems;
+using StarryEyes.Settings;
+using System;
 using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Runtime;
 using System.Threading;
 using System.Windows;
-using Livet;
-using StarryEyes.Models.Hub;
-using StarryEyes.Models.Plugins;
-using StarryEyes.Models.Store;
-using StarryEyes.Settings;
-using StarryEyes.Breezy.Api;
-using StarryEyes.Models;
 
 namespace StarryEyes
 {
@@ -26,7 +26,12 @@ namespace StarryEyes
         private void Application_Startup(object sender, StartupEventArgs e)
         {
             // enable multi-core JIT.
-            // see reference: 
+            // see reference: http://msdn.microsoft.com/en-us/library/system.runtime.profileoptimization.aspx
+            if (IsMulticoreJITEnabled)
+            {
+                ProfileOptimization.SetProfileRoot(ConfigurationDirectoryPath);
+                ProfileOptimization.StartProfile(ProfileFileName);
+            }
 
             // initialize dispatcher helper
             DispatcherHelper.UIDispatcher = Dispatcher;
@@ -72,7 +77,7 @@ namespace StarryEyes
             StatusStore.Initialize();
             UserStore.Initialize();
             AccountsStore.Initialize();
-            StatisticsHub.Initialize();
+            StatisticsService.Initialize();
 
             // Activate plugins
             PluginManager.LoadedPlugins.ForEach(p => p.Initialize());
@@ -139,21 +144,29 @@ namespace StarryEyes
         {
             get
             {
-                switch (ConfigurationManager.AppSettings["ExecutionMode"])
+                switch (ConfigurationManager.AppSettings["ExecutionMode"].ToLower())
                 {
                     case "standalone":
-                    case "Standalone":
                     case "portable":
-                    case "Portable":
                         return ExecutionMode.Standalone;
 
                     case "roaming":
-                    case "Roaming":
                         return ExecutionMode.Roaming;
 
                     default:
                         return ExecutionMode.Default;
                 }
+            }
+        }
+
+        public static bool IsMulticoreJITEnabled
+        {
+            get
+            {
+                if (ConfigurationManager.AppSettings["UseMulticoreJIT"].ToLower() == "none")
+                    return false;
+                else
+                    return true;
             }
         }
 
@@ -183,7 +196,7 @@ namespace StarryEyes
         {
             get
             {
-                return Path.Combine(ConfigurationDirectoryPath, "krile.xml");
+                return Path.Combine(ConfigurationDirectoryPath, ConfigurationFileName);
             }
         }
 
@@ -191,7 +204,7 @@ namespace StarryEyes
         {
             get
             {
-                return Path.Combine(ConfigurationDirectoryPath, "store");
+                return Path.Combine(ConfigurationDirectoryPath, DataStoreDirectory);
             }
         }
 
@@ -250,6 +263,8 @@ namespace StarryEyes
             }
         }
 
+        public static readonly string DataStoreDirectory = "store";
+
         public static readonly string KeyAssignDirectory = "assigns";
 
         public static readonly string MediaDirectory = "media";
@@ -257,6 +272,10 @@ namespace StarryEyes
         public static readonly string PluginDirectory = "plugins";
 
         public static readonly string ScriptDirectiory = "scripts";
+
+        public static readonly string ConfigurationFileName = "krile.xml";
+
+        public static readonly string ProfileFileName = "krile.profile";
 
         public static readonly string FeedbackAppName = "reporter.exe";
 

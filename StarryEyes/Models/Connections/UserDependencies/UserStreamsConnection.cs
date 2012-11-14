@@ -7,14 +7,14 @@ using System.Reactive.Subjects;
 using StarryEyes.Breezy.Api.Streaming;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
-using StarryEyes.Models.Store;
-using StarryEyes.Models.Hub;
+using StarryEyes.Models.Stores;
+using StarryEyes.Models.Hubs;
 using StarryEyes.Models.Backpanels;
 using StarryEyes.Models.Backpanels.TwitterEvents;
 using StarryEyes.Models.Backpanels.SystemEvents;
 using StarryEyes.Settings;
 
-namespace StarryEyes.Models.Connection.UserDependency
+namespace StarryEyes.Models.Connections.UserDependencies
 {
     public sealed class UserStreamsConnection : ConnectionBase
     {

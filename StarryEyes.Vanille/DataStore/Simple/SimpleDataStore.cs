@@ -49,7 +49,7 @@ namespace StarryEyes.Vanille.DataStore.Simple
             .SelectMany(_ => _);
         }
 
-        public override IObservable<TValue> Find(Func<TValue, bool> predicate, FindRange<TKey> range = null, int? maxCountOfItems = null)
+        public override IObservable<TValue> Find(Func<TValue, bool> predicate, FindRange<TKey> range = null)
         {
             return Observable.Start(() =>
             {
@@ -57,7 +57,6 @@ namespace StarryEyes.Vanille.DataStore.Simple
                 {
                     return dictionary.Values.Where(predicate)
                         .CheckRange(range, GetKey)
-                        .TakeNullable(maxCountOfItems)
                         .ToArray();
                 }
             })

@@ -6,7 +6,7 @@ using StarryEyes.Breezy.DataModel;
 using StarryEyes.Models;
 using StarryEyes.Models.Backpanels.PostEvents;
 using StarryEyes.Models.Operations;
-using StarryEyes.Models.Store;
+using StarryEyes.Models.Stores;
 using StarryEyes.Settings;
 using StarryEyes.ViewModels.WindowParts.Timelines;
 using StarryEyes.Views.Messaging;
@@ -278,6 +278,37 @@ namespace StarryEyes.ViewModels.WindowParts
                 return true;
             }
         }
+
+        #region Post limit prediction properties
+
+        public bool IsPostLimitPredictionEnabled
+        {
+            get { return false; }
+        }
+
+        public int WindowTime
+        {
+            get { return 30; }
+        }
+
+        public int RemainUpdate
+        {
+            get { return 0; }
+        }
+
+        public int MaxUpdate
+        {
+            get { return 128; }
+        }
+
+        /// <summary>
+        /// update state of ALPS.
+        /// </summary>
+        private void UpdatePostLimitPredictionState()
+        {
+        }
+
+        #endregion
 
         private GeoCoordinateWatcher geoWatcher;
 

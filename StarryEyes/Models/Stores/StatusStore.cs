@@ -7,9 +7,9 @@ using StarryEyes.Vanille.DataStore;
 using StarryEyes.Vanille.DataStore.Persistent;
 using System.Threading;
 using System.Threading.Tasks;
-using StarryEyes.Models.Hub;
+using StarryEyes.Models.Hubs;
 
-namespace StarryEyes.Models.Store
+namespace StarryEyes.Models.Stores
 {
     /// <summary>
     /// Storage for twitter statuses.
@@ -105,10 +105,10 @@ namespace StarryEyes.Models.Store
         /// <param name="predicate">find predicate</param>
         /// <param name="range">finding range</param>
         /// <returns>results observable sequence.</returns>
-        public static IObservable<TwitterStatus> Find(Func<TwitterStatus, bool> predicate, FindRange<long> range = null, int? count = null)
+        public static IObservable<TwitterStatus> Find(Func<TwitterStatus, bool> predicate, FindRange<long> range = null)
         {
             if (_isInShutdown) return Observable.Empty<TwitterStatus>();
-            return store.Find(predicate, range, count);
+            return store.Find(predicate, range);
         }
 
         /// <summary>

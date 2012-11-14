@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace StarryEyes.Models.Hub
+namespace StarryEyes.Models.Hubs
 {
     /// <summary>
     /// Publish/Manage application internal information.

@@ -1,5 +1,5 @@
 ﻿using System;
-using StarryEyes.Models.Connection.UserDependency;
+using StarryEyes.Models.Connections.UserDependencies;
 using StarryEyes.Breezy.DataModel;
 
 namespace StarryEyes.Filters.Sources

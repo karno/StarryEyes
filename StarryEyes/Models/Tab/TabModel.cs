@@ -5,8 +5,8 @@ using System.Reactive.Linq;
 using StarryEyes.Albireo.Data;
 using StarryEyes.Filters;
 using StarryEyes.Filters.Parsing;
-using StarryEyes.Models.Hub;
-using StarryEyes.Models.Store;
+using StarryEyes.Models.Hubs;
+using StarryEyes.Models.Stores;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Vanille.DataStore;
 using System.Reactive;
@@ -135,9 +135,9 @@ namespace StarryEyes.Models.Tab
 
         private IObservable<TwitterStatus> GetChunk(long? maxId, int chunkCount)
         {
-            return StatusStore.Find(evaluator,
-                maxId != null ? FindRange<long>.By(maxId.Value) : null,
-                chunkCount);
+            return StatusStore.Find(evaluator, maxId != null ? FindRange<long>.By(maxId.Value) : null)
+                .OrderByDescending(_ => _.CreatedAt)
+                .Take(chunkCount);
         }
 
         public void Deactivate()

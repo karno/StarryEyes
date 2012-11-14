@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Linq;
 using System.Reactive.Linq;
-using StarryEyes.Models.Store;
+using StarryEyes.Models.Stores;
 using StarryEyes.Settings;
 using StarryEyes.Breezy.Api.Rest;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
 
-namespace StarryEyes.Models.Hub
+namespace StarryEyes.Models.Hubs
 {
     /// <summary>
     /// Find local cache, if not existed, query to Twitter.

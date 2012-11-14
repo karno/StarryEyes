@@ -5,7 +5,7 @@ using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Settings;
 using System.Net;
-using StarryEyes.Models.Store;
+using StarryEyes.Models.Stores;
 
 namespace StarryEyes.Models.Operations
 {

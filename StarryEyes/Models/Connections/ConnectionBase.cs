@@ -1,8 +1,8 @@
-﻿using System;
-using StarryEyes.Models.Hub;
-using StarryEyes.Breezy.Authorize;
+﻿using StarryEyes.Breezy.Authorize;
+using StarryEyes.Models.Hubs;
+using System;
 
-namespace StarryEyes.Models.Connection
+namespace StarryEyes.Models.Connections
 {
     public abstract class ConnectionBase : IDisposable
     {

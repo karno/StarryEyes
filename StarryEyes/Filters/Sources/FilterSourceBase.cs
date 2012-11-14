@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using StarryEyes.Filters.Expressions.Operators;
-using StarryEyes.Models.Store;
+using StarryEyes.Models.Stores;
 using StarryEyes.Settings;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;

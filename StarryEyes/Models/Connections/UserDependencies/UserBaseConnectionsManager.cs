@@ -1,12 +1,11 @@
-﻿using System;
+﻿using StarryEyes.Breezy.Authorize;
+using StarryEyes.Models.Hubs;
+using StarryEyes.Models.Stores;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using StarryEyes.Models.Hub;
-using StarryEyes.Settings;
-using StarryEyes.Breezy.Authorize;
-using StarryEyes.Models.Store;
 
-namespace StarryEyes.Models.Connection.UserDependency
+namespace StarryEyes.Models.Connections.UserDependencies
 {
     /// <summary>
     /// Provides management for connect to twitter.

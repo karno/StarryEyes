@@ -8,8 +8,9 @@ using Livet;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Models.Operations;
-using StarryEyes.Models.Store;
+using StarryEyes.Models.Stores;
 using StarryEyes.Models.Tab;
+using StarryEyes.Settings;
 
 namespace StarryEyes.Models
 {
@@ -25,7 +26,7 @@ namespace StarryEyes.Models
         public static ObservableSynchronizedCollectionEx<AuthenticateInfo> BindingAuthInfos
         {
             get { return InputAreaModel._bindingAuthInfos; }
-        } 
+        }
 
         private static readonly ObservableSynchronizedCollectionEx<string> _bindingHashtags =
             new ObservableSynchronizedCollectionEx<string>();
@@ -128,6 +129,11 @@ namespace StarryEyes.Models
             if (focusToInputArea)
                 MainWindowModel.SetFocusTo(FocusRequest.Tweet);
         }
+
+        #region ALPS controls
+
+
+        #endregion
     }
 
     public class TweetInputInfo
@@ -159,7 +165,7 @@ namespace StarryEyes.Models
         public string Text { get; set; }
 
         private Tuple<AuthenticateInfo, TwitterStatus>[] _postedTweets = null;
-        
+
         /// <summary>
         /// Posted status ids.
         /// </summary>
@@ -181,7 +187,7 @@ namespace StarryEyes.Models
         {
             get
             {
-                var ex =  this.ThrownException as TweetFailedException;
+                var ex = this.ThrownException as TweetFailedException;
                 if (ex != null)
                 {
                     return ex.Message;

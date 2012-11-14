@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Reactive.Linq;
-using Livet;
+﻿using Livet;
 using Livet.Commands;
 using Livet.Messaging;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Filters.Parsing;
-using StarryEyes.Models.Connection.UserDependency;
-using StarryEyes.Models.Hub;
+using StarryEyes.Models.Connections.UserDependencies;
 using StarryEyes.Models.Operations;
-using StarryEyes.Models.Store;
+using StarryEyes.Models.Stores;
+using StarryEyes.Models.Subsystems;
 using StarryEyes.Settings;
 using StarryEyes.ViewModels.Dialogs;
 using StarryEyes.ViewModels.WindowParts;
@@ -19,6 +14,11 @@ using StarryEyes.ViewModels.WindowParts.Timelines;
 using StarryEyes.Views.Dialogs;
 using StarryEyes.Views.Helpers;
 using StarryEyes.Views.Messaging;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Reactive.Linq;
 
 namespace StarryEyes.ViewModels
 {
@@ -71,7 +71,7 @@ namespace StarryEyes.ViewModels
         public BackpanelViewModel BackpanelViewModel
         {
             get { return _backpanelViewModel; }
-        } 
+        }
 
 
         #endregion
@@ -84,7 +84,7 @@ namespace StarryEyes.ViewModels
 
         public void Initialize()
         {
-            StatisticsHub.OnStatisticsParamsUpdated += () =>
+            StatisticsService.OnStatisticsParamsUpdated += () =>
             {
                 RaisePropertyChanged(() => StatusCount);
                 RaisePropertyChanged(() => TweetsPerMinutes);
@@ -96,7 +96,7 @@ namespace StarryEyes.ViewModels
             StatusStore.StatusPublisher
                 .Where(_ => _.IsAdded)
                 .Select(_ => _.Status)
-                .Select(_ => new StatusViewModel(null,_, AccountsStore.Accounts.Select(a => a.UserId)))
+                .Select(_ => new StatusViewModel(null, _, AccountsStore.Accounts.Select(a => a.UserId)))
                 .Subscribe(_ => RecentReceived = _.Status);
             var kovm = new KeyOverrideViewModel();
             this.Messenger.RaiseAsync(new TransitionMessage(
@@ -150,12 +150,12 @@ namespace StarryEyes.ViewModels
 
         public int StatusCount
         {
-            get { return StatisticsHub.EstimatedGrossTweetCount; }
+            get { return StatisticsService.EstimatedGrossTweetCount; }
         }
 
         public double TweetsPerMinutes
         {
-            get { return StatisticsHub.TweetsPerSeconds * 60; }
+            get { return StatisticsService.TweetsPerSeconds * 60; }
         }
 
         private string _query;

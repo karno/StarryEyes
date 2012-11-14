@@ -1,5 +1,5 @@
-﻿using System;
-using StarryEyes.Vanille.Serialization;
+﻿using StarryEyes.Vanille.Serialization;
+using System;
 
 namespace StarryEyes.Vanille.DataStore
 {
@@ -52,7 +52,7 @@ namespace StarryEyes.Vanille.DataStore
         /// this method may very slow.
         /// </summary>
         /// <returns>all stored data</returns>
-        public abstract IObservable<TValue> Find(Func<TValue, bool> predicate, FindRange<TKey> range = null, int? maxCountOfItems = null);
+        public abstract IObservable<TValue> Find(Func<TValue, bool> predicate, FindRange<TKey> range = null);
 
         /// <summary>
         /// remove stored data from storage.

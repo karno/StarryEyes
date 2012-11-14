@@ -4,7 +4,7 @@ using System.Linq;
 using StarryEyes.Albireo.Data;
 using StarryEyes.Breezy.Authorize;
 
-namespace StarryEyes.Models.Store
+namespace StarryEyes.Models.Stores
 {
     /// <summary>
     /// Account data store

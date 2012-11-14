@@ -1,6 +1,6 @@
 ﻿using System;
-using StarryEyes.Models.Connection.Polling;
 using StarryEyes.Breezy.DataModel;
+using StarryEyes.Models.Connections.Extends;
 
 namespace StarryEyes.Filters.Sources
 {

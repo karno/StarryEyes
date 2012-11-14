@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using Livet;
-using StarryEyes.Models.Hub;
+using StarryEyes.Models.Hubs;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Settings;
 using StarryEyes.Models.Operations;
 using StarryEyes.Breezy.Authorize;
 using System.Reactive.Linq;
-using StarryEyes.Models.Store;
+using StarryEyes.Models.Stores;
 using System.Reactive;
 using StarryEyes.Models;
 
