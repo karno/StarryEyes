@@ -25,6 +25,9 @@ namespace StarryEyes
         private static Mutex appMutex;
         private void Application_Startup(object sender, StartupEventArgs e)
         {
+            // enable multi-core JIT.
+            // see reference: 
+
             // initialize dispatcher helper
             DispatcherHelper.UIDispatcher = Dispatcher;
 
@@ -146,7 +149,7 @@ namespace StarryEyes
 
                     case "roaming":
                     case "Roaming":
-                        return ExecutionMode.Default;
+                        return ExecutionMode.Roaming;
 
                     default:
                         return ExecutionMode.Default;
