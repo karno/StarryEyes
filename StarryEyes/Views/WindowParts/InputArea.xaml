@@ -320,7 +320,7 @@
                     <DockPanel Grid.Column="2"
                                Width="32"
                                LastChildFill="False">
-                        <Button Content="x"
+                        <Button
                                 DockPanel.Dock="Top"
                                 Style="{DynamicResource MetroSquareUnfocusableFlatButton}">
                             <i:Interaction.Triggers>
@@ -328,6 +328,7 @@
                                     <ei:CallMethodAction TargetObject="{Binding Mode=OneWay}" />
                                 </i:EventTrigger>
                             </i:Interaction.Triggers>
+                        	<Path Stretch="Fill" Fill="#FF000000" Data="F1 M 21.2,20L 24,22.8L 26.7999,20.0001L 27.9999,21.2001L 25.2,24L 28,26.8L 26.8,28L 24,25.2L 21.2,28L 20,26.8L 22.8,24L 20,21.2L 21.2,20 Z " Height="8" Width="8"/>
                         </Button>
                         <TextBlock Margin="4"
                                    DockPanel.Dock="Bottom"

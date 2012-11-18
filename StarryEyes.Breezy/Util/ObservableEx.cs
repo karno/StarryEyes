@@ -43,12 +43,12 @@ namespace System.Reactive.Linq
     {
         public static IObservable<WebResponse> GetResponseAsObservable(this WebRequest request)
         {
-            return Observable.FromAsyncPattern<WebResponse>(request.BeginGetResponse, request.EndGetResponse)();
+            return Observable.FromAsync(request.GetResponseAsync);
         }
 
         public static IObservable<Stream> GetRequestStreamAsObservable(this WebRequest request)
         {
-            return Observable.FromAsyncPattern<Stream>(request.BeginGetRequestStream, request.EndGetRequestStream)();
+            return Observable.FromAsync(request.GetRequestStreamAsync);
         }
 
         public static IObservable<byte[]> DownloadDataAsync(this WebRequest request)
@@ -177,12 +177,12 @@ namespace System.Reactive.Linq
     {
         public static IObservable<Unit> WriteAsObservable(this Stream stream, byte[] buffer, int offset, int count)
         {
-            return Observable.FromAsyncPattern((ac, o) => stream.BeginWrite(buffer, offset, count, ac, o), stream.EndWrite)();
+            return Observable.FromAsync(() => stream.WriteAsync(buffer, offset, count));
         }
 
         public static IObservable<int> ReadAsObservable(this Stream stream, byte[] buffer, int offset, int count)
         {
-            return Observable.FromAsyncPattern<int>((ac, o) => stream.BeginRead(buffer, offset, count, ac, o), stream.EndRead)();
+            return Observable.FromAsync(() => stream.ReadAsync(buffer, offset, count));
         }
 
         public static IObservable<Unit> WriteAsync(this Stream stream, string data)

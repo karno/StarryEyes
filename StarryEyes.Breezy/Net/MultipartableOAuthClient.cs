@@ -61,8 +61,7 @@ namespace StarryEyes.Breezy.Net
             req.ContentType = "multipart/form-data; boundary=" + boundary;
             boundary = "--" + boundary;
 
-            return Observable.Defer(() =>
-                Observable.FromAsyncPattern<Stream>(req.BeginGetRequestStream, req.EndGetRequestStream)())
+            return Observable.Defer(req.GetRequestStreamAsObservable)
                 .Do(stream =>
                 {
                     using (stream)
@@ -84,7 +83,7 @@ namespace StarryEyes.Breezy.Net
                         sw.Flush();
                     }
                 })
-                .SelectMany(_ => Observable.FromAsyncPattern<WebResponse>(req.BeginGetResponse, req.EndGetResponse)());
+                .SelectMany(_ => req.GetResponseAsObservable());
         }
     }
 

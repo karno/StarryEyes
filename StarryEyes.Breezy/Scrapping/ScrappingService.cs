@@ -31,7 +31,7 @@ namespace StarryEyes.Scrapping
             var req = HttpWebRequest.Create(url + "?" + param) as HttpWebRequest;
             if (attach != null)
                 attach(req);
-            return Observable.FromAsyncPattern<WebResponse>(req.BeginGetResponse, req.EndGetResponse)()
+            return Observable.FromAsync(req.GetResponseAsync)
                 .Select(w => (HttpWebResponse)w);
         }
     }
