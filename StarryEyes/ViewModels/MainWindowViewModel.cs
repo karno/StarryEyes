@@ -73,12 +73,18 @@ namespace StarryEyes.ViewModels
             get { return _backpanelViewModel; }
         }
 
+        private readonly InputAreaViewModel _inputAreaViewModel;
+        public InputAreaViewModel InputAreaViewModel
+        {
+            get { return _inputAreaViewModel; }
+        }
 
         #endregion
 
         public MainWindowViewModel()
         {
             this.CompositeDisposable.Add(_backpanelViewModel = new BackpanelViewModel());
+            this.CompositeDisposable.Add(_inputAreaViewModel = new InputAreaViewModel());
             _backpanelViewModel.Initialize();
         }
 

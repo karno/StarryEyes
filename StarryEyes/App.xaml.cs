@@ -56,7 +56,9 @@ namespace StarryEyes
                 return;
             }
 
+#if RELEASE
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
+#endif
             Application.Current.Exit += (_, __) => AppFinalize(true);
 
             // Initialize service points

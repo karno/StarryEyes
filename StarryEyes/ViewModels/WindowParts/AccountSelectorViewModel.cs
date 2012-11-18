@@ -15,11 +15,10 @@ namespace StarryEyes.ViewModels.WindowParts
     {
         public AccountSelectorViewModel()
         {
-            accounts = ViewModelHelper.CreateReadOnlyDispatcherCollection<AccountSetting, SelectableAccountViewModel>
-                (AccountsStore.Accounts,
+            this.CompositeDisposable.Add(accounts = ViewModelHelper.CreateReadOnlyDispatcherCollection(
+                AccountsStore.Accounts,
                 _ => new SelectableAccountViewModel(_.AuthenticateInfo, RaiseSelectedAccountsChanged),
-                DispatcherHelper.UIDispatcher);
-            this.CompositeDisposable.Add(accounts);
+                DispatcherHelper.UIDispatcher));
         }
 
         private readonly ReadOnlyDispatcherCollection<SelectableAccountViewModel> accounts;
@@ -30,7 +29,8 @@ namespace StarryEyes.ViewModels.WindowParts
 
         public void SetSelectedAccountIds(IEnumerable<long> accountIds)
         {
-            Accounts.ForEach(i => i.IsSelected = accountIds.Contains(i.Id));
+            var acl = accountIds.Guard().ToArray();
+            Accounts.ForEach(i => i.IsSelected = acl.Contains(i.Id));
         }
 
         public IEnumerable<AuthenticateInfo> SelectedAccounts

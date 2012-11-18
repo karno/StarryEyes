@@ -32,12 +32,12 @@ namespace StarryEyes.Models.Operations
             var req = WebRequest.Create(FeedbackUri);
             req.Method = "POST";
             req.ContentType = "application/x-www-form-urlencoded";
-            return Observable.FromAsyncPattern<Stream>(req.BeginGetRequestStream, req.EndGetRequestStream)()
+            return Observable.FromAsync(req.GetRequestStreamAsync)
                 .SelectMany(s =>
                 {
                     s.Write(pdb, 0, pdb.Length);
                     s.Close();
-                    return Observable.FromAsyncPattern<WebResponse>(req.BeginGetResponse, req.EndGetResponse)();
+                    return Observable.FromAsync(req.GetResponseAsync);
                 })
                 .Select(_ => new Unit());
         }

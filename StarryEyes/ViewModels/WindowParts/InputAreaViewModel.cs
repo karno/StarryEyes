@@ -31,10 +31,16 @@ namespace StarryEyes.ViewModels.WindowParts
             get { return _accountSelector; }
         }
 
-        private readonly ReadOnlyDispatcherCollection<string> _bindingHashtags;
-        public ReadOnlyDispatcherCollection<string> BindingHashtags
+        private readonly ReadOnlyDispatcherCollection<BindHashtagViewModel> _bindingHashtags;
+        public ReadOnlyDispatcherCollection<BindHashtagViewModel> BindingHashtags
         {
             get { return _bindingHashtags; }
+        }
+
+        private readonly DispatcherCollection<BindHashtagViewModel> _bindableHashtagCandidates;
+        public DispatcherCollection<BindHashtagViewModel> BindableHashtagCandidates
+        {
+            get { return _bindableHashtagCandidates; }
         }
 
         private readonly ReadOnlyDispatcherCollection<TweetInputInfoViewModel> _draftedInputs;
@@ -42,6 +48,8 @@ namespace StarryEyes.ViewModels.WindowParts
         {
             get { return _draftedInputs; }
         }
+
+        public IEnumerable<BindHashtagViewModel> DesignSource { get { return new[] { "Entropy", "Negentropy" }.Select(_ => new BindHashtagViewModel(_, () => { })); } }
 
         private readonly ReadOnlyDispatcherCollection<AuthenticateInfoViewModel> _bindingAuthInfos;
         public ReadOnlyDispatcherCollection<AuthenticateInfoViewModel> BindingAuthInfos
@@ -118,7 +126,24 @@ namespace StarryEyes.ViewModels.WindowParts
                 InputInfo.Text = value;
                 RaisePropertyChanged(() => InputText);
                 UpdateTextCount();
+                UpdateHashtagCandidates();
             }
+        }
+
+        private void UpdateHashtagCandidates()
+        {
+            var hashtags = RegexHelper.HashRegex.Matches(this.InputText)
+                .OfType<Match>()
+                .Select(_ => _.Value)
+                .ToArray();
+            BindableHashtagCandidates
+                .Where(_ => !hashtags.Contains(_.Hashtag))
+                .ToList()
+                .ForEach(_ => BindableHashtagCandidates.Remove(_));
+            hashtags
+                .Where(_ => !BindableHashtagCandidates.Select(t => t.Hashtag).Contains(_))
+                .Select(_ => new BindHashtagViewModel(_, () => BindHashtag(_)))
+                .ForEach(BindableHashtagCandidates.Add);
         }
 
         public bool IsUrlAutoEsacpeEnabled
@@ -240,10 +265,19 @@ namespace StarryEyes.ViewModels.WindowParts
 
         public LocationDescriptionViewModel AttachedLocation
         {
-            get { return new LocationDescriptionViewModel(InputInfo.AttachedGeoInfo); }
+            get
+            {
+                if (InputInfo.AttachedGeoInfo != null)
+                    return new LocationDescriptionViewModel(InputInfo.AttachedGeoInfo);
+                else
+                    return null;
+            }
             set
             {
-                InputInfo.AttachedGeoInfo = value.Location;
+                if (value == null)
+                    InputInfo.AttachedGeoInfo = null;
+                else
+                    InputInfo.AttachedGeoInfo = value.Location;
                 RaisePropertyChanged(() => AttachedLocation);
                 RaisePropertyChanged(() => IsLocationAttached);
             }
@@ -352,8 +386,11 @@ namespace StarryEyes.ViewModels.WindowParts
             this.CompositeDisposable.Add(this._bindingHashtags =
                 ViewModelHelper.CreateReadOnlyDispatcherCollection(
                 InputAreaModel.BindingHashtags,
-                _ => _,
+                _ => new BindHashtagViewModel(_, () => UnbindHashtag(_)),
                 DispatcherHelper.UIDispatcher));
+
+            this._bindableHashtagCandidates =
+                new DispatcherCollection<BindHashtagViewModel>(DispatcherHelper.UIDispatcher);
 
             this.CompositeDisposable.Add(this._draftedInputs =
                 ViewModelHelper.CreateReadOnlyDispatcherCollection(
@@ -624,12 +661,16 @@ namespace StarryEyes.ViewModels.WindowParts
         public void BindHashtag(string hashtag)
         {
             if (!InputAreaModel.BindingHashtags.Contains(hashtag))
+            {
                 InputAreaModel.BindingHashtags.Add(hashtag);
+                UpdateHashtagCandidates();
+            }
         }
 
         public void UnbindHashtag(string hashtag)
         {
             InputAreaModel.BindingHashtags.Remove(hashtag);
+            UpdateHashtagCandidates();
         }
 
         public void Send()
@@ -860,6 +901,28 @@ namespace StarryEyes.ViewModels.WindowParts
         public long Id
         {
             get { return _authInfo.Id; }
+        }
+    }
+
+    public class BindHashtagViewModel : ViewModel
+    {
+        private readonly string _hashtag;
+        public string Hashtag
+        {
+            get { return _hashtag; }
+        }
+
+        private readonly Action _callback;
+
+        public BindHashtagViewModel(string hashtag, Action callback)
+        {
+            this._hashtag = hashtag;
+            this._callback = callback;
+        }
+
+        public void ToggleBind()
+        {
+            _callback();
         }
     }
 }
