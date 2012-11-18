@@ -1,4 +1,10 @@
-﻿using Livet;
+﻿using System;
+using System.Collections.Generic;
+using System.Device.Location;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Windows.Media.Imaging;
+using Livet;
 using Livet.EventListeners;
 using Livet.Messaging.IO;
 using StarryEyes.Breezy.Authorize;
@@ -10,12 +16,6 @@ using StarryEyes.Models.Stores;
 using StarryEyes.Settings;
 using StarryEyes.ViewModels.WindowParts.Timelines;
 using StarryEyes.Views.Messaging;
-using System;
-using System.Collections.Generic;
-using System.Device.Location;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Windows.Media.Imaging;
 using TaskDialogInterop;
 
 namespace StarryEyes.ViewModels.WindowParts
@@ -37,10 +37,20 @@ namespace StarryEyes.ViewModels.WindowParts
             get { return _bindingHashtags; }
         }
 
+        public bool IsBindingHashtagExisted
+        {
+            get { return _bindingHashtags.Count > 0; }
+        }
+
         private readonly DispatcherCollection<BindHashtagViewModel> _bindableHashtagCandidates;
         public DispatcherCollection<BindHashtagViewModel> BindableHashtagCandidates
         {
             get { return _bindableHashtagCandidates; }
+        }
+
+        public bool IsBindableHashtagExisted
+        {
+            get { return _bindableHashtagCandidates.Count > 0; }
         }
 
         private readonly ReadOnlyDispatcherCollection<TweetInputInfoViewModel> _draftedInputs;
@@ -114,19 +124,20 @@ namespace StarryEyes.ViewModels.WindowParts
                 RaisePropertyChanged(() => IsImageAttached);
                 RaisePropertyChanged(() => AttachedLocation);
                 RaisePropertyChanged(() => IsLocationAttached);
+                UpdateHashtagCandidates();
                 UpdateTextCount();
             }
         }
 
         public string InputText
         {
-            get { return InputInfo.Text; }
+            get { return InputInfo.Text ?? String.Empty; }
             set
             {
                 InputInfo.Text = value;
                 RaisePropertyChanged(() => InputText);
-                UpdateTextCount();
                 UpdateHashtagCandidates();
+                UpdateTextCount();
             }
         }
 
@@ -135,6 +146,8 @@ namespace StarryEyes.ViewModels.WindowParts
             var hashtags = RegexHelper.HashRegex.Matches(this.InputText)
                 .OfType<Match>()
                 .Select(_ => _.Value)
+                .Distinct()
+                .Except(BindingHashtags.Select(_ => _.Hashtag))
                 .ToArray();
             BindableHashtagCandidates
                 .Where(_ => !hashtags.Contains(_.Hashtag))
@@ -297,6 +310,17 @@ namespace StarryEyes.ViewModels.WindowParts
                 {
                     currentTextLength += Setting.GetImageUploader().UrlLengthPerImages + 1;
                 }
+                var tags = RegexHelper.HashRegex.Matches(InputText)
+                    .OfType<Match>()
+                    .Select(_ => _.Value)
+                    .ToArray();
+                if (InputAreaModel.BindingHashtags.Count > 0)
+                {
+                    currentTextLength += InputAreaModel.BindingHashtags
+                        .Except(tags)
+                        .Select(_ => _.Length + 1)
+                        .Sum();
+                }
                 return currentTextLength;
             }
         }
@@ -388,9 +412,13 @@ namespace StarryEyes.ViewModels.WindowParts
                 InputAreaModel.BindingHashtags,
                 _ => new BindHashtagViewModel(_, () => UnbindHashtag(_)),
                 DispatcherHelper.UIDispatcher));
+            this.CompositeDisposable.Add(new CollectionChangedEventListener(
+                this._bindingHashtags, (_, __) => RaisePropertyChanged(() => IsBindingHashtagExisted)));
 
             this._bindableHashtagCandidates =
                 new DispatcherCollection<BindHashtagViewModel>(DispatcherHelper.UIDispatcher);
+            this.CompositeDisposable.Add(new CollectionChangedEventListener(
+                this._bindableHashtagCandidates, (_, __) => RaisePropertyChanged(() => IsBindableHashtagExisted)));
 
             this.CompositeDisposable.Add(this._draftedInputs =
                 ViewModelHelper.CreateReadOnlyDispatcherCollection(
@@ -537,6 +565,7 @@ namespace StarryEyes.ViewModels.WindowParts
         {
             if (!this.IsOpening) return;
             CheckClearInput();
+            this.IsOpening = false;
         }
 
         private void CheckClearInput()
@@ -605,6 +634,7 @@ namespace StarryEyes.ViewModels.WindowParts
             RaisePropertyChanged(() => IsImageAttached);
             RaisePropertyChanged(() => AttachedLocation);
             RaisePropertyChanged(() => IsLocationAttached);
+            UpdateHashtagCandidates();
             UpdateTextCount();
         }
 
@@ -629,13 +659,11 @@ namespace StarryEyes.ViewModels.WindowParts
             msg.InitialDirectory = Setting.LastImageOpenDir.Value;
             msg.MultiSelect = false;
             msg.Title = "添付する画像ファイルを指定";
-            this.Messenger.GetResponseAsync(msg, m =>
+            var m = this.Messenger.GetResponse(msg);
+            if (m.Response != null && m.Response.Length > 0)
             {
-                if (m.Response.Length > 0)
-                {
-                    this.AttachedImage = new ImageDescriptionViewModel(m.Response[0]);
-                }
-            });
+                this.AttachedImage = new ImageDescriptionViewModel(m.Response[0]);
+            }
         }
 
         public void DetachImage()
@@ -664,6 +692,7 @@ namespace StarryEyes.ViewModels.WindowParts
             {
                 InputAreaModel.BindingHashtags.Add(hashtag);
                 UpdateHashtagCandidates();
+                UpdateTextCount();
             }
         }
 
@@ -671,6 +700,7 @@ namespace StarryEyes.ViewModels.WindowParts
         {
             InputAreaModel.BindingHashtags.Remove(hashtag);
             UpdateHashtagCandidates();
+            UpdateTextCount();
         }
 
         public void Send()

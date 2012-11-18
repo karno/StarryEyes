@@ -66,15 +66,21 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Livet, Version=1.0.4.0, Culture=neutral, PublicKeyToken=b0b1d3f711ef38cb, processorArchitecture=MSIL">
+    <Reference Include="Livet, Version=1.0.5.0, Culture=neutral, PublicKeyToken=b0b1d3f711ef38cb, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>InfrastructureAssemblies\Livet.dll</HintPath>
+    </Reference>
+    <Reference Include="Livet.Extensions">
+      <HintPath>InfrastructureAssemblies\Livet.Extensions.dll</HintPath>
     </Reference>
     <Reference Include="MahApps.Metro, Version=0.9.0.0, Culture=neutral, PublicKeyToken=f4fb5a3c4d1e5b4f, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\MahApps.Metro.0.10.0.0\lib\net40\MahApps.Metro.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Expression.Interactions, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.Expression.Interactions, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>InfrastructureAssemblies\Microsoft.Expression.Interactions.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -107,7 +113,10 @@
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>InfrastructureAssemblies\System.Windows.Interactivity.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -164,6 +173,7 @@
     <Compile Include="Filters\Sources\FilterSearch.cs" />
     <Compile Include="Filters\Sources\FilterTrack.cs" />
     <Compile Include="Helpers\FreezableHelper.cs" />
+    <Compile Include="Hotfixes\LivetFixer.cs" />
     <Compile Include="Helpers\RegexHelper.cs" />
     <Compile Include="Models\BackpanelModel.cs" />
     <Compile Include="Models\Backpanels\BackpanelActionEventBase.cs" />

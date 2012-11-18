@@ -2,9 +2,9 @@
 
 namespace StarryEyes.Views.Messaging
 {
-    public class GoToStateMessage : ResponsiveInteractionMessage<bool>
+    public class GoToStateMessage : ResponsiveInteractionMessage<bool?>
     {
-        public GoToStateMessage(string messageKey, string stateName, bool useTransitions = true) 
+        public GoToStateMessage(string messageKey, string stateName, bool useTransitions = true)
             : base(messageKey)
         {
             this.StateName = stateName;
@@ -21,10 +21,7 @@ namespace StarryEyes.Views.Messaging
 
         protected override System.Windows.Freezable CreateInstanceCore()
         {
-            return new GoToStateMessage(this.MessageKey, this.StateName, this.UseTransitions)
-            {
-                Response = this.Response
-            };
+            return new GoToStateMessage(this.MessageKey, this.StateName, this.UseTransitions);
         }
     }
 }

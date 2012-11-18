@@ -213,6 +213,6 @@
                    VerticalAlignment="Top"
                    Text="{Binding QueryResult}"
                    TextWrapping="Wrap" />
-        <WindowParts:InputArea DataContext="{Binding InputAreaViewModel}" />
+        <WindowParts:InputArea DataContext="{Binding InputAreaViewModel}" Margin="0,4" />
     </Grid>
 </Controls:MetroWindow>

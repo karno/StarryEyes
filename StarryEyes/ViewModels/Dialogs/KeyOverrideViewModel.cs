@@ -92,7 +92,7 @@ namespace StarryEyes.ViewModels.Dialogs
         {
             if (String.IsNullOrEmpty(Setting.GlobalConsumerKey.Value) && String.IsNullOrEmpty(Setting.GlobalConsumerSecret.Value))
             {
-                this.Messenger.GetResponseAsync(new TaskDialogMessage(
+                var m = this.Messenger.GetResponse(new TaskDialogMessage(
                     new TaskDialogInterop.TaskDialogOptions()
                     {
                         Title = "APIキー設定のスキップ",
@@ -103,13 +103,11 @@ namespace StarryEyes.ViewModels.Dialogs
                         CommonButtons = TaskDialogInterop.TaskDialogCommonButtons.OKCancel,
                         ExpandedInfo = "APIキーの状況によってはアカウントが登録できないことがあります。" + Environment.NewLine +
                         "また、最大登録可能アカウント数も制限されます。"
-                    }), m =>
-                    {
-                        if (m.Response.Result == TaskDialogInterop.TaskDialogSimpleResult.Ok)
-                        {
-                            this.Messenger.Raise(new WindowActionMessage(null, WindowAction.Close));
-                        }
-                    });
+                    }));
+                if (m.Response.Result == TaskDialogInterop.TaskDialogSimpleResult.Ok)
+                {
+                    this.Messenger.Raise(new WindowActionMessage(null, WindowAction.Close));
+                }
             }
             else
             {

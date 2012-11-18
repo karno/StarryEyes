@@ -21,10 +21,7 @@ namespace StarryEyes.Views.Messaging
 
         protected override Freezable CreateInstanceCore()
         {
-            return new TaskDialogMessage(this.MessageKey, this.Options)
-            {
-                Response = this.Response,
-            };
+            return new TaskDialogMessage(this.MessageKey, this.Options);
         }
     }
 }

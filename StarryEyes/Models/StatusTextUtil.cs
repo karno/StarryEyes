@@ -13,7 +13,7 @@ namespace StarryEyes.Models
 
         public static int CountText(string text)
         {
-            return RegexHelper.UrlRegex.Tokenize(text ?? "")
+            return RegexHelper.UrlRegex.Tokenize(text)
                 .SelectMany(s =>
                 {
                     if (s.Item2) // URL matched
