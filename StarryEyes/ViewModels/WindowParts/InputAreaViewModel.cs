@@ -106,8 +106,7 @@ namespace StarryEyes.ViewModels.WindowParts
                 RaisePropertyChanged(() => IsImageAttached);
                 RaisePropertyChanged(() => AttachedLocation);
                 RaisePropertyChanged(() => IsLocationAttached);
-                RaisePropertyChanged(() => TextCount);
-                RaisePropertyChanged(() => CanSend);
+                UpdateTextCount();
             }
         }
 
@@ -218,6 +217,7 @@ namespace StarryEyes.ViewModels.WindowParts
                 InputInfo.AttachedImage = value.Source;
                 RaisePropertyChanged(() => AttachedImage);
                 RaisePropertyChanged(() => IsImageAttached);
+                RaisePropertyChanged(() => CanSaveToDraft);
                 UpdateTextCount();
             }
         }
@@ -267,6 +267,11 @@ namespace StarryEyes.ViewModels.WindowParts
             }
         }
 
+        public int RemainTextCount
+        {
+            get { return StatusTextUtil.MaxTextLength - TextCount; }
+        }
+
         public bool CanSend
         {
             get
@@ -287,6 +292,11 @@ namespace StarryEyes.ViewModels.WindowParts
         public int DraftCount
         {
             get { return _draftedInputs.Count; }
+        }
+
+        public bool CanSaveToDraft
+        {
+            get { return IsImageAttached || !String.IsNullOrEmpty(InputText); }
         }
 
         #region Post limit prediction properties
@@ -441,7 +451,9 @@ namespace StarryEyes.ViewModels.WindowParts
         private void UpdateTextCount()
         {
             RaisePropertyChanged(() => TextCount);
+            RaisePropertyChanged(() => RemainTextCount);
             RaisePropertyChanged(() => CanSend);
+            RaisePropertyChanged(() => CanSaveToDraft);
         }
 
         public void OverrideSelectedAccounts(IEnumerable<AuthenticateInfo> infos)
@@ -556,8 +568,7 @@ namespace StarryEyes.ViewModels.WindowParts
             RaisePropertyChanged(() => IsImageAttached);
             RaisePropertyChanged(() => AttachedLocation);
             RaisePropertyChanged(() => IsLocationAttached);
-            RaisePropertyChanged(() => TextCount);
-            RaisePropertyChanged(() => CanSend);
+            UpdateTextCount();
         }
 
         public void AmendPreviousOne()
@@ -593,6 +604,10 @@ namespace StarryEyes.ViewModels.WindowParts
         public void DetachImage()
         {
             this.AttachedImage = null;
+        }
+
+        public void OpenAttachedImage()
+        {
         }
 
         public void AttachLocation()

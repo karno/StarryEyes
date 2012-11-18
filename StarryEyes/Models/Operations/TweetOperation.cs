@@ -119,6 +119,11 @@ namespace StarryEyes.Models.Operations
     {
         public double Latitude { get; set; }
         public double Longitude { get; set; }
+
+        public override string ToString()
+        {
+            return "lat:" + Latitude.ToString("0.000") + ", long:" + Longitude.ToString("0.000");
+        }
     }
 
     [Serializable]
