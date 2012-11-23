@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Device.Location;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using Livet;
 using Livet.EventListeners;
+using Livet.Messaging;
 using Livet.Messaging.IO;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
@@ -138,6 +140,8 @@ namespace StarryEyes.ViewModels.WindowParts
                 RaisePropertyChanged(() => InputText);
                 UpdateHashtagCandidates();
                 UpdateTextCount();
+                if (IsUrlAutoEsacpeEnabled)
+                    EscapeUrl();
             }
         }
 
@@ -166,6 +170,8 @@ namespace StarryEyes.ViewModels.WindowParts
             {
                 Setting.IsUrlAutoEscapeEnabled.Value = value;
                 RaisePropertyChanged(() => IsUrlAutoEsacpeEnabled);
+                if (value)
+                    EscapeUrl();
             }
         }
 
@@ -356,6 +362,43 @@ namespace StarryEyes.ViewModels.WindowParts
         {
             get { return IsImageAttached || !String.IsNullOrEmpty(InputText); }
         }
+
+        #region Text box control
+
+        private int _selectionStart = 0;
+        public int SelectionStart
+        {
+            get { return _selectionStart; }
+            set
+            {
+                _selectionStart = value;
+                RaisePropertyChanged(() => SelectionStart);
+            }
+        }
+
+        private int _selectionLength = 0;
+        public int SelectionLength
+        {
+            get { return _selectionLength; }
+            set
+            {
+                _selectionLength = value;
+                RaisePropertyChanged(() => SelectionLength);
+            }
+        }
+
+        private string _selectedText = "";
+        public string SelectedText
+        {
+            get { return _selectedText; }
+            set
+            {
+                _selectedText = value;
+                RaisePropertyChanged(() => SelectedText);
+            }
+        }
+
+        #endregion
 
         #region Post limit prediction properties
 
@@ -552,12 +595,21 @@ namespace StarryEyes.ViewModels.WindowParts
 
         public void OpenInput(bool restorePreviousStashed)
         {
-            this.IsOpening = true;
-            if (restorePreviousStashed && InputAreaModel.Drafts.Count > 0)
+            if (!this.IsOpening)
             {
-                var last = InputAreaModel.Drafts[InputAreaModel.Drafts.Count - 1];
-                InputAreaModel.Drafts.RemoveAt(InputAreaModel.Drafts.Count - 1);
-                this.InputInfo = last;
+                this.IsOpening = true;
+                this.Messenger.Raise(new InteractionMessage("FocusToTextBox"));
+                if (restorePreviousStashed && InputAreaModel.Drafts.Count > 0)
+                {
+                    var last = InputAreaModel.Drafts[InputAreaModel.Drafts.Count - 1];
+                    InputAreaModel.Drafts.RemoveAt(InputAreaModel.Drafts.Count - 1);
+                    this.InputInfo = last;
+                    this.Messenger.Raise(new TextBoxSetCaretMessage(this.InputInfo.Text.Length));
+                }
+            }
+            else
+            {
+                this.Messenger.Raise(new InteractionMessage("FocusToTextBox"));
             }
         }
 
@@ -701,6 +753,21 @@ namespace StarryEyes.ViewModels.WindowParts
             InputAreaModel.BindingHashtags.Remove(hashtag);
             UpdateHashtagCandidates();
             UpdateTextCount();
+        }
+
+        private void EscapeUrl()
+        {
+            var escaped = StatusTextUtil.AutoEscape(this.InputText);
+            if (escaped != this.InputText)
+            {
+                InputInfo.Text = escaped;
+                RaisePropertyChanged(() => InputText);
+                UpdateHashtagCandidates();
+                UpdateTextCount();
+
+                var diff = escaped.Length - this.InputText.Length;
+                this.SelectionStart += diff;
+            }
         }
 
         public void Send()
