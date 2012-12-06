@@ -273,6 +273,12 @@ namespace StarryEyes
 
         public static readonly string PluginDirectory = "plugins";
 
+        public static readonly string PluginDescriptionFile = "package.xml";
+
+        public static readonly string PluginPublicKeyFile = "pubkey.pub";
+
+        public static readonly string PluginSignatureFile = "auth.sig";
+
         public static readonly string ScriptDirectiory = "scripts";
 
         public static readonly string ConfigurationFileName = "krile.xml";

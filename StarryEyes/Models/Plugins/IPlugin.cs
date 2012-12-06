@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Windows.Controls;
 
 namespace StarryEyes.Models.Plugins
 {
     /// <summary>
-    /// Interface for Krile StarryEyes
+    /// Interface for plugins works on Krile StarryEyes
     /// </summary>
     public interface IPlugin
     {
@@ -11,6 +12,16 @@ namespace StarryEyes.Models.Plugins
 
         Version Version { get; }
 
+        Uri SupportUri { get; }
+
         void Initialize();
+    }
+
+    /// <summary>
+    /// Interface for configurable plugins
+    /// </summary>
+    public interface IConfigurablePlugin : IPlugin
+    {
+        Control GetConfigurationInterface();
     }
 }

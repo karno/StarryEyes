@@ -150,6 +150,10 @@ namespace StarryEyes.Settings
 
         #region High-level configurations
 
+        public static readonly SettingItemStruct<bool> LoadUnsafePlugins = new SettingItemStruct<bool>("LoadUnsafePlugins", false);
+
+        public static readonly SettingItemStruct<bool> LoadPluginFromDevFolder = new SettingItemStruct<bool>("LoadPluginFromDevFolder", false);
+
         public static readonly SettingItemStruct<bool> ApplyMuteToRetweetOriginals = new SettingItemStruct<bool>("ApplyMuteToRetweetOriginals", true);
 
         public static readonly SettingItemStruct<int> EventDispatchMinimumMSec = new SettingItemStruct<int>("EventDispatchMinimumMSec", 200);
