@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
 using StarryEyes.Breezy.DataModel;
+using StarryEyes.Models.Stores.Internal;
 using StarryEyes.Vanille.DataStore;
 using StarryEyes.Vanille.DataStore.Persistent;
 
@@ -24,13 +25,13 @@ namespace StarryEyes.Models.Stores
             if (StoreOnMemoryObjectPersistence.IsPersistentDataExisted("users"))
             {
                 store = new PersistentDataStore<long, TwitterUser>
-                    (_ => _.Id, Path.Combine(App.DataStorePath, "users"), 16,
+                    (_ => _.Id, Path.Combine(App.DataStorePath, "users"), chunkNum: 16,
                     tocniops: StoreOnMemoryObjectPersistence.GetPersistentData("users"));
             }
             else
             {
                 store = new PersistentDataStore<long, TwitterUser>
-                    (_ => _.Id, Path.Combine(App.DataStorePath, "users"), 16);
+                    (_ => _.Id, Path.Combine(App.DataStorePath, "users"), chunkNum: 16);
             }
             LoadScreenNameResolverCache();
             App.OnApplicationFinalize += Shutdown;
@@ -94,7 +95,7 @@ namespace StarryEyes.Models.Stores
             SaveScreenNameResolverCache();
         }
 
-        private static readonly string ScreenNameResolverCacheFile = 
+        private static readonly string ScreenNameResolverCacheFile =
             Path.Combine(App.DataStorePath, "snrcache.dat");
 
         private static void SaveScreenNameResolverCache()

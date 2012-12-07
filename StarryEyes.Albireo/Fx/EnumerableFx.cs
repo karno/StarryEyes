@@ -78,5 +78,13 @@ namespace System.Linq
         {
             return String.Join(separator, source);
         }
+
+        public static IEnumerable<T> TakeIfNotNull<T>(this IEnumerable<T> source, int? take)
+        {
+            if (take == null)
+                return source;
+            else
+                return source.Take(take.Value);
+        }
     }
 }

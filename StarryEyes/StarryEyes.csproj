@@ -205,7 +205,8 @@
     <Compile Include="Models\StatusModel.cs" />
     <Compile Include="Models\StatusTextUtil.cs" />
     <Compile Include="Models\Stores\AccountsStore.cs" />
-    <Compile Include="Models\Stores\StoreOnMemoryObjectPersistence.cs" />
+    <Compile Include="Models\Stores\Internal\IdReverseComparer.cs" />
+    <Compile Include="Models\Stores\Internal\StoreOnMemoryObjectPersistence.cs" />
     <Compile Include="Models\Subsystems\NotificationOptimizationService.cs" />
     <Compile Include="Models\Subsystems\PostLimitPredictionService.cs" />
     <Compile Include="Models\Tab\ColumnInfo.cs" />

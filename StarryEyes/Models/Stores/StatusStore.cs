@@ -3,11 +3,10 @@ using System.IO;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using StarryEyes.Breezy.DataModel;
+using StarryEyes.Models.Hubs;
+using StarryEyes.Models.Stores.Internal;
 using StarryEyes.Vanille.DataStore;
 using StarryEyes.Vanille.DataStore.Persistent;
-using System.Threading;
-using System.Threading.Tasks;
-using StarryEyes.Models.Hubs;
 
 namespace StarryEyes.Models.Stores
 {
@@ -39,7 +38,7 @@ namespace StarryEyes.Models.Stores
                 try
                 {
                     store = new PersistentDataStore<long, TwitterStatus>
-                        (_ => _.Id, Path.Combine(App.DataStorePath, "statuses"),
+                        (_ => _.Id, Path.Combine(App.DataStorePath, "statuses"), new IdReverseComparer(),
                         tocniops: StoreOnMemoryObjectPersistence.GetPersistentData("statuses"));
                 }
                 catch (Exception ex)
@@ -54,7 +53,7 @@ namespace StarryEyes.Models.Stores
             if (store == null)
             {
                 store = new PersistentDataStore<long, TwitterStatus>
-                    (_ => _.Id, Path.Combine(App.DataStorePath, "statuses"));
+                    (_ => _.Id, Path.Combine(App.DataStorePath, "statuses"), new IdReverseComparer());
             }
             App.OnApplicationFinalize += Shutdown;
         }

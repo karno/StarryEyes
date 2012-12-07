@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using StarryEyes.Vanille.Serialization;
 
@@ -10,7 +11,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         where TKey : IComparable<TKey>
         where TValue : IBinarySerializable, new()
     {
-        const int PacketSize = 512;
+        const int PacketSize = 256;
         const int ChunkSize = 1024;
 
         const int Empty = -1;
@@ -33,9 +34,9 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// Initialize persistent drive with create-new mode.
         /// </summary>
         /// <param name="path">base file path</param>
-        public PersistentDrive(string path)
+        public PersistentDrive(string path, IComparer<TKey> comparer)
         {
-            this.tableOfContents = new SortedDictionary<TKey, int>();
+            this.tableOfContents = new SortedDictionary<TKey, int>(comparer);
             this.nextIndexOfPackets = new SortedDictionary<int, List<int>>();
             SetNextIndexOfPackets(0, 0); // index 0 is reserved for the parity.
             this.path = path;
@@ -206,9 +207,12 @@ namespace StarryEyes.Vanille.DataStore.Persistent
 
             // serialize data
             var ms = new MemoryStream();
-            ms.Write(new byte[4], 0, 4); // add empty 4 bytes (placeholder)
-            using (var bw = new BinaryWriter(ms))
-                value.Serialize(bw);
+            using (var cs = new GZipStream(ms, CompressionLevel.Fastest))
+            {
+                ms.Write(new byte[4], 0, 4); // add empty 4 bytes (placeholder)
+                using (var bw = new BinaryWriter(cs))
+                    value.Serialize(bw);
+            }
             var bytes = ms.ToArray();
 
             // get length-bit into the header
@@ -244,18 +248,19 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// </summary>
         /// <param name="predicate">find predicate</param>
         /// <returns>value sequence</returns>
-        public IEnumerable<TValue> Find(Func<TValue, bool> predicate, FindRange<TKey> range)
+        public IEnumerable<TValue> Find(Func<TValue, bool> predicate, FindRange<TKey> range, int? returnLowerBound)
         {
             IEnumerable<int> indexes;
             if (range != null)
             {
                 indexes = tableOfContents
                     .CheckRange(range, _ => _.Key)
-                    .Select(_ => _.Value);
+                    .Select(_ => _.Value)
+                    .TakeIfNotNull(returnLowerBound);
             }
             else
             {
-                indexes = tableOfContents.Values;
+                indexes = tableOfContents.Values.TakeIfNotNull(returnLowerBound);
             }
             return indexes.Select(Load).Where(predicate);
         }
@@ -270,8 +275,12 @@ namespace StarryEyes.Vanille.DataStore.Persistent
             var bytes = LoadInternal(index);
             var length = BitConverter.ToInt32(bytes, 0);
             var ret = new TValue();
-            using (var br = new BinaryReader(new MemoryStream(bytes, 4, length, false)))
+            using (var ms = new MemoryStream(bytes, 4, length, false))
+            using (var cs = new GZipStream(ms, CompressionMode.Decompress))
+            using (var br = new BinaryReader(cs))
+            {
                 ret.Deserialize(br);
+            }
             return ret;
         }
 

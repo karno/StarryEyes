@@ -28,13 +28,15 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         }
 
         /// <summary>
-        /// Initialize DynamicCache
+        /// Initialize Persistent Data Store
         /// </summary>
         /// <param name="keyProvider">key provider for the value</param>
         /// <param name="baseDirectoryPath">path for serialize objects</param>
         /// <param name="chunkNum">cache separate count</param>
         /// <param name="tocniops">ToC/NIoPs</param>
-        public PersistentDataStore(Func<TValue, TKey> keyProvider, string baseDirectoryPath, int chunkNum = 32,
+        public PersistentDataStore(Func<TValue, TKey> keyProvider, string baseDirectoryPath,
+            IComparer<TKey> comparer = null,
+            int chunkNum = 32,
             IEnumerable<Tuple<IDictionary<TKey, int>, IEnumerable<int>>> tocniops = null)
             : base(keyProvider)
         {
@@ -54,7 +56,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
             else
             {
                 this.chunks = Enumerable.Range(0, chunkNum)
-                    .Select(_ => new PersistentChunk<TKey, TValue>(this, GeneratePath(baseDirectoryPath, _)))
+                    .Select(_ => new PersistentChunk<TKey, TValue>(this, GeneratePath(baseDirectoryPath, _), comparer))
                     .ToArray();
             }
         }
@@ -112,10 +114,10 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// <param name="range">finding id range</param>
         /// <param name="maxCountOfItems">max count of returning items</param>
         /// <returns>observable sequence</returns>
-        public override IObservable<TValue> Find(Func<TValue, bool> predicate, FindRange<TKey> range = null)
+        public override IObservable<TValue> Find(Func<TValue, bool> predicate, FindRange<TKey> range = null, int? returnLowerBound = null)
         {
             return chunks.ToObservable()
-                .SelectMany(c => c.Find(predicate, range));
+                .SelectMany(c => c.Find(predicate, range, returnLowerBound));
         }
 
         /// <summary>

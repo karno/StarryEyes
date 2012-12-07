@@ -36,17 +36,20 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         private object writeBackSync = new object();
         private volatile bool writeBackThreadAlive = true;
 
+        private IComparer<TKey> comparer = null;
+
         /// <summary>
         /// initialize persistent chunk.
         /// </summary>
         /// <param name="parent">chunk holder</param>
         /// <param name="dbFilePath">file path for storing data</param>
-        public PersistentChunk(PersistentDataStore<TKey, TValue> parent, string dbFilePath)
+        public PersistentChunk(PersistentDataStore<TKey, TValue> parent, string dbFilePath, IComparer<TKey> comparer)
         {
             this._parent = parent;
+            this.comparer = comparer;
             using (AcquireDriveLock(true))
             {
-                this.persistentDrive = new PersistentDrive<TKey, TValue>(dbFilePath);
+                this.persistentDrive = new PersistentDrive<TKey, TValue>(dbFilePath, comparer);
             }
             this.writeBackWorker = new Thread(WriteBackProc);
             this.writeBackWorker.Start();
@@ -334,7 +337,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// </summary>
         /// <param name="predicate"></param>
         /// <returns></returns>
-        public IObservable<TValue> Find(Func<TValue, bool> predicate, FindRange<TKey> range)
+        public IObservable<TValue> Find(Func<TValue, bool> predicate, FindRange<TKey> range, int? returnLowerBound)
         {
             return
                 Observable.Defer(() => Observable.Merge(
@@ -365,7 +368,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                         using (AcquireDriveLock())
                         {
                             return persistentDrive
-                                .Find(predicate, range)
+                                .Find(predicate, range, returnLowerBound)
                                 .ToArray();
                         }
                     })))

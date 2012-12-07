@@ -16,9 +16,13 @@ namespace StarryEyes.Vanille.DataStore.Simple
         where TValue : IBinarySerializable, new()
     {
         private object dictLock = new object();
-        private Dictionary<TKey, TValue> dictionary = new Dictionary<TKey, TValue>();
+        private SortedDictionary<TKey, TValue> dictionary;
 
-        public SimpleDataStore(Func<TValue, TKey> keyProvider) : base(keyProvider) { }
+        public SimpleDataStore(Func<TValue, TKey> keyProvider, IComparer<TKey> comparer = null)
+            : base(keyProvider)
+        {
+            dictionary = new SortedDictionary<TKey, TValue>(comparer);
+        }
 
         public override int Count
         {
@@ -49,14 +53,17 @@ namespace StarryEyes.Vanille.DataStore.Simple
             .SelectMany(_ => _);
         }
 
-        public override IObservable<TValue> Find(Func<TValue, bool> predicate, FindRange<TKey> range = null)
+        public override IObservable<TValue> Find(Func<TValue, bool> predicate, FindRange<TKey> range = null, int? returnLowerBound = null)
         {
             return Observable.Start(() =>
             {
                 lock (dictLock)
                 {
-                    return dictionary.Values.Where(predicate)
-                        .CheckRange(range, GetKey)
+                    return dictionary.Keys
+                        .CheckRange(range, _ => _)
+                        .Select(_ => dictionary[_])
+                        .Where(predicate)
+                        .TakeIfNotNull(returnLowerBound)
                         .ToArray();
                 }
             })

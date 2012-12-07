@@ -51,8 +51,11 @@ namespace StarryEyes.Vanille.DataStore
         /// get all stored data.<para />
         /// this method may very slow.
         /// </summary>
+        /// <param name="predicate">find predicate</param>
+        /// <param name="range">find ID range</param>
+        /// <param name="lowerBound">Count of items, lower bound.</param>
         /// <returns>all stored data</returns>
-        public abstract IObservable<TValue> Find(Func<TValue, bool> predicate, FindRange<TKey> range = null);
+        public abstract IObservable<TValue> Find(Func<TValue, bool> predicate, FindRange<TKey> range = null, int? returnLowerBound = null);
 
         /// <summary>
         /// remove stored data from storage.
