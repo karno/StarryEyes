@@ -19,6 +19,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{6EF91D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarryEyes.Nightmare", "StarryEyes.Nightmare\StarryEyes.Nightmare.csproj", "{3A78CEB3-A112-4A66-8724-BFF2BFA9182B}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AutoUpdateServices", "AutoUpdateServices", "{B2DF914A-A068-4FD0-8ED9-50743E1AFF71}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
