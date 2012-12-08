@@ -104,10 +104,17 @@ namespace StarryEyes.Models.Stores
         /// <param name="predicate">find predicate</param>
         /// <param name="range">finding range</param>
         /// <returns>results observable sequence.</returns>
-        public static IObservable<TwitterStatus> Find(Func<TwitterStatus, bool> predicate, FindRange<long> range = null)
+        public static IObservable<TwitterStatus> Find(Func<TwitterStatus, bool> predicate,
+            FindRange<long> range = null, int? count = null)
         {
             if (_isInShutdown) return Observable.Empty<TwitterStatus>();
-            return store.Find(predicate, range);
+            var result = store.Find(predicate, range, count);
+            if (count == null)
+                return result;
+            return result
+                .Distinct(_ => _.Id)
+                .OrderByDescending(_ => _.Id)
+                .Take(count.Value);
         }
 
         /// <summary>

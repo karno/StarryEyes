@@ -14,6 +14,7 @@ using System.Reflection;
 using System.Runtime;
 using System.Threading;
 using System.Windows;
+using System.Text;
 
 namespace StarryEyes
 {
@@ -56,7 +57,12 @@ namespace StarryEyes
                 return;
             }
 
-#if RELEASE
+#if DEBUG
+            if (!System.Diagnostics.Debugger.IsAttached)
+            {
+                AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
+            }
+#else
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
 #endif
             Application.Current.Exit += (_, __) => AppFinalize(true);
@@ -110,12 +116,42 @@ namespace StarryEyes
         //集約エラーハンドラ
         private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            // TODO:ロギング処理など
-            System.Diagnostics.Debug.WriteLine("##### SYSTEM CRASH! #####");
-            System.Diagnostics.Debug.WriteLine(e.ExceptionObject.ToString());
+            try
+            {
+                // TODO:ロギング処理など
+                System.Diagnostics.Debug.WriteLine("##### SYSTEM CRASH! #####");
+                System.Diagnostics.Debug.WriteLine(e.ExceptionObject.ToString());
 
-            // アプリケーション ファイナライズ
-            this.AppFinalize(false);
+                // Build stack trace report file
+                var builder = new StringBuilder();
+                builder.AppendLine("Krile STARRYEYES #" + App.FormattedVersion);
+                builder.AppendLine(Environment.OSVersion.ToString() + " " + (Environment.Is64BitProcess ? "x64" : "x86"));
+                builder.AppendLine();
+                builder.AppendLine("thrown:");
+                builder.AppendLine(e.ExceptionObject.ToString());
+#if DEBUG
+                var tpath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
+                    "StarryEyes_Dump_" + Path.GetRandomFileName() + ".txt");
+                using (var sw = new StreamWriter(tpath))
+                {
+                    sw.WriteLine(builder.ToString());
+                }
+#else
+                var tpath = Path.GetTempFileName();
+                using (var sw = new StreamWriter(tpath))
+                {
+                    sw.WriteLine(builder.ToString());
+                }
+                var apppath = Path.GetDirectoryName(Environment.GetCommandLineArgs()[0]);
+                System.Diagnostics.Process.Start(Path.Combine(apppath, App.FeedbackAppName), tpath);
+#endif
+            }
+            finally
+            {
+                // アプリケーション ファイナライズ
+                this.AppFinalize(false);
+            }
+
 
             Environment.Exit(-1);
         }

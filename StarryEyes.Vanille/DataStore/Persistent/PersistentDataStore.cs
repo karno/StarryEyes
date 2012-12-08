@@ -114,10 +114,11 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// <param name="range">finding id range</param>
         /// <param name="maxCountOfItems">max count of returning items</param>
         /// <returns>observable sequence</returns>
-        public override IObservable<TValue> Find(Func<TValue, bool> predicate, FindRange<TKey> range = null, int? returnLowerBound = null)
+        public override IObservable<TValue> Find(Func<TValue, bool> predicate,
+            FindRange<TKey> range = null, int? itemCount = null)
         {
             return chunks.ToObservable()
-                .SelectMany(c => c.Find(predicate, range, returnLowerBound));
+                .SelectMany(c => c.Find(predicate, range, itemCount));
         }
 
         /// <summary>

@@ -207,13 +207,18 @@ namespace StarryEyes.Vanille.DataStore.Persistent
 
             // serialize data
             var ms = new MemoryStream();
-            using (var cs = new GZipStream(ms, CompressionLevel.Fastest))
-            {
-                ms.Write(new byte[4], 0, 4); // add empty 4 bytes (placeholder)
-                using (var bw = new BinaryWriter(cs))
-                    value.Serialize(bw);
-            }
+            using (var bw = new BinaryWriter(ms))
+                value.Serialize(bw);
             var bytes = ms.ToArray();
+
+            // compress data
+            var cs = new MemoryStream();
+            cs.Write(new byte[4], 0, 4); // add empty 4 bytes (placeholder)
+            using (var gzs = new GZipStream(cs, CompressionLevel.Fastest))
+            {
+                gzs.Write(bytes, 0, bytes.Length);
+            }
+            bytes = cs.ToArray();
 
             // get length-bit into the header
             var lengthBytes = BitConverter.GetBytes(bytes.Length - 4); // byte[4]
@@ -255,14 +260,15 @@ namespace StarryEyes.Vanille.DataStore.Persistent
             {
                 indexes = tableOfContents
                     .CheckRange(range, _ => _.Key)
-                    .Select(_ => _.Value)
-                    .TakeIfNotNull(returnLowerBound);
+                    .Select(_ => _.Value);
             }
             else
             {
-                indexes = tableOfContents.Values.TakeIfNotNull(returnLowerBound);
+                indexes = tableOfContents.Values;
             }
-            return indexes.Select(Load).Where(predicate);
+            return indexes.Select(Load)
+                .Where(predicate)
+                .TakeIfNotNull(returnLowerBound);
         }
 
         /// <summary>
