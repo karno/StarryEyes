@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Reactive.Concurrency;
+using System.Threading.Tasks;
 
 namespace StarryEyes.Models.Operations
 {
@@ -13,7 +14,7 @@ namespace StarryEyes.Models.Operations
     {
         static OperationQueueRunner()
         {
-            MaxConcurrency = 4;
+            MaxConcurrency = 8;
         }
 
         /// <summary>
@@ -67,7 +68,8 @@ namespace StarryEyes.Models.Operations
             }
             else
             {
-                Observable.Start(() => IssueOperations(), new NewThreadScheduler())
+                System.Diagnostics.Debug.WriteLine("Spawn runner.");
+                Observable.Start(() => IssueOperations(), TaskPoolScheduler.Default)
                     .Finally(() => Interlocked.Decrement(ref runningConcurrency))
                     .Subscribe();
             }
@@ -78,6 +80,7 @@ namespace StarryEyes.Models.Operations
         /// </summary>
         private static void IssueOperations()
         {
+            System.Diagnostics.Debug.WriteLine("issue started.");
             var operation = Lock(() =>
             {
                 if (highPriorityQueue.Count > 0)
@@ -90,11 +93,17 @@ namespace StarryEyes.Models.Operations
                     return null;
             });
             if (operation != null)
+            {
                 operation.Run()
-                    .Finally(() => IssueOperations())
+                    .Do(_ => System.Diagnostics.Debug.WriteLine("Done running."))
+                    .Finally(() => IssueOperations()) // loop issue operation
                     .Subscribe();
+            }
             else
+            {
+                System.Diagnostics.Debug.WriteLine("halt issue.");
                 return;
+            }
         }
 
         private static void Lock(Action action)

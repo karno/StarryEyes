@@ -134,7 +134,7 @@ namespace StarryEyes.Breezy.Api.Rest
                         .ReadTweet();
                 });
         }
-    
+
         public static IObservable<TwitterStatus> Destroy(this AuthenticateInfo info,
             long id, bool? trim_user = null, bool include_entities = true)
         {

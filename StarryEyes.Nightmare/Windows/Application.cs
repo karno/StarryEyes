@@ -1,6 +1,6 @@
 ﻿using WinForms = System.Windows.Forms;
 
-namespace Windows
+namespace StarryEyes.Nightmare.Windows
 {
     public static class Application
     {

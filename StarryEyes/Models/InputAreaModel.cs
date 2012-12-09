@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using Livet;
 using StarryEyes.Breezy.Authorize;
@@ -239,74 +240,49 @@ namespace StarryEyes.Models
 
         public IObservable<TweetInputInfo> Send()
         {
-            return
-                Observable.Defer(() => Observable.Start(() => DeletePrevious()))
-                .SelectMany(_ => _)
-                .Materialize()
-                .Where(_ => _.Kind == System.Reactive.NotificationKind.OnCompleted)
-                .SelectMany(_ => new[] { Notification.CreateOnNext(new Unit()), _ })
-                .Dematerialize()
-                .SelectMany(emptyResult =>
-                    Observable.Merge(
-                        // process each auth infos.
-                    Observable.Return(_authInfos)
-                    .SelectMany(_ => _)
-                        // build up operation and run.
-                    .Select(_ => new
-                    {
-                        AuthInfo = _,
-                        Operation = MessageRecipient != null ?
-                            new DirectMessageOperation(_, MessageRecipient, Text).Run() :
-                            new TweetOperation(_, Text, InReplyTo, AttachedGeoInfo, AttachedImage).Run()
-                    })
-                        // handle result.
-                    .Select(_ => _.Operation
-                        .Do(s => StatusStore.Store(s))
-                        .Select(s => new PostResult(_.AuthInfo, s))
-                        .Catch((Exception ex) => Observable.Return(new PostResult(_.AuthInfo, ex)))))
-                        // grouping by succeeded flag.
-                .GroupBy(_ => _.IsSucceeded)
-                .SelectMany(_ =>
-                    {
-                        if (_.Key)
-                        {
-                            // succeeded group
-                            var ret = this.Clone();
-                            ret.AuthInfos = _.Select(pr => pr.AuthInfo).ToEnumerable();
-                            ret.PostedTweets = _.Select(pr => Tuple.Create(pr.AuthInfo, pr.Status))
-                                .ToEnumerable();
-                            return Observable.Return(ret);
-                        }
-                        else
-                        {
-                            // failed group
-                            return _.Select(pr =>
-                                {
-                                    var ret = this.Clone();
-                                    ret.AuthInfos = new[] { pr.AuthInfo };
-                                    ret.ThrownException = pr.ThrownException;
-                                    return ret;
-                                });
-                        }
-                    }));
+            return _authInfos.ToObservable()
+               .SelectMany(AuthInfo =>
+                   (MessageRecipient != null ? (OperationBase<TwitterStatus>)
+                       new DirectMessageOperation(AuthInfo, MessageRecipient, Text) :
+                       new TweetOperation(AuthInfo, Text, InReplyTo, AttachedGeoInfo, AttachedImage)
+                   ).Run()
+                   .Do(_ => StatusStore.Store(_))
+                   .Select(_ => new PostResult(AuthInfo, _))
+                   .Catch((Exception ex) => Observable.Return(new PostResult(AuthInfo, ex))))
+               .GroupBy(_ => _.IsSucceeded)
+               .SelectMany(_ =>
+                   {
+                       if (_.Key)
+                       {
+                           // succeeded group
+                           var ret = this.Clone();
+                           ret.AuthInfos = _.Select(pr => pr.AuthInfo).ToEnumerable();
+                           ret.PostedTweets = _.Select(pr => Tuple.Create(pr.AuthInfo, pr.Status))
+                               .ToEnumerable();
+                           return Observable.Return(ret);
+                       }
+                       else
+                       {
+                           // failed group
+                           return _.Select(pr =>
+                           {
+                               var ret = this.Clone();
+                               ret.AuthInfos = new[] { pr.AuthInfo };
+                               ret.ThrownException = pr.ThrownException;
+                               return ret;
+                           });
+                       }
+                   });
         }
 
-        private IObservable<Unit> DeletePrevious()
+        internal async Task DeletePrevious()
         {
             if (PostedTweets != null)
             {
-                return Observable.Defer(() =>
-                    Observable.Merge(
-                    Observable.Return(PostedTweets)
-                    .SelectMany(_ => _)
+                System.Diagnostics.Debug.WriteLine("deleting previous...");
+                await PostedTweets.ToObservable()
                     .Select(_ => new DeleteOperation(_.Item1, _.Item2))
-                    .SelectMany(_ => _.Run())
-                    .Select(_ => new Unit())
-                    .Catch(Observable.Return(new Unit()))));
-            }
-            else
-            {
-                return Observable.Empty<Unit>();
+                    .LastOrDefaultAsync();
             }
         }
 

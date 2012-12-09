@@ -11,7 +11,7 @@ namespace StarryEyes.Models.Operations
     {
         public OperationBase() { }
 
-        private Subject<T> resultHandler = new Subject<T>();
+        private readonly Subject<T> resultHandler = new Subject<T>();
         protected Subject<T> ResultHandler
         {
             get { return resultHandler; }
@@ -72,12 +72,13 @@ namespace StarryEyes.Models.Operations
 
         IObservable<Unit> IRunnerQueueable.Run()
         {
-            var subject = new Subject<T>();
-            var connectable = RunCore().Publish();
-            connectable.Subscribe(resultHandler);
-            connectable.Subscribe(subject);
-            connectable.Connect();
-            return subject.Select(_ => new Unit());
+            return Observable.Defer(() => RunCore())
+                .Publish(connectable =>
+                {
+                    connectable.Subscribe(resultHandler);
+                    return connectable;
+                })
+                .Select(_ => new Unit());
         }
     }
 }

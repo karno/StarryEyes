@@ -10,6 +10,8 @@ using Microsoft.Phone.Reactive;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Concurrency;
+using System.Threading.Tasks;
+using System.Reactive.Threading.Tasks;
 #endif
 
 namespace Codeplex.OAuth
@@ -49,12 +51,12 @@ namespace Codeplex.OAuth
     {
         public static IObservable<WebResponse> GetResponseAsObservable(this WebRequest request)
         {
-            return Observable.FromAsync(request.GetResponseAsync);
+            return request.GetResponseAsync().ToObservable();
         }
 
         public static IObservable<Stream> GetRequestStreamAsObservable(this WebRequest request)
         {
-            return Observable.FromAsync(request.GetRequestStreamAsync);
+            return request.GetRequestStreamAsync().ToObservable();
         }
 
         public static IObservable<byte[]> DownloadDataAsync(this WebRequest request)
@@ -120,7 +122,8 @@ namespace Codeplex.OAuth
         public static IObservable<WebResponse> UploadDataAsync(this WebRequest request, byte[] data)
         {
             return Observable.Defer(() => request.GetRequestStreamAsObservable())
-                .SelectMany(stream => stream.WriteAsObservable(data, 0, data.Length).Finally(() => stream.Close()))
+                .SelectMany(stream => stream.WriteAsObservable(data, 0, data.Length)
+                    .Finally(() => stream.Close()))
                 .TakeLast(1)
                 .SelectMany(_ => request.GetResponseAsObservable());
         }
@@ -183,12 +186,12 @@ namespace Codeplex.OAuth
     {
         public static IObservable<Unit> WriteAsObservable(this Stream stream, byte[] buffer, int offset, int count)
         {
-            return Observable.FromAsync(() => stream.WriteAsync(buffer, offset, count));
+            return stream.WriteAsync(buffer, offset, count).ToObservable();
         }
 
         public static IObservable<int> ReadAsObservable(this Stream stream, byte[] buffer, int offset, int count)
         {
-            return Observable.FromAsync(() => stream.ReadAsync(buffer, offset, count));
+            return stream.ReadAsync(buffer, offset, count).ToObservable();
         }
 
         public static IObservable<Unit> WriteAsync(this Stream stream, string data)

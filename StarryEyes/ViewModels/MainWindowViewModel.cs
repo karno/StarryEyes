@@ -79,12 +79,31 @@ namespace StarryEyes.ViewModels
             get { return _inputAreaViewModel; }
         }
 
+        private readonly MainAreaViewModel _mainTimelineViewModel;
+        public MainAreaViewModel MainTimelineViewModel
+        {
+            get { return _mainTimelineViewModel; }
+        }
+
+        public AccountSelectorViewModel InputAreaAccountSelectorViewModel
+        {
+            get { return _inputAreaViewModel.AccountSelector; }
+        }
+
+        private readonly AccountSelectorViewModel _globalAccountSelectorViewModel;
+        public AccountSelectorViewModel GlobalAccountSelectorViewModel
+        {
+            get { return _globalAccountSelectorViewModel; }
+        }
+
         #endregion
 
         public MainWindowViewModel()
         {
             this.CompositeDisposable.Add(_backpanelViewModel = new BackpanelViewModel());
             this.CompositeDisposable.Add(_inputAreaViewModel = new InputAreaViewModel());
+            this.CompositeDisposable.Add(_mainTimelineViewModel = new MainAreaViewModel());
+            this.CompositeDisposable.Add(_globalAccountSelectorViewModel = new AccountSelectorViewModel());
             _backpanelViewModel.Initialize();
         }
 
@@ -99,15 +118,21 @@ namespace StarryEyes.ViewModels
             {
                 UserBaseConnectionsManager.Update();
             }
+            else
+            {
+                StartReceive();
+            }
             StatusStore.StatusPublisher
                 .Where(_ => _.IsAdded)
                 .Select(_ => _.Status)
                 .Select(_ => new StatusViewModel(null, _, AccountsStore.Accounts.Select(a => a.UserId)))
                 .Subscribe(_ => RecentReceived = _.Status);
             var kovm = new KeyOverrideViewModel();
+            /*
             this.Messenger.RaiseAsync(new TransitionMessage(
                 typeof(KeyOverrideWindow),
                 kovm, TransitionMode.Modal, null));
+            */
         }
 
         private TwitterStatus _recentReceived = null;

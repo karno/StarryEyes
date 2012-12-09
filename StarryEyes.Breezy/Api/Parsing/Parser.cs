@@ -96,7 +96,8 @@ namespace StarryEyes.Breezy.Api.Parsing
 
         public static IObservable<TwitterStatus> ReadTweet(this IObservable<WebResponse> response)
         {
-            return response.ReadString()
+            return response
+                .ReadString()
                 .DeserializeJson<TweetJson>()
                 .Where(_ => _ != null)
                 .Select(_ => _.Spawn());

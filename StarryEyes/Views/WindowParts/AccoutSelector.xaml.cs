@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -15,11 +16,11 @@ using System.Windows.Shapes;
 namespace StarryEyes.Views.WindowParts
 {
     /// <summary>
-    /// OperationAccountSelectOverwrap.xaml の相互作用ロジック
+    /// AccoutSelector.xaml の相互作用ロジック
     /// </summary>
-    public partial class OperationAccountSelectOverwrap : UserControl
+    public partial class AccoutSelector : UserControl
     {
-        public OperationAccountSelectOverwrap()
+        public AccoutSelector()
         {
             InitializeComponent();
         }

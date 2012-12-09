@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using StarryEyes.Breezy.Util;
 
 namespace StarryEyes.Scrapping
@@ -31,8 +32,8 @@ namespace StarryEyes.Scrapping
             var req = HttpWebRequest.Create(url + "?" + param) as HttpWebRequest;
             if (attach != null)
                 attach(req);
-            return Observable.FromAsync(req.GetResponseAsync)
-                .Select(w => (HttpWebResponse)w);
+            return req.GetResponseAsync().ToObservable()
+                .OfType<HttpWebResponse>();
         }
     }
 }

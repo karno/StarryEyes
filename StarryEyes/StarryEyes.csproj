@@ -16,7 +16,7 @@
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
-    <ExpressionBlendVersion>4.0.30816.0</ExpressionBlendVersion>
+    <ExpressionBlendVersion>5.2.30810.0</ExpressionBlendVersion>
     <Utf8Output>true</Utf8Output>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
@@ -77,6 +77,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\MahApps.Metro.0.10.0.0\lib\net40\MahApps.Metro.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Expression.Drawing" />
     <Reference Include="Microsoft.Expression.Interactions, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>InfrastructureAssemblies\Microsoft.Expression.Interactions.dll</HintPath>
@@ -218,7 +219,8 @@
     <Compile Include="ViewModels\WindowParts\AccountSelectorViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\BackpanelViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\InputAreaViewModel.cs" />
-    <Compile Include="ViewModels\WindowParts\StatusAreaViewModel.cs" />
+    <Compile Include="ViewModels\WindowParts\MainAreaViewModel.cs" />
+    <Compile Include="ViewModels\WindowParts\Timelines\ColumnViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Timelines\StatusViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Timelines\TabViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Timelines\UserViewModel.cs" />
@@ -238,6 +240,10 @@
     <Compile Include="Views\Utils\CollectionExistsToVisibleConverter.cs" />
     <Compile Include="Views\Utils\ConverterBase.cs" />
     <Compile Include="Views\Utils\StringToVisibleConverter.cs" />
+    <Compile Include="Views\Utils\UriImageConverter.cs" />
+    <Compile Include="Views\WindowParts\AccoutSelector.xaml.cs">
+      <DependentUpon>AccoutSelector.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\WindowParts\Backpanel.xaml.cs">
       <DependentUpon>Backpanel.xaml</DependentUpon>
     </Compile>
@@ -247,17 +253,14 @@
     <Compile Include="Views\WindowParts\InputArea.xaml.cs">
       <DependentUpon>InputArea.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\WindowParts\OperationAccountSelectOverwrap.xaml.cs">
-      <DependentUpon>OperationAccountSelectOverwrap.xaml</DependentUpon>
+    <Compile Include="Views\WindowParts\MainArea.xaml.cs">
+      <DependentUpon>MainArea.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\WindowParts\SearchOverwrap.xaml.cs">
       <DependentUpon>SearchOverwrap.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\WindowParts\SettingPanel.xaml.cs">
       <DependentUpon>SettingPanel.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\WindowParts\StatusArea.xaml.cs">
-      <DependentUpon>StatusArea.xaml</DependentUpon>
     </Compile>
     <Page Include="Simple Styles.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -321,6 +324,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Views\WindowParts\AccoutSelector.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\WindowParts\Backpanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -333,7 +340,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\WindowParts\OperationAccountSelectOverwrap.xaml">
+    <Page Include="Views\WindowParts\MainArea.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -342,10 +349,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\WindowParts\SettingPanel.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\WindowParts\StatusArea.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -388,6 +391,7 @@
     <Content Include="InfrastructureAssemblies\System.Windows.Interactivity.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="ViewModels\WindowParts\Backpanels\" />
     <Folder Include="Views\WindowParts\Timelines\" />
   </ItemGroup>
   <ItemGroup>

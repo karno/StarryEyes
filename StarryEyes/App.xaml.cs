@@ -15,6 +15,7 @@ using System.Runtime;
 using System.Threading;
 using System.Windows;
 using System.Text;
+using TaskDialogInterop;
 
 namespace StarryEyes
 {
@@ -36,6 +37,12 @@ namespace StarryEyes
 
             // initialize dispatcher helper
             DispatcherHelper.UIDispatcher = Dispatcher;
+
+            // set rendering mode
+            if (!IsHardwareRenderingEnabled)
+            {
+                System.Windows.Media.RenderOptions.ProcessRenderMode = System.Windows.Interop.RenderMode.SoftwareOnly;
+            }
 
             // Check run duplication
             string mutexStr = null;
@@ -82,8 +89,39 @@ namespace StarryEyes
             ApiEndpoint.DefaultConsumerSecret = Setting.GlobalConsumerSecret.Value ?? ConsumerSecret;
 
             // Initialize core systems
-            StatusStore.Initialize();
-            UserStore.Initialize();
+            try
+            {
+                StatusStore.Initialize();
+                UserStore.Initialize();
+            }
+            catch (Exception ex)
+            {
+                var option = new TaskDialogOptions()
+                {
+                    Title = "Krile データストア初期化エラー",
+                    MainInstruction = "Krileの起動中にエラーが発生しました。",
+                    Content = "データストアが破損しています。" + Environment.NewLine +
+                    "データストアを初期化するか、またはKrileを終了してバックアップを取ることができます。",
+                    ExpandedInfo = ex.ToString(),
+                    CommandButtons = new[] { "データストアを初期化して再起動", "Krileを終了" }
+                };
+                var result = TaskDialog.Show(option);
+                if (!result.CommandButtonResult.HasValue ||
+                    result.CommandButtonResult.Value == 1)
+                {
+                    // shutdown
+                    Application.Current.Shutdown();
+                    return;
+                }
+                else
+                {
+                    // clear data
+                    ClearStoreData();
+                    Nightmare.Windows.Application.Restart();
+                    Application.Current.Shutdown();
+                    return;
+                }
+            }
             AccountsStore.Initialize();
             StatisticsService.Initialize();
 
@@ -113,7 +151,9 @@ namespace StarryEyes
             appMutex.ReleaseMutex();
         }
 
-        //集約エラーハンドラ
+        /// <summary>
+        /// Error handler
+        /// </summary>
         private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             try
@@ -126,6 +166,9 @@ namespace StarryEyes
                 var builder = new StringBuilder();
                 builder.AppendLine("Krile STARRYEYES #" + App.FormattedVersion);
                 builder.AppendLine(Environment.OSVersion.ToString() + " " + (Environment.Is64BitProcess ? "x64" : "x86"));
+                builder.AppendLine("execution mode: " + App.ExecutionMode.ToString() + " " +
+                    "multicore JIT: " + App.IsMulticoreJITEnabled.ToString() + " " +
+                    "hardware rendering: " + App.IsHardwareRenderingEnabled.ToString());
                 builder.AppendLine();
                 builder.AppendLine("thrown:");
                 builder.AppendLine(e.ExceptionObject.ToString());
@@ -154,6 +197,14 @@ namespace StarryEyes
 
 
             Environment.Exit(-1);
+        }
+
+        /// <summary>
+        /// Clear all data stored in data store.
+        /// </summary>
+        internal void ClearStoreData()
+        {
+            Directory.Delete(DataStorePath, true);
         }
 
         #region Definitions
@@ -202,6 +253,17 @@ namespace StarryEyes
             get
             {
                 if (ConfigurationManager.AppSettings["UseMulticoreJIT"].ToLower() == "none")
+                    return false;
+                else
+                    return true;
+            }
+        }
+
+        public static bool IsHardwareRenderingEnabled
+        {
+            get
+            {
+                if (ConfigurationManager.AppSettings["UseHardwareRendering"].ToLower() == "none")
                     return false;
                 else
                     return true;

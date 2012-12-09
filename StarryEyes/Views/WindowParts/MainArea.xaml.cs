@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -15,11 +16,11 @@ using System.Windows.Shapes;
 namespace StarryEyes.Views.WindowParts
 {
     /// <summary>
-    /// StatusArea.xaml の相互作用ロジック
+    /// MainArea.xaml の相互作用ロジック
     /// </summary>
-    public partial class StatusArea : UserControl
+    public partial class MainArea : UserControl
     {
-        public StatusArea()
+        public MainArea()
         {
             InitializeComponent();
         }

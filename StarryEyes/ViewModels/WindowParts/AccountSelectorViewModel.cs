@@ -5,6 +5,7 @@ using Livet;
 using StarryEyes.Models.Stores;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Settings;
+using StarryEyes.Views.Messaging;
 
 namespace StarryEyes.ViewModels.WindowParts
 {
@@ -21,7 +22,21 @@ namespace StarryEyes.ViewModels.WindowParts
                 DispatcherHelper.UIDispatcher));
         }
 
-        private readonly ReadOnlyDispatcherCollection<SelectableAccountViewModel> accounts;
+        private string _selectionReason;
+        /// <summary>
+        /// Reason of selecting account
+        /// </summary>
+        public string SelectionReason
+        {
+            get { return _selectionReason; }
+            set
+            {
+                _selectionReason = value;
+                RaisePropertyChanged(() => SelectionReason);
+            }
+        }
+
+        private ReadOnlyDispatcherCollection<SelectableAccountViewModel> accounts;
         public ReadOnlyDispatcherCollection<SelectableAccountViewModel> Accounts
         {
             get { return accounts; }
@@ -53,6 +68,27 @@ namespace StarryEyes.ViewModels.WindowParts
             var handler = OnSelectedAccountsChanged;
             if (handler != null)
                 handler();
+        }
+
+        private bool _isVisible = false;
+        public bool IsVisible
+        {
+            get { return _isVisible; }
+            set
+            {
+                _isVisible = value;
+                RaisePropertyChanged(() => IsVisible);
+            }
+        }
+
+        public void Open()
+        {
+            this.Messenger.Raise(new GoToStateMessage("Open"));
+        }
+
+        public void Close()
+        {
+            this.Messenger.Raise(new GoToStateMessage("Close"));
         }
     }
 

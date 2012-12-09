@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Reactive.Linq;
 using StarryEyes.Breezy.DataModel;
@@ -102,6 +103,7 @@ namespace StarryEyes.Models.Stores
         {
             using (var fs = new FileStream(ScreenNameResolverCacheFile,
                 FileMode.Create, FileAccess.ReadWrite))
+            using (var cs = new DeflateStream(fs, CompressionLevel.Optimal))
             using (var bw = new BinaryWriter(fs))
             {
                 bw.Write(screenNameResolver.Count);
@@ -119,6 +121,7 @@ namespace StarryEyes.Models.Stores
             {
                 using (var fs = new FileStream(ScreenNameResolverCacheFile,
                     FileMode.Open, FileAccess.Read))
+                using (var cs = new DeflateStream(fs, CompressionMode.Decompress))
                 using (var br = new BinaryReader(fs))
                 {
                     int count = br.ReadInt32();

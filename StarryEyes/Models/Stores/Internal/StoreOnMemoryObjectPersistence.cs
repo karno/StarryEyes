@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using StarryEyes.Vanille.Serialization;
 
@@ -22,8 +23,9 @@ namespace StarryEyes.Models.Stores.Internal
         {
             var sd = tocniops.Select(s => new ToCAndNIoP(s)).ToList();
             using (var fs = new FileStream(GetDataStoreFileName(key), FileMode.Create, FileAccess.ReadWrite))
+            using (var cs = new DeflateStream(fs, CompressionLevel.Optimal))
             {
-                BinarySerialization.SerializeCollection(fs, sd);
+                BinarySerialization.SerializeCollection(cs, sd);
             }
         }
 
@@ -35,8 +37,9 @@ namespace StarryEyes.Models.Stores.Internal
         public static IEnumerable<Tuple<IDictionary<long, int>, IEnumerable<int>>> GetPersistentData(string key)
         {
             using (var fs = new FileStream(GetDataStoreFileName(key), FileMode.Open, FileAccess.ReadWrite))
+            using (var cs = new DeflateStream(fs, CompressionMode.Decompress))
             {
-                return BinarySerialization.DeserializeCollection<ToCAndNIoP>(fs)
+                return BinarySerialization.DeserializeCollection<ToCAndNIoP>(cs)
                     .Select(s => s.GetToCNIoP());
             }
         }

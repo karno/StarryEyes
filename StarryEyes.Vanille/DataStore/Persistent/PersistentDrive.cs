@@ -214,7 +214,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
             // compress data
             var cs = new MemoryStream();
             cs.Write(new byte[4], 0, 4); // add empty 4 bytes (placeholder)
-            using (var gzs = new GZipStream(cs, CompressionLevel.Fastest))
+            using (var gzs = new DeflateStream(cs, CompressionLevel.Fastest))
             {
                 gzs.Write(bytes, 0, bytes.Length);
             }
@@ -282,7 +282,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
             var length = BitConverter.ToInt32(bytes, 0);
             var ret = new TValue();
             using (var ms = new MemoryStream(bytes, 4, length, false))
-            using (var cs = new GZipStream(ms, CompressionMode.Decompress))
+            using (var cs = new DeflateStream(ms, CompressionMode.Decompress))
             using (var br = new BinaryReader(cs))
             {
                 ret.Deserialize(br);

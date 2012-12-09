@@ -344,7 +344,7 @@ namespace StarryEyes.ViewModels.WindowParts
                     return false; // send account is not found.
                 if (TextCount > StatusTextUtil.MaxTextLength)
                     return false;
-                return true;
+                return TextCount > 0;
             }
         }
 
@@ -676,6 +676,7 @@ namespace StarryEyes.ViewModels.WindowParts
         {
             this._inputInfo = new TweetInputInfo();
             ApplyBaseSelectedAccounts();
+            InputInfo.AuthInfos = this.AccountSelector.SelectedAccounts;
             RaisePropertyChanged(() => InputInfo);
             RaisePropertyChanged(() => InputText);
             RaisePropertyChanged(() => InReplyTo);
@@ -802,7 +803,7 @@ namespace StarryEyes.ViewModels.WindowParts
             }
             if (!CheckInput())
                 return;
-            this.Send(InputInfo);
+            Send(InputInfo);
             ClearInput();
         }
 
@@ -846,8 +847,9 @@ namespace StarryEyes.ViewModels.WindowParts
             return true;
         }
 
-        internal void Send(TweetInputInfo inputInfo)
+        internal async static void Send(TweetInputInfo inputInfo)
         {
+            await inputInfo.DeletePrevious();
             inputInfo.Send()
                 .Subscribe(_ =>
                 {
@@ -863,10 +865,14 @@ namespace StarryEyes.ViewModels.WindowParts
                             InputAreaModel.Drafts.Add(_);
                         BackpanelModel.RegisterEvent(new PostFailedEvent(_, result.Item2));
                     }
+                }, ex =>
+                {
+                    System.Diagnostics.Debug.WriteLine("Exception is thrown...");
+                    System.Diagnostics.Debug.WriteLine(ex);
                 });
         }
 
-        private Tuple<bool, string> AnalysisFailedReason(TweetInputInfo info)
+        private static Tuple<bool, string> AnalysisFailedReason(TweetInputInfo info)
         {
             if (info == null)
                 throw new ArgumentNullException("info");
@@ -890,6 +896,11 @@ namespace StarryEyes.ViewModels.WindowParts
             {
                 return Tuple.Create(true, info.ThrownException.Message);
             }
+        }
+
+        public void SelectAccounts()
+        {
+            this.AccountSelector.Open();
         }
     }
 
@@ -968,7 +979,7 @@ namespace StarryEyes.ViewModels.WindowParts
         public void Send()
         {
             _removeHandler(this.Model);
-            Parent.Send(this.Model);
+            InputAreaViewModel.Send(this.Model);
         }
     }
 

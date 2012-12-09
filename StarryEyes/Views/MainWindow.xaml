@@ -64,106 +64,17 @@
     </Controls:MetroWindow.WindowCommands>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="13*" />
+            <RowDefinition />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <Button Grid.Row="1"
-                Width="200"
-                Height="33"
-                Margin="8,3,0,0"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Top"
-                Command="{Binding StartReceiveCommand,
-                                  Mode=OneWay}"
-                Content="Auth" />
-        <Button Grid.Row="1"
-                Width="200"
-                Height="33"
-                Margin="8,119,0,0"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Top"
-                Command="{Binding ExecuteFilterCommand,
-                                  Mode=OneWay}"
-                Content="Execute Find" />
-        <TextBlock Grid.Row="1"
-                   Width="103"
-                   Height="15"
-                   Margin="8,40,0,0"
-                   HorizontalAlignment="Left"
-                   VerticalAlignment="Top"><Run Text="{Binding StatusCount, Mode=OneWay}" /><Run Text=" " /><Run Text="tweets / " /><Run Text=" " /><Run Text="{Binding TweetsPerMinutes, Mode=OneWay}" /><Run Text=" " /><Run Text="tpm" />
-        </TextBlock>
-        <RichTextBox Grid.Row="1"
-                     Height="15"
-                     Margin="8,65,8,0"
-                     HorizontalAlignment="Stretch"
-                     VerticalAlignment="Top"
-                     BorderBrush="{x:Null}"
-                     BorderThickness="0"
-                     IsDocumentEnabled="True"
-                     IsReadOnly="True"
-                     helper:RichTextBoxHelper.LinkNavigationCommand="{Binding OpenLinkCommand}"
-                     helper:RichTextBoxHelper.TwitterStatus="{Binding RecentReceived}" />
-        <TextBlock x:Name="textBlock1"
-                   Grid.Row="1"
-                   Width="39"
-                   Height="23"
-                   Margin="8,92,0,0"
-                   HorizontalAlignment="Left"
-                   VerticalAlignment="Top"
-                   Text="query:" />
-        <TextBox x:Name="textBox1"
-                 Grid.Row="1"
-                 Height="26"
-                 Margin="59,89,8,0"
-                 VerticalAlignment="Top"
-                 Text="{Binding Query,
-                                UpdateSourceTrigger=PropertyChanged}" />
-        <TextBlock x:Name="textBlock2"
-                   Grid.Row="1"
-                   Width="0"
-                   Height="23"
-                   Margin="8,158,0,0"
-                   HorizontalAlignment="Left"
-                   VerticalAlignment="Top"
-                   Text="{Binding QueryResult,
-                                  Mode=OneWay}" />
-        <TextBox x:Name="textBox2"
-                 Grid.Row="1"
-                 Height="26"
-                 Margin="8,158,48,0"
-                 VerticalAlignment="Top"
-                 SpellCheck.IsEnabled="True"
-                 Text="{Binding PostText,
-                                Mode=TwoWay,
-                                UpdateSourceTrigger=PropertyChanged}" />
-        <Label x:Name="label1"
-               Grid.Row="1"
-               Width="17"
-               Height="28"
-               Margin="0,158,8,0"
-               HorizontalAlignment="Right"
-               VerticalAlignment="Top"
-               Content="{Binding PostTextLength,
-                                 Mode=OneWay}" />
-        <CheckBox Grid.Row="1"
-                  Width="129"
-                  Height="16"
-                  Margin="8,188,0,0"
-                  HorizontalAlignment="Left"
-                  VerticalAlignment="Top"
-                  Content="Automatic escape URL"
-                  IsChecked="{Binding IsAutoEscapeEnabled}" />
-        <Button Grid.Row="1"
-                Width="75"
-                Height="25"
-                Margin="0,188,8,0"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Top"
-                Command="{Binding PostCommand,
-                                  Mode=OneWay}"
-                Content="POST" />
-        <Grid Grid.Row="2">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="13*" />
+            </Grid.RowDefinitions>
+            <WindowParts:InputArea Margin="0,4" DataContext="{Binding InputAreaViewModel}" />
+        </Grid>
+        <Grid Grid.Row="1">
             <TextBlock Margin="8"
                        Text="完了"
                        ToolTip="ここをクリックすると、バックパネルを開くことができます。" />
@@ -203,16 +114,12 @@
                     </TextBlock>
                 </StackPanel>
             </Border>
-
         </Grid>
-        <TextBlock Grid.Row="1"
-                   Width="0"
-                   Height="15"
-                   Margin="213,127,0,0"
-                   HorizontalAlignment="Left"
-                   VerticalAlignment="Top"
-                   Text="{Binding QueryResult}"
-                   TextWrapping="Wrap" />
-        <WindowParts:InputArea DataContext="{Binding InputAreaViewModel}" Margin="0,4" />
+        <WindowParts:AccoutSelector Grid.RowSpan="2"
+                                    Margin="0,-30,0,0"
+                                    DataContext="{Binding InputAreaAccountSelectorViewModel}" />
+        <WindowParts:AccoutSelector Grid.RowSpan="2"
+                                    Margin="0,-30,0,0"
+                                    DataContext="{Binding GlobalAccountSelectorViewModel}" />
     </Grid>
 </Controls:MetroWindow>

@@ -87,7 +87,7 @@ namespace StarryEyes
         /// This is for the URL which is not the URL but be treated as the URL by Fucking Twitter.
         /// </summary>
         public static Regex TwitterUrlTLDRegex = new Regex(
-            "([-a-z0-9_\\.]+)(\\.((" + TLD.JoinString("|") + ")|([a-z0-9]+\\.(" +ccTLD.JoinString("|") + ")))" +
+            "([-a-z0-9_\\.]+)(\\.((" + TLD.JoinString("|") + ")|([a-z0-9]+\\.(" + ccTLD.JoinString("|") + ")))" +
             "[-a-z0-9\\/_\\.!~\\*'\\(\\)%]*)", RegexOptions.Singleline | RegexOptions.IgnoreCase);
 
         /// <summary>
@@ -119,9 +119,9 @@ namespace StarryEyes
                     return "<" + target + ">";
                 });
             return separated.Split(new[] { '>' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Split('<'))
-                .SelectMany(s => 
+                .SelectMany(s =>
                 s.Length == 1 ?
-                new[]{ Tuple.Create(UnescapeInnerEntity(s[0]), false) }:
+                new[] { Tuple.Create(UnescapeInnerEntity(s[0]), false) } :
                 new[] 
                 {
                     Tuple.Create(UnescapeInnerEntity(s[0]), false),

@@ -84,6 +84,11 @@
                 BorderThickness="0"
                 Padding="0"
                 Style="{DynamicResource MetroSquareUnfocusableFlatButton}">
+        	<i:Interaction.Triggers>
+        		<i:EventTrigger EventName="Click">
+        			<ei:CallMethodAction TargetObject="{Binding Mode=OneWay}" MethodName="SelectAccounts"/>
+        		</i:EventTrigger>
+        	</i:Interaction.Triggers>
             <Button.ToolTip>
                 <TextBlock Foreground="White">
                     <Run Text="{Binding AuthInfoScreenNames, Mode=OneWay}" />
@@ -94,7 +99,8 @@
             <ItemsControl x:Name="itemsControl"
                           Width="24"
                           Height="24"
-                          ItemsSource="{Binding BindingAuthInfos}">
+                          ItemsSource="{Binding BindingAuthInfos}"
+                          d:IsHidden="True">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <UniformGrid Columns="{Binding AuthInfoGridRowColumn}" Rows="{Binding AuthInfoGridRowColumn}" />
@@ -167,7 +173,8 @@
         <Grid x:Name="Opening"
               Grid.Column="1"
               Margin="4,0"
-              Visibility="{Binding IsOpening, Converter={StaticResource BooleanToVisibleConverter}}">
+              Visibility="{Binding IsOpening,
+                                   Converter={StaticResource BooleanToVisibleConverter}}">
             <Border Background="White" BorderThickness="1">
                 <Border.BorderBrush>
                     <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlDarkDarkColorKey}}" />
@@ -287,57 +294,83 @@
                                        TextWrapping="Wrap"
                                        Visibility="{Binding IsLocationAttached,
                                                             Converter={StaticResource BooleanToVisibleConverter}}" />
-                            <Grid>
-                            	<Grid.ColumnDefinitions>
-                            		<ColumnDefinition Width="Auto"/>
-                            		<ColumnDefinition/>
-                            	</Grid.ColumnDefinitions>
-                            	<Border VerticalAlignment="Center" Visibility="{Binding IsChecked, Converter={StaticResource BooleanToInvisibleConverter}, ElementName=ToggleUrlAutoEscapeButton}" ToolTip="URLリンク化自動回避は行われません。" >
-                            		<Path Stretch="Fill" Fill="#FF000000" Data="F1 M 17.8932,27.756L 18.5598,28.9107L 20.3812,29.3987L 22.1132,28.3987L 22.6906,28.0654L 23.8453,27.3987L 24.1786,27.9761L 23.6906,29.7974L 20.8038,31.4641L 17.1611,30.488L 15.8278,28.1786L 16.8039,24.5359L 19.6906,22.8692L 21.512,23.3573L 21.8453,23.9346L 20.6906,24.6013L 20.1132,24.9346L 18.3812,25.9346L 17.8932,27.756 Z M 24.3094,20.2026L 27.1961,18.5359L 30.8389,19.512L 32.1722,21.8214L 31.1961,25.4641L 28.3094,27.1308L 26.488,26.6427L 26.1547,26.0654L 27.3094,25.3987L 27.8867,25.0654L 29.6188,24.0654L 30.1068,22.244L 29.4402,21.0893L 27.6188,20.6013L 25.8867,21.6013L 25.3094,21.9346L 24.1547,22.6013L 23.8214,22.0239L 24.3094,20.2026 Z M 22.2739,27.3437L 21.3632,27.0997L 20.8632,26.2337L 21.1073,25.323L 25.7261,22.6563L 26.6367,22.9003L 27.1367,23.7664L 26.8927,24.677L 22.2739,27.3437 Z " Height="12.928"/>
-                            	</Border>
-                            	<Border VerticalAlignment="Center" Visibility="{Binding IsChecked, Converter={StaticResource BooleanToVisibleConverter}, ElementName=ToggleUrlAutoEscapeButton}" ToolTip="URLリンク化自動回避を行います。" >
-                            		<Path Stretch="Fill" Fill="#FF000000" Data="F1 M 17.8932,27.756L 18.5598,28.9107L 20.3812,29.3987L 22.1132,28.3987L 22.6906,28.0654L 23.8453,27.3987L 24.1786,27.9761L 23.6906,29.7974L 20.8038,31.4641L 17.1611,30.488L 15.8278,28.1786L 16.8039,24.5359L 19.6906,22.8692L 21.512,23.3573L 21.8453,23.9346L 20.6906,24.6013L 20.1132,24.9346L 18.3812,25.9346L 17.8932,27.756 Z M 24.3094,20.2026L 27.1961,18.5359L 30.8389,19.512L 32.1722,21.8214L 31.1961,25.4641L 28.3094,27.1308L 26.488,26.6427L 26.1547,26.0654L 27.3094,25.3987L 27.8867,25.0654L 29.6188,24.0654L 30.1068,22.244L 29.4401,21.0893L 27.6188,20.6013L 25.8867,21.6013L 25.3094,21.9346L 24.1547,22.6013L 23.8214,22.0239L 24.3094,20.2026 Z M 22.2739,27.3437L 21.3632,27.0997L 20.8632,26.2337L 21.1073,25.323L 25.7261,22.6563L 26.6367,22.9003L 27.1367,23.7664L 26.8927,24.677L 22.2739,27.3437 Z M 27.6937,27.375L 29.3125,28.9938L 30.9312,27.375L 31.625,28.0688L 30.0062,29.6875L 31.625,31.3063L 30.9312,32L 29.3125,30.3813L 27.6937,32L 27,31.3062L 28.6187,29.6875L 27,28.0687L 27.6937,27.375 Z " Height="13.464"/>
-                            	</Border>
-                            	<Viewbox HorizontalAlignment="Left" Height="16" VerticalAlignment="Center" Grid.Column="1" Margin="4,0">
-                            		<Custom:ToggleSwitchButton x:Name="ToggleUrlAutoEscapeButton" Content="ToggleSwitchButton" ToolTip="URLリンク化自動回避のオンオフを切り替えます。" IsChecked="{Binding IsUrlAutoEsacpeEnabled}"/>
-                            	</Viewbox>
+                            <Grid Margin="4,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <Border VerticalAlignment="Center"
+                                        ToolTip="URLリンク化自動回避は行われません。"
+                                        Visibility="{Binding IsChecked,
+                                                             Converter={StaticResource BooleanToInvisibleConverter},
+                                                             ElementName=ToggleUrlAutoEscapeButton}">
+                                    <Path Height="12.928"
+                                          Data="F1 M 17.8932,27.756L 18.5598,28.9107L 20.3812,29.3987L 22.1132,28.3987L 22.6906,28.0654L 23.8453,27.3987L 24.1786,27.9761L 23.6906,29.7974L 20.8038,31.4641L 17.1611,30.488L 15.8278,28.1786L 16.8039,24.5359L 19.6906,22.8692L 21.512,23.3573L 21.8453,23.9346L 20.6906,24.6013L 20.1132,24.9346L 18.3812,25.9346L 17.8932,27.756 Z M 24.3094,20.2026L 27.1961,18.5359L 30.8389,19.512L 32.1722,21.8214L 31.1961,25.4641L 28.3094,27.1308L 26.488,26.6427L 26.1547,26.0654L 27.3094,25.3987L 27.8867,25.0654L 29.6188,24.0654L 30.1068,22.244L 29.4402,21.0893L 27.6188,20.6013L 25.8867,21.6013L 25.3094,21.9346L 24.1547,22.6013L 23.8214,22.0239L 24.3094,20.2026 Z M 22.2739,27.3437L 21.3632,27.0997L 20.8632,26.2337L 21.1073,25.323L 25.7261,22.6563L 26.6367,22.9003L 27.1367,23.7664L 26.8927,24.677L 22.2739,27.3437 Z "
+                                          Fill="#FF000000"
+                                          Stretch="Fill" />
+                                </Border>
+                                <Border VerticalAlignment="Center"
+                                        ToolTip="URLリンク化自動回避を行います。"
+                                        Visibility="{Binding IsChecked,
+                                                             Converter={StaticResource BooleanToVisibleConverter},
+                                                             ElementName=ToggleUrlAutoEscapeButton}">
+                                    <Path Height="13.464"
+                                          Data="F1 M 17.8932,27.756L 18.5598,28.9107L 20.3812,29.3987L 22.1132,28.3987L 22.6906,28.0654L 23.8453,27.3987L 24.1786,27.9761L 23.6906,29.7974L 20.8038,31.4641L 17.1611,30.488L 15.8278,28.1786L 16.8039,24.5359L 19.6906,22.8692L 21.512,23.3573L 21.8453,23.9346L 20.6906,24.6013L 20.1132,24.9346L 18.3812,25.9346L 17.8932,27.756 Z M 24.3094,20.2026L 27.1961,18.5359L 30.8389,19.512L 32.1722,21.8214L 31.1961,25.4641L 28.3094,27.1308L 26.488,26.6427L 26.1547,26.0654L 27.3094,25.3987L 27.8867,25.0654L 29.6188,24.0654L 30.1068,22.244L 29.4401,21.0893L 27.6188,20.6013L 25.8867,21.6013L 25.3094,21.9346L 24.1547,22.6013L 23.8214,22.0239L 24.3094,20.2026 Z M 22.2739,27.3437L 21.3632,27.0997L 20.8632,26.2337L 21.1073,25.323L 25.7261,22.6563L 26.6367,22.9003L 27.1367,23.7664L 26.8927,24.677L 22.2739,27.3437 Z M 27.6937,27.375L 29.3125,28.9938L 30.9312,27.375L 31.625,28.0688L 30.0062,29.6875L 31.625,31.3063L 30.9312,32L 29.3125,30.3813L 27.6937,32L 27,31.3062L 28.6187,29.6875L 27,28.0687L 27.6937,27.375 Z "
+                                          Fill="#FF000000"
+                                          Stretch="Fill" />
+                                </Border>
+                                <Viewbox Grid.Column="1"
+                                         Height="12"
+                                         Margin="4,0"
+                                         HorizontalAlignment="Left"
+                                         VerticalAlignment="Center">
+                                    <Custom:ToggleSwitchButton x:Name="ToggleUrlAutoEscapeButton"
+                                                               Content="ToggleSwitchButton"
+                                                               IsChecked="{Binding IsUrlAutoEsacpeEnabled}"
+                                                               ToolTip="URLリンク化自動回避のオンオフを切り替えます。" />
+                                </Viewbox>
                             </Grid>
                         </StackPanel>
                         <DockPanel LastChildFill="False">
-                        	<Border Width="14"
-                        		Height="14"
-                        		Margin="7,0"
-                        		ToolTip="ロックされているハッシュタグ"
-                        		Visibility="{Binding IsBindingHashtagExisted, Converter={StaticResource BooleanToVisibleConverter}}">
-                        		<Path Stretch="Fill" Fill="#FF000000" Data="F1 M 18.1693,23.4199L 19.3361,23.4199L 19.3361,21.6697C 19.3361,19.092 21.4257,17.0024 24.0034,17.0024C 26.5811,17.0024 28.6707,19.092 28.6707,21.6697L 28.6707,23.4199L 29.8376,23.4199L 29.8376,31.0043L 18.1693,31.0043L 18.1693,23.4199 Z M 26.9205,21.6697C 26.9205,20.0586 25.6145,18.7526 24.0034,18.7526C 22.3923,18.7526 21.0863,20.0586 21.0863,21.6697L 21.0863,23.4199L 26.9205,23.4199L 26.9205,21.6697 Z " Margin="0,0,2.332,-0.002"/>
-                        	</Border>
-                        	<ItemsControl ItemTemplate="{DynamicResource HashtagDataTemplate}" ItemsSource="{Binding BindingHashtags}">
-                        		<ItemsControl.ItemsPanel>
-                        			<ItemsPanelTemplate>
-                        				<StackPanel Orientation="Horizontal" />
-                        			</ItemsPanelTemplate>
-                        		</ItemsControl.ItemsPanel>
-                        	</ItemsControl>
-                        	<Border Width="14"
-                        		Height="14"
-                        		Margin="7,0"
-                        		ToolTip="ロック可能なハッシュタグ"
-                        		Visibility="{Binding IsBindableHashtagExisted, Converter={StaticResource BooleanToVisibleConverter}}">
-                        		<Path Data="F1 M 18.8704,16.7929L 22.1351,16.7929L 30.4452,25.103C 30.9088,25.5666 30.9088,26.3183 30.4452,26.7819L 26.7819,30.4452C 26.3183,30.9088 25.5666,30.9088 25.103,30.4452L 16.7929,22.1351L 16.7929,18.8704C 16.7929,18.1779 16.7929,17.4854 17.1391,17.1392C 17.4854,16.7929 18.1779,16.7929 18.8704,16.7929 Z M 19.7608,18.5736C 19.1051,18.5736 18.5736,19.1051 18.5736,19.7608C 18.5736,20.4164 19.1051,20.9479 19.7608,20.9479C 20.4164,20.9479 20.9479,20.4164 20.9479,19.7608C 20.9479,19.1051 20.4164,18.5736 19.7608,18.5736 Z "
-                        			Fill="#FF000000"
-                        			Stretch="Fill" />
-                        	</Border>
-                        	<ItemsControl ItemTemplate="{DynamicResource HashtagDataTemplate}" ItemsSource="{Binding BindableHashtagCandidates}">
-                        		<ItemsControl.ItemsPanel>
-                        			<ItemsPanelTemplate>
-                        				<StackPanel Orientation="Horizontal" />
-                        			</ItemsPanelTemplate>
-                        		</ItemsControl.ItemsPanel>
-                        	</ItemsControl>
+                            <Border Width="14"
+                                    Height="14"
+                                    Margin="7,0"
+                                    ToolTip="ロックされているハッシュタグ"
+                                    Visibility="{Binding IsBindingHashtagExisted,
+                                                         Converter={StaticResource BooleanToVisibleConverter}}">
+                                <Path Margin="0,0,2.332,-0.002"
+                                      Data="F1 M 18.1693,23.4199L 19.3361,23.4199L 19.3361,21.6697C 19.3361,19.092 21.4257,17.0024 24.0034,17.0024C 26.5811,17.0024 28.6707,19.092 28.6707,21.6697L 28.6707,23.4199L 29.8376,23.4199L 29.8376,31.0043L 18.1693,31.0043L 18.1693,23.4199 Z M 26.9205,21.6697C 26.9205,20.0586 25.6145,18.7526 24.0034,18.7526C 22.3923,18.7526 21.0863,20.0586 21.0863,21.6697L 21.0863,23.4199L 26.9205,23.4199L 26.9205,21.6697 Z "
+                                      Fill="#FF000000"
+                                      Stretch="Fill" />
+                            </Border>
+                            <ItemsControl ItemTemplate="{DynamicResource HashtagDataTemplate}" ItemsSource="{Binding BindingHashtags}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+                            <Border Width="14"
+                                    Height="14"
+                                    Margin="7,0"
+                                    ToolTip="ロック可能なハッシュタグ"
+                                    Visibility="{Binding IsBindableHashtagExisted,
+                                                         Converter={StaticResource BooleanToVisibleConverter}}">
+                                <Path Data="F1 M 18.8704,16.7929L 22.1351,16.7929L 30.4452,25.103C 30.9088,25.5666 30.9088,26.3183 30.4452,26.7819L 26.7819,30.4452C 26.3183,30.9088 25.5666,30.9088 25.103,30.4452L 16.7929,22.1351L 16.7929,18.8704C 16.7929,18.1779 16.7929,17.4854 17.1391,17.1392C 17.4854,16.7929 18.1779,16.7929 18.8704,16.7929 Z M 19.7608,18.5736C 19.1051,18.5736 18.5736,19.1051 18.5736,19.7608C 18.5736,20.4164 19.1051,20.9479 19.7608,20.9479C 20.4164,20.9479 20.9479,20.4164 20.9479,19.7608C 20.9479,19.1051 20.4164,18.5736 19.7608,18.5736 Z "
+                                      Fill="#FF000000"
+                                      Stretch="Fill" />
+                            </Border>
+                            <ItemsControl ItemTemplate="{DynamicResource HashtagDataTemplate}" ItemsSource="{Binding BindableHashtagCandidates}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
                         </DockPanel>
                     </DockPanel>
                     <DockPanel Grid.Column="2"
-                               Width="32"
+                               MinWidth="32"
                                LastChildFill="False">
                         <Button DockPanel.Dock="Top" Style="{DynamicResource MetroSquareUnfocusableFlatButton}">
                             <i:Interaction.Triggers>

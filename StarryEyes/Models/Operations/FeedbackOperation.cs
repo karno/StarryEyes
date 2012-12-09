@@ -1,8 +1,8 @@
 using System;
-using System.IO;
 using System.Net;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using System.Text;
 
 namespace StarryEyes.Models.Operations
@@ -32,12 +32,12 @@ namespace StarryEyes.Models.Operations
             var req = WebRequest.Create(FeedbackUri);
             req.Method = "POST";
             req.ContentType = "application/x-www-form-urlencoded";
-            return Observable.FromAsync(req.GetRequestStreamAsync)
+            return req.GetRequestStreamAsync().ToObservable()
                 .SelectMany(s =>
                 {
                     s.Write(pdb, 0, pdb.Length);
                     s.Close();
-                    return Observable.FromAsync(req.GetResponseAsync);
+                    return req.GetResponseAsync().ToObservable();
                 })
                 .Select(_ => new Unit());
         }

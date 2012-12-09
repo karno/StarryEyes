@@ -74,7 +74,8 @@ namespace Codeplex.OAuth
                     return Observable.Defer(() => req.GetResponseAsObservable());
                 case MethodType.Post:
                     var postData = Encoding.UTF8.GetBytes(Parameters.ToQueryParameter());
-                    return req.UploadDataAsync(postData);
+                    return req.UploadDataAsync(postData)
+                        .Finally(() => System.Diagnostics.Debug.WriteLine("Upload data OK."));
                 default:
                     throw new InvalidOperationException();
             }

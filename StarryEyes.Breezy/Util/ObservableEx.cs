@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reactive.Concurrency;
+using System.Reactive.Threading.Tasks;
 using System.Text;
 
 // from ReactiveOAuth
@@ -43,12 +44,12 @@ namespace System.Reactive.Linq
     {
         public static IObservable<WebResponse> GetResponseAsObservable(this WebRequest request)
         {
-            return Observable.FromAsync(request.GetResponseAsync);
+            return request.GetResponseAsync().ToObservable();
         }
 
         public static IObservable<Stream> GetRequestStreamAsObservable(this WebRequest request)
         {
-            return Observable.FromAsync(request.GetRequestStreamAsync);
+            return request.GetRequestStreamAsync().ToObservable();
         }
 
         public static IObservable<byte[]> DownloadDataAsync(this WebRequest request)
@@ -139,7 +140,9 @@ namespace System.Reactive.Linq
         {
             return Observable.Defer(() => response.GetResponseStream().ReadAsync())
                 .Finally(() => response.Close())
+                .Finally(() => System.Diagnostics.Debug.WriteLine("response closed."))
                 .Aggregate(new List<byte>(), (list, bytes) => { list.AddRange(bytes); return list; })
+                .Finally(() => System.Diagnostics.Debug.WriteLine("aggregate completed."))
                 .Select(x => x.ToArray());
         }
 
@@ -177,12 +180,12 @@ namespace System.Reactive.Linq
     {
         public static IObservable<Unit> WriteAsObservable(this Stream stream, byte[] buffer, int offset, int count)
         {
-            return Observable.FromAsync(() => stream.WriteAsync(buffer, offset, count));
+            return stream.WriteAsync(buffer, offset, count).ToObservable();
         }
 
         public static IObservable<int> ReadAsObservable(this Stream stream, byte[] buffer, int offset, int count)
         {
-            return Observable.FromAsync(() => stream.ReadAsync(buffer, offset, count));
+            return stream.ReadAsync(buffer, offset, count).ToObservable();
         }
 
         public static IObservable<Unit> WriteAsync(this Stream stream, string data)
