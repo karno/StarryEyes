@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xaml;
-using StarryEyes.Albireo.Data;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Breezy.Imaging;
 using StarryEyes.Filters.Expressions;
 using StarryEyes.Filters.Parsing;
-using StarryEyes.Models.Hubs;
+using TaskDialogInterop;
 
 namespace StarryEyes.Settings
 {
@@ -16,7 +15,7 @@ namespace StarryEyes.Settings
     {
         static SortedDictionary<string, object> settingValueHolder;
 
-        public static void LoadSettings()
+        public static bool LoadSettings()
         {
             if (File.Exists(App.ConfigurationFilePath))
             {
@@ -27,42 +26,64 @@ namespace StarryEyes.Settings
                         settingValueHolder = new SortedDictionary<string, object>(
                             XamlServices.Load(fs) as IDictionary<string, object>);
                     }
+                    return true;
                 }
                 catch (Exception ex)
                 {
-                    try
+                    var option = new TaskDialogOptions()
                     {
-                        var cpfn = "Krile_CorruptedConfig_" + Path.GetRandomFileName() + ".xml";
-                        File.Copy(App.ConfigurationFilePath, Path.Combine(
-                            Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
-                            cpfn));
-                        File.Delete(App.ConfigurationFilePath);
-                        settingValueHolder = new SortedDictionary<string, object>();
-                        AppInformationHub.PublishInformation(new AppInformation(AppInformationKind.Warning,
-                            "SETTING_LOAD_ERROR",
-                            "設定が読み込めません。バックアップをデスクトップに作成し、設定を初期化しました。",
-                            "バックアップ設定ファイルは " + cpfn + " として作成されました。" + Environment.NewLine +
-                            "あなた自身で原因の特定と修復が可能な場合は、修復した設定ファイルを元のディレクトリに配置し直すことで設定を回復できるかもしれません。" + Environment.NewLine +
-                            "元のディレクトリ: " + App.ConfigurationFilePath + Environment.NewLine +
-                            "送出された例外: " + ex.ToString()));
-                    }
-                    catch (Exception ex_)
+                        Title = "Krile 設定読み込みエラー",
+                        MainInstruction = "設定が破損しています。",
+                        Content = "設定ファイルに異常があるため、読み込めませんでした。" + Environment.NewLine +
+                        "どのような操作を行うか選択してください。",
+                        ExpandedInfo = ex.ToString(),
+                        CommandButtons = new[] { "設定を初期化", "バックアップを作成し初期化", "Krileを終了" },
+                    };
+                    var result = TaskDialog.Show(option);
+                    if (!result.CommandButtonResult.HasValue ||
+                        result.CommandButtonResult.Value == 2)
                     {
-                        Environment.FailFast(
-                            "設定ファイルの緊急バックアップ ストアが行えませんでした。", ex_);
-                        return;
+                        // shutdown
+                        return false;
                     }
+                    else if (result.CommandButtonResult == 1)
+                    {
+                        try
+                        {
+                            var cpfn = "Krile_CorruptedConfig_" + Path.GetRandomFileName() + ".xml";
+                            File.Copy(App.ConfigurationFilePath, Path.Combine(
+                                Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
+                                cpfn));
+                        }
+                        catch (Exception iex)
+                        {
+                            var noption = new TaskDialogOptions()
+                            {
+                                Title = "バックアップ失敗",
+                                MainInstruction = "何らかの原因により、バックアップが正常に行えませんでした。",
+                                Content = "これ以上の動作を継続できません。",
+                                ExpandedInfo = iex.ToString(),
+                                CommandButtons = new[] { "Krileを終了" }
+                            };
+                            TaskDialog.Show(noption);
+                            return false;
+                        }
+                    }
+                    File.Delete(App.ConfigurationFilePath);
+                    settingValueHolder = new SortedDictionary<string, object>();
+                    return true;
                 }
             }
             else
             {
                 settingValueHolder = new SortedDictionary<string, object>();
+                return true;
             }
         }
 
         public static void Save()
         {
-            using (var fs = File.Open(App.ConfigurationFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+            using (var fs = File.Open(App.ConfigurationFilePath, FileMode.Create, FileAccess.ReadWrite))
             {
                 XamlServices.Save(fs, settingValueHolder);
             }

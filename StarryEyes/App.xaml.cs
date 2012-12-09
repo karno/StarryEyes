@@ -82,7 +82,11 @@ namespace StarryEyes
             PluginManager.Load();
 
             // Load settings
-            Setting.LoadSettings();
+            if (!Setting.LoadSettings())
+            {
+                Application.Current.Shutdown();
+                return; // fail
+            }
 
             // Set CK/CS for accessing twitter.
             ApiEndpoint.DefaultConsumerKey = Setting.GlobalConsumerKey.Value ?? ConsumerKey;
