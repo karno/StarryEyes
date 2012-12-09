@@ -28,6 +28,7 @@
             </ResourceDictionary.MergedDictionaries>
             <Utils:BooleanToVisibleConverter x:Key="BooleanToVisibleConverter" />
             <Utils:BooleanToInvisibleConverter x:Key="BooleanToInvisibleConverter" />
+            <Utils:UriImageConverter x:Key="UriImageConverter" />
             <DataTemplate x:Key="HashtagDataTemplate">
                 <Button Width="Auto"
                         HorizontalAlignment="Left"
@@ -61,7 +62,8 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
-            <ColumnDefinition />
+            <ColumnDefinition Width="183*" />
+            <ColumnDefinition Width="253*" />
         </Grid.ColumnDefinitions>
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="ButtonSizeControl">
@@ -84,11 +86,11 @@
                 BorderThickness="0"
                 Padding="0"
                 Style="{DynamicResource MetroSquareUnfocusableFlatButton}">
-        	<i:Interaction.Triggers>
-        		<i:EventTrigger EventName="Click">
-        			<ei:CallMethodAction TargetObject="{Binding Mode=OneWay}" MethodName="SelectAccounts"/>
-        		</i:EventTrigger>
-        	</i:Interaction.Triggers>
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="Click">
+                    <ei:CallMethodAction MethodName="SelectAccounts" TargetObject="{Binding Mode=OneWay}" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
             <Button.ToolTip>
                 <TextBlock Foreground="White">
                     <Run Text="{Binding AuthInfoScreenNames, Mode=OneWay}" />
@@ -108,17 +110,14 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Image>
-                            <Image.Source>
-                                <BitmapImage UriSource="{Binding ProfileImageUri}" />
-                            </Image.Source>
-                        </Image>
+                        <Image Source="{Binding ProfileImageUri, Converter={StaticResource UriImageConverter}}" />
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </Button>
         <Grid x:Name="Default"
               Grid.Column="1"
+              Grid.ColumnSpan="2"
               Margin="4,0"
               Visibility="{Binding IsOpening,
                                    Converter={StaticResource BooleanToInvisibleConverter}}">
@@ -147,7 +146,7 @@
                                Margin="4,0,4,0"
                                Foreground="Green"
                                Visibility="{Binding IsDraftsExisted,
-                                                    Converter={StaticResource BooleanToVisibleConverter}}"><Run Text="{Binding DraftCount, Mode=OneWay}" /><Run Text=" " /><Run Text="件の下書きがあります" />
+                                                    Converter={StaticResource BooleanToVisibleConverter}}"><Run Text="{Binding DraftCount, Mode=OneWay}" /><Run Text="件の下書きがあります" />
                     </TextBlock>
                     <Grid Grid.Column="2"
                           Width="{Binding MaxControlWidth}"
@@ -172,6 +171,7 @@
         </Grid>
         <Grid x:Name="Opening"
               Grid.Column="1"
+              Grid.ColumnSpan="2"
               Margin="4,0"
               Visibility="{Binding IsOpening,
                                    Converter={StaticResource BooleanToVisibleConverter}}">
@@ -393,7 +393,7 @@
                     <Border Grid.Column="1"
                             MaxWidth="100"
                             MaxHeight="100"
-                            Margin="4,0"
+                            Margin="4"
                             HorizontalAlignment="Left"
                             VerticalAlignment="Center"
                             BorderThickness="1"

@@ -11,15 +11,14 @@ namespace StarryEyes.Views.Utils
                 return null;
             try
             {
-                var image = new BitmapImage();
-                image.BeginInit();
-                image.CacheOption = BitmapCacheOption.OnDemand;
-                image.CreateOptions = BitmapCreateOptions.DelayCreation;
-                image.UriSource = input;
-                image.EndInit();
-                return image;
+                System.Diagnostics.Debug.WriteLine(input.OriginalString);
+                return new BitmapImage(input)
+                {
+                    CacheOption = BitmapCacheOption.OnDemand,
+                    CreateOptions = BitmapCreateOptions.DelayCreation,
+                };
             }
-            catch
+            catch (Exception ex)
             {
                 return null;
             }

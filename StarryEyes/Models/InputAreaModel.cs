@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using Livet;
@@ -22,16 +23,16 @@ namespace StarryEyes.Models
     {
         private static TabModel currentFocusTabModel = null;
 
-        private static readonly ObservableSynchronizedCollectionEx<AuthenticateInfo> _bindingAuthInfos =
-            new ObservableSynchronizedCollectionEx<AuthenticateInfo>();
-        public static ObservableSynchronizedCollectionEx<AuthenticateInfo> BindingAuthInfos
+        private static readonly ObservableSynchronizedCollection<AuthenticateInfo> _bindingAuthInfos =
+            new ObservableSynchronizedCollection<AuthenticateInfo>();
+        public static ObservableSynchronizedCollection<AuthenticateInfo> BindingAuthInfos
         {
             get { return InputAreaModel._bindingAuthInfos; }
         }
 
-        private static readonly ObservableSynchronizedCollectionEx<string> _bindingHashtags =
-            new ObservableSynchronizedCollectionEx<string>();
-        public static ObservableSynchronizedCollectionEx<string> BindingHashtags
+        private static readonly ObservableSynchronizedCollection<string> _bindingHashtags =
+            new ObservableSynchronizedCollection<string>();
+        public static ObservableSynchronizedCollection<string> BindingHashtags
         {
             get { return InputAreaModel._bindingHashtags; }
         }
@@ -163,7 +164,12 @@ namespace StarryEyes.Models
 
         public TwitterUser MessageRecipient { get; set; }
 
-        public string Text { get; set; }
+        private string _text;
+        public string Text
+        {
+            get { return _text ?? String.Empty; }
+            set { _text = value; }
+        }
 
         private Tuple<AuthenticateInfo, TwitterStatus>[] _postedTweets = null;
 
@@ -240,7 +246,9 @@ namespace StarryEyes.Models
 
         public IObservable<TweetInputInfo> Send()
         {
-            return _authInfos.ToObservable()
+            List<PostResult> postResults = new List<PostResult>();
+            var subject = new Subject<TweetInputInfo>();
+            _authInfos.ToObservable()
                .SelectMany(AuthInfo =>
                    (MessageRecipient != null ? (OperationBase<TwitterStatus>)
                        new DirectMessageOperation(AuthInfo, MessageRecipient, Text) :
@@ -249,30 +257,33 @@ namespace StarryEyes.Models
                    .Do(_ => StatusStore.Store(_))
                    .Select(_ => new PostResult(AuthInfo, _))
                    .Catch((Exception ex) => Observable.Return(new PostResult(AuthInfo, ex))))
-               .GroupBy(_ => _.IsSucceeded)
-               .SelectMany(_ =>
-                   {
-                       if (_.Key)
+               .Subscribe(postResults.Add,
+               () =>
+               {
+                   postResults.GroupBy(_ => _.IsSucceeded)
+                       .ForEach(_ =>
                        {
-                           // succeeded group
-                           var ret = this.Clone();
-                           ret.AuthInfos = _.Select(pr => pr.AuthInfo).ToEnumerable();
-                           ret.PostedTweets = _.Select(pr => Tuple.Create(pr.AuthInfo, pr.Status))
-                               .ToEnumerable();
-                           return Observable.Return(ret);
-                       }
-                       else
-                       {
-                           // failed group
-                           return _.Select(pr =>
+                           if (_.Key)
                            {
                                var ret = this.Clone();
-                               ret.AuthInfos = new[] { pr.AuthInfo };
-                               ret.ThrownException = pr.ThrownException;
-                               return ret;
-                           });
-                       }
-                   });
+                               ret.AuthInfos = _.Select(pr => pr.AuthInfo).ToArray();
+                               ret.PostedTweets = _.Select(pr => Tuple.Create(pr.AuthInfo, pr.Status)).ToArray();
+                               subject.OnNext(ret);
+                           }
+                           else
+                           {
+                               _.ForEach(pr =>
+                                   {
+                                       var ret = this.Clone();
+                                       ret.AuthInfos = new[] { pr.AuthInfo };
+                                       ret.ThrownException = pr.ThrownException;
+                                       subject.OnNext(ret);
+                                   });
+                           }
+                       });
+                   subject.OnCompleted();
+               });
+            return subject;
         }
 
         internal async Task DeletePrevious()

@@ -102,6 +102,7 @@ namespace StarryEyes
             {
                 var option = new TaskDialogOptions()
                 {
+                    MainIcon = VistaTaskDialogIcon.Error,
                     Title = "Krile データストア初期化エラー",
                     MainInstruction = "Krileの起動中にエラーが発生しました。",
                     Content = "データストアが破損しています。" + Environment.NewLine +

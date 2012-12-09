@@ -17,7 +17,7 @@ namespace Livet
     /// <typeparam name="T">コレクションアイテムの型</typeparam>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
     [Serializable]
-    public class ObservableSynchronizedCollectionEx<T> : IList<T>,ICollection,INotifyCollectionChanged, INotifyPropertyChanged
+    public class ObservableSynchronizedCollectionEx<T> : IList<T>, ICollection, INotifyCollectionChanged, INotifyPropertyChanged
     {
         private IList<T> _list;
         [NonSerialized]
@@ -108,7 +108,7 @@ namespace Livet
         {
             get
             {
-                return ReadWithLockAction(() =>_list[index]);
+                return ReadWithLockAction(() => _list[index]);
             }
             set
             {
@@ -261,15 +261,17 @@ namespace Livet
         /// <param name="items">新しく配置するアイテムのコレクション</param>
         public void Replace(IEnumerable<T> items)
         {
+            var freezedItems = items.ToArray();
             ReadAndWriteWithLockAction(() =>
             {
                 _list.Clear();
-                items.ForEach(_list.Add);
+                freezedItems.ForEach(_list.Add);
             },
             () =>
             {
                 OnPropertyChanged("Count");
                 OnPropertyChanged("Item[]");
+                System.Diagnostics.Debug.WriteLine("changed. collection:" + _list.Count);
                 OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
             });
         }

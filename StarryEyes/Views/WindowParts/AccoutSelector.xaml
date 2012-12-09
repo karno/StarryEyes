@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:Behaviors="clr-namespace:StarryEyes.Views.Messaging.Behaviors"
              xmlns:Custom="http://schemas.livet-mvvm.net/2011/wpf"
+             xmlns:Custom1="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:WindowParts="clr-namespace:StarryEyes.ViewModels.WindowParts"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
@@ -25,26 +26,41 @@
             </ResourceDictionary.MergedDictionaries>
             <util:UriImageConverter x:Key="UriImageConverter" />
             <DataTemplate x:Key="SelectableAccountTemplate">
-                <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}">
-                    <Grid Width="Auto">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
-                        <Image Width="40"
-                               Height="40"
-                               HorizontalAlignment="Center"
+                <Grid Width="Auto">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Viewbox Width="Auto"
+                             Height="16"
+                             Margin="4"
+                             VerticalAlignment="Center"
+                             Stretch="Fill">
+                        <Border Background="DimGray">
+                            <Custom1:ToggleSwitchButton Margin="2" IsChecked="{Binding IsSelected}" />
+                        </Border>
+                    </Viewbox>
+                    <Border Grid.Column="1"
+                            Width="40"
+                            Height="40"
+                            Margin="4"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            BorderThickness="1">
+                        <Border.BorderBrush>
+                            <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ActiveBorderColorKey}}" />
+                        </Border.BorderBrush>
+                        <Image Source="{Binding ProfileImageUri, Converter={StaticResource UriImageConverter}}" />
+                    </Border>
+                    <TextBlock Grid.Column="2"
+                               HorizontalAlignment="Left"
                                VerticalAlignment="Center"
-                               Source="{Binding ProfileImageUri,
-                                                Converter={StaticResource UriImageConverter}}" />
-                        <TextBlock Grid.Column="1"
-                                   HorizontalAlignment="Left"
-                                   VerticalAlignment="Center"
-                                   Text="{Binding ScreenName,
-                                                  Mode=OneWay}"
-                                   TextWrapping="Wrap" />
-                    </Grid>
-                </CheckBox>
+                               Foreground="White"
+                               Text="{Binding ScreenName,
+                                              Mode=OneWay}"
+                               TextWrapping="Wrap" />
+                </Grid>
             </DataTemplate>
         </ResourceDictionary>
     </UserControl.Resources>
@@ -173,6 +189,7 @@
             </DockPanel>
             <ItemsControl Grid.Row="1"
                           Margin="0,8,0,0"
+                          HorizontalContentAlignment="Stretch"
                           ItemTemplate="{DynamicResource SelectableAccountTemplate}"
                           ItemsSource="{Binding Accounts}"
                           ScrollViewer.CanContentScroll="True">

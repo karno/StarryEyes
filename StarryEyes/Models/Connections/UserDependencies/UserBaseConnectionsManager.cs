@@ -238,17 +238,25 @@ namespace StarryEyes.Models.Connections.UserDependencies
             }
         }
 
-        private UserTimelinesReceiver receiver;
-        public UserTimelinesReceiver EssentialsReceiver
+        private readonly UserTimelinesReceiver userTimelineReceiver;
+        public UserTimelinesReceiver UserDependentTimelinesReceiver
         {
-            get { return receiver; }
+            get { return userTimelineReceiver; }
+        }
+
+        private readonly UserInfoReceiver userInfoReceiver;
+        public UserInfoReceiver UserInfoReceiver
+        {
+            get { return userInfoReceiver; }
         }
 
         public ConnectionGroup(long id)
         {
             this.userId = id;
-            receiver = new UserTimelinesReceiver(AuthInfo);
-            receiver.IsActivated = true;
+            userTimelineReceiver = new UserTimelinesReceiver(AuthInfo);
+            userTimelineReceiver.IsActivated = true;
+            userInfoReceiver = new UserInfoReceiver(AuthInfo);
+            userInfoReceiver.IsActivated = true;
         }
 
         // essential connections
@@ -331,7 +339,7 @@ namespace StarryEyes.Models.Connections.UserDependencies
                 userStreams = null;
                 disposal.Dispose();
             }
-            receiver.Dispose();
+            userTimelineReceiver.Dispose();
         }
     }
 }

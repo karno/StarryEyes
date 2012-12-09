@@ -124,8 +124,13 @@ namespace Codeplex.OAuth
             return Observable.Defer(() => request.GetRequestStreamAsObservable())
                 .SelectMany(stream => stream.WriteAsObservable(data, 0, data.Length)
                     .Finally(() => stream.Close()))
-                .TakeLast(1)
-                .SelectMany(_ => request.GetResponseAsObservable());
+                .Take(1)
+                .SelectMany(_ => request.GetResponseAsObservable())
+                .Do(_ => System.Diagnostics.Debug.WriteLine("checkpoint(1)"))
+                .Finally(() => System.Diagnostics.Debug.WriteLine("checkpoint(2)"))
+                .Take(1)
+                .Do(_ => System.Diagnostics.Debug.WriteLine("data arrived."))
+                .Finally(() => System.Diagnostics.Debug.WriteLine("finally called!"));
         }
 
         public static IObservable<Progress<Unit>> UploadDataAsyncWithProgress(this WebRequest request, byte[] data, int chunkSize = 65536)

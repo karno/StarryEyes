@@ -194,6 +194,7 @@
     <Compile Include="Models\Connections\ConnectionUtil.cs" />
     <Compile Include="Models\Connections\Extends\ListReceiver.cs" />
     <Compile Include="Models\Connections\Extends\SearchReceiver.cs" />
+    <Compile Include="Models\Connections\UserDependencies\UserInfoReceiver.cs" />
     <Compile Include="Models\Hubs\StoreHub.cs" />
     <Compile Include="Models\InputAreaModel.cs" />
     <Compile Include="Models\MainWindowModel.cs" />

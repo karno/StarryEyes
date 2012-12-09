@@ -140,9 +140,7 @@ namespace System.Reactive.Linq
         {
             return Observable.Defer(() => response.GetResponseStream().ReadAsync())
                 .Finally(() => response.Close())
-                .Finally(() => System.Diagnostics.Debug.WriteLine("response closed."))
                 .Aggregate(new List<byte>(), (list, bytes) => { list.AddRange(bytes); return list; })
-                .Finally(() => System.Diagnostics.Debug.WriteLine("aggregate completed."))
                 .Select(x => x.ToArray());
         }
 

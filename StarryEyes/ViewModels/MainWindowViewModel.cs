@@ -357,7 +357,9 @@ namespace StarryEyes.ViewModels
             tweetop.Status = PostText;
             PostText = String.Empty;
             tweetop.AuthInfo = AccountsStore.Accounts.First().AuthenticateInfo;
-            tweetop.Run().Subscribe(_ => this.Messenger.Raise(new TaskDialogMessage(
+            tweetop.Run()
+                .Finally(() => System.Diagnostics.Debug.WriteLine("finally called."))
+                .Subscribe(_ => this.Messenger.Raise(new TaskDialogMessage(
                 new TaskDialogInterop.TaskDialogOptions()
                 {
                     Title = "Tweeted!",

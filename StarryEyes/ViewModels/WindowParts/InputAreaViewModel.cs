@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Device.Location;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Windows.Controls;
+using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using Livet;
 using Livet.EventListeners;
 using Livet.Messaging;
 using Livet.Messaging.IO;
+using StarryEyes.Breezy.Api.Rest;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Models;
@@ -487,7 +488,9 @@ namespace StarryEyes.ViewModels.WindowParts
                 if (!_isSuppressAccountChangeRelay)
                 {
                     // write-back
-                    InputAreaModel.BindingAuthInfos.Replace(this._accountSelector.SelectedAccounts);
+                    InputAreaModel.BindingAuthInfos.Clear();
+                    this._accountSelector.SelectedAccounts
+                        .ForEach(InputAreaModel.BindingAuthInfos.Add);
                     _baseSelectedAccounts = InputAreaModel.BindingAuthInfos.Select(_ => _.Id).ToArray();
                 }
                 InputInfo.AuthInfos = this.AccountSelector.SelectedAccounts;
@@ -853,6 +856,7 @@ namespace StarryEyes.ViewModels.WindowParts
             inputInfo.Send()
                 .Subscribe(_ =>
                 {
+                    System.Diagnostics.Debug.WriteLine("Completed!");
                     if (_.PostedTweets != null)
                     {
                         InputAreaModel.PreviousPosted = _;
@@ -998,7 +1002,19 @@ namespace StarryEyes.ViewModels.WindowParts
 
         public Uri ProfileImageUri
         {
-            get { return _authInfo.UnreliableProfileImageUri; }
+            get
+            {
+                if (_authInfo.UnreliableProfileImageUri == null)
+                {
+                    Task.Run(() => _authInfo.ShowUser(_authInfo.Id)
+                        .Subscribe(_ =>
+                        {
+                            _authInfo.UnreliableProfileImageUriString = _.ProfileImageUri.OriginalString;
+                            RaisePropertyChanged(() => ProfileImageUri);
+                        }));
+                }
+                return _authInfo.UnreliableProfileImageUri;
+            }
         }
 
         public string ScreenName

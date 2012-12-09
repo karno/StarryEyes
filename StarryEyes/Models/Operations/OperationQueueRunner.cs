@@ -59,7 +59,17 @@ namespace StarryEyes.Models.Operations
         /// </summary>
         private static void SpawnNewRunner()
         {
+            var operation = DequeueOperation();
+            // operation is not available.
+
+            if (operation == null)
+            {
+                System.Diagnostics.Debug.WriteLine("operation run completed.");
+                return;
+            }
+
             int cv = Interlocked.Increment(ref runningConcurrency);
+            System.Diagnostics.Debug.WriteLine("running " + cv);
             if (cv > MaxConcurrency)
             {
                 // already run max count of threads.
@@ -68,20 +78,22 @@ namespace StarryEyes.Models.Operations
             }
             else
             {
-                System.Diagnostics.Debug.WriteLine("Spawn runner.");
-                Observable.Start(() => IssueOperations(), TaskPoolScheduler.Default)
-                    .Finally(() => Interlocked.Decrement(ref runningConcurrency))
+                Observable.Defer(() => Observable.Return(operation))
+                    // .ObserveOn(TaskPoolScheduler.Default)
+                    .SelectMany(_ => _.Run())
+                    .Finally(() =>
+                    {
+                        Interlocked.Decrement(ref runningConcurrency);
+                        System.Diagnostics.Debug.WriteLine("continuation...");
+                        SpawnNewRunner();
+                    })
                     .Subscribe();
             }
         }
 
-        /// <summary>
-        /// Issue all operations when operation is enabled.
-        /// </summary>
-        private static void IssueOperations()
+        private static IRunnerQueueable DequeueOperation()
         {
-            System.Diagnostics.Debug.WriteLine("issue started.");
-            var operation = Lock(() =>
+            return Lock(() =>
             {
                 if (highPriorityQueue.Count > 0)
                     return highPriorityQueue.Dequeue();
@@ -92,18 +104,6 @@ namespace StarryEyes.Models.Operations
                 else
                     return null;
             });
-            if (operation != null)
-            {
-                operation.Run()
-                    .Do(_ => System.Diagnostics.Debug.WriteLine("Done running."))
-                    .Finally(() => IssueOperations()) // loop issue operation
-                    .Subscribe();
-            }
-            else
-            {
-                System.Diagnostics.Debug.WriteLine("halt issue.");
-                return;
-            }
         }
 
         private static void Lock(Action action)

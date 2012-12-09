@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Livet;
-using StarryEyes.Models.Stores;
+using StarryEyes.Breezy.Api.Rest;
 using StarryEyes.Breezy.Authorize;
-using StarryEyes.Settings;
+using StarryEyes.Models.Stores;
 using StarryEyes.Views.Messaging;
 
 namespace StarryEyes.ViewModels.WindowParts
@@ -138,7 +139,19 @@ namespace StarryEyes.ViewModels.WindowParts
 
         public Uri ProfileImageUri
         {
-            get { return info.UnreliableProfileImageUri; }
+            get
+            {
+                if (info.UnreliableProfileImageUri == null)
+                {
+                    Task.Run(() => info.ShowUser(info.Id)
+                        .Subscribe(_ =>
+                        {
+                            info.UnreliableProfileImageUriString = _.ProfileImageUri.OriginalString;
+                            RaisePropertyChanged(() => ProfileImageUri);
+                        }));
+                }
+                return info.UnreliableProfileImageUri;
+            }
         }
     }
 }

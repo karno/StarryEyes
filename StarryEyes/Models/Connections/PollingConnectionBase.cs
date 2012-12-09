@@ -26,6 +26,7 @@ namespace StarryEyes.Models.Connections
                 .Subscribe(_ => this.Dispose()));
             _disposablesHolder.Add(Observable.Interval(TimeSpan.FromSeconds(1))
                 .Subscribe(_ => OnTick()));
+            _currentTick = IntervalSec; // first receive occurs immediately.
         }
 
         /// <summary>

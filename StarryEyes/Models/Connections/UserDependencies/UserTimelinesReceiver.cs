@@ -1,4 +1,5 @@
-﻿using StarryEyes.Breezy.Api.Rest;
+﻿using System.Threading.Tasks;
+using StarryEyes.Breezy.Api.Rest;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Settings;
 
@@ -17,22 +18,11 @@ namespace StarryEyes.Models.Connections.UserDependencies
             get { return Setting.RESTReceivePeriod.Value; }
         }
 
-        private int latch = 0;
         protected override void DoReceive()
         {
-            latch = (latch + 1) % 3;
-            switch (latch)
-            {
-                case 0:
-                    ReceiveHomeTimeline(this.AuthInfo);
-                    break;
-                case 1:
-                    ReceiveMentionTimeline(this.AuthInfo);
-                    break;
-                case 2:
-                    ReceiveMessages(this.AuthInfo);
-                    break;
-            }
+            Task.Run(() => ReceiveHomeTimeline(this.AuthInfo));
+            Task.Run(() => ReceiveMentionTimeline(this.AuthInfo));
+            Task.Run(() => ReceiveMessages(this.AuthInfo));
         }
 
         public static void ReceiveHomeTimeline(AuthenticateInfo info, long? max_id = null)

@@ -23,7 +23,7 @@ namespace StarryEyes.Models
         public static ObservableSynchronizedCollection<TwitterEventBase> TwitterEvents
         {
             get { return BackpanelModel._twitterEvents; }
-        } 
+        }
 
         public static event Action<BackpanelEventBase> OnEventRegistered;
         public static void RegisterEvent(BackpanelEventBase ev)

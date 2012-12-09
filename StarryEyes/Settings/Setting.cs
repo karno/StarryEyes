@@ -32,6 +32,7 @@ namespace StarryEyes.Settings
                 {
                     var option = new TaskDialogOptions()
                     {
+                        MainIcon = VistaTaskDialogIcon.Error,
                         Title = "Krile 設定読み込みエラー",
                         MainInstruction = "設定が破損しています。",
                         Content = "設定ファイルに異常があるため、読み込めませんでした。" + Environment.NewLine +
@@ -180,6 +181,8 @@ namespace StarryEyes.Settings
         public static readonly SettingItemStruct<int> EventDispatchMinimumMSec = new SettingItemStruct<int>("EventDispatchMinimumMSec", 200);
 
         public static readonly SettingItemStruct<int> EventDispatchMaximumMSec = new SettingItemStruct<int>("EventDispatchMaximumMSec", 3000);
+
+        public static readonly SettingItemStruct<int> UserInfoReceivePeriod = new SettingItemStruct<int>("UserInfoReceivePeriod", 600);
 
         public static readonly SettingItemStruct<int> RESTReceivePeriod = new SettingItemStruct<int>("RESTReceivePeriod", 90);
 

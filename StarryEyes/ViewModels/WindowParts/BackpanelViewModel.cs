@@ -112,7 +112,7 @@ namespace StarryEyes.ViewModels.WindowParts
         public BackpanelEventBase SourceEvent
         {
             get { return _sourceEvent; }
-        } 
+        }
 
         public BackpanelEventViewModel(BackpanelEventBase ev)
         {
