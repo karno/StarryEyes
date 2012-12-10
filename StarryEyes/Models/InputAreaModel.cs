@@ -138,6 +138,9 @@ namespace StarryEyes.Models
         #endregion
     }
 
+    /// <summary>
+    /// Describes &quot;a input&quot;.
+    /// </summary>
     public class TweetInputInfo
     {
         private AuthenticateInfo[] _authInfos = null;
@@ -160,8 +163,14 @@ namespace StarryEyes.Models
             set { _hashtags = value.ToArray(); }
         }
 
+        /// <summary>
+        /// In reply to someone.
+        /// </summary>
         public TwitterStatus InReplyTo { get; set; }
 
+        /// <summary>
+        /// Message recipient target.
+        /// </summary>
         public TwitterUser MessageRecipient { get; set; }
 
         private string _text;
