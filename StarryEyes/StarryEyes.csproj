@@ -229,6 +229,7 @@
     <Compile Include="ViewModels\WindowParts\Timelines\TabViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Timelines\UserViewModel.cs" />
     <Compile Include="Views\Behaviors\Planerator.cs" />
+    <Compile Include="Views\Controls\DropDownMenuButton.cs" />
     <Compile Include="Views\Dialogs\KeyOverrideWindow.xaml.cs">
       <DependentUpon>KeyOverrideWindow.xaml</DependentUpon>
     </Compile>

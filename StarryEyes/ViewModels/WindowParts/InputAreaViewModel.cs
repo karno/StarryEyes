@@ -602,6 +602,7 @@ namespace StarryEyes.ViewModels.WindowParts
 
         public void OpenInput(bool restorePreviousStashed)
         {
+            restorePreviousStashed = false;
             if (!this.IsOpening)
             {
                 this.IsOpening = true;
@@ -972,6 +973,24 @@ namespace StarryEyes.ViewModels.WindowParts
         }
 
         public Exception ThrownException { get { return Model.ThrownException; } }
+
+
+        #region WritebackCommand
+        private Livet.Commands.ViewModelCommand _WritebackCommand;
+
+        public Livet.Commands.ViewModelCommand WritebackCommand
+        {
+            get
+            {
+                if (_WritebackCommand == null)
+                {
+                    _WritebackCommand = new Livet.Commands.ViewModelCommand(Writeback);
+                }
+                return _WritebackCommand;
+            }
+        }
+        #endregion
+
 
         public void Writeback()
         {
