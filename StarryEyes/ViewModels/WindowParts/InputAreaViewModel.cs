@@ -259,7 +259,11 @@ namespace StarryEyes.ViewModels.WindowParts
             get { return new ImageDescriptionViewModel(InputInfo.AttachedImage); }
             set
             {
-                InputInfo.AttachedImage = value.Source;
+                if (value == null)
+                    InputInfo.AttachedImage = null;
+                else
+                    InputInfo.AttachedImage = value.Source;
+
                 RaisePropertyChanged(() => AttachedImage);
                 RaisePropertyChanged(() => IsImageAttached);
                 RaisePropertyChanged(() => CanSaveToDraft);

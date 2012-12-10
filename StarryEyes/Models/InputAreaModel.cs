@@ -222,7 +222,7 @@ namespace StarryEyes.Models
             set
             {
                 // freeze object for accessibility with non-dispatcher threads.
-                if (!value.IsFrozen)
+                if (value != null && !value.IsFrozen)
                     value.Freeze();
                 _attachedImage = value;
             }

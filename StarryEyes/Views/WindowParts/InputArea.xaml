@@ -79,6 +79,16 @@
                 </VisualState>
                 <VisualState x:Name="CloseState" />
             </VisualStateGroup>
+            <VisualStateGroup x:Name="ImageAttachControl">
+            	<VisualState x:Name="MouseOverState">
+            		<Storyboard>
+            			<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="border">
+            				<EasingDoubleKeyFrame KeyTime="0" Value="0.4"/>
+            			</DoubleAnimationUsingKeyFrames>
+            		</Storyboard>
+            	</VisualState>
+            	<VisualState x:Name="MouseOutState"/>
+            </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
         <Button Margin="4,0,0,0"
                 HorizontalAlignment="Left"
@@ -399,16 +409,30 @@
                             VerticalAlignment="Center"
                             BorderThickness="1"
                             Visibility="{Binding IsImageAttached,
-                                                 Converter={StaticResource BooleanToVisibleConverter}}">
+                                                 Converter={StaticResource BooleanToVisibleConverter}}" MinWidth="40" MinHeight="40" ToolTip="クリックで画像の添付を解除します。">
+                    	<Border.Background>
+                    		<SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
+                    	</Border.Background>
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="MouseLeftButtonDown">
-                                <ei:CallMethodAction MethodName="OpenInput" TargetObject="{Binding Mode=OneWay}" />
+                                <ei:CallMethodAction MethodName="DetachImage" TargetObject="{Binding Mode=OneWay}" />
+                            </i:EventTrigger>
+                            <i:EventTrigger EventName="MouseEnter">
+                            	<ei:GoToStateAction StateName="MouseOverState"/>
+                            </i:EventTrigger>
+                            <i:EventTrigger EventName="MouseLeave">
+                            	<ei:GoToStateAction StateName="MouseOutState"/>
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
                         <Border.BorderBrush>
                             <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ActiveBorderColorKey}}" />
                         </Border.BorderBrush>
-                        <Image Source="{Binding AttachedImage.Source}" Stretch="Uniform" />
+                        <Grid>
+                    		<Image Source="{Binding AttachedImage.Source}" Stretch="Uniform" />
+                    		<Border x:Name="border" Background="#FFE51400" Opacity="0">
+                    			<Path Stretch="Fill" Fill="#FFFFFFFF" Data="F1 M 20.5,19L 24,22.5L 27.4999,19.0001L 28.9999,20.5001L 25.5,24L 29,27.5L 27.5,29L 24,25.5L 20.5,29L 19,27.5L 22.5,24L 19,20.5L 20.5,19 Z " Width="10" Height="10" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,6,6,0"/>
+                    		</Border>
+                    	</Grid>
                     </Border>
                 </Grid>
             </Border>
