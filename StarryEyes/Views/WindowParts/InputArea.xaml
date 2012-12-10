@@ -386,6 +386,7 @@
                         </Button>
                         <TextBlock Margin="4"
                                    DockPanel.Dock="Bottom"
+                                   Foreground="DimGray"
                                    Text="{Binding RemainTextCount}"
                                    TextAlignment="Right"
                                    TextWrapping="Wrap" />
