@@ -349,7 +349,7 @@ namespace StarryEyes.ViewModels.WindowParts
                     return false; // send account is not found.
                 if (TextCount > StatusTextUtil.MaxTextLength)
                     return false;
-                return TextCount > 0;
+                return CanSaveToDraft;
             }
         }
 
@@ -365,7 +365,7 @@ namespace StarryEyes.ViewModels.WindowParts
 
         public bool CanSaveToDraft
         {
-            get { return IsImageAttached || !String.IsNullOrEmpty(InputText); }
+            get { return IsImageAttached || !String.IsNullOrEmpty(InputText.Replace("\t", "").Replace("\r", "").Replace("\n", "").Replace(" ", "")); }
         }
 
         #region Text box control
@@ -404,7 +404,6 @@ namespace StarryEyes.ViewModels.WindowParts
         }
 
         #endregion
-
         #region Post limit prediction properties
 
         public bool IsPostLimitPredictionEnabled
@@ -630,8 +629,7 @@ namespace StarryEyes.ViewModels.WindowParts
 
         private void CheckClearInput()
         {
-            if (!String.IsNullOrWhiteSpace(InputText) ||
-                this.IsImageAttached)
+            if (CanSaveToDraft)
             {
                 var action = Setting.TweetBoxClosingAction.Value;
                 if (action == TweetBoxClosingAction.Confirm)
@@ -702,7 +700,7 @@ namespace StarryEyes.ViewModels.WindowParts
         public void AmendPreviousOne()
         {
             if (InputInfo.PostedTweets != null) return; // amending now.
-            if (!String.IsNullOrEmpty(InputText) || this.IsImageAttached)
+            if (CanSaveToDraft)
                 StashInDraft();
             InputInfo = InputAreaModel.PreviousPosted;
         }
