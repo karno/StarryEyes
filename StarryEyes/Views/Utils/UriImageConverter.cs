@@ -11,7 +11,6 @@ namespace StarryEyes.Views.Utils
                 return null;
             try
             {
-                System.Diagnostics.Debug.WriteLine(input.OriginalString);
                 return new BitmapImage(input)
                 {
                     CacheOption = BitmapCacheOption.OnDemand,

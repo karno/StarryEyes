@@ -51,7 +51,10 @@
     </i:Interaction.Triggers>
     <Controls:MetroWindow.WindowCommands>
         <Controls:WindowCommands>
-            <Button Command="{Binding ShowSettingCommand}" Content="settings" />
+            <Button Command="{Binding ShowSettingCommand}"
+                    Content="settings"
+                    Visibility="{Binding ShowWindowCommands,
+                                         Converter={StaticResource BooleanToVisibleConverter}}" />
             <TextBox Width="180"
                      Height="20"
                      Margin="-1,0,2,0"
@@ -59,7 +62,9 @@
                      BorderThickness="0"
                      Controls:TextboxHelper.ClearTextButton="True"
                      Controls:TextboxHelper.Watermark="search"
-                     Opacity="0.8" />
+                     Opacity="0.8"
+                     Visibility="{Binding ShowWindowCommands,
+                                          Converter={StaticResource BooleanToVisibleConverter}}" />
         </Controls:WindowCommands>
     </Controls:MetroWindow.WindowCommands>
     <Grid>

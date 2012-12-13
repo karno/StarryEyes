@@ -195,10 +195,81 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
                         <RowDefinition />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                    <TextBox AcceptsReturn="True"
+                    <DockPanel Grid.ColumnSpan="3"
+                               Height="26"
+                               Background="#FFF09609"
+                               LastChildFill="True"
+                               Visibility="{Binding IsInReplyToEnabled,
+                                                    Converter={StaticResource BooleanToVisibleConverter}}">
+                        <Path Width="12"
+                              Height="11"
+                              Margin="6"
+                              VerticalAlignment="Center"
+                              Data="F1 M 26.0556,21.9444L 22.0556,21.9444L 24.2778,24.1667L 21.6759,24.1667L 18.5,21.1018L 21.6759,17.9444L 24.2778,17.9444L 22.0556,20.1667L 26.0556,20.1667C 28.5101,20.1667 30.5,22.1565 30.5,24.6111C 30.5,27.0657 28.5101,29.0556 26.0555,29.0556L 24.7222,29.0556L 24.7222,27.2778L 26.0556,27.2778C 27.5283,27.2778 28.7222,26.0839 28.7222,24.6111C 28.7222,23.1384 27.5283,21.9444 26.0556,21.9444 Z "
+                              Fill="#FFFFFFFF"
+                              Stretch="Fill" />
+                        <Button Width="32"
+                                DockPanel.Dock="Right"
+                                Style="{DynamicResource MetroSquareTransparentButtonStyle}">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="Click">
+                                    <ei:CallMethodAction MethodName="ClearInReplyTo" TargetObject="{Binding Mode=OneWay}" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                            <Path Width="8"
+                                  Height="8"
+                                  Data="F1 M 21.2,20L 24,22.8L 26.7999,20.0001L 27.9999,21.2001L 25.2,24L 28,26.8L 26.8,28L 24,25.2L 21.2,28L 20,26.8L 22.8,24L 20,21.2L 21.2,20 Z "
+                                  Fill="#FFFFFFFF"
+                                  Stretch="Fill" />
+                        </Button>
+                        <TextBlock VerticalAlignment="Center" Foreground="White">
+                            <TextBlock.Text>
+                                <MultiBinding StringFormat="@{0}: {1}">
+                                    <Binding Path="InReplyTo.User.ScreenName" />
+                                    <Binding Path="InReplyTo.Status.Text" />
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
+                    </DockPanel>
+                    <DockPanel Grid.ColumnSpan="3"
+                               Height="26"
+                               Background="#FFA05000"
+                               LastChildFill="True"
+                               Visibility="{Binding IsDirectMessageEnabled,
+                                                    Converter={StaticResource BooleanToVisibleConverter}}">
+                        <Path Width="13.44"
+                              Height="14"
+                              Margin="6"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center"
+                              Data="F1 M 22.32,29.58L 23.44,33.5L 18.96,29.58L 17.28,29.58L 17.28,19.5L 30.72,19.5L 30.72,29.58L 22.32,29.58 Z "
+                              Fill="#FFFFFFFF"
+                              Stretch="Fill" />
+                        <Button Width="32"
+                                DockPanel.Dock="Right"
+                                Style="{DynamicResource MetroSquareTransparentButtonStyle}">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="Click">
+                                    <ei:CallMethodAction MethodName="ClearDirectMessage" TargetObject="{Binding Mode=OneWay}" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                            <Path Width="8"
+                                  Height="8"
+                                  Data="F1 M 21.2,20L 24,22.8L 26.7999,20.0001L 27.9999,21.2001L 25.2,24L 28,26.8L 26.8,28L 24,25.2L 21.2,28L 20,26.8L 22.8,24L 20,21.2L 21.2,20 Z "
+                                  Fill="#FFFFFFFF"
+                                  Stretch="Fill" />
+                        </Button>
+                        <TextBlock VerticalAlignment="Center"
+                                   Foreground="White"
+                                   Text="{Binding DirectMessageTo.User.ScreenName,
+                                                  StringFormat=@{0}}" />
+                    </DockPanel>
+                    <TextBox Grid.Row="1"
+                             AcceptsReturn="True"
                              BorderBrush="{x:Null}"
                              BorderThickness="0"
                              Text="{Binding InputText,
@@ -217,7 +288,7 @@
                                                              SelectionStart="{Binding SelectionStart}" />
                         </i:Interaction.Behaviors>
                     </TextBox>
-                    <DockPanel Grid.Row="1"
+                    <DockPanel Grid.Row="2"
                                Grid.ColumnSpan="3"
                                VerticalAlignment="Top">
                         <DockPanel.Background>
@@ -246,23 +317,23 @@
                                                          ToolTip="下書き"
                                                          Visibility="{Binding IsDraftsExisted,
                                                                               Converter={StaticResource BooleanToVisibleConverter}}">
-                                <Path Width="15.273"
-                                      Height="14"
-                                      Data="F1 M 23.6818,25.5455L 20.1818,21.0909L 22.0909,21.0909L 22.0909,16L 25.9091,16L 25.9091,21.0909L 27.8182,21.0909L 24.3182,25.5455L 23.6818,25.5455 Z M 16.3636,23.6364L 18.2727,19.1818L 20.6591,19.1818L 20.6591,20.4545L 19.2273,20.4545L 17.9545,23.6364L 21.1364,23.6364C 21.1364,25.2179 22.4185,26.5 24,26.5C 25.5815,26.5 26.8636,25.2179 26.8636,23.6364L 30.0454,23.6364L 28.7727,20.4545L 27.3409,20.4545L 27.3409,19.1818L 29.7273,19.1818L 31.6364,23.6364L 31.6364,30L 16.3636,30L 16.3636,23.6364 Z "
-                                      Fill="#FF000000"
-                                      Stretch="Fill" />
                                 <Controls:DropDownMenuButton.DropDownContextMenu>
-                                    <ContextMenu DataContext="{Binding Path=PlacementTarget.DataContext,
+                                    <ContextMenu DataContext="{Binding PlacementTarget.DataContext,
                                                                        RelativeSource={RelativeSource Self}}"
                                                  DisplayMemberPath="Text"
                                                  ItemsSource="{Binding DraftedInputs}">
                                         <ContextMenu.ItemContainerStyle>
-                                            <Style TargetType="MenuItem">
+                                            <Style TargetType="{x:Type MenuItem}">
                                                 <Setter Property="Command" Value="{Binding WritebackCommand}" />
                                             </Style>
                                         </ContextMenu.ItemContainerStyle>
                                     </ContextMenu>
                                 </Controls:DropDownMenuButton.DropDownContextMenu>
+                                <Path Width="15.273"
+                                      Height="14"
+                                      Data="F1 M 23.6818,25.5455L 20.1818,21.0909L 22.0909,21.0909L 22.0909,16L 25.9091,16L 25.9091,21.0909L 27.8182,21.0909L 24.3182,25.5455L 23.6818,25.5455 Z M 16.3636,23.6364L 18.2727,19.1818L 20.6591,19.1818L 20.6591,20.4545L 19.2273,20.4545L 17.9545,23.6364L 21.1364,23.6364C 21.1364,25.2179 22.4185,26.5 24,26.5C 25.5815,26.5 26.8636,25.2179 26.8636,23.6364L 30.0454,23.6364L 28.7727,20.4545L 27.3409,20.4545L 27.3409,19.1818L 29.7273,19.1818L 31.6364,23.6364L 31.6364,30L 16.3636,30L 16.3636,23.6364 Z "
+                                      Fill="#FF000000"
+                                      Stretch="Fill" />
                             </Controls:DropDownMenuButton>
                             <Button Width="28"
                                     Style="{DynamicResource MetroSquareUnfocusableFlatButton}"
@@ -392,10 +463,13 @@
                             </ItemsControl>
                         </DockPanel>
                     </DockPanel>
-                    <DockPanel Grid.Column="2"
+                    <DockPanel Grid.Row="1"
+                               Grid.Column="2"
                                MinWidth="32"
                                LastChildFill="False">
-                        <Button DockPanel.Dock="Top" Style="{DynamicResource MetroSquareUnfocusableFlatButton}">
+                        <Button Height="26"
+                                DockPanel.Dock="Top"
+                                Style="{DynamicResource MetroSquareUnfocusableFlatButton}">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="Click">
                                     <ei:CallMethodAction MethodName="CloseInput" TargetObject="{Binding Mode=OneWay}" />
@@ -414,7 +488,8 @@
                                    TextAlignment="Right"
                                    TextWrapping="Wrap" />
                     </DockPanel>
-                    <Border Grid.Column="1"
+                    <Border Grid.Row="1"
+                            Grid.Column="1"
                             MinWidth="40"
                             MinHeight="40"
                             MaxWidth="100"

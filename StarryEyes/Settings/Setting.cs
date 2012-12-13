@@ -15,8 +15,11 @@ namespace StarryEyes.Settings
     {
         static SortedDictionary<string, object> settingValueHolder;
 
+        public static bool IsFirstGenerated { get; private set; }
+
         public static bool LoadSettings()
         {
+            IsFirstGenerated = false;
             if (File.Exists(App.ConfigurationFilePath))
             {
                 try
@@ -78,6 +81,7 @@ namespace StarryEyes.Settings
             else
             {
                 settingValueHolder = new SortedDictionary<string, object>();
+                IsFirstGenerated = true;
                 return true;
             }
         }

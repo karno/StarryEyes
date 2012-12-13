@@ -8,6 +8,14 @@ namespace StarryEyes.Models
 {
     public static class MainWindowModel
     {
+        public static event Action<bool> OnWindowCommandDisplayChanged;
+        public static void SetShowMainWindowCommands(bool show)
+        {
+            var handler = OnWindowCommandDisplayChanged;
+            if (handler != null)
+                handler(show);
+        }
+
         #region Focus and timeline action control
 
         public static event Action<FocusRequest> OnFocusRequested;

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Livet;
 using StarryEyes.Breezy.Api.Rest;
 using StarryEyes.Breezy.Authorize;
+using StarryEyes.Models;
 using StarryEyes.Models.Stores;
 using StarryEyes.Views.Messaging;
 
@@ -84,12 +85,14 @@ namespace StarryEyes.ViewModels.WindowParts
 
         public void Open()
         {
+            MainWindowModel.SetShowMainWindowCommands(false);
             this.Messenger.Raise(new GoToStateMessage("Open"));
         }
 
         public void Close()
         {
             this.Messenger.Raise(new GoToStateMessage("Close"));
+            MainWindowModel.SetShowMainWindowCommands(true);
         }
     }
 

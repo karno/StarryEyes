@@ -574,6 +574,8 @@ namespace StarryEyes.ViewModels.WindowParts
         {
             _isSuppressAccountChangeRelay = true;
             AccountSelector.SelectedAccounts = infos;
+            InputAreaModel.BindingAuthInfos.Clear();
+            infos.ForEach(InputAreaModel.BindingAuthInfos.Add);
             _isSuppressAccountChangeRelay = false;
         }
 
@@ -972,7 +974,6 @@ namespace StarryEyes.ViewModels.WindowParts
 
         public Exception ThrownException { get { return Model.ThrownException; } }
 
-
         #region WritebackCommand
         private Livet.Commands.ViewModelCommand _WritebackCommand;
 
@@ -988,7 +989,6 @@ namespace StarryEyes.ViewModels.WindowParts
             }
         }
         #endregion
-
 
         public void Writeback()
         {
@@ -1034,6 +1034,7 @@ namespace StarryEyes.ViewModels.WindowParts
                             RaisePropertyChanged(() => ProfileImageUri);
                         }));
                 }
+                System.Diagnostics.Debug.WriteLine(_authInfo.UnreliableProfileImageUri.OriginalString);
                 return _authInfo.UnreliableProfileImageUri;
             }
         }

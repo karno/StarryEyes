@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Linq;
+using StarryEyes.Models;
 
 namespace StarryEyes.ViewModels
 {
@@ -98,6 +99,31 @@ namespace StarryEyes.ViewModels
 
         #endregion
 
+        #region Properties
+
+        private bool _showWindowCommands = true;
+        public bool ShowWindowCommands
+        {
+            get { return _showWindowCommands; }
+            set
+            {
+                _showWindowCommands = value;
+                RaisePropertyChanged(() => ShowWindowCommands);
+            }
+        }
+
+        public int StatusCount
+        {
+            get { return StatisticsService.EstimatedGrossTweetCount; }
+        }
+
+        public double TweetsPerMinutes
+        {
+            get { return StatisticsService.TweetsPerSeconds * 60; }
+        }
+
+        #endregion
+
         public MainWindowViewModel()
         {
             this.CompositeDisposable.Add(_backpanelViewModel = new BackpanelViewModel());
@@ -114,25 +140,39 @@ namespace StarryEyes.ViewModels
                 RaisePropertyChanged(() => StatusCount);
                 RaisePropertyChanged(() => TweetsPerMinutes);
             };
+            MainWindowModel.OnWindowCommandDisplayChanged += _ =>
+                this.ShowWindowCommands = _;
+
+            if (Setting.IsFirstGenerated)
+            {
+                var kovm = new KeyOverrideViewModel();
+                this.Messenger.RaiseAsync(new TransitionMessage(
+                    typeof(KeyOverrideWindow),
+                    kovm, TransitionMode.Modal, null));
+            }
+
+            // Start receiving
             if (AccountsStore.Accounts.Count() > 0)
             {
                 UserBaseConnectionsManager.Update();
             }
             else
             {
-                StartReceive();
+                var auth = new AuthorizationViewModel();
+                auth.AuthorizeObservable.Subscribe(_ =>
+                {
+                    AccountsStore.Accounts.Add(
+                        new AccountSetting()
+                        {
+                            AuthenticateInfo = _,
+                            IsUserStreamsEnabled = true
+                        });
+                    UserBaseConnectionsManager.Update();
+                });
+                this.Messenger.RaiseAsync(new TransitionMessage(
+                    typeof(AuthorizationWindow),
+                    auth, TransitionMode.Modal, null));
             }
-            StatusStore.StatusPublisher
-                .Where(_ => _.IsAdded)
-                .Select(_ => _.Status)
-                .Select(_ => new StatusViewModel(null, _, AccountsStore.Accounts.Select(a => a.UserId)))
-                .Subscribe(_ => RecentReceived = _.Status);
-            var kovm = new KeyOverrideViewModel();
-            /*
-            this.Messenger.RaiseAsync(new TransitionMessage(
-                typeof(KeyOverrideWindow),
-                kovm, TransitionMode.Modal, null));
-            */
         }
 
         private TwitterStatus _recentReceived = null;
@@ -179,15 +219,6 @@ namespace StarryEyes.ViewModels
         }
         #endregion
 
-        public int StatusCount
-        {
-            get { return StatisticsService.EstimatedGrossTweetCount; }
-        }
-
-        public double TweetsPerMinutes
-        {
-            get { return StatisticsService.TweetsPerSeconds * 60; }
-        }
 
         private string _query;
         public string Query
@@ -210,40 +241,6 @@ namespace StarryEyes.ViewModels
                 RaisePropertyChanged(() => QueryResult);
             }
         }
-
-        #region StartReceiveCommand
-        private ViewModelCommand _StartReceiveCommand;
-
-        public ViewModelCommand StartReceiveCommand
-        {
-            get
-            {
-                if (_StartReceiveCommand == null)
-                {
-                    _StartReceiveCommand = new ViewModelCommand(StartReceive);
-                }
-                return _StartReceiveCommand;
-            }
-        }
-
-        public void StartReceive()
-        {
-            var auth = new AuthorizationViewModel();
-            auth.AuthorizeObservable.Subscribe(_ =>
-            {
-                AccountsStore.Accounts.Add(
-                    new AccountSetting()
-                    {
-                        AuthenticateInfo = _,
-                        IsUserStreamsEnabled = true
-                    });
-                UserBaseConnectionsManager.Update();
-            });
-            this.Messenger.RaiseAsync(new TransitionMessage(
-                typeof(AuthorizationWindow),
-                auth, TransitionMode.Modal, null));
-        }
-        #endregion
 
         #region ExecuteFilterCommand
         private ViewModelCommand _ExecuteFilterCommand;

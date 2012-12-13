@@ -20,7 +20,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         public TabViewModel Parent
         {
             get { return parent; }
-        } 
+        }
 
         /// <summary>
         /// Represents status model.
@@ -64,7 +64,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         {
             this.parent = parent;
             this.Model = StatusModel.Get(status);
-            this._bindingAccounts = initialBoundAccounts.ToArray();
+            this._bindingAccounts = initialBoundAccounts.Guard().ToArray();
             this._favoritedUsers = ViewModelHelper.CreateReadOnlyDispatcherCollection(
                 Model.FavoritedUsers, _ => new UserViewModel(_), DispatcherHelper.UIDispatcher);
             this._retweetedUsers = ViewModelHelper.CreateReadOnlyDispatcherCollection(
@@ -101,7 +101,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         public ReadOnlyDispatcherCollection<UserViewModel> FavoritedUsers
         {
             get { return _favoritedUsers; }
-        } 
+        }
 
         public bool IsDirectMessage
         {
