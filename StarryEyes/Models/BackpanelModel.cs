@@ -34,9 +34,13 @@ namespace StarryEyes.Models
             var te = ev as TwitterEventBase;
             if (te != null)
             {
-                _twitterEvents.Insert(0, te);
-                if (_twitterEvents.Count > TwitterEventMaxHoldCount)
-                    _twitterEvents.RemoveAt(_twitterEvents.Count - 1);
+                lock (_twitterEvents.SyncRoot)
+                {
+                    _twitterEvents.Insert(0, te);
+                    if (_twitterEvents.Count > TwitterEventMaxHoldCount)
+                        _twitterEvents.RemoveAt(_twitterEvents.Count - 1);
+
+                }
             }
         }
 
