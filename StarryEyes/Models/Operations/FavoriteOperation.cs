@@ -34,7 +34,7 @@ namespace StarryEyes.Models.Operations
                     return GetExceptionDetail(ex)
                         .SelectMany(s =>
                         {
-                            if (s.Contains("You have already favorited this status."))
+                            if (s.Contains("You have already favorited this status"))
                             {
                                 // favorited
                                 return Observable.Empty<TwitterStatus>();
