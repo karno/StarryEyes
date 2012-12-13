@@ -60,7 +60,7 @@ namespace StarryEyes.ViewModels.WindowParts
             }
             set
             {
-                SetSelectedAccountIds(value.Select(i => i.Id));
+                SetSelectedAccountIds(value.Guard().Select(i => i.Id));
             }
         }
 

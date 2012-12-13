@@ -14,7 +14,7 @@ namespace StarryEyes.Models.Operations
     {
         static OperationQueueRunner()
         {
-            MaxConcurrency = 8;
+            MaxConcurrency = 16;
         }
 
         /// <summary>
@@ -59,32 +59,32 @@ namespace StarryEyes.Models.Operations
         /// </summary>
         private static void SpawnNewRunner()
         {
-            var operation = DequeueOperation();
-            // operation is not available.
-
-            if (operation == null)
-            {
-                System.Diagnostics.Debug.WriteLine("operation run completed.");
-                return;
-            }
-
             int cv = Interlocked.Increment(ref runningConcurrency);
-            System.Diagnostics.Debug.WriteLine("running " + cv);
             if (cv > MaxConcurrency)
             {
                 // already run max count of threads.
                 Interlocked.Decrement(ref runningConcurrency);
                 return;
             }
+
+
+            var operation = DequeueOperation();
+
+            if (operation == null)
+            {
+                // operation is not available.
+                Interlocked.Decrement(ref runningConcurrency);
+                return;
+            }
             else
             {
+                // operation acquired.
                 Observable.Defer(() => Observable.Return(operation))
                     // .ObserveOn(TaskPoolScheduler.Default)
                     .SelectMany(_ => _.Run())
                     .Finally(() =>
                     {
                         Interlocked.Decrement(ref runningConcurrency);
-                        System.Diagnostics.Debug.WriteLine("continuation...");
                         SpawnNewRunner();
                     })
                     .Subscribe();
