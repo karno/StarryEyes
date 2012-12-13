@@ -20,7 +20,7 @@ namespace StarryEyes.ViewModels.WindowParts
         {
             this.CompositeDisposable.Add(accounts = ViewModelHelper.CreateReadOnlyDispatcherCollection(
                 AccountsStore.Accounts,
-                _ => new SelectableAccountViewModel(_.AuthenticateInfo, RaiseSelectedAccountsChanged),
+                _ => new SelectableAccountViewModel(this, _.AuthenticateInfo, RaiseSelectedAccountsChanged),
                 DispatcherHelper.UIDispatcher));
         }
 
@@ -112,10 +112,13 @@ namespace StarryEyes.ViewModels.WindowParts
             get { return info; }
         }
 
+        private AccountSelectorViewModel parent;
+
         private readonly Action onSelectionChanged;
 
-        public SelectableAccountViewModel(AuthenticateInfo info, Action onSelectionChanged)
+        public SelectableAccountViewModel(AccountSelectorViewModel parent, AuthenticateInfo info, Action onSelectionChanged)
         {
+            this.parent = parent;
             this.info = info;
             this.onSelectionChanged = onSelectionChanged;
         }
@@ -160,6 +163,16 @@ namespace StarryEyes.ViewModels.WindowParts
                 }
                 return info.UnreliableProfileImageUri;
             }
+        }
+
+        public void ToggleSelection()
+        {
+            this.IsSelected = !IsSelected;
+        }
+
+        public void SelectExcepted()
+        {
+            parent.SelectedAccounts = new[] { this.info };
         }
     }
 }

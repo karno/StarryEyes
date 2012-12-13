@@ -120,11 +120,11 @@
                 </StackPanel>
             </Border>
         </Grid>
-        <WindowParts:AccoutSelector Grid.RowSpan="2"
-                                    Margin="0,-30,0,0"
-                                    DataContext="{Binding InputAreaAccountSelectorViewModel}" />
-        <WindowParts:AccoutSelector Grid.RowSpan="2"
-                                    Margin="0,-30,0,0"
-                                    DataContext="{Binding GlobalAccountSelectorViewModel}" />
+        <WindowParts:AccountSelector Grid.RowSpan="2"
+                                     Margin="0,-30,0,0"
+                                     DataContext="{Binding InputAreaAccountSelectorViewModel}" />
+        <WindowParts:AccountSelector Grid.RowSpan="2"
+                                     Margin="0,-30,0,0"
+                                     DataContext="{Binding GlobalAccountSelectorViewModel}" />
     </Grid>
 </Controls:MetroWindow>

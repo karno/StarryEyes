@@ -268,6 +268,24 @@
                                    Text="{Binding DirectMessageTo.User.ScreenName,
                                                   StringFormat=@{0}}" />
                     </DockPanel>
+                    <DockPanel Grid.ColumnSpan="3"
+                               Height="26"
+                               Background="#FFD80073"
+                               LastChildFill="True"
+                               Visibility="{Binding IsBindingAuthInfoExisted,
+                                                    Converter={StaticResource BooleanToInvisibleConverter}}">
+                        <Path Width="14"
+                              Height="13.2"
+                              Margin="6"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center"
+                              Data="F1 M 24,17.7727C 25.2727,17.7727 31.6364,29.8636 31,30.5C 30.3636,31.1364 17.6364,31.1364 17,30.5C 16.3636,29.8636 22.7273,17.7727 24,17.7727 Z M 24,27.3182C 23.4728,27.3182 23.0454,27.7456 23.0454,28.2727C 23.0454,28.7999 23.4728,29.2273 24,29.2273C 24.5272,29.2273 24.9545,28.7999 24.9545,28.2727C 24.9545,27.7456 24.5272,27.3182 24,27.3182 Z M 23.0454,21.5909L 23.3636,26.6818L 24.6364,26.6818L 24.9545,21.5909L 23.0454,21.5909 Z "
+                              Fill="#FFFFFFFF"
+                              Stretch="Fill" />
+                        <TextBlock VerticalAlignment="Center"
+                                   Foreground="White"
+                                   Text="アカウントが選択されていません。左側のエリアをクリックして、投稿するアカウントを選択してください。" />
+                    </DockPanel>
                     <TextBox Grid.Row="1"
                              AcceptsReturn="True"
                              BorderBrush="{x:Null}"

@@ -42,7 +42,7 @@ namespace StarryEyes.ViewModels.WindowParts
 
         public bool IsBindingHashtagExisted
         {
-            get { return _bindingHashtags.Count > 0; }
+            get { return _bindingHashtags != null && _bindingHashtags.Count > 0; }
         }
 
         private readonly DispatcherCollection<BindHashtagViewModel> _bindableHashtagCandidates;
@@ -53,7 +53,7 @@ namespace StarryEyes.ViewModels.WindowParts
 
         public bool IsBindableHashtagExisted
         {
-            get { return _bindableHashtagCandidates.Count > 0; }
+            get { return _bindableHashtagCandidates != null && _bindableHashtagCandidates.Count > 0; }
         }
 
         private readonly ReadOnlyDispatcherCollection<TweetInputInfoViewModel> _draftedInputs;
@@ -62,7 +62,10 @@ namespace StarryEyes.ViewModels.WindowParts
             get { return _draftedInputs; }
         }
 
-        public IEnumerable<BindHashtagViewModel> DesignSource { get { return new[] { "Entropy", "Negentropy" }.Select(_ => new BindHashtagViewModel(_, () => { })); } }
+        public bool IsBindingAuthInfoExisted
+        {
+            get { return _bindingAuthInfos != null && _bindingAuthInfos.Count > 0; }
+        }
 
         private readonly ReadOnlyDispatcherCollection<AuthenticateInfoViewModel> _bindingAuthInfos;
         public ReadOnlyDispatcherCollection<AuthenticateInfoViewModel> BindingAuthInfos
@@ -453,6 +456,15 @@ namespace StarryEyes.ViewModels.WindowParts
         public InputAreaViewModel()
         {
             this._accountSelector = new AccountSelectorViewModel();
+            this._accountSelector.OnClosed += () =>
+            {
+                // After selection accounts, return focus to text box
+                // if input area is opened.
+                if (IsOpening)
+                {
+                    FocusToTextBox();
+                }
+            };
 
             this.CompositeDisposable.Add(this._bindingHashtags =
                 ViewModelHelper.CreateReadOnlyDispatcherCollection(
@@ -486,14 +498,20 @@ namespace StarryEyes.ViewModels.WindowParts
                 _ => new AuthenticateInfoViewModel(_),
                 DispatcherHelper.UIDispatcher));
 
+            this.CompositeDisposable.Add(new CollectionChangedEventListener(
+                this._bindingAuthInfos, (_, __) => RaisePropertyChanged(() => IsBindingAuthInfoExisted)));
+
+            bool _accountSelectReflecting = false;
             this._accountSelector.OnSelectedAccountsChanged += () =>
             {
                 if (!_isSuppressAccountChangeRelay)
                 {
                     // write-back
+                    _accountSelectReflecting = true;
                     InputAreaModel.BindingAuthInfos.Clear();
                     this._accountSelector.SelectedAccounts
                         .ForEach(InputAreaModel.BindingAuthInfos.Add);
+                    _accountSelectReflecting = false;
                     _baseSelectedAccounts = InputAreaModel.BindingAuthInfos.Select(_ => _.Id).ToArray();
                 }
                 InputInfo.AuthInfos = this.AccountSelector.SelectedAccounts;
@@ -506,6 +524,7 @@ namespace StarryEyes.ViewModels.WindowParts
                     InputAreaModel.BindingAuthInfos,
                     (_, __) =>
                     {
+                        if (_accountSelectReflecting) return;
                         _baseSelectedAccounts = InputAreaModel.BindingAuthInfos
                             .Select(a => a.Id)
                             .ToArray();
@@ -607,7 +626,7 @@ namespace StarryEyes.ViewModels.WindowParts
             if (!this.IsOpening)
             {
                 this.IsOpening = true;
-                this.Messenger.Raise(new InteractionMessage("FocusToTextBox"));
+                FocusToTextBox();
                 if (restorePreviousStashed && InputAreaModel.Drafts.Count > 0)
                 {
                     var last = InputAreaModel.Drafts[InputAreaModel.Drafts.Count - 1];
@@ -618,7 +637,7 @@ namespace StarryEyes.ViewModels.WindowParts
             }
             else
             {
-                this.Messenger.Raise(new InteractionMessage("FocusToTextBox"));
+                FocusToTextBox();
             }
         }
 
@@ -627,6 +646,11 @@ namespace StarryEyes.ViewModels.WindowParts
             if (!this.IsOpening) return;
             CheckClearInput();
             this.IsOpening = false;
+        }
+
+        public void FocusToTextBox()
+        {
+            this.Messenger.Raise(new InteractionMessage("FocusToTextBox"));
         }
 
         private void CheckClearInput()

@@ -1,8 +1,14 @@
-﻿using Livet;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Reactive.Linq;
+using Livet;
 using Livet.Commands;
 using Livet.Messaging;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Filters.Parsing;
+using StarryEyes.Models;
 using StarryEyes.Models.Connections.UserDependencies;
 using StarryEyes.Models.Operations;
 using StarryEyes.Models.Stores;
@@ -10,17 +16,9 @@ using StarryEyes.Models.Subsystems;
 using StarryEyes.Settings;
 using StarryEyes.ViewModels.Dialogs;
 using StarryEyes.ViewModels.WindowParts;
-using StarryEyes.ViewModels.WindowParts.Timelines;
 using StarryEyes.Views.Dialogs;
 using StarryEyes.Views.Helpers;
 using StarryEyes.Views.Messaging;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Reactive.Linq;
-using StarryEyes.Models;
-using System.Threading.Tasks;
 
 namespace StarryEyes.ViewModels
 {
@@ -237,7 +235,6 @@ namespace StarryEyes.ViewModels
             }
         }
         #endregion
-
 
         private string _query;
         public string Query

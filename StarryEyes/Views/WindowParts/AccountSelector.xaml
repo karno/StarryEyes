@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="StarryEyes.Views.WindowParts.AccoutSelector"
+﻿<UserControl x:Class="StarryEyes.Views.WindowParts.AccountSelector"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:Behaviors="clr-namespace:StarryEyes.Views.Messaging.Behaviors"
@@ -32,6 +32,21 @@
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="MouseLeftButtonDown">
+                            <ei:CallMethodAction MethodName="ToggleSelection" TargetObject="{Binding}" />
+                        </i:EventTrigger>
+                        <i:EventTrigger EventName="MouseRightButtonDown">
+                            <ei:CallMethodAction MethodName="SelectExcepted" TargetObject="{Binding}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                    <Grid.ToolTip>
+                        <TextBlock>
+                            <Run Text="左クリックするとこのアカウントの選択を切り替えます。" />
+                            <LineBreak />
+                            <Run Text="右クリックでこのアカウントだけを選択します。" />
+                        </TextBlock>
+                    </Grid.ToolTip>
                     <Viewbox Width="Auto"
                              Height="16"
                              Margin="4"
@@ -47,19 +62,21 @@
                             Margin="4"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
-                            BorderThickness="1">
+                            BorderThickness="1"
+                            DockPanel.Dock="Left">
                         <Border.BorderBrush>
                             <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ActiveBorderColorKey}}" />
                         </Border.BorderBrush>
                         <Image Source="{Binding ProfileImageUri, Converter={StaticResource UriImageConverter}}" />
                     </Border>
                     <TextBlock Grid.Column="2"
+                               Margin="0,0,4,0"
                                HorizontalAlignment="Left"
                                VerticalAlignment="Center"
                                Foreground="White"
                                Text="{Binding ScreenName,
                                               Mode=OneWay}"
-                               TextWrapping="Wrap" />
+                               TextWrapping="NoWrap" />
                 </Grid>
             </DataTemplate>
         </ResourceDictionary>
@@ -136,8 +153,8 @@
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="2*" MaxWidth="400" />
-            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="3*" MaxWidth="250" />
+            <ColumnDefinition Width="2*" />
         </Grid.ColumnDefinitions>
         <Border Grid.ColumnSpan="2"
                 Background="Black"

@@ -247,8 +247,8 @@
     <Compile Include="Views\Utils\ConverterBase.cs" />
     <Compile Include="Views\Utils\StringToVisibleConverter.cs" />
     <Compile Include="Views\Utils\UriImageConverter.cs" />
-    <Compile Include="Views\WindowParts\AccoutSelector.xaml.cs">
-      <DependentUpon>AccoutSelector.xaml</DependentUpon>
+    <Compile Include="Views\WindowParts\AccountSelector.xaml.cs">
+      <DependentUpon>AccountSelector.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\WindowParts\Backpanel.xaml.cs">
       <DependentUpon>Backpanel.xaml</DependentUpon>
@@ -330,7 +330,7 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Views\WindowParts\AccoutSelector.xaml">
+    <Page Include="Views\WindowParts\AccountSelector.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

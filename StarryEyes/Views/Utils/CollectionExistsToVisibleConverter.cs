@@ -8,7 +8,7 @@ namespace StarryEyes.Views.Utils
     {
         public override Visibility ToTarget(IEnumerable<object> input, object parameter)
         {
-            return input.Count() > 0 ? Visibility.Visible : Visibility.Collapsed;
+            return input != null && input.Count() > 0 ? Visibility.Visible : Visibility.Collapsed;
         }
     }
 }

@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace StarryEyes.Views.WindowParts
 {
     /// <summary>
-    /// AccoutSelector.xaml の相互作用ロジック
+    /// AccountSelector.xaml の相互作用ロジック
     /// </summary>
-    public partial class AccoutSelector : UserControl
+    public partial class AccountSelector : UserControl
     {
-        public AccoutSelector()
+        public AccountSelector()
         {
             InitializeComponent();
         }
