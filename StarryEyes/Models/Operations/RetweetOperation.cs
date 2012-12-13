@@ -12,7 +12,7 @@ namespace StarryEyes.Models.Operations
     public class RetweetOperation : OperationBase<TwitterStatus>
     {
         public RetweetOperation() { }
-        public RetweetOperation(AuthenticateInfo auth, TwitterStatus status,bool add)
+        public RetweetOperation(AuthenticateInfo auth, TwitterStatus status, bool add)
         {
             this.AuthInfo = auth;
             this.TargetId = status.Id;

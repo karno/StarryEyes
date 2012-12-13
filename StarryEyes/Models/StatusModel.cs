@@ -134,7 +134,7 @@ namespace StarryEyes.Models
         public ObservableSynchronizedCollection<TwitterUser> FavoritedUsers
         {
             get { return _favoritedUsers; }
-        } 
+        }
 
         public void AddFavoritedUser(long userId)
         {
@@ -149,7 +149,7 @@ namespace StarryEyes.Models
                 if (!_favoritedUsersDic.ContainsKey(user.Id))
                 {
                     _favoritedUsersDic.Add(user.Id, user);
-                    this.Status.FavoritedUsers = this.Status.FavoritedUsers.Append(user.Id).ToArray();
+                    this.Status.FavoritedUsers = this.Status.FavoritedUsers.Guard().Append(user.Id).ToArray();
                     added = true;
                 }
             }
@@ -177,12 +177,12 @@ namespace StarryEyes.Models
         }
 
         private object _retweetedsLock = new object();
-        private readonly SortedDictionary<long, TwitterUser> _retweetedUsersDic = new SortedDictionary<long,TwitterUser>();
+        private readonly SortedDictionary<long, TwitterUser> _retweetedUsersDic = new SortedDictionary<long, TwitterUser>();
         private readonly ObservableSynchronizedCollection<TwitterUser> _retweetedUsers = new ObservableSynchronizedCollection<TwitterUser>();
         public ObservableSynchronizedCollection<TwitterUser> RetweetedUsers
         {
             get { return _retweetedUsers; }
-        } 
+        }
 
         public void AddRetweetedUser(long userId)
         {
@@ -197,11 +197,11 @@ namespace StarryEyes.Models
                 if (!_retweetedUsersDic.ContainsKey(user.Id))
                 {
                     _retweetedUsersDic.Add(user.Id, user);
-                    this.Status.RetweetedUsers = this.Status.RetweetedUsers.Append(user.Id).ToArray();
+                    this.Status.RetweetedUsers = this.Status.RetweetedUsers.Guard().Append(user.Id).ToArray();
                     added = true;
                 }
             }
-            if(added)
+            if (added)
             {
                 _retweetedUsers.Add(user);
                 // update persistent info

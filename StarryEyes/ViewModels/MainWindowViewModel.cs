@@ -143,6 +143,24 @@ namespace StarryEyes.ViewModels
             MainWindowModel.OnWindowCommandDisplayChanged += _ =>
                 this.ShowWindowCommands = _;
 
+            MainWindowModel.OnExecuteAccountSelectActionRequested += (action, status, selecteds, aftercall) =>
+            {
+                _globalAccountSelectorViewModel.SelectedAccounts = selecteds;
+                _globalAccountSelectorViewModel.SelectionReason = "";
+                switch (action)
+                {
+                    case AccountSelectionAction.Favorite:
+                        _globalAccountSelectorViewModel.SelectionReason = "favorite";
+                        break;
+                    case AccountSelectionAction.Retweet:
+                        _globalAccountSelectorViewModel.SelectionReason = "retweet";
+                        break;
+                }
+                Observable.FromEvent(_ => _globalAccountSelectorViewModel.OnClosed += _, _ => _globalAccountSelectorViewModel.OnClosed -= _)
+                    .Subscribe(_ => aftercall(_globalAccountSelectorViewModel.SelectedAccounts));
+                _globalAccountSelectorViewModel.Open();
+            };
+
             if (Setting.IsFirstGenerated)
             {
                 var kovm = new KeyOverrideViewModel();

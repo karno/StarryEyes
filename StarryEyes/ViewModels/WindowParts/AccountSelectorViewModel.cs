@@ -64,6 +64,8 @@ namespace StarryEyes.ViewModels.WindowParts
             }
         }
 
+        public event Action OnClosed;
+
         public event Action OnSelectedAccountsChanged;
         private void RaiseSelectedAccountsChanged()
         {
@@ -93,6 +95,9 @@ namespace StarryEyes.ViewModels.WindowParts
         {
             this.Messenger.Raise(new GoToStateMessage("Close"));
             MainWindowModel.SetShowMainWindowCommands(true);
+            var handler = OnClosed;
+            if (handler != null)
+                handler();
         }
     }
 

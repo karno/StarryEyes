@@ -44,10 +44,14 @@ namespace StarryEyes.Models
 
         #endregion
 
+        public static event Action<AccountSelectionAction, TwitterStatus, IEnumerable<AuthenticateInfo>, Action<IEnumerable<AuthenticateInfo>>> OnExecuteAccountSelectActionRequested;
         public static void ExecuteAccountSelectAction(
             AccountSelectionAction action, TwitterStatus targetStatus,
             IEnumerable<AuthenticateInfo> defaultSelected, Action<IEnumerable<AuthenticateInfo>> after)
         {
+            var handler = OnExecuteAccountSelectActionRequested;
+            if (handler != null)
+                handler(action, targetStatus, defaultSelected, after);
         }
 
         public static void ShowUserInfo(TwitterUser user)

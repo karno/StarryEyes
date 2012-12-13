@@ -11,6 +11,7 @@ using System.Reactive.Linq;
 using StarryEyes.Models.Stores;
 using System.Reactive;
 using StarryEyes.Models;
+using StarryEyes.Models.Backpanels.PostEvents;
 
 namespace StarryEyes.ViewModels.WindowParts.Timelines
 {
@@ -221,6 +222,10 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                     .Catch((Exception ex) =>
                     {
                         onFail(a);
+                        BackpanelModel.RegisterEvent(
+                            new OperationFailedEvent((add ? "" : "un") + "favorite failed: " +
+                                a.UnreliableScreenName + " -> " + this.Status.User.ScreenName + " :" +
+                                ex.Message));
                         return Observable.Empty<TwitterStatus>();
                     }))
                 .Subscribe();
@@ -242,12 +247,16 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             }
             infos.ToObservable()
                 .Do(expected)
-                .Select(a =>
-                    new RetweetOperation(a, this.Status, add)
+                .Do(_ => System.Diagnostics.Debug.WriteLine(_.UnreliableScreenName + " / " + add))
+                .SelectMany(a => new RetweetOperation(a, this.Status, add)
                     .Run()
                     .Catch((Exception ex) =>
                     {
                         onFail(a);
+                        BackpanelModel.RegisterEvent(
+                            new OperationFailedEvent((add ? "" : "un") + "retweet failed: " +
+                                a.UnreliableScreenName + " -> " + this.Status.User.ScreenName + " :" +
+                                ex.Message));
                         return Observable.Empty<TwitterStatus>();
                     }))
                 .Subscribe();
@@ -310,8 +319,8 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                 infos =>
                 {
                     var adds = infos.Except(favoriteds);
-                    Favorite(adds, true);
                     var rmvs = favoriteds.Except(infos);
+                    Favorite(adds, true);
                     Favorite(rmvs, false);
                 });
         }
@@ -328,9 +337,9 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                 infos =>
                 {
                     var adds = infos.Except(retweeteds);
-                    Retweet(adds, true);
                     var rmvs = retweeteds.Except(infos);
-                    Favorite(rmvs, false);
+                    Retweet(adds, true);
+                    Retweet(rmvs, false);
                 });
         }
 
