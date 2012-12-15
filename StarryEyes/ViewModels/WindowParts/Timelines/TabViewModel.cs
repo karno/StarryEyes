@@ -21,6 +21,10 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             set { _model = value; }
         }
 
+        /// <summary>
+        /// for design time support.
+        /// </summary>
+        public TabViewModel() { }
         public TabViewModel(ColumnViewModel owner, TabModel tabModel)
         {
             this._owner = owner;
@@ -42,9 +46,11 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         private void Initialize()
         {
             this._readonlyTimeline = ViewModelHelper.CreateReadOnlyDispatcherCollection(
-                            Model.Timeline.Statuses, _ => new StatusViewModel(this, _, _model.BindingAccountIds),
+                            Model.Timeline.Statuses,
+                            _ => new StatusViewModel(this, _, _model.BindingAccountIds),
                             DispatcherHelper.UIDispatcher);
             this.CompositeDisposable.Add(_readonlyTimeline);
+            RaisePropertyChanged(() => Timeline);
             this.CompositeDisposable.Add(Observable.FromEvent(
                 _ => Model.Timeline.OnNewStatusArrived += _,
                 _ => Model.Timeline.OnNewStatusArrived -= _)

@@ -60,7 +60,8 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         public StatusViewModel(TwitterStatus status)
             : this(null, status, null) { }
 
-        public StatusViewModel(TabViewModel parent, TwitterStatus status, IEnumerable<long> initialBoundAccounts)
+        public StatusViewModel(TabViewModel parent, TwitterStatus status,
+            IEnumerable<long> initialBoundAccounts)
         {
             this.parent = parent;
             this.Model = StatusModel.Get(status);
@@ -82,7 +83,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         private UserViewModel _retweeter;
         public UserViewModel Retweeter
         {
-            get { return _retweeter ?? (_retweeter = new UserViewModel(Status.User)); }
+            get { return _retweeter ?? (_retweeter = new UserViewModel(OriginalStatus.User)); }
         }
 
         private UserViewModel _recipient;
@@ -110,7 +111,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public bool IsRetweet
         {
-            get { return Status.RetweetedOriginal != null; }
+            get { return OriginalStatus.RetweetedOriginal != null; }
         }
 
         public bool IsFavorited
@@ -171,7 +172,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public bool IsMyself
         {
-            get { return AccountsStore.AccountIds.Contains(Status.User.Id); }
+            get { return AccountsStore.AccountIds.Contains(OriginalStatus.User.Id); }
         }
 
         public bool IsMyselfStrict
@@ -304,6 +305,11 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             return AccountsStore.Accounts
                 .Where(a => _bindingAccounts.Contains(a.UserId))
                 .Select(a => a.AuthenticateInfo);
+        }
+
+        public void ToggleSelect()
+        {
+            IsSelected = !IsSelected;
         }
 
         public void ToggleFavorite()

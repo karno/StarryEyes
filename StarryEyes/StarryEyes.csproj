@@ -268,6 +268,9 @@
     <Compile Include="Views\WindowParts\SettingPanel.xaml.cs">
       <DependentUpon>SettingPanel.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\WindowParts\Timelines\Timeline.xaml.cs">
+      <DependentUpon>Timeline.xaml</DependentUpon>
+    </Compile>
     <Page Include="Simple Styles.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -358,6 +361,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\WindowParts\Timelines\Timeline.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -397,7 +404,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ViewModels\WindowParts\Backpanels\" />
-    <Folder Include="Views\WindowParts\Timelines\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ReactiveOAuth\ReactiveOAuth.csproj">

@@ -192,7 +192,7 @@ namespace StarryEyes.ViewModels
                     auth, TransitionMode.Modal, null));
             }
             TabManager.CreateTab(new TabModel("hello", "from all where ()"));
-            TabManager.CreateTab(new TabModel("home", "from all where user -> *.following"));
+            TabManager.CreateTab(new TabModel("home", "from all where user <- *.following"));
             TabManager.CreateTab(new TabModel("replies", "from all where to -> *"));
             TabManager.CreateTab(new TabModel("Krile", "from all where source == \"Krile\""));
         }

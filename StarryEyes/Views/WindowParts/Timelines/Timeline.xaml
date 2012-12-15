@@ -1,0 +1,190 @@
+﻿<UserControl x:Class="StarryEyes.Views.WindowParts.Timelines.Timeline"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:Helpers="clr-namespace:StarryEyes.Views.Helpers"
+             xmlns:Timelines="clr-namespace:StarryEyes.ViewModels.WindowParts.Timelines"
+             xmlns:Utils="clr-namespace:StarryEyes.Views.Utils"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             d:DataContext="{d:DesignInstance Type=Timelines:TabViewModel}"
+             d:DesignHeight="300"
+             d:DesignWidth="300"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colours.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <Utils:UriImageConverter x:Key="UriImageConverter" />
+            <Utils:BooleanToVisibleConverter x:Key="BooleanToVisibleConverter" />
+            <DataTemplate x:Key="StatusItemTemplate">
+                <DockPanel Margin="0,0,0,15">
+                    <Grid Width="Auto"
+                          Height="Auto"
+                          Margin="0,6,0,0"
+                          HorizontalAlignment="Stretch"
+                          VerticalAlignment="Stretch"
+                          DockPanel.Dock="Left">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="MouseLeftButtonDown">
+                                <ei:CallMethodAction MethodName="ToggleSelect" TargetObject="{Binding Mode=OneWay}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                        <Border Grid.RowSpan="1"
+                                Width="40"
+                                Height="40"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top"
+                                Background="#FFD8D8D8">
+                            <Image Source="{Binding User.User.ProfileImageUri, Converter={StaticResource UriImageConverter}}" />
+                        </Border>
+                        <Border Grid.Row="0"
+                                Grid.RowSpan="1"
+                                Grid.ColumnSpan="1"
+                                Width="Auto"
+                                Height="Auto"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch"
+                                Background="#331BA1E2"
+                                Visibility="{Binding IsSelected,
+                                                     Converter={StaticResource BooleanToVisibleConverter}}" />
+                    </Grid>
+                    <StackPanel Grid.Column="1" Orientation="Vertical">
+
+                        <DockPanel Grid.RowSpan="1"
+                                   Grid.Column="1"
+                                   Grid.ColumnSpan="1"
+                                   Width="Auto"
+                                   Height="Auto"
+                                   HorizontalAlignment="Stretch"
+                                   VerticalAlignment="Stretch"
+                                   LastChildFill="False">
+                            <TextBlock Height="Auto"
+                                       Margin="8,0,4,0"
+                                       VerticalAlignment="Center"
+                                       FontSize="16"
+                                       Foreground="#FF1BA1E2"
+                                       Text="{Binding User.ScreenName,
+                                                      FallbackValue=user,
+                                                      Mode=OneWay}"
+                                       TextWrapping="Wrap" />
+                            <TextBlock Height="Auto"
+                                       Margin="0,2,0,0"
+                                       VerticalAlignment="Center"
+                                       FontSize="10.667"
+                                       Foreground="Gray"
+                                       Text="{Binding User.User.Name,
+                                                      FallbackValue=name}"
+                                       TextWrapping="Wrap" />
+                            <TextBlock Height="Auto"
+                                       Margin="0,2,8,0"
+                                       VerticalAlignment="Center"
+                                       DockPanel.Dock="Right"
+                                       FontSize="10.667"
+                                       Foreground="Gray"
+                                       Text="{Binding Status.CreatedAt,
+                                                      FallbackValue=00:00:00,
+                                                      StringFormat=HH:mm:ss}"
+                                       TextWrapping="Wrap" />
+                        </DockPanel>
+                        <Border Grid.Row="1"
+                                Grid.Column="1"
+                                Height="Auto"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Top">
+                            <DockPanel Margin="8,5,8,3"
+                                       Background="#FF339933"
+                                       Visibility="{Binding IsRetweet,
+                                                            Converter={StaticResource BooleanToVisibleConverter},
+                                                            Mode=OneWay}">
+                                <Path Width="6.77"
+                                      Height="8"
+                                      Margin="4"
+                                      Data="F1 M 24,18.9231C 25.4548,18.9231 26.7667,19.535 27.6923,20.5154L 27.6923,18L 29.0769,19.3846L 29.0769,23.0769L 25.3846,23.0769L 24,21.6923L 26.5801,21.6923C 25.9463,20.9841 25.0252,20.5385 24,20.5385C 22.2447,20.5385 20.7946,21.8449 20.569,23.5385L 18.9438,23.5385C 19.177,20.9508 21.3517,18.9231 24,18.9231 Z M 24,27.4615C 25.7553,27.4615 27.2054,26.1551 27.431,24.4615L 29.0562,24.4615C 28.823,27.0492 26.6483,29.0769 24,29.0769C 22.5452,29.0769 21.2333,28.465 20.3077,27.4846L 20.3077,30L 18.9231,28.6154L 18.9231,24.9231L 22.6154,24.9231L 24,26.3077L 21.4199,26.3077C 22.0537,27.0159 22.9748,27.4615 24,27.4615 Z "
+                                      Fill="#FFFFFFFF"
+                                      Stretch="Fill" />
+                                <TextBlock HorizontalAlignment="Left"
+                                           VerticalAlignment="Center"
+                                           FontSize="10.667"
+                                           Foreground="White"
+                                           Padding="0,0,4,0"
+                                           Text="retweeted by"
+                                           TextWrapping="Wrap" />
+                                <TextBlock HorizontalAlignment="Left"
+                                           VerticalAlignment="Center"
+                                           FontSize="10.667"
+                                           Foreground="White"
+                                           Text="{Binding Retweeter.ScreenName, FallbackValue=user}"
+                                           TextWrapping="Wrap" />
+                            </DockPanel>
+                        </Border>
+                        <RichTextBox Grid.Row="2"
+                                     Grid.Column="1"
+                                     Width="Auto"
+                                     Height="Auto"
+                                     Margin="3,7,3,6"
+                                     HorizontalAlignment="Stretch"
+                                     VerticalAlignment="Top"
+                                     HorizontalContentAlignment="Stretch"
+                                     Background="{x:Null}"
+                                     BorderBrush="{x:Null}"
+                                     BorderThickness="0"
+                                     Helpers:RichTextBoxHelper.TwitterStatus="{Binding Status}"
+                                     IsDocumentEnabled="True"
+                                     IsReadOnly="True"
+                                     SelectionBrush="#FF1BA1E2" />
+                        <Grid Grid.Row="3"
+                              Grid.Column="1"
+                              Margin="8,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Margin="0,0,-0.001,0"
+                                       HorizontalAlignment="Left"
+                                       VerticalAlignment="Center"
+                                       FontSize="10.667"
+                                       Foreground="Gray"
+                                       Text="{Binding Status.Source,
+                                                      FallbackValue=via (unknown),
+                                                      StringFormat=via \{0\}}"
+                                       TextWrapping="Wrap" />
+                            <ItemsControl Grid.Row="0"
+                                          Grid.RowSpan="1"
+                                          Grid.Column="1"
+                                          Grid.ColumnSpan="1"
+                                          Height="16"
+                                          HorizontalAlignment="Right"
+                                          VerticalAlignment="Stretch" />
+                        </Grid>
+                    </StackPanel>
+                </DockPanel>
+            </DataTemplate>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <ItemsControl ItemTemplate="{DynamicResource StatusItemTemplate}"
+                  ItemsSource="{Binding Timeline}"
+                  ScrollViewer.CanContentScroll="True"
+                  VirtualizingPanel.IsVirtualizing="True"
+                  VirtualizingPanel.ScrollUnit="Pixel"
+                  VirtualizingPanel.VirtualizationMode="Recycling">
+        <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+                <VirtualizingStackPanel />
+            </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.Template>
+            <ControlTemplate>
+                <ScrollViewer Focusable="False">
+                    <ItemsPresenter />
+                </ScrollViewer>
+            </ControlTemplate>
+        </ItemsControl.Template>
+    </ItemsControl>
+</UserControl>
