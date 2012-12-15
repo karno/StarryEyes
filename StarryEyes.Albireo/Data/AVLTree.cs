@@ -376,6 +376,7 @@ namespace StarryEyes.Albireo.Data
 
         public bool Contains(T item)
         {
+            if (root == null) return false; // collection is empty.
             AVLTreeLeaf current = root;
             while (true)
             {
