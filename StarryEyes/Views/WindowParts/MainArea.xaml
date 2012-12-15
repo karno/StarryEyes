@@ -1,11 +1,115 @@
 ﻿<UserControl x:Class="StarryEyes.Views.WindowParts.MainArea"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
-    <Grid>
-            
-    </Grid>
+             xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+             xmlns:Utils="clr-namespace:StarryEyes.Views.Utils"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             d:DesignHeight="300"
+             d:DesignWidth="300"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <Utils:BooleanToInvisibleConverter x:Key="BooleanToInvisibleConverter" />
+        <Utils:BooleanToVisibleConverter x:Key="BooleanToVisibleConverter" />
+        <DataTemplate x:Key="TabHeaderTemplate">
+            <StackPanel Margin="0,0,8,0" Orientation="Horizontal">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseLeftButtonDown">
+                        <ei:CallMethodAction MethodName="Select" TargetObject="{Binding}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+                <StackPanel.ContextMenu>
+                    <ContextMenu DataContext="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                        <MenuItem Header="編集..." />
+                        <MenuItem Header="このタブをコピーして追加" />
+                        <Separator />
+                        <MenuItem Header="新しいタブの追加..." />
+                        <MenuItem Header="最後に閉じたタブを元に戻す" />
+                        <Separator />
+                        <MenuItem Header="タブを閉じる" />
+                    </ContextMenu>
+                </StackPanel.ContextMenu>
+                <TextBlock x:Name="TabName"
+                           Margin="0,3,0,0"
+                           VerticalAlignment="Center"
+                           FontSize="16"
+                           Foreground="#FF999999"
+                           Text="{Binding Name}" />
+                <TextBlock VerticalAlignment="Top"
+                           Foreground="#FF1BA1E2"
+                           Text="{Binding UnreadCount}"
+                           Visibility="{Binding IsUnreadExisted,
+                                                Converter={StaticResource BooleanToVisibleConverter}}" />
+            </StackPanel>
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                    <Setter TargetName="TabName" Property="Foreground" Value="Black" />
+                </DataTrigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
+        <DataTemplate x:Key="ColumnTemplate">
+            <Grid Margin="8" Background="Gainsboro">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <ItemsControl Background="White"
+                              ItemTemplate="{StaticResource TabHeaderTemplate}"
+                              ItemsSource="{Binding Tabs}">
+                    <ItemsControl.ContextMenu>
+                        <ContextMenu DataContext="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                            <MenuItem Header="新しいタブの追加..." />
+                            <MenuItem Header="最後に閉じたタブを元に戻す" />
+                        </ContextMenu>
+                    </ItemsControl.ContextMenu>
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+                <ItemsControl Grid.Row="1"
+                              Background="White"
+                              ItemsSource="{Binding Tabs}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <Grid />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Grid.Row="1" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibleConverter}}">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <Border Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibleConverter}}">
+                                    <StackPanel Margin="4"
+                                                HorizontalAlignment="Center"
+                                                Orientation="Horizontal">
+                                        <Viewbox Width="20" Height="20">
+                                            <Controls:ProgressRing IsActive="True" />
+                                        </Viewbox>
+                                        <TextBlock Margin="4"
+                                                   VerticalAlignment="Center"
+                                                   Text="loading..." />
+                                    </StackPanel>
+                                </Border>
+                                <TextBlock Grid.Row="1" Text="{Binding Name}" />
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Grid>
+        </DataTemplate>
+    </UserControl.Resources>
+    <ItemsControl ItemTemplate="{StaticResource ColumnTemplate}" ItemsSource="{Binding Columns}">
+        <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+                <UniformGrid Rows="1" />
+            </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+    </ItemsControl>
 </UserControl>
