@@ -183,7 +183,7 @@
     <Compile Include="Models\Backpanels\BackpanelActionEventBase.cs" />
     <Compile Include="Models\Backpanels\BackpanelEventBase.cs" />
     <Compile Include="Models\Backpanels\PostEvents\FallbackedEvent.cs" />
-    <Compile Include="Models\Backpanels\PostEvents\OperationFailedEvent.cs" />
+    <Compile Include="Models\Backpanels\SystemEvents\OperationFailedEvent.cs" />
     <Compile Include="Models\Backpanels\PostEvents\PostFailedEvent.cs" />
     <Compile Include="Models\Backpanels\PostEvents\PostSucceededEvent.cs" />
     <Compile Include="Models\Backpanels\SystemEvents\TrackLimitEvent.cs" />

@@ -1,6 +1,6 @@
 ﻿using StarryEyes.Views;
 
-namespace StarryEyes.Models.Backpanels.PostEvents
+namespace StarryEyes.Models.Backpanels.SystemEvents
 {
     public class OperationFailedEvent : BackpanelEventBase
     {

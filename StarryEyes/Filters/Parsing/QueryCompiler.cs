@@ -19,14 +19,36 @@ namespace StarryEyes.Filters.Parsing
             try
             {
                 var tokens = Tokenizer.Tokenize(query);
-                // from (sources) where (filters)
+                // (from (sources)) (where (filters))
                 var first = tokens.FirstOrDefault();
-                if (first.Type != TokenType.Literal ||
-                    !first.Value.Equals("from", StringComparison.CurrentCultureIgnoreCase))
-                    throw new FormatException("Query must be started with \"from\" keyword.");
-                var sources = CompileSources(tokens.Skip(1).TakeWhile(t => t.Type != TokenType.Literal || t.Value != "where")).ToArray();
-                var filters = CompileFilters(tokens.Skip(1).SkipWhile(t => t.Type != TokenType.Literal || t.Value != "where").Skip(1));
-                return new FilterQuery() { Sources = sources, PredicateTreeRoot = filters };
+                if (first.Type == TokenType.Literal &&
+                    first.Value.Equals("from", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    // compile with sources && predicates
+                    var sources = CompileSources(tokens.Skip(1).TakeWhile(t => t.Type != TokenType.Literal || t.Value != "where")).ToArray();
+                    if (tokens.Skip(1).SkipWhile(t => t.Type != TokenType.Literal || t.Value != "where").Count() == 0)
+                    {
+                        // without predicates
+                        return new FilterQuery() { Sources = sources, PredicateTreeRoot = new FilterExpressionRoot() };
+                    }
+                    else
+                    {
+                        var filters = CompileFilters(tokens.Skip(1).SkipWhile(t => t.Type != TokenType.Literal || t.Value != "where").Skip(1));
+                        return new FilterQuery() { Sources = sources, PredicateTreeRoot = filters };
+                    }
+                }
+                else if (first.Type == TokenType.Literal &&
+                    first.Value.Equals("where", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    // compile with predicates
+                    var sources = new[] { new FilterLocal() }; // implicit "from all"
+                    var filters = CompileFilters(tokens.Skip(1));
+                    return new FilterQuery() { Sources = sources, PredicateTreeRoot = filters };
+                }
+                else
+                {
+                    throw new FormatException("Query must be started with \"from\" keyword or \"where\" keyword..");
+                }
             }
             catch (FilterQueryException)
             {
@@ -60,6 +82,7 @@ namespace StarryEyes.Filters.Parsing
 
         private static readonly IDictionary<string, Type> FilterSourceResolver = new SortedDictionary<string, Type>()
         {
+            { "*", typeof(FilterLocal) },
             { "local", typeof(FilterLocal) },
             { "all", typeof(FilterLocal) },
             { "home", typeof(FilterHome) },
@@ -89,10 +112,14 @@ namespace StarryEyes.Filters.Parsing
             var reader = new TokenReader(token);
             while (reader.IsRemainToken)
             {
-                var filter = reader.AssertGet(TokenType.Literal);
+                var filter = reader.Get();
+                if (filter.Type != TokenType.Literal && filter.Type != TokenType.OperatorMultiple)
+                {
+                    throw new ArgumentException("Operator is not expected.(" + filter.Type + ") expected is Literal or \'*\'.");
+                }
                 Type fstype;
                 if (!FilterSourceResolver.TryGetValue(filter.Value, out fstype))
-                    throw new ArgumentException("Unexpected filter type: " + filter.Value);
+                    throw new ArgumentException("Unexpected source type: " + filter.Value);
                 if (reader.IsRemainToken && reader.LookAhead().Type == TokenType.Collon) // with argument
                 {
                     reader.AssertGet(TokenType.Collon);
@@ -300,9 +327,18 @@ namespace StarryEyes.Filters.Parsing
             {
                 // in bracket
                 reader.AssertGet(TokenType.OpenBracket);
-                var ret = CompileL0(reader);
-                reader.AssertGet(TokenType.CloseBracket);
-                return new FilterBracket(ret);
+                if (reader.LookAhead().Type == TokenType.CloseBracket)
+                {
+                    // empty bracket
+                    reader.AssertGet(TokenType.CloseBracket);
+                    return new FilterBracket(null);
+                }
+                else
+                {
+                    var ret = CompileL0(reader);
+                    reader.AssertGet(TokenType.CloseBracket);
+                    return new FilterBracket(ret);
+                }
             }
             else
             {
@@ -529,7 +565,7 @@ namespace StarryEyes.Filters.Parsing
                 case "isRetweeted":
                 case "is_retweeted":
                     return new StatusIsRetweeted();
-                case"replyTo":
+                case "replyTo":
                 case "reply_to":
                 case "inReplyTo":
                 case "in_reply_to":

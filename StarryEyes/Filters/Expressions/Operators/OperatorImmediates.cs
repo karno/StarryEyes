@@ -37,32 +37,56 @@ namespace StarryEyes.Filters.Expressions.Operators
 
         public override IEnumerable<FilterExpressionType> SupportedTypes
         {
-            get { return _inner.SupportedTypes; }
+            get
+            {
+                if (_inner == null)
+                {
+                    // behave as "true" boolean value or empty set.
+                    return new[] { FilterExpressionType.Boolean, FilterExpressionType.Set };
+                }
+                else
+                {
+                    return _inner.SupportedTypes;
+                }
+            }
         }
 
         public override Func<TwitterStatus, bool> GetBooleanValueProvider()
         {
-            return _inner.GetBooleanValueProvider();
+            if (_inner == null)
+                return _ => true;
+            else
+                return _inner.GetBooleanValueProvider();
         }
 
         public override Func<TwitterStatus, long> GetNumericValueProvider()
         {
+            if (_inner == null)
+                throw new NotSupportedException();
             return _inner.GetNumericValueProvider();
         }
 
         public override Func<TwitterStatus, IReadOnlyCollection<long>> GetSetValueProvider()
         {
-            return _inner.GetSetValueProvider();
+            if (_inner == null)
+                return _ => new List<long>();
+            else
+                return _inner.GetSetValueProvider();
         }
 
         public override Func<TwitterStatus, string> GetStringValueProvider()
         {
+            if (_inner == null)
+                throw new NotSupportedException();
             return _inner.GetStringValueProvider();
         }
 
         public override string ToQuery()
         {
-            return "(" + _inner.ToQuery() + ")";
+            if (_inner == null)
+                return "()";
+            else
+                return "(" + _inner.ToQuery() + ")";
         }
     }
 }
