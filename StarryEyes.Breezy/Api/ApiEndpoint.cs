@@ -8,9 +8,15 @@ namespace StarryEyes.Breezy.Api
 {
     public static class ApiEndpoint
     {
-        public const int DEFAULT_TIMEOUT = 6000;
-
-        public const string USER_AGENT_STR = "StarryEyes.Breezy/Krile \"StarryEyes\" with ReactiveOAuth";
+        private static string _userAgent = "StarryEyes.Breezy with ReactiveOAuth";
+        /// <summary>
+        /// default user agent of connection.
+        /// </summary>
+        public static string UserAgent
+        {
+            get { return _userAgent; }
+            set { _userAgent = value; }
+        }
 
         public static readonly string EndpointApiV1a = "https://api.twitter.com/1.1/";
 
@@ -54,7 +60,7 @@ namespace StarryEyes.Breezy.Api
                 overrideConsumerSecret ?? DefaultConsumerSecret,
                 token)
             {
-                ApplyBeforeRequest = req => req.UserAgent = USER_AGENT_STR
+                ApplyBeforeRequest = req => req.UserAgent = UserAgent
             };
         }
 

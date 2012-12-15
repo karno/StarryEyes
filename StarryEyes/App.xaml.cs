@@ -91,6 +91,7 @@ namespace StarryEyes
             // Set CK/CS for accessing twitter.
             ApiEndpoint.DefaultConsumerKey = Setting.GlobalConsumerKey.Value ?? ConsumerKey;
             ApiEndpoint.DefaultConsumerSecret = Setting.GlobalConsumerSecret.Value ?? ConsumerSecret;
+            ApiEndpoint.UserAgent = Setting.UserAgent.Value;
 
             // Initialize core systems
             try

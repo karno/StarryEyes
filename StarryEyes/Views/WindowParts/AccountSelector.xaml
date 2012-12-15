@@ -204,18 +204,19 @@
                            Foreground="White"
                            Text="{Binding SelectionReason}" />
             </DockPanel>
-            <ItemsControl Grid.Row="1"
+            <ScrollViewer Grid.Row="1"
                           Margin="0,8,0,0"
                           HorizontalContentAlignment="Stretch"
-                          ItemTemplate="{DynamicResource SelectableAccountTemplate}"
-                          ItemsSource="{Binding Accounts}"
-                          ScrollViewer.CanContentScroll="True">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <StackPanel Orientation="Vertical" />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-            </ItemsControl>
+                          CanContentScroll="True"
+                          VerticalScrollBarVisibility="Auto">
+                <ItemsControl ItemTemplate="{DynamicResource SelectableAccountTemplate}" ItemsSource="{Binding Accounts}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Vertical" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+            </ScrollViewer>
         </Grid>
     </Grid>
 </UserControl>

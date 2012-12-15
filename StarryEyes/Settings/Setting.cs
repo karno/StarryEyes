@@ -176,6 +176,8 @@ namespace StarryEyes.Settings
 
         #region High-level configurations
 
+        public static readonly SettingItem<string> UserAgent = new SettingItem<string>("UserAgent", "Krile StarryEyes/Breezy TL with ReactiveOAuth");
+
         public static readonly SettingItemStruct<bool> LoadUnsafePlugins = new SettingItemStruct<bool>("LoadUnsafePlugins", false);
 
         public static readonly SettingItemStruct<bool> LoadPluginFromDevFolder = new SettingItemStruct<bool>("LoadPluginFromDevFolder", false);
