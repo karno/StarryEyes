@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using StarryEyes.Models.Backpanels.SystemEvents;
 
 namespace StarryEyes.Models.Hubs
 {
@@ -21,7 +22,9 @@ namespace StarryEyes.Models.Hubs
             var q = localQueue;
             localQueue = null;
             while (q.Count > 0)
+            {
                 PublishInformation(q.Dequeue());
+            }
         }
 
         private static Queue<AppInformation> localQueue = new Queue<AppInformation>();
@@ -31,12 +34,15 @@ namespace StarryEyes.Models.Hubs
         public static void PublishInformation(AppInformation information)
         {
             if (!isUiReady)
+            {
                 localQueue.Enqueue(information);
+            }
             else
             {
                 var handler = OnInformationPublished;
                 if (handler != null)
                     handler(information);
+                BackpanelModel.RegisterEvent(new OperationFailedEvent(information.Detail));
             }
         }
     }

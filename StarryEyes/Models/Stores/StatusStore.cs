@@ -76,12 +76,14 @@ namespace StarryEyes.Models.Stores
         {
             if (_isInShutdown) return;
             if (publish)
+            {
                 statusPublisher.OnNext(new StatusNotification()
                 {
                     IsAdded = true,
                     Status = status,
                     StatusId = status.Id
                 });
+            }
             store.Store(status);
             UserStore.Store(status.User);
         }

@@ -22,6 +22,8 @@ namespace StarryEyes.Models.Tab
         private Func<long?, int, IObservable<TwitterStatus>> _fetcher;
         private CompositeDisposable _disposable;
 
+        public event Action OnNewStatusArrived;
+
         public TimelineModel(Func<TwitterStatus, bool> evaluator,
             Func<long?, int, IObservable<TwitterStatus>> fetcher)
         {
@@ -59,6 +61,9 @@ namespace StarryEyes.Models.Tab
                     status);
                 if (_statusIdCache.Count > TimelineChunkCount + TimelineChunkCountBounce)
                     TrimTimeline();
+                var handler = OnNewStatusArrived;
+                if (handler != null)
+                    handler();
             }
         }
 

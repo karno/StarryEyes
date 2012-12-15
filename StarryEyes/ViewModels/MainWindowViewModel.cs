@@ -13,6 +13,7 @@ using StarryEyes.Models.Connections.UserDependencies;
 using StarryEyes.Models.Operations;
 using StarryEyes.Models.Stores;
 using StarryEyes.Models.Subsystems;
+using StarryEyes.Models.Tab;
 using StarryEyes.Settings;
 using StarryEyes.ViewModels.Dialogs;
 using StarryEyes.ViewModels.WindowParts;
@@ -79,10 +80,10 @@ namespace StarryEyes.ViewModels
             get { return _inputAreaViewModel; }
         }
 
-        private readonly MainAreaViewModel _mainTimelineViewModel;
-        public MainAreaViewModel MainTimelineViewModel
+        private readonly MainAreaViewModel _mainAreaViewModel;
+        public MainAreaViewModel MainAreaViewModel
         {
-            get { return _mainTimelineViewModel; }
+            get { return _mainAreaViewModel; }
         }
 
         public AccountSelectorViewModel InputAreaAccountSelectorViewModel
@@ -127,7 +128,7 @@ namespace StarryEyes.ViewModels
         {
             this.CompositeDisposable.Add(_backpanelViewModel = new BackpanelViewModel());
             this.CompositeDisposable.Add(_inputAreaViewModel = new InputAreaViewModel());
-            this.CompositeDisposable.Add(_mainTimelineViewModel = new MainAreaViewModel());
+            this.CompositeDisposable.Add(_mainAreaViewModel = new MainAreaViewModel());
             this.CompositeDisposable.Add(_globalAccountSelectorViewModel = new AccountSelectorViewModel());
             _backpanelViewModel.Initialize();
         }
@@ -190,6 +191,10 @@ namespace StarryEyes.ViewModels
                     typeof(AuthorizationWindow),
                     auth, TransitionMode.Modal, null));
             }
+            TabManager.CreateTab(new TabModel("hello", "from all where ()"));
+            TabManager.CreateTab(new TabModel("home", "from all where user -> *.following"));
+            TabManager.CreateTab(new TabModel("replies", "from all where to -> *"));
+            TabManager.CreateTab(new TabModel("Krile", "from all where source == \"Krile\""));
         }
 
         private TwitterStatus _recentReceived = null;

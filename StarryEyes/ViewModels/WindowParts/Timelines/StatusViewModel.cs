@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Livet;
-using StarryEyes.Models.Hubs;
-using StarryEyes.Breezy.DataModel;
-using StarryEyes.Settings;
-using StarryEyes.Models.Operations;
-using StarryEyes.Breezy.Authorize;
 using System.Reactive.Linq;
-using StarryEyes.Models.Stores;
-using System.Reactive;
+using Livet;
+using StarryEyes.Breezy.Authorize;
+using StarryEyes.Breezy.DataModel;
 using StarryEyes.Models;
-using StarryEyes.Models.Backpanels.PostEvents;
+using StarryEyes.Models.Backpanels.SystemEvents;
+using StarryEyes.Models.Hubs;
+using StarryEyes.Models.Operations;
+using StarryEyes.Models.Stores;
+using StarryEyes.Settings;
 
 namespace StarryEyes.ViewModels.WindowParts.Timelines
 {

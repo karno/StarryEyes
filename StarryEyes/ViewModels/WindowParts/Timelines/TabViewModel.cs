@@ -1,25 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.ComponentModel;
-
-using Livet;
-using Livet.Commands;
-using Livet.Messaging;
-using Livet.Messaging.IO;
-using Livet.EventListeners;
-using Livet.Messaging.Windows;
-
-using StarryEyes.Models;
-using StarryEyes.Models.Tab;
-using System.Reactive.Linq;
 using System.Reactive;
-using StarryEyes.Settings;
-using StarryEyes.Breezy.Api.Rest;
-using System.Collections.ObjectModel;
-using System.Reactive.Disposables;
-using StarryEyes.Breezy.DataModel;
+using System.Reactive.Linq;
+using Livet;
+using StarryEyes.Models.Tab;
 
 namespace StarryEyes.ViewModels.WindowParts.Timelines
 {
@@ -28,6 +12,8 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
     /// </summary>
     public class TabViewModel : ViewModel
     {
+        private ColumnViewModel _owner;
+
         private TabModel _model;
         public TabModel Model
         {
@@ -35,14 +21,36 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             set { _model = value; }
         }
 
-        public TabViewModel(TabModel tabModel)
+        public TabViewModel(ColumnViewModel owner, TabModel tabModel)
         {
+            this._owner = owner;
             this._model = tabModel;
+            if (tabModel.IsActivated)
+            {
+                Initialize();
+            }
+            else
+            {
+                this.IsLoading = true;
+                Observable.Start(() => tabModel.Activate())
+                    .SelectMany(_ => _)
+                    .ObserveOnDispatcher()
+                    .Subscribe(_ => { }, Initialize);
+            }
+        }
+
+        private void Initialize()
+        {
             this._readonlyTimeline = ViewModelHelper.CreateReadOnlyDispatcherCollection(
-                tabModel.Timeline.Statuses, _ => new StatusViewModel(this, _, _model.BindingAccountIds),
-                DispatcherHelper.UIDispatcher);
+                            Model.Timeline.Statuses, _ => new StatusViewModel(this, _, _model.BindingAccountIds),
+                            DispatcherHelper.UIDispatcher);
             this.CompositeDisposable.Add(_readonlyTimeline);
-            this.CompositeDisposable.Add(() => tabModel.Deactivate());
+            this.CompositeDisposable.Add(Observable.FromEvent(
+                _ => Model.Timeline.OnNewStatusArrived += _,
+                _ => Model.Timeline.OnNewStatusArrived -= _)
+                .Subscribe(_ => UnreadCount++));
+            this.CompositeDisposable.Add(() => Model.Deactivate());
+            this.IsLoading = false;
         }
 
         public string Name
@@ -55,10 +63,50 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             }
         }
 
-        private readonly ReadOnlyDispatcherCollection<StatusViewModel> _readonlyTimeline;
+        private bool _isSelected = false;
+        public bool IsSelected
+        {
+            get { return _isSelected; }
+            set
+            {
+                _isSelected = value;
+                if (value)
+                {
+                    UnreadCount = 0;
+                }
+                RaisePropertyChanged(() => IsSelected);
+            }
+        }
+
+        public void Select()
+        {
+            _owner.SetSelected(this.Model);
+        }
+
+        private ReadOnlyDispatcherCollection<StatusViewModel> _readonlyTimeline;
         public ReadOnlyDispatcherCollection<StatusViewModel> Timeline
         {
             get { return _readonlyTimeline; }
+        }
+
+        private int _unreadCount = 0;
+        public int UnreadCount
+        {
+            get { return _unreadCount; }
+            set
+            {
+                if (IsSelected)
+                    _unreadCount = 0;
+                else
+                    _unreadCount = value;
+                RaisePropertyChanged(() => UnreadCount);
+                RaisePropertyChanged(() => IsUnreadExisted);
+            }
+        }
+
+        public bool IsUnreadExisted
+        {
+            get { return UnreadCount > 0; }
         }
 
         private bool _isLoading = false;

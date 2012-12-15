@@ -23,6 +23,14 @@ namespace StarryEyes.Models.Tab
     /// </summary>
     public class TabModel
     {
+        public TabModel() { }
+
+        public TabModel(string name, string query)
+        {
+            this.Name = name;
+            this.FilterQueryString = query;
+        }
+
         /// <summary>
         /// Name of this tab.
         /// </summary>
@@ -50,23 +58,23 @@ namespace StarryEyes.Models.Tab
         public TimelineModel Timeline { get; private set; }
 
         private Func<TwitterStatus, bool> evaluator = _ => false;
-        private FilterQuery filterQuery = null;
+        private FilterQuery _filterQuery = null;
         /// <summary>
         /// Filter query info
         /// </summary>
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public FilterQuery FilterQuery
         {
-            get { return filterQuery; }
+            get { return _filterQuery; }
             set
             {
                 if (IsActivated)
                     throw new InvalidOperationException("タブ情報がアクティブな状態のままフィルタクエリの交換を行うことはできません。");
-                if (this.filterQuery != value)
+                if (this._filterQuery != value)
                 {
-                    filterQuery = value;
-                    if (filterQuery != null)
-                        evaluator = filterQuery.GetEvaluator();
+                    _filterQuery = value;
+                    if (_filterQuery != null)
+                        evaluator = _filterQuery.GetEvaluator();
                     else
                         evaluator = _ => false;
                 }
@@ -78,15 +86,16 @@ namespace StarryEyes.Models.Tab
         /// </summary>
         public string FilterQueryString
         {
-            get { return filterQuery.ToQuery(); }
+            get { return FilterQuery.ToQuery(); }
             set
             {
                 try
                 {
-                    filterQuery = QueryCompiler.Compile(value);
+                    FilterQuery = QueryCompiler.Compile(value);
                 }
                 catch (FilterQueryException fex)
                 {
+                    System.Diagnostics.Debug.WriteLine(fex);
                     AppInformationHub.PublishInformation(new AppInformation(AppInformationKind.Warning,
                         "TABINFO_QUERY_CORRUPTED_" + Name,
                         "クエリが壊れています。",
@@ -118,15 +127,13 @@ namespace StarryEyes.Models.Tab
                 {
                     if (!IsActivated)
                     {
-                        if (this.filterQuery != null)
-                            this.filterQuery.Activate();
                         if (this.Timeline != null)
                             this.Timeline.Dispose();
                         this.Timeline = new TimelineModel(evaluator, GetChunk);
-                        if (this.filterQuery != null)
+                        if (this.FilterQuery != null)
                         {
-                            this.filterQuery.Activate();
-                            this.filterQuery.OnInvalidateRequired += InvalidateCollection;
+                            this.FilterQuery.Activate();
+                            this.FilterQuery.OnInvalidateRequired += InvalidateCollection;
                         }
                     }
                     IsActivated = true;
@@ -144,10 +151,10 @@ namespace StarryEyes.Models.Tab
         {
             if (IsActivated)
             {
-                if (this.filterQuery != null)
+                if (this.FilterQuery != null)
                 {
-                    this.filterQuery.Deactivate();
-                    this.filterQuery.OnInvalidateRequired += InvalidateCollection;
+                    this.FilterQuery.Deactivate();
+                    this.FilterQuery.OnInvalidateRequired -= InvalidateCollection;
                 }
                 if (this.Timeline != null)
                 {
