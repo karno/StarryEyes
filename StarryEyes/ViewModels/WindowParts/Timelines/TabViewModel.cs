@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using Livet;
+using Livet.EventListeners;
+using StarryEyes.Breezy.DataModel;
 using StarryEyes.Models.Tab;
 
 namespace StarryEyes.ViewModels.WindowParts.Timelines
@@ -27,6 +31,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         public TabViewModel() { }
         public TabViewModel(ColumnViewModel owner, TabModel tabModel)
         {
+            this._timeline = new ObservableCollection<StatusViewModel>();
             this._owner = owner;
             this._model = tabModel;
             if (tabModel.IsActivated)
@@ -45,18 +50,52 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         private void Initialize()
         {
-            this._readonlyTimeline = ViewModelHelper.CreateReadOnlyDispatcherCollection(
-                            Model.Timeline.Statuses,
-                            _ => new StatusViewModel(this, _, _model.BindingAccountIds),
-                            DispatcherHelper.UIDispatcher);
-            this.CompositeDisposable.Add(_readonlyTimeline);
-            RaisePropertyChanged(() => Timeline);
+            DispatcherHelper.BeginInvoke(InitializeCollection);
             this.CompositeDisposable.Add(Observable.FromEvent(
                 _ => Model.Timeline.OnNewStatusArrived += _,
                 _ => Model.Timeline.OnNewStatusArrived -= _)
                 .Subscribe(_ => UnreadCount++));
             this.CompositeDisposable.Add(() => Model.Deactivate());
             this.IsLoading = false;
+        }
+
+        private void InitializeCollection()
+        {
+            var collection = Model.Timeline.Statuses.ToArray();
+            this.CompositeDisposable.Add(new CollectionChangedEventListener(Model.Timeline.Statuses,
+                (sender, e) => DispatcherHelper.BeginInvoke(() => ReflectCollectionChanged(e))));
+            collection
+                .Select(GenerateStatusViewModel)
+                .ForEach(_timeline.Add);
+        }
+
+        private void ReflectCollectionChanged(NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    this._timeline.Insert(e.NewStartingIndex, GenerateStatusViewModel((TwitterStatus)e.NewItems[0]));
+                    break;
+                case NotifyCollectionChangedAction.Move:
+                    this._timeline.Move(e.OldStartingIndex, e.NewStartingIndex);
+                    break;
+                case NotifyCollectionChangedAction.Remove:
+                    this.Timeline.RemoveAt(e.OldStartingIndex);
+                    break;
+                case NotifyCollectionChangedAction.Reset:
+                    var collection = Model.Timeline.Statuses.ToArray();
+                    collection
+                        .Select(GenerateStatusViewModel)
+                        .ForEach(_timeline.Add);
+                    break;
+                default:
+                    throw new ArgumentException();
+            }
+        }
+
+        private StatusViewModel GenerateStatusViewModel(TwitterStatus status)
+        {
+            return new StatusViewModel(this, status, Model.BindingAccountIds);
         }
 
         public string Name
@@ -89,10 +128,10 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             _owner.SetSelected(this.Model);
         }
 
-        private ReadOnlyDispatcherCollection<StatusViewModel> _readonlyTimeline;
-        public ReadOnlyDispatcherCollection<StatusViewModel> Timeline
+        private readonly ObservableCollection<StatusViewModel> _timeline;
+        public ObservableCollection<StatusViewModel> Timeline
         {
-            get { return _readonlyTimeline; }
+            get { return _timeline; }
         }
 
         private int _unreadCount = 0;

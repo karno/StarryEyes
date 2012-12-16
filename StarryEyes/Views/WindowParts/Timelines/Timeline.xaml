@@ -25,27 +25,103 @@
             <Utils:BooleanToVisibleConverter x:Key="BooleanToVisibleConverter" />
             <DataTemplate x:Key="StatusItemTemplate">
                 <DockPanel Margin="0,0,0,15">
+                    <VisualStateManager.VisualStateGroups>
+                        <VisualStateGroup x:Name="StatusSelection">
+                            <VisualState x:Name="Selected">
+                                <Storyboard>
+                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetName="checkBoxBorder" Storyboard.TargetProperty="(FrameworkElement.Width)">
+                                        <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="30">
+                                            <EasingDoubleKeyFrame.EasingFunction>
+                                                <CircleEase EasingMode="EaseOut" />
+                                            </EasingDoubleKeyFrame.EasingFunction>
+                                        </EasingDoubleKeyFrame>
+                                    </DoubleAnimationUsingKeyFrames>
+                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetName="pickerBorder" Storyboard.TargetProperty="(UIElement.Opacity)">
+                                        <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0">
+                                            <EasingDoubleKeyFrame.EasingFunction>
+                                                <CircleEase EasingMode="EaseIn" />
+                                            </EasingDoubleKeyFrame.EasingFunction>
+                                        </EasingDoubleKeyFrame>
+                                    </DoubleAnimationUsingKeyFrames>
+                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="checkBox" Storyboard.TargetProperty="(FrameworkElement.VerticalAlignment)">
+                                        <DiscreteObjectKeyFrame KeyTime="0:0:0.1" Value="{x:Static VerticalAlignment.Center}" />
+                                    </ObjectAnimationUsingKeyFrames>
+                                </Storyboard>
+                            </VisualState>
+                            <VisualState x:Name="NotSelected">
+                                <Storyboard>
+                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetName="checkBoxBorder" Storyboard.TargetProperty="(FrameworkElement.Width)">
+                                        <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0">
+                                            <EasingDoubleKeyFrame.EasingFunction>
+                                                <CircleEase EasingMode="EaseOut" />
+                                            </EasingDoubleKeyFrame.EasingFunction>
+                                        </EasingDoubleKeyFrame>
+                                    </DoubleAnimationUsingKeyFrames>
+                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetName="pickerBorder" Storyboard.TargetProperty="(UIElement.Opacity)">
+                                        <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="1">
+                                            <EasingDoubleKeyFrame.EasingFunction>
+                                                <CircleEase EasingMode="EaseOut" />
+                                            </EasingDoubleKeyFrame.EasingFunction>
+                                        </EasingDoubleKeyFrame>
+                                    </DoubleAnimationUsingKeyFrames>
+                                </Storyboard>
+                            </VisualState>
+                        </VisualStateGroup>
+                    </VisualStateManager.VisualStateGroups>
+                    <i:Interaction.Triggers>
+                        <ei:DataTrigger Binding="{Binding Parent.IsSelectedStatusExisted}" Value="True">
+                            <ei:GoToStateAction StateName="Selected" />
+                        </ei:DataTrigger>
+                        <ei:DataTrigger Binding="{Binding Parent.IsSelectedStatusExisted}" Value="False">
+                            <ei:GoToStateAction StateName="NotSelected" />
+                        </ei:DataTrigger>
+                    </i:Interaction.Triggers>
                     <Grid Width="Auto"
                           Height="Auto"
-                          Margin="0,6,0,0"
+                          Margin="0,4,0,0"
                           HorizontalAlignment="Stretch"
                           VerticalAlignment="Stretch"
                           DockPanel.Dock="Left">
-                        <i:Interaction.Triggers>
-                            <i:EventTrigger EventName="MouseLeftButtonDown">
-                                <ei:CallMethodAction MethodName="ToggleSelect" TargetObject="{Binding Mode=OneWay}" />
-                            </i:EventTrigger>
-                        </i:Interaction.Triggers>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="10" />
+                            <ColumnDefinition Width="30" />
+                        </Grid.ColumnDefinitions>
                         <Border Grid.RowSpan="1"
+                                Grid.Column="1"
+                                Grid.ColumnSpan="2"
                                 Width="40"
                                 Height="40"
-                                HorizontalAlignment="Left"
+                                HorizontalAlignment="Right"
                                 VerticalAlignment="Top"
                                 Background="#FFD8D8D8">
                             <Image Source="{Binding User.User.ProfileImageUri, Converter={StaticResource UriImageConverter}}" />
                         </Border>
-                        <Border Grid.Row="0"
+                        <Border x:Name="checkBoxBorder"
+                                Grid.ColumnSpan="1"
+                                Width="0"
+                                Margin="0"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                Background="#FDFFFFFF">
+                            <Viewbox Width="22"
+                                     Height="22"
+                                     Margin="4,0"
+                                     Stretch="Fill">
+                                <CheckBox x:Name="checkBox"
+                                          Width="16"
+                                          Height="16"
+                                          VerticalContentAlignment="Center"
+                                          Content=""
+                                          Focusable="False"
+                                          IsChecked="{Binding IsSelected}"
+                                          Padding="0" />
+                            </Viewbox>
+                        </Border>
+                        <Border x:Name="pickerBorder"
+                                Grid.Row="0"
                                 Grid.RowSpan="1"
+                                Grid.Column="1"
                                 Grid.ColumnSpan="1"
                                 Width="Auto"
                                 Height="Auto"
@@ -54,6 +130,22 @@
                                 Background="#331BA1E2"
                                 Visibility="{Binding IsSelected,
                                                      Converter={StaticResource BooleanToVisibleConverter}}" />
+                        <Border x:Name="clickerBorder"
+                                Grid.Row="0"
+                                Grid.RowSpan="1"
+                                Grid.Column="0"
+                                Grid.ColumnSpan="2"
+                                Width="Auto"
+                                Height="Auto"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch"
+                                Background="#00000000">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="MouseLeftButtonDown">
+                                    <ei:CallMethodAction MethodName="ToggleSelect" TargetObject="{Binding Mode=OneWay}" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </Border>
                     </Grid>
                     <StackPanel Grid.Column="1" Orientation="Vertical">
 
@@ -66,45 +158,45 @@
                                    VerticalAlignment="Stretch"
                                    LastChildFill="False">
                             <TextBlock Height="Auto"
-                                       Margin="8,0,4,0"
-                                       VerticalAlignment="Center"
-                                       FontSize="16"
+                                       Margin="8,-2,4,0"
+                                       VerticalAlignment="Bottom"
+                                       FontSize="18.667"
                                        Foreground="#FF1BA1E2"
                                        Text="{Binding User.ScreenName,
-                                                      FallbackValue=user,
+                                                      FallbackValue=USER,
                                                       Mode=OneWay}"
-                                       TextWrapping="Wrap" />
+                                       TextWrapping="NoWrap" />
                             <TextBlock Height="Auto"
-                                       Margin="0,2,0,0"
-                                       VerticalAlignment="Center"
+                                       Margin="0,0,0,2"
+                                       VerticalAlignment="Bottom"
                                        FontSize="10.667"
                                        Foreground="Gray"
                                        Text="{Binding User.User.Name,
                                                       FallbackValue=name}"
-                                       TextWrapping="Wrap" />
+                                       TextWrapping="NoWrap" />
                             <TextBlock Height="Auto"
-                                       Margin="0,2,8,0"
-                                       VerticalAlignment="Center"
+                                       Margin="0,0,8,2"
+                                       VerticalAlignment="Bottom"
                                        DockPanel.Dock="Right"
                                        FontSize="10.667"
                                        Foreground="Gray"
                                        Text="{Binding Status.CreatedAt,
                                                       FallbackValue=00:00:00,
                                                       StringFormat=HH:mm:ss}"
-                                       TextWrapping="Wrap" />
+                                       TextWrapping="NoWrap" />
                         </DockPanel>
                         <Border Grid.Row="1"
                                 Grid.Column="1"
                                 Height="Auto"
                                 HorizontalAlignment="Stretch"
                                 VerticalAlignment="Top">
-                            <DockPanel Margin="8,5,8,3"
+                            <DockPanel Margin="8,3"
                                        Background="#FF339933"
                                        Visibility="{Binding IsRetweet,
                                                             Converter={StaticResource BooleanToVisibleConverter},
                                                             Mode=OneWay}">
-                                <Path Width="6.77"
-                                      Height="8"
+                                <Path Width="11"
+                                      Height="13"
                                       Margin="4"
                                       Data="F1 M 24,18.9231C 25.4548,18.9231 26.7667,19.535 27.6923,20.5154L 27.6923,18L 29.0769,19.3846L 29.0769,23.0769L 25.3846,23.0769L 24,21.6923L 26.5801,21.6923C 25.9463,20.9841 25.0252,20.5385 24,20.5385C 22.2447,20.5385 20.7946,21.8449 20.569,23.5385L 18.9438,23.5385C 19.177,20.9508 21.3517,18.9231 24,18.9231 Z M 24,27.4615C 25.7553,27.4615 27.2054,26.1551 27.431,24.4615L 29.0562,24.4615C 28.823,27.0492 26.6483,29.0769 24,29.0769C 22.5452,29.0769 21.2333,28.465 20.3077,27.4846L 20.3077,30L 18.9231,28.6154L 18.9231,24.9231L 22.6154,24.9231L 24,26.3077L 21.4199,26.3077C 22.0537,27.0159 22.9748,27.4615 24,27.4615 Z "
                                       Fill="#FFFFFFFF"
@@ -115,13 +207,14 @@
                                            Foreground="White"
                                            Padding="0,0,4,0"
                                            Text="retweeted by"
-                                           TextWrapping="Wrap" />
+                                           TextWrapping="NoWrap" />
                                 <TextBlock HorizontalAlignment="Left"
                                            VerticalAlignment="Center"
                                            FontSize="10.667"
                                            Foreground="White"
-                                           Text="{Binding Retweeter.ScreenName, FallbackValue=user}"
-                                           TextWrapping="Wrap" />
+                                           Text="{Binding Retweeter.ScreenName,
+                                                          FallbackValue=user}"
+                                           TextWrapping="NoWrap" />
                             </DockPanel>
                         </Border>
                         <RichTextBox Grid.Row="2"
@@ -166,9 +259,134 @@
                     </StackPanel>
                 </DockPanel>
             </DataTemplate>
+            <Style x:Key="FocusVisual">
+                <Setter Property="Control.Template">
+                    <Setter.Value>
+                        <ControlTemplate>
+                            <Rectangle Margin="2"
+                                       SnapsToDevicePixels="true"
+                                       Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
+                                       StrokeDashArray="1 2"
+                                       StrokeThickness="1" />
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <SolidColorBrush x:Key="OptionMark.Static.Background" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="OptionMark.Static.Border" Color="#FF707070" />
+            <Style x:Key="OptionMarkFocusVisual">
+                <Setter Property="Control.Template">
+                    <Setter.Value>
+                        <ControlTemplate>
+                            <Rectangle Margin="14,0,0,0"
+                                       SnapsToDevicePixels="true"
+                                       Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
+                                       StrokeDashArray="1 2"
+                                       StrokeThickness="1" />
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <SolidColorBrush x:Key="OptionMark.MouseOver.Background" Color="#FFF3F9FF" />
+            <SolidColorBrush x:Key="OptionMark.MouseOver.Border" Color="#FF5593FF" />
+            <SolidColorBrush x:Key="OptionMark.MouseOver.Glyph" Color="#FF212121" />
+            <SolidColorBrush x:Key="OptionMark.Disabled.Background" Color="#FFE6E6E6" />
+            <SolidColorBrush x:Key="OptionMark.Disabled.Border" Color="#FFBCBCBC" />
+            <SolidColorBrush x:Key="OptionMark.Disabled.Glyph" Color="#FF707070" />
+            <SolidColorBrush x:Key="OptionMark.Pressed.Background" Color="#FFD9ECFF" />
+            <SolidColorBrush x:Key="OptionMark.Pressed.Border" Color="#FF3C77DD" />
+            <SolidColorBrush x:Key="OptionMark.Pressed.Glyph" Color="#FF212121" />
+            <SolidColorBrush x:Key="OptionMark.Static.Glyph" Color="#FF212121" />
+            <Style TargetType="{x:Type CheckBox}">
+                <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}" />
+                <Setter Property="Background" Value="{StaticResource OptionMark.Static.Background}" />
+                <Setter Property="BorderBrush" Value="{StaticResource OptionMark.Static.Border}" />
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type CheckBox}">
+                            <Grid x:Name="templateRoot"
+                                  Background="Transparent"
+                                  SnapsToDevicePixels="True">
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroup x:Name="CommonStates" />
+                                    <VisualStateGroup x:Name="FocusStates" />
+                                    <VisualStateGroup x:Name="CheckStates" />
+                                    <VisualStateGroup x:Name="ValidationStates" />
+                                </VisualStateManager.VisualStateGroups>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Border x:Name="checkBoxBorder"
+                                        Margin="1"
+                                        HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                        Background="{TemplateBinding Background}"
+                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                        BorderThickness="{TemplateBinding BorderThickness}">
+                                    <Grid x:Name="markGrid">
+                                        <Path x:Name="optionMark"
+                                              Margin="1"
+                                              Data="F1 M 9.97498,1.22334L 4.6983,9.09834L 4.52164,9.09834L 0,5.19331L 1.27664,3.52165L 4.255,6.08833L 8.33331,1.52588e-005L 9.97498,1.22334 Z "
+                                              Fill="{StaticResource OptionMark.Static.Glyph}"
+                                              Opacity="0"
+                                              Stretch="None" />
+                                        <Rectangle x:Name="indeterminateMark"
+                                                   Margin="2"
+                                                   Fill="{StaticResource OptionMark.Static.Glyph}"
+                                                   Opacity="0" />
+                                    </Grid>
+                                </Border>
+                                <ContentPresenter x:Name="contentPresenter"
+                                                  Grid.Column="1"
+                                                  Margin="{TemplateBinding Padding}"
+                                                  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                  Focusable="False"
+                                                  RecognizesAccessKey="True"
+                                                  SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                            </Grid>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="HasContent" Value="true">
+                                    <Setter Property="FocusVisualStyle" Value="{StaticResource OptionMarkFocusVisual}" />
+                                    <Setter Property="Padding" Value="4,-1,0,0" />
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="true">
+                                    <Setter TargetName="checkBoxBorder" Property="Background" Value="{StaticResource OptionMark.MouseOver.Background}" />
+                                    <Setter TargetName="checkBoxBorder" Property="BorderBrush" Value="{StaticResource OptionMark.MouseOver.Border}" />
+                                    <Setter TargetName="optionMark" Property="Fill" Value="{StaticResource OptionMark.MouseOver.Glyph}" />
+                                    <Setter TargetName="indeterminateMark" Property="Fill" Value="{StaticResource OptionMark.MouseOver.Glyph}" />
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="false">
+                                    <Setter TargetName="checkBoxBorder" Property="Background" Value="{StaticResource OptionMark.Disabled.Background}" />
+                                    <Setter TargetName="checkBoxBorder" Property="BorderBrush" Value="{StaticResource OptionMark.Disabled.Border}" />
+                                    <Setter TargetName="optionMark" Property="Fill" Value="{StaticResource OptionMark.Disabled.Glyph}" />
+                                    <Setter TargetName="indeterminateMark" Property="Fill" Value="{StaticResource OptionMark.Disabled.Glyph}" />
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="true">
+                                    <Setter TargetName="checkBoxBorder" Property="Background" Value="{StaticResource OptionMark.Pressed.Background}" />
+                                    <Setter TargetName="checkBoxBorder" Property="BorderBrush" Value="{StaticResource OptionMark.Pressed.Border}" />
+                                    <Setter TargetName="optionMark" Property="Fill" Value="{StaticResource OptionMark.Pressed.Glyph}" />
+                                    <Setter TargetName="indeterminateMark" Property="Fill" Value="{StaticResource OptionMark.Pressed.Glyph}" />
+                                </Trigger>
+                                <Trigger Property="IsChecked" Value="true">
+                                    <Setter TargetName="optionMark" Property="Opacity" Value="1" />
+                                    <Setter TargetName="indeterminateMark" Property="Opacity" Value="0" />
+                                </Trigger>
+                                <Trigger Property="IsChecked" Value="{x:Null}">
+                                    <Setter TargetName="optionMark" Property="Opacity" Value="0" />
+                                    <Setter TargetName="indeterminateMark" Property="Opacity" Value="1" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
         </ResourceDictionary>
     </UserControl.Resources>
-    <ItemsControl ItemTemplate="{DynamicResource StatusItemTemplate}"
+    <ItemsControl ItemTemplate="{StaticResource StatusItemTemplate}"
                   ItemsSource="{Binding Timeline}"
                   ScrollViewer.CanContentScroll="True"
                   VirtualizingPanel.IsVirtualizing="True"
