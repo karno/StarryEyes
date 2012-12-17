@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using Livet;
+using Livet.Commands;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Models;
@@ -11,6 +12,7 @@ using StarryEyes.Models.Hubs;
 using StarryEyes.Models.Operations;
 using StarryEyes.Models.Stores;
 using StarryEyes.Settings;
+using StarryEyes.Views.Helpers;
 
 namespace StarryEyes.ViewModels.WindowParts.Timelines
 {
@@ -390,6 +392,39 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             }
         }
 
+        #endregion
+
+        #region OpenLinkCommand
+        private ListenerCommand<string> _OpenLinkCommand;
+
+        public ListenerCommand<string> OpenLinkCommand
+        {
+            get
+            {
+                if (_OpenLinkCommand == null)
+                {
+                    _OpenLinkCommand = new ListenerCommand<string>(OpenLink);
+                }
+                return _OpenLinkCommand;
+            }
+        }
+
+        public void OpenLink(string parameter)
+        {
+            var param = RichTextBoxHelper.ResolveInternalUrl(parameter);
+            switch (param.Item1)
+            {
+                case LinkType.User:
+                    BrowserHelper.Open("http://twitter.com/" + param.Item2);
+                    break;
+                case LinkType.Hash:
+                    BrowserHelper.Open("http://twitter.com/search/?q=" + param.Item2);
+                    break;
+                case LinkType.Url:
+                    BrowserHelper.Open(param.Item2);
+                    break;
+            }
+        }
         #endregion
     }
 }

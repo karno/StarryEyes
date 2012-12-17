@@ -174,6 +174,12 @@ namespace StarryEyes.Settings
 
         #endregion
 
+        #region Notification and Confirmations
+
+        public static readonly SettingItemStruct<bool> ConfirmOnExitApp = new SettingItemStruct<bool>("ConfirmOnExitApp", true);
+
+        #endregion
+
         #region High-level configurations
 
         public static readonly SettingItem<string> UserAgent = new SettingItem<string>("UserAgent", "Krile StarryEyes/Breezy TL with ReactiveOAuth");

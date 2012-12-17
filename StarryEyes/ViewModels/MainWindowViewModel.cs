@@ -6,6 +6,7 @@ using System.Reactive.Linq;
 using Livet;
 using Livet.Commands;
 using Livet.Messaging;
+using Livet.Messaging.Windows;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Filters.Parsing;
 using StarryEyes.Models;
@@ -197,204 +198,29 @@ namespace StarryEyes.ViewModels
             TabManager.CreateTab(new TabModel("Krile", "from all where source == \"Krile\""));
         }
 
-        private TwitterStatus _recentReceived = null;
-        public TwitterStatus RecentReceived
+        public bool OnClosing()
         {
-            get { return _recentReceived; }
-            set
+            if (Setting.ConfirmOnExitApp.Value)
             {
-                _recentReceived = value;
-                RaisePropertyChanged(() => RecentReceived);
-            }
-        }
-
-        #region OpenLinkCommand
-        private ListenerCommand<string> _OpenLinkCommand;
-
-        public ListenerCommand<string> OpenLinkCommand
-        {
-            get
-            {
-                if (_OpenLinkCommand == null)
-                {
-                    _OpenLinkCommand = new ListenerCommand<string>(OpenLink);
-                }
-                return _OpenLinkCommand;
-            }
-        }
-
-        public void OpenLink(string parameter)
-        {
-            var param = RichTextBoxHelper.ResolveInternalUrl(parameter);
-            switch (param.Item1)
-            {
-                case LinkType.User:
-                    BrowserHelper.Open("http://twitter.com/" + param.Item2);
-                    break;
-                case LinkType.Hash:
-                    BrowserHelper.Open("http://twitter.com/search/?q=" + param.Item2);
-                    break;
-                case LinkType.Url:
-                    BrowserHelper.Open(param.Item2);
-                    break;
-            }
-        }
-        #endregion
-
-        private string _query;
-        public string Query
-        {
-            get { return _query; }
-            set
-            {
-                _query = value;
-                RaisePropertyChanged(() => Query);
-            }
-        }
-
-        private string _queryResult;
-        public string QueryResult
-        {
-            get { return _queryResult; }
-            set
-            {
-                _queryResult = value;
-                RaisePropertyChanged(() => QueryResult);
-            }
-        }
-
-        #region ExecuteFilterCommand
-        private ViewModelCommand _ExecuteFilterCommand;
-
-        public ViewModelCommand ExecuteFilterCommand
-        {
-            get
-            {
-                if (_ExecuteFilterCommand == null)
-                {
-                    _ExecuteFilterCommand = new ViewModelCommand(ExecuteFilter);
-                }
-                return _ExecuteFilterCommand;
-            }
-        }
-
-        public void ExecuteFilter()
-        {
-            QueryResult = "querying...";
-            var sw = new Stopwatch();
-            int _count = 0;
-            try
-            {
-                var filter = QueryCompiler.Compile(_query);
-                var func = filter.GetEvaluator();
-                System.Diagnostics.Debug.WriteLine(filter.ToQuery());
-                List<TwitterStatus> result = new List<TwitterStatus>();
-                sw.Start();
-                StatusStore.Find(func)
-                    .Subscribe(_ =>
+                var ret = this.Messenger.GetResponse(
+                    new TaskDialogMessage(new TaskDialogInterop.TaskDialogOptions()
                     {
-                        _count++;
-                        result.Add(_);
-                    },
-                    () =>
-                    {
-                        sw.Stop();
-                        QueryResult = "Completed! (" + sw.Elapsed.TotalSeconds.ToString("0.00") + " sec, " + _count + " records hot.)";
-                        result.OrderBy(_ => _.CreatedAt).ForEach(_ => System.Diagnostics.Debug.WriteLine(_));
-                    });
-            }
-            catch (Exception ex)
-            {
-                QueryResult = ex.ToString();
-            }
-        }
-        #endregion
-
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-        }
-
-        private string _postText = "";
-        public string PostText
-        {
-            get { return _postText; }
-            set
-            {
-                _postText = value;
-                RaisePropertyChanged(() => PostText);
-                RaisePropertyChanged(() => PostTextLength);
-                if (IsAutoEscapeEnabled)
-                    AutoEscape();
-            }
-        }
-
-        private void AutoEscape()
-        {
-            var newText = StarryEyes.Models.StatusTextUtil.AutoEscape(PostText);
-            if (newText != PostText)
-                PostText = newText;
-        }
-
-        public int PostTextLength
-        {
-            get { return StarryEyes.Models.StatusTextUtil.CountText(PostText); }
-        }
-
-        private bool _isAutoEscapeEnabled = false;
-        public bool IsAutoEscapeEnabled
-        {
-            get { return _isAutoEscapeEnabled; }
-            set
-            {
-                _isAutoEscapeEnabled = value;
-                RaisePropertyChanged(() => IsAutoEscapeEnabled);
-                if (value)
-                    AutoEscape();
-            }
-        }
-
-        #region PostCommand
-        private ViewModelCommand _PostCommand;
-
-        public ViewModelCommand PostCommand
-        {
-            get
-            {
-                if (_PostCommand == null)
+                        Title = "Krileの終了",
+                        MainIcon = TaskDialogInterop.VistaTaskDialogIcon.Warning,
+                        MainInstruction = "Krileを終了してもよろしいですか？",
+                        VerificationText = "次回から確認せずに終了",
+                        CommonButtons = TaskDialogInterop.TaskDialogCommonButtons.OKCancel,
+                    }));
+                if (ret.Response.VerificationChecked.GetValueOrDefault())
                 {
-                    _PostCommand = new ViewModelCommand(Post);
+                    Setting.ConfirmOnExitApp.Value = false;
                 }
-                return _PostCommand;
-            }
-        }
-
-        public void Post()
-        {
-            var tweetop = new TweetOperation();
-            tweetop.Status = PostText;
-            PostText = String.Empty;
-            tweetop.AuthInfo = AccountsStore.Accounts.First().AuthenticateInfo;
-            tweetop.Run()
-                .Finally(() => System.Diagnostics.Debug.WriteLine("finally called."))
-                .Subscribe(_ => this.Messenger.Raise(new TaskDialogMessage(
-                new TaskDialogInterop.TaskDialogOptions()
+                if (ret.Response.Result == TaskDialogInterop.TaskDialogSimpleResult.Cancel)
                 {
-                    Title = "Tweeted!",
-                    MainInstruction = "Tweeted successfully.",
-                    ExpandedInfo = _.ToString(),
-                    CommonButtons = TaskDialogInterop.TaskDialogCommonButtons.Close
-                })),
-                ex => this.Messenger.Raise(new TaskDialogMessage(
-                    new TaskDialogInterop.TaskDialogOptions()
-                    {
-                        Title = "Tweet Failed",
-                        MainInstruction = "Tweet is failed: " + ex.Message,
-                        ExpandedInfo = ex.ToString(),
-                        CommonButtons = TaskDialogInterop.TaskDialogCommonButtons.Close
-                    })));
+                    return false;
+                }
+            }
+            return true;
         }
-        #endregion
-
     }
 }

@@ -1,4 +1,5 @@
 ﻿using MahApps.Metro.Controls;
+using StarryEyes.ViewModels;
 
 namespace StarryEyes.Views
 {
@@ -10,6 +11,15 @@ namespace StarryEyes.Views
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void OnClosing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            var viewModel = this.DataContext as MainWindowViewModel;
+            if (viewModel != null && !viewModel.OnClosing())
+            {
+                e.Cancel = true;
+            }
         }
     }
 }

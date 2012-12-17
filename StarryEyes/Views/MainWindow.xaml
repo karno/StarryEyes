@@ -17,6 +17,7 @@
                       Width="525"
                       Height="350"
                       Background="White"
+                      Closing="OnClosing"
                       mc:Ignorable="d">
     <Controls:MetroWindow.Resources>
         <ResourceDictionary>
