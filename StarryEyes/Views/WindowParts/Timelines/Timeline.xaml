@@ -42,7 +42,7 @@
                             <VisualState x:Name="Selected">
                                 <Storyboard>
                                     <DoubleAnimationUsingKeyFrames Storyboard.TargetName="checkBoxBorder" Storyboard.TargetProperty="(FrameworkElement.Width)">
-                                        <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="30">
+                                        <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="20">
                                             <EasingDoubleKeyFrame.EasingFunction>
                                                 <CircleEase EasingMode="EaseOut" />
                                             </EasingDoubleKeyFrame.EasingFunction>
@@ -162,7 +162,7 @@
                                     Background="{x:Null}">
                                 <Viewbox Width="18"
                                          Height="18"
-                                         Margin="4,0"
+                                         Margin="-2,0,4,0"
                                          Stretch="Fill">
                                     <CheckBox x:Name="checkBox"
                                               Width="16"
@@ -185,8 +185,7 @@
                                     VerticalAlignment="Stretch"
                                     Background="#FF1BA1E2"
                                     Visibility="{Binding IsSelected,
-                                                         Converter={StaticResource BooleanToVisibleConverter}}"
-                                    d:IsHidden="True" />
+                                                         Converter={StaticResource BooleanToVisibleConverter}}" Margin="-8,-9,0,-9" />
                             <Border x:Name="clickerBorder"
                                     Grid.Row="0"
                                     Grid.RowSpan="1"
@@ -196,7 +195,7 @@
                                     Height="Auto"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Stretch"
-                                    Background="#00000000">
+                                    Background="#00000000" Margin="-8,-9,0,-9">
                                 <i:Interaction.Triggers>
                                     <i:EventTrigger EventName="MouseLeftButtonDown">
                                         <ei:CallMethodAction MethodName="ToggleSelect" TargetObject="{Binding Mode=OneWay}" />
@@ -349,18 +348,18 @@
                 </Border>
                 <DataTemplate.Triggers>
                     <DataTrigger Binding="{Binding IsMyself}" Value="True">
-                        <Setter TargetName="MainBorder" Property="Background" Value="#161BA1E2" />
+                        <Setter TargetName="MainBorder" Property="Background" Value="#201BA1E2" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding IsDirectMessage}" Value="True">
-                        <Setter TargetName="MainBorder" Property="Background" Value="#16A20025" />
+                        <Setter TargetName="MainBorder" Property="Background" Value="#20A20025" />
                         <Setter TargetName="ScreenNameText" Property="Foreground" Value="#FFA20025" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding IsInReplyToMe}" Value="True">
-                        <Setter TargetName="MainBorder" Property="Background" Value="#16F0A30A" />
+                        <Setter TargetName="MainBorder" Property="Background" Value="#20F0A30A" />
                         <Setter TargetName="ScreenNameText" Property="Foreground" Value="#FFFA6800" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding IsRetweet}" Value="True">
-                        <Setter TargetName="MainBorder" Property="Background" Value="#16008A00" />
+                        <Setter TargetName="MainBorder" Property="Background" Value="#20008A00" />
                         <Setter TargetName="ScreenNameText" Property="Foreground" Value="#FF008A00" />
                     </DataTrigger>
                 </DataTemplate.Triggers>
