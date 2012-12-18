@@ -7,6 +7,7 @@ using Livet;
 using Livet.Commands;
 using Livet.Messaging.Windows;
 using StarryEyes.Breezy.Authorize;
+using StarryEyes.Settings;
 using StarryEyes.Views.Messaging;
 
 namespace StarryEyes.ViewModels.Dialogs
@@ -33,7 +34,8 @@ namespace StarryEyes.ViewModels.Dialogs
 
         public void Initialize()
         {
-            authorizer = new OAuthAuthorizer(App.ConsumerKey, App.ConsumerSecret);
+            authorizer = new OAuthAuthorizer(Setting.GlobalConsumerKey.Value ?? App.ConsumerKey,
+                Setting.GlobalConsumerSecret.Value ?? App.ConsumerSecret);
             CurrentAuthenticationStep = AuthenticationStep.RequestingToken;
             Observable.Defer(() => authorizer.GetRequestToken(RequestTokenEndpoint))
                 .Retry(3, TimeSpan.FromSeconds(3)) // twitter sometimes returns an error without any troubles.
