@@ -6,6 +6,7 @@ using Livet;
 using Livet.Commands;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
+using StarryEyes.Filters;
 using StarryEyes.Models;
 using StarryEyes.Models.Backpanels.SystemEvents;
 using StarryEyes.Models.Hubs;
@@ -185,6 +186,15 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             }
         }
 
+        public bool IsInReplyToMe
+        {
+            get
+            {
+                return FilterSystemUtil.InReplyToUsers(this.Status)
+                    .Any(AccountsStore.AccountIds.Contains);
+            }
+        }
+
         private bool _isSelected;
         public bool IsSelected
         {
@@ -198,6 +208,42 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                     Parent.OnSelectionUpdated();
                 }
             }
+        }
+
+        public bool IsSourceVisible
+        {
+            get { return Status.StatusType != StatusType.DirectMessage; }
+        }
+
+        public bool IsSourceIsLink
+        {
+            get { return Status.Source.Contains("<a href"); }
+        }
+
+        public string SourceText
+        {
+            get
+            {
+                if (IsSourceIsLink)
+                {
+                    var start = Status.Source.IndexOf(">");
+                    var end = Status.Source.IndexOf("<", start + 1);
+                    return Status.Source.Substring(start + 1, end - start - 1);
+                }
+                else
+                {
+                    return Status.Source;
+                }
+            }
+        }
+
+        public void OpenSourceLink()
+        {
+            if (!IsSourceIsLink) return;
+            var start = Status.Source.IndexOf("\"");
+            var end = Status.Source.IndexOf("\"", start + 1);
+            var url = Status.Source.Substring(start + 1, end - start - 1);
+            BrowserHelper.Open(url);
         }
 
         #region Execution commands

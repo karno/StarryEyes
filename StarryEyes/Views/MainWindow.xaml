@@ -79,7 +79,9 @@
                 <RowDefinition Height="13*" />
             </Grid.RowDefinitions>
             <WindowParts:InputArea Margin="3,4" DataContext="{Binding InputAreaViewModel}" />
-            <WindowParts:MainArea Grid.Row="1" DataContext="{Binding MainAreaViewModel}" />
+            <WindowParts:MainArea Grid.Row="1"
+                                  Margin="-8,0,0,0"
+                                  DataContext="{Binding MainAreaViewModel}" />
         </Grid>
         <Grid Grid.Row="1">
             <TextBlock Margin="8"

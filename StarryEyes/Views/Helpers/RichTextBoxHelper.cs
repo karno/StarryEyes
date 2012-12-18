@@ -9,6 +9,8 @@ using System.Windows.Input;
 using StarryEyes.Breezy.DataModel;
 using System.Windows.Controls;
 using StarryEyes.Models;
+using System.Windows.Media;
+using Livet.Commands;
 
 namespace StarryEyes.Views.Helpers
 {
@@ -184,10 +186,15 @@ namespace StarryEyes.Views.Helpers
         private static Inline GenerateLink(DependencyObject obj, string surface, string linkUrl)
         {
             var hl = new Hyperlink();
+            hl.Foreground = Brushes.Gray;
             hl.Inlines.Add(XmlParser.ResolveEntity(surface));
-            hl.Command = GetLinkNavigationCommand(obj);
+            hl.Command = new ListenerCommand<string>(link =>
+            {
+                var command = GetLinkNavigationCommand(obj);
+                if (command != null)
+                    command.Execute(link);
+            });
             hl.CommandParameter = linkUrl;
-            // hl.NavigateUri = new Uri(linkUrl);
             return hl;
         }
 

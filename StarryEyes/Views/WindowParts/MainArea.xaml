@@ -15,7 +15,7 @@
         <Utils:BooleanToInvisibleConverter x:Key="BooleanToInvisibleConverter" />
         <Utils:BooleanToVisibleConverter x:Key="BooleanToVisibleConverter" />
         <DataTemplate x:Key="TabHeaderTemplate">
-            <StackPanel Margin="0,0,8,0" Orientation="Horizontal">
+            <StackPanel Margin="0,8,8,4" Orientation="Horizontal">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="MouseLeftButtonDown">
                         <ei:CallMethodAction MethodName="Select" TargetObject="{Binding}" />
@@ -51,12 +51,13 @@
             </DataTemplate.Triggers>
         </DataTemplate>
         <DataTemplate x:Key="ColumnTemplate">
-            <Grid Margin="8" Background="{x:Null}">
+            <Grid Margin="8,8,8,0" Background="{x:Null}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition />
                 </Grid.RowDefinitions>
-                <ItemsControl Background="White"
+                <ItemsControl Margin="8,0"
+                              Background="White"
                               ItemTemplate="{StaticResource TabHeaderTemplate}"
                               ItemsSource="{Binding Tabs}">
                     <ItemsControl.ContextMenu>
@@ -72,8 +73,9 @@
                     </ItemsControl.ItemsPanel>
                 </ItemsControl>
                 <ItemsControl Grid.Row="1"
+                              Margin="0,4,0,0"
                               Background="White"
-                              ItemsSource="{Binding Tabs}" Margin="0,4,0,0">
+                              ItemsSource="{Binding Tabs}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <Grid />
