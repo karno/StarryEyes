@@ -34,11 +34,13 @@ namespace StarryEyes.Views.Behaviors
         private double _previousHeight;
         private void UpdateScrollHeight(double value)
         {
-            if (value > _previousHeight && IsScrollLockEnabled)
-            {
-                SetScroll(value - _previousHeight);
-            }
+            double p = value - _previousHeight;
             _previousHeight = value;
+            if (p > 0 && IsScrollLockEnabled)
+            {
+                this.AssociatedObject.ScrollToVerticalOffset(
+                    this.AssociatedObject.VerticalOffset + p);
+            }
         }
 
         protected override void OnDetaching()
@@ -46,30 +48,5 @@ namespace StarryEyes.Views.Behaviors
             _disposables.Dispose();
         }
 
-        private object _syncLock = new object();
-        private double _scrollWaitCount = 0;
-        private void SetScroll(double distance)
-        {
-            double _remain = 0;
-            lock (_syncLock)
-            {
-                _scrollWaitCount += distance;
-                _remain = _scrollWaitCount;
-            }
-            if (_remain == distance)
-                SetScrollSynchronized();
-        }
-
-        private void SetScrollSynchronized()
-        {
-            double value;
-            lock (_syncLock)
-            {
-                value = _scrollWaitCount;
-                _scrollWaitCount = 0;
-            }
-            this.AssociatedObject.ScrollToVerticalOffset(
-                this.AssociatedObject.VerticalOffset + value);
-        }
     }
 }
