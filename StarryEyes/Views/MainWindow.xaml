@@ -84,9 +84,27 @@
                                   DataContext="{Binding MainAreaViewModel}" />
         </Grid>
         <Grid Grid.Row="1">
-            <TextBlock Margin="8"
-                       Text="完了"
-                       ToolTip="ここをクリックすると、バックパネルを開くことができます。" />
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Margin="8"
+                           Text="{Binding StateString}"
+                           ToolTip="ここをクリックすると、バックパネルを開くことができます。" />
+                <TextBlock Grid.Column="1"
+                           Margin="8"
+                           Text="{Binding GrossTweetCount}" />
+                <TextBlock Grid.Column="2"
+                           Margin="8"
+                           Text="{Binding TweetsPerMinutes,
+                                          StringFormat={}{0}tpm}" />
+                <TextBlock Grid.Column="3"
+                           Margin="8"
+                           Text="{Binding StartupTime}" />
+            </Grid>
             <Border Visibility="{Binding BackpanelViewModel.IsCurrentEventAvailable, Converter={StaticResource BooleanToVisibleConverter}, Mode=OneWay}">
                 <Border.Background>
                     <SolidColorBrush Color="{Binding BackpanelViewModel.CurrentEvent.Background, Mode=OneWay}" />

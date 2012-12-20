@@ -135,10 +135,10 @@
                     <ei:CallMethodAction MethodName="OpenInput" TargetObject="{Binding Mode=OneWay}" />
                 </i:EventTrigger>
             </i:Interaction.Triggers>
-            <Border BorderThickness="1" Cursor="IBeam">
-                <Border.BorderBrush>
-                    <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlDarkDarkColorKey}}" />
-                </Border.BorderBrush>
+            <Border Background="White"
+                    BorderBrush="Gray"
+                    BorderThickness="1"
+                    Cursor="IBeam">
                 <Grid Margin="4" VerticalAlignment="Center">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition />
@@ -184,10 +184,9 @@
               Margin="4,0"
               Visibility="{Binding IsOpening,
                                    Converter={StaticResource BooleanToVisibleConverter}}">
-            <Border Background="White" BorderThickness="1">
-                <Border.BorderBrush>
-                    <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlDarkDarkColorKey}}" />
-                </Border.BorderBrush>
+            <Border Background="White"
+                    BorderBrush="Gray"
+                    BorderThickness="1">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition />

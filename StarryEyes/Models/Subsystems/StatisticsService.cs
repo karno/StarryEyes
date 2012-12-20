@@ -20,6 +20,7 @@ namespace StarryEyes.Models.Subsystems
                         Monitor.Pulse(statisticsWorkProcSync);
                     }
                 });
+            estimatedGrossTweetCount = StatusStore.Count;
             App.OnApplicationFinalize += StopThread;
             workThread = new Thread(UpdateStatisticWorkProc);
             workThread.Start();
@@ -37,11 +38,6 @@ namespace StarryEyes.Models.Subsystems
                 isThreadAlive = false;
                 Monitor.Pulse(statisticsWorkProcSync);
             }
-        }
-
-        private static void UpdateStatistics()
-        {
-            estimatedGrossTweetCount = StatusStore.Count;
         }
 
         /// <summary>
@@ -67,8 +63,9 @@ namespace StarryEyes.Models.Subsystems
                 {
                     // current period of tweets per seconds
                     var cptps = (estimatedGrossTweetCount - previousGross) / duration;
-                    // smoothing: 99.2:0.8
-                    tweetsPerSeconds = (tweetsPerSeconds * 0.992) + (cptps * 0.008);
+                    // smoothing: 59:1
+                    // -> 
+                    tweetsPerSeconds = (tweetsPerSeconds * 59 + cptps) / 60;
                 }
                 var handler = OnStatisticsParamsUpdated;
                 if (handler != null)

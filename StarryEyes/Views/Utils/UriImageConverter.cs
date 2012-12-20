@@ -19,6 +19,7 @@ namespace StarryEyes.Views.Utils
             }
             catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine("Image resolve failed: " + ex.Message);
                 return null;
             }
         }

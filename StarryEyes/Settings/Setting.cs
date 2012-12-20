@@ -126,21 +126,29 @@ namespace StarryEyes.Settings
 
         #region Timeline display and action
 
-        public static FilterSettingItem Muteds = new FilterSettingItem("Muteds");
+        public static readonly FilterSettingItem Muteds = new FilterSettingItem("Muteds");
 
-        public static readonly SettingItemStruct<bool> AllowFavoriteMyself = new SettingItemStruct<bool>("AllowFavoriteMyself", false);
+        public static readonly SettingItemStruct<bool> AllowFavoriteMyself =
+            new SettingItemStruct<bool>("AllowFavoriteMyself", false);
+
+        public static readonly SettingItemStruct<ScrollLockStrategy> ScrollLockStrategy =
+            new SettingItemStruct<ScrollLockStrategy>("ScrollLockStrategy", Settings.ScrollLockStrategy.WhenScrolled);
 
         #endregion
 
         #region Input control
 
-        public static readonly SettingItemStruct<bool> IsUrlAutoEscapeEnabled = new SettingItemStruct<bool>("IsUrlAutoEscapeEnabled", false);
+        public static readonly SettingItemStruct<bool> IsUrlAutoEscapeEnabled =
+            new SettingItemStruct<bool>("IsUrlAutoEscapeEnabled", false);
 
-        public static readonly SettingItemStruct<bool> IsWarnAmendTweet = new SettingItemStruct<bool>("IsWarnAmendTweet", true);
+        public static readonly SettingItemStruct<bool> IsWarnAmendTweet =
+            new SettingItemStruct<bool>("IsWarnAmendTweet", true);
 
-        public static readonly SettingItemStruct<bool> IsWarnReplyFromThirdAccount = new SettingItemStruct<bool>("IsWarnReplyFromThirdAccount", true);
+        public static readonly SettingItemStruct<bool> IsWarnReplyFromThirdAccount =
+            new SettingItemStruct<bool>("IsWarnReplyFromThirdAccount", true);
 
-        public static readonly SettingItemStruct<TweetBoxClosingAction> TweetBoxClosingAction = new SettingItemStruct<TweetBoxClosingAction>("TweetBoxClosingAction", Settings.TweetBoxClosingAction.Confirm);
+        public static readonly SettingItemStruct<TweetBoxClosingAction> TweetBoxClosingAction =
+            new SettingItemStruct<TweetBoxClosingAction>("TweetBoxClosingAction", Settings.TweetBoxClosingAction.Confirm);
 
         #endregion
 
@@ -176,37 +184,49 @@ namespace StarryEyes.Settings
 
         #region Notification and Confirmations
 
-        public static readonly SettingItemStruct<bool> ConfirmOnExitApp = new SettingItemStruct<bool>("ConfirmOnExitApp", true);
+        public static readonly SettingItemStruct<bool> ConfirmOnExitApp =
+            new SettingItemStruct<bool>("ConfirmOnExitApp", true);
 
         #endregion
 
         #region High-level configurations
 
-        public static readonly SettingItem<string> UserAgent = new SettingItem<string>("UserAgent", "Krile StarryEyes/Breezy TL with ReactiveOAuth");
+        public static readonly SettingItem<string> UserAgent =
+            new SettingItem<string>("UserAgent", "Krile StarryEyes/Breezy TL with ReactiveOAuth");
 
-        public static readonly SettingItemStruct<bool> LoadUnsafePlugins = new SettingItemStruct<bool>("LoadUnsafePlugins", false);
+        public static readonly SettingItemStruct<bool> LoadUnsafePlugins =
+            new SettingItemStruct<bool>("LoadUnsafePlugins", false);
 
-        public static readonly SettingItemStruct<bool> LoadPluginFromDevFolder = new SettingItemStruct<bool>("LoadPluginFromDevFolder", false);
+        public static readonly SettingItemStruct<bool> LoadPluginFromDevFolder =
+            new SettingItemStruct<bool>("LoadPluginFromDevFolder", false);
 
-        public static readonly SettingItemStruct<bool> ApplyMuteToRetweetOriginals = new SettingItemStruct<bool>("ApplyMuteToRetweetOriginals", true);
+        public static readonly SettingItemStruct<bool> ApplyMuteToRetweetOriginals =
+            new SettingItemStruct<bool>("ApplyMuteToRetweetOriginals", true);
 
-        public static readonly SettingItemStruct<int> EventDispatchMinimumMSec = new SettingItemStruct<int>("EventDispatchMinimumMSec", 200);
+        public static readonly SettingItemStruct<int> EventDispatchMinimumMSec =
+            new SettingItemStruct<int>("EventDispatchMinimumMSec", 200);
 
-        public static readonly SettingItemStruct<int> EventDispatchMaximumMSec = new SettingItemStruct<int>("EventDispatchMaximumMSec", 3000);
+        public static readonly SettingItemStruct<int> EventDispatchMaximumMSec =
+            new SettingItemStruct<int>("EventDispatchMaximumMSec", 3000);
 
-        public static readonly SettingItemStruct<int> UserInfoReceivePeriod = new SettingItemStruct<int>("UserInfoReceivePeriod", 600);
+        public static readonly SettingItemStruct<int> UserInfoReceivePeriod =
+            new SettingItemStruct<int>("UserInfoReceivePeriod", 600);
 
-        public static readonly SettingItemStruct<int> RESTReceivePeriod = new SettingItemStruct<int>("RESTReceivePeriod", 90);
+        public static readonly SettingItemStruct<int> RESTReceivePeriod =
+            new SettingItemStruct<int>("RESTReceivePeriod", 90);
 
-        public static readonly SettingItemStruct<int> PostWindowTimeSec = new SettingItemStruct<int>("PostWindowTimeSec", 10800);
+        public static readonly SettingItemStruct<int> PostWindowTimeSec =
+            new SettingItemStruct<int>("PostWindowTimeSec", 10800);
 
-        public static readonly SettingItemStruct<int> PostLimitPerWindow = new SettingItemStruct<int>("PostLimitPerWindow", 128);
+        public static readonly SettingItemStruct<int> PostLimitPerWindow =
+            new SettingItemStruct<int>("PostLimitPerWindow", 128);
 
         #endregion
 
         #region Krile internal state
 
-        public static readonly SettingItem<string> LastImageOpenDir = new SettingItem<string>("LastImageOpenDir", Environment.GetFolderPath(Environment.SpecialFolder.MyPictures));
+        public static readonly SettingItem<string> LastImageOpenDir =
+            new SettingItem<string>("LastImageOpenDir", Environment.GetFolderPath(Environment.SpecialFolder.MyPictures));
 
         #endregion
 
@@ -365,6 +385,30 @@ namespace StarryEyes.Settings
         }
 
         #endregion
+    }
+
+    public enum ScrollLockStrategy
+    {
+        /// <summary>
+        /// Always unlock
+        /// </summary>
+        None,
+        /// <summary>
+        /// Always scroll locked
+        /// </summary>
+        Always,
+        /// <summary>
+        /// Change lock/unlock explicitly
+        /// </summary>
+        Explicit,
+        /// <summary>
+        /// If scrolled (scroll offset != 0)
+        /// </summary>
+        WhenScrolled,
+        /// <summary>
+        /// When mouse over
+        /// </summary>
+        WhenMouseOver,
     }
 
     public enum TweetBoxClosingAction

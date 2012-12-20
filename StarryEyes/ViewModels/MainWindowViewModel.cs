@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Text;
 using Livet;
 using Livet.Commands;
 using Livet.Messaging;
@@ -113,16 +114,6 @@ namespace StarryEyes.ViewModels
             }
         }
 
-        public int StatusCount
-        {
-            get { return StatisticsService.EstimatedGrossTweetCount; }
-        }
-
-        public double TweetsPerMinutes
-        {
-            get { return StatisticsService.TweetsPerSeconds * 60; }
-        }
-
         #endregion
 
         public MainWindowViewModel()
@@ -136,13 +127,17 @@ namespace StarryEyes.ViewModels
 
         public void Initialize()
         {
-            StatisticsService.OnStatisticsParamsUpdated += () =>
-            {
-                RaisePropertyChanged(() => StatusCount);
-                RaisePropertyChanged(() => TweetsPerMinutes);
-            };
             MainWindowModel.OnWindowCommandDisplayChanged += _ =>
                 this.ShowWindowCommands = _;
+
+            this.CompositeDisposable.Add(Observable.FromEvent(
+                handler => MainWindowModel.OnStateStringChanged += handler,
+                handler => MainWindowModel.OnStateStringChanged -= handler)
+                .Subscribe(_ => RaisePropertyChanged(() => StateString)));
+            this.CompositeDisposable.Add(Observable.FromEvent(
+                handler => StatisticsService.OnStatisticsParamsUpdated += handler,
+                handler => StatisticsService.OnStatisticsParamsUpdated -= handler)
+                .Subscribe(_ => UpdateStatistics()));
 
             MainWindowModel.OnExecuteAccountSelectActionRequested += (action, status, selecteds, aftercall) =>
             {
@@ -222,5 +217,48 @@ namespace StarryEyes.ViewModels
             }
             return true;
         }
+
+        #region Status control
+
+        public string StateString
+        {
+            get { return MainWindowModel.StateString; }
+        }
+
+        private void UpdateStatistics()
+        {
+            RaisePropertyChanged(() => TweetsPerMinutes);
+            RaisePropertyChanged(() => GrossTweetCount);
+            RaisePropertyChanged(() => StartupTime);
+        }
+
+        public string TweetsPerMinutes
+        {
+            get { return (StatisticsService.TweetsPerSeconds * 60).ToString("0.0"); }
+        }
+
+        public int GrossTweetCount
+        {
+            get { return StatisticsService.EstimatedGrossTweetCount; }
+        }
+
+        public string StartupTime
+        {
+            get
+            {
+                var duration = DateTime.Now - App.StartupDateTime;
+                StringBuilder builder = new StringBuilder();
+                if (duration.Hours > 0)
+                {
+                    return duration.Hours + ":" + duration.ToString("mm\\:ss");
+                }
+                else
+                {
+                    return duration.ToString("mm\\:ss");
+                }
+            }
+        }
+
+        #endregion
     }
 }

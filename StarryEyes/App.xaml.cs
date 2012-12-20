@@ -1,10 +1,4 @@
-﻿using Livet;
-using StarryEyes.Breezy.Api;
-using StarryEyes.Models.Plugins;
-using StarryEyes.Models.Stores;
-using StarryEyes.Models.Subsystems;
-using StarryEyes.Settings;
-using System;
+﻿using System;
 using System.Configuration;
 using System.Diagnostics;
 using System.IO;
@@ -12,9 +6,15 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Runtime;
+using System.Text;
 using System.Threading;
 using System.Windows;
-using System.Text;
+using Livet;
+using StarryEyes.Breezy.Api;
+using StarryEyes.Models.Plugins;
+using StarryEyes.Models.Stores;
+using StarryEyes.Models.Subsystems;
+using StarryEyes.Settings;
 using TaskDialogInterop;
 
 namespace StarryEyes
@@ -37,6 +37,7 @@ namespace StarryEyes
 
             // initialize dispatcher helper
             DispatcherHelper.UIDispatcher = Dispatcher;
+            DispatcherHolder.Initialize(Dispatcher);
 
             // set rendering mode
             if (!IsHardwareRenderingEnabled)
@@ -466,6 +467,8 @@ namespace StarryEyes
         }
 
         #endregion
+
+        public static readonly DateTime StartupDateTime = DateTime.Now;
     }
 
     public enum ExecutionMode

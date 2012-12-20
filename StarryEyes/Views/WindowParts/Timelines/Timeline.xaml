@@ -1,6 +1,7 @@
 ﻿<UserControl x:Class="StarryEyes.Views.WindowParts.Timelines.Timeline"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:Behaviors="clr-namespace:StarryEyes.Views.Behaviors"
              xmlns:Helpers="clr-namespace:StarryEyes.Views.Helpers"
              xmlns:Timelines="clr-namespace:StarryEyes.ViewModels.WindowParts.Timelines"
              xmlns:Utils="clr-namespace:StarryEyes.Views.Utils"
@@ -8,7 +9,7 @@
              xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             d:DataContext="{d:DesignInstance Type=Timelines:TabViewModel}"
+             d:DataContext="{d:DesignInstance Type={x:Type Timelines:TabViewModel}}"
              d:DesignHeight="300"
              d:DesignWidth="300"
              mc:Ignorable="d">
@@ -25,7 +26,7 @@
             <Utils:BooleanToVisibleConverter x:Key="BooleanToVisibleConverter" />
             <Utils:BooleanToInvisibleConverter x:Key="BooleanToInvisibleConverter" />
             <DataTemplate x:Key="StatusItemTemplate">
-                <Border Name="MainBorder"
+                <Border x:Name="MainBorder"
                         Margin="0"
                         Background="#00000000"
                         Padding="0">
@@ -120,7 +121,7 @@
                     </VisualStateManager.VisualStateGroups>
                     <Grid Width="Auto"
                           Height="Auto"
-                          Margin="8,9,0,9">
+                          Margin="8,10,0,10">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition />
@@ -181,11 +182,12 @@
                                     Grid.ColumnSpan="1"
                                     Width="Auto"
                                     Height="Auto"
+                                    Margin="-8,-10,0,-10"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Stretch"
                                     Background="#FF1BA1E2"
                                     Visibility="{Binding IsSelected,
-                                                         Converter={StaticResource BooleanToVisibleConverter}}" Margin="-8,-9,0,-9" />
+                                                         Converter={StaticResource BooleanToVisibleConverter}}" />
                             <Border x:Name="clickerBorder"
                                     Grid.Row="0"
                                     Grid.RowSpan="1"
@@ -193,9 +195,10 @@
                                     Grid.ColumnSpan="2"
                                     Width="Auto"
                                     Height="Auto"
+                                    Margin="-8,-10,0,-10"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Stretch"
-                                    Background="#00000000" Margin="-8,-9,0,-9">
+                                    Background="#00000000">
                                 <i:Interaction.Triggers>
                                     <i:EventTrigger EventName="MouseLeftButtonDown">
                                         <ei:CallMethodAction MethodName="ToggleSelect" TargetObject="{Binding Mode=OneWay}" />
@@ -210,14 +213,16 @@
                                        Grid.ColumnSpan="1"
                                        Width="Auto"
                                        Height="Auto"
+                                       Margin="0,0,0,4"
                                        HorizontalAlignment="Stretch"
                                        VerticalAlignment="Stretch"
                                        LastChildFill="False">
-                                <TextBlock Name="ScreenNameText"
+                                <TextBlock x:Name="ScreenNameText"
                                            Height="Auto"
-                                           Margin="9,-2,2,0"
+                                           Margin="10,-2,2,0"
                                            VerticalAlignment="Bottom"
                                            FontSize="13.333"
+                                           FontWeight="Bold"
                                            Foreground="#FF1BA1E2"
                                            RenderTransformOrigin="0.5,0.5"
                                            Text="{Binding User.ScreenName,
@@ -282,7 +287,7 @@
                                          Grid.Column="1"
                                          Width="Auto"
                                          Height="Auto"
-                                         Margin="4,5,4,6"
+                                         Margin="5,3,3,3"
                                          HorizontalAlignment="Stretch"
                                          VerticalAlignment="Top"
                                          HorizontalContentAlignment="Stretch"
@@ -297,7 +302,7 @@
                                          SelectionBrush="#FF1BA1E2" />
                             <Grid Grid.Row="3"
                                   Grid.Column="1"
-                                  Margin="8,0">
+                                  Margin="8,4">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition />
@@ -323,7 +328,7 @@
                                               VerticalAlignment="Stretch"
                                               Opacity="0" />
                             </Grid>
-                            <DockPanel Margin="7,6,7,-1"
+                            <DockPanel Margin="7,4,7,-1"
                                        Background="Transparent"
                                        Visibility="{Binding IsRetweet,
                                                             Converter={StaticResource BooleanToVisibleConverter},
@@ -348,18 +353,18 @@
                 </Border>
                 <DataTemplate.Triggers>
                     <DataTrigger Binding="{Binding IsMyself}" Value="True">
-                        <Setter TargetName="MainBorder" Property="Background" Value="#201BA1E2" />
+                        <Setter TargetName="MainBorder" Property="Background" Value="#161BA1E2" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding IsDirectMessage}" Value="True">
-                        <Setter TargetName="MainBorder" Property="Background" Value="#20A20025" />
+                        <Setter TargetName="MainBorder" Property="Background" Value="#16A20025" />
                         <Setter TargetName="ScreenNameText" Property="Foreground" Value="#FFA20025" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding IsInReplyToMe}" Value="True">
-                        <Setter TargetName="MainBorder" Property="Background" Value="#20F0A30A" />
+                        <Setter TargetName="MainBorder" Property="Background" Value="#16F0A30A" />
                         <Setter TargetName="ScreenNameText" Property="Foreground" Value="#FFFA6800" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding IsRetweet}" Value="True">
-                        <Setter TargetName="MainBorder" Property="Background" Value="#20008A00" />
+                        <Setter TargetName="MainBorder" Property="Background" Value="#16008A00" />
                         <Setter TargetName="ScreenNameText" Property="Foreground" Value="#FF008A00" />
                     </DataTrigger>
                 </DataTemplate.Triggers>
@@ -494,6 +499,7 @@
     <ItemsControl ItemTemplate="{StaticResource StatusItemTemplate}"
                   ItemsSource="{Binding Timeline}"
                   ScrollViewer.CanContentScroll="True"
+                  ScrollViewer.VerticalScrollBarVisibility="Visible"
                   VirtualizingPanel.IsVirtualizing="True"
                   VirtualizingPanel.ScrollUnit="Pixel"
                   VirtualizingPanel.VirtualizationMode="Recycling">
@@ -505,6 +511,10 @@
         <ItemsControl.Template>
             <ControlTemplate>
                 <ScrollViewer Focusable="False">
+                    <i:Interaction.Behaviors>
+                        <Behaviors:TimelineTriggerBehavior IsMouseOver="{Binding IsMouseOver, Mode=OneWayToSource}" ScrollOffset="{Binding ScrollIndex, Mode=OneWayToSource}" />
+                        <Behaviors:TimelineScrollLockerBehavior IsScrollLockEnabled="{Binding IsScrollLock}" />
+                    </i:Interaction.Behaviors>
                     <ItemsPresenter />
                 </ScrollViewer>
             </ControlTemplate>

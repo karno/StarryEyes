@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using StarryEyes.Filters.Expressions;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
+using System.Reactive.Disposables;
 
 namespace StarryEyes.Models
 {
@@ -52,6 +53,42 @@ namespace StarryEyes.Models
             var handler = OnExecuteAccountSelectActionRequested;
             if (handler != null)
                 handler(action, targetStatus, defaultSelected, after);
+        }
+
+        private static LinkedList<string> _stateStack = new LinkedList<string>();
+        public static event Action OnStateStringChanged;
+
+        public static string StateString
+        {
+            get
+            {
+                var item = _stateStack.First;
+                if (item != null)
+                {
+                    return item.Value;
+                }
+                else
+                {
+                    return App.DefaultStatusMessage;
+                }
+            }
+        }
+
+        public static IDisposable SetState(string state)
+        {
+            var node = _stateStack.AddFirst(state);
+            RaiseStateStringChanged();
+            return Disposable.Create(() =>
+            {
+                _stateStack.Remove(node);
+                RaiseStateStringChanged();
+            });
+        }
+
+        private static void RaiseStateStringChanged()
+        {
+            var handler = OnStateStringChanged;
+            if (handler != null) handler();
         }
 
         public static void ShowUserInfo(TwitterUser user)

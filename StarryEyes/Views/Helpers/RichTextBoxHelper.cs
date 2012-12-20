@@ -188,11 +188,11 @@ namespace StarryEyes.Views.Helpers
             var hl = new Hyperlink();
             hl.Foreground = Brushes.Gray;
             hl.Inlines.Add(XmlParser.ResolveEntity(surface));
-            hl.Command = new ListenerCommand<string>(link =>
+            hl.Command = new ProxyCommand(link =>
             {
                 var command = GetLinkNavigationCommand(obj);
                 if (command != null)
-                    command.Execute(link);
+                    command.Execute(link as string);
             });
             hl.CommandParameter = linkUrl;
             return hl;
@@ -206,6 +206,29 @@ namespace StarryEyes.Views.Helpers
         private static Inline GenerateHashtagLink(DependencyObject obj, string surface)
         {
             return GenerateLink(obj, "#" + surface, HashtagNavigation + surface);
+        }
+
+
+
+    }
+
+    public class ProxyCommand : ICommand
+    {
+        public ProxyCommand(Action<object> callback)
+        {
+            this._callback = callback;
+        }
+        public bool CanExecute(object parameter)
+        {
+            return true;
+        }
+
+        public event EventHandler CanExecuteChanged;
+        private Action<object> _callback;
+
+        public void Execute(object parameter)
+        {
+            _callback(parameter);
         }
     }
 

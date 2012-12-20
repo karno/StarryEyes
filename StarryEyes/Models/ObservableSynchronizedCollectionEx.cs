@@ -239,10 +239,11 @@ namespace Livet
             ReadAndWriteWithLockAction(() =>
             {
                 Dictionary<int, T> indexAndItems = new Dictionary<int, T>();
-                _list.Zip(Enumerable.Range(0, Int32.MaxValue), (item, i) => new { i, item })
+                _list
+                    .Select((item, i) => new { i, item })
                     .Where(i => predicate(i.item))
                     .ForEach(i => indexAndItems.Add(i.i, i.item));
-                return indexAndItems;
+                return indexAndItems.Reverse();
             },
             indexAndItems => indexAndItems.ForEach(i => _list.RemoveAt(i.Key)),
             indexAndItems =>

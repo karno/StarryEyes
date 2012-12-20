@@ -8,6 +8,7 @@ using Livet;
 using Livet.EventListeners;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Models.Tab;
+using StarryEyes.Settings;
 
 namespace StarryEyes.ViewModels.WindowParts.Timelines
 {
@@ -50,11 +51,19 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         private void Initialize()
         {
-            DispatcherHelper.BeginInvoke(InitializeCollection);
+            DispatcherHolder.Push(InitializeCollection);
             this.CompositeDisposable.Add(Observable.FromEvent(
                 _ => Model.Timeline.OnNewStatusArrived += _,
                 _ => Model.Timeline.OnNewStatusArrived -= _)
                 .Subscribe(_ => UnreadCount++));
+            this.CompositeDisposable.Add(Observable.FromEvent<ScrollLockStrategy>(
+                handler => Setting.ScrollLockStrategy.OnValueChanged += handler,
+                handler => Setting.ScrollLockStrategy.OnValueChanged -= handler)
+                .Subscribe(_ =>
+                {
+                    RaisePropertyChanged(() => IsScrollLock);
+                    RaisePropertyChanged(() => IsScrollLockExplicitEnabled);
+                }));
             this.CompositeDisposable.Add(() => Model.Deactivate());
             this.IsLoading = false;
         }
@@ -63,7 +72,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         {
             var collection = Model.Timeline.Statuses.ToArray();
             this.CompositeDisposable.Add(new CollectionChangedEventListener(Model.Timeline.Statuses,
-                (sender, e) => DispatcherHelper.BeginInvoke(() => ReflectCollectionChanged(e))));
+                (sender, e) => DispatcherHolder.Push(() => ReflectCollectionChanged(e))));
             collection
                 .Select(GenerateStatusViewModel)
                 .ForEach(_timeline.Add);
@@ -162,6 +171,64 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             {
                 _isLoading = value;
                 RaisePropertyChanged(() => IsLoading);
+            }
+        }
+
+        private bool _isMouseOver = false;
+        public bool IsMouseOver
+        {
+            get { return _isMouseOver; }
+            set
+            {
+                _isMouseOver = value;
+                RaisePropertyChanged(() => IsMouseOver);
+                RaisePropertyChanged(() => IsScrollLock);
+            }
+        }
+
+        private double _scrollIndex = 0;
+        public double ScrollIndex
+        {
+            get { return _scrollIndex; }
+            set
+            {
+                _scrollIndex = value;
+                RaisePropertyChanged(() => ScrollIndex);
+                RaisePropertyChanged(() => IsScrollLock);
+            }
+        }
+
+        private bool _isScrollLockExplicit = false;
+        public bool IsScrollLockExplicit
+        {
+            get { return _isScrollLockExplicit; }
+            set { _isScrollLockExplicit = value; }
+        }
+
+        public bool IsScrollLockExplicitEnabled
+        {
+            get { return Setting.ScrollLockStrategy.Value == ScrollLockStrategy.Explicit; }
+        }
+
+        public bool IsScrollLock
+        {
+            get
+            {
+                switch (Setting.ScrollLockStrategy.Value)
+                {
+                    case ScrollLockStrategy.None:
+                        return false;
+                    case ScrollLockStrategy.Always:
+                        return true;
+                    case ScrollLockStrategy.WhenMouseOver:
+                        return IsMouseOver;
+                    case ScrollLockStrategy.WhenScrolled:
+                        return _scrollIndex != 0;
+                    case ScrollLockStrategy.Explicit:
+                        return IsScrollLockExplicit;
+                    default:
+                        return false;
+                }
             }
         }
 

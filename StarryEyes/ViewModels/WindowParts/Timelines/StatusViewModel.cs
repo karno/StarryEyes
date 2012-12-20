@@ -217,7 +217,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public bool IsSourceIsLink
         {
-            get { return Status.Source.Contains("<a href"); }
+            get { return Status.Source != null && Status.Source.Contains("<a href"); }
         }
 
         public string SourceText

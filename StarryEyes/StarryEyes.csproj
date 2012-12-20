@@ -177,6 +177,7 @@
     <Compile Include="Filters\Sources\FilterSearch.cs" />
     <Compile Include="Filters\Sources\FilterTrack.cs" />
     <Compile Include="Helpers\FreezableHelper.cs" />
+    <Compile Include="Hotfixes\DispatcherEx.cs" />
     <Compile Include="Hotfixes\LivetFixer.cs" />
     <Compile Include="Helpers\RegexHelper.cs" />
     <Compile Include="Models\BackpanelModel.cs" />
@@ -230,6 +231,8 @@
     <Compile Include="ViewModels\WindowParts\Timelines\TabViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Timelines\UserViewModel.cs" />
     <Compile Include="Views\Behaviors\Planerator.cs" />
+    <Compile Include="Views\Behaviors\TimelineScrollLockerBehavior.cs" />
+    <Compile Include="Views\Behaviors\TimelineTriggerBehavior.cs" />
     <Compile Include="Views\Controls\DropDownMenuButton.cs" />
     <Compile Include="Views\Dialogs\KeyOverrideWindow.xaml.cs">
       <DependentUpon>KeyOverrideWindow.xaml</DependentUpon>
