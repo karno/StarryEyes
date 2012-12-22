@@ -42,14 +42,14 @@
                         <VisualStateGroup x:Name="StatusSelection">
                             <VisualState x:Name="Selected">
                                 <Storyboard>
-                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetName="checkBoxBorder" Storyboard.TargetProperty="(FrameworkElement.Width)">
-                                        <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="20">
+                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetName="CheckBoxBorder" Storyboard.TargetProperty="(FrameworkElement.Width)">
+                                        <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="24">
                                             <EasingDoubleKeyFrame.EasingFunction>
                                                 <CircleEase EasingMode="EaseOut" />
                                             </EasingDoubleKeyFrame.EasingFunction>
                                         </EasingDoubleKeyFrame>
                                     </DoubleAnimationUsingKeyFrames>
-                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetName="pickerBorder" Storyboard.TargetProperty="(UIElement.Opacity)">
+                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetName="PickerBorder" Storyboard.TargetProperty="(UIElement.Opacity)">
                                         <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0">
                                             <EasingDoubleKeyFrame.EasingFunction>
                                                 <CircleEase EasingMode="EaseIn" />
@@ -59,18 +59,21 @@
                                     <ObjectAnimationUsingKeyFrames Storyboard.TargetName="checkBox" Storyboard.TargetProperty="(FrameworkElement.VerticalAlignment)">
                                         <DiscreteObjectKeyFrame KeyTime="0:0:0.1" Value="{x:Static VerticalAlignment.Center}" />
                                     </ObjectAnimationUsingKeyFrames>
+                                    <ThicknessAnimationUsingKeyFrames Storyboard.TargetName="viewbox" Storyboard.TargetProperty="(FrameworkElement.Margin)">
+                                        <EasingThicknessKeyFrame KeyTime="0:0:0.1" Value="0,0,6,0" />
+                                    </ThicknessAnimationUsingKeyFrames>
                                 </Storyboard>
                             </VisualState>
                             <VisualState x:Name="NotSelected">
                                 <Storyboard>
-                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetName="checkBoxBorder" Storyboard.TargetProperty="(FrameworkElement.Width)">
+                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetName="CheckBoxBorder" Storyboard.TargetProperty="(FrameworkElement.Width)">
                                         <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0">
                                             <EasingDoubleKeyFrame.EasingFunction>
                                                 <CircleEase EasingMode="EaseOut" />
                                             </EasingDoubleKeyFrame.EasingFunction>
                                         </EasingDoubleKeyFrame>
                                     </DoubleAnimationUsingKeyFrames>
-                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetName="pickerBorder" Storyboard.TargetProperty="(UIElement.Opacity)">
+                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetName="PickerBorder" Storyboard.TargetProperty="(UIElement.Opacity)">
                                         <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="1">
                                             <EasingDoubleKeyFrame.EasingFunction>
                                                 <CircleEase EasingMode="EaseOut" />
@@ -83,7 +86,7 @@
                         <VisualStateGroup x:Name="StatusMouseOver">
                             <VisualState x:Name="Default">
                                 <Storyboard>
-                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetName="stackPanel" Storyboard.TargetProperty="(UIElement.Opacity)">
+                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetName="ViaPanel" Storyboard.TargetProperty="(UIElement.Opacity)">
                                         <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0">
                                             <EasingDoubleKeyFrame.EasingFunction>
                                                 <CircleEase EasingMode="EaseOut" />
@@ -101,7 +104,7 @@
                             </VisualState>
                             <VisualState x:Name="OnMouseOver">
                                 <Storyboard>
-                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetName="stackPanel" Storyboard.TargetProperty="(UIElement.Opacity)">
+                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetName="ViaPanel" Storyboard.TargetProperty="(UIElement.Opacity)">
                                         <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="1">
                                             <EasingDoubleKeyFrame.EasingFunction>
                                                 <CircleEase EasingMode="EaseOut" />
@@ -134,6 +137,18 @@
                                 <ei:GoToStateAction StateName="NotSelected" />
                             </ei:DataTrigger>
                         </i:Interaction.Triggers>
+                        <Border x:Name="HighlightBorder"
+                                Grid.Row="0"
+                                Grid.RowSpan="1"
+                                Grid.Column="0"
+                                Grid.ColumnSpan="1"
+                                Width="1"
+                                Height="Auto"
+                                Margin="-8,-10,0,-10"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Stretch"
+                                Background="#00000000"
+                                Opacity="0.3" />
                         <Grid Width="Auto"
                               Height="Auto"
                               HorizontalAlignment="Stretch"
@@ -154,16 +169,17 @@
                                     SnapsToDevicePixels="True">
                                 <Image SnapsToDevicePixels="True" Source="{Binding User.User.ProfileImageUri, Converter={StaticResource UriImageConverter}}" />
                             </Border>
-                            <Border x:Name="checkBoxBorder"
+                            <Border x:Name="CheckBoxBorder"
                                     Grid.ColumnSpan="1"
                                     Width="0"
                                     Margin="0"
                                     HorizontalAlignment="Left"
                                     VerticalAlignment="Center"
                                     Background="{x:Null}">
-                                <Viewbox Width="18"
+                                <Viewbox x:Name="viewbox"
+                                         Width="18"
                                          Height="18"
-                                         Margin="-2,0,4,0"
+                                         Margin="-2,0,6,0"
                                          Stretch="Fill">
                                     <CheckBox x:Name="checkBox"
                                               Width="16"
@@ -175,7 +191,7 @@
                                               Padding="0" />
                                 </Viewbox>
                             </Border>
-                            <Border x:Name="pickerBorder"
+                            <Border x:Name="PickerBorder"
                                     Grid.Row="0"
                                     Grid.RowSpan="1"
                                     Grid.Column="1"
@@ -187,8 +203,9 @@
                                     VerticalAlignment="Stretch"
                                     Background="#FF1BA1E2"
                                     Visibility="{Binding IsSelected,
-                                                         Converter={StaticResource BooleanToVisibleConverter}}" />
-                            <Border x:Name="clickerBorder"
+                                                         Converter={StaticResource BooleanToVisibleConverter}}"
+                                    d:IsHidden="True" />
+                            <Border x:Name="ClickerBorder"
                                     Grid.Row="0"
                                     Grid.RowSpan="1"
                                     Grid.Column="0"
@@ -213,16 +230,16 @@
                                        Grid.ColumnSpan="1"
                                        Width="Auto"
                                        Height="Auto"
-                                       Margin="0,0,0,4"
+                                       Margin="0,-2,0,3"
                                        HorizontalAlignment="Stretch"
                                        VerticalAlignment="Stretch"
                                        LastChildFill="False">
                                 <TextBlock x:Name="ScreenNameText"
                                            Height="Auto"
-                                           Margin="10,-2,2,0"
+                                           Margin="10,-4,2,0"
                                            VerticalAlignment="Bottom"
+                                           FontFamily="Segoe UI Semibold"
                                            FontSize="13.333"
-                                           FontWeight="Bold"
                                            Foreground="#FF1BA1E2"
                                            RenderTransformOrigin="0.5,0.5"
                                            Text="{Binding User.ScreenName,
@@ -230,14 +247,15 @@
                                                           Mode=OneWay}"
                                            TextWrapping="NoWrap" />
                                 <TextBlock Height="Auto"
-                                           Margin="3,-2,3,0"
+                                           Margin="3,-4,3,0"
                                            VerticalAlignment="Bottom"
-                                           FontSize="13.333"
+                                           FontFamily="Segoe UI Semilight"
+                                           FontSize="12.667"
                                            Foreground="Gray"
                                            Text="{Binding User.User.Name,
                                                           FallbackValue=name}"
                                            TextWrapping="NoWrap" />
-                                <StackPanel x:Name="stackPanel"
+                                <StackPanel x:Name="ViaPanel"
                                             Width="Auto"
                                             Margin="0,0,8,0"
                                             HorizontalAlignment="Right"
@@ -247,27 +265,30 @@
                                             Orientation="Horizontal"
                                             Visibility="{Binding IsSourceVisible,
                                                                  Converter={StaticResource BooleanToVisibleConverter}}">
-                                    <TextBlock Margin="1,0"
+                                    <TextBlock Margin="1,-1,1,0"
                                                HorizontalAlignment="Left"
                                                VerticalAlignment="Center"
-                                               FontSize="10.667"
+                                               FontFamily="Segoe UI Semilight"
+                                               FontSize="12"
                                                Foreground="Gray"
                                                Text="via "
                                                TextWrapping="NoWrap" />
-                                    <TextBlock Margin="1,0"
+                                    <TextBlock Margin="1,-1,1,0"
                                                HorizontalAlignment="Left"
                                                VerticalAlignment="Center"
-                                               FontSize="10.667"
+                                               FontFamily="Segoe UI Semilight"
+                                               FontSize="12"
                                                Foreground="Gray"
                                                Text="{Binding SourceText}"
                                                TextWrapping="NoWrap"
                                                Visibility="{Binding IsSourceIsLink,
                                                                     Converter={StaticResource BooleanToInvisibleConverter}}" />
-                                    <TextBlock Margin="1,0"
+                                    <TextBlock Margin="1,-1,1,0"
                                                HorizontalAlignment="Left"
                                                VerticalAlignment="Center"
                                                Cursor="Hand"
-                                               FontSize="10.667"
+                                               FontFamily="Segoe UI Semilight"
+                                               FontSize="12"
                                                Foreground="Gray"
                                                Text="{Binding SourceText}"
                                                TextDecorations="Underline"
@@ -287,13 +308,14 @@
                                          Grid.Column="1"
                                          Width="Auto"
                                          Height="Auto"
-                                         Margin="5,3,3,3"
+                                         Margin="5,4,3,4"
                                          HorizontalAlignment="Stretch"
                                          VerticalAlignment="Top"
                                          HorizontalContentAlignment="Stretch"
                                          Background="{x:Null}"
                                          BorderBrush="{x:Null}"
                                          BorderThickness="0"
+                                         FontFamily="Segoe UI"
                                          FontSize="13.333"
                                          Helpers:RichTextBoxHelper.LinkNavigationCommand="{Binding OpenLinkCommand}"
                                          Helpers:RichTextBoxHelper.TwitterStatus="{Binding Status}"
@@ -302,7 +324,7 @@
                                          SelectionBrush="#FF1BA1E2" />
                             <Grid Grid.Row="3"
                                   Grid.Column="1"
-                                  Margin="8,4">
+                                  Margin="8,4,8,0">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition />
@@ -312,6 +334,7 @@
                                            Height="Auto"
                                            Margin="2,0,4,0"
                                            VerticalAlignment="Center"
+                                           FontFamily="Segoe UI Semilight"
                                            FontSize="10.667"
                                            Foreground="Gray"
                                            Text="{Binding Status.CreatedAt,
@@ -328,7 +351,20 @@
                                               VerticalAlignment="Stretch"
                                               Opacity="0" />
                             </Grid>
-                            <DockPanel Margin="7,4,7,-1"
+                            <DockPanel Height="Auto" LastChildFill="False" Margin="7,8,7,0" Visibility="{Binding IsFavoritedUserExists, Converter={StaticResource BooleanToVisibleConverter}}">
+                            	<Path Stretch="Fill" Fill="#FFF0A30A" Data="F1 M 17.5,22.5L 22.3928,22.5L 24,18L 25.6071,22.5L 30.5,22.5L 26.4252,25.4193L 28.25,30L 24,27.5L 20.25,30L 21.6625,25.4875L 17.5,22.5 Z " Height="11" Width="12" Margin="2,0"/>
+                            	<TextBlock TextWrapping="Wrap" Text="{Binding FavoriteCount, FallbackValue=00}" Foreground="#FFF0A30A" FontFamily="Segoe UI Semilight" Margin="1,-1,3,0"/>
+                            </DockPanel>
+                            <DockPanel Height="Auto" LastChildFill="False" Margin="7,8,7,0" Visibility="{Binding IsRetweetedUserExists, Converter={StaticResource BooleanToVisibleConverter}}">
+                            	<Path Width="10"
+                            		Height="12"
+                            		Margin="3,1"
+                            		Data="F1 M 24,18.9231C 25.4548,18.9231 26.7667,19.535 27.6923,20.5154L 27.6923,18L 29.0769,19.3846L 29.0769,23.0769L 25.3846,23.0769L 24,21.6923L 26.5801,21.6923C 25.9463,20.9841 25.0252,20.5385 24,20.5385C 22.2447,20.5385 20.7946,21.8449 20.569,23.5385L 18.9438,23.5385C 19.177,20.9508 21.3517,18.9231 24,18.9231 Z M 24,27.4615C 25.7553,27.4615 27.2054,26.1551 27.431,24.4615L 29.0562,24.4615C 28.823,27.0492 26.6483,29.0769 24,29.0769C 22.5452,29.0769 21.2333,28.465 20.3077,27.4846L 20.3077,30L 18.9231,28.6154L 18.9231,24.9231L 22.6154,24.9231L 24,26.3077L 21.4199,26.3077C 22.0537,27.0159 22.9748,27.4615 24,27.4615 Z "
+                            		Fill="#FF008A00"
+                            		Stretch="Fill" />
+                            	<TextBlock TextWrapping="Wrap" Text="{Binding RetweetCount, FallbackValue=00}" FontFamily="Segoe UI Semilight" Margin="1,-2,3,0" Foreground="#FF008A00" VerticalAlignment="Center"/>
+                            </DockPanel>
+                            <DockPanel Margin="7,8,7,-1"
                                        Background="Transparent"
                                        Visibility="{Binding IsRetweet,
                                                             Converter={StaticResource BooleanToVisibleConverter},
@@ -339,9 +375,10 @@
                                       Data="F1 M 24,18.9231C 25.4548,18.9231 26.7667,19.535 27.6923,20.5154L 27.6923,18L 29.0769,19.3846L 29.0769,23.0769L 25.3846,23.0769L 24,21.6923L 26.5801,21.6923C 25.9463,20.9841 25.0252,20.5385 24,20.5385C 22.2447,20.5385 20.7946,21.8449 20.569,23.5385L 18.9438,23.5385C 19.177,20.9508 21.3517,18.9231 24,18.9231 Z M 24,27.4615C 25.7553,27.4615 27.2054,26.1551 27.431,24.4615L 29.0562,24.4615C 28.823,27.0492 26.6483,29.0769 24,29.0769C 22.5452,29.0769 21.2333,28.465 20.3077,27.4846L 20.3077,30L 18.9231,28.6154L 18.9231,24.9231L 22.6154,24.9231L 24,26.3077L 21.4199,26.3077C 22.0537,27.0159 22.9748,27.4615 24,27.4615 Z "
                                       Fill="#FF008A00"
                                       Stretch="Fill" />
-                                <TextBlock Margin="0,-2,0,0"
+                                <TextBlock Margin="1,-2,0,0"
                                            HorizontalAlignment="Left"
                                            VerticalAlignment="Center"
+                                           FontFamily="Segoe UI Semilight"
                                            FontSize="12"
                                            Foreground="#FF008A00"
                                            Text="{Binding Retweeter.ScreenName,
@@ -354,18 +391,22 @@
                 <DataTemplate.Triggers>
                     <DataTrigger Binding="{Binding IsMyself}" Value="True">
                         <Setter TargetName="MainBorder" Property="Background" Value="#161BA1E2" />
+                        <Setter TargetName="HighlightBorder" Property="Background" Value="#FF1BA1E2" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding IsDirectMessage}" Value="True">
                         <Setter TargetName="MainBorder" Property="Background" Value="#16A20025" />
                         <Setter TargetName="ScreenNameText" Property="Foreground" Value="#FFA20025" />
+                        <Setter TargetName="HighlightBorder" Property="Background" Value="#FFA20025" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding IsInReplyToMe}" Value="True">
                         <Setter TargetName="MainBorder" Property="Background" Value="#16F0A30A" />
                         <Setter TargetName="ScreenNameText" Property="Foreground" Value="#FFFA6800" />
+                        <Setter TargetName="HighlightBorder" Property="Background" Value="#FFFA6800" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding IsRetweet}" Value="True">
                         <Setter TargetName="MainBorder" Property="Background" Value="#16008A00" />
                         <Setter TargetName="ScreenNameText" Property="Foreground" Value="#FF008A00" />
+                        <Setter TargetName="HighlightBorder" Property="Background" Value="#FF008A00" />
                     </DataTrigger>
                 </DataTemplate.Triggers>
             </DataTemplate>

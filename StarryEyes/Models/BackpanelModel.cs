@@ -22,7 +22,7 @@ namespace StarryEyes.Models
             new ObservableSynchronizedCollection<TwitterEventBase>();
         public static ObservableSynchronizedCollection<TwitterEventBase> TwitterEvents
         {
-            get { return BackpanelModel._twitterEvents; }
+            get { return _twitterEvents; }
         }
 
         public static event Action<BackpanelEventBase> OnEventRegistered;
@@ -39,11 +39,9 @@ namespace StarryEyes.Models
                     _twitterEvents.Insert(0, te);
                     if (_twitterEvents.Count > TwitterEventMaxHoldCount)
                         _twitterEvents.RemoveAt(_twitterEvents.Count - 1);
-
                 }
             }
         }
-
         #endregion
     }
 }

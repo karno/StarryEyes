@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
-using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
@@ -12,7 +13,6 @@ using StarryEyes.Breezy.DataModel;
 using StarryEyes.Models.Operations;
 using StarryEyes.Models.Stores;
 using StarryEyes.Models.Tab;
-using StarryEyes.Settings;
 
 namespace StarryEyes.Models
 {
@@ -21,100 +21,100 @@ namespace StarryEyes.Models
     /// </summary>
     public static class InputAreaModel
     {
-        private static TabModel currentFocusTabModel = null;
+        private static TabModel _currentFocusTabModel;
 
         private static readonly ObservableSynchronizedCollection<AuthenticateInfo> _bindingAuthInfos =
             new ObservableSynchronizedCollection<AuthenticateInfo>();
-        public static ObservableSynchronizedCollection<AuthenticateInfo> BindingAuthInfos
-        {
-            get { return InputAreaModel._bindingAuthInfos; }
-        }
 
         private static readonly ObservableSynchronizedCollection<string> _bindingHashtags =
             new ObservableSynchronizedCollection<string>();
-        public static ObservableSynchronizedCollection<string> BindingHashtags
-        {
-            get { return InputAreaModel._bindingHashtags; }
-        }
 
         private static readonly ObservableSynchronizedCollection<TweetInputInfo> _drafts =
             new ObservableSynchronizedCollection<TweetInputInfo>();
-        public static ObservableSynchronizedCollection<TweetInputInfo> Drafts
-        {
-            get { return InputAreaModel._drafts; }
-        }
-
-        private static TweetInputInfo _previousPosted = null;
-        public static TweetInputInfo PreviousPosted
-        {
-            get { return InputAreaModel._previousPosted; }
-            set { InputAreaModel._previousPosted = value; }
-        }
 
         static InputAreaModel()
         {
             _bindingAuthInfos.CollectionChanged += (_, __) =>
-            {
-                if (currentFocusTabModel != null)
                 {
-                    switch (__.Action)
+                    if (_currentFocusTabModel != null)
                     {
-                        case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-                            __.NewItems
-                                .OfType<AuthenticateInfo>()
-                                .Select(i => i.Id)
-                                .ForEach(currentFocusTabModel.BindingAccountIds.Add);
-                            break;
-                        case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
-                            __.OldItems
-                                .OfType<AuthenticateInfo>()
-                                .ForEach(i => currentFocusTabModel.BindingAccountIds.Remove(i.Id));
-                            break;
-                        case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
-                            __.OldItems
-                                .OfType<AuthenticateInfo>()
-                                .ForEach(i => currentFocusTabModel.BindingAccountIds.Remove(i.Id));
-                            __.NewItems
-                                .OfType<AuthenticateInfo>()
-                                .Select(i => i.Id)
-                                .ForEach(currentFocusTabModel.BindingAccountIds.Add);
-                            break;
-                        case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
-                            currentFocusTabModel.BindingAccountIds.Clear();
-                            _bindingAuthInfos
-                                .Select(i => i.Id)
-                                .ForEach(currentFocusTabModel.BindingAccountIds.Add);
-                            break;
+                        switch (__.Action)
+                        {
+                            case NotifyCollectionChangedAction.Add:
+                                __.NewItems
+                                  .OfType<AuthenticateInfo>()
+                                  .Select(i => i.Id)
+                                  .ForEach(_currentFocusTabModel.BindingAccountIds.Add);
+                                break;
+                            case NotifyCollectionChangedAction.Remove:
+                                __.OldItems
+                                  .OfType<AuthenticateInfo>()
+                                  .ForEach(i => _currentFocusTabModel.BindingAccountIds.Remove(i.Id));
+                                break;
+                            case NotifyCollectionChangedAction.Replace:
+                                __.OldItems
+                                  .OfType<AuthenticateInfo>()
+                                  .ForEach(i => _currentFocusTabModel.BindingAccountIds.Remove(i.Id));
+                                __.NewItems
+                                  .OfType<AuthenticateInfo>()
+                                  .Select(i => i.Id)
+                                  .ForEach(_currentFocusTabModel.BindingAccountIds.Add);
+                                break;
+                            case NotifyCollectionChangedAction.Reset:
+                                _currentFocusTabModel.BindingAccountIds.Clear();
+                                _bindingAuthInfos
+                                    .Select(i => i.Id)
+                                    .ForEach(_currentFocusTabModel.BindingAccountIds.Add);
+                                break;
+                        }
                     }
-                }
-            };
+                };
             _bindingHashtags.CollectionChanged += (_, __) =>
-            {
-                if (currentFocusTabModel != null)
-                    currentFocusTabModel.BindingHashtags = _bindingHashtags.ToList();
-            };
+                {
+                    if (_currentFocusTabModel != null)
+                        _currentFocusTabModel.BindingHashtags = _bindingHashtags.ToList();
+                };
         }
+
+        public static ObservableSynchronizedCollection<AuthenticateInfo> BindingAuthInfos
+        {
+            get { return _bindingAuthInfos; }
+        }
+
+        public static ObservableSynchronizedCollection<string> BindingHashtags
+        {
+            get { return _bindingHashtags; }
+        }
+
+        public static ObservableSynchronizedCollection<TweetInputInfo> Drafts
+        {
+            get { return _drafts; }
+        }
+
+        public static TweetInputInfo PreviousPosted { get; set; }
 
         public static void NotifyChangeFocusingTab(TabModel tabModel)
         {
             _bindingAuthInfos.Clear();
-            currentFocusTabModel = null;
+            _currentFocusTabModel = null;
             tabModel.BindingAccountIds
-                .Select(_ => AccountsStore.GetAccountSetting(_))
-                .Where(_ => _ != null)
-                .Select(_ => _.AuthenticateInfo)
-                .ForEach(_bindingAuthInfos.Add);
+                    .Select(AccountsStore.GetAccountSetting)
+                    .Where(_ => _ != null)
+                    .Select(_ => _.AuthenticateInfo)
+                    .ForEach(_bindingAuthInfos.Add);
             _bindingHashtags.Clear();
             tabModel.BindingHashtags.ForEach(_bindingHashtags.Add);
-            currentFocusTabModel = tabModel;
+            _currentFocusTabModel = tabModel;
         }
 
-        public static event Action<IEnumerable<AuthenticateInfo>, string, CursorPosition, TwitterStatus> OnSetTextRequested;
+        public static event Action<IEnumerable<AuthenticateInfo>, string, CursorPosition, TwitterStatus>
+            OnSetTextRequested;
+
         public static void SetText(IEnumerable<AuthenticateInfo> infos = null, string body = null,
-            CursorPosition cursor = CursorPosition.End, TwitterStatus inReplyTo = null,
-            bool focusToInputArea = true)
+                                   CursorPosition cursor = CursorPosition.End, TwitterStatus inReplyTo = null,
+                                   bool focusToInputArea = true)
         {
-            var handler = OnSetTextRequested;
+            Action<IEnumerable<AuthenticateInfo>, string, CursorPosition, TwitterStatus> handler = OnSetTextRequested;
             if (handler != null)
                 handler(infos, body, cursor, inReplyTo);
             if (focusToInputArea)
@@ -122,30 +122,33 @@ namespace StarryEyes.Models
         }
 
         public static event Action<IEnumerable<AuthenticateInfo>, TwitterUser> OnSendDirectMessageRequested;
+
         public static void SetDirectMessage(IEnumerable<AuthenticateInfo> info, TwitterUser recipient,
-            bool focusToInputArea = true)
+                                            bool focusToInputArea = true)
         {
-            var handler = OnSendDirectMessageRequested;
+            Action<IEnumerable<AuthenticateInfo>, TwitterUser> handler = OnSendDirectMessageRequested;
             if (handler != null)
                 handler(info, recipient);
             if (focusToInputArea)
                 MainWindowModel.SetFocusTo(FocusRequest.Tweet);
         }
 
-        #region ALPS controls
-
-
-        #endregion
     }
 
     /// <summary>
-    /// Describes &quot;a input&quot;.
+    ///     Describes &quot;a input&quot;.
     /// </summary>
     public class TweetInputInfo
     {
-        private AuthenticateInfo[] _authInfos = null;
+        private BitmapImage _attachedImage;
+        private AuthenticateInfo[] _authInfos;
+
+        private string[] _hashtags;
+        private Tuple<AuthenticateInfo, TwitterStatus>[] _postedTweets;
+        private string _text;
+
         /// <summary>
-        /// Binding authenticate informations.
+        ///     Binding authenticate informations.
         /// </summary>
         public IEnumerable<AuthenticateInfo> AuthInfos
         {
@@ -153,9 +156,8 @@ namespace StarryEyes.Models
             set { _authInfos = value.ToArray(); }
         }
 
-        private string[] _hashtags = null;
         /// <summary>
-        /// Binding hashtags.
+        ///     Binding hashtags.
         /// </summary>
         public IEnumerable<string> Hashtags
         {
@@ -164,26 +166,23 @@ namespace StarryEyes.Models
         }
 
         /// <summary>
-        /// In reply to someone.
+        ///     In reply to someone.
         /// </summary>
         public TwitterStatus InReplyTo { get; set; }
 
         /// <summary>
-        /// Message recipient target.
+        ///     Message recipient target.
         /// </summary>
         public TwitterUser MessageRecipient { get; set; }
 
-        private string _text;
         public string Text
         {
             get { return _text ?? String.Empty; }
             set { _text = value; }
         }
 
-        private Tuple<AuthenticateInfo, TwitterStatus>[] _postedTweets = null;
-
         /// <summary>
-        /// Posted status ids.
+        ///     Posted status ids.
         /// </summary>
         public IEnumerable<Tuple<AuthenticateInfo, TwitterStatus>> PostedTweets
         {
@@ -192,38 +191,35 @@ namespace StarryEyes.Models
         }
 
         /// <summary>
-        /// Thrown Exception in previous trial.
+        ///     Thrown Exception in previous trial.
         /// </summary>
         public Exception ThrownException { get; set; }
 
         /// <summary>
-        /// Get exception readable info, if available.
+        ///     Get exception readable info, if available.
         /// </summary>
         public string ThrownExceptionMessage
         {
             get
             {
-                var ex = this.ThrownException as TweetFailedException;
+                var ex = ThrownException as TweetFailedException;
                 if (ex != null)
                 {
                     return ex.Message;
                 }
-                else
-                {
-                    return null;
-                }
+                return null;
             }
         }
 
         /// <summary>
-        /// Attached geo-location info.
+        ///     Attached geo-location info.
         /// </summary>
         public GeoLocationInfo AttachedGeoInfo { get; set; }
 
-        private BitmapImage _attachedImage = null;
         /// <summary>
-        /// Attached image.<para />
-        /// This bitmap image is frozen.
+        ///     Attached image.
+        ///     <para />
+        ///     This bitmap image is frozen.
         /// </summary>
         public BitmapImage AttachedImage
         {
@@ -239,59 +235,62 @@ namespace StarryEyes.Models
 
         public TweetInputInfo Clone()
         {
-            return new TweetInputInfo()
-            {
-                _authInfos = this._authInfos,
-                _hashtags = this._hashtags,
-                InReplyTo = this.InReplyTo,
-                MessageRecipient = this.MessageRecipient,
-                Text = this.Text,
-                _postedTweets = this._postedTweets,
-                ThrownException = this.ThrownException,
-                AttachedGeoInfo = this.AttachedGeoInfo,
-                _attachedImage = this._attachedImage
-            };
+            return new TweetInputInfo
+                {
+                    _authInfos = _authInfos,
+                    _hashtags = _hashtags,
+                    InReplyTo = InReplyTo,
+                    MessageRecipient = MessageRecipient,
+                    Text = Text,
+                    _postedTweets = _postedTweets,
+                    ThrownException = ThrownException,
+                    AttachedGeoInfo = AttachedGeoInfo,
+                    _attachedImage = _attachedImage
+                };
         }
 
         public IObservable<TweetInputInfo> Send()
         {
-            List<PostResult> postResults = new List<PostResult>();
+            var postResults = new List<PostResult>();
             var subject = new Subject<TweetInputInfo>();
             _authInfos.ToObservable()
-               .SelectMany(AuthInfo =>
-                   (MessageRecipient != null ? (OperationBase<TwitterStatus>)
-                       new DirectMessageOperation(AuthInfo, MessageRecipient, Text) :
-                       new TweetOperation(AuthInfo, Text, InReplyTo, AttachedGeoInfo, AttachedImage)
-                   ).Run()
-                   .Do(_ => StatusStore.Store(_))
-                   .Select(_ => new PostResult(AuthInfo, _))
-                   .Catch((Exception ex) => Observable.Return(new PostResult(AuthInfo, ex))))
-               .Subscribe(postResults.Add,
-               () =>
-               {
-                   postResults.GroupBy(_ => _.IsSucceeded)
-                       .ForEach(_ =>
-                       {
-                           if (_.Key)
-                           {
-                               var ret = this.Clone();
-                               ret.AuthInfos = _.Select(pr => pr.AuthInfo).ToArray();
-                               ret.PostedTweets = _.Select(pr => Tuple.Create(pr.AuthInfo, pr.Status)).ToArray();
-                               subject.OnNext(ret);
-                           }
-                           else
-                           {
-                               _.ForEach(pr =>
-                                   {
-                                       var ret = this.Clone();
-                                       ret.AuthInfos = new[] { pr.AuthInfo };
-                                       ret.ThrownException = pr.ThrownException;
-                                       subject.OnNext(ret);
-                                   });
-                           }
-                       });
-                   subject.OnCompleted();
-               });
+                      .SelectMany(authInfo =>
+                                  (MessageRecipient != null
+                                       ? (OperationBase<TwitterStatus>)
+                                         new DirectMessageOperation(authInfo, MessageRecipient, Text)
+                                       : new TweetOperation(authInfo, Text, InReplyTo, AttachedGeoInfo, AttachedImage)
+                                  ).Run()
+                                   .Do(_ => StatusStore.Store(_))
+                                   .Select(_ => new PostResult(authInfo, _))
+                                   .Catch((Exception ex) => Observable.Return(new PostResult(authInfo, ex))))
+                      .Subscribe(postResults.Add,
+                                 () =>
+                                 {
+                                     postResults.GroupBy(_ => _.IsSucceeded)
+                                                .ForEach(_ =>
+                                                    {
+                                                        if (_.Key)
+                                                        {
+                                                            TweetInputInfo ret = Clone();
+                                                            ret.AuthInfos = _.Select(pr => pr.AuthInfo).ToArray();
+                                                            ret.PostedTweets =
+                                                                _.Select(pr => Tuple.Create(pr.AuthInfo, pr.Status))
+                                                                 .ToArray();
+                                                            subject.OnNext(ret);
+                                                        }
+                                                        else
+                                                        {
+                                                            _.ForEach(pr =>
+                                                                {
+                                                                    TweetInputInfo ret = Clone();
+                                                                    ret.AuthInfos = new[] { pr.AuthInfo };
+                                                                    ret.ThrownException = pr.ThrownException;
+                                                                    subject.OnNext(ret);
+                                                                });
+                                                        }
+                                                    });
+                                     subject.OnCompleted();
+                                 });
             return subject;
         }
 
@@ -299,10 +298,10 @@ namespace StarryEyes.Models
         {
             if (PostedTweets != null)
             {
-                System.Diagnostics.Debug.WriteLine("deleting previous...");
+                Debug.WriteLine("deleting previous...");
                 await PostedTweets.ToObservable()
-                    .Select(_ => new DeleteOperation(_.Item1, _.Item2))
-                    .LastOrDefaultAsync();
+                                  .Select(_ => new DeleteOperation(_.Item1, _.Item2))
+                                  .LastOrDefaultAsync();
             }
         }
 
@@ -310,16 +309,16 @@ namespace StarryEyes.Models
         {
             public PostResult(AuthenticateInfo info, TwitterStatus status)
             {
-                this.AuthInfo = info;
-                this.IsSucceeded = true;
-                this.Status = status;
+                AuthInfo = info;
+                IsSucceeded = true;
+                Status = status;
             }
 
             public PostResult(AuthenticateInfo info, Exception ex)
             {
-                this.AuthInfo = info;
-                this.IsSucceeded = false;
-                this.ThrownException = ex;
+                AuthInfo = info;
+                IsSucceeded = false;
+                ThrownException = ex;
             }
 
             public bool IsSucceeded { get; private set; }

@@ -6,37 +6,66 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using Livet;
 using StarryEyes.Albireo.Data;
-using StarryEyes.Models.Stores;
 using StarryEyes.Breezy.DataModel;
+using StarryEyes.Models.Stores;
 
 namespace StarryEyes.Models.Tab
 {
     public class TimelineModel : IDisposable
     {
-        public readonly int TimelineChunkCount = 250;
-        public readonly int TimelineChunkCountBounce = 50;
+        public readonly int TimelineChunkCount = 120;
+        public readonly int TimelineChunkCountBounce = 30;
+        private readonly CompositeDisposable _disposable;
+        private readonly Func<long?, int, IObservable<TwitterStatus>> _fetcher;
 
-        private object _sicLocker = new object();
-        private AVLTree<long> _statusIdCache;
-        private Func<TwitterStatus, bool> _evaluator;
-        private Func<long?, int, IObservable<TwitterStatus>> _fetcher;
-        private CompositeDisposable _disposable;
+        private readonly object _sicLocker = new object();
+        private readonly AVLTree<long> _statusIdCache;
 
-        public event Action OnNewStatusArrived;
+        private readonly ObservableSynchronizedCollectionEx<TwitterStatus> _statuses
+            = new ObservableSynchronizedCollectionEx<TwitterStatus>();
+
+        private bool _isSuppressTimelineTrimming;
 
         public TimelineModel(Func<TwitterStatus, bool> evaluator,
-            Func<long?, int, IObservable<TwitterStatus>> fetcher)
+                             Func<long?, int, IObservable<TwitterStatus>> fetcher)
         {
-            this._evaluator = evaluator;
-            this._fetcher = fetcher;
-            this._statusIdCache = new AVLTree<long>();
-            this._disposable = new CompositeDisposable();
+            _fetcher = fetcher;
+            _statusIdCache = new AVLTree<long>();
+            _disposable = new CompositeDisposable();
 
             // listen status stream
             _disposable.Add(StatusStore.StatusPublisher
-                .Where(sn => !sn.IsAdded || evaluator(sn.Status))
-                .Subscribe(AcceptStatusNotification));
+                                       .Where(sn => !sn.IsAdded || evaluator(sn.Status))
+                                       .Subscribe(AcceptStatusNotification));
         }
+
+        public ObservableSynchronizedCollectionEx<TwitterStatus> Statuses
+        {
+            get { return _statuses; }
+        }
+
+        public bool IsSuppressTimelineTrimming
+        {
+            get { return _isSuppressTimelineTrimming; }
+            set
+            {
+                if (_isSuppressTimelineTrimming != value)
+                {
+                    _isSuppressTimelineTrimming = value;
+                    if (!value)
+                        TrimTimeline();
+                }
+            }
+        }
+
+        public void Dispose()
+        {
+            _disposable.Dispose();
+            _statusIdCache.Clear();
+            _statuses.Clear();
+        }
+
+        public event Action OnNewStatusArrived;
 
         private void AcceptStatusNotification(StatusNotification notification)
         {
@@ -61,7 +90,7 @@ namespace StarryEyes.Models.Tab
                     status);
                 if (_statusIdCache.Count > TimelineChunkCount + TimelineChunkCountBounce)
                     TrimTimeline();
-                var handler = OnNewStatusArrived;
+                Action handler = OnNewStatusArrived;
                 if (handler != null)
                     handler();
             }
@@ -81,41 +110,19 @@ namespace StarryEyes.Models.Tab
             }
         }
 
-        private readonly ObservableSynchronizedCollectionEx<TwitterStatus> _statuses
-            = new ObservableSynchronizedCollectionEx<TwitterStatus>();
-        public ObservableSynchronizedCollectionEx<TwitterStatus> Statuses
-        {
-            get { return _statuses; }
-        }
-
         public IObservable<Unit> ReadMore(long? maxId)
         {
-            return Observable.Defer(() => this._fetcher(maxId, TimelineChunkCount))
-                .Do(this.AddStatus)
-                .OfType<Unit>();
-        }
-
-        private bool _isSuppressTimelineTrimming = false;
-        public bool IsSuppressTimelineTrimming
-        {
-            get { return _isSuppressTimelineTrimming; }
-            set
-            {
-                if (_isSuppressTimelineTrimming != value)
-                {
-                    _isSuppressTimelineTrimming = value;
-                    if (!value)
-                        TrimTimeline();
-                }
-            }
+            return Observable.Defer(() => _fetcher(maxId, TimelineChunkCount))
+                             .Do(AddStatus)
+                             .OfType<Unit>();
         }
 
         private void TrimTimeline()
         {
             if (_isSuppressTimelineTrimming) return;
             if (_statuses.Count < TimelineChunkCount + TimelineChunkCountBounce) return;
-            var lastCreatedAt = _statuses[TimelineChunkCount].CreatedAt;
-            List<long> removedIds = new List<long>();
+            DateTime lastCreatedAt = _statuses[TimelineChunkCount].CreatedAt;
+            var removedIds = new List<long>();
             _statuses.RemoveWhere(t =>
             {
                 if (t.CreatedAt < lastCreatedAt)
@@ -132,14 +139,6 @@ namespace StarryEyes.Models.Tab
             {
                 removedIds.ForEach(i => _statusIdCache.Remove(i));
             }
-            System.Diagnostics.Debug.WriteLine(removedIds.Count + " statuses removed.");
-        }
-
-        public void Dispose()
-        {
-            _disposable.Dispose();
-            _statusIdCache.Clear();
-            _statuses.Clear();
         }
     }
 }

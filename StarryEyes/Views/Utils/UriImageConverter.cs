@@ -7,6 +7,7 @@ namespace StarryEyes.Views.Utils
     {
         public override BitmapImage ToTarget(Uri input, object parameter)
         {
+            return null;
             if (input == null)
                 return null;
             try

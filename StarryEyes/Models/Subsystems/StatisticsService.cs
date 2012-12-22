@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reactive.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using StarryEyes.Models.Stores;
 
 namespace StarryEyes.Models.Subsystems
@@ -22,13 +23,11 @@ namespace StarryEyes.Models.Subsystems
                 });
             estimatedGrossTweetCount = StatusStore.Count;
             App.OnApplicationFinalize += StopThread;
-            workThread = new Thread(UpdateStatisticWorkProc);
-            workThread.Start();
+            Task.Factory.StartNew(UpdateStatisticWorkProc, TaskCreationOptions.LongRunning);
         }
 
         private static DateTime timestamp = DateTime.Now;
 
-        private static Thread workThread;
         private static object statisticsWorkProcSync = new object();
         private static volatile bool isThreadAlive = true;
         private static void StopThread()

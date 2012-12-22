@@ -18,37 +18,35 @@ namespace StarryEyes.Filters.Parsing
         {
             try
             {
-                var tokens = Tokenizer.Tokenize(query);
+                Token[] tokens = Tokenizer.Tokenize(query).ToArray();
                 // (from (sources)) (where (filters))
-                var first = tokens.FirstOrDefault();
+                Token first = tokens.FirstOrDefault();
                 if (first.Type == TokenType.Literal &&
                     first.Value.Equals("from", StringComparison.CurrentCultureIgnoreCase))
                 {
                     // compile with sources && predicates
-                    var sources = CompileSources(tokens.Skip(1).TakeWhile(t => t.Type != TokenType.Literal || t.Value != "where")).ToArray();
-                    if (tokens.Skip(1).SkipWhile(t => t.Type != TokenType.Literal || t.Value != "where").Count() == 0)
+                    FilterSourceBase[] sources =
+                        CompileSources(tokens.Skip(1).TakeWhile(t => t.Type != TokenType.Literal || t.Value != "where"))
+                            .ToArray();
+                    if (!tokens.Skip(1).SkipWhile(t => t.Type != TokenType.Literal || t.Value != "where").Any())
                     {
                         // without predicates
-                        return new FilterQuery() { Sources = sources, PredicateTreeRoot = new FilterExpressionRoot() };
+                        return new FilterQuery { Sources = sources, PredicateTreeRoot = new FilterExpressionRoot() };
                     }
-                    else
-                    {
-                        var filters = CompileFilters(tokens.Skip(1).SkipWhile(t => t.Type != TokenType.Literal || t.Value != "where").Skip(1));
-                        return new FilterQuery() { Sources = sources, PredicateTreeRoot = filters };
-                    }
+                    FilterExpressionRoot filters =
+                        CompileFilters(
+                            tokens.Skip(1).SkipWhile(t => t.Type != TokenType.Literal || t.Value != "where").Skip(1));
+                    return new FilterQuery { Sources = sources, PredicateTreeRoot = filters };
                 }
-                else if (first.Type == TokenType.Literal &&
+                if (first.Type == TokenType.Literal &&
                     first.Value.Equals("where", StringComparison.CurrentCultureIgnoreCase))
                 {
                     // compile with predicates
-                    var sources = new[] { new FilterLocal() }; // implicit "from all"
-                    var filters = CompileFilters(tokens.Skip(1));
-                    return new FilterQuery() { Sources = sources, PredicateTreeRoot = filters };
+                    var sources = new FilterSourceBase[] { new FilterLocal() }; // implicit "from all"
+                    FilterExpressionRoot filters = CompileFilters(tokens.Skip(1));
+                    return new FilterQuery { Sources = sources, PredicateTreeRoot = filters };
                 }
-                else
-                {
-                    throw new FormatException("Query must be started with \"from\" keyword or \"where\" keyword..");
-                }
+                throw new FormatException("Query must be started with \"from\" keyword or \"where\" keyword..");
             }
             catch (FilterQueryException)
             {
@@ -64,7 +62,7 @@ namespace StarryEyes.Filters.Parsing
         {
             try
             {
-                var tokens = Tokenizer.Tokenize(query);
+                IEnumerable<Token> tokens = Tokenizer.Tokenize(query);
                 // from (sources) where (filters)
                 return CompileFilters(tokens);
             }
@@ -80,29 +78,29 @@ namespace StarryEyes.Filters.Parsing
 
         #region sources compiler
 
-        private static readonly IDictionary<string, Type> FilterSourceResolver = new SortedDictionary<string, Type>()
+        private static readonly IDictionary<string, Type> FilterSourceResolver = new SortedDictionary<string, Type>
         {
-            { "*", typeof(FilterLocal) },
-            { "local", typeof(FilterLocal) },
-            { "all", typeof(FilterLocal) },
-            { "home", typeof(FilterHome) },
-            { "list", typeof(FilterList) },
-            { "mention", typeof(FilterMentions) },
-            { "mentions", typeof(FilterMentions) },
-            { "reply", typeof(FilterMentions) },
-            { "replies", typeof(FilterMentions) },
-            { "message", typeof(FilterMessages) },
-            { "messages", typeof(FilterMessages) },
-            { "dm", typeof(FilterMessages) },
-            { "dms", typeof(FilterMessages) },
-            { "search", typeof(FilterSearch) },
-            { "find", typeof(FilterSearch) },
-            { "track", typeof(FilterTrack) },
-            { "stream", typeof(FilterTrack) },
+            {"*", typeof (FilterLocal)},
+            {"local", typeof (FilterLocal)},
+            {"all", typeof (FilterLocal)},
+            {"home", typeof (FilterHome)},
+            {"list", typeof (FilterList)},
+            {"mention", typeof (FilterMentions)},
+            {"mentions", typeof (FilterMentions)},
+            {"reply", typeof (FilterMentions)},
+            {"replies", typeof (FilterMentions)},
+            {"message", typeof (FilterMessages)},
+            {"messages", typeof (FilterMessages)},
+            {"dm", typeof (FilterMessages)},
+            {"dms", typeof (FilterMessages)},
+            {"search", typeof (FilterSearch)},
+            {"find", typeof (FilterSearch)},
+            {"track", typeof (FilterTrack)},
+            {"stream", typeof (FilterTrack)},
         };
 
         /// <summary>
-        /// Instantiate sources from tokens.
+        ///     Instantiate sources from tokens.
         /// </summary>
         private static IEnumerable<FilterSourceBase> CompileSources(IEnumerable<Token> token)
         {
@@ -112,10 +110,11 @@ namespace StarryEyes.Filters.Parsing
             var reader = new TokenReader(token);
             while (reader.IsRemainToken)
             {
-                var filter = reader.Get();
+                Token filter = reader.Get();
                 if (filter.Type != TokenType.Literal && filter.Type != TokenType.OperatorMultiple)
                 {
-                    throw new ArgumentException("Operator is not expected.(" + filter.Type + ") expected is Literal or \'*\'.");
+                    throw new ArgumentException("Operator is not expected.(" + filter.Type +
+                                                ") expected is Literal or \'*\'.");
                 }
                 Type fstype;
                 if (!FilterSourceResolver.TryGetValue(filter.Value, out fstype))
@@ -125,7 +124,7 @@ namespace StarryEyes.Filters.Parsing
                     reader.AssertGet(TokenType.Collon);
                     do
                     {
-                        var argument = reader.AssertGet(TokenType.String);
+                        Token argument = reader.AssertGet(TokenType.String);
                         yield return Activator.CreateInstance(fstype, argument.Value) as FilterSourceBase;
                         // separated by comma
                         if (reader.IsRemainToken)
@@ -151,15 +150,15 @@ namespace StarryEyes.Filters.Parsing
         #region filter expression tree compiler
 
         /// <summary>
-        /// Instantiate expression tree from tokens.
+        ///     Instantiate expression tree from tokens.
         /// </summary>
         private static FilterExpressionRoot CompileFilters(IEnumerable<Token> token)
         {
             var reader = new TokenReader(token);
-            var op = CompileL0(reader);
+            FilterOperatorBase op = CompileL0(reader);
             if (reader.IsRemainToken)
                 throw new FilterQueryException("Invalid token: " + reader.Get(), reader.RemainQuery);
-            return new FilterExpressionRoot() { Operator = op };
+            return new FilterExpressionRoot { Operator = op };
         }
 
         // Operators:
@@ -177,11 +176,11 @@ namespace StarryEyes.Filters.Parsing
         private static FilterOperatorBase CompileL0(TokenReader reader)
         {
             // ||
-            var left = CompileL1(reader);
+            FilterOperatorBase left = CompileL1(reader);
             if (!reader.IsRemainToken)
                 return left;
             var generate = (Func<TokenType, FilterTwoValueOperator, FilterOperatorBase>)
-                ((type, oper) => GenerateSink(reader, left, type, oper, CompileL0));
+                           ((type, oper) => GenerateSink(reader, left, type, oper, CompileL0));
             switch (reader.LookAhead().Type)
             {
                 case TokenType.OperatorOr:
@@ -194,11 +193,11 @@ namespace StarryEyes.Filters.Parsing
         private static FilterOperatorBase CompileL1(TokenReader reader)
         {
             // &&
-            var left = CompileL2(reader);
+            FilterOperatorBase left = CompileL2(reader);
             if (!reader.IsRemainToken)
                 return left;
             var generate = (Func<TokenType, FilterTwoValueOperator, FilterOperatorBase>)
-                ((type, oper) => GenerateSink(reader, left, type, oper, CompileL1));
+                           ((type, oper) => GenerateSink(reader, left, type, oper, CompileL1));
             switch (reader.LookAhead().Type)
             {
                 case TokenType.OperatorAnd:
@@ -211,11 +210,11 @@ namespace StarryEyes.Filters.Parsing
         private static FilterOperatorBase CompileL2(TokenReader reader)
         {
             // == !=
-            var left = CompileL3(reader);
+            FilterOperatorBase left = CompileL3(reader);
             if (!reader.IsRemainToken)
                 return left;
             var generate = (Func<TokenType, FilterTwoValueOperator, FilterOperatorBase>)
-                ((type, oper) => GenerateSink(reader, left, type, oper, CompileL2));
+                           ((type, oper) => GenerateSink(reader, left, type, oper, CompileL2));
             switch (reader.LookAhead().Type)
             {
                 case TokenType.OperatorEquals:
@@ -230,11 +229,11 @@ namespace StarryEyes.Filters.Parsing
         private static FilterOperatorBase CompileL3(TokenReader reader)
         {
             // < <= > >=
-            var left = CompileL4(reader);
+            FilterOperatorBase left = CompileL4(reader);
             if (!reader.IsRemainToken)
                 return left;
             var generate = (Func<TokenType, FilterTwoValueOperator, FilterOperatorBase>)
-                ((type, oper) => GenerateSink(reader, left, type, oper, CompileL3));
+                           ((type, oper) => GenerateSink(reader, left, type, oper, CompileL3));
             switch (reader.LookAhead().Type)
             {
                 case TokenType.OperatorLessThan:
@@ -253,11 +252,11 @@ namespace StarryEyes.Filters.Parsing
         private static FilterOperatorBase CompileL4(TokenReader reader)
         {
             // <- ->
-            var left = CompileL5(reader);
+            FilterOperatorBase left = CompileL5(reader);
             if (!reader.IsRemainToken)
                 return left;
             var generate = (Func<TokenType, FilterTwoValueOperator, FilterOperatorBase>)
-                ((type, oper) => GenerateSink(reader, left, type, oper, CompileL4));
+                           ((type, oper) => GenerateSink(reader, left, type, oper, CompileL4));
             switch (reader.LookAhead().Type)
             {
                 case TokenType.OperatorContains:
@@ -272,11 +271,11 @@ namespace StarryEyes.Filters.Parsing
         private static FilterOperatorBase CompileL5(TokenReader reader)
         {
             // parse arithmetic operators
-            var left = CompileL6(reader);
+            FilterOperatorBase left = CompileL6(reader);
             if (!reader.IsRemainToken)
                 return left;
             var generate = (Func<TokenType, FilterTwoValueOperator, FilterOperatorBase>)
-                ((type, oper) => GenerateSink(reader, left, type, oper, CompileL5));
+                           ((type, oper) => GenerateSink(reader, left, type, oper, CompileL5));
             switch (reader.LookAhead().Type)
             {
                 case TokenType.OperatorPlus:
@@ -291,11 +290,11 @@ namespace StarryEyes.Filters.Parsing
         private static FilterOperatorBase CompileL6(TokenReader reader)
         {
             // parse arithmetic operators (faster)
-            var left = CompileL7(reader);
+            FilterOperatorBase left = CompileL7(reader);
             if (!reader.IsRemainToken)
                 return left;
             var generate = (Func<TokenType, FilterTwoValueOperator, FilterOperatorBase>)
-                ((type, oper) => GenerateSink(reader, left, type, oper, CompileL6));
+                           ((type, oper) => GenerateSink(reader, left, type, oper, CompileL6));
             switch (reader.LookAhead().Type)
             {
                 case TokenType.OperatorMultiple:
@@ -313,12 +312,9 @@ namespace StarryEyes.Filters.Parsing
             if (reader.LookAhead().Type == TokenType.Exclamation)
             {
                 reader.AssertGet(TokenType.Exclamation);
-                return new FilterNegate() { Value = CompileL7(reader) };
+                return new FilterNegate { Value = CompileL7(reader) };
             }
-            else
-            {
-                return CompileL8(reader);
-            }
+            return CompileL8(reader);
         }
 
         private static FilterOperatorBase CompileL8(TokenReader reader)
@@ -333,17 +329,11 @@ namespace StarryEyes.Filters.Parsing
                     reader.AssertGet(TokenType.CloseBracket);
                     return new FilterBracket(null);
                 }
-                else
-                {
-                    var ret = CompileL0(reader);
-                    reader.AssertGet(TokenType.CloseBracket);
-                    return new FilterBracket(ret);
-                }
+                FilterOperatorBase ret = CompileL0(reader);
+                reader.AssertGet(TokenType.CloseBracket);
+                return new FilterBracket(ret);
             }
-            else
-            {
-                return InstantiateValue(reader);
-            }
+            return InstantiateValue(reader);
         }
 
         private static FilterOperatorBase GenerateSink(
@@ -354,7 +344,7 @@ namespace StarryEyes.Filters.Parsing
             Func<TokenReader, FilterOperatorBase> selfCall)
         {
             reader.AssertGet(type);
-            var rightValue = selfCall(reader);
+            FilterOperatorBase rightValue = selfCall(reader);
             oper.LeftValue = leftValue;
             oper.RightValue = rightValue;
             return oper;
@@ -362,17 +352,17 @@ namespace StarryEyes.Filters.Parsing
 
         private static ValueBase InstantiateValue(TokenReader reader)
         {
-            var literal = reader.LookAhead();
+            Token literal = reader.LookAhead();
             if (literal.Type == TokenType.String)
             {
                 // immediate string value
                 return new StringValue(reader.AssertGet(TokenType.String).Value);
             }
-            else if (literal.Type == TokenType.OperatorMultiple)
+            if (literal.Type == TokenType.OperatorMultiple)
             {
                 // for parsing asterisk user
-                var _pseudo = reader.AssertGet(TokenType.OperatorMultiple);
-                literal = new Token(TokenType.Literal, "*", _pseudo.DebugIndex);
+                Token pseudo = reader.AssertGet(TokenType.OperatorMultiple);
+                literal = new Token(TokenType.Literal, "*", pseudo.DebugIndex);
             }
             else
             {
@@ -390,25 +380,22 @@ namespace StarryEyes.Filters.Parsing
                 case "retweeter":
                     return InstantiateUserValue(literal.Value == "retweeter", reader);
                 default:
-                    long iv = 0;
+                    long iv;
                     if (Int64.TryParse(literal.Value, out iv))
                     {
                         return new NumericValue(iv);
                     }
-                    else
-                    {
-                        return InstantiateStatusValue(literal.Value, reader);
-                    }
+                    return InstantiateStatusValue(literal.Value, reader);
             }
         }
 
         private static ValueBase InstantiateLocalUsers(string value, TokenReader reader)
         {
-            var repl = GetRepresentation(value);
+            UserRepresentationBase repl = GetRepresentation(value);
             if (reader.IsRemainToken && reader.LookAhead().Type == TokenType.Period)
             {
                 reader.AssertGet(TokenType.Period);
-                var literal = reader.AssertGet(TokenType.Literal);
+                Token literal = reader.AssertGet(TokenType.Literal);
                 switch (literal.Value)
                 {
                     case "friend":
@@ -420,13 +407,11 @@ namespace StarryEyes.Filters.Parsing
                     case "followers":
                         return new LocalUserFollowers(repl);
                     default:
-                        throw new FilterQueryException("Unexpected token: " + literal.Value, repl.ToQuery() + "." + literal.Value + " " + reader.RemainQuery);
+                        throw new FilterQueryException("Unexpected token: " + literal.Value,
+                                                       repl.ToQuery() + "." + literal.Value + " " + reader.RemainQuery);
                 }
             }
-            else
-            {
-                return new LocalUser(repl);
-            }
+            return new LocalUser(repl);
         }
 
         private static UserRepresentationBase GetRepresentation(string key)
@@ -435,28 +420,25 @@ namespace StarryEyes.Filters.Parsing
             {
                 return new UserAny();
             }
-            else if (key.StartsWith("#"))
+            if (key.StartsWith("#"))
             {
-                var id = Int64.Parse(key.Substring(1));
+                long id = Int64.Parse(key.Substring(1));
                 return new UserSpecified(id);
             }
-            else
-            {
-                return new UserSpecified(key);
-            }
+            return new UserSpecified(key);
         }
 
         private static ValueBase InstantiateUserValue(bool isRetweeter, TokenReader reader)
         {
             var selector = (Func<ValueBase, ValueBase, ValueBase>)
-                ((user, retweeter) => isRetweeter ? retweeter : user);
+                           ((user, retweeter) => isRetweeter ? retweeter : user);
             if (reader.IsRemainToken && reader.LookAhead().Type != TokenType.Period)
             {
                 // user representation
                 return selector(new User(), new Retweeter());
             }
             reader.AssertGet(TokenType.Period);
-            var literal = reader.AssertGet(TokenType.Literal);
+            Token literal = reader.AssertGet(TokenType.Literal);
             switch (literal.Value)
             {
                 case "protected":
@@ -537,7 +519,8 @@ namespace StarryEyes.Filters.Parsing
                 case "language":
                     return selector(new UserLanguage(), new RetweeterLanguage());
                 default:
-                    throw new FilterQueryException("Unexpected token: " + literal.Value, "user." + literal.Value + " " + reader.RemainQuery);
+                    throw new FilterQueryException("Unexpected token: " + literal.Value,
+                                                   "user." + literal.Value + " " + reader.RemainQuery);
             }
         }
 
@@ -553,6 +536,7 @@ namespace StarryEyes.Filters.Parsing
                 case "isDirectMessage":
                 case "is_direct_message":
                     return new StatusIsDirectMessage();
+                case "rt":
                 case "retweet":
                 case "isRetweet":
                 case "is_retweet":
@@ -574,12 +558,16 @@ namespace StarryEyes.Filters.Parsing
                     return new StatusTo();
                 case "id":
                     return new StatusId();
+                case "favs":
+                case "favorites":
                 case "favorer":
                 case "favorers":
-                    return new StatusFavorers();
+                    return new StatusFavorites();
+                case "rts":
+                case "retweets":
                 case "retweeter":
                 case "retweeters":
-                    return new StatusRetweeters();
+                    return new StatusRetweets();
                 case "text":
                 case "body":
                     return new StatusText();

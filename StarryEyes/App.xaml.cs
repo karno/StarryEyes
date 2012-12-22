@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Configuration;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -11,6 +12,7 @@ using System.Threading;
 using System.Windows;
 using Livet;
 using StarryEyes.Breezy.Api;
+using StarryEyes.Models.Hubs;
 using StarryEyes.Models.Plugins;
 using StarryEyes.Models.Stores;
 using StarryEyes.Models.Subsystems;
@@ -22,9 +24,9 @@ namespace StarryEyes
     /// <summary>
     /// App.xaml の相互作用ロジック
     /// </summary>
-    public partial class App : Application
+    public partial class App
     {
-        private static Mutex appMutex;
+        private static Mutex _appMutex;
         private void Application_Startup(object sender, StartupEventArgs e)
         {
             // enable multi-core JIT.
@@ -57,23 +59,22 @@ namespace StarryEyes
                     mutexStr = "Standalone_" + ExeFilePath;
                     break;
             }
-            appMutex = new Mutex(true, "Krile_StarryEyes_" + mutexStr);
-            if (appMutex.WaitOne(0, false) == false)
+            _appMutex = new Mutex(true, "Krile_StarryEyes_" + mutexStr);
+            if (_appMutex.WaitOne(0, false) == false)
             {
                 MessageBox.Show("Krileは既に起動しています。");
                 Environment.Exit(0);
-                return;
             }
 
 #if DEBUG
-            if (!System.Diagnostics.Debugger.IsAttached)
+            if (!Debugger.IsAttached)
             {
-                AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
+                AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             }
 #else
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
 #endif
-            Application.Current.Exit += (_, __) => AppFinalize(true);
+            Current.Exit += (_, __) => AppFinalize(true);
 
             // Initialize service points
             ServicePointManager.Expect100Continue = false; // disable expect 100 continue for User Streams connection.
@@ -85,7 +86,7 @@ namespace StarryEyes
             // Load settings
             if (!Setting.LoadSettings())
             {
-                Application.Current.Shutdown();
+                Current.Shutdown();
                 return; // fail
             }
 
@@ -102,7 +103,7 @@ namespace StarryEyes
             }
             catch (Exception ex)
             {
-                var option = new TaskDialogOptions()
+                var option = new TaskDialogOptions
                 {
                     MainIcon = VistaTaskDialogIcon.Error,
                     Title = "Krile データストア初期化エラー",
@@ -117,20 +118,18 @@ namespace StarryEyes
                     result.CommandButtonResult.Value == 1)
                 {
                     // shutdown
-                    Application.Current.Shutdown();
+                    Current.Shutdown();
                     return;
                 }
-                else
-                {
-                    // clear data
-                    ClearStoreData();
-                    Nightmare.Windows.Application.Restart();
-                    Application.Current.Shutdown();
-                    return;
-                }
+                // clear data
+                ClearStoreData();
+                Nightmare.Windows.Application.Restart();
+                Current.Shutdown();
+                return;
             }
             AccountsStore.Initialize();
             StatisticsService.Initialize();
+            EventHub.Initialize();
 
             // Activate plugins
             PluginManager.LoadedPlugins.ForEach(p => p.Initialize());
@@ -138,6 +137,7 @@ namespace StarryEyes
             // Activate scripts
             ScriptingManager.ExecuteScripts();
 
+            EventHub.RegisterDefaultHandlers();
             RaiseSystemReady();
         }
 
@@ -149,13 +149,13 @@ namespace StarryEyes
         {
             if (shutdown)
             {
-                System.Diagnostics.Debug.WriteLine("App Normal Exit");
+                Debug.WriteLine("App Normal Exit");
                 // 正規の終了
                 RaiseApplicationExit();
             }
-            System.Diagnostics.Debug.WriteLine("App Finalize");
+            Debug.WriteLine("App Finalize");
             RaiseApplicationFinalize();
-            appMutex.ReleaseMutex();
+            _appMutex.ReleaseMutex();
         }
 
         /// <summary>
@@ -166,16 +166,16 @@ namespace StarryEyes
             try
             {
                 // TODO:ロギング処理など
-                System.Diagnostics.Debug.WriteLine("##### SYSTEM CRASH! #####");
-                System.Diagnostics.Debug.WriteLine(e.ExceptionObject.ToString());
+                Debug.WriteLine("##### SYSTEM CRASH! #####");
+                Debug.WriteLine(e.ExceptionObject.ToString());
 
                 // Build stack trace report file
                 var builder = new StringBuilder();
-                builder.AppendLine("Krile STARRYEYES #" + App.FormattedVersion);
-                builder.AppendLine(Environment.OSVersion.ToString() + " " + (Environment.Is64BitProcess ? "x64" : "x86"));
-                builder.AppendLine("execution mode: " + App.ExecutionMode.ToString() + " " +
-                    "multicore JIT: " + App.IsMulticoreJITEnabled.ToString() + " " +
-                    "hardware rendering: " + App.IsHardwareRenderingEnabled.ToString());
+                builder.AppendLine("Krile STARRYEYES #" + FormattedVersion);
+                builder.AppendLine(Environment.OSVersion + " " + (Environment.Is64BitProcess ? "x64" : "x86"));
+                builder.AppendLine("execution mode: " + ExecutionMode.ToString() + " " +
+                    "multicore JIT: " + IsMulticoreJITEnabled.ToString() + " " +
+                    "hardware rendering: " + IsHardwareRenderingEnabled.ToString());
                 builder.AppendLine();
                 builder.AppendLine("thrown:");
                 builder.AppendLine(e.ExceptionObject.ToString());
@@ -199,7 +199,7 @@ namespace StarryEyes
             finally
             {
                 // アプリケーション ファイナライズ
-                this.AppFinalize(false);
+                AppFinalize(false);
             }
 
 
@@ -261,8 +261,7 @@ namespace StarryEyes
             {
                 if (ConfigurationManager.AppSettings["UseMulticoreJIT"].ToLower() == "none")
                     return false;
-                else
-                    return true;
+                return true;
             }
         }
 
@@ -272,8 +271,7 @@ namespace StarryEyes
             {
                 if (ConfigurationManager.AppSettings["UseHardwareRendering"].ToLower() == "none")
                     return false;
-                else
-                    return true;
+                return true;
             }
         }
 
@@ -289,7 +287,6 @@ namespace StarryEyes
                         return Path.Combine(
                             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                             "Krile");
-                    case ExecutionMode.Default:
                     default:
                         // setting hold in "Local"
                         return Path.Combine(
@@ -364,8 +361,8 @@ namespace StarryEyes
         {
             get
             {
-                var lvstr = (Version.FileMajorPart * 1000 + Version.FileMinorPart).ToString() + "." +
-                    Version.FilePrivatePart.ToString();
+                var lvstr = (Version.FileMajorPart * 1000 + Version.FileMinorPart).ToString(CultureInfo.InvariantCulture) + "." +
+                    Version.FilePrivatePart.ToString(CultureInfo.InvariantCulture);
                 return Double.Parse(lvstr);
             }
         }

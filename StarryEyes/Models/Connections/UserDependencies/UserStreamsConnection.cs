@@ -1,18 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using StarryEyes.Breezy.Api.Streaming;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
-using StarryEyes.Models.Stores;
 using StarryEyes.Models.Hubs;
-using StarryEyes.Models.Backpanels;
-using StarryEyes.Models.Backpanels.TwitterEvents;
-using StarryEyes.Models.Backpanels.SystemEvents;
-using StarryEyes.Settings;
+using StarryEyes.Models.Stores;
 
 namespace StarryEyes.Models.Connections.UserDependencies
 {
@@ -21,73 +17,71 @@ namespace StarryEyes.Models.Connections.UserDependencies
         public const int MaxTrackingKeywordBytes = 60;
         public const int MaxTrackingKeywordCounts = 100;
 
-        const int HardErrorRetryMaxCount = 3;
-        int hardErrorRetryCount = 0;
+        private const int HardErrorRetryMaxCount = 3;
+        private IDisposable _connection;
 
-        private enum BackOffMode
+        private BackOffMode _currentBackOffMode = BackOffMode.None;
+        private long _currentBackOffWaitCount;
+        private int _hardErrorRetryCount;
+
+        private string[] _trackKeywords;
+
+        public UserStreamsConnection(AuthenticateInfo ai)
+            : base(ai)
         {
-            None,
-            Network,
-            Protocol,
         }
 
-        public event Action<bool> IsConnectionAliveEvent;
-
-        private BackOffMode currentBackOffMode = BackOffMode.None;
-        private long currentBackOffWaitCount = 0;
-
-        public UserStreamsConnection(AuthenticateInfo ai) : base(ai) { }
-        private IDisposable _connection = null;
-
-        private string[] trackKeywords;
         public IEnumerable<string> TrackKeywords
         {
-            get { return trackKeywords; }
-            set { trackKeywords = value.ToArray(); }
+            get { return _trackKeywords; }
+            set { _trackKeywords = value.ToArray(); }
         }
 
         /// <summary>
-        /// User Streams is connected
+        ///     User Streams is connected
         /// </summary>
         public bool IsConnected
         {
             get { return _connection != null; }
         }
 
+        public event Action<bool> IsConnectionAliveEvent;
+
         /// <summary>
-        /// Connect to user streams.<para />
-        /// Or, update connected streams.
+        ///     Connect to user streams.
+        ///     <para />
+        ///     Or, update connected streams.
         /// </summary>
         public void Connect()
         {
             CheckDisposed();
             Disconnect();
-            _connection = this.AuthInfo.ConnectToUserStreams(trackKeywords)
-                .Do(_ => currentBackOffMode = BackOffMode.None) // initialize back-off
-                .Subscribe(
-                _ => Register(_),
-                ex => HandleException(ex),
-                () =>
-                {
-                    if (_connection != null)
-                    {
-                        // make reconnect.
-                        Disconnect();
-                        System.Diagnostics.Debug.WriteLine("***Auto reconnect***");
-                        Connect();
-                    }
-                });
+            _connection = AuthInfo.ConnectToUserStreams(_trackKeywords)
+                                  .Do(_ => _currentBackOffMode = BackOffMode.None) // initialize back-off
+                                  .Subscribe(
+                                      Register,
+                                      HandleException,
+                                      () =>
+                                      {
+                                          if (_connection != null)
+                                          {
+                                              // make reconnect.
+                                              Disconnect();
+                                              Debug.WriteLine("***Auto reconnect***");
+                                              Connect();
+                                          }
+                                      });
             RaiseIsConnectedEvent(true);
         }
 
         /// <summary>
-        /// Disconnect from user streams.
+        ///     Disconnect from user streams.
         /// </summary>
         public void Disconnect()
         {
             if (_connection != null)
             {
-                var disposal = _connection;
+                IDisposable disposal = _connection;
                 _connection = null;
                 disposal.Dispose();
                 RaiseIsConnectedEvent(false);
@@ -96,7 +90,7 @@ namespace StarryEyes.Models.Connections.UserDependencies
 
         private void Register(TwitterStreamingElement elem)
         {
-            hardErrorRetryCount = 0; // initialize error count
+            _hardErrorRetryCount = 0; // initialize error count
             switch (elem.EventType)
             {
                 case EventType.Empty:
@@ -104,22 +98,16 @@ namespace StarryEyes.Models.Connections.UserDependencies
                     if (elem.Status != null)
                     {
                         StatusStore.Store(elem.Status);
-                        // notify status
-                        if (elem.Status.RetweetedOriginal != null &&
-                            AccountsStore.AccountIds.Contains(elem.Status.RetweetedOriginal.User.Id) &&
-                            !Setting.Muteds.Evaluator(elem.Status) &&
-                            (!Setting.ApplyMuteToRetweetOriginals.Value || !Setting.Muteds.Evaluator(elem.Status.RetweetedOriginal)))
-                        {
-                            BackpanelModel.RegisterEvent(new RetweetedEvent(elem.Status.User, elem.Status.RetweetedOriginal));
-                        }
                     }
                     if (elem.DeletedId != null)
+                    {
                         StatusStore.Remove(elem.DeletedId.Value);
+                    }
                     break;
                 case EventType.Follow:
                 case EventType.Unfollow:
-                    var source = elem.EventSourceUser.Id;
-                    var target = elem.EventTargetUser.Id;
+                    long source = elem.EventSourceUser.Id;
+                    long target = elem.EventTargetUser.Id;
                     bool isFollowed = elem.EventType == EventType.Follow;
                     if (source == AuthInfo.Id) // follow or remove
                     {
@@ -152,36 +140,31 @@ namespace StarryEyes.Models.Connections.UserDependencies
 
         private void RegisterEvent(TwitterStreamingElement elem)
         {
-            BackpanelEventBase ev = null;
-            switch(elem.EventType)
+            switch (elem.EventType)
             {
                 case EventType.Blocked:
-                    ev = new BlockedEvent(elem.EventSourceUser, elem.EventTargetUser);
+                    EventHub.NotifyBlocked(elem.EventSourceUser, elem.EventTargetUser);
                     break;
                 case EventType.Unblocked:
-                    ev = new UnblockedEvent(elem.EventSourceUser, elem.EventTargetUser);
+                    EventHub.NotifyUnblocked(elem.EventSourceUser, elem.EventTargetUser);
                     break;
                 case EventType.Favorite:
-                    ev = new FavoritedEvent(elem.EventSourceUser, elem.EventTargetTweet);
+                    EventHub.NotifyFavorited(elem.EventSourceUser, elem.EventTargetTweet);
                     break;
                 case EventType.Unfavorite:
-                    ev = new UnfavoritedEvent(elem.EventSourceUser, elem.EventTargetTweet);
+                    EventHub.NotifyUnfavorited(elem.EventSourceUser, elem.EventTargetTweet);
                     break;
                 case EventType.Follow:
-                    ev = new FollowedEvent(elem.EventSourceUser, elem.EventTargetUser);
+                    EventHub.NotifyFollowed(elem.EventSourceUser, elem.EventTargetUser);
                     break;
                 case EventType.Unfollow:
-                    ev = new UnfollowedEvent(elem.EventSourceUser, elem.EventTargetUser);
+                    EventHub.NotifyUnfollwed(elem.EventSourceUser, elem.EventTargetUser);
                     break;
                 case EventType.LimitationInfo:
-                    ev = new TrackLimitEvent(this.AuthInfo, elem.TrackLimit.GetValueOrDefault());
+                    EventHub.NotifyLimitationInfoGot(AuthInfo, elem.TrackLimit.GetValueOrDefault());
                     break;
                 default:
                     return;
-            }
-            if (ev != null)
-            {
-                BackpanelModel.RegisterEvent(ev);
             }
         }
 
@@ -203,7 +186,8 @@ namespace StarryEyes.Models.Connections.UserDependencies
                                 // ERR: Unauthorized, invalid OAuth request?
                                 if (CheckHardError())
                                 {
-                                    RaiseDisconnectedByError("ユーザー認証が行えません。",
+                                    RaiseDisconnectedByError(
+                                        "ユーザー認証が行えません。",
                                         "PCの時刻設定が正しいか確認してください。回復しない場合は、OAuth認証を再度行ってください。");
                                     return;
                                 }
@@ -212,26 +196,30 @@ namespace StarryEyes.Models.Connections.UserDependencies
                             case HttpStatusCode.NotFound:
                                 if (CheckHardError())
                                 {
-                                    RaiseDisconnectedByError("ユーザーストリーム接続が一時的、または恒久的に利用できなくなっています。",
+                                    RaiseDisconnectedByError(
+                                        "ユーザーストリーム接続が一時的、または恒久的に利用できなくなっています。",
                                         "エンドポイントへの接続時にアクセスが拒否されたか、またはエンドポイントが削除されています。");
                                     return;
                                 }
                                 break;
                             case HttpStatusCode.NotAcceptable:
                             case HttpStatusCode.RequestEntityTooLarge:
-                                RaiseDisconnectedByError("トラックしているキーワードが長すぎるか、不正な可能性があります。",
-                                    "(トラック中のキーワード:" + trackKeywords.JoinString(", ") + ")");
+                                RaiseDisconnectedByError(
+                                    "トラックしているキーワードが長すぎるか、不正な可能性があります。",
+                                    "(トラック中のキーワード:" + _trackKeywords.JoinString(", ") + ")");
                                 return;
                             case HttpStatusCode.RequestedRangeNotSatisfiable:
-                                RaiseDisconnectedByError("ユーザーストリームに接続できません。",
-                                    "(テクニカル エラー: 416 Range Unacceptable. Elevated permission is required or paramter is out of range.)");
+                                RaiseDisconnectedByError(
+                                    "ユーザーストリームに接続できません。",
+                                    "(システム エラー: 416 Range Unacceptable. Elevated permission is required or paramter is out of range.)");
                                 return;
                             case (HttpStatusCode)420:
                                 // ERR: Too many connections
                                 // (other client is already connected?)
                                 if (CheckHardError())
                                 {
-                                    RaiseDisconnectedByError("ユーザーストリーム接続が制限されています。",
+                                    RaiseDisconnectedByError(
+                                        "ユーザーストリーム接続が制限されています。",
                                         "Krileが多重起動していないか確認してください。短時間に何度も接続を試みていた場合は、しばらく待つと再接続できるようになります。");
                                     return;
                                 }
@@ -239,13 +227,14 @@ namespace StarryEyes.Models.Connections.UserDependencies
                         }
                     }
                     // else -> backoff
-                    if (currentBackOffMode == BackOffMode.Protocol)
-                        currentBackOffWaitCount += currentBackOffWaitCount; // wait count is raised exponentially.
+                    if (_currentBackOffMode == BackOffMode.Protocol)
+                        _currentBackOffWaitCount += _currentBackOffWaitCount; // wait count is raised exponentially.
                     else
-                        currentBackOffWaitCount = 5000;
-                    if (currentBackOffWaitCount >= 320000) // max wait is 320 sec.
+                        _currentBackOffWaitCount = 5000;
+                    if (_currentBackOffWaitCount >= 320000) // max wait is 320 sec.
                     {
-                        RaiseDisconnectedByError("Twitterが不安定な状態になっています。",
+                        RaiseDisconnectedByError(
+                            "Twitterが不安定な状態になっています。",
                             "プロトコル エラーにより、ユーザーストリームに既定のリトライ回数内で接続できませんでした。");
                         return;
                     }
@@ -254,13 +243,14 @@ namespace StarryEyes.Models.Connections.UserDependencies
                 {
                     // network error
                     // -> backoff
-                    if (currentBackOffMode == BackOffMode.Network)
-                        currentBackOffMode += 250; // wait count is raised linearly.
+                    if (_currentBackOffMode == BackOffMode.Network)
+                        _currentBackOffMode += 250; // wait count is raised linearly.
                     else
-                        currentBackOffWaitCount = 250; // wait starts 250ms
-                    if (currentBackOffWaitCount >= 16000) // max wait is 16 sec.
+                        _currentBackOffWaitCount = 250; // wait starts 250ms
+                    if (_currentBackOffWaitCount >= 16000) // max wait is 16 sec.
                     {
-                        RaiseDisconnectedByError("Twitterが不安定な状態になっています。",
+                        RaiseDisconnectedByError(
+                            "Twitterが不安定な状態になっています。",
                             "ネットワーク エラーにより、ユーザーストリームに規定のリトライ回数内で接続できませんでした。");
                         return;
                     }
@@ -268,48 +258,49 @@ namespace StarryEyes.Models.Connections.UserDependencies
             }
             else
             {
-                currentBackOffMode = BackOffMode.None;
-                if (currentBackOffWaitCount == 110)
+                _currentBackOffMode = BackOffMode.None;
+                if (_currentBackOffWaitCount == 110)
                 {
-                    RaiseDisconnectedByError("ユーザーストリーム接続が何らかのエラーの頻発で停止しました。",
+                    RaiseDisconnectedByError(
+                        "ユーザーストリーム接続が何らかのエラーの頻発で停止しました。",
                         "Twitterが不安定な状態になっているか、仕様が変更された可能性があります: " + ex.Message);
                     return;
                 }
-                if (currentBackOffWaitCount >= 108 && currentBackOffWaitCount <= 109)
+                if (_currentBackOffWaitCount >= 108 && _currentBackOffWaitCount <= 109)
                 {
-                    currentBackOffWaitCount++;
+                    _currentBackOffWaitCount++;
                 }
                 else
                 {
-                    currentBackOffWaitCount = 108; // wait shortly
+                    _currentBackOffWaitCount = 108; // wait shortly
                 }
             }
-            System.Diagnostics.Debug.WriteLine("*** USER STREAMS error ***" + Environment.NewLine + ex);
-            System.Diagnostics.Debug.WriteLine(" -> reconnect.");
+            Debug.WriteLine("*** USER STREAMS error ***" + Environment.NewLine + ex);
+            Debug.WriteLine(" -> reconnect.");
             // parsing error, auto-reconnect
-            Observable.Timer(TimeSpan.FromMilliseconds(currentBackOffWaitCount))
-                .Subscribe(_ => Connect());
+            Observable.Timer(TimeSpan.FromMilliseconds(_currentBackOffWaitCount))
+                      .Subscribe(_ => Connect());
         }
 
         private bool CheckHardError()
         {
-            hardErrorRetryCount++;
-            if (hardErrorRetryCount > HardErrorRetryMaxCount)
+            _hardErrorRetryCount++;
+            if (_hardErrorRetryCount > HardErrorRetryMaxCount)
                 return true;
-            else
-                return false;
+            return false;
         }
 
         private void RaiseIsConnectedEvent(bool connected)
         {
-            var handler = IsConnectionAliveEvent;
+            Action<bool> handler = IsConnectionAliveEvent;
             if (handler != null)
                 handler(connected);
         }
 
         private void RaiseDisconnectedByError(string header, string detail)
         {
-            this.RaiseErrorNotification("UserStreams_Reconnection_" + AuthInfo.UnreliableScreenName,
+            RaiseErrorNotification(
+                "UserStreams_Reconnection_" + AuthInfo.UnreliableScreenName,
                 header, detail,
                 "再接続", () =>
                 {
@@ -322,6 +313,13 @@ namespace StarryEyes.Models.Connections.UserDependencies
         {
             base.Dispose(disposing);
             Disconnect();
+        }
+
+        private enum BackOffMode
+        {
+            None,
+            Network,
+            Protocol,
         }
     }
 }

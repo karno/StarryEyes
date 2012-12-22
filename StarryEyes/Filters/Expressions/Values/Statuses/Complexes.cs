@@ -54,7 +54,7 @@ namespace StarryEyes.Filters.Expressions.Values.Statuses
         public override Func<TwitterStatus, string> GetStringValueProvider()
         {
             return _ => _.StatusType == StatusType.Tweet ?
-                _.GetOriginal().InReplyToScreenName ?? string.Empty : 
+                _.GetOriginal().InReplyToScreenName ?? string.Empty :
                 _.Recipient.ScreenName;
         }
 

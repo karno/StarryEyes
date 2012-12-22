@@ -13,21 +13,19 @@ using StarryEyes.Settings;
 namespace StarryEyes.ViewModels.WindowParts
 {
     /// <summary>
-    /// バックパネル ViewModel
+    ///     バックパネル ViewModel
     /// </summary>
     public class BackpanelViewModel : ViewModel
     {
         private readonly ReadOnlyDispatcherCollection<TwitterEventViewModel> _events;
-        public ReadOnlyDispatcherCollection<TwitterEventViewModel> Events
-        {
-            get { return _events; }
-        }
+        private readonly object _syncLock = new object();
 
         private readonly Queue<BackpanelEventBase> _waitingEvents =
             new Queue<BackpanelEventBase>();
 
-        private bool _isDisposed = false;
-        private object _syncLock = new object();
+        private BackpanelEventViewModel _currentEvent;
+
+        private bool _isDisposed;
 
         public BackpanelViewModel()
         {
@@ -35,34 +33,32 @@ namespace StarryEyes.ViewModels.WindowParts
                 BackpanelModel.TwitterEvents,
                 tev => new TwitterEventViewModel(tev),
                 DispatcherHelper.UIDispatcher);
-            this.CompositeDisposable.Add(new EventListener<Action<BackpanelEventBase>>(
-                _ => BackpanelModel.OnEventRegistered += _,
-                _ => BackpanelModel.OnEventRegistered -= _,
-                ev =>
+            CompositeDisposable.Add(new EventListener<Action<BackpanelEventBase>>(
+                                        _ => BackpanelModel.OnEventRegistered += _,
+                                        _ => BackpanelModel.OnEventRegistered -= _,
+                                        ev =>
+                                        {
+                                            lock (_syncLock)
+                                            {
+                                                _waitingEvents.Enqueue(ev);
+                                                Monitor.Pulse(_syncLock);
+                                            }
+                                        }));
+            CompositeDisposable.Add(() =>
                 {
                     lock (_syncLock)
                     {
-                        _waitingEvents.Enqueue(ev);
+                        _isDisposed = true;
                         Monitor.Pulse(_syncLock);
                     }
-                }));
-            this.CompositeDisposable.Add(() =>
-            {
-                lock (_syncLock)
-                {
-                    _isDisposed = true;
-                    Monitor.Pulse(_syncLock);
-                }
-            });
+                });
         }
 
-        public void Initialize()
+        public ReadOnlyDispatcherCollection<TwitterEventViewModel> Events
         {
-            Task.Factory.StartNew(() => EventDispatchWorker(),
-                TaskCreationOptions.LongRunning);
+            get { return _events; }
         }
 
-        private BackpanelEventViewModel _currentEvent = null;
         public BackpanelEventViewModel CurrentEvent
         {
             get { return _currentEvent; }
@@ -79,11 +75,17 @@ namespace StarryEyes.ViewModels.WindowParts
             get { return _currentEvent != null; }
         }
 
+        public void Initialize()
+        {
+            Task.Factory.StartNew(EventDispatchWorker,
+                                  TaskCreationOptions.LongRunning);
+        }
+
         private void EventDispatchWorker()
         {
-            BackpanelEventBase ev = null;
             while (true)
             {
+                BackpanelEventBase ev;
                 lock (_syncLock)
                 {
                     if (_isDisposed) return;
@@ -98,7 +100,7 @@ namespace StarryEyes.ViewModels.WindowParts
                 {
                     if (_waitingEvents.Count == 0)
                         Monitor.Wait(_syncLock,
-                            Setting.EventDispatchMaximumMSec.Value - Setting.EventDispatchMinimumMSec.Value);
+                                     Setting.EventDispatchMaximumMSec.Value - Setting.EventDispatchMinimumMSec.Value);
                     if (_waitingEvents.Count == 0)
                         CurrentEvent = null;
                 }
@@ -109,14 +111,15 @@ namespace StarryEyes.ViewModels.WindowParts
     public class BackpanelEventViewModel : ViewModel
     {
         private readonly BackpanelEventBase _sourceEvent;
-        public BackpanelEventBase SourceEvent
-        {
-            get { return _sourceEvent; }
-        }
 
         public BackpanelEventViewModel(BackpanelEventBase ev)
         {
-            this._sourceEvent = ev;
+            _sourceEvent = ev;
+        }
+
+        public BackpanelEventBase SourceEvent
+        {
+            get { return _sourceEvent; }
         }
 
         public Color Background
@@ -153,11 +156,13 @@ namespace StarryEyes.ViewModels.WindowParts
     public class TwitterEventViewModel : BackpanelEventViewModel
     {
         public TwitterEventViewModel(TwitterEventBase tev)
-            : base(tev) { }
+            : base(tev)
+        {
+        }
 
         public TwitterEventBase TwitterEvent
         {
-            get { return this.SourceEvent as TwitterEventBase; }
+            get { return SourceEvent as TwitterEventBase; }
         }
     }
 }

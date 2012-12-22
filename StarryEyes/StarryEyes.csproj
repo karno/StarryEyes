@@ -164,7 +164,6 @@
     <Compile Include="Filters\Expressions\Values\Statuses\Booleans.cs" />
     <Compile Include="Filters\Expressions\Values\Statuses\Complexes.cs" />
     <Compile Include="Filters\Expressions\Values\Statuses\Numerics.cs" />
-    <Compile Include="Filters\Expressions\Values\Statuses\Sets.cs" />
     <Compile Include="Filters\Expressions\Values\Statuses\Strings.cs" />
     <Compile Include="Filters\FilterSystemUtil.cs" />
     <Compile Include="Filters\Parsing\QueryCompiler.cs" />
@@ -178,7 +177,6 @@
     <Compile Include="Filters\Sources\FilterTrack.cs" />
     <Compile Include="Helpers\FreezableHelper.cs" />
     <Compile Include="Hotfixes\DispatcherEx.cs" />
-    <Compile Include="Hotfixes\LivetFixer.cs" />
     <Compile Include="Helpers\RegexHelper.cs" />
     <Compile Include="Models\BackpanelModel.cs" />
     <Compile Include="Models\Backpanels\BackpanelActionEventBase.cs" />
@@ -200,6 +198,7 @@
     <Compile Include="Models\Connections\Extends\ListReceiver.cs" />
     <Compile Include="Models\Connections\Extends\SearchReceiver.cs" />
     <Compile Include="Models\Connections\UserDependencies\UserInfoReceiver.cs" />
+    <Compile Include="Models\Hubs\EventHub.cs" />
     <Compile Include="Models\Hubs\StoreHub.cs" />
     <Compile Include="Models\InputAreaModel.cs" />
     <Compile Include="Models\MainWindowModel.cs" />

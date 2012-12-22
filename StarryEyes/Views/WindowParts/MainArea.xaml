@@ -37,12 +37,12 @@
                            VerticalAlignment="Center"
                            FontSize="16"
                            Foreground="#FF999999"
-                           Text="{Binding Name}" />
+                           Text="{Binding Name}" FontFamily="Segoe UI" />
                 <TextBlock VerticalAlignment="Top"
                            Foreground="#FF1BA1E2"
                            Text="{Binding UnreadCount}"
                            Visibility="{Binding IsUnreadExisted,
-                                                Converter={StaticResource BooleanToVisibleConverter}}" />
+                                                Converter={StaticResource BooleanToVisibleConverter}}" FontFamily="Segoe UI" />
             </StackPanel>
             <DataTemplate.Triggers>
                 <DataTrigger Binding="{Binding IsSelected}" Value="True">

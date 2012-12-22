@@ -147,7 +147,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
-            var tcol = chunks.Select(c => Task.Factory.StartNew(() => c.Dispose()));
+            var tcol = chunks.Guard().Select(c => Task.Factory.StartNew(() => c.Dispose()));
             Task.WaitAll(tcol.ToArray());
         }
     }

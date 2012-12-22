@@ -17,9 +17,9 @@ namespace StarryEyes.Albireo.Data
             initial.ForEach(Add);
         }
 
-        private int count = 0;
+        private int _count;
 
-        private AVLTreeLeaf root;
+        private AVLTreeLeaf _root;
 
         public void Add(T item)
         {
@@ -28,14 +28,14 @@ namespace StarryEyes.Albireo.Data
 
         public bool AddDistinct(T item)
         {
-            if (count == 0)
+            if (_count == 0)
             {
-                root = new AVLTreeLeaf() { Value = item, Label = AVLLabel.E };
+                _root = new AVLTreeLeaf { Value = item, Label = AVLLabel.E };
             }
             else
             {
-                AVLTreeLeaf current = root;
-                Stack<Tuple<AVLTreeLeaf, Direction>> trace = new Stack<Tuple<AVLTreeLeaf, Direction>>();
+                AVLTreeLeaf current = _root;
+                var trace = new Stack<Tuple<AVLTreeLeaf, Direction>>();
                 while (true)
                 {
                     int d = current.Value.CompareTo(item);
@@ -43,7 +43,7 @@ namespace StarryEyes.Albireo.Data
                     {
                         return false;
                     }
-                    else if (d > 0)
+                    if (d > 0)
                     {
                         trace.Push(Tuple.Create(current, Direction.Left));
                         if (current.LeftLeaf != null)
@@ -52,7 +52,7 @@ namespace StarryEyes.Albireo.Data
                         }
                         else
                         {
-                            current.LeftLeaf = new AVLTreeLeaf() { Value = item, Label = AVLLabel.E };
+                            current.LeftLeaf = new AVLTreeLeaf { Value = item, Label = AVLLabel.E };
                             break;
                         }
                     }
@@ -65,7 +65,7 @@ namespace StarryEyes.Albireo.Data
                         }
                         else
                         {
-                            current.RightLeaf = new AVLTreeLeaf() { Value = item, Label = AVLLabel.E };
+                            current.RightLeaf = new AVLTreeLeaf { Value = item, Label = AVLLabel.E };
                             break;
                         }
                     }
@@ -84,12 +84,10 @@ namespace StarryEyes.Albireo.Data
                             tuple.Item1.Label = AVLLabel.R;
                             continue;
                         }
-                        else if (tuple.Item1.Label == AVLLabel.R)
+                        if (tuple.Item1.Label == AVLLabel.R)
                         {
-                            if (node.RightLeaf.Label == AVLLabel.L)
-                                node = DoubleRightTurn(node);
-                            else
-                                node = SimpleLeftTurn(node);
+                            node = node.RightLeaf.Label == AVLLabel.L ?
+                                DoubleRightTurn(node) : SimpleLeftTurn(node);
                         }
                         else
                         {
@@ -104,12 +102,10 @@ namespace StarryEyes.Albireo.Data
                             tuple.Item1.Label = AVLLabel.L;
                             continue;
                         }
-                        else if (tuple.Item1.Label == AVLLabel.L)
+                        if (tuple.Item1.Label == AVLLabel.L)
                         {
-                            if (node.LeftLeaf.Label == AVLLabel.R)
-                                node = DoubleLeftTurn(node);
-                            else
-                                node = SimpleRightTurn(node);
+                            node = node.LeftLeaf.Label == AVLLabel.R ?
+                                DoubleLeftTurn(node) : SimpleRightTurn(node);
                         }
                         else
                         {
@@ -128,170 +124,167 @@ namespace StarryEyes.Albireo.Data
                     }
                     else
                     {
-                        root = node;
+                        _root = node;
                     }
                     break; // END
                 }
             }
-            count++;
+            _count++;
             return true;
         }
 
         public bool Remove(T item)
         {
-            if (count == 0)
+            if (_count == 0)
             {
                 return false;
             }
-            else
+            // find node
+            AVLTreeLeaf current = _root;
+            var trace = new Stack<Tuple<AVLTreeLeaf, Direction>>();
+            while (true)
             {
-                // find node
-                AVLTreeLeaf current = root;
-                Stack<Tuple<AVLTreeLeaf, Direction>> trace = new Stack<Tuple<AVLTreeLeaf, Direction>>();
-                while (true)
+                int d = current.Value.CompareTo(item);
+                if (d == 0) // this item is already inserted.
                 {
-                    int d = current.Value.CompareTo(item);
-                    if (d == 0) // this item is already inserted.
-                    {
-                        // found
-                        break;
-                    }
-                    else if (d > 0)
-                    {
-                        trace.Push(Tuple.Create(current, Direction.Left));
-
-                        if (current.LeftLeaf != null)
-                            current = current.LeftLeaf;
-                        else // not found
-                            return false;
-                    }
-                    else
-                    {
-                        trace.Push(Tuple.Create(current, Direction.Right));
-
-                        if (current.RightLeaf != null)
-                            current = current.RightLeaf;
-                        else // not found
-                            return false;
-                    }
+                    // found
+                    break;
                 }
-
-                // remove node
-                var parent = trace.Peek();
-                if (current.LeftLeaf != null && current.RightLeaf != null)
+                if (d > 0)
                 {
-                    // has two children
                     trace.Push(Tuple.Create(current, Direction.Left));
 
-                    // get most right element in the left sub-tree
-                    var child = current.LeftLeaf;
-                    while (child.RightLeaf != null)
-                    {
-                        trace.Push(Tuple.Create(child, Direction.Right));
-                        child = child.RightLeaf;
-                    }
-                    // remove most-right children
-                    var peek = trace.Peek();
-                    if (peek.Item2 == Direction.Left)
-                        trace.Peek().Item1.LeftLeaf = child.LeftLeaf;
-                    else
-                        trace.Peek().Item1.RightLeaf = child.LeftLeaf;
-                    current.Value = child.Value;
+                    if (current.LeftLeaf != null)
+                        current = current.LeftLeaf;
+                    else // not found
+                        return false;
                 }
                 else
                 {
-                    // has a child or no children
-                    AVLTreeLeaf leaf = null;
-                    if (current.LeftLeaf != null)
-                        leaf = current.LeftLeaf;
-                    else if (current.RightLeaf != null)
-                        leaf = current.RightLeaf;
-                    else // has no children
-                        leaf = null;
+                    trace.Push(Tuple.Create(current, Direction.Right));
 
-                    if (parent.Item2 == Direction.Left)
-                        parent.Item1.LeftLeaf = leaf;
-                    else
-                        parent.Item1.RightLeaf = leaf;
+                    if (current.RightLeaf != null)
+                        current = current.RightLeaf;
+                    else // not found
+                        return false;
                 }
-
-                // rotate and balance
-                while (trace.Count > 0)
-                {
-                    bool breakLoop = false;
-                    var tuple = trace.Pop();
-                    var node = tuple.Item1;
-                    if (tuple.Item2 == Direction.Left)
-                    {
-                        // come from left
-                        if (tuple.Item1.Label == AVLLabel.L)
-                        {
-                            tuple.Item1.Label = AVLLabel.E;
-                            continue;
-                        }
-                        else if (tuple.Item1.Label == AVLLabel.R)
-                        {
-                            if (node.RightLeaf.Label == AVLLabel.L)
-                            {
-                                node = DoubleRightTurn(node);
-                            }
-                            else
-                            {
-                                node = SimpleLeftTurn(node);
-                                breakLoop = node.Label == AVLLabel.L;
-                            }
-                        }
-                        else
-                        {
-                            tuple.Item1.Label = AVLLabel.R;
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        // come from right
-                        if (tuple.Item1.Label == AVLLabel.R)
-                        {
-                            tuple.Item1.Label = AVLLabel.E;
-                            continue;
-                        }
-                        else if (tuple.Item1.Label == AVLLabel.L)
-                        {
-                            if (node.LeftLeaf.Label == AVLLabel.R)
-                            {
-                                node = DoubleLeftTurn(node);
-                            }
-                            else
-                            {
-                                node = SimpleRightTurn(node);
-                                breakLoop = node.Label != AVLLabel.E;
-                            }
-                        }
-                        else
-                        {
-                            tuple.Item1.Label = AVLLabel.L;
-                            break;
-                        }
-                    }
-
-                    // attach new node 
-                    if (trace.Count > 0)
-                    {
-                        var peek = trace.Peek();
-                        if (peek.Item2 == Direction.Left)
-                            peek.Item1.LeftLeaf = node;
-                        else
-                            peek.Item1.RightLeaf = node;
-                    }
-                    else
-                    {
-                        root = node;
-                    }
-                    if (breakLoop)
-                        break;
-                }
-                return true;
             }
+
+            // remove node
+            if (current.LeftLeaf != null && current.RightLeaf != null)
+            {
+                // has two children
+                trace.Push(Tuple.Create(current, Direction.Left));
+
+                // get most right element in the left sub-tree
+                var child = current.LeftLeaf;
+                while (child.RightLeaf != null)
+                {
+                    trace.Push(Tuple.Create(child, Direction.Right));
+                    child = child.RightLeaf;
+                }
+                // remove most-right children
+                var peek = trace.Peek();
+                if (peek.Item2 == Direction.Left)
+                    trace.Peek().Item1.LeftLeaf = child.LeftLeaf;
+                else
+                    trace.Peek().Item1.RightLeaf = child.LeftLeaf;
+                current.Value = child.Value;
+            }
+            else
+            {
+                var parent = trace.Peek();
+                // has a child or no children
+                AVLTreeLeaf leaf;
+                if (current.LeftLeaf != null)
+                    leaf = current.LeftLeaf;
+                else if (current.RightLeaf != null)
+                    leaf = current.RightLeaf;
+                else // has no children
+                    leaf = null;
+
+                if (parent.Item2 == Direction.Left)
+                    parent.Item1.LeftLeaf = leaf;
+                else
+                    parent.Item1.RightLeaf = leaf;
+            }
+
+            // rotate and balance
+            while (trace.Count > 0)
+            {
+                bool breakLoop = false;
+                var tuple = trace.Pop();
+                var node = tuple.Item1;
+                if (tuple.Item2 == Direction.Left)
+                {
+                    // come from left
+                    if (tuple.Item1.Label == AVLLabel.L)
+                    {
+                        tuple.Item1.Label = AVLLabel.E;
+                        continue;
+                    }
+                    if (tuple.Item1.Label == AVLLabel.R)
+                    {
+                        if (node.RightLeaf.Label == AVLLabel.L)
+                        {
+                            node = DoubleRightTurn(node);
+                        }
+                        else
+                        {
+                            node = SimpleLeftTurn(node);
+                            breakLoop = node.Label == AVLLabel.L;
+                        }
+                    }
+                    else
+                    {
+                        tuple.Item1.Label = AVLLabel.R;
+                        break;
+                    }
+                }
+                else
+                {
+                    // come from right
+                    if (tuple.Item1.Label == AVLLabel.R)
+                    {
+                        tuple.Item1.Label = AVLLabel.E;
+                        continue;
+                    }
+                    if (tuple.Item1.Label == AVLLabel.L)
+                    {
+                        if (node.LeftLeaf.Label == AVLLabel.R)
+                        {
+                            node = DoubleLeftTurn(node);
+                        }
+                        else
+                        {
+                            node = SimpleRightTurn(node);
+                            breakLoop = node.Label != AVLLabel.E;
+                        }
+                    }
+                    else
+                    {
+                        tuple.Item1.Label = AVLLabel.L;
+                        break;
+                    }
+                }
+
+                // attach new node 
+                if (trace.Count > 0)
+                {
+                    var peek = trace.Peek();
+                    if (peek.Item2 == Direction.Left)
+                        peek.Item1.LeftLeaf = node;
+                    else
+                        peek.Item1.RightLeaf = node;
+                }
+                else
+                {
+                    _root = node;
+                }
+                if (breakLoop)
+                    break;
+            }
+            return true;
         }
 
         private AVLTreeLeaf SimpleLeftTurn(AVLTreeLeaf leaf)
@@ -370,14 +363,14 @@ namespace StarryEyes.Albireo.Data
 
         public void Clear()
         {
-            root = null;
-            count = 0;
+            _root = null;
+            _count = 0;
         }
 
         public bool Contains(T item)
         {
-            if (root == null) return false; // collection is empty.
-            AVLTreeLeaf current = root;
+            if (_root == null) return false; // collection is empty.
+            AVLTreeLeaf current = _root;
             while (true)
             {
                 int d = current.Value.CompareTo(item);
@@ -385,7 +378,7 @@ namespace StarryEyes.Albireo.Data
                 {
                     return true;
                 }
-                else if (d > 0)
+                if (d > 0)
                 {
                     if (current.LeftLeaf != null)
                         current = current.LeftLeaf;
@@ -413,7 +406,7 @@ namespace StarryEyes.Albireo.Data
 
         public int Count
         {
-            get { return count; }
+            get { return _count; }
         }
 
         public bool IsReadOnly
@@ -454,19 +447,19 @@ namespace StarryEyes.Albireo.Data
 
         class AVLEnumerator : IEnumerator<T>
         {
-            AVLTree<T> target;
-            Stack<Tuple<AVLTreeLeaf, Direction>> trace = new Stack<Tuple<AVLTreeLeaf, Direction>>();
+            readonly AVLTree<T> _target;
+            readonly Stack<Tuple<AVLTreeLeaf, Direction>> _trace = new Stack<Tuple<AVLTreeLeaf, Direction>>();
 
             public AVLEnumerator(AVLTree<T> tree)
             {
-                target = tree;
+                _target = tree;
             }
 
             public T Current
             {
                 get
                 {
-                    return trace.Count > 0 ? trace.Peek().Item1.Value : default(T);
+                    return _trace.Count > 0 ? _trace.Peek().Item1.Value : default(T);
                 }
             }
 
@@ -479,42 +472,39 @@ namespace StarryEyes.Albireo.Data
 
             public bool MoveNext()
             {
-                if (trace.Count == 0) // init
+                if (_trace.Count == 0) // init
                 {
-                    AVLTreeLeaf leaf = target.root;
+                    AVLTreeLeaf leaf = _target._root;
                     do
                     {
-                        trace.Push(Tuple.Create(leaf, Direction.Left));
+                        _trace.Push(Tuple.Create(leaf, Direction.Left));
                         leaf = leaf.LeftLeaf;
                     } while (leaf != null);
-                    return trace.Count > 0;
+                    return _trace.Count > 0;
                 }
                 else // trace
                 {
-                    var leaf = trace.Pop().Item1;
+                    var leaf = _trace.Pop().Item1;
                     if (leaf.RightLeaf != null)
                     {
-                        trace.Push(Tuple.Create(leaf, Direction.Right));
+                        _trace.Push(Tuple.Create(leaf, Direction.Right));
                         leaf = leaf.RightLeaf;
                         do
                         {
-                            trace.Push(Tuple.Create(leaf, Direction.Left));
+                            _trace.Push(Tuple.Create(leaf, Direction.Left));
                             leaf = leaf.LeftLeaf;
                         } while (leaf != null);
                         return true;
                     }
-                    else
-                    {
-                        while (trace.Count > 0 && trace.Peek().Item2 == Direction.Right)
-                            trace.Pop();
-                    }
-                    return trace.Count > 0;
+                    while (_trace.Count > 0 && _trace.Peek().Item2 == Direction.Right)
+                        _trace.Pop();
+                    return _trace.Count > 0;
                 }
             }
 
             public void Reset()
             {
-                trace.Clear();
+                _trace.Clear();
             }
         }
     }

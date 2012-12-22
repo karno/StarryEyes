@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using StarryEyes.Vanille.Serialization;
 
 namespace StarryEyes.Vanille.DataStore.Persistent
@@ -12,47 +13,45 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         where TKey : IComparable<TKey>
         where TValue : IBinarySerializable, new()
     {
-        const int aliveToDeadlyThreshold = 64;
-        const int deadlyToKillThreshold = 32;
+        const int AliveToDeadlyThreshold = 64;
+        const int DeadlyToKillThreshold = 32;
 
-        private PersistentDataStore<TKey, TValue> _parent;
+        private readonly PersistentDataStore<TKey, TValue> _parent;
 
-        private LinkedList<TKey> deletedItems = new LinkedList<TKey>();
-        private object deletedItemKeyLocker = new object();
+        private readonly LinkedList<TKey> _deletedItems = new LinkedList<TKey>();
+        private readonly object _deletedItemKeyLocker = new object();
 
-        private LinkedList<TValue> aliveCaches = new LinkedList<TValue>();
-        private SortedDictionary<TKey, LinkedListNode<TValue>> aliveCacheFinder =
+        private readonly LinkedList<TValue> _aliveCaches = new LinkedList<TValue>();
+        private readonly SortedDictionary<TKey, LinkedListNode<TValue>> _aliveCacheFinder =
             new SortedDictionary<TKey, LinkedListNode<TValue>>();
-        private object aliveCachesLocker = new object();
+        private readonly object _aliveCachesLocker = new object();
 
-        private LinkedList<PersistentItem<TValue>> deadlyCaches = new LinkedList<PersistentItem<TValue>>();
-        private SortedDictionary<TKey, LinkedListNode<PersistentItem<TValue>>> deadlyCacheFinder =
+        private readonly LinkedList<PersistentItem<TValue>> _deadlyCaches = new LinkedList<PersistentItem<TValue>>();
+        private readonly SortedDictionary<TKey, LinkedListNode<PersistentItem<TValue>>> _deadlyCacheFinder =
             new SortedDictionary<TKey, LinkedListNode<PersistentItem<TValue>>>();
-        private object deadlyCachesLocker = new object();
+        private readonly object _deadlyCachesLocker = new object();
 
-        private ReaderWriterLockSlim driveLocker = new ReaderWriterLockSlim();
-        private PersistentDrive<TKey, TValue> persistentDrive;
-        private Thread writeBackWorker;
-        private object writeBackSync = new object();
-        private volatile bool writeBackThreadAlive = true;
-
-        private IComparer<TKey> comparer = null;
+        private readonly ReaderWriterLockSlim _driveLocker = new ReaderWriterLockSlim();
+        private readonly PersistentDrive<TKey, TValue> _persistentDrive;
+        private readonly Thread _writeBackWorker;
+        private readonly object _writeBackSync = new object();
+        private volatile bool _writeBackThreadAlive = true;
 
         /// <summary>
         /// initialize persistent chunk.
         /// </summary>
         /// <param name="parent">chunk holder</param>
         /// <param name="dbFilePath">file path for storing data</param>
+        /// <param name="comparer">comparator using sort key.</param>
         public PersistentChunk(PersistentDataStore<TKey, TValue> parent, string dbFilePath, IComparer<TKey> comparer)
         {
-            this._parent = parent;
-            this.comparer = comparer;
+            _parent = parent;
             using (AcquireDriveLock(true))
             {
-                this.persistentDrive = new PersistentDrive<TKey, TValue>(dbFilePath, comparer);
+                _persistentDrive = new PersistentDrive<TKey, TValue>(dbFilePath, comparer);
             }
-            this.writeBackWorker = new Thread(WriteBackProc);
-            this.writeBackWorker.Start();
+            _writeBackWorker = new Thread(WriteBackProc);
+            _writeBackWorker.Start();
         }
 
         /// <summary>
@@ -65,13 +64,12 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         public PersistentChunk(PersistentDataStore<TKey, TValue> parent, string dbFilePath,
             IDictionary<TKey, int> tableOfContents, IEnumerable<int> nextIndexOfPackets)
         {
-            this._parent = parent;
+            _parent = parent;
             using (AcquireDriveLock(true))
             {
-                this.persistentDrive = new PersistentDrive<TKey, TValue>(dbFilePath, tableOfContents, nextIndexOfPackets);
+                _persistentDrive = new PersistentDrive<TKey, TValue>(dbFilePath, tableOfContents, nextIndexOfPackets);
             }
-            this.writeBackWorker = new Thread(WriteBackProc);
-            this.writeBackWorker.Start();
+            Task.Factory.StartNew(WriteBackProc, TaskCreationOptions.LongRunning);
         }
 
         /// <summary>
@@ -82,21 +80,21 @@ namespace StarryEyes.Vanille.DataStore.Persistent
             get
             {
                 int amount = 0;
-                lock (aliveCachesLocker)
+                lock (_aliveCachesLocker)
                 {
-                    amount += aliveCaches.Count;
+                    amount += _aliveCaches.Count;
                 }
-                lock (deadlyCachesLocker)
+                lock (_deadlyCachesLocker)
                 {
-                    amount += deadlyCaches.Count;
+                    amount += _deadlyCaches.Count;
                 }
-                lock (deletedItemKeyLocker)
+                lock (_deletedItemKeyLocker)
                 {
-                    amount -= deletedItems.Count;
+                    amount -= _deletedItems.Count;
                 }
-                lock (driveLocker)
+                lock (_driveLocker)
                 {
-                    amount += persistentDrive.Count;
+                    amount += _persistentDrive.Count;
                 }
                 return amount;
             }
@@ -122,48 +120,48 @@ namespace StarryEyes.Vanille.DataStore.Persistent
             bool overflow = false;
             TKey deadlyKey = default(TKey);
             TValue deadlyItem = default(TValue);
-            lock (aliveCachesLocker)
+            lock (_aliveCachesLocker)
             {
                 // alive cache
                 LinkedListNode<TValue> node;
-                if (aliveCacheFinder.TryGetValue(key, out node))
+                if (_aliveCacheFinder.TryGetValue(key, out node))
                 {
                     node.Value = value; // replace previous
-                    aliveCaches.Remove(node);
-                    aliveCaches.AddFirst(node); // move node to top
+                    _aliveCaches.Remove(node);
+                    _aliveCaches.AddFirst(node); // move node to top
                 }
                 else
                 {
                     node = new LinkedListNode<TValue>(value);
-                    aliveCaches.AddFirst(node);
-                    aliveCacheFinder.Add(key, node);
+                    _aliveCaches.AddFirst(node);
+                    _aliveCacheFinder.Add(key, node);
                 }
-                if (aliveCaches.Count > aliveToDeadlyThreshold)
+                if (_aliveCaches.Count > AliveToDeadlyThreshold)
                 {
                     overflow = true;
-                    deadlyItem = aliveCaches.Last.Value;
+                    deadlyItem = _aliveCaches.Last.Value;
                     deadlyKey = _parent.GetKey(deadlyItem);
-                    aliveCacheFinder.Remove(deadlyKey);
-                    aliveCaches.RemoveLast();
+                    _aliveCacheFinder.Remove(deadlyKey);
+                    _aliveCaches.RemoveLast();
                 }
             }
 
-            lock (deadlyCachesLocker)
+            lock (_deadlyCachesLocker)
             {
                 LinkedListNode<PersistentItem<TValue>> nitem;
-                if (deadlyCacheFinder.TryGetValue(key, out nitem))
+                if (_deadlyCacheFinder.TryGetValue(key, out nitem))
                 {
                     // alive caches added.
                     // remove from deadly
-                    deadlyCacheFinder.Remove(key);
-                    deadlyCaches.Remove(nitem);
+                    _deadlyCacheFinder.Remove(key);
+                    _deadlyCaches.Remove(nitem);
                 }
             }
 
-            lock (deletedItemKeyLocker)
+            lock (_deletedItemKeyLocker)
             {
                 // remove key from deleted store
-                deletedItems.Remove(key);
+                _deletedItems.Remove(key);
             }
 
             if (overflow)
@@ -177,11 +175,11 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// <param name="value">add value</param>
         private void AddToDeadly(TKey key, TValue value)
         {
-            bool writeBackRequired = false;
-            lock (deadlyCachesLocker)
+            bool writeBackRequired;
+            lock (_deadlyCachesLocker)
             {
                 LinkedListNode<PersistentItem<TValue>> dnode;
-                if (deadlyCacheFinder.TryGetValue(key, out dnode))
+                if (_deadlyCacheFinder.TryGetValue(key, out dnode))
                 {
                     dnode.Value.Item = value;
                 }
@@ -189,38 +187,37 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                 {
                     dnode = new LinkedListNode<PersistentItem<TValue>>(
                         new PersistentItem<TValue>(value));
-                    deadlyCaches.AddFirst(dnode);
-                    deadlyCacheFinder.Add(key, dnode);
+                    _deadlyCaches.AddFirst(dnode);
+                    _deadlyCacheFinder.Add(key, dnode);
                 }
-                writeBackRequired = deadlyCaches.Count > deadlyToKillThreshold;
+                writeBackRequired = _deadlyCaches.Count > DeadlyToKillThreshold;
             }
             if (writeBackRequired)
             {
-                lock (writeBackSync)
+                lock (_writeBackSync)
                 {
-                    Monitor.Pulse(writeBackSync);
+                    Monitor.Pulse(_writeBackSync);
                 }
             }
         }
 
         private void WriteBackProc()
         {
-            List<LinkedListNode<PersistentItem<TValue>>> workingCopy =
-                new List<LinkedListNode<PersistentItem<TValue>>>();
+            var workingCopy = new List<LinkedListNode<PersistentItem<TValue>>>();
             while (true)
             {
-                lock (writeBackSync)
+                lock (_writeBackSync)
                 {
-                    if (writeBackThreadAlive)
-                        Monitor.Wait(writeBackSync);
+                    if (_writeBackThreadAlive)
+                        Monitor.Wait(_writeBackSync);
                 }
-                if (!writeBackThreadAlive)
+                if (!_writeBackThreadAlive)
                     return;
                 System.Diagnostics.Debug.WriteLine("write-backing...");
-                lock (deadlyCachesLocker)
+                lock (_deadlyCachesLocker)
                 {
                     EnumerableEx.Generate(
-                        deadlyCaches.First,
+                        _deadlyCaches.First,
                         node => node.Next != null,
                         node => node.Next,
                         node => node)
@@ -233,18 +230,18 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                     workingCopy
                         .Do(n => n.Value.WriteFlag = true)
                         .Select(n => n.Value.Item)
-                        .ForEach(v => persistentDrive.Store(_parent.GetKey(v), v));
+                        .ForEach(v => _persistentDrive.Store(_parent.GetKey(v), v));
                 }
                 Thread.Sleep(0);
-                lock (deadlyCachesLocker)
+                lock (_deadlyCachesLocker)
                 {
                     workingCopy
                         .Where(i => i.Value.WriteFlag)
                         .ForEach(n =>
                         {
                             if (n.List != null)
-                                deadlyCaches.Remove(n);
-                            deadlyCacheFinder.Remove(_parent.GetKey(n.Value.Item));
+                                _deadlyCaches.Remove(n);
+                            _deadlyCacheFinder.Remove(_parent.GetKey(n.Value.Item));
                         });
                 }
                 // release memory
@@ -264,14 +261,11 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         {
             if (writeLock)
             {
-                driveLocker.EnterWriteLock();
-                return Disposable.Create(() => driveLocker.ExitWriteLock());
+                _driveLocker.EnterWriteLock();
+                return Disposable.Create(() => _driveLocker.ExitWriteLock());
             }
-            else
-            {
-                driveLocker.EnterReadLock();
-                return Disposable.Create(() => driveLocker.ExitReadLock());
-            }
+            _driveLocker.EnterReadLock();
+            return Disposable.Create(() => _driveLocker.ExitReadLock());
         }
 
         /// <summary>
@@ -285,10 +279,10 @@ namespace StarryEyes.Vanille.DataStore.Persistent
              * 1: add DeletedItems collection
              * 2: when write-backing to persistent drive, deleted items are also write-back into it.
              */
-            lock (deletedItemKeyLocker)
+            lock (_deletedItemKeyLocker)
             {
-                if (!deletedItems.Contains(key))
-                    deletedItems.AddFirst(key);
+                if (!_deletedItems.Contains(key))
+                    _deletedItems.AddFirst(key);
             }
         }
 
@@ -299,21 +293,21 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         {
             return Observable.Start(() =>
             {
-                lock (deletedItemKeyLocker)
+                lock (_deletedItemKeyLocker)
                 {
-                    if (deletedItems.Contains(key))
+                    if (_deletedItems.Contains(key))
                         return Observable.Empty<TValue>();
                 }
-                lock (aliveCachesLocker)
+                lock (_aliveCachesLocker)
                 {
                     LinkedListNode<TValue> node;
-                    if (aliveCacheFinder.TryGetValue(key, out node))
+                    if (_aliveCacheFinder.TryGetValue(key, out node))
                         return Observable.Return(node.Value);
                 }
-                lock (deadlyCachesLocker)
+                lock (_deadlyCachesLocker)
                 {
                     LinkedListNode<PersistentItem<TValue>> node;
-                    if (deadlyCacheFinder.TryGetValue(key, out node))
+                    if (_deadlyCacheFinder.TryGetValue(key, out node))
                         return Observable.Return(node.Value.Item);
                 }
                 // disk access
@@ -321,7 +315,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                 {
                     try
                     {
-                        return Observable.Return(persistentDrive.Load(key));
+                        return Observable.Return(_persistentDrive.Load(key));
                     }
                     catch
                     {
@@ -335,7 +329,9 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// <summary>
         /// Find item with predicate
         /// </summary>
-        /// <param name="predicate"></param>
+        /// <param name="predicate">predicate for finding items.</param>
+        /// <param name="range">range value</param>
+        /// <param name="returnLowerBound">lower bound count of returning items.</param>
         /// <returns></returns>
         public IObservable<TValue> Find(Func<TValue, bool> predicate, FindRange<TKey> range, int? returnLowerBound)
         {
@@ -343,31 +339,31 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                 Observable.Defer(() => Observable.Merge(
                     Observable.Start(() =>
                     {
-                        lock (aliveCachesLocker)
+                        lock (_aliveCachesLocker)
                         {
-                            return aliveCaches
+                            return _aliveCaches
                                 .CheckRange(range, _parent.GetKey)
-                                .Where(v => predicate(v))
+                                .Where(predicate)
                                 .ToArray();
                         }
 
                     }),
                     Observable.Start(() =>
                     {
-                        lock (deadlyCachesLocker)
+                        lock (_deadlyCachesLocker)
                         {
-                            return deadlyCaches
+                            return _deadlyCaches
                                 .Select(v => v.Item)
                                 .CheckRange(range, _parent.GetKey)
-                                .Where(v => predicate(v))
+                                .Where(predicate)
                                 .ToArray();
                         }
                     }),
-                    Observable.Start<TValue[]>(() =>
+                    Observable.Start(() =>
                     {
                         using (AcquireDriveLock())
                         {
-                            return persistentDrive
+                            return _persistentDrive
                                 .Find(predicate, range, returnLowerBound)
                                 .ToArray();
                         }
@@ -381,17 +377,17 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// </summary>
         public IDictionary<TKey, int> GetTableOfContents()
         {
-            lock (driveLocker)
+            lock (_driveLocker)
             {
-                return new Dictionary<TKey, int>(persistentDrive.GetTableOfContents());
+                return new Dictionary<TKey, int>(_persistentDrive.GetTableOfContents());
             }
         }
 
         public IEnumerable<int> GetNextIndexOfPacketsArray()
         {
-            lock (driveLocker)
+            lock (_driveLocker)
             {
-                return persistentDrive.GetNextIndexOfPackets().ToArray();
+                return _persistentDrive.GetNextIndexOfPackets().ToArray();
             }
         }
 
@@ -400,27 +396,27 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// </summary>
         public void Dispose()
         {
-            lock (writeBackSync)
+            lock (_writeBackSync)
             {
-                writeBackThreadAlive = false;
-                Monitor.Pulse(writeBackSync);
+                _writeBackThreadAlive = false;
+                Monitor.Pulse(_writeBackSync);
             }
-            System.Threading.Thread.Sleep(0);
-            List<TValue> workingCopy = new List<TValue>();
+            Thread.Sleep(0);
+            var workingCopy = new List<TValue>();
             // write all data to persistent store
-            lock (aliveCachesLocker)
+            lock (_aliveCachesLocker)
             {
-                workingCopy.AddRange(aliveCaches);
+                workingCopy.AddRange(_aliveCaches);
             }
-            lock (deadlyCachesLocker)
+            lock (_deadlyCachesLocker)
             {
-                workingCopy.AddRange(deadlyCaches.Select(i => i.Item));
+                workingCopy.AddRange(_deadlyCaches.Select(i => i.Item));
             }
             using (AcquireDriveLock(true))
             {
                 workingCopy
-                    .ForEach(v => persistentDrive.Store(_parent.GetKey(v), v));
-                persistentDrive.Dispose();
+                    .ForEach(v => _persistentDrive.Store(_parent.GetKey(v), v));
+                _persistentDrive.Dispose();
             }
         }
     }

@@ -2,7 +2,9 @@
 using System.Threading.Tasks;
 using System.Windows.Threading;
 
+// ReSharper disable CheckNamespace
 public static class DispatcherHolder
+// ReSharper restore CheckNamespace
 {
     #region Static methods
 

@@ -17,18 +17,18 @@ namespace StarryEyes.Models.Stores
     {
         #region publish block
 
-        private static Subject<StatusNotification> statusPublisher = new Subject<StatusNotification>();
+        private static readonly Subject<StatusNotification> _statusPublisher = new Subject<StatusNotification>();
 
         public static IObservable<StatusNotification> StatusPublisher
         {
-            get { return statusPublisher; }
+            get { return _statusPublisher; }
         }
 
         #endregion
 
         private static bool _isInShutdown = false;
 
-        private static DataStoreBase<long, TwitterStatus> store;
+        private static DataStoreBase<long, TwitterStatus> _store;
 
         public static void Initialize()
         {
@@ -37,7 +37,7 @@ namespace StarryEyes.Models.Stores
             {
                 try
                 {
-                    store = new PersistentDataStore<long, TwitterStatus>
+                    _store = new PersistentDataStore<long, TwitterStatus>
                         (_ => _.Id, Path.Combine(App.DataStorePath, "statuses"), new IdReverseComparer(),
                         tocniops: StoreOnMemoryObjectPersistence.GetPersistentData("statuses"));
                 }
@@ -50,9 +50,9 @@ namespace StarryEyes.Models.Stores
                         "送出された例外: " + ex.ToString()));
                 }
             }
-            if (store == null)
+            if (_store == null)
             {
-                store = new PersistentDataStore<long, TwitterStatus>
+                _store = new PersistentDataStore<long, TwitterStatus>
                     (_ => _.Id, Path.Combine(App.DataStorePath, "statuses"), new IdReverseComparer());
             }
             App.OnApplicationFinalize += Shutdown;
@@ -64,7 +64,7 @@ namespace StarryEyes.Models.Stores
         /// </summary>
         public static int Count
         {
-            get { return store.Count; }
+            get { return _store.Count; }
         }
 
         /// <summary>
@@ -77,14 +77,14 @@ namespace StarryEyes.Models.Stores
             if (_isInShutdown) return;
             if (publish)
             {
-                statusPublisher.OnNext(new StatusNotification()
+                _statusPublisher.OnNext(new StatusNotification()
                 {
                     IsAdded = true,
                     Status = status,
                     StatusId = status.Id
                 });
             }
-            store.Store(status);
+            _store.Store(status);
             UserStore.Store(status.User);
         }
 
@@ -96,7 +96,7 @@ namespace StarryEyes.Models.Stores
         public static IObservable<TwitterStatus> Get(long id)
         {
             if (_isInShutdown) return Observable.Empty<TwitterStatus>();
-            return store.Get(id)
+            return _store.Get(id)
                 .Do(_ => Store(_, false)); // add to local cache
         }
 
@@ -105,12 +105,13 @@ namespace StarryEyes.Models.Stores
         /// </summary>
         /// <param name="predicate">find predicate</param>
         /// <param name="range">finding range</param>
+        /// <param name="count">count of findings</param>
         /// <returns>results observable sequence.</returns>
         public static IObservable<TwitterStatus> Find(Func<TwitterStatus, bool> predicate,
             FindRange<long> range = null, int? count = null)
         {
             if (_isInShutdown) return Observable.Empty<TwitterStatus>();
-            var result = store.Find(predicate, range, count);
+            var result = _store.Find(predicate, range, count);
             if (count == null)
                 return result;
             return result
@@ -124,12 +125,16 @@ namespace StarryEyes.Models.Stores
         /// </summary>
         /// <param name="id">removing tweet's id</param>
         /// <param name="publish">publish removing notification to children</param>
-        public static void Remove(long id, bool publish = true)
+        public static async void Remove(long id, bool publish = true)
         {
             if (_isInShutdown) return;
             if (publish)
-                statusPublisher.OnNext(new StatusNotification() { IsAdded = false, StatusId = id });
-            store.Remove(id);
+                _statusPublisher.OnNext(new StatusNotification() { IsAdded = false, StatusId = id });
+            var removal = await Get(id);
+            if (removal == null) return;
+            _store.Remove(id);
+            if (publish)
+                _statusPublisher.OnNext(new StatusNotification() { IsAdded = false, Status = removal, StatusId = id });
         }
 
         /// <summary>
@@ -138,8 +143,8 @@ namespace StarryEyes.Models.Stores
         internal static void Shutdown()
         {
             _isInShutdown = true;
-            store.Dispose();
-            var pds = (PersistentDataStore<long, TwitterStatus>)store;
+            _store.Dispose();
+            var pds = (PersistentDataStore<long, TwitterStatus>)_store;
             StoreOnMemoryObjectPersistence.MakePersistent("statuses", pds.GetToCNIoPs());
         }
     }

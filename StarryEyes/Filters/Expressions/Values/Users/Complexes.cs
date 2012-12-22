@@ -57,4 +57,59 @@ namespace StarryEyes.Filters.Expressions.Values.Users
             return "retweeter";
         }
     }
+
+    public sealed class StatusFavorites : ValueBase
+    {
+        public override IEnumerable<FilterExpressionType> SupportedTypes
+        {
+            get
+            {
+                yield return FilterExpressionType.Set;
+                yield return FilterExpressionType.Numeric;
+            }
+        }
+
+        public override Func<TwitterStatus, IReadOnlyCollection<long>> GetSetValueProvider()
+        {
+            return _ => _.FavoritedUsers ?? new long[0];
+        }
+
+        public override Func<TwitterStatus, long> GetNumericValueProvider()
+        {
+            return _ => (_.FavoritedUsers ?? new long[0]).Length;
+        }
+
+        public override string ToQuery()
+        {
+            return "favs";
+        }
+    }
+
+    public sealed class StatusRetweets : ValueBase
+    {
+        public override IEnumerable<FilterExpressionType> SupportedTypes
+        {
+            get
+            {
+                yield return FilterExpressionType.Set;
+                yield return FilterExpressionType.Numeric;
+            }
+        }
+
+        public override Func<TwitterStatus, IReadOnlyCollection<long>> GetSetValueProvider()
+        {
+            return _ => _.RetweetedUsers ?? new long[0];
+        }
+
+        public override Func<TwitterStatus, long> GetNumericValueProvider()
+        {
+            return _ => (_.RetweetedUsers ?? new long[0]).Length;
+        }
+
+        public override string ToQuery()
+        {
+            return "retweets";
+        }
+    }
+
 }
