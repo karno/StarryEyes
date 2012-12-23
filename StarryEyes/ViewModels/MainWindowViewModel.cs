@@ -158,7 +158,7 @@ namespace StarryEyes.ViewModels
             if (Setting.IsFirstGenerated)
             {
                 var kovm = new KeyOverrideViewModel();
-                Messenger.RaiseAsync(new TransitionMessage(
+                Messenger.Raise(new TransitionMessage(
                                          typeof(KeyOverrideWindow),
                                          kovm, TransitionMode.Modal, null));
             }
