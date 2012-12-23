@@ -73,6 +73,7 @@
     <Compile Include="DataStore\DataStoreBase.cs" />
     <Compile Include="DataStore\DataStoreExtensions.cs" />
     <Compile Include="DataStore\FindRange.cs" />
+    <Compile Include="DataStore\Persistent\DataPersistenceException.cs" />
     <Compile Include="DataStore\Persistent\PersistentChunk.cs" />
     <Compile Include="DataStore\Persistent\PersistentDrive.cs" />
     <Compile Include="DataStore\Persistent\PersistentDataStore.cs" />

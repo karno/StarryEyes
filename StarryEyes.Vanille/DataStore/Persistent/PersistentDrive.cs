@@ -16,19 +16,19 @@ namespace StarryEyes.Vanille.DataStore.Persistent
 
         const int Empty = -1;
 
-        private string path;
+        private readonly string _path;
         public string Path
         {
-            get { return path; }
+            get { return _path; }
         }
 
-        private FileStream fs;
+        private FileStream _fstream;
 
         // niop is delimited per 1024 packets(= 1 chunks).
-        private SortedDictionary<int, List<int>> nextIndexOfPackets;
+        private readonly SortedDictionary<int, List<int>> _nextIndexOfPackets;
 
         // start index resolver
-        private SortedDictionary<TKey, int> tableOfContents;
+        private readonly SortedDictionary<TKey, int> _tableOfContents;
 
         /// <summary>
         /// Initialize persistent drive with create-new mode.
@@ -36,10 +36,10 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// <param name="path">base file path</param>
         public PersistentDrive(string path, IComparer<TKey> comparer)
         {
-            this.tableOfContents = new SortedDictionary<TKey, int>(comparer);
-            this.nextIndexOfPackets = new SortedDictionary<int, List<int>>();
+            this._tableOfContents = new SortedDictionary<TKey, int>(comparer);
+            this._nextIndexOfPackets = new SortedDictionary<int, List<int>>();
             SetNextIndexOfPackets(0, 0); // index 0 is reserved for the parity.
-            this.path = path;
+            this._path = path;
             PrepareFile(false);
         }
 
@@ -51,12 +51,12 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// <param name="nextIndexOfPackets">previous next index of packets table</param>
         public PersistentDrive(string path, IDictionary<TKey, int> tableOfContents, IEnumerable<int> nextIndexOfPackets)
         {
-            this.tableOfContents = new SortedDictionary<TKey, int>(tableOfContents);
-            this.nextIndexOfPackets = new SortedDictionary<int, List<int>>();
+            this._tableOfContents = new SortedDictionary<TKey, int>(tableOfContents);
+            this._nextIndexOfPackets = new SortedDictionary<int, List<int>>();
             nextIndexOfPackets
                 .Zip(Enumerable.Range(0, Int32.MaxValue), (v, k) => new { Key = k, Value = v })
                 .ForEach(i => SetNextIndexOfPackets(i.Key, i.Value));
-            this.path = path;
+            this._path = path;
             PrepareFile(true);
         }
 
@@ -65,7 +65,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// </summary>
         public int Count
         {
-            get { return tableOfContents.Count; }
+            get { return _tableOfContents.Count; }
         }
 
         /// <summary>
@@ -76,21 +76,21 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         {
             if (isInitializedWithToc)
             {
-                fs = File.Open(path, FileMode.Open, FileAccess.ReadWrite);
+                _fstream = File.Open(_path, FileMode.Open, FileAccess.ReadWrite);
                 // verify toc and niop-table
 
                 // TODO: use parity, it is existed at index #0.
                 if (!VerifyToCNIoPParity(LoadInternal(0)))
                 {
                     // if invalid, throw exception
-                    fs.Close();
+                    _fstream.Close();
                     throw new IOException("Index table verification failed.");
                 }
             }
             else
             {
                 // initialize file by empty data.
-                fs = File.Open(path, FileMode.Create, FileAccess.ReadWrite);
+                _fstream = File.Open(_path, FileMode.Create, FileAccess.ReadWrite);
             }
         }
 
@@ -102,12 +102,12 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         {
             // 64bit
             long tocParity = 0;
-            tableOfContents
+            _tableOfContents
                 .Select(kvp => (long)kvp.Value)
                 .ForEach(i => tocParity ^= i << (int)(i % 5));
             // 64bit
             long niopParity = 0;
-            nextIndexOfPackets
+            _nextIndexOfPackets
                 .SelectMany(kvp => kvp.Value.Select(v => (long)(v + kvp.Key * ChunkSize)))
                 .ForEach(i => niopParity ^= i << (int)(i % 5));
             return BitConverter.GetBytes(tocParity).Concat(BitConverter.GetBytes(niopParity)).ToArray();
@@ -139,7 +139,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
             List<int> curChunk;
 
             // get chunk
-            if (this.nextIndexOfPackets.TryGetValue(chunk, out curChunk))
+            if (this._nextIndexOfPackets.TryGetValue(chunk, out curChunk))
             {
                 // chunk found
                 curChunk[key] = next;
@@ -150,7 +150,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                 var list = new List<int>(Enumerable.Repeat(Empty, ChunkSize)); // init chunk with Empty recode
                 list[key] = next;
                 // add chunk to niop-tree
-                this.nextIndexOfPackets[chunk] = list;
+                this._nextIndexOfPackets[chunk] = list;
             }
         }
 
@@ -164,7 +164,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
             int chunk = index / ChunkSize;
             int key = index % ChunkSize;
             List<int> curChunk;
-            if (this.nextIndexOfPackets.TryGetValue(chunk, out curChunk))
+            if (this._nextIndexOfPackets.TryGetValue(chunk, out curChunk))
             {
                 return curChunk[key];
             }
@@ -182,8 +182,8 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// <returns></returns>
         public IEnumerable<int> GetNextIndexOfPackets()
         {
-            return Enumerable.Range(0, nextIndexOfPackets.Keys.Max() + 1)
-                .Select(i => nextIndexOfPackets.ContainsKey(i) ? nextIndexOfPackets[i] : Enumerable.Repeat(Empty, ChunkSize))
+            return Enumerable.Range(0, _nextIndexOfPackets.Keys.Max() + 1)
+                .Select(i => _nextIndexOfPackets.ContainsKey(i) ? _nextIndexOfPackets[i] : Enumerable.Repeat(Empty, ChunkSize))
                 .SelectMany(_ => _);
         }
 
@@ -192,7 +192,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// </summary>
         public IDictionary<TKey, int> GetTableOfContents()
         {
-            return tableOfContents;
+            return _tableOfContents;
         }
 
         /// <summary>
@@ -205,20 +205,27 @@ namespace StarryEyes.Vanille.DataStore.Persistent
             // remove old data, if existed.
             Remove(key);
 
+            byte[] bytes;
             // serialize data
-            var ms = new MemoryStream();
-            using (var bw = new BinaryWriter(ms))
-                value.Serialize(bw);
-            var bytes = ms.ToArray();
+            using (var ms = new MemoryStream())
+            {
+                using (var bw = new BinaryWriter(ms))
+                {
+                    value.Serialize(bw);
+                }
+                bytes = ms.ToArray();
+            }
 
             // compress data
-            var cs = new MemoryStream();
-            cs.Write(new byte[4], 0, 4); // add empty 4 bytes (placeholder)
-            using (var gzs = new DeflateStream(cs, CompressionLevel.Fastest))
+            using (var cs = new MemoryStream())
             {
-                gzs.Write(bytes, 0, bytes.Length);
+                cs.Write(new byte[4], 0, 4); // add empty 4 bytes (placeholder)
+                using (var gzs = new DeflateStream(cs, CompressionLevel.Fastest))
+                {
+                    gzs.Write(bytes, 0, bytes.Length);
+                }
+                bytes = cs.ToArray();
             }
-            bytes = cs.ToArray();
 
             // get length-bit into the header
             var lengthBytes = BitConverter.GetBytes(bytes.Length - 4); // byte[4]
@@ -228,7 +235,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
 
             // get index for storing data
             int writeTo = GetNextEmptyIndex(0);
-            tableOfContents[key] = writeTo;
+            _tableOfContents[key] = writeTo;
 
             // store
             StoreInternal(bytes, writeTo);
@@ -243,7 +250,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         public TValue Load(TKey key)
         {
             int readFrom;
-            if (!tableOfContents.TryGetValue(key, out readFrom) || readFrom < 0)
+            if (!_tableOfContents.TryGetValue(key, out readFrom) || readFrom < 0)
                 throw new KeyNotFoundException("Not found key in this persistent drive.");
             return Load(readFrom);
         }
@@ -258,13 +265,13 @@ namespace StarryEyes.Vanille.DataStore.Persistent
             IEnumerable<int> indexes;
             if (range != null)
             {
-                indexes = tableOfContents
+                indexes = _tableOfContents
                     .CheckRange(range, _ => _.Key)
                     .Select(_ => _.Value);
             }
             else
             {
-                indexes = tableOfContents.Values;
+                indexes = _tableOfContents.Values;
             }
             return indexes.Select(Load)
                 .Where(predicate)
@@ -278,16 +285,23 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// <returns>deserialized value</returns>
         private TValue Load(int index)
         {
-            var bytes = LoadInternal(index);
-            var length = BitConverter.ToInt32(bytes, 0);
-            var ret = new TValue();
-            using (var ms = new MemoryStream(bytes, 4, length, false))
-            using (var cs = new DeflateStream(ms, CompressionMode.Decompress))
-            using (var br = new BinaryReader(cs))
+            try
             {
-                ret.Deserialize(br);
+                var bytes = LoadInternal(index);
+                var length = BitConverter.ToInt32(bytes, 0);
+                var ret = new TValue();
+                using (var ms = new MemoryStream(bytes, 4, length, false))
+                using (var cs = new DeflateStream(ms, CompressionMode.Decompress))
+                using (var br = new BinaryReader(cs))
+                {
+                    ret.Deserialize(br);
+                }
+                return ret;
             }
-            return ret;
+            catch (Exception ex)
+            {
+                throw new DataPersistenceException("data load error.", ex);
+            }
         }
 
         /// <summary>
@@ -298,7 +312,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         public bool Remove(TKey key)
         {
             int idx;
-            if (!tableOfContents.TryGetValue(key, out idx))
+            if (!_tableOfContents.TryGetValue(key, out idx))
                 return false; // not found
             do
             {
@@ -329,14 +343,15 @@ namespace StarryEyes.Vanille.DataStore.Persistent
             while (true)
             {
                 // seek to write destination, write packet
-                fs.Seek(offset * PacketSize, SeekOrigin.Begin);
-                fs.Write(data, cursor, Math.Min(PacketSize, data.Length - cursor));
+                _fstream.Seek(offset * PacketSize, SeekOrigin.Begin);
+                _fstream.Write(data, cursor, Math.Min(PacketSize, data.Length - cursor));
 
                 // move cursor
                 cursor += PacketSize;
 
                 if (cursor > data.Length)
                 {
+                    _fstream.Flush(); // flush packets
                     SetNextIndexOfPackets(offset, 0); // finalize (mark as EOP)
                     return; // write completed
                 }
@@ -379,24 +394,26 @@ namespace StarryEyes.Vanille.DataStore.Persistent
             // data reading buffer
             var buffer = new byte[PacketSize];
             // return data buffer
-            var rstream = new MemoryStream();
-
-            // read size
-            int read = 0;
-
-            while (true)
+            using (var ms = new MemoryStream())
             {
-                // seek to source offset, read packet
-                fs.Seek(offset * PacketSize, SeekOrigin.Begin);
-                read = fs.Read(buffer, 0, PacketSize);
 
-                // write to return stream
-                rstream.Write(buffer, 0, read);
+                // read size
+                int read = 0;
 
-                // determine next packet index
-                offset = GetNextIndexOfPackets(offset);
-                if (offset == 0)
-                    return rstream.ToArray(); // return 'return stream' as array
+                while (true)
+                {
+                    // seek to source offset, read packet
+                    _fstream.Seek(offset * PacketSize, SeekOrigin.Begin);
+                    read = _fstream.Read(buffer, 0, PacketSize);
+
+                    // write to return stream
+                    ms.Write(buffer, 0, read);
+
+                    // determine next packet index
+                    offset = GetNextIndexOfPackets(offset);
+                    if (offset == 0)
+                        return ms.ToArray(); // return 'return stream' as array
+                }
             }
         }
 
@@ -420,9 +437,10 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         public void Dispose()
         {
             StoreParity();
-            fs.Flush();
-            fs.Close();
-            fs = null;
+            _fstream.Flush();
+            _fstream.Close();
+            _fstream.Dispose();
+            _fstream = null;
         }
     }
 }

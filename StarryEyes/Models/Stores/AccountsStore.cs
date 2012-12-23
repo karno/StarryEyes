@@ -28,11 +28,11 @@ namespace StarryEyes.Models.Stores
             if (isInitialized)
                 throw new InvalidOperationException("AccountsModel has already initialized.");
             isInitialized = true;
-            Setting._AccountsInternalDataStore.ForEach(Accounts.Add);
+            Setting.@Infrastructure_Accounts.ForEach(Accounts.Add);
             // writeback delegate
             Accounts.CollectionChanged += (_, __) =>
             {
-                Setting._AccountsInternalDataStore = Accounts;
+                Setting.@Infrastructure_Accounts = Accounts;
                 _accountsIdCollection = null;
             };
         }

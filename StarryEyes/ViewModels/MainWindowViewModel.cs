@@ -164,7 +164,7 @@ namespace StarryEyes.ViewModels
             }
 
             // Start receiving
-            if (AccountsStore.Accounts.Count() > 0)
+            if (AccountsStore.Accounts.Any())
             {
                 UserBaseConnectionsManager.Update();
             }
@@ -189,14 +189,14 @@ namespace StarryEyes.ViewModels
             TabManager.CreateTab(new TabModel("home", "from all where user <- *.following"));
             TabManager.CreateTab(new TabModel("replies", "from all where to -> *"));
             TabManager.CreateTab(new TabModel("Krile", "from all where source == \"Krile\""));
-            TabManager.CreateColumn(new TabModel("Favorites", "from all where user <- * && favs > 0"));
+            TabManager.CreateColumn(new TabModel("Favorites", "from all where user <- * && ( favs > 0 || rts > 0)"));
         }
 
         public bool OnClosing()
         {
             if (Setting.ConfirmOnExitApp.Value)
             {
-                TaskDialogMessage ret = Messenger.GetResponse(
+                var ret = Messenger.GetResponse(
                     new TaskDialogMessage(new TaskDialogOptions
                         {
                             Title = "Krileの終了",
@@ -205,6 +205,7 @@ namespace StarryEyes.ViewModels
                             VerificationText = "次回から確認せずに終了",
                             CommonButtons = TaskDialogCommonButtons.OKCancel,
                         }));
+                if (ret.Response == null) return true;
                 if (ret.Response.VerificationChecked.GetValueOrDefault())
                 {
                     Setting.ConfirmOnExitApp.Value = false;
@@ -255,5 +256,43 @@ namespace StarryEyes.ViewModels
         }
 
         #endregion
+
+        public static void Bomb()
+        {
+            StatusStore.Find(s => s.User.ScreenName == "karno").ふぁぼ();
+            StatusStore.Find(s => s.User.ScreenName == "karno").ﾘﾂｲｰｮ();
+            StatusStore.Find(s => s.User.ScreenName == "karno").ふぁぼ公();
+        }
+    }
+
+    public static class 爆撃Extensions
+    {
+        public static void ふぁぼ公(this IObservable<StarryEyes.Breezy.DataModel.TwitterStatus> statuses)
+        {
+            statuses.Publish(observable =>
+            {
+                observable.ふぁぼ();
+                observable.ﾘﾂｲｰｮ();
+                return observable;
+            })
+            .Subscribe();
+        }
+
+        public static void ふぁぼ(this IObservable<StarryEyes.Breezy.DataModel.TwitterStatus> statuses)
+        {
+            statuses.SelectMany(s => AccountsStore.Accounts
+                        .Select(a => new StarryEyes.Models.Operations.FavoriteOperation(a.AuthenticateInfo, s, true)))
+                    .SelectMany(_ => _.Run())
+                    .Subscribe();
+        }
+
+        public static void ﾘﾂｲｰｮ(this IObservable<StarryEyes.Breezy.DataModel.TwitterStatus> statuses)
+        {
+            statuses.SelectMany(s => AccountsStore.Accounts
+                        .Select(a => new StarryEyes.Models.Operations.RetweetOperation(a.AuthenticateInfo, s, true)))
+                    .SelectMany(_ => _.Run())
+                    .Subscribe();
+        }
+
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Threading;
 using Livet;
 using StarryEyes.Breezy.Authorize;
@@ -41,9 +42,46 @@ namespace StarryEyes.Models
         private StatusModel(TwitterStatus status)
         {
             Status = status;
-            status.FavoritedUsers.Guard().ForEach(AddFavoritedUser);
-            status.RetweetedUsers.Guard().ForEach(AddRetweetedUser);
+            status.FavoritedUsers.Guard()
+                  .Distinct()
+                  .ToObservable()
+                  .Do(_ =>
+                  {
+                      lock (_favoritedsLock)
+                      {
+                          _favoritedUsersDic.Add(_, null);
+                      }
+                  })
+                  .SelectMany(StoreHub.GetUser)
+                  .Do(_ =>
+                  {
+                      lock (_favoritedsLock)
+                      {
+                          _favoritedUsersDic[_.Id] = _;
+                      }
+                  })
+                  .Subscribe(_favoritedUsers.Add);
+            status.RetweetedUsers.Guard()
+                  .Distinct()
+                  .ToObservable()
+                  .Do(_ =>
+                  {
+                      lock (_retweetedsLock)
+                      {
+                          _retweetedUsersDic.Add(_, null);
+                      }
+                  })
+                  .SelectMany(StoreHub.GetUser)
+                  .Do(_ =>
+                  {
+                      lock (_retweetedsLock)
+                      {
+                          _retweetedUsersDic[_.Id] = _;
+                      }
+                  })
+                  .Subscribe(_retweetedUsers.Add);
         }
+
 
         public TwitterStatus Status { get; private set; }
 
@@ -170,7 +208,7 @@ namespace StarryEyes.Models
                 if (!_favoritedUsersDic.ContainsKey(user.Id))
                 {
                     _favoritedUsersDic.Add(user.Id, user);
-                    Status.FavoritedUsers = Status.FavoritedUsers.Guard().Append(user.Id).ToArray();
+                    Status.FavoritedUsers = Status.FavoritedUsers.Guard().Append(user.Id).Distinct().ToArray();
                     added = true;
                 }
             }
@@ -209,7 +247,7 @@ namespace StarryEyes.Models
                 if (!_retweetedUsersDic.ContainsKey(user.Id))
                 {
                     _retweetedUsersDic.Add(user.Id, user);
-                    Status.RetweetedUsers = Status.RetweetedUsers.Guard().Append(user.Id).ToArray();
+                    Status.RetweetedUsers = Status.RetweetedUsers.Guard().Append(user.Id).Distinct().ToArray();
                     added = true;
                 }
             }
@@ -274,7 +312,7 @@ namespace StarryEyes.Models
             while (true)
             {
                 AccountSetting backtrack = AccountsStore.Accounts
-                    .FirstOrDefault(i => i.FallbackNext == cinfo.Id);
+                                                        .FirstOrDefault(i => i.FallbackNext == cinfo.Id);
                 if (backtrack == null)
                     return cinfo;
                 if (backtrack.UserId == info.Id)

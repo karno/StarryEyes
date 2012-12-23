@@ -74,6 +74,13 @@ namespace StarryEyes.Models.Hubs
         {
             // optional default handlers
             if (OverrideDefaultHandlers) return;
+            OnReceived += t =>
+            {
+                if (t.RetweetedOriginal != null && AccountsStore.AccountIds.Contains(t.RetweetedOriginal.User.Id))
+                {
+                    BackpanelModel.RegisterEvent(new RetweetedEvent(t.User, t.RetweetedOriginal));
+                }
+            };
             OnFollowed += ue => BackpanelModel.RegisterEvent(new FollowedEvent(ue.Source, ue.Target));
             OnUnfollowed += ue => BackpanelModel.RegisterEvent(new UnfollowedEvent(ue.Source, ue.Target));
             OnBlocked += ue => BackpanelModel.RegisterEvent(new BlockedEvent(ue.Source, ue.Target));

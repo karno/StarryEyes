@@ -52,7 +52,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             _retweetedUsers.CollectionChanged += (sender, e) =>
             {
                 RaisePropertyChanged(() => IsRetweetedUserExists);
-                RaisePropertyChanged(() => FavoriteCount);
+                RaisePropertyChanged(() => RetweetCount);
             };
             CompositeDisposable.Add(_favoritedUsers);
             CompositeDisposable.Add(_retweetedUsers);
