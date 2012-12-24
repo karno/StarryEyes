@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading;
 using Livet;
@@ -42,57 +43,96 @@ namespace StarryEyes.Models
         private StatusModel(TwitterStatus status)
         {
             Status = status;
-            status.FavoritedUsers.Guard()
-                  .Distinct()
-                  .ToObservable()
-                  .Do(_ =>
-                  {
-                      lock (_favoritedsLock)
-                      {
-                          _favoritedUsersDic.Add(_, null);
-                      }
-                  })
-                  .SelectMany(StoreHub.GetUser)
-                  .Do(_ =>
-                  {
-                      lock (_favoritedsLock)
-                      {
-                          _favoritedUsersDic[_.Id] = _;
-                      }
-                  })
-                  .Subscribe(_favoritedUsers.Add);
-            status.RetweetedUsers.Guard()
-                  .Distinct()
-                  .ToObservable()
-                  .Do(_ =>
-                  {
-                      lock (_retweetedsLock)
-                      {
-                          _retweetedUsersDic.Add(_, null);
-                      }
-                  })
-                  .SelectMany(StoreHub.GetUser)
-                  .Do(_ =>
-                  {
-                      lock (_retweetedsLock)
-                      {
-                          _retweetedUsersDic[_.Id] = _;
-                      }
-                  })
-                  .Subscribe(_retweetedUsers.Add);
-        }
 
+
+        }
 
         public TwitterStatus Status { get; private set; }
 
+        private volatile bool _isFavoritedUsersLoaded = false;
+
         public ObservableSynchronizedCollection<TwitterUser> FavoritedUsers
         {
-            get { return _favoritedUsers; }
+            get
+            {
+                if (!_isFavoritedUsersLoaded)
+                {
+                    _isFavoritedUsersLoaded = true;
+                    LoadFavoritedUsers();
+                }
+                return _favoritedUsers;
+            }
         }
+
+        private void LoadFavoritedUsers()
+        {
+            if (Status.FavoritedUsers != null && Status.FavoritedUsers.Length > 0)
+            {
+                Status.FavoritedUsers
+                      .Distinct()
+                      .Reverse()
+                      .ToObservable()
+                      .ObserveOn(TaskPoolScheduler.Default)
+                      .Do(_ =>
+                      {
+                          lock (_favoritedsLock)
+                          {
+                              _favoritedUsersDic.Add(_, null);
+                          }
+                      })
+                      .SelectMany(StoreHub.GetUser)
+                      .Do(_ =>
+                      {
+                          lock (_favoritedsLock)
+                          {
+                              _favoritedUsersDic[_.Id] = _;
+                          }
+                      })
+                      .Subscribe(_ => _favoritedUsers.Insert(0, _));
+            }
+        }
+
+        private volatile bool _isRetweetedUsersLoaded = false;
 
         public ObservableSynchronizedCollection<TwitterUser> RetweetedUsers
         {
-            get { return _retweetedUsers; }
+            get
+            {
+                if (!_isRetweetedUsersLoaded)
+                {
+                    _isRetweetedUsersLoaded = true;
+                    LoadRetweetedUsers();
+                }
+                return _retweetedUsers;
+            }
+        }
+
+        private void LoadRetweetedUsers()
+        {
+            if (Status.RetweetedUsers != null && Status.RetweetedUsers.Length > 0)
+            {
+                Status.RetweetedUsers
+                      .Distinct()
+                      .Reverse()
+                      .ToObservable()
+                      .ObserveOn(TaskPoolScheduler.Default)
+                      .Do(_ =>
+                      {
+                          lock (_retweetedsLock)
+                          {
+                              _retweetedUsersDic.Add(_, null);
+                          }
+                      })
+                      .SelectMany(StoreHub.GetUser)
+                      .Do(_ =>
+                      {
+                          lock (_retweetedsLock)
+                          {
+                              _retweetedUsersDic[_.Id] = _;
+                          }
+                      })
+                      .Subscribe(_ => _retweetedUsers.Insert(0, _));
+            }
         }
 
         public static void UpdateStatusInfo(TwitterStatus status,
