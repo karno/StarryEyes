@@ -14,6 +14,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         const int PacketSize = 256;
         const int ChunkSize = 1024;
 
+        const int EndOfPackets = 0;
         const int Empty = -1;
 
         private readonly string _path;
@@ -34,11 +35,12 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// Initialize persistent drive with create-new mode.
         /// </summary>
         /// <param name="path">base file path</param>
+        /// <param name="comparer">comparer for key ordering</param>
         public PersistentDrive(string path, IComparer<TKey> comparer)
         {
             this._tableOfContents = new SortedDictionary<TKey, int>(comparer);
             this._nextIndexOfPackets = new SortedDictionary<int, List<int>>();
-            SetNextIndexOfPackets(0, 0); // index 0 is reserved for the parity.
+            SetNextIndexOfPackets(0, EndOfPackets); // index 0 is reserved for the parity.
             this._path = path;
             PrepareFile(false);
         }
@@ -79,12 +81,11 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                 _fstream = File.Open(_path, FileMode.Open, FileAccess.ReadWrite);
                 // verify toc and niop-table
 
-                // TODO: use parity, it is existed at index #0.
                 if (!VerifyToCNIoPParity(LoadInternal(0)))
                 {
                     // if invalid, throw exception
                     _fstream.Close();
-                    throw new IOException("Index table verification failed.");
+                    throw new DataPersistenceException("Index table verification failed.");
                 }
             }
             else
@@ -168,12 +169,9 @@ namespace StarryEyes.Vanille.DataStore.Persistent
             {
                 return curChunk[key];
             }
-            else
-            {
-                // chunk is not existed yet.
-                // -> treat as empty.
-                return Empty;
-            }
+            // chunk is not existed yet.
+            // -> treat as empty.
+            return Empty;
         }
 
         /// <summary>
@@ -208,21 +206,20 @@ namespace StarryEyes.Vanille.DataStore.Persistent
             byte[] bytes;
             // serialize data
             using (var ms = new MemoryStream())
-            {
-                using (var bw = new BinaryWriter(ms))
-                {
-                    value.Serialize(bw);
-                }
-                bytes = ms.ToArray();
-            }
-
-            // compress data
             using (var cs = new MemoryStream())
+            using (var bw = new BinaryWriter(ms))
             {
-                cs.Write(new byte[4], 0, 4); // add empty 4 bytes (placeholder)
-                using (var gzs = new DeflateStream(cs, CompressionLevel.Fastest))
+                // serialize
+                value.Serialize(bw);
+                bw.Flush();
+
+                ms.Seek(0, SeekOrigin.Begin); // initialize seek point
+                cs.Seek(4, SeekOrigin.Begin); // 4 bytes for length placeholder.
+                //compress
+                using (var ds = new DeflateStream(cs, CompressionLevel.Fastest))
                 {
-                    gzs.Write(bytes, 0, bytes.Length);
+                    ms.CopyTo(ds);
+                    ms.Flush();
                 }
                 bytes = cs.ToArray();
             }
@@ -285,23 +282,35 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// <returns>deserialized value</returns>
         private TValue Load(int index)
         {
+            /*
             try
             {
-                var bytes = LoadInternal(index);
-                var length = BitConverter.ToInt32(bytes, 0);
-                var ret = new TValue();
-                using (var ms = new MemoryStream(bytes, 4, length, false))
-                using (var cs = new DeflateStream(ms, CompressionMode.Decompress))
-                using (var br = new BinaryReader(cs))
+            */
+            var bytes = LoadInternal(index);
+            var length = BitConverter.ToInt32(bytes, 0);
+            var ret = new TValue();
+            // decompress
+            using (var cs = new MemoryStream(bytes, 4, length, false))
+            using (var ds = new DeflateStream(cs, CompressionMode.Decompress))
+            using (var ms = new MemoryStream())
+            {
+                ds.CopyTo(ms);
+                ds.Flush();
+
+                ms.Seek(0, SeekOrigin.Begin);
+                using (var br = new BinaryReader(ms))
                 {
                     ret.Deserialize(br);
                 }
-                return ret;
+            }
+            return ret;
+            /*
             }
             catch (Exception ex)
             {
                 throw new DataPersistenceException("data load error.", ex);
             }
+            */
         }
 
         /// <summary>
@@ -330,21 +339,25 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// Store value.
         /// </summary>
         /// <param name="data"></param>
-        /// <param name="startOffset"></param>
-        private void StoreInternal(byte[] data, int startOffset)
+        /// <param name="offset"></param>
+        private void StoreInternal(byte[] data, int offset)
         {
             // current writing data starting offset
             int cursor = 0;
-
-            // set offset
-            int offset = startOffset;
 
             // write packets
             while (true)
             {
                 // seek to write destination, write packet
                 _fstream.Seek(offset * PacketSize, SeekOrigin.Begin);
-                _fstream.Write(data, cursor, Math.Min(PacketSize, data.Length - cursor));
+                if (data.Length - cursor < PacketSize)
+                {
+                    _fstream.Write(data, cursor, data.Length - cursor);
+                }
+                else
+                {
+                    _fstream.Write(data, cursor, PacketSize);
+                }
 
                 // move cursor
                 cursor += PacketSize;
@@ -352,7 +365,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                 if (cursor > data.Length)
                 {
                     _fstream.Flush(); // flush packets
-                    SetNextIndexOfPackets(offset, 0); // finalize (mark as EOP)
+                    SetNextIndexOfPackets(offset, EndOfPackets); // finalize (mark as EOP)
                     return; // write completed
                 }
 
@@ -373,15 +386,11 @@ namespace StarryEyes.Vanille.DataStore.Persistent
             int current = start + 1;
             while (true)
             {
-                switch (GetNextIndexOfPackets(current))
-                {
-                    case Empty: // empty block
-                        return current;
-                    default:
-                        current++; // continue loop
-                        break;
-                }
+                if (GetNextIndexOfPackets(current) == Empty)
+                    break;
+                current++;
             }
+            return current;
         }
 
         /// <summary>
@@ -397,14 +406,11 @@ namespace StarryEyes.Vanille.DataStore.Persistent
             using (var ms = new MemoryStream())
             {
 
-                // read size
-                int read = 0;
-
                 while (true)
                 {
                     // seek to source offset, read packet
                     _fstream.Seek(offset * PacketSize, SeekOrigin.Begin);
-                    read = _fstream.Read(buffer, 0, PacketSize);
+                    int read = _fstream.Read(buffer, 0, PacketSize);
 
                     // write to return stream
                     ms.Write(buffer, 0, read);
