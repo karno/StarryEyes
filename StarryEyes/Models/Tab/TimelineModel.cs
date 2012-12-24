@@ -85,9 +85,12 @@ namespace StarryEyes.Models.Tab
             if (add)
             {
                 // estimate point
-                var addpoint = _statuses.TakeWhile(_ => _.CreatedAt > status.CreatedAt).Count();
-                if (addpoint > TimelineChunkCount + TimelineChunkCountBounce)
-                    return;
+                if (!_isSuppressTimelineTrimming)
+                {
+                    var addpoint = _statuses.TakeWhile(_ => _.CreatedAt > status.CreatedAt).Count();
+                    if (addpoint > TimelineChunkCount)
+                        return;
+                }
                 _statuses.Insert(
                     i => i.TakeWhile(_ => _.CreatedAt > status.CreatedAt).Count(),
                     status);

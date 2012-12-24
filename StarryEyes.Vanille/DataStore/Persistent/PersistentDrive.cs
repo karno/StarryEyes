@@ -23,6 +23,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
             get { return _path; }
         }
 
+        private readonly object _fslock = new object();
         private FileStream _fstream;
 
         // niop is delimited per 1024 packets(= 1 chunks).
@@ -348,15 +349,18 @@ namespace StarryEyes.Vanille.DataStore.Persistent
             // write packets
             while (true)
             {
-                // seek to write destination, write packet
-                _fstream.Seek(offset * PacketSize, SeekOrigin.Begin);
-                if (data.Length - cursor < PacketSize)
+                lock (_fslock)
                 {
-                    _fstream.Write(data, cursor, data.Length - cursor);
-                }
-                else
-                {
-                    _fstream.Write(data, cursor, PacketSize);
+                    // seek to write destination, write packet
+                    _fstream.Seek(offset * PacketSize, SeekOrigin.Begin);
+                    if (data.Length - cursor < PacketSize)
+                    {
+                        _fstream.Write(data, cursor, data.Length - cursor);
+                    }
+                    else
+                    {
+                        _fstream.Write(data, cursor, PacketSize);
+                    }
                 }
 
                 // move cursor
@@ -364,7 +368,10 @@ namespace StarryEyes.Vanille.DataStore.Persistent
 
                 if (cursor > data.Length)
                 {
-                    _fstream.Flush(); // flush packets
+                    lock (_fslock)
+                    {
+                        _fstream.Flush();
+                    }
                     SetNextIndexOfPackets(offset, EndOfPackets); // finalize (mark as EOP)
                     return; // write completed
                 }
@@ -405,12 +412,15 @@ namespace StarryEyes.Vanille.DataStore.Persistent
             // return data buffer
             using (var ms = new MemoryStream())
             {
-
                 while (true)
                 {
-                    // seek to source offset, read packet
-                    _fstream.Seek(offset * PacketSize, SeekOrigin.Begin);
-                    int read = _fstream.Read(buffer, 0, PacketSize);
+                    int read;
+                    lock (_fslock)
+                    {
+                        // seek to source offset, read packet
+                        _fstream.Seek(offset * PacketSize, SeekOrigin.Begin);
+                        read = _fstream.Read(buffer, 0, PacketSize);
+                    }
 
                     // write to return stream
                     ms.Write(buffer, 0, read);
@@ -443,10 +453,13 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         public void Dispose()
         {
             StoreParity();
-            _fstream.Flush();
-            _fstream.Close();
-            _fstream.Dispose();
-            _fstream = null;
+            lock (_fslock)
+            {
+                _fstream.Flush();
+                _fstream.Close();
+                _fstream.Dispose();
+                _fstream = null;
+            }
         }
     }
 }
