@@ -382,7 +382,7 @@
                                 		</i:EventTrigger>
                                 	</i:Interaction.Triggers>
                                 </TextBlock>
-                                <StackPanel x:Name="stackPanel" Grid.Column="1" Orientation="Horizontal" Height="21" Opacity="1" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                <StackPanel x:Name="stackPanel" Grid.Column="1" Orientation="Horizontal" Height="21" Opacity="0" HorizontalAlignment="Right" VerticalAlignment="Center">
                                 	<Button Style="{DynamicResource MetroSquareUnfocusableFlatButton}" Width="32" Height="22" Margin="0,-2" Visibility="{Binding CanFavoriteAndRetweet, Converter={StaticResource BooleanToVisibleConverter}}">
                                 		<i:Interaction.Triggers>
                                 			<i:EventTrigger EventName="Click">

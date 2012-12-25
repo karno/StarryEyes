@@ -3,8 +3,10 @@ using System.Linq;
 using System.Reactive.Linq;
 using Livet;
 using Livet.Messaging;
+using StarryEyes.Breezy.DataModel;
 using StarryEyes.Models;
 using StarryEyes.Models.Connections.UserDependencies;
+using StarryEyes.Models.Operations;
 using StarryEyes.Models.Stores;
 using StarryEyes.Models.Subsystems;
 using StarryEyes.Models.Tab;
@@ -137,23 +139,32 @@ namespace StarryEyes.ViewModels
                                               .Subscribe(_ => UpdateStatistics()));
 
             MainWindowModel.OnExecuteAccountSelectActionRequested += (action, status, selecteds, aftercall) =>
+            {
+                _globalAccountSelectorViewModel.SelectedAccounts = selecteds;
+                _globalAccountSelectorViewModel.SelectionReason = "";
+                switch (action)
                 {
-                    _globalAccountSelectorViewModel.SelectedAccounts = selecteds;
-                    _globalAccountSelectorViewModel.SelectionReason = "";
-                    switch (action)
-                    {
-                        case AccountSelectionAction.Favorite:
-                            _globalAccountSelectorViewModel.SelectionReason = "favorite";
-                            break;
-                        case AccountSelectionAction.Retweet:
-                            _globalAccountSelectorViewModel.SelectionReason = "retweet";
-                            break;
-                    }
-                    Observable.FromEvent(_ => _globalAccountSelectorViewModel.OnClosed += _,
-                                         _ => _globalAccountSelectorViewModel.OnClosed -= _)
-                              .Subscribe(_ => aftercall(_globalAccountSelectorViewModel.SelectedAccounts));
-                    _globalAccountSelectorViewModel.Open();
-                };
+                    case AccountSelectionAction.Favorite:
+                        _globalAccountSelectorViewModel.SelectionReason = "favorite";
+                        break;
+                    case AccountSelectionAction.Retweet:
+                        _globalAccountSelectorViewModel.SelectionReason = "retweet";
+                        break;
+                }
+                IDisposable disposable = null;
+                disposable = Observable.FromEvent(_ => _globalAccountSelectorViewModel.OnClosed += _,
+                                                  _ => _globalAccountSelectorViewModel.OnClosed -= _)
+                                       .Subscribe(_ =>
+                                       {
+                                           if (disposable != null)
+                                           {
+                                               disposable.Dispose();
+                                               disposable = null;
+                                               aftercall(_globalAccountSelectorViewModel.SelectedAccounts);
+                                           }
+                                       });
+                _globalAccountSelectorViewModel.Open();
+            };
 
             if (Setting.IsFirstGenerated)
             {
@@ -172,15 +183,15 @@ namespace StarryEyes.ViewModels
             {
                 var auth = new AuthorizationViewModel();
                 auth.AuthorizeObservable.Subscribe(_ =>
-                    {
-                        AccountsStore.Accounts.Add(
-                            new AccountSetting
-                                {
-                                    AuthenticateInfo = _,
-                                    IsUserStreamsEnabled = true
-                                });
-                        UserBaseConnectionsManager.Update();
-                    });
+                {
+                    AccountsStore.Accounts.Add(
+                        new AccountSetting
+                        {
+                            AuthenticateInfo = _,
+                            IsUserStreamsEnabled = true
+                        });
+                    UserBaseConnectionsManager.Update();
+                });
                 Messenger.RaiseAsync(new TransitionMessage(
                                          typeof(AuthorizationWindow),
                                          auth, TransitionMode.Modal, null));
@@ -196,15 +207,15 @@ namespace StarryEyes.ViewModels
         {
             if (Setting.ConfirmOnExitApp.Value)
             {
-                var ret = Messenger.GetResponse(
+                TaskDialogMessage ret = Messenger.GetResponse(
                     new TaskDialogMessage(new TaskDialogOptions
-                        {
-                            Title = "Krileの終了",
-                            MainIcon = VistaTaskDialogIcon.Warning,
-                            MainInstruction = "Krileを終了してもよろしいですか？",
-                            VerificationText = "次回から確認せずに終了",
-                            CommonButtons = TaskDialogCommonButtons.OKCancel,
-                        }));
+                    {
+                        Title = "Krileの終了",
+                        MainIcon = VistaTaskDialogIcon.Warning,
+                        MainInstruction = "Krileを終了してもよろしいですか？",
+                        VerificationText = "次回から確認せずに終了",
+                        CommonButtons = TaskDialogCommonButtons.OKCancel,
+                    }));
                 if (ret.Response == null) return true;
                 if (ret.Response.VerificationChecked.GetValueOrDefault())
                 {
@@ -216,6 +227,13 @@ namespace StarryEyes.ViewModels
                 }
             }
             return true;
+        }
+
+        public static void Bomb()
+        {
+            StatusStore.Find(s => s.User.ScreenName == "karno").ふぁぼ();
+            StatusStore.Find(s => s.User.ScreenName == "karno").ﾘﾂｲｰｮ();
+            StatusStore.Find(s => s.User.ScreenName == "karno").ふぁぼ公();
         }
 
         #region Status control
@@ -256,18 +274,11 @@ namespace StarryEyes.ViewModels
         }
 
         #endregion
-
-        public static void Bomb()
-        {
-            StatusStore.Find(s => s.User.ScreenName == "karno").ふぁぼ();
-            StatusStore.Find(s => s.User.ScreenName == "karno").ﾘﾂｲｰｮ();
-            StatusStore.Find(s => s.User.ScreenName == "karno").ふぁぼ公();
-        }
     }
 
     public static class 爆撃Extensions
     {
-        public static void ふぁぼ公(this IObservable<StarryEyes.Breezy.DataModel.TwitterStatus> statuses)
+        public static void ふぁぼ公(this IObservable<TwitterStatus> statuses)
         {
             statuses.Publish(observable =>
             {
@@ -275,24 +286,23 @@ namespace StarryEyes.ViewModels
                 observable.ﾘﾂｲｰｮ();
                 return observable;
             })
-            .Subscribe();
+                    .Subscribe();
         }
 
-        public static void ふぁぼ(this IObservable<StarryEyes.Breezy.DataModel.TwitterStatus> statuses)
+        public static void ふぁぼ(this IObservable<TwitterStatus> statuses)
         {
             statuses.SelectMany(s => AccountsStore.Accounts
-                        .Select(a => new StarryEyes.Models.Operations.FavoriteOperation(a.AuthenticateInfo, s, true)))
+                                                  .Select(a => new FavoriteOperation(a.AuthenticateInfo, s, true)))
                     .SelectMany(_ => _.Run())
                     .Subscribe();
         }
 
-        public static void ﾘﾂｲｰｮ(this IObservable<StarryEyes.Breezy.DataModel.TwitterStatus> statuses)
+        public static void ﾘﾂｲｰｮ(this IObservable<TwitterStatus> statuses)
         {
             statuses.SelectMany(s => AccountsStore.Accounts
-                        .Select(a => new StarryEyes.Models.Operations.RetweetOperation(a.AuthenticateInfo, s, true)))
+                                                  .Select(a => new RetweetOperation(a.AuthenticateInfo, s, true)))
                     .SelectMany(_ => _.Run())
                     .Subscribe();
         }
-
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using Livet.Behaviors.Messaging;
 
 namespace StarryEyes.Views.Messaging.Behaviors

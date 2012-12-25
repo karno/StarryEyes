@@ -55,7 +55,7 @@ namespace StarryEyes.Models
                 handler(action, targetStatus, defaultSelected, after);
         }
 
-        private static LinkedList<string> _stateStack = new LinkedList<string>();
+        private static readonly LinkedList<string> _stateStack = new LinkedList<string>();
         public static event Action OnStateStringChanged;
 
         public static string StateString
@@ -67,10 +67,7 @@ namespace StarryEyes.Models
                 {
                     return item.Value;
                 }
-                else
-                {
-                    return App.DefaultStatusMessage;
-                }
+                return App.DefaultStatusMessage;
             }
         }
 
