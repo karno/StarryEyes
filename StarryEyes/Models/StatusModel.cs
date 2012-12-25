@@ -16,6 +16,8 @@ namespace StarryEyes.Models
 {
     public class StatusModel
     {
+        #region Static members
+
         private static readonly object _staticCacheLock = new object();
 
         private static readonly SortedDictionary<long, WeakReference> _staticCache =
@@ -23,6 +25,85 @@ namespace StarryEyes.Models
 
         private static readonly ConcurrentDictionary<long, object> _generateLock =
             new ConcurrentDictionary<long, object>();
+
+        public static int CachedObjectsCount
+        {
+            get { return _staticCache.Count; }
+        }
+
+        public static StatusModel GetIfCacheIsAlive(long id)
+        {
+            StatusModel model = null;
+            WeakReference wr;
+            lock (_staticCacheLock)
+            {
+                _staticCache.TryGetValue(id, out wr);
+            }
+            if (wr != null)
+                model = (StatusModel)wr.Target;
+            return model;
+        }
+
+        public static StatusModel Get(TwitterStatus status)
+        {
+            object lockerobj = _generateLock.GetOrAdd(status.Id, new object());
+            try
+            {
+                lock (lockerobj)
+                {
+                    StatusModel model;
+                    WeakReference wr;
+                    lock (_staticCacheLock)
+                    {
+                        _staticCache.TryGetValue(status.Id, out wr);
+                    }
+                    if (wr != null)
+                    {
+                        model = (StatusModel)wr.Target;
+                        if (model != null)
+                            return model;
+                    }
+
+                    // cache is dead/not cached yet
+                    model = new StatusModel(status);
+                    wr = new WeakReference(model);
+                    lock (_staticCacheLock)
+                    {
+                        _staticCache[status.Id] = wr;
+                    }
+                    return model;
+                }
+            }
+            finally
+            {
+                _generateLock.TryRemove(status.Id, out lockerobj);
+            }
+        }
+
+        public static void CollectGarbages()
+        {
+            long[] values;
+            lock (_staticCacheLock)
+            {
+                values = _staticCache.Keys.ToArray();
+            }
+            foreach (var ids in values.Buffer(16))
+            {
+                lock (_staticCacheLock)
+                {
+                    foreach (long id in ids)
+                    {
+                        WeakReference wr;
+                        _staticCache.TryGetValue(id, out wr);
+                        if (wr != null && wr.Target == null)
+                            _staticCache.Remove(id);
+                    }
+                }
+                Thread.Sleep(0);
+            }
+        }
+
+        #endregion
 
         private readonly ObservableSynchronizedCollection<TwitterUser> _favoritedUsers =
             new ObservableSynchronizedCollection<TwitterUser>();
@@ -40,16 +121,15 @@ namespace StarryEyes.Models
 
         private readonly object _retweetedsLock = new object();
 
+        private volatile bool _isFavoritedUsersLoaded;
+        private volatile bool _isRetweetedUsersLoaded;
+
         private StatusModel(TwitterStatus status)
         {
             Status = status;
-
-
         }
 
         public TwitterStatus Status { get; private set; }
-
-        private volatile bool _isFavoritedUsersLoaded = false;
 
         public ObservableSynchronizedCollection<TwitterUser> FavoritedUsers
         {
@@ -61,6 +141,19 @@ namespace StarryEyes.Models
                     LoadFavoritedUsers();
                 }
                 return _favoritedUsers;
+            }
+        }
+
+        public ObservableSynchronizedCollection<TwitterUser> RetweetedUsers
+        {
+            get
+            {
+                if (!_isRetweetedUsersLoaded)
+                {
+                    _isRetweetedUsersLoaded = true;
+                    LoadRetweetedUsers();
+                }
+                return _retweetedUsers;
             }
         }
 
@@ -89,21 +182,6 @@ namespace StarryEyes.Models
                           }
                       })
                       .Subscribe(_ => _favoritedUsers.Insert(0, _));
-            }
-        }
-
-        private volatile bool _isRetweetedUsersLoaded = false;
-
-        public ObservableSynchronizedCollection<TwitterUser> RetweetedUsers
-        {
-            get
-            {
-                if (!_isRetweetedUsersLoaded)
-                {
-                    _isRetweetedUsersLoaded = true;
-                    LoadRetweetedUsers();
-                }
-                return _retweetedUsers;
             }
         }
 
@@ -161,77 +239,6 @@ namespace StarryEyes.Models
             finally
             {
                 _generateLock.TryRemove(status.Id, out lockerobj);
-            }
-        }
-
-        public static StatusModel GetIfCacheIsAlive(long id)
-        {
-            StatusModel model = null;
-            WeakReference wr;
-            lock (_staticCacheLock)
-            {
-                _staticCache.TryGetValue(id, out wr);
-            }
-            if (wr != null)
-                model = (StatusModel)wr.Target;
-            return model;
-        }
-
-        public static StatusModel Get(TwitterStatus status)
-        {
-            object lockerobj = _generateLock.GetOrAdd(status.Id, new object());
-            try
-            {
-                lock (lockerobj)
-                {
-                    StatusModel model = null;
-                    WeakReference wr;
-                    lock (_staticCacheLock)
-                    {
-                        _staticCache.TryGetValue(status.Id, out wr);
-                    }
-                    if (wr != null)
-                        model = (StatusModel)wr.Target;
-
-                    if (model != null)
-                        return model;
-
-                    // cache is dead/not cached yet
-                    model = new StatusModel(status);
-                    wr = new WeakReference(model);
-                    lock (_staticCacheLock)
-                    {
-                        _staticCache[status.Id] = wr;
-                    }
-                    return model;
-                }
-            }
-            finally
-            {
-                _generateLock.TryRemove(status.Id, out lockerobj);
-            }
-        }
-
-        public static void CollectGarbages()
-        {
-            long[] values;
-            lock (_staticCacheLock)
-            {
-                values = _staticCache.Keys.ToArray();
-            }
-            foreach (var ids in values.Buffer(16))
-            {
-                lock (_staticCacheLock)
-                {
-                    foreach (long id in ids)
-                    {
-                        WeakReference wr;
-                        _staticCache.TryGetValue(id, out wr);
-                        if (wr != null && wr.Target == null)
-                            _staticCache.Remove(id);
-                    }
-                }
-                Thread.Sleep(0);
             }
         }
 

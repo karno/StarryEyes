@@ -539,7 +539,10 @@ namespace StarryEyes.ViewModels.WindowParts
                 {
                     OpenInput(false);
                     CheckClearInput();
-                    OverrideSelectedAccounts(infos);
+                    if (infos != null)
+                    {
+                        OverrideSelectedAccounts(infos);
+                    }
                     InputText = body;
                     InReplyTo = new StatusViewModel(inReplyTo);
                     switch (cursor)

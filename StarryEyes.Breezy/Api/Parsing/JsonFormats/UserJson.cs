@@ -39,7 +39,7 @@ namespace StarryEyes.Breezy.Api.Parsing.JsonFormats
 
         public int favourites_count { get; set; }
 
-        public int listed_count { get; set; }
+        public int? listed_count { get; set; }
 
         public string lang { get; set; }
 
@@ -77,7 +77,7 @@ namespace StarryEyes.Breezy.Api.Parsing.JsonFormats
                 FriendsCount = (long)friends_count,
                 FollowersCount = (long)followers_count,
                 FavoritesCount = (long)favourites_count,
-                ListedCount = (long)listed_count,
+                ListedCount = (long)listed_count.GetValueOrDefault(),
                 Language = lang,
                 IsGeoEnabled = is_geo_enabled,
                 CreatedAt = created_at.ParseDateTime(XmlParser.TwitterDateTimeFormat)

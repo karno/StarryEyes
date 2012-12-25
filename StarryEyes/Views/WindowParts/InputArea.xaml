@@ -298,6 +298,9 @@
                             <l:InteractionMessageTrigger MessageKey="FocusToTextBox" Messenger="{Binding Messenger}">
                                 <l:SetFocusAction />
                             </l:InteractionMessageTrigger>
+                            <l:InteractionMessageTrigger Messenger="{Binding Messenger}">
+                            	<Behaviors:TextBoxSetCaretInteractionMessageAction/>
+                            </l:InteractionMessageTrigger>
                         </i:Interaction.Triggers>
                         <i:Interaction.Behaviors>
                             <l:TextBoxBindingSupportBehavior SelectedText="{Binding SelectedText}"
