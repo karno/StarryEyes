@@ -28,7 +28,7 @@
             <DataTemplate x:Key="StatusItemTemplate">
                 <Border x:Name="MainBorder"
                         Margin="0"
-                        Background="#00000000"
+                        Background="White"
                         Padding="0">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="MouseEnter">
@@ -170,7 +170,7 @@
                                 Grid.RowSpan="1"
                                 Grid.Column="0"
                                 Grid.ColumnSpan="1"
-                                Width="1"
+                                Width="0"
                                 Height="Auto"
                                 Margin="-8,-10,0,-10"
                                 HorizontalAlignment="Left"
@@ -339,7 +339,6 @@
                                          HorizontalAlignment="Stretch"
                                          VerticalAlignment="Top"
                                          HorizontalContentAlignment="Stretch"
-                                         Background="{x:Null}"
                                          BorderBrush="{x:Null}"
                                          BorderThickness="0"
                                          FontFamily="Segoe UI"
@@ -348,7 +347,7 @@
                                          Helpers:RichTextBoxHelper.TwitterStatus="{Binding Status}"
                                          IsDocumentEnabled="True"
                                          IsReadOnly="True"
-                                         SelectionBrush="#FF1BA1E2" />
+                                         SelectionBrush="#FF1BA1E2" Background="#00000000" IsUndoEnabled="False" TextOptions.TextFormattingMode="Display" AcceptsReturn="False" />
                             <Grid Grid.Row="3"
                                   Grid.Column="1"
                                   Margin="8,4,8,0">
@@ -378,7 +377,7 @@
                                 	TextWrapping="NoWrap" Opacity="0" Cursor="Hand" >
                                 	<i:Interaction.Triggers>
                                 		<i:EventTrigger EventName="MouseLeftButtonDown">
-                                			<ei:CallMethodAction TargetObject="{Binding Mode=OneWay}" MethodName="OpenSourceLink"/>
+                                			<ei:CallMethodAction TargetObject="{Binding Mode=OneWay}" MethodName="OpenWeb"/>
                                 		</i:EventTrigger>
                                 	</i:Interaction.Triggers>
                                 </TextBlock>
