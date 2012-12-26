@@ -13,25 +13,25 @@ namespace StarryEyes.Models.Stores
 {
     public static class UserStore
     {
-        private static DataStoreBase<long, TwitterUser> store;
+        private static DataStoreBase<long, TwitterUser> _store;
 
-        private static object snResolverLocker = new object();
-        private static SortedDictionary<string, long> screenNameResolver = new SortedDictionary<string, long>();
+        private static readonly object SnResolverLocker = new object();
+        private static readonly SortedDictionary<string, long> ScreenNameResolver = new SortedDictionary<string, long>();
 
-        private static bool _isInShutdown = false;
+        private static volatile bool _isInShutdown = false;
 
         public static void Initialize()
         {
             // initialize store
             if (StoreOnMemoryObjectPersistence.IsPersistentDataExisted("users"))
             {
-                store = new PersistentDataStore<long, TwitterUser>
+                _store = new PersistentDataStore<long, TwitterUser>
                     (_ => _.Id, Path.Combine(App.DataStorePath, "users"), chunkNum: 16,
                     tocniops: StoreOnMemoryObjectPersistence.GetPersistentData("users"));
             }
             else
             {
-                store = new PersistentDataStore<long, TwitterUser>
+                _store = new PersistentDataStore<long, TwitterUser>
                     (_ => _.Id, Path.Combine(App.DataStorePath, "users"), chunkNum: 16);
             }
             LoadScreenNameResolverCache();
@@ -41,17 +41,17 @@ namespace StarryEyes.Models.Stores
         public static void Store(TwitterUser user)
         {
             if (_isInShutdown) return;
-            store.Store(user);
-            lock (snResolverLocker)
+            _store.Store(user);
+            lock (SnResolverLocker)
             {
-                screenNameResolver[user.ScreenName] = user.Id;
+                ScreenNameResolver[user.ScreenName] = user.Id;
             }
         }
 
         public static IObservable<TwitterUser> Get(long id)
         {
             if (_isInShutdown) return Observable.Empty<TwitterUser>();
-            return store.Get(id)
+            return _store.Get(id)
                 .Do(_ => Store(_));
         }
 
@@ -59,9 +59,9 @@ namespace StarryEyes.Models.Stores
         {
             if (_isInShutdown) return Observable.Empty<TwitterUser>();
             long id = 0;
-            lock (snResolverLocker)
+            lock (SnResolverLocker)
             {
-                if (!screenNameResolver.TryGetValue(screenName, out id))
+                if (!ScreenNameResolver.TryGetValue(screenName, out id))
                     return Observable.Empty<TwitterUser>();
             }
             return Get(id);
@@ -69,29 +69,29 @@ namespace StarryEyes.Models.Stores
 
         public static IDictionary<string, long> GetScreenNameResolverTable()
         {
-            lock (snResolverLocker)
+            lock (SnResolverLocker)
             {
-                return new Dictionary<string, long>(screenNameResolver);
+                return new Dictionary<string, long>(ScreenNameResolver);
             }
         }
 
         public static IObservable<TwitterUser> Find(Func<TwitterUser, bool> predicate)
         {
             if (_isInShutdown) return Observable.Empty<TwitterUser>();
-            return store.Find(predicate);
+            return _store.Find(predicate);
         }
 
         public static void Remove(long id)
         {
             if (_isInShutdown) return;
-            store.Remove(id);
+            _store.Remove(id);
         }
 
         internal static void Shutdown()
         {
             _isInShutdown = true;
-            store.Dispose();
-            var pds = (PersistentDataStore<long, TwitterUser>)store;
+            _store.Dispose();
+            var pds = (PersistentDataStore<long, TwitterUser>)_store;
             StoreOnMemoryObjectPersistence.MakePersistent("users", pds.GetToCNIoPs());
             SaveScreenNameResolverCache();
         }
@@ -106,8 +106,8 @@ namespace StarryEyes.Models.Stores
             using (var cs = new DeflateStream(fs, CompressionLevel.Optimal))
             using (var bw = new BinaryWriter(fs))
             {
-                bw.Write(screenNameResolver.Count);
-                screenNameResolver.ForEach(k =>
+                bw.Write(ScreenNameResolver.Count);
+                ScreenNameResolver.ForEach(k =>
                 {
                     bw.Write(k.Key);
                     bw.Write(k.Value);
@@ -129,7 +129,7 @@ namespace StarryEyes.Models.Stores
                     {
                         var key = br.ReadString();
                         var value = br.ReadInt64();
-                        screenNameResolver.Add(key, value);
+                        ScreenNameResolver.Add(key, value);
                     }
                 }
             }

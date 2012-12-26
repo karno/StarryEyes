@@ -127,20 +127,21 @@ namespace StarryEyes.Models.Tab
         {
             return Observable.Defer(() => Observable.Return(new Unit()))
                              .Do(_ =>
+                             {
+                                 if (!IsActivated)
                                  {
-                                     if (!IsActivated)
+                                     if (Timeline != null)
+                                         Timeline.Dispose();
+                                     Timeline = new TimelineModel(_evaluator, GetChunk);
+                                     if (FilterQuery != null)
                                      {
-                                         if (Timeline != null)
-                                             Timeline.Dispose();
-                                         Timeline = new TimelineModel(_evaluator, GetChunk);
-                                         if (FilterQuery != null)
-                                         {
-                                             FilterQuery.Activate();
-                                             FilterQuery.OnInvalidateRequired += InvalidateCollection;
-                                         }
+                                         FilterQuery.Activate();
+                                         FilterQuery.OnInvalidateRequired += InvalidateCollection;
                                      }
-                                     IsActivated = true;
-                                 });
+                                 }
+                                 IsActivated = true;
+                             })
+                             .SelectMany(_ => Timeline.ReadMore(null));
         }
 
         private IObservable<TwitterStatus> GetChunk(long? maxId, int chunkCount)

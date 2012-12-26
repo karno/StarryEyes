@@ -114,7 +114,7 @@ namespace StarryEyes.Models
                                    CursorPosition cursor = CursorPosition.End, TwitterStatus inReplyTo = null,
                                    bool focusToInputArea = true)
         {
-            Action<IEnumerable<AuthenticateInfo>, string, CursorPosition, TwitterStatus> handler = OnSetTextRequested;
+            var handler = OnSetTextRequested;
             if (handler != null)
                 handler(infos, body, cursor, inReplyTo);
             if (focusToInputArea)

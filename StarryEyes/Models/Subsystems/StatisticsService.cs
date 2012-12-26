@@ -16,9 +16,9 @@ namespace StarryEyes.Models.Subsystems
             Observable.Interval(TimeSpan.FromSeconds(0.5))
                 .Subscribe(_ =>
                 {
-                    lock (statisticsWorkProcSync)
+                    lock (StatisticsWorkProcSync)
                     {
-                        Monitor.Pulse(statisticsWorkProcSync);
+                        Monitor.Pulse(StatisticsWorkProcSync);
                     }
                 });
             estimatedGrossTweetCount = StatusStore.Count;
@@ -26,16 +26,16 @@ namespace StarryEyes.Models.Subsystems
             Task.Factory.StartNew(UpdateStatisticWorkProc, TaskCreationOptions.LongRunning);
         }
 
-        private static DateTime timestamp = DateTime.Now;
+        private static DateTime _timestamp = DateTime.Now;
 
-        private static object statisticsWorkProcSync = new object();
-        private static volatile bool isThreadAlive = true;
+        private static readonly object StatisticsWorkProcSync = new object();
+        private static volatile bool _isThreadAlive = true;
         private static void StopThread()
         {
-            lock (statisticsWorkProcSync)
+            lock (StatisticsWorkProcSync)
             {
-                isThreadAlive = false;
-                Monitor.Pulse(statisticsWorkProcSync);
+                _isThreadAlive = false;
+                Monitor.Pulse(StatisticsWorkProcSync);
             }
         }
 
@@ -44,27 +44,27 @@ namespace StarryEyes.Models.Subsystems
         /// </summary>
         private static void UpdateStatisticWorkProc()
         {
-            while (isThreadAlive)
+            while (_isThreadAlive)
             {
-                lock (statisticsWorkProcSync)
+                lock (StatisticsWorkProcSync)
                 {
-                    if (!isThreadAlive) return;
-                    Monitor.Wait(statisticsWorkProcSync);
+                    if (!_isThreadAlive) return;
+                    Monitor.Wait(StatisticsWorkProcSync);
                 }
-                if (!isThreadAlive) return;
+                if (!_isThreadAlive) return;
                 // update statistics params
                 var previousGross = estimatedGrossTweetCount;
                 estimatedGrossTweetCount = StatusStore.Count;
-                var previousTimestamp = timestamp;
-                timestamp = DateTime.Now;
-                var duration = (timestamp - previousTimestamp).TotalSeconds;
+                var previousTimestamp = _timestamp;
+                _timestamp = DateTime.Now;
+                var duration = (_timestamp - previousTimestamp).TotalSeconds;
                 if (duration > 0)
                 {
                     // current period of tweets per seconds
                     var cptps = (estimatedGrossTweetCount - previousGross) / duration;
-                    // smoothing: 59:1
+                    // smoothing: 119:1
                     // -> 
-                    tweetsPerSeconds = (tweetsPerSeconds * 59 + cptps) / 60;
+                    tweetsPerSeconds = (tweetsPerSeconds * 119 + cptps) / 120;
                 }
                 var handler = OnStatisticsParamsUpdated;
                 if (handler != null)

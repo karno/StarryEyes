@@ -18,7 +18,7 @@ namespace StarryEyes.ViewModels.WindowParts
     {
         public AccountSelectorViewModel()
         {
-            this.CompositeDisposable.Add(accounts = ViewModelHelper.CreateReadOnlyDispatcherCollection(
+            this.CompositeDisposable.Add(_accounts = ViewModelHelper.CreateReadOnlyDispatcherCollection(
                 AccountsStore.Accounts,
                 _ => new SelectableAccountViewModel(this, _.AuthenticateInfo, RaiseSelectedAccountsChanged),
                 DispatcherHelper.UIDispatcher));
@@ -38,10 +38,10 @@ namespace StarryEyes.ViewModels.WindowParts
             }
         }
 
-        private ReadOnlyDispatcherCollection<SelectableAccountViewModel> accounts;
+        private readonly ReadOnlyDispatcherCollection<SelectableAccountViewModel> _accounts;
         public ReadOnlyDispatcherCollection<SelectableAccountViewModel> Accounts
         {
-            get { return accounts; }
+            get { return _accounts; }
         }
 
         public void SetSelectedAccountIds(IEnumerable<long> accountIds)
@@ -74,7 +74,7 @@ namespace StarryEyes.ViewModels.WindowParts
                 handler();
         }
 
-        private bool _isVisible = false;
+        private bool _isVisible;
         public bool IsVisible
         {
             get { return _isVisible; }
@@ -106,62 +106,62 @@ namespace StarryEyes.ViewModels.WindowParts
     /// </summary>
     public class SelectableAccountViewModel : ViewModel
     {
-        private readonly AuthenticateInfo info;
+        private readonly AuthenticateInfo _info;
         public AuthenticateInfo AuthenticateInfo
         {
-            get { return info; }
+            get { return _info; }
         }
 
-        private AccountSelectorViewModel parent;
+        private readonly AccountSelectorViewModel _parent;
 
-        private readonly Action onSelectionChanged;
+        private readonly Action _onSelectionChanged;
 
         public SelectableAccountViewModel(AccountSelectorViewModel parent, AuthenticateInfo info, Action onSelectionChanged)
         {
-            this.parent = parent;
-            this.info = info;
-            this.onSelectionChanged = onSelectionChanged;
+            this._parent = parent;
+            this._info = info;
+            this._onSelectionChanged = onSelectionChanged;
         }
 
-        private bool isSelected;
+        private bool _isSelected;
         public bool IsSelected
         {
-            get { return isSelected; }
+            get { return _isSelected; }
             set
             {
-                if (isSelected != value)
+                if (_isSelected != value)
                 {
-                    isSelected = value;
+                    _isSelected = value;
                     RaisePropertyChanged(() => IsSelected);
-                    onSelectionChanged();
+                    _onSelectionChanged();
                 }
             }
         }
 
         public long Id
         {
-            get { return info.Id; }
+            get { return _info.Id; }
         }
 
         public string ScreenName
         {
-            get { return info.UnreliableScreenName; }
+            get { return _info.UnreliableScreenName; }
         }
 
         public Uri ProfileImageUri
         {
             get
             {
-                if (info.UnreliableProfileImageUri == null)
+                if (_info.UnreliableProfileImageUri == null)
                 {
-                    Task.Run(() => info.ShowUser(info.Id)
+                    Task.Run(() => _info.ShowUser(_info.Id)
                         .Subscribe(_ =>
                         {
-                            info.UnreliableProfileImageUriString = _.ProfileImageUri.OriginalString;
+                            _info.UnreliableProfileImageUriString = _.ProfileImageUri.OriginalString;
                             RaisePropertyChanged(() => ProfileImageUri);
                         }));
                 }
-                return info.UnreliableProfileImageUri;
+                return _info.UnreliableProfileImageUri;
             }
         }
 
@@ -172,7 +172,7 @@ namespace StarryEyes.ViewModels.WindowParts
 
         public void SelectExcepted()
         {
-            parent.SelectedAccounts = new[] { this.info };
+            _parent.SelectedAccounts = new[] { this._info };
         }
     }
 }

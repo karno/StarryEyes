@@ -412,6 +412,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
             {
                 workingCopy.AddRange(_deadlyCaches.Select(i => i.Item));
             }
+            System.Diagnostics.Debug.WriteLine("[final]write-backing " + workingCopy.Count + " objects...");
             using (AcquireDriveLock(true))
             {
                 workingCopy

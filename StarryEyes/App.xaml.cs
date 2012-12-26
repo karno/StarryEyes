@@ -17,6 +17,7 @@ using StarryEyes.Models.Plugins;
 using StarryEyes.Models.Stores;
 using StarryEyes.Models.Subsystems;
 using StarryEyes.Settings;
+using StarryEyes.Vanille.DataStore.Persistent;
 using TaskDialogInterop;
 
 namespace StarryEyes
@@ -66,14 +67,8 @@ namespace StarryEyes
                 Environment.Exit(0);
             }
 
-#if DEBUG
-            if (!Debugger.IsAttached)
-            {
-                AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-            }
-#else
-            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
-#endif
+            Application.Current.DispatcherUnhandledException += (sender2, e2) => HandleException(e2.Exception);
+            AppDomain.CurrentDomain.UnhandledException += (sender2, e2) => HandleException(e2.ExceptionObject as Exception);
             Current.Exit += (_, __) => AppFinalize(true);
 
             // Initialize service points
@@ -98,6 +93,10 @@ namespace StarryEyes
             // Initialize core systems
             try
             {
+                if (Setting.DatabaseCorruption.Value)
+                {
+                    throw new DataPersistenceException("データストアの不整合が検出されています。");
+                }
                 StatusStore.Initialize();
                 UserStore.Initialize();
             }
@@ -123,6 +122,9 @@ namespace StarryEyes
                 }
                 // clear data
                 ClearStoreData();
+                Setting.DatabaseCorruption.Value = false;
+                Setting.Save();
+                _appMutex.Dispose();
                 Nightmare.Windows.Application.Restart();
                 Current.Shutdown();
                 return;
@@ -158,16 +160,23 @@ namespace StarryEyes
             _appMutex.ReleaseMutex();
         }
 
-        /// <summary>
-        /// Error handler
-        /// </summary>
-        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        private void HandleException(Exception ex)
         {
             try
             {
+                var dex = ex as StarryEyes.Vanille.DataStore.Persistent.DataPersistenceException;
+                if (dex != null)
+                {
+                    ClearStoreData();
+                    Setting.DatabaseCorruption.Value = true;
+                    Setting.Save();
+                    Nightmare.Windows.Application.Restart();
+                    Current.Shutdown();
+                    return;
+                }
                 // TODO:ロギング処理など
                 Debug.WriteLine("##### SYSTEM CRASH! #####");
-                Debug.WriteLine(e.ExceptionObject.ToString());
+                Debug.WriteLine(ex.ToString());
 
                 // Build stack trace report file
                 var builder = new StringBuilder();
@@ -178,7 +187,7 @@ namespace StarryEyes
                     "hardware rendering: " + IsHardwareRenderingEnabled.ToString());
                 builder.AppendLine();
                 builder.AppendLine("thrown:");
-                builder.AppendLine(e.ExceptionObject.ToString());
+                builder.AppendLine(ex.ToString());
 #if DEBUG
                 var tpath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
                     "StarryEyes_Dump_" + Path.GetRandomFileName() + ".txt");
@@ -202,7 +211,6 @@ namespace StarryEyes
                 AppFinalize(false);
             }
 
-
             Environment.Exit(-1);
         }
 
@@ -211,7 +219,10 @@ namespace StarryEyes
         /// </summary>
         internal void ClearStoreData()
         {
-            Directory.Delete(DataStorePath, true);
+            if (Directory.Exists(DataStorePath))
+            {
+                Directory.Delete(DataStorePath, true);
+            }
         }
 
         #region Definitions

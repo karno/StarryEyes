@@ -5,31 +5,31 @@ namespace StarryEyes.Vanille.DataStore.Persistent
     {
         public PersistentItem(T item)
         {
-            this.item = item;
+            this._item = item;
         }
 
-        private T item;
+        private T _item;
         /// <summary>
         /// actual item
         /// </summary>
         public T Item
         {
-            get { return item; }
+            get { return _item; }
             set
             {
-                item = value;
-                writeFlag = false;
+                _item = value;
+                _writeFlag = false;
             }
         }
 
-        private bool writeFlag;
+        private bool _writeFlag;
         /// <summary>
         /// flag of item is not changed
         /// </summary>
         public bool WriteFlag
         {
-            get { return writeFlag; }
-            set { writeFlag = value; }
+            get { return _writeFlag; }
+            set { _writeFlag = value; }
         }
     }
 }

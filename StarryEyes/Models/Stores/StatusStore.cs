@@ -26,7 +26,7 @@ namespace StarryEyes.Models.Stores
 
         #endregion
 
-        private static bool _isInShutdown = false;
+        private static volatile bool _isInShutdown = false;
 
         private static DataStoreBase<long, TwitterStatus> _store;
 

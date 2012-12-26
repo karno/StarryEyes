@@ -13,105 +13,15 @@ namespace StarryEyes.Settings
 {
     public static class Setting
     {
-        static SortedDictionary<string, object> settingValueHolder;
-
-        public static bool IsFirstGenerated { get; private set; }
-
-        public static bool LoadSettings()
-        {
-            IsFirstGenerated = false;
-            if (File.Exists(App.ConfigurationFilePath))
-            {
-                try
-                {
-                    using (var fs = File.Open(App.ConfigurationFilePath, FileMode.Open, FileAccess.Read))
-                    {
-                        settingValueHolder = new SortedDictionary<string, object>(
-                            XamlServices.Load(fs) as IDictionary<string, object>);
-                    }
-                    return true;
-                }
-                catch (Exception ex)
-                {
-                    var option = new TaskDialogOptions()
-                    {
-                        MainIcon = VistaTaskDialogIcon.Error,
-                        Title = "Krile 設定読み込みエラー",
-                        MainInstruction = "設定が破損しています。",
-                        Content = "設定ファイルに異常があるため、読み込めませんでした。" + Environment.NewLine +
-                        "どのような操作を行うか選択してください。",
-                        ExpandedInfo = ex.ToString(),
-                        CommandButtons = new[] { "設定を初期化", "バックアップを作成し初期化", "Krileを終了" },
-                    };
-                    var result = TaskDialog.Show(option);
-                    if (!result.CommandButtonResult.HasValue ||
-                        result.CommandButtonResult.Value == 2)
-                    {
-                        // shutdown
-                        return false;
-                    }
-                    else if (result.CommandButtonResult == 1)
-                    {
-                        try
-                        {
-                            var cpfn = "Krile_CorruptedConfig_" + Path.GetRandomFileName() + ".xml";
-                            File.Copy(App.ConfigurationFilePath, Path.Combine(
-                                Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
-                                cpfn));
-                        }
-                        catch (Exception iex)
-                        {
-                            var noption = new TaskDialogOptions()
-                            {
-                                Title = "バックアップ失敗",
-                                MainInstruction = "何らかの原因により、バックアップが正常に行えませんでした。",
-                                Content = "これ以上の動作を継続できません。",
-                                ExpandedInfo = iex.ToString(),
-                                CommandButtons = new[] { "Krileを終了" }
-                            };
-                            TaskDialog.Show(noption);
-                            return false;
-                        }
-                    }
-                    File.Delete(App.ConfigurationFilePath);
-                    settingValueHolder = new SortedDictionary<string, object>();
-                    return true;
-                }
-            }
-            else
-            {
-                settingValueHolder = new SortedDictionary<string, object>();
-                IsFirstGenerated = true;
-                return true;
-            }
-        }
-
-        public static void Save()
-        {
-            using (var fs = File.Open(App.ConfigurationFilePath, FileMode.Create, FileAccess.ReadWrite))
-            {
-                XamlServices.Save(fs, settingValueHolder);
-            }
-        }
-
-        public static void Clear()
-        {
-            Properties.Settings.Default.Reset();
-        }
+        private static SortedDictionary<string, object> _settingValueHolder;
 
         public static readonly SettingItemStruct<bool> IsPowerUser =
             new SettingItemStruct<bool>("IsPowerUser", false);
 
         #region Authentication and accounts
 
-        private static readonly SettingItem<List<AccountSetting>> accounts =
+        private static readonly SettingItem<List<AccountSetting>> _accounts =
             new SettingItem<List<AccountSetting>>("Accounts", new List<AccountSetting>());
-
-        internal static IEnumerable<AccountSetting> _AccountsInternalDataStore
-        {
-            get { return accounts.Value; }
-            set { accounts.Value = value.ToList(); }
-        }
 
         public static readonly SettingItem<string> GlobalConsumerKey =
             new SettingItem<string>("GlobalConsumerKey", null);
@@ -120,7 +30,15 @@ namespace StarryEyes.Settings
             new SettingItem<string>("GlobalConsumerSecret", null);
 
         public static readonly SettingItemStruct<bool> IsBacktrackFallback =
-             new SettingItemStruct<bool>("IsBacktrackFallback", true);
+            new SettingItemStruct<bool>("IsBacktrackFallback", true);
+
+        // ReSharper disable InconsistentNaming
+        internal static IEnumerable<AccountSetting> @Infrastructure_Accounts
+        {
+            get { return _accounts.Value; }
+            set { _accounts.Value = value.ToList(); }
+        }
+        // ReSharper restore InconsistentNaming
 
         #endregion
 
@@ -157,24 +75,23 @@ namespace StarryEyes.Settings
         public static readonly SettingItem<string> ExternalBrowserPath =
             new SettingItem<string>("ExternalBrowserPath", null);
 
-        private static readonly SettingItemStruct<int> imageUploaderService =
+        private static readonly SettingItemStruct<int> _imageUploaderService =
             new SettingItemStruct<int>("ImageUploaderService", 0);
 
         public static ImageUploaderService ImageUploaderService
         {
-            get { return (ImageUploaderService)imageUploaderService.Value; }
-            set { imageUploaderService.Value = (int)value; }
+            get { return (ImageUploaderService)_imageUploaderService.Value; }
+            set { _imageUploaderService.Value = (int)value; }
         }
 
         public static ImageUploaderBase GetImageUploader()
         {
             switch (ImageUploaderService)
             {
-                case Settings.ImageUploaderService.TwitPic:
+                case ImageUploaderService.TwitPic:
                     return new TwitPicUploader();
-                case Settings.ImageUploaderService.YFrog:
+                case ImageUploaderService.YFrog:
                     return new YFrogUploader();
-                case Settings.ImageUploaderService.TwitterOfficial:
                 default:
                     return new TwitterPhotoUploader();
             }
@@ -225,6 +142,9 @@ namespace StarryEyes.Settings
 
         #region Krile internal state
 
+        public static readonly SettingItemStruct<bool> DatabaseCorruption =
+            new SettingItemStruct<bool>("DatabaseCorruption", false);
+
         public static readonly SettingItem<string> LastImageOpenDir =
             new SettingItem<string>("LastImageOpenDir", Environment.GetFolderPath(Environment.SpecialFolder.MyPictures));
 
@@ -234,22 +154,23 @@ namespace StarryEyes.Settings
 
         public class FilterSettingItem
         {
-            public event Action<FilterExpressionBase> OnValueChanged;
+            private readonly bool _autoSave;
+            private readonly string _name;
+            private Func<TwitterStatus, bool> _evaluatorCache;
 
-            private string _name;
+            private FilterExpressionRoot _expression;
+
+            public FilterSettingItem(string name, bool autoSave = true)
+            {
+                _name = name;
+                _autoSave = autoSave;
+            }
+
             public string Name
             {
                 get { return _name; }
             }
 
-            private bool _autoSave;
-            public FilterSettingItem(string name, bool autoSave = true)
-            {
-                this._name = name;
-                this._autoSave = autoSave;
-            }
-
-            private FilterExpressionRoot _expression;
             public FilterExpressionRoot Value
             {
                 get
@@ -257,7 +178,7 @@ namespace StarryEyes.Settings
                     try
                     {
                         return _expression ??
-                            (_expression = QueryCompiler.CompileFilters(settingValueHolder[Name] as string));
+                               (_expression = QueryCompiler.CompileFilters(_settingValueHolder[Name] as string));
                     }
                     catch
                     {
@@ -267,146 +188,236 @@ namespace StarryEyes.Settings
                 set
                 {
                     _expression = value;
-                    settingValueHolder[Name] = value.ToQuery();
+                    _settingValueHolder[Name] = value.ToQuery();
                     _evaluatorCache = null;
                     if (_autoSave)
                     {
                         Save();
                     }
-                    var handler = OnValueChanged;
+                    Action<FilterExpressionBase> handler = OnValueChanged;
                     if (handler != null)
                         OnValueChanged(value);
                 }
             }
 
-            private Func<TwitterStatus, bool> _evaluatorCache = null;
             public Func<TwitterStatus, bool> Evaluator
             {
                 get { return _evaluatorCache ?? (_evaluatorCache = Value.GetEvaluator()); }
             }
+
+            public event Action<FilterExpressionBase> OnValueChanged;
         }
 
         public class SettingItem<T> where T : class
         {
-            public event Action<T> OnValueChanged;
+            private readonly bool _autoSave;
+            private readonly T _defaultValue;
+            private readonly string _name;
 
-            private string _name;
+            private T _valueCache;
+
+            public SettingItem(string name, T defaultValue, bool autoSave = true)
+            {
+                _name = name;
+                _defaultValue = defaultValue;
+                _autoSave = autoSave;
+            }
+
             public string Name
             {
                 get { return _name; }
             }
 
-            private T _defaultValue;
-            private bool _autoSave;
-            public SettingItem(string name, T defaultValue, bool autoSave = true)
-            {
-                this._name = name;
-                this._defaultValue = defaultValue;
-                this._autoSave = autoSave;
-            }
-
-            private T valueCache;
             public T Value
             {
                 get
                 {
                     try
                     {
-                        return valueCache ??
-                            (valueCache = settingValueHolder[Name] as T);
+                        return _valueCache ??
+                               (_valueCache = _settingValueHolder[Name] as T);
                     }
                     catch
                     {
-                        return valueCache = _defaultValue;
+                        return _valueCache = _defaultValue;
                     }
                 }
                 set
                 {
-                    valueCache = value;
-                    settingValueHolder[Name] = value;
+                    _valueCache = value;
+                    _settingValueHolder[Name] = value;
                     if (_autoSave)
                     {
                         Save();
                     }
-                    var handler = OnValueChanged;
+                    Action<T> handler = OnValueChanged;
                     if (handler != null)
                         OnValueChanged(value);
                 }
             }
+
+            public event Action<T> OnValueChanged;
         }
 
         public class SettingItemStruct<T> where T : struct
         {
-            public event Action<T> OnValueChanged;
+            private readonly bool _autoSave;
+            private readonly T _defaultValue;
+            private readonly string _name;
 
-            private string _name;
+            private T? _valueCache;
+
+            public SettingItemStruct(string name, T defaultValue, bool autoSave = true)
+            {
+                _name = name;
+                _defaultValue = defaultValue;
+                _autoSave = autoSave;
+            }
+
             public string Name
             {
                 get { return _name; }
             }
 
-            private T _defaultValue;
-            private bool _autoSave;
-            public SettingItemStruct(string name, T defaultValue, bool autoSave = true)
-            {
-                this._name = name;
-                this._defaultValue = defaultValue;
-                this._autoSave = autoSave;
-            }
-
-            private T? valueCache;
             public T Value
             {
                 get
                 {
                     try
                     {
-                        return valueCache ??
-                            (valueCache = (T)settingValueHolder[Name]).Value;
+                        return _valueCache ??
+                               (_valueCache = (T)_settingValueHolder[Name]).Value;
                     }
                     catch
                     {
-                        return (valueCache = _defaultValue).Value;
+                        return (_valueCache = _defaultValue).Value;
                     }
                 }
                 set
                 {
-                    valueCache = value;
-                    settingValueHolder[Name] = value;
+                    _valueCache = value;
+                    _settingValueHolder[Name] = value;
                     if (_autoSave)
                     {
                         Save();
                     }
-                    var handler = OnValueChanged;
+                    Action<T> handler = OnValueChanged;
                     if (handler != null)
                         OnValueChanged(value);
                 }
             }
+
+            public event Action<T> OnValueChanged;
         }
 
         #endregion
+
+        public static bool IsFirstGenerated { get; private set; }
+
+        public static bool LoadSettings()
+        {
+            IsFirstGenerated = false;
+            if (File.Exists(App.ConfigurationFilePath))
+            {
+                try
+                {
+                    using (FileStream fs = File.Open(App.ConfigurationFilePath, FileMode.Open, FileAccess.Read))
+                    {
+                        _settingValueHolder = new SortedDictionary<string, object>(
+                            XamlServices.Load(fs) as IDictionary<string, object> ?? new Dictionary<string, object>());
+                    }
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    var option = new TaskDialogOptions
+                    {
+                        MainIcon = VistaTaskDialogIcon.Error,
+                        Title = "Krile 設定読み込みエラー",
+                        MainInstruction = "設定が破損しています。",
+                        Content = "設定ファイルに異常があるため、読み込めませんでした。" + Environment.NewLine +
+                                  "どのような操作を行うか選択してください。",
+                        ExpandedInfo = ex.ToString(),
+                        CommandButtons = new[] { "設定を初期化", "バックアップを作成し初期化", "Krileを終了" },
+                    };
+                    TaskDialogResult result = TaskDialog.Show(option);
+                    if (!result.CommandButtonResult.HasValue ||
+                        result.CommandButtonResult.Value == 2)
+                    {
+                        // shutdown
+                        return false;
+                    }
+                    if (result.CommandButtonResult == 1)
+                    {
+                        try
+                        {
+                            string cpfn = "Krile_CorruptedConfig_" + Path.GetRandomFileName() + ".xml";
+                            File.Copy(App.ConfigurationFilePath, Path.Combine(
+                                Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
+                                cpfn));
+                        }
+                        catch (Exception iex)
+                        {
+                            var noption = new TaskDialogOptions
+                            {
+                                Title = "バックアップ失敗",
+                                MainInstruction = "何らかの原因により、バックアップが正常に行えませんでした。",
+                                Content = "これ以上の動作を継続できません。",
+                                ExpandedInfo = iex.ToString(),
+                                CommandButtons = new[] { "Krileを終了" }
+                            };
+                            TaskDialog.Show(noption);
+                            return false;
+                        }
+                    }
+                    File.Delete(App.ConfigurationFilePath);
+                    _settingValueHolder = new SortedDictionary<string, object>();
+                    return true;
+                }
+            }
+            _settingValueHolder = new SortedDictionary<string, object>();
+            IsFirstGenerated = true;
+            return true;
+        }
+
+        public static void Save()
+        {
+            using (FileStream fs = File.Open(App.ConfigurationFilePath, FileMode.Create, FileAccess.ReadWrite))
+            {
+                XamlServices.Save(fs, _settingValueHolder);
+            }
+        }
+
+        public static void Clear()
+        {
+            Properties.Settings.Default.Reset();
+        }
     }
 
     public enum ScrollLockStrategy
     {
         /// <summary>
-        /// Always unlock
+        ///     Always unlock
         /// </summary>
         None,
+
         /// <summary>
-        /// Always scroll locked
+        ///     Always scroll locked
         /// </summary>
         Always,
+
         /// <summary>
-        /// Change lock/unlock explicitly
+        ///     Change lock/unlock explicitly
         /// </summary>
         Explicit,
+
         /// <summary>
-        /// If scrolled (scroll offset != 0)
+        ///     If scrolled (scroll offset != 0)
         /// </summary>
         WhenScrolled,
+
         /// <summary>
-        /// When mouse over
+        ///     When mouse over
         /// </summary>
         WhenMouseOver,
     }

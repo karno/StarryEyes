@@ -2,6 +2,8 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Concurrency;
+using System.Reactive.Linq;
 using System.Threading;
 using Livet;
 using StarryEyes.Breezy.Authorize;
@@ -14,6 +16,8 @@ namespace StarryEyes.Models
 {
     public class StatusModel
     {
+        #region Static members
+
         private static readonly object _staticCacheLock = new object();
 
         private static readonly SortedDictionary<long, WeakReference> _staticCache =
@@ -22,68 +26,9 @@ namespace StarryEyes.Models
         private static readonly ConcurrentDictionary<long, object> _generateLock =
             new ConcurrentDictionary<long, object>();
 
-        private readonly ObservableSynchronizedCollection<TwitterUser> _favoritedUsers =
-            new ObservableSynchronizedCollection<TwitterUser>();
-
-        private readonly SortedDictionary<long, TwitterUser> _favoritedUsersDic =
-            new SortedDictionary<long, TwitterUser>();
-
-        private readonly object _favoritedsLock = new object();
-
-        private readonly ObservableSynchronizedCollection<TwitterUser> _retweetedUsers =
-            new ObservableSynchronizedCollection<TwitterUser>();
-
-        private readonly SortedDictionary<long, TwitterUser> _retweetedUsersDic =
-            new SortedDictionary<long, TwitterUser>();
-
-        private readonly object _retweetedsLock = new object();
-
-        private StatusModel(TwitterStatus status)
+        public static int CachedObjectsCount
         {
-            Status = status;
-            status.FavoritedUsers.Guard().ForEach(AddFavoritedUser);
-            status.RetweetedUsers.Guard().ForEach(AddRetweetedUser);
-        }
-
-        public TwitterStatus Status { get; private set; }
-
-        public ObservableSynchronizedCollection<TwitterUser> FavoritedUsers
-        {
-            get { return _favoritedUsers; }
-        }
-
-        public ObservableSynchronizedCollection<TwitterUser> RetweetedUsers
-        {
-            get { return _retweetedUsers; }
-        }
-
-        public static void UpdateStatusInfo(TwitterStatus status,
-                                            Action<StatusModel> ifCacheIsAlive, Action<TwitterStatus> ifCacheIsDead)
-        {
-            object lockerobj = _generateLock.GetOrAdd(status.Id, new object());
-            try
-            {
-                lock (lockerobj)
-                {
-                    StatusModel model = null;
-                    WeakReference wr;
-                    lock (_staticCacheLock)
-                    {
-                        _staticCache.TryGetValue(status.Id, out wr);
-                    }
-                    if (wr != null)
-                        model = (StatusModel)wr.Target;
-
-                    if (model != null)
-                        ifCacheIsAlive(model);
-                    else
-                        ifCacheIsDead(status);
-                }
-            }
-            finally
-            {
-                _generateLock.TryRemove(status.Id, out lockerobj);
-            }
+            get { return _staticCache.Count; }
         }
 
         public static StatusModel GetIfCacheIsAlive(long id)
@@ -106,17 +51,18 @@ namespace StarryEyes.Models
             {
                 lock (lockerobj)
                 {
-                    StatusModel model = null;
+                    StatusModel model;
                     WeakReference wr;
                     lock (_staticCacheLock)
                     {
                         _staticCache.TryGetValue(status.Id, out wr);
                     }
                     if (wr != null)
+                    {
                         model = (StatusModel)wr.Target;
-
-                    if (model != null)
-                        return model;
+                        if (model != null)
+                            return model;
+                    }
 
                     // cache is dead/not cached yet
                     model = new StatusModel(status);
@@ -157,6 +103,145 @@ namespace StarryEyes.Models
             }
         }
 
+        #endregion
+
+        private readonly ObservableSynchronizedCollection<TwitterUser> _favoritedUsers =
+            new ObservableSynchronizedCollection<TwitterUser>();
+
+        private readonly SortedDictionary<long, TwitterUser> _favoritedUsersDic =
+            new SortedDictionary<long, TwitterUser>();
+
+        private readonly object _favoritedsLock = new object();
+
+        private readonly ObservableSynchronizedCollection<TwitterUser> _retweetedUsers =
+            new ObservableSynchronizedCollection<TwitterUser>();
+
+        private readonly SortedDictionary<long, TwitterUser> _retweetedUsersDic =
+            new SortedDictionary<long, TwitterUser>();
+
+        private readonly object _retweetedsLock = new object();
+
+        private volatile bool _isFavoritedUsersLoaded;
+        private volatile bool _isRetweetedUsersLoaded;
+
+        private StatusModel(TwitterStatus status)
+        {
+            Status = status;
+        }
+
+        public TwitterStatus Status { get; private set; }
+
+        public ObservableSynchronizedCollection<TwitterUser> FavoritedUsers
+        {
+            get
+            {
+                if (!_isFavoritedUsersLoaded)
+                {
+                    _isFavoritedUsersLoaded = true;
+                    LoadFavoritedUsers();
+                }
+                return _favoritedUsers;
+            }
+        }
+
+        public ObservableSynchronizedCollection<TwitterUser> RetweetedUsers
+        {
+            get
+            {
+                if (!_isRetweetedUsersLoaded)
+                {
+                    _isRetweetedUsersLoaded = true;
+                    LoadRetweetedUsers();
+                }
+                return _retweetedUsers;
+            }
+        }
+
+        private void LoadFavoritedUsers()
+        {
+            if (Status.FavoritedUsers != null && Status.FavoritedUsers.Length > 0)
+            {
+                Status.FavoritedUsers
+                      .Distinct()
+                      .Reverse()
+                      .ToObservable()
+                      .ObserveOn(TaskPoolScheduler.Default)
+                      .Do(_ =>
+                      {
+                          lock (_favoritedsLock)
+                          {
+                              _favoritedUsersDic.Add(_, null);
+                          }
+                      })
+                      .SelectMany(StoreHub.GetUser)
+                      .Do(_ =>
+                      {
+                          lock (_favoritedsLock)
+                          {
+                              _favoritedUsersDic[_.Id] = _;
+                          }
+                      })
+                      .Subscribe(_ => _favoritedUsers.Insert(0, _));
+            }
+        }
+
+        private void LoadRetweetedUsers()
+        {
+            if (Status.RetweetedUsers != null && Status.RetweetedUsers.Length > 0)
+            {
+                Status.RetweetedUsers
+                      .Distinct()
+                      .Reverse()
+                      .ToObservable()
+                      .ObserveOn(TaskPoolScheduler.Default)
+                      .Do(_ =>
+                      {
+                          lock (_retweetedsLock)
+                          {
+                              _retweetedUsersDic.Add(_, null);
+                          }
+                      })
+                      .SelectMany(StoreHub.GetUser)
+                      .Do(_ =>
+                      {
+                          lock (_retweetedsLock)
+                          {
+                              _retweetedUsersDic[_.Id] = _;
+                          }
+                      })
+                      .Subscribe(_ => _retweetedUsers.Insert(0, _));
+            }
+        }
+
+        public static void UpdateStatusInfo(TwitterStatus status,
+                                            Action<StatusModel> ifCacheIsAlive, Action<TwitterStatus> ifCacheIsDead)
+        {
+            object lockerobj = _generateLock.GetOrAdd(status.Id, new object());
+            try
+            {
+                lock (lockerobj)
+                {
+                    StatusModel model = null;
+                    WeakReference wr;
+                    lock (_staticCacheLock)
+                    {
+                        _staticCache.TryGetValue(status.Id, out wr);
+                    }
+                    if (wr != null)
+                        model = (StatusModel)wr.Target;
+
+                    if (model != null)
+                        ifCacheIsAlive(model);
+                    else
+                        ifCacheIsDead(status);
+                }
+            }
+            finally
+            {
+                _generateLock.TryRemove(status.Id, out lockerobj);
+            }
+        }
+
         public void AddFavoritedUser(long userId)
         {
             StoreHub.GetUser(userId).Subscribe(AddFavoritedUser);
@@ -170,7 +255,7 @@ namespace StarryEyes.Models
                 if (!_favoritedUsersDic.ContainsKey(user.Id))
                 {
                     _favoritedUsersDic.Add(user.Id, user);
-                    Status.FavoritedUsers = Status.FavoritedUsers.Guard().Append(user.Id).ToArray();
+                    Status.FavoritedUsers = Status.FavoritedUsers.Guard().Append(user.Id).Distinct().ToArray();
                     added = true;
                 }
             }
@@ -209,7 +294,7 @@ namespace StarryEyes.Models
                 if (!_retweetedUsersDic.ContainsKey(user.Id))
                 {
                     _retweetedUsersDic.Add(user.Id, user);
-                    Status.RetweetedUsers = Status.RetweetedUsers.Guard().Append(user.Id).ToArray();
+                    Status.RetweetedUsers = Status.RetweetedUsers.Guard().Append(user.Id).Distinct().ToArray();
                     added = true;
                 }
             }
@@ -274,7 +359,7 @@ namespace StarryEyes.Models
             while (true)
             {
                 AccountSetting backtrack = AccountsStore.Accounts
-                    .FirstOrDefault(i => i.FallbackNext == cinfo.Id);
+                                                        .FirstOrDefault(i => i.FallbackNext == cinfo.Id);
                 if (backtrack == null)
                     return cinfo;
                 if (backtrack.UserId == info.Id)

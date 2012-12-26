@@ -77,14 +77,20 @@ namespace StarryEyes.Models.Tab
 
         private void AddStatus(TwitterStatus status)
         {
-            bool add = false;
+            bool add;
             lock (_sicLocker)
             {
                 add = _statusIdCache.AddDistinct(status.Id);
             }
             if (add)
             {
-                // add
+                // estimate point
+                if (!_isSuppressTimelineTrimming)
+                {
+                    var addpoint = _statuses.TakeWhile(_ => _.CreatedAt > status.CreatedAt).Count();
+                    if (addpoint > TimelineChunkCount)
+                        return;
+                }
                 _statuses.Insert(
                     i => i.TakeWhile(_ => _.CreatedAt > status.CreatedAt).Count(),
                     status);
@@ -98,7 +104,7 @@ namespace StarryEyes.Models.Tab
 
         private void RemoveStatus(long id)
         {
-            bool remove = false;
+            bool remove;
             lock (_sicLocker)
             {
                 remove = _statusIdCache.Remove(id);
@@ -130,10 +136,7 @@ namespace StarryEyes.Models.Tab
                     removedIds.Add(t.Id);
                     return true;
                 }
-                else
-                {
-                    return false;
-                }
+                return false;
             });
             lock (_sicLocker)
             {

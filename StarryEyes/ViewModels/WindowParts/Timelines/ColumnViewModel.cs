@@ -21,11 +21,11 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         {
             get
             {
-                return Tabs.Where(_ => _.IsSelected).FirstOrDefault();
+                return Tabs.FirstOrDefault(_ => _.IsSelected);
             }
             set
             {
-                var selected = Tabs.Where(_ => _ == value).FirstOrDefault();
+                var selected = Tabs.FirstOrDefault(_ => _ == value);
                 if (selected == null) return;
                 Tabs.ForEach(_ => _.IsSelected = false);
                 selected.IsSelected = true;
@@ -35,10 +35,10 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public void SetSelected(TabModel model)
         {
-            this.Selected = this.Tabs.Where(_ => _.Model == model).FirstOrDefault();
+            this.Selected = this.Tabs.FirstOrDefault(_ => _.Model == model);
         }
 
-        public ColumnViewModel(Livet.ObservableSynchronizedCollection<TabModel> tabs)
+        public ColumnViewModel(IList<TabModel> tabs)
         {
             this._modelCollection = tabs;
             this.CompositeDisposable.Add(_tabs = ViewModelHelper.CreateReadOnlyDispatcherCollection(
