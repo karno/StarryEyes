@@ -13,7 +13,7 @@ namespace StarryEyes.Models.Connections
         /// <summary>
         /// internal disposables holder
         /// </summary>
-        private CompositeDisposable _disposablesHolder = new CompositeDisposable();
+        private readonly CompositeDisposable _disposablesHolder = new CompositeDisposable();
 
         private int _currentTick = 0;
 
@@ -21,8 +21,8 @@ namespace StarryEyes.Models.Connections
             : base(ai)
         {
             _disposablesHolder.Add(Observable.FromEvent(
-                _ => App.OnApplicationFinalize += _,
-                _ => App.OnApplicationFinalize -= _)
+                h => App.OnApplicationFinalize += h,
+                h => App.OnApplicationFinalize -= h)
                 .Subscribe(_ => this.Dispose()));
             _disposablesHolder.Add(Observable.Interval(TimeSpan.FromSeconds(1))
                 .Subscribe(_ => OnTick()));

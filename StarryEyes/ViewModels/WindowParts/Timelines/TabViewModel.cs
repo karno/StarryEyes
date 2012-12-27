@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using Livet;
 using Livet.EventListeners;
@@ -40,18 +41,31 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             _timeline = new ObservableCollection<StatusViewModel>();
             _owner = owner;
             _model = tabModel;
-            if (tabModel.IsActivated)
-            {
-                Initialize();
-            }
-            else
-            {
-                IsLoading = true;
-                Observable.Start(() => tabModel.Activate())
-                          .SelectMany(_ => _)
-                          .ObserveOnDispatcher()
-                          .Subscribe(_ => { }, Initialize);
-            }
+            tabModel.Activate();
+            DispatcherHolder.Push(InitializeCollection);
+            CompositeDisposable.Add(
+                Observable.FromEvent(
+                    _ => Model.Timeline.OnNewStatusArrived += _,
+                    _ => Model.Timeline.OnNewStatusArrived -= _)
+                          .Subscribe(_ => UnreadCount++));
+            CompositeDisposable.Add(
+                Observable.FromEvent<ScrollLockStrategy>(
+                    handler => Setting.ScrollLockStrategy.OnValueChanged += handler,
+                    handler => Setting.ScrollLockStrategy.OnValueChanged -= handler)
+                          .Subscribe(_ =>
+                          {
+                              RaisePropertyChanged(() => IsScrollLock);
+                              RaisePropertyChanged(() => IsScrollLockExplicitEnabled);
+                          }));
+            CompositeDisposable.Add(() => Model.Deactivate());
+            IsLoading = true;
+            Observable.Defer(
+                () =>
+                Observable.Start(() => Model.Timeline.ReadMore(null))
+                          .Merge(Observable.Start(() => Model.ReceiveTimelines(null))))
+                      .SelectMany(_ => _)
+                      .Finally(() => IsLoading = false)
+                      .Subscribe();
         }
 
         public TabModel Model
@@ -175,27 +189,6 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             }
         }
 
-        private void Initialize()
-        {
-            DispatcherHolder.Push(InitializeCollection);
-            CompositeDisposable.Add(
-                Observable.FromEvent(
-                    _ => Model.Timeline.OnNewStatusArrived += _,
-                    _ => Model.Timeline.OnNewStatusArrived -= _)
-                          .Subscribe(_ => UnreadCount++));
-            CompositeDisposable.Add(
-                Observable.FromEvent<ScrollLockStrategy>(
-                    handler => Setting.ScrollLockStrategy.OnValueChanged += handler,
-                    handler => Setting.ScrollLockStrategy.OnValueChanged -= handler)
-                          .Subscribe(_ =>
-                          {
-                              RaisePropertyChanged(() => IsScrollLock);
-                              RaisePropertyChanged(() => IsScrollLockExplicitEnabled);
-                          }));
-            CompositeDisposable.Add(() => Model.Deactivate());
-            IsLoading = false;
-        }
-
         private void InitializeCollection()
         {
             TwitterStatus[] collection = Model.Timeline.Statuses.ToArray();
@@ -221,10 +214,16 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                     _timeline.Move(e.OldStartingIndex, e.NewStartingIndex);
                     break;
                 case NotifyCollectionChangedAction.Remove:
+                    StatusViewModel removal = _timeline[e.OldStartingIndex];
                     _timeline.RemoveAt(e.OldStartingIndex);
+                    removal.Dispose();
                     break;
                 case NotifyCollectionChangedAction.Reset:
+                    StatusViewModel[] cache = _timeline.ToArray();
                     _timeline.Clear();
+                    cache.ToObservable()
+                         .ObserveOn(TaskPoolScheduler.Default)
+                         .Subscribe(_ => _.Dispose());
                     TwitterStatus[] collection = Model.Timeline.Statuses.ToArray();
                     collection
                         .Select(GenerateStatusViewModel)

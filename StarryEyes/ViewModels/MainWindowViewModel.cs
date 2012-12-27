@@ -3,10 +3,8 @@ using System.Linq;
 using System.Reactive.Linq;
 using Livet;
 using Livet.Messaging;
-using StarryEyes.Breezy.DataModel;
 using StarryEyes.Models;
 using StarryEyes.Models.Connections.UserDependencies;
-using StarryEyes.Models.Operations;
 using StarryEyes.Models.Stores;
 using StarryEyes.Models.Subsystems;
 using StarryEyes.Models.Tab;
@@ -117,7 +115,7 @@ namespace StarryEyes.ViewModels
 
         public MainWindowViewModel()
         {
-            CompositeDisposable.Add(_backpanelViewModel = new BackpanelViewModel());
+            CompositeDisposable.Add(_backpanelViewModel = new BackpanelViewModel(this));
             CompositeDisposable.Add(_inputAreaViewModel = new InputAreaViewModel());
             CompositeDisposable.Add(_mainAreaViewModel = new MainAreaViewModel());
             CompositeDisposable.Add(_globalAccountSelectorViewModel = new AccountSelectorViewModel());
@@ -130,12 +128,12 @@ namespace StarryEyes.ViewModels
                                                              ShowWindowCommands = _;
 
             CompositeDisposable.Add(Observable.FromEvent(
-                handler => MainWindowModel.OnStateStringChanged += handler,
-                handler => MainWindowModel.OnStateStringChanged -= handler)
+                h => MainWindowModel.OnStateStringChanged += h,
+                h => MainWindowModel.OnStateStringChanged -= h)
                                               .Subscribe(_ => RaisePropertyChanged(() => StateString)));
             CompositeDisposable.Add(Observable.FromEvent(
-                handler => StatisticsService.OnStatisticsParamsUpdated += handler,
-                handler => StatisticsService.OnStatisticsParamsUpdated -= handler)
+                h => StatisticsService.OnStatisticsParamsUpdated += h,
+                h => StatisticsService.OnStatisticsParamsUpdated -= h)
                                               .Subscribe(_ => UpdateStatistics()));
 
             MainWindowModel.OnExecuteAccountSelectActionRequested += (action, status, selecteds, aftercall) =>
@@ -152,8 +150,8 @@ namespace StarryEyes.ViewModels
                         break;
                 }
                 IDisposable disposable = null;
-                disposable = Observable.FromEvent(_ => _globalAccountSelectorViewModel.OnClosed += _,
-                                                  _ => _globalAccountSelectorViewModel.OnClosed -= _)
+                disposable = Observable.FromEvent(h => _globalAccountSelectorViewModel.OnClosed += h,
+                                                  h => _globalAccountSelectorViewModel.OnClosed -= h)
                                        .Subscribe(_ =>
                                        {
                                            if (disposable != null)
@@ -229,13 +227,6 @@ namespace StarryEyes.ViewModels
             return true;
         }
 
-        public static void Bomb()
-        {
-            StatusStore.Find(s => s.User.ScreenName == "karno").ふぁぼ();
-            StatusStore.Find(s => s.User.ScreenName == "karno").ﾘﾂｲｰｮ();
-            StatusStore.Find(s => s.User.ScreenName == "karno").ふぁぼ公();
-        }
-
         #region Status control
 
         public string StateString
@@ -274,35 +265,5 @@ namespace StarryEyes.ViewModels
         }
 
         #endregion
-    }
-
-    public static class 爆撃Extensions
-    {
-        public static void ふぁぼ公(this IObservable<TwitterStatus> statuses)
-        {
-            statuses.Publish(observable =>
-            {
-                observable.ふぁぼ();
-                observable.ﾘﾂｲｰｮ();
-                return observable;
-            })
-                    .Subscribe();
-        }
-
-        public static void ふぁぼ(this IObservable<TwitterStatus> statuses)
-        {
-            statuses.SelectMany(s => AccountsStore.Accounts
-                                                  .Select(a => new FavoriteOperation(a.AuthenticateInfo, s, true)))
-                    .SelectMany(_ => _.Run())
-                    .Subscribe();
-        }
-
-        public static void ﾘﾂｲｰｮ(this IObservable<TwitterStatus> statuses)
-        {
-            statuses.SelectMany(s => AccountsStore.Accounts
-                                                  .Select(a => new RetweetOperation(a.AuthenticateInfo, s, true)))
-                    .SelectMany(_ => _.Run())
-                    .Subscribe();
-        }
     }
 }

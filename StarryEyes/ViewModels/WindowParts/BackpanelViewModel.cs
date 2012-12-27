@@ -9,6 +9,7 @@ using StarryEyes.Models;
 using StarryEyes.Models.Backpanels;
 using StarryEyes.Models.Backpanels.TwitterEvents;
 using StarryEyes.Settings;
+using StarryEyes.Views.Messaging;
 
 namespace StarryEyes.ViewModels.WindowParts
 {
@@ -18,6 +19,7 @@ namespace StarryEyes.ViewModels.WindowParts
     public class BackpanelViewModel : ViewModel
     {
         private readonly ReadOnlyDispatcherCollection<TwitterEventViewModel> _events;
+        private readonly MainWindowViewModel _parent;
         private readonly object _syncLock = new object();
 
         private readonly Queue<BackpanelEventBase> _waitingEvents =
@@ -26,9 +28,18 @@ namespace StarryEyes.ViewModels.WindowParts
         private BackpanelEventViewModel _currentEvent;
 
         private bool _isDisposed;
+        private BackpanelEventViewModel _previousEvent;
 
+        /// <summary>
+        ///     for design-time support.
+        /// </summary>
         public BackpanelViewModel()
         {
+        }
+
+        public BackpanelViewModel(MainWindowViewModel parent)
+        {
+            _parent = parent;
             _events = ViewModelHelper.CreateReadOnlyDispatcherCollection(
                 BackpanelModel.TwitterEvents,
                 tev => new TwitterEventViewModel(tev),
@@ -45,13 +56,13 @@ namespace StarryEyes.ViewModels.WindowParts
                                             }
                                         }));
             CompositeDisposable.Add(() =>
+            {
+                lock (_syncLock)
                 {
-                    lock (_syncLock)
-                    {
-                        _isDisposed = true;
-                        Monitor.Pulse(_syncLock);
-                    }
-                });
+                    _isDisposed = true;
+                    Monitor.Pulse(_syncLock);
+                }
+            });
         }
 
         public ReadOnlyDispatcherCollection<TwitterEventViewModel> Events
@@ -65,7 +76,7 @@ namespace StarryEyes.ViewModels.WindowParts
             set
             {
                 _currentEvent = value;
-                RaisePropertyChanged(() => CurrentEvent);
+                RaisePropertyChanged();
                 RaisePropertyChanged(() => IsCurrentEventAvailable);
             }
         }
@@ -73,6 +84,22 @@ namespace StarryEyes.ViewModels.WindowParts
         public bool IsCurrentEventAvailable
         {
             get { return _currentEvent != null; }
+        }
+
+        public BackpanelEventViewModel PreviousEvent
+        {
+            get { return _previousEvent; }
+            set
+            {
+                _previousEvent = value;
+                RaisePropertyChanged();
+                RaisePropertyChanged(() => IsPreviousEventAvailable);
+            }
+        }
+
+        public bool IsPreviousEventAvailable
+        {
+            get { return _previousEvent != null; }
         }
 
         public void Initialize()
@@ -94,7 +121,13 @@ namespace StarryEyes.ViewModels.WindowParts
                     if (_isDisposed) return;
                     ev = _waitingEvents.Dequeue();
                 }
+                if (CurrentEvent != null)
+                {
+                    PreviousEvent = CurrentEvent;
+                }
+                _parent.Messenger.Raise(new GoToStateMessage("HideCurrentEvent"));
                 CurrentEvent = new BackpanelEventViewModel(ev);
+                _parent.Messenger.Raise(new GoToStateMessage("ShowCurrentEvent"));
                 Thread.Sleep(Setting.EventDispatchMinimumMSec.Value);
                 lock (_syncLock)
                 {
@@ -102,7 +135,13 @@ namespace StarryEyes.ViewModels.WindowParts
                         Monitor.Wait(_syncLock,
                                      Setting.EventDispatchMaximumMSec.Value - Setting.EventDispatchMinimumMSec.Value);
                     if (_waitingEvents.Count == 0)
+                    {
+                        PreviousEvent = CurrentEvent;
+                        _parent.Messenger.Raise(new GoToStateMessage("ShowPreviousEvent"));
                         CurrentEvent = null;
+                        _parent.Messenger.Raise(new GoToStateMessage("HidePreviousEvent"));
+                        DispatcherHolder.Invoke(() => _parent.OnClosing());
+                    }
                 }
             }
         }
