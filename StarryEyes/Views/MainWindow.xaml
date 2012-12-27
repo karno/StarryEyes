@@ -43,6 +43,9 @@
             <l:DataContextDisposeAction />
         </i:EventTrigger>
         <l:InteractionMessageTrigger Messenger="{Binding Messenger}">
+            <StarryEyes_Mystique_Views_Messaging_Behaviors:GoToStateInteractionMessageAction />
+        </l:InteractionMessageTrigger>
+        <l:InteractionMessageTrigger Messenger="{Binding Messenger}">
             <l:TransitionInteractionMessageAction />
         </l:InteractionMessageTrigger>
         <l:InteractionMessageTrigger Messenger="{Binding Messenger}">
@@ -69,6 +72,82 @@
         </Controls:WindowCommands>
     </Controls:MetroWindow.WindowCommands>
     <Grid>
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="CurrentEventStates">
+                <VisualState x:Name="ShowCurrentEvent">
+                    <Storyboard>
+                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="CurrentEventBorder" Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.Y)">
+                            <EasingDoubleKeyFrame KeyTime="0" Value="100">
+                                <EasingDoubleKeyFrame.EasingFunction>
+                                    <CircleEase EasingMode="EaseOut" />
+                                </EasingDoubleKeyFrame.EasingFunction>
+                            </EasingDoubleKeyFrame>
+                            <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0">
+                                <EasingDoubleKeyFrame.EasingFunction>
+                                    <CircleEase EasingMode="EaseOut" />
+                                </EasingDoubleKeyFrame.EasingFunction>
+                            </EasingDoubleKeyFrame>
+                        </DoubleAnimationUsingKeyFrames>
+                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="CurrentEventBorder" Storyboard.TargetProperty="(UIElement.Opacity)">
+                            <EasingDoubleKeyFrame KeyTime="0" Value="0">
+                                <EasingDoubleKeyFrame.EasingFunction>
+                                    <CircleEase EasingMode="EaseOut" />
+                                </EasingDoubleKeyFrame.EasingFunction>
+                            </EasingDoubleKeyFrame>
+                            <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="1">
+                                <EasingDoubleKeyFrame.EasingFunction>
+                                    <CircleEase EasingMode="EaseOut" />
+                                </EasingDoubleKeyFrame.EasingFunction>
+                            </EasingDoubleKeyFrame>
+                        </DoubleAnimationUsingKeyFrames>
+                    </Storyboard>
+                </VisualState>
+                <VisualState x:Name="HideCurrentEvent">
+                    <Storyboard>
+                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="CurrentEventBorder" Storyboard.TargetProperty="(UIElement.Opacity)">
+                            <EasingDoubleKeyFrame KeyTime="0" Value="0" />
+                        </DoubleAnimationUsingKeyFrames>
+                    </Storyboard>
+                </VisualState>
+            </VisualStateGroup>
+            <VisualStateGroup x:Name="PreviousEventState">
+                <VisualState x:Name="ShowPreviousEvent">
+                    <Storyboard>
+                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="PreviousEventBorder" Storyboard.TargetProperty="(UIElement.Opacity)">
+                            <EasingDoubleKeyFrame KeyTime="0" Value="1" />
+                        </DoubleAnimationUsingKeyFrames>
+                    </Storyboard>
+                </VisualState>
+                <VisualState x:Name="HidePreviousEvent">
+                    <Storyboard>
+                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="PreviousEventBorder" Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.Y)">
+                            <EasingDoubleKeyFrame KeyTime="0" Value="0">
+                                <EasingDoubleKeyFrame.EasingFunction>
+                                    <CircleEase EasingMode="EaseOut" />
+                                </EasingDoubleKeyFrame.EasingFunction>
+                            </EasingDoubleKeyFrame>
+                            <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="100">
+                                <EasingDoubleKeyFrame.EasingFunction>
+                                    <CircleEase EasingMode="EaseOut" />
+                                </EasingDoubleKeyFrame.EasingFunction>
+                            </EasingDoubleKeyFrame>
+                        </DoubleAnimationUsingKeyFrames>
+                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="PreviousEventBorder" Storyboard.TargetProperty="(UIElement.Opacity)">
+                            <EasingDoubleKeyFrame KeyTime="0" Value="1">
+                                <EasingDoubleKeyFrame.EasingFunction>
+                                    <CircleEase EasingMode="EaseOut" />
+                                </EasingDoubleKeyFrame.EasingFunction>
+                            </EasingDoubleKeyFrame>
+                            <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0">
+                                <EasingDoubleKeyFrame.EasingFunction>
+                                    <CircleEase EasingMode="EaseOut" />
+                                </EasingDoubleKeyFrame.EasingFunction>
+                            </EasingDoubleKeyFrame>
+                        </DoubleAnimationUsingKeyFrames>
+                    </Storyboard>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
         <Grid.RowDefinitions>
             <RowDefinition />
             <RowDefinition Height="Auto" />
@@ -94,26 +173,118 @@
                 <TextBlock Margin="8"
                            Text="{Binding StateString}"
                            ToolTip="ここをクリックすると、バックパネルを開くことができます。" />
-                <StackPanel Grid.Column="1" Margin="8" Orientation="Horizontal" ToolTip="現在保持している総ツイート数です。">
-                	<Path Stretch="Fill" Fill="#FF000000" Data="F1 M 24,18C 27.0376,18 29.5,18.6716 29.5,19.5C 29.5,19.8842 28.9704,20.2346 28.0995,20.5C 27.0924,20.8069 25.6289,21 24,21C 22.3711,21 20.9076,20.8069 19.9005,20.5C 19.0296,20.2346 18.5,19.8842 18.5,19.5C 18.5,18.6716 20.9624,18 24,18 Z M 29.5,28.5C 29.5,29.3284 27.0376,30 24,30C 20.9624,30 18.5,29.3284 18.5,28.5L 18.5,26.5C 18.5,27.3284 20.9624,28 24,28C 27.0376,28 29.5,27.3284 29.5,26.5L 29.5,28.5 Z M 29.5,25.5C 29.5,26.3284 27.0376,27 24,27C 20.9624,27 18.5,26.3284 18.5,25.5L 18.5,23.5C 18.5,24.3284 20.9624,25 24,25C 27.0376,25 29.5,24.3284 29.5,23.5L 29.5,25.5 Z M 29.5,22.5C 29.5,23.3284 27.0376,24 24,24C 20.9624,24 18.5,23.3284 18.5,22.5L 18.5,20.5C 18.5,21.3284 20.9624,22 24,22C 27.0376,22 29.5,21.3284 29.5,20.5L 29.5,22.5 Z " Width="9" Height="11" VerticalAlignment="Center" Margin="0,2,4,0"/>
-                	<TextBlock
-                		Margin="0,0,16,0"
-                		Text="{Binding GrossTweetCount}" Height="15.24" FontFamily="Segoe UI" />
+                <StackPanel Grid.Column="1"
+                            Margin="8"
+                            Orientation="Horizontal"
+                            ToolTip="現在保持している総ツイート数です。">
+                    <Path Width="9"
+                          Height="11"
+                          Margin="0,2,4,0"
+                          VerticalAlignment="Center"
+                          Data="F1 M 24,18C 27.0376,18 29.5,18.6716 29.5,19.5C 29.5,19.8842 28.9704,20.2346 28.0995,20.5C 27.0924,20.8069 25.6289,21 24,21C 22.3711,21 20.9076,20.8069 19.9005,20.5C 19.0296,20.2346 18.5,19.8842 18.5,19.5C 18.5,18.6716 20.9624,18 24,18 Z M 29.5,28.5C 29.5,29.3284 27.0376,30 24,30C 20.9624,30 18.5,29.3284 18.5,28.5L 18.5,26.5C 18.5,27.3284 20.9624,28 24,28C 27.0376,28 29.5,27.3284 29.5,26.5L 29.5,28.5 Z M 29.5,25.5C 29.5,26.3284 27.0376,27 24,27C 20.9624,27 18.5,26.3284 18.5,25.5L 18.5,23.5C 18.5,24.3284 20.9624,25 24,25C 27.0376,25 29.5,24.3284 29.5,23.5L 29.5,25.5 Z M 29.5,22.5C 29.5,23.3284 27.0376,24 24,24C 20.9624,24 18.5,23.3284 18.5,22.5L 18.5,20.5C 18.5,21.3284 20.9624,22 24,22C 27.0376,22 29.5,21.3284 29.5,20.5L 29.5,22.5 Z "
+                          Fill="#FF000000"
+                          Stretch="Fill" />
+                    <TextBlock Height="15.24"
+                               Margin="0,0,16,0"
+                               FontFamily="Segoe UI"
+                               Text="{Binding GrossTweetCount}" />
                 </StackPanel>
-                <StackPanel Grid.Column="2" Margin="8" Orientation="Horizontal" ToolTip="一分間あたりのツイート受信数の目安です。">
-                	<Path Stretch="Fill" Fill="#FF000000" Data="F1 M 20.4704,34.6073L 17.9998,34.6073C 17.9998,31.2936 20.6861,28.6073 23.9998,28.6073C 27.3135,28.6073 29.9998,31.2936 29.9998,34.6073L 27.5292,34.6073L 27.1763,34.4309C 27.1763,32.6766 25.7541,31.2544 23.9998,31.2544C 22.2455,31.2544 20.8233,32.6766 20.8233,34.4309L 20.4704,34.6073 Z M 23.6166,29.3269C 22.4318,29.4116 21.355,29.8862 20.5136,30.6231L 21.2108,31.4199C 21.8839,30.8305 22.7454,30.4508 23.6932,30.383L 23.6166,29.3269 Z M 27.486,30.6231C 26.6446,29.8862 25.5678,29.4116 24.383,29.3269L 24.3064,30.383C 25.2542,30.4508 26.1157,30.8305 26.7888,31.4199L 27.486,30.6231 Z M 27.9841,31.1211L 27.1872,31.8184C 27.7497,32.4607 28.1212,33.2745 28.2129,34.1712L 29.2662,34.0621C 29.1515,32.9413 28.6872,31.924 27.9841,31.1211 Z M 20.0155,31.1211C 19.3124,31.924 18.8481,32.9413 18.7334,34.0621L 19.7867,34.1712C 19.8784,33.2745 20.2499,32.4607 20.8124,31.8184L 20.0155,31.1211 Z M 24.7924,34.5846C 25.1171,34.958 25.0775,35.5239 24.7041,35.8486C 24.3306,36.1732 23.7647,36.1336 23.4401,35.7602L 22.2697,32.8205L 24.7924,34.5846 Z " Width="12" Height="7.5" Margin="0,2,4,0"/>
-                	<TextBlock
-                		Margin="0,0,16,0"
-                		Text="{Binding TweetsPerMinutes, Mode=OneWay}" Height="15.24" FontFamily="Segoe UI" />
+                <StackPanel Grid.Column="2"
+                            Margin="8"
+                            Orientation="Horizontal"
+                            ToolTip="一分間あたりのツイート受信数の目安です。">
+                    <Path Width="12"
+                          Height="7.5"
+                          Margin="0,2,4,0"
+                          Data="F1 M 20.4704,34.6073L 17.9998,34.6073C 17.9998,31.2936 20.6861,28.6073 23.9998,28.6073C 27.3135,28.6073 29.9998,31.2936 29.9998,34.6073L 27.5292,34.6073L 27.1763,34.4309C 27.1763,32.6766 25.7541,31.2544 23.9998,31.2544C 22.2455,31.2544 20.8233,32.6766 20.8233,34.4309L 20.4704,34.6073 Z M 23.6166,29.3269C 22.4318,29.4116 21.355,29.8862 20.5136,30.6231L 21.2108,31.4199C 21.8839,30.8305 22.7454,30.4508 23.6932,30.383L 23.6166,29.3269 Z M 27.486,30.6231C 26.6446,29.8862 25.5678,29.4116 24.383,29.3269L 24.3064,30.383C 25.2542,30.4508 26.1157,30.8305 26.7888,31.4199L 27.486,30.6231 Z M 27.9841,31.1211L 27.1872,31.8184C 27.7497,32.4607 28.1212,33.2745 28.2129,34.1712L 29.2662,34.0621C 29.1515,32.9413 28.6872,31.924 27.9841,31.1211 Z M 20.0155,31.1211C 19.3124,31.924 18.8481,32.9413 18.7334,34.0621L 19.7867,34.1712C 19.8784,33.2745 20.2499,32.4607 20.8124,31.8184L 20.0155,31.1211 Z M 24.7924,34.5846C 25.1171,34.958 25.0775,35.5239 24.7041,35.8486C 24.3306,36.1732 23.7647,36.1336 23.4401,35.7602L 22.2697,32.8205L 24.7924,34.5846 Z "
+                          Fill="#FF000000"
+                          Stretch="Fill" />
+                    <TextBlock Height="15.24"
+                               Margin="0,0,16,0"
+                               FontFamily="Segoe UI"
+                               Text="{Binding TweetsPerMinutes,
+                                              Mode=OneWay}" />
                 </StackPanel>
-                <StackPanel Grid.Column="3" Margin="8" Orientation="Horizontal" ToolTip="Krileの起動時間です。">
-                	<Path Stretch="Fill" Fill="#FF000000" Data="F1 M 24,19.9091C 26.5104,19.9091 28.5455,21.9442 28.5455,24.4545C 28.5455,26.9649 26.5104,29 24,29C 21.4896,29 19.4545,26.9649 19.4545,24.4545C 19.4545,21.9442 21.4896,19.9091 24,19.9091 Z M 24,21.0455C 22.1172,21.0455 20.5909,22.5718 20.5909,24.4545C 20.5909,26.3373 22.1172,27.8636 24,27.8636C 25.8828,27.8636 27.4091,26.3373 27.4091,24.4545C 27.4091,22.5718 25.8828,21.0455 24,21.0455 Z M 23.8864,21.9545C 24.1374,21.9545 24.3409,22.1581 24.3409,22.4091L 24.3409,24.1136L 26.0454,24.1136C 26.2965,24.1136 26.5,24.3171 26.5,24.5682L 26.5,24.7955C 26.5,25.0465 26.2965,25.25 26.0455,25.25L 24,25.25C 23.7727,25.2121 23.5454,25.1742 23.4129,25.0417C 23.2803,24.9091 23.2424,24.6818 23.2045,24.4546L 23.2045,22.4091C 23.2045,22.1581 23.408,21.9545 23.6591,21.9545L 23.8864,21.9545 Z M 27.1818,19C 28.186,19 29,19.814 29,20.8182C 29,21.2514 28.8485,21.6492 28.5956,21.9615C 28.0028,20.871 27.033,20.015 25.8613,19.5684C 26.1927,19.2183 26.6618,19 27.1818,19 Z M 20.8182,19C 21.3382,19 21.8073,19.2184 22.1387,19.5684C 20.9669,20.015 19.9972,20.871 19.4044,21.9615C 19.1515,21.6492 19,21.2514 19,20.8182C 19,19.814 19.814,19 20.8182,19 Z " Width="11" Height="11" VerticalAlignment="Center" Margin="0,2,4,0"/>
-                	<TextBlock
-                		Margin="0,0,16,0"
-                		Text="{Binding StartupTime}" Height="15.24" FontFamily="Segoe UI" />
+                <StackPanel Grid.Column="3"
+                            Margin="8"
+                            Orientation="Horizontal"
+                            ToolTip="Krileの起動時間です。">
+                    <Path Width="11"
+                          Height="11"
+                          Margin="0,2,4,0"
+                          VerticalAlignment="Center"
+                          Data="F1 M 24,19.9091C 26.5104,19.9091 28.5455,21.9442 28.5455,24.4545C 28.5455,26.9649 26.5104,29 24,29C 21.4896,29 19.4545,26.9649 19.4545,24.4545C 19.4545,21.9442 21.4896,19.9091 24,19.9091 Z M 24,21.0455C 22.1172,21.0455 20.5909,22.5718 20.5909,24.4545C 20.5909,26.3373 22.1172,27.8636 24,27.8636C 25.8828,27.8636 27.4091,26.3373 27.4091,24.4545C 27.4091,22.5718 25.8828,21.0455 24,21.0455 Z M 23.8864,21.9545C 24.1374,21.9545 24.3409,22.1581 24.3409,22.4091L 24.3409,24.1136L 26.0454,24.1136C 26.2965,24.1136 26.5,24.3171 26.5,24.5682L 26.5,24.7955C 26.5,25.0465 26.2965,25.25 26.0455,25.25L 24,25.25C 23.7727,25.2121 23.5454,25.1742 23.4129,25.0417C 23.2803,24.9091 23.2424,24.6818 23.2045,24.4546L 23.2045,22.4091C 23.2045,22.1581 23.408,21.9545 23.6591,21.9545L 23.8864,21.9545 Z M 27.1818,19C 28.186,19 29,19.814 29,20.8182C 29,21.2514 28.8485,21.6492 28.5956,21.9615C 28.0028,20.871 27.033,20.015 25.8613,19.5684C 26.1927,19.2183 26.6618,19 27.1818,19 Z M 20.8182,19C 21.3382,19 21.8073,19.2184 22.1387,19.5684C 20.9669,20.015 19.9972,20.871 19.4044,21.9615C 19.1515,21.6492 19,21.2514 19,20.8182C 19,19.814 19.814,19 20.8182,19 Z "
+                          Fill="#FF000000"
+                          Stretch="Fill" />
+                    <TextBlock Height="15.24"
+                               Margin="0,0,16,0"
+                               FontFamily="Segoe UI"
+                               Text="{Binding StartupTime}" />
                 </StackPanel>
             </Grid>
-            <Border Visibility="{Binding BackpanelViewModel.IsCurrentEventAvailable, Converter={StaticResource BooleanToVisibleConverter}, Mode=OneWay}">
+            <Border x:Name="PreviousEventBorder"
+                    Opacity="0"
+                    RenderTransformOrigin="0.5,0.5"
+                    Visibility="{Binding BackpanelViewModel.IsPreviousEventAvailable,
+                                         Converter={StaticResource BooleanToVisibleConverter},
+                                         Mode=OneWay}">
+                <Border.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform />
+                        <SkewTransform />
+                        <RotateTransform />
+                        <TranslateTransform />
+                    </TransformGroup>
+                </Border.RenderTransform>
+                <Border.Background>
+                    <SolidColorBrush Color="{Binding BackpanelViewModel.PreviousEvent.Background, Mode=OneWay}" />
+                </Border.Background>
+                <StackPanel Orientation="Horizontal">
+                    <Image Width="16"
+                           Height="16"
+                           Margin="8,8,4,8"
+                           VerticalAlignment="Center"
+                           Source="{Binding BackpanelViewModel.PreviousEvent.TitleImage,
+                                            Mode=OneWay}"
+                           Visibility="{Binding BackpanelViewModel.PreviousEvent.IsImageAvailable,
+                                                Converter={StaticResource BooleanToVisibleConverter},
+                                                Mode=OneWay}" />
+                    <TextBlock Margin="8,8,4,8"
+                               VerticalAlignment="Center"
+                               FontWeight="Bold"
+                               Text="{Binding BackpanelViewModel.PreviousEvent.Title,
+                                              Mode=OneWay}"
+                               Visibility="{Binding BackpanelViewModel.PreviousEvent.IsImageAvailable,
+                                                    Converter={StaticResource BooleanToInvisibleConverter},
+                                                    Mode=OneWay}">
+                        <TextBlock.Foreground>
+                            <SolidColorBrush Color="{Binding BackpanelViewModel.PreviousEvent.Foreground, Mode=OneWay}" />
+                        </TextBlock.Foreground>
+                    </TextBlock>
+                    <TextBlock Margin="4,8,8,8"
+                               VerticalAlignment="Center"
+                               Text="{Binding BackpanelViewModel.PreviousEvent.Detail,
+                                              Mode=OneWay}">
+                        <TextBlock.Foreground>
+                            <SolidColorBrush Color="{Binding BackpanelViewModel.PreviousEvent.Foreground, Mode=OneWay}" />
+                        </TextBlock.Foreground>
+                    </TextBlock>
+                </StackPanel>
+            </Border>
+            <Border x:Name="CurrentEventBorder"
+                    Opacity="0"
+                    RenderTransformOrigin="0.5,0.5"
+                    Visibility="{Binding BackpanelViewModel.IsCurrentEventAvailable,
+                                         Converter={StaticResource BooleanToVisibleConverter},
+                                         Mode=OneWay}">
+                <Border.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform />
+                        <SkewTransform />
+                        <RotateTransform />
+                        <TranslateTransform />
+                    </TransformGroup>
+                </Border.RenderTransform>
                 <Border.Background>
                     <SolidColorBrush Color="{Binding BackpanelViewModel.CurrentEvent.Background, Mode=OneWay}" />
                 </Border.Background>

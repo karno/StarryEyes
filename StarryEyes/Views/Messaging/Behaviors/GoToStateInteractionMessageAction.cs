@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using Livet.Behaviors.Messaging;
 using Microsoft.Expression.Interactivity;
 
@@ -14,9 +15,12 @@ namespace StarryEyes.Views.Messaging.Behaviors
             {
                 gtsm.Response = VisualStateUtilities.GoToState(
                     this.AssociatedObject, gtsm.StateName, gtsm.UseTransitions);
-
+                System.Diagnostics.Debug.WriteLine("gtsm:" + gtsm.StateName + ", resp:" + gtsm.Response);
             }
-            catch { }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.ToString());
+            }
         }
     }
 }

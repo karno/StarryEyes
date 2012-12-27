@@ -5,6 +5,7 @@ using System.Linq;
 using System.Xaml;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Breezy.Imaging;
+using StarryEyes.Filters;
 using StarryEyes.Filters.Expressions;
 using StarryEyes.Filters.Parsing;
 using TaskDialogInterop;
@@ -175,15 +176,20 @@ namespace StarryEyes.Settings
             {
                 get
                 {
-                    try
+                    if (_expression != null) return _expression;
+
+                    object value;
+                    if (_settingValueHolder.TryGetValue(Name, out value))
                     {
-                        return _expression ??
-                               (_expression = QueryCompiler.CompileFilters(_settingValueHolder[Name] as string));
+                        try
+                        {
+                            return _expression = QueryCompiler.CompileFilters(value as string);
+                        }
+                        catch (FilterQueryException)
+                        {
+                        }
                     }
-                    catch
-                    {
-                        return new FilterExpressionRoot();
-                    }
+                    return _expression = new FilterExpressionRoot();
                 }
                 set
                 {
@@ -232,15 +238,14 @@ namespace StarryEyes.Settings
             {
                 get
                 {
-                    try
+                    if (_valueCache != null) return _valueCache;
+
+                    object value;
+                    if (_settingValueHolder.TryGetValue(Name, out value))
                     {
-                        return _valueCache ??
-                               (_valueCache = _settingValueHolder[Name] as T);
+                        return _valueCache = value as T;
                     }
-                    catch
-                    {
-                        return _valueCache = _defaultValue;
-                    }
+                    return _valueCache = _defaultValue;
                 }
                 set
                 {
@@ -283,15 +288,13 @@ namespace StarryEyes.Settings
             {
                 get
                 {
-                    try
+                    if (_valueCache != null) return _valueCache.Value;
+                    object value;
+                    if (_settingValueHolder.TryGetValue(Name, out value))
                     {
-                        return _valueCache ??
-                               (_valueCache = (T)_settingValueHolder[Name]).Value;
+                        return (_valueCache = (T)value).Value;
                     }
-                    catch
-                    {
-                        return (_valueCache = _defaultValue).Value;
-                    }
+                    return (_valueCache = _defaultValue).Value;
                 }
                 set
                 {

@@ -123,30 +123,25 @@ namespace StarryEyes.Models.Tab
         ///     ストリームの読み込みを開始します。
         /// </summary>
         /// <returns></returns>
-        public IObservable<Unit> Activate()
+        public void Activate()
         {
-            return Observable.Defer(() => Observable.Return(new Unit()))
-                             .Do(_ =>
-                             {
-                                 if (!IsActivated)
-                                 {
-                                     if (Timeline != null)
-                                         Timeline.Dispose();
-                                     Timeline = new TimelineModel(_evaluator, GetChunk);
-                                     if (FilterQuery != null)
-                                     {
-                                         FilterQuery.Activate();
-                                         FilterQuery.OnInvalidateRequired += InvalidateCollection;
-                                     }
-                                 }
-                                 IsActivated = true;
-                             })
-                             .SelectMany(_ => Timeline.ReadMore(null));
+            if (!IsActivated)
+            {
+                if (Timeline != null)
+                    Timeline.Dispose();
+                Timeline = new TimelineModel(_evaluator, GetChunk);
+                if (FilterQuery != null)
+                {
+                    FilterQuery.Activate();
+                    FilterQuery.OnInvalidateRequired += InvalidateCollection;
+                }
+            }
+            IsActivated = true;
         }
 
         private IObservable<TwitterStatus> GetChunk(long? maxId, int chunkCount)
         {
-            return StatusStore.Find(_evaluator, maxId != null ? FindRange<long>.By(maxId.Value) : null)
+            return StatusStore.Find(_evaluator, maxId != null ? FindRange<long>.By(maxId.Value) : null, chunkCount)
                               .OrderByDescending(_ => _.CreatedAt)
                               .Take(chunkCount);
         }

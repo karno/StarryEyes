@@ -9,7 +9,7 @@ namespace StarryEyes.Views.Behaviors
 {
     public class TimelineScrollLockerBehavior : Behavior<ScrollViewer>
     {
-        private CompositeDisposable _disposables = new CompositeDisposable();
+        private readonly CompositeDisposable _disposables = new CompositeDisposable();
 
         public bool IsScrollLockEnabled
         {
@@ -26,8 +26,8 @@ namespace StarryEyes.Views.Behaviors
         {
             base.OnAttached();
             _disposables.Add(Observable.FromEventPattern<ScrollChangedEventHandler, ScrollChangedEventArgs>(
-                handler => this.AssociatedObject.ScrollChanged += handler,
-                handler => this.AssociatedObject.ScrollChanged -= handler)
+                h => this.AssociatedObject.ScrollChanged += h,
+                h => this.AssociatedObject.ScrollChanged -= h)
                 .Subscribe(_ => UpdateScrollHeight(this.AssociatedObject.ScrollableHeight)));
         }
 
