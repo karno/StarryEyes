@@ -35,22 +35,11 @@ namespace StarryEyes.Models.Stores
             // initialize
             if (StoreOnMemoryObjectPersistence.IsPersistentDataExisted("statuses"))
             {
-                try
-                {
-                    _store = new PersistentDataStore<long, TwitterStatus>
-                        (_ => _.Id, Path.Combine(App.DataStorePath, "statuses"), new IdReverseComparer(),
-                        tocniops: StoreOnMemoryObjectPersistence.GetPersistentData("statuses"));
-                }
-                catch (Exception ex)
-                {
-                    AppInformationHub.PublishInformation(new AppInformation(AppInformationKind.Warning,
-                        "STATUSSTORE_INIT_FAILED",
-                        "ステータス データベースが破損しています。",
-                        "読み込み時にエラーが発生したため、データベースを初期化しました。" + Environment.NewLine +
-                        "送出された例外: " + ex.ToString()));
-                }
+                _store = new PersistentDataStore<long, TwitterStatus>
+                    (_ => _.Id, Path.Combine(App.DataStorePath, "statuses"), new IdReverseComparer(),
+                    manageData: StoreOnMemoryObjectPersistence.GetPersistentData("statuses"));
             }
-            if (_store == null)
+            else
             {
                 _store = new PersistentDataStore<long, TwitterStatus>
                     (_ => _.Id, Path.Combine(App.DataStorePath, "statuses"), new IdReverseComparer());
@@ -143,9 +132,12 @@ namespace StarryEyes.Models.Stores
         internal static void Shutdown()
         {
             _isInShutdown = true;
-            _store.Dispose();
-            var pds = (PersistentDataStore<long, TwitterStatus>)_store;
-            StoreOnMemoryObjectPersistence.MakePersistent("statuses", pds.GetToCNIoPs());
+            if (_store != null)
+            {
+                _store.Dispose();
+                var pds = (PersistentDataStore<long, TwitterStatus>)_store;
+                StoreOnMemoryObjectPersistence.MakePersistent("statuses", pds.GetManageDatas());
+            }
         }
     }
 
