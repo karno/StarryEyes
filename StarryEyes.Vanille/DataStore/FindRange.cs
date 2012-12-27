@@ -2,7 +2,7 @@
 
 namespace StarryEyes.Vanille.DataStore
 {
-    public class FindRange<T> where T:IComparable<T>
+    public class FindRange<T> where T : IComparable<T>
     {
         /// <summary>
         /// Initialize range with from mode.
@@ -35,15 +35,15 @@ namespace StarryEyes.Vanille.DataStore
             return new FindRange<T>(from, by, RangeMode.Between);
         }
 
-        private T begin;
-        private T end;
-        private RangeMode mode;
+        private readonly T _begin;
+        private readonly T _end;
+        private readonly RangeMode _mode;
 
         private FindRange(T begin, T end, RangeMode mode)
         {
-            this.begin = begin;
-            this.end = end;
-            this.mode = mode;
+            this._begin = begin;
+            this._end = end;
+            this._mode = mode;
         }
 
         /// <summary>
@@ -53,9 +53,9 @@ namespace StarryEyes.Vanille.DataStore
         {
             get
             {
-                if (mode == RangeMode.By)
+                if (_mode == RangeMode.By)
                     throw new Exception("cannot read begin field when in by range mode.");
-                return begin;
+                return _begin;
             }
         }
 
@@ -66,9 +66,9 @@ namespace StarryEyes.Vanille.DataStore
         {
             get
             {
-                if (mode == RangeMode.From)
+                if (_mode == RangeMode.From)
                     throw new Exception("cannot read end field when in from range mode.");
-                return end;
+                return _end;
             }
         }
 
@@ -77,7 +77,7 @@ namespace StarryEyes.Vanille.DataStore
         /// </summary>
         public RangeMode Mode
         {
-            get { return mode; }
+            get { return _mode; }
         }
 
         /// <summary>

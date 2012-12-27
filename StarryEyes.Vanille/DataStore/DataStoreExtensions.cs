@@ -12,8 +12,7 @@ namespace StarryEyes.Vanille.DataStore
         {
             if (range == null)
                 return collection;
-            else
-                return collection.Where(v => range.IsIn(keyProvider(v)));
+            return collection.Where(v => range.IsIn(keyProvider(v)));
         }
 
         internal static IObservable<TValue> CheckRange<TKey, TValue>(this IObservable<TValue> collection,
@@ -21,8 +20,7 @@ namespace StarryEyes.Vanille.DataStore
         {
             if (range == null)
                 return collection;
-            else
-                return collection.Where(v => range.IsIn(keyProvider(v)));
+            return collection.Where(v => range.IsIn(keyProvider(v)));
         }
     }
 }
