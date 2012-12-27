@@ -67,7 +67,7 @@ namespace StarryEyes
                 Environment.Exit(0);
             }
 
-            Application.Current.DispatcherUnhandledException += (sender2, e2) => HandleException(e2.Exception);
+            Current.DispatcherUnhandledException += (sender2, e2) => HandleException(e2.Exception);
             AppDomain.CurrentDomain.UnhandledException += (sender2, e2) => HandleException(e2.ExceptionObject as Exception);
             Current.Exit += (_, __) => AppFinalize(true);
 
@@ -120,12 +120,14 @@ namespace StarryEyes
                     Current.Shutdown();
                     return;
                 }
+                StatusStore.Shutdown();
+                UserStore.Shutdown();
                 // clear data
                 ClearStoreData();
                 Setting.DatabaseCorruption.Value = false;
                 Setting.Save();
                 _appMutex.Dispose();
-                Nightmare.Windows.Application.Restart();
+                Process.Start(ResourceAssembly.Location);
                 Current.Shutdown();
                 return;
             }
@@ -157,7 +159,12 @@ namespace StarryEyes
             }
             Debug.WriteLine("App Finalize");
             RaiseApplicationFinalize();
-            _appMutex.ReleaseMutex();
+            try
+            {
+                _appMutex.Dispose();
+            }
+            catch (ObjectDisposedException)
+            { }
         }
 
         private void HandleException(Exception ex)
@@ -167,10 +174,10 @@ namespace StarryEyes
                 var dex = ex as StarryEyes.Vanille.DataStore.Persistent.DataPersistenceException;
                 if (dex != null)
                 {
-                    ClearStoreData();
                     Setting.DatabaseCorruption.Value = true;
                     Setting.Save();
-                    Nightmare.Windows.Application.Restart();
+                    _appMutex.Dispose();
+                    Process.Start(ResourceAssembly.Location);
                     Current.Shutdown();
                     return;
                 }

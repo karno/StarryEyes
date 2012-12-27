@@ -27,7 +27,7 @@ namespace StarryEyes.Models.Stores
             {
                 _store = new PersistentDataStore<long, TwitterUser>
                     (_ => _.Id, Path.Combine(App.DataStorePath, "users"), chunkNum: 16,
-                    tocniops: StoreOnMemoryObjectPersistence.GetPersistentData("users"));
+                    manageData: StoreOnMemoryObjectPersistence.GetPersistentData("users"));
             }
             else
             {
@@ -90,10 +90,13 @@ namespace StarryEyes.Models.Stores
         internal static void Shutdown()
         {
             _isInShutdown = true;
-            _store.Dispose();
-            var pds = (PersistentDataStore<long, TwitterUser>)_store;
-            StoreOnMemoryObjectPersistence.MakePersistent("users", pds.GetToCNIoPs());
-            SaveScreenNameResolverCache();
+            if (_store != null)
+            {
+                _store.Dispose();
+                var pds = (PersistentDataStore<long, TwitterUser>)_store;
+                StoreOnMemoryObjectPersistence.MakePersistent("users", pds.GetManageDatas());
+                SaveScreenNameResolverCache();
+            }
         }
 
         private static readonly string ScreenNameResolverCacheFile =
