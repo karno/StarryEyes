@@ -7,14 +7,14 @@ namespace StarryEyes.Vanille.DataStore
         where TKey : IComparable<TKey>
         where TValue : IBinarySerializable, new()
     {
-        private Func<TValue, TKey> _keyProvider = null;
+        private readonly Func<TValue, TKey> _keyProvider;
         private bool _disposed;
 
         /// <summary>
         /// initialize abstract data store.
         /// </summary>
         /// <param name="keyProvider"></param>
-        public DataStoreBase(Func<TValue, TKey> keyProvider)
+        protected DataStoreBase(Func<TValue, TKey> keyProvider)
         {
             this._keyProvider = keyProvider;
         }
@@ -53,7 +53,7 @@ namespace StarryEyes.Vanille.DataStore
         /// </summary>
         /// <param name="predicate">find predicate</param>
         /// <param name="range">find ID range</param>
-        /// <param name="lowerBound">Count of items, lower bound.</param>
+        /// <param name="returnLowerBound">count of items, lower bound.</param>
         /// <returns>all stored data</returns>
         public abstract IObservable<TValue> Find(Func<TValue, bool> predicate, FindRange<TKey> range = null, int? returnLowerBound = null);
 

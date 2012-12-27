@@ -3,48 +3,48 @@ using System.IO;
 
 namespace StarryEyes.Vanille.Serialization
 {
-    public sealed class BinarySerializableCollection<T> : ICollection<T>, IBinarySerializable where T: IBinarySerializable, new()
+    public sealed class BinarySerializableCollection<T> : ICollection<T>, IBinarySerializable where T : IBinarySerializable, new()
     {
-        private List<T> internalCollection = new List<T>();
+        private List<T> _internalCollection = new List<T>();
 
         public void Add(T item)
         {
-            internalCollection.Add(item);
+            _internalCollection.Add(item);
         }
 
         public void Clear()
         {
-            internalCollection.Clear();
+            _internalCollection.Clear();
         }
 
         public bool Contains(T item)
         {
-            return internalCollection.Contains(item);
+            return _internalCollection.Contains(item);
         }
 
         public void CopyTo(T[] array, int arrayIndex)
         {
-            internalCollection.CopyTo(array, arrayIndex);
+            _internalCollection.CopyTo(array, arrayIndex);
         }
 
         public int Count
         {
-            get { return internalCollection.Count; }
+            get { return _internalCollection.Count; }
         }
 
         public bool IsReadOnly
         {
-            get { return ((ICollection<T>)internalCollection).IsReadOnly; }
+            get { return ((ICollection<T>)_internalCollection).IsReadOnly; }
         }
 
         public bool Remove(T item)
         {
-            return internalCollection.Remove(item);
+            return _internalCollection.Remove(item);
         }
 
         public IEnumerator<T> GetEnumerator()
         {
-            return internalCollection.GetEnumerator();
+            return _internalCollection.GetEnumerator();
         }
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
@@ -54,12 +54,12 @@ namespace StarryEyes.Vanille.Serialization
 
         public void Serialize(BinaryWriter writer)
         {
-            writer.Write(internalCollection);
+            writer.Write(_internalCollection);
         }
 
         public void Deserialize(BinaryReader reader)
         {
-            internalCollection = new List<T>(reader.ReadCollection<T>());
+            _internalCollection = new List<T>(reader.ReadCollection<T>());
         }
     }
 }

@@ -50,11 +50,12 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// Initialize persistent drive with load previous data mode.
         /// </summary>
         /// <param name="path">base file path</param>
+        /// <param name="comparer">comparer for ordering key.</param>
         /// <param name="tableOfContents">previous table of contents</param>
         /// <param name="nextIndexOfPackets">previous next index of packets table</param>
-        public PersistentDrive(string path, IDictionary<TKey, int> tableOfContents, IEnumerable<int> nextIndexOfPackets)
+        public PersistentDrive(string path, IComparer<TKey> comparer, IDictionary<TKey, int> tableOfContents, IEnumerable<int> nextIndexOfPackets)
         {
-            this._tableOfContents = new SortedDictionary<TKey, int>(tableOfContents);
+            this._tableOfContents = new SortedDictionary<TKey, int>(tableOfContents, comparer);
             this._nextIndexOfPackets = new SortedDictionary<int, List<int>>();
             nextIndexOfPackets
                 .Zip(Enumerable.Range(0, Int32.MaxValue), (v, k) => new { Key = k, Value = v })
@@ -82,7 +83,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                 _fstream = File.Open(_path, FileMode.Open, FileAccess.ReadWrite);
                 // verify toc and niop-table
 
-                if (!VerifyToCNIoPParity(LoadInternal(0)))
+                if (!VerifyParity(LoadInternal(0).ToArray()))
                 {
                     // if invalid, throw exception
                     _fstream.Close();
@@ -100,7 +101,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// Get ToC/NIoP Parity bytes.
         /// </summary>
         /// <returns>parity</returns>
-        private byte[] GetToCNIoPParity()
+        private byte[] GetParity()
         {
             // 64bit
             long tocParity = 0;
@@ -120,10 +121,10 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// </summary>
         /// <param name="parity">parity</param>
         /// <returns>if verified, return true</returns>
-        private bool VerifyToCNIoPParity(byte[] parity)
+        private bool VerifyParity(IEnumerable<byte> parity)
         {
             // 128bit parity
-            var comparate = GetToCNIoPParity();
+            var comparate = GetParity();
             return comparate.SequenceEqual(parity.Take(16));
         }
 
@@ -207,29 +208,15 @@ namespace StarryEyes.Vanille.DataStore.Persistent
             byte[] bytes;
             // serialize data
             using (var ms = new MemoryStream())
-            using (var cs = new MemoryStream())
-            using (var bw = new BinaryWriter(ms))
             {
-                // serialize
-                value.Serialize(bw);
-                bw.Flush();
-
-                ms.Seek(0, SeekOrigin.Begin); // initialize seek point
-                cs.Seek(4, SeekOrigin.Begin); // 4 bytes for length placeholder.
-                //compress
-                using (var ds = new DeflateStream(cs, CompressionLevel.Fastest))
+                using (var ds = new DeflateStream(ms, CompressionLevel.Fastest))
+                using (var bw = new BinaryWriter(ds))
                 {
-                    ms.CopyTo(ds);
-                    ms.Flush();
+                    // serialize
+                    value.Serialize(bw);
                 }
-                bytes = cs.ToArray();
+                bytes = ms.ToArray();
             }
-
-            // get length-bit into the header
-            var lengthBytes = BitConverter.GetBytes(bytes.Length - 4); // byte[4]
-
-            // paste length bytes into serialize buffer
-            Array.Copy(lengthBytes, bytes, 4);
 
             // get index for storing data
             int writeTo = GetNextEmptyIndex(0);
@@ -257,6 +244,8 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// Find values with predicate.
         /// </summary>
         /// <param name="predicate">find predicate</param>
+        /// <param name="range">find id range</param>
+        /// <param name="returnLowerBound">rower bound count of items.</param>
         /// <returns>value sequence</returns>
         public IEnumerable<TValue> Find(Func<TValue, bool> predicate, FindRange<TKey> range, int? returnLowerBound)
         {
@@ -283,35 +272,21 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// <returns>deserialized value</returns>
         private TValue Load(int index)
         {
-            /*
             try
             {
-            */
-            var bytes = LoadInternal(index);
-            var length = BitConverter.ToInt32(bytes, 0);
-            var ret = new TValue();
-            // decompress
-            using (var cs = new MemoryStream(bytes, 4, length, false))
-            using (var ds = new DeflateStream(cs, CompressionMode.Decompress))
-            using (var ms = new MemoryStream())
-            {
-                ds.CopyTo(ms);
-                ds.Flush();
-
-                ms.Seek(0, SeekOrigin.Begin);
-                using (var br = new BinaryReader(ms))
+                var ret = new TValue();
+                using (var ms = LoadInternal(index))
+                using (var ds = new DeflateStream(ms, CompressionMode.Decompress))
+                using (var br = new BinaryReader(ds))
                 {
                     ret.Deserialize(br);
+                    return ret;
                 }
-            }
-            return ret;
-            /*
             }
             catch (Exception ex)
             {
                 throw new DataPersistenceException("data load error.", ex);
             }
-            */
         }
 
         /// <summary>
@@ -361,6 +336,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                     {
                         _fstream.Write(data, cursor, PacketSize);
                     }
+                    _fstream.Flush();
                 }
 
                 // move cursor
@@ -405,30 +381,31 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// </summary>
         /// <param name="offset">load start offset</param>
         /// <returns>byte array</returns>
-        private byte[] LoadInternal(int offset)
+        private MemoryStream LoadInternal(int offset)
         {
             // data reading buffer
             var buffer = new byte[PacketSize];
             // return data buffer
-            using (var ms = new MemoryStream())
+            var ms = new MemoryStream(PacketSize);
+            while (true)
             {
-                while (true)
+                int read;
+                lock (_fslock)
                 {
-                    int read;
-                    lock (_fslock)
-                    {
-                        // seek to source offset, read packet
-                        _fstream.Seek(offset * PacketSize, SeekOrigin.Begin);
-                        read = _fstream.Read(buffer, 0, PacketSize);
-                    }
+                    // seek to source offset, read packet
+                    _fstream.Seek(offset * PacketSize, SeekOrigin.Begin);
+                    read = _fstream.Read(buffer, 0, PacketSize);
+                }
 
-                    // write to return stream
-                    ms.Write(buffer, 0, read);
+                // write to return stream
+                ms.Write(buffer, 0, read);
 
-                    // determine next packet index
-                    offset = GetNextIndexOfPackets(offset);
-                    if (offset == 0)
-                        return ms.ToArray(); // return 'return stream' as array
+                // determine next packet index
+                offset = GetNextIndexOfPackets(offset);
+                if (offset == 0)
+                {
+                    ms.Seek(0, SeekOrigin.Begin);
+                    return ms;
                 }
             }
         }
@@ -447,7 +424,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// </summary>
         public void StoreParity()
         {
-            StoreInternal(GetToCNIoPParity(), 0);
+            StoreInternal(GetParity(), 0);
         }
 
         public void Dispose()

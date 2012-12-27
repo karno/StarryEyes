@@ -101,14 +101,20 @@ namespace StarryEyes.Vanille.Serialization
         {
             var array = items.ToArray();
             writer.Write(array.Length);
-            array.ForEach(i => writer.Write(i));
+            foreach (var item in array)
+            {
+                writer.Write(item);
+            }
         }
 
-        public static void Write<T>(this BinaryWriter writer, IEnumerable<T> item) where T : IBinarySerializable, new()
+        public static void Write<T>(this BinaryWriter writer, IEnumerable<T> items) where T : IBinarySerializable, new()
         {
-            var ia = item.ToArray();
-            writer.Write(ia.Length);
-            item.ForEach(i => i.Serialize(writer));
+            var array = items.ToArray();
+            writer.Write(array.Length);
+            foreach (var item in array)
+            {
+                item.Serialize(writer);
+            }
         }
 
         public static IEnumerable<long> ReadIds(this BinaryReader reader)
@@ -135,16 +141,14 @@ namespace StarryEyes.Vanille.Serialization
         {
             if (reader.ReadBoolean())
                 return reader.ReadInt64();
-            else
-                return null;
+            return null;
         }
 
         public static double? ReadNullableDouble(this BinaryReader reader)
         {
             if (reader.ReadBoolean())
                 return reader.ReadDouble();
-            else
-                return null;
+            return null;
         }
 
         public static Uri ReadUri(this BinaryReader reader)
@@ -166,10 +170,7 @@ namespace StarryEyes.Vanille.Serialization
                 item.Deserialize(reader);
                 return item;
             }
-            else
-            {
-                return default(T);
-            }
+            return default(T);
         }
     }
 }

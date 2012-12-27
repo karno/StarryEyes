@@ -59,15 +59,16 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// </summary>
         /// <param name="parent">chunk holder</param>
         /// <param name="dbFilePath">file path for storing data</param>
+        /// <param name="comparer">comparer for ordering keys</param>
         /// <param name="tableOfContents"></param>
         /// <param name="nextIndexOfPackets"></param>
-        public PersistentChunk(PersistentDataStore<TKey, TValue> parent, string dbFilePath,
+        public PersistentChunk(PersistentDataStore<TKey, TValue> parent, string dbFilePath, IComparer<TKey> comparer,
             IDictionary<TKey, int> tableOfContents, IEnumerable<int> nextIndexOfPackets)
         {
             _parent = parent;
             using (AcquireDriveLock(true))
             {
-                _persistentDrive = new PersistentDrive<TKey, TValue>(dbFilePath, tableOfContents, nextIndexOfPackets);
+                _persistentDrive = new PersistentDrive<TKey, TValue>(dbFilePath, comparer, tableOfContents, nextIndexOfPackets);
             }
             Task.Factory.StartNew(WriteBackProc, TaskCreationOptions.LongRunning);
         }
@@ -92,7 +93,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                 {
                     amount -= _deletedItems.Count;
                 }
-                lock (_driveLocker)
+                using (AcquireDriveLock())
                 {
                     amount += _persistentDrive.Count;
                 }
@@ -213,7 +214,6 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                 }
                 if (!_writeBackThreadAlive)
                     return;
-                System.Diagnostics.Debug.WriteLine("write-backing...");
                 lock (_deadlyCachesLocker)
                 {
                     EnumerableEx.Generate(
@@ -224,7 +224,6 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                         .ForEach(workingCopy.Add);
                 }
                 Thread.Sleep(0);
-                System.Diagnostics.Debug.WriteLine("write-back " + workingCopy.Count + " objects.");
                 using (AcquireDriveLock(true))
                 {
                     workingCopy
@@ -377,7 +376,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// </summary>
         public IDictionary<TKey, int> GetTableOfContents()
         {
-            lock (_driveLocker)
+            using (AcquireDriveLock())
             {
                 return new Dictionary<TKey, int>(_persistentDrive.GetTableOfContents());
             }
@@ -385,7 +384,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
 
         public IEnumerable<int> GetNextIndexOfPacketsArray()
         {
-            lock (_driveLocker)
+            using (AcquireDriveLock())
             {
                 return _persistentDrive.GetNextIndexOfPackets().ToArray();
             }
@@ -412,7 +411,6 @@ namespace StarryEyes.Vanille.DataStore.Persistent
             {
                 workingCopy.AddRange(_deadlyCaches.Select(i => i.Item));
             }
-            System.Diagnostics.Debug.WriteLine("[final]write-backing " + workingCopy.Count + " objects...");
             using (AcquireDriveLock(true))
             {
                 workingCopy
