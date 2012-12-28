@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reactive.Linq;
 using Codeplex.OAuth;
 using Livet;
@@ -92,19 +93,21 @@ namespace StarryEyes.ViewModels.Dialogs
         {
             if (String.IsNullOrEmpty(Setting.GlobalConsumerKey.Value) && String.IsNullOrEmpty(Setting.GlobalConsumerSecret.Value))
             {
-                var m = this.Messenger.GetResponse(new TaskDialogMessage(
-                    new TaskDialogInterop.TaskDialogOptions()
-                    {
-                        Title = "APIキー設定のスキップ",
-                        MainIcon = TaskDialogInterop.VistaTaskDialogIcon.Warning,
-                        MainInstruction = "APIキーの設定をスキップしますか？",
-                        Content = "スキップする場合、いくつか制限が適用されます。" + Environment.NewLine +
-                        "後からもキーを設定できますが、その際にすべてのアカウントを認証しなおす必要があります。",
-                        CommonButtons = TaskDialogInterop.TaskDialogCommonButtons.OKCancel,
-                        ExpandedInfo = "APIキーの状況によってはアカウントが登録できないことがあります。" + Environment.NewLine +
-                        "また、最大登録可能アカウント数も制限されます。"
-                    }));
-                if (m.Response.Result == TaskDialogInterop.TaskDialogSimpleResult.Ok)
+                var result = TaskDialogInterop.TaskDialog.ShowMessage(
+                    System.Windows.Application.Current.Windows.OfType<System.Windows.Window>().SingleOrDefault(x => x.IsActive),
+                    "APIキー設定のスキップ",
+                    "APIキーの設定をスキップしますか？",
+                    "スキップする場合、いくつか制限が適用されます。" + Environment.NewLine +
+                    "後からもキーを設定できますが、その際にすべてのアカウントを認証しなおす必要があります。",
+                    "APIキーの状況によってはアカウントが登録できないことがあります。" + Environment.NewLine +
+                    "また、最大登録可能アカウント数も制限されます。",
+                    "",
+                    "",
+                    TaskDialogInterop.TaskDialogCommonButtons.OKCancel,
+                    TaskDialogInterop.VistaTaskDialogIcon.Warning,
+                    TaskDialogInterop.VistaTaskDialogIcon.None
+                    );
+                if (result == TaskDialogInterop.TaskDialogSimpleResult.Ok)
                 {
                     this.Messenger.Raise(new WindowActionMessage(null, WindowAction.Close));
                 }
