@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarryEyes", "StarryEyes\StarryEyes.csproj", "{3BF1F46A-B095-40EC-A89D-A34EBBACA966}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarryEyes.Breezy", "StarryEyes.Breezy\StarryEyes.Breezy.csproj", "{7E909D43-7BAD-4885-9983-2FF0030D5A5E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarryEyes", "StarryEyes\StarryEyes.csproj", "{3BF1F46A-B095-40EC-A89D-A34EBBACA966}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarryEyes.Vanille", "StarryEyes.Vanille\StarryEyes.Vanille.csproj", "{7C1764E1-AF06-48A8-8590-09500A363118}"
 EndProject
@@ -20,6 +20,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarryEyes.Nightmare", "StarryEyes.Nightmare\StarryEyes.Nightmare.csproj", "{3A78CEB3-A112-4A66-8724-BFF2BFA9182B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AutoUpdateServices", "AutoUpdateServices", "{B2DF914A-A068-4FD0-8ED9-50743E1AFF71}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Detective", "Detective\Detective.csproj", "{F26CDB6B-3D72-4240-BC11-CEB7351672F1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -91,6 +93,16 @@ Global
 		{3A78CEB3-A112-4A66-8724-BFF2BFA9182B}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{3A78CEB3-A112-4A66-8724-BFF2BFA9182B}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{3A78CEB3-A112-4A66-8724-BFF2BFA9182B}.Release|x86.ActiveCfg = Release|Any CPU
+		{F26CDB6B-3D72-4240-BC11-CEB7351672F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F26CDB6B-3D72-4240-BC11-CEB7351672F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F26CDB6B-3D72-4240-BC11-CEB7351672F1}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{F26CDB6B-3D72-4240-BC11-CEB7351672F1}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{F26CDB6B-3D72-4240-BC11-CEB7351672F1}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F26CDB6B-3D72-4240-BC11-CEB7351672F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F26CDB6B-3D72-4240-BC11-CEB7351672F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F26CDB6B-3D72-4240-BC11-CEB7351672F1}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{F26CDB6B-3D72-4240-BC11-CEB7351672F1}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{F26CDB6B-3D72-4240-BC11-CEB7351672F1}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

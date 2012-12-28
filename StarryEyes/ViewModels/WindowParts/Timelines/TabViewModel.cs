@@ -192,7 +192,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         private void InitializeCollection()
         {
-            List<TwitterStatus> collection = Model.Timeline.Statuses.ToList();
+            var collection = Model.Timeline.Statuses.ToArray();
             DispatcherHolder.Push(
                 () => collection
                           .Select(GenerateStatusViewModel)
@@ -210,7 +210,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    _timeline.Insert(e.NewStartingIndex, GenerateStatusViewModel((TwitterStatus) e.NewItems[0]));
+                    _timeline.Insert(e.NewStartingIndex, GenerateStatusViewModel((TwitterStatus)e.NewItems[0]));
                     break;
                 case NotifyCollectionChangedAction.Move:
                     _timeline.Move(e.OldStartingIndex, e.NewStartingIndex);
