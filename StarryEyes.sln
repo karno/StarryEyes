@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarryEyes.Breezy", "StarryEyes.Breezy\StarryEyes.Breezy.csproj", "{7E909D43-7BAD-4885-9983-2FF0030D5A5E}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarryEyes", "StarryEyes\StarryEyes.csproj", "{3BF1F46A-B095-40EC-A89D-A34EBBACA966}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarryEyes.Breezy", "StarryEyes.Breezy\StarryEyes.Breezy.csproj", "{7E909D43-7BAD-4885-9983-2FF0030D5A5E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarryEyes.Vanille", "StarryEyes.Vanille\StarryEyes.Vanille.csproj", "{7C1764E1-AF06-48A8-8590-09500A363118}"
 EndProject
