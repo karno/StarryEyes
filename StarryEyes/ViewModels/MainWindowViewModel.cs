@@ -115,7 +115,7 @@ namespace StarryEyes.ViewModels
 
         public MainWindowViewModel()
         {
-            CompositeDisposable.Add(_backpanelViewModel = new BackpanelViewModel(this));
+            CompositeDisposable.Add(_backpanelViewModel = new BackpanelViewModel());
             CompositeDisposable.Add(_inputAreaViewModel = new InputAreaViewModel());
             CompositeDisposable.Add(_mainAreaViewModel = new MainAreaViewModel());
             CompositeDisposable.Add(_globalAccountSelectorViewModel = new AccountSelectorViewModel());
@@ -265,5 +265,29 @@ namespace StarryEyes.ViewModels
         }
 
         #endregion
+
+        #region ShowSettingCommand
+        private Livet.Commands.ViewModelCommand _ShowSettingCommand;
+
+        public Livet.Commands.ViewModelCommand ShowSettingCommand
+        {
+            get
+            {
+                if (_ShowSettingCommand == null)
+                {
+                    _ShowSettingCommand = new Livet.Commands.ViewModelCommand(ShowSetting);
+                }
+                return _ShowSettingCommand;
+            }
+        }
+
+        public void ShowSetting()
+        {
+            MainWindowModel.SetShowMainWindowCommands(false);
+            // TODO: show settings.
+            MainWindowModel.SetShowMainWindowCommands(true);
+        }
+        #endregion
+
     }
 }

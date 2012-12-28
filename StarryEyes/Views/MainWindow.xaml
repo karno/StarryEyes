@@ -1,38 +1,38 @@
-﻿<Controls:MetroWindow x:Class="StarryEyes.Views.MainWindow"
+﻿<controls:MetroWindow x:Class="StarryEyes.Views.MainWindow"
                       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                      xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
-                      xmlns:StarryEyes_Mystique_Views_Messaging_Behaviors="clr-namespace:StarryEyes.Views.Messaging.Behaviors"
-                      xmlns:Utils="clr-namespace:StarryEyes.Views.Utils"
-                      xmlns:WindowParts="clr-namespace:StarryEyes.Views.WindowParts"
+                      xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
                       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                       xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
                       xmlns:helper="clr-namespace:StarryEyes.Views.Helpers"
                       xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
                       xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                      xmlns:sebehaviors="clr-namespace:StarryEyes.Views.Messaging.Behaviors"
+                      xmlns:utils="clr-namespace:StarryEyes.Views.Utils"
                       xmlns:v="clr-namespace:StarryEyes.Views"
                       xmlns:vm="clr-namespace:StarryEyes.ViewModels"
+                      xmlns:windowParts="clr-namespace:StarryEyes.Views.WindowParts"
                       Title="Krile StarryEyes"
                       Width="525"
                       Height="350"
                       Background="White"
                       Closing="OnClosing"
                       mc:Ignorable="d">
-    <Controls:MetroWindow.Resources>
+    <controls:MetroWindow.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colours.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <Utils:BooleanToInvisibleConverter x:Key="BooleanToInvisibleConverter" />
-            <Utils:BooleanToVisibleConverter x:Key="BooleanToVisibleConverter" />
+            <utils:BooleanToInvisibleConverter x:Key="BooleanToInvisibleConverter" />
+            <utils:BooleanToVisibleConverter x:Key="BooleanToVisibleConverter" />
         </ResourceDictionary>
-    </Controls:MetroWindow.Resources>
-    <Controls:MetroWindow.DataContext>
+    </controls:MetroWindow.Resources>
+    <controls:MetroWindow.DataContext>
         <vm:MainWindowViewModel />
-    </Controls:MetroWindow.DataContext>
+    </controls:MetroWindow.DataContext>
     <i:Interaction.Triggers>
         <!--  WindowのContentRenderedイベントのタイミングでViewModelのInitializeメソッドが呼ばれます  -->
         <i:EventTrigger EventName="ContentRendered">
@@ -43,18 +43,15 @@
             <l:DataContextDisposeAction />
         </i:EventTrigger>
         <l:InteractionMessageTrigger Messenger="{Binding Messenger}">
-            <StarryEyes_Mystique_Views_Messaging_Behaviors:GoToStateInteractionMessageAction />
-        </l:InteractionMessageTrigger>
-        <l:InteractionMessageTrigger Messenger="{Binding Messenger}">
             <l:TransitionInteractionMessageAction />
         </l:InteractionMessageTrigger>
         <l:InteractionMessageTrigger Messenger="{Binding Messenger}">
-            <StarryEyes_Mystique_Views_Messaging_Behaviors:TaskDialogInteractionMessageAction />
+            <sebehaviors:TaskDialogInteractionMessageAction />
         </l:InteractionMessageTrigger>
         <!--  WindowのCloseキャンセル処理に対応する場合は、WindowCloseCancelBehaviorの使用を検討してください  -->
     </i:Interaction.Triggers>
-    <Controls:MetroWindow.WindowCommands>
-        <Controls:WindowCommands>
+    <controls:MetroWindow.WindowCommands>
+        <controls:WindowCommands>
             <Button Command="{Binding ShowSettingCommand}"
                     Content="settings"
                     Visibility="{Binding ShowWindowCommands,
@@ -64,87 +61,93 @@
                      Margin="-1,0,2,0"
                      VerticalContentAlignment="Center"
                      BorderThickness="0"
-                     Controls:TextboxHelper.ClearTextButton="True"
-                     Controls:TextboxHelper.Watermark="search"
                      Opacity="0.8"
                      Visibility="{Binding ShowWindowCommands,
-                                          Converter={StaticResource BooleanToVisibleConverter}}" />
-        </Controls:WindowCommands>
-    </Controls:MetroWindow.WindowCommands>
+                                          Converter={StaticResource BooleanToVisibleConverter}}"
+                     controls:TextboxHelper.ClearTextButton="True"
+                     controls:TextboxHelper.Watermark="search" />
+        </controls:WindowCommands>
+    </controls:MetroWindow.WindowCommands>
     <Grid>
+        <i:Interaction.Triggers>
+            <ei:DataTrigger Binding="{Binding BackpanelViewModel.ShowCurrentEvent,
+                                              Mode=OneWay}"
+                            Comparison="Equal"
+                            Value="True">
+                <ei:GoToStateAction StateName="ShowCurrentEvent" />
+            </ei:DataTrigger>
+            <ei:DataTrigger Binding="{Binding BackpanelViewModel.ShowCurrentEvent,
+                                              Mode=OneWay}"
+                            Comparison="Equal"
+                            Value="False">
+                <ei:GoToStateAction StateName="HideCurrentEvent" />
+            </ei:DataTrigger>
+            <ei:DataTrigger Binding="{Binding BackpanelViewModel.ShowPreviousEvent,
+                                              Mode=OneWay}"
+                            Comparison="Equal"
+                            Value="True">
+                <ei:GoToStateAction StateName="ShowPreviousEvent" />
+            </ei:DataTrigger>
+            <ei:DataTrigger Binding="{Binding BackpanelViewModel.ShowPreviousEvent,
+                                              Mode=OneWay}"
+                            Comparison="Equal"
+                            Value="False">
+                <ei:GoToStateAction StateName="HidePreviousEvent" />
+            </ei:DataTrigger>
+        </i:Interaction.Triggers>
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="CurrentEventStates">
                 <VisualState x:Name="ShowCurrentEvent">
                     <Storyboard>
                         <DoubleAnimationUsingKeyFrames Storyboard.TargetName="CurrentEventBorder" Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.Y)">
-                            <EasingDoubleKeyFrame KeyTime="0" Value="100">
+                            <EasingDoubleKeyFrame KeyTime="0" Value="30">
                                 <EasingDoubleKeyFrame.EasingFunction>
-                                    <CircleEase EasingMode="EaseOut" />
+                                	<CircleEase EasingMode="EaseIn"/>
                                 </EasingDoubleKeyFrame.EasingFunction>
                             </EasingDoubleKeyFrame>
                             <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0">
                                 <EasingDoubleKeyFrame.EasingFunction>
-                                    <CircleEase EasingMode="EaseOut" />
+                                	<CircleEase EasingMode="EaseIn"/>
                                 </EasingDoubleKeyFrame.EasingFunction>
                             </EasingDoubleKeyFrame>
                         </DoubleAnimationUsingKeyFrames>
                         <DoubleAnimationUsingKeyFrames Storyboard.TargetName="CurrentEventBorder" Storyboard.TargetProperty="(UIElement.Opacity)">
                             <EasingDoubleKeyFrame KeyTime="0" Value="0">
                                 <EasingDoubleKeyFrame.EasingFunction>
-                                    <CircleEase EasingMode="EaseOut" />
+                                	<CircleEase EasingMode="EaseIn"/>
                                 </EasingDoubleKeyFrame.EasingFunction>
                             </EasingDoubleKeyFrame>
                             <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="1">
                                 <EasingDoubleKeyFrame.EasingFunction>
-                                    <CircleEase EasingMode="EaseOut" />
+                                	<CircleEase EasingMode="EaseIn"/>
                                 </EasingDoubleKeyFrame.EasingFunction>
                             </EasingDoubleKeyFrame>
                         </DoubleAnimationUsingKeyFrames>
                     </Storyboard>
                 </VisualState>
                 <VisualState x:Name="HideCurrentEvent">
-                    <Storyboard>
-                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="CurrentEventBorder" Storyboard.TargetProperty="(UIElement.Opacity)">
-                            <EasingDoubleKeyFrame KeyTime="0" Value="0" />
-                        </DoubleAnimationUsingKeyFrames>
-                    </Storyboard>
-                </VisualState>
-            </VisualStateGroup>
-            <VisualStateGroup x:Name="PreviousEventState">
-                <VisualState x:Name="ShowPreviousEvent">
-                    <Storyboard>
-                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="PreviousEventBorder" Storyboard.TargetProperty="(UIElement.Opacity)">
-                            <EasingDoubleKeyFrame KeyTime="0" Value="1" />
-                        </DoubleAnimationUsingKeyFrames>
-                    </Storyboard>
-                </VisualState>
-                <VisualState x:Name="HidePreviousEvent">
-                    <Storyboard>
-                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="PreviousEventBorder" Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.Y)">
-                            <EasingDoubleKeyFrame KeyTime="0" Value="0">
-                                <EasingDoubleKeyFrame.EasingFunction>
-                                    <CircleEase EasingMode="EaseOut" />
-                                </EasingDoubleKeyFrame.EasingFunction>
-                            </EasingDoubleKeyFrame>
-                            <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="100">
-                                <EasingDoubleKeyFrame.EasingFunction>
-                                    <CircleEase EasingMode="EaseOut" />
-                                </EasingDoubleKeyFrame.EasingFunction>
-                            </EasingDoubleKeyFrame>
-                        </DoubleAnimationUsingKeyFrames>
-                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="PreviousEventBorder" Storyboard.TargetProperty="(UIElement.Opacity)">
-                            <EasingDoubleKeyFrame KeyTime="0" Value="1">
-                                <EasingDoubleKeyFrame.EasingFunction>
-                                    <CircleEase EasingMode="EaseOut" />
-                                </EasingDoubleKeyFrame.EasingFunction>
-                            </EasingDoubleKeyFrame>
-                            <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0">
-                                <EasingDoubleKeyFrame.EasingFunction>
-                                    <CircleEase EasingMode="EaseOut" />
-                                </EasingDoubleKeyFrame.EasingFunction>
-                            </EasingDoubleKeyFrame>
-                        </DoubleAnimationUsingKeyFrames>
-                    </Storyboard>
+                	<Storyboard>
+                		<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="CurrentEventBorder">
+                			<EasingDoubleKeyFrame KeyTime="0" Value="1">
+                				<EasingDoubleKeyFrame.EasingFunction>
+                					<CircleEase EasingMode="EaseOut"/>
+                				</EasingDoubleKeyFrame.EasingFunction>
+                			</EasingDoubleKeyFrame>
+                			<EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0">
+                				<EasingDoubleKeyFrame.EasingFunction>
+                					<CircleEase EasingMode="EaseOut"/>
+                				</EasingDoubleKeyFrame.EasingFunction>
+                			</EasingDoubleKeyFrame>
+                		</DoubleAnimationUsingKeyFrames>
+                		<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.Y)" Storyboard.TargetName="CurrentEventBorder">
+                			<EasingDoubleKeyFrame KeyTime="0" Value="0">
+                				<EasingDoubleKeyFrame.EasingFunction>
+                					<CircleEase EasingMode="EaseOut"/>
+                				</EasingDoubleKeyFrame.EasingFunction>
+                			</EasingDoubleKeyFrame>
+                			<EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="30"/>
+                		</DoubleAnimationUsingKeyFrames>
+                	</Storyboard>
                 </VisualState>
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
@@ -157,8 +160,8 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="13*" />
             </Grid.RowDefinitions>
-            <WindowParts:InputArea Margin="3,4" DataContext="{Binding InputAreaViewModel}" />
-            <WindowParts:MainArea Grid.Row="1"
+            <windowParts:InputArea Margin="3,4" DataContext="{Binding InputAreaViewModel}" />
+            <windowParts:MainArea Grid.Row="1"
                                   Margin="-8,0,0,0"
                                   DataContext="{Binding MainAreaViewModel}" />
         </Grid>
@@ -222,67 +225,15 @@
                                Text="{Binding StartupTime}" />
                 </StackPanel>
             </Grid>
-            <Border x:Name="PreviousEventBorder"
-                    Opacity="0"
-                    RenderTransformOrigin="0.5,0.5"
-                    Visibility="{Binding BackpanelViewModel.IsPreviousEventAvailable,
-                                         Converter={StaticResource BooleanToVisibleConverter},
-                                         Mode=OneWay}">
-                <Border.RenderTransform>
-                    <TransformGroup>
-                        <ScaleTransform />
-                        <SkewTransform />
-                        <RotateTransform />
-                        <TranslateTransform />
-                    </TransformGroup>
-                </Border.RenderTransform>
-                <Border.Background>
-                    <SolidColorBrush Color="{Binding BackpanelViewModel.PreviousEvent.Background, Mode=OneWay}" />
-                </Border.Background>
-                <StackPanel Orientation="Horizontal">
-                    <Image Width="16"
-                           Height="16"
-                           Margin="8,8,4,8"
-                           VerticalAlignment="Center"
-                           Source="{Binding BackpanelViewModel.PreviousEvent.TitleImage,
-                                            Mode=OneWay}"
-                           Visibility="{Binding BackpanelViewModel.PreviousEvent.IsImageAvailable,
-                                                Converter={StaticResource BooleanToVisibleConverter},
-                                                Mode=OneWay}" />
-                    <TextBlock Margin="8,8,4,8"
-                               VerticalAlignment="Center"
-                               FontWeight="Bold"
-                               Text="{Binding BackpanelViewModel.PreviousEvent.Title,
-                                              Mode=OneWay}"
-                               Visibility="{Binding BackpanelViewModel.PreviousEvent.IsImageAvailable,
-                                                    Converter={StaticResource BooleanToInvisibleConverter},
-                                                    Mode=OneWay}">
-                        <TextBlock.Foreground>
-                            <SolidColorBrush Color="{Binding BackpanelViewModel.PreviousEvent.Foreground, Mode=OneWay}" />
-                        </TextBlock.Foreground>
-                    </TextBlock>
-                    <TextBlock Margin="4,8,8,8"
-                               VerticalAlignment="Center"
-                               Text="{Binding BackpanelViewModel.PreviousEvent.Detail,
-                                              Mode=OneWay}">
-                        <TextBlock.Foreground>
-                            <SolidColorBrush Color="{Binding BackpanelViewModel.PreviousEvent.Foreground, Mode=OneWay}" />
-                        </TextBlock.Foreground>
-                    </TextBlock>
-                </StackPanel>
-            </Border>
             <Border x:Name="CurrentEventBorder"
                     Opacity="0"
-                    RenderTransformOrigin="0.5,0.5"
-                    Visibility="{Binding BackpanelViewModel.IsCurrentEventAvailable,
-                                         Converter={StaticResource BooleanToVisibleConverter},
-                                         Mode=OneWay}">
+                    RenderTransformOrigin="0.5,0.5" SnapsToDevicePixels="True">
                 <Border.RenderTransform>
                     <TransformGroup>
                         <ScaleTransform />
                         <SkewTransform />
                         <RotateTransform />
-                        <TranslateTransform />
+                        <TranslateTransform Y="100" />
                     </TransformGroup>
                 </Border.RenderTransform>
                 <Border.Background>
@@ -321,11 +272,11 @@
                 </StackPanel>
             </Border>
         </Grid>
-        <WindowParts:AccountSelector Grid.RowSpan="2"
+        <windowParts:AccountSelector Grid.RowSpan="2"
                                      Margin="0,-30,0,0"
                                      DataContext="{Binding InputAreaAccountSelectorViewModel}" />
-        <WindowParts:AccountSelector Grid.RowSpan="2"
+        <windowParts:AccountSelector Grid.RowSpan="2"
                                      Margin="0,-30,0,0"
                                      DataContext="{Binding GlobalAccountSelectorViewModel}" />
     </Grid>
-</Controls:MetroWindow>
+</controls:MetroWindow>

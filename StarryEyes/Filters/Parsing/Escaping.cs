@@ -26,7 +26,7 @@ namespace StarryEyes.Filters.Parsing
         /// <summary>
         /// Quote string.
         /// </summary>
-        /// <param name="argstr">escaped string</param>
+        /// <param name="escaped">escaping string</param>
         public static string Quote(this string escaped)
         {
             return "\"" + escaped + "\"";

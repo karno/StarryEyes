@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
@@ -191,16 +192,17 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         private void InitializeCollection()
         {
-            TwitterStatus[] collection = Model.Timeline.Statuses.ToArray();
+            List<TwitterStatus> collection = Model.Timeline.Statuses.ToList();
+            DispatcherHolder.Push(
+                () => collection
+                          .Select(GenerateStatusViewModel)
+                          .ForEach(_timeline.Add));
             CompositeDisposable.Add(
                 new CollectionChangedEventListener(
                     Model.Timeline.Statuses,
                     (sender, e) =>
                     DispatcherHolder.Push(
                         () => ReflectCollectionChanged(e))));
-            collection
-                .Select(GenerateStatusViewModel)
-                .ForEach(_timeline.Add);
         }
 
         private void ReflectCollectionChanged(NotifyCollectionChangedEventArgs e)
@@ -208,7 +210,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    _timeline.Insert(e.NewStartingIndex, GenerateStatusViewModel((TwitterStatus)e.NewItems[0]));
+                    _timeline.Insert(e.NewStartingIndex, GenerateStatusViewModel((TwitterStatus) e.NewItems[0]));
                     break;
                 case NotifyCollectionChangedAction.Move:
                     _timeline.Move(e.OldStartingIndex, e.NewStartingIndex);

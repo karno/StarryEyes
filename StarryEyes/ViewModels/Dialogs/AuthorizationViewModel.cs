@@ -18,56 +18,53 @@ namespace StarryEyes.ViewModels.Dialogs
         public const string AuthorizationEndpoint = "https://api.twitter.com/oauth/authorize";
         public const string AccessTokenEndpoint = "https://api.twitter.com/oauth/access_token";
 
-        private Subject<AuthenticateInfo> returnSubject = new Subject<AuthenticateInfo>();
+        private readonly Subject<AuthenticateInfo> _returnSubject = new Subject<AuthenticateInfo>();
         public IObservable<AuthenticateInfo> AuthorizeObservable
         {
-            get { return returnSubject; }
+            get { return _returnSubject; }
         }
 
         public AuthorizationViewModel()
         {
-            this.CompositeDisposable.Add(() => returnSubject.OnCompleted());
+            this.CompositeDisposable.Add(() => _returnSubject.OnCompleted());
         }
 
-        private OAuthAuthorizer authorizer;
-        private RequestToken currentRequestToken;
+        private OAuthAuthorizer _authorizer;
+        private RequestToken _currentRequestToken;
 
         public void Initialize()
         {
-            authorizer = new OAuthAuthorizer(Setting.GlobalConsumerKey.Value ?? App.ConsumerKey,
-                Setting.GlobalConsumerSecret.Value ?? App.ConsumerSecret);
+            _authorizer = new OAuthAuthorizer(Setting.GlobalConsumerKey.Value ?? App.ConsumerKey,
+             Setting.GlobalConsumerSecret.Value ?? App.ConsumerSecret);
             CurrentAuthenticationStep = AuthenticationStep.RequestingToken;
-            Observable.Defer(() => authorizer.GetRequestToken(RequestTokenEndpoint))
+            Observable.Defer(() => _authorizer.GetRequestToken(RequestTokenEndpoint))
                 .Retry(3, TimeSpan.FromSeconds(3)) // twitter sometimes returns an error without any troubles.
                 .Subscribe(t =>
                 {
-                    currentRequestToken = t.Token;
+                    _currentRequestToken = t.Token;
                     CurrentAuthenticationStep = AuthenticationStep.WaitingPinInput;
-                    BrowserHelper.Open(authorizer.BuildAuthorizeUrl(AuthorizationEndpoint, t.Token));
+                    BrowserHelper.Open(_authorizer.BuildAuthorizeUrl(AuthorizationEndpoint, t.Token));
                 },
-                ex =>
-                {
-                    this.Messenger.Raise(new TaskDialogMessage(
-                        new TaskDialogInterop.TaskDialogOptions()
-                        {
-                            Title = "認証失敗",
-                            MainIcon = TaskDialogInterop.VistaTaskDialogIcon.Error,
-                            MainInstruction = "Twitterと正しく通信できませんでした。",
-                            Content = "何度も繰り返し発生する場合は、しばらく時間を置いて試してみてください。",
-                            CommonButtons = TaskDialogInterop.TaskDialogCommonButtons.Close,
-                            FooterIcon = TaskDialogInterop.VistaTaskDialogIcon.Information,
-                            FooterText = "コンピュータの時計が大幅にずれている場合も認証が行えないことがあります。"
-                        }));
-                });
+                ex => this.Messenger.Raise(new TaskDialogMessage(
+                                               new TaskDialogInterop.TaskDialogOptions
+                                               {
+                                                   Title = "認証失敗",
+                                                   MainIcon = TaskDialogInterop.VistaTaskDialogIcon.Error,
+                                                   MainInstruction = "Twitterと正しく通信できませんでした。",
+                                                   Content = "何度も繰り返し発生する場合は、しばらく時間を置いて試してみてください。",
+                                                   CommonButtons = TaskDialogInterop.TaskDialogCommonButtons.Close,
+                                                   FooterIcon = TaskDialogInterop.VistaTaskDialogIcon.Information,
+                                                   FooterText = "コンピュータの時計が大幅にずれている場合も認証が行えないことがあります。"
+                                               })));
         }
 
-        private AuthenticationStep currentAuthenticationStep = AuthenticationStep.RequestingToken;
+        private AuthenticationStep _currentAuthenticationStep = AuthenticationStep.RequestingToken;
         public AuthenticationStep CurrentAuthenticationStep
         {
-            get { return currentAuthenticationStep; }
+            get { return _currentAuthenticationStep; }
             set
             {
-                currentAuthenticationStep = value;
+                _currentAuthenticationStep = value;
                 RaisePropertyChanged(() => CurrentAuthenticationStep);
                 RaisePropertyChanged(() => IsNegotiating);
                 VerifyPinCommand.RaiseCanExecuteChanged();
@@ -83,30 +80,23 @@ namespace StarryEyes.ViewModels.Dialogs
             }
         }
 
-        private string pin = String.Empty;
+        private string _pin = String.Empty;
         public string Pin
         {
-            get { return pin; }
+            get { return _pin; }
             set
             {
-                pin = value;
+                _pin = value;
                 RaisePropertyChanged(() => Pin);
             }
         }
 
         #region VerifyPinCommand
-        private ViewModelCommand _VerifyPinCommand;
+        private ViewModelCommand _verifyPinCommand;
 
         public ViewModelCommand VerifyPinCommand
         {
-            get
-            {
-                if (_VerifyPinCommand == null)
-                {
-                    _VerifyPinCommand = new ViewModelCommand(VerifyPin, CanVerifyPin);
-                }
-                return _VerifyPinCommand;
-            }
+            get { return _verifyPinCommand ?? (_verifyPinCommand = new ViewModelCommand(VerifyPin, CanVerifyPin)); }
         }
 
         public bool CanVerifyPin()
@@ -117,20 +107,20 @@ namespace StarryEyes.ViewModels.Dialogs
         public void VerifyPin()
         {
             CurrentAuthenticationStep = AuthenticationStep.AuthorizingUser;
-            Observable.Defer(() => authorizer.GetAccessToken(AccessTokenEndpoint, currentRequestToken, Pin))
+            Observable.Defer(() => _authorizer.GetAccessToken(AccessTokenEndpoint, _currentRequestToken, Pin))
                 .Retry(3, TimeSpan.FromSeconds(3))
                 .Subscribe(r =>
                 {
                     var id = long.Parse(r.ExtraData["user_id"].First());
                     var sn = r.ExtraData["screen_name"].First();
-                    returnSubject.OnNext(new AuthenticateInfo(id, sn, r.Token));
+                    _returnSubject.OnNext(new AuthenticateInfo(id, sn, r.Token));
                     this.Messenger.Raise(new WindowActionMessage(null, WindowAction.Close));
                 },
                 ex =>
                 {
                     CurrentAuthenticationStep = AuthenticationStep.WaitingPinInput;
                     this.Messenger.Raise(new TaskDialogMessage(
-                        new TaskDialogInterop.TaskDialogOptions()
+                        new TaskDialogInterop.TaskDialogOptions
                         {
                             Title = "アクセス許可取得失敗",
                             MainIcon = TaskDialogInterop.VistaTaskDialogIcon.Error,

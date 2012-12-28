@@ -249,35 +249,55 @@ namespace StarryEyes.Models
 
         public void AddFavoritedUser(TwitterUser user)
         {
-            bool added = false;
-            lock (_favoritedsLock)
+            if (this.Status.RetweetedOriginal != null)
             {
-                if (!_favoritedUsersDic.ContainsKey(user.Id))
-                {
-                    _favoritedUsersDic.Add(user.Id, user);
-                    Status.FavoritedUsers = Status.FavoritedUsers.Guard().Append(user.Id).Distinct().ToArray();
-                    added = true;
-                }
+                Get(this.Status.RetweetedOriginal)
+                    .AddFavoritedUser(user);
             }
-            if (added)
+            else
             {
-                _favoritedUsers.Add(user);
-                StatusStore.Store(Status);
+
+                bool added = false;
+                lock (_favoritedsLock)
+                {
+                    if (!_favoritedUsersDic.ContainsKey(user.Id))
+                    {
+                        _favoritedUsersDic.Add(user.Id, user);
+                        Status.FavoritedUsers = Status.FavoritedUsers.Guard()
+                                                      .Append(user.Id)
+                                                      .Distinct()
+                                                      .ToArray();
+                        added = true;
+                    }
+                }
+                if (added)
+                {
+                    _favoritedUsers.Add(user);
+                    StatusStore.Store(Status);
+                }
             }
         }
 
         public void RemoveFavoritedUser(long id)
         {
-            TwitterUser remove;
-            lock (_favoritedsLock)
+            if (this.Status.RetweetedOriginal != null)
             {
-                if (_favoritedUsersDic.TryGetValue(id, out remove))
-                    Status.FavoritedUsers = Status.FavoritedUsers.Except(new[] { id }).ToArray();
+                Get(this.Status.RetweetedOriginal)
+                    .RemoveRetweetedUser(id);
             }
-            if (remove != null)
+            else
             {
-                _favoritedUsers.Remove(remove);
-                StatusStore.Store(Status);
+                TwitterUser remove;
+                lock (_favoritedsLock)
+                {
+                    if (_favoritedUsersDic.TryGetValue(id, out remove))
+                        Status.FavoritedUsers = Status.FavoritedUsers.Except(new[] { id }).ToArray();
+                }
+                if (remove != null)
+                {
+                    _favoritedUsers.Remove(remove);
+                    StatusStore.Store(Status);
+                }
             }
         }
 
@@ -288,42 +308,66 @@ namespace StarryEyes.Models
 
         public void AddRetweetedUser(TwitterUser user)
         {
-            bool added = false;
-            lock (_retweetedsLock)
+            if (this.Status.RetweetedOriginal != null)
             {
-                if (!_retweetedUsersDic.ContainsKey(user.Id))
-                {
-                    _retweetedUsersDic.Add(user.Id, user);
-                    Status.RetweetedUsers = Status.RetweetedUsers.Guard().Append(user.Id).Distinct().ToArray();
-                    added = true;
-                }
+                Get(this.Status.RetweetedOriginal)
+                    .AddRetweetedUser(user);
             }
-            if (added)
+            else
             {
-                _retweetedUsers.Add(user);
-                // update persistent info
-                StatusStore.Store(Status);
+                bool added = false;
+                lock (_retweetedsLock)
+                {
+                    if (!_retweetedUsersDic.ContainsKey(user.Id))
+                    {
+                        _retweetedUsersDic.Add(user.Id, user);
+                        Status.RetweetedUsers = Status.RetweetedUsers.Guard()
+                                                      .Append(user.Id)
+                                                      .Distinct()
+                                                      .ToArray();
+                        added = true;
+                    }
+                }
+                if (added)
+                {
+                    _retweetedUsers.Add(user);
+                    // update persistent info
+                    StatusStore.Store(Status);
+                }
             }
         }
 
         public void RemoveRetweetedUser(long id)
         {
-            TwitterUser remove;
-            lock (_retweetedsLock)
+            if (this.Status.RetweetedOriginal != null)
             {
-                if (_retweetedUsersDic.TryGetValue(id, out remove))
-                    Status.RetweetedUsers = Status.RetweetedUsers.Except(new[] { id }).ToArray();
+                Get(this.Status.RetweetedOriginal)
+                    .RemoveRetweetedUser(id);
             }
-            if (remove != null)
+            else
             {
-                _retweetedUsers.Remove(remove);
-                // update persistent info
-                StatusStore.Store(Status);
+                TwitterUser remove;
+                lock (_retweetedsLock)
+                {
+                    if (_retweetedUsersDic.TryGetValue(id, out remove))
+                        Status.RetweetedUsers = Status.RetweetedUsers.Except(new[] { id }).ToArray();
+                }
+                if (remove != null)
+                {
+                    _retweetedUsers.Remove(remove);
+                    // update persistent info
+                    StatusStore.Store(Status);
+                }
             }
         }
 
         public bool IsFavorited(params long[] ids)
         {
+            if (this.Status.RetweetedOriginal != null)
+            {
+                return Get(this.Status.RetweetedOriginal)
+                    .IsFavorited(ids);
+            }
             lock (_favoritedsLock)
             {
                 return ids.All(_favoritedUsersDic.ContainsKey);
@@ -332,6 +376,11 @@ namespace StarryEyes.Models
 
         public bool IsRetweeted(params long[] ids)
         {
+            if (this.Status.RetweetedOriginal != null)
+            {
+                return Get(this.Status.RetweetedOriginal)
+                    .IsRetweeted(ids);
+            }
             lock (_retweetedsLock)
             {
                 return ids.All(_retweetedUsersDic.ContainsKey);
@@ -351,7 +400,7 @@ namespace StarryEyes.Models
             return null;
         }
 
-        public AuthenticateInfo BacktrackFallback(AuthenticateInfo info)
+        public static AuthenticateInfo BacktrackFallback(AuthenticateInfo info)
         {
             if (!Setting.IsBacktrackFallback.Value)
                 return info;

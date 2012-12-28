@@ -10,22 +10,21 @@ namespace StarryEyes.Models.Connections.Extends
 {
     public sealed class ListReceiver : PollingConnectionBase
     {
-        private static object listReceiverLocker = new object();
-        private static SortedDictionary<ListInfo, ListReceiver> listReceiverResolver
+        private static readonly object ListReceiverLocker = new object();
+        private static readonly SortedDictionary<ListInfo, ListReceiver> ListReceiverResolver
             = new SortedDictionary<ListInfo, ListReceiver>();
-        private static SortedDictionary<ListInfo, int> listReceiverReferenceCount
+        private static readonly SortedDictionary<ListInfo, int> ListReceiverReferenceCount
             = new SortedDictionary<ListInfo, int>();
 
         public static void StartReceive(ListInfo info)
         {
-            var ai = AccountsStore.Accounts.Where(aset => aset.AuthenticateInfo.UnreliableScreenName == info.OwnerScreenName)
-                .FirstOrDefault();
+            var ai = AccountsStore.Accounts.FirstOrDefault(aset => aset.AuthenticateInfo.UnreliableScreenName == info.OwnerScreenName);
             if (ai != null)
                 StartReceive(ai.AuthenticateInfo, info);
             else
                 AppInformationHub.PublishInformation(new AppInformation(AppInformationKind.Warning,
-                    "LIST_RECEIVER_NOT_FOUND_" + info.ToString(),
-                    "リストを受信するアカウントが検索できません。(対象リスト: " + info.ToString() + ")",
+                    "LIST_RECEIVER_NOT_FOUND_" + info,
+                    "リストを受信するアカウントが検索できません。(対象リスト: " + info + ")",
                     "リストをどのアカウントで受信するのか分かりませんでした。" + Environment.NewLine +
                     "(他者のリストは受信アカウントを自動決定できません。明示的にどのアカウントから受信するか指定する必要があります。)" + Environment.NewLine +
                     "(アカウントの@IDを変更した場合は、リストの所属@IDも変更しなければいけません。)" + Environment.NewLine +
@@ -34,8 +33,7 @@ namespace StarryEyes.Models.Connections.Extends
 
         public static void StartReceive(string receiverScreenName, ListInfo info)
         {
-            var ai = AccountsStore.Accounts.Where(aset => aset.AuthenticateInfo.UnreliableScreenName == receiverScreenName)
-                .FirstOrDefault();
+            var ai = AccountsStore.Accounts.FirstOrDefault(aset => aset.AuthenticateInfo.UnreliableScreenName == receiverScreenName);
             if (ai != null)
                 StartReceive(ai.AuthenticateInfo, info);
             else
@@ -44,42 +42,40 @@ namespace StarryEyes.Models.Connections.Extends
 
         public static void StartReceive(AuthenticateInfo auth, ListInfo info)
         {
-            lock (listReceiverLocker)
+            lock (ListReceiverLocker)
             {
-                if (listReceiverReferenceCount.ContainsKey(info))
+                if (ListReceiverReferenceCount.ContainsKey(info))
                 {
-                    listReceiverReferenceCount[info]++;
-                    return;
+                    ListReceiverReferenceCount[info]++;
                 }
                 else
                 {
-                    var lr = new ListReceiver(auth, info);
-                    lr.IsActivated = true;
-                    listReceiverReferenceCount.Add(info, 1);
-                    listReceiverResolver.Add(info, lr);
+                    var lr = new ListReceiver(auth, info) { IsActivated = true };
+                    ListReceiverReferenceCount.Add(info, 1);
+                    ListReceiverResolver.Add(info, lr);
                 }
             }
         }
 
         public static void StopReceive(ListInfo info)
         {
-            lock (listReceiverLocker)
+            lock (ListReceiverLocker)
             {
-                if (!listReceiverReferenceCount.ContainsKey(info))
+                if (!ListReceiverReferenceCount.ContainsKey(info))
                     return;
-                if (--listReceiverReferenceCount[info] == 0)
+                if (--ListReceiverReferenceCount[info] == 0)
                 {
                     // dispose connection
-                    listReceiverReferenceCount.Remove(info);
-                    var lr = listReceiverResolver[info];
-                    listReceiverResolver.Remove(info);
+                    ListReceiverReferenceCount.Remove(info);
+                    var lr = ListReceiverResolver[info];
+                    ListReceiverResolver.Remove(info);
                     lr.IsActivated = false;
                     lr.Dispose();
                 }
             }
         }
 
-        private ListInfo _receive;
+        private readonly ListInfo _receive;
         private ListReceiver(AuthenticateInfo ainfo, ListInfo linfo)
             : base(ainfo)
         {
@@ -96,9 +92,9 @@ namespace StarryEyes.Models.Connections.Extends
             DoReceive(AuthInfo, _receive);
         }
 
-        public static void DoReceive(AuthenticateInfo info, ListInfo list, long? max_id = null)
+        public static void DoReceive(AuthenticateInfo info, ListInfo list, long? maxId = null)
         {
-            info.GetListStatuses(slug: list.Slug, owner_screen_name: list.OwnerScreenName, max_id: max_id)
+            info.GetListStatuses(slug: list.Slug, owner_screen_name: list.OwnerScreenName, max_id: maxId)
                 .RegisterToStore();
         }
 
@@ -118,7 +114,7 @@ namespace StarryEyes.Models.Connections.Extends
         public bool Equals(ListInfo other)
         {
             if (other == null) return false;
-            return this.OwnerScreenName == this.OwnerScreenName && other.Slug == this.Slug;
+            return other.OwnerScreenName == this.OwnerScreenName && other.Slug == this.Slug;
         }
 
         public override int GetHashCode()
