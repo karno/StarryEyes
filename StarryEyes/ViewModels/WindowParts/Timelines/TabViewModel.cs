@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
@@ -191,16 +192,17 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         private void InitializeCollection()
         {
-            TwitterStatus[] collection = Model.Timeline.Statuses.ToArray();
+            var collection = Model.Timeline.Statuses.ToArray();
+            DispatcherHolder.Push(
+                () => collection
+                          .Select(GenerateStatusViewModel)
+                          .ForEach(_timeline.Add));
             CompositeDisposable.Add(
                 new CollectionChangedEventListener(
                     Model.Timeline.Statuses,
                     (sender, e) =>
                     DispatcherHolder.Push(
                         () => ReflectCollectionChanged(e))));
-            collection
-                .Select(GenerateStatusViewModel)
-                .ForEach(_timeline.Add);
         }
 
         private void ReflectCollectionChanged(NotifyCollectionChangedEventArgs e)

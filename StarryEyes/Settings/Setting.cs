@@ -69,6 +69,9 @@ namespace StarryEyes.Settings
         public static readonly SettingItemStruct<TweetBoxClosingAction> TweetBoxClosingAction =
             new SettingItemStruct<TweetBoxClosingAction>("TweetBoxClosingAction", Settings.TweetBoxClosingAction.Confirm);
 
+        public static readonly SettingItemStruct<bool> RestorePreviousStashed =
+            new SettingItemStruct<bool>("RestorePreviousStashed", false);
+
         #endregion
 
         #region Outer and Third Party services

@@ -25,7 +25,7 @@ namespace StarryEyes.ViewModels.WindowParts
 {
     public class InputAreaViewModel : ViewModel
     {
-        private bool _isSuppressAccountChangeRelay = false;
+        private bool _isSuppressAccountChangeRelay;
         private long[] _baseSelectedAccounts;
 
         private readonly AccountSelectorViewModel _accountSelector;
@@ -91,7 +91,7 @@ namespace StarryEyes.ViewModels.WindowParts
             }
         }
 
-        private bool _isOpening = false;
+        private bool _isOpening;
         public bool IsOpening
         {
             get { return _isOpening; }
@@ -100,14 +100,11 @@ namespace StarryEyes.ViewModels.WindowParts
                 if (_isOpening == value) return;
                 _isOpening = value;
                 RaisePropertyChanged(() => IsOpening);
-                if (value)
-                    this.Messenger.RaiseAsync(new GoToStateMessage("Open"));
-                else
-                    this.Messenger.RaiseAsync(new GoToStateMessage("Close"));
+                this.Messenger.RaiseAsync(value ? new GoToStateMessage("Open") : new GoToStateMessage("Close"));
             }
         }
 
-        private TweetInputInfo _inputInfo = null;
+        private TweetInputInfo _inputInfo;
         public TweetInputInfo InputInfo
         {
             get
@@ -179,7 +176,7 @@ namespace StarryEyes.ViewModels.WindowParts
             }
         }
 
-        private StatusViewModel _inReplyToViewModelCache = null;
+        private StatusViewModel _inReplyToViewModelCache;
         public StatusViewModel InReplyTo
         {
             get
@@ -218,7 +215,7 @@ namespace StarryEyes.ViewModels.WindowParts
             get { return InputInfo.InReplyTo != null; }
         }
 
-        private UserViewModel _directMessageToCache = null;
+        private UserViewModel _directMessageToCache;
         public UserViewModel DirectMessageTo
         {
             get
@@ -262,10 +259,7 @@ namespace StarryEyes.ViewModels.WindowParts
             get { return new ImageDescriptionViewModel(InputInfo.AttachedImage); }
             set
             {
-                if (value == null)
-                    InputInfo.AttachedImage = null;
-                else
-                    InputInfo.AttachedImage = value.Source;
+                InputInfo.AttachedImage = value == null ? null : value.Source;
 
                 RaisePropertyChanged(() => AttachedImage);
                 RaisePropertyChanged(() => IsImageAttached);
@@ -279,7 +273,7 @@ namespace StarryEyes.ViewModels.WindowParts
             get { return InputInfo.AttachedImage != null; }
         }
 
-        private bool _isLocationEnabled = false;
+        private bool _isLocationEnabled;
         public bool IsLocationEnabled
         {
             get { return _isLocationEnabled; }
@@ -296,15 +290,11 @@ namespace StarryEyes.ViewModels.WindowParts
             {
                 if (InputInfo.AttachedGeoInfo != null)
                     return new LocationDescriptionViewModel(InputInfo.AttachedGeoInfo);
-                else
-                    return null;
+                return null;
             }
             set
             {
-                if (value == null)
-                    InputInfo.AttachedGeoInfo = null;
-                else
-                    InputInfo.AttachedGeoInfo = value.Location;
+                InputInfo.AttachedGeoInfo = value == null ? null : value.Location;
                 RaisePropertyChanged(() => AttachedLocation);
                 RaisePropertyChanged(() => IsLocationAttached);
             }
@@ -373,7 +363,7 @@ namespace StarryEyes.ViewModels.WindowParts
 
         #region Text box control
 
-        private int _selectionStart = 0;
+        private int _selectionStart;
         public int SelectionStart
         {
             get { return _selectionStart; }
@@ -384,7 +374,7 @@ namespace StarryEyes.ViewModels.WindowParts
             }
         }
 
-        private int _selectionLength = 0;
+        private int _selectionLength;
         public int SelectionLength
         {
             get { return _selectionLength; }
@@ -448,7 +438,7 @@ namespace StarryEyes.ViewModels.WindowParts
 
         #endregion
 
-        private GeoCoordinateWatcher geoWatcher;
+        private readonly GeoCoordinateWatcher _geoWatcher;
 
         /// <summary>
         /// Constructor
@@ -501,17 +491,17 @@ namespace StarryEyes.ViewModels.WindowParts
             this.CompositeDisposable.Add(new CollectionChangedEventListener(
                 this._bindingAuthInfos, (_, __) => RaisePropertyChanged(() => IsBindingAuthInfoExisted)));
 
-            bool _accountSelectReflecting = false;
+            bool accountSelectReflecting = false;
             this._accountSelector.OnSelectedAccountsChanged += () =>
             {
                 if (!_isSuppressAccountChangeRelay)
                 {
                     // write-back
-                    _accountSelectReflecting = true;
+                    accountSelectReflecting = true;
                     InputAreaModel.BindingAuthInfos.Clear();
                     this._accountSelector.SelectedAccounts
                         .ForEach(InputAreaModel.BindingAuthInfos.Add);
-                    _accountSelectReflecting = false;
+                    accountSelectReflecting = false;
                     _baseSelectedAccounts = InputAreaModel.BindingAuthInfos.Select(_ => _.Id).ToArray();
                 }
                 InputInfo.AuthInfos = this.AccountSelector.SelectedAccounts;
@@ -524,7 +514,7 @@ namespace StarryEyes.ViewModels.WindowParts
                     InputAreaModel.BindingAuthInfos,
                     (_, __) =>
                     {
-                        if (_accountSelectReflecting) return;
+                        if (accountSelectReflecting) return;
                         _baseSelectedAccounts = InputAreaModel.BindingAuthInfos
                             .Select(a => a.Id)
                             .ToArray();
@@ -567,8 +557,8 @@ namespace StarryEyes.ViewModels.WindowParts
                         DirectMessageTo = new UserViewModel(user);
                     }));
 
-            geoWatcher = new GeoCoordinateWatcher(GeoPositionAccuracy.Default);
-            geoWatcher.StatusChanged += (_, e) =>
+            _geoWatcher = new GeoCoordinateWatcher(GeoPositionAccuracy.Default);
+            _geoWatcher.StatusChanged += (_, e) =>
             {
                 if (e.Status != GeoPositionStatus.Ready)
                 {
@@ -580,8 +570,8 @@ namespace StarryEyes.ViewModels.WindowParts
                     this.AttachedLocation = null;
                 }
             };
-            this.CompositeDisposable.Add(geoWatcher);
-            geoWatcher.Start();
+            this.CompositeDisposable.Add(_geoWatcher);
+            _geoWatcher.Start();
         }
 
         private void UpdateTextCount()
@@ -595,9 +585,10 @@ namespace StarryEyes.ViewModels.WindowParts
         public void OverrideSelectedAccounts(IEnumerable<AuthenticateInfo> infos)
         {
             _isSuppressAccountChangeRelay = true;
-            AccountSelector.SelectedAccounts = infos;
+            var accounts = infos as AuthenticateInfo[] ?? infos.ToArray();
+            AccountSelector.SelectedAccounts = accounts;
             InputAreaModel.BindingAuthInfos.Clear();
-            infos.ForEach(InputAreaModel.BindingAuthInfos.Add);
+            accounts.ForEach(InputAreaModel.BindingAuthInfos.Add);
             _isSuppressAccountChangeRelay = false;
         }
 
@@ -620,12 +611,11 @@ namespace StarryEyes.ViewModels.WindowParts
 
         public void OpenInput()
         {
-            this.OpenInput(true);
+            this.OpenInput(Setting.RestorePreviousStashed.Value);
         }
 
         public void OpenInput(bool restorePreviousStashed)
         {
-            restorePreviousStashed = false;
             if (!this.IsOpening)
             {
                 this.IsOpening = true;
@@ -664,7 +654,7 @@ namespace StarryEyes.ViewModels.WindowParts
                 if (action == TweetBoxClosingAction.Confirm)
                 {
                     var msg = this.Messenger.GetResponse(new TaskDialogMessage(
-                        new TaskDialogOptions()
+                        new TaskDialogOptions
                         {
                             AllowDialogCancellation = true,
                             CommonButtons = TaskDialogCommonButtons.YesNoCancel,
@@ -742,11 +732,13 @@ namespace StarryEyes.ViewModels.WindowParts
 
         public void AttachImage()
         {
-            var msg = new OpeningFileSelectionMessage();
-            msg.Filter = "画像ファイル|*.jpg;*.jpeg;*.jpe;*.png;*.gif;*.bmp;*.dib|全てのファイル|*.*";
-            msg.InitialDirectory = Setting.LastImageOpenDir.Value;
-            msg.MultiSelect = false;
-            msg.Title = "添付する画像ファイルを指定";
+            var msg = new OpeningFileSelectionMessage
+            {
+                Filter = "画像ファイル|*.jpg;*.jpeg;*.jpe;*.png;*.gif;*.bmp;*.dib|全てのファイル|*.*",
+                InitialDirectory = Setting.LastImageOpenDir.Value,
+                MultiSelect = false,
+                Title = "添付する画像ファイルを指定"
+            };
             var m = this.Messenger.GetResponse(msg);
             if (m.Response != null && m.Response.Length > 0)
             {
@@ -766,7 +758,7 @@ namespace StarryEyes.ViewModels.WindowParts
         public void AttachLocation()
         {
             this.AttachedLocation = new LocationDescriptionViewModel(
-                geoWatcher.Position.Location);
+                _geoWatcher.Position.Location);
         }
 
         public void DetachLocation()
@@ -818,14 +810,14 @@ namespace StarryEyes.ViewModels.WindowParts
             {
                 // amend mode
                 var amend = this.Messenger.GetResponse(new TaskDialogMessage(
-                    new TaskDialogInterop.TaskDialogOptions()
+                    new TaskDialogOptions
                     {
                         Title = "ツイートの訂正",
                         MainIcon = VistaTaskDialogIcon.Information,
                         Content = "直前に投稿されたツイートを削除し、投稿し直します。" + Environment.NewLine +
                             "(削除に失敗した場合でも投稿は行われます。)",
                         ExpandedInfo = "削除されるツイート: " +
-                        InputInfo.PostedTweets.First().Item2.ToString() +
+                        InputInfo.PostedTweets.First().Item2 +
                         (InputInfo.PostedTweets.Count() > 1 ?
                             Environment.NewLine + "(" + (InputInfo.PostedTweets.Count() - 1) +
                             " 件のツイートも同時に削除されます)" : ""),
@@ -865,7 +857,7 @@ namespace StarryEyes.ViewModels.WindowParts
                         .Any(replies.Contains))
                 {
                     var thirdreply = this.Messenger.GetResponse(
-                        new TaskDialogMessage(new TaskDialogOptions()
+                        new TaskDialogMessage(new TaskDialogOptions
                         {
                             Title = "割込みリプライ警告",
                             MainIcon = VistaTaskDialogIcon.Warning,
@@ -928,10 +920,7 @@ namespace StarryEyes.ViewModels.WindowParts
                 // TODO: Implement more cases.
                 return Tuple.Create(true, msg);
             }
-            else
-            {
-                return Tuple.Create(true, info.ThrownException.Message);
-            }
+            return Tuple.Create(true, info.ThrownException.Message);
         }
 
         public void SelectAccounts()
@@ -959,7 +948,7 @@ namespace StarryEyes.ViewModels.WindowParts
     {
         public LocationDescriptionViewModel(GeoCoordinate geoCoordinate)
         {
-            this.Location = new GeoLocationInfo()
+            this.Location = new GeoLocationInfo
             {
                 Latitude = geoCoordinate.Latitude,
                 Longitude = geoCoordinate.Longitude,
@@ -980,7 +969,7 @@ namespace StarryEyes.ViewModels.WindowParts
 
         public TweetInputInfo Model { get; private set; }
 
-        private Action<TweetInputInfo> _removeHandler;
+        private readonly Action<TweetInputInfo> _removeHandler;
 
         public TweetInputInfoViewModel(InputAreaViewModel parent,
             TweetInputInfo info, Action<TweetInputInfo> removeHandler)
@@ -1002,18 +991,11 @@ namespace StarryEyes.ViewModels.WindowParts
         public Exception ThrownException { get { return Model.ThrownException; } }
 
         #region WritebackCommand
-        private Livet.Commands.ViewModelCommand _WritebackCommand;
+        private Livet.Commands.ViewModelCommand _writebackCommand;
 
         public Livet.Commands.ViewModelCommand WritebackCommand
         {
-            get
-            {
-                if (_WritebackCommand == null)
-                {
-                    _WritebackCommand = new Livet.Commands.ViewModelCommand(Writeback);
-                }
-                return _WritebackCommand;
-            }
+            get { return _writebackCommand ?? (_writebackCommand = new Livet.Commands.ViewModelCommand(Writeback)); }
         }
         #endregion
 
@@ -1061,8 +1043,12 @@ namespace StarryEyes.ViewModels.WindowParts
                             RaisePropertyChanged(() => ProfileImageUri);
                         }));
                 }
-                System.Diagnostics.Debug.WriteLine(_authInfo.UnreliableProfileImageUri.OriginalString);
-                return _authInfo.UnreliableProfileImageUri;
+                if (_authInfo.UnreliableProfileImageUri != null)
+                {
+                    System.Diagnostics.Debug.WriteLine(_authInfo.UnreliableProfileImageUri.OriginalString);
+                    return _authInfo.UnreliableProfileImageUri;
+                }
+                return null;
             }
         }
 

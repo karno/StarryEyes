@@ -19,11 +19,11 @@ namespace Livet
     [Serializable]
     public class ObservableSynchronizedCollectionEx<T> : IList<T>, ICollection, INotifyCollectionChanged, INotifyPropertyChanged
     {
-        private IList<T> _list;
+        private readonly IList<T> _list;
         [NonSerialized]
-        private object _syncRoot = new object();
+        private readonly object _syncRoot = new object();
         [NonSerialized]
-        private ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
+        private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
 
         /// <summary>
         /// デフォルトコンストラクタ
@@ -184,6 +184,11 @@ namespace Livet
             ReadWithLockAction(() => _list.CopyTo(array, arrayIndex));
         }
 
+        public T[] ToArray()
+        {
+            return ReadWithLockAction(() => _list.ToArray());
+        }
+
         /// <summary>
         /// 実際に格納されている要素の数を取得します。
         /// </summary>
@@ -238,7 +243,7 @@ namespace Livet
         {
             ReadAndWriteWithLockAction(() =>
             {
-                Dictionary<int, T> indexAndItems = new Dictionary<int, T>();
+                var indexAndItems = new Dictionary<int, T>();
                 _list
                     .Select((item, i) => new { i, item })
                     .Where(i => predicate(i.item))

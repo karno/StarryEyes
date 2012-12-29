@@ -6,12 +6,11 @@ namespace StarryEyes.Filters.Parsing
 {
     internal class TokenReader
     {
-        List<Token> tokenQueueList;
-        int queueCursor = 0;
+        readonly List<Token> _tokenQueueList;
+        int _queueCursor;
         public TokenReader(IEnumerable<Token> tokens)
         {
-            System.Diagnostics.Debug.WriteLine("Tokens: " + tokens.Select(t => t.ToString()).JoinString(Environment.NewLine));
-            tokenQueueList = new List<Token>(tokens);
+            _tokenQueueList = new List<Token>(tokens);
         }
 
         /// <summary>
@@ -20,8 +19,8 @@ namespace StarryEyes.Filters.Parsing
         /// <returns></returns>
         public Token Get()
         {
-            System.Diagnostics.Debug.WriteLine("read:" + tokenQueueList[queueCursor]);
-            return tokenQueueList[queueCursor++];
+            System.Diagnostics.Debug.WriteLine("read:" + _tokenQueueList[_queueCursor]);
+            return _tokenQueueList[_queueCursor++];
         }
 
         /// <summary>
@@ -31,7 +30,7 @@ namespace StarryEyes.Filters.Parsing
         {
             if (!IsRemainToken)
                 throw new FilterQueryException("Query is terminated in halfway.", RemainQuery);
-            return tokenQueueList[queueCursor];
+            return _tokenQueueList[_queueCursor];
         }
 
         /// <summary>
@@ -39,9 +38,9 @@ namespace StarryEyes.Filters.Parsing
         /// </summary>
         public void RewindOne()
         {
-            if (queueCursor == 0)
+            if (_queueCursor == 0)
                 throw new InvalidOperationException("トークンリーダーは初期状態まで巻き戻っています。もう戻せません。");
-            queueCursor--;
+            _queueCursor--;
         }
 
         /// <summary>
@@ -49,15 +48,15 @@ namespace StarryEyes.Filters.Parsing
         /// </summary>
         public bool IsRemainToken
         {
-            get { return queueCursor < tokenQueueList.Count; }
+            get { return _queueCursor < _tokenQueueList.Count; }
         }
 
         public string RemainQuery
         {
             get
             {
-                return tokenQueueList
-                    .Skip(queueCursor)
+                return _tokenQueueList
+                    .Skip(_queueCursor)
                     .Select(t => t.Value)
                     .JoinString(" ");
             }
