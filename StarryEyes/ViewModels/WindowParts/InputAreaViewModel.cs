@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Device.Location;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
@@ -401,7 +402,7 @@ namespace StarryEyes.ViewModels.WindowParts
 
         public bool IsPostLimitPredictionEnabled
         {
-            get { return false; }
+            get { return InputAreaModel.BindingAuthInfos.Count == 1; }
         }
 
         public int WindowTime
@@ -419,21 +420,27 @@ namespace StarryEyes.ViewModels.WindowParts
             get { return 128; }
         }
 
-        /// <summary>
-        /// update state of ALPS.
-        /// </summary>
-        private void UpdatePostLimitPredictionState()
-        {
-        }
-
         public int MaxControlWidth
         {
             get { return 80; }
         }
 
-        public int ControlWidth
+        public double ControlWidth
         {
-            get { return (int)((double)MaxControlWidth * RemainUpdate / MaxUpdate); }
+            get { return (double)MaxControlWidth * RemainUpdate / MaxUpdate; }
+        }
+
+        /// <summary>
+        /// Start ALPS.
+        /// </summary>
+        private void InitPostLimitPrediction()
+        {
+            Observable.Interval(TimeSpan.FromSeconds(0.5))
+                      .Where(_ => IsPostLimitPredictionEnabled)
+                      .Subscribe(_ =>
+                      {
+                          RaisePropertyChanged(() => IsPostLimitPredictionEnabled);
+                      });
         }
 
         #endregion
@@ -520,6 +527,7 @@ namespace StarryEyes.ViewModels.WindowParts
                             .ToArray();
                         ApplyBaseSelectedAccounts();
                         UpdateTextCount();
+                        RaisePropertyChanged(() => IsPostLimitPredictionEnabled);
                     }));
             this.CompositeDisposable.Add(
                 new EventListener<Action<IEnumerable<AuthenticateInfo>, string, CursorPosition, TwitterStatus>>(

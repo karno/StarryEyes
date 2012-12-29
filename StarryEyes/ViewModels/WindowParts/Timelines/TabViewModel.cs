@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
@@ -190,49 +189,56 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             }
         }
 
+        private readonly object _collectionLock = new object();
+
         private void InitializeCollection()
         {
             var collection = Model.Timeline.Statuses.ToArray();
-            DispatcherHolder.Push(
-                () => collection
+            lock (_collectionLock)
+            {
+                CompositeDisposable.Add(
+                    new CollectionChangedEventListener(
+                        Model.Timeline.Statuses,
+                        (sender, e) =>
+                        DispatcherHolder.Push(
+                            () => ReflectCollectionChanged(e))));
+                collection
                           .Select(GenerateStatusViewModel)
-                          .ForEach(_timeline.Add));
-            CompositeDisposable.Add(
-                new CollectionChangedEventListener(
-                    Model.Timeline.Statuses,
-                    (sender, e) =>
-                    DispatcherHolder.Push(
-                        () => ReflectCollectionChanged(e))));
+                          .ForEach(_timeline.Add);
+            }
         }
 
         private void ReflectCollectionChanged(NotifyCollectionChangedEventArgs e)
         {
-            switch (e.Action)
+            lock (_collectionLock)
             {
-                case NotifyCollectionChangedAction.Add:
-                    _timeline.Insert(e.NewStartingIndex, GenerateStatusViewModel((TwitterStatus)e.NewItems[0]));
-                    break;
-                case NotifyCollectionChangedAction.Move:
-                    _timeline.Move(e.OldStartingIndex, e.NewStartingIndex);
-                    break;
-                case NotifyCollectionChangedAction.Remove:
-                    StatusViewModel removal = _timeline[e.OldStartingIndex];
-                    _timeline.RemoveAt(e.OldStartingIndex);
-                    removal.Dispose();
-                    break;
-                case NotifyCollectionChangedAction.Reset:
-                    StatusViewModel[] cache = _timeline.ToArray();
-                    _timeline.Clear();
-                    cache.ToObservable()
-                         .ObserveOn(TaskPoolScheduler.Default)
-                         .Subscribe(_ => _.Dispose());
-                    TwitterStatus[] collection = Model.Timeline.Statuses.ToArray();
-                    collection
-                        .Select(GenerateStatusViewModel)
-                        .ForEach(_timeline.Add);
-                    break;
-                default:
-                    throw new ArgumentException();
+                switch (e.Action)
+                {
+                    case NotifyCollectionChangedAction.Add:
+                        _timeline.Insert(e.NewStartingIndex, GenerateStatusViewModel((TwitterStatus)e.NewItems[0]));
+                        break;
+                    case NotifyCollectionChangedAction.Move:
+                        _timeline.Move(e.OldStartingIndex, e.NewStartingIndex);
+                        break;
+                    case NotifyCollectionChangedAction.Remove:
+                        StatusViewModel removal = _timeline[e.OldStartingIndex];
+                        _timeline.RemoveAt(e.OldStartingIndex);
+                        removal.Dispose();
+                        break;
+                    case NotifyCollectionChangedAction.Reset:
+                        StatusViewModel[] cache = _timeline.ToArray();
+                        _timeline.Clear();
+                        cache.ToObservable()
+                             .ObserveOn(TaskPoolScheduler.Default)
+                             .Subscribe(_ => _.Dispose());
+                        TwitterStatus[] collection = Model.Timeline.Statuses.ToArray();
+                        collection
+                            .Select(GenerateStatusViewModel)
+                            .ForEach(_timeline.Add);
+                        break;
+                    default:
+                        throw new ArgumentException();
+                }
             }
         }
 
