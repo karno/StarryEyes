@@ -102,52 +102,56 @@
                         <DoubleAnimationUsingKeyFrames Storyboard.TargetName="CurrentEventBorder" Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.Y)">
                             <EasingDoubleKeyFrame KeyTime="0" Value="30">
                                 <EasingDoubleKeyFrame.EasingFunction>
-                                	<CircleEase EasingMode="EaseIn"/>
+                                    <ExponentialEase EasingMode="EaseOut" />
                                 </EasingDoubleKeyFrame.EasingFunction>
                             </EasingDoubleKeyFrame>
                             <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0">
                                 <EasingDoubleKeyFrame.EasingFunction>
-                                	<CircleEase EasingMode="EaseIn"/>
+                                    <ExponentialEase EasingMode="EaseOut" />
                                 </EasingDoubleKeyFrame.EasingFunction>
                             </EasingDoubleKeyFrame>
                         </DoubleAnimationUsingKeyFrames>
                         <DoubleAnimationUsingKeyFrames Storyboard.TargetName="CurrentEventBorder" Storyboard.TargetProperty="(UIElement.Opacity)">
                             <EasingDoubleKeyFrame KeyTime="0" Value="0">
                                 <EasingDoubleKeyFrame.EasingFunction>
-                                	<CircleEase EasingMode="EaseIn"/>
+                                    <CircleEase EasingMode="EaseOut" />
                                 </EasingDoubleKeyFrame.EasingFunction>
                             </EasingDoubleKeyFrame>
                             <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="1">
                                 <EasingDoubleKeyFrame.EasingFunction>
-                                	<CircleEase EasingMode="EaseIn"/>
+                                    <CircleEase EasingMode="EaseOut" />
                                 </EasingDoubleKeyFrame.EasingFunction>
                             </EasingDoubleKeyFrame>
                         </DoubleAnimationUsingKeyFrames>
                     </Storyboard>
                 </VisualState>
                 <VisualState x:Name="HideCurrentEvent">
-                	<Storyboard>
-                		<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="CurrentEventBorder">
-                			<EasingDoubleKeyFrame KeyTime="0" Value="1">
-                				<EasingDoubleKeyFrame.EasingFunction>
-                					<CircleEase EasingMode="EaseOut"/>
-                				</EasingDoubleKeyFrame.EasingFunction>
-                			</EasingDoubleKeyFrame>
-                			<EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0">
-                				<EasingDoubleKeyFrame.EasingFunction>
-                					<CircleEase EasingMode="EaseOut"/>
-                				</EasingDoubleKeyFrame.EasingFunction>
-                			</EasingDoubleKeyFrame>
-                		</DoubleAnimationUsingKeyFrames>
-                		<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.Y)" Storyboard.TargetName="CurrentEventBorder">
-                			<EasingDoubleKeyFrame KeyTime="0" Value="0">
-                				<EasingDoubleKeyFrame.EasingFunction>
-                					<CircleEase EasingMode="EaseOut"/>
-                				</EasingDoubleKeyFrame.EasingFunction>
-                			</EasingDoubleKeyFrame>
-                			<EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="30"/>
-                		</DoubleAnimationUsingKeyFrames>
-                	</Storyboard>
+                    <Storyboard>
+                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="CurrentEventBorder" Storyboard.TargetProperty="(UIElement.Opacity)">
+                            <EasingDoubleKeyFrame KeyTime="0" Value="1">
+                                <EasingDoubleKeyFrame.EasingFunction>
+                                    <CircleEase EasingMode="EaseOut" />
+                                </EasingDoubleKeyFrame.EasingFunction>
+                            </EasingDoubleKeyFrame>
+                            <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0">
+                                <EasingDoubleKeyFrame.EasingFunction>
+                                    <CircleEase EasingMode="EaseOut" />
+                                </EasingDoubleKeyFrame.EasingFunction>
+                            </EasingDoubleKeyFrame>
+                        </DoubleAnimationUsingKeyFrames>
+                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="CurrentEventBorder" Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.Y)">
+                            <EasingDoubleKeyFrame KeyTime="0" Value="0">
+                                <EasingDoubleKeyFrame.EasingFunction>
+                                    <ExponentialEase EasingMode="EaseIn" />
+                                </EasingDoubleKeyFrame.EasingFunction>
+                            </EasingDoubleKeyFrame>
+                            <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="30">
+                                <EasingDoubleKeyFrame.EasingFunction>
+                                    <ExponentialEase EasingMode="EaseIn" />
+                                </EasingDoubleKeyFrame.EasingFunction>
+                            </EasingDoubleKeyFrame>
+                        </DoubleAnimationUsingKeyFrames>
+                    </Storyboard>
                 </VisualState>
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
@@ -227,7 +231,8 @@
             </Grid>
             <Border x:Name="CurrentEventBorder"
                     Opacity="0"
-                    RenderTransformOrigin="0.5,0.5" SnapsToDevicePixels="True">
+                    RenderTransformOrigin="0.5,0.5"
+                    SnapsToDevicePixels="True">
                 <Border.RenderTransform>
                     <TransformGroup>
                         <ScaleTransform />
