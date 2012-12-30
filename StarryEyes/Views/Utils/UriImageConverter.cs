@@ -14,7 +14,6 @@ namespace StarryEyes.Views.Utils
                 return new BitmapImage(input)
                 {
                     CacheOption = BitmapCacheOption.OnDemand,
-                    CreateOptions = BitmapCreateOptions.DelayCreation,
                 };
             }
             catch (Exception ex)
