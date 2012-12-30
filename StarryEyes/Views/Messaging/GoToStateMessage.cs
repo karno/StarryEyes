@@ -14,7 +14,6 @@ namespace StarryEyes.Views.Messaging
         public GoToStateMessage(string stateName, bool useTransitions = true)
             : this(null, stateName, useTransitions)
         {
-            System.Diagnostics.Debug.WriteLine("GTSM called: " + stateName);
         }
 
         public string StateName { get; set; }

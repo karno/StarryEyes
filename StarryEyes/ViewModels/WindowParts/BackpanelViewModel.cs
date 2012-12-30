@@ -111,12 +111,12 @@ namespace StarryEyes.ViewModels.WindowParts
                 }
                 CurrentEvent = new BackpanelEventViewModel(ev);
                 ShowCurrentEvent = true;
-                Thread.Sleep(Math.Max(Setting.EventDispatchMinimumMSec.Value, 100));
+                Thread.Sleep(Math.Max(Setting.EventDisplayMinimumMSec.Value, 100));
                 lock (_syncLock)
                 {
                     if (_waitingEvents.Count == 0)
                         Monitor.Wait(_syncLock,
-                                     Setting.EventDispatchMaximumMSec.Value - Setting.EventDispatchMinimumMSec.Value);
+                                     Setting.EventDisplayMaximumMSec.Value - Setting.EventDisplayMinimumMSec.Value);
                     ShowCurrentEvent = false;
                     Thread.Sleep(100);
                 }

@@ -398,6 +398,7 @@ namespace StarryEyes.ViewModels.WindowParts
         }
 
         #endregion
+
         #region Post limit prediction properties
 
         public bool IsPostLimitPredictionEnabled
@@ -435,11 +436,10 @@ namespace StarryEyes.ViewModels.WindowParts
         /// </summary>
         private void InitPostLimitPrediction()
         {
-            Observable.Interval(TimeSpan.FromSeconds(0.5))
+            Observable.Interval(TimeSpan.FromSeconds(60))
                       .Where(_ => IsPostLimitPredictionEnabled)
                       .Subscribe(_ =>
                       {
-                          RaisePropertyChanged(() => IsPostLimitPredictionEnabled);
                       });
         }
 

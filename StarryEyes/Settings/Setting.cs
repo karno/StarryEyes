@@ -124,11 +124,11 @@ namespace StarryEyes.Settings
         public static readonly SettingItemStruct<bool> ApplyMuteToRetweetOriginals =
             new SettingItemStruct<bool>("ApplyMuteToRetweetOriginals", true);
 
-        public static readonly SettingItemStruct<int> EventDispatchMinimumMSec =
-            new SettingItemStruct<int>("EventDispatchMinimumMSec", 200);
+        public static readonly SettingItemStruct<int> EventDisplayMinimumMSec =
+            new SettingItemStruct<int>("EventDisplayMinimumMSec", 200);
 
-        public static readonly SettingItemStruct<int> EventDispatchMaximumMSec =
-            new SettingItemStruct<int>("EventDispatchMaximumMSec", 3000);
+        public static readonly SettingItemStruct<int> EventDisplayMaximumMSec =
+            new SettingItemStruct<int>("EventDisplayMaximumMSec", 3000);
 
         public static readonly SettingItemStruct<int> UserInfoReceivePeriod =
             new SettingItemStruct<int>("UserInfoReceivePeriod", 600);

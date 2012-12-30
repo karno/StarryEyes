@@ -160,17 +160,18 @@
                     <Grid Grid.Column="2"
                           Width="{Binding MaxControlWidth}"
                           Height="12"
-                          Background="DimGray"
+                          Background="Gainsboro"
+                          SnapsToDevicePixels="True"
                           Visibility="{Binding IsPostLimitPredictionEnabled,
                                                Converter={StaticResource BooleanToVisibleConverter}}">
                         <Grid.ToolTip>
                             <StackPanel Orientation="Vertical">
-                                <TextBlock>
-                                    <Run Text="規制までのこり" /><Run Text=" " />
+                                <TextBlock Foreground="White">
+                                    <Run Text="規制までおよそ" />
                                     <Run Text="{Binding RemainUpdate, Mode=OneWay}" />
-                                    <Run Text=" " /><Run Text="ツイート" />
+                                    <Run Text="ツイート" />
                                 </TextBlock>
-                                <TextBlock>
+                                <TextBlock Foreground="White">
                                     <Run Text="約" /><Run Text=" " /><Run Text="{Binding WindowTime, Mode=OneWay}" />
                                     <Run Text=" " />
                                     <Run Text="分で1ツイート分回復します。" />
@@ -178,8 +179,10 @@
                             </StackPanel>
                         </Grid.ToolTip>
                         <Grid Width="{Binding ControlWidth}"
+                              HorizontalAlignment="Left"
                               VerticalAlignment="Stretch"
-                              Background="Blue" />
+                              Background="#FF1BA1E2"
+                              SnapsToDevicePixels="True" />
                     </Grid>
                 </Grid>
             </Border>
