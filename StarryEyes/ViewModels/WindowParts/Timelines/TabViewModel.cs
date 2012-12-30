@@ -193,15 +193,22 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         private void InitializeCollection()
         {
-            var collection = Model.Timeline.Statuses.ToArray();
             lock (_collectionLock)
             {
+                bool activated = false;
                 CompositeDisposable.Add(
                     new CollectionChangedEventListener(
                         Model.Timeline.Statuses,
                         (sender, e) =>
-                        DispatcherHolder.Push(
-                            () => ReflectCollectionChanged(e))));
+                        {
+                            if (activated)
+                            {
+                                DispatcherHolder.Push(
+                                    () => ReflectCollectionChanged(e));
+                            }
+                        }));
+                var collection = Model.Timeline.Statuses.ToArray();
+                activated = true;
                 collection
                           .Select(GenerateStatusViewModel)
                           .ForEach(_timeline.Add);
