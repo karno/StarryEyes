@@ -172,8 +172,8 @@
                                     <Run Text="ツイート" />
                                 </TextBlock>
                                 <TextBlock Foreground="White">
-                                    <Run Text="約" /><Run Text=" " /><Run Text="{Binding WindowTime, Mode=OneWay}" />
-                                    <Run Text=" " />
+                                    <Run Text="約" />
+                                    <Run Text="{Binding WindowTime, Mode=OneWay}" />
                                     <Run Text="分で1ツイート分回復します。" />
                                 </TextBlock>
                             </StackPanel>
