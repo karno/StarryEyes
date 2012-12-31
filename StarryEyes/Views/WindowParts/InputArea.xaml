@@ -137,7 +137,8 @@
             <Border Background="White"
                     BorderBrush="Gray"
                     BorderThickness="1"
-                    Cursor="IBeam">
+                    Cursor="IBeam"
+                    SnapsToDevicePixels="True">
                 <Grid Margin="4" VerticalAlignment="Center">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition />
@@ -195,7 +196,8 @@
                                    Converter={StaticResource BooleanToVisibleConverter}}">
             <Border Background="White"
                     BorderBrush="Gray"
-                    BorderThickness="1">
+                    BorderThickness="1"
+                    SnapsToDevicePixels="True">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition />

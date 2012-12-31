@@ -11,7 +11,7 @@
                       xmlns:utils="clr-namespace:StarryEyes.Views.Utils"
                       xmlns:vm="clr-namespace:StarryEyes.ViewModels"
                       xmlns:windowParts="clr-namespace:StarryEyes.Views.WindowParts"
-                      Title="Krile STARRY EYES"
+                      Title="Krile STARRYEYES"
                       Width="525"
                       Height="350"
                       Background="White"
