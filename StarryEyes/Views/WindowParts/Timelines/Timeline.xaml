@@ -25,6 +25,13 @@
             <Utils:UriImageConverter x:Key="UriImageConverter" />
             <Utils:BooleanToVisibleConverter x:Key="BooleanToVisibleConverter" />
             <Utils:BooleanToInvisibleConverter x:Key="BooleanToInvisibleConverter" />
+            <DataTemplate x:Key="UserItemTemplate">
+                <Image Width="20"
+                       Height="20"
+                       Source="{Binding ProfileImageUri,
+                                        Converter={StaticResource UriImageConverter}}"
+                       ToolTip="{Binding ScreenName}" />
+            </DataTemplate>
             <DataTemplate x:Key="StatusItemTemplate">
                 <Border x:Name="MainBorder"
                         Margin="0"
@@ -540,7 +547,7 @@
                             </Grid>
                             <DockPanel Height="Auto"
                                        Margin="7,8,7,0"
-                                       LastChildFill="False"
+                                       LastChildFill="True"
                                        Visibility="{Binding IsFavoritedUserExists,
                                                             Converter={StaticResource BooleanToVisibleConverter}}">
                                 <Path Width="12"
@@ -548,17 +555,26 @@
                                       Margin="2,0"
                                       Data="F1 M 17.5,22.5L 22.3928,22.5L 24,18L 25.6071,22.5L 30.5,22.5L 26.4252,25.4193L 28.25,30L 24,27.5L 20.25,30L 21.6625,25.4875L 17.5,22.5 Z "
                                       Fill="#FFF0A30A"
-                                      Stretch="Fill" />
-                                <TextBlock Margin="1,-1,3,0"
+                                      Stretch="Fill" VerticalAlignment="Center" />
+                                <TextBlock Margin="1,-1,5,0"
                                            FontFamily="Segoe UI Semilight"
                                            Foreground="#FFF0A30A"
                                            Text="{Binding FavoriteCount,
                                                           FallbackValue=00}"
-                                           TextWrapping="Wrap" />
+                                           TextWrapping="Wrap" VerticalAlignment="Center" />
+                                <ItemsControl Height="Auto"
+                                              ItemTemplate="{DynamicResource UserItemTemplate}"
+                                              ItemsSource="{Binding FavoritedUsers}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                </ItemsControl>
                             </DockPanel>
                             <DockPanel Height="Auto"
                                        Margin="7,8,7,0"
-                                       LastChildFill="False"
+                                       LastChildFill="True"
                                        Visibility="{Binding IsRetweetedUserExists,
                                                             Converter={StaticResource BooleanToVisibleConverter}}">
                                 <Path Width="10"
@@ -566,14 +582,23 @@
                                       Margin="3,1"
                                       Data="F1 M 24,18.9231C 25.4548,18.9231 26.7667,19.535 27.6923,20.5154L 27.6923,18L 29.0769,19.3846L 29.0769,23.0769L 25.3846,23.0769L 24,21.6923L 26.5801,21.6923C 25.9463,20.9841 25.0252,20.5385 24,20.5385C 22.2447,20.5385 20.7946,21.8449 20.569,23.5385L 18.9438,23.5385C 19.177,20.9508 21.3517,18.9231 24,18.9231 Z M 24,27.4615C 25.7553,27.4615 27.2054,26.1551 27.431,24.4615L 29.0562,24.4615C 28.823,27.0492 26.6483,29.0769 24,29.0769C 22.5452,29.0769 21.2333,28.465 20.3077,27.4846L 20.3077,30L 18.9231,28.6154L 18.9231,24.9231L 22.6154,24.9231L 24,26.3077L 21.4199,26.3077C 22.0537,27.0159 22.9748,27.4615 24,27.4615 Z "
                                       Fill="#FF008A00"
-                                      Stretch="Fill" />
-                                <TextBlock Margin="1,-2,3,0"
+                                      Stretch="Fill" VerticalAlignment="Center" />
+                                <TextBlock Margin="1,-2,5,0"
                                            VerticalAlignment="Center"
                                            FontFamily="Segoe UI Semilight"
                                            Foreground="#FF008A00"
                                            Text="{Binding RetweetCount,
                                                           FallbackValue=00}"
                                            TextWrapping="Wrap" />
+                                <ItemsControl Height="Auto"
+                                              ItemTemplate="{DynamicResource UserItemTemplate}"
+                                              ItemsSource="{Binding RetweetedUsers}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                </ItemsControl>
                             </DockPanel>
                             <DockPanel Margin="7,8,7,-1"
                                        Background="Transparent"
