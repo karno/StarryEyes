@@ -33,10 +33,16 @@ namespace StarryEyes.Models.Tab
             _statusIdCache = new AVLTree<long>();
             _disposable = new CompositeDisposable();
 
-            // listen status stream
+            // add handler
             _disposable.Add(StatusStore.StatusPublisher
-                                       .Where(sn => !sn.IsAdded || evaluator(sn.Status))
-                                       .Subscribe(AcceptStatusNotification));
+                                       .Where(sn => sn.IsAdded && evaluator(sn.Status))
+                                       .Select(s => s.Status)
+                                       .Subscribe(AddStatus));
+            // remove handler
+            _disposable.Add(StatusStore.StatusPublisher
+                                       .Where(sn => !sn.IsAdded || !evaluator(sn.Status))
+                                       .Select(s => s.StatusId)
+                                       .Subscribe(RemoveStatus));
         }
 
         public ObservableSynchronizedCollectionEx<TwitterStatus> Statuses
@@ -66,14 +72,6 @@ namespace StarryEyes.Models.Tab
         }
 
         public event Action OnNewStatusArrived;
-
-        private void AcceptStatusNotification(StatusNotification notification)
-        {
-            if (notification.IsAdded)
-                AddStatus(notification.Status);
-            else
-                RemoveStatus(notification.StatusId);
-        }
 
         private void AddStatus(TwitterStatus status)
         {
