@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Device.Location;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Text.RegularExpressions;
@@ -136,12 +137,11 @@ namespace StarryEyes.ViewModels.WindowParts
                     (infos, body, cursor, inReplyTo) =>
                     {
                         OpenInput(false);
-                        CheckClearInput();
+                        if (!CheckClearInput(body)) return;
                         if (infos != null)
                         {
                             OverrideSelectedAccounts(infos);
                         }
-                        InputText = body;
                         InReplyTo = new StatusViewModel(inReplyTo);
                         switch (cursor)
                         {
@@ -259,6 +259,10 @@ namespace StarryEyes.ViewModels.WindowParts
             }
             set
             {
+                if (CanSaveToDraft)
+                {
+                    InputAreaModel.Drafts.Add(InputInfo);
+                }
                 _inputInfo = value;
                 OverrideSelectedAccounts(value.AuthInfos);
                 RaisePropertyChanged(() => InputInfo);
@@ -483,11 +487,11 @@ namespace StarryEyes.ViewModels.WindowParts
         {
             get
             {
-                return IsImageAttached ||
-                       !String.IsNullOrEmpty(InputText.Replace("\t", "")
-                                                      .Replace("\r", "")
-                                                      .Replace("\n", "")
-                                                      .Replace(" ", ""));
+                return IsImageAttached || !String.IsNullOrEmpty(
+                    InputText.Replace("\t", "")
+                             .Replace("\r", "")
+                             .Replace("\n", "")
+                             .Replace(" ", ""));
             }
         }
 
@@ -654,8 +658,8 @@ namespace StarryEyes.ViewModels.WindowParts
         public void CloseInput()
         {
             if (!IsOpening) return;
-            CheckClearInput();
-            IsOpening = false;
+            if (CheckClearInput())
+                IsOpening = false;
         }
 
         public void FocusToTextBox()
@@ -663,9 +667,9 @@ namespace StarryEyes.ViewModels.WindowParts
             Messenger.Raise(new InteractionMessage("FocusToTextBox"));
         }
 
-        private void CheckClearInput()
+        public bool CheckClearInput(string clearTo = "")
         {
-            if (CanSaveToDraft)
+            if (CanSaveToDraft && InputInfo.InitialText != InputInfo.Text)
             {
                 TweetBoxClosingAction action = Setting.TweetBoxClosingAction.Value;
                 if (action == TweetBoxClosingAction.Confirm)
@@ -673,10 +677,10 @@ namespace StarryEyes.ViewModels.WindowParts
                     TaskDialogMessage msg = Messenger.GetResponse(new TaskDialogMessage(
                                                                       new TaskDialogOptions
                                                                       {
+                                                                          MainInstruction = "現在の内容を下書きに保存しますか？",
                                                                           AllowDialogCancellation = true,
                                                                           CommonButtons =
                                                                               TaskDialogCommonButtons.YesNoCancel,
-                                                                          Content = "現在の内容を下書きに保存しますか？",
                                                                           MainIcon = VistaTaskDialogIcon.Information,
                                                                           Title = "下書きへの保存",
                                                                           VerificationText = "次回から表示しない"
@@ -690,7 +694,7 @@ namespace StarryEyes.ViewModels.WindowParts
                             action = TweetBoxClosingAction.Discard;
                             break;
                         default:
-                            return;
+                            return false;
                     }
                     if (msg.Response.VerificationChecked.GetValueOrDefault())
                     {
@@ -700,24 +704,25 @@ namespace StarryEyes.ViewModels.WindowParts
                 switch (action)
                 {
                     case TweetBoxClosingAction.Discard:
-                        ClearInput();
                         break;
                     case TweetBoxClosingAction.SaveToDraft:
-                        StashInDraft();
-                        break;
+                        ClearInput(clearTo, true);
+                        return true;
                     default:
                         throw new InvalidOperationException("Invalid return value:" + action.ToString());
                 }
             }
-            else
-            {
-                ClearInput();
-            }
+            ClearInput(clearTo);
+            return true;
         }
 
-        public void ClearInput()
+        public void ClearInput(string clearTo = "", bool stash = false)
         {
-            _inputInfo = new TweetInputInfo();
+            if (stash && CanSaveToDraft)
+            {
+                InputAreaModel.Drafts.Add(InputInfo);
+            }
+            _inputInfo = new TweetInputInfo(clearTo);
             ApplyBaseSelectedAccounts();
             InputInfo.AuthInfos = AccountSelector.SelectedAccounts;
             RaisePropertyChanged(() => InputInfo);
@@ -737,15 +742,7 @@ namespace StarryEyes.ViewModels.WindowParts
         public void AmendPreviousOne()
         {
             if (InputInfo.PostedTweets != null) return; // amending now.
-            if (CanSaveToDraft)
-                StashInDraft();
             InputInfo = InputAreaModel.PreviousPosted;
-        }
-
-        public void StashInDraft()
-        {
-            InputAreaModel.Drafts.Add(InputInfo);
-            ClearInput();
         }
 
         public void AttachImage()
@@ -758,10 +755,10 @@ namespace StarryEyes.ViewModels.WindowParts
                 Title = "添付する画像ファイルを指定"
             };
             OpeningFileSelectionMessage m = Messenger.GetResponse(msg);
-            if (m.Response != null && m.Response.Length > 0)
-            {
-                AttachedImage = new ImageDescriptionViewModel(m.Response[0]);
-            }
+            if (m.Response == null || m.Response.Length <= 0 || String.IsNullOrEmpty(m.Response[0]) ||
+                !File.Exists(m.Response[0])) return;
+            AttachedImage = new ImageDescriptionViewModel(m.Response[0]);
+            Setting.LastImageOpenDir.Value = Path.GetDirectoryName(m.Response[0]);
         }
 
         public void DetachImage()

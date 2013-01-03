@@ -145,7 +145,14 @@ namespace StarryEyes.Models
 
         private string[] _hashtags;
         private Tuple<AuthenticateInfo, TwitterStatus>[] _postedTweets;
+        private readonly string _initialText;
         private string _text;
+
+        public TweetInputInfo(string initialText)
+        {
+            _initialText = initialText;
+            _text = initialText;
+        }
 
         /// <summary>
         ///     Binding authenticate informations.
@@ -233,9 +240,14 @@ namespace StarryEyes.Models
             }
         }
 
+        public string InitialText
+        {
+            get { return _initialText; }
+        }
+
         public TweetInputInfo Clone()
         {
-            return new TweetInputInfo
+            return new TweetInputInfo(_initialText)
                 {
                     _authInfos = _authInfos,
                     _hashtags = _hashtags,
