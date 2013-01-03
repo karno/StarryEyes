@@ -166,11 +166,13 @@ namespace StarryEyes.Models
                       .Reverse()
                       .ToObservable()
                       .ObserveOn(TaskPoolScheduler.Default)
-                      .Do(_ =>
+                      .Where(_ =>
                       {
                           lock (_favoritedsLock)
                           {
+                              if (_favoritedUsersDic.ContainsKey(_)) return false;
                               _favoritedUsersDic.Add(_, null);
+                              return true;
                           }
                       })
                       .SelectMany(StoreHub.GetUser)
@@ -194,11 +196,13 @@ namespace StarryEyes.Models
                       .Reverse()
                       .ToObservable()
                       .ObserveOn(TaskPoolScheduler.Default)
-                      .Do(_ =>
+                      .Where(_ =>
                       {
                           lock (_retweetedsLock)
                           {
+                              if (_retweetedUsersDic.ContainsKey(_)) return false;
                               _retweetedUsersDic.Add(_, null);
+                              return true;
                           }
                       })
                       .SelectMany(StoreHub.GetUser)

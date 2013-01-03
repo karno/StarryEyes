@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -66,12 +67,7 @@ namespace StarryEyes.Models.Stores
             if (_isInShutdown) return;
             if (publish)
             {
-                _statusPublisher.OnNext(new StatusNotification()
-                {
-                    IsAdded = true,
-                    Status = status,
-                    StatusId = status.Id
-                });
+                _statusPublisher.OnNext(new StatusNotification(status, true));
             }
             _store.Store(status);
             UserStore.Store(status.User);
@@ -118,12 +114,12 @@ namespace StarryEyes.Models.Stores
         {
             if (_isInShutdown) return;
             if (publish)
-                _statusPublisher.OnNext(new StatusNotification() { IsAdded = false, StatusId = id });
+                _statusPublisher.OnNext(new StatusNotification(id, false));
             var removal = await Get(id);
             if (removal == null) return;
             _store.Remove(id);
             if (publish)
-                _statusPublisher.OnNext(new StatusNotification() { IsAdded = false, Status = removal, StatusId = id });
+                _statusPublisher.OnNext(new StatusNotification(removal, false));
         }
 
         /// <summary>
@@ -143,6 +139,22 @@ namespace StarryEyes.Models.Stores
 
     public class StatusNotification
     {
+        public StatusNotification(TwitterStatus status, bool isAdded)
+        {
+            Debug.Assert(status != null, "status could not be null.");
+            this.Status = status;
+            this.StatusId = status.Id;
+            this.IsAdded = isAdded;
+        }
+
+        public StatusNotification(long id, bool isAdded)
+        {
+            if (isAdded)
+                throw new ArgumentException("isAdded could not be true in this overload.");
+            this.StatusId = id;
+            this.IsAdded = false;
+        }
+
         /// <summary>
         /// flag of added status or removed
         /// </summary>
