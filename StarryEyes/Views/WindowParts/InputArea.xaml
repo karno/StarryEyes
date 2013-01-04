@@ -27,7 +27,6 @@
             </ResourceDictionary.MergedDictionaries>
             <utils:BooleanToVisibleConverter x:Key="BooleanToVisibleConverter" />
             <utils:BooleanToInvisibleConverter x:Key="BooleanToInvisibleConverter" />
-            <utils:UriImageConverter x:Key="UriImageConverter" />
             <DataTemplate x:Key="HashtagDataTemplate">
                 <Button Width="Auto"
                         HorizontalAlignment="Left"
@@ -118,7 +117,7 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Image Source="{Binding ProfileImageUri, Converter={StaticResource UriImageConverter}}" />
+                        <controls:LazyImage UriSource="{Binding ProfileImageUri}" />
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
