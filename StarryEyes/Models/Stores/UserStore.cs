@@ -41,6 +41,7 @@ namespace StarryEyes.Models.Stores
         public static void Store(TwitterUser user)
         {
             if (_isInShutdown) return;
+            System.Diagnostics.Debug.WriteLine("STORE user: " + user.ScreenName);
             _store.Store(user);
             lock (SnResolverLocker)
             {
@@ -51,8 +52,9 @@ namespace StarryEyes.Models.Stores
         public static IObservable<TwitterUser> Get(long id)
         {
             if (_isInShutdown) return Observable.Empty<TwitterUser>();
-            return _store.Get(id)
-                .Do(_ => Store(_));
+            return _store.Get(id);
+            // Cache control is deactivated.
+            // .Do(Store); 
         }
 
         public static IObservable<TwitterUser> Get(string screenName)

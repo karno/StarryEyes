@@ -4,7 +4,6 @@ using System.IO;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using StarryEyes.Breezy.DataModel;
-using StarryEyes.Models.Hubs;
 using StarryEyes.Models.Stores.Internal;
 using StarryEyes.Vanille.DataStore;
 using StarryEyes.Vanille.DataStore.Persistent;
@@ -69,6 +68,7 @@ namespace StarryEyes.Models.Stores
             {
                 _statusPublisher.OnNext(new StatusNotification(status, true));
             }
+            System.Diagnostics.Debug.WriteLine("STORE status:" + status.ToString());
             _store.Store(status);
             UserStore.Store(status.User);
         }

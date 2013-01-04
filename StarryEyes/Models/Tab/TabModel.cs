@@ -167,8 +167,8 @@ namespace StarryEyes.Models.Tab
         public IObservable<Unit> ReceiveTimelines(long? maxId)
         {
             return FilterQuery.Sources
-                              .ToObservable()
-                              .SelectMany(_ => _.Receive(maxId))
+                              .Select(_ => _.Receive(maxId))
+                              .Merge()
                               .Do(_ => StatusStore.Store(_))
                               .OfType<Unit>();
         }

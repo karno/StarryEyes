@@ -33,7 +33,7 @@ namespace StarryEyes.Models.Hubs
                     Task.Run(() =>
                              StatusModel.UpdateStatusInfo(
                                  status.RetweetedOriginal,
-                                 model => model.AddRetweetedUser(status.User.Id),
+                                 model => model.AddRetweetedUser(status.User),
                                  persist =>
                                  persist.RetweetedUsers =
                                  persist.RetweetedUsers.Guard().Append(status.User.Id).ToArray()));
@@ -56,7 +56,7 @@ namespace StarryEyes.Models.Hubs
                            Task.Run(() =>
                                     StatusModel.UpdateStatusInfo(
                                         ue.Target,
-                                        model => model.AddFavoritedUser(ue.Source.Id),
+                                        model => model.AddFavoritedUser(ue.Source),
                                         status =>
                                         status.FavoritedUsers =
                                         status.FavoritedUsers.Guard().Where(id => id != ue.Source.Id).ToArray()));

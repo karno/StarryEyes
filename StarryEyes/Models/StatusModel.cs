@@ -164,8 +164,6 @@ namespace StarryEyes.Models
                 Status.FavoritedUsers
                       .Distinct()
                       .Reverse()
-                      .ToObservable()
-                      .ObserveOn(TaskPoolScheduler.Default)
                       .Where(_ =>
                       {
                           lock (_favoritedsLock)
@@ -175,7 +173,9 @@ namespace StarryEyes.Models
                               return true;
                           }
                       })
-                      .SelectMany(StoreHub.GetUser)
+                      .Select(u => Observable.Start(() => StoreHub.GetUser(u)))
+                      .Merge()
+                      .SelectMany(_ => _)
                       .Do(_ =>
                       {
                           lock (_favoritedsLock)
@@ -194,8 +194,6 @@ namespace StarryEyes.Models
                 Status.RetweetedUsers
                       .Distinct()
                       .Reverse()
-                      .ToObservable()
-                      .ObserveOn(TaskPoolScheduler.Default)
                       .Where(_ =>
                       {
                           lock (_retweetedsLock)
@@ -205,7 +203,9 @@ namespace StarryEyes.Models
                               return true;
                           }
                       })
-                      .SelectMany(StoreHub.GetUser)
+                      .Select(u => Observable.Start(() => StoreHub.GetUser(u)))
+                      .Merge()
+                      .SelectMany(_ => _)
                       .Do(_ =>
                       {
                           lock (_retweetedsLock)
@@ -220,30 +220,22 @@ namespace StarryEyes.Models
         public static void UpdateStatusInfo(TwitterStatus status,
                                             Action<StatusModel> ifCacheIsAlive, Action<TwitterStatus> ifCacheIsDead)
         {
-            object lockerobj = _generateLock.GetOrAdd(status.Id, new object());
-            try
-            {
-                lock (lockerobj)
-                {
-                    StatusModel model = null;
-                    WeakReference wr;
-                    lock (_staticCacheLock)
-                    {
-                        _staticCache.TryGetValue(status.Id, out wr);
-                    }
-                    if (wr != null)
-                        model = (StatusModel)wr.Target;
 
-                    if (model != null)
-                        ifCacheIsAlive(model);
-                    else
-                        ifCacheIsDead(status);
+            WeakReference wr;
+            lock (_staticCacheLock)
+            {
+                _staticCache.TryGetValue(status.Id, out wr);
+            }
+            if (wr != null)
+            {
+                var target = (StatusModel)wr.Target;
+                if (wr.IsAlive)
+                {
+                    ifCacheIsAlive(target);
+                    return;
                 }
             }
-            finally
-            {
-                _generateLock.TryRemove(status.Id, out lockerobj);
-            }
+            ifCacheIsDead(status);
         }
 
         public void AddFavoritedUser(long userId)
