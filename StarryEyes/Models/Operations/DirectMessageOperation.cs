@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Reactive.Linq;
+using StarryEyes.Models.Hubs;
 using StarryEyes.Models.Stores;
 using StarryEyes.Breezy.Api.Rest;
 using StarryEyes.Breezy.Authorize;
@@ -30,7 +31,7 @@ namespace StarryEyes.Models.Operations
             return AuthInfo.SendDirectMessage(Text, TargetUserId)
                 .ObserveOnDispatcher()
                 // .Do(s => ShowToast(s.ToString(), "DM SENT"))
-                .Do(s => StatusStore.Store(s))
+                .SelectMany(StoreHub.MergeStore)
                 .Catch((Exception ex) =>
                 {
                     return GetExceptionDetail(ex)

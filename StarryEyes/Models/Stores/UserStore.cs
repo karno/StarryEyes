@@ -4,6 +4,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Models.Stores.Internal;
 using StarryEyes.Vanille.DataStore;
@@ -41,8 +42,7 @@ namespace StarryEyes.Models.Stores
         public static void Store(TwitterUser user)
         {
             if (_isInShutdown) return;
-            System.Diagnostics.Debug.WriteLine("STORE user: " + user.ScreenName);
-            _store.Store(user);
+            Task.Run(() => _store.Store(user));
             lock (SnResolverLocker)
             {
                 ScreenNameResolver[user.ScreenName] = user.Id;
@@ -53,8 +53,6 @@ namespace StarryEyes.Models.Stores
         {
             if (_isInShutdown) return Observable.Empty<TwitterUser>();
             return _store.Get(id);
-            // Cache control is deactivated.
-            // .Do(Store); 
         }
 
         public static IObservable<TwitterUser> Get(string screenName)

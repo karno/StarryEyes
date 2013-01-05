@@ -31,12 +31,35 @@ namespace StarryEyes.Models.Hubs
                 if (status.RetweetedOriginal != null)
                 {
                     Task.Run(() =>
-                             StatusModel.UpdateStatusInfo(
-                                 status.RetweetedOriginal,
-                                 model => model.AddRetweetedUser(status.User),
-                                 persist =>
-                                 persist.RetweetedUsers =
-                                 persist.RetweetedUsers.Guard().Append(status.User.Id).ToArray()));
+                    {
+                        bool isAdd = false;
+                        StatusModel.UpdateStatusInfo(
+                            status.RetweetedOriginal,
+                            model =>
+                            {
+                                if (!model.IsRetweeted(status.User.Id))
+                                {
+                                    isAdd = true;
+                                    model.AddRetweetedUser(status.User);
+                                }
+                            },
+                            persist =>
+                            {
+                                if (persist.RetweetedUsers == null)
+                                {
+                                    isAdd = true;
+                                    persist.RetweetedUsers = new[] { status.User.Id };
+                                }
+                                else if (!persist.RetweetedUsers.Contains(status.User.Id))
+                                {
+                                    isAdd = true;
+                                    persist.RetweetedUsers =
+                                        persist.RetweetedUsers.Guard().Append(status.User.Id).ToArray();
+                                }
+                            });
+                        if (isAdd)
+                            NotifyRetweeted(status.User, status.RetweetedOriginal);
+                    });
                 }
             };
             OnDeleted += status =>
@@ -74,19 +97,21 @@ namespace StarryEyes.Models.Hubs
         {
             // optional default handlers
             if (OverrideDefaultHandlers) return;
-            OnReceived += t =>
-            {
-                if (t.RetweetedOriginal != null && AccountsStore.AccountIds.Contains(t.RetweetedOriginal.User.Id))
-                {
-                    BackpanelModel.RegisterEvent(new RetweetedEvent(t.User, t.RetweetedOriginal));
-                }
-            };
             OnFollowed += ue => BackpanelModel.RegisterEvent(new FollowedEvent(ue.Source, ue.Target));
             OnUnfollowed += ue => BackpanelModel.RegisterEvent(new UnfollowedEvent(ue.Source, ue.Target));
             OnBlocked += ue => BackpanelModel.RegisterEvent(new BlockedEvent(ue.Source, ue.Target));
             OnUnblocked += ue => BackpanelModel.RegisterEvent(new UnblockedEvent(ue.Source, ue.Target));
             OnFavorited += te => BackpanelModel.RegisterEvent(new FavoritedEvent(te.Source, te.Target));
             OnUnfavorited += te => BackpanelModel.RegisterEvent(new UnfavoritedEvent(te.Source, te.Target));
+            OnRetweeted += te =>
+            {
+                // check user
+                if (AccountsStore.AccountIds.Contains(te.Source.Id) ||
+                    AccountsStore.AccountIds.Contains(te.Target.User.Id))
+                {
+                    BackpanelModel.RegisterEvent(new RetweetedEvent(te.Source, te.Target));
+                }
+            };
             OnLimitationInfoGot += (auth, limit) => BackpanelModel.RegisterEvent(new TrackLimitEvent(auth, limit));
         }
 
@@ -149,6 +174,15 @@ namespace StarryEyes.Models.Hubs
         public static void NotifyUnfavorited(TwitterUser source, TwitterStatus status)
         {
             Action<TwitterStatusEvent> handler = OnUnfavorited;
+            if (handler != null)
+                handler(new TwitterStatusEvent(source, status));
+        }
+
+        public static event Action<TwitterStatusEvent> OnRetweeted;
+
+        public static void NotifyRetweeted(TwitterUser source, TwitterStatus status)
+        {
+            Action<TwitterStatusEvent> handler = OnRetweeted;
             if (handler != null)
                 handler(new TwitterStatusEvent(source, status));
         }

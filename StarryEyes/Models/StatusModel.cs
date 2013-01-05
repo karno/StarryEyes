@@ -232,10 +232,12 @@ namespace StarryEyes.Models
                 if (wr.IsAlive)
                 {
                     ifCacheIsAlive(target);
+                    StatusStore.Store(target.Status);
                     return;
                 }
             }
             ifCacheIsDead(status);
+            StatusStore.Store(status);
         }
 
         public void AddFavoritedUser(long userId)

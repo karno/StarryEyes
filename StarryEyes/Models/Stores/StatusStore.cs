@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Threading.Tasks;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Models.Stores.Internal;
 using StarryEyes.Vanille.DataStore;
@@ -68,8 +69,7 @@ namespace StarryEyes.Models.Stores
             {
                 _statusPublisher.OnNext(new StatusNotification(status, true));
             }
-            System.Diagnostics.Debug.WriteLine("STORE status:" + status.ToString());
-            _store.Store(status);
+            Task.Run(() => _store.Store(status));
             UserStore.Store(status.User);
         }
 
@@ -81,8 +81,7 @@ namespace StarryEyes.Models.Stores
         public static IObservable<TwitterStatus> Get(long id)
         {
             if (_isInShutdown) return Observable.Empty<TwitterStatus>();
-            return _store.Get(id)
-                .Do(_ => Store(_, false)); // add to local cache
+            return _store.Get(id);
         }
 
         /// <summary>

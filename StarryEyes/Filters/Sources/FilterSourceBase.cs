@@ -7,6 +7,7 @@ using StarryEyes.Models.Stores;
 using StarryEyes.Settings;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
+using StarryEyes.Models.Hubs;
 
 namespace StarryEyes.Filters.Sources
 {
@@ -39,7 +40,7 @@ namespace StarryEyes.Filters.Sources
         public IObservable<TwitterStatus> Receive(long? max_id)
         {
             return ReceiveSink(max_id)
-                .Do(_ => StatusStore.Store(_));
+                .SelectMany(StoreHub.MergeStore);
         }
 
         protected virtual IObservable<TwitterStatus> ReceiveSink(long? max_id)

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 using StarryEyes.Breezy.Api.Streaming;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
@@ -97,7 +98,7 @@ namespace StarryEyes.Models.Connections.UserDependencies
                     // deliver tweet or something.
                     if (elem.Status != null)
                     {
-                        StatusStore.Store(elem.Status);
+                        Observable.Return(elem.Status).RegisterToStore();
                     }
                     if (elem.DeletedId != null)
                     {

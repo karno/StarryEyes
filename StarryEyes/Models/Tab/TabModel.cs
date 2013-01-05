@@ -169,7 +169,7 @@ namespace StarryEyes.Models.Tab
             return FilterQuery.Sources
                               .Select(_ => _.Receive(maxId))
                               .Merge()
-                              .Do(_ => StatusStore.Store(_))
+                              .SelectMany(StoreHub.MergeStore)
                               .OfType<Unit>();
         }
     }

@@ -24,7 +24,7 @@ namespace StarryEyes.Models.Operations
             this.AuthInfo = info;
             this.Status = status;
             this.InReplyTo = inReplyTo != null ? inReplyTo.Id : 0;
-            this.GeoLocation = GeoLocation;
+            this.GeoLocation = geoLocation;
             this.AttachedImage = image;
         }
 
@@ -36,9 +36,9 @@ namespace StarryEyes.Models.Operations
 
         public GeoLocationInfo GeoLocation { get; set; }
 
-        private AuthenticateInfo _originalAuthInfo { get; set; }
+        private AuthenticateInfo OriginalAuthInfo { get; set; }
 
-        private byte[] attachedImageBin;
+        private byte[] _attachedImageBin;
         private BitmapSource _originalBitmapSource;
         public BitmapSource AttachedImage
         {
@@ -51,14 +51,14 @@ namespace StarryEyes.Models.Operations
                 _originalBitmapSource = value;
                 if (value == null)
                 {
-                    attachedImageBin = new byte[0];
+                    _attachedImageBin = new byte[0];
                     return;
                 }
                 var ms = new MemoryStream();
                 var encoder = new PngBitmapEncoder();
                 encoder.Frames.Add(BitmapFrame.Create(value));
                 encoder.Save(ms);
-                attachedImageBin = ms.ToArray();
+                _attachedImageBin = ms.ToArray();
             }
         }
 
@@ -66,52 +66,44 @@ namespace StarryEyes.Models.Operations
         {
             return ExecPost()
                 .Catch((Exception ex) =>
-                {
-                    return
-                        GetExceptionDetail(ex)
-                        .SelectMany(s =>
-                        {
-                            AccountSetting cas;
-                            AccountSetting fallbackAccount;
-                            if (s.Contains("User is over daily status update limit.") &&
-                                (cas = AccountsStore.GetAccountSetting(this.AuthInfo.Id)) != null &&
-                                (fallbackAccount = AccountsStore.GetAccountSetting(cas.FallbackNext)) != null)
-                            {
-                                // Post limit, go fallback
-                                if (this._originalAuthInfo != null)
-                                    this._originalAuthInfo = AuthInfo;
-                                this.AuthInfo = fallbackAccount.AuthenticateInfo;
-                                BackpanelModel.RegisterEvent(new FallbackedEvent(this.AuthInfo, fallbackAccount.AuthenticateInfo));
-                                return this.Run(OperationPriority.High);
-                            }
-                            else
-                            {
-                                return Observable.Throw<TwitterStatus>(new TweetFailedException(s, ex));
-                            }
-                        });
-                });
+                       GetExceptionDetail(ex)
+                           .SelectMany(s =>
+                           {
+                               AccountSetting cas;
+                               AccountSetting fallbackAccount;
+                               if (s.Contains("User is over daily status update limit.") &&
+                                   (cas = AccountsStore.GetAccountSetting(this.AuthInfo.Id)) != null &&
+                                   (fallbackAccount = AccountsStore.GetAccountSetting(cas.FallbackNext)) != null)
+                               {
+                                   // Post limit, go fallback
+                                   if (this.OriginalAuthInfo != null)
+                                       this.OriginalAuthInfo = AuthInfo;
+                                   this.AuthInfo = fallbackAccount.AuthenticateInfo;
+                                   BackpanelModel.RegisterEvent(new FallbackedEvent(this.AuthInfo,
+                                                                                    fallbackAccount.AuthenticateInfo));
+                                   return this.Run(OperationPriority.High);
+                               }
+                               return Observable.Throw<TwitterStatus>(new TweetFailedException(s, ex));
+                           }));
         }
 
         private IObservable<TwitterStatus> ExecPost()
         {
             long? reply = InReplyTo == 0 ? null : (long?)InReplyTo;
-            double? geo_lat = null;
-            double? geo_long = null;
+            double? geoLat = null;
+            double? geoLong = null;
             if (GeoLocation != null)
             {
-                geo_lat = GeoLocation.Latitude;
-                geo_long = GeoLocation.Longitude;
+                geoLat = GeoLocation.Latitude;
+                geoLong = GeoLocation.Longitude;
             }
             if (AttachedImage != null)
             {
                 return Setting.GetImageUploader()
                     .Upload(this.AuthInfo, this.Status,
-                    this.attachedImageBin, reply, geo_lat, geo_long);
+                    this._attachedImageBin, reply, geoLat, geoLong);
             }
-            else
-            {
-                return AuthInfo.Update(this.Status, reply, geo_lat, geo_long);
-            }
+            return AuthInfo.Update(this.Status, reply, geoLat, geoLong);
         }
     }
 

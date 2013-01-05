@@ -227,6 +227,24 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         }
 
         /// <summary>
+        /// Load a value from key or not.
+        /// </summary>
+        /// <param name="key">finding key</param>
+        /// <param name="value">result value</param>
+        /// <returns>key is found or not</returns>
+        public bool TryLoad(TKey key, out TValue value)
+        {
+            int readFrom;
+            if (!_tableOfContents.TryGetValue(key, out readFrom) || readFrom < 0)
+            {
+                value = default(TValue);
+                return false;
+            }
+            value = Load(readFrom);
+            return true;
+        }
+
+        /// <summary>
         /// Load a value from key.<para />
         /// If key is not found, throws KeyNotFoundException.
         /// </summary>

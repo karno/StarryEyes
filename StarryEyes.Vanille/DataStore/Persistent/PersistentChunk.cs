@@ -312,14 +312,12 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                 // disk access
                 using (AcquireDriveLock())
                 {
-                    try
+                    TValue value;
+                    if (_persistentDrive.TryLoad(key, out value))
                     {
-                        return Observable.Return(_persistentDrive.Load(key));
+                        return Observable.Return(value);
                     }
-                    catch
-                    {
-                        return Observable.Empty<TValue>();
-                    }
+                    return Observable.Empty<TValue>();
                 }
             })
             .SelectMany(_ => _);

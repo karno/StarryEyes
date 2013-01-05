@@ -10,6 +10,7 @@ using System.Windows.Media.Imaging;
 using Livet;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
+using StarryEyes.Models.Hubs;
 using StarryEyes.Models.Operations;
 using StarryEyes.Models.Stores;
 using StarryEyes.Models.Tab;
@@ -272,7 +273,7 @@ namespace StarryEyes.Models
                                          new DirectMessageOperation(authInfo, MessageRecipient, Text)
                                        : new TweetOperation(authInfo, Text, InReplyTo, AttachedGeoInfo, AttachedImage)
                                   ).Run()
-                                   .Do(_ => StatusStore.Store(_))
+                                   .SelectMany(StoreHub.MergeStore)
                                    .Select(_ => new PostResult(authInfo, _))
                                    .Catch((Exception ex) => Observable.Return(new PostResult(authInfo, ex))))
                       .Subscribe(postResults.Add,
@@ -280,27 +281,27 @@ namespace StarryEyes.Models
                                  {
                                      postResults.GroupBy(_ => _.IsSucceeded)
                                                 .ForEach(_ =>
+                                                {
+                                                    if (_.Key)
                                                     {
-                                                        if (_.Key)
+                                                        TweetInputInfo ret = Clone();
+                                                        ret.AuthInfos = _.Select(pr => pr.AuthInfo).ToArray();
+                                                        ret.PostedTweets =
+                                                            _.Select(pr => Tuple.Create(pr.AuthInfo, pr.Status))
+                                                             .ToArray();
+                                                        subject.OnNext(ret);
+                                                    }
+                                                    else
+                                                    {
+                                                        _.ForEach(pr =>
                                                         {
                                                             TweetInputInfo ret = Clone();
-                                                            ret.AuthInfos = _.Select(pr => pr.AuthInfo).ToArray();
-                                                            ret.PostedTweets =
-                                                                _.Select(pr => Tuple.Create(pr.AuthInfo, pr.Status))
-                                                                 .ToArray();
+                                                            ret.AuthInfos = new[] { pr.AuthInfo };
+                                                            ret.ThrownException = pr.ThrownException;
                                                             subject.OnNext(ret);
-                                                        }
-                                                        else
-                                                        {
-                                                            _.ForEach(pr =>
-                                                                {
-                                                                    TweetInputInfo ret = Clone();
-                                                                    ret.AuthInfos = new[] { pr.AuthInfo };
-                                                                    ret.ThrownException = pr.ThrownException;
-                                                                    subject.OnNext(ret);
-                                                                });
-                                                        }
-                                                    });
+                                                        });
+                                                    }
+                                                });
                                      subject.OnCompleted();
                                  });
             return subject;
