@@ -5,22 +5,33 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interactivity;
+using Livet.EventListeners;
 
 namespace StarryEyes.Views.Behaviors
 {
     public class TimelineTriggerBehavior : Behavior<ScrollViewer>
     {
-        private CompositeDisposable _disposables = new CompositeDisposable();
+        private readonly CompositeDisposable _disposables = new CompositeDisposable();
 
-        public double ScrollOffset
+        public bool IsScrollOnTop
         {
-            get { return (int)GetValue(ScrollOffsetProperty); }
-            set { SetValue(ScrollOffsetProperty, value); }
+            get { return (bool)GetValue(IsScrollOnTopProperty); }
+            set { SetValue(IsScrollOnTopProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for ScrollOffset.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty ScrollOffsetProperty =
-            DependencyProperty.Register("ScrollOffset", typeof(double), typeof(TimelineTriggerBehavior), new PropertyMetadata(0.0));
+        // Using a DependencyProperty as the backing store for IsScrollOnTop.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty IsScrollOnTopProperty =
+            DependencyProperty.Register("IsScrollOnTop", typeof(bool), typeof(TimelineTriggerBehavior), new PropertyMetadata(false));
+
+        public bool IsScrollOnBottom
+        {
+            get { return (bool)GetValue(IsScrollOnBottomProperty); }
+            set { SetValue(IsScrollOnBottomProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for IsScrollOnBottom.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty IsScrollOnBottomProperty =
+            DependencyProperty.Register("IsScrollOnBottom", typeof(bool), typeof(TimelineTriggerBehavior), new PropertyMetadata(false));
 
         public bool IsMouseOver
         {
@@ -36,20 +47,26 @@ namespace StarryEyes.Views.Behaviors
         {
             base.OnAttached();
             this._disposables.Add(
-                Observable.FromEventPattern<MouseEventHandler, MouseEventArgs>(
-                handler => this.AssociatedObject.MouseEnter += handler,
-                handler => this.AssociatedObject.MouseEnter -= handler)
-                .Subscribe(_ => this.IsMouseOver = this.AssociatedObject.IsMouseOver));
+                new EventListener<MouseEventHandler>(
+                    h => this.AssociatedObject.MouseEnter += h,
+                    h => this.AssociatedObject.MouseEnter -= h,
+                    (_, __) => this.IsMouseOver = this.AssociatedObject.IsMouseOver));
             this._disposables.Add(
-                Observable.FromEventPattern<MouseEventHandler, MouseEventArgs>(
-                handler => this.AssociatedObject.MouseLeave += handler,
-                handler => this.AssociatedObject.MouseLeave -= handler)
-                .Subscribe(_ => this.IsMouseOver = this.AssociatedObject.IsMouseOver));
+                new EventListener<MouseEventHandler>(
+                    h => this.AssociatedObject.MouseLeave += h,
+                    h => this.AssociatedObject.MouseLeave -= h,
+                    (_, __) => this.IsMouseOver = this.AssociatedObject.IsMouseOver));
             this._disposables.Add(
-                Observable.FromEventPattern<ScrollChangedEventHandler, ScrollChangedEventArgs>(
-                handler => this.AssociatedObject.ScrollChanged += handler,
-                handler => this.AssociatedObject.ScrollChanged -= handler)
-                .Subscribe(_ => this.ScrollOffset = this.AssociatedObject.VerticalOffset));
+                new EventListener<ScrollChangedEventHandler>(
+                    h => this.AssociatedObject.ScrollChanged += h,
+                    h => this.AssociatedObject.ScrollChanged -= h,
+                    (_, __) =>
+                    {
+                        bool top = this.AssociatedObject.VerticalOffset < 1;
+                        bool bottom = this.AssociatedObject.VerticalOffset > this.AssociatedObject.ScrollableHeight - 1;
+                        IsScrollOnTop = top;
+                        IsScrollOnBottom = bottom;
+                    }));
         }
 
         protected override void OnDetaching()

@@ -28,10 +28,34 @@ namespace StarryEyes.Views.Controls
             set { SetValue(UriSourceProperty, value); }
         }
 
+
+
+        public int DecodePixelWidth
+        {
+            get { return (int)GetValue(DecodePixelWidthProperty); }
+            set { SetValue(DecodePixelWidthProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for DecodePixelWidth.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty DecodePixelWidthProperty =
+            DependencyProperty.Register("DecodePixelWidth", typeof(int), typeof(LazyImage), new PropertyMetadata(0));
+
+        public int DecodePixelHeight
+        {
+            get { return (int)GetValue(DecodePixelHeightProperty); }
+            set { SetValue(DecodePixelHeightProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for DecodePixelHeight.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty DecodePixelHeightProperty =
+            DependencyProperty.Register("DecodePixelHeight", typeof(int), typeof(LazyImage), new PropertyMetadata(0));
+
         private static void UriSourcePropertyChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
             var img = sender as LazyImage;
             if (img == null) return;
+            var dcw = img.DecodePixelWidth;
+            var dch = img.DecodePixelHeight;
             var uri = e.NewValue as Uri;
             if (e.NewValue == e.OldValue) return;
             if (uri != null)
@@ -46,30 +70,49 @@ namespace StarryEyes.Views.Controls
                     }
                     else
                     {
+                        img.Source = null;
                         Subject<byte[]> publisher = null;
                         _imageStreamer.GetOrAdd(uri, _ => publisher = new Subject<byte[]>())
                                       .Select(b => new MemoryStream(b, false))
                                       .Select(ms =>
                                       {
-                                          var bi = new BitmapImage();
-                                          bi.BeginInit();
-                                          bi.CacheOption = BitmapCacheOption.OnLoad;
-                                          bi.StreamSource = ms;
-                                          bi.EndInit();
-                                          bi.Freeze();
-                                          return bi;
+                                          try
+                                          {
+                                              var bi = new BitmapImage();
+                                              bi.BeginInit();
+                                              bi.CacheOption = BitmapCacheOption.OnLoad;
+                                              bi.StreamSource = ms;
+                                              bi.DecodePixelWidth = dcw;
+                                              bi.DecodePixelHeight = dch;
+                                              bi.EndInit();
+                                              bi.Freeze();
+                                              return bi;
+                                          }
+                                          catch
+                                          {
+                                              return null;
+                                          }
                                       })
                                       .ObserveOnDispatcher()
-                                      .Subscribe(b => SetImage(img, b, uri));
+                                      .Subscribe(b => SetImage(img, b, uri), ex => { });
                         if (publisher != null)
                         {
-                            var wc = new WebClient();
-                            wc.DownloadDataTaskAsync(uri)
+                            Func<Uri, byte[]> resolver;
+                            if (uri.Scheme != "http" && uri.Scheme != "https" &&
+                                _specialTable.TryGetValue(uri.Scheme, out resolver))
+                            {
+                                Observable.Start(() => resolver(uri))
+                                    .Subscribe(publisher.OnNext, ex => { });
+                                return;
+                            }
+                            var client = new WebClient();
+                            client.DownloadDataTaskAsync(uri)
                               .ToObservable()
                               .Finally(() =>
                               {
                                   IObservable<byte[]> subscribe;
                                   _imageStreamer.TryRemove(uri, out subscribe);
+                                  client.Dispose();
                               })
                               .Subscribe(publisher.OnNext, ex => { });
                         }
@@ -90,12 +133,19 @@ namespace StarryEyes.Views.Controls
                     if (!source.IsFrozen)
                         throw new ArgumentException("Image is not frozen.");
                     image.Source = source;
-                    System.Diagnostics.Debug.WriteLine("set " + sourceFrom);
                 }
             }
             catch
             {
             }
+        }
+
+        private static readonly ConcurrentDictionary<string, Func<Uri, byte[]>> _specialTable =
+            new ConcurrentDictionary<string, Func<Uri, byte[]>>();
+
+        public static bool RegisterSpecialResolverTable(string scheme, Func<Uri, byte[]> resolver)
+        {
+            return _specialTable.TryAdd(scheme, resolver);
         }
     }
 }

@@ -75,6 +75,9 @@ namespace StarryEyes
             ServicePointManager.Expect100Continue = false; // disable expect 100 continue for User Streams connection.
             ServicePointManager.DefaultConnectionLimit = Int32.MaxValue; // Limit Break!
 
+            // Initialize special image handlers
+            SpecialImageResolverRegister.Initialize();
+
             // Load plugins
             PluginManager.Load();
 

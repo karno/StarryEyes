@@ -15,6 +15,7 @@ using StarryEyes.Models.Operations;
 using StarryEyes.Models.Stores;
 using StarryEyes.Settings;
 using StarryEyes.Views.Helpers;
+using StarryEyes.Views.Messaging;
 
 namespace StarryEyes.ViewModels.WindowParts.Timelines
 {
@@ -27,6 +28,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         private readonly ReadOnlyDispatcherCollection<UserViewModel> _retweetedUsers;
         private long[] _bindingAccounts;
         private bool _isSelected;
+        private TwitterStatus _inReplyTo;
         private UserViewModel _recipient;
         private UserViewModel _retweeter;
         private UserViewModel _user;
@@ -40,8 +42,13 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                                IEnumerable<long> initialBoundAccounts)
         {
             _parent = parent;
+            // get status model
             Model = StatusModel.Get(status);
+
+            // bind accounts 
             _bindingAccounts = initialBoundAccounts.Guard().ToArray();
+
+            // initialize users information
             _favoritedUsers = ViewModelHelper.CreateReadOnlyDispatcherCollection(
                 Model.FavoritedUsers, _ => new UserViewModel(_), DispatcherHelper.UIDispatcher);
             _favoritedUsers.CollectionChanged += (sender, e) =>
@@ -58,6 +65,31 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             };
             CompositeDisposable.Add(_favoritedUsers);
             CompositeDisposable.Add(_retweetedUsers);
+
+            // resolve images
+            Model.ImagesSubject
+                 .Finally(() =>
+                 {
+                     RaisePropertyChanged(() => Images);
+                     RaisePropertyChanged(() => FirstImage);
+                     RaisePropertyChanged(() => IsImageAvailable);
+                 })
+                 .Subscribe();
+
+            // look-up in-reply-to
+            if (status.InReplyToStatusId.HasValue)
+            {
+                StoreHub.GetTweet(status.InReplyToStatusId.Value)
+                        .Subscribe(replyTo =>
+                        {
+                            _inReplyTo = replyTo;
+                            RaisePropertyChanged(() => IsInReplyToExists);
+                            RaisePropertyChanged(() => InReplyToUserImage);
+                            RaisePropertyChanged(() => InReplyToUserName);
+                            RaisePropertyChanged(() => InReplyToUserScreenName);
+                            RaisePropertyChanged(() => InReplyToBody);
+                        });
+            }
         }
 
         public TabViewModel Parent
@@ -210,12 +242,67 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             get { return _bindingAccounts.Length == 1 && _bindingAccounts[0] == Status.User.Id; }
         }
 
+        public bool IsInReplyToExists
+        {
+            get { return _inReplyTo != null; }
+        }
+
         public bool IsInReplyToMe
         {
             get
             {
                 return FilterSystemUtil.InReplyToUsers(Status)
                                        .Any(AccountsStore.AccountIds.Contains);
+            }
+        }
+
+        public Uri InReplyToUserImage
+        {
+            get
+            {
+                if (_inReplyTo == null) return null;
+                return _inReplyTo.User.ProfileImageUri;
+            }
+        }
+
+        public string InReplyToUserName
+        {
+            get
+            {
+                if (_inReplyTo == null) return null;
+                return _inReplyTo.User.Name;
+            }
+        }
+
+        public string InReplyToUserScreenName
+        {
+            get
+            {
+                if (_inReplyTo == null) return null;
+                return _inReplyTo.User.ScreenName;
+            }
+        }
+
+        public string InReplyToBody
+        {
+            get
+            {
+                if (_inReplyTo == null) return null;
+                return _inReplyTo.Text;
+            }
+        }
+
+        public bool IsFocused
+        {
+            get { return _parent.FocusedStatus == this; }
+        }
+
+        public void RaiseFocusedChanged()
+        {
+            RaisePropertyChanged(() => IsFocused);
+            if (IsFocused)
+            {
+                this.Messenger.Raise(new BringIntoViewMessage());
             }
         }
 
@@ -270,6 +357,20 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             int end = Status.Source.IndexOf("\"", start + 1, StringComparison.Ordinal);
             string url = Status.Source.Substring(start + 1, end - start - 1);
             BrowserHelper.Open(url);
+        }
+
+        public bool IsImageAvailable { get { return Model.Images != null && Model.Images.Any(); } }
+
+        public IEnumerable<Uri> Images { get { return Model.Images.Select(i => i.Item2); } }
+
+        public Uri FirstImage { get { return Model.Images != null ? Model.Images.Select(i => i.Item2).FirstOrDefault() : null; } }
+
+        public void OpenFirstImage()
+        {
+            if (Model.Images == null) return;
+            var tuple = Model.Images.FirstOrDefault();
+            if (tuple == null) return;
+            BrowserHelper.Open(tuple.Item1);
         }
 
         #region Execution commands
@@ -492,6 +593,17 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             }
         }
 
+        public void ToggleFocus()
+        {
+            this.Parent.FocusedStatus =
+                this.Parent.FocusedStatus == this ? null : this;
+        }
+
+        public void ShowInReplyTo()
+        {
+            // TODO: Implementation
+        }
+
         #endregion
 
         #region OpenLinkCommand
@@ -521,5 +633,10 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         }
 
         #endregion
+
+        /// <summary>
+        /// For animating helper
+        /// </summary>
+        internal bool IsLoaded { get; set; }
     }
 }

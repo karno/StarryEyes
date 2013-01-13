@@ -215,6 +215,9 @@
     <Compile Include="Models\Stores\Internal\StoreOnMemoryObjectPersistence.cs" />
     <Compile Include="Models\Subsystems\NotificationOptimizationService.cs" />
     <Compile Include="Models\Subsystems\PostLimitPredictionService.cs" />
+    <Compile Include="Models\Subsystems\SpecialImageResolverRegister.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Models\Tab\ColumnInfo.cs" />
     <Compile Include="Models\Tab\TabManager.cs" />
     <Compile Include="Models\Plugins\IPlugin.cs" />
@@ -229,6 +232,7 @@
     <Compile Include="ViewModels\WindowParts\Timelines\StatusViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Timelines\TabViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Timelines\UserViewModel.cs" />
+    <Compile Include="Views\Behaviors\KeyHandlingBehavior.cs" />
     <Compile Include="Views\Behaviors\Planerator.cs" />
     <Compile Include="Views\Behaviors\TimelineScrollLockerBehavior.cs" />
     <Compile Include="Views\Behaviors\TimelineTriggerBehavior.cs" />
@@ -238,9 +242,11 @@
       <DependentUpon>KeyOverrideWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Helpers\RichTextBoxHelper.cs" />
+    <Compile Include="Views\Messaging\Behaviors\BringIntoViewInteractionMessageAction.cs" />
     <Compile Include="Views\Messaging\Behaviors\GoToStateInteractionMessageAction.cs" />
     <Compile Include="Views\Messaging\Behaviors\TaskDialogInteractionMessageAction.cs" />
     <Compile Include="Views\Messaging\Behaviors\TextBoxSetCaretInteractionMessageAction.cs" />
+    <Compile Include="Views\Messaging\BringIntoViewMessage.cs" />
     <Compile Include="Views\Messaging\GoToStateMessage.cs" />
     <Compile Include="Views\Messaging\TaskDialogMessage.cs" />
     <Compile Include="Views\Messaging\TextBoxSetCaretMessage.cs" />

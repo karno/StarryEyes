@@ -139,9 +139,11 @@ namespace StarryEyes.Models.Tab
             IsActivated = true;
         }
 
-        private IObservable<TwitterStatus> GetChunk(long? maxId, int chunkCount)
+        private IObservable<TwitterStatus> GetChunk(long? maxId, int chunkCount, bool isBatch)
         {
-            return StatusStore.Find(_evaluator, maxId != null ? FindRange<long>.By(maxId.Value) : null, chunkCount)
+            return (isBatch ?
+                StatusStore.FindBatch(_evaluator, chunkCount) :
+                StatusStore.Find(_evaluator, maxId != null ? FindRange<long>.By(maxId.Value) : null, chunkCount))
                               .OrderByDescending(_ => _.CreatedAt)
                               .Take(chunkCount);
         }

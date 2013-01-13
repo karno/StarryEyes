@@ -2,12 +2,15 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Threading;
 using Livet;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
+using StarryEyes.Breezy.Imaging;
 using StarryEyes.Models.Hubs;
 using StarryEyes.Models.Stores;
 using StarryEyes.Settings;
@@ -124,9 +127,18 @@ namespace StarryEyes.Models
         private volatile bool _isFavoritedUsersLoaded;
         private volatile bool _isRetweetedUsersLoaded;
 
+        private readonly Subject<Unit> _imagesSubject = new Subject<Unit>();
+
         private StatusModel(TwitterStatus status)
         {
             Status = status;
+            ImageResolver.Resolve(status.GetEntityAidedText(true))
+                         .Aggregate(new List<Tuple<Uri, Uri>>(), (l, i) =>
+                         {
+                             l.Add(i);
+                             return l;
+                         })
+                         .Subscribe(l => Images = l, () => _imagesSubject.OnCompleted());
         }
 
         public TwitterStatus Status { get; private set; }
@@ -155,6 +167,13 @@ namespace StarryEyes.Models
                 }
                 return _retweetedUsers;
             }
+        }
+
+        public IEnumerable<Tuple<Uri, Uri>> Images { get; private set; }
+
+        public IObservable<Unit> ImagesSubject
+        {
+            get { return _imagesSubject; }
         }
 
         private void LoadFavoritedUsers()

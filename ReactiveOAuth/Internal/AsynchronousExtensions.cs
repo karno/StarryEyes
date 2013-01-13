@@ -10,7 +10,6 @@ using Microsoft.Phone.Reactive;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Concurrency;
-using System.Threading.Tasks;
 using System.Reactive.Threading.Tasks;
 #endif
 
@@ -61,12 +60,12 @@ namespace Codeplex.OAuth
 
         public static IObservable<byte[]> DownloadDataAsync(this WebRequest request)
         {
-            return Observable.Defer(() => request.GetResponseAsObservable()).SelectMany(r => r.DownloadDataAsync());
+            return Observable.Defer(request.GetResponseAsObservable).SelectMany(r => r.DownloadDataAsync());
         }
 
         public static IObservable<Progress<byte[]>> DownloadDataAsyncWithProgress(this WebRequest request, int chunkSize = 65536)
         {
-            return Observable.Defer(() => request.GetResponseAsObservable()).SelectMany(r => r.DownloadDataAsyncWithProgress(chunkSize));
+            return Observable.Defer(request.GetResponseAsObservable).SelectMany(r => r.DownloadDataAsyncWithProgress(chunkSize));
         }
 
         public static IObservable<string> DownloadStringAsync(this WebRequest request)
@@ -76,7 +75,7 @@ namespace Codeplex.OAuth
 
         public static IObservable<string> DownloadStringAsync(this WebRequest request, Encoding encoding)
         {
-            return Observable.Defer(() => request.GetResponseAsObservable()).SelectMany(r => r.DownloadStringAsync(encoding));
+            return Observable.Defer(request.GetResponseAsObservable).SelectMany(r => r.DownloadStringAsync(encoding));
         }
 
         public static IObservable<string> DownloadStringLineAsync(this WebRequest request)
@@ -86,7 +85,7 @@ namespace Codeplex.OAuth
 
         public static IObservable<string> DownloadStringLineAsync(this WebRequest request, Encoding encoding)
         {
-            return Observable.Defer(() => request.GetResponseAsObservable()).SelectMany(r => r.DownloadStringLineAsync(encoding));
+            return Observable.Defer(request.GetResponseAsObservable).SelectMany(r => r.DownloadStringLineAsync(encoding));
         }
 
         public static IObservable<WebResponse> UploadStringAsync(this WebRequest request, string data)
@@ -121,21 +120,17 @@ namespace Codeplex.OAuth
 
         public static IObservable<WebResponse> UploadDataAsync(this WebRequest request, byte[] data)
         {
-            return Observable.Defer(() => request.GetRequestStreamAsObservable())
-                .SelectMany(stream => stream.WriteAsObservable(data, 0, data.Length)
-                    .Finally(() => stream.Close()))
-                .Take(1)
-                .SelectMany(_ => request.GetResponseAsObservable())
-                .Do(_ => System.Diagnostics.Debug.WriteLine("checkpoint(1)"))
-                .Finally(() => System.Diagnostics.Debug.WriteLine("checkpoint(2)"))
-                .Take(1)
-                .Do(_ => System.Diagnostics.Debug.WriteLine("data arrived."))
-                .Finally(() => System.Diagnostics.Debug.WriteLine("finally called!"));
+            return Observable.Defer(request.GetRequestStreamAsObservable)
+                             .SelectMany(stream => stream.WriteAsObservable(data, 0, data.Length)
+                                                         .Finally(stream.Close))
+                             .Take(1)
+                             .SelectMany(_ => request.GetResponseAsObservable())
+                             .Take(1);
         }
 
         public static IObservable<Progress<Unit>> UploadDataAsyncWithProgress(this WebRequest request, byte[] data, int chunkSize = 65536)
         {
-            return Observable.Defer(() => request.GetRequestStreamAsObservable())
+            return Observable.Defer(request.GetRequestStreamAsObservable)
                 .SelectMany(stream => stream.WriteAsync(data, chunkSize))
                 .Scan(0, (i, _) => i + 1)
                 .Select(i =>
@@ -152,7 +147,7 @@ namespace Codeplex.OAuth
         public static IObservable<byte[]> DownloadDataAsync(this WebResponse response)
         {
             return Observable.Defer(() => response.GetResponseStream().ReadAsync())
-                .Finally(() => response.Close())
+                .Finally(response.Close)
                 .Aggregate(new List<byte>(), (list, bytes) => { list.AddRange(bytes); return list; })
                 .Select(x => x.ToArray());
         }
@@ -160,7 +155,7 @@ namespace Codeplex.OAuth
         public static IObservable<Progress<byte[]>> DownloadDataAsyncWithProgress(this WebResponse response, int chunkSize = 65536)
         {
             return Observable.Defer(() => response.GetResponseStream().ReadAsync(chunkSize))
-                .Finally(() => response.Close())
+                .Finally(response.Close)
                 .Scan(Progress.Create(new byte[0], 0, 0),
                     (p, bytes) => Progress.Create(bytes, p.CurrentLength + bytes.Length, response.ContentLength));
         }
@@ -219,7 +214,7 @@ namespace Codeplex.OAuth
             return Observable.Defer(() => data)
                 .Buffer(chunkSize)
                 .SelectMany(l => stream.WriteAsObservable(l.ToArray(), 0, l.Count))
-                .Finally(() => stream.Close());
+                .Finally(stream.Close);
         }
 
         public static IObservable<Unit> WriteLineAsync(this Stream stream, string data)
@@ -267,7 +262,7 @@ namespace Codeplex.OAuth
                     Array.Copy(a.buffer, newBuffer, a.readCount);
                     return newBuffer;
                 })
-                .Finally(() => stream.Close());
+                .Finally(stream.Close);
         }
 
         public static IObservable<string> ReadLineAsync(this Stream stream, int chunkSize = 65536)

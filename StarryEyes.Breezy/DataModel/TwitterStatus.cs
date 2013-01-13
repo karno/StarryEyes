@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Text;
+using StarryEyes.Breezy.Util;
 using StarryEyes.Vanille.Serialization;
 
 namespace StarryEyes.Breezy.DataModel
@@ -137,6 +139,56 @@ namespace StarryEyes.Breezy.DataModel
         /// </summary>
         [DataMember]
         public TwitterEntity[] Entities { get; set; }
+
+        public string GetEntityAidedText(bool showFullUrl = false)
+        {
+            var builder = new StringBuilder();
+            var status = this;
+            if (status.RetweetedOriginal != null)
+                status = status.RetweetedOriginal; // change target
+            TwitterEntity prevEntity = null;
+            foreach (var entity in status.Entities.Guard().OrderBy(e => e.StartIndex))
+            {
+                int pidx = 0;
+                if (prevEntity != null)
+                    pidx = prevEntity.EndIndex;
+                if (pidx < entity.StartIndex)
+                {
+                    // output raw
+                    builder.Append(XmlParser.ResolveEntity(status.Text.Substring(pidx, entity.StartIndex - pidx)));
+                }
+                switch (entity.EntityType)
+                {
+                    case EntityType.Hashtags:
+                        builder.Append("#" + entity.DisplayText);
+                        break;
+                    case EntityType.Urls:
+                        builder.Append(showFullUrl
+                                           ? XmlParser.ResolveEntity(entity.OriginalText)
+                                           : XmlParser.ResolveEntity(entity.DisplayText));
+                        break;
+                    case EntityType.Media:
+                        builder.Append(showFullUrl
+                                           ? XmlParser.ResolveEntity(entity.MediaUrl)
+                                           : XmlParser.ResolveEntity(entity.DisplayText));
+                        break;
+                    case EntityType.UserMentions:
+                        builder.Append("@" + entity.DisplayText);
+                        break;
+                }
+                prevEntity = entity;
+            }
+            if (prevEntity == null)
+            {
+                builder.Append(XmlParser.ResolveEntity(status.Text));
+            }
+            else if (prevEntity.EndIndex < status.Text.Length)
+            {
+                builder.Append(XmlParser.ResolveEntity(
+                    status.Text.Substring(prevEntity.EndIndex, status.Text.Length - prevEntity.EndIndex)));
+            }
+            return builder.ToString();
+        }
 
         /// <summary>
         /// Represent tweet with format: &quot;@user: text&quot;

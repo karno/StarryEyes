@@ -26,8 +26,9 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         private bool _isSelected;
 
         private TabModel _model;
-        private double _scrollIndex;
         private int _unreadCount;
+        private bool _isScrollInTop;
+        private bool _isScrollInBottom;
 
         /// <summary>
         ///     for design time support.
@@ -61,7 +62,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             IsLoading = true;
             Observable.Defer(
                 () =>
-                Observable.Start(() => Model.Timeline.ReadMore(null))
+                Observable.Start(() => Model.Timeline.ReadMore(null, true))
                           .Merge(Observable.Start(() => Model.ReceiveTimelines(null))))
                       .SelectMany(_ => _)
                       .Finally(() => IsLoading = false)
@@ -79,6 +80,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             get { return _model.Name; }
             set
             {
+                if (_model.Name == value) return;
                 _model.Name = value;
                 RaisePropertyChanged();
             }
@@ -89,6 +91,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             get { return _isSelected; }
             set
             {
+                if (_isSelected == value) return;
                 _isSelected = value;
                 if (value)
                 {
@@ -108,7 +111,9 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             get { return _unreadCount; }
             set
             {
-                _unreadCount = IsSelected ? 0 : value;
+                var newValue = IsSelected ? 0 : value;
+                if (_unreadCount == newValue) return;
+                _unreadCount = newValue;
                 RaisePropertyChanged();
                 RaisePropertyChanged(() => IsUnreadExisted);
             }
@@ -124,6 +129,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             get { return _isLoading; }
             set
             {
+                if (_isLoading == value) return;
                 _isLoading = value;
                 RaisePropertyChanged();
             }
@@ -134,18 +140,32 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             get { return _isMouseOver; }
             set
             {
+                if (_isMouseOver == value) return;
                 _isMouseOver = value;
                 RaisePropertyChanged();
                 RaisePropertyChanged(() => IsScrollLock);
             }
         }
 
-        public double ScrollIndex
+        public bool IsScrollInTop
         {
-            get { return _scrollIndex; }
+            get { return _isScrollInTop; }
             set
             {
-                _scrollIndex = value;
+                if (_isScrollInTop == value) return;
+                _isScrollInTop = value;
+                RaisePropertyChanged();
+                RaisePropertyChanged(() => IsScrollLock);
+            }
+        }
+
+        public bool IsScrollInBottom
+        {
+            get { return _isScrollInBottom; }
+            set
+            {
+                if (_isScrollInBottom == value) return;
+                _isScrollInBottom = value;
                 RaisePropertyChanged();
                 RaisePropertyChanged(() => IsScrollLock);
             }
@@ -156,6 +176,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             get { return _isScrollLockExplicit; }
             set
             {
+                if (_isScrollLockExplicit == value) return;
                 _isScrollLockExplicit = value;
                 RaisePropertyChanged();
                 RaisePropertyChanged(() => IsScrollLock);
@@ -180,7 +201,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                     case ScrollLockStrategy.WhenMouseOver:
                         return IsMouseOver;
                     case ScrollLockStrategy.WhenScrolled:
-                        return _scrollIndex > 0;
+                        return !_isScrollInTop;
                     case ScrollLockStrategy.Explicit:
                         return IsScrollLockExplicit;
                     default:
@@ -312,6 +333,55 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             Timeline.ForEach(s => s.IsSelected = false);
         }
 
+        #endregion
+
+        #region Focus Control
+
+        private StatusViewModel _focusedStatus;
+        public StatusViewModel FocusedStatus
+        {
+            get { return _focusedStatus; }
+            set
+            {
+                var previous = _focusedStatus;
+                _focusedStatus = value;
+                if (previous != null)
+                    previous.RaiseFocusedChanged();
+                if (_focusedStatus != null)
+                    _focusedStatus.RaiseFocusedChanged();
+            }
+        }
+
+        public void FocusUp()
+        {
+            if (this.FocusedStatus == null) return;
+            var index = Timeline.IndexOf(this.FocusedStatus) - 1;
+            this.FocusedStatus = index < 0 ? null : Timeline[index];
+        }
+
+        public void FocusDown()
+        {
+            if (this.FocusedStatus == null)
+            {
+                FocusTop();
+                return;
+            }
+            var index = Timeline.IndexOf(this.FocusedStatus) + 1;
+            if (index >= Timeline.Count) return;
+            this.FocusedStatus = Timeline[index];
+        }
+
+        public void FocusTop()
+        {
+            if (Timeline.Count == 0) return;
+            this.FocusedStatus = Timeline[0];
+        }
+
+        public void FocusBottom()
+        {
+            if (Timeline.Count == 0) return;
+            this.FocusedStatus = Timeline[Timeline.Count - 1];
+        }
         #endregion
     }
 }

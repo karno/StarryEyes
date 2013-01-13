@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -7,14 +6,13 @@ using System.Text;
 #if WINDOWS_PHONE
 using Microsoft.Phone.Reactive;
 #else
-using System.Reactive;
 using System.Reactive.Linq;
 #endif
 
 namespace Codeplex.OAuth
 {
     /// <summary>access protected resource client</summary>
-    public class OAuthClient : OAuthBase
+    public sealed class OAuthClient : OAuthBase
     {
         public AccessToken AccessToken { get; private set; }
         public ParameterCollection Parameters { get; set; }
@@ -34,10 +32,10 @@ namespace Codeplex.OAuth
 
             this.AccessToken = accessToken;
             Parameters = new ParameterCollection();
-            MethodType = OAuth.MethodType.Get;
+            MethodType = MethodType.Get;
         }
 
-        protected string AuthorizationHeader
+        private string AuthorizationHeader
         {
             get
             {
@@ -47,16 +45,16 @@ namespace Codeplex.OAuth
             }
         }
 
-        protected virtual WebRequest CreateWebRequest()
+        private WebRequest CreateWebRequest()
         {
-            var requestUrl = (MethodType == OAuth.MethodType.Get) ? Url + "?" + Parameters.ToQueryParameter() : Url;
+            var requestUrl = (MethodType == MethodType.Get) ? Url + "?" + Parameters.ToQueryParameter() : Url;
             var req = (HttpWebRequest)WebRequest.Create(requestUrl);
 #if WINDOWS_PHONE
             req.AllowReadStreamBuffering = false;
 #endif
             req.Headers[HttpRequestHeader.Authorization] = this.AuthorizationHeader;
             req.Method = MethodType.ToUpperString();
-            if (MethodType == OAuth.MethodType.Post) req.ContentType = "application/x-www-form-urlencoded";
+            if (MethodType == MethodType.Post) req.ContentType = "application/x-www-form-urlencoded";
             if (ApplyBeforeRequest != null) ApplyBeforeRequest(req);
 
             return req;
@@ -71,11 +69,10 @@ namespace Codeplex.OAuth
             switch (MethodType)
             {
                 case MethodType.Get:
-                    return Observable.Defer(() => req.GetResponseAsObservable());
+                    return Observable.Defer(req.GetResponseAsObservable);
                 case MethodType.Post:
                     var postData = Encoding.UTF8.GetBytes(Parameters.ToQueryParameter());
-                    return req.UploadDataAsync(postData)
-                        .Finally(() => System.Diagnostics.Debug.WriteLine("Upload data OK."));
+                    return req.UploadDataAsync(postData);
                 default:
                     throw new InvalidOperationException();
             }

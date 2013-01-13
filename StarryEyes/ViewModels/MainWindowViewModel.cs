@@ -197,6 +197,7 @@ namespace StarryEyes.ViewModels
             TabManager.CreateTab(new TabModel("hello", "from all where ()"));
             TabManager.CreateTab(new TabModel("home", "from all where user <- *.following"));
             TabManager.CreateTab(new TabModel("replies", "from all where to -> *"));
+            TabManager.CreateTab(new TabModel("my", "from all where user <- *"));
             TabManager.CreateTab(new TabModel("Krile", "from all where source == \"Krile\""));
             TabManager.CreateColumn(new TabModel("Favorites", "from all where user <- * && ( favs > 0 || rts > 0)"));
         }
@@ -249,9 +250,9 @@ namespace StarryEyes.ViewModels
             get
             {
                 TimeSpan duration = DateTime.Now - App.StartupDateTime;
-                if (duration.Hours > 0)
+                if (duration.TotalHours >= 1)
                 {
-                    return duration.Hours + ":" + duration.ToString("mm\\:ss");
+                    return (int)duration.TotalHours + ":" + duration.ToString("mm\\:ss");
                 }
                 return duration.ToString("mm\\:ss");
             }

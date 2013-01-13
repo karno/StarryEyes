@@ -13,10 +13,11 @@ namespace StarryEyes.Models.Tab
 {
     public class TimelineModel : IDisposable
     {
-        public readonly int TimelineChunkCount = 120;
-        public readonly int TimelineChunkCountBounce = 30;
+        public static readonly int TimelineChunkCount = 40;
+        public static readonly int TimelineChunkCountBounce = 20;
+
         private readonly CompositeDisposable _disposable;
-        private readonly Func<long?, int, IObservable<TwitterStatus>> _fetcher;
+        private readonly Func<long?, int, bool, IObservable<TwitterStatus>> _fetcher;
 
         private readonly object _sicLocker = new object();
         private readonly AVLTree<long> _statusIdCache;
@@ -27,7 +28,7 @@ namespace StarryEyes.Models.Tab
         private bool _isSuppressTimelineTrimming;
 
         public TimelineModel(Func<TwitterStatus, bool> evaluator,
-                             Func<long?, int, IObservable<TwitterStatus>> fetcher)
+                             Func<long?, int, bool, IObservable<TwitterStatus>> fetcher)
         {
             _fetcher = fetcher;
             _statusIdCache = new AVLTree<long>();
@@ -114,9 +115,9 @@ namespace StarryEyes.Models.Tab
             }
         }
 
-        public IObservable<Unit> ReadMore(long? maxId)
+        public IObservable<Unit> ReadMore(long? maxId, bool batch = false)
         {
-            return Observable.Defer(() => _fetcher(maxId, TimelineChunkCount))
+            return Observable.Defer(() => _fetcher(maxId, TimelineChunkCount, batch))
                              .Do(AddStatus)
                              .OfType<Unit>();
         }

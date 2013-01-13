@@ -9,7 +9,6 @@ namespace StarryEyes.Views.Messaging
         public TaskDialogOptions Options { get; private set; }
 
         public TaskDialogMessage(TaskDialogOptions options)
-            : base()
         {
             this.Options = options;
         }

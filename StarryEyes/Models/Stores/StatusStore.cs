@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Threading;
 using System.Threading.Tasks;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Models.Stores.Internal;
@@ -102,6 +105,59 @@ namespace StarryEyes.Models.Stores
                 .Distinct(_ => _.Id)
                 .OrderByDescending(_ => _.Id)
                 .Take(count.Value);
+        }
+
+        private const int BatchWaitSec = 5;
+        private static readonly object _batchLock = new object();
+        private static List<Func<TwitterStatus, bool>> _predicates = null;
+        private static Subject<TwitterStatus> _batchResult = null;
+
+        /// <summary>
+        /// Find tweets with batch query.
+        /// </summary>
+        /// <param name="predicate">finding predicate.</param>
+        /// <param name="count">find status count</param>
+        /// <returns></returns>
+        public static IObservable<TwitterStatus> FindBatch(Func<TwitterStatus, bool> predicate, int count)
+        {
+            Subject<TwitterStatus> batch;
+            bool register = false;
+            lock (_batchLock)
+            {
+                if (_batchResult == null)
+                {
+                    _batchResult = new Subject<TwitterStatus>();
+                    _predicates = new List<Func<TwitterStatus, bool>>();
+                    register = true;
+                }
+                batch = _batchResult;
+                _predicates.Add(predicate);
+            }
+            if (register)
+            {
+                // queue batch
+                Observable.Timer(TimeSpan.FromSeconds(BatchWaitSec))
+                          .Subscribe(_ =>
+                          {
+                              Subject<TwitterStatus> callback;
+                              Func<TwitterStatus, bool> find;
+                              lock (_batchLock)
+                              {
+                                  var pa = _predicates.ToArray();
+                                  find = t => pa.Any(p => p(t));
+                                  callback = _batchResult;
+                                  _predicates = null;
+                                  _batchResult = null;
+                              }
+                              Find(find)
+                                  .Distinct(s => s.Id)
+                                  .Subscribe(callback);
+                          });
+            }
+            return batch
+                .Where(predicate)
+                .OrderByDescending(_ => _.Id)
+                .Take(count);
         }
 
         /// <summary>
