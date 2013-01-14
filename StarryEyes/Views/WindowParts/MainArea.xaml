@@ -18,7 +18,7 @@
             <StackPanel Margin="0,8,8,4" Orientation="Horizontal">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="MouseLeftButtonDown">
-                        <ei:CallMethodAction MethodName="Select" TargetObject="{Binding}" />
+                        <ei:CallMethodAction MethodName="Focus" TargetObject="{Binding}" />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
                 <StackPanel.ContextMenu>
@@ -35,17 +35,19 @@
                 <TextBlock x:Name="TabName"
                            Margin="0,3,0,0"
                            VerticalAlignment="Center"
+                           FontFamily="Segoe UI"
                            FontSize="16"
                            Foreground="#FF999999"
-                           Text="{Binding Name}" FontFamily="Segoe UI" />
+                           Text="{Binding Name}" />
                 <TextBlock VerticalAlignment="Top"
+                           FontFamily="Segoe UI"
                            Foreground="#FF1BA1E2"
                            Text="{Binding UnreadCount}"
                            Visibility="{Binding IsUnreadExisted,
-                                                Converter={StaticResource BooleanToVisibleConverter}}" FontFamily="Segoe UI" />
+                                                Converter={StaticResource BooleanToVisibleConverter}}" />
             </StackPanel>
             <DataTemplate.Triggers>
-                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                <DataTrigger Binding="{Binding IsFocused}" Value="True">
                     <Setter TargetName="TabName" Property="Foreground" Value="Black" />
                 </DataTrigger>
             </DataTemplate.Triggers>
@@ -83,7 +85,7 @@
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Grid Grid.Row="1" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibleConverter}}">
+                            <Grid Grid.Row="1" Visibility="{Binding IsFocused, Converter={StaticResource BooleanToVisibleConverter}}">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition />

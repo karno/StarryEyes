@@ -18,17 +18,18 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
     /// </summary>
     public class TabViewModel : ViewModel
     {
+        private readonly object _collectionLock = new object();
         private readonly ColumnViewModel _owner;
         private readonly ObservableCollection<StatusViewModel> _timeline;
+        private bool _isFocused;
         private bool _isLoading;
         private bool _isMouseOver;
+        private bool _isScrollInBottom;
+        private bool _isScrollInTop;
         private bool _isScrollLockExplicit;
-        private bool _isSelected;
 
         private TabModel _model;
         private int _unreadCount;
-        private bool _isScrollInTop;
-        private bool _isScrollInBottom;
 
         /// <summary>
         ///     for design time support.
@@ -43,7 +44,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             _owner = owner;
             _model = tabModel;
             tabModel.Activate();
-            DispatcherHolder.Push(InitializeCollection);
+            DispatcherHolder.Queue(InitializeCollection);
             CompositeDisposable.Add(
                 Observable.FromEvent(
                     _ => Model.Timeline.OnNewStatusArrived += _,
@@ -86,19 +87,18 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             }
         }
 
-        public bool IsSelected
+        public bool IsFocused
         {
-            get { return _isSelected; }
-            set
+            get { return _owner.Focused == this; }
+        }
+
+        internal void UpdateFocus()
+        {
+            if (IsFocused)
             {
-                if (_isSelected == value) return;
-                _isSelected = value;
-                if (value)
-                {
-                    UnreadCount = 0;
-                }
-                RaisePropertyChanged();
+                UnreadCount = 0;
             }
+            this.RaisePropertyChanged(() => IsFocused);
         }
 
         public ObservableCollection<StatusViewModel> Timeline
@@ -111,7 +111,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             get { return _unreadCount; }
             set
             {
-                var newValue = IsSelected ? 0 : value;
+                int newValue = IsFocused ? 0 : value;
                 if (_unreadCount == newValue) return;
                 _unreadCount = newValue;
                 RaisePropertyChanged();
@@ -210,8 +210,6 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             }
         }
 
-        private readonly object _collectionLock = new object();
-
         private void InitializeCollection()
         {
             lock (_collectionLock)
@@ -224,15 +222,15 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                         {
                             if (activated)
                             {
-                                DispatcherHolder.Push(
+                                DispatcherHolder.Queue(
                                     () => ReflectCollectionChanged(e));
                             }
                         }));
-                var collection = Model.Timeline.Statuses.ToArray();
+                TwitterStatus[] collection = Model.Timeline.Statuses.ToArray();
                 activated = true;
                 collection
-                          .Select(GenerateStatusViewModel)
-                          .ForEach(_timeline.Add);
+                    .Select(GenerateStatusViewModel)
+                    .ForEach(_timeline.Add);
             }
         }
 
@@ -275,9 +273,9 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             return new StatusViewModel(this, status, Model.BindingAccountIds);
         }
 
-        public void Select()
+        public void Focus()
         {
-            _owner.SetSelected(Model);
+            _owner.Focused = this;
         }
 
         public void ReadMore()
@@ -338,12 +336,13 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         #region Focus Control
 
         private StatusViewModel _focusedStatus;
+
         public StatusViewModel FocusedStatus
         {
             get { return _focusedStatus; }
             set
             {
-                var previous = _focusedStatus;
+                StatusViewModel previous = _focusedStatus;
                 _focusedStatus = value;
                 if (previous != null)
                     previous.RaiseFocusedChanged();
@@ -354,34 +353,35 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public void FocusUp()
         {
-            if (this.FocusedStatus == null) return;
-            var index = Timeline.IndexOf(this.FocusedStatus) - 1;
-            this.FocusedStatus = index < 0 ? null : Timeline[index];
+            if (FocusedStatus == null) return;
+            int index = Timeline.IndexOf(FocusedStatus) - 1;
+            FocusedStatus = index < 0 ? null : Timeline[index];
         }
 
         public void FocusDown()
         {
-            if (this.FocusedStatus == null)
+            if (FocusedStatus == null)
             {
                 FocusTop();
                 return;
             }
-            var index = Timeline.IndexOf(this.FocusedStatus) + 1;
+            int index = Timeline.IndexOf(FocusedStatus) + 1;
             if (index >= Timeline.Count) return;
-            this.FocusedStatus = Timeline[index];
+            FocusedStatus = Timeline[index];
         }
 
         public void FocusTop()
         {
             if (Timeline.Count == 0) return;
-            this.FocusedStatus = Timeline[0];
+            FocusedStatus = Timeline[0];
         }
 
         public void FocusBottom()
         {
             if (Timeline.Count == 0) return;
-            this.FocusedStatus = Timeline[Timeline.Count - 1];
+            FocusedStatus = Timeline[Timeline.Count - 1];
         }
+
         #endregion
     }
 }

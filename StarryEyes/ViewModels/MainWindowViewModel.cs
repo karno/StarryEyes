@@ -194,12 +194,12 @@ namespace StarryEyes.ViewModels
                                          typeof(AuthorizationWindow),
                                          auth, TransitionMode.Modal, null));
             }
-            TabManager.CreateTab(new TabModel("hello", "from all where ()"));
-            TabManager.CreateTab(new TabModel("home", "from all where user <- *.following"));
-            TabManager.CreateTab(new TabModel("replies", "from all where to -> *"));
-            TabManager.CreateTab(new TabModel("my", "from all where user <- *"));
-            TabManager.CreateTab(new TabModel("Krile", "from all where source == \"Krile\""));
-            TabManager.CreateColumn(new TabModel("Favorites", "from all where user <- * && ( favs > 0 || rts > 0)"));
+            MainAreaModel.CreateTab(new TabModel("hello", "from all where ()"));
+            MainAreaModel.CreateTab(new TabModel("home", "from all where user <- *.following"));
+            MainAreaModel.CreateTab(new TabModel("replies", "from all where to -> *"));
+            MainAreaModel.CreateTab(new TabModel("my", "from all where user <- *"));
+            MainAreaModel.CreateTab(new TabModel("Krile", "from all where source == \"Krile\""));
+            MainAreaModel.CreateColumn(new TabModel("Favorites", "from all where user <- * && ( favs > 0 || rts > 0)"));
         }
 
         public bool OnClosing()

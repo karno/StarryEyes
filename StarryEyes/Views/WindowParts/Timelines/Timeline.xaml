@@ -181,86 +181,86 @@
                             </VisualState>
                         </VisualStateGroup>
                         <VisualStateGroup x:Name="StatusFocus">
-                            <VisualState x:Name="NotFocused" >
-                        		<Storyboard>
-                        			<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="InRerplyToBorder">
-                        				<EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0"/>
-                        			</DoubleAnimationUsingKeyFrames>
-                        			<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="InRerplyToBorder">
-                        				<DiscreteObjectKeyFrame KeyTime="0:0:0.1" Value="{x:Static Visibility.Collapsed}"/>
-                        			</ObjectAnimationUsingKeyFrames>
-                        			<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.LayoutTransform).(TransformGroup.Children)[0].(ScaleTransform.ScaleY)" Storyboard.TargetName="InRerplyToBorder">
-                        				<EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0"/>
-                        			</DoubleAnimationUsingKeyFrames>
-                        			<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.LayoutTransform).(TransformGroup.Children)[0].(ScaleTransform.ScaleY)" Storyboard.TargetName="ActionQuickView">
-                        				<EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="1"/>
-                        			</DoubleAnimationUsingKeyFrames>
-                        			<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="ActionQuickView">
-                        				<DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}"/>
-                        				<DiscreteObjectKeyFrame KeyTime="0:0:0.1" Value="{x:Static Visibility.Visible}"/>
-                        			</ObjectAnimationUsingKeyFrames>
-                        			<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="ActionQuickView">
-                        				<EasingDoubleKeyFrame KeyTime="0" Value="0"/>
-                        				<EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="1"/>
-                        			</DoubleAnimationUsingKeyFrames>
-                        			<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="ActionDetailView">
-                        				<EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="0"/>
-                        			</DoubleAnimationUsingKeyFrames>
-                        			<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="ActionDetailView">
-                        				<DiscreteObjectKeyFrame KeyTime="0:0:0.2" Value="{x:Static Visibility.Collapsed}"/>
-                        			</ObjectAnimationUsingKeyFrames>
-                        			<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.LayoutTransform).(TransformGroup.Children)[0].(ScaleTransform.ScaleY)" Storyboard.TargetName="ActionDetailView">
-                        				<EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="0"/>
-                        			</DoubleAnimationUsingKeyFrames>
-                        		</Storyboard>
-                        	</VisualState>
+                            <VisualState x:Name="NotFocused">
+                                <Storyboard>
+                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetName="InRerplyToBorder" Storyboard.TargetProperty="(UIElement.Opacity)">
+                                        <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0" />
+                                    </DoubleAnimationUsingKeyFrames>
+                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="InRerplyToBorder" Storyboard.TargetProperty="(UIElement.Visibility)">
+                                        <DiscreteObjectKeyFrame KeyTime="0:0:0.1" Value="{x:Static Visibility.Collapsed}" />
+                                    </ObjectAnimationUsingKeyFrames>
+                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetName="InRerplyToBorder" Storyboard.TargetProperty="(FrameworkElement.LayoutTransform).(TransformGroup.Children)[0].(ScaleTransform.ScaleY)">
+                                        <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0" />
+                                    </DoubleAnimationUsingKeyFrames>
+                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetName="ActionQuickView" Storyboard.TargetProperty="(FrameworkElement.LayoutTransform).(TransformGroup.Children)[0].(ScaleTransform.ScaleY)">
+                                        <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="1" />
+                                    </DoubleAnimationUsingKeyFrames>
+                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ActionQuickView" Storyboard.TargetProperty="(UIElement.Visibility)">
+                                        <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}" />
+                                        <DiscreteObjectKeyFrame KeyTime="0:0:0.1" Value="{x:Static Visibility.Visible}" />
+                                    </ObjectAnimationUsingKeyFrames>
+                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetName="ActionQuickView" Storyboard.TargetProperty="(UIElement.Opacity)">
+                                        <EasingDoubleKeyFrame KeyTime="0" Value="0" />
+                                        <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="1" />
+                                    </DoubleAnimationUsingKeyFrames>
+                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetName="ActionDetailView" Storyboard.TargetProperty="(UIElement.Opacity)">
+                                        <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="0" />
+                                    </DoubleAnimationUsingKeyFrames>
+                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ActionDetailView" Storyboard.TargetProperty="(UIElement.Visibility)">
+                                        <DiscreteObjectKeyFrame KeyTime="0:0:0.2" Value="{x:Static Visibility.Collapsed}" />
+                                    </ObjectAnimationUsingKeyFrames>
+                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetName="ActionDetailView" Storyboard.TargetProperty="(FrameworkElement.LayoutTransform).(TransformGroup.Children)[0].(ScaleTransform.ScaleY)">
+                                        <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="0" />
+                                    </DoubleAnimationUsingKeyFrames>
+                                </Storyboard>
+                            </VisualState>
                             <VisualState x:Name="Focused">
                                 <Storyboard>
                                     <ColorAnimationUsingKeyFrames Storyboard.TargetName="BackHighlightBorder" Storyboard.TargetProperty="(Panel.Background).(SolidColorBrush.Color)">
                                         <EasingColorKeyFrame KeyTime="0" Value="#0C000000" />
                                     </ColorAnimationUsingKeyFrames>
-                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="InRerplyToBorder">
-                                    	<DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}"/>
+                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="InRerplyToBorder" Storyboard.TargetProperty="(UIElement.Visibility)">
+                                        <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}" />
                                     </ObjectAnimationUsingKeyFrames>
-                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.LayoutTransform).(TransformGroup.Children)[0].(ScaleTransform.ScaleY)" Storyboard.TargetName="InRerplyToBorder">
-                                    	<EasingDoubleKeyFrame KeyTime="0" Value="0"/>
-                                    	<EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="1"/>
+                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetName="InRerplyToBorder" Storyboard.TargetProperty="(FrameworkElement.LayoutTransform).(TransformGroup.Children)[0].(ScaleTransform.ScaleY)">
+                                        <EasingDoubleKeyFrame KeyTime="0" Value="0" />
+                                        <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="1" />
                                     </DoubleAnimationUsingKeyFrames>
-                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.LayoutTransform).(TransformGroup.Children)[0].(ScaleTransform.CenterY)" Storyboard.TargetName="InRerplyToBorder">
-                                    	<EasingDoubleKeyFrame KeyTime="0" Value="0"/>
-                                    	<EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0"/>
+                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetName="InRerplyToBorder" Storyboard.TargetProperty="(FrameworkElement.LayoutTransform).(TransformGroup.Children)[0].(ScaleTransform.CenterY)">
+                                        <EasingDoubleKeyFrame KeyTime="0" Value="0" />
+                                        <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0" />
                                     </DoubleAnimationUsingKeyFrames>
-                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.LayoutTransform).(TransformGroup.Children)[1].(SkewTransform.CenterY)" Storyboard.TargetName="InRerplyToBorder">
-                                    	<EasingDoubleKeyFrame KeyTime="0" Value="0"/>
-                                    	<EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0"/>
+                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetName="InRerplyToBorder" Storyboard.TargetProperty="(FrameworkElement.LayoutTransform).(TransformGroup.Children)[1].(SkewTransform.CenterY)">
+                                        <EasingDoubleKeyFrame KeyTime="0" Value="0" />
+                                        <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0" />
                                     </DoubleAnimationUsingKeyFrames>
-                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.LayoutTransform).(TransformGroup.Children)[2].(RotateTransform.CenterY)" Storyboard.TargetName="InRerplyToBorder">
-                                    	<EasingDoubleKeyFrame KeyTime="0" Value="0"/>
-                                    	<EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0"/>
+                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetName="InRerplyToBorder" Storyboard.TargetProperty="(FrameworkElement.LayoutTransform).(TransformGroup.Children)[2].(RotateTransform.CenterY)">
+                                        <EasingDoubleKeyFrame KeyTime="0" Value="0" />
+                                        <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0" />
                                     </DoubleAnimationUsingKeyFrames>
-                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="ActionDetailView">
-                                    	<DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}"/>
+                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ActionDetailView" Storyboard.TargetProperty="(UIElement.Visibility)">
+                                        <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}" />
                                     </ObjectAnimationUsingKeyFrames>
-                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.LayoutTransform).(TransformGroup.Children)[0].(ScaleTransform.ScaleY)" Storyboard.TargetName="ActionDetailView">
-                                    	<EasingDoubleKeyFrame KeyTime="0" Value="0"/>
-                                    	<EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="1"/>
+                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetName="ActionDetailView" Storyboard.TargetProperty="(FrameworkElement.LayoutTransform).(TransformGroup.Children)[0].(ScaleTransform.ScaleY)">
+                                        <EasingDoubleKeyFrame KeyTime="0" Value="0" />
+                                        <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="1" />
                                     </DoubleAnimationUsingKeyFrames>
-                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.LayoutTransform).(TransformGroup.Children)[0].(ScaleTransform.ScaleY)" Storyboard.TargetName="ActionQuickView">
-                                    	<EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0"/>
+                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetName="ActionQuickView" Storyboard.TargetProperty="(FrameworkElement.LayoutTransform).(TransformGroup.Children)[0].(ScaleTransform.ScaleY)">
+                                        <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0" />
                                     </DoubleAnimationUsingKeyFrames>
-                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="ActionQuickView">
-                                    	<DiscreteObjectKeyFrame KeyTime="0:0:0.1" Value="{x:Static Visibility.Collapsed}"/>
+                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ActionQuickView" Storyboard.TargetProperty="(UIElement.Visibility)">
+                                        <DiscreteObjectKeyFrame KeyTime="0:0:0.1" Value="{x:Static Visibility.Collapsed}" />
                                     </ObjectAnimationUsingKeyFrames>
-                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="ActionQuickView">
-                                    	<EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0"/>
+                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetName="ActionQuickView" Storyboard.TargetProperty="(UIElement.Opacity)">
+                                        <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0" />
                                     </DoubleAnimationUsingKeyFrames>
-                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="ActionDetailView">
-                                    	<EasingDoubleKeyFrame KeyTime="0" Value="0"/>
-                                    	<EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="1"/>
+                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetName="ActionDetailView" Storyboard.TargetProperty="(UIElement.Opacity)">
+                                        <EasingDoubleKeyFrame KeyTime="0" Value="0" />
+                                        <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="1" />
                                     </DoubleAnimationUsingKeyFrames>
-                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="InRerplyToBorder">
-                                    	<EasingDoubleKeyFrame KeyTime="0" Value="0"/>
-                                    	<EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="1"/>
+                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetName="InRerplyToBorder" Storyboard.TargetProperty="(UIElement.Opacity)">
+                                        <EasingDoubleKeyFrame KeyTime="0" Value="0" />
+                                        <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="1" />
                                     </DoubleAnimationUsingKeyFrames>
                                 </Storyboard>
                             </VisualState>
@@ -298,7 +298,8 @@
                                         <ei:GoToStateAction StateName="NotSelected" />
                                     </ei:DataTrigger>
                                 </i:Interaction.Triggers>
-                                <Border x:Name="InRerplyToBorder" Grid.RowSpan="1"
+                                <Border x:Name="InRerplyToBorder"
+                                        Grid.RowSpan="1"
                                         Grid.Column="0"
                                         Grid.ColumnSpan="2"
                                         Width="Auto"
@@ -306,15 +307,16 @@
                                         Margin="-8,-10,0,10"
                                         HorizontalAlignment="Stretch"
                                         VerticalAlignment="Top"
-                                        Background="#0F808080" Visibility="Collapsed">
-                                	<Border.LayoutTransform>
-                                		<TransformGroup>
-                                			<ScaleTransform/>
-                                			<SkewTransform/>
-                                			<RotateTransform/>
-                                			<TranslateTransform/>
-                                		</TransformGroup>
-                                	</Border.LayoutTransform>
+                                        Background="#0F808080"
+                                        Visibility="Collapsed">
+                                    <Border.LayoutTransform>
+                                        <TransformGroup>
+                                            <ScaleTransform />
+                                            <SkewTransform />
+                                            <RotateTransform />
+                                            <TranslateTransform />
+                                        </TransformGroup>
+                                    </Border.LayoutTransform>
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="MouseLeftButtonDown">
                                             <ei:CallMethodAction MethodName="ShowInReplyTo" TargetObject="{Binding Mode=OneWay}" />
@@ -820,17 +822,18 @@
                                             </Button>
                                         </StackPanel>
                                     </Grid>
-                                    <StackPanel x:Name="ActionQuickView" Height="Auto"
+                                    <StackPanel x:Name="ActionQuickView"
+                                                Height="Auto"
                                                 Margin="7,0"
                                                 Orientation="Horizontal">
-                                    	<StackPanel.LayoutTransform>
-                                    		<TransformGroup>
-                                    			<ScaleTransform/>
-                                    			<SkewTransform/>
-                                    			<RotateTransform/>
-                                    			<TranslateTransform/>
-                                    		</TransformGroup>
-                                    	</StackPanel.LayoutTransform>
+                                        <StackPanel.LayoutTransform>
+                                            <TransformGroup>
+                                                <ScaleTransform />
+                                                <SkewTransform />
+                                                <RotateTransform />
+                                                <TranslateTransform />
+                                            </TransformGroup>
+                                        </StackPanel.LayoutTransform>
                                         <StackPanel Width="Auto"
                                                     Margin="0,7,0,0"
                                                     Orientation="Horizontal"
@@ -872,15 +875,18 @@
                                                        TextWrapping="Wrap" />
                                         </StackPanel>
                                     </StackPanel>
-                                    <StackPanel x:Name="ActionDetailView" Margin="7,0" Orientation="Vertical" Visibility="Collapsed">
-                                    	<StackPanel.LayoutTransform>
-                                    		<TransformGroup>
-                                    			<ScaleTransform/>
-                                    			<SkewTransform/>
-                                    			<RotateTransform/>
-                                    			<TranslateTransform/>
-                                    		</TransformGroup>
-                                    	</StackPanel.LayoutTransform>
+                                    <StackPanel x:Name="ActionDetailView"
+                                                Margin="7,0"
+                                                Orientation="Vertical"
+                                                Visibility="Collapsed">
+                                        <StackPanel.LayoutTransform>
+                                            <TransformGroup>
+                                                <ScaleTransform />
+                                                <SkewTransform />
+                                                <RotateTransform />
+                                                <TranslateTransform />
+                                            </TransformGroup>
+                                        </StackPanel.LayoutTransform>
                                         <DockPanel Height="Auto"
                                                    Margin="0,7,0,0"
                                                    LastChildFill="True"

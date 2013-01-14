@@ -5,18 +5,20 @@ using Livet;
 
 namespace StarryEyes.Models.Tab
 {
-    public static class TabManager
+    public static class MainAreaModel
     {
         private static readonly Stack<TabModel> _closedTabsStack = new Stack<TabModel>();
 
-        private static readonly ObservableSynchronizedCollection<ObservableSynchronizedCollection<TabModel>> _tabs =
-            new ObservableSynchronizedCollection<ObservableSynchronizedCollection<TabModel>>();
+        private static readonly ObservableSynchronizedCollection<ColumnModel> _columns =
+            new ObservableSynchronizedCollection<ColumnModel>();
 
         private static int _currentFocusColumn;
 
-        internal static ObservableSynchronizedCollection<ObservableSynchronizedCollection<TabModel>> Tabs
+        public static event Action OnCurrentFocusColumnChanged;
+
+        public static ObservableSynchronizedCollection<ColumnModel> Columns
         {
-            get { return _tabs; }
+            get { return _columns; }
         }
 
         /// <summary>
@@ -25,7 +27,12 @@ namespace StarryEyes.Models.Tab
         public static int CurrentFocusColumn
         {
             get { return _currentFocusColumn; }
-            set { _currentFocusColumn = value; }
+            set
+            {
+                _currentFocusColumn = value;
+                Action handler = OnCurrentFocusColumnChanged;
+                if (handler != null) handler();
+            }
         }
 
         /// <summary>
@@ -42,7 +49,7 @@ namespace StarryEyes.Models.Tab
         /// <returns></returns>
         internal static IEnumerable<ColumnInfo> GetColumnInfoData()
         {
-            return _tabs.Select(t => new ColumnInfo(t));
+            return _columns.Select(c => new ColumnInfo(c.Tabs));
         }
 
         /// <summary>
@@ -53,11 +60,11 @@ namespace StarryEyes.Models.Tab
         /// <param name="tabIndex">tab index</param>
         public static void GetTabInfoIndexes(TabModel info, out int colIndex, out int tabIndex)
         {
-            for (int ci = 0; ci < _tabs.Count; ci++)
+            for (int ci = 0; ci < _columns.Count; ci++)
             {
-                for (int ti = 0; ti < _tabs[ci].Count; ti++)
+                for (int ti = 0; ti < _columns[ci].Tabs.Count; ti++)
                 {
-                    if (_tabs[ci][ti] == info)
+                    if (_columns[ci].Tabs[ti] == info)
                     {
                         colIndex = ci;
                         tabIndex = ti;
@@ -88,13 +95,13 @@ namespace StarryEyes.Models.Tab
             if (fromColumnIndex == destColumnIndex)
             {
                 // in-column moving
-                _tabs[fromColumnIndex].Move(fromTabIndex, destTabIndex);
+                _columns[fromColumnIndex].Tabs.Move(fromTabIndex, fromColumnIndex);
             }
             else
             {
-                TabModel tab = _tabs[fromColumnIndex][fromTabIndex];
-                _tabs[fromColumnIndex].RemoveAt(fromTabIndex);
-                _tabs[destColumnIndex].Insert(destTabIndex, tab);
+                TabModel tab = _columns[fromColumnIndex].Tabs[fromTabIndex];
+                _columns[fromColumnIndex].Tabs.RemoveAt(fromTabIndex);
+                _columns[destTabIndex].Tabs.Insert(destTabIndex, tab);
             }
         }
 
@@ -112,19 +119,20 @@ namespace StarryEyes.Models.Tab
         /// </summary>
         public static void CreateTab(TabModel info, int columnIndex)
         {
-            if (columnIndex > _tabs.Count) // column index is only for existed or new column
-                throw new ArgumentOutOfRangeException("columnIndex",
-                                                      "currently " + _tabs.Count +
-                                                      " columns are created. so, you can't set this parameter as " +
-                                                      columnIndex + ".");
-            if (columnIndex == _tabs.Count)
+            if (columnIndex > _columns.Count) // column index is only for existed or new column
+                throw new ArgumentOutOfRangeException(
+                    "columnIndex",
+                    "currently " + _columns.Count +
+                    " columns are existed. so, you can't set this parameter as " +
+                    columnIndex + ".");
+            if (columnIndex == _columns.Count)
             {
                 // create new
                 CreateColumn(info);
             }
             else
             {
-                _tabs[columnIndex].Add(info);
+                _columns[columnIndex].CreateTab(info);
             }
         }
 
@@ -134,7 +142,7 @@ namespace StarryEyes.Models.Tab
         /// <param name="info">initial created tab</param>
         public static void CreateColumn(TabModel info)
         {
-            _tabs.Add(new ObservableSynchronizedCollection<TabModel>(new[] { info }));
+            _columns.Add(new ColumnModel(info));
         }
 
         /// <summary>
@@ -142,10 +150,10 @@ namespace StarryEyes.Models.Tab
         /// </summary>
         public static void CloseTab(int colIndex, int tabIndex)
         {
-            TabModel ti = _tabs[colIndex][tabIndex];
+            TabModel ti = _columns[colIndex].Tabs[tabIndex];
             ti.Deactivate();
             _closedTabsStack.Push(ti);
-            _tabs[colIndex].RemoveAt(tabIndex);
+            _columns[colIndex].Tabs.RemoveAt(tabIndex);
         }
 
         /// <summary>

@@ -24,12 +24,12 @@ public static class DispatcherHolder
         return dispatcher.Invoke(func, null) as T;
     }
 
-    public static void Push(this Dispatcher dispatcher, Action action)
+    public static void Enqueue(this Dispatcher dispatcher, Action action)
     {
         dispatcher.BeginInvoke(action, null);
     }
 
-    public static void Push(this Dispatcher dispatcher, Action action, DispatcherPriority priority)
+    public static void Enqueue(this Dispatcher dispatcher, Action action, DispatcherPriority priority)
     {
         dispatcher.BeginInvoke(action, priority, null);
     }
@@ -78,9 +78,9 @@ public static class DispatcherHolder
         return Dispatcher.Invoke(func);
     }
 
-    public static void Push(Action action)
+    public static void Enqueue(Action action)
     {
-        Dispatcher.Push(action);
+        Dispatcher.Enqueue(action);
     }
 
     public static async Task BeginInvoke(Action action)

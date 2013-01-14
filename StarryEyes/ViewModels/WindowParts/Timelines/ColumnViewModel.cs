@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System;
+using System.Reactive.Linq;
 using Livet;
 using StarryEyes.Models.Tab;
 
@@ -7,63 +7,80 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 {
     public class ColumnViewModel : ViewModel
     {
-        private readonly ICollection<TabModel> _modelCollection;
+        private readonly MainAreaViewModel _parent;
+        private readonly ColumnModel _model;
         private readonly ReadOnlyDispatcherCollection<TabViewModel> _tabs;
         public ReadOnlyDispatcherCollection<TabViewModel> Tabs
         {
             get { return _tabs; }
         }
 
-        public TabViewModel Selected
+        private int _oldFocus;
+        public TabViewModel Focused
         {
-            get
-            {
-                return Tabs.FirstOrDefault(_ => _.IsSelected);
-            }
+            get { return _tabs[_model.CurrentFocusTab]; }
             set
             {
-                var selected = Tabs.FirstOrDefault(_ => _ == value);
-                if (selected == null) return;
-                Tabs.ForEach(_ => _.IsSelected = false);
-                selected.IsSelected = true;
-                RaisePropertyChanged(() => Selected);
+                var previous = Focused;
+                _model.CurrentFocusTab = _oldFocus = _tabs.IndexOf(value);
+                previous.UpdateFocus();
+                value.UpdateFocus();
+                RaisePropertyChanged();
             }
         }
 
-        public void SetSelected(TabModel model)
+        private void UpdateFocusFromModel(int newFocus)
         {
-            this.Selected = this.Tabs.FirstOrDefault(_ => _.Model == model);
+            DispatcherHolder.Enqueue(() =>
+            {
+                if (newFocus == _oldFocus) return;
+                _tabs[_oldFocus].UpdateFocus();
+                _tabs[newFocus].UpdateFocus();
+                _oldFocus = newFocus;
+                RaisePropertyChanged(() => Focused);
+            });
         }
 
-        public ColumnViewModel(IList<TabModel> tabs)
+        public ColumnViewModel(MainAreaViewModel parent, ColumnModel model)
         {
-            this._modelCollection = tabs;
-            this.CompositeDisposable.Add(_tabs = ViewModelHelper.CreateReadOnlyDispatcherCollection(
-                tabs, _ => OnTabGenerated(new TabViewModel(this, _)), DispatcherHelper.UIDispatcher));
+            _parent = parent;
+            _model = model;
+            this.CompositeDisposable.Add(
+                _tabs = ViewModelHelper.CreateReadOnlyDispatcherCollection(
+                    model.Tabs,
+                    _ => new TabViewModel(this, _),
+                    DispatcherHelper.UIDispatcher));
+            this.CompositeDisposable.Add(
+                Observable.FromEvent(
+                h => _model.OnCurrentFocusColumnChanged += h,
+                h => _model.OnCurrentFocusColumnChanged -= h)
+                .Select(_ => _model.CurrentFocusTab)
+                .Subscribe(UpdateFocusFromModel));
             if (_tabs.Count > 0)
             {
-                Selected = _tabs[0];
+                Focused = _tabs[0];
             }
-        }
-
-        private TabViewModel OnTabGenerated(TabViewModel viewModel)
-        {
-            if (this._tabs != null)
-            {
-                var selected = Selected;
-                if (selected != null)
-                {
-                    this.Selected.IsSelected = false;
-                    viewModel.IsSelected = true;
-                }
-            }
-            return viewModel;
         }
 
         public void AddTab(TabViewModel tab)
         {
-            this._modelCollection.Add(tab.Model);
-            SetSelected(tab.Model);
+            this._model.Tabs.Add(tab.Model);
+            this.Focused = tab;
+        }
+
+        public bool IsFocused
+        {
+            get { return _parent.Focused == this; }
+        }
+
+        internal void UpdateFocus()
+        {
+            this.RaisePropertyChanged(() => IsFocused);
+        }
+
+        public void Focus()
+        {
+            _parent.Focused = this;
         }
     }
 }

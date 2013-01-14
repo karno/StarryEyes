@@ -27,8 +27,8 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         private readonly TabViewModel _parent;
         private readonly ReadOnlyDispatcherCollection<UserViewModel> _retweetedUsers;
         private long[] _bindingAccounts;
-        private bool _isSelected;
         private TwitterStatus _inReplyTo;
+        private bool _isSelected;
         private UserViewModel _recipient;
         private UserViewModel _retweeter;
         private UserViewModel _user;
@@ -297,15 +297,6 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             get { return _parent.FocusedStatus == this; }
         }
 
-        public void RaiseFocusedChanged()
-        {
-            RaisePropertyChanged(() => IsFocused);
-            if (IsFocused)
-            {
-                this.Messenger.Raise(new BringIntoViewMessage());
-            }
-        }
-
         public bool IsSelected
         {
             get { return _isSelected; }
@@ -344,6 +335,35 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             }
         }
 
+        public bool IsImageAvailable
+        {
+            get { return Model.Images != null && Model.Images.Any(); }
+        }
+
+        public IEnumerable<Uri> Images
+        {
+            get { return Model.Images.Select(i => i.Item2); }
+        }
+
+        public Uri FirstImage
+        {
+            get { return Model.Images != null ? Model.Images.Select(i => i.Item2).FirstOrDefault() : null; }
+        }
+
+        /// <summary>
+        ///     For animating helper
+        /// </summary>
+        internal bool IsLoaded { get; set; }
+
+        public void RaiseFocusedChanged()
+        {
+            RaisePropertyChanged(() => IsFocused);
+            if (IsFocused)
+            {
+                Messenger.Raise(new BringIntoViewMessage());
+            }
+        }
+
         public void OpenWeb()
         {
             BrowserHelper.Open(
@@ -359,16 +379,10 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             BrowserHelper.Open(url);
         }
 
-        public bool IsImageAvailable { get { return Model.Images != null && Model.Images.Any(); } }
-
-        public IEnumerable<Uri> Images { get { return Model.Images.Select(i => i.Item2); } }
-
-        public Uri FirstImage { get { return Model.Images != null ? Model.Images.Select(i => i.Item2).FirstOrDefault() : null; } }
-
         public void OpenFirstImage()
         {
             if (Model.Images == null) return;
-            var tuple = Model.Images.FirstOrDefault();
+            Tuple<Uri, Uri> tuple = Model.Images.FirstOrDefault();
             if (tuple == null) return;
             BrowserHelper.Open(tuple.Item1);
         }
@@ -538,7 +552,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public void SendReply()
         {
-            if (this.Status.StatusType == StatusType.DirectMessage)
+            if (Status.StatusType == StatusType.DirectMessage)
             {
                 DirectMessage();
             }
@@ -595,8 +609,8 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public void ToggleFocus()
         {
-            this.Parent.FocusedStatus =
-                this.Parent.FocusedStatus == this ? null : this;
+            Parent.FocusedStatus =
+                Parent.FocusedStatus == this ? null : this;
         }
 
         public void ShowInReplyTo()
@@ -633,10 +647,5 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         }
 
         #endregion
-
-        /// <summary>
-        /// For animating helper
-        /// </summary>
-        internal bool IsLoaded { get; set; }
     }
 }
