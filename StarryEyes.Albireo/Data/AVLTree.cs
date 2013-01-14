@@ -472,6 +472,10 @@ namespace StarryEyes.Albireo.Data
 
             public bool MoveNext()
             {
+                if (_target._root == null)
+                {
+                    return false;
+                }
                 if (_trace.Count == 0) // init
                 {
                     AVLTreeLeaf leaf = _target._root;
