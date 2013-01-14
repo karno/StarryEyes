@@ -15,9 +15,9 @@ namespace StarryEyes.Models.Connections
         /// </summary>
         private readonly CompositeDisposable _disposablesHolder = new CompositeDisposable();
 
-        private int _currentTick = 0;
+        private int _currentTick;
 
-        public PollingConnectionBase(AuthenticateInfo ai)
+        protected PollingConnectionBase(AuthenticateInfo ai)
             : base(ai)
         {
             _disposablesHolder.Add(Observable.FromEvent(
@@ -26,7 +26,9 @@ namespace StarryEyes.Models.Connections
                 .Subscribe(_ => this.Dispose()));
             _disposablesHolder.Add(Observable.Interval(TimeSpan.FromSeconds(1))
                 .Subscribe(_ => OnTick()));
+            // ReSharper disable DoNotCallOverridableMethodsInConstructor
             _currentTick = IntervalSec; // first receive occurs immediately.
+            // ReSharper restore DoNotCallOverridableMethodsInConstructor
         }
 
         /// <summary>

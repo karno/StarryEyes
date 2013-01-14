@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Media;
-using StarryEyes.Breezy.Authorize;
+﻿using StarryEyes.Breezy.Authorize;
 using StarryEyes.Views;
 
 namespace StarryEyes.Models.Backpanels.PostEvents
@@ -21,7 +15,7 @@ namespace StarryEyes.Models.Backpanels.PostEvents
         public AuthenticateInfo FallbackToAuthInfo
         {
             get { return _fallbackToAuthInfo; }
-        } 
+        }
 
 
         public FallbackedEvent(AuthenticateInfo authInfo, AuthenticateInfo fallbackTo)

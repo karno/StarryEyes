@@ -25,21 +25,21 @@ namespace StarryEyes.Models.Connections.UserDependencies
             Task.Run(() => ReceiveMessages(this.AuthInfo));
         }
 
-        public static void ReceiveHomeTimeline(AuthenticateInfo info, long? max_id = null)
+        public static void ReceiveHomeTimeline(AuthenticateInfo info, long? maxId = null)
         {
-            info.GetHomeTimeline(count: 100, include_rts: true, include_entities: true, max_id: max_id)
+            info.GetHomeTimeline(count: 100, include_rts: true, include_entities: true, max_id: maxId)
                 .RegisterToStore();
         }
 
-        public static void ReceiveMentionTimeline(AuthenticateInfo info, long? max_id = null)
+        public static void ReceiveMentionTimeline(AuthenticateInfo info, long? maxId = null)
         {
-            info.GetMentions(count: 100, include_rts: false, max_id: max_id)
+            info.GetMentions(count: 100, include_rts: false, max_id: maxId)
                 .RegisterToStore();
         }
 
-        public static void ReceiveMessages(AuthenticateInfo info, long? max_id = null)
+        public static void ReceiveMessages(AuthenticateInfo info, long? maxId = null)
         {
-            info.GetDirectMessages(count: 50, max_id: max_id)
+            info.GetDirectMessages(count: 50, max_id: maxId)
                 .RegisterToStore();
         }
 

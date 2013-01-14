@@ -44,7 +44,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             _owner = owner;
             _model = tabModel;
             tabModel.Activate();
-            DispatcherHolder.Queue(InitializeCollection);
+            DispatcherHolder.Enqueue(InitializeCollection);
             CompositeDisposable.Add(
                 Observable.FromEvent(
                     _ => Model.Timeline.OnNewStatusArrived += _,
@@ -222,7 +222,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                         {
                             if (activated)
                             {
-                                DispatcherHolder.Queue(
+                                DispatcherHolder.Enqueue(
                                     () => ReflectCollectionChanged(e));
                             }
                         }));

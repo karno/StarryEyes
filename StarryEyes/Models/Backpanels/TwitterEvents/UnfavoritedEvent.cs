@@ -5,7 +5,7 @@ namespace StarryEyes.Models.Backpanels.TwitterEvents
 {
     public sealed class UnfavoritedEvent : TwitterEventBase
     {
-        public UnfavoritedEvent(TwitterUser user, TwitterStatus target) 
+        public UnfavoritedEvent(TwitterUser user, TwitterStatus target)
             : base(user, target) { }
 
         public override string Title
@@ -15,12 +15,12 @@ namespace StarryEyes.Models.Backpanels.TwitterEvents
 
         public override string Detail
         {
-            get { return Source.ScreenName + ": " + TargetStatus.ToString(); }
+            get { return Source.ScreenName + ": " + TargetStatus; }
         }
 
-        public override System.Windows.Media.Color Background
+        public override Color Background
         {
-            get{return Colors.DimGray; }
+            get { return Colors.DimGray; }
         }
     }
 }

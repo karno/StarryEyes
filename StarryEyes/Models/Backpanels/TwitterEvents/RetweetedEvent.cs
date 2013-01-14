@@ -6,7 +6,7 @@ namespace StarryEyes.Models.Backpanels.TwitterEvents
     public sealed class RetweetedEvent : TwitterEventBase
     {
         public RetweetedEvent(TwitterUser source, TwitterStatus target)
-            :base(source, target){}
+            : base(source, target) { }
 
         public override string Title
         {
@@ -15,7 +15,7 @@ namespace StarryEyes.Models.Backpanels.TwitterEvents
 
         public override string Detail
         {
-            get { return Source.ScreenName + ": " + TargetStatus.ToString(); }
+            get { return Source.ScreenName + ": " + TargetStatus; }
         }
 
         public override System.Windows.Media.Color Background

@@ -10,7 +10,7 @@ namespace StarryEyes.Models.Backpanels.TwitterEvents
         public DateTime CreatedAt
         {
             get { return _createdAt; }
-        } 
+        }
 
 
         private readonly TwitterUser _source;
@@ -29,7 +29,7 @@ namespace StarryEyes.Models.Backpanels.TwitterEvents
         public TwitterStatus TargetStatus
         {
             get { return _targetStatus; }
-        } 
+        }
 
         public TwitterEventBase(TwitterUser source, TwitterUser target)
         {

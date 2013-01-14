@@ -18,7 +18,7 @@ namespace StarryEyes.Models.Backpanels.TwitterEvents
             get { return Source.ScreenName + " -/-> " + TargetUser.ScreenName; }
         }
 
-        public override System.Windows.Media.Color Background
+        public override Color Background
         {
             get
             {

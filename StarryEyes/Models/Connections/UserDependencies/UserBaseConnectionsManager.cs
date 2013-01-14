@@ -236,10 +236,8 @@ namespace StarryEyes.Models.Connections.UserDependencies
         public ConnectionGroup(long id)
         {
             _userId = id;
-            _userTimelineReceiver = new UserTimelinesReceiver(AuthInfo);
-            _userTimelineReceiver.IsActivated = true;
-            _userInfoReceiver = new UserInfoReceiver(AuthInfo);
-            _userInfoReceiver.IsActivated = true;
+            _userTimelineReceiver = new UserTimelinesReceiver(AuthInfo) { IsActivated = true };
+            _userInfoReceiver = new UserInfoReceiver(AuthInfo) { IsActivated = true };
         }
 
         public long UserId

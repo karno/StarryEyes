@@ -6,7 +6,7 @@ namespace StarryEyes.Models.Connections
 {
     public abstract class ConnectionBase : IDisposable
     {
-        private AuthenticateInfo _authInfo;
+        private readonly AuthenticateInfo _authInfo;
         protected AuthenticateInfo AuthInfo
         {
             get { return _authInfo; }
@@ -27,12 +27,12 @@ namespace StarryEyes.Models.Connections
                     fixName, fix));
         }
 
-        public ConnectionBase(AuthenticateInfo authInfo)
+        protected ConnectionBase(AuthenticateInfo authInfo)
         {
             this._authInfo = authInfo;
         }
 
-        bool _disposed = false;
+        bool _disposed;
         protected bool IsDisposed
         {
             get { return _disposed; }
