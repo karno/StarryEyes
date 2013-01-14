@@ -138,7 +138,8 @@ namespace StarryEyes.Models
                              l.Add(i);
                              return l;
                          })
-                         .Subscribe(l => Images = l, () => _imagesSubject.OnCompleted());
+                         .Finally(() => _imagesSubject.OnCompleted())
+                         .Subscribe(l => Images = l);
         }
 
         public TwitterStatus Status { get; private set; }

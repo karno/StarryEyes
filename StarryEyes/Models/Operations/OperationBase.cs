@@ -9,25 +9,25 @@ namespace StarryEyes.Models.Operations
 {
     public abstract class OperationBase<T> : IRunnerQueueable
     {
-        public OperationBase() { }
-
-        private readonly Subject<T> resultHandler = new Subject<T>();
+        private readonly Subject<T> _resultHandler = new Subject<T>();
         protected Subject<T> ResultHandler
         {
-            get { return resultHandler; }
+            get { return _resultHandler; }
         }
 
         /// <summary>
         /// Run operation via operation queue.
         /// </summary>
+        // ReSharper disable MethodOverloadWithOptionalParameter
         internal IObservable<T> Run(OperationPriority priority = OperationPriority.Middle)
         {
             return Observable.Defer(() =>
             {
                 OperationQueueRunner.Enqueue(this, priority);
-                return resultHandler;
+                return _resultHandler;
             });
         }
+        // ReSharper restore MethodOverloadWithOptionalParameter
 
         /// <summary>
         /// Run operation without operation queue
@@ -53,12 +53,9 @@ namespace StarryEyes.Models.Operations
                         return Observable.Return(wex.Response)
                             .ObserveOn(TaskPoolScheduler.Default)
                             .SelectMany(r => r.DownloadStringAsync())
-                            .Select(s => ParseErrorMessage(s));
+                            .Select(ParseErrorMessage);
                     }
-                    else
-                    {
-                        return Observable.Return(ex.Message);
-                    }
+                    return Observable.Return(ex.Message);
                 });
         }
 
@@ -66,16 +63,15 @@ namespace StarryEyes.Models.Operations
         {
             if (error.StartsWith("{error:") && error.EndsWith("}"))
                 return error.Substring(7, error.Length - 8);
-            else
-                return error;
+            return error;
         }
 
         IObservable<Unit> IRunnerQueueable.Run()
         {
-            return Observable.Defer(() => RunCore())
+            return Observable.Defer(RunCore)
                 .Publish(connectable =>
                 {
-                    connectable.Subscribe(resultHandler);
+                    connectable.Subscribe(_resultHandler);
                     return connectable;
                 })
                 .Select(_ => new Unit());

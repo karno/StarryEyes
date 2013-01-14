@@ -28,8 +28,6 @@ namespace StarryEyes.Views.Controls
             set { SetValue(UriSourceProperty, value); }
         }
 
-
-
         public int DecodePixelWidth
         {
             get { return (int)GetValue(DecodePixelWidthProperty); }
@@ -97,28 +95,39 @@ namespace StarryEyes.Views.Controls
                                       .Subscribe(b => SetImage(img, b, uri), ex => { });
                         if (publisher != null)
                         {
+                            IObservable<byte[]> observable;
                             Func<Uri, byte[]> resolver;
                             if (uri.Scheme != "http" && uri.Scheme != "https" &&
                                 _specialTable.TryGetValue(uri.Scheme, out resolver))
                             {
-                                Observable.Start(() => resolver(uri))
-                                    .Subscribe(publisher.OnNext, ex => { });
-                                return;
+                                // ReSharper disable ImplicitlyCapturedClosure
+                                observable = Observable.Start(() => resolver(uri));
+                                // ReSharper restore ImplicitlyCapturedClosure
                             }
-                            var client = new WebClient();
-                            client.DownloadDataTaskAsync(uri)
-                              .ToObservable()
-                              .Finally(() =>
-                              {
-                                  IObservable<byte[]> subscribe;
-                                  _imageStreamer.TryRemove(uri, out subscribe);
-                                  client.Dispose();
-                              })
-                              .Subscribe(publisher.OnNext, ex => { });
+                            else
+                            {
+
+                                var client = new WebClient();
+                                observable = client.DownloadDataTaskAsync(uri)
+                                                   .ToObservable()
+                                    // ReSharper disable ImplicitlyCapturedClosure
+                                                   .Finally(() =>
+                                                   // ReSharper restore ImplicitlyCapturedClosure
+                                                   {
+                                                       IObservable<byte[]> subscribe;
+                                                       _imageStreamer.TryRemove(uri, out subscribe);
+                                                       client.Dispose();
+                                                   });
+                            }
+                            observable
+                                .Finally(() => publisher.OnCompleted())
+                                .Subscribe(publisher.OnNext, ex => { });
                         }
                     }
                 }
+                // ReSharper disable EmptyGeneralCatchClause
                 catch
+                // ReSharper restore EmptyGeneralCatchClause
                 {
                 }
             }
@@ -135,7 +144,9 @@ namespace StarryEyes.Views.Controls
                     image.Source = source;
                 }
             }
+            // ReSharper disable EmptyGeneralCatchClause
             catch
+            // ReSharper restore EmptyGeneralCatchClause
             {
             }
         }

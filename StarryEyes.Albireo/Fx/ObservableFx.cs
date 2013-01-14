@@ -96,7 +96,7 @@ namespace System.Reactive.Linq
         public static IObservable<T> OrderBy<T, TKey>(this IObservable<T> observable,
             Func<T, TKey> keySelector)
         {
-            List<Notification<T>> material = new List<Notification<T>>();
+            var material = new List<Notification<T>>();
             return observable.Materialize()
                 .Select(_ =>
                 {
