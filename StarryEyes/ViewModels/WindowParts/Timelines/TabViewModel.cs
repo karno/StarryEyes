@@ -60,6 +60,11 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                               RaisePropertyChanged(() => IsScrollLockExplicitEnabled);
                           }));
             CompositeDisposable.Add(() => Model.Deactivate());
+            CompositeDisposable.Add(
+                Observable.FromEvent(
+                h => tabModel.OnBindingAccountIdsChanged += h,
+                h => tabModel.OnBindingAccountIdsChanged -= h)
+                .Subscribe(_ => DispatcherHolder.Enqueue(() => Timeline.ForEach(t => t.BindingAccounts = Model.BindingAccountIds))));
             IsLoading = true;
             Observable.Defer(
                 () =>

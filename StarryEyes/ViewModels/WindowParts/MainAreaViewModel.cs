@@ -22,7 +22,7 @@ namespace StarryEyes.ViewModels.WindowParts
                 Observable.FromEvent(
                     h => MainAreaModel.OnCurrentFocusColumnChanged += h,
                     h => MainAreaModel.OnCurrentFocusColumnChanged -= h)
-                          .Select(_ => MainAreaModel.CurrentFocusColumn)
+                          .Select(_ => MainAreaModel.CurrentFocusColumnIndex)
                           .Subscribe(UpdateFocusFromModel));
         }
 
@@ -34,11 +34,11 @@ namespace StarryEyes.ViewModels.WindowParts
         private int _oldFocus;
         public ColumnViewModel Focused
         {
-            get { return _columns[MainAreaModel.CurrentFocusColumn]; }
+            get { return _columns[MainAreaModel.CurrentFocusColumnIndex]; }
             set
             {
                 var previous = Focused;
-                MainAreaModel.CurrentFocusColumn = _oldFocus = _columns.IndexOf(value);
+                MainAreaModel.CurrentFocusColumnIndex = _oldFocus = _columns.IndexOf(value);
                 previous.UpdateFocus();
                 value.UpdateFocus();
                 RaisePropertyChanged();

@@ -18,11 +18,11 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         private int _oldFocus;
         public TabViewModel Focused
         {
-            get { return _tabs[_model.CurrentFocusTab]; }
+            get { return _tabs[_model.CurrentFocusTabIndex]; }
             set
             {
                 var previous = Focused;
-                _model.CurrentFocusTab = _oldFocus = _tabs.IndexOf(value);
+                _model.CurrentFocusTabIndex = _oldFocus = _tabs.IndexOf(value);
                 previous.UpdateFocus();
                 value.UpdateFocus();
                 RaisePropertyChanged();
@@ -54,7 +54,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                 Observable.FromEvent(
                 h => _model.OnCurrentFocusColumnChanged += h,
                 h => _model.OnCurrentFocusColumnChanged -= h)
-                .Select(_ => _model.CurrentFocusTab)
+                .Select(_ => _model.CurrentFocusTabIndex)
                 .Subscribe(UpdateFocusFromModel));
             if (_tabs.Count > 0)
             {

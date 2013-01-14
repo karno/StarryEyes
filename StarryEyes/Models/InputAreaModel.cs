@@ -96,8 +96,8 @@ namespace StarryEyes.Models
 
         public static void NotifyChangeFocusingTab(TabModel tabModel)
         {
-            _bindingAuthInfos.Clear();
             _currentFocusTabModel = null;
+            _bindingAuthInfos.Clear();
             tabModel.BindingAccountIds
                     .Select(AccountsStore.GetAccountSetting)
                     .Where(_ => _ != null)

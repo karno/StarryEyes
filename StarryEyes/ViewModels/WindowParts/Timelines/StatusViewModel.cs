@@ -130,6 +130,10 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             {
                 _bindingAccounts = value.ToArray();
                 // raise property changed
+                RaisePropertyChanged();
+                RaisePropertyChanged(() => IsFavorited);
+                RaisePropertyChanged(() => IsRetweeted);
+                RaisePropertyChanged(() => IsMyselfStrict);
             }
         }
 
