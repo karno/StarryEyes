@@ -57,7 +57,7 @@ namespace StarryEyes
                     mutexStr = ExecutionMode.ToString();
                     break;
                 case ExecutionMode.Standalone:
-                    mutexStr = "Standalone_" + ExeFilePath;
+                    mutexStr = "Standalone_" + ExeFilePath.Replace('\\', '*');
                     break;
             }
             _appMutex = new Mutex(true, "Krile_StarryEyes_" + mutexStr);
