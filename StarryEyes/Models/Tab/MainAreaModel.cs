@@ -121,12 +121,14 @@ namespace StarryEyes.Models.Tab
         /// </summary>
         public static void CreateTab(TabModel info, int columnIndex)
         {
+            // ReSharper disable LocalizableElement
             if (columnIndex > _columns.Count) // column index is only for existed or new column
                 throw new ArgumentOutOfRangeException(
                     "columnIndex",
                     "currently " + _columns.Count +
                     " columns are existed. so, you can't set this parameter as " +
                     columnIndex + ".");
+            // ReSharper restore LocalizableElement
             if (columnIndex == _columns.Count)
             {
                 // create new

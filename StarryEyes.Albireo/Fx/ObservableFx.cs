@@ -2,7 +2,9 @@
 using System.Linq;
 using System.Reactive.Concurrency;
 
+// ReSharper disable CheckNamespace
 namespace System.Reactive.Linq
+// ReSharper restore CheckNamespace
 {
     public static class ObservableFx
     {
@@ -39,9 +41,9 @@ namespace System.Reactive.Linq
                     return Observable.Timer(delaySpan, scheduler).SelectMany(_ => source.Retry(retryCount, exAction, delaySpan, scheduler));
                 }
 
-                int nowRetryCount = 1;
-
-                return Observable.Timer(delaySpan, scheduler).SelectMany(_ => source.Retry(retryCount, exAction, delaySpan, scheduler, nowRetryCount));
+                return
+                    Observable.Timer(delaySpan, scheduler)
+                              .SelectMany(_ => source.Retry(retryCount, exAction, delaySpan, scheduler, 1));
             });
         }
 
@@ -120,7 +122,7 @@ namespace System.Reactive.Linq
         public static IObservable<T> OrderByDescending<T, TKey>(this IObservable<T> observable,
             Func<T, TKey> keySelector)
         {
-            List<Notification<T>> material = new List<Notification<T>>();
+            var material = new List<Notification<T>>();
             return observable.Materialize()
                 .Select(_ =>
                 {

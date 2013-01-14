@@ -19,7 +19,7 @@ namespace StarryEyes.Models.Tab
     /// <summary>
     ///     Hold tab information for spawning tab.
     /// </summary>
-    public class TabModel
+    public sealed class TabModel
     {
         private readonly AVLTree<long> _bindingAccountIds = new AVLTree<long>();
         private List<string> _bindingHashtags = new List<string>();
@@ -44,7 +44,7 @@ namespace StarryEyes.Models.Tab
 
         public event Action OnBindingAccountIdsChanged;
 
-        protected virtual void RaiseOnBindingAccountIdsChanged()
+        private void RaiseOnBindingAccountIdsChanged()
         {
             Action handler = OnBindingAccountIdsChanged;
             if (handler != null) handler();

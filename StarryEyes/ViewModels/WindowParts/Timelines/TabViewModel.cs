@@ -21,7 +21,6 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         private readonly object _collectionLock = new object();
         private readonly ColumnViewModel _owner;
         private readonly ObservableCollection<StatusViewModel> _timeline;
-        private bool _isFocused;
         private bool _isLoading;
         private bool _isMouseOver;
         private bool _isScrollInBottom;

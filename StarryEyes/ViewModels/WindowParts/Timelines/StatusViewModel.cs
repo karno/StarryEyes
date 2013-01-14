@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using Livet;
 using Livet.Commands;
 using StarryEyes.Breezy.Authorize;
@@ -422,6 +421,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                                                                        ex.Message));
                                           return Observable.Empty<TwitterStatus>();
                                       }))
+                 .Do(_ => RaisePropertyChanged(() => IsFavorited))
                  .Subscribe();
         }
 
@@ -453,6 +453,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                                                                        ex.Message));
                                           return Observable.Empty<TwitterStatus>();
                                       }))
+                 .Do(_ => RaisePropertyChanged(() => IsRetweeted))
                  .Subscribe();
         }
 
@@ -468,7 +469,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public void FavoriteAndRetweetImmediate()
         {
-            IConnectableObservable<AuthenticateInfo> accounts = GetImmediateAccounts()
+            var accounts = GetImmediateAccounts()
                 .ToObservable()
                 .Publish();
             if (!IsFavorited)

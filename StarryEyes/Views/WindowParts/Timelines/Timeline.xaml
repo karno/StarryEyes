@@ -734,8 +734,18 @@
                                                       Height="14.77"
                                                       Margin="-2"
                                                       Data="F1 M 771.886,590.845L 776.402,590.845L 777.886,586.691L 779.369,590.845L 783.886,590.845L 780.124,593.539L 781.809,597.768L 777.886,595.46L 774.424,597.768L 775.728,593.602L 771.886,590.845 Z "
-                                                      Fill="Gray"
-                                                      Stretch="Fill" />
+                                                      Stretch="Fill">
+                                                    <Path.Style>
+                                                        <Style TargetType="{x:Type Path}">
+                                                            <Setter Property="Fill" Value="Gray" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsFavorited, Mode=OneWay}" Value="True">
+                                                                    <Setter Property="Fill" Value="#EF9608" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Path.Style>
+                                                </Path>
                                             </Button>
                                             <Button Width="46"
                                                     Height="22"
@@ -755,8 +765,7 @@
                                                       Fill="Gray"
                                                       Stretch="Fill" />
                                             </Button>
-                                            <Button x:Name="button3"
-                                                    Width="32"
+                                            <Button Width="32"
                                                     Height="22"
                                                     Margin="-60,-2,0,-2"
                                                     Style="{DynamicResource MetroSquareUnfocusableFlatButton}"
@@ -772,8 +781,18 @@
                                                       Height="16"
                                                       Margin="-2"
                                                       Data="F1 M 797.334,587.09C 798.788,587.09 800.1,587.702 801.026,588.682L 801.026,586.167L 802.41,587.551L 802.41,591.244L 798.718,591.244L 797.334,589.859L 799.914,589.859C 799.28,589.151 798.359,588.705 797.334,588.705C 795.578,588.705 794.128,590.012 793.903,591.705L 792.277,591.705C 792.511,589.117 794.685,587.09 797.334,587.09 Z M 797.334,595.628C 799.089,595.628 800.539,594.322 800.765,592.628L 802.39,592.628C 802.157,595.216 799.982,597.244 797.334,597.244C 795.879,597.244 794.567,596.632 793.641,595.651L 793.641,598.167L 792.257,596.782L 792.257,593.09L 795.949,593.09L 797.334,594.474L 794.753,594.474C 795.387,595.182 796.308,595.628 797.334,595.628 Z "
-                                                      Fill="Gray"
-                                                      Stretch="Fill" />
+                                                      Stretch="Fill">
+                                                    <Path.Style>
+                                                        <Style TargetType="{x:Type Path}">
+                                                            <Setter Property="Fill" Value="Gray" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsRetweeted, Mode=OneWay}" Value="True">
+                                                                    <Setter Property="Fill" Value="#339933" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Path.Style>
+                                                </Path>
                                             </Button>
                                             <Button Width="32"
                                                     Height="22"
@@ -1122,14 +1141,12 @@
                   ScrollViewer.CanContentScroll="True"
                   ScrollViewer.VerticalScrollBarVisibility="Visible"
                   VirtualizingPanel.IsVirtualizing="True"
-                  VirtualizingPanel.ScrollUnit="Pixel"
-                  VirtualizingPanel.VirtualizationMode="Recycling">
+                  VirtualizingPanel.ScrollUnit="Pixel">
         <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
                 <VirtualizingStackPanel IsVirtualizing="True"
                                         Orientation="Vertical"
-                                        ScrollUnit="Pixel"
-                                        VirtualizationMode="Recycling" />
+                                        ScrollUnit="Pixel" />
             </ItemsPanelTemplate>
         </ItemsControl.ItemsPanel>
         <ItemsControl.Template>
