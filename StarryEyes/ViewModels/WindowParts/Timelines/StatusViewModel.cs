@@ -409,6 +409,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
             infos.ToObservable()
                  .Do(expected)
+                 .Do(_ => RaisePropertyChanged(() => IsFavorited))
                  .SelectMany(a => new FavoriteOperation(a, Status, add)
                                       .Run()
                                       .Catch((Exception ex) =>
@@ -441,6 +442,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             }
             infos.ToObservable()
                  .Do(expected)
+                 .Do(_ => RaisePropertyChanged(() => IsRetweeted))
                  .SelectMany(a => new RetweetOperation(a, Status, add)
                                       .Run()
                                       .Catch((Exception ex) =>
@@ -474,6 +476,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                 .Publish();
             if (!IsFavorited)
                 accounts.Do(a => Model.AddFavoritedUser(a.Id))
+                        .Do(_ => RaisePropertyChanged(() => IsFavorited))
                         .SelectMany(a => new FavoriteOperation(a, Status, true)
                                              .Run()
                                              .Catch((Exception ex) =>
@@ -481,9 +484,11 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                                                  Model.RemoveFavoritedUser(a.Id);
                                                  return Observable.Empty<TwitterStatus>();
                                              }))
+                        .Do(_ => RaisePropertyChanged(() => IsFavorited))
                         .Subscribe();
             if (!IsRetweeted)
                 accounts.Do(a => Model.AddRetweetedUser(a.Id))
+                        .Do(_ => RaisePropertyChanged(() => IsRetweeted))
                         .SelectMany(a => new RetweetOperation(a, Status, true)
                                              .Run()
                                              .Catch((Exception ex) =>
@@ -491,6 +496,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                                                  Model.RemoveRetweetedUser(a.Id);
                                                  return Observable.Empty<TwitterStatus>();
                                              }))
+                        .Do(_ => RaisePropertyChanged(() => IsRetweeted))
                         .Subscribe();
             accounts.Connect();
         }
