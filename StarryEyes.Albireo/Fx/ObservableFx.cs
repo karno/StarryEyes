@@ -90,7 +90,8 @@ namespace System.Reactive.Linq
         {
             return source
                 .Materialize()
-                .Select((n, i) => (n.Kind == NotificationKind.OnCompleted && i == 0) ? next().Materialize() : Observable.Return(n))
+                .Select((n, i) => (n.Kind == NotificationKind.OnCompleted && i == 0) ?
+                    next().Materialize() : Observable.Return(n))
                 .SelectMany(ns => ns)
                 .Dematerialize();
         }

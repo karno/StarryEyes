@@ -31,7 +31,7 @@ namespace StarryEyes.Breezy.Util
         /// <returns>encoded string</returns>
         public static string UrlEncode(string s, Encoding enc)
         {
-            StringBuilder rt = new StringBuilder();
+            var rt = new StringBuilder();
             foreach (byte i in enc.GetBytes(s))
                 if (i == 0x20)
                     rt.Append('+');
@@ -53,7 +53,7 @@ namespace StarryEyes.Breezy.Util
         /// <returns>encoded string</returns>
         public static string UrlEncodeStrict(string value, Encoding encoding, bool upper)
         {
-            StringBuilder result = new StringBuilder();
+            var result = new StringBuilder();
             byte[] data = encoding.GetBytes(value);
             int len = data.Length;
 
@@ -93,7 +93,7 @@ namespace StarryEyes.Breezy.Util
         /// <returns>decoded string</returns>
         public static string UrlDecode(string s, Encoding enc)
         {
-            List<byte> bytes = new List<byte>();
+            var bytes = new List<byte>();
             for (int i = 0; i < s.Length; i++)
             {
                 char c = s[i];

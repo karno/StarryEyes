@@ -45,15 +45,17 @@ namespace StarryEyes.Views.Behaviors
         }
 
         private double _previousHeight;
-        private int _itemsCount;
+        // private int _itemsCount;
         private void UpdateScrollHeight(double value)
         {
+            /*
             if (ItemsSource != null)
             {
                 var pc = _itemsCount;
                 _itemsCount = ItemsSource.Count;
                 if (pc == _itemsCount) return; // item count is not changed.
             }
+            */
             double p = value - _previousHeight;
             _previousHeight = value;
             if (p > 0 && IsScrollLockEnabled)

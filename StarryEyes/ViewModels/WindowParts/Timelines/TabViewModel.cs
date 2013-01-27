@@ -20,7 +20,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
     {
         private readonly object _collectionLock = new object();
         private readonly ColumnViewModel _owner;
-        private readonly ObservableCollection<StatusViewModel> _timeline;
+        private ObservableCollection<StatusViewModel> _timeline;
         private bool _isLoading;
         private bool _isMouseOver;
         private bool _isScrollInBottom;
@@ -39,11 +39,9 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public TabViewModel(ColumnViewModel owner, TabModel tabModel)
         {
-            _timeline = new ObservableCollection<StatusViewModel>();
             _owner = owner;
             _model = tabModel;
             tabModel.Activate();
-            DispatcherHolder.Enqueue(InitializeCollection);
             CompositeDisposable.Add(
                 Observable.FromEvent(
                     _ => Model.Timeline.OnNewStatusArrived += _,
@@ -107,7 +105,15 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public ObservableCollection<StatusViewModel> Timeline
         {
-            get { return _timeline; }
+            get
+            {
+                if (_timeline == null)
+                {
+                    _timeline = new ObservableCollection<StatusViewModel>();
+                    DispatcherHolder.Enqueue(InitializeCollection);
+                }
+                return _timeline;
+            }
         }
 
         public int UnreadCount

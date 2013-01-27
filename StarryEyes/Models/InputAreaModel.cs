@@ -303,6 +303,7 @@ namespace StarryEyes.Models
                                                     }
                                                 });
                                      subject.OnCompleted();
+                                     subject.Dispose();
                                  });
             return subject;
         }

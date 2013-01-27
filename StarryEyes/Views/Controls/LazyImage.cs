@@ -5,6 +5,8 @@ using System.Net;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -48,7 +50,7 @@ namespace StarryEyes.Views.Controls
         public static readonly DependencyProperty DecodePixelHeightProperty =
             DependencyProperty.Register("DecodePixelHeight", typeof(int), typeof(LazyImage), new PropertyMetadata(0));
 
-        private static void UriSourcePropertyChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        private static async void UriSourcePropertyChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
             var img = sender as LazyImage;
             if (img == null) return;
@@ -84,6 +86,7 @@ namespace StarryEyes.Views.Controls
                                               bi.DecodePixelHeight = dch;
                                               bi.EndInit();
                                               bi.Freeze();
+                                              ms.Dispose();
                                               return bi;
                                           }
                                           catch
@@ -95,33 +98,14 @@ namespace StarryEyes.Views.Controls
                                       .Subscribe(b => SetImage(img, b, uri), ex => { });
                         if (publisher != null)
                         {
-                            IObservable<byte[]> observable;
-                            Func<Uri, byte[]> resolver;
-                            if (uri.Scheme != "http" && uri.Scheme != "https" &&
-                                _specialTable.TryGetValue(uri.Scheme, out resolver))
+                            WaitObjects.Enqueue(Tuple.Create(uri, publisher));
+                            while (Interlocked.Increment(ref _threadCount) > ThreadMaxCount)
                             {
-                                // ReSharper disable ImplicitlyCapturedClosure
-                                observable = Observable.Start(() => resolver(uri));
-                                // ReSharper restore ImplicitlyCapturedClosure
+                                if (Interlocked.Decrement(ref _threadCount) > 0)
+                                    return;
                             }
-                            else
-                            {
-
-                                var client = new WebClient();
-                                observable = client.DownloadDataTaskAsync(uri)
-                                                   .ToObservable()
-                                    // ReSharper disable ImplicitlyCapturedClosure
-                                                   .Finally(() =>
-                                                   // ReSharper restore ImplicitlyCapturedClosure
-                                                   {
-                                                       IObservable<byte[]> subscribe;
-                                                       _imageStreamer.TryRemove(uri, out subscribe);
-                                                       client.Dispose();
-                                                   });
-                            }
-                            observable
-                                .Finally(() => publisher.OnCompleted())
-                                .Subscribe(publisher.OnNext, ex => { });
+                            await Worker();
+                            Interlocked.Decrement(ref _threadCount);
                         }
                     }
                 }
@@ -131,6 +115,48 @@ namespace StarryEyes.Views.Controls
                 {
                 }
             }
+        }
+
+        private const int ThreadMaxCount = 8;
+        private static int _threadCount;
+        private static readonly ConcurrentQueue<Tuple<Uri, Subject<byte[]>>> WaitObjects = new ConcurrentQueue<Tuple<Uri, Subject<byte[]>>>();
+
+        private static async Task Worker()
+        {
+            await Task.Run(() =>
+            {
+                Tuple<Uri, Subject<byte[]>> dequeue;
+                var client = new WebClient();
+                while (WaitObjects.TryDequeue(out dequeue))
+                {
+                    try
+                    {
+                        byte[] result;
+                        Func<Uri, byte[]> resolver;
+                        var uri = dequeue.Item1;
+                        if (uri.Scheme != "http" && uri.Scheme != "https" &&
+                            _specialTable.TryGetValue(uri.Scheme, out resolver))
+                        {
+                            result = resolver(uri);
+                        }
+                        else
+                        {
+                            result = client.DownloadData(uri);
+                        }
+                        IObservable<byte[]> removal;
+                        _imageStreamer.TryRemove(uri, out removal);
+                        dequeue.Item2.OnNext(result);
+                        dequeue.Item2.OnCompleted();
+                        dequeue.Item2.Dispose();
+                    }
+                    catch (Exception ex)
+                    {
+                        if (dequeue == null) continue;
+                        dequeue.Item2.OnError(ex);
+                        dequeue.Item2.Dispose();
+                    }
+                }
+            });
         }
 
         private static void SetImage(LazyImage image, ImageSource source, Uri sourceFrom)

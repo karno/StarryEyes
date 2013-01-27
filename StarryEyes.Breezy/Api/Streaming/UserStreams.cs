@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
+using Codeplex.OAuth;
 using Newtonsoft.Json;
 using StarryEyes.Breezy.Api.Parsing.JsonFormats;
 using StarryEyes.Breezy.Authorize;
@@ -13,72 +15,62 @@ namespace StarryEyes.Breezy.Api.Streaming
 {
     public static class UserStreams
     {
-        private static readonly string EndpointUserStreams = "https://userstream.twitter.com/2/user.json";
+        private const string EndpointUserStreams = "https://userstream.twitter.com/2/user.json";
 
         public static IObservable<TwitterStreamingElement> ConnectToUserStreams(this AuthenticateInfo info,
-            IEnumerable<string> trackKeywords = null)
+                                                                                IEnumerable<string> trackKeywords = null)
         {
             var paradic = new Dictionary<string, object>();
-            var tracks = trackKeywords != null ? trackKeywords.Distinct().JoinString(",") : null;
+            string tracks = trackKeywords != null ? trackKeywords.Distinct().JoinString(",") : null;
             if (!String.IsNullOrWhiteSpace(tracks))
             {
                 paradic.Add("track", tracks);
             }
-            var param = paradic.Parametalize();
+            ParameterCollection param = paradic.Parametalize();
             return info.GetOAuthClient(useGzip: false)
-                .SetEndpoint(EndpointUserStreams)
-                .SetParameters(param)
-                .GetResponse()
-                .SelectMany(res => res.DownloadStringLineAsync())
-                .Where(s => !String.IsNullOrEmpty(s))
-                .ObserveOn(TaskPoolScheduler.Default)
-                .ParseStreamingElement();
+                       .SetEndpoint(EndpointUserStreams)
+                       .SetParameters(param)
+                       .GetResponse()
+                       .SelectMany(res => res.DownloadStringLineAsync())
+                       .Where(s => !String.IsNullOrEmpty(s))
+                       .ObserveOn(TaskPoolScheduler.Default)
+                       .ParseStreamingElement();
         }
-
-        private static Type[] candidates = new Type[] 
-        { 
-            typeof(TweetJson),
-            typeof(DirectMessageJson), 
-            typeof(StreamingDeleteJson), 
-            typeof(StreamingTrackJson),
-        };
 
         private static T DeserializeJson<T>(this string s)
         {
             return new StringReader(s)
                 .Using(sr => new JsonTextReader(sr)
-                    .Using(jtr => new JsonSerializer()
-                        .Deserialize<T>(jtr)));
+                                 .Using(jtr => new JsonSerializer()
+                                                   .Deserialize<T>(jtr)));
         }
 
         private static TwitterStreamingElement CheckSpawn(this ITwitterStreamingElementSpawnable s)
         {
             if (s == null)
                 return null;
-            else
-                return s.Spawn();
+            return s.Spawn();
         }
 
         private static IObservable<TwitterStreamingElement> ParseStreamingElement(this IObservable<string> observable)
         {
             return observable
-                .Select<string, TwitterStreamingElement>(s =>
+                .Select(s =>
                 {
-                    EventType eventType;
                     var desz = s.DeserializeJson<StreamingEventJson>();
-                    eventType = (desz == null ? null : desz.event_kind).ToEventType();
+                    EventType eventType = (desz == null ? null : desz.event_kind).ToEventType();
                     switch (eventType)
                     {
                         case EventType.Empty:
                             var tweet = s.DeserializeJson<TweetJson>();
                             if (tweet != null && tweet.id_str != null)
-                                return new TwitterStreamingElement()
+                                return new TwitterStreamingElement
                                 {
                                     Status = tweet.Spawn(),
                                 };
                             var dmsg = s.DeserializeJson<DirectMessageJson>();
                             if (dmsg != null && dmsg.id_str != null)
-                                return new TwitterStreamingElement()
+                                return new TwitterStreamingElement
                                 {
                                     Status = dmsg.Spawn(),
                                 };
@@ -87,30 +79,30 @@ namespace StarryEyes.Breezy.Api.Streaming
                                 return deleted.Spawn();
                             var track = s.DeserializeJson<StreamingTrackJson>();
                             if (track != null && track.track != 0)
-                                return new TwitterStreamingElement()
+                                return new TwitterStreamingElement
                                 {
-                                    EventType = DataModel.EventType.LimitationInfo,
+                                    EventType = EventType.LimitationInfo,
                                     TrackLimit = track.track,
                                 };
                             return s.DeserializeJson<StreamingAdditionalJson>().CheckSpawn();
-                        case DataModel.EventType.Follow:
-                        case DataModel.EventType.Unfollow:
-                        case DataModel.EventType.Blocked:
-                        case DataModel.EventType.Unblocked:
+                        case EventType.Follow:
+                        case EventType.Unfollow:
+                        case EventType.Blocked:
+                        case EventType.Unblocked:
                             return s.DeserializeJson<StreamingUserEventJson>().CheckSpawn();
-                        case DataModel.EventType.Favorite:
-                        case DataModel.EventType.Unfavorite:
+                        case EventType.Favorite:
+                        case EventType.Unfavorite:
                             return s.DeserializeJson<StreamingTweetEventJson>().CheckSpawn();
-                        case DataModel.EventType.ListCreated:
-                        case DataModel.EventType.ListUpdated:
-                        case DataModel.EventType.ListDeleted:
-                        case DataModel.EventType.ListSubscribed:
-                        case DataModel.EventType.ListUnsubscribed:
-                        case DataModel.EventType.ListMemberAdded:
-                        case DataModel.EventType.ListMemberRemoved:
+                        case EventType.ListCreated:
+                        case EventType.ListUpdated:
+                        case EventType.ListDeleted:
+                        case EventType.ListSubscribed:
+                        case EventType.ListUnsubscribed:
+                        case EventType.ListMemberAdded:
+                        case EventType.ListMemberRemoved:
                             return s.DeserializeJson<StreamingEventJson>().CheckSpawn();
                         default:
-                            System.Diagnostics.Debug.WriteLine("undecodable:" + s);
+                            Debug.WriteLine("undecodable:" + s);
                             return null;
                     }
                 })

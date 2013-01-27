@@ -585,33 +585,15 @@
 
                                         </StackPanel>
                                     </DockPanel>
-                                    <Grid Height="Auto" Margin="5,0,0,0">
+                                    <Grid Height="Auto" Margin="10,0,0,0">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition />
                                             <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
-                                        <RichTextBox Margin="0,0,3,0"
-                                                     VerticalAlignment="Top"
-                                                     HorizontalContentAlignment="Stretch"
-                                                     AcceptsReturn="False"
-                                                     Background="#00000000"
-                                                     BorderBrush="{x:Null}"
-                                                     BorderThickness="0"
-                                                     FontFamily="Segoe UI"
-                                                     FontSize="13.333"
-                                                     IsDocumentEnabled="True"
-                                                     IsReadOnly="True"
-                                                     IsUndoEnabled="False"
-                                                     SelectionBrush="#FF1BA1E2"
-                                                     TextOptions.TextFormattingMode="Display"
-                                                     helpers:RichTextBoxHelper.LinkNavigationCommand="{Binding OpenLinkCommand}"
-                                                     helpers:RichTextBoxHelper.TwitterStatus="{Binding Status}">
-                                            <i:Interaction.Triggers>
-                                                <i:EventTrigger EventName="MouseLeftButtonDown">
-                                                    <ei:CallMethodAction MethodName="ToggleFocus" TargetObject="{Binding Mode=OneWay}" />
-                                                </i:EventTrigger>
-                                            </i:Interaction.Triggers>
-                                        </RichTextBox>
+                                        <TextBlock VerticalAlignment="Top"
+                                                   TextWrapping="Wrap"
+                                                   helpers:StatusStylizeHelper.LinkNavigationCommand="{Binding OpenLinkCommand}"
+                                                   helpers:StatusStylizeHelper.TwitterStatus="{Binding Status}" />
                                         <Border Grid.Column="1"
                                                 Grid.ColumnSpan="1"
                                                 Width="60"
@@ -1139,30 +1121,28 @@
     <ItemsControl ItemTemplate="{StaticResource StatusItemTemplate}"
                   ItemsSource="{Binding Timeline}"
                   ScrollViewer.CanContentScroll="True"
-                  ScrollViewer.VerticalScrollBarVisibility="Visible"
                   VirtualizingPanel.IsVirtualizing="True"
-                  VirtualizingPanel.ScrollUnit="Pixel">
+                  VirtualizingPanel.ScrollUnit="Pixel"
+                  VirtualizingPanel.VirtualizationMode="Recycling">
         <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
-                <VirtualizingStackPanel IsVirtualizing="True"
-                                        Orientation="Vertical"
-                                        ScrollUnit="Pixel" />
+                <VirtualizingStackPanel Orientation="Vertical" />
             </ItemsPanelTemplate>
         </ItemsControl.ItemsPanel>
         <ItemsControl.Template>
             <ControlTemplate TargetType="ItemsControl">
-                <ScrollViewer Focusable="False">
-                    <i:Interaction.Behaviors>
-                        <!--
-                            <behaviors:TimelineTriggerBehavior IsMouseOver="{Binding IsMouseOver,
-                            Mode=OneWayToSource}"
-                            IsScrollOnBottom="{Binding IsScrollInBottom,
-                            Mode=OneWayToSource}"
-                            IsScrollOnTop="{Binding IsScrollInTop,
-                            Mode=OneWayToSource}" />
-                            <behaviors:TimelineScrollLockerBehavior IsScrollLockEnabled="{Binding IsScrollLock}" ItemsSource="{Binding Timeline}" />
-                        -->
-                    </i:Interaction.Behaviors>
+                <ScrollViewer Focusable="False" VerticalScrollBarVisibility="Visible">
+                    <!--
+                        <i:Interaction.Behaviors>
+                        <behaviors:TimelineTriggerBehavior IsMouseOver="{Binding IsMouseOver,
+                        Mode=OneWayToSource}"
+                        IsScrollOnBottom="{Binding IsScrollInBottom,
+                        Mode=OneWayToSource}"
+                        IsScrollOnTop="{Binding IsScrollInTop,
+                        Mode=OneWayToSource}" />
+                        <behaviors:TimelineScrollLockerBehavior IsScrollLockEnabled="{Binding IsScrollLock}" ItemsSource="{Binding Timeline}" />
+                        </i:Interaction.Behaviors>
+                    -->
                     <ItemsPresenter />
                 </ScrollViewer>
             </ControlTemplate>

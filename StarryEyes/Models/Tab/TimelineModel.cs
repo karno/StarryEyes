@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 using Livet;
 using StarryEyes.Albireo.Data;
 using StarryEyes.Breezy.DataModel;
@@ -13,8 +14,7 @@ namespace StarryEyes.Models.Tab
 {
     public class TimelineModel : IDisposable
     {
-        public static readonly int TimelineChunkCount = 40;
-        public static readonly int TimelineChunkCountBounce = 20;
+        public static readonly int TimelineChunkCount = 120;
 
         private readonly CompositeDisposable _disposable;
         private readonly Func<long?, int, bool, IObservable<TwitterStatus>> _fetcher;
@@ -93,8 +93,8 @@ namespace StarryEyes.Models.Tab
                 _statuses.Insert(
                     i => i.TakeWhile(_ => _.CreatedAt > status.CreatedAt).Count(),
                     status);
-                if (_statusIdCache.Count > TimelineChunkCount + TimelineChunkCountBounce)
-                    TrimTimeline();
+                if (_statusIdCache.Count > TimelineChunkCount)
+                    Task.Run(() => TrimTimeline());
                 Action handler = OnNewStatusArrived;
                 if (handler != null)
                     handler();
@@ -125,7 +125,7 @@ namespace StarryEyes.Models.Tab
         private void TrimTimeline()
         {
             if (_isSuppressTimelineTrimming) return;
-            if (_statuses.Count < TimelineChunkCount + TimelineChunkCountBounce) return;
+            if (_statuses.Count < TimelineChunkCount) return;
             DateTime lastCreatedAt = _statuses[TimelineChunkCount].CreatedAt;
             var removedIds = new List<long>();
             _statuses.RemoveWhere(t =>

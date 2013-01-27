@@ -14,7 +14,7 @@ using Livet.Commands;
 
 namespace StarryEyes.Views.Helpers
 {
-    public class RichTextBoxHelper
+    public class StatusStylizeHelper
     {
         public static string UserNavigation = "user://";
 
@@ -50,21 +50,26 @@ namespace StarryEyes.Views.Helpers
             DependencyProperty.RegisterAttached(
             "TwitterStatus",
             typeof(TwitterStatus),
-            typeof(RichTextBoxHelper),
+            typeof(StatusStylizeHelper),
             new PropertyMetadata((o, e) =>
             {
                 var status = (TwitterStatus)e.NewValue;
-                if (status == null) return;
-                var richText = (RichTextBox)o;
-                var paragraph = new Paragraph();
+                var text = (TextBlock)o;
+
+                text.Inlines.Clear();
+
+                if (status == null)
+                    return;
+
                 // generate contents
                 if (status.IsDataLacking)
-                    GenerateInlines(o, (status.Text))
-                        .ForEach(paragraph.Inlines.Add);
+                {
+                    GenerateInlines(o, (status.Text)).ForEach(text.Inlines.Add);
+                }
                 else
-                    GenerateInlines(o, status).ForEach(paragraph.Inlines.Add);
-                richText.Document.Blocks.Clear();
-                richText.Document.Blocks.Add(paragraph);
+                {
+                    GenerateInlines(o, status).ForEach(text.Inlines.Add);
+                }
             }));
 
         public static string GetText(DependencyObject obj)
@@ -81,7 +86,7 @@ namespace StarryEyes.Views.Helpers
             DependencyProperty.RegisterAttached(
             "Text",
             typeof(string),
-            typeof(RichTextBoxHelper),
+            typeof(StatusStylizeHelper),
             new PropertyMetadata((o, e) =>
             {
                 var text = (string)e.NewValue;
@@ -108,7 +113,7 @@ namespace StarryEyes.Views.Helpers
             DependencyProperty.RegisterAttached(
             "LinkNavigationCommand",
             typeof(ICommand),
-            typeof(RichTextBoxHelper),
+            typeof(StatusStylizeHelper),
             new PropertyMetadata(null));
 
         private static IEnumerable<Inline> GenerateInlines(DependencyObject obj, TwitterStatus status)
@@ -185,8 +190,7 @@ namespace StarryEyes.Views.Helpers
 
         private static Inline GenerateLink(DependencyObject obj, string surface, string linkUrl)
         {
-            var hl = new Hyperlink();
-            hl.Foreground = Brushes.Gray;
+            var hl = new Hyperlink { Foreground = Brushes.Gray };
             hl.Inlines.Add(XmlParser.ResolveEntity(surface));
             hl.Command = new ProxyCommand(link =>
             {
@@ -207,9 +211,6 @@ namespace StarryEyes.Views.Helpers
         {
             return GenerateLink(obj, "#" + surface, HashtagNavigation + surface);
         }
-
-
-
     }
 
     public class ProxyCommand : ICommand
@@ -218,13 +219,14 @@ namespace StarryEyes.Views.Helpers
         {
             this._callback = callback;
         }
+
         public bool CanExecute(object parameter)
         {
             return true;
         }
 
         public event EventHandler CanExecuteChanged;
-        private Action<object> _callback;
+        private readonly Action<object> _callback;
 
         public void Execute(object parameter)
         {

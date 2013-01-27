@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Threading;
 using Livet;
 using Livet.Commands;
 using StarryEyes.Breezy.Authorize;
@@ -31,6 +32,8 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         private UserViewModel _recipient;
         private UserViewModel _retweeter;
         private UserViewModel _user;
+
+        private static int _statusVmCount = 0;
 
         public StatusViewModel(TwitterStatus status)
             : this(null, status, null)
@@ -66,14 +69,24 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             CompositeDisposable.Add(_retweetedUsers);
 
             // resolve images
-            Model.ImagesSubject
-                 .Finally(() =>
-                 {
-                     RaisePropertyChanged(() => Images);
-                     RaisePropertyChanged(() => FirstImage);
-                     RaisePropertyChanged(() => IsImageAvailable);
-                 })
-                 .Subscribe();
+            var imgsubj = Model.ImagesSubject;
+            if (imgsubj != null)
+            {
+                try
+                {
+                    imgsubj
+                        .Finally(() =>
+                        {
+                            RaisePropertyChanged(() => Images);
+                            RaisePropertyChanged(() => FirstImage);
+                            RaisePropertyChanged(() => IsImageAvailable);
+                        })
+                        .Subscribe();
+                }
+                catch (ObjectDisposedException)
+                {
+                }
+            }
 
             // look-up in-reply-to
             if (status.InReplyToStatusId.HasValue)
@@ -642,7 +655,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public void OpenLink(string parameter)
         {
-            Tuple<LinkType, string> param = RichTextBoxHelper.ResolveInternalUrl(parameter);
+            Tuple<LinkType, string> param = StatusStylizeHelper.ResolveInternalUrl(parameter);
             switch (param.Item1)
             {
                 case LinkType.User:

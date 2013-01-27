@@ -126,7 +126,7 @@ namespace StarryEyes.Models
         private volatile bool _isFavoritedUsersLoaded;
         private volatile bool _isRetweetedUsersLoaded;
 
-        private readonly Subject<Unit> _imagesSubject = new Subject<Unit>();
+        private Subject<Unit> _imagesSubject = new Subject<Unit>();
 
         private StatusModel(TwitterStatus status)
         {
@@ -137,7 +137,12 @@ namespace StarryEyes.Models
                              l.Add(i);
                              return l;
                          })
-                         .Finally(() => _imagesSubject.OnCompleted())
+                         .Finally(() =>
+                         {
+                             var subj = Interlocked.Exchange(ref _imagesSubject, null);
+                             subj.OnCompleted();
+                             subj.Dispose();
+                         })
                          .Subscribe(l => Images = l);
         }
 

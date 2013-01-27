@@ -16,30 +16,20 @@ namespace StarryEyes.Models.Hubs
     {
         public static IObservable<TwitterStatus> MergeStore(TwitterStatus status)
         {
-            bool gazed = false;
             return StatusStore.Get(status.Id)
-                .Materialize()
-                .SelectMany(notify =>
-                {
-                    if (notify.Kind != NotificationKind.OnCompleted)
-                    {
-                        gazed = true;
-                    }
-                    else if (!gazed)
-                    {
-                        StatusStore.Store(status);
-                        Observable.Return(status);
-                    }
-                    return Observable.Return(notify);
-                })
-                .Dematerialize();
+                              .ConcatIfEmpty(() =>
+                              {
+                                  StatusStore.Store(status);
+                                  return Observable.Return(status);
+                              });
         }
 
         public static IObservable<TwitterStatus> GetTweet(long id)
         {
             return StatusStore.Get(id)
                 .Where(_ => _ != null)
-                .ConcatIfEmpty(() => GetRandomAuthInfo().SelectMany(a => a.ShowTweet(id).Do(s => StatusStore.Store(s, false))));
+                .ConcatIfEmpty(() => GetRandomAuthInfo()
+                    .SelectMany(a => a.ShowTweet(id).Do(s => StatusStore.Store(s, false))));
         }
 
         public static IObservable<TwitterUser> GetUser(long id)
@@ -53,7 +43,7 @@ namespace StarryEyes.Models.Hubs
         {
             return UserStore.Get(screenName)
                 .Where(_ => _ != null)
-                .ConcatIfEmpty(() => GetRandomAuthInfo().SelectMany(a => a.ShowUser(screen_name: screenName).Do(UserStore.Store)));
+                .ConcatIfEmpty(() => GetRandomAuthInfo().SelectMany(a => a.ShowUser(screenName: screenName).Do(UserStore.Store)));
         }
 
         public static IObservable<AuthenticateInfo> GetRandomAuthInfo()

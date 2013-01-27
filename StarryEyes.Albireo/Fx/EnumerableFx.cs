@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
 
+// ReSharper disable CheckNamespace
 namespace System.Linq
+// ReSharper restore CheckNamespace
 {
     public static class EnumerableFx
     {
-        private static Random _rng = new Random();
+        private static readonly Random _rng = new Random();
 
         public static IEnumerable<T> Append<T>(this IEnumerable<T> source, params T[] item)
         {
@@ -49,16 +51,16 @@ namespace System.Linq
         {
             if (guard())
                 return source;
-            else
-                return new T[0];
+            return new T[0];
         }
 
         public static IEnumerable<T> Guard<T>(this IEnumerable<T> source, Func<IEnumerable<T>, bool> guard)
         {
+            // ReSharper disable PossibleMultipleEnumeration
             if (guard(source))
                 return source;
-            else
-                return new T[0];
+            return new T[0];
+            // ReSharper restore PossibleMultipleEnumeration
         }
 
         public static IEnumerable<TResult> Singlize<TSource, TIntermediate, TResult>(this IEnumerable<TSource> source,
@@ -83,8 +85,7 @@ namespace System.Linq
         {
             if (take == null)
                 return source;
-            else
-                return source.Take(take.Value);
+            return source.Take(take.Value);
         }
     }
 }

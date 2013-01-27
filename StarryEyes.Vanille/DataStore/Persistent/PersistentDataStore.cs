@@ -123,8 +123,9 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         public override IObservable<TValue> Find(Func<TValue, bool> predicate,
                                                  FindRange<TKey> range = null, int? itemCount = null)
         {
-            return _chunks.ToObservable()
-                          .SelectMany(c => c.Find(predicate, range, itemCount));
+            return _chunks
+                .ToObservable()
+                .SelectMany(c => c.Find(predicate, range, itemCount));
         }
 
         /// <summary>

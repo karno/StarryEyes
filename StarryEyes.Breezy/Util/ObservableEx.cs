@@ -54,12 +54,12 @@ namespace System.Reactive.Linq
 
         public static IObservable<byte[]> DownloadDataAsync(this WebRequest request)
         {
-            return Observable.Defer(() => request.GetResponseAsObservable()).SelectMany(r => r.DownloadDataAsync());
+            return Observable.Defer(request.GetResponseAsObservable).SelectMany(r => r.DownloadDataAsync());
         }
 
         public static IObservable<Progress<byte[]>> DownloadDataAsyncWithProgress(this WebRequest request, int chunkSize = 65536)
         {
-            return Observable.Defer(() => request.GetResponseAsObservable()).SelectMany(r => r.DownloadDataAsyncWithProgress(chunkSize));
+            return Observable.Defer(request.GetResponseAsObservable).SelectMany(r => r.DownloadDataAsyncWithProgress(chunkSize));
         }
 
         public static IObservable<string> DownloadStringAsync(this WebRequest request)
@@ -69,7 +69,7 @@ namespace System.Reactive.Linq
 
         public static IObservable<string> DownloadStringAsync(this WebRequest request, Encoding encoding)
         {
-            return Observable.Defer(() => request.GetResponseAsObservable()).SelectMany(r => r.DownloadStringAsync(encoding));
+            return Observable.Defer(request.GetResponseAsObservable).SelectMany(r => r.DownloadStringAsync(encoding));
         }
 
         public static IObservable<string> DownloadStringLineAsync(this WebRequest request)
@@ -79,7 +79,7 @@ namespace System.Reactive.Linq
 
         public static IObservable<string> DownloadStringLineAsync(this WebRequest request, Encoding encoding)
         {
-            return Observable.Defer(() => request.GetResponseAsObservable()).SelectMany(r => r.DownloadStringLineAsync(encoding));
+            return Observable.Defer(request.GetResponseAsObservable).SelectMany(r => r.DownloadStringLineAsync(encoding));
         }
 
         public static IObservable<WebResponse> UploadStringAsync(this WebRequest request, string data)
@@ -114,15 +114,15 @@ namespace System.Reactive.Linq
 
         public static IObservable<WebResponse> UploadDataAsync(this WebRequest request, byte[] data)
         {
-            return Observable.Defer(() => request.GetRequestStreamAsObservable())
-                .SelectMany(stream => stream.WriteAsObservable(data, 0, data.Length).Finally(() => stream.Close()))
+            return Observable.Defer(request.GetRequestStreamAsObservable)
+                .SelectMany(stream => stream.WriteAsObservable(data, 0, data.Length).Finally(stream.Close))
                 .TakeLast(1)
                 .SelectMany(_ => request.GetResponseAsObservable());
         }
 
         public static IObservable<Progress<Unit>> UploadDataAsyncWithProgress(this WebRequest request, byte[] data, int chunkSize = 65536)
         {
-            return Observable.Defer(() => request.GetRequestStreamAsObservable())
+            return Observable.Defer(request.GetRequestStreamAsObservable)
                 .SelectMany(stream => stream.WriteAsync(data, chunkSize))
                 .Scan(0, (i, _) => i + 1)
                 .Select(i =>
@@ -139,7 +139,7 @@ namespace System.Reactive.Linq
         public static IObservable<byte[]> DownloadDataAsync(this WebResponse response)
         {
             return Observable.Defer(() => response.GetResponseStream().ReadAsync())
-                .Finally(() => response.Close())
+                .Finally(response.Close)
                 .Aggregate(new List<byte>(), (list, bytes) => { list.AddRange(bytes); return list; })
                 .Select(x => x.ToArray());
         }
@@ -147,7 +147,7 @@ namespace System.Reactive.Linq
         public static IObservable<Progress<byte[]>> DownloadDataAsyncWithProgress(this WebResponse response, int chunkSize = 65536)
         {
             return Observable.Defer(() => response.GetResponseStream().ReadAsync(chunkSize))
-                .Finally(() => response.Close())
+                .Finally(response.Close)
                 .Scan(Progress.Create(new byte[0], 0, 0),
                     (p, bytes) => Progress.Create(bytes, p.CurrentLength + bytes.Length, response.ContentLength));
         }
@@ -170,7 +170,7 @@ namespace System.Reactive.Linq
         public static IObservable<string> DownloadStringLineAsync(this WebResponse response, Encoding encoding)
         {
             return Observable.Defer(() => response.GetResponseStream().ReadLineAsync(encoding))
-                .Finally(() => response.Close());
+                .Finally(response.Close);
         }
     }
 
@@ -206,7 +206,7 @@ namespace System.Reactive.Linq
             return Observable.Defer(() => data)
                 .Buffer(chunkSize)
                 .SelectMany(l => stream.WriteAsObservable(l.ToArray(), 0, l.Count))
-                .Finally(() => stream.Close());
+                .Finally(stream.Close);
         }
 
         public static IObservable<Unit> WriteLineAsync(this Stream stream, string data)
@@ -254,7 +254,7 @@ namespace System.Reactive.Linq
                     Array.Copy(a.buffer, newBuffer, a.readCount);
                     return newBuffer;
                 })
-                .Finally(() => stream.Close());
+                .Finally(stream.Close);
         }
 
         public static IObservable<string> ReadLineAsync(this Stream stream, int chunkSize = 65536)

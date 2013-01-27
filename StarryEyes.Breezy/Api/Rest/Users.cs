@@ -9,15 +9,15 @@ namespace StarryEyes.Breezy.Api.Rest
     public static class Users
     {
         public static IObservable<TwitterUser> LookupUser(this AuthenticateInfo info,
-            long? user_id = null, string screen_name = null, bool include_entities = true)
+            long? userId = null, string screenName = null, bool includeEntities = true)
         {
-            if (user_id == null && screen_name == null)
+            if (userId == null && screenName == null)
                 throw new ArgumentNullException("both of user_id and screen_name are null.");
-            var param = new Dictionary<string, object>()
+            var param = new Dictionary<string, object>
             {
-                {"user_id", user_id},
-                {"screen_name", screen_name},
-                {"include_entities", include_entities}
+                {"user_id", userId},
+                {"screen_name", screenName},
+                {"include_entities", includeEntities}
             }.Parametalize();
             return info.GetOAuthClient()
                 .SetEndpoint(ApiEndpoint.EndpointApiV1a.JoinUrl("/users/lookup.json"))
@@ -30,14 +30,14 @@ namespace StarryEyes.Breezy.Api.Rest
         // profile image is not implemented... (please teach how to implement it!)
 
         public static IObservable<TwitterUser> SearchUser(this AuthenticateInfo info,
-            string query, int? page = null, int per_page = 20, bool include_entities = true)
+            string query, int? page = null, int perPage = 20, bool includeEntities = true)
         {
-            var param = new Dictionary<string, object>()
+            var param = new Dictionary<string, object>
             {
                 {"q", query},
                 {"page", page},
-                {"per_page", per_page},
-                {"include_entities", include_entities},
+                {"per_page", perPage},
+                {"include_entities", includeEntities},
             }.Parametalize();
             return info.GetOAuthClient()
                 .SetEndpoint(ApiEndpoint.EndpointApiV1a.JoinUrl("/users/search.json"))
@@ -48,13 +48,13 @@ namespace StarryEyes.Breezy.Api.Rest
         }
 
         public static IObservable<TwitterUser> ShowUser(this AuthenticateInfo info,
-            long? user_id = null, string screen_name = null, bool include_entities = true)
+            long? userId = null, string screenName = null, bool includeEntities = true)
         {
             var param = new Dictionary<string, object>()
             {
-                {"user_id", user_id},
-                {"screen_name", screen_name},
-                {"include_entities", include_entities},
+                {"user_id", userId},
+                {"screen_name", screenName},
+                {"include_entities", includeEntities},
             }.Parametalize();
             return info.GetOAuthClient()
                 .SetEndpoint(ApiEndpoint.EndpointApiV1a.JoinUrl("/users/show.json"))

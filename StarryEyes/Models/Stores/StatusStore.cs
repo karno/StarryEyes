@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Threading;
 using System.Threading.Tasks;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Models.Stores.Internal;
@@ -21,7 +20,8 @@ namespace StarryEyes.Models.Stores
     {
         #region publish block
 
-        private static readonly Subject<StatusNotification> _statusPublisher = new Subject<StatusNotification>();
+        private static readonly Subject<StatusNotification> _statusPublisher =
+            new Subject<StatusNotification>();
 
         public static IObservable<StatusNotification> StatusPublisher
         {
@@ -30,7 +30,7 @@ namespace StarryEyes.Models.Stores
 
         #endregion
 
-        private static volatile bool _isInShutdown = false;
+        private static volatile bool _isInShutdown;
 
         private static DataStoreBase<long, TwitterStatus> _store;
 
@@ -109,8 +109,8 @@ namespace StarryEyes.Models.Stores
 
         private const int BatchWaitSec = 5;
         private static readonly object _batchLock = new object();
-        private static List<Func<TwitterStatus, bool>> _predicates = null;
-        private static Subject<TwitterStatus> _batchResult = null;
+        private static List<Func<TwitterStatus, bool>> _predicates;
+        private static Subject<TwitterStatus> _batchResult;
 
         /// <summary>
         /// Find tweets with batch query.

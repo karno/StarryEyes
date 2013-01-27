@@ -242,7 +242,7 @@
     <Compile Include="Views\Dialogs\KeyOverrideWindow.xaml.cs">
       <DependentUpon>KeyOverrideWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Helpers\RichTextBoxHelper.cs" />
+    <Compile Include="Views\Helpers\StatusStylizeHelper.cs" />
     <Compile Include="Views\Messaging\Behaviors\BringIntoViewInteractionMessageAction.cs" />
     <Compile Include="Views\Messaging\Behaviors\GoToStateInteractionMessageAction.cs" />
     <Compile Include="Views\Messaging\Behaviors\TaskDialogInteractionMessageAction.cs" />
