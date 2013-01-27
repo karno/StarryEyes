@@ -305,7 +305,7 @@ namespace StarryEyes.Models
             if (this.Status.RetweetedOriginal != null)
             {
                 Get(this.Status.RetweetedOriginal)
-                    .RemoveRetweetedUser(id);
+                    .RemoveFavoritedUser(id);
             }
             else
             {
@@ -313,7 +313,10 @@ namespace StarryEyes.Models
                 lock (_favoritedsLock)
                 {
                     if (_favoritedUsersDic.TryGetValue(id, out remove))
+                    {
+                        _favoritedUsersDic.Remove(id);
                         Status.FavoritedUsers = Status.FavoritedUsers.Except(new[] { id }).ToArray();
+                    }
                 }
                 if (remove != null)
                 {
@@ -372,7 +375,10 @@ namespace StarryEyes.Models
                 lock (_retweetedsLock)
                 {
                     if (_retweetedUsersDic.TryGetValue(id, out remove))
+                    {
+                        _retweetedUsersDic.Remove(id);
                         Status.RetweetedUsers = Status.RetweetedUsers.Except(new[] { id }).ToArray();
+                    }
                 }
                 if (remove != null)
                 {
