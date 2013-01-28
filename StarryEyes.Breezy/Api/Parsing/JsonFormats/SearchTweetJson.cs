@@ -33,7 +33,7 @@ namespace StarryEyes.Breezy.Api.Parsing.JsonFormats
                 IsDataLacking = true,
                 Id = id_str.ParseLong(),
                 Source = XmlParser.ResolveEntity(source),
-                Text = text,
+                Text = XmlParser.ResolveEntity(text),
                 IsFavored = false,
                 CreatedAt = created_at.ParseDateTime(), // Can parse with default format rule
                 InReplyToUserId = to_user_id_str == null || to_user_id_str == "0" ? null :

@@ -60,7 +60,7 @@ namespace StarryEyes.Models
         public static IEnumerable<TextToken> Tokenize(string raw)
         {
             if (String.IsNullOrEmpty(raw)) yield break;
-            var escaped = HtmlEscape(HtmlUnescape(raw));
+            var escaped = HtmlEscape(raw);
             escaped = RegexHelper.UrlRegex.Replace(escaped, (m) =>
             {
                 // # => &sharp; (ハッシュタグで再識別されることを防ぐ)

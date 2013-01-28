@@ -125,7 +125,7 @@ namespace StarryEyes.Models.Tab
         private void TrimTimeline()
         {
             if (_isSuppressTimelineTrimming) return;
-            if (_statuses.Count < TimelineChunkCount) return;
+            if (_statuses.Count <= TimelineChunkCount) return;
             DateTime lastCreatedAt = _statuses[TimelineChunkCount].CreatedAt;
             var removedIds = new List<long>();
             _statuses.RemoveWhere(t =>
