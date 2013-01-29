@@ -147,6 +147,7 @@ namespace StarryEyes.Breezy.DataModel
             var status = this;
             if (status.RetweetedOriginal != null)
                 status = status.RetweetedOriginal; // change target
+            var escaped = XmlParser.EscapeEntity(status.Text);
             TwitterEntity prevEntity = null;
             foreach (var entity in status.Entities.Guard().OrderBy(e => e.StartIndex))
             {
@@ -156,7 +157,7 @@ namespace StarryEyes.Breezy.DataModel
                 if (pidx < entity.StartIndex)
                 {
                     // output raw
-                    builder.Append(XmlParser.ResolveEntity(status.Text.Substring(pidx, entity.StartIndex - pidx)));
+                    builder.Append(XmlParser.ResolveEntity(escaped.Substring(pidx, entity.StartIndex - pidx)));
                 }
                 switch (entity.EntityType)
                 {
@@ -181,12 +182,12 @@ namespace StarryEyes.Breezy.DataModel
             }
             if (prevEntity == null)
             {
-                builder.Append(XmlParser.ResolveEntity(status.Text));
+                builder.Append(XmlParser.ResolveEntity(escaped));
             }
-            else if (prevEntity.EndIndex < status.Text.Length)
+            else if (prevEntity.EndIndex < escaped.Length)
             {
                 builder.Append(XmlParser.ResolveEntity(
-                    status.Text.Substring(prevEntity.EndIndex, status.Text.Length - prevEntity.EndIndex)));
+                    escaped.Substring(prevEntity.EndIndex, escaped.Length - prevEntity.EndIndex)));
             }
             return builder.ToString();
         }

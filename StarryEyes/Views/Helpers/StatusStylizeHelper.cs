@@ -120,7 +120,7 @@ namespace StarryEyes.Views.Helpers
         {
             if (status.RetweetedOriginal != null)
                 status = status.RetweetedOriginal; // change target
-            string text = status.Text;
+            string text = XmlParser.EscapeEntity(status.Text);
             TwitterEntity prevEntity = null;
             foreach (var entity in status.Entities.Guard().OrderBy(e => e.StartIndex))
             {
@@ -131,7 +131,7 @@ namespace StarryEyes.Views.Helpers
                 {
                     // output raw
                     yield return GenerateText(
-                        status.Text.Substring(pidx, entity.StartIndex - pidx));
+                        text.Substring(pidx, entity.StartIndex - pidx));
                 }
                 switch (entity.EntityType)
                 {
@@ -150,12 +150,12 @@ namespace StarryEyes.Views.Helpers
             }
             if (prevEntity == null)
             {
-                yield return GenerateText(XmlParser.ResolveEntity(status.Text));
+                yield return GenerateText(XmlParser.ResolveEntity(text));
             }
-            else if (prevEntity.EndIndex < status.Text.Length)
+            else if (prevEntity.EndIndex < text.Length)
             {
                 yield return GenerateText(
-                    status.Text.Substring(prevEntity.EndIndex, status.Text.Length - prevEntity.EndIndex));
+                    text.Substring(prevEntity.EndIndex, text.Length - prevEntity.EndIndex));
             }
         }
 

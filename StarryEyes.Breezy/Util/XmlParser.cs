@@ -246,6 +246,15 @@ namespace StarryEyes.Breezy.Util
                 .Replace("&amp;", "&");
         }
 
+        public static string EscapeEntity(string text)
+        {
+            return text
+                .Replace("&", "&amp;")
+                .Replace("\"", "&quot;")
+                .Replace("<", "&lt;")
+                .Replace(">", "&gt;");
+        }
+
         #endregion
     }
 }
