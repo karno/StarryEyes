@@ -44,22 +44,17 @@ namespace System.Linq
 
         public static IEnumerable<T> Guard<T>(this IEnumerable<T> source)
         {
-            return source ?? new T[0];
+            return source ?? Enumerable.Empty<T>();
         }
 
         public static IEnumerable<T> Guard<T>(this IEnumerable<T> source, Func<bool> guard)
         {
-            if (guard())
-                return source;
-            return new T[0];
+            return guard() ? source : Enumerable.Empty<T>();
         }
 
         public static IEnumerable<T> Guard<T>(this IEnumerable<T> source, Func<IEnumerable<T>, bool> guard)
         {
-            // ReSharper disable PossibleMultipleEnumeration
-            if (guard(source))
-                return source;
-            return new T[0];
+            return guard(source) ? source : Enumerable.Empty<T>();
             // ReSharper restore PossibleMultipleEnumeration
         }
 
