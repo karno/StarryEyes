@@ -6,6 +6,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
+using System.Threading.Tasks;
 using Livet;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
@@ -46,6 +47,10 @@ namespace StarryEyes.Models
             return model;
         }
 
+        private const int CleanupInterval = 65535;
+
+        private static int _cleanupCount;
+
         public static StatusModel Get(TwitterStatus status)
         {
             object lockerobj = _generateLock.GetOrAdd(status.Id, new object());
@@ -79,17 +84,25 @@ namespace StarryEyes.Models
             finally
             {
                 _generateLock.TryRemove(status.Id, out lockerobj);
+                var cc = Interlocked.Increment(ref _cleanupCount);
+                if (cc == CleanupInterval)
+                {
+                    Interlocked.Exchange(ref _cleanupCount, 0);
+                    Task.Run((Action)CollectGarbages);
+                }
             }
         }
 
         public static void CollectGarbages()
         {
+            System.Diagnostics.Debug.WriteLine("*** COLLECT STATUS MODEL GARBAGES...");
+            GC.Collect(2, GCCollectionMode.Optimized);
             long[] values;
             lock (_staticCacheLock)
             {
                 values = _staticCache.Keys.ToArray();
             }
-            foreach (var ids in values.Buffer(16))
+            foreach (var ids in values.Buffer(256))
             {
                 lock (_staticCacheLock)
                 {
@@ -143,6 +156,7 @@ namespace StarryEyes.Models
                              subj.OnCompleted();
                              subj.Dispose();
                          })
+                         .Track()
                          .Subscribe(l => Images = l);
         }
 

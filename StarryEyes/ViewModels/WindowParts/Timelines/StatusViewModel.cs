@@ -81,6 +81,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                             RaisePropertyChanged(() => FirstImage);
                             RaisePropertyChanged(() => IsImageAvailable);
                         })
+                        .Track()
                         .Subscribe();
                 }
                 catch (ObjectDisposedException)

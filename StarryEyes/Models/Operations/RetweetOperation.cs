@@ -57,7 +57,7 @@ namespace StarryEyes.Models.Operations
                                                   AuthInfo = fallbackAccount.AuthenticateInfo;
                                                   return Run(OperationPriority.High);
                                               }
-                                              return Observable.Throw<TwitterStatus>(ex);
+                                              return Observable.Throw<TwitterStatus>(new RetweetFailedException(s, ex));
                                           }));
             }
             return AuthInfo.GetMyRetweetId(TargetId)
@@ -68,5 +68,16 @@ namespace StarryEyes.Models.Operations
                            })
                            .SelectMany(id => AuthInfo.Destroy(id));
         }
+    }
+
+
+    [Serializable]
+    public class RetweetFailedException : Exception
+    {
+        public RetweetFailedException(string message, Exception inner) : base(message, inner) { }
+        protected RetweetFailedException(
+          System.Runtime.Serialization.SerializationInfo info,
+          System.Runtime.Serialization.StreamingContext context)
+            : base(info, context) { }
     }
 }

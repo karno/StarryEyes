@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
+using System.Threading;
 using Livet;
 using Livet.EventListeners;
 using StarryEyes.Breezy.DataModel;
@@ -220,24 +221,24 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             }
         }
 
+        private volatile bool _isCollectionAddEnabled = false;
         private void InitializeCollection()
         {
             lock (_collectionLock)
             {
-                bool activated = false;
                 CompositeDisposable.Add(
                     new CollectionChangedEventListener(
                         Model.Timeline.Statuses,
                         (sender, e) =>
                         {
-                            if (activated)
+                            if (_isCollectionAddEnabled)
                             {
                                 DispatcherHolder.Enqueue(
                                     () => ReflectCollectionChanged(e));
                             }
                         }));
                 TwitterStatus[] collection = Model.Timeline.Statuses.ToArray();
-                activated = true;
+                _isCollectionAddEnabled = true;
                 collection
                     .Select(GenerateStatusViewModel)
                     .ForEach(_timeline.Add);
@@ -262,19 +263,29 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                         removal.Dispose();
                         break;
                     case NotifyCollectionChangedAction.Reset:
-                        StatusViewModel[] cache = _timeline.ToArray();
-                        _timeline.Clear();
-                        cache.ToObservable()
-                             .ObserveOn(TaskPoolScheduler.Default)
-                             .Subscribe(_ => _.Dispose());
-                        TwitterStatus[] collection = Model.Timeline.Statuses.ToArray();
-                        collection
-                            .Select(GenerateStatusViewModel)
-                            .ForEach(_timeline.Add);
+                        Rebind();
                         break;
                     default:
                         throw new ArgumentException();
                 }
+            }
+        }
+
+        public void Rebind()
+        {
+            lock (_collectionLock)
+            {
+                _isCollectionAddEnabled = false;
+                StatusViewModel[] cache = _timeline.ToArray();
+                _timeline.Clear();
+                cache.ToObservable()
+                     .ObserveOn(TaskPoolScheduler.Default)
+                     .Subscribe(_ => _.Dispose());
+                TwitterStatus[] collection = Model.Timeline.Statuses.ToArray();
+                _isCollectionAddEnabled = true;
+                collection
+                    .Select(GenerateStatusViewModel)
+                    .ForEach(_timeline.Add);
             }
         }
 

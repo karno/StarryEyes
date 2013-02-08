@@ -29,7 +29,16 @@ namespace StarryEyes.Breezy.Api.Parsing.JsonFormats
         [JsonProperty("contributors_enabled")]
         public bool is_contributors_enabled { get; set; }
 
+        [JsonProperty("default_profile_image")]
+        public bool is_default_profile_image { get; set; }
+
         public string profile_image_url { get; set; }
+
+        public string profile_image_url_https { get; set; }
+
+        public string profile_background_image_url { get; set; }
+
+        public string profile_background_image_url_https { get; set; }
 
         public int statuses_count { get; set; }
 
@@ -54,13 +63,7 @@ namespace StarryEyes.Breezy.Api.Parsing.JsonFormats
         /// <returns></returns>
         public TwitterUser Spawn()
         {
-            var profimg = profile_image_url.ParseUri();
-            if (profimg != null && !profimg.IsAbsoluteUri)
-            {
-                // Twitter sometimes returns partial url.
-                profimg = null;
-            }
-            return new TwitterUser()
+            return new TwitterUser
             {
                 Id = id_str.ParseLong(),
                 ScreenName = screen_name,
@@ -72,12 +75,16 @@ namespace StarryEyes.Breezy.Api.Parsing.JsonFormats
                 IsTranslator = is_translator,
                 IsVerified = is_verified,
                 IsContributorsEnabled = is_contributors_enabled,
-                ProfileImageUri = profimg,
-                StatusesCount = (long)statuses_count,
-                FriendsCount = (long)friends_count,
-                FollowersCount = (long)followers_count,
-                FavoritesCount = (long)favourites_count,
-                ListedCount = (long)listed_count.GetValueOrDefault(),
+                ProfileImageUri = profile_image_url.ParseUriAbsolute(),
+                ProfileImageUriHttps = profile_image_url_https.ParseUriAbsolute(),
+                ProfileBackgroundImageUri = profile_background_image_url.ParseUriAbsolute(),
+                ProfileBackgroundImageUriHttps = profile_background_image_url_https.ParseUriAbsolute(),
+                IsDefaultProfileImage = is_default_profile_image,
+                StatusesCount = statuses_count,
+                FriendsCount = friends_count,
+                FollowersCount = followers_count,
+                FavoritesCount = favourites_count,
+                ListedCount = listed_count.GetValueOrDefault(),
                 Language = lang,
                 IsGeoEnabled = is_geo_enabled,
                 CreatedAt = created_at.ParseDateTime(XmlParser.TwitterDateTimeFormat)

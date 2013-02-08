@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Windows;
-using System.Windows.Documents;
-using StarryEyes.Breezy.Util;
-using System.Windows.Input;
-using StarryEyes.Breezy.DataModel;
 using System.Windows.Controls;
-using StarryEyes.Models;
+using System.Windows.Documents;
+using System.Windows.Input;
 using System.Windows.Media;
-using Livet.Commands;
+using StarryEyes.Breezy.DataModel;
+using StarryEyes.Breezy.Util;
+using StarryEyes.Models;
 
 namespace StarryEyes.Views.Helpers
 {
@@ -26,14 +24,11 @@ namespace StarryEyes.Views.Helpers
             {
                 return new Tuple<LinkType, string>(LinkType.User, iurl.Substring(UserNavigation.Length));
             }
-            else if (iurl.StartsWith(HashtagNavigation))
+            if (iurl.StartsWith(HashtagNavigation))
             {
                 return new Tuple<LinkType, string>(LinkType.Hash, iurl.Substring(HashtagNavigation.Length));
             }
-            else
-            {
-                return new Tuple<LinkType, string>(LinkType.Url, iurl);
-            }
+            return new Tuple<LinkType, string>(LinkType.Url, iurl);
         }
 
         public static TwitterStatus GetTwitterStatus(DependencyObject obj)
@@ -54,9 +49,9 @@ namespace StarryEyes.Views.Helpers
             new PropertyMetadata((o, e) =>
             {
                 var status = (TwitterStatus)e.NewValue;
-                var text = (TextBlock)o;
+                var textBlock = (TextBlock)o;
 
-                text.Inlines.Clear();
+                textBlock.Inlines.Clear();
 
                 if (status == null)
                     return;
@@ -64,11 +59,11 @@ namespace StarryEyes.Views.Helpers
                 // generate contents
                 if (status.IsDataLacking)
                 {
-                    GenerateInlines(o, (status.Text)).ForEach(text.Inlines.Add);
+                    GenerateInlines(o, status.Text).ForEach(textBlock.Inlines.Add);
                 }
                 else
                 {
-                    GenerateInlines(o, status).ForEach(text.Inlines.Add);
+                    GenerateInlines(o, status).ForEach(textBlock.Inlines.Add);
                 }
             }));
 
@@ -90,13 +85,12 @@ namespace StarryEyes.Views.Helpers
             new PropertyMetadata((o, e) =>
             {
                 var text = (string)e.NewValue;
-                var richText = (RichTextBox)o;
-                var paragraph = new Paragraph();
+                var textBlock = (TextBlock)o;
+
+                textBlock.Inlines.Clear();
+
                 // generate contents
-                GenerateInlines(o, text).ForEach(i => paragraph.Inlines.Add(i));
-                richText.Document.Blocks.Clear();
-                richText.Document.IsEnabled = true;
-                richText.Document.Blocks.Add(paragraph);
+                GenerateInlines(o, text).ForEach(textBlock.Inlines.Add);
             }));
 
         public static ICommand GetLinkNavigationCommand(DependencyObject obj)
@@ -120,7 +114,7 @@ namespace StarryEyes.Views.Helpers
         {
             if (status.RetweetedOriginal != null)
                 status = status.RetweetedOriginal; // change target
-            string text = XmlParser.EscapeEntity(status.Text);
+            var escaped = XmlParser.EscapeEntity(status.Text);
             TwitterEntity prevEntity = null;
             foreach (var entity in status.Entities.Guard().OrderBy(e => e.StartIndex))
             {
@@ -130,32 +124,31 @@ namespace StarryEyes.Views.Helpers
                 if (pidx < entity.StartIndex)
                 {
                     // output raw
-                    yield return GenerateText(
-                        text.Substring(pidx, entity.StartIndex - pidx));
+                    yield return GenerateText(XmlParser.ResolveEntity(escaped.Substring(pidx, entity.StartIndex - pidx)));
                 }
                 switch (entity.EntityType)
                 {
                     case EntityType.Hashtags:
-                        yield return GenerateHashtagLink(obj, entity.DisplayText);
+                        yield return GenerateHashtagLink(obj, XmlParser.ResolveEntity(entity.DisplayText));
                         break;
                     case EntityType.Media:
                     case EntityType.Urls:
-                        yield return GenerateLink(obj, entity.DisplayText, entity.OriginalText);
+                        yield return GenerateLink(obj, entity.DisplayText, XmlParser.ResolveEntity(entity.OriginalText));
                         break;
                     case EntityType.UserMentions:
-                        yield return GenerateUserLink(obj, entity.DisplayText, entity.DisplayText);
+                        yield return GenerateUserLink(obj, entity.DisplayText, XmlParser.ResolveEntity(entity.DisplayText));
                         break;
                 }
                 prevEntity = entity;
             }
             if (prevEntity == null)
             {
-                yield return GenerateText(XmlParser.ResolveEntity(text));
+                yield return GenerateText(status.Text);
             }
-            else if (prevEntity.EndIndex < text.Length)
+            else if (prevEntity.EndIndex < status.Text.Length)
             {
                 yield return GenerateText(
-                    text.Substring(prevEntity.EndIndex, text.Length - prevEntity.EndIndex));
+                    XmlParser.ResolveEntity(escaped.Substring(prevEntity.EndIndex, status.Text.Length - prevEntity.EndIndex)));
             }
         }
 
@@ -183,15 +176,13 @@ namespace StarryEyes.Views.Helpers
 
         private static Inline GenerateText(string surface)
         {
-            var run = new Run();
-            run.Text = XmlParser.ResolveEntity(surface);
-            return run;
+            return new Run { Text = surface };
         }
 
         private static Inline GenerateLink(DependencyObject obj, string surface, string linkUrl)
         {
             var hl = new Hyperlink { Foreground = Brushes.Gray };
-            hl.Inlines.Add(XmlParser.ResolveEntity(surface));
+            hl.Inlines.Add(surface);
             hl.Command = new ProxyCommand(link =>
             {
                 var command = GetLinkNavigationCommand(obj);

@@ -71,7 +71,7 @@ namespace StarryEyes.Models.Operations
                            {
                                AccountSetting cas;
                                AccountSetting fallbackAccount;
-                               if (s.Contains("User is over daily status update limit.") &&
+                               if (s.Contains("User is over daily status update limit") &&
                                    (cas = AccountsStore.GetAccountSetting(this.AuthInfo.Id)) != null &&
                                    (fallbackAccount = AccountsStore.GetAccountSetting(cas.FallbackNext)) != null)
                                {

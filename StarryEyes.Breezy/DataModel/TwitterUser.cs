@@ -7,8 +7,6 @@ namespace StarryEyes.Breezy.DataModel
     [DataContract]
     public class TwitterUser : IBinarySerializable
     {
-        public TwitterUser() { }
-
         /// <summary>
         /// Exactly Numeric ID of this user. (PRIMARY KEY)
         /// </summary>
@@ -54,10 +52,34 @@ namespace StarryEyes.Breezy.DataModel
         public string Url { get; set; }
 
         /// <summary>
+        /// Profile image is default or not.
+        /// </summary>
+        [DataMember]
+        public bool IsDefaultProfileImage { get; set; }
+
+        /// <summary>
         /// Profile image of this user.
         /// </summary>
         [DataMember]
         public Uri ProfileImageUri { get; set; }
+
+        /// <summary>
+        /// HttpsProfile image of this user.
+        /// </summary>
+        [DataMember]
+        public Uri ProfileImageUriHttps { get; set; }
+
+        /// <summary>
+        /// Profile background image of this user.
+        /// </summary>
+        [DataMember]
+        public Uri ProfileBackgroundImageUri { get; set; }
+
+        /// <summary>
+        /// HttpsProfile background image of this user.
+        /// </summary>
+        [DataMember]
+        public Uri ProfileBackgroundImageUriHttps { get; set; }
 
         /// <summary>
         /// Flag for check protected of this user.

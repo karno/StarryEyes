@@ -64,6 +64,13 @@ namespace StarryEyes.Breezy.Util
                 return null;
         }
 
+        public static Uri ParseUriAbsolute(this string s)
+        {
+            Uri ret = s.ParseUri();
+            if (ret == null || !ret.IsAbsoluteUri) return null;
+            return ret;
+        }
+
         #endregion
 
         #region for Element
