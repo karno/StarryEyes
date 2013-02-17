@@ -54,8 +54,8 @@ namespace System.Linq
 
         public static IEnumerable<T> Guard<T>(this IEnumerable<T> source, Func<IEnumerable<T>, bool> guard)
         {
-            return guard(source) ? source : Enumerable.Empty<T>();
-            // ReSharper restore PossibleMultipleEnumeration
+            var buffer = source.Memoize();
+            return guard(buffer) ? buffer : Enumerable.Empty<T>();
         }
 
         public static IEnumerable<TResult> Singlize<TSource, TIntermediate, TResult>(this IEnumerable<TSource> source,
