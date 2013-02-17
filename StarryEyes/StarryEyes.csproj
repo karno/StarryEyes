@@ -257,6 +257,7 @@
     <Compile Include="Views\Utils\ConverterBase.cs" />
     <Compile Include="Views\Utils\StringToVisibleConverter.cs" />
     <Compile Include="Views\Utils\UriImageConverter.cs" />
+    <Compile Include="Views\Utils\WindowStateVisibilityConverter.cs" />
     <Compile Include="Views\WindowParts\AccountSelector.xaml.cs">
       <DependentUpon>AccountSelector.xaml</DependentUpon>
     </Compile>
