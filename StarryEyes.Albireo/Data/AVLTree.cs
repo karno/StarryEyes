@@ -284,6 +284,7 @@ namespace StarryEyes.Albireo.Data
                 if (breakLoop)
                     break;
             }
+            _count--;
             return true;
         }
 
