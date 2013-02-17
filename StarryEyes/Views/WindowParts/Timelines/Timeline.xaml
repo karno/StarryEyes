@@ -18,23 +18,16 @@
              mc:Ignorable="d">
     <UserControl.Resources>
         <ResourceDictionary>
-            <!--
-                <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colours.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
-                </ResourceDictionary.MergedDictionaries>
-            -->
             <utils:BooleanToVisibleConverter x:Key="BooleanToVisibleConverter" />
             <utils:BooleanToInvisibleConverter x:Key="BooleanToInvisibleConverter" />
             <DataTemplate x:Key="UserItemTemplate">
                 <controls:LazyImage Width="20"
                                     Height="20"
                                     DecodePixelWidth="20"
-                                    ToolTip="{Binding ScreenName}"
-                                    UriSource="{Binding ProfileImageUri}" />
+                                    ToolTip="{Binding ScreenName,
+                                                      Mode=OneTime}"
+                                    UriSource="{Binding ProfileImageUri,
+                                                        Mode=OneTime}" />
             </DataTemplate>
             <DataTemplate x:Key="StatusItemTemplate">
                 <Border x:Name="MainBorder"
@@ -66,13 +59,13 @@
                         <i:EventTrigger EventName="MouseLeave">
                             <ei:GoToStateAction StateName="Default" />
                         </i:EventTrigger>
-                        <Custom:InteractionMessageTrigger Messenger="{Binding Messenger}">
+                        <Custom:InteractionMessageTrigger Messenger="{Binding Messenger, Mode=OneTime}">
                             <Behaviors:BringIntoViewInteractionMessageAction />
                         </Custom:InteractionMessageTrigger>
-                        <ei:DataTrigger Binding="{Binding IsFocused}" Value="True">
+                        <ei:DataTrigger Binding="{Binding IsFocused, Mode=OneWay}" Value="True">
                             <ei:GoToStateAction StateName="Focused" />
                         </ei:DataTrigger>
-                        <ei:DataTrigger Binding="{Binding IsFocused}" Value="False">
+                        <ei:DataTrigger Binding="{Binding IsFocused, Mode=OneWay}" Value="False">
                             <ei:GoToStateAction StateName="NotFocused" />
                         </ei:DataTrigger>
                     </i:Interaction.Triggers>
@@ -278,7 +271,7 @@
                                 Padding="0">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="MouseLeftButtonDown">
-                                    <ei:CallMethodAction MethodName="ToggleFocus" TargetObject="{Binding Mode=OneWay}" />
+                                    <ei:CallMethodAction MethodName="ToggleFocus" TargetObject="{Binding Mode=OneTime}" />
                                 </i:EventTrigger>
                             </i:Interaction.Triggers>
                             <Grid Width="Auto"
@@ -293,10 +286,10 @@
                                     <ColumnDefinition />
                                 </Grid.ColumnDefinitions>
                                 <i:Interaction.Triggers>
-                                    <ei:DataTrigger Binding="{Binding Parent.IsSelectedStatusExisted}" Value="True">
+                                    <ei:DataTrigger Binding="{Binding Parent.IsSelectedStatusExisted, Mode=OneWay}" Value="True">
                                         <ei:GoToStateAction StateName="Selected" />
                                     </ei:DataTrigger>
-                                    <ei:DataTrigger Binding="{Binding Parent.IsSelectedStatusExisted}" Value="False">
+                                    <ei:DataTrigger Binding="{Binding Parent.IsSelectedStatusExisted, Mode=OneWay}" Value="False">
                                         <ei:GoToStateAction StateName="NotSelected" />
                                     </ei:DataTrigger>
                                 </i:Interaction.Triggers>
@@ -321,12 +314,14 @@
                                     </Border.LayoutTransform>
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="MouseLeftButtonDown">
-                                            <ei:CallMethodAction MethodName="ShowInReplyTo" TargetObject="{Binding Mode=OneWay}" />
+                                            <ei:CallMethodAction MethodName="ShowInReplyTo" TargetObject="{Binding Mode=OneTime}" />
                                         </i:EventTrigger>
                                     </i:Interaction.Triggers>
                                     <Grid Height="Auto"
                                           Background="{x:Null}"
+                                          IsHitTestVisible="False"
                                           Visibility="{Binding IsInReplyToExists,
+                                                               Mode=OneWay,
                                                                Converter={StaticResource BooleanToVisibleConverter}}">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="8" />
@@ -352,7 +347,8 @@
                                                 Background="#19808080"
                                                 SnapsToDevicePixels="True">
                                             <controls:LazyImage DecodePixelWidth="48"
-                                                                UriSource="{Binding InReplyToUserImage}"
+                                                                UriSource="{Binding InReplyToUserImage,
+                                                                                    Mode=OneWay}"
                                                                 UseLayoutRounding="True" />
                                         </Border>
                                         <StackPanel Grid.Column="3"
@@ -376,7 +372,7 @@
                                                            RenderTransformOrigin="0.5,0.5"
                                                            Text="{Binding InReplyToUserScreenName,
                                                                           FallbackValue=uSeR,
-                                                                          Mode=OneTime}"
+                                                                          Mode=OneWay}"
                                                            TextWrapping="NoWrap" />
                                                 <TextBlock Height="Auto"
                                                            Margin="3,-4,3,0"
@@ -386,61 +382,13 @@
                                                            Foreground="Gray"
                                                            Text="{Binding InReplyToUserName,
                                                                           FallbackValue=name,
-                                                                          Mode=OneTime}"
+                                                                          Mode=OneWay}"
                                                            TextWrapping="NoWrap" />
-                                                <StackPanel Width="Auto"
-                                                            Margin="0,0,8,0"
-                                                            HorizontalAlignment="Right"
-                                                            VerticalAlignment="Center"
-                                                            DockPanel.Dock="Right"
-                                                            Opacity="0"
-                                                            Orientation="Horizontal"
-                                                            Visibility="{Binding IsSourceVisible,
-                                                                                 Converter={StaticResource BooleanToVisibleConverter}}">
-                                                    <TextBlock Margin="1,-1,1,0"
-                                                               HorizontalAlignment="Left"
-                                                               VerticalAlignment="Center"
-                                                               FontFamily="Segoe UI Semilight"
-                                                               FontSize="12"
-                                                               Foreground="Gray"
-                                                               Text="via "
-                                                               TextWrapping="NoWrap" />
-                                                    <TextBlock Margin="1,-1,1,0"
-                                                               HorizontalAlignment="Left"
-                                                               VerticalAlignment="Center"
-                                                               FontFamily="Segoe UI Semilight"
-                                                               FontSize="12"
-                                                               Foreground="Gray"
-                                                               Text="{Binding SourceText,
-                                                                              Mode=OneTime}"
-                                                               TextWrapping="NoWrap"
-                                                               Visibility="{Binding IsSourceIsLink,
-                                                                                    Converter={StaticResource BooleanToInvisibleConverter}}" />
-                                                    <TextBlock Margin="1,-1,1,0"
-                                                               HorizontalAlignment="Left"
-                                                               VerticalAlignment="Center"
-                                                               Cursor="Hand"
-                                                               FontFamily="Segoe UI Semilight"
-                                                               FontSize="12"
-                                                               Foreground="Gray"
-                                                               Text="{Binding SourceText,
-                                                                              Mode=OneTime}"
-                                                               TextWrapping="NoWrap"
-                                                               Visibility="{Binding IsSourceIsLink,
-                                                                                    Converter={StaticResource BooleanToVisibleConverter}}">
-                                                        <i:Interaction.Triggers>
-                                                            <i:EventTrigger EventName="MouseLeftButtonDown">
-                                                                <ei:CallMethodAction MethodName="OpenSourceLink" TargetObject="{Binding Mode=OneWay}" />
-                                                            </i:EventTrigger>
-                                                        </i:Interaction.Triggers>
-                                                    </TextBlock>
-
-                                                </StackPanel>
                                             </DockPanel>
                                             <TextBlock Margin="10,0"
                                                        Foreground="Gray"
                                                        Text="{Binding InReplyToBody,
-                                                                      Mode=OneTime}"
+                                                                      Mode=OneWay}"
                                                        TextWrapping="Wrap" />
                                         </StackPanel>
                                     </Grid>
@@ -465,7 +413,8 @@
                                             Background="#191BA1E2"
                                             SnapsToDevicePixels="True">
                                         <controls:LazyImage DecodePixelWidth="48"
-                                                            UriSource="{Binding User.User.ProfileImageUri}"
+                                                            UriSource="{Binding User.User.ProfileImageUri,
+                                                                                Mode=OneTime}"
                                                             UseLayoutRounding="True" />
                                     </Border>
                                     <Border x:Name="CheckBoxBorder"
@@ -486,7 +435,8 @@
                                                       VerticalContentAlignment="Center"
                                                       Content=""
                                                       Focusable="False"
-                                                      IsChecked="{Binding IsSelected}"
+                                                      IsChecked="{Binding IsSelected,
+                                                                          Mode=TwoWay}"
                                                       Padding="0" />
                                         </Viewbox>
                                     </Border>
@@ -503,7 +453,7 @@
                                             Background="#00000000">
                                         <i:Interaction.Triggers>
                                             <i:EventTrigger EventName="MouseLeftButtonDown">
-                                                <ei:CallMethodAction MethodName="ToggleSelect" TargetObject="{Binding Mode=OneWay}" />
+                                                <ei:CallMethodAction MethodName="ToggleSelect" TargetObject="{Binding Mode=OneTime}" />
                                             </i:EventTrigger>
                                         </i:Interaction.Triggers>
                                     </Border>
@@ -539,6 +489,7 @@
                                                    FontFamily="Segoe UI Semilight"
                                                    FontSize="12.667"
                                                    Foreground="Gray"
+                                                   IsHitTestVisible="False"
                                                    Text="{Binding User.User.Name,
                                                                   FallbackValue=name,
                                                                   Mode=OneTime}"
@@ -552,6 +503,7 @@
                                                     Opacity="0"
                                                     Orientation="Horizontal"
                                                     Visibility="{Binding IsSourceVisible,
+                                                                         Mode=OneTime,
                                                                          Converter={StaticResource BooleanToVisibleConverter}}">
                                             <TextBlock Margin="1,-1,1,0"
                                                        HorizontalAlignment="Left"
@@ -559,6 +511,7 @@
                                                        FontFamily="Segoe UI Semilight"
                                                        FontSize="12"
                                                        Foreground="Gray"
+                                                       IsHitTestVisible="False"
                                                        Text="via "
                                                        TextWrapping="NoWrap" />
                                             <TextBlock Margin="1,-1,1,0"
@@ -567,10 +520,12 @@
                                                        FontFamily="Segoe UI Semilight"
                                                        FontSize="12"
                                                        Foreground="Gray"
+                                                       IsHitTestVisible="False"
                                                        Text="{Binding SourceText,
                                                                       Mode=OneTime}"
                                                        TextWrapping="NoWrap"
                                                        Visibility="{Binding IsSourceIsLink,
+                                                                            Mode=OneTime,
                                                                             Converter={StaticResource BooleanToInvisibleConverter}}" />
                                             <TextBlock Margin="1,-1,1,0"
                                                        HorizontalAlignment="Left"
@@ -583,10 +538,11 @@
                                                                       Mode=OneTime}"
                                                        TextWrapping="NoWrap"
                                                        Visibility="{Binding IsSourceIsLink,
+                                                                            Mode=OneTime,
                                                                             Converter={StaticResource BooleanToVisibleConverter}}">
                                                 <i:Interaction.Triggers>
                                                     <i:EventTrigger EventName="MouseLeftButtonDown">
-                                                        <ei:CallMethodAction MethodName="OpenSourceLink" TargetObject="{Binding Mode=OneWay}" />
+                                                        <ei:CallMethodAction MethodName="OpenSourceLink" TargetObject="{Binding Mode=OneTime}" />
                                                     </i:EventTrigger>
                                                 </i:Interaction.Triggers>
                                             </TextBlock>
@@ -600,8 +556,10 @@
                                         </Grid.ColumnDefinitions>
                                         <TextBlock VerticalAlignment="Top"
                                                    TextWrapping="Wrap"
-                                                   helpers:StatusStylizeHelper.LinkNavigationCommand="{Binding OpenLinkCommand}"
-                                                   helpers:StatusStylizeHelper.TwitterStatus="{Binding Status}" />
+                                                   helpers:StatusStylizeHelper.LinkNavigationCommand="{Binding OpenLinkCommand,
+                                                                                                               Mode=OneTime}"
+                                                   helpers:StatusStylizeHelper.TwitterStatus="{Binding Status,
+                                                                                                       Mode=OneTime}" />
                                         <Border Grid.Column="1"
                                                 Grid.ColumnSpan="1"
                                                 Width="60"
@@ -613,14 +571,16 @@
                                                 BorderBrush="#FF979797"
                                                 BorderThickness="1"
                                                 Visibility="{Binding IsImageAvailable,
+                                                                     Mode=OneWay,
                                                                      Converter={StaticResource BooleanToVisibleConverter}}">
                                             <controls:LazyImage Cursor="Hand"
                                                                 DecodePixelHeight="60"
                                                                 Stretch="UniformToFill"
-                                                                UriSource="{Binding FirstImage}">
+                                                                UriSource="{Binding FirstImage,
+                                                                                    Mode=OneWay}">
                                                 <i:Interaction.Triggers>
                                                     <i:EventTrigger EventName="MouseLeftButtonDown">
-                                                        <ei:CallMethodAction MethodName="OpenFirstImage" TargetObject="{Binding Mode=OneWay}" />
+                                                        <ei:CallMethodAction MethodName="OpenFirstImage" TargetObject="{Binding Mode=OneTime}" />
                                                     </i:EventTrigger>
                                                 </i:Interaction.Triggers>
                                             </controls:LazyImage>
@@ -641,6 +601,7 @@
                                                    FontFamily="Segoe UI Semilight"
                                                    FontSize="10.667"
                                                    Foreground="Gray"
+                                                   IsHitTestVisible="False"
                                                    Text="{Binding Status.CreatedAt,
                                                                   FallbackValue=0:00,
                                                                   StringFormat=H:mm,
@@ -663,7 +624,7 @@
                                                    TextWrapping="NoWrap">
                                             <i:Interaction.Triggers>
                                                 <i:EventTrigger EventName="MouseLeftButtonDown">
-                                                    <ei:CallMethodAction MethodName="OpenWeb" TargetObject="{Binding Mode=OneWay}" />
+                                                    <ei:CallMethodAction MethodName="OpenWeb" TargetObject="{Binding Mode=OneTime}" />
                                                 </i:EventTrigger>
                                             </i:Interaction.Triggers>
                                         </TextBlock>
@@ -677,12 +638,13 @@
                                             <Button Width="32"
                                                     Height="22"
                                                     Margin="0,-2"
-                                                    Style="{DynamicResource MetroSquareUnfocusableFlatButton}"
+                                                    Style="{StaticResource MetroSquareUnfocusableFlatButton}"
                                                     Visibility="{Binding CanFavoriteAndRetweet,
+                                                                         Mode=OneWay,
                                                                          Converter={StaticResource BooleanToVisibleConverter}}">
                                                 <i:Interaction.Triggers>
                                                     <i:EventTrigger EventName="Click">
-                                                        <ei:CallMethodAction MethodName="FavoriteAndRetweetImmediate" TargetObject="{Binding Mode=OneWay}" />
+                                                        <ei:CallMethodAction MethodName="FavoriteAndRetweetImmediate" TargetObject="{Binding Mode=OneTime}" />
                                                     </i:EventTrigger>
                                                 </i:Interaction.Triggers>
                                                 <Path Width="14.5"
@@ -695,12 +657,13 @@
                                             <Button Width="46"
                                                     Height="22"
                                                     Margin="0,-2"
-                                                    Style="{DynamicResource MetroSquareUnfocusableFlatButton}"
+                                                    Style="{StaticResource MetroSquareUnfocusableFlatButton}"
                                                     Visibility="{Binding CanFavorite,
+                                                                         Mode=OneTime,
                                                                          Converter={StaticResource BooleanToVisibleConverter}}">
                                                 <i:Interaction.Triggers>
                                                     <i:EventTrigger EventName="Click">
-                                                        <ei:CallMethodAction MethodName="ToggleFavorite" TargetObject="{Binding Mode=OneWay}" />
+                                                        <ei:CallMethodAction MethodName="ToggleFavorite" TargetObject="{Binding Mode=OneTime}" />
                                                     </i:EventTrigger>
                                                 </i:Interaction.Triggers>
                                                 <Path Width="5"
@@ -713,12 +676,13 @@
                                             <Button Width="32"
                                                     Height="22"
                                                     Margin="-60,-2,0,-2"
-                                                    Style="{DynamicResource MetroSquareUnfocusableFlatButton}"
+                                                    Style="{StaticResource MetroSquareUnfocusableFlatButton}"
                                                     Visibility="{Binding CanFavorite,
+                                                                         Mode=OneTime,
                                                                          Converter={StaticResource BooleanToVisibleConverter}}">
                                                 <i:Interaction.Triggers>
                                                     <i:EventTrigger EventName="Click">
-                                                        <ei:CallMethodAction MethodName="ToggleFavoriteImmediate" TargetObject="{Binding Mode=OneWay}" />
+                                                        <ei:CallMethodAction MethodName="ToggleFavoriteImmediate" TargetObject="{Binding Mode=OneTime}" />
                                                     </i:EventTrigger>
                                                 </i:Interaction.Triggers>
                                                 <Path x:Name="FavoriteStar"
@@ -742,12 +706,13 @@
                                             <Button Width="46"
                                                     Height="22"
                                                     Margin="0,-2"
-                                                    Style="{DynamicResource MetroSquareUnfocusableFlatButton}"
+                                                    Style="{StaticResource MetroSquareUnfocusableFlatButton}"
                                                     Visibility="{Binding CanRetweet,
+                                                                         Mode=OneTime,
                                                                          Converter={StaticResource BooleanToVisibleConverter}}">
                                                 <i:Interaction.Triggers>
                                                     <i:EventTrigger EventName="Click">
-                                                        <ei:CallMethodAction MethodName="ToggleRetweet" TargetObject="{Binding Mode=OneWay}" />
+                                                        <ei:CallMethodAction MethodName="ToggleRetweet" TargetObject="{Binding Mode=OneTime}" />
                                                     </i:EventTrigger>
                                                 </i:Interaction.Triggers>
                                                 <Path Width="5"
@@ -760,12 +725,13 @@
                                             <Button Width="32"
                                                     Height="22"
                                                     Margin="-60,-2,0,-2"
-                                                    Style="{DynamicResource MetroSquareUnfocusableFlatButton}"
+                                                    Style="{StaticResource MetroSquareUnfocusableFlatButton}"
                                                     Visibility="{Binding CanRetweet,
+                                                                         Mode=OneTime,
                                                                          Converter={StaticResource BooleanToVisibleConverter}}">
                                                 <i:Interaction.Triggers>
                                                     <i:EventTrigger EventName="Click">
-                                                        <ei:CallMethodAction MethodName="ToggleRetweetImmediate" TargetObject="{Binding Mode=OneWay}" />
+                                                        <ei:CallMethodAction MethodName="ToggleRetweetImmediate" TargetObject="{Binding Mode=OneTime}" />
                                                     </i:EventTrigger>
                                                 </i:Interaction.Triggers>
                                                 <Path x:Name="RetweetCircle"
@@ -789,7 +755,7 @@
                                             <Button Width="32"
                                                     Height="22"
                                                     Margin="0,-2"
-                                                    Style="{DynamicResource MetroSquareUnfocusableFlatButton}">
+                                                    Style="{StaticResource MetroSquareUnfocusableFlatButton}">
                                                 <Path Width="4"
                                                       Height="3.432"
                                                       Margin="0,6,3,0"
@@ -800,10 +766,10 @@
                                             <Button Width="32"
                                                     Height="22"
                                                     Margin="0,-2"
-                                                    Style="{DynamicResource MetroSquareUnfocusableFlatButton}">
+                                                    Style="{StaticResource MetroSquareUnfocusableFlatButton}">
                                                 <i:Interaction.Triggers>
                                                     <i:EventTrigger EventName="Click">
-                                                        <ei:CallMethodAction MethodName="SendReply" TargetObject="{Binding Mode=OneWay}" />
+                                                        <ei:CallMethodAction MethodName="SendReply" TargetObject="{Binding Mode=OneTime}" />
                                                     </i:EventTrigger>
                                                 </i:Interaction.Triggers>
                                                 <Path Width="12"
@@ -816,12 +782,13 @@
                                             <Button Width="32"
                                                     Height="22"
                                                     Margin="0,-2"
-                                                    Style="{DynamicResource MetroSquareUnfocusableFlatButton}"
+                                                    Style="{StaticResource MetroSquareUnfocusableFlatButton}"
                                                     Visibility="{Binding CanDelete,
+                                                                         Mode=OneWay,
                                                                          Converter={StaticResource BooleanToVisibleConverter}}">
                                                 <i:Interaction.Triggers>
                                                     <i:EventTrigger EventName="Click">
-                                                        <ei:CallMethodAction MethodName="Delete" TargetObject="{Binding Mode=OneWay}" />
+                                                        <ei:CallMethodAction MethodName="ConfirmDelete" TargetObject="{Binding Mode=OneTime}" />
                                                     </i:EventTrigger>
                                                 </i:Interaction.Triggers>
                                                 <Path Width="10.89"
@@ -849,6 +816,7 @@
                                                     Margin="0,7,0,0"
                                                     Orientation="Horizontal"
                                                     Visibility="{Binding IsFavoritedUserExists,
+                                                                         Mode=OneWay,
                                                                          Converter={StaticResource BooleanToVisibleConverter}}">
                                             <Path Width="Auto"
                                                   Height="11"
@@ -861,6 +829,7 @@
                                                        VerticalAlignment="Center"
                                                        FontFamily="Segoe UI Semilight"
                                                        Foreground="#FFF0A30A"
+                                                       IsHitTestVisible="False"
                                                        Text="{Binding FavoriteCount,
                                                                       Mode=OneWay,
                                                                       FallbackValue=00}"
@@ -870,6 +839,7 @@
                                                     Margin="0,7,0,0"
                                                     Orientation="Horizontal"
                                                     Visibility="{Binding IsRetweetedUserExists,
+                                                                         Mode=OneWay,
                                                                          Converter={StaticResource BooleanToVisibleConverter}}">
                                             <Path Width="Auto"
                                                   Height="12"
@@ -882,6 +852,7 @@
                                                        VerticalAlignment="Center"
                                                        FontFamily="Segoe UI Semilight"
                                                        Foreground="#FF008A00"
+                                                       IsHitTestVisible="False"
                                                        Text="{Binding RetweetCount,
                                                                       Mode=OneWay,
                                                                       FallbackValue=00}"
@@ -904,6 +875,7 @@
                                                    Margin="0,7,0,0"
                                                    LastChildFill="True"
                                                    Visibility="{Binding IsFavoritedUserExists,
+                                                                        Mode=OneWay,
                                                                         Converter={StaticResource BooleanToVisibleConverter}}">
                                             <Path Width="12"
                                                   Height="11"
@@ -916,13 +888,15 @@
                                                        VerticalAlignment="Center"
                                                        FontFamily="Segoe UI Semilight"
                                                        Foreground="#FFF0A30A"
+                                                       IsHitTestVisible="False"
                                                        Text="{Binding FavoriteCount,
                                                                       Mode=OneWay,
                                                                       FallbackValue=00}"
                                                        TextWrapping="Wrap" />
                                             <ItemsControl Height="Auto"
                                                           ItemTemplate="{StaticResource UserItemTemplate}"
-                                                          ItemsSource="{Binding FavoritedUsers}">
+                                                          ItemsSource="{Binding FavoritedUsers,
+                                                                                Mode=OneTime}">
                                                 <ItemsControl.ItemsPanel>
                                                     <ItemsPanelTemplate>
                                                         <WrapPanel />
@@ -934,6 +908,7 @@
                                                    Margin="0,7,0,0"
                                                    LastChildFill="True"
                                                    Visibility="{Binding IsRetweetedUserExists,
+                                                                        Mode=OneWay,
                                                                         Converter={StaticResource BooleanToVisibleConverter}}">
                                             <Path Width="10"
                                                   Height="12"
@@ -946,13 +921,15 @@
                                                        VerticalAlignment="Center"
                                                        FontFamily="Segoe UI Semilight"
                                                        Foreground="#FF008A00"
+                                                       IsHitTestVisible="False"
                                                        Text="{Binding RetweetCount,
                                                                       Mode=OneWay,
                                                                       FallbackValue=00}"
                                                        TextWrapping="Wrap" />
                                             <ItemsControl Height="Auto"
                                                           ItemTemplate="{StaticResource UserItemTemplate}"
-                                                          ItemsSource="{Binding RetweetedUsers}">
+                                                          ItemsSource="{Binding RetweetedUsers,
+                                                                                Mode=OneTime}">
                                                 <ItemsControl.ItemsPanel>
                                                     <ItemsPanelTemplate>
                                                         <WrapPanel />
@@ -964,8 +941,8 @@
                                     <DockPanel Margin="7,8,7,-1"
                                                Background="Transparent"
                                                Visibility="{Binding IsRetweet,
-                                                                    Converter={StaticResource BooleanToVisibleConverter},
-                                                                    Mode=OneWay}">
+                                                                    Mode=OneTime,
+                                                                    Converter={StaticResource BooleanToVisibleConverter}}">
                                         <Path Width="10"
                                               Height="12"
                                               Margin="3,1"
@@ -981,7 +958,13 @@
                                                    Text="{Binding Retweeter.ScreenName,
                                                                   Mode=OneTime,
                                                                   FallbackValue=user}"
-                                                   TextWrapping="NoWrap" />
+                                                   TextWrapping="NoWrap">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="MouseLeftButtonDown">
+                                                    <ei:CallMethodAction MethodName="OpenRetweeterProfile" TargetObject="{Binding}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBlock>
                                     </DockPanel>
                                 </StackPanel>
                             </Grid>
@@ -989,18 +972,18 @@
                     </Border>
                 </Border>
                 <DataTemplate.Triggers>
-                    <DataTrigger Binding="{Binding IsMyself}" Value="True">
+                    <DataTrigger Binding="{Binding IsMyself, Mode=OneWay}" Value="True">
                         <Setter TargetName="MainBorder" Property="Background" Value="#161BA1E2" />
                     </DataTrigger>
-                    <DataTrigger Binding="{Binding IsDirectMessage}" Value="True">
+                    <DataTrigger Binding="{Binding IsDirectMessage, Mode=OneTime}" Value="True">
                         <Setter TargetName="MainBorder" Property="Background" Value="#16A20025" />
                         <Setter TargetName="ScreenNameText" Property="Foreground" Value="#FFA20025" />
                     </DataTrigger>
-                    <DataTrigger Binding="{Binding IsInReplyToMe}" Value="True">
+                    <DataTrigger Binding="{Binding IsInReplyToMe, Mode=OneWay}" Value="True">
                         <Setter TargetName="MainBorder" Property="Background" Value="#16F0A30A" />
                         <Setter TargetName="ScreenNameText" Property="Foreground" Value="#FFFA6800" />
                     </DataTrigger>
-                    <DataTrigger Binding="{Binding IsRetweet}" Value="True">
+                    <DataTrigger Binding="{Binding IsRetweet, Mode=OneTime}" Value="True">
                         <Setter TargetName="MainBorder" Property="Background" Value="#16008A00" />
                         <Setter TargetName="ScreenNameText" Property="Foreground" Value="#FF008A00" />
                     </DataTrigger>
@@ -1012,7 +995,7 @@
                         <ControlTemplate>
                             <Rectangle Margin="2"
                                        SnapsToDevicePixels="true"
-                                       Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
+                                       Stroke="{StaticResource {x:Static SystemColors.ControlTextBrushKey}}"
                                        StrokeDashArray="1 2"
                                        StrokeThickness="1" />
                         </ControlTemplate>
@@ -1027,7 +1010,7 @@
                         <ControlTemplate>
                             <Rectangle Margin="14,0,0,0"
                                        SnapsToDevicePixels="true"
-                                       Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
+                                       Stroke="{StaticResource {x:Static SystemColors.ControlTextBrushKey}}"
                                        StrokeDashArray="1 2"
                                        StrokeThickness="1" />
                         </ControlTemplate>
@@ -1048,7 +1031,7 @@
                 <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}" />
                 <Setter Property="Background" Value="{StaticResource OptionMark.Static.Background}" />
                 <Setter Property="BorderBrush" Value="{StaticResource OptionMark.Static.Border}" />
-                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
+                <Setter Property="Foreground" Value="{StaticResource {x:Static SystemColors.ControlTextBrushKey}}" />
                 <Setter Property="BorderThickness" Value="1" />
                 <Setter Property="Template">
                     <Setter.Value>
@@ -1134,11 +1117,17 @@
         </ResourceDictionary>
     </UserControl.Resources>
     <ItemsControl ItemTemplate="{StaticResource StatusItemTemplate}"
-                  ItemsSource="{Binding Timeline}"
+                  ItemsSource="{Binding Timeline,
+                                        Mode=OneTime}"
                   ScrollViewer.CanContentScroll="True"
                   VirtualizingPanel.IsVirtualizing="True"
                   VirtualizingPanel.ScrollUnit="Pixel"
                   VirtualizingPanel.VirtualizationMode="Recycling">
+        <i:Interaction.Triggers>
+            <Custom:InteractionMessageTrigger Messenger="{Binding Messenger, Mode=OneTime}">
+                <Behaviors:TaskDialogInteractionMessageAction />
+            </Custom:InteractionMessageTrigger>
+        </i:Interaction.Triggers>
         <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
                 <VirtualizingStackPanel Orientation="Vertical" />
@@ -1147,17 +1136,15 @@
         <ItemsControl.Template>
             <ControlTemplate TargetType="ItemsControl">
                 <ScrollViewer Focusable="False" VerticalScrollBarVisibility="Visible">
-                    <!--
-                        <i:Interaction.Behaviors>
+                    <i:Interaction.Behaviors>
                         <behaviors:TimelineTriggerBehavior IsMouseOver="{Binding IsMouseOver,
-                        Mode=OneWayToSource}"
-                        IsScrollOnBottom="{Binding IsScrollInBottom,
-                        Mode=OneWayToSource}"
-                        IsScrollOnTop="{Binding IsScrollInTop,
-                        Mode=OneWayToSource}" />
+                                                                                 Mode=OneWayToSource}"
+                                                           IsScrollOnBottom="{Binding IsScrollInBottom,
+                                                                                      Mode=OneWayToSource}"
+                                                           IsScrollOnTop="{Binding IsScrollInTop,
+                                                                                   Mode=OneWayToSource}" />
                         <behaviors:TimelineScrollLockerBehavior IsScrollLockEnabled="{Binding IsScrollLock}" ItemsSource="{Binding Timeline}" />
-                        </i:Interaction.Behaviors>
-                    -->
+                    </i:Interaction.Behaviors>
                     <ItemsPresenter />
                 </ScrollViewer>
             </ControlTemplate>

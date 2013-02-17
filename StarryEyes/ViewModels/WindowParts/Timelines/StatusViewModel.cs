@@ -16,6 +16,7 @@ using StarryEyes.Models.Stores;
 using StarryEyes.Settings;
 using StarryEyes.Views.Helpers;
 using StarryEyes.Views.Messaging;
+using TaskDialogInterop;
 
 namespace StarryEyes.ViewModels.WindowParts.Timelines
 {
@@ -81,7 +82,6 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                             RaisePropertyChanged(() => FirstImage);
                             RaisePropertyChanged(() => IsImageAvailable);
                         })
-                        .Track()
                         .Subscribe();
                 }
                 catch (ObjectDisposedException)
@@ -236,7 +236,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public bool CanRetweet
         {
-            get { return !IsDirectMessage; }
+            get { return !IsDirectMessage && !Status.User.IsProtected; }
         }
 
         public bool CanRetweetImmediate
@@ -295,7 +295,8 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         {
             get
             {
-                if (_inReplyTo == null) return null;
+                if (_inReplyTo == null)
+                    return Status.InReplyToScreenName;
                 return _inReplyTo.User.ScreenName;
             }
         }
@@ -475,12 +476,51 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public void ToggleFavoriteImmediate()
         {
+            if (!AssertQuickActionEnabled()) return;
+            if (!CanFavoriteImmediate && !IsFavorited)
+            {
+                NotifyQuickActionFailed("このツイートは現在のアカウントからお気に入り登録できません。",
+                    "Krile上で自分自身のツイートをお気に入り登録しないよう設定されています。");
+                return;
+            }
             Favorite(GetImmediateAccounts(), !IsFavorited);
         }
 
         public void ToggleRetweetImmediate()
         {
+            if (!AssertQuickActionEnabled()) return;
+            if (!CanRetweetImmediate)
+            {
+                NotifyQuickActionFailed("このツイートは現在のアカウントからリツイートできません。",
+                    "自分自身のツイートはリツイートできません。");
+                return;
+            }
             Retweet(GetImmediateAccounts(), !IsRetweeted);
+        }
+
+        private bool AssertQuickActionEnabled()
+        {
+            if (!BindingAccounts.Any())
+            {
+                NotifyQuickActionFailed("アカウントが選択されていません。",
+                                        "クイックアクションを利用するには、投稿欄横のエリアからアカウントを選択する必要があります。" + Environment.NewLine +
+                                        "選択されているアカウントはタブごとに保持されます。");
+                return false;
+            }
+            return true;
+        }
+
+        private void NotifyQuickActionFailed(string main, string body)
+        {
+            var msg = new TaskDialogMessage(new TaskDialogOptions()
+            {
+                CommonButtons = TaskDialogCommonButtons.Close,
+                MainIcon = VistaTaskDialogIcon.Error,
+                MainInstruction = main,
+                Content = body,
+                Title = "クイックアクション エラー"
+            });
+            this.Parent.Messenger.Raise(msg);
         }
 
         public void FavoriteAndRetweetImmediate()
@@ -595,6 +635,26 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         public void DirectMessage()
         {
             InputAreaModel.SetDirectMessage(Model.GetSuitableReplyAccount(), Status.User);
+        }
+
+        public void ConfirmDelete()
+        {
+            var msg = new TaskDialogMessage(new TaskDialogOptions()
+            {
+                AllowDialogCancellation = true,
+                CommonButtons = TaskDialogCommonButtons.OKCancel,
+                Content = "削除したツイートはもとに戻せません。",
+                FooterIcon = VistaTaskDialogIcon.Information,
+                MainIcon = VistaTaskDialogIcon.Warning,
+                MainInstruction = "ツイートを削除しますか？",
+                FooterText = "直近一件のツイートの訂正は、投稿欄で↑キーを押すと行えます。",
+                Title = "ツイートの削除",
+            });
+            var response = this.Parent.Messenger.GetResponse(msg);
+            if (response.Response.Result == TaskDialogSimpleResult.Ok)
+            {
+                Delete();
+            }
         }
 
         public void Delete()

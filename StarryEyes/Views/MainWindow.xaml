@@ -43,6 +43,7 @@
             <SolidColorBrush x:Key="AccentColorBrush" Color="{StaticResource AccentColor}" />
             <utils:BooleanToInvisibleConverter x:Key="BooleanToInvisibleConverter" />
             <utils:BooleanToVisibleConverter x:Key="BooleanToVisibleConverter" />
+            <utils:WindowMaximizeToInvisibleConverter x:Key="MaximizeToInvisibleConverter" />
         </ResourceDictionary>
     </controls:MetroWindow.Resources>
     <controls:MetroWindow.DataContext>
@@ -181,6 +182,7 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Margin="8"
                            Text="{Binding StateString}"
@@ -233,6 +235,12 @@
                                FontFamily="Segoe UI"
                                Text="{Binding StartupTime}" />
                 </StackPanel>
+                <Canvas Grid.Column="4"
+                        Width="10"
+                        Visibility="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
+                                                                            AncestorType={x:Type Window}},
+                                             Path=WindowState,
+                                             Converter={StaticResource MaximizeToInvisibleConverter}}" />
             </Grid>
             <Border x:Name="CurrentEventBorder"
                     Opacity="0"

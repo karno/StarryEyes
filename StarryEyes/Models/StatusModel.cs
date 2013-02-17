@@ -156,7 +156,6 @@ namespace StarryEyes.Models
                              subj.OnCompleted();
                              subj.Dispose();
                          })
-                         .Track()
                          .Subscribe(l => Images = l);
         }
 

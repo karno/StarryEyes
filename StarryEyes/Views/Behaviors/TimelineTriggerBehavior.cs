@@ -13,33 +13,54 @@ namespace StarryEyes.Views.Behaviors
     {
         private readonly CompositeDisposable _disposables = new CompositeDisposable();
 
+        private bool? _isScrollOnTop;
         public bool IsScrollOnTop
         {
-            get { return (bool)GetValue(IsScrollOnTopProperty); }
-            set { SetValue(IsScrollOnTopProperty, value); }
+            get { return (_isScrollOnTop = (bool)GetValue(IsScrollOnTopProperty)).Value; }
+            set
+            {
+                if (_isScrollOnTop != value)
+                {
+                    _isScrollOnTop = value;
+                    SetValue(IsScrollOnTopProperty, value);
+                }
+            }
         }
 
-        // Using a DependencyProperty as the backing store for IsScrollOnTop.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty IsScrollOnTopProperty =
             DependencyProperty.Register("IsScrollOnTop", typeof(bool), typeof(TimelineTriggerBehavior), new PropertyMetadata(false));
 
+        private bool? _isScrollOnBottom;
         public bool IsScrollOnBottom
         {
-            get { return (bool)GetValue(IsScrollOnBottomProperty); }
-            set { SetValue(IsScrollOnBottomProperty, value); }
+            get { return (_isScrollOnBottom = (bool)GetValue(IsScrollOnBottomProperty)).Value; }
+            set
+            {
+                if (_isScrollOnBottom != value)
+                {
+                    _isScrollOnBottom = value;
+                    SetValue(IsScrollOnBottomProperty, value);
+                }
+            }
         }
 
-        // Using a DependencyProperty as the backing store for IsScrollOnBottom.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty IsScrollOnBottomProperty =
             DependencyProperty.Register("IsScrollOnBottom", typeof(bool), typeof(TimelineTriggerBehavior), new PropertyMetadata(false));
 
+        private bool? _isMouseOver;
         public bool IsMouseOver
         {
-            get { return (bool)GetValue(IsMouseOverProperty); }
-            set { SetValue(IsMouseOverProperty, value); }
+            get { return (_isMouseOver = (bool)GetValue(IsMouseOverProperty)).Value; }
+            set
+            {
+                if (_isMouseOver != value)
+                {
+                    _isMouseOver = value;
+                    SetValue(IsMouseOverProperty, value);
+                }
+            }
         }
 
-        // Using a DependencyProperty as the backing store for IsMouseOver.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty IsMouseOverProperty =
             DependencyProperty.Register("IsMouseOver", typeof(bool), typeof(TimelineTriggerBehavior), new PropertyMetadata(false));
 
