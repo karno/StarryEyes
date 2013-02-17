@@ -8,9 +8,9 @@ namespace StarryEyes.Views.Utils
     // Converter templates
     public abstract class TwoWayConverter<TSource, TTarget> : ConvertBase, IValueConverter
     {
-        public abstract TTarget ToTarget(TSource input, object parameter);
+        protected abstract TTarget ToTarget(TSource input, object parameter);
 
-        public abstract TSource ToSource(TTarget input, object parameter);
+        protected abstract TSource ToSource(TTarget input, object parameter);
 
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
@@ -25,7 +25,7 @@ namespace StarryEyes.Views.Utils
 
     public abstract class OneWayConverter<TSource, TTarget> : ConvertBase, IValueConverter
     {
-        public abstract TTarget ToTarget(TSource input, object parameter);
+        protected abstract TTarget ToTarget(TSource input, object parameter);
 
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
@@ -53,10 +53,7 @@ namespace StarryEyes.Views.Utils
                     return converter(default(TSource), parameter);
                 }
             }
-            else
-            {
-                return converter((TSource)value, parameter);
-            }
+            return converter((TSource)value, parameter);
         }
 
         protected static bool IsInDesignTime

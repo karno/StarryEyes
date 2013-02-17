@@ -6,9 +6,17 @@ namespace StarryEyes.Views.Utils
 {
     public class CollectionExistsToVisibleConverter : OneWayConverter<IEnumerable<object>, Visibility>
     {
-        public override Visibility ToTarget(IEnumerable<object> input, object parameter)
+        protected override Visibility ToTarget(IEnumerable<object> input, object parameter)
         {
-            return input != null && input.Count() > 0 ? Visibility.Visible : Visibility.Collapsed;
+            return input != null && input.Any() ? Visibility.Visible : Visibility.Collapsed;
+        }
+    }
+
+    public class CollectionExistsToInvisibleConverter : OneWayConverter<IEnumerable<object>, Visibility>
+    {
+        protected override Visibility ToTarget(IEnumerable<object> input, object parameter)
+        {
+            return input == null || !input.Any() ? Visibility.Visible : Visibility.Collapsed;
         }
     }
 }
