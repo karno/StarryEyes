@@ -19,7 +19,6 @@ namespace StarryEyes.Filters.Parsing
         /// <returns></returns>
         public Token Get()
         {
-            System.Diagnostics.Debug.WriteLine("read:" + _tokenQueueList[_queueCursor]);
             return _tokenQueueList[_queueCursor++];
         }
 
@@ -29,7 +28,7 @@ namespace StarryEyes.Filters.Parsing
         public Token LookAhead()
         {
             if (!IsRemainToken)
-                throw new FilterQueryException("Query is terminated in halfway.", RemainQuery);
+                throw new FilterQueryException("クエリは途中で終了しました。", RemainQuery);
             return _tokenQueueList[_queueCursor];
         }
 
@@ -73,13 +72,13 @@ namespace StarryEyes.Filters.Parsing
                 RaiseQueryInvalidTerminatedError(type, RemainQuery);
             var token = Get();
             if (token.Type != type)
-                throw new FilterQueryException("Invalid token: " + token + " in " + token.DebugIndex + ", expected is: " + type, RemainQuery);
+                throw new FilterQueryException("不正なトークン: " + token + " in " + token.DebugIndex + ", 予期されるもの: " + type, RemainQuery);
             return token;
         }
 
         private void RaiseQueryInvalidTerminatedError(TokenType expected, string innerQuery)
         {
-            throw new FilterQueryException("Query is terminated in halfway. Next token is expected: " + expected.ToString(), innerQuery);
+            throw new FilterQueryException("クエリは途中で終了しています。次のトークンが続くと予測されています: " + expected.ToString(), innerQuery);
         }
     }
 }

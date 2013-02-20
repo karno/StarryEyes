@@ -46,7 +46,7 @@ namespace StarryEyes.Filters.Parsing
                     FilterExpressionRoot filters = CompileFilters(tokens.Skip(1));
                     return new FilterQuery { Sources = sources, PredicateTreeRoot = filters };
                 }
-                throw new FormatException("Query must be started with \"from\" keyword or \"where\" keyword..");
+                throw new FormatException("クエリは\"from\"キーワードか\"where\"キーワードで始まらなければなりません。");
             }
             catch (FilterQueryException)
             {
@@ -54,7 +54,7 @@ namespace StarryEyes.Filters.Parsing
             }
             catch (Exception ex)
             {
-                throw new FilterQueryException("Query compilation failed. " + ex.Message, query, ex);
+                throw new FilterQueryException("クエリのコンパイルに失敗しました。 " + ex.Message, query, ex);
             }
         }
 
@@ -72,7 +72,7 @@ namespace StarryEyes.Filters.Parsing
             }
             catch (Exception ex)
             {
-                throw new FilterQueryException("Query compilation failed. " + ex.Message, query, ex);
+                throw new FilterQueryException("クエリのコンパイルに失敗しました: " + ex.Message, query, ex);
             }
         }
 
@@ -113,12 +113,12 @@ namespace StarryEyes.Filters.Parsing
                 Token filter = reader.Get();
                 if (filter.Type != TokenType.Literal && filter.Type != TokenType.OperatorMultiple)
                 {
-                    throw new ArgumentException("Operator is not expected.(" + filter.Type +
-                                                ") expected is Literal or \'*\'.");
+                    throw new ArgumentException("このトークンは無効です: " + filter.Type +
+                                                " (リテラルか \'*\' です。)");
                 }
                 Type fstype;
                 if (!FilterSourceResolver.TryGetValue(filter.Value, out fstype))
-                    throw new ArgumentException("Unexpected source type: " + filter.Value);
+                    throw new ArgumentException("フィルタ ソースが一致しません: " + filter.Value);
                 if (reader.IsRemainToken && reader.LookAhead().Type == TokenType.Collon) // with argument
                 {
                     reader.AssertGet(TokenType.Collon);
@@ -157,7 +157,7 @@ namespace StarryEyes.Filters.Parsing
             var reader = new TokenReader(token);
             FilterOperatorBase op = CompileL0(reader);
             if (reader.IsRemainToken)
-                throw new FilterQueryException("Invalid token: " + reader.Get(), reader.RemainQuery);
+                throw new FilterQueryException("不正なトークンです: " + reader.Get(), reader.RemainQuery);
             return new FilterExpressionRoot { Operator = op };
         }
 
@@ -407,7 +407,7 @@ namespace StarryEyes.Filters.Parsing
                     case "followers":
                         return new LocalUserFollowers(repl);
                     default:
-                        throw new FilterQueryException("Unexpected token: " + literal.Value,
+                        throw new FilterQueryException("不正なトークンです: " + literal.Value,
                                                        repl.ToQuery() + "." + literal.Value + " " + reader.RemainQuery);
                 }
             }
@@ -519,7 +519,7 @@ namespace StarryEyes.Filters.Parsing
                 case "language":
                     return selector(new UserLanguage(), new RetweeterLanguage());
                 default:
-                    throw new FilterQueryException("Unexpected token: " + literal.Value,
+                    throw new FilterQueryException("不正なトークンです: " + literal.Value,
                                                    "user." + literal.Value + " " + reader.RemainQuery);
             }
         }
@@ -577,7 +577,7 @@ namespace StarryEyes.Filters.Parsing
                 case "client":
                     return new StatusSource();
                 default:
-                    throw new FilterQueryException("Unexpected token: " + value, value + " " + reader.RemainQuery);
+                    throw new FilterQueryException("不正なトークンです: " + value, value + " " + reader.RemainQuery);
             }
         }
 

@@ -25,7 +25,7 @@ namespace StarryEyes.Filters.Parsing
                         break;
                     case '<':
                         if (query.Length <= strptr + 1)
-                            throw new ArgumentException("Query is too short.");
+                            throw new ArgumentException("クエリが短すぎます。");
                         switch (query[strptr + 1])
                         {
                             case '=': // <=
@@ -43,7 +43,7 @@ namespace StarryEyes.Filters.Parsing
                         break;
                     case '>':
                         if (query.Length <= strptr + 1)
-                            throw new ArgumentException("Query is too short.");
+                            throw new ArgumentException("クエリが短すぎます。");
                         switch (query[strptr + 1])
                         {
                             case '=': // >=
@@ -60,7 +60,7 @@ namespace StarryEyes.Filters.Parsing
                         break;
                     case '-':
                         if (query.Length <= strptr + 1)
-                            throw new ArgumentException("Query is too short.");
+                            throw new ArgumentException("クエリが短すぎます。");
                         switch (query[strptr + 1])
                         {
                             case '>': // ->
@@ -94,7 +94,7 @@ namespace StarryEyes.Filters.Parsing
                         break;
                     case '!':
                         if (query.Length <= strptr + 1)
-                            throw new ArgumentException("Query is too short.");
+                            throw new ArgumentException("クエリが短すぎます。");
                         switch (query[strptr + 1])
                         {
                             case '=': // !=
@@ -124,7 +124,7 @@ namespace StarryEyes.Filters.Parsing
                     default:
                         int begin = strptr;
                         // 何らかのトークン分割子に出会うまで空回し
-                        var tokens = "&|.,:!()\"= \t\r\n";
+                        const string tokens = "&|.,:!()\"= \t\r\n";
                         do
                         {
                             if (tokens.Contains(query[strptr]))
@@ -167,7 +167,7 @@ namespace StarryEyes.Filters.Parsing
                     // 次のダブルクオートかバックスラッシュを読み飛ばす
                     if (cursor + 1 == query.Length)
                     {
-                        throw new ArgumentException("Query ends with backslash.");
+                        throw new ArgumentException("クエリはバックスラッシュで終了しています。");
                     }
                     else if (query[cursor + 1] == '"' || query[cursor + 1] == '\\')
                     {
@@ -181,7 +181,7 @@ namespace StarryEyes.Filters.Parsing
                 }
                 cursor++;
             }
-            throw new ArgumentException("String is not terminated: " + query.Substring(begin));
+            throw new ArgumentException("文字列が閉じられていません: " + query.Substring(begin));
         }
 
         public static bool CheckNext(string q, int i, char c)
@@ -195,9 +195,9 @@ namespace StarryEyes.Filters.Parsing
         public static void AssertNext(string q, int i, char c)
         {
             if (i + 1 >= q.Length)
-                throw new ArgumentException("String is too short.");
+                throw new ArgumentException("クエリが短すぎます。");
             if (q[i] != c)
-                throw new ArgumentException("Unexpected char: " + q[i] + "(in \"" + q + "\" , index " + i + "), expected: " + c);
+                throw new ArgumentException("この文字は予期されていません: " + q[i] + "(in \"" + q + "\" , index " + i + "), 予期されているもの: " + c);
         }
     }
 }

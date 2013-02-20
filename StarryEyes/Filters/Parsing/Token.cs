@@ -74,7 +74,7 @@ namespace StarryEyes.Filters.Parsing
                 case TokenType.OperatorGreaterThanOrEqual:
                     return ">= [より大きいか等しい]";
                 case TokenType.Literal:
-                    return "リテラル (" + (Value == null ? "[null]" : Value) + ")";
+                    return "リテラル (" + (Value ?? "[null]") + ")";
                 case TokenType.Period:
                     return ". [ピリオド]";
                 case TokenType.Comma:
