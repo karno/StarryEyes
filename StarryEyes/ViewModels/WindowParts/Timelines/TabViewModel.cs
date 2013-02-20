@@ -5,10 +5,10 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
-using System.Threading;
 using Livet;
 using Livet.EventListeners;
 using StarryEyes.Breezy.DataModel;
+using StarryEyes.Models;
 using StarryEyes.Models.Tab;
 using StarryEyes.Settings;
 
@@ -43,11 +43,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             _owner = owner;
             _model = tabModel;
             tabModel.Activate();
-            CompositeDisposable.Add(
-                Observable.FromEvent(
-                    _ => Model.Timeline.OnNewStatusArrived += _,
-                    _ => Model.Timeline.OnNewStatusArrived -= _)
-                          .Subscribe(_ => UnreadCount++));
+            BindTimeline();
             CompositeDisposable.Add(
                 Observable.FromEvent<ScrollLockStrategy>(
                     handler => Setting.ScrollLockStrategy.OnValueChanged += handler,
@@ -60,17 +56,52 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             CompositeDisposable.Add(() => Model.Deactivate());
             CompositeDisposable.Add(
                 Observable.FromEvent(
-                h => tabModel.OnBindingAccountIdsChanged += h,
-                h => tabModel.OnBindingAccountIdsChanged -= h)
-                .Subscribe(_ => DispatcherHolder.Enqueue(() => Timeline.ForEach(t => t.BindingAccounts = Model.BindingAccountIds))));
+                    h => tabModel.OnBindingAccountIdsChanged += h,
+                    h => tabModel.OnBindingAccountIdsChanged -= h)
+                          .Subscribe(
+                              _ =>
+                              DispatcherHolder.Enqueue(
+                                  () => Timeline.ForEach(t => t.BindingAccounts = Model.BindingAccountIds))));
+            CompositeDisposable.Add(
+                Observable.FromEvent<bool>(
+                    h => tabModel.OnConfigurationUpdated += h,
+                    h => tabModel.OnConfigurationUpdated -= h)
+                          .Subscribe(isQueryUpdated =>
+                          {
+                              System.Diagnostics.Debug.WriteLine("Configuration updated.");
+                              RaisePropertyChanged(() => Name);
+                              RaisePropertyChanged(() => UnreadCount);
+                              if (isQueryUpdated)
+                              {
+                                  BindTimeline();
+                              }
+                          }));
+        }
+
+        private void BindTimeline()
+        {
+            // invalidate cache
+            System.Diagnostics.Debug.WriteLine("Re-bind cache.");
+            _timeline = null;
+
+            CompositeDisposable.Add(
+                Observable.FromEvent<TwitterStatus>(
+                    h => Model.Timeline.OnNewStatusArrival += h,
+                    h =>
+                    {
+                        if (Model.Timeline != null)
+                            Model.Timeline.OnNewStatusArrival -= h;
+                    })
+                          .Subscribe(_ => UnreadCount++));
             IsLoading = true;
-            Observable.Defer(
-                () =>
-                Observable.Start(() => Model.Timeline.ReadMore(null, true))
-                          .Merge(Observable.Start(() => Model.ReceiveTimelines(null))))
+            Observable.Start(() => Model.Timeline.ReadMore(null, true))
+                      .Merge(Observable.Start(() => Model.ReceiveTimelines(null)))
                       .SelectMany(_ => _)
                       .Finally(() => IsLoading = false)
                       .Subscribe();
+            if (UnreadCount > 0)
+                UnreadCount = 0;
+            RaisePropertyChanged(() => Timeline);
         }
 
         public TabModel Model
@@ -110,8 +141,8 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             {
                 if (_timeline == null)
                 {
-                    _timeline = new ObservableCollection<StatusViewModel>();
-                    DispatcherHolder.Enqueue(InitializeCollection);
+                    var ctl = _timeline = new ObservableCollection<StatusViewModel>();
+                    DispatcherHolder.Enqueue(() => InitializeCollection(ctl));
                 }
                 return _timeline;
             }
@@ -122,7 +153,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             get { return _unreadCount; }
             set
             {
-                int newValue = IsFocused ? 0 : value;
+                int newValue = IsFocused || !Model.IsShowUnreadCounts ? 0 : value;
                 if (_unreadCount == newValue) return;
                 _unreadCount = newValue;
                 RaisePropertyChanged();
@@ -221,8 +252,8 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             }
         }
 
-        private volatile bool _isCollectionAddEnabled = false;
-        private void InitializeCollection()
+        private volatile bool _isCollectionAddEnabled;
+        private void InitializeCollection(ObservableCollection<StatusViewModel> ctl)
         {
             lock (_collectionLock)
             {
@@ -234,36 +265,36 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                             if (_isCollectionAddEnabled)
                             {
                                 DispatcherHolder.Enqueue(
-                                    () => ReflectCollectionChanged(e));
+                                    () => ReflectCollectionChanged(e, ctl));
                             }
                         }));
                 TwitterStatus[] collection = Model.Timeline.Statuses.ToArray();
                 _isCollectionAddEnabled = true;
                 collection
                     .Select(GenerateStatusViewModel)
-                    .ForEach(_timeline.Add);
+                    .ForEach(ctl.Add);
             }
         }
 
-        private void ReflectCollectionChanged(NotifyCollectionChangedEventArgs e)
+        private void ReflectCollectionChanged(NotifyCollectionChangedEventArgs e, ObservableCollection<StatusViewModel> ctl)
         {
             lock (_collectionLock)
             {
                 switch (e.Action)
                 {
                     case NotifyCollectionChangedAction.Add:
-                        _timeline.Insert(e.NewStartingIndex, GenerateStatusViewModel((TwitterStatus)e.NewItems[0]));
+                        ctl.Insert(e.NewStartingIndex, GenerateStatusViewModel((TwitterStatus)e.NewItems[0]));
                         break;
                     case NotifyCollectionChangedAction.Move:
-                        _timeline.Move(e.OldStartingIndex, e.NewStartingIndex);
+                        ctl.Move(e.OldStartingIndex, e.NewStartingIndex);
                         break;
                     case NotifyCollectionChangedAction.Remove:
-                        StatusViewModel removal = _timeline[e.OldStartingIndex];
-                        _timeline.RemoveAt(e.OldStartingIndex);
+                        StatusViewModel removal = ctl[e.OldStartingIndex];
+                        ctl.RemoveAt(e.OldStartingIndex);
                         removal.Dispose();
                         break;
                     case NotifyCollectionChangedAction.Reset:
-                        Rebind();
+                        Rebind(ctl);
                         break;
                     default:
                         throw new ArgumentException();
@@ -271,13 +302,13 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             }
         }
 
-        public void Rebind()
+        public void Rebind(ObservableCollection<StatusViewModel> ctl)
         {
             lock (_collectionLock)
             {
                 _isCollectionAddEnabled = false;
-                StatusViewModel[] cache = _timeline.ToArray();
-                _timeline.Clear();
+                StatusViewModel[] cache = ctl.ToArray();
+                ctl.Clear();
                 cache.ToObservable()
                      .ObserveOn(TaskPoolScheduler.Default)
                      .Subscribe(_ => _.Dispose());
@@ -285,7 +316,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                 _isCollectionAddEnabled = true;
                 collection
                     .Select(GenerateStatusViewModel)
-                    .ForEach(_timeline.Add);
+                    .ForEach(ctl.Add);
             }
         }
 
@@ -323,6 +354,20 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                  .OnErrorResumeNext(Observable.Empty<Unit>())
                  .Subscribe();
         }
+
+        #region EditTabCommand
+        private Livet.Commands.ViewModelCommand _editTabCommand;
+
+        public Livet.Commands.ViewModelCommand EditTabCommand
+        {
+            get { return _editTabCommand ?? (_editTabCommand = new Livet.Commands.ViewModelCommand(EditTab)); }
+        }
+
+        public void EditTab()
+        {
+            MainWindowModel.ShowTabConfigure(this.Model);
+        }
+        #endregion
 
         #region Call by code-behind
 

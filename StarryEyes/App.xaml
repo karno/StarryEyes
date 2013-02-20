@@ -272,6 +272,63 @@
             		</Setter.Value>
             	</Setter>
             </Style>
+            <ControlTemplate x:Key="MetroBlackCircleButtonTemplate" TargetType="{x:Type Button}">
+            	<Grid x:Name="grid" Opacity="0.8">
+            		<VisualStateManager.VisualStateGroups>
+            			<VisualStateGroup x:Name="CommonStates">
+            				<VisualState x:Name="MouseOver">
+            					<Storyboard>
+            						<ColorAnimationUsingKeyFrames Storyboard.TargetName="arc" Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)">
+            							<EasingColorKeyFrame KeyTime="0" Value="#0CFFFFFF" />
+            						</ColorAnimationUsingKeyFrames>
+            						<DoubleAnimationUsingKeyFrames Storyboard.TargetName="grid" Storyboard.TargetProperty="(UIElement.Opacity)">
+            							<EasingDoubleKeyFrame KeyTime="0" Value="1" />
+            						</DoubleAnimationUsingKeyFrames>
+            					</Storyboard>
+            				</VisualState>
+            				<VisualState x:Name="Pressed">
+            					<Storyboard>
+            						<ColorAnimationUsingKeyFrames Storyboard.TargetName="arc" Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)">
+            							<EasingColorKeyFrame KeyTime="0" Value="#19FFFFFF" />
+            						</ColorAnimationUsingKeyFrames>
+            					</Storyboard>
+            				</VisualState>
+            				<VisualState x:Name="Disabled" />
+            				<VisualState x:Name="Normal">
+            					<Storyboard>
+            						<DoubleAnimationUsingKeyFrames Storyboard.TargetName="grid" Storyboard.TargetProperty="(UIElement.Opacity)">
+            							<EasingDoubleKeyFrame KeyTime="0" Value="1" />
+            						</DoubleAnimationUsingKeyFrames>
+            					</Storyboard>
+            				</VisualState>
+            			</VisualStateGroup>
+            			<VisualStateGroup x:Name="FocusStates">
+            				<VisualState x:Name="Focused" />
+            			</VisualStateGroup>
+            			<VisualStateGroup x:Name="ValidationStates">
+            				<VisualState x:Name="InvalidFocused" />
+            				<VisualState x:Name="InvalidUnfocused" />
+            			</VisualStateGroup>
+            		</VisualStateManager.VisualStateGroups>
+            		<ed:Arc x:Name="arc"
+            			Width="Auto"
+            			Height="Auto"
+            			HorizontalAlignment="Stretch"
+            			VerticalAlignment="Stretch"
+            			ArcThickness="1"
+            			ArcThicknessUnit="Percent"
+            			EndAngle="360"
+            			Fill="#00000000"
+            			StartAngle="0"
+            			Stretch="None"
+            			Stroke="Black" />
+            		<ContentPresenter Width="Auto"
+            			Height="Auto"
+            			Margin="2"
+            			HorizontalAlignment="Stretch"
+            			VerticalAlignment="Stretch" />
+            	</Grid>
+            </ControlTemplate>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

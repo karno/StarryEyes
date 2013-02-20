@@ -8,6 +8,7 @@ using StarryEyes.Breezy.Imaging;
 using StarryEyes.Filters;
 using StarryEyes.Filters.Expressions;
 using StarryEyes.Filters.Parsing;
+using StarryEyes.Models.Tab;
 using TaskDialogInterop;
 
 namespace StarryEyes.Settings
@@ -18,6 +19,41 @@ namespace StarryEyes.Settings
 
         public static readonly SettingItemStruct<bool> IsPowerUser =
             new SettingItemStruct<bool>("IsPowerUser", false);
+
+        #region Tab and Columns
+
+        private static readonly SettingItem<ColumnDescription[]> _columns =
+            new SettingItem<ColumnDescription[]>("Columns", null);
+
+        internal static IEnumerable<ColumnDescription> Columns
+        {
+            get { return _columns.Value ?? GenerateEmptyTabs(); }
+            set { _columns.Value = value.Guard().ToArray(); }
+        } 
+
+        private static IEnumerable<ColumnDescription> GenerateEmptyTabs()
+        {
+            return new[]
+            {
+                new ColumnDescription
+                {
+                    Tabs = new[]
+                    {
+                        CommonTabBuilder.GenerateGeneralTab(),
+                        CommonTabBuilder.GenerateHomeTab(),
+                        CommonTabBuilder.GenerateMentionTab(),
+                        CommonTabBuilder.GenerateMeTab(),
+                    }.Select(t => new TabDescription(t)).ToArray()
+                },
+                new ColumnDescription
+                {
+                    Tabs = new[] {CommonTabBuilder.GenerateActivitiesTab()}
+                        .Select(t => new TabDescription(t)).ToArray()
+                }
+            };
+        } 
+
+        #endregion
 
         #region Authentication and accounts
 

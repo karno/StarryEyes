@@ -4,6 +4,7 @@
                       xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
                       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                       xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
+                      xmlns:flips="clr-namespace:StarryEyes.Views.WindowParts.Flips"
                       xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
                       xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -290,11 +291,14 @@
                 </StackPanel>
             </Border>
         </Grid>
-        <windowParts:AccountSelector Grid.RowSpan="2"
-                                     Margin="0,-30,0,0"
-                                     DataContext="{Binding InputAreaAccountSelectorViewModel}" />
-        <windowParts:AccountSelector Grid.RowSpan="2"
-                                     Margin="0,-30,0,0"
-                                     DataContext="{Binding GlobalAccountSelectorViewModel}" />
+        <flips:AccountSelectionFlip Grid.RowSpan="2"
+                                    Margin="0,-30,0,0"
+                                    DataContext="{Binding InputAreaAccountSelectionFlipViewModel}" />
+        <flips:AccountSelectionFlip Grid.RowSpan="2"
+                                    Margin="0,-30,0,0"
+                                    DataContext="{Binding GlobalAccountSelectionFlipViewModel}" />
+        <flips:TabConfigurationFlip Grid.RowSpan="2"
+                                    Margin="0, -30, 0, 0"
+                                    DataContext="{Binding TabConfigurationFlipViewModel}" />
     </Grid>
 </controls:MetroWindow>

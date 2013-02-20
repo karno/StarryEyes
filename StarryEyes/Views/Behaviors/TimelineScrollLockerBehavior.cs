@@ -39,7 +39,6 @@ namespace StarryEyes.Views.Behaviors
         public static readonly DependencyProperty ItemsSourceProperty =
             DependencyProperty.Register("ItemsSource", typeof(IList), typeof(TimelineScrollLockerBehavior), new PropertyMetadata(null));
 
-        private double _pxh;
         protected override void OnAttached()
         {
             base.OnAttached();
@@ -51,13 +50,7 @@ namespace StarryEyes.Views.Behaviors
                                      if (e.ExtentHeightChange > 0 && IsScrollLockEnabled)
                                      {
                                          this.AssociatedObject.ScrollToVerticalOffset(e.VerticalOffset + e.ExtentHeightChange);
-                                         System.Diagnostics.Debug.WriteLine("★locked. extent: " + e.ExtentHeightChange);
                                      }
-                                     else if (IsScrollLockEnabled)
-                                     {
-                                         System.Diagnostics.Debug.WriteLine("☆not locked. extent: " + e.ExtentHeightChange);
-                                     }
-                                     _pxh = e.ExtentHeight;
                                  }));
         }
 

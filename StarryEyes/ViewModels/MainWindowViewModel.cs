@@ -11,6 +11,7 @@ using StarryEyes.Models.Tab;
 using StarryEyes.Settings;
 using StarryEyes.ViewModels.Dialogs;
 using StarryEyes.ViewModels.WindowParts;
+using StarryEyes.ViewModels.WindowParts.Flips;
 using StarryEyes.Views.Dialogs;
 using StarryEyes.Views.Messaging;
 using TaskDialogInterop;
@@ -64,11 +65,14 @@ namespace StarryEyes.ViewModels
         #region Included viewmodels
 
         private readonly BackpanelViewModel _backpanelViewModel;
-        private readonly AccountSelectorViewModel _globalAccountSelectorViewModel;
+
+        private readonly AccountSelectionFlipViewModel _globalAccountSelectionFlipViewModel;
 
         private readonly InputAreaViewModel _inputAreaViewModel;
 
         private readonly MainAreaViewModel _mainAreaViewModel;
+
+        private readonly TabConfigurationFlipViewModel _tabConfigurationFlipViewModel;
 
         public BackpanelViewModel BackpanelViewModel
         {
@@ -85,14 +89,19 @@ namespace StarryEyes.ViewModels
             get { return _mainAreaViewModel; }
         }
 
-        public AccountSelectorViewModel InputAreaAccountSelectorViewModel
+        public AccountSelectionFlipViewModel InputAreaAccountSelectionFlipViewModel
         {
-            get { return _inputAreaViewModel.AccountSelector; }
+            get { return _inputAreaViewModel.AccountSelectionFlip; }
         }
 
-        public AccountSelectorViewModel GlobalAccountSelectorViewModel
+        public AccountSelectionFlipViewModel GlobalAccountSelectionFlipViewModel
         {
-            get { return _globalAccountSelectorViewModel; }
+            get { return _globalAccountSelectionFlipViewModel; }
+        }
+
+        public TabConfigurationFlipViewModel TabConfigurationFlipViewModel
+        {
+            get { return _tabConfigurationFlipViewModel; }
         }
 
         #endregion
@@ -118,7 +127,8 @@ namespace StarryEyes.ViewModels
             CompositeDisposable.Add(_backpanelViewModel = new BackpanelViewModel());
             CompositeDisposable.Add(_inputAreaViewModel = new InputAreaViewModel());
             CompositeDisposable.Add(_mainAreaViewModel = new MainAreaViewModel());
-            CompositeDisposable.Add(_globalAccountSelectorViewModel = new AccountSelectorViewModel());
+            CompositeDisposable.Add(_globalAccountSelectionFlipViewModel = new AccountSelectionFlipViewModel());
+            CompositeDisposable.Add(_tabConfigurationFlipViewModel = new TabConfigurationFlipViewModel());
             _backpanelViewModel.Initialize();
         }
 
@@ -138,30 +148,30 @@ namespace StarryEyes.ViewModels
 
             MainWindowModel.OnExecuteAccountSelectActionRequested += (action, status, selecteds, aftercall) =>
             {
-                _globalAccountSelectorViewModel.SelectedAccounts = selecteds;
-                _globalAccountSelectorViewModel.SelectionReason = "";
+                _globalAccountSelectionFlipViewModel.SelectedAccounts = selecteds;
+                _globalAccountSelectionFlipViewModel.SelectionReason = "";
                 switch (action)
                 {
                     case AccountSelectionAction.Favorite:
-                        _globalAccountSelectorViewModel.SelectionReason = "favorite";
+                        _globalAccountSelectionFlipViewModel.SelectionReason = "favorite";
                         break;
                     case AccountSelectionAction.Retweet:
-                        _globalAccountSelectorViewModel.SelectionReason = "retweet";
+                        _globalAccountSelectionFlipViewModel.SelectionReason = "retweet";
                         break;
                 }
                 IDisposable disposable = null;
-                disposable = Observable.FromEvent(h => _globalAccountSelectorViewModel.OnClosed += h,
-                                                  h => _globalAccountSelectorViewModel.OnClosed -= h)
+                disposable = Observable.FromEvent(h => _globalAccountSelectionFlipViewModel.OnClosed += h,
+                                                  h => _globalAccountSelectionFlipViewModel.OnClosed -= h)
                                        .Subscribe(_ =>
                                        {
                                            if (disposable != null)
                                            {
                                                disposable.Dispose();
                                                disposable = null;
-                                               aftercall(_globalAccountSelectorViewModel.SelectedAccounts);
+                                               aftercall(_globalAccountSelectionFlipViewModel.SelectedAccounts);
                                            }
                                        });
-                _globalAccountSelectorViewModel.Open();
+                _globalAccountSelectionFlipViewModel.Open();
             };
 
             if (Setting.IsFirstGenerated)
@@ -194,12 +204,16 @@ namespace StarryEyes.ViewModels
                                          typeof(AuthorizationWindow),
                                          auth, TransitionMode.Modal, null));
             }
+            MainAreaModel.Load();
+            MainAreaModel.Save();
+            /*
             MainAreaModel.CreateTab(new TabModel("hello", "from all where ()"));
             MainAreaModel.CreateTab(new TabModel("home", "from all where user <- *.following"));
             MainAreaModel.CreateTab(new TabModel("replies", "from all where to -> *"));
             MainAreaModel.CreateTab(new TabModel("my", "from all where user <- *"));
             MainAreaModel.CreateTab(new TabModel("Krile", "from all where source == \"Krile\""));
             MainAreaModel.CreateColumn(new TabModel("Favorites", "from all where user <- * && ( favs > 0 || rts > 0)"));
+            */
         }
 
         public bool OnClosing()

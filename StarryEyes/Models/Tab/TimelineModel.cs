@@ -70,11 +70,12 @@ namespace StarryEyes.Models.Tab
         public void Dispose()
         {
             _disposable.Dispose();
+            System.Diagnostics.Debug.WriteLine("TIMELINE DISPOSED.");
             _statusIdCache.Clear();
             _statuses.Clear();
         }
 
-        public event Action OnNewStatusArrived;
+        public event Action<TwitterStatus> OnNewStatusArrival;
 
         private void AddStatus(TwitterStatus status)
         {
@@ -101,9 +102,9 @@ namespace StarryEyes.Models.Tab
                 if (_statusIdCache.Count > TimelineChunkCount + TimelineChunkCountBounce &&
                     _trimCount == 0)
                     Task.Run(() => TrimTimeline());
-                Action handler = OnNewStatusArrived;
+                var handler = OnNewStatusArrival;
                 if (handler != null)
-                    handler();
+                    handler(status);
             }
         }
 
@@ -134,7 +135,6 @@ namespace StarryEyes.Models.Tab
             if (_isSuppressTimelineTrimming) return;
             if (_statuses.Count <= TimelineChunkCount) return;
             if (Interlocked.Exchange(ref _trimCount, 1) != 0) return;
-            System.Diagnostics.Debug.WriteLine("trimming...");
             try
             {
                 DateTime lastCreatedAt = _statuses[TimelineChunkCount].CreatedAt;
@@ -148,11 +148,9 @@ namespace StarryEyes.Models.Tab
                     }
                     return false;
                 });
-                System.Diagnostics.Debug.WriteLine("trim executed. reflect it... (" + removedIds.Count + ")");
                 lock (_sicLocker)
                 {
                     removedIds.ForEach(i => _statusIdCache.Remove(i));
-                    System.Diagnostics.Debug.WriteLine("after: statuses: " + _statuses.Count + " / sic: " + _statusIdCache.Count);
                 }
             }
             finally

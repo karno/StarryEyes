@@ -1118,7 +1118,7 @@
     </UserControl.Resources>
     <ItemsControl ItemTemplate="{StaticResource StatusItemTemplate}"
                   ItemsSource="{Binding Timeline,
-                                        Mode=OneTime}"
+                                        Mode=OneWay}"
                   ScrollViewer.CanContentScroll="True"
                   VirtualizingPanel.IsVirtualizing="True"
                   VirtualizingPanel.ScrollUnit="Pixel"
@@ -1143,7 +1143,7 @@
                                                                                       Mode=OneWayToSource}"
                                                            IsScrollOnTop="{Binding IsScrollInTop,
                                                                                    Mode=OneWayToSource}" />
-                        <behaviors:TimelineScrollLockerBehavior IsScrollLockEnabled="{Binding IsScrollLock}" ItemsSource="{Binding Timeline}" />
+                        <behaviors:TimelineScrollLockerBehavior IsScrollLockEnabled="{Binding IsScrollLock}" ItemsSource="{Binding Timeline, Mode=OneWay}" />
                     </i:Interaction.Behaviors>
                     <ItemsPresenter />
                 </ScrollViewer>

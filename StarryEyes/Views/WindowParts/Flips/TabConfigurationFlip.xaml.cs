@@ -13,14 +13,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace StarryEyes.Views.WindowParts
+namespace StarryEyes.Views.WindowParts.Flips
 {
     /// <summary>
-    /// AccountSelector.xaml の相互作用ロジック
+    /// TabConfigurationFlipViewModel.xaml の相互作用ロジック
     /// </summary>
-    public partial class AccountSelector : UserControl
+    public partial class TabConfigurationFlip : UserControl
     {
-        public AccountSelector()
+        public TabConfigurationFlip()
         {
             InitializeComponent();
         }

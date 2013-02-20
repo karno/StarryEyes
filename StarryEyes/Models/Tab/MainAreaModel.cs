@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Livet;
+using StarryEyes.Settings;
 
 namespace StarryEyes.Models.Tab
 {
@@ -19,6 +20,25 @@ namespace StarryEyes.Models.Tab
         public static ObservableSynchronizedCollection<ColumnModel> Columns
         {
             get { return _columns; }
+        }
+
+        /// <summary>
+        /// Load from configuration.
+        /// </summary>
+        internal static void Load()
+        {
+            Setting.Columns
+                .Select(c => new ColumnModel(c.Tabs.Select(d => d.ToTabModel()).ToArray()))
+                .ForEach(_columns.Add);
+        }
+
+        /// <summary>
+        /// Save tab info to configuration file.
+        /// </summary>
+        public static void Save()
+        {
+            Setting.Columns = Columns.Select(c => c.Tabs.Select(t => new TabDescription(t)))
+                                     .Select(ts => new ColumnDescription { Tabs = ts.ToArray() }).ToArray();
         }
 
         /// <summary>
@@ -105,6 +125,7 @@ namespace StarryEyes.Models.Tab
                 _columns[fromColumnIndex].Tabs.RemoveAt(fromTabIndex);
                 _columns[destTabIndex].Tabs.Insert(destTabIndex, tab);
             }
+            Save();
         }
 
         /// <summary>
@@ -114,6 +135,7 @@ namespace StarryEyes.Models.Tab
         public static void CreateTab(TabModel info)
         {
             CreateTab(info, _currentFocusColumnIndex);
+            Save();
         }
 
         /// <summary>
@@ -137,6 +159,7 @@ namespace StarryEyes.Models.Tab
             else
             {
                 _columns[columnIndex].CreateTab(info);
+                Save();
             }
         }
 
@@ -144,9 +167,10 @@ namespace StarryEyes.Models.Tab
         ///     Create column
         /// </summary>
         /// <param name="info">initial created tab</param>
-        public static void CreateColumn(TabModel info)
+        public static void CreateColumn(params TabModel[] info)
         {
             _columns.Add(new ColumnModel(info));
+            Save();
         }
 
         /// <summary>
@@ -158,6 +182,7 @@ namespace StarryEyes.Models.Tab
             ti.Deactivate();
             _closedTabsStack.Push(ti);
             _columns[colIndex].Tabs.RemoveAt(tabIndex);
+            Save();
         }
 
         /// <summary>

@@ -85,6 +85,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>InfrastructureAssemblies\Microsoft.Expression.Interactions.dll</HintPath>
     </Reference>
+    <Reference Include="PresentationFramework.Aero" />
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
@@ -202,6 +203,7 @@
     <Compile Include="Models\Hubs\StoreHub.cs" />
     <Compile Include="Models\InputAreaModel.cs" />
     <Compile Include="Models\MainWindowModel.cs" />
+    <Compile Include="Models\Notifications\NotificationModel.cs" />
     <Compile Include="Models\ObservableSynchronizedCollectionEx.cs" />
     <Compile Include="Models\Plugins\ImageUploaderManager.cs" />
     <Compile Include="Models\Plugins\Packaging\PackageDescription.cs" />
@@ -220,13 +222,16 @@
     </Compile>
     <Compile Include="Models\Tab\ColumnInfo.cs" />
     <Compile Include="Models\Tab\ColumnModel.cs" />
+    <Compile Include="Models\Tab\CommonTabBuilder.cs" />
     <Compile Include="Models\Tab\MainAreaModel.cs" />
     <Compile Include="Models\Plugins\IPlugin.cs" />
     <Compile Include="Models\Tab\TimelineModel.cs" />
     <Compile Include="Models\UserModel.cs" />
+    <Compile Include="Settings\TabDescription.cs" />
     <Compile Include="ViewModels\Dialogs\KeyOverrideViewModel.cs" />
-    <Compile Include="ViewModels\WindowParts\AccountSelectorViewModel.cs" />
+    <Compile Include="ViewModels\WindowParts\Flips\AccountSelectionFlipViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\BackpanelViewModel.cs" />
+    <Compile Include="ViewModels\WindowParts\Flips\TabConfigurationFlipViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\InputAreaViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\MainAreaViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Timelines\ColumnViewModel.cs" />
@@ -255,14 +260,19 @@
     <Compile Include="Views\Utils\BooleanConverters.cs" />
     <Compile Include="Views\Utils\CollectionExistsToVisibleConverter.cs" />
     <Compile Include="Views\Utils\ConverterBase.cs" />
+    <Compile Include="Views\Utils\DesignTimeUtil.cs" />
     <Compile Include="Views\Utils\StringToVisibleConverter.cs" />
     <Compile Include="Views\Utils\UriImageConverter.cs" />
     <Compile Include="Views\Utils\WindowStateVisibilityConverter.cs" />
-    <Compile Include="Views\WindowParts\AccountSelector.xaml.cs">
-      <DependentUpon>AccountSelector.xaml</DependentUpon>
+    <Compile Include="Views\WindowParts\Flips\AccountSelectionFlip.xaml.cs">
+      <DependentUpon>AccountSelectionFlip.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\WindowParts\Backpanel.xaml.cs">
       <DependentUpon>Backpanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\WindowParts\Flips\FlipContent.cs" />
+    <Compile Include="Views\WindowParts\Flips\TabConfigurationFlip.xaml.cs">
+      <DependentUpon>TabConfigurationFlip.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\WindowParts\Frontpanel.xaml.cs">
       <DependentUpon>Frontpanel.xaml</DependentUpon>
@@ -273,18 +283,20 @@
     <Compile Include="Views\WindowParts\MainArea.xaml.cs">
       <DependentUpon>MainArea.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\WindowParts\SearchOverwrap.xaml.cs">
-      <DependentUpon>SearchOverwrap.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\WindowParts\SettingPanel.xaml.cs">
-      <DependentUpon>SettingPanel.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\WindowParts\Timelines\Timeline.xaml.cs">
       <DependentUpon>Timeline.xaml</DependentUpon>
     </Compile>
     <Page Include="Simple Styles.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\FlipContent.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Dialogs\AuthorizationWindow.xaml">
       <SubType>Designer</SubType>
@@ -344,11 +356,15 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Views\WindowParts\AccountSelector.xaml">
+    <Page Include="Views\WindowParts\Flips\AccountSelectionFlip.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\WindowParts\Backpanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\WindowParts\Flips\TabConfigurationFlip.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -361,14 +377,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\WindowParts\MainArea.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\WindowParts\SearchOverwrap.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\WindowParts\SettingPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -414,7 +422,9 @@
     <Content Include="InfrastructureAssemblies\System.Windows.Interactivity.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="ViewModels\Notifications\" />
     <Folder Include="ViewModels\WindowParts\Backpanels\" />
+    <Folder Include="Views\Notifications\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ReactiveOAuth\ReactiveOAuth.csproj">

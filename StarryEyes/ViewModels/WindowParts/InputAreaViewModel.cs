@@ -21,6 +21,7 @@ using StarryEyes.Models.Backpanels.PostEvents;
 using StarryEyes.Models.Operations;
 using StarryEyes.Models.Stores;
 using StarryEyes.Settings;
+using StarryEyes.ViewModels.WindowParts.Flips;
 using StarryEyes.ViewModels.WindowParts.Timelines;
 using StarryEyes.Views.Messaging;
 using TaskDialogInterop;
@@ -29,7 +30,7 @@ namespace StarryEyes.ViewModels.WindowParts
 {
     public class InputAreaViewModel : ViewModel
     {
-        private readonly AccountSelectorViewModel _accountSelector;
+        private readonly AccountSelectionFlipViewModel _accountSelectionFlip;
         private readonly DispatcherCollection<BindHashtagViewModel> _bindableHashtagCandidates;
         private readonly ReadOnlyDispatcherCollection<AuthenticateInfoViewModel> _bindingAuthInfos;
 
@@ -49,8 +50,8 @@ namespace StarryEyes.ViewModels.WindowParts
         /// </summary>
         public InputAreaViewModel()
         {
-            _accountSelector = new AccountSelectorViewModel();
-            _accountSelector.OnClosed += () =>
+            _accountSelectionFlip = new AccountSelectionFlipViewModel();
+            _accountSelectionFlip.OnClosed += () =>
             {
                 // After selection accounts, return focus to text box
                 // if input area is opened.
@@ -99,24 +100,24 @@ namespace StarryEyes.ViewModels.WindowParts
                                         (_, __) => RaisePropertyChanged(() => IsBindingAuthInfoExisted)));
 
             bool accountSelectReflecting = false;
-            _accountSelector.OnSelectedAccountsChanged += () =>
+            _accountSelectionFlip.OnSelectedAccountsChanged += () =>
             {
                 if (!_isSuppressAccountChangeRelay)
                 {
                     // write-back
                     accountSelectReflecting = true;
                     InputAreaModel.BindingAuthInfos.Clear();
-                    _accountSelector.SelectedAccounts
+                    _accountSelectionFlip.SelectedAccounts
                                     .ForEach(InputAreaModel.BindingAuthInfos.Add);
                     accountSelectReflecting = false;
                     _baseSelectedAccounts = InputAreaModel.BindingAuthInfos.Select(_ => _.Id).ToArray();
                 }
-                InputInfo.AuthInfos = AccountSelector.SelectedAccounts;
+                InputInfo.AuthInfos = AccountSelectionFlip.SelectedAccounts;
                 RaisePropertyChanged(() => AuthInfoGridRowColumn);
                 UpdateTextCount();
                 RaisePropertyChanged(() => IsPostLimitPredictionEnabled);
             };
-            CompositeDisposable.Add(_accountSelector);
+            CompositeDisposable.Add(_accountSelectionFlip);
             CompositeDisposable.Add(
                 new CollectionChangedEventListener(
                     InputAreaModel.BindingAuthInfos,
@@ -182,9 +183,9 @@ namespace StarryEyes.ViewModels.WindowParts
             _geoWatcher.Start();
         }
 
-        public AccountSelectorViewModel AccountSelector
+        public AccountSelectionFlipViewModel AccountSelectionFlip
         {
-            get { return _accountSelector; }
+            get { return _accountSelectionFlip; }
         }
 
         public ReadOnlyDispatcherCollection<BindHashtagViewModel> BindingHashtags
@@ -465,7 +466,7 @@ namespace StarryEyes.ViewModels.WindowParts
         {
             get
             {
-                if (AccountSelector.SelectedAccounts.FirstOrDefault() == null)
+                if (AccountSelectionFlip.SelectedAccounts.FirstOrDefault() == null)
                     return false; // send account is not found.
                 if (TextCount > StatusTextUtil.MaxTextLength)
                     return false;
@@ -607,7 +608,7 @@ namespace StarryEyes.ViewModels.WindowParts
         {
             _isSuppressAccountChangeRelay = true;
             AuthenticateInfo[] accounts = infos as AuthenticateInfo[] ?? infos.ToArray();
-            AccountSelector.SelectedAccounts = accounts;
+            AccountSelectionFlip.SelectedAccounts = accounts;
             InputAreaModel.BindingAuthInfos.Clear();
             accounts.ForEach(InputAreaModel.BindingAuthInfos.Add);
             _isSuppressAccountChangeRelay = false;
@@ -616,7 +617,7 @@ namespace StarryEyes.ViewModels.WindowParts
         public void ApplyBaseSelectedAccounts()
         {
             _isSuppressAccountChangeRelay = true;
-            _accountSelector.SetSelectedAccountIds(_baseSelectedAccounts);
+            _accountSelectionFlip.SetSelectedAccountIds(_baseSelectedAccounts);
             _isSuppressAccountChangeRelay = false;
         }
 
@@ -724,7 +725,7 @@ namespace StarryEyes.ViewModels.WindowParts
             }
             _inputInfo = new TweetInputInfo(clearTo);
             ApplyBaseSelectedAccounts();
-            InputInfo.AuthInfos = AccountSelector.SelectedAccounts;
+            InputInfo.AuthInfos = AccountSelectionFlip.SelectedAccounts;
             RaisePropertyChanged(() => InputInfo);
             RaisePropertyChanged(() => InputText);
             RaisePropertyChanged(() => InReplyTo);
@@ -948,7 +949,7 @@ namespace StarryEyes.ViewModels.WindowParts
 
         public void SelectAccounts()
         {
-            AccountSelector.Open();
+            AccountSelectionFlip.Open();
         }
     }
 

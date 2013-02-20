@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using StarryEyes.Filters.Expressions;
+using System.Reactive.Disposables;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
-using System.Reactive.Disposables;
+using StarryEyes.Filters.Expressions;
+using StarryEyes.Models.Tab;
 
 namespace StarryEyes.Models
 {
@@ -94,6 +95,14 @@ namespace StarryEyes.Models
 
         public static void ConfirmMute(string description, FilterExpressionBase addExpr)
         {
+        }
+
+        public static event Action<TabModel> OnTabModelConfigureRaised;
+
+        public static void ShowTabConfigure(TabModel model)
+        {
+            var handler = OnTabModelConfigureRaised;
+            if (handler != null) handler(model);
         }
     }
 

@@ -23,7 +23,7 @@
                 </i:Interaction.Triggers>
                 <StackPanel.ContextMenu>
                     <ContextMenu DataContext="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
-                        <MenuItem Header="編集..." />
+                        <MenuItem Command="{Binding EditTabCommand}" Header="編集..." />
                         <MenuItem Header="このタブをコピーして追加" />
                         <Separator />
                         <MenuItem Header="新しいタブの追加..." />

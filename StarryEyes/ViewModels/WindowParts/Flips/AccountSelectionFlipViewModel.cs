@@ -9,14 +9,14 @@ using StarryEyes.Models;
 using StarryEyes.Models.Stores;
 using StarryEyes.Views.Messaging;
 
-namespace StarryEyes.ViewModels.WindowParts
+namespace StarryEyes.ViewModels.WindowParts.Flips
 {
     /// <summary>
     /// アカウントを選択するコンポーネント用ビューモデル
     /// </summary>
-    public class AccountSelectorViewModel : ViewModel
+    public class AccountSelectionFlipViewModel : ViewModel
     {
-        public AccountSelectorViewModel()
+        public AccountSelectionFlipViewModel()
         {
             this.CompositeDisposable.Add(_accounts = ViewModelHelper.CreateReadOnlyDispatcherCollection(
                 AccountsStore.Accounts,
@@ -112,11 +112,11 @@ namespace StarryEyes.ViewModels.WindowParts
             get { return _info; }
         }
 
-        private readonly AccountSelectorViewModel _parent;
+        private readonly AccountSelectionFlipViewModel _parent;
 
         private readonly Action _onSelectionChanged;
 
-        public SelectableAccountViewModel(AccountSelectorViewModel parent, AuthenticateInfo info, Action onSelectionChanged)
+        public SelectableAccountViewModel(AccountSelectionFlipViewModel parent, AuthenticateInfo info, Action onSelectionChanged)
         {
             this._parent = parent;
             this._info = info;

@@ -1,0 +1,127 @@
+﻿<UserControl x:Class="StarryEyes.Views.WindowParts.Flips.TabConfigurationFlip"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
+             xmlns:flips="clr-namespace:StarryEyes.Views.WindowParts.Flips"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:utils="clr-namespace:StarryEyes.Views.Utils"
+             d:DesignHeight="600"
+             d:DesignWidth="800"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.AnimatedTabControl.xaml" />
+                <ResourceDictionary Source="/Themes/FlipContent.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <utils:BooleanToVisibleConverter x:Key="BoolVisibleConveter" />
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <flips:FlipContent IsOpen="{Binding IsConfigurationActive}"
+                       OwnerVisibility="{Binding Visibility,
+                                                 Mode=TwoWay,
+                                                 RelativeSource={RelativeSource AncestorType={x:Type UserControl},
+                                                                                Mode=FindAncestor}}"
+                       Visibility="Visible">
+        <Grid Background="White">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Grid Background="#FFF0F0F0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Button Width="48"
+                        Height="48"
+                        Margin="-6,-6,12,12"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Template="{DynamicResource MetroBlackCircleButtonTemplate}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <ei:CallMethodAction MethodName="Close" TargetObject="{Binding Mode=OneWay}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                    <Path Width="25"
+                          Height="18"
+                          Data="F1 M 36,22L 36,26L 19.75,26L 27,33L 20.5,33L 11,24L 20.5,15L 27,15L 19.75,22L 36,22 Z "
+                          Fill="Black"
+                          Stretch="Fill" />
+                </Button>
+                <TextBox Grid.Column="1"
+                         VerticalAlignment="Top"
+                         Background="#FFF0F0F0"
+                         BorderBrush="{x:Null}"
+                         BorderThickness="0"
+                         FontSize="32"
+                         Padding="4,8,4,1"
+                         Text="{Binding TabName}"
+                         TextWrapping="Wrap" />
+            </Grid>
+            <StackPanel Grid.Row="1" Orientation="Horizontal">
+                <CheckBox Margin="8"
+                          HorizontalAlignment="Left"
+                          Content="新着を通知"
+                          IsChecked="{Binding IsNotifyNewArrivals}" />
+                <CheckBox Margin="8,8,0,8"
+                          HorizontalAlignment="Left"
+                          Content="非選択時の新着ツイート数を表示"
+                          IsChecked="{Binding IsShowUnreadCounts}" />
+            </StackPanel>
+            <TabControl Grid.Row="2"
+                        HorizontalContentAlignment="Stretch"
+                        VerticalContentAlignment="Stretch"
+                        Padding="0">
+                <TabItem Header="ビジュアルエディタ">
+                    <Grid Background="#FFE5E5E5" />
+                </TabItem>
+                <TabItem Header="クエリエディタ">
+                    <Grid Background="#FFE5E5E5">
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <TextBox AcceptsReturn="True"
+                                 AcceptsTab="True"
+                                 Background="#FFF0F0F0"
+                                 BorderThickness="0"
+                                 Text="{Binding QueryString,
+                                                UpdateSourceTrigger=PropertyChanged}"
+                                 TextWrapping="Wrap"
+                                 VerticalScrollBarVisibility="Auto" />
+                        <TextBlock Grid.Row="1"
+                                   Background="#60E51400"
+                                   Padding="4"
+                                   Text="{Binding ExceptionMessage}"
+                                   Visibility="{Binding FoundError,
+                                                        Converter={StaticResource BoolVisibleConveter}}" />
+                        <TextBlock Grid.Row="2"
+                                   VerticalAlignment="Top"
+                                   Foreground="White"
+                                   Padding="4"
+                                   TextWrapping="Wrap">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Background" Value="#FF1BA1E2" />
+                                    <Setter Property="Text" Value="クエリを正しく解析できました。" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding FoundError}" Value="True">
+                                            <Setter Property="Background" Value="#FFE51400" />
+                                            <Setter Property="Text" Value="クエリにエラーが存在します。(現在の結果は反映されません)" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Grid>
+                </TabItem>
+            </TabControl>
+        </Grid>
+    </flips:FlipContent>
+</UserControl>

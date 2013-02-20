@@ -404,6 +404,7 @@ namespace StarryEyes.Models
 
         public bool IsFavorited(params long[] ids)
         {
+            if (ids.Length == 0) return false;
             if (this.Status.RetweetedOriginal != null)
             {
                 return Get(this.Status.RetweetedOriginal)
@@ -417,6 +418,7 @@ namespace StarryEyes.Models
 
         public bool IsRetweeted(params long[] ids)
         {
+            if (ids.Length == 0) return false;
             if (this.Status.RetweetedOriginal != null)
             {
                 return Get(this.Status.RetweetedOriginal)

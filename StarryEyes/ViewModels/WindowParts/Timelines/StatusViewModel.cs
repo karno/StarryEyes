@@ -525,6 +525,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public void FavoriteAndRetweetImmediate()
         {
+            if (!AssertQuickActionEnabled()) return;
             var accounts = GetImmediateAccounts()
                 .ToObservable()
                 .Publish();

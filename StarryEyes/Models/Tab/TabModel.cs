@@ -11,6 +11,7 @@ using StarryEyes.Breezy.DataModel;
 using StarryEyes.Filters;
 using StarryEyes.Filters.Parsing;
 using StarryEyes.Models.Hubs;
+using StarryEyes.Models.Notifications;
 using StarryEyes.Models.Stores;
 using StarryEyes.Vanille.DataStore;
 
@@ -42,12 +43,23 @@ namespace StarryEyes.Models.Tab
         /// </summary>
         public string Name { get; set; }
 
+        /// <summary>
+        /// Notify new arrivals.
+        /// </summary>
+        public bool IsNotifyNewArrivals { get; set; }
+
+        /// <summary>
+        /// Show unread counts.
+        /// </summary>
+        public bool IsShowUnreadCounts { get; set; }
+
         public event Action OnBindingAccountIdsChanged;
 
         private void RaiseOnBindingAccountIdsChanged()
         {
             Action handler = OnBindingAccountIdsChanged;
             if (handler != null) handler();
+            MainAreaModel.Save();
         }
 
         /// <summary>
@@ -64,7 +76,11 @@ namespace StarryEyes.Models.Tab
         public IEnumerable<string> BindingHashtags
         {
             get { return _bindingHashtags ?? Enumerable.Empty<string>(); }
-            set { _bindingHashtags = (value ?? Enumerable.Empty<string>()).ToList(); }
+            set
+            {
+                _bindingHashtags = (value ?? Enumerable.Empty<string>()).ToList();
+                MainAreaModel.Save();
+            }
         }
 
         public TimelineModel Timeline { get; private set; }
@@ -82,10 +98,25 @@ namespace StarryEyes.Models.Tab
                     throw new InvalidOperationException("タブ情報がアクティブな状態のままフィルタクエリの交換を行うことはできません。");
                 if (value.Equals(_filterQuery)) return;
                 _filterQuery = value;
-                if (_filterQuery != null)
-                    _evaluator = _filterQuery.GetEvaluator();
-                else
+                try
+                {
+                    if (_filterQuery != null)
+                        _evaluator = _filterQuery.GetEvaluator();
+                    else
+                        _evaluator = _ => false;
+                }
+                catch (Exception fex)
+                {
+                    AppInformationHub.PublishInformation(
+                        new AppInformation(AppInformationKind.Warning,
+                                           "TABINFO_QUERY_CORRUPTED_" + Name,
+                                           "クエリが壊れています。",
+                                           "タブ " + Name +
+                                           " のクエリは破損しているため、フィルタが初期化されました。" +
+                                           Environment.NewLine +
+                                           "送出された例外: " + fex));
                     _evaluator = _ => false;
+                }
             }
         }
 
@@ -104,13 +135,14 @@ namespace StarryEyes.Models.Tab
                 catch (FilterQueryException fex)
                 {
                     Debug.WriteLine(fex);
-                    AppInformationHub.PublishInformation(new AppInformation(AppInformationKind.Warning,
-                                                                            "TABINFO_QUERY_CORRUPTED_" + Name,
-                                                                            "クエリが壊れています。",
-                                                                            "タブ " + Name +
-                                                                            " のクエリは破損しているため、フィルタが初期化されました。" +
-                                                                            Environment.NewLine +
-                                                                            "送出された例外: " + fex));
+                    AppInformationHub.PublishInformation(
+                        new AppInformation(AppInformationKind.Warning,
+                                           "TABINFO_QUERY_CORRUPTED_" + Name,
+                                           "クエリが壊れています。",
+                                           "タブ " + Name +
+                                           " のクエリは破損しているため、フィルタが初期化されました。" +
+                                           Environment.NewLine +
+                                           "送出された例外: " + fex));
                 }
             }
         }
@@ -122,6 +154,14 @@ namespace StarryEyes.Models.Tab
             TimelineModel oldt = Timeline;
             Timeline = new TimelineModel(_evaluator, GetChunk);
             oldt.Dispose();
+        }
+
+        private void OnNewStatusArrival(TwitterStatus status)
+        {
+            if (IsNotifyNewArrivals)
+            {
+                NotificationModel.NotifyNewArrival(status);
+            }
         }
 
         /// <summary>
@@ -139,6 +179,7 @@ namespace StarryEyes.Models.Tab
                 if (Timeline != null)
                     Timeline.Dispose();
                 Timeline = new TimelineModel(_evaluator, GetChunk);
+                Timeline.OnNewStatusArrival += OnNewStatusArrival;
                 if (FilterQuery != null)
                 {
                     FilterQuery.Activate();
@@ -150,11 +191,11 @@ namespace StarryEyes.Models.Tab
 
         private IObservable<TwitterStatus> GetChunk(long? maxId, int chunkCount, bool isBatch)
         {
-            return (isBatch ?
-                StatusStore.FindBatch(_evaluator, chunkCount) :
-                StatusStore.Find(_evaluator, maxId != null ? FindRange<long>.By(maxId.Value) : null, chunkCount))
-                              .OrderByDescending(_ => _.CreatedAt)
-                              .Take(chunkCount);
+            return (isBatch
+                        ? StatusStore.FindBatch(_evaluator, chunkCount)
+                        : StatusStore.Find(_evaluator, maxId != null ? FindRange<long>.By(maxId.Value) : null, chunkCount))
+                .OrderByDescending(_ => _.CreatedAt)
+                .Take(chunkCount);
         }
 
         public void Deactivate()
@@ -243,6 +284,14 @@ namespace StarryEyes.Models.Tab
             {
                 get { return _source.IsReadOnly; }
             }
+        }
+
+        public event Action<bool> OnConfigurationUpdated;
+
+        public void ConfigurationUpdated(bool isQueryUpdated)
+        {
+            var handler = OnConfigurationUpdated;
+            if (handler != null) handler(isQueryUpdated);
         }
     }
 }
