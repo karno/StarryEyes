@@ -92,7 +92,10 @@ namespace StarryEyes.Models.Tab
                     var addpoint = _statuses.TakeWhile(_ => _.CreatedAt > status.CreatedAt).Count();
                     if (addpoint > TimelineChunkCount)
                     {
-                        _statusIdCache.Remove(status.Id);
+                        lock (_sicLocker)
+                        {
+                            _statusIdCache.Remove(status.Id);
+                        }
                         return;
                     }
                 }
