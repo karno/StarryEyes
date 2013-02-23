@@ -36,17 +36,18 @@ namespace StarryEyes.ViewModels.WindowParts
                 BackpanelModel.TwitterEvents,
                 tev => new TwitterEventViewModel(tev),
                 DispatcherHelper.UIDispatcher);
-            CompositeDisposable.Add(new EventListener<Action<BackpanelEventBase>>(
-                                        _ => BackpanelModel.OnEventRegistered += _,
-                                        _ => BackpanelModel.OnEventRegistered -= _,
-                                        ev =>
-                                        {
-                                            lock (_syncLock)
-                                            {
-                                                _waitingEvents.Enqueue(ev);
-                                                Monitor.Pulse(_syncLock);
-                                            }
-                                        }));
+            CompositeDisposable.Add(
+                new EventListener<Action<BackpanelEventBase>>(
+                    h => BackpanelModel.OnEventRegistered += h,
+                    h => BackpanelModel.OnEventRegistered -= h,
+                    ev =>
+                    {
+                        lock (_syncLock)
+                        {
+                            _waitingEvents.Enqueue(ev);
+                            Monitor.Pulse(_syncLock);
+                        }
+                    }));
             CompositeDisposable.Add(() =>
             {
                 lock (_syncLock)

@@ -14,18 +14,27 @@ namespace StarryEyes.Models.Subsystems
         public static void Initialize()
         {
             Observable.Interval(TimeSpan.FromSeconds(0.5))
-                .Subscribe(_ =>
-                {
-                    lock (StatisticsWorkProcSync)
-                    {
-                        Monitor.Pulse(StatisticsWorkProcSync);
-                    }
-                });
-            estimatedGrossTweetCount = StatusStore.Count;
+                      .Subscribe(_ =>
+                      {
+                          lock (StatisticsWorkProcSync)
+                          {
+                              Monitor.Pulse(StatisticsWorkProcSync);
+                          }
+                      });
+            App.OnUserInterfaceReady +=
+                () => Observable.Interval(TimeSpan.FromSeconds(8.0))
+                                .Subscribe(_ =>
+                                {
+                                    if (!_tpsAccess)
+                                    {
+                                        TooFastWarning = true;
+                                    }
+                                    _tpsAccess = false;
+                                });
+            _estimatedGrossTweetCount = StatusStore.Count;
             App.OnApplicationFinalize += StopThread;
             Task.Factory.StartNew(UpdateStatisticWorkProc, TaskCreationOptions.LongRunning);
         }
-
         private static DateTime _timestamp = DateTime.Now;
 
         private static readonly object StatisticsWorkProcSync = new object();
@@ -53,18 +62,18 @@ namespace StarryEyes.Models.Subsystems
                 }
                 if (!_isThreadAlive) return;
                 // update statistics params
-                var previousGross = estimatedGrossTweetCount;
-                estimatedGrossTweetCount = StatusStore.Count;
+                var previousGross = _estimatedGrossTweetCount;
+                _estimatedGrossTweetCount = StatusStore.Count;
                 var previousTimestamp = _timestamp;
                 _timestamp = DateTime.Now;
                 var duration = (_timestamp - previousTimestamp).TotalSeconds;
                 if (duration > 0)
                 {
                     // current period of tweets per seconds
-                    var cptps = (estimatedGrossTweetCount - previousGross) / duration;
+                    var cptps = (_estimatedGrossTweetCount - previousGross) / duration;
                     // smoothing: 119:1
                     // -> 
-                    tweetsPerSeconds = (tweetsPerSeconds * 119 + cptps) / 120;
+                    _tweetsPerSeconds = (_tweetsPerSeconds * 119 + cptps) / 120;
                 }
                 var handler = OnStatisticsParamsUpdated;
                 if (handler != null)
@@ -77,22 +86,38 @@ namespace StarryEyes.Models.Subsystems
         /// </summary>
         public static event Action OnStatisticsParamsUpdated;
 
-        private static int estimatedGrossTweetCount = 0;
+        private static int _estimatedGrossTweetCount;
         /// <summary>
         /// Gross tweet count (ESTIMATED, not ACTUAL)
         /// </summary>
         public static int EstimatedGrossTweetCount
         {
-            get { return StatisticsService.estimatedGrossTweetCount; }
+            get { return _estimatedGrossTweetCount; }
         }
 
-        private static double tweetsPerSeconds = 0;
+        private static bool _tpsAccess = false;
+
+        private static double _tweetsPerSeconds;
         /// <summary>
         /// Tweets per seconds, estimated.
         /// </summary>
         public static double TweetsPerSeconds
         {
-            get { return StatisticsService.tweetsPerSeconds; }
+            get
+            {
+                _tpsAccess = true;
+                return _tweetsPerSeconds;
+            }
+        }
+
+        /// <summary>
+        /// When too fast timeline current, this flags will indicates true.
+        /// </summary>
+        public static bool TooFastWarning { get; internal set; }
+
+        public static void ResetTooFastWarning()
+        {
+            TooFastWarning = false;
         }
     }
 }

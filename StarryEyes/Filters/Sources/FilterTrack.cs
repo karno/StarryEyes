@@ -1,12 +1,12 @@
 ﻿using System;
-using StarryEyes.Models.Connections.UserDependencies;
 using StarryEyes.Breezy.DataModel;
+using StarryEyes.Models.Connections.UserDependencies;
 
 namespace StarryEyes.Filters.Sources
 {
     public class FilterTrack : FilterSourceBase
     {
-        private string _query;
+        private readonly string _query;
         public FilterTrack(string query)
         {
             this._query = query;
@@ -14,10 +14,10 @@ namespace StarryEyes.Filters.Sources
 
         public override Func<TwitterStatus, bool> GetEvaluator()
         {
-            return _ => _.Text.IndexOf(_query) >= 0;
+            return _ => _.Text.IndexOf(_query, StringComparison.Ordinal) >= 0;
         }
 
-        private bool _isActivated = false;
+        private bool _isActivated;
         public override void Activate()
         {
             if (_isActivated) return;

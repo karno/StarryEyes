@@ -368,12 +368,22 @@ namespace StarryEyes.Filters.Parsing
             {
                 literal = reader.AssertGet(TokenType.Literal);
             }
+            // check first letter
+            switch (literal.Value[0])
+            {
+                case '@':
+                    // user screen name
+                    return InstantiateLocalUsers(literal.Value.Substring(1), reader);
+                case '#':
+                    // user id
+                    return InstantiateLocalUsers(literal.Value, reader);
+            }
             // check first layers
             switch (literal.Value)
             {
                 case "*":
                     return InstantiateLocalUsers("*", reader);
-                case "local":
+                case "@":
                     reader.AssertGet(TokenType.Period);
                     return InstantiateLocalUsers(reader.AssertGet(TokenType.Literal).Value, reader);
                 case "user":

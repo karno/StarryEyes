@@ -103,7 +103,7 @@ namespace StarryEyes.Filters.Expressions.Values.Users
 
         public override Func<TwitterStatus, bool> GetBooleanValueProvider()
         {
-            return _ => _.RetweetedOriginal != null ? _.User.IsProtected : false;
+            return _ => _.RetweetedOriginal != null && _.User.IsProtected;
         }
 
         public override string ToQuery()
@@ -121,7 +121,7 @@ namespace StarryEyes.Filters.Expressions.Values.Users
 
         public override Func<TwitterStatus, bool> GetBooleanValueProvider()
         {
-            return _ => _.RetweetedOriginal != null ? _.User.IsVerified : false;
+            return _ => _.RetweetedOriginal != null && _.User.IsVerified;
         }
 
         public override string ToQuery()
@@ -139,7 +139,7 @@ namespace StarryEyes.Filters.Expressions.Values.Users
 
         public override Func<TwitterStatus, bool> GetBooleanValueProvider()
         {
-            return _ => _.RetweetedOriginal != null ? _.User.IsTranslator : false;
+            return _ => _.RetweetedOriginal != null && _.User.IsTranslator;
         }
 
         public override string ToQuery()
@@ -157,7 +157,7 @@ namespace StarryEyes.Filters.Expressions.Values.Users
 
         public override Func<TwitterStatus, bool> GetBooleanValueProvider()
         {
-            return _ => _.RetweetedOriginal != null ? _.User.IsContributorsEnabled : false;
+            return _ => _.RetweetedOriginal != null && _.User.IsContributorsEnabled;
         }
 
         public override string ToQuery()
@@ -175,7 +175,7 @@ namespace StarryEyes.Filters.Expressions.Values.Users
 
         public override Func<TwitterStatus, bool> GetBooleanValueProvider()
         {
-            return _ => _.RetweetedOriginal != null ? _.User.IsGeoEnabled : false;
+            return _ => _.RetweetedOriginal != null && _.User.IsGeoEnabled;
         }
 
         public override string ToQuery()

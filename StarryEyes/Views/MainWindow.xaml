@@ -243,6 +243,22 @@
                                              Path=WindowState,
                                              Converter={StaticResource MaximizeToInvisibleConverter}}" />
             </Grid>
+            <Border Grid.Row="4"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    Background="#FFE51400"
+                    Visibility="{Binding IsTooFast,
+                                         Converter={StaticResource BooleanToVisibleConverter}}">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseLeftButtonDown">
+                        <ei:CallMethodAction MethodName="ResetTooFastFlag" TargetObject="{Binding}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+                <TextBlock Margin="8"
+                           VerticalAlignment="Center"
+                           Foreground="White"
+                           Text="タイムラインのスピードが速すぎて処理が追いつかないため、流量を制限しています。ここをクリックすると解除されます。" />
+            </Border>
             <Border x:Name="CurrentEventBorder"
                     Opacity="0"
                     RenderTransformOrigin="0.5,0.5"

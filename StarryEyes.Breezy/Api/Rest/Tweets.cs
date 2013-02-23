@@ -104,8 +104,9 @@ namespace StarryEyes.Breezy.Api.Rest
         }
 
         public static IObservable<TwitterStatus> UpdateWithMedia(this AuthenticateInfo info,
-            string status, byte[] image, string imageFileName, bool possibly_sensitive = false, long? in_reply_to_status_id = null, double? geo_lat = null, double? geo_long = null,
-            string place_id = null, bool? display_coordinates = null, bool sendInBackground = false)
+            string status, byte[] image, string imageFileName, bool possibly_sensitive = false,
+            long? in_reply_to_status_id = null, double? geo_lat = null, double? geo_long = null,
+            string place_id = null, bool? display_coordinates = null)
         {
             return Observable.Start(() => new Unit())
                 .SelectMany(ms =>

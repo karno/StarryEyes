@@ -8,6 +8,7 @@ using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Models.Stores.Internal;
+using StarryEyes.Models.Subsystems;
 using StarryEyes.Vanille.DataStore;
 using StarryEyes.Vanille.DataStore.Persistent;
 
@@ -34,6 +35,10 @@ namespace StarryEyes.Models.Stores
 
         private static DataStoreBase<long, TwitterStatus> _store;
 
+        private static DateTime _dispatch = DateTime.Now;
+
+        private static SingleThreadDispatcher<TwitterStatus> _dispatcher;
+
         public static void Initialize()
         {
             // initialize
@@ -48,6 +53,7 @@ namespace StarryEyes.Models.Stores
                 _store = new PersistentDataStore<long, TwitterStatus>
                     (_ => _.Id, Path.Combine(App.DataStorePath, "statuses"), new IdReverseComparer());
             }
+            _dispatcher = new SingleThreadDispatcher<TwitterStatus>(_store.Store);
             App.OnApplicationFinalize += Shutdown;
         }
 
@@ -70,9 +76,14 @@ namespace StarryEyes.Models.Stores
             if (_isInShutdown) return;
             if (publish)
             {
-                _statusPublisher.OnNext(new StatusNotification(status, true));
+                if (!StatisticsService.TooFastWarning ||
+                    (DateTime.Now - _dispatch).TotalSeconds > 1)
+                {
+                    _dispatch = DateTime.Now;
+                    Task.Run(() => _statusPublisher.OnNext(new StatusNotification(status, true)));
+                }
             }
-            Task.Run(() => _store.Store(status));
+            _dispatcher.Send(status);
             UserStore.Store(status.User);
         }
 

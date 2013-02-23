@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Reactive.Linq;
-using System.Threading.Tasks;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Models.Stores.Internal;
 using StarryEyes.Vanille.DataStore;
@@ -16,10 +14,12 @@ namespace StarryEyes.Models.Stores
     {
         private static DataStoreBase<long, TwitterUser> _store;
 
+        private static SingleThreadDispatcher<TwitterUser> _dispatcher;
+
         private static readonly object SnResolverLocker = new object();
         private static readonly SortedDictionary<string, long> ScreenNameResolver = new SortedDictionary<string, long>();
 
-        private static volatile bool _isInShutdown = false;
+        private static volatile bool _isInShutdown;
 
         public static void Initialize()
         {
@@ -35,6 +35,7 @@ namespace StarryEyes.Models.Stores
                 _store = new PersistentDataStore<long, TwitterUser>
                     (_ => _.Id, Path.Combine(App.DataStorePath, "users"), chunkNum: 16);
             }
+            _dispatcher = new SingleThreadDispatcher<TwitterUser>(_store.Store);
             LoadScreenNameResolverCache();
             App.OnApplicationFinalize += Shutdown;
         }
@@ -42,7 +43,7 @@ namespace StarryEyes.Models.Stores
         public static void Store(TwitterUser user)
         {
             if (_isInShutdown) return;
-            Task.Run(() => _store.Store(user));
+            _dispatcher.Send(user);
             lock (SnResolverLocker)
             {
                 ScreenNameResolver[user.ScreenName] = user.Id;
@@ -58,7 +59,7 @@ namespace StarryEyes.Models.Stores
         public static IObservable<TwitterUser> Get(string screenName)
         {
             if (_isInShutdown) return Observable.Empty<TwitterUser>();
-            long id = 0;
+            long id;
             lock (SnResolverLocker)
             {
                 if (!ScreenNameResolver.TryGetValue(screenName, out id))
@@ -107,14 +108,14 @@ namespace StarryEyes.Models.Stores
             using (var fs = new FileStream(ScreenNameResolverCacheFile,
                 FileMode.Create, FileAccess.ReadWrite))
             using (var cs = new DeflateStream(fs, CompressionLevel.Optimal))
-            using (var bw = new BinaryWriter(fs))
+            using (var bw = new BinaryWriter(cs))
             {
                 bw.Write(ScreenNameResolver.Count);
-                ScreenNameResolver.ForEach(k =>
+                foreach (var k in ScreenNameResolver)
                 {
                     bw.Write(k.Key);
                     bw.Write(k.Value);
-                });
+                }
             }
         }
 
@@ -125,7 +126,7 @@ namespace StarryEyes.Models.Stores
                 using (var fs = new FileStream(ScreenNameResolverCacheFile,
                     FileMode.Open, FileAccess.Read))
                 using (var cs = new DeflateStream(fs, CompressionMode.Decompress))
-                using (var br = new BinaryReader(fs))
+                using (var br = new BinaryReader(cs))
                 {
                     int count = br.ReadInt32();
                     for (int i = 0; i < count; i++)

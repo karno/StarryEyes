@@ -34,8 +34,8 @@ namespace StarryEyes.Breezy.Api.Rest
         {
             var param = new Dictionary<string, object>()
             {
-                {"include_entities", include_entities},
                 {"id", id},
+                {"include_entities", include_entities},
             }.Parametalize();
             return info.GetOAuthClient()
                 .SetEndpoint(ApiEndpoint.EndpointApiV1a.JoinUrl("/favorites/create.json"))
@@ -50,8 +50,8 @@ namespace StarryEyes.Breezy.Api.Rest
         {
             var param = new Dictionary<string, object>()
             {
-                {"include_entities", include_entities},
                 {"id", id},
+                {"include_entities", include_entities},
             }.Parametalize();
             return info.GetOAuthClient()
                 .SetEndpoint(ApiEndpoint.EndpointApiV1a.JoinUrl("/favorites/destroy.json"))

@@ -68,7 +68,7 @@ namespace StarryEyes.Breezy.Api.Rest
         public static IObservable<TwitterStatus> SendDirectMessage(this AuthenticateInfo info,
             string text, long? user_id = null, string screen_name = null)
         {
-            if(user_id == null && screen_name == null)
+            if (user_id == null && screen_name == null)
                 throw new ArgumentNullException("both of user_id and screen_name are zero.");
             var param = new Dictionary<string, object>()
             {

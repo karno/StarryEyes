@@ -60,8 +60,7 @@ namespace StarryEyes.Breezy.Util
             Uri ret;
             if (Uri.TryCreate(s, UriKind.RelativeOrAbsolute, out ret))
                 return ret;
-            else
-                return null;
+            return null;
         }
 
         public static Uri ParseUriAbsolute(this string s)
@@ -80,12 +79,7 @@ namespace StarryEyes.Breezy.Util
             return e == null ? null : e.Value.Replace("&lt;", "<").Replace("&gt;", ">");
         }
 
-        public static bool ParseBool(this XElement e)
-        {
-            return ParseBool(e, false);
-        }
-
-        public static bool ParseBool(this XElement e, bool def)
+        public static bool ParseBool(this XElement e, bool def = false)
         {
             return ParseBool(e == null ? null : e.Value, def);
         }
@@ -129,12 +123,7 @@ namespace StarryEyes.Breezy.Util
             return e == null ? null : e.Value.Replace("&lt;", "<").Replace("&gt;", ">");
         }
 
-        public static bool ParseBool(this XAttribute e)
-        {
-            return ParseBool(e, false);
-        }
-
-        public static bool ParseBool(this XAttribute e, bool def)
+        public static bool ParseBool(this XAttribute e, bool def = false)
         {
             return ParseBool(e == null ? null : e.Value, def);
         }
@@ -171,8 +160,7 @@ namespace StarryEyes.Breezy.Util
             {
                 if (String.IsNullOrEmpty(uri))
                     return null;
-                else
-                    return new Uri(uri);
+                return new Uri(uri);
             }
             catch (UriFormatException)
             {
@@ -189,12 +177,7 @@ namespace StarryEyes.Breezy.Util
             return e == null ? null : e.Value.Replace("&lt;", "<").Replace("&gt;", ">");
         }
 
-        public static bool ParseBool(this XText e)
-        {
-            return ParseBool(e, false);
-        }
-
-        public static bool ParseBool(this XText e, bool def)
+        public static bool ParseBool(this XText e, bool def = false)
         {
             return ParseBool(e == null ? null : e.Value, def);
         }
@@ -231,8 +214,7 @@ namespace StarryEyes.Breezy.Util
             {
                 if (String.IsNullOrEmpty(uri))
                     return null;
-                else
-                    return new Uri(uri);
+                return new Uri(uri);
             }
             catch (UriFormatException)
             {

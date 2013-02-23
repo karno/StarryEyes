@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
+using System.Windows.Threading;
 using Livet;
 using Livet.EventListeners;
 using StarryEyes.Breezy.DataModel;
@@ -59,16 +60,14 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                     h => tabModel.OnBindingAccountIdsChanged += h,
                     h => tabModel.OnBindingAccountIdsChanged -= h)
                           .Subscribe(
-                              _ =>
-                              DispatcherHolder.Enqueue(
-                                  () => Timeline.ForEach(t => t.BindingAccounts = Model.BindingAccountIds))));
+                              _ => DispatcherHolder.Enqueue(
+                                  () => Timeline.ForEach(t => t.BindingAccounts = Model.BindingAccountIds), DispatcherPriority.Background)));
             CompositeDisposable.Add(
                 Observable.FromEvent<bool>(
                     h => tabModel.OnConfigurationUpdated += h,
                     h => tabModel.OnConfigurationUpdated -= h)
                           .Subscribe(isQueryUpdated =>
                           {
-                              System.Diagnostics.Debug.WriteLine("Configuration updated.");
                               RaisePropertyChanged(() => Name);
                               RaisePropertyChanged(() => UnreadCount);
                               if (isQueryUpdated)
@@ -81,7 +80,6 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         private void BindTimeline()
         {
             // invalidate cache
-            System.Diagnostics.Debug.WriteLine("Re-bind cache.");
             _timeline = null;
 
             CompositeDisposable.Add(
@@ -142,7 +140,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                 if (_timeline == null)
                 {
                     var ctl = _timeline = new ObservableCollection<StatusViewModel>();
-                    DispatcherHolder.Enqueue(() => InitializeCollection(ctl));
+                    DispatcherHolder.Enqueue(() => InitializeCollection(ctl), DispatcherPriority.Background);
                 }
                 return _timeline;
             }
@@ -265,7 +263,8 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                             if (_isCollectionAddEnabled)
                             {
                                 DispatcherHolder.Enqueue(
-                                    () => ReflectCollectionChanged(e, ctl));
+                                    () => ReflectCollectionChanged(e, ctl),
+                                    DispatcherPriority.Background);
                             }
                         }));
                 TwitterStatus[] collection = Model.Timeline.Statuses.ToArray();

@@ -153,8 +153,11 @@ namespace StarryEyes.Models
                          .Finally(() =>
                          {
                              var subj = Interlocked.Exchange(ref _imagesSubject, null);
-                             subj.OnCompleted();
-                             subj.Dispose();
+                             lock (subj)
+                             {
+                                 subj.OnCompleted();
+                                 subj.Dispose();
+                             }
                          })
                          .Subscribe(l => Images = l);
         }

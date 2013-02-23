@@ -34,8 +34,6 @@ namespace StarryEyes.Models.Connections.UserDependencies
             get { return _danglingKeywords.AsEnumerable(); }
         }
 
-        public static bool ReconnectImmediate { get; set; }
-
         /// <summary>
         ///     Update connection states.
         ///     <para />
@@ -146,7 +144,7 @@ namespace StarryEyes.Models.Connections.UserDependencies
         /// </summary>
         /// <param name="keyword">adding keyword</param>
         /// <param name="reconnectImmediate">reconnect user streams immediately if required.</param>
-        public static void AddTrackKeyword(string keyword, bool? reconnectImmediate = null)
+        public static void AddTrackKeyword(string keyword)
         {
             lock (TrackingLocker)
             {
@@ -157,6 +155,7 @@ namespace StarryEyes.Models.Connections.UserDependencies
                 }
                 else
                 {
+                    System.Diagnostics.Debug.WriteLine("*** TRACK ADD:" + keyword);
                     TrackReferenceCount[keyword] = 1;
                     // connect
                     UserStreamsConnection connection = GetMostSuitableConnection();
@@ -170,8 +169,7 @@ namespace StarryEyes.Models.Connections.UserDependencies
                         TrackResolver.Add(keyword, connection);
                         connection.TrackKeywords =
                             connection.TrackKeywords.Append(new[] { keyword });
-                        if (reconnectImmediate ?? ReconnectImmediate)
-                            connection.Connect();
+                        connection.Connect();
                     }
                 }
                 NotifyDanglings();
@@ -213,9 +211,9 @@ namespace StarryEyes.Models.Connections.UserDependencies
                     if (tracked != null) // if track-resolver bind key to null value, that's dangling word.
                     {
                         TrackResolver.Remove(keyword);
+                    System.Diagnostics.Debug.WriteLine("*** TRACK REMOVE: " + keyword);
                         tracked.TrackKeywords = tracked.TrackKeywords.Except(new[] { keyword });
-                        if (reconnectImmediate ?? ReconnectImmediate)
-                            tracked.Connect();
+                        tracked.Connect();
                     }
                 }
             }

@@ -86,5 +86,27 @@ namespace StarryEyes.Breezy.Api.Rest
                 .UpdateRateLimitInfo(info)
                 .ReadTimeline();
         }
+
+
+        public static IObservable<TwitterStatus> GetRetweeetsOfMe(this AuthenticateInfo info,
+            int count = 20, long? since_id = null, long? max_id = null, int? page = null,
+            bool trim_user = false, bool include_entities = true)
+        {
+            var param = new Dictionary<string, object>()
+            {
+                {"count", count},
+                {"since_id", since_id},
+                {"max_id", max_id},
+                {"page", page},
+                {"trim_user", trim_user},
+                {"include_entities", include_entities},
+            }.Parametalize();
+            return info.GetOAuthClient()
+                .SetParameters(param)
+                .SetEndpoint(ApiEndpoint.EndpointApiV1a.JoinUrl("/statuses/retweets_of_me.json"))
+                .GetResponse()
+                .UpdateRateLimitInfo(info)
+                .ReadTimeline();
+        }
     }
 }

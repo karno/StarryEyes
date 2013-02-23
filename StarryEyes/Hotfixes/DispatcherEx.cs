@@ -78,9 +78,9 @@ public static class DispatcherHolder
         return Dispatcher.Invoke(func);
     }
 
-    public static void Enqueue(Action action)
+    public static void Enqueue(Action action, DispatcherPriority priority = DispatcherPriority.Normal)
     {
-        Dispatcher.Enqueue(action);
+        Dispatcher.Enqueue(action, priority);
     }
 
     public static async Task BeginInvoke(Action action)

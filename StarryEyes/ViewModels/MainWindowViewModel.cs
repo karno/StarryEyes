@@ -272,11 +272,22 @@ namespace StarryEyes.ViewModels
             }
         }
 
+        public bool IsTooFast
+        {
+            get { return StatisticsService.TooFastWarning; }
+        }
+
+        public void ResetTooFastFlag()
+        {
+            StatisticsService.ResetTooFastWarning();
+        }
+
         private void UpdateStatistics()
         {
             RaisePropertyChanged(() => TweetsPerMinutes);
             RaisePropertyChanged(() => GrossTweetCount);
             RaisePropertyChanged(() => StartupTime);
+            RaisePropertyChanged(() => IsTooFast);
         }
 
         #endregion

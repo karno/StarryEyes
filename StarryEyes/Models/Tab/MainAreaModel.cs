@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Livet;
+using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
 
 namespace StarryEyes.Models.Tab
@@ -30,6 +31,7 @@ namespace StarryEyes.Models.Tab
             Setting.Columns
                 .Select(c => new ColumnModel(c.Tabs.Select(d => d.ToTabModel()).ToArray()))
                 .ForEach(_columns.Add);
+            App.RaiseUserInterfaceReady();
         }
 
         /// <summary>

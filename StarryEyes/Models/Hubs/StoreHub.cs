@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Reactive;
 using System.Reactive.Linq;
 using StarryEyes.Breezy.Api.Rest;
 using StarryEyes.Breezy.Authorize;
@@ -16,12 +15,13 @@ namespace StarryEyes.Models.Hubs
     {
         public static IObservable<TwitterStatus> MergeStore(TwitterStatus status)
         {
-            return StatusStore.Get(status.Id)
-                              .ConcatIfEmpty(() =>
-                              {
-                                  StatusStore.Store(status);
-                                  return Observable.Return(status);
-                              });
+            return StatusStore
+                .Get(status.Id)
+                .ConcatIfEmpty(() =>
+                {
+                    StatusStore.Store(status);
+                    return Observable.Return(status);
+                });
         }
 
         public static IObservable<TwitterStatus> GetTweet(long id)

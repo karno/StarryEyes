@@ -29,7 +29,7 @@ namespace StarryEyes.Settings
         {
             get { return _columns.Value ?? GenerateEmptyTabs(); }
             set { _columns.Value = value.Guard().ToArray(); }
-        } 
+        }
 
         private static IEnumerable<ColumnDescription> GenerateEmptyTabs()
         {
@@ -51,7 +51,7 @@ namespace StarryEyes.Settings
                         .Select(t => new TabDescription(t)).ToArray()
                 }
             };
-        } 
+        }
 
         #endregion
 

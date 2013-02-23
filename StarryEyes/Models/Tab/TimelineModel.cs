@@ -70,7 +70,6 @@ namespace StarryEyes.Models.Tab
         public void Dispose()
         {
             _disposable.Dispose();
-            System.Diagnostics.Debug.WriteLine("TIMELINE DISPOSED.");
             _statusIdCache.Clear();
             _statuses.Clear();
         }
@@ -103,8 +102,10 @@ namespace StarryEyes.Models.Tab
                     i => i.TakeWhile(_ => _.CreatedAt > status.CreatedAt).Count(),
                     status);
                 if (_statusIdCache.Count > TimelineChunkCount + TimelineChunkCountBounce &&
-                    _trimCount == 0)
+                    Interlocked.Exchange(ref _trimCount, 1) == 0)
+                {
                     Task.Run(() => TrimTimeline());
+                }
                 var handler = OnNewStatusArrival;
                 if (handler != null)
                     handler(status);
@@ -137,7 +138,6 @@ namespace StarryEyes.Models.Tab
         {
             if (_isSuppressTimelineTrimming) return;
             if (_statuses.Count <= TimelineChunkCount) return;
-            if (Interlocked.Exchange(ref _trimCount, 1) != 0) return;
             try
             {
                 DateTime lastCreatedAt = _statuses[TimelineChunkCount].CreatedAt;
@@ -159,6 +159,7 @@ namespace StarryEyes.Models.Tab
             finally
             {
                 Interlocked.Exchange(ref _trimCount, 0);
+                GC.Collect();
             }
         }
     }

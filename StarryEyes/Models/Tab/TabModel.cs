@@ -204,11 +204,12 @@ namespace StarryEyes.Models.Tab
             {
                 if (FilterQuery != null)
                 {
-                    FilterQuery.Deactivate();
                     FilterQuery.OnInvalidateRequired -= InvalidateCollection;
+                    FilterQuery.Deactivate();
                 }
                 if (Timeline != null)
                 {
+                    Timeline.OnNewStatusArrival -= OnNewStatusArrival;
                     Timeline.Dispose();
                     Timeline = null;
                 }

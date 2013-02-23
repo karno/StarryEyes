@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using StarryEyes.Albireo.Data;
 using StarryEyes.Models.Stores;
-using StarryEyes.Settings;
 
 namespace StarryEyes.Filters.Expressions.Values.Locals
 {
     public sealed class UserSpecified : UserRepresentationBase
     {
-        string _originalScreenName;
-        long _userId;
+        readonly string _originalScreenName;
+        readonly long _userId;
         AccountData _adata;
 
         public UserSpecified(string screenName)
@@ -40,8 +39,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
             {
                 if (_adata == null)
                     return new List<long>();
-                else
-                    return new List<long>(new[] { _adata.AccountId });
+                return new List<long>(new[] { _adata.AccountId });
             }
         }
 
@@ -51,8 +49,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
             {
                 if (_adata == null)
                     return new List<long>(); // returns empty list
-                else
-                    return new AVLTree<long>(_adata.Followings);
+                return new AVLTree<long>(_adata.Followings);
             }
         }
 
@@ -62,17 +59,15 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
             {
                 if (_adata == null)
                     return new List<long>();
-                else
-                    return new AVLTree<long>(_adata.Followers);
+                return new AVLTree<long>(_adata.Followers);
             }
         }
 
         public override string ToQuery()
         {
             if (String.IsNullOrEmpty(_originalScreenName))
-                return "local.#" + _userId.ToString();
-            else
-                return "local." + _originalScreenName;
+                return "#" + _userId.ToString();
+            return "@" + _originalScreenName;
         }
 
         public override long UserId

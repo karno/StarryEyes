@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Threading;
 using Livet;
 using Livet.Commands;
+using Livet.EventListeners;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Filters;
@@ -34,8 +34,6 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         private UserViewModel _retweeter;
         private UserViewModel _user;
 
-        private static int _statusVmCount = 0;
-
         public StatusViewModel(TwitterStatus status)
             : this(null, status, null)
         {
@@ -53,29 +51,35 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
             // initialize users information
             _favoritedUsers = ViewModelHelper.CreateReadOnlyDispatcherCollection(
-                Model.FavoritedUsers, _ => new UserViewModel(_), DispatcherHelper.UIDispatcher);
-            _favoritedUsers.CollectionChanged += (sender, e) =>
-            {
-                RaisePropertyChanged(() => IsFavoritedUserExists);
-                RaisePropertyChanged(() => FavoriteCount);
-            };
-            _retweetedUsers = ViewModelHelper.CreateReadOnlyDispatcherCollection(
-                Model.RetweetedUsers, _ => new UserViewModel(_), DispatcherHelper.UIDispatcher);
-            _retweetedUsers.CollectionChanged += (sender, e) =>
-            {
-                RaisePropertyChanged(() => IsRetweetedUserExists);
-                RaisePropertyChanged(() => RetweetCount);
-            };
+                Model.FavoritedUsers, user => new UserViewModel(user), DispatcherHelper.UIDispatcher);
+            _favoritedUsers.EventListeners.Add(
+                new CollectionChangedEventListener(
+                    _favoritedUsers,
+                    (sender, e) =>
+                    {
+                        RaisePropertyChanged(() => IsFavoritedUserExists);
+                        RaisePropertyChanged(() => FavoriteCount);
+                    }));
             CompositeDisposable.Add(_favoritedUsers);
+            _retweetedUsers = ViewModelHelper.CreateReadOnlyDispatcherCollection(
+                Model.RetweetedUsers, user => new UserViewModel(user), DispatcherHelper.UIDispatcher);
+            _retweetedUsers.EventListeners.Add(
+                new CollectionChangedEventListener(
+                    _retweetedUsers,
+                    (sender, e) =>
+                    {
+                        RaisePropertyChanged(() => IsRetweetedUserExists);
+                        RaisePropertyChanged(() => RetweetCount);
+                    }));
             CompositeDisposable.Add(_retweetedUsers);
 
             // resolve images
             var imgsubj = Model.ImagesSubject;
             if (imgsubj != null)
             {
-                try
+                lock (imgsubj)
                 {
-                    imgsubj
+                    var subscribe = imgsubj
                         .Finally(() =>
                         {
                             RaisePropertyChanged(() => Images);
@@ -83,16 +87,14 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                             RaisePropertyChanged(() => IsImageAvailable);
                         })
                         .Subscribe();
-                }
-                catch (ObjectDisposedException)
-                {
+                    CompositeDisposable.Add(subscribe);
                 }
             }
 
             // look-up in-reply-to
             if (status.InReplyToStatusId.HasValue)
             {
-                StoreHub.GetTweet(status.InReplyToStatusId.Value)
+                var subscribe = StoreHub.GetTweet(status.InReplyToStatusId.Value)
                         .Subscribe(replyTo =>
                         {
                             _inReplyTo = replyTo;
@@ -102,6 +104,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                             RaisePropertyChanged(() => InReplyToUserScreenName);
                             RaisePropertyChanged(() => InReplyToBody);
                         });
+                CompositeDisposable.Add(subscribe);
             }
         }
 
@@ -353,6 +356,11 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             }
         }
 
+        public DateTime CreatedAt
+        {
+            get { return Status.CreatedAt; }
+        }
+
         public bool IsImageAvailable
         {
             get { return Model.Images != null && Model.Images.Any(); }
@@ -512,7 +520,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         private void NotifyQuickActionFailed(string main, string body)
         {
-            var msg = new TaskDialogMessage(new TaskDialogOptions()
+            var msg = new TaskDialogMessage(new TaskDialogOptions
             {
                 CommonButtons = TaskDialogCommonButtons.Close,
                 MainIcon = VistaTaskDialogIcon.Error,
@@ -640,7 +648,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public void ConfirmDelete()
         {
-            var msg = new TaskDialogMessage(new TaskDialogOptions()
+            var msg = new TaskDialogMessage(new TaskDialogOptions
             {
                 AllowDialogCancellation = true,
                 CommonButtons = TaskDialogCommonButtons.OKCancel,

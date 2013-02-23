@@ -99,8 +99,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         public override void Store(TValue value)
         {
             TKey key = GetKey(value);
-            Observable.Start(() => GetChunk(key).AddOrUpdate(key, value))
-                      .Subscribe();
+            GetChunk(key).AddOrUpdate(key, value);
         }
 
         /// <summary>

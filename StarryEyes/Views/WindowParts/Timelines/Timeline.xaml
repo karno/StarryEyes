@@ -413,7 +413,7 @@
                                             Background="#191BA1E2"
                                             SnapsToDevicePixels="True">
                                         <controls:LazyImage DecodePixelWidth="48"
-                                                            UriSource="{Binding User.User.ProfileImageUri,
+                                                            UriSource="{Binding User.ProfileImageUri,
                                                                                 Mode=OneTime}"
                                                             UseLayoutRounding="True" />
                                     </Border>
@@ -490,7 +490,7 @@
                                                    FontSize="12.667"
                                                    Foreground="Gray"
                                                    IsHitTestVisible="False"
-                                                   Text="{Binding User.User.Name,
+                                                   Text="{Binding User.Name,
                                                                   FallbackValue=name,
                                                                   Mode=OneTime}"
                                                    TextWrapping="NoWrap" />
@@ -602,7 +602,7 @@
                                                    FontSize="10.667"
                                                    Foreground="Gray"
                                                    IsHitTestVisible="False"
-                                                   Text="{Binding Status.CreatedAt,
+                                                   Text="{Binding CreatedAt,
                                                                   FallbackValue=0:00,
                                                                   StringFormat=H:mm,
                                                                   Mode=OneTime}"
@@ -617,7 +617,7 @@
                                                    FontSize="10.667"
                                                    Foreground="Gray"
                                                    Opacity="0"
-                                                   Text="{Binding Status.CreatedAt,
+                                                   Text="{Binding CreatedAt,
                                                                   Mode=OneTime,
                                                                   FallbackValue=0:00:00 - 0 Nil \'00,
                                                                   StringFormat=H:mm:ss - d MMM \\\'yy}"

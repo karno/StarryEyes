@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Reactive.Linq;
 using StarryEyes.Breezy.Api.Parsing;
 using StarryEyes.Breezy.Api.Parsing.JsonFormats;

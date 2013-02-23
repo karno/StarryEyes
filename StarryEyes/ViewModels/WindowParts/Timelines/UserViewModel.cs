@@ -24,6 +24,11 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             get { return User.ProfileImageUri; }
         }
 
+        public string Name
+        {
+            get { return User.Name; }
+        }
+
         public string ScreenName
         {
             get { return User.ScreenName; }

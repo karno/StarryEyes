@@ -23,21 +23,17 @@ namespace StarryEyes.Filters
         public string ToQuery()
         {
             return "from " + Sources.GroupBy(s => s.FilterKey)
-                .Select(g => g.Distinct(_ => _.FilterValue))
-                .Select(f =>
+                .Select(g => g.Distinct(_ => _.FilterValue).ToArray())
+                .Select(fs =>
                 {
-                    if (f.Count() == 1)
+                    if (fs.Length == 1)
                     {
-                        var item = f.First();
+                        var item = fs[0];
                         if (String.IsNullOrEmpty(item.FilterValue))
                             return item.FilterKey;
-                        else
-                            return item.FilterKey + ": " + item.FilterValue;
+                        return item.FilterKey + ": \"" + item.FilterValue + "\"";
                     }
-                    else
-                    {
-                        return f.First().FilterKey + ": " + f.Select(fs => "\"" + fs.FilterValue + "\"").JoinString(", ");
-                    }
+                    return fs[0].FilterKey + ": " + fs.Select(f => "\"" + f.FilterValue + "\"").JoinString(", ");
                 })
                 .JoinString(", ") +
                 " where " + PredicateTreeRoot.ToQuery();
