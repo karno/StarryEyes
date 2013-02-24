@@ -325,6 +325,10 @@ namespace StarryEyes.ViewModels.WindowParts
             }
             set
             {
+                if (_inReplyToViewModelCache != null)
+                {
+                    _inReplyToViewModelCache.Dispose();
+                }
                 if (value == null)
                 {
                     _inReplyToViewModelCache = null;
