@@ -52,7 +52,8 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             // initialize users information
             _favoritedUsers = ViewModelHelperEx.CreateReadOnlyDispatcherCollection(
                 Model.FavoritedUsers, user => new UserViewModel(user), DispatcherHelper.UIDispatcher);
-            _favoritedUsers.EventListeners.Add(
+            CompositeDisposable.Add(_favoritedUsers);
+            CompositeDisposable.Add(
                 new CollectionChangedEventListener(
                     _favoritedUsers,
                     (sender, e) =>
@@ -60,10 +61,10 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                         RaisePropertyChanged(() => IsFavoritedUserExists);
                         RaisePropertyChanged(() => FavoriteCount);
                     }));
-            CompositeDisposable.Add(_favoritedUsers);
             _retweetedUsers = ViewModelHelperEx.CreateReadOnlyDispatcherCollection(
                 Model.RetweetedUsers, user => new UserViewModel(user), DispatcherHelper.UIDispatcher);
-            _retweetedUsers.EventListeners.Add(
+            CompositeDisposable.Add(_retweetedUsers);
+            CompositeDisposable.Add(
                 new CollectionChangedEventListener(
                     _retweetedUsers,
                     (sender, e) =>
@@ -71,7 +72,6 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                         RaisePropertyChanged(() => IsRetweetedUserExists);
                         RaisePropertyChanged(() => RetweetCount);
                     }));
-            CompositeDisposable.Add(_retweetedUsers);
 
             // resolve images
             var imgsubj = Model.ImagesSubject;
