@@ -14,7 +14,7 @@ namespace StarryEyes.ViewModels.WindowParts
         {
             CompositeDisposable.Add(
                 _columns =
-                ViewModelHelper.CreateReadOnlyDispatcherCollection(
+                ViewModelHelperEx.CreateReadOnlyDispatcherCollection(
                     MainAreaModel.Columns,
                     cm => new ColumnViewModel(this, cm),
                     DispatcherHelper.UIDispatcher));

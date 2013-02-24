@@ -46,7 +46,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             _parent = parent;
             _model = model;
             this.CompositeDisposable.Add(
-                _tabs = ViewModelHelper.CreateReadOnlyDispatcherCollection(
+                _tabs = ViewModelHelperEx.CreateReadOnlyDispatcherCollection(
                     model.Tabs,
                     _ => new TabViewModel(this, _),
                     DispatcherHelper.UIDispatcher));

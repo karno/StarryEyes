@@ -32,7 +32,7 @@ namespace StarryEyes.ViewModels.WindowParts
         /// </summary>
         public BackpanelViewModel()
         {
-            _events = ViewModelHelper.CreateReadOnlyDispatcherCollection(
+            _events = ViewModelHelperEx.CreateReadOnlyDispatcherCollection(
                 BackpanelModel.TwitterEvents,
                 tev => new TwitterEventViewModel(tev),
                 DispatcherHelper.UIDispatcher);

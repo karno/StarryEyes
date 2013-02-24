@@ -62,7 +62,7 @@ namespace StarryEyes.ViewModels.WindowParts
             };
 
             CompositeDisposable.Add(_bindingHashtags =
-                                    ViewModelHelper.CreateReadOnlyDispatcherCollection(
+                                    ViewModelHelperEx.CreateReadOnlyDispatcherCollection(
                                         InputAreaModel.BindingHashtags,
                                         _ => new BindHashtagViewModel(_, () => UnbindHashtag(_)),
                                         DispatcherHelper.UIDispatcher));
@@ -76,7 +76,7 @@ namespace StarryEyes.ViewModels.WindowParts
                                         (_, __) => RaisePropertyChanged(() => IsBindableHashtagExisted)));
 
             CompositeDisposable.Add(_draftedInputs =
-                                    ViewModelHelper.CreateReadOnlyDispatcherCollection(
+                                    ViewModelHelperEx.CreateReadOnlyDispatcherCollection(
                                         InputAreaModel.Drafts,
                                         _ =>
                                         new TweetInputInfoViewModel(this, _, vm => InputAreaModel.Drafts.Remove(vm)),
@@ -90,7 +90,7 @@ namespace StarryEyes.ViewModels.WindowParts
                                                                        }));
 
             CompositeDisposable.Add(_bindingAuthInfos =
-                                    ViewModelHelper.CreateReadOnlyDispatcherCollection(
+                                    ViewModelHelperEx.CreateReadOnlyDispatcherCollection(
                                         InputAreaModel.BindingAuthInfos,
                                         _ => new AuthenticateInfoViewModel(_),
                                         DispatcherHelper.UIDispatcher));

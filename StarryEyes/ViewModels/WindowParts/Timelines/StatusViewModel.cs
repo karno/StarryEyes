@@ -50,7 +50,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             _bindingAccounts = initialBoundAccounts.Guard().ToArray();
 
             // initialize users information
-            _favoritedUsers = ViewModelHelper.CreateReadOnlyDispatcherCollection(
+            _favoritedUsers = ViewModelHelperEx.CreateReadOnlyDispatcherCollection(
                 Model.FavoritedUsers, user => new UserViewModel(user), DispatcherHelper.UIDispatcher);
             _favoritedUsers.EventListeners.Add(
                 new CollectionChangedEventListener(
@@ -61,7 +61,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                         RaisePropertyChanged(() => FavoriteCount);
                     }));
             CompositeDisposable.Add(_favoritedUsers);
-            _retweetedUsers = ViewModelHelper.CreateReadOnlyDispatcherCollection(
+            _retweetedUsers = ViewModelHelperEx.CreateReadOnlyDispatcherCollection(
                 Model.RetweetedUsers, user => new UserViewModel(user), DispatcherHelper.UIDispatcher);
             _retweetedUsers.EventListeners.Add(
                 new CollectionChangedEventListener(

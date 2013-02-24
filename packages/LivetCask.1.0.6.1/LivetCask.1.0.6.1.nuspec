@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>LivetCask</id>
+    <version>1.0.6.1</version>
+    <title>Livet Cask</title>
+    <authors>Livet Project</authors>
+    <owners>Livet Project</owners>
+    <licenseUrl>http://ugaya40.net/Publish/license-jp.rtf</licenseUrl>
+    <projectUrl>http://ugaya40.net/livet</projectUrl>
+    <iconUrl>http://ugaya40.net/Publish/LivetCask.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Livet(リベット)はWPF4のためのMVVM(Model/View/ViewModel)パターン用インフラストラクチャです。
+.NET Framework 4 Client Profile以上で動作し、zlib/libpngライセンスで提供しています。</description>
+    <summary>WPF 4/4.5 MVVM Infrastructure.</summary>
+    <copyright>Copyright (c) 2010-2012 Livet Project</copyright>
+    <language>ja-JP</language>
+    <tags>MVVM,WPF</tags>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="PresentationCore" targetFramework="" />
+      <frameworkAssembly assemblyName="PresentationFramework" targetFramework="" />
+      <frameworkAssembly assemblyName="System" targetFramework="" />
+      <frameworkAssembly assemblyName="System.Core" targetFramework="" />
+      <frameworkAssembly assemblyName="System.Xaml" targetFramework="" />
+      <frameworkAssembly assemblyName="WindowsBase" targetFramework="" />
+    </frameworkAssemblies>
+    <references>
+      <reference file="Livet.dll" />
+      <reference file="Microsoft.Expression.Interactions.dll" />
+      <reference file="System.Windows.Interactivity.dll" />
+    </references>
+  </metadata>
+</package>
