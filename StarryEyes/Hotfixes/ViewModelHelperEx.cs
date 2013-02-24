@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Reactive.Linq;
 using System.Windows.Threading;
 using Livet;
-using Livet.EventListeners;
 
 // ReSharper disable CheckNamespace
 namespace StarryEyes
@@ -26,51 +26,54 @@ namespace StarryEyes
                 var target = new DispatcherCollection<TViewModel>(initCollection, dispatcher);
                 var result = new ReadOnlyDispatcherCollection<TViewModel>(target);
 
-                var collectionChangedListener = new CollectionChangedEventListener(sourceAsNotifyCollection);
-
-                result.EventListeners.Add(collectionChangedListener);
-
-                collectionChangedListener.RegisterHandler((sender, e) =>
-                {
-                    lock (internalLock)
+                var subscribe = Observable
+                    .FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(
+                        h => sourceAsNotifyCollection.CollectionChanged += h,
+                        h => sourceAsNotifyCollection.CollectionChanged -= h)
+                    .Select(e => e.EventArgs)
+                    .Subscribe(e =>
                     {
-                        switch (e.Action)
+                        lock (internalLock)
                         {
-                            case NotifyCollectionChangedAction.Add:
-                                target.Insert(e.NewStartingIndex, converter((TModel)e.NewItems[0]));
-                                break;
-                            case NotifyCollectionChangedAction.Move:
-                                target.Move(e.OldStartingIndex, e.NewStartingIndex);
-                                break;
-                            case NotifyCollectionChangedAction.Remove:
-                                if (typeof(IDisposable).IsAssignableFrom(typeof(TViewModel)))
-                                {
-                                    ((IDisposable)target[e.OldStartingIndex]).Dispose();
-                                }
-                                target.RemoveAt(e.OldStartingIndex);
-                                break;
-                            case NotifyCollectionChangedAction.Replace:
-                                if (typeof(IDisposable).IsAssignableFrom(typeof(TViewModel)))
-                                {
-                                    ((IDisposable)target[e.NewStartingIndex]).Dispose();
-                                }
-                                target[e.NewStartingIndex] = converter((TModel)e.NewItems[0]);
-                                break;
-                            case NotifyCollectionChangedAction.Reset:
-                                if (typeof(IDisposable).IsAssignableFrom(typeof(TViewModel)))
-                                {
-                                    foreach (IDisposable item in target)
+                            switch (e.Action)
+                            {
+                                case NotifyCollectionChangedAction.Add:
+                                    target.Insert(e.NewStartingIndex, converter((TModel)e.NewItems[0]));
+                                    break;
+                                case NotifyCollectionChangedAction.Move:
+                                    target.Move(e.OldStartingIndex, e.NewStartingIndex);
+                                    break;
+                                case NotifyCollectionChangedAction.Remove:
+                                    if (typeof(IDisposable).IsAssignableFrom(typeof(TViewModel)))
                                     {
-                                        item.Dispose();
+                                        ((IDisposable)target[e.OldStartingIndex]).Dispose();
                                     }
-                                }
-                                target.Clear();
-                                break;
-                            default:
-                                throw new ArgumentException();
+                                    target.RemoveAt(e.OldStartingIndex);
+                                    break;
+                                case NotifyCollectionChangedAction.Replace:
+                                    if (typeof(IDisposable).IsAssignableFrom(typeof(TViewModel)))
+                                    {
+                                        ((IDisposable)target[e.NewStartingIndex]).Dispose();
+                                    }
+                                    target[e.NewStartingIndex] = converter((TModel)e.NewItems[0]);
+                                    break;
+                                case NotifyCollectionChangedAction.Reset:
+                                    if (typeof(IDisposable).IsAssignableFrom(typeof(TViewModel)))
+                                    {
+                                        foreach (IDisposable item in target)
+                                        {
+                                            item.Dispose();
+                                        }
+                                    }
+                                    target.Clear();
+                                    break;
+                                default:
+                                    throw new ArgumentException();
+                            }
                         }
-                    }
-                });
+                    });
+
+                result.EventListeners.Add(subscribe);
 
                 foreach (var model in source)
                 {

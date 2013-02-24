@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Reactive.Linq;
 using Livet;
@@ -54,24 +55,26 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                 Model.FavoritedUsers, user => new UserViewModel(user), DispatcherHelper.UIDispatcher);
             CompositeDisposable.Add(_favoritedUsers);
             CompositeDisposable.Add(
-                new CollectionChangedEventListener(
-                    _favoritedUsers,
-                    (sender, e) =>
-                    {
-                        RaisePropertyChanged(() => IsFavoritedUserExists);
-                        RaisePropertyChanged(() => FavoriteCount);
-                    }));
+                Observable.FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(
+                    h => _favoritedUsers.CollectionChanged += h,
+                    h => _favoritedUsers.CollectionChanged -= h)
+                          .Subscribe(_ =>
+                          {
+                              RaisePropertyChanged(() => IsFavoritedUserExists);
+                              RaisePropertyChanged(() => FavoriteCount);
+                          }));
             _retweetedUsers = ViewModelHelperEx.CreateReadOnlyDispatcherCollection(
                 Model.RetweetedUsers, user => new UserViewModel(user), DispatcherHelper.UIDispatcher);
             CompositeDisposable.Add(_retweetedUsers);
             CompositeDisposable.Add(
-                new CollectionChangedEventListener(
-                    _retweetedUsers,
-                    (sender, e) =>
-                    {
-                        RaisePropertyChanged(() => IsRetweetedUserExists);
-                        RaisePropertyChanged(() => RetweetCount);
-                    }));
+                Observable.FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(
+                    h => _retweetedUsers.CollectionChanged += h,
+                    h => _retweetedUsers.CollectionChanged -= h)
+                          .Subscribe(_ =>
+                          {
+                              RaisePropertyChanged(() => IsRetweetedUserExists);
+                              RaisePropertyChanged(() => RetweetCount);
+                          }));
 
             // resolve images
             var imgsubj = Model.ImagesSubject;
