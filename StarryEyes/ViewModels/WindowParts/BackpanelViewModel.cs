@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Media;
@@ -17,7 +18,7 @@ namespace StarryEyes.ViewModels.WindowParts
     /// </summary>
     public class BackpanelViewModel : ViewModel
     {
-        private readonly ReadOnlyDispatcherCollection<TwitterEventViewModel> _events;
+        private readonly ReadOnlyDispatcherCollectionRx<TwitterEventViewModel> _events;
         private readonly object _syncLock = new object();
 
         private readonly Queue<BackpanelEventBase> _waitingEvents =
@@ -32,22 +33,22 @@ namespace StarryEyes.ViewModels.WindowParts
         /// </summary>
         public BackpanelViewModel()
         {
-            _events = ViewModelHelperEx.CreateReadOnlyDispatcherCollection(
+            _events = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
                 BackpanelModel.TwitterEvents,
                 tev => new TwitterEventViewModel(tev),
                 DispatcherHelper.UIDispatcher);
             CompositeDisposable.Add(
-                new EventListener<Action<BackpanelEventBase>>(
+                Observable.FromEvent<BackpanelEventBase>(
                     h => BackpanelModel.OnEventRegistered += h,
-                    h => BackpanelModel.OnEventRegistered -= h,
-                    ev =>
-                    {
-                        lock (_syncLock)
-                        {
-                            _waitingEvents.Enqueue(ev);
-                            Monitor.Pulse(_syncLock);
-                        }
-                    }));
+                    h => BackpanelModel.OnEventRegistered -= h)
+                          .Subscribe(ev =>
+                          {
+                              lock (_syncLock)
+                              {
+                                  _waitingEvents.Enqueue(ev);
+                                  Monitor.Pulse(_syncLock);
+                              }
+                          }));
             CompositeDisposable.Add(() =>
             {
                 lock (_syncLock)
@@ -58,7 +59,7 @@ namespace StarryEyes.ViewModels.WindowParts
             });
         }
 
-        public ReadOnlyDispatcherCollection<TwitterEventViewModel> Events
+        public ReadOnlyDispatcherCollectionRx<TwitterEventViewModel> Events
         {
             get { return _events; }
         }

@@ -18,7 +18,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
     {
         public AccountSelectionFlipViewModel()
         {
-            this.CompositeDisposable.Add(_accounts = ViewModelHelperEx.CreateReadOnlyDispatcherCollection(
+            this.CompositeDisposable.Add(_accounts = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
                 AccountsStore.Accounts,
                 _ => new SelectableAccountViewModel(this, _.AuthenticateInfo, RaiseSelectedAccountsChanged),
                 DispatcherHelper.UIDispatcher));
@@ -38,8 +38,8 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             }
         }
 
-        private readonly ReadOnlyDispatcherCollection<SelectableAccountViewModel> _accounts;
-        public ReadOnlyDispatcherCollection<SelectableAccountViewModel> Accounts
+        private readonly ReadOnlyDispatcherCollectionRx<SelectableAccountViewModel> _accounts;
+        public ReadOnlyDispatcherCollectionRx<SelectableAccountViewModel> Accounts
         {
             get { return _accounts; }
         }

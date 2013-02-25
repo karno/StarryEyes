@@ -8,13 +8,13 @@ namespace StarryEyes.ViewModels.WindowParts
 {
     public class MainAreaViewModel : ViewModel
     {
-        private readonly ReadOnlyDispatcherCollection<ColumnViewModel> _columns;
+        private readonly ReadOnlyDispatcherCollectionRx<ColumnViewModel> _columns;
 
         public MainAreaViewModel()
         {
             CompositeDisposable.Add(
                 _columns =
-                ViewModelHelperEx.CreateReadOnlyDispatcherCollection(
+                ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
                     MainAreaModel.Columns,
                     cm => new ColumnViewModel(this, cm),
                     DispatcherHelper.UIDispatcher));
@@ -26,7 +26,7 @@ namespace StarryEyes.ViewModels.WindowParts
                           .Subscribe(UpdateFocusFromModel));
         }
 
-        public ReadOnlyDispatcherCollection<ColumnViewModel> Columns
+        public ReadOnlyDispatcherCollectionRx<ColumnViewModel> Columns
         {
             get { return _columns; }
         }

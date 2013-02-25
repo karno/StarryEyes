@@ -186,9 +186,11 @@
     <Compile Include="Filters\Sources\FilterSearch.cs" />
     <Compile Include="Filters\Sources\FilterTrack.cs" />
     <Compile Include="Helpers\FreezableHelper.cs" />
+    <Compile Include="Hotfixes\DispatcherCollectionRx.cs" />
     <Compile Include="Hotfixes\DispatcherEx.cs" />
     <Compile Include="Helpers\RegexHelper.cs" />
-    <Compile Include="Hotfixes\ViewModelHelperEx.cs" />
+    <Compile Include="Hotfixes\ReadOnlyDispatcherCollectionRx.cs" />
+    <Compile Include="Hotfixes\ViewModelHelperRx.cs" />
     <Compile Include="Models\BackpanelModel.cs" />
     <Compile Include="Models\Backpanels\BackpanelActionEventBase.cs" />
     <Compile Include="Models\Backpanels\BackpanelEventBase.cs" />

@@ -5,14 +5,19 @@ using System.Collections.Specialized;
 using System.Reactive.Linq;
 using System.Windows.Threading;
 using Livet;
+using StarryEyes.Hotfixes;
 
 // ReSharper disable CheckNamespace
 namespace StarryEyes
 // ReSharper restore CheckNamespace
 {
-    public static class ViewModelHelperEx
+    /// <summary>
+    /// ViewModelHelper based on Reactive Extensions.
+    /// </summary>
+    public static class ViewModelHelperRx
     {
-        public static ReadOnlyDispatcherCollection<TViewModel> CreateReadOnlyDispatcherCollection<TModel, TViewModel>(IList<TModel> source, Func<TModel, TViewModel> converter, Dispatcher dispatcher)
+        public static ReadOnlyDispatcherCollectionRx<TViewModel> CreateReadOnlyDispatcherCollectionRx<TModel, TViewModel>
+            (IList<TModel> source, Func<TModel, TViewModel> converter, Dispatcher dispatcher)
         {
             if (source == null) throw new ArgumentNullException("source");
 
@@ -23,14 +28,10 @@ namespace StarryEyes
             var internalLock = new object();
             lock (internalLock)
             {
-                var target = new DispatcherCollection<TViewModel>(initCollection, dispatcher);
-                var result = new ReadOnlyDispatcherCollection<TViewModel>(target);
+                var target = new DispatcherCollectionRx<TViewModel>(initCollection, dispatcher);
+                var result = new ReadOnlyDispatcherCollectionRx<TViewModel>(target);
 
-                var subscribe = Observable
-                    .FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(
-                        h => sourceAsNotifyCollection.CollectionChanged += h,
-                        h => sourceAsNotifyCollection.CollectionChanged -= h)
-                    .Select(e => e.EventArgs)
+                var subscribe = sourceAsNotifyCollection.ListenCollectionChanged()
                     .Subscribe(e =>
                     {
                         lock (internalLock)
@@ -73,7 +74,7 @@ namespace StarryEyes
                         }
                     });
 
-                result.EventListeners.Add(subscribe);
+                result.Disposables.Add(subscribe);
 
                 foreach (var model in source)
                 {

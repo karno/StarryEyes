@@ -16,6 +16,7 @@ using Livet.Messaging.IO;
 using StarryEyes.Breezy.Api.Rest;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
+using StarryEyes.Hotfixes;
 using StarryEyes.Models;
 using StarryEyes.Models.Backpanels.PostEvents;
 using StarryEyes.Models.Operations;
@@ -32,10 +33,10 @@ namespace StarryEyes.ViewModels.WindowParts
     {
         private readonly AccountSelectionFlipViewModel _accountSelectionFlip;
         private readonly DispatcherCollection<BindHashtagViewModel> _bindableHashtagCandidates;
-        private readonly ReadOnlyDispatcherCollection<AuthenticateInfoViewModel> _bindingAuthInfos;
+        private readonly ReadOnlyDispatcherCollectionRx<AuthenticateInfoViewModel> _bindingAuthInfos;
 
-        private readonly ReadOnlyDispatcherCollection<BindHashtagViewModel> _bindingHashtags;
-        private readonly ReadOnlyDispatcherCollection<TweetInputInfoViewModel> _draftedInputs;
+        private readonly ReadOnlyDispatcherCollectionRx<BindHashtagViewModel> _bindingHashtags;
+        private readonly ReadOnlyDispatcherCollectionRx<TweetInputInfoViewModel> _draftedInputs;
         private readonly GeoCoordinateWatcher _geoWatcher;
         private long[] _baseSelectedAccounts;
         private UserViewModel _directMessageToCache;
@@ -62,42 +63,44 @@ namespace StarryEyes.ViewModels.WindowParts
             };
 
             CompositeDisposable.Add(_bindingHashtags =
-                                    ViewModelHelperEx.CreateReadOnlyDispatcherCollection(
+                                    ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
                                         InputAreaModel.BindingHashtags,
                                         _ => new BindHashtagViewModel(_, () => UnbindHashtag(_)),
                                         DispatcherHelper.UIDispatcher));
-            CompositeDisposable.Add(new CollectionChangedEventListener(
-                                        _bindingHashtags, (_, __) => RaisePropertyChanged(() => IsBindingHashtagExisted)));
+            CompositeDisposable.Add(_bindingHashtags
+                                        .ListenCollectionChanged()
+                                        .Subscribe(_ => RaisePropertyChanged(() => IsBindingHashtagExisted)));
 
             _bindableHashtagCandidates =
                 new DispatcherCollection<BindHashtagViewModel>(DispatcherHelper.UIDispatcher);
-            CompositeDisposable.Add(new CollectionChangedEventListener(
-                                        _bindableHashtagCandidates,
-                                        (_, __) => RaisePropertyChanged(() => IsBindableHashtagExisted)));
+            CompositeDisposable.Add(_bindableHashtagCandidates
+                                        .ListenCollectionChanged()
+                                        .Subscribe(_ => RaisePropertyChanged(() => IsBindableHashtagExisted)));
 
             CompositeDisposable.Add(_draftedInputs =
-                                    ViewModelHelperEx.CreateReadOnlyDispatcherCollection(
+                                    ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
                                         InputAreaModel.Drafts,
                                         _ =>
                                         new TweetInputInfoViewModel(this, _, vm => InputAreaModel.Drafts.Remove(vm)),
                                         DispatcherHelper.UIDispatcher));
 
-            CompositeDisposable.Add(new CollectionChangedEventListener(_draftedInputs,
-                                                                       (o, ev) =>
-                                                                       {
-                                                                           RaisePropertyChanged(() => DraftCount);
-                                                                           RaisePropertyChanged(() => IsDraftsExisted);
-                                                                       }));
+            CompositeDisposable.Add(_draftedInputs
+                                        .ListenCollectionChanged()
+                                        .Subscribe(_ =>
+                                        {
+                                            RaisePropertyChanged(() => DraftCount);
+                                            RaisePropertyChanged(() => IsDraftsExisted);
+                                        }));
 
             CompositeDisposable.Add(_bindingAuthInfos =
-                                    ViewModelHelperEx.CreateReadOnlyDispatcherCollection(
+                                    ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
                                         InputAreaModel.BindingAuthInfos,
                                         _ => new AuthenticateInfoViewModel(_),
                                         DispatcherHelper.UIDispatcher));
 
-            CompositeDisposable.Add(new CollectionChangedEventListener(
-                                        _bindingAuthInfos,
-                                        (_, __) => RaisePropertyChanged(() => IsBindingAuthInfoExisted)));
+            CompositeDisposable.Add(_bindingAuthInfos
+                                        .ListenCollectionChanged()
+                                        .Subscribe(_ => RaisePropertyChanged(() => IsBindingAuthInfoExisted)));
 
             bool accountSelectReflecting = false;
             _accountSelectionFlip.OnSelectedAccountsChanged += () =>
@@ -131,6 +134,7 @@ namespace StarryEyes.ViewModels.WindowParts
                         ApplyBaseSelectedAccounts();
                         UpdateTextCount();
                     }));
+
             CompositeDisposable.Add(
                 new EventListener<Action<IEnumerable<AuthenticateInfo>, string, CursorPosition, TwitterStatus>>(
                     _ => InputAreaModel.OnSetTextRequested += _,
@@ -154,6 +158,7 @@ namespace StarryEyes.ViewModels.WindowParts
                                 break;
                         }
                     }));
+
             CompositeDisposable.Add(
                 new EventListener<Action<IEnumerable<AuthenticateInfo>, TwitterUser>>(
                     _ => InputAreaModel.OnSendDirectMessageRequested += _,
@@ -188,7 +193,7 @@ namespace StarryEyes.ViewModels.WindowParts
             get { return _accountSelectionFlip; }
         }
 
-        public ReadOnlyDispatcherCollection<BindHashtagViewModel> BindingHashtags
+        public ReadOnlyDispatcherCollectionRx<BindHashtagViewModel> BindingHashtags
         {
             get { return _bindingHashtags; }
         }
@@ -208,7 +213,7 @@ namespace StarryEyes.ViewModels.WindowParts
             get { return _bindableHashtagCandidates != null && _bindableHashtagCandidates.Count > 0; }
         }
 
-        public ReadOnlyDispatcherCollection<TweetInputInfoViewModel> DraftedInputs
+        public ReadOnlyDispatcherCollectionRx<TweetInputInfoViewModel> DraftedInputs
         {
             get { return _draftedInputs; }
         }
@@ -218,7 +223,7 @@ namespace StarryEyes.ViewModels.WindowParts
             get { return _bindingAuthInfos != null && _bindingAuthInfos.Count > 0; }
         }
 
-        public ReadOnlyDispatcherCollection<AuthenticateInfoViewModel> BindingAuthInfos
+        public ReadOnlyDispatcherCollectionRx<AuthenticateInfoViewModel> BindingAuthInfos
         {
             get { return _bindingAuthInfos; }
         }

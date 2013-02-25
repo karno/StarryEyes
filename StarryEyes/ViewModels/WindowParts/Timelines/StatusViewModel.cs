@@ -25,9 +25,9 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
     {
         public const string TwitterStatusUrl = "https://twitter.com/{0}/status/{1}";
 
-        private readonly ReadOnlyDispatcherCollection<UserViewModel> _favoritedUsers;
+        private readonly ReadOnlyDispatcherCollectionRx<UserViewModel> _favoritedUsers;
         private readonly TabViewModel _parent;
-        private readonly ReadOnlyDispatcherCollection<UserViewModel> _retweetedUsers;
+        private readonly ReadOnlyDispatcherCollectionRx<UserViewModel> _retweetedUsers;
         private long[] _bindingAccounts;
         private TwitterStatus _inReplyTo;
         private bool _isSelected;
@@ -51,30 +51,26 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             _bindingAccounts = initialBoundAccounts.Guard().ToArray();
 
             // initialize users information
-            _favoritedUsers = ViewModelHelperEx.CreateReadOnlyDispatcherCollection(
+            _favoritedUsers = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
                 Model.FavoritedUsers, user => new UserViewModel(user), DispatcherHelper.UIDispatcher);
             CompositeDisposable.Add(_favoritedUsers);
             CompositeDisposable.Add(
-                Observable.FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(
-                    h => _favoritedUsers.CollectionChanged += h,
-                    h => _favoritedUsers.CollectionChanged -= h)
-                          .Subscribe(_ =>
-                          {
-                              RaisePropertyChanged(() => IsFavoritedUserExists);
-                              RaisePropertyChanged(() => FavoriteCount);
-                          }));
-            _retweetedUsers = ViewModelHelperEx.CreateReadOnlyDispatcherCollection(
+                _favoritedUsers.ListenCollectionChanged()
+                               .Subscribe(_ =>
+                               {
+                                   RaisePropertyChanged(() => IsFavoritedUserExists);
+                                   RaisePropertyChanged(() => FavoriteCount);
+                               }));
+            _retweetedUsers = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
                 Model.RetweetedUsers, user => new UserViewModel(user), DispatcherHelper.UIDispatcher);
             CompositeDisposable.Add(_retweetedUsers);
             CompositeDisposable.Add(
-                Observable.FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(
-                    h => _retweetedUsers.CollectionChanged += h,
-                    h => _retweetedUsers.CollectionChanged -= h)
-                          .Subscribe(_ =>
-                          {
-                              RaisePropertyChanged(() => IsRetweetedUserExists);
-                              RaisePropertyChanged(() => RetweetCount);
-                          }));
+                _retweetedUsers.ListenCollectionChanged()
+                               .Subscribe(_ =>
+                               {
+                                   RaisePropertyChanged(() => IsRetweetedUserExists);
+                                   RaisePropertyChanged(() => RetweetCount);
+                               }));
 
             // resolve images
             var imgsubj = Model.ImagesSubject;
@@ -185,7 +181,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             get { return RetweetedUsers.Count; }
         }
 
-        public ReadOnlyDispatcherCollection<UserViewModel> RetweetedUsers
+        public ReadOnlyDispatcherCollectionRx<UserViewModel> RetweetedUsers
         {
             get { return _retweetedUsers; }
         }
@@ -200,7 +196,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             get { return FavoritedUsers.Count; }
         }
 
-        public ReadOnlyDispatcherCollection<UserViewModel> FavoritedUsers
+        public ReadOnlyDispatcherCollectionRx<UserViewModel> FavoritedUsers
         {
             get { return _favoritedUsers; }
         }

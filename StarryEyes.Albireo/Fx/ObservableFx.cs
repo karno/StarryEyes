@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Concurrency;
 
@@ -8,6 +10,33 @@ namespace System.Reactive.Linq
 {
     public static class ObservableFx
     {
+        public static IObservable<NotifyCollectionChangedEventArgs> ListenCollectionChanged(
+            this INotifyCollectionChanged collection)
+        {
+            return Observable.FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>
+                (h => collection.CollectionChanged += h,
+                 h => collection.CollectionChanged -= h)
+                             .Select(p => p.EventArgs);
+        }
+
+        public static IObservable<PropertyChangedEventArgs> ListenPropertyChanged(
+            this INotifyPropertyChanged listenee)
+        {
+            return Observable.FromEventPattern<PropertyChangedEventHandler, PropertyChangedEventArgs>
+                (h => listenee.PropertyChanged += h,
+                 h => listenee.PropertyChanged -= h)
+                             .Select(p => p.EventArgs);
+        }
+
+        public static IObservable<PropertyChangingEventArgs> ListenePropertyChanging(
+            this INotifyPropertyChanging listenee)
+        {
+            return Observable.FromEventPattern<PropertyChangingEventHandler, PropertyChangingEventArgs>
+                (h => listenee.PropertyChanging += h,
+                 h => listenee.PropertyChanging -= h)
+                             .Select(p => p.EventArgs);
+        }
+
         public static IObservable<T> Retry<T>(this IObservable<T> source, int retryCount, TimeSpan delaySpan)
         {
             return source.Retry<T, Exception>(retryCount, null, delaySpan, TaskPoolScheduler.Default);
