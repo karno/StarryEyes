@@ -1,0 +1,48 @@
+﻿<UserControl x:Class="StarryEyes.Views.WindowParts.Flips.UserInformationFlip"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:Behaviors="clr-namespace:StarryEyes.Views.Messaging.Behaviors"
+             xmlns:Custom="http://schemas.livet-mvvm.net/2011/wpf"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             d:DesignHeight="800"
+             d:DesignWidth="1200"
+             mc:Ignorable="d">
+    <i:Interaction.Triggers>
+        <Custom:InteractionMessageTrigger Messenger="{Binding Messenger}">
+            <Behaviors:GoToStateInteractionMessageAction />
+        </Custom:InteractionMessageTrigger>
+    </i:Interaction.Triggers>
+    <Grid x:Name="outerGrid">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <Border Grid.ColumnSpan="2"
+                Background="White"
+                BorderThickness="1"
+                Opacity="0.6" />
+        <Grid x:Name="innerGrid"
+              Grid.Column="1"
+              MinWidth="480"
+              HorizontalAlignment="Right"
+              Background="White">
+            <Button Height="48"
+                    Margin="-6,-6,438,758"
+                    Template="{DynamicResource MetroBlackCircleButtonTemplate}">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="Click">
+                        <ei:CallMethodAction MethodName="Close" TargetObject="{Binding Mode=OneWay}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+                <Path Width="25"
+                      Height="18"
+                      Data="F1 M 36,22L 36,26L 19.75,26L 27,33L 20.5,33L 11,24L 20.5,15L 27,15L 19.75,22L 36,22 Z "
+                      Fill="Black"
+                      Stretch="Fill" />
+            </Button>
+        </Grid>
+    </Grid>
+</UserControl>

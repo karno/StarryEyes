@@ -55,6 +55,13 @@ namespace StarryEyes.Settings
 
         #endregion
 
+        #region Searchings
+
+        public static readonly SettingItemStruct<bool> IsSearchFromWeb =
+            new SettingItemStruct<bool>("IsSearchFromWeb", true);
+
+        #endregion
+
         #region Authentication and accounts
 
         private static readonly SettingItem<List<AccountSetting>> _accounts =

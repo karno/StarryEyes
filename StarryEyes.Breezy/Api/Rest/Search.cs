@@ -13,7 +13,7 @@ namespace StarryEyes.Breezy.Api.Rest
 
         public static IObservable<TwitterStatus> SearchTweets(this AuthenticateInfo info,
             string query, string geocode = null, string lang = null, string locale = null,
-            int page = 1, SearchResultType result_type = SearchResultType.mixed, int count = 100, string until = null,
+            SearchResultType result_type = SearchResultType.mixed, int count = 100, string until = null,
             long? since_id = null, long? max_id = null, bool include_entities = true)
         {
             var param = new Dictionary<string, object>()
@@ -37,7 +37,7 @@ namespace StarryEyes.Breezy.Api.Rest
                 .ReadString()
                 .DeserializeJson<SearchJson>()
                 .Where(_ => _ != null)
-                .SelectMany(s => s.results)
+                .SelectMany(s => s.statuses)
                 .Where(_ => _ != null)
                 .Select(s => s.Spawn());
         }

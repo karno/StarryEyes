@@ -44,6 +44,23 @@ namespace StarryEyes.Models.Tab
         }
 
         /// <summary>
+        /// Get current focusing tab model.
+        /// </summary>
+        public static TabModel CurrentFocusTab
+        {
+            get
+            {
+                if (_currentFocusColumnIndex < 0 || _currentFocusColumnIndex >= _columns.Count)
+                    return null;
+                var col = _columns[_currentFocusColumnIndex];
+                var cti = col.CurrentFocusTabIndex;
+                if (cti < 0 || cti >= col.Tabs.Count)
+                    return null;
+                return col.Tabs[cti];
+            }
+        }
+
+        /// <summary>
         ///     Current focused column index
         /// </summary>
         public static int CurrentFocusColumnIndex

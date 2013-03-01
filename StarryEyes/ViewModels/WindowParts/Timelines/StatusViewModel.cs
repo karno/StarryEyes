@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
 using System.Reactive.Linq;
 using Livet;
 using Livet.Commands;
-using Livet.EventListeners;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Filters;
@@ -26,7 +24,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         public const string TwitterStatusUrl = "https://twitter.com/{0}/status/{1}";
 
         private readonly ReadOnlyDispatcherCollectionRx<UserViewModel> _favoritedUsers;
-        private readonly TabViewModel _parent;
+        private readonly TimelineViewModelBase _parent;
         private readonly ReadOnlyDispatcherCollectionRx<UserViewModel> _retweetedUsers;
         private long[] _bindingAccounts;
         private TwitterStatus _inReplyTo;
@@ -40,7 +38,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         {
         }
 
-        public StatusViewModel(TabViewModel parent, TwitterStatus status,
+        public StatusViewModel(TimelineViewModelBase parent, TwitterStatus status,
                                IEnumerable<long> initialBoundAccounts)
         {
             _parent = parent;
@@ -107,7 +105,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             }
         }
 
-        public TabViewModel Parent
+        public TimelineViewModelBase Parent
         {
             get { return _parent; }
         }
@@ -118,7 +116,8 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         public StatusModel Model { get; private set; }
 
         /// <summary>
-        ///     Represents ORIGINAL status. (if this status is retweet, this property represents a status which contains retweeted_original.)
+        ///     Represents ORIGINAL status. 
+        ///     (if this status is retweet, this property represents a status which contains retweeted_original.)
         /// </summary>
         public TwitterStatus OriginalStatus
         {
@@ -700,8 +699,12 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             }
         }
 
+        private bool _lastSelectState;
         public void ToggleFocus()
         {
+            var psel = _lastSelectState;
+            _lastSelectState = IsSelected;
+            if (psel != IsSelected) return;
             Parent.FocusedStatus =
                 Parent.FocusedStatus == this ? null : this;
         }

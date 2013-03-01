@@ -14,7 +14,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
     /// <summary>
     /// アカウントを選択するコンポーネント用ビューモデル
     /// </summary>
-    public class AccountSelectionFlipViewModel : ViewModel
+    public class AccountSelectionFlipViewModel : PartialFlipViewModelBase
     {
         public AccountSelectionFlipViewModel()
         {
@@ -64,38 +64,10 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             }
         }
 
-        public event Action OnClosed;
-
         public event Action OnSelectedAccountsChanged;
         private void RaiseSelectedAccountsChanged()
         {
             var handler = OnSelectedAccountsChanged;
-            if (handler != null)
-                handler();
-        }
-
-        private bool _isVisible;
-        public bool IsVisible
-        {
-            get { return _isVisible; }
-            set
-            {
-                _isVisible = value;
-                RaisePropertyChanged(() => IsVisible);
-            }
-        }
-
-        public void Open()
-        {
-            MainWindowModel.SetShowMainWindowCommands(false);
-            this.Messenger.Raise(new GoToStateMessage("Open"));
-        }
-
-        public void Close()
-        {
-            this.Messenger.Raise(new GoToStateMessage("Close"));
-            MainWindowModel.SetShowMainWindowCommands(true);
-            var handler = OnClosed;
             if (handler != null)
                 handler();
         }

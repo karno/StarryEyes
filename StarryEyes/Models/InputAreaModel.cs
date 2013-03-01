@@ -122,6 +122,17 @@ namespace StarryEyes.Models
                 MainWindowModel.SetFocusTo(FocusRequest.Tweet);
         }
 
+        public static void SetText(IEnumerable<long> infos = null, string body = null,
+                                   CursorPosition cursor = CursorPosition.End, TwitterStatus inReplyTo = null,
+                                   bool focusToInputArea = true)
+        {
+            var accounts = infos.Guard()
+                                .Select(AccountsStore.GetAccountSetting)
+                                .Where(s => s != null)
+                                .Select(s => s.AuthenticateInfo);
+            SetText(accounts, body, cursor, inReplyTo, focusToInputArea);
+        }
+
         public static event Action<IEnumerable<AuthenticateInfo>, TwitterUser> OnSendDirectMessageRequested;
 
         public static void SetDirectMessage(IEnumerable<AuthenticateInfo> info, TwitterUser recipient,

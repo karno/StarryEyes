@@ -244,12 +244,18 @@
     <Compile Include="ViewModels\Dialogs\KeyOverrideViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\AccountSelectionFlipViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\BackpanelViewModel.cs" />
+    <Compile Include="ViewModels\WindowParts\Flips\PartialFlipViewModelBase.cs" />
+    <Compile Include="ViewModels\WindowParts\Flips\SearchFlipViewModel.cs" />
+    <Compile Include="ViewModels\WindowParts\Flips\SearchFlip\SearchCandidateViewModel.cs" />
+    <Compile Include="ViewModels\WindowParts\Flips\SearchFlip\SearchResultViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\TabConfigurationFlipViewModel.cs" />
+    <Compile Include="ViewModels\WindowParts\Flips\UserInformationFlipViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\InputAreaViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\MainAreaViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Timelines\ColumnViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Timelines\StatusViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Timelines\TabViewModel.cs" />
+    <Compile Include="ViewModels\WindowParts\Timelines\TimelineViewModelBase.cs" />
     <Compile Include="ViewModels\WindowParts\Timelines\UserViewModel.cs" />
     <Compile Include="Views\Behaviors\KeyHandlingBehavior.cs" />
     <Compile Include="Views\Behaviors\Planerator.cs" />
@@ -284,8 +290,14 @@
       <DependentUpon>Backpanel.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\WindowParts\Flips\FlipContent.cs" />
+    <Compile Include="Views\WindowParts\Flips\SearchFlip.xaml.cs">
+      <DependentUpon>SearchFlip.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\WindowParts\Flips\TabConfigurationFlip.xaml.cs">
       <DependentUpon>TabConfigurationFlip.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\WindowParts\Flips\UserInformationFlip.xaml.cs">
+      <DependentUpon>UserInformationFlip.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\WindowParts\Frontpanel.xaml.cs">
       <DependentUpon>Frontpanel.xaml</DependentUpon>
@@ -377,7 +389,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\WindowParts\Flips\SearchFlip.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\WindowParts\Flips\TabConfigurationFlip.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\WindowParts\Flips\UserInformationFlip.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

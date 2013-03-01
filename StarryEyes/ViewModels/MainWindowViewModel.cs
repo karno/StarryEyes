@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Threading;
 using Livet;
 using Livet.Messaging;
 using StarryEyes.Models;
@@ -132,10 +133,15 @@ namespace StarryEyes.ViewModels
             _backpanelViewModel.Initialize();
         }
 
+        private int _visibleCount;
+
         public void Initialize()
         {
-            MainWindowModel.OnWindowCommandDisplayChanged += _ =>
-                                                             ShowWindowCommands = _;
+            MainWindowModel.OnWindowCommandDisplayChanged += visible =>
+            {
+                int offset = visible ? Interlocked.Increment(ref _visibleCount) : Interlocked.Decrement(ref _visibleCount);
+                ShowWindowCommands = offset >= 0;
+            };
 
             CompositeDisposable.Add(Observable.FromEvent(
                 h => MainWindowModel.OnStateStringChanged += h,

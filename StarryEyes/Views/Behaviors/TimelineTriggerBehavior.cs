@@ -5,7 +5,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interactivity;
-using Livet.EventListeners;
 
 namespace StarryEyes.Views.Behaviors
 {
@@ -80,11 +79,12 @@ namespace StarryEyes.Views.Behaviors
                 Observable.FromEventPattern<ScrollChangedEventHandler, ScrollChangedEventArgs>(
                     h => this.AssociatedObject.ScrollChanged += h,
                     h => this.AssociatedObject.ScrollChanged -= h)
-                          .Subscribe(_ =>
+                    .Select(p => p.EventArgs)
+                          .Subscribe(e =>
                           {
-                              bool top = this.AssociatedObject.VerticalOffset < 1;
-                              bool bottom = this.AssociatedObject.VerticalOffset >
-                                            this.AssociatedObject.ScrollableHeight - 1;
+                              var vo = e.VerticalOffset;
+                              bool top = vo < 1;
+                              bool bottom = vo > this.AssociatedObject.ScrollableHeight - 1;
                               IsScrollOnTop = top;
                               IsScrollOnBottom = bottom;
                           }));

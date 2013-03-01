@@ -147,7 +147,10 @@ namespace StarryEyes.ViewModels.WindowParts
                         {
                             OverrideSelectedAccounts(infos);
                         }
-                        InReplyTo = new StatusViewModel(inReplyTo);
+                        if (inReplyTo != null)
+                        {
+                            InReplyTo = new StatusViewModel(inReplyTo);
+                        }
                         switch (cursor)
                         {
                             case CursorPosition.Begin:
