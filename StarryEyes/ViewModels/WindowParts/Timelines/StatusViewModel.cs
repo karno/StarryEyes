@@ -413,7 +413,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         #region Execution commands
 
-        private void Favorite(IEnumerable<AuthenticateInfo> infos, bool add)
+        public void Favorite(IEnumerable<AuthenticateInfo> infos, bool add)
         {
             Action<AuthenticateInfo> expected;
             Action<AuthenticateInfo> onFail;
@@ -447,7 +447,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                  .Subscribe();
         }
 
-        private void Retweet(IEnumerable<AuthenticateInfo> infos, bool add)
+        public void Retweet(IEnumerable<AuthenticateInfo> infos, bool add)
         {
             Action<AuthenticateInfo> expected;
             Action<AuthenticateInfo> onFail;

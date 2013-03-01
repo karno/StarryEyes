@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
-using StarryEyes.Filters.Expressions.Operators;
-using StarryEyes.Models.Stores;
-using StarryEyes.Settings;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
+using StarryEyes.Filters.Expressions.Operators;
 using StarryEyes.Models.Hubs;
+using StarryEyes.Models.Stores;
 
 namespace StarryEyes.Filters.Sources
 {
@@ -36,14 +35,14 @@ namespace StarryEyes.Filters.Sources
         /// Receive older tweets. <para />
         /// Tweets are registered to StatusStore automatically.
         /// </summary>
-        /// <param name="max_id">receiving threshold id</param>
-        public IObservable<TwitterStatus> Receive(long? max_id)
+        /// <param name="maxId">receiving threshold id</param>
+        public IObservable<TwitterStatus> Receive(long? maxId)
         {
-            return ReceiveSink(max_id)
+            return ReceiveSink(maxId)
                 .SelectMany(StoreHub.MergeStore);
         }
 
-        protected virtual IObservable<TwitterStatus> ReceiveSink(long? max_id)
+        protected virtual IObservable<TwitterStatus> ReceiveSink(long? maxId)
         {
             return Observable.Empty<TwitterStatus>();
         }
@@ -57,11 +56,11 @@ namespace StarryEyes.Filters.Sources
         {
             if (String.IsNullOrEmpty(screenName))
                 return AccountsStore.Accounts.Select(i => i.AuthenticateInfo);
-            else
-                return AccountsStore.Accounts
-                    .Select(i => i.AuthenticateInfo)
-                    .Where(i => FilterOperatorEquals.StringMatch(i.UnreliableScreenName, screenName,
-                        FilterOperatorEquals.StringArgumentSide.Right));
+            return AccountsStore.Accounts
+                                .Select(i => i.AuthenticateInfo)
+                                .Where(i => FilterOperatorEquals.StringMatch(
+                                    i.UnreliableScreenName, screenName,
+                                    FilterOperatorEquals.StringArgumentSide.Right));
         }
     }
 }

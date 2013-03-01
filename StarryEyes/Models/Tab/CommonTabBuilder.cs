@@ -27,7 +27,7 @@ namespace StarryEyes.Models.Tab
 
         public static TabModel GenerateMeTab()
         {
-            return new TabModel("me", "from all where user <- *").SetDefaultParams();
+            return new TabModel("me", "from all where (user <- * && !retweet) || retweeter <- *").SetDefaultParams();
         }
 
         public static TabModel GenerateActivitiesTab()

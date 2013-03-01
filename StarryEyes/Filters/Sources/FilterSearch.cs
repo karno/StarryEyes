@@ -10,7 +10,7 @@ namespace StarryEyes.Filters.Sources
 {
     public class FilterSearch : FilterSourceBase
     {
-        private string _query;
+        private readonly string _query;
         public FilterSearch(string query)
         {
             this._query = query;
@@ -21,13 +21,13 @@ namespace StarryEyes.Filters.Sources
             return _ => _.Text.IndexOf(_query) >= 0;
         }
 
-        protected override IObservable<TwitterStatus> ReceiveSink(long? max_id)
+        protected override IObservable<TwitterStatus> ReceiveSink(long? maxId)
         {
             return Observable.Defer(() => AccountsStore.Accounts.Shuffle().Take(1).ToObservable())
                 .SelectMany(a => a.AuthenticateInfo.SearchTweets(_query));
         }
 
-        private bool _isActivated = false;
+        private bool _isActivated;
         public override void Activate()
         {
             if (_isActivated) return;

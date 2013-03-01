@@ -10,6 +10,7 @@ using StarryEyes.Models.Stores;
 using StarryEyes.Models.Subsystems;
 using StarryEyes.Models.Tab;
 using StarryEyes.Settings;
+using StarryEyes.ViewModels.Controls;
 using StarryEyes.ViewModels.Dialogs;
 using StarryEyes.ViewModels.WindowParts;
 using StarryEyes.ViewModels.WindowParts.Flips;
@@ -75,6 +76,8 @@ namespace StarryEyes.ViewModels
 
         private readonly TabConfigurationFlipViewModel _tabConfigurationFlipViewModel;
 
+        private readonly SearchTextBoxViewModel _searchTextBoxViewModel;
+
         public BackpanelViewModel BackpanelViewModel
         {
             get { return _backpanelViewModel; }
@@ -105,6 +108,11 @@ namespace StarryEyes.ViewModels
             get { return _tabConfigurationFlipViewModel; }
         }
 
+        public SearchTextBoxViewModel SearchTextBoxViewModel
+        {
+            get { return _searchTextBoxViewModel; }
+        }
+
         #endregion
 
         #region Properties
@@ -130,6 +138,7 @@ namespace StarryEyes.ViewModels
             CompositeDisposable.Add(_mainAreaViewModel = new MainAreaViewModel());
             CompositeDisposable.Add(_globalAccountSelectionFlipViewModel = new AccountSelectionFlipViewModel());
             CompositeDisposable.Add(_tabConfigurationFlipViewModel = new TabConfigurationFlipViewModel());
+            CompositeDisposable.Add(_searchTextBoxViewModel = new SearchTextBoxViewModel());
             _backpanelViewModel.Initialize();
         }
 

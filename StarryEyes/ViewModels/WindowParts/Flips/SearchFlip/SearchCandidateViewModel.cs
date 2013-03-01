@@ -47,7 +47,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlip
         public void LoadSearches()
         {
             var ccoc = _candidates = new ObservableCollection<SearchCandidateItemViewModel>();
-            _auth.GetSavedSearchs()
+            _auth.GetSavedSearches()
                 .Finally(() => IsLoading = false)
                 .ObserveOnDispatcher()
                 .Subscribe(

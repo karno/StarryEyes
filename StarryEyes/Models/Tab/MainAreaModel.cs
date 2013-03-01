@@ -189,6 +189,7 @@ namespace StarryEyes.Models.Tab
         public static void CreateColumn(params TabModel[] info)
         {
             _columns.Add(new ColumnModel(info));
+            CurrentFocusColumnIndex = _columns.Count - 1;
             Save();
         }
 

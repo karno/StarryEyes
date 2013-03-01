@@ -9,6 +9,7 @@
                       xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                       xmlns:sebehaviors="clr-namespace:StarryEyes.Views.Messaging.Behaviors"
+                      xmlns:sectrls="clr-namespace:StarryEyes.Views.Controls"
                       xmlns:utils="clr-namespace:StarryEyes.Views.Utils"
                       xmlns:vm="clr-namespace:StarryEyes.ViewModels"
                       xmlns:windowParts="clr-namespace:StarryEyes.Views.WindowParts"
@@ -73,16 +74,12 @@
                     Content="settings"
                     Visibility="{Binding ShowWindowCommands,
                                          Converter={StaticResource BooleanToVisibleConverter}}" />
-            <TextBox Width="180"
-                     Height="20"
-                     Margin="-1,0,2,0"
-                     VerticalContentAlignment="Center"
-                     BorderThickness="0"
-                     Opacity="0.8"
-                     Visibility="{Binding ShowWindowCommands,
-                                          Converter={StaticResource BooleanToVisibleConverter}}"
-                     controls:TextboxHelper.ClearTextButton="True"
-                     controls:TextboxHelper.Watermark="search" />
+            <sectrls:SearchTextBox Width="180"
+                                   Height="26"
+                                   Margin="0,0,0,-1"
+                                   DataContext="{Binding SearchTextBoxViewModel}"
+                                   Visibility="{Binding ShowWindowCommands,
+                                                        Converter={StaticResource BooleanToVisibleConverter}}" />
         </controls:WindowCommands>
     </controls:MetroWindow.WindowCommands>
     <Grid>

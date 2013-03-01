@@ -1,18 +1,21 @@
 ﻿using System;
+using System.Linq;
+using System.Reactive.Linq;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Models.Connections.Extends;
+using StarryEyes.Models.Stores;
 
 namespace StarryEyes.Filters.Sources
 {
     public class FilterList : FilterSourceBase
     {
-        ListInfo _listInfo;
+        private readonly ListInfo _listInfo;
         public FilterList(string ownerAndslug)
         {
             var splited = ownerAndslug.Split('/');
             if (splited.Length != 2)
                 throw new ArgumentException("owner and slug must be separated as slash, once.");
-            _listInfo = new ListInfo() { OwnerScreenName = splited[0], Slug = splited[1] };
+            _listInfo = new ListInfo { OwnerScreenName = splited[0], Slug = splited[1] };
         }
 
         public override Func<TwitterStatus, bool> GetEvaluator()
@@ -20,10 +23,17 @@ namespace StarryEyes.Filters.Sources
             throw new NotImplementedException();
         }
 
-        protected override IObservable<TwitterStatus> ReceiveSink(long? max_id)
+        protected override IObservable<TwitterStatus> ReceiveSink(long? maxId)
         {
-            // ListReceiver.DoReceive(
-            return base.ReceiveSink(max_id);
+            var info = AccountsStore.Accounts
+                                    .Where(
+                                        a =>
+                                        a.AuthenticateInfo.UnreliableScreenName ==
+                                        _listInfo.OwnerScreenName).Concat(AccountsStore.Accounts)
+                                 .FirstOrDefault();
+            if (info == null) return base.ReceiveSink(maxId);
+            return base.ReceiveSink(maxId)
+                       .Merge(ListReceiver.DoReceive(info.AuthenticateInfo, _listInfo, maxId));
         }
 
         public override string FilterKey
@@ -36,18 +46,18 @@ namespace StarryEyes.Filters.Sources
             get { return _listInfo.OwnerScreenName + "/" + _listInfo.Slug; }
         }
 
-        private bool isActivated = false;
+        private bool _isActivated;
         public override void Activate()
         {
-            if (isActivated) return;
-            isActivated = true;
+            if (_isActivated) return;
+            _isActivated = true;
             ListReceiver.StartReceive(_listInfo);
         }
 
         public override void Deactivate()
         {
-            if (!isActivated) return;
-            isActivated = false;
+            if (!_isActivated) return;
+            _isActivated = false;
             ListReceiver.StopReceive(_listInfo);
         }
     }

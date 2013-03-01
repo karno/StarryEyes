@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using StarryEyes.Breezy.Api.Rest;
 using StarryEyes.Breezy.Authorize;
+using StarryEyes.Breezy.DataModel;
 using StarryEyes.Models.Hubs;
 using StarryEyes.Models.Stores;
 
@@ -89,15 +90,13 @@ namespace StarryEyes.Models.Connections.Extends
 
         protected override void DoReceive()
         {
-            DoReceive(AuthInfo, _receive);
+            DoReceive(AuthInfo, _receive).RegisterToStore();
         }
 
-        public static void DoReceive(AuthenticateInfo info, ListInfo list, long? maxId = null)
+        public static IObservable<TwitterStatus> DoReceive(AuthenticateInfo info, ListInfo list, long? maxId = null)
         {
-            info.GetListStatuses(slug: list.Slug, owner_screen_name: list.OwnerScreenName, max_id: maxId)
-                .RegisterToStore();
+            return info.GetListStatuses(slug: list.Slug, owner_screen_name: list.OwnerScreenName, max_id: maxId);
         }
-
     }
 
     public class ListInfo : IEquatable<ListInfo>

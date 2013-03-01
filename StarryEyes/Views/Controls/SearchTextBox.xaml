@@ -1,0 +1,113 @@
+﻿<UserControl x:Class="StarryEyes.Views.Controls.SearchTextBox"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:behaviors="clr-namespace:Livet.Behaviors;assembly=Livet"
+             xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
+             xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+             xmlns:l="clr-namespace:Livet.Behaviors.Messaging;assembly=Livet"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:utils="clr-namespace:StarryEyes.Views.Utils"
+             xmlns:vm="clr-namespace:StarryEyes.ViewModels.Controls"
+             d:DataContext="{d:DesignInstance vm:SearchTextBoxViewModel}"
+             d:DesignWidth="180"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colours.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <Color x:Key="AccentColor">#FF1BA1E2</Color>
+            <utils:BooleanToInvisibleConverter x:Key="BooleanToInvisibleConverter" />
+            <utils:BooleanToVisibleConverter x:Key="BooleanToVisibleConverter" />
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <DockPanel>
+        <Popup DockPanel.Dock="Bottom" IsOpen="{Binding IsDropDownOpen}">
+            <Border Background="White"
+                    BorderBrush="DimGray"
+                    BorderThickness="1">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="GotFocus">
+                        <ei:CallMethodAction MethodName="GotFocusToPopup" TargetObject="{Binding}" />
+                    </i:EventTrigger>
+                    <i:EventTrigger EventName="LostFocus">
+                        <ei:CallMethodAction MethodName="LostFocusFromPopup" TargetObject="{Binding}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <ListBox MaxHeight="400"
+                             ItemsSource="{Binding SearchCandidates}"
+                             SelectedIndex="{Binding SelectedIndex}">
+                        <i:Interaction.Triggers>
+                            <l:InteractionMessageTrigger MessageKey="FocusToListBox" Messenger="{Binding Messenger}">
+                                <behaviors:SetFocusAction />
+                            </l:InteractionMessageTrigger>
+                        </i:Interaction.Triggers>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <DockPanel>
+                                    <Button DockPanel.Dock="Right">
+                                        <TextBlock Text="delete..." />
+                                    </Button>
+                                    <TextBlock Margin="4" Text="{Binding Query}" />
+                                </DockPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                    <TextBlock Grid.Row="1"
+                               Margin="4"
+                               Text="Enterキーを押すと、Webから検索を行います。&#10;先頭に?を付加することで、クエリで検索が行えます。"
+                               Visibility="{Binding IsQueryMode,
+                                                    Converter={StaticResource BooleanToInvisibleConverter}}" />
+                    <StackPanel Grid.Row="1"
+                                Orientation="Vertical"
+                                Visibility="{Binding IsQueryMode,
+                                                     Converter={StaticResource BooleanToVisibleConverter}}">
+                        <TextBlock Margin="4"
+                                   Text="クエリにエラーはありません。Enterキーを押すと、このクエリで検索を行います。"
+                                   Visibility="{Binding HasError,
+                                                        Converter={StaticResource BooleanToInvisibleConverter}}" />
+                        <TextBlock Margin="4,4,2,4"
+                                   Foreground="Red"
+                                   Text="クエリにエラーがあります:"
+                                   Visibility="{Binding HasError,
+                                                        Converter={StaticResource BooleanToInvisibleConverter}}" />
+                        <TextBlock Margin="2,4,4,4"
+                                   Foreground="Red"
+                                   Text="{Binding ErrorText}"
+                                   Visibility="{Binding HasError,
+                                                        Converter={StaticResource BooleanToInvisibleConverter}}" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Popup>
+
+        <TextBox VerticalContentAlignment="Center"
+                 BorderThickness="0"
+                 Opacity="0.8"
+                 Text="{Binding Text}"
+                 controls:TextboxHelper.ClearTextButton="True"
+                 controls:TextboxHelper.Watermark="search">
+            <i:Interaction.Triggers>
+                <l:InteractionMessageTrigger MessageKey="FocusToTextBox" Messenger="{Binding Messenger}">
+                    <behaviors:SetFocusAction />
+                </l:InteractionMessageTrigger>
+                <i:EventTrigger EventName="GotFocus">
+                    <ei:CallMethodAction MethodName="GotFocusToText" TargetObject="{Binding}" />
+                </i:EventTrigger>
+                <i:EventTrigger EventName="LostFocus">
+                    <ei:CallMethodAction MethodName="LostFocusFromText" TargetObject="{Binding}" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </TextBox>
+    </DockPanel>
+</UserControl>

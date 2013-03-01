@@ -52,8 +52,8 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                     DispatcherHelper.UIDispatcher));
             this.CompositeDisposable.Add(
                 Observable.FromEvent(
-                h => _model.OnCurrentFocusColumnChanged += h,
-                h => _model.OnCurrentFocusColumnChanged -= h)
+                h => _model.OnCurrentFocusTabChanged += h,
+                h => _model.OnCurrentFocusTabChanged -= h)
                 .Select(_ => _model.CurrentFocusTabIndex)
                 .Subscribe(UpdateFocusFromModel));
             if (_tabs.Count > 0)

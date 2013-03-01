@@ -11,8 +11,11 @@ using Livet;
 using Livet.EventListeners;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Models;
+using StarryEyes.Models.Stores;
 using StarryEyes.Models.Tab;
 using StarryEyes.Settings;
+using StarryEyes.Views.Messaging;
+using TaskDialogInterop;
 
 namespace StarryEyes.ViewModels.WindowParts.Timelines
 {
@@ -268,13 +271,31 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public void FavoriteSelecteds()
         {
+            var accounts = CurrentAccounts
+                .Select(AccountsStore.GetAccountSetting)
+                .Where(a => a != null)
+                .Select(a => a.AuthenticateInfo)
+                .ToArray();
+            if (accounts.Length == 0)
+            {
+                var msg = new TaskDialogMessage(new TaskDialogOptions
+                            {
+                                CommonButtons = TaskDialogCommonButtons.Close,
+                                MainIcon = VistaTaskDialogIcon.Error,
+                                MainInstruction = "ツイートをお気に入り登録できません。",
+                                Content = "アカウントが選択されていません。",
+                                Title = "クイックアクション エラー"
+                            });
+                this.Messenger.Raise(msg);
+                return;
+            }
             SelectedStatuses
                 .Where(s => s.CanFavorite && !s.IsFavorited)
-                .ForEach(s => s.ToggleFavoriteImmediate());
+                .ForEach(s => s.Favorite(accounts, true));
             DeselectAll();
         }
 
-        public void ExtractSelectedUsers()
+        public void ExtractSelecteds()
         {
             var users = SelectedStatuses
                 .Select(s => s.OriginalStatus.User.ScreenName)

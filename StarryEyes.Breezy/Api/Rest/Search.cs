@@ -42,7 +42,7 @@ namespace StarryEyes.Breezy.Api.Rest
                 .Select(s => s.Spawn());
         }
 
-        public static IObservable<SavedSearchJson> GetSavedSearchs(this AuthenticateInfo info)
+        public static IObservable<SavedSearchJson> GetSavedSearches(this AuthenticateInfo info)
         {
             return info.GetOAuthClient()
                 .SetEndpoint(ApiEndpoint.EndpointApiV1a.JoinUrl("/saved_searches/list.json"))

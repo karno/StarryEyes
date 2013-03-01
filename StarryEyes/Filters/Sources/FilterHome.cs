@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
-using StarryEyes.Models.Stores;
 using StarryEyes.Breezy.Api.Rest;
 using StarryEyes.Breezy.DataModel;
+using StarryEyes.Models.Stores;
 
 namespace StarryEyes.Filters.Sources
 {
     public class FilterHome : FilterSourceBase
     {
-        private string _screenName;
+        private readonly string _screenName;
         public FilterHome() { }
 
         public FilterHome(string screenName)
@@ -35,10 +35,10 @@ namespace StarryEyes.Filters.Sources
                 FilterSystemUtil.InReplyToUsers(status).Contains(ad.AccountId));
         }
 
-        protected override IObservable<TwitterStatus> ReceiveSink(long? max_id)
+        protected override IObservable<TwitterStatus> ReceiveSink(long? maxId)
         {
             return Observable.Defer(() => GetAccountsFromString(_screenName).ToObservable())
-                .SelectMany(a => a.GetHomeTimeline(count: 50, max_id: max_id));
+                .SelectMany(a => a.GetHomeTimeline(count: 50, max_id: maxId));
         }
 
         public override string FilterKey

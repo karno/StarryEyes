@@ -258,7 +258,8 @@ namespace StarryEyes.Models
         }
 
         public static void UpdateStatusInfo(TwitterStatus status,
-                                            Action<StatusModel> ifCacheIsAlive, Action<TwitterStatus> ifCacheIsDead)
+                                            Action<StatusModel> ifCacheIsAlive,
+                                            Action<TwitterStatus> ifCacheIsDead)
         {
 
             WeakReference wr;
