@@ -10,13 +10,13 @@ using StarryEyes.Breezy.DataModel;
 using StarryEyes.Breezy.Util;
 using StarryEyes.Models;
 
-namespace StarryEyes.Views.Helpers
+namespace StarryEyes.Views.Utils
 {
-    public class StatusStylizeHelper
+    public class StatusStylizer
     {
-        public static string UserNavigation = "user://";
+        const string UserNavigation = "user://";
 
-        public static string HashtagNavigation = "hash://";
+        const string HashtagNavigation = "hash://";
 
         public static Tuple<LinkType, string> ResolveInternalUrl(string iurl)
         {
@@ -45,7 +45,7 @@ namespace StarryEyes.Views.Helpers
             DependencyProperty.RegisterAttached(
             "TwitterStatus",
             typeof(TwitterStatus),
-            typeof(StatusStylizeHelper),
+            typeof(StatusStylizer),
             new PropertyMetadata((o, e) =>
             {
                 var status = (TwitterStatus)e.NewValue;
@@ -81,7 +81,7 @@ namespace StarryEyes.Views.Helpers
             DependencyProperty.RegisterAttached(
             "Text",
             typeof(string),
-            typeof(StatusStylizeHelper),
+            typeof(StatusStylizer),
             new PropertyMetadata((o, e) =>
             {
                 var text = (string)e.NewValue;
@@ -107,7 +107,7 @@ namespace StarryEyes.Views.Helpers
             DependencyProperty.RegisterAttached(
             "LinkNavigationCommand",
             typeof(ICommand),
-            typeof(StatusStylizeHelper),
+            typeof(StatusStylizer),
             new PropertyMetadata(null));
 
         private static IEnumerable<Inline> GenerateInlines(DependencyObject obj, TwitterStatus status)

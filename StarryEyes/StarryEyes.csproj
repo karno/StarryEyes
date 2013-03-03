@@ -241,7 +241,6 @@
     <Compile Include="Models\Tab\TimelineModel.cs" />
     <Compile Include="Models\UserModel.cs" />
     <Compile Include="Settings\TabDescription.cs" />
-    <Compile Include="ViewModels\Controls\SearchTextBoxViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\KeyOverrideViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\AccountSelectionFlipViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\BackpanelViewModel.cs" />
@@ -265,13 +264,10 @@
     <Compile Include="Views\Behaviors\TimelineTriggerBehavior.cs" />
     <Compile Include="Views\Controls\DropDownMenuButton.cs" />
     <Compile Include="Views\Controls\LazyImage.cs" />
-    <Compile Include="Views\Controls\SearchTextBox.xaml.cs">
-      <DependentUpon>SearchTextBox.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\Dialogs\KeyOverrideWindow.xaml.cs">
       <DependentUpon>KeyOverrideWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Helpers\StatusStylizeHelper.cs" />
+    <Compile Include="Views\Utils\StatusStylizeHelper.cs" />
     <Compile Include="Views\Messaging\Behaviors\BringIntoViewInteractionMessageAction.cs" />
     <Compile Include="Views\Messaging\Behaviors\GoToStateInteractionMessageAction.cs" />
     <Compile Include="Views\Messaging\Behaviors\TaskDialogInteractionMessageAction.cs" />
@@ -325,10 +321,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Themes\Generic.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Controls\SearchTextBox.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

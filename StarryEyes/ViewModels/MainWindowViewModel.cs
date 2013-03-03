@@ -10,7 +10,6 @@ using StarryEyes.Models.Stores;
 using StarryEyes.Models.Subsystems;
 using StarryEyes.Models.Tab;
 using StarryEyes.Settings;
-using StarryEyes.ViewModels.Controls;
 using StarryEyes.ViewModels.Dialogs;
 using StarryEyes.ViewModels.WindowParts;
 using StarryEyes.ViewModels.WindowParts.Flips;
@@ -76,7 +75,7 @@ namespace StarryEyes.ViewModels
 
         private readonly TabConfigurationFlipViewModel _tabConfigurationFlipViewModel;
 
-        private readonly SearchTextBoxViewModel _searchTextBoxViewModel;
+        private readonly SearchFlipViewModel _searchFlipViewModel;
 
         public BackpanelViewModel BackpanelViewModel
         {
@@ -108,9 +107,9 @@ namespace StarryEyes.ViewModels
             get { return _tabConfigurationFlipViewModel; }
         }
 
-        public SearchTextBoxViewModel SearchTextBoxViewModel
+        public SearchFlipViewModel SearchFlipViewModel
         {
-            get { return _searchTextBoxViewModel; }
+            get { return _searchFlipViewModel; }
         }
 
         #endregion
@@ -138,8 +137,27 @@ namespace StarryEyes.ViewModels
             CompositeDisposable.Add(_mainAreaViewModel = new MainAreaViewModel());
             CompositeDisposable.Add(_globalAccountSelectionFlipViewModel = new AccountSelectionFlipViewModel());
             CompositeDisposable.Add(_tabConfigurationFlipViewModel = new TabConfigurationFlipViewModel());
-            CompositeDisposable.Add(_searchTextBoxViewModel = new SearchTextBoxViewModel());
+            CompositeDisposable.Add(_searchFlipViewModel = new SearchFlipViewModel());
+            CompositeDisposable.Add(Observable.FromEvent<FocusRequest>(
+                h => MainWindowModel.OnFocusRequested += h,
+                h => MainWindowModel.OnFocusRequested -= h)
+                .Subscribe(SetFocus));
             _backpanelViewModel.Initialize();
+        }
+
+        private void SetFocus(FocusRequest req)
+        {
+            switch (req)
+            {
+                case FocusRequest.Find:
+                    SearchFlipViewModel.FocusToSearchBox();
+                    break;
+                case FocusRequest.Timeline:
+                    MainAreaModel.CurrentFocusTab.SetPhysicalFocus();
+                    break;
+                case FocusRequest.Tweet:
+                    break;
+            }
         }
 
         private int _visibleCount;
@@ -308,18 +326,11 @@ namespace StarryEyes.ViewModels
         #endregion
 
         #region ShowSettingCommand
-        private Livet.Commands.ViewModelCommand _ShowSettingCommand;
+        private Livet.Commands.ViewModelCommand _showSettingCommand;
 
         public Livet.Commands.ViewModelCommand ShowSettingCommand
         {
-            get
-            {
-                if (_ShowSettingCommand == null)
-                {
-                    _ShowSettingCommand = new Livet.Commands.ViewModelCommand(ShowSetting);
-                }
-                return _ShowSettingCommand;
-            }
+            get { return _showSettingCommand ?? (_showSettingCommand = new Livet.Commands.ViewModelCommand(ShowSetting)); }
         }
 
         public void ShowSetting()
@@ -329,6 +340,5 @@ namespace StarryEyes.ViewModels
             MainWindowModel.SetShowMainWindowCommands(true);
         }
         #endregion
-
     }
 }

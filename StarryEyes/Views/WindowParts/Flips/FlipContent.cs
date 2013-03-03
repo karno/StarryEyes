@@ -49,6 +49,8 @@ namespace StarryEyes.Views.WindowParts.Flips
 
         public FlipContent()
         {
+            dynamic dobj = new object();
+            var members = ((Type)dobj.GetType()).GetMembers();
             this.Loaded += (sender, args) =>
             {
                 if (DesignTimeUtil.IsInDesignMode)

@@ -143,7 +143,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             this.IsConfigurationActive = false;
             if (_currentConfigurationTarget != null)
             {
-                if (_filterQuery.ToQuery() != _initialQuery)
+                if (_filterQuery.ToQuery() != _initialQuery && _currentConfigurationTarget.IsActivated)
                 {
                     _currentConfigurationTarget.Deactivate();
                     // update query info

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.Linq;
 using System.Reactive.Linq;
 using Livet;
@@ -9,114 +8,114 @@ using StarryEyes.Breezy.Authorize;
 using StarryEyes.Models;
 using StarryEyes.Models.Backpanels.SystemEvents;
 using StarryEyes.Models.Stores;
-using StarryEyes.Settings;
+using StarryEyes.Models.Tab;
 
 namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlip
 {
     public class SearchCandidateViewModel : ViewModel
     {
-        public SearchCandidateViewModel()
+        private readonly SearchFlipViewModel _parent;
+        public SearchFlipViewModel Parent
         {
-            this.CompositeDisposable.Add(
-                _accounts = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
-                AccountsStore.Accounts,
-                a => new AccountBoundSearchCandidateViewModel(a.AuthenticateInfo),
-                DispatcherHolder.Dispatcher));
+            get { return _parent; }
         }
 
-        private readonly ReadOnlyDispatcherCollectionRx<AccountBoundSearchCandidateViewModel> _accounts;
-        public ReadOnlyDispatcherCollectionRx<AccountBoundSearchCandidateViewModel> Accounts
+        private bool _isSearchCandidateAvailable;
+        public bool IsSearchCandidateAvailable
         {
-            get { return _accounts; }
-        }
-    }
-
-    public class AccountBoundSearchCandidateViewModel : ViewModel
-    {
-        private readonly AuthenticateInfo _auth;
-        public AuthenticateInfo AuthenticateInfo
-        {
-            get { return _auth; }
-        }
-
-        public AccountBoundSearchCandidateViewModel(AuthenticateInfo auth)
-        {
-            _auth = auth;
-        }
-
-        public void LoadSearches()
-        {
-            var ccoc = _candidates = new ObservableCollection<SearchCandidateItemViewModel>();
-            _auth.GetSavedSearches()
-                .Finally(() => IsLoading = false)
-                .ObserveOnDispatcher()
-                .Subscribe(
-                    j => ccoc.Add(new SearchCandidateItemViewModel(j.id, j.query, () => Remove(j.id))),
-                    ex => IsAvailable = false);
-            RaisePropertyChanged(() => Candidates);
-        }
-
-        private void Remove(long id)
-        {
-            _auth.DestroySavedSearch(id)
-                 .Subscribe(_ =>
-                 {
-                     var idx = _candidates.TakeWhile(vm => vm.Id == id).Count();
-                     if (idx < _candidates.Count)
-                     {
-                         _candidates.RemoveAt(idx);
-                     }
-                 }, ex => BackpanelModel.RegisterEvent(
-                     new OperationFailedEvent(ex.Message)));
-        }
-
-        private bool _isLoading;
-        public bool IsLoading
-        {
-            get { return _isLoading; }
+            get { return _isSearchCandidateAvailable; }
             set
             {
-                _isLoading = value;
+                _isSearchCandidateAvailable = value;
                 RaisePropertyChanged();
             }
         }
 
-        private bool _isAvailable;
-
-        public bool IsAvailable
+        public SearchCandidateViewModel(SearchFlipViewModel parent)
         {
-            get { return _isAvailable; }
+            _parent = parent;
+        }
+
+        private long _currentId;
+
+        private Uri _currentUserProfileImage;
+        public Uri CurrentUserProfileImage
+        {
+            get { return _currentUserProfileImage; }
             set
             {
-                _isAvailable = value;
+                _currentUserProfileImage = value;
                 RaisePropertyChanged();
             }
         }
 
-        private ObservableCollection<SearchCandidateItemViewModel> _candidates =
-            new ObservableCollection<SearchCandidateItemViewModel>();
-        public ObservableCollection<SearchCandidateItemViewModel> Candidates
+        private string _currentUserScreenName;
+        public string CurrentUserScreenName
         {
-            get { return _candidates; }
+            get { return _currentUserScreenName; }
+            set
+            {
+                _currentUserScreenName = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        private readonly ObservableCollection<SearchCandidateItemViewModel> _searchCandidates
+            = new ObservableCollection<SearchCandidateItemViewModel>();
+        public ObservableCollection<SearchCandidateItemViewModel> SearchCandidates
+        {
+            get { return _searchCandidates; }
+        }
+
+        public void UpdateInfo()
+        {
+            // update current binding accounts
+            var ctab = MainAreaModel.CurrentFocusTab;
+            long cid = 0;
+            if (ctab != null && ctab.BindingAccountIds.Count == 1)
+            {
+                cid = ctab.BindingAccountIds.First();
+            }
+            if (_currentId != cid)
+            {
+                _currentId = cid;
+                _searchCandidates.Clear();
+                var aid = AccountsStore.GetAccountSetting(_currentId);
+                if (aid == null)
+                {
+                    IsSearchCandidateAvailable = false;
+                    return;
+                }
+                CurrentUserScreenName = aid.AuthenticateInfo.UnreliableScreenName;
+                CurrentUserProfileImage = aid.AuthenticateInfo.UnreliableProfileImageUri;
+                IsSearchCandidateAvailable = true;
+                aid.AuthenticateInfo.GetSavedSearches()
+                    .ObserveOnDispatcher()
+                   .Subscribe(j => _searchCandidates.Add(new SearchCandidateItemViewModel(this, aid.AuthenticateInfo, j.id, j.query)), ex => BackpanelModel.RegisterEvent(new OperationFailedEvent(ex.Message)));
+            }
         }
     }
+
 
     public class SearchCandidateItemViewModel : ViewModel
     {
+        private readonly SearchCandidateViewModel _parent;
+        private readonly AuthenticateInfo _authenticateInfo;
         private readonly long _id;
         private readonly string _query;
-        private readonly Action _onRemove;
 
-        public SearchCandidateItemViewModel(long id, string query, Action onRemove)
+        public SearchCandidateItemViewModel(SearchCandidateViewModel parent,
+            AuthenticateInfo authenticateInfo, long id, string query)
         {
+            _parent = parent;
+            _authenticateInfo = authenticateInfo;
             _id = id;
             _query = query;
-            _onRemove = onRemove;
         }
 
-        public string Query
+        public AuthenticateInfo AuthenticateInfo
         {
-            get { return _query; }
+            get { return _authenticateInfo; }
         }
 
         public long Id
@@ -124,14 +123,30 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlip
             get { return _id; }
         }
 
-        public void Exec()
+        public string Query
         {
+            get { return _query; }
+        }
 
+        public void SelectThis()
+        {
+            _parent.Parent.Text = Query;
+        }
+
+        #region RemoveCommand
+        private Livet.Commands.ViewModelCommand _removeCommand;
+
+        public Livet.Commands.ViewModelCommand RemoveCommand
+        {
+            get { return _removeCommand ?? (_removeCommand = new Livet.Commands.ViewModelCommand(Remove)); }
         }
 
         public void Remove()
         {
-            _onRemove();
+            _authenticateInfo.DestroySavedSearch(_id)
+                             .Subscribe(_ => _parent.UpdateInfo(),
+                                        ex => BackpanelModel.RegisterEvent(new OperationFailedEvent(ex.Message)));
         }
+        #endregion
     }
 }

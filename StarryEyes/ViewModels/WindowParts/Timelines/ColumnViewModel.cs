@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Specialized;
 using System.Reactive.Linq;
 using Livet;
+using StarryEyes.Models;
 using StarryEyes.Models.Tab;
 
 namespace StarryEyes.ViewModels.WindowParts.Timelines
@@ -15,15 +17,21 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             get { return _tabs; }
         }
 
-        private int _oldFocus;
+        public ColumnModel Model
+        {
+            get { return _model; }
+        }
+
+        private int _currentFocus;
         public TabViewModel Focused
         {
-            get { return _tabs[_model.CurrentFocusTabIndex]; }
+            get { return _tabs != null && _tabs.Count > 0 ? _tabs[_model.CurrentFocusTabIndex] : null; }
             set
             {
                 var previous = Focused;
-                _model.CurrentFocusTabIndex = _oldFocus = _tabs.IndexOf(value);
-                previous.UpdateFocus();
+                _model.CurrentFocusTabIndex = _currentFocus = _tabs.IndexOf(value);
+                if (previous != null)
+                    previous.UpdateFocus();
                 value.UpdateFocus();
                 RaisePropertyChanged();
             }
@@ -33,10 +41,10 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         {
             DispatcherHolder.Enqueue(() =>
             {
-                if (newFocus == _oldFocus) return;
-                _tabs[_oldFocus].UpdateFocus();
+                if (newFocus == _currentFocus) return;
+                _tabs[_currentFocus].UpdateFocus();
                 _tabs[newFocus].UpdateFocus();
-                _oldFocus = newFocus;
+                _currentFocus = newFocus;
                 RaisePropertyChanged(() => Focused);
             });
         }
@@ -51,6 +59,17 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                     _ => new TabViewModel(this, _),
                     DispatcherHelper.UIDispatcher));
             this.CompositeDisposable.Add(
+                model.Tabs.ListenCollectionChanged()
+                .Subscribe(arg =>
+                {
+                    switch (arg.Action)
+                    {
+                        case NotifyCollectionChangedAction.Add:
+                            _currentFocus = arg.NewStartingIndex;
+                            break;
+                    }
+                }));
+            this.CompositeDisposable.Add(
                 Observable.FromEvent(
                 h => _model.OnCurrentFocusTabChanged += h,
                 h => _model.OnCurrentFocusTabChanged -= h)
@@ -60,12 +79,6 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             {
                 Focused = _tabs[0];
             }
-        }
-
-        public void AddTab(TabViewModel tab)
-        {
-            this._model.Tabs.Add(tab.Model);
-            this.Focused = tab;
         }
 
         public bool IsFocused
@@ -82,5 +95,61 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         {
             _parent.Focused = this;
         }
+
+        internal void CloseTab(TabViewModel tab)
+        {
+            _parent.CloseTab(this, tab);
+        }
+
+        #region CreateNewTabCommand
+        private Livet.Commands.ViewModelCommand _createNewTabCommand;
+
+        public Livet.Commands.ViewModelCommand CreateNewTabCommand
+        {
+            get
+            {
+                return _createNewTabCommand ??
+                       (_createNewTabCommand = new Livet.Commands.ViewModelCommand(CreateNewTab));
+            }
+        }
+
+        const string DefaultQueryString = "from all where ()";
+        public void CreateNewTab()
+        {
+            var creating = new TabModel(string.Empty, DefaultQueryString);
+            IDisposable subscribe = null;
+            subscribe = Observable.FromEvent<bool>(
+                h => creating.OnConfigurationUpdated += h,
+                h => creating.OnConfigurationUpdated -= h)
+                                  .Subscribe(_ =>
+                                  {
+                                      if (subscribe != null) subscribe.Dispose();
+                                      // configuration completed.
+                                      if (String.IsNullOrEmpty(creating.Name) &&
+                                          creating.FilterQueryString == DefaultQueryString) return;
+                                      this.Model.CreateTab(creating);
+                                  });
+            MainWindowModel.ShowTabConfigure(creating);
+        }
+        #endregion
+
+        #region RestoreLastClosedTabCommand
+        private Livet.Commands.ViewModelCommand _restoreLastClosedTabCommand;
+
+        public Livet.Commands.ViewModelCommand RestoreLastClosedTabCommand
+        {
+            get
+            {
+                return _restoreLastClosedTabCommand ??
+                       (_restoreLastClosedTabCommand = new Livet.Commands.ViewModelCommand(RestoreLastClosedTab));
+            }
+        }
+
+        public void RestoreLastClosedTab()
+        {
+            Focus();
+            MainAreaModel.ReviveTab();
+        }
+        #endregion
     }
 }

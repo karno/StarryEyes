@@ -56,5 +56,12 @@ namespace StarryEyes.ViewModels.WindowParts
                 RaisePropertyChanged(() => Focused);
             });
         }
+
+        public void CloseTab(ColumnViewModel column, TabViewModel tab)
+        {
+            var ci = _columns.IndexOf(column);
+            var ti = column.Tabs.IndexOf(tab);
+            MainAreaModel.CloseTab(ci, ti);
+        }
     }
 }

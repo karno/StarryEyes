@@ -24,12 +24,12 @@
                 <StackPanel.ContextMenu>
                     <ContextMenu DataContext="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
                         <MenuItem Command="{Binding EditTabCommand}" Header="編集..." />
-                        <MenuItem Header="このタブをコピーして追加" />
+                        <MenuItem Command="{Binding CopyTabCommand}" Header="このタブをコピーして追加" />
                         <Separator />
-                        <MenuItem Header="新しいタブの追加..." />
-                        <MenuItem Header="最後に閉じたタブを元に戻す" />
+                        <MenuItem Command="{Binding Owner.CreateNewTabCommand}" Header="新しいタブの追加..." />
+                        <MenuItem Command="{Binding Owner.RestoreLastClosedTabCommand}" Header="最後に閉じたタブを元に戻す" />
                         <Separator />
-                        <MenuItem Header="タブを閉じる" />
+                        <MenuItem Command="{Binding CloseTabCommand}" Header="タブを閉じる" />
                     </ContextMenu>
                 </StackPanel.ContextMenu>
                 <TextBlock x:Name="TabName"
@@ -47,9 +47,20 @@
                                                 Converter={StaticResource BooleanToVisibleConverter}}" />
             </StackPanel>
             <DataTemplate.Triggers>
-                <DataTrigger Binding="{Binding IsFocused}" Value="True">
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding IsFocused}" Value="True" />
+                        <Condition Binding="{Binding Owner.IsFocused}" Value="True" />
+                    </MultiDataTrigger.Conditions>
                     <Setter TargetName="TabName" Property="Foreground" Value="Black" />
-                </DataTrigger>
+                </MultiDataTrigger>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding IsFocused}" Value="True" />
+                        <Condition Binding="{Binding Owner.IsFocused}" Value="False" />
+                    </MultiDataTrigger.Conditions>
+                    <Setter TargetName="TabName" Property="Foreground" Value="#FF1BA1E2" />
+                </MultiDataTrigger>
             </DataTemplate.Triggers>
         </DataTemplate>
         <DataTemplate x:Key="ColumnTemplate">
@@ -58,14 +69,15 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition />
                 </Grid.RowDefinitions>
-                <ItemsControl Margin="8,0"
+                <ItemsControl MinHeight="16"
+                              Margin="8,0"
                               Background="White"
                               ItemTemplate="{StaticResource TabHeaderTemplate}"
                               ItemsSource="{Binding Tabs}">
                     <ItemsControl.ContextMenu>
                         <ContextMenu DataContext="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
-                            <MenuItem Header="新しいタブの追加..." />
-                            <MenuItem Header="最後に閉じたタブを元に戻す" />
+                            <MenuItem Command="{Binding CreateNewTabCommand}" Header="新しいタブの追加..." />
+                            <MenuItem Command="{Binding RestoreLastClosedTabCommand}" Header="最後に閉じたタブを元に戻す" />
                         </ContextMenu>
                     </ItemsControl.ContextMenu>
                     <ItemsControl.ItemsPanel>

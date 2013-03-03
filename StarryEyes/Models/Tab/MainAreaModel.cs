@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Livet;
-using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
 
 namespace StarryEyes.Models.Tab
@@ -31,6 +30,10 @@ namespace StarryEyes.Models.Tab
             Setting.Columns
                 .Select(c => new ColumnModel(c.Tabs.Select(d => d.ToTabModel()).ToArray()))
                 .ForEach(_columns.Add);
+            if (_columns.Count == 0)
+            {
+                _columns.Add(new ColumnModel(Enumerable.Empty<TabModel>()));
+            }
             App.RaiseUserInterfaceReady();
         }
 
@@ -198,10 +201,26 @@ namespace StarryEyes.Models.Tab
         /// </summary>
         public static void CloseTab(int colIndex, int tabIndex)
         {
-            TabModel ti = _columns[colIndex].Tabs[tabIndex];
+            var ti = _columns[colIndex].Tabs[tabIndex];
             ti.Deactivate();
             _closedTabsStack.Push(ti);
             _columns[colIndex].Tabs.RemoveAt(tabIndex);
+            if (_columns[colIndex].Tabs.Count == 0 && _columns.Count > 2)
+            {
+                CloseColumn(colIndex);
+            }
+            Save();
+        }
+
+        public static void CloseColumn(int colIndex)
+        {
+            var col = _columns[colIndex];
+            col.Tabs.ForEach(ti =>
+            {
+                ti.Deactivate();
+                _closedTabsStack.Push(ti);
+            });
+            _columns.RemoveAt(colIndex);
             Save();
         }
 

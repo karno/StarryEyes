@@ -13,7 +13,7 @@ using StarryEyes.Models.Hubs;
 using StarryEyes.Models.Operations;
 using StarryEyes.Models.Stores;
 using StarryEyes.Settings;
-using StarryEyes.Views.Helpers;
+using StarryEyes.Views.Utils;
 using StarryEyes.Views.Messaging;
 using TaskDialogInterop;
 
@@ -727,7 +727,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public void OpenLink(string parameter)
         {
-            Tuple<LinkType, string> param = StatusStylizeHelper.ResolveInternalUrl(parameter);
+            Tuple<LinkType, string> param = StatusStylizer.ResolveInternalUrl(parameter);
             switch (param.Item1)
             {
                 case LinkType.User:

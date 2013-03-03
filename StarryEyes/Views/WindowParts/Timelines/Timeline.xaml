@@ -1,17 +1,18 @@
-﻿<UserControl x:Name="userControl" x:Class="StarryEyes.Views.WindowParts.Timelines.Timeline"
+﻿<UserControl x:Class="StarryEyes.Views.WindowParts.Timelines.Timeline"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:Behaviors="clr-namespace:StarryEyes.Views.Messaging.Behaviors"
-             xmlns:Custom="http://schemas.livet-mvvm.net/2011/wpf"
              xmlns:behaviors="clr-namespace:StarryEyes.Views.Behaviors"
              xmlns:controls="clr-namespace:StarryEyes.Views.Controls"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
-             xmlns:helpers="clr-namespace:StarryEyes.Views.Helpers"
+             xmlns:helpers="clr-namespace:StarryEyes.Views.Utils"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"
+             xmlns:mbehaviors="clr-namespace:StarryEyes.Views.Messaging.Behaviors"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:timelines="clr-namespace:StarryEyes.ViewModels.WindowParts.Timelines"
              xmlns:utils="clr-namespace:StarryEyes.Views.Utils"
+             x:Name="userControl"
              d:DataContext="{d:DesignInstance Type={x:Type timelines:TabViewModel}}"
              d:DesignHeight="300"
              d:DesignWidth="300"
@@ -59,9 +60,9 @@
                         <i:EventTrigger EventName="MouseLeave">
                             <ei:GoToStateAction StateName="Default" />
                         </i:EventTrigger>
-                        <Custom:InteractionMessageTrigger Messenger="{Binding Messenger, Mode=OneTime}">
-                            <Behaviors:BringIntoViewInteractionMessageAction />
-                        </Custom:InteractionMessageTrigger>
+                        <l:InteractionMessageTrigger Messenger="{Binding Messenger, Mode=OneTime}">
+                            <mbehaviors:BringIntoViewInteractionMessageAction />
+                        </l:InteractionMessageTrigger>
                         <ei:DataTrigger Binding="{Binding IsFocused, Mode=OneWay}" Value="True">
                             <ei:GoToStateAction StateName="Focused" />
                         </ei:DataTrigger>
@@ -556,10 +557,10 @@
                                         </Grid.ColumnDefinitions>
                                         <TextBlock VerticalAlignment="Top"
                                                    TextWrapping="Wrap"
-                                                   helpers:StatusStylizeHelper.LinkNavigationCommand="{Binding OpenLinkCommand,
-                                                                                                               Mode=OneTime}"
-                                                   helpers:StatusStylizeHelper.TwitterStatus="{Binding Status,
-                                                                                                       Mode=OneTime}" />
+                                                   helpers:StatusStylizer.LinkNavigationCommand="{Binding OpenLinkCommand,
+                                                                                                          Mode=OneTime}"
+                                                   helpers:StatusStylizer.TwitterStatus="{Binding Status,
+                                                                                                  Mode=OneTime}" />
                                         <Border Grid.Column="1"
                                                 Grid.ColumnSpan="1"
                                                 Width="60"
@@ -1116,127 +1117,185 @@
             </Style>
         </ResourceDictionary>
     </UserControl.Resources>
-	<i:Interaction.Triggers>
-		<ei:DataTrigger Binding="{Binding IsSelectedStatusExisted}" Value="True">
-			<ei:GoToStateAction TargetObject="{Binding ElementName=userControl}" StateName="Open"/>
-		</ei:DataTrigger>
-		<ei:DataTrigger Binding="{Binding IsSelectedStatusExisted}" Value="False">
-			<ei:GoToStateAction TargetObject="{Binding ElementName=userControl}" StateName="Close"/>
-		</ei:DataTrigger>
-	</i:Interaction.Triggers>
+    <i:Interaction.Triggers>
+        <ei:DataTrigger Binding="{Binding IsSelectedStatusExisted}" Value="True">
+            <ei:GoToStateAction StateName="Open" TargetObject="{Binding ElementName=userControl}" />
+        </ei:DataTrigger>
+        <ei:DataTrigger Binding="{Binding IsSelectedStatusExisted}" Value="False">
+            <ei:GoToStateAction StateName="Close" TargetObject="{Binding ElementName=userControl}" />
+        </ei:DataTrigger>
+    </i:Interaction.Triggers>
     <DockPanel>
-    	<VisualStateManager.VisualStateGroups>
-    		<VisualStateGroup x:Name="StatusesActionBar">
-    			<VisualState x:Name="Close">
-    				<Storyboard>
-    					<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="border">
-    						<DiscreteObjectKeyFrame KeyTime="0:0:0.2">
-    							<DiscreteObjectKeyFrame.Value>
-    								<Visibility>Collapsed</Visibility>
-    							</DiscreteObjectKeyFrame.Value>
-    						</DiscreteObjectKeyFrame>
-    					</ObjectAnimationUsingKeyFrames>
-    					<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Height)" Storyboard.TargetName="border">
-    						<EasingDoubleKeyFrame KeyTime="0" Value="40">
-    							<EasingDoubleKeyFrame.EasingFunction>
-    								<CircleEase EasingMode="EaseOut"/>
-    							</EasingDoubleKeyFrame.EasingFunction>
-    						</EasingDoubleKeyFrame>
-    						<EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="0">
-    							<EasingDoubleKeyFrame.EasingFunction>
-    								<CircleEase EasingMode="EaseOut"/>
-    							</EasingDoubleKeyFrame.EasingFunction>
-    						</EasingDoubleKeyFrame>
-    					</DoubleAnimationUsingKeyFrames>
-    				</Storyboard>
-    			</VisualState>
-    			<VisualState x:Name="Open">
-    				<Storyboard>
-    					<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="border">
-    						<DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}"/>
-    						<DiscreteObjectKeyFrame KeyTime="0:0:0.2" Value="{x:Static Visibility.Visible}"/>
-    					</ObjectAnimationUsingKeyFrames>
-    					<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Height)" Storyboard.TargetName="border">
-    						<EasingDoubleKeyFrame KeyTime="0" Value="0">
-    							<EasingDoubleKeyFrame.EasingFunction>
-    								<CircleEase EasingMode="EaseOut"/>
-    							</EasingDoubleKeyFrame.EasingFunction>
-    						</EasingDoubleKeyFrame>
-    						<EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="40">
-    							<EasingDoubleKeyFrame.EasingFunction>
-    								<CircleEase EasingMode="EaseOut"/>
-    							</EasingDoubleKeyFrame.EasingFunction>
-    						</EasingDoubleKeyFrame>
-    					</DoubleAnimationUsingKeyFrames>
-    				</Storyboard>
-    			</VisualState>
-    		</VisualStateGroup>
-    	</VisualStateManager.VisualStateGroups>
-		<Border x:Name="border" VerticalAlignment="Top" DockPanel.Dock="Bottom" Background="White" Visibility="Collapsed" Height="40" >
-    		<StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-    			<Button Template="{DynamicResource MetroBlackCircleButtonTemplate}" Width="32" Height="32" Margin="12,4" ToolTip="選択したツイートをお気に入りに追加">
-    				<i:Interaction.Triggers>
-    					<i:EventTrigger EventName="Click">
-    						<ei:CallMethodAction TargetObject="{Binding Mode=OneWay}" MethodName="FavoriteSelecteds"/>
-    					</i:EventTrigger>
-    				</i:Interaction.Triggers>
-    				<Path Stretch="Fill" Fill="#FF000000" Data="F1 M 19.1538,24.1539L 21.2308,24.1539L 21.2308,27.6154L 24.6923,27.6154L 24.6923,29.6923L 21.2308,29.6923L 21.2308,33.1539L 19.1538,33.1539L 19.1538,29.6923L 15.6923,29.6923L 15.6923,27.6154L 19.1538,27.6154L 19.1538,24.1539 Z M 15,22.0769L 21.7747,22.0769L 24,15.8462L 26.2253,22.0769L 33,22.0769L 27.358,26.119L 29.8846,32.4615L 25.3846,29.8145L 25.3846,26.9231L 21.9231,26.9231L 21.9231,23.4615L 18.4615,23.4616L 18.4615,24.5613L 15,22.0769 Z " HorizontalAlignment="Center" VerticalAlignment="Center" Width="18" Height="17"/>
-    			</Button>
-    			<Button Template="{DynamicResource MetroBlackCircleButtonTemplate}" Width="32" Height="32" Margin="12,4" ToolTip="選択したユーザー全員に返信">
-    				<i:Interaction.Triggers>
-    					<i:EventTrigger EventName="Click">
-    						<ei:CallMethodAction MethodName="ReplySelecteds" TargetObject="{Binding Mode=OneWay}"/>
-    					</i:EventTrigger>
-    				</i:Interaction.Triggers>
-    				<Path Stretch="Fill" Fill="#FF000000" Data="F1 M 21,32L 23,39L 15,32L 12,32L 12,14L 36,14L 36,32L 21,32 Z " Height="17" Width="16" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,2,0,0"/>
-    			</Button>
-    			<Button Template="{DynamicResource MetroBlackCircleButtonTemplate}" Width="32" Height="32" Margin="12,4" ToolTip="選択したユーザーを新しいタブに抽出">
-    				<i:Interaction.Triggers>
-    					<i:EventTrigger EventName="Click">
-    						<ei:CallMethodAction TargetObject="{Binding Mode=OneWay}" MethodName="ExtractSelecteds"/>
-    					</i:EventTrigger>
-    				</i:Interaction.Triggers>
-    				<Path Stretch="Fill" Fill="#FF000000" Data="F1 M 27,15L 33,15L 33,21L 30.75,23.25L 30.75,19.125L 22.5,27.375L 20.625,25.5L 28.875,17.25L 24.75,17.25L 27,15 Z M 15,18L 26.25,18L 24,20.25L 17.25,20.25L 17.25,30.75L 27.75,30.75L 27.75,24L 30,21.75L 30,33L 15,33L 15,18 Z " Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="2,0,0,2"/>
-    			</Button>
-    			<Button Template="{DynamicResource MetroBlackCircleButtonTemplate}" Width="32" Height="32" Margin="12,4" ToolTip="選択をすべて解除">
-    				<i:Interaction.Triggers>
-    					<i:EventTrigger EventName="Click">
-    						<ei:CallMethodAction TargetObject="{Binding Mode=OneWay}" MethodName="DeselectAll"/>
-    					</i:EventTrigger>
-    				</i:Interaction.Triggers>
-    				<Path Stretch="Fill" Fill="#FF000000" Data="F1 M 18.4,16L 24,21.6L 29.5999,16.0001L 31.9999,18.4001L 26.4,24L 32,29.6001L 29.6,32L 24,26.4L 18.3999,32L 16,29.6L 21.6,24L 16,18.4L 18.4,16 Z " Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-    			</Button>
-    		</StackPanel>
-    	</Border>
-		<ItemsControl ItemTemplate="{StaticResource StatusItemTemplate}"
-			ItemsSource="{Binding Timeline, Mode=OneWay}"
-			ScrollViewer.CanContentScroll="True"
-			VirtualizingPanel.IsVirtualizing="True"
-			VirtualizingPanel.ScrollUnit="Pixel"
-			VirtualizingPanel.VirtualizationMode="Recycling">
-			<i:Interaction.Triggers>
-				<Custom:InteractionMessageTrigger Messenger="{Binding Messenger, Mode=OneTime}">
-					<Behaviors:TaskDialogInteractionMessageAction />
-				</Custom:InteractionMessageTrigger>
-			</i:Interaction.Triggers>
-			<ItemsControl.ItemsPanel>
-				<ItemsPanelTemplate>
-					<VirtualizingStackPanel Orientation="Vertical" />
-				</ItemsPanelTemplate>
-			</ItemsControl.ItemsPanel>
-			<ItemsControl.Template>
-				<ControlTemplate TargetType="{x:Type ItemsControl}">
-					<ScrollViewer Focusable="False" VerticalScrollBarVisibility="Visible">
-						<i:Interaction.Behaviors>
-							<behaviors:TimelineTriggerBehavior IsMouseOver="{Binding IsMouseOver, Mode=OneWayToSource}"
-								IsScrollOnBottom="{Binding IsScrollInBottom, Mode=OneWayToSource}"
-								IsScrollOnTop="{Binding IsScrollInTop, Mode=OneWayToSource}" />
-							<behaviors:TimelineScrollLockerBehavior IsScrollLockEnabled="{Binding IsScrollLock}" ItemsSource="{Binding Timeline, Mode=OneWay}" />
-						</i:Interaction.Behaviors>
-						<ItemsPresenter />
-					</ScrollViewer>
-				</ControlTemplate>
-			</ItemsControl.Template>
-		</ItemsControl>
-	</DockPanel>
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="StatusesActionBar">
+                <VisualState x:Name="Close">
+                    <Storyboard>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="border" Storyboard.TargetProperty="(UIElement.Visibility)">
+                            <DiscreteObjectKeyFrame KeyTime="0:0:0.2">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <Visibility>Collapsed</Visibility>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="border" Storyboard.TargetProperty="(FrameworkElement.Height)">
+                            <EasingDoubleKeyFrame KeyTime="0" Value="40">
+                                <EasingDoubleKeyFrame.EasingFunction>
+                                    <CircleEase EasingMode="EaseOut" />
+                                </EasingDoubleKeyFrame.EasingFunction>
+                            </EasingDoubleKeyFrame>
+                            <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="0">
+                                <EasingDoubleKeyFrame.EasingFunction>
+                                    <CircleEase EasingMode="EaseOut" />
+                                </EasingDoubleKeyFrame.EasingFunction>
+                            </EasingDoubleKeyFrame>
+                        </DoubleAnimationUsingKeyFrames>
+                    </Storyboard>
+                </VisualState>
+                <VisualState x:Name="Open">
+                    <Storyboard>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="border" Storyboard.TargetProperty="(UIElement.Visibility)">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}" />
+                            <DiscreteObjectKeyFrame KeyTime="0:0:0.2" Value="{x:Static Visibility.Visible}" />
+                        </ObjectAnimationUsingKeyFrames>
+                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="border" Storyboard.TargetProperty="(FrameworkElement.Height)">
+                            <EasingDoubleKeyFrame KeyTime="0" Value="0">
+                                <EasingDoubleKeyFrame.EasingFunction>
+                                    <CircleEase EasingMode="EaseOut" />
+                                </EasingDoubleKeyFrame.EasingFunction>
+                            </EasingDoubleKeyFrame>
+                            <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="40">
+                                <EasingDoubleKeyFrame.EasingFunction>
+                                    <CircleEase EasingMode="EaseOut" />
+                                </EasingDoubleKeyFrame.EasingFunction>
+                            </EasingDoubleKeyFrame>
+                        </DoubleAnimationUsingKeyFrames>
+                    </Storyboard>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+        <Border x:Name="border"
+                Height="40"
+                VerticalAlignment="Top"
+                Background="White"
+                DockPanel.Dock="Bottom"
+                Visibility="Collapsed">
+            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                <Button Width="32"
+                        Height="32"
+                        Margin="12,4"
+                        Template="{DynamicResource MetroBlackCircleButtonTemplate}"
+                        ToolTip="選択したツイートをお気に入りに追加">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <ei:CallMethodAction MethodName="FavoriteSelecteds" TargetObject="{Binding Mode=OneWay}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                    <Path Width="18"
+                          Height="17"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center"
+                          Data="F1 M 19.1538,24.1539L 21.2308,24.1539L 21.2308,27.6154L 24.6923,27.6154L 24.6923,29.6923L 21.2308,29.6923L 21.2308,33.1539L 19.1538,33.1539L 19.1538,29.6923L 15.6923,29.6923L 15.6923,27.6154L 19.1538,27.6154L 19.1538,24.1539 Z M 15,22.0769L 21.7747,22.0769L 24,15.8462L 26.2253,22.0769L 33,22.0769L 27.358,26.119L 29.8846,32.4615L 25.3846,29.8145L 25.3846,26.9231L 21.9231,26.9231L 21.9231,23.4615L 18.4615,23.4616L 18.4615,24.5613L 15,22.0769 Z "
+                          Fill="#FF000000"
+                          Stretch="Fill" />
+                </Button>
+                <Button Width="32"
+                        Height="32"
+                        Margin="12,4"
+                        Template="{DynamicResource MetroBlackCircleButtonTemplate}"
+                        ToolTip="選択したユーザー全員に返信">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <ei:CallMethodAction MethodName="ReplySelecteds" TargetObject="{Binding Mode=OneWay}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                    <Path Width="16"
+                          Height="17"
+                          Margin="0,2,0,0"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center"
+                          Data="F1 M 21,32L 23,39L 15,32L 12,32L 12,14L 36,14L 36,32L 21,32 Z "
+                          Fill="#FF000000"
+                          Stretch="Fill" />
+                </Button>
+                <Button Width="32"
+                        Height="32"
+                        Margin="12,4"
+                        Template="{DynamicResource MetroBlackCircleButtonTemplate}"
+                        ToolTip="選択したユーザーを新しいタブに抽出">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <ei:CallMethodAction MethodName="ExtractSelecteds" TargetObject="{Binding Mode=OneWay}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                    <Path Width="16"
+                          Height="16"
+                          Margin="2,0,0,2"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center"
+                          Data="F1 M 27,15L 33,15L 33,21L 30.75,23.25L 30.75,19.125L 22.5,27.375L 20.625,25.5L 28.875,17.25L 24.75,17.25L 27,15 Z M 15,18L 26.25,18L 24,20.25L 17.25,20.25L 17.25,30.75L 27.75,30.75L 27.75,24L 30,21.75L 30,33L 15,33L 15,18 Z "
+                          Fill="#FF000000"
+                          Stretch="Fill" />
+                </Button>
+                <Button Width="32"
+                        Height="32"
+                        Margin="12,4"
+                        Template="{DynamicResource MetroBlackCircleButtonTemplate}"
+                        ToolTip="選択をすべて解除">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <ei:CallMethodAction MethodName="DeselectAll" TargetObject="{Binding Mode=OneWay}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                    <Path Width="14"
+                          Height="14"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center"
+                          Data="F1 M 18.4,16L 24,21.6L 29.5999,16.0001L 31.9999,18.4001L 26.4,24L 32,29.6001L 29.6,32L 24,26.4L 18.3999,32L 16,29.6L 21.6,24L 16,18.4L 18.4,16 Z "
+                          Fill="#FF000000"
+                          Stretch="Fill" />
+                </Button>
+            </StackPanel>
+        </Border>
+        <ItemsControl Focusable="True"
+                      ItemTemplate="{StaticResource StatusItemTemplate}"
+                      ItemsSource="{Binding Timeline,
+                                            Mode=OneWay}"
+                      ScrollViewer.CanContentScroll="True"
+                      VirtualizingPanel.IsVirtualizing="True"
+                      VirtualizingPanel.ScrollUnit="Pixel"
+                      VirtualizingPanel.VirtualizationMode="Recycling">
+            <i:Interaction.Triggers>
+                <l:InteractionMessageTrigger Messenger="{Binding Messenger, Mode=OneTime}">
+                    <mbehaviors:TaskDialogInteractionMessageAction />
+                </l:InteractionMessageTrigger>
+                <l:InteractionMessageTrigger MessageKey="SetPhysicalFocus" Messenger="{Binding Messenger, Mode=OneTime}">
+                    <l:SetFocusAction />
+                </l:InteractionMessageTrigger>
+                <i:EventTrigger EventName="MouseDown">
+                    <l:SetFocusAction />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel Orientation="Vertical" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.Template>
+                <ControlTemplate TargetType="{x:Type ItemsControl}">
+                    <ScrollViewer Focusable="False" VerticalScrollBarVisibility="Visible">
+                        <i:Interaction.Behaviors>
+                            <behaviors:TimelineTriggerBehavior IsMouseOver="{Binding IsMouseOver,
+                                                                                     Mode=OneWayToSource}"
+                                                               IsScrollOnBottom="{Binding IsScrollInBottom,
+                                                                                          Mode=OneWayToSource}"
+                                                               IsScrollOnTop="{Binding IsScrollInTop,
+                                                                                       Mode=OneWayToSource}" />
+                            <behaviors:TimelineScrollLockerBehavior IsScrollLockEnabled="{Binding IsScrollLock}" ItemsSource="{Binding Timeline, Mode=OneWay}" />
+                        </i:Interaction.Behaviors>
+                        <ItemsPresenter />
+                    </ScrollViewer>
+                </ControlTemplate>
+            </ItemsControl.Template>
+        </ItemsControl>
+    </DockPanel>
 </UserControl>

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Windows.Threading;
+using Livet.Messaging;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Models;
 using StarryEyes.Models.Tab;
@@ -18,8 +18,17 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
     public sealed class TabViewModel : TimelineViewModelBase
     {
         private readonly ColumnViewModel _owner;
+        public ColumnViewModel Owner
+        {
+            get { return _owner; }
+        }
 
-        private TabModel _model;
+        private readonly TabModel _model;
+        public TabModel Model
+        {
+            get { return _model; }
+        }
+
         private int _unreadCount;
 
         /// <summary>
@@ -27,6 +36,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         /// </summary>
         public TabViewModel()
         {
+            _model = null;
         }
 
         public TabViewModel(ColumnViewModel owner, TabModel tabModel)
@@ -66,6 +76,11 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                                   BindTimeline();
                               }
                           }));
+            CompositeDisposable.Add(
+                Observable.FromEvent(
+                h => tabModel.OnSetPhysicalFocusRequired += h,
+                h => tabModel.OnSetPhysicalFocusRequired -= h)
+                .Subscribe(_ => this.Messenger.Raise(new InteractionMessage("SetPhysicalFocus"))));
         }
 
         private void BindTimeline()
@@ -91,26 +106,20 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                 UnreadCount = 0;
         }
 
-        public TabModel Model
-        {
-            get { return _model; }
-            set { _model = value; }
-        }
-
         public string Name
         {
-            get { return _model.Name; }
+            get { return Model.Name; }
             set
             {
-                if (_model.Name == value) return;
-                _model.Name = value;
+                if (Model.Name == value) return;
+                Model.Name = value;
                 RaisePropertyChanged();
             }
         }
 
         public bool IsFocused
         {
-            get { return _owner.Focused == this; }
+            get { return Owner.Focused == this; }
         }
 
         internal void UpdateFocus()
@@ -124,7 +133,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         protected override TimelineModel TimelineModel
         {
-            get { return _model.Timeline; }
+            get { return Model.Timeline; }
         }
 
         protected override IEnumerable<long> CurrentAccounts
@@ -152,7 +161,9 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public void Focus()
         {
-            _owner.Focused = this;
+            Owner.Focused = this;
+            // propagate focus
+            Owner.Focus();
         }
 
         public override void ReadMore(long id)
@@ -182,6 +193,35 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         public void EditTab()
         {
             MainWindowModel.ShowTabConfigure(this.Model);
+        }
+        #endregion
+
+        #region CopyTabCommand
+        private Livet.Commands.ViewModelCommand _copyTabCommand;
+
+        public Livet.Commands.ViewModelCommand CopyTabCommand
+        {
+            get { return _copyTabCommand ?? (_copyTabCommand = new Livet.Commands.ViewModelCommand(CopyTab)); }
+        }
+
+        public void CopyTab()
+        {
+            Owner.Model.CreateTab(new TabModel(this.Name + "_",
+                                                 this.Model.FilterQueryString));
+        }
+        #endregion
+
+        #region CloseTabCommand
+        private Livet.Commands.ViewModelCommand _closeTabCommand;
+
+        public Livet.Commands.ViewModelCommand CloseTabCommand
+        {
+            get { return _closeTabCommand ?? (_closeTabCommand = new Livet.Commands.ViewModelCommand(CloseTab)); }
+        }
+
+        public void CloseTab()
+        {
+            Owner.CloseTab(this);
         }
         #endregion
     }

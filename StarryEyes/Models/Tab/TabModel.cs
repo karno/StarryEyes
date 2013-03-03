@@ -294,5 +294,13 @@ namespace StarryEyes.Models.Tab
             var handler = OnConfigurationUpdated;
             if (handler != null) handler(isQueryUpdated);
         }
+
+        public event Action OnSetPhysicalFocusRequired;
+
+        public void SetPhysicalFocus()
+        {
+            var handler = OnSetPhysicalFocusRequired;
+            if (handler != null) handler();
+        }
     }
 }
