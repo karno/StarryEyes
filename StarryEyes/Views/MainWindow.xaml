@@ -69,10 +69,12 @@
     </i:Interaction.Triggers>
     <controls:MetroWindow.WindowCommands>
         <controls:WindowCommands>
-            <Button Command="{Binding ShowSettingCommand}"
-                    Content="settings"
-                    Visibility="{Binding ShowWindowCommands,
-                                         Converter={StaticResource BooleanToVisibleConverter}}" />
+            <StackPanel VerticalAlignment="Center" Visibility="{Binding SearchFlipViewModel.IsVisible, Converter={StaticResource BooleanToInvisibleConverter}}">
+                <Button Command="{Binding ShowSettingCommand}"
+                        Content="settings"
+                        Visibility="{Binding ShowWindowCommands,
+                                             Converter={StaticResource BooleanToVisibleConverter}}" />
+            </StackPanel>
             <TextBox Width="180"
                      Height="20"
                      Margin="-1,0,2,0"

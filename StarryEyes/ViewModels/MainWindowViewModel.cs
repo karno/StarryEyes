@@ -128,6 +128,16 @@ namespace StarryEyes.ViewModels
             }
         }
 
+        public bool ShowSettingLabel
+        {
+            get { return _showWindowCommands && SearchFlipViewModel.IsVisible; }
+        }
+
+        public bool ShowSearchBox
+        {
+            get { return _showWindowCommands; }
+        }
+
         #endregion
 
         public MainWindowViewModel()

@@ -86,6 +86,7 @@ namespace StarryEyes
         /// <summary>
         /// This is for the URL which is not the URL but be treated as the URL by Fucking Twitter.
         /// </summary>
+        // compiling below regex drives krile to death.
         public static Regex TwitterUrlTLDRegex = new Regex(
             "([-a-z0-9_\\.]+)(\\.((" + TLD.JoinString("|") + ")|([a-z0-9]+\\.(" + ccTLD.JoinString("|") + ")))" +
             "[-a-z0-9\\/_\\.!~\\*'\\(\\)%]*)", RegexOptions.Singleline | RegexOptions.IgnoreCase);

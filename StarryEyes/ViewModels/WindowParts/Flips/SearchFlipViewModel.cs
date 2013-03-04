@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Reactive.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Livet.Messaging;
@@ -7,7 +7,6 @@ using StarryEyes.Filters;
 using StarryEyes.Filters.Parsing;
 using StarryEyes.Models;
 using StarryEyes.ViewModels.WindowParts.Flips.SearchFlip;
-using StarryEyes.Views.Messaging;
 using StarryEyes.Views.Utils;
 
 namespace StarryEyes.ViewModels.WindowParts.Flips
@@ -70,6 +69,28 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             }
         }
 
+        private bool _isUserSearchAvailable;
+        public bool IsUserSearchAvailable
+        {
+            get { return _isUserSearchAvailable; }
+            set
+            {
+                _isUserSearchAvailable = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        private bool _isSearchOptionAvailable;
+        public bool IsSearchOptionAvailable
+        {
+            get { return _isSearchOptionAvailable; }
+            set
+            {
+                _isSearchOptionAvailable = value;
+                RaisePropertyChanged();
+            }
+        }
+
         private string _text;
         public string Text
         {
@@ -102,13 +123,33 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             get { return !String.IsNullOrEmpty(_errorText); }
         }
 
+        private SearchMode _searchMode = SearchMode.Quick;
+        public SearchMode SearchMode
+        {
+            get { return _searchMode; }
+            set
+            {
+                _searchMode = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        private readonly Regex _userScreenNameRegex = new Regex("^[A-Za-z0-9_]+$", RegexOptions.Compiled);
         private async void OnTextChanged(string value)
         {
             if (value != null && value.StartsWith("?"))
             {
                 IsQueryMode = true;
+                IsSearchOptionAvailable = false;
+                IsSearchResultAvailable = false;
                 try
                 {
+                    if (value == "?")
+                    {
+                        ErrorText = "クエリの本文がありません。";
+                        IsSearchResultAvailable = false;
+                        return;
+                    }
                     await Task.Run(() =>
                     {
                         var result = QueryCompiler.Compile(value.Substring(1));
@@ -128,20 +169,31 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 if (String.IsNullOrEmpty(value))
                 {
                     IsSearchResultAvailable = false;
+                    IsSearchOptionAvailable = false;
+                }
+                else
+                {
+                    IsSearchResultAvailable = SearchMode == SearchMode.Quick;
+                    if (IsSearchResultAvailable)
+                    {
+                        CommitSearch();
+                    }
+                    IsSearchOptionAvailable = true;
+                    IsUserSearchAvailable = _userScreenNameRegex.IsMatch(value);
                 }
             }
         }
 
-        public void Open()
+        public override void Open()
         {
-            this.Messenger.Raise(new GoToStateMessage("Open"));
+            base.Open();
+            SearchCandidate.UpdateInfo();
         }
 
-        public void Close()
+        public override void Close()
         {
-            Text = String.Empty;
-            this.Messenger.Raise(new GoToStateMessage("Close"));
             MainWindowModel.SetFocusTo(FocusRequest.Timeline);
+            base.Close();
         }
 
         #region Text box control
@@ -156,6 +208,30 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             Open();
         }
 
+        public void OnEnterKeyDown()
+        {
+            if (!IsQueryMode || ErrorText == null)
+            {
+                // commit search query
+                IsSearchResultAvailable = true;
+                CommitSearch();
+            }
+        }
+
+        private void CommitSearch()
+        {
+
+        }
+
         #endregion
+    }
+
+    public enum SearchMode
+    {
+        Quick,
+        Local,
+        Web,
+        UserWeb,
+        UserId,
     }
 }

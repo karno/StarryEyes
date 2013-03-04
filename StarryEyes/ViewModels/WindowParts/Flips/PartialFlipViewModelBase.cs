@@ -25,17 +25,19 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             get { return true; }
         }
 
-        public void Open()
+        public virtual void Open()
         {
             if (IsWindowCommandsRelated)
             {
                 MainWindowModel.SetShowMainWindowCommands(false);
             }
+            IsVisible = true;
             this.Messenger.Raise(new GoToStateMessage("Open"));
         }
 
-        public void Close()
+        public virtual void Close()
         {
+            IsVisible = false;
             this.Messenger.Raise(new GoToStateMessage("Close"));
             if (IsWindowCommandsRelated)
             {
