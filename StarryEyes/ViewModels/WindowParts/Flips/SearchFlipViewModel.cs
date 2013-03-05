@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Reactive;
+using System.Reactive.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Livet;
 using Livet.Messaging;
 using StarryEyes.Filters;
 using StarryEyes.Filters.Parsing;
@@ -69,13 +72,13 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             }
         }
 
-        private bool _isUserSearchAvailable;
-        public bool IsUserSearchAvailable
+        private bool _canBeUserScreenName;
+        public bool CanBeUserScreenName
         {
-            get { return _isUserSearchAvailable; }
+            get { return _canBeUserScreenName; }
             set
             {
-                _isUserSearchAvailable = value;
+                _canBeUserScreenName = value;
                 RaisePropertyChanged();
             }
         }
@@ -90,6 +93,55 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 RaisePropertyChanged();
             }
         }
+
+        #region Search options
+
+        public void SetNextSearchOption()
+        {
+            if (SearchMode == SearchMode.UserId)
+                SearchMode = SearchMode.Quick;
+            else
+                SearchMode = (SearchMode)(((int)SearchMode) + 1);
+            if (SearchMode == SearchMode.UserId && !CanBeUserScreenName)
+                SearchMode = SearchMode.Quick;
+        }
+
+        public void SetPreviousSearchOption()
+        {
+            if (SearchMode == SearchMode.Quick)
+                SearchMode = SearchMode.UserId;
+            else
+                SearchMode = (SearchMode)(((int)SearchMode) - 1);
+            if (SearchMode == SearchMode.UserId && !CanBeUserScreenName)
+                SearchMode = SearchMode.UserWeb;
+        }
+
+        public void SetQuickSearch()
+        {
+            SearchMode = SearchMode.Quick;
+        }
+
+        public void SetLocalSearch()
+        {
+            SearchMode = SearchMode.Local;
+        }
+
+        public void SetWebSearch()
+        {
+            SearchMode = SearchMode.Web;
+        }
+
+        public void SetUserWebSearch()
+        {
+            SearchMode = SearchMode.UserWeb;
+        }
+
+        public void SetUserIdSearch()
+        {
+            SearchMode = SearchMode.UserId;
+        }
+
+        #endregion
 
         private string _text;
         public string Text
@@ -179,7 +231,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                         CommitSearch();
                     }
                     IsSearchOptionAvailable = true;
-                    IsUserSearchAvailable = _userScreenNameRegex.IsMatch(value);
+                    CanBeUserScreenName = _userScreenNameRegex.IsMatch(value);
                 }
             }
         }
@@ -192,6 +244,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public override void Close()
         {
+            Text = String.Empty;
             MainWindowModel.SetFocusTo(FocusRequest.Timeline);
             base.Close();
         }
@@ -224,6 +277,41 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         }
 
         #endregion
+    }
+
+    /// TODO: Implementation
+    public class SearchTypeViewModel : ViewModel
+    {
+        private readonly string _label;
+        private readonly string _description;
+        private readonly IObservable<bool> _enabilityNotifier;
+        private readonly IObservable<bool> _selectedNotifier;
+        private readonly Action _onSelected;
+
+        public SearchTypeViewModel(string label, string description, IObservable<bool> selectedNotifier, Action onSelected)
+        {
+            _label = label;
+            _description = description;
+            _selectedNotifier = selectedNotifier;
+            _onSelected = onSelected;
+        }
+
+        public SearchTypeViewModel(string label, string description, IObservable<bool> enabilityNotifier,
+            IObservable<bool> selectedNotifier, Action onSelected)
+            : this(label, description, selectedNotifier, onSelected)
+        {
+            _enabilityNotifier = enabilityNotifier;
+        }
+
+        public void Activate()
+        {
+            if (_selectedNotifier != null)
+            {
+            }
+            if (_enabilityNotifier != null)
+            {
+            }
+        }
     }
 
     public enum SearchMode

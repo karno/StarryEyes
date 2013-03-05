@@ -248,6 +248,8 @@
     <Compile Include="ViewModels\WindowParts\Flips\SearchFlipViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\SearchFlip\SearchCandidateViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\SearchFlip\SearchResultViewModel.cs" />
+    <Compile Include="ViewModels\WindowParts\Flips\SearchFlip\UserCandidateViewModel.cs" />
+    <Compile Include="ViewModels\WindowParts\Flips\SearchFlip\UserInfoViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\TabConfigurationFlipViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\UserFlip\UserTimelineViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\UserInformationFlipViewModel.cs" />

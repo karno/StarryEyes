@@ -2,6 +2,7 @@
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reactive.Concurrency;
 
 // ReSharper disable CheckNamespace
@@ -28,13 +29,39 @@ namespace System.Reactive.Linq
                              .Select(p => p.EventArgs);
         }
 
-        public static IObservable<PropertyChangingEventArgs> ListenePropertyChanging(
+        public static IObservable<PropertyChangedEventArgs> ListenPropertyChanged<T>(
+            this INotifyPropertyChanged listenee, Expression<Func<T>> propertyExpression)
+        {
+            String propname = ExtractPropertyName(propertyExpression);
+            if (propname == null)
+                throw new ArgumentException("Unknown property name.");
+            return ListenPropertyChanged(listenee)
+                .Where(p => p.PropertyName == propname);
+        }
+
+        public static IObservable<PropertyChangingEventArgs> ListenPropertyChanging(
             this INotifyPropertyChanging listenee)
         {
             return Observable.FromEventPattern<PropertyChangingEventHandler, PropertyChangingEventArgs>
                 (h => listenee.PropertyChanging += h,
                  h => listenee.PropertyChanging -= h)
                              .Select(p => p.EventArgs);
+        }
+
+        public static IObservable<PropertyChangingEventArgs> ListenPropertyChanging<T>(
+            this INotifyPropertyChanging listenee, Expression<Func<T>> propertyExpression)
+        {
+            String propname = ExtractPropertyName(propertyExpression);
+            if (propname == null)
+                throw new ArgumentException("Unknown property name.");
+            return ListenPropertyChanging(listenee)
+                .Where(p => p.PropertyName == propname);
+        }
+
+        private static string ExtractPropertyName<T>(Expression<Func<T>> propertyExpression)
+        {
+            var memberExpression = propertyExpression.Body as MemberExpression;
+            return memberExpression != null ? memberExpression.Member.Name : null;
         }
 
         public static IObservable<T> Retry<T>(this IObservable<T> source, int retryCount, TimeSpan delaySpan)
