@@ -154,7 +154,7 @@
         </Grid.ColumnDefinitions>
         <Border Grid.ColumnSpan="2"
                 Background="#111111"
-                Opacity="0.6">
+                Opacity="0.4">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="MouseLeftButtonDown">
                     <ei:CallMethodAction MethodName="Close" TargetObject="{Binding Mode=OneWay}" />
@@ -176,7 +176,7 @@
             </Grid.RowDefinitions>
             <Border Grid.RowSpan="2"
                     Background="#111111"
-                    Opacity="0.6" />
+                    Opacity="1.0" />
             <DockPanel>
                 <Button Width="48"
                         Height="48"

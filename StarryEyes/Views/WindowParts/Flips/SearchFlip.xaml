@@ -50,7 +50,7 @@
                             </EasingDoubleKeyFrame>
                         </DoubleAnimationUsingKeyFrames>
                         <DoubleAnimationUsingKeyFrames Storyboard.TargetName="InnerGrid" Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.X)">
-                            <EasingDoubleKeyFrame KeyTime="0" Value="300" />
+                            <EasingDoubleKeyFrame KeyTime="0" Value="100" />
                             <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="0">
                                 <EasingDoubleKeyFrame.EasingFunction>
                                     <CircleEase EasingMode="EaseOut" />
@@ -76,7 +76,7 @@
                             </EasingDoubleKeyFrame>
                         </DoubleAnimationUsingKeyFrames>
                         <DoubleAnimationUsingKeyFrames Storyboard.TargetName="InnerGrid" Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.X)">
-                            <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="300">
+                            <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="100">
                                 <EasingDoubleKeyFrame.EasingFunction>
                                     <CircleEase EasingMode="EaseOut" />
                                 </EasingDoubleKeyFrame.EasingFunction>
