@@ -10,7 +10,7 @@ using StarryEyes.Models.Backpanels.SystemEvents;
 using StarryEyes.Models.Stores;
 using StarryEyes.Models.Tab;
 
-namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlip
+namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
 {
     public class SearchCandidateViewModel : ViewModel
     {
@@ -131,6 +131,8 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlip
         public void SelectThis()
         {
             _parent.Parent.Text = Query;
+            _parent.Parent.SearchMode = SearchMode.Web;
+            _parent.Parent.OnEnterKeyDown();
         }
 
         #region RemoveCommand

@@ -12,118 +12,123 @@
              d:DesignWidth="300"
              mc:Ignorable="d">
     <UserControl.Resources>
-        <Utils:BooleanToInvisibleConverter x:Key="BooleanToInvisibleConverter" />
-        <Utils:BooleanToVisibleConverter x:Key="BooleanToVisibleConverter" />
-        <DataTemplate x:Key="TabHeaderTemplate">
-            <StackPanel Margin="0,8,8,4" Orientation="Horizontal">
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="MouseLeftButtonDown">
-                        <ei:CallMethodAction MethodName="Focus" TargetObject="{Binding}" />
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-                <StackPanel.ContextMenu>
-                    <ContextMenu DataContext="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
-                        <MenuItem Command="{Binding EditTabCommand}" Header="編集..." />
-                        <MenuItem Command="{Binding CopyTabCommand}" Header="このタブをコピーして追加" />
-                        <Separator />
-                        <MenuItem Command="{Binding Owner.CreateNewTabCommand}" Header="新しいタブの追加..." />
-                        <MenuItem Command="{Binding Owner.RestoreLastClosedTabCommand}" Header="最後に閉じたタブを元に戻す" />
-                        <Separator />
-                        <MenuItem Command="{Binding CloseTabCommand}" Header="タブを閉じる" />
-                    </ContextMenu>
-                </StackPanel.ContextMenu>
-                <TextBlock x:Name="TabName"
-                           Margin="0,3,0,0"
-                           VerticalAlignment="Center"
-                           FontFamily="Segoe UI"
-                           FontSize="16"
-                           Foreground="#FF999999"
-                           Text="{Binding Name}" />
-                <TextBlock VerticalAlignment="Top"
-                           FontFamily="Segoe UI"
-                           Foreground="#FF1BA1E2"
-                           Text="{Binding UnreadCount}"
-                           Visibility="{Binding IsUnreadExisted,
-                                                Converter={StaticResource BooleanToVisibleConverter}}" />
-            </StackPanel>
-            <DataTemplate.Triggers>
-                <MultiDataTrigger>
-                    <MultiDataTrigger.Conditions>
-                        <Condition Binding="{Binding IsFocused}" Value="True" />
-                        <Condition Binding="{Binding Owner.IsFocused}" Value="True" />
-                    </MultiDataTrigger.Conditions>
-                    <Setter TargetName="TabName" Property="Foreground" Value="Black" />
-                </MultiDataTrigger>
-                <MultiDataTrigger>
-                    <MultiDataTrigger.Conditions>
-                        <Condition Binding="{Binding IsFocused}" Value="True" />
-                        <Condition Binding="{Binding Owner.IsFocused}" Value="False" />
-                    </MultiDataTrigger.Conditions>
-                    <Setter TargetName="TabName" Property="Foreground" Value="#FF1BA1E2" />
-                </MultiDataTrigger>
-            </DataTemplate.Triggers>
-        </DataTemplate>
-        <DataTemplate x:Key="ColumnTemplate">
-            <Grid Margin="8,8,8,0" Background="{x:Null}">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition />
-                </Grid.RowDefinitions>
-                <ItemsControl MinHeight="16"
-                              Margin="8,0"
-                              Background="White"
-                              ItemTemplate="{StaticResource TabHeaderTemplate}"
-                              ItemsSource="{Binding Tabs}">
-                    <ItemsControl.ContextMenu>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Krile;component/DefaultContextMenus.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <Utils:BooleanToInvisibleConverter x:Key="BooleanToInvisibleConverter" />
+            <Utils:BooleanToVisibleConverter x:Key="BooleanToVisibleConverter" />
+            <DataTemplate x:Key="TabHeaderTemplate">
+                <StackPanel Margin="0,8,8,4" Orientation="Horizontal">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="MouseLeftButtonDown">
+                            <ei:CallMethodAction MethodName="Focus" TargetObject="{Binding}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                    <StackPanel.ContextMenu>
                         <ContextMenu DataContext="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
-                            <MenuItem Command="{Binding CreateNewTabCommand}" Header="新しいタブの追加..." />
-                            <MenuItem Command="{Binding RestoreLastClosedTabCommand}" Header="最後に閉じたタブを元に戻す" />
+                            <MenuItem Command="{Binding EditTabCommand}" Header="編集..." />
+                            <MenuItem Command="{Binding CopyTabCommand}" Header="このタブをコピーして追加" />
+                            <Separator />
+                            <MenuItem Command="{Binding Owner.CreateNewTabCommand}" Header="新しいタブの追加..." />
+                            <MenuItem Command="{Binding Owner.RestoreLastClosedTabCommand}" Header="最後に閉じたタブを元に戻す" />
+                            <Separator />
+                            <MenuItem Command="{Binding CloseTabCommand}" Header="タブを閉じる" />
                         </ContextMenu>
-                    </ItemsControl.ContextMenu>
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <WrapPanel />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                </ItemsControl>
-                <ItemsControl Grid.Row="1"
-                              Margin="0,4,0,0"
-                              Background="White"
-                              ItemsSource="{Binding Tabs}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <Grid />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Grid Grid.Row="1" Visibility="{Binding IsFocused, Converter={StaticResource BooleanToVisibleConverter}}">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition />
-                                </Grid.RowDefinitions>
-                                <Border Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibleConverter}}">
-                                    <StackPanel Margin="4"
-                                                HorizontalAlignment="Center"
-                                                Orientation="Horizontal">
-                                        <Viewbox Width="20" Height="20">
-                                            <Controls:ProgressRing IsActive="True" />
-                                        </Viewbox>
-                                        <TextBlock Margin="4"
-                                                   VerticalAlignment="Center"
-                                                   Text="loading..." />
-                                    </StackPanel>
-                                </Border>
-                                <Timelines:Timeline Grid.Row="1"
-                                                    HorizontalAlignment="Stretch"
-                                                    VerticalAlignment="Stretch"
-                                                    DataContext="{Binding}" />
-                            </Grid>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </Grid>
-        </DataTemplate>
+                    </StackPanel.ContextMenu>
+                    <TextBlock x:Name="TabName"
+                               Margin="0,3,0,0"
+                               VerticalAlignment="Center"
+                               FontFamily="Segoe UI"
+                               FontSize="16"
+                               Foreground="#FF999999"
+                               Text="{Binding Name}" />
+                    <TextBlock VerticalAlignment="Top"
+                               FontFamily="Segoe UI"
+                               Foreground="#FF1BA1E2"
+                               Text="{Binding UnreadCount}"
+                               Visibility="{Binding IsUnreadExisted,
+                                                    Converter={StaticResource BooleanToVisibleConverter}}" />
+                </StackPanel>
+                <DataTemplate.Triggers>
+                    <MultiDataTrigger>
+                        <MultiDataTrigger.Conditions>
+                            <Condition Binding="{Binding IsFocused}" Value="True" />
+                            <Condition Binding="{Binding Owner.IsFocused}" Value="True" />
+                        </MultiDataTrigger.Conditions>
+                        <Setter TargetName="TabName" Property="Foreground" Value="Black" />
+                    </MultiDataTrigger>
+                    <MultiDataTrigger>
+                        <MultiDataTrigger.Conditions>
+                            <Condition Binding="{Binding IsFocused}" Value="True" />
+                            <Condition Binding="{Binding Owner.IsFocused}" Value="False" />
+                        </MultiDataTrigger.Conditions>
+                        <Setter TargetName="TabName" Property="Foreground" Value="#FF1BA1E2" />
+                    </MultiDataTrigger>
+                </DataTemplate.Triggers>
+            </DataTemplate>
+            <DataTemplate x:Key="ColumnTemplate">
+                <Grid Margin="8,8,8,0" Background="{x:Null}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <ItemsControl MinHeight="16"
+                                  Margin="8,0"
+                                  Background="White"
+                                  ItemTemplate="{StaticResource TabHeaderTemplate}"
+                                  ItemsSource="{Binding Tabs}">
+                        <ItemsControl.ContextMenu>
+                            <ContextMenu DataContext="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                                <MenuItem Command="{Binding CreateNewTabCommand}" Header="新しいタブの追加..." />
+                                <MenuItem Command="{Binding RestoreLastClosedTabCommand}" Header="最後に閉じたタブを元に戻す" />
+                            </ContextMenu>
+                        </ItemsControl.ContextMenu>
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                    <ItemsControl Grid.Row="1"
+                                  Margin="0,4,0,0"
+                                  Background="White"
+                                  ItemsSource="{Binding Tabs}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <Grid />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Grid.Row="1" Visibility="{Binding IsFocused, Converter={StaticResource BooleanToVisibleConverter}}">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <Border Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibleConverter}}">
+                                        <StackPanel Margin="4"
+                                                    HorizontalAlignment="Center"
+                                                    Orientation="Horizontal">
+                                            <Viewbox Width="20" Height="20">
+                                                <Controls:ProgressRing IsActive="True" />
+                                            </Viewbox>
+                                            <TextBlock Margin="4"
+                                                       VerticalAlignment="Center"
+                                                       Text="loading..." />
+                                        </StackPanel>
+                                    </Border>
+                                    <Timelines:Timeline Grid.Row="1"
+                                                        HorizontalAlignment="Stretch"
+                                                        VerticalAlignment="Stretch"
+                                                        DataContext="{Binding}" />
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Grid>
+            </DataTemplate>
+        </ResourceDictionary>
     </UserControl.Resources>
     <ItemsControl ItemTemplate="{StaticResource ColumnTemplate}" ItemsSource="{Binding Columns}">
         <ItemsControl.ItemsPanel>

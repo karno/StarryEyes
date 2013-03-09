@@ -716,6 +716,26 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         #endregion
 
+        #region Menu commands
+
+        #region ReplyCommand
+        private ViewModelCommand _ReplyCommand;
+
+        public ViewModelCommand ReplyCommand
+        {
+            get
+            {
+                if (_ReplyCommand == null)
+                {
+                    _ReplyCommand = new ViewModelCommand(Reply);
+                }
+                return _ReplyCommand;
+            }
+        }
+        #endregion
+
+        #endregion
+
         #region OpenLinkCommand
 
         private ListenerCommand<string> _openLinkCommand;

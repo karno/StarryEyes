@@ -127,7 +127,6 @@
     </Reference>
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\LivetCask.1.0.6.1\lib\net45\System.Windows.Interactivity.dll</HintPath>
     </Reference>
@@ -240,19 +239,22 @@
     <Compile Include="Models\Plugins\IPlugin.cs" />
     <Compile Include="Models\Tab\TimelineModel.cs" />
     <Compile Include="Models\UserModel.cs" />
+    <Compile Include="Settings\KeyBindingManager.cs" />
+    <Compile Include="Settings\KeyBindings\BindingGroup.cs" />
+    <Compile Include="Settings\KeyBindings\DefaultBindingProvider.cs" />
+    <Compile Include="Settings\KeyBindings\KeyBinding.cs" />
+    <Compile Include="Settings\KeyBindings\KeyBindingProfile.cs" />
     <Compile Include="Settings\TabDescription.cs" />
     <Compile Include="ViewModels\Dialogs\KeyOverrideViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\AccountSelectionFlipViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\BackpanelViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\PartialFlipViewModelBase.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\SearchFlipViewModel.cs" />
-    <Compile Include="ViewModels\WindowParts\Flips\SearchFlip\SearchCandidateViewModel.cs" />
-    <Compile Include="ViewModels\WindowParts\Flips\SearchFlip\SearchResultViewModel.cs" />
-    <Compile Include="ViewModels\WindowParts\Flips\SearchFlip\UserCandidateViewModel.cs" />
-    <Compile Include="ViewModels\WindowParts\Flips\SearchFlip\UserInfoViewModel.cs" />
+    <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\SearchCandidateViewModel.cs" />
+    <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\SearchResultViewModel.cs" />
+    <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\UserCandidateViewModel.cs" />
+    <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\UserInfoViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\TabConfigurationFlipViewModel.cs" />
-    <Compile Include="ViewModels\WindowParts\Flips\UserFlip\UserTimelineViewModel.cs" />
-    <Compile Include="ViewModels\WindowParts\Flips\UserInformationFlipViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\InputAreaViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\MainAreaViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Timelines\ColumnViewModel.cs" />
@@ -269,6 +271,11 @@
     <Compile Include="Views\Dialogs\KeyOverrideWindow.xaml.cs">
       <DependentUpon>KeyOverrideWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Triggers\EnterKeyTrigger.cs" />
+    <Compile Include="Views\Triggers\EscapeKeyTrigger.cs" />
+    <Compile Include="Views\Triggers\KeyBindingTrigger.cs" />
+    <Compile Include="Views\Triggers\KeyTriggerBase.cs" />
+    <Compile Include="Views\Utils\NotNullToVisibleConverter.cs" />
     <Compile Include="Views\Utils\StatusStylizeHelper.cs" />
     <Compile Include="Views\Messaging\Behaviors\BringIntoViewInteractionMessageAction.cs" />
     <Compile Include="Views\Messaging\Behaviors\GoToStateInteractionMessageAction.cs" />
@@ -296,11 +303,11 @@
     <Compile Include="Views\WindowParts\Flips\SearchFlip.xaml.cs">
       <DependentUpon>SearchFlip.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\WindowParts\Flips\SearchFlips\SearchResult.xaml.cs">
+      <DependentUpon>SearchResult.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\WindowParts\Flips\TabConfigurationFlip.xaml.cs">
       <DependentUpon>TabConfigurationFlip.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\WindowParts\Flips\UserInformationFlip.xaml.cs">
-      <DependentUpon>UserInformationFlip.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\WindowParts\Frontpanel.xaml.cs">
       <DependentUpon>Frontpanel.xaml</DependentUpon>
@@ -314,6 +321,10 @@
     <Compile Include="Views\WindowParts\Timelines\Timeline.xaml.cs">
       <DependentUpon>Timeline.xaml</DependentUpon>
     </Compile>
+    <Page Include="DefaultContextMenus.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Simple Styles.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -396,11 +407,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\WindowParts\Flips\TabConfigurationFlip.xaml">
+    <Page Include="Views\WindowParts\Flips\SearchFlips\SearchResult.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\WindowParts\Flips\UserInformationFlip.xaml">
+    <Page Include="Views\WindowParts\Flips\TabConfigurationFlip.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

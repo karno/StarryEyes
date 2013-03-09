@@ -263,8 +263,9 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         public void ReplySelecteds()
         {
             var users = SelectedStatuses
-                .Select(s => "@" + s.User.ScreenName).JoinString(" ")
-                .Distinct();
+                .Select(s => "@" + s.User.ScreenName)
+                .Distinct()
+                .JoinString(" ");
             InputAreaModel.SetText(CurrentAccounts.ToArray(), users + " ");
             DeselectAll();
         }

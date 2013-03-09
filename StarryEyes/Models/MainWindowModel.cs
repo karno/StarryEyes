@@ -93,12 +93,17 @@ namespace StarryEyes.Models
         {
         }
 
+        public static event Action<Tuple<string, FilterExpressionBase>> OnConfirmMuteRequested;
         public static void ConfirmMute(string description, FilterExpressionBase addExpr)
         {
+            var handler = OnConfirmMuteRequested;
+            if (handler != null)
+            {
+                handler(Tuple.Create(description, addExpr));
+            }
         }
 
         public static event Action<TabModel> OnTabModelConfigureRaised;
-
         public static void ShowTabConfigure(TabModel model)
         {
             var handler = OnTabModelConfigureRaised;

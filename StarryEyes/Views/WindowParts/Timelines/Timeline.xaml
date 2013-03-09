@@ -19,6 +19,9 @@
              mc:Ignorable="d">
     <UserControl.Resources>
         <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Krile;component/DefaultContextMenus.xaml" />
+            </ResourceDictionary.MergedDictionaries>
             <utils:BooleanToVisibleConverter x:Key="BooleanToVisibleConverter" />
             <utils:BooleanToInvisibleConverter x:Key="BooleanToInvisibleConverter" />
             <DataTemplate x:Key="UserItemTemplate">
@@ -37,6 +40,43 @@
                         Padding="0"
                         RenderTransformOrigin="0.5,1"
                         SnapsToDevicePixels="True">
+                    <Border.ContextMenu>
+                        <ContextMenu DataContext="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                            <MenuItem Header="返信(_R)" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToInvisibleConverter}}" />
+                            <MenuItem Header="選択ツイートすべてに返信(_R)" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibleConverter}}" />
+                            <MenuItem Header="ダイレクトメッセージ(_D)" />
+                            <MenuItem Header="お気に入り登録(_F)" />
+                            <MenuItem Header="リツイート(_R)" />
+                            <MenuItem Header="引用(_Q)" />
+                            <MenuItem Header="パーマリンクで引用(_L)" />
+                            <Separator />
+                            <MenuItem Header="クリップボードへコピー(_C)">
+                                <MenuItem Header="本文(_B)" />
+                                <MenuItem Header="パーマリンク(_P)" />
+                            </MenuItem>
+                            <MenuItem Header="Webを開く(_W)" />
+                            <MenuItem Header="Favstarを開く(_F)" />
+                            <MenuItem Header="Favstar トロフィーを授与(_T)" />
+                            <Separator />
+                            <MenuItem Header="このツイートを選択(_S)" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToInvisibleConverter}}" />
+                            <MenuItem Header="このツイートの選択を解除(_S)" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibleConverter}}" />
+                            <MenuItem Header="選択をすべてお気に入り登録(_A)" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibleConverter}}" />
+                            <MenuItem Header="選択ツイートのユーザーを抽出(_U)" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibleConverter}}" />
+                            <MenuItem Header="選択をすべて解除(_Z)" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibleConverter}}" />
+                            <Separator />
+                            <MenuItem Header="ユーザーのプロフィール(_P)" />
+                            <MenuItem Header="このユーザーを抽出(_E)" />
+                            <MenuItem Header="このツイートの関連ツイート(_O)" />
+                            <Separator />
+                            <MenuItem Header="ミュート・スパム報告(_X)">
+                                <MenuItem Header="キーワードをミュート(_K)" />
+                                <MenuItem Header="ユーザーをミュート(_U)" />
+                                <MenuItem Header="クライアントをミュート(_C)" />
+                                <Separator />
+                                <MenuItem Header="ユーザーをスパムとして報告(_X)" />
+                            </MenuItem>
+                        </ContextMenu>
+                    </Border.ContextMenu>
                     <Border.LayoutTransform>
                         <TransformGroup>
                             <ScaleTransform />

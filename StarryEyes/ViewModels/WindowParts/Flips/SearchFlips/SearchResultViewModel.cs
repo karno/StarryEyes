@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
+using Livet.Messaging;
 using StarryEyes.Breezy.Api.Rest;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Filters;
@@ -13,22 +14,35 @@ using StarryEyes.Models.Tab;
 using StarryEyes.Vanille.DataStore;
 using StarryEyes.ViewModels.WindowParts.Timelines;
 
-namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlip
+namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
 {
     public class SearchResultViewModel : TimelineViewModelBase
     {
+        private readonly SearchFlipViewModel _parent;
+        private readonly string _query;
+        public string Query
+        {
+            get { return _query; }
+        }
+
         private readonly SearchOption _option;
         private readonly TimelineModel _timelineModel;
 
         private readonly Func<TwitterStatus, bool> _predicate;
         private FilterQuery _localQuery;
 
-        public SearchResultViewModel(string query, SearchOption option)
+        public SearchResultViewModel(SearchFlipViewModel parent, string query, SearchOption option)
         {
+            _parent = parent;
+            _query = query;
             _option = option;
             _timelineModel = new TimelineModel(
                 _predicate = CreatePredicate(query, option),
-                (id, c, _) => Fetch(query, id, c));
+                (id, c, _) => Fetch(id, c));
+            IsLoading = true;
+            _timelineModel.ReadMore(null)
+                          .Finally(() => IsLoading = false)
+                          .Subscribe();
         }
 
         private Func<TwitterStatus, bool> CreatePredicate(string query, SearchOption option)
@@ -54,8 +68,16 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlip
                    !negative.Any(s => status.Text.IndexOf(s, StringComparison.CurrentCultureIgnoreCase) >= 0);
         }
 
-        private IObservable<TwitterStatus> Fetch(string query, long? maxId, int count)
+        private IObservable<TwitterStatus> Fetch(long? maxId, int count)
         {
+            if (_option == SearchOption.Quick)
+            {
+                return Observable.Start(() =>
+                                        MainAreaModel.Columns.SelectMany(c => c.Tabs)
+                                                     .SelectMany(t => t.Timeline.Statuses))
+                                 .SelectMany(_ => _)
+                                 .Where(s => _predicate(s));
+            }
             var fetch = Observable.Start(() =>
                                          StatusStore.Find(_predicate,
                                                           maxId != null
@@ -76,7 +98,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlip
                                         .FirstOrDefault();
                 if (info == null)
                     return Observable.Empty<TwitterStatus>();
-                return fetch.Merge(info.SearchTweets(query, count: count, max_id: maxId)
+                return fetch.Merge(info.SearchTweets(_query, count: count, max_id: maxId)
                                        .Catch((Exception ex) =>
                                        {
                                            BackpanelModel.RegisterEvent(new OperationFailedEvent(ex.Message));
@@ -99,6 +121,22 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlip
                 return ctab != null ? ctab.BindingAccountIds : Enumerable.Empty<long>();
             }
         }
+
+        public void SetPhysicalFocus()
+        {
+            this.Messenger.Raise(new InteractionMessage("SetPhysicalFocus"));
+        }
+
+        public void Close()
+        {
+            _parent.Close();
+        }
+
+        public void PinToTab()
+        {
+            // TODO: Implement
+            Close();
+        }
     }
 
     /// <summary>
@@ -110,6 +148,10 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlip
         /// Search local store by keyword.
         /// </summary>
         None,
+        /// <summary>
+        /// Search from tabs only
+        /// </summary>
+        Quick,
         /// <summary>
         /// Search local store by query.
         /// </summary>

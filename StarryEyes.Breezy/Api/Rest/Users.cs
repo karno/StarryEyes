@@ -30,13 +30,13 @@ namespace StarryEyes.Breezy.Api.Rest
         // profile image is not implemented... (please teach how to implement it!)
 
         public static IObservable<TwitterUser> SearchUser(this AuthenticateInfo info,
-            string query, int? page = null, int perPage = 20, bool includeEntities = true)
+            string query, int? page = null, int count = 20, bool includeEntities = true)
         {
             var param = new Dictionary<string, object>
             {
                 {"q", query},
                 {"page", page},
-                {"per_page", perPage},
+                {"count", count},
                 {"include_entities", includeEntities},
             }.Parametalize();
             return info.GetOAuthClient()

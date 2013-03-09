@@ -13,14 +13,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace StarryEyes.Views.WindowParts.Flips
+namespace StarryEyes.Views.WindowParts.Flips.SearchFlips
 {
     /// <summary>
-    /// UserInformationFlip.xaml の相互作用ロジック
+    /// SearchResult.xaml の相互作用ロジック
     /// </summary>
-    public partial class UserInformationFlip : UserControl
+    public partial class SearchResult : UserControl
     {
-        public UserInformationFlip()
+        public SearchResult()
         {
             InitializeComponent();
         }

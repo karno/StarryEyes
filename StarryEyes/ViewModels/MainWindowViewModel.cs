@@ -4,6 +4,7 @@ using System.Reactive.Linq;
 using System.Threading;
 using Livet;
 using Livet.Messaging;
+using StarryEyes.Filters.Expressions;
 using StarryEyes.Models;
 using StarryEyes.Models.Connections.UserDependencies;
 using StarryEyes.Models.Stores;
@@ -152,6 +153,10 @@ namespace StarryEyes.ViewModels
                 h => MainWindowModel.OnFocusRequested += h,
                 h => MainWindowModel.OnFocusRequested -= h)
                 .Subscribe(SetFocus));
+            CompositeDisposable.Add(Observable.FromEvent<Tuple<string, FilterExpressionBase>>(
+                h => MainWindowModel.OnConfirmMuteRequested += h,
+                h => MainWindowModel.OnConfirmMuteRequested -= h)
+                .Subscribe(OnMuteRequested));
             _backpanelViewModel.Initialize();
         }
 
@@ -164,10 +169,18 @@ namespace StarryEyes.ViewModels
                     break;
                 case FocusRequest.Timeline:
                     MainAreaModel.CurrentFocusTab.SetPhysicalFocus();
+                    SearchFlipViewModel.Close();
                     break;
                 case FocusRequest.Tweet:
+                    InputAreaViewModel.OpenInput();
+                    InputAreaViewModel.FocusToTextBox();
+                    SearchFlipViewModel.Close();
                     break;
             }
+        }
+
+        private void OnMuteRequested(Tuple<string, FilterExpressionBase> tuple)
+        {
         }
 
         private int _visibleCount;

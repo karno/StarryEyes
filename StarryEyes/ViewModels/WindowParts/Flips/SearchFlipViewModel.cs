@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Reactive;
-using System.Reactive.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using Livet;
 using Livet.Messaging;
 using StarryEyes.Filters;
 using StarryEyes.Filters.Parsing;
 using StarryEyes.Models;
-using StarryEyes.ViewModels.WindowParts.Flips.SearchFlip;
+using StarryEyes.ViewModels.WindowParts.Flips.SearchFlips;
 using StarryEyes.Views.Utils;
 
 namespace StarryEyes.ViewModels.WindowParts.Flips
@@ -21,9 +18,10 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             get { return false; }
         }
 
-        private SearchResultViewModel _resultViewModel;
-
         private readonly SearchCandidateViewModel _candidateViewModel;
+        private SearchResultViewModel _resultViewModel;
+        private UserCandidateViewModel _userViewModel;
+        private UserInfoViewModel _userInfoViewModel;
 
         public SearchFlipViewModel()
         {
@@ -46,13 +44,38 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         {
             get { return _candidateViewModel; }
         }
-
         public SearchResultViewModel SearchResult
         {
             get { return _resultViewModel; }
             private set
             {
                 var previous = Interlocked.Exchange(ref _resultViewModel, value);
+                RaisePropertyChanged();
+                if (previous != null)
+                {
+                    previous.Dispose();
+                }
+            }
+        }
+        public UserCandidateViewModel UserCandidate
+        {
+            get { return _userViewModel; }
+            private set
+            {
+                var previous = Interlocked.Exchange(ref _userViewModel, value);
+                RaisePropertyChanged();
+                if (previous != null)
+                {
+                    previous.Dispose();
+                }
+            }
+        }
+        public UserInfoViewModel UserInfo
+        {
+            get { return _userInfoViewModel; }
+            private set
+            {
+                var previous = Interlocked.Exchange(ref _userInfoViewModel, value);
                 RaisePropertyChanged();
                 if (previous != null)
                 {
@@ -98,21 +121,21 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public void SetNextSearchOption()
         {
-            if (SearchMode == SearchMode.UserId)
+            if (SearchMode == SearchMode.UserScreenName)
                 SearchMode = SearchMode.Quick;
             else
                 SearchMode = (SearchMode)(((int)SearchMode) + 1);
-            if (SearchMode == SearchMode.UserId && !CanBeUserScreenName)
+            if (SearchMode == SearchMode.UserScreenName && !CanBeUserScreenName)
                 SearchMode = SearchMode.Quick;
         }
 
         public void SetPreviousSearchOption()
         {
             if (SearchMode == SearchMode.Quick)
-                SearchMode = SearchMode.UserId;
+                SearchMode = SearchMode.UserScreenName;
             else
                 SearchMode = (SearchMode)(((int)SearchMode) - 1);
-            if (SearchMode == SearchMode.UserId && !CanBeUserScreenName)
+            if (SearchMode == SearchMode.UserScreenName && !CanBeUserScreenName)
                 SearchMode = SearchMode.UserWeb;
         }
 
@@ -138,7 +161,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public void SetUserIdSearch()
         {
-            SearchMode = SearchMode.UserId;
+            SearchMode = SearchMode.UserScreenName;
         }
 
         #endregion
@@ -181,9 +204,16 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             get { return _searchMode; }
             set
             {
+                if (_searchMode == value) return;
                 _searchMode = value;
                 RaisePropertyChanged();
+                CommitSearch();
             }
+        }
+
+        public string SearchHintLabel
+        {
+            get { return "search (Ctrl+Q)"; }
         }
 
         private readonly Regex _userScreenNameRegex = new Regex("^[A-Za-z0-9_]+$", RegexOptions.Compiled);
@@ -217,6 +247,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             else
             {
                 IsQueryMode = false;
+                IsSearchOptionAvailable = true;
                 ErrorText = null;
                 if (String.IsNullOrEmpty(value))
                 {
@@ -230,7 +261,6 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                     {
                         CommitSearch();
                     }
-                    IsSearchOptionAvailable = true;
                     CanBeUserScreenName = _userScreenNameRegex.IsMatch(value);
                 }
             }
@@ -238,15 +268,18 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public override void Open()
         {
+            if (this.IsVisible) return;
             base.Open();
+            SearchMode = SearchMode.Quick;
             SearchCandidate.UpdateInfo();
         }
 
         public override void Close()
         {
+            if (!this.IsVisible) return;
             Text = String.Empty;
-            MainWindowModel.SetFocusTo(FocusRequest.Timeline);
             base.Close();
+            MainWindowModel.SetFocusTo(FocusRequest.Timeline);
         }
 
         #region Text box control
@@ -263,54 +296,54 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public void OnEnterKeyDown()
         {
+            // check difference
+            if (_previousCommit == Text) return;
             if (!IsQueryMode || ErrorText == null)
             {
                 // commit search query
-                IsSearchResultAvailable = true;
                 CommitSearch();
+                if (SearchResult != null)
+                {
+                    SearchResult.SetPhysicalFocus();
+                }
             }
-        }
-
-        private void CommitSearch()
-        {
-
         }
 
         #endregion
-    }
 
-    /// TODO: Implementation
-    public class SearchTypeViewModel : ViewModel
-    {
-        private readonly string _label;
-        private readonly string _description;
-        private readonly IObservable<bool> _enabilityNotifier;
-        private readonly IObservable<bool> _selectedNotifier;
-        private readonly Action _onSelected;
-
-        public SearchTypeViewModel(string label, string description, IObservable<bool> selectedNotifier, Action onSelected)
+        private string _previousCommit;
+        private void CommitSearch()
         {
-            _label = label;
-            _description = description;
-            _selectedNotifier = selectedNotifier;
-            _onSelected = onSelected;
-        }
-
-        public SearchTypeViewModel(string label, string description, IObservable<bool> enabilityNotifier,
-            IObservable<bool> selectedNotifier, Action onSelected)
-            : this(label, description, selectedNotifier, onSelected)
-        {
-            _enabilityNotifier = enabilityNotifier;
-        }
-
-        public void Activate()
-        {
-            if (_selectedNotifier != null)
+            _previousCommit = Text;
+            if (String.IsNullOrWhiteSpace(Text))
             {
+                IsSearchResultAvailable = false;
+                return;
             }
-            if (_enabilityNotifier != null)
+            SearchResult = null;
+            UserCandidate = null;
+            UserInfo = null;
+            switch (SearchMode)
             {
+                case SearchMode.Quick:
+                    SearchResult = new SearchResultViewModel(this, Text, SearchOption.Quick);
+                    break;
+                case SearchMode.Local:
+                    SearchResult = new SearchResultViewModel(this, Text, SearchOption.None);
+                    break;
+                case SearchMode.Web:
+                    SearchResult = new SearchResultViewModel(this, Text, SearchOption.Web);
+                    break;
+                case SearchMode.UserWeb:
+                    UserCandidate = new UserCandidateViewModel(Text);
+                    break;
+                case SearchMode.UserScreenName:
+                    break;
+                default:
+                    IsSearchResultAvailable = false;
+                    throw new ArgumentOutOfRangeException();
             }
+            IsSearchResultAvailable = true;
         }
     }
 
@@ -320,6 +353,6 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         Local,
         Web,
         UserWeb,
-        UserId,
+        UserScreenName,
     }
 }

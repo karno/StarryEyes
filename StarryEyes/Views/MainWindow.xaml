@@ -9,6 +9,7 @@
                       xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                       xmlns:sebehaviors="clr-namespace:StarryEyes.Views.Messaging.Behaviors"
+                      xmlns:triggers="clr-namespace:StarryEyes.Views.Triggers"
                       xmlns:utils="clr-namespace:StarryEyes.Views.Utils"
                       xmlns:vm="clr-namespace:StarryEyes.ViewModels"
                       xmlns:windowParts="clr-namespace:StarryEyes.Views.WindowParts"
@@ -86,7 +87,8 @@
                      Visibility="{Binding ShowWindowCommands,
                                           Converter={StaticResource BooleanToVisibleConverter}}"
                      controls:TextboxHelper.ClearTextButton="True"
-                     controls:TextboxHelper.Watermark="search">
+                     controls:TextboxHelper.Watermark="{Binding SearchFlipViewModel.SearchHintLabel,
+                                                                FallbackValue=search}">
                 <i:Interaction.Triggers>
                     <l:InteractionMessageTrigger MessageKey="FocusToTextBox" Messenger="{Binding SearchFlipViewModel.Messenger}">
                         <l:SetFocusAction />
@@ -94,6 +96,9 @@
                     <i:EventTrigger EventName="GotFocus">
                         <ei:CallMethodAction MethodName="GotFocusToSearchBox" TargetObject="{Binding SearchFlipViewModel}" />
                     </i:EventTrigger>
+                    <triggers:EnterKeyTrigger>
+                        <ei:CallMethodAction MethodName="OnEnterKeyDown" TargetObject="{Binding SearchFlipViewModel}" />
+                    </triggers:EnterKeyTrigger>
                 </i:Interaction.Triggers>
             </TextBox>
         </controls:WindowCommands>
