@@ -16,13 +16,12 @@ using StarryEyes.Settings;
 using StarryEyes.Views.Utils;
 using StarryEyes.Views.Messaging;
 using TaskDialogInterop;
+using System.Windows;
 
 namespace StarryEyes.ViewModels.WindowParts.Timelines
 {
     public class StatusViewModel : ViewModel
     {
-        public const string TwitterStatusUrl = "https://twitter.com/{0}/status/{1}";
-
         private readonly ReadOnlyDispatcherCollectionRx<UserViewModel> _favoritedUsers;
         private readonly TimelineViewModelBase _parent;
         private readonly ReadOnlyDispatcherCollectionRx<UserViewModel> _retweetedUsers;
@@ -388,10 +387,39 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             }
         }
 
+        public void ShowUserProfile()
+        {
+
+        }
+
+        public void ShowConversation()
+        {
+
+        }
+
         public void OpenWeb()
         {
-            BrowserHelper.Open(
-                String.Format(TwitterStatusUrl, User.ScreenName, Status.Id));
+            BrowserHelper.Open(Status.Permalink);
+        }
+
+        public void OpenFavstar()
+        {
+            BrowserHelper.Open(Status.FavstarPermalink);
+        }
+
+        public void OpenUserWeb()
+        {
+            BrowserHelper.Open(Status.UserPermalink);
+        }
+
+        public void OpenUserFavstar()
+        {
+            BrowserHelper.Open(Status.FavstarUserPermalink);
+        }
+
+        public void OpenUserTwilog()
+        {
+            BrowserHelper.Open(Status.TwilogUserPermalink);
         }
 
         public void OpenSourceLink()
@@ -412,6 +440,41 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         }
 
         #region Execution commands
+
+        public void CopyBody()
+        {
+            SetClipboard(Status.GetEntityAidedText(true));
+        }
+
+        public void CopyPermalink()
+        {
+            SetClipboard(Status.Permalink);
+        }
+
+        public void CopySTOT()
+        {
+            SetClipboard(Status.STOTString);
+        }
+
+        private void SetClipboard(string value)
+        {
+            try
+            {
+                Clipboard.SetText(value);
+            }
+            catch (Exception ex)
+            {
+                var msg = new TaskDialogMessage(new TaskDialogOptions
+                            {
+                                CommonButtons = TaskDialogCommonButtons.Close,
+                                MainIcon = VistaTaskDialogIcon.Error,
+                                MainInstruction = "コピーを行えませんでした。",
+                                Content = ex.Message,
+                                Title = "クリップボード エラー"
+                            });
+                this.Parent.Messenger.Raise(msg);
+            }
+        }
 
         public void Favorite(IEnumerable<AuthenticateInfo> infos, bool add)
         {
@@ -639,6 +702,17 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             InputAreaModel.SetText(Model.GetSuitableReplyAccount(), "@" + User.ScreenName + " ", inReplyTo: Status);
         }
 
+        public void Quote()
+        {
+            InputAreaModel.SetText(Model.GetSuitableReplyAccount(),
+                " RT @" + User.ScreenName + " " + Status.GetEntityAidedText(true), CursorPosition.Begin);
+        }
+
+        public void QuotePermalink()
+        {
+            InputAreaModel.SetText(Model.GetSuitableReplyAccount(), " " + Status.Permalink, CursorPosition.Begin);
+        }
+
         public void DirectMessage()
         {
             InputAreaModel.SetDirectMessage(Model.GetSuitableReplyAccount(), Status.User);
@@ -714,26 +788,113 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             // TODO: Implementation
         }
 
-        #endregion
-
-        #region Menu commands
-
-        #region ReplyCommand
-        private ViewModelCommand _ReplyCommand;
-
-        public ViewModelCommand ReplyCommand
+        public void GiveFavstarTrophy()
         {
-            get
+            if (!AssertQuickActionEnabled()) return;
+            if (Setting.FavstarApiKey.Value == null)
             {
-                if (_ReplyCommand == null)
+                this.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
                 {
-                    _ReplyCommand = new ViewModelCommand(Reply);
-                }
-                return _ReplyCommand;
+                    AllowDialogCancellation = true,
+                    CommonButtons = TaskDialogCommonButtons.Close,
+                    MainIcon = VistaTaskDialogIcon.Error,
+                    MainInstruction = "この操作にはFavstar APIキーが必要です。",
+                    Content = "Favstar APIキーを取得し、設定画面で登録してください。",
+                    FooterIcon = VistaTaskDialogIcon.Information,
+                    FooterText = "FavstarのProメンバーのみこの操作を行えます。",
+                    Title = "ツイート賞の授与",
+                }));
+                return;
+            }
+            var msg = new TaskDialogMessage(new TaskDialogOptions
+                        {
+                            AllowDialogCancellation = true,
+                            CommonButtons = TaskDialogCommonButtons.OKCancel,
+                            MainIcon = VistaTaskDialogIcon.Information,
+                            MainInstruction = "このツイートに今日のツイート賞を与えますか？",
+                            Content = Status.ToString(),
+                            FooterIcon = VistaTaskDialogIcon.Information,
+                            FooterText = "FavstarのProメンバーのみこの操作を行えます。",
+                            Title = "Favstar ツイート賞の授与",
+                        });
+            var response = this.Parent.Messenger.GetResponse(msg);
+            if (response.Response.Result == TaskDialogSimpleResult.Ok)
+            {
+                var accounts = GetImmediateAccounts()
+                    .ToObservable();
+                accounts.SelectMany(a => new FavstarTrophyOperation(a, this.Status).Run())
+                        .Do(_ => RaisePropertyChanged(() => IsFavorited))
+                        .Subscribe();
             }
         }
-        #endregion
 
+        public void ReportAsSpam()
+        {
+            var msg = new TaskDialogMessage(new TaskDialogOptions
+            {
+                AllowDialogCancellation = true,
+                CommonButtons = TaskDialogCommonButtons.OKCancel,
+                MainIcon = VistaTaskDialogIcon.Warning,
+                MainInstruction = "ユーザー " + Status.User.ScreenName + " をスパム報告しますか？",
+                Content = "全てのアカウントからブロックし、代表のアカウントからスパム報告します。",
+                Title = "ユーザーをスパムとして報告",
+            });
+            var response = this.Parent.Messenger.GetResponse(msg);
+            if (response.Response.Result == TaskDialogSimpleResult.Ok)
+            {
+                // report as a spam
+                // TODO
+                System.Diagnostics.Debug.WriteLine("R4S: " + Status.User.ScreenName);
+            }
+        }
+
+        public void MuteKeyword()
+        {
+            // TODO
+        }
+
+        public void MuteUser()
+        {
+            var msg = new TaskDialogMessage(new TaskDialogOptions
+            {
+                AllowDialogCancellation = true,
+                CommonButtons = TaskDialogCommonButtons.OKCancel,
+                MainIcon = VistaTaskDialogIcon.Warning,
+                MainInstruction = "ユーザー " + Status.User.ScreenName + " をミュートしますか？",
+                Content = "このユーザーのツイートが全てのタブから除外されるようになります。",
+                FooterIcon = VistaTaskDialogIcon.Information,
+                FooterText = "ミュートの解除は設定画面から行えます。",
+                Title = "ユーザーのミュート",
+            });
+            var response = this.Parent.Messenger.GetResponse(msg);
+            if (response.Response.Result == TaskDialogSimpleResult.Ok)
+            {
+                // report as a spam
+                // TODO
+                System.Diagnostics.Debug.WriteLine("Mute: " + Status.User.ScreenName);
+            }
+        }
+
+        public void MuteClient()
+        {
+            var msg = new TaskDialogMessage(new TaskDialogOptions
+            {
+                AllowDialogCancellation = true,
+                CommonButtons = TaskDialogCommonButtons.OKCancel,
+                MainIcon = VistaTaskDialogIcon.Warning,
+                MainInstruction = "クライアント " + SourceText + " をスパム報告しますか？",
+                Content = "このクライアントからのツイートが全てのタブから除外されるようになります。",
+                FooterIcon = VistaTaskDialogIcon.Information,
+                FooterText = "ミュートの解除は設定画面から行えます。",
+                Title = "クライアントのミュート",
+            });
+            var response = this.Parent.Messenger.GetResponse(msg);
+            if (response.Response.Result == TaskDialogSimpleResult.Ok)
+            {
+                // report as a spam
+                System.Diagnostics.Debug.WriteLine("Mute: " + Status.Source);
+            }
+        }
         #endregion
 
         #region OpenLinkCommand

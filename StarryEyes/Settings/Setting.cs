@@ -137,6 +137,9 @@ namespace StarryEyes.Settings
             }
         }
 
+        public static readonly SettingItem<string> FavstarApiKey =
+            new SettingItem<string>("FavstarApiKey", null);
+
         #endregion
 
         #region Notification and Confirmations

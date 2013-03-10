@@ -72,9 +72,9 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
         {
             if (_option == SearchOption.Quick)
             {
-                return Observable.Start(() =>
-                                        MainAreaModel.Columns.SelectMany(c => c.Tabs)
-                                                     .SelectMany(t => t.Timeline.Statuses))
+                if (MainAreaModel.CurrentFocusTab == null)
+                    return Observable.Empty<TwitterStatus>();
+                return Observable.Start(() => MainAreaModel.CurrentFocusTab.Timeline.Statuses)
                                  .SelectMany(_ => _)
                                  .Where(s => _predicate(s));
             }

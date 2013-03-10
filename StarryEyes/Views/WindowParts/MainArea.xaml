@@ -101,28 +101,12 @@
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Grid Grid.Row="1" Visibility="{Binding IsFocused, Converter={StaticResource BooleanToVisibleConverter}}">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition />
-                                    </Grid.RowDefinitions>
-                                    <Border Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibleConverter}}">
-                                        <StackPanel Margin="4"
-                                                    HorizontalAlignment="Center"
-                                                    Orientation="Horizontal">
-                                            <Viewbox Width="20" Height="20">
-                                                <Controls:ProgressRing IsActive="True" />
-                                            </Viewbox>
-                                            <TextBlock Margin="4"
-                                                       VerticalAlignment="Center"
-                                                       Text="loading..." />
-                                        </StackPanel>
-                                    </Border>
-                                    <Timelines:Timeline Grid.Row="1"
-                                                        HorizontalAlignment="Stretch"
-                                                        VerticalAlignment="Stretch"
-                                                        DataContext="{Binding}" />
-                                </Grid>
+                                <Timelines:Timeline Grid.Row="1"
+                                                    HorizontalAlignment="Stretch"
+                                                    VerticalAlignment="Stretch"
+                                                    DataContext="{Binding}"
+                                                    Visibility="{Binding IsFocused,
+                                                                         Converter={StaticResource BooleanToVisibleConverter}}" />
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>

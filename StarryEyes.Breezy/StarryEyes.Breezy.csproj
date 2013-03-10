@@ -123,6 +123,7 @@
     <Compile Include="DataModel\TwitterUser.cs" />
     <Compile Include="Imaging\ImageResolver.cs" />
     <Compile Include="Net\MultipartableOAuthClient.cs" />
+    <Compile Include="Net\OAuthEchoClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scrapping\InstapaperApi.cs" />
     <Compile Include="Scrapping\PocketApi.cs" />

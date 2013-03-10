@@ -618,6 +618,8 @@ namespace StarryEyes.ViewModels.WindowParts
 
         public void OverrideSelectedAccounts(IEnumerable<AuthenticateInfo> infos)
         {
+            // if null, not override default.
+            if (infos == null) return;
             _isSuppressAccountChangeRelay = true;
             AuthenticateInfo[] accounts = infos as AuthenticateInfo[] ?? infos.ToArray();
             AccountSelectionFlip.SelectedAccounts = accounts;

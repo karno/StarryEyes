@@ -1,6 +1,7 @@
 ﻿<UserControl x:Class="StarryEyes.Views.WindowParts.Timelines.Timeline"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
              xmlns:behaviors="clr-namespace:StarryEyes.Views.Behaviors"
              xmlns:controls="clr-namespace:StarryEyes.Views.Controls"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -42,38 +43,228 @@
                         SnapsToDevicePixels="True">
                     <Border.ContextMenu>
                         <ContextMenu DataContext="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
-                            <MenuItem Header="返信(_R)" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToInvisibleConverter}}" />
-                            <MenuItem Header="選択ツイートすべてに返信(_R)" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibleConverter}}" />
-                            <MenuItem Header="ダイレクトメッセージ(_D)" />
-                            <MenuItem Header="お気に入り登録(_F)" />
-                            <MenuItem Header="リツイート(_R)" />
-                            <MenuItem Header="引用(_Q)" />
-                            <MenuItem Header="パーマリンクで引用(_L)" />
-                            <Separator />
-                            <MenuItem Header="クリップボードへコピー(_C)">
-                                <MenuItem Header="本文(_B)" />
-                                <MenuItem Header="パーマリンク(_P)" />
+                            <MenuItem Header="返信(_M)" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToInvisibleConverter}}">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="Click">
+                                        <ei:CallMethodAction MethodName="Reply" TargetObject="{Binding}" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
                             </MenuItem>
-                            <MenuItem Header="Webを開く(_W)" />
-                            <MenuItem Header="Favstarを開く(_F)" />
-                            <MenuItem Header="Favstar トロフィーを授与(_T)" />
+                            <MenuItem Header="選択ツイートすべてに返信(_M)" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibleConverter}}">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="Click">
+                                        <ei:CallMethodAction MethodName="ReplySelecteds" TargetObject="{Binding Parent}" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </MenuItem>
                             <Separator />
-                            <MenuItem Header="このツイートを選択(_S)" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToInvisibleConverter}}" />
-                            <MenuItem Header="このツイートの選択を解除(_S)" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibleConverter}}" />
-                            <MenuItem Header="選択をすべてお気に入り登録(_A)" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibleConverter}}" />
-                            <MenuItem Header="選択ツイートのユーザーを抽出(_U)" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibleConverter}}" />
-                            <MenuItem Header="選択をすべて解除(_Z)" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibleConverter}}" />
+                            <MenuItem Header="このツイートを選択(_S)" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToInvisibleConverter}}">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="Click">
+                                        <ei:CallMethodAction MethodName="ToggleSelect" TargetObject="{Binding}" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </MenuItem>
+                            <MenuItem Header="選択を解除(_S)" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibleConverter}}">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="Click">
+                                        <ei:CallMethodAction MethodName="ToggleSelect" TargetObject="{Binding}" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </MenuItem>
+                            <MenuItem Header="選択ツイートの操作(_A)" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibleConverter}}">
+                                <MenuItem Header="お気に入り登録(_F)" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibleConverter}}">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="Click">
+                                            <ei:CallMethodAction MethodName="FavoriteSelecteds" TargetObject="{Binding Parent}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </MenuItem>
+                                <MenuItem Header="ユーザーを抽出(_E)" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibleConverter}}">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="Click">
+                                            <ei:CallMethodAction MethodName="ExtractSelecteds" TargetObject="{Binding Parent}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </MenuItem>
+                                <MenuItem Header="すべて解除(_Z)" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibleConverter}}">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="Click">
+                                            <ei:CallMethodAction MethodName="DeselectAll" TargetObject="{Binding Parent}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </MenuItem>
+                            </MenuItem>
                             <Separator />
-                            <MenuItem Header="ユーザーのプロフィール(_P)" />
-                            <MenuItem Header="このユーザーを抽出(_E)" />
-                            <MenuItem Header="このツイートの関連ツイート(_O)" />
+                            <MenuItem Header="お気に入り登録(_F)" Visibility="{Binding CanFavoriteImmediate, Converter={StaticResource BooleanToVisibleConverter}}">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="Click">
+                                        <ei:CallMethodAction MethodName="ToggleFavoriteImmediate" TargetObject="{Binding}" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </MenuItem>
+                            <MenuItem Header="アカウントを選択してお気に入り登録(_V)" Visibility="{Binding CanFavorite, Converter={StaticResource BooleanToVisibleConverter}}">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="Click">
+                                        <ei:CallMethodAction MethodName="ToggleFavorite" TargetObject="{Binding}" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </MenuItem>
+
+                            <MenuItem Header="リツイート(_R)" Visibility="{Binding CanRetweetImmediate, Converter={StaticResource BooleanToVisibleConverter}}">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="Click">
+                                        <ei:CallMethodAction MethodName="ToggleRetweetImmediate" TargetObject="{Binding}" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </MenuItem>
+                            <MenuItem Header="アカウントを選択してリツイート(_W)" Visibility="{Binding CanRetweet, Converter={StaticResource BooleanToVisibleConverter}}">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="Click">
+                                        <ei:CallMethodAction MethodName="ToggleRetweet" TargetObject="{Binding}" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </MenuItem>
+                            <MenuItem Header="引用(_Q)">
+                                <MenuItem Header="パーマリンクで引用(_L)">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="Click">
+                                            <ei:CallMethodAction MethodName="QuotePermalink" TargetObject="{Binding}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </MenuItem>
+                                <MenuItem Header="非公式RT(_Q)">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="Click">
+                                            <ei:CallMethodAction MethodName="Quote" TargetObject="{Binding}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </MenuItem>
+                            </MenuItem>
                             <Separator />
-                            <MenuItem Header="ミュート・スパム報告(_X)">
-                                <MenuItem Header="キーワードをミュート(_K)" />
-                                <MenuItem Header="ユーザーをミュート(_U)" />
-                                <MenuItem Header="クライアントをミュート(_C)" />
+
+                            <MenuItem Header="このツイート(_T)">
+                                <MenuItem Header="会話を開く(_C)">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="Click">
+                                            <ei:CallMethodAction MethodName="OpenConversation" TargetObject="{Binding}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </MenuItem>
                                 <Separator />
-                                <MenuItem Header="ユーザーをスパムとして報告(_X)" />
+                                <MenuItem Header="本文をコピー(_B)">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="Click">
+                                            <ei:CallMethodAction MethodName="CopyBody" TargetObject="{Binding}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </MenuItem>
+                                <MenuItem Header="パーマリンクをコピー(_P)">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="Click">
+                                            <ei:CallMethodAction MethodName="CopyPermalink" TargetObject="{Binding}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </MenuItem>
+                                <MenuItem Header="STOT形式でコピー(_S)">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="Click">
+                                            <ei:CallMethodAction MethodName="CopySTOT" TargetObject="{Binding}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </MenuItem>
+                                <Separator />
+                                <MenuItem Header="Webを開く(_W)">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="Click">
+                                            <ei:CallMethodAction MethodName="OpenWeb" TargetObject="{Binding}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </MenuItem>
+                                <MenuItem Header="Favstarを開く(_F)">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="Click">
+                                            <ei:CallMethodAction MethodName="OpenFavstar" TargetObject="{Binding}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </MenuItem>
+                                <Separator />
+                                <MenuItem Header="Favstar トロフィーを授与(_T)">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="Click">
+                                            <ei:CallMethodAction MethodName="GiveFavstarTrophy" TargetObject="{Binding}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </MenuItem>
+                            </MenuItem>
+                            <MenuItem Header="このユーザー(_U)">
+                                <MenuItem Header="プロフィール(_P)">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="Click">
+                                            <ei:CallMethodAction MethodName="ShowUserProfile" TargetObject="{Binding}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </MenuItem>
+                                <MenuItem Header="ダイレクトメッセージ(_D)">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="Click">
+                                            <ei:CallMethodAction MethodName="DirectMessage" TargetObject="{Binding}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </MenuItem>
+                                <Separator />
+                                <MenuItem Header="Twitterで見る(_T)">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="Click">
+                                            <ei:CallMethodAction MethodName="OpenUserWeb" TargetObject="{Binding}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </MenuItem>
+                                <MenuItem Header="Twilogで見る(_L)">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="Click">
+                                            <ei:CallMethodAction MethodName="OpenUserTwilog" TargetObject="{Binding}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </MenuItem>
+                                <MenuItem Header="Favstarで見る(_F)">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="Click">
+                                            <ei:CallMethodAction MethodName="OpenUserFavstar" TargetObject="{Binding}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </MenuItem>
+                                <Separator />
+                                <MenuItem Header="スパムとして報告(_S)">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="Click">
+                                            <ei:CallMethodAction MethodName="ReportAsSpam" TargetObject="{Binding}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </MenuItem>
+                            </MenuItem>
+                            <MenuItem Header="ミュート(_X)">
+                                <MenuItem Header="キーワードをミュート(_K)">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="Click">
+                                            <ei:CallMethodAction MethodName="MuteKeyword" TargetObject="{Binding}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </MenuItem>
+                                <MenuItem Header="ユーザーをミュート(_U)">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="Click">
+                                            <ei:CallMethodAction MethodName="MuteUser" TargetObject="{Binding}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </MenuItem>
+                                <MenuItem Header="クライアントをミュート(_C)">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="Click">
+                                            <ei:CallMethodAction MethodName="MuteClient" TargetObject="{Binding}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </MenuItem>
                             </MenuItem>
                         </ContextMenu>
                     </Border.ContextMenu>
@@ -797,17 +988,6 @@
                                                     Height="22"
                                                     Margin="0,-2"
                                                     Style="{StaticResource MetroSquareUnfocusableFlatButton}">
-                                                <Path Width="4"
-                                                      Height="3.432"
-                                                      Margin="0,6,3,0"
-                                                      Data="F1 M 817.171,593.771C 816.641,593.983 816.348,594.477 816.343,595.227L 817.01,595.227L 817.01,596.562L 815.508,596.562L 815.508,595.32C 815.508,594.971 815.59,594.63 815.633,594.373C 815.677,594.116 815.79,594.025 815.975,593.767C 816.159,593.509 816.443,593.297 816.825,593.13L 817.171,593.771 Z M 814.833,593.771C 814.309,593.983 814.015,594.477 814.005,595.227L 814.673,595.227L 814.673,596.562L 813.171,596.562L 813.171,595.32C 813.171,594.971 813.253,594.63 813.296,594.373C 813.339,594.116 813.452,594.025 813.633,593.767C 813.814,593.509 814.099,593.297 814.488,593.13L 814.833,593.771 Z "
-                                                      Fill="Gray"
-                                                      Stretch="Fill" />
-                                            </Button>
-                                            <Button Width="32"
-                                                    Height="22"
-                                                    Margin="0,-2"
-                                                    Style="{StaticResource MetroSquareUnfocusableFlatButton}">
                                                 <i:Interaction.Triggers>
                                                     <i:EventTrigger EventName="Click">
                                                         <ei:CallMethodAction MethodName="SendReply" TargetObject="{Binding Mode=OneTime}" />
@@ -1170,14 +1350,14 @@
             <VisualStateGroup x:Name="StatusesActionBar">
                 <VisualState x:Name="Close">
                     <Storyboard>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="border" Storyboard.TargetProperty="(UIElement.Visibility)">
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="multiOperationBlock" Storyboard.TargetProperty="(UIElement.Visibility)">
                             <DiscreteObjectKeyFrame KeyTime="0:0:0.2">
                                 <DiscreteObjectKeyFrame.Value>
                                     <Visibility>Collapsed</Visibility>
                                 </DiscreteObjectKeyFrame.Value>
                             </DiscreteObjectKeyFrame>
                         </ObjectAnimationUsingKeyFrames>
-                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="border" Storyboard.TargetProperty="(FrameworkElement.Height)">
+                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="multiOperationBlock" Storyboard.TargetProperty="(FrameworkElement.Height)">
                             <EasingDoubleKeyFrame KeyTime="0" Value="40">
                                 <EasingDoubleKeyFrame.EasingFunction>
                                     <CircleEase EasingMode="EaseOut" />
@@ -1193,11 +1373,11 @@
                 </VisualState>
                 <VisualState x:Name="Open">
                     <Storyboard>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="border" Storyboard.TargetProperty="(UIElement.Visibility)">
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="multiOperationBlock" Storyboard.TargetProperty="(UIElement.Visibility)">
                             <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}" />
                             <DiscreteObjectKeyFrame KeyTime="0:0:0.2" Value="{x:Static Visibility.Visible}" />
                         </ObjectAnimationUsingKeyFrames>
-                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="border" Storyboard.TargetProperty="(FrameworkElement.Height)">
+                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="multiOperationBlock" Storyboard.TargetProperty="(FrameworkElement.Height)">
                             <EasingDoubleKeyFrame KeyTime="0" Value="0">
                                 <EasingDoubleKeyFrame.EasingFunction>
                                     <CircleEase EasingMode="EaseOut" />
@@ -1213,7 +1393,23 @@
                 </VisualState>
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
-        <Border x:Name="border"
+        <Border x:Name="loadingBlock"
+                VerticalAlignment="Top"
+                DockPanel.Dock="Top"
+                Visibility="{Binding IsLoading,
+                                     Converter={StaticResource BooleanToVisibleConverter}}">
+            <StackPanel Margin="4"
+                        HorizontalAlignment="Center"
+                        Orientation="Horizontal">
+                <Viewbox Width="20" Height="20">
+                    <Controls:ProgressRing IsActive="True" />
+                </Viewbox>
+                <TextBlock Margin="4"
+                           VerticalAlignment="Center"
+                           Text="loading..." />
+            </StackPanel>
+        </Border>
+        <Border x:Name="multiOperationBlock"
                 Height="40"
                 VerticalAlignment="Top"
                 Background="White"
@@ -1308,7 +1504,7 @@
                 <l:InteractionMessageTrigger Messenger="{Binding Messenger, Mode=OneTime}">
                     <mbehaviors:TaskDialogInteractionMessageAction />
                 </l:InteractionMessageTrigger>
-                <l:InteractionMessageTrigger MessageKey="SetPhysicalFocus" Messenger="{Binding Messenger, Mode=OneTime}">
+                <l:InteractionMessageTrigger MessageKey="SetPhysicalFocus" Messenger="{Binding Messenger, Mode=OneWay}">
                     <l:SetFocusAction />
                 </l:InteractionMessageTrigger>
                 <i:EventTrigger EventName="MouseDown">

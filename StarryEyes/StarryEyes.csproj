@@ -198,6 +198,7 @@
     <Compile Include="Models\Backpanels\PostEvents\PostFailedEvent.cs" />
     <Compile Include="Models\Backpanels\PostEvents\PostSucceededEvent.cs" />
     <Compile Include="Models\Backpanels\SystemEvents\TrackLimitEvent.cs" />
+    <Compile Include="Models\Backpanels\ThirdpartyEvents\FavstarTrophyEvent.cs" />
     <Compile Include="Models\Backpanels\TwitterEvents\BlockedEvent.cs" />
     <Compile Include="Models\Backpanels\TwitterEvents\FavoritedEvent.cs" />
     <Compile Include="Models\Backpanels\TwitterEvents\FollowedEvent.cs" />
@@ -216,6 +217,7 @@
     <Compile Include="Models\MainWindowModel.cs" />
     <Compile Include="Models\Notifications\NotificationModel.cs" />
     <Compile Include="Models\ObservableSynchronizedCollectionEx.cs" />
+    <Compile Include="Models\Operations\FavstarTrophyOperation.cs" />
     <Compile Include="Models\Plugins\ImageUploaderManager.cs" />
     <Compile Include="Models\Plugins\Packaging\PackageDescription.cs" />
     <Compile Include="Models\Plugins\Packaging\PluginPackage.cs" />

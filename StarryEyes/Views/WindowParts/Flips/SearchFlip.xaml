@@ -33,17 +33,17 @@
                         </ResourceDictionary.MergedDictionaries>
                         <Storyboard x:Key="DefaultStoryBoard">
                             <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(TextBlock.Background).(SolidColorBrush.Color)">
-                                <SplineColorKeyFrame KeyTime="0:0:0" Value="#001BA1E2" />
+                                <SplineColorKeyFrame KeyTime="0:0:0" Value="#00000000" />
                             </ColorAnimationUsingKeyFrames>
                         </Storyboard>
                         <Storyboard x:Key="HighlightStoryBoard">
                             <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(TextBlock.Background).(SolidColorBrush.Color)">
-                                <SplineColorKeyFrame KeyTime="0:0:0" Value="#661BA1E2" />
+                                <SplineColorKeyFrame KeyTime="0:0:0" Value="#FF5C83C2" />
                             </ColorAnimationUsingKeyFrames>
                         </Storyboard>
                         <Storyboard x:Key="PressStoryBoard">
                             <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(TextBlock.Background).(SolidColorBrush.Color)">
-                                <SplineColorKeyFrame KeyTime="0:0:0" Value="#201BA1E2" />
+                                <SplineColorKeyFrame KeyTime="0:0:0" Value="#FF16499A" />
                             </ColorAnimationUsingKeyFrames>
                         </Storyboard>
                     </ResourceDictionary>
@@ -231,7 +231,7 @@
         </VisualStateManager.VisualStateGroups>
         <Border x:Name="border"
                 Grid.ColumnSpan="2"
-                Background="#111111"
+                Background="#FF111111"
                 BorderThickness="0"
                 Opacity="0.6">
             <i:Interaction.Triggers>
@@ -269,7 +269,9 @@
         <!--  Search navigations  -->
         <Grid x:Name="InnerGrid"
               Grid.Column="1"
+              Width="286"
               HorizontalAlignment="Right"
+              Background="#FF1B58B8"
               RenderTransformOrigin="0.5,0.5">
             <Grid.RenderTransform>
                 <TransformGroup>
@@ -279,321 +281,306 @@
                     <TranslateTransform />
                 </TransformGroup>
             </Grid.RenderTransform>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <Border Grid.Column="1"
-                    BorderBrush="#111111"
-                    BorderThickness="1,0,0,0">
-                <DockPanel>
-                    <Grid Width="286" Background="#111111">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="30" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition />
-                        </Grid.RowDefinitions>
-                        <!--  Search Candidates  -->
-                        <Border Grid.RowSpan="2" VerticalAlignment="Stretch">
-                            <Border.Style>
-                                <Style TargetType="Border">
-                                    <Setter Property="Background" Value="#111111" />
-                                    <Style.Triggers>
-                                        <MultiDataTrigger>
-                                            <MultiDataTrigger.Conditions>
-                                                <Condition Binding="{Binding IsQueryMode}" Value="True" />
-                                                <Condition Binding="{Binding HasError}" Value="True" />
-                                            </MultiDataTrigger.Conditions>
-                                            <Setter Property="Background" Value="#FFE51400" />
-                                        </MultiDataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Border.Style>
-                        </Border>
-                        <TextBlock Grid.Row="1"
-                                   Margin="8"
-                                   Foreground="White"
-                                   Text="先頭に?を入力することでクエリを用いて検索できます。"
-                                   TextWrapping="Wrap"
-                                   Visibility="{Binding IsQueryMode,
-                                                        Converter={StaticResource BooleanToInvisibleConverter}}" />
-                        <Grid Grid.Row="1" Visibility="{Binding IsQueryMode, Converter={StaticResource BooleanToVisibleConverter}}">
-                            <TextBlock Margin="8"
-                                       Foreground="White"
-                                       Text="クエリは正しく解釈されました。Enterキーを入力すると検索が開始されます。"
-                                       TextWrapping="Wrap"
-                                       Visibility="{Binding HasError,
-                                                            Converter={StaticResource BooleanToInvisibleConverter}}" />
-                            <TextBlock Margin="8"
-                                       Foreground="White"
-                                       TextWrapping="Wrap"
-                                       Visibility="{Binding HasError,
-                                                            Converter={StaticResource BooleanToVisibleConverter}}">
-                                <Run Text="クエリにエラーがあります: " />
-                                <Run Text="{Binding ErrorText, Mode=OneWay}" />
-                            </TextBlock>
-                        </Grid>
-                        <StackPanel x:Name="searchOptionPanel"
-                                    Grid.Row="2"
-                                    Orientation="Vertical"
-                                    Visibility="Collapsed">
-                            <i:Interaction.Triggers>
-                                <ei:DataTrigger Binding="{Binding IsSearchOptionAvailable}" Value="True">
-                                    <ei:GoToStateAction StateName="OpenSearchOption" />
-                                </ei:DataTrigger>
-                                <ei:DataTrigger Binding="{Binding IsSearchOptionAvailable}" Value="False">
-                                    <ei:GoToStateAction StateName="CloseSearchOption" />
-                                </ei:DataTrigger>
-                            </i:Interaction.Triggers>
-                            <StackPanel.LayoutTransform>
-                                <TransformGroup>
-                                    <ScaleTransform />
-                                    <SkewTransform />
-                                    <RotateTransform />
-                                    <TranslateTransform />
-                                </TransformGroup>
-                            </StackPanel.LayoutTransform>
-                            <TextBlock Margin="8"
-                                       Foreground="White"
-                                       Text="検索対象:" />
-                            <Grid>
-                                <Grid.Style>
-                                    <Style TargetType="Grid">
-                                        <Setter Property="Background" Value="Transparent" />
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding SearchMode}" Value="Quick">
-                                                <Setter Property="Background" Value="#801BA1E2" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Grid.Style>
-                                <TextBlock Padding="8"
-                                           Style="{StaticResource FloatTextBlockStyle}"
-                                           Text="タブ内のツイート">
-                                    <TextBlock.ToolTip>
-                                        <TextBlock Margin="4"
-                                                   Foreground="White"
-                                                   Text="いずれかのタブに表示されているツイートを検索します。" />
-                                    </TextBlock.ToolTip>
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="MouseLeftButtonDown">
-                                            <ei:CallMethodAction MethodName="SetQuickSearch" TargetObject="{Binding}" />
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                </TextBlock>
-                            </Grid>
-
-                            <Grid>
-                                <Grid.Style>
-                                    <Style TargetType="Grid">
-                                        <Setter Property="Background" Value="Transparent" />
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding SearchMode}" Value="Local">
-                                                <Setter Property="Background" Value="#801BA1E2" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Grid.Style>
-                                <TextBlock Padding="8"
-                                           Style="{StaticResource FloatTextBlockStyle}"
-                                           Text="ローカルデータ">
-                                    <TextBlock.ToolTip>
-                                        <TextBlock Margin="4"
-                                                   Foreground="White"
-                                                   Text="Krileに蓄積されているすべてのツイートから検索します。" />
-                                    </TextBlock.ToolTip>
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="MouseLeftButtonDown">
-                                            <ei:CallMethodAction MethodName="SetLocalSearch" TargetObject="{Binding}" />
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                </TextBlock>
-                            </Grid>
-
-                            <Grid>
-                                <Grid.Style>
-                                    <Style TargetType="Grid">
-                                        <Setter Property="Background" Value="Transparent" />
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding SearchMode}" Value="Web">
-                                                <Setter Property="Background" Value="#801BA1E2" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Grid.Style>
-                                <TextBlock Padding="8"
-                                           Style="{StaticResource FloatTextBlockStyle}"
-                                           Text="Twitter上のツイート">
-                                    <TextBlock.ToolTip>
-                                        <TextBlock Margin="4"
-                                                   Foreground="White"
-                                                   Text="Twitterからツイートを検索します。" />
-                                    </TextBlock.ToolTip>
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="MouseLeftButtonDown">
-                                            <ei:CallMethodAction MethodName="SetWebSearch" TargetObject="{Binding}" />
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                </TextBlock>
-                            </Grid>
-
-                            <Grid>
-                                <Grid.Style>
-                                    <Style TargetType="Grid">
-                                        <Setter Property="Background" Value="Transparent" />
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding SearchMode}" Value="UserWeb">
-                                                <Setter Property="Background" Value="#801BA1E2" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Grid.Style>
-                                <TextBlock Padding="8"
-                                           Style="{StaticResource FloatTextBlockStyle}"
-                                           Text="ユーザー名">
-                                    <TextBlock.ToolTip>
-                                        <TextBlock Margin="4"
-                                                   Foreground="White"
-                                                   Text="Twitterでユーザーを検索します。" />
-                                    </TextBlock.ToolTip>
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="MouseLeftButtonDown">
-                                            <ei:CallMethodAction MethodName="SetUserWebSearch" TargetObject="{Binding}" />
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                </TextBlock>
-                            </Grid>
-
-                            <Grid Visibility="{Binding CanBeUserScreenName, Converter={StaticResource BooleanToVisibleConverter}}">
-                                <Grid.Style>
-                                    <Style TargetType="Grid">
-                                        <Setter Property="Background" Value="Transparent" />
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding SearchMode}" Value="UserId">
-                                                <Setter Property="Background" Value="#801BA1E2" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Grid.Style>
-                                <TextBlock Padding="8"
-                                           Style="{StaticResource FloatTextBlockStyle}"
-                                           Text="ユーザー@ID">
-                                    <TextBlock.ToolTip>
-                                        <TextBlock Margin="4"
-                                                   Foreground="White"
-                                                   Text="この@IDを持つユーザーを表示します。" />
-                                    </TextBlock.ToolTip>
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="MouseLeftButtonDown">
-                                            <ei:CallMethodAction MethodName="SetUserIdSearch" TargetObject="{Binding}" />
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                </TextBlock>
-                            </Grid>
-
-                        </StackPanel>
-                        <TextBlock Grid.Row="3"
-                                   Margin="8"
-                                   VerticalAlignment="Bottom"
-                                   Foreground="White"
-                                   Text="アクティブアカウントが一つだけの場合、保存されている検索キーワードを表示します。"
-                                   TextWrapping="Wrap"
-                                   Visibility="{Binding SearchCandidate.IsSearchCandidateAvailable,
-                                                        Converter={StaticResource BooleanToInvisibleConverter}}" />
-                        <DockPanel Grid.Row="3"
-                                   Margin="0,8,0,0"
-                                   Visibility="{Binding SearchCandidate.IsSearchCandidateAvailable,
-                                                        Converter={StaticResource BooleanToVisibleConverter}}">
-                            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
-                                <controls:LazyImage Width="24"
-                                                    Height="24"
-                                                    Margin="8,8,4,8"
-                                                    DecodePixelWidth="24"
-                                                    UriSource="{Binding SearchCandidate.CurrentUserProfileImage}" />
-                                <TextBlock Margin="4,8,8,8"
-                                           VerticalAlignment="Center"
-                                           Foreground="White">
-                                    <Run Text="{Binding SearchCandidate.CurrentUserScreenName, Mode=OneWay}" />
-                                    <Run Text="が保存している検索キーワード:" />
-                                </TextBlock>
-                            </StackPanel>
-                            <ItemsControl ItemsSource="{Binding SearchCandidate.SearchCandidates}">
-                                <ItemsControl.Template>
-                                    <ControlTemplate>
-                                        <ScrollViewer x:Name="ScrollViewer" Padding="{TemplateBinding Padding}">
-                                            <ItemsPresenter />
-                                        </ScrollViewer>
-                                    </ControlTemplate>
-                                </ItemsControl.Template>
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <DataTemplate.Resources>
-                                            <Storyboard x:Key="HighlightStoryBoard">
-                                                <ColorAnimationUsingKeyFrames Storyboard.TargetName="grid" Storyboard.TargetProperty="(Panel.Background).(SolidColorBrush.Color)">
-                                                    <EasingColorKeyFrame KeyTime="0:0:0" Value="#FF333333" />
-                                                </ColorAnimationUsingKeyFrames>
-                                            </Storyboard>
-                                            <Storyboard x:Key="LowlightStoryBoard">
-                                                <ColorAnimationUsingKeyFrames Storyboard.TargetName="grid" Storyboard.TargetProperty="(Panel.Background).(SolidColorBrush.Color)">
-                                                    <EasingColorKeyFrame KeyTime="0:0:0" Value="#FF111111" />
-                                                </ColorAnimationUsingKeyFrames>
-                                            </Storyboard>
-                                            <Storyboard x:Key="PressStoryBoard">
-                                                <ColorAnimationUsingKeyFrames Storyboard.TargetName="grid" Storyboard.TargetProperty="(Panel.Background).(SolidColorBrush.Color)">
-                                                    <EasingColorKeyFrame KeyTime="0:0:0" Value="Black" />
-                                                </ColorAnimationUsingKeyFrames>
-                                            </Storyboard>
-                                            <Storyboard x:Key="PullupStoryBoard">
-                                                <ColorAnimationUsingKeyFrames Storyboard.TargetName="grid" Storyboard.TargetProperty="(Panel.Background).(SolidColorBrush.Color)">
-                                                    <EasingColorKeyFrame KeyTime="0:0:0" Value="#FF111111" />
-                                                </ColorAnimationUsingKeyFrames>
-                                            </Storyboard>
-                                        </DataTemplate.Resources>
-                                        <Grid x:Name="grid">
-                                            <i:Interaction.Triggers>
-                                                <i:EventTrigger EventName="MouseLeftButtonDown">
-                                                    <ei:CallMethodAction MethodName="SelectThis" TargetObject="{Binding}" />
-                                                </i:EventTrigger>
-                                            </i:Interaction.Triggers>
-                                            <Grid.ContextMenu>
-                                                <ContextMenu DataContext="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
-                                                    <MenuItem Command="{Binding RemoveCommand}" Header="このアイテムを削除(_D)" />
-                                                </ContextMenu>
-                                            </Grid.ContextMenu>
-                                            <TextBlock Margin="8"
-                                                       Foreground="White"
-                                                       Text="{Binding Query}" />
-                                            <Grid.Style>
-                                                <Style TargetType="Grid">
-                                                    <Setter Property="Background" Value="#111111" />
-                                                    <Style.Triggers>
-                                                        <EventTrigger RoutedEvent="MouseEnter" />
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </Grid.Style>
-                                        </Grid>
-                                        <DataTemplate.Triggers>
-                                            <EventTrigger RoutedEvent="Mouse.MouseEnter" SourceName="grid">
-                                                <BeginStoryboard Storyboard="{StaticResource HighlightStoryBoard}" />
-                                            </EventTrigger>
-                                            <EventTrigger RoutedEvent="UIElement.MouseLeftButtonDown" SourceName="grid">
-                                                <BeginStoryboard Storyboard="{StaticResource PressStoryBoard}" />
-                                            </EventTrigger>
-                                            <EventTrigger RoutedEvent="Mouse.MouseLeave" SourceName="grid">
-                                                <BeginStoryboard Storyboard="{StaticResource LowlightStoryBoard}" />
-                                            </EventTrigger>
-                                            <EventTrigger RoutedEvent="UIElement.MouseLeftButtonUp" SourceName="grid">
-                                                <BeginStoryboard Storyboard="{StaticResource PullupStoryBoard}" />
-                                            </EventTrigger>
-                                        </DataTemplate.Triggers>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </DockPanel>
-                    </Grid>
-                </DockPanel>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <!--  Search Candidates  -->
+            <Border Grid.RowSpan="2" VerticalAlignment="Stretch">
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="Background" Value="#1B58B8" />
+                        <Style.Triggers>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding IsQueryMode}" Value="True" />
+                                    <Condition Binding="{Binding HasError}" Value="True" />
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Background" Value="#FFE51400" />
+                            </MultiDataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
             </Border>
+            <TextBlock Grid.Row="1"
+                       Margin="8"
+                       Foreground="White"
+                       Text="先頭に?を入力することでクエリを用いて検索できます。"
+                       TextWrapping="Wrap"
+                       Visibility="{Binding IsQueryMode,
+                                            Converter={StaticResource BooleanToInvisibleConverter}}" />
+            <Grid Grid.Row="1" Visibility="{Binding IsQueryMode, Converter={StaticResource BooleanToVisibleConverter}}">
+                <TextBlock Margin="8"
+                           Foreground="White"
+                           Text="クエリは正しく解釈されました。Enterキーを入力すると検索が開始されます。"
+                           TextWrapping="Wrap"
+                           Visibility="{Binding HasError,
+                                                Converter={StaticResource BooleanToInvisibleConverter}}" />
+                <TextBlock Margin="8"
+                           Foreground="White"
+                           TextWrapping="Wrap"
+                           Visibility="{Binding HasError,
+                                                Converter={StaticResource BooleanToVisibleConverter}}">
+                    <Run Text="クエリにエラーがあります: " />
+                    <Run Text="{Binding ErrorText, Mode=OneWay}" />
+                </TextBlock>
+            </Grid>
+            <StackPanel x:Name="searchOptionPanel"
+                        Grid.Row="2"
+                        Orientation="Vertical"
+                        Visibility="Collapsed">
+                <i:Interaction.Triggers>
+                    <ei:DataTrigger Binding="{Binding IsSearchOptionAvailable}" Value="True">
+                        <ei:GoToStateAction StateName="OpenSearchOption" />
+                    </ei:DataTrigger>
+                    <ei:DataTrigger Binding="{Binding IsSearchOptionAvailable}" Value="False">
+                        <ei:GoToStateAction StateName="CloseSearchOption" />
+                    </ei:DataTrigger>
+                </i:Interaction.Triggers>
+                <StackPanel.LayoutTransform>
+                    <TransformGroup>
+                        <ScaleTransform />
+                        <SkewTransform />
+                        <RotateTransform />
+                        <TranslateTransform />
+                    </TransformGroup>
+                </StackPanel.LayoutTransform>
+                <TextBlock Margin="8"
+                           Foreground="White"
+                           Text="検索対象:" />
+                <Grid>
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Setter Property="Background" Value="Transparent" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding SearchMode}" Value="Quick">
+                                    <Setter Property="Background" Value="#FF5C83C2" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <TextBlock Padding="8"
+                               Style="{StaticResource FloatTextBlockStyle}"
+                               Text="タブ内のツイート">
+                        <TextBlock.ToolTip>
+                            <TextBlock Margin="4"
+                                       Foreground="White"
+                                       Text="現在選択されているタブに表示されているツイートを検索します。" />
+                        </TextBlock.ToolTip>
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="MouseLeftButtonDown">
+                                <ei:CallMethodAction MethodName="SetQuickSearch" TargetObject="{Binding}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </TextBlock>
+                </Grid>
+
+                <Grid>
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Setter Property="Background" Value="Transparent" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding SearchMode}" Value="Local">
+                                    <Setter Property="Background" Value="#FF5C83C2" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <TextBlock Padding="8"
+                               Style="{StaticResource FloatTextBlockStyle}"
+                               Text="ローカルデータ">
+                        <TextBlock.ToolTip>
+                            <TextBlock Margin="4"
+                                       Foreground="White"
+                                       Text="Krileに蓄積されているすべてのツイートから検索します。" />
+                        </TextBlock.ToolTip>
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="MouseLeftButtonDown">
+                                <ei:CallMethodAction MethodName="SetLocalSearch" TargetObject="{Binding}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </TextBlock>
+                </Grid>
+
+                <Grid>
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Setter Property="Background" Value="Transparent" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding SearchMode}" Value="Web">
+                                    <Setter Property="Background" Value="#FF5C83C2" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <TextBlock Padding="8"
+                               Style="{StaticResource FloatTextBlockStyle}"
+                               Text="Twitter上のツイート">
+                        <TextBlock.ToolTip>
+                            <TextBlock Margin="4"
+                                       Foreground="White"
+                                       Text="Twitterからツイートを検索します。" />
+                        </TextBlock.ToolTip>
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="MouseLeftButtonDown">
+                                <ei:CallMethodAction MethodName="SetWebSearch" TargetObject="{Binding}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </TextBlock>
+                </Grid>
+
+                <Grid>
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Setter Property="Background" Value="Transparent" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding SearchMode}" Value="UserWeb">
+                                    <Setter Property="Background" Value="#FF5C83C2" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <TextBlock Padding="8"
+                               Style="{StaticResource FloatTextBlockStyle}"
+                               Text="ユーザー名">
+                        <TextBlock.ToolTip>
+                            <TextBlock Margin="4"
+                                       Foreground="White"
+                                       Text="Twitterでユーザーを検索します。" />
+                        </TextBlock.ToolTip>
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="MouseLeftButtonDown">
+                                <ei:CallMethodAction MethodName="SetUserWebSearch" TargetObject="{Binding}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </TextBlock>
+                </Grid>
+
+                <Grid Visibility="{Binding CanBeUserScreenName, Converter={StaticResource BooleanToVisibleConverter}}">
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Setter Property="Background" Value="Transparent" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding SearchMode}" Value="UserId">
+                                    <Setter Property="Background" Value="#FF5C83C2" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <TextBlock Padding="8"
+                               Style="{StaticResource FloatTextBlockStyle}"
+                               Text="ユーザー@ID">
+                        <TextBlock.ToolTip>
+                            <TextBlock Margin="4"
+                                       Foreground="White"
+                                       Text="この@IDを持つユーザーを表示します。" />
+                        </TextBlock.ToolTip>
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="MouseLeftButtonDown">
+                                <ei:CallMethodAction MethodName="SetUserIdSearch" TargetObject="{Binding}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </TextBlock>
+                </Grid>
+
+            </StackPanel>
+            <TextBlock Grid.Row="3"
+                       Margin="8"
+                       VerticalAlignment="Bottom"
+                       Foreground="White"
+                       Text="アクティブアカウントが一つだけの場合、保存されている検索キーワードを表示します。"
+                       TextWrapping="Wrap"
+                       Visibility="{Binding SearchCandidate.IsSearchCandidateAvailable,
+                                            Converter={StaticResource BooleanToInvisibleConverter}}" />
+            <DockPanel Grid.Row="3"
+                       Margin="0,8,0,0"
+                       Visibility="{Binding SearchCandidate.IsSearchCandidateAvailable,
+                                            Converter={StaticResource BooleanToVisibleConverter}}">
+                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+                    <controls:LazyImage Width="24"
+                                        Height="24"
+                                        Margin="8,8,4,8"
+                                        DecodePixelWidth="24"
+                                        UriSource="{Binding SearchCandidate.CurrentUserProfileImage}" />
+                    <TextBlock Margin="4,8,8,8"
+                               VerticalAlignment="Center"
+                               Foreground="White">
+                        <Run Text="{Binding SearchCandidate.CurrentUserScreenName, Mode=OneWay}" />
+                        <Run Text="が保存している検索キーワード:" />
+                    </TextBlock>
+                </StackPanel>
+                <ItemsControl ItemsSource="{Binding SearchCandidate.SearchCandidates}">
+                    <ItemsControl.Template>
+                        <ControlTemplate>
+                            <ScrollViewer x:Name="ScrollViewer"
+                                          Padding="{TemplateBinding Padding}"
+                                          VerticalScrollBarVisibility="Auto">
+                                <ItemsPresenter />
+                            </ScrollViewer>
+                        </ControlTemplate>
+                    </ItemsControl.Template>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <DataTemplate.Resources>
+                                <Storyboard x:Key="HighlightStoryBoard">
+                                    <ColorAnimationUsingKeyFrames Storyboard.TargetName="grid" Storyboard.TargetProperty="(Panel.Background).(SolidColorBrush.Color)">
+                                        <EasingColorKeyFrame KeyTime="0:0:0" Value="#FF5C83C2" />
+                                    </ColorAnimationUsingKeyFrames>
+                                </Storyboard>
+                                <Storyboard x:Key="LowlightStoryBoard">
+                                    <ColorAnimationUsingKeyFrames Storyboard.TargetName="grid" Storyboard.TargetProperty="(Panel.Background).(SolidColorBrush.Color)">
+                                        <EasingColorKeyFrame KeyTime="0:0:0" Value="#00000000" />
+                                    </ColorAnimationUsingKeyFrames>
+                                </Storyboard>
+                                <Storyboard x:Key="PressStoryBoard">
+                                    <ColorAnimationUsingKeyFrames Storyboard.TargetName="grid" Storyboard.TargetProperty="(Panel.Background).(SolidColorBrush.Color)">
+                                        <EasingColorKeyFrame KeyTime="0:0:0" Value="#FF16499A" />
+                                    </ColorAnimationUsingKeyFrames>
+                                </Storyboard>
+                            </DataTemplate.Resources>
+                            <Grid x:Name="grid">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="MouseLeftButtonDown">
+                                        <ei:CallMethodAction MethodName="SelectThis" TargetObject="{Binding}" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                                <Grid.ContextMenu>
+                                    <ContextMenu DataContext="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                                        <MenuItem Command="{Binding RemoveCommand}" Header="このアイテムを削除(_D)" />
+                                    </ContextMenu>
+                                </Grid.ContextMenu>
+                                <TextBlock Margin="8"
+                                           Foreground="White"
+                                           Text="{Binding Query}" />
+                                <Grid.Style>
+                                    <Style TargetType="Grid">
+                                        <Setter Property="Background" Value="#00000000" />
+                                        <Style.Triggers>
+                                            <EventTrigger RoutedEvent="MouseEnter" />
+                                        </Style.Triggers>
+                                    </Style>
+                                </Grid.Style>
+                            </Grid>
+                            <DataTemplate.Triggers>
+                                <EventTrigger RoutedEvent="Mouse.MouseEnter" SourceName="grid">
+                                    <BeginStoryboard Storyboard="{StaticResource HighlightStoryBoard}" />
+                                </EventTrigger>
+                                <EventTrigger RoutedEvent="UIElement.MouseLeftButtonDown" SourceName="grid">
+                                    <BeginStoryboard Storyboard="{StaticResource PressStoryBoard}" />
+                                </EventTrigger>
+                                <EventTrigger RoutedEvent="Mouse.MouseLeave" SourceName="grid">
+                                    <BeginStoryboard Storyboard="{StaticResource LowlightStoryBoard}" />
+                                </EventTrigger>
+                                <EventTrigger RoutedEvent="UIElement.MouseLeftButtonUp" SourceName="grid">
+                                    <BeginStoryboard Storyboard="{StaticResource LowlightStoryBoard}" />
+                                </EventTrigger>
+                            </DataTemplate.Triggers>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </DockPanel>
         </Grid>
     </Grid>
 </UserControl>

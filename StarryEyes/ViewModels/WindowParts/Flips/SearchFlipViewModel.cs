@@ -297,15 +297,14 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         public void OnEnterKeyDown()
         {
             // check difference
-            if (_previousCommit == Text) return;
-            if (!IsQueryMode || ErrorText == null)
+            if (_previousCommit != Text && (!IsQueryMode || ErrorText == null))
             {
                 // commit search query
                 CommitSearch();
-                if (SearchResult != null)
-                {
-                    SearchResult.SetPhysicalFocus();
-                }
+            }
+            if (SearchResult != null)
+            {
+                SearchResult.SetPhysicalFocus();
             }
         }
 
@@ -323,25 +322,32 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             SearchResult = null;
             UserCandidate = null;
             UserInfo = null;
-            switch (SearchMode)
+            if (IsQueryMode)
             {
-                case SearchMode.Quick:
-                    SearchResult = new SearchResultViewModel(this, Text, SearchOption.Quick);
-                    break;
-                case SearchMode.Local:
-                    SearchResult = new SearchResultViewModel(this, Text, SearchOption.None);
-                    break;
-                case SearchMode.Web:
-                    SearchResult = new SearchResultViewModel(this, Text, SearchOption.Web);
-                    break;
-                case SearchMode.UserWeb:
-                    UserCandidate = new UserCandidateViewModel(Text);
-                    break;
-                case SearchMode.UserScreenName:
-                    break;
-                default:
-                    IsSearchResultAvailable = false;
-                    throw new ArgumentOutOfRangeException();
+                SearchResult = new SearchResultViewModel(this, Text.Substring(1), SearchOption.Query);
+            }
+            else
+            {
+                switch (SearchMode)
+                {
+                    case SearchMode.Quick:
+                        SearchResult = new SearchResultViewModel(this, Text, SearchOption.Quick);
+                        break;
+                    case SearchMode.Local:
+                        SearchResult = new SearchResultViewModel(this, Text, SearchOption.None);
+                        break;
+                    case SearchMode.Web:
+                        SearchResult = new SearchResultViewModel(this, Text, SearchOption.Web);
+                        break;
+                    case SearchMode.UserWeb:
+                        UserCandidate = new UserCandidateViewModel(Text);
+                        break;
+                    case SearchMode.UserScreenName:
+                        break;
+                    default:
+                        IsSearchResultAvailable = false;
+                        throw new ArgumentOutOfRangeException();
+                }
             }
             IsSearchResultAvailable = true;
         }
