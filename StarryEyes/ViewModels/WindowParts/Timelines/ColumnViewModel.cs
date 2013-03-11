@@ -23,12 +23,12 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         }
 
         private int _currentFocus;
-        public TabViewModel Focused
+        public TabViewModel FocusedTab
         {
             get { return _tabs != null && _tabs.Count > 0 ? _tabs[_model.CurrentFocusTabIndex] : null; }
             set
             {
-                var previous = Focused;
+                var previous = FocusedTab;
                 _model.CurrentFocusTabIndex = _currentFocus = _tabs.IndexOf(value);
                 if (previous != null)
                     previous.UpdateFocus();
@@ -45,7 +45,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                 _tabs[_currentFocus].UpdateFocus();
                 _tabs[newFocus].UpdateFocus();
                 _currentFocus = newFocus;
-                RaisePropertyChanged(() => Focused);
+                RaisePropertyChanged(() => FocusedTab);
             });
         }
 
@@ -77,13 +77,13 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                 .Subscribe(UpdateFocusFromModel));
             if (_tabs.Count > 0)
             {
-                Focused = _tabs[0];
+                FocusedTab = _tabs[0];
             }
         }
 
         public bool IsFocused
         {
-            get { return _parent.Focused == this; }
+            get { return _parent.FocusedColumn == this; }
         }
 
         internal void UpdateFocus()
@@ -93,7 +93,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public void Focus()
         {
-            _parent.Focused = this;
+            _parent.FocusedColumn = this;
         }
 
         internal void CloseTab(TabViewModel tab)

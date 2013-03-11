@@ -392,11 +392,6 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         }
 
-        public void ShowConversation()
-        {
-
-        }
-
         public void OpenWeb()
         {
             BrowserHelper.Open(Status.Permalink);
@@ -699,7 +694,14 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public void Reply()
         {
-            InputAreaModel.SetText(Model.GetSuitableReplyAccount(), "@" + User.ScreenName + " ", inReplyTo: Status);
+            if (IsSelected)
+            {
+                Parent.ReplySelecteds();
+            }
+            else
+            {
+                InputAreaModel.SetText(Model.GetSuitableReplyAccount(), "@" + User.ScreenName + " ", inReplyTo: Status);
+            }
         }
 
         public void Quote()
@@ -783,7 +785,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                 Parent.FocusedStatus == this ? null : this;
         }
 
-        public void ShowInReplyTo()
+        public void ShowConversation()
         {
             // TODO: Implementation
         }

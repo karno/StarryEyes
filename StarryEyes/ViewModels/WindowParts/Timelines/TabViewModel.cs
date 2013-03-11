@@ -83,6 +83,11 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                 .Subscribe(_ => this.Messenger.Raise(new InteractionMessage("SetPhysicalFocus"))));
         }
 
+        public override void GotPhysicalFocus()
+        {
+            _owner.Focus();
+        }
+
         private void BindTimeline()
         {
             CompositeDisposable.Add(
@@ -119,7 +124,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public bool IsFocused
         {
-            get { return Owner.Focused == this; }
+            get { return Owner.FocusedTab == this; }
         }
 
         internal void UpdateFocus()
@@ -161,7 +166,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public void Focus()
         {
-            Owner.Focused = this;
+            Owner.FocusedTab = this;
             // propagate focus
             Owner.Focus();
         }

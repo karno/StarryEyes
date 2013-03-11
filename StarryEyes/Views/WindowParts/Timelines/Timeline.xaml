@@ -546,7 +546,7 @@
                                     </Border.LayoutTransform>
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="MouseLeftButtonDown">
-                                            <ei:CallMethodAction MethodName="ShowInReplyTo" TargetObject="{Binding Mode=OneTime}" />
+                                            <ei:CallMethodAction MethodName="ShowConversation" TargetObject="{Binding Mode=OneTime}" />
                                         </i:EventTrigger>
                                     </i:Interaction.Triggers>
                                     <Grid Height="Auto"
@@ -1509,6 +1509,7 @@
                 </l:InteractionMessageTrigger>
                 <i:EventTrigger EventName="MouseDown">
                     <l:SetFocusAction />
+                    <ei:CallMethodAction MethodName="GotPhysicalFocus" TargetObject="{Binding}" />
                 </i:EventTrigger>
             </i:Interaction.Triggers>
             <ItemsControl.ItemsPanel>

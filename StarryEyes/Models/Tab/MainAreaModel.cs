@@ -22,6 +22,11 @@ namespace StarryEyes.Models.Tab
             get { return _columns; }
         }
 
+        static MainAreaModel()
+        {
+            RegisterEvents();
+        }
+
         /// <summary>
         /// Load from configuration.
         /// </summary>
@@ -239,6 +244,45 @@ namespace StarryEyes.Models.Tab
         public static void CrearClosedTabsStack()
         {
             _closedTabsStack.Clear();
+        }
+
+        public static void RegisterEvents()
+        {
+            MainWindowModel.OnTimelineFocusRequested += MainWindowModel_OnTimelineFocusRequested;
+            KeyAssignManager.RegisterActions(
+                KeyAssignAction.Create("RestoreTab", ReviveTab),
+                KeyAssignAction.Create("CloseTab", () =>
+                {
+                    var ccolumn = Columns[CurrentFocusColumnIndex];
+                    if (ccolumn.Tabs.Count == 0) return;
+                    CloseTab(CurrentFocusColumnIndex, ccolumn.CurrentFocusTabIndex);
+                }));
+
+        }
+
+        static void MainWindowModel_OnTimelineFocusRequested(TimelineFocusRequest req)
+        {
+            var ccolumn = Columns[CurrentFocusColumnIndex];
+            if (ccolumn.Tabs.Count == 0) return; // not available
+            switch (req)
+            {
+                case TimelineFocusRequest.LeftColumn:
+                    var left = CurrentFocusColumnIndex - 1;
+                    CurrentFocusColumnIndex = left < 0 ? Columns.Count - 1 : left;
+                    break;
+                case TimelineFocusRequest.RightColumn:
+                    var right = CurrentFocusColumnIndex + 1;
+                    CurrentFocusColumnIndex = right >= Columns.Count ? 0 : right;
+                    break;
+                case TimelineFocusRequest.LeftTab:
+                    var ltab = ccolumn.CurrentFocusTabIndex - 1;
+                    ccolumn.CurrentFocusTabIndex = ltab < 0 ? ccolumn.Tabs.Count - 1 : ltab;
+                    break;
+                case TimelineFocusRequest.RightTab:
+                    var rtab = ccolumn.CurrentFocusTabIndex + 1;
+                    ccolumn.CurrentFocusTabIndex = rtab >= ccolumn.Tabs.Count ? 0 : rtab;
+                    break;
+            }
         }
     }
 }

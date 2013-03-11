@@ -164,14 +164,14 @@ namespace StarryEyes.ViewModels
         {
             switch (req)
             {
-                case FocusRequest.Find:
+                case FocusRequest.Search:
                     SearchFlipViewModel.FocusToSearchBox();
                     break;
                 case FocusRequest.Timeline:
                     MainAreaModel.CurrentFocusTab.SetPhysicalFocus();
                     SearchFlipViewModel.Close();
                     break;
-                case FocusRequest.Tweet:
+                case FocusRequest.Input:
                     InputAreaViewModel.OpenInput();
                     InputAreaViewModel.FocusToTextBox();
                     SearchFlipViewModel.Close();

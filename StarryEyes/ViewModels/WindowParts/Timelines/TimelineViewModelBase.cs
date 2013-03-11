@@ -364,6 +364,8 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             FocusedStatus = Timeline[Timeline.Count - 1];
         }
 
+        public abstract void GotPhysicalFocus();
+
         #endregion
     }
 }

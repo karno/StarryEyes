@@ -119,7 +119,7 @@ namespace StarryEyes.Models
             if (handler != null)
                 handler(infos, body, cursor, inReplyTo);
             if (focusToInputArea)
-                MainWindowModel.SetFocusTo(FocusRequest.Tweet);
+                MainWindowModel.SetFocusTo(FocusRequest.Input);
         }
 
         public static void SetText(IEnumerable<long> infos = null, string body = null,
@@ -142,7 +142,7 @@ namespace StarryEyes.Models
             if (handler != null)
                 handler(info, recipient);
             if (focusToInputArea)
-                MainWindowModel.SetFocusTo(FocusRequest.Tweet);
+                MainWindowModel.SetFocusTo(FocusRequest.Input);
         }
 
     }

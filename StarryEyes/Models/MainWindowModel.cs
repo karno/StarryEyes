@@ -5,6 +5,7 @@ using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Filters.Expressions;
 using StarryEyes.Models.Tab;
+using StarryEyes.Settings;
 
 namespace StarryEyes.Models
 {
@@ -16,6 +17,27 @@ namespace StarryEyes.Models
             var handler = OnWindowCommandDisplayChanged;
             if (handler != null)
                 handler(show);
+        }
+
+        private static void RegisterKeyAssigns()
+        {
+            // Focus
+            KeyAssignManager.RegisterActions(
+                KeyAssignAction.Create("FocusToTimeline", () => SetFocusTo(FocusRequest.Timeline)),
+                KeyAssignAction.Create("FocusToInput", () => SetFocusTo(FocusRequest.Input)),
+                KeyAssignAction.Create("FocusToSearch", () => SetFocusTo(FocusRequest.Search)));
+
+            // Timeline move
+            KeyAssignManager.RegisterActions(
+                KeyAssignAction.Create("SelectLeftColumn", () => SetTimelineFocusTo(TimelineFocusRequest.LeftColumn)),
+                KeyAssignAction.Create("SelectRightColumn", () => SetTimelineFocusTo(TimelineFocusRequest.RightColumn)),
+                KeyAssignAction.Create("SelectLeftTab", () => SetTimelineFocusTo(TimelineFocusRequest.LeftTab)),
+                KeyAssignAction.Create("SelectRightTab", () => SetTimelineFocusTo(TimelineFocusRequest.RightTab)),
+                KeyAssignAction.Create("MoveUp", () => SetTimelineFocusTo(TimelineFocusRequest.AboveStatus)),
+                KeyAssignAction.Create("MoveDown", () => SetTimelineFocusTo(TimelineFocusRequest.BelowStatus)),
+                KeyAssignAction.Create("MoveTop", () => SetTimelineFocusTo(TimelineFocusRequest.TopOfTimeline)),
+                KeyAssignAction.Create("MoveBottom", () => SetTimelineFocusTo(TimelineFocusRequest.BottomOfTimeline)));
+
         }
 
         #region Focus and timeline action control
@@ -32,14 +54,6 @@ namespace StarryEyes.Models
         public static void SetTimelineFocusTo(TimelineFocusRequest req)
         {
             var handler = OnTimelineFocusRequested;
-            if (handler != null)
-                handler(req);
-        }
-
-        public static event Action<TimelineActionRequest> OnTimelineActionRequested;
-        public static void ExecuteTimelineAction(TimelineActionRequest req)
-        {
-            var handler = OnTimelineActionRequested;
             if (handler != null)
                 handler(req);
         }
@@ -119,9 +133,9 @@ namespace StarryEyes.Models
 
     public enum FocusRequest
     {
-        Tweet,
+        Input,
         Timeline,
-        Find,
+        Search,
     }
 
     public enum TimelineFocusRequest
@@ -131,27 +145,40 @@ namespace StarryEyes.Models
         LeftTab,
         RightTab,
         TopOfTimeline,
+        BottomOfTimeline,
         AboveStatus,
         BelowStatus,
     }
 
     public enum TimelineActionRequest
     {
+        ToggleFocus,
         ToggleSelect,
         ClearSelect,
         Reply,
         Favorite,
+        FavoriteMultiple,
         Retweet,
+        RetweetMultiple,
         Quote,
+        QuoteLink,
         DirectMessage,
         CopyText,
         CopySTOT,
-        CopyWebUrl,
-        ShowInTwitterWeb,
+        CopyPermalink,
+        ShowConversation,
+        ShowTweetInTwitterWeb,
+        ShowTweetInFavstar,
+        ShowUserInTwitterWeb,
+        ShowUserInFavstar,
+        ShowUserInTwilog,
         ShowUserInfo,
+        GiveTrophy,
         Delete,
         ReportAsSpam,
-        Mute,
+        MuteKeyword,
+        MuteUser,
+        MuteClient,
     }
 
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using StarryEyes.Models.Hubs;
 using StarryEyes.Settings.KeyAssigns;
 
@@ -97,6 +98,11 @@ namespace StarryEyes.Settings
                         "プロファイル " + profileId + " が見つかりません。"));
                 return DefaultAssignProvider.GetEmpty();
             }
+        }
+
+        public static void RegisterActions(params KeyAssignAction[] callbacks)
+        {
+            callbacks.ForEach(RegisterAction);
         }
 
         public static void RegisterAction(KeyAssignAction callback)

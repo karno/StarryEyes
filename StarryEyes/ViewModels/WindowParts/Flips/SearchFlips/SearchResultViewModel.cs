@@ -43,6 +43,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             _timelineModel.ReadMore(null)
                           .Finally(() => IsLoading = false)
                           .Subscribe();
+            MainAreaViewModel.TimelineActionHijacker = this;
         }
 
         private Func<TwitterStatus, bool> CreatePredicate(string query, SearchOption option)
@@ -127,8 +128,14 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             this.Messenger.Raise(new InteractionMessage("SetPhysicalFocus"));
         }
 
+        public override void GotPhysicalFocus()
+        {
+            MainAreaViewModel.TimelineActionHijacker = this;
+        }
+
         public void Close()
         {
+            MainAreaViewModel.TimelineActionHijacker = null;
             _parent.Close();
         }
 
