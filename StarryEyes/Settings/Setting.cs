@@ -89,6 +89,9 @@ namespace StarryEyes.Settings
         public static readonly SettingItemStruct<ScrollLockStrategy> ScrollLockStrategy =
             new SettingItemStruct<ScrollLockStrategy>("ScrollLockStrategy", Settings.ScrollLockStrategy.WhenScrolled);
 
+        public static readonly SettingItem<string> KeyAssign =
+            new SettingItem<string>("KeyAssign", null);
+
         #endregion
 
         #region Input control

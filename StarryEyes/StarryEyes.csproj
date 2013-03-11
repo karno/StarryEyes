@@ -241,11 +241,11 @@
     <Compile Include="Models\Plugins\IPlugin.cs" />
     <Compile Include="Models\Tab\TimelineModel.cs" />
     <Compile Include="Models\UserModel.cs" />
-    <Compile Include="Settings\KeyBindingManager.cs" />
-    <Compile Include="Settings\KeyBindings\BindingGroup.cs" />
-    <Compile Include="Settings\KeyBindings\DefaultBindingProvider.cs" />
-    <Compile Include="Settings\KeyBindings\KeyBinding.cs" />
-    <Compile Include="Settings\KeyBindings\KeyBindingProfile.cs" />
+    <Compile Include="Settings\KeyAssignManager.cs" />
+    <Compile Include="Settings\KeyAssigns\KeyAssignGroup.cs" />
+    <Compile Include="Settings\KeyAssigns\DefaultAssignProvider.cs" />
+    <Compile Include="Settings\KeyAssigns\KeyAssign.cs" />
+    <Compile Include="Settings\KeyAssigns\KeyAssignProfile.cs" />
     <Compile Include="Settings\TabDescription.cs" />
     <Compile Include="ViewModels\Dialogs\KeyOverrideViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\AccountSelectionFlipViewModel.cs" />
@@ -275,7 +275,7 @@
     </Compile>
     <Compile Include="Views\Triggers\EnterKeyTrigger.cs" />
     <Compile Include="Views\Triggers\EscapeKeyTrigger.cs" />
-    <Compile Include="Views\Triggers\KeyBindingTrigger.cs" />
+    <Compile Include="Views\Triggers\KeyAssignTrigger.cs" />
     <Compile Include="Views\Triggers\KeyTriggerBase.cs" />
     <Compile Include="Views\Utils\NotNullToVisibleConverter.cs" />
     <Compile Include="Views\Utils\StatusStylizeHelper.cs" />

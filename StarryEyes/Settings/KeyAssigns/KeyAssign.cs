@@ -1,20 +1,25 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Input;
 
-namespace StarryEyes.Settings.KeyBindings
+namespace StarryEyes.Settings.KeyAssigns
 {
-    public class KeyBinding
+    public class KeyAssign
     {
         static readonly Regex LineRegex =
             new Regex(@"^(?<important>!)?(?:[ \t]*(?:(?<mod_ctrl>c(?:trl|ontrol)?)|(?<mod_alt>a(?:lt)?)|(?<mod_shift>s(?:hift)?))[ \t]*[\+＋]+)*(?<key>[^\:\+]+?)\:(?<action>.+?)$",
                       RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
+        static readonly Regex ActionsParseRegex =
+            new Regex(@"^(?:\s*([^(]+?\s*(?:\("".*?(?<!\\)""\))?\s*),)+$");
+        static readonly Regex ActionParseRegex =
+            new Regex(@"^\s*([^(]+?)\s*(?:\(""(.*?)(?<!\\)""\))?\s*$");
         static readonly Regex NumericRegex =
             new Regex("^[0-9]+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-        public static KeyBinding FromString(string line)
+        public static KeyAssign FromString(string line)
         {
             var result = LineRegex.Match(line.Trim());
             if (!result.Success)
@@ -22,9 +27,8 @@ namespace StarryEyes.Settings.KeyBindings
                 throw new ArgumentException("That line could not be parsed: \"" + line + "\"");
             }
             var important = false;
-            var key = Key.None;
+            Key key;
             var modifiers = ModifierKeys.None;
-            string action = result.Groups["action"].Value;
 
             if (result.Groups["important"].Success)
             {
@@ -56,15 +60,35 @@ namespace StarryEyes.Settings.KeyBindings
                 modifiers |= ModifierKeys.Shift;
             }
 
-            return new KeyBinding(key, modifiers, action, important);
+            var actions = ActionsParseRegex.Match(result.Groups["action"].Value + ",");
+            if (!actions.Success)
+            {
+                throw new ArgumentException("Actions are could not be parsed: " + result.Groups["action"].Value);
+            }
+            var descriptions = new List<KeyAssignActionDescription>();
+            foreach (var capture in actions.Groups[1].Captures.OfType<Capture>().Select(s => s.Value))
+            {
+                var action = ActionParseRegex.Match(capture);
+                if (!action.Success)
+                {
+                    throw new ArgumentException("Action is could not be parsed: " + capture);
+                }
+                descriptions.Add(new KeyAssignActionDescription
+                {
+                    ActionName = action.Groups[1].Value,
+                    Argument = action.Groups.Count > 2 ? action.Groups[2].Value : null
+                });
+            }
+
+            return new KeyAssign(key, modifiers, descriptions, important);
         }
 
-        public KeyBinding(Key key, ModifierKeys modifiers, string callAction, bool handlePreview = false)
+        public KeyAssign(Key key, ModifierKeys modifiers, IEnumerable<KeyAssignActionDescription> actions, bool handlePreview = false)
         {
             Key = key;
             Modifiers = modifiers;
-            CallAction = callAction;
             HandlePreview = handlePreview;
+            Actions = actions.ToArray();
         }
 
         public Key Key { get; set; }
@@ -73,8 +97,11 @@ namespace StarryEyes.Settings.KeyBindings
 
         public bool HandlePreview { get; set; }
 
-        public string CallAction { get; set; }
+        public IEnumerable<KeyAssignActionDescription> Actions { get; set; }
 
+        /// <summary>
+        /// Get formatted string.
+        /// </summary>
         public override string ToString()
         {
             var builder = new StringBuilder();
@@ -88,8 +115,31 @@ namespace StarryEyes.Settings.KeyBindings
                 builder.Append("Shift+");
             builder.Append(Key.ToString());
             builder.Append(": ");
-            builder.Append(CallAction);
+            builder.Append(Actions.Select(a => a.ToString()).JoinString(","));
             return builder.ToString();
+        }
+    }
+
+    public sealed class KeyAssignActionDescription
+    {
+        /// <summary>
+        /// Call action name
+        /// </summary>
+        public string ActionName { get; set; }
+
+        /// <summary>
+        /// Action argument
+        /// </summary>
+        public string Argument { get; set; }
+
+        /// <summary>
+        /// Flag of has argument information
+        /// </summary>
+        public bool HasArgument { get { return !String.IsNullOrEmpty(Argument); } }
+
+        public override string ToString()
+        {
+            return ActionName + (HasArgument ? "(\"" + Argument + "\")" : "");
         }
     }
 }

@@ -93,6 +93,9 @@ namespace StarryEyes
             ApiEndpoint.DefaultConsumerSecret = Setting.GlobalConsumerSecret.Value ?? ConsumerSecret;
             ApiEndpoint.UserAgent = Setting.UserAgent.Value;
 
+            // Load key bindings
+            KeyAssignManager.Initialize();
+
             // Initialize core systems
             try
             {
@@ -174,7 +177,7 @@ namespace StarryEyes
         {
             try
             {
-                var dex = ex as StarryEyes.Vanille.DataStore.Persistent.DataPersistenceException;
+                var dex = ex as DataPersistenceException;
                 if (dex != null)
                 {
                     Setting.DatabaseCorruption.Value = true;
@@ -390,7 +393,7 @@ namespace StarryEyes
 
         public static readonly string DataStoreDirectory = "store";
 
-        public static readonly string KeyAssignDirectory = "assigns";
+        public static readonly string KeyAssignProfilesDirectory = "assigns";
 
         public static readonly string MediaDirectory = "media";
 

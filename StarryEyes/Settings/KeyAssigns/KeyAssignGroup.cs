@@ -1,6 +1,6 @@
-﻿namespace StarryEyes.Settings.KeyBindings
+﻿namespace StarryEyes.Settings.KeyAssigns
 {
-    public enum BindingGroup
+    public enum KeyAssignGroup
     {
         Global,
         Timeline,

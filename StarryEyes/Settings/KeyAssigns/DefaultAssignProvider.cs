@@ -1,12 +1,19 @@
-﻿using System;
-
-namespace StarryEyes.Settings.KeyBindings
+﻿
+namespace StarryEyes.Settings.KeyAssigns
 {
-    public static class DefaultBindingProvider
+    public static class DefaultAssignProvider
     {
-        public static KeyBindingProfile MakeDefault()
+        public const string DefaultAssignName = "default";
+
+        public static KeyAssignProfile GetEmpty()
         {
-            var profile = new KeyBindingProfile("default");
+            var profile = new KeyAssignProfile("*EMPTY*");
+            return profile;
+        }
+
+        public static KeyAssignProfile GetDefault()
+        {
+            var profile = new KeyAssignProfile(DefaultAssignName);
             const string assign = @"[Global]
 enter: FocusToInput
 c+t: FocusToTimeline
@@ -36,7 +43,7 @@ r: Reply
 c+r: Retweet
 c+q: Quote
 c+f: Favorite Retweet
-c+m: Reply(@{1} もやし)
+c+m: Reply(""@{1} もやし"")
 c+delete: Delete
 c+a+delete: Mute
 
@@ -48,9 +55,9 @@ OemPeriod: ShowConversation
 
 w: OpenWeb
 c+w: OpenFavstar
-s+1: OpenUrl(0)
-s+2: OpenUrl(1)
-s+3: OpenUrl(2)
+s+1: OpenUrl(""0"")
+s+2: OpenUrl(""1"")
+s+3: OpenUrl(""2"")
 
 [Input]
 escape: CloseInput
@@ -70,7 +77,7 @@ c+w: SearchFromWeb
 c+u: SearchUser
 c+s: SearchScreenName
 ";
-            profile.SetBindings(assign.Split(new[] { '\r', '\n' }));
+            profile.SetAssigns(assign.Split(new[] { '\r', '\n' }));
             return profile;
         }
     }

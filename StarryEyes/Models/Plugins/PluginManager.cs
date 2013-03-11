@@ -1,19 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 
 namespace StarryEyes.Models.Plugins
 {
     public static class PluginManager
     {
-        private static Exception thrownException = null;
+        private static Exception _thrownException;
         internal static Exception ThrownException
         {
-            get { return PluginManager.thrownException; }
+            get { return _thrownException; }
         }
 
-        private static object pluginsLocker = new object();
-        private static List<IPlugin> plugins = new List<IPlugin>();
+        private static readonly object pluginsLocker = new object();
+        private static readonly List<IPlugin> plugins = new List<IPlugin>();
 
         public static IEnumerable<IPlugin> LoadedPlugins
         {
@@ -33,7 +32,7 @@ namespace StarryEyes.Models.Plugins
             }
             catch (Exception ex)
             {
-                thrownException = ex;
+                _thrownException = ex;
             }
         }
 
