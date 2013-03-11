@@ -22,7 +22,7 @@ namespace StarryEyes.Models.Tab
 
         public static TabModel GenerateMentionTab()
         {
-            return new TabModel("mentions", "from all where to -> *").SetDefaultParams();
+            return new TabModel("mentions", "from all where to -> * && !retweet").SetDefaultParams();
         }
 
         public static TabModel GenerateMeTab()
@@ -32,7 +32,7 @@ namespace StarryEyes.Models.Tab
 
         public static TabModel GenerateActivitiesTab()
         {
-            return new TabModel("activities", "from all where user <- * && (favs > 0 && rts > 0)").SetDefaultParams();
+            return new TabModel("activities", "from all where user <- * && (favs > 0 || rts > 0)").SetDefaultParams();
         }
     }
 }
