@@ -23,15 +23,12 @@ namespace StarryEyes.Filters.Expressions.Operators
                 var rnp = RightValue.GetNumericValueProvider();
                 return _ => lsp(_).Contains(rnp(_));
             }
-            else
+            var rsp = RightValue.GetSetValueProvider();
+            return _ =>
             {
-                var rsp = RightValue.GetSetValueProvider();
-                return _ =>
-                {
-                    var ls = lsp(_);
-                    return rsp(_).Any(id => ls.Contains(id));
-                };
-            }
+                var ls = lsp(_);
+                return rsp(_).Any(ls.Contains);
+            };
         }
 
         public override IEnumerable<FilterExpressionType> SupportedTypes
@@ -58,15 +55,12 @@ namespace StarryEyes.Filters.Expressions.Operators
                 var lnp = LeftValue.GetNumericValueProvider();
                 return _ => rsp(_).Contains(lnp(_));
             }
-            else
+            var lsp = LeftValue.GetSetValueProvider();
+            return _ =>
             {
-                var lsp = LeftValue.GetSetValueProvider();
-                return _ =>
-                {
-                    var rs = rsp(_);
-                    return lsp(_).Any(id => rs.Contains(id));
-                };
-            }
+                var rs = rsp(_);
+                return lsp(_).Any(rs.Contains);
+            };
         }
 
         public override IEnumerable<FilterExpressionType> SupportedTypes

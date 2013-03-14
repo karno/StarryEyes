@@ -6,10 +6,13 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 {
     public sealed class LocalUser : ValueBase
     {
-        private UserExpressionBase _expression;
+        private readonly UserExpressionBase _expression;
+        private readonly IReadOnlyCollection<long> _setCache;
+
         public LocalUser(UserExpressionBase expression)
         {
             this._expression = expression;
+            _setCache = _expression.Users;
         }
 
         public override IEnumerable<FilterExpressionType> SupportedTypes
@@ -26,13 +29,12 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
         {
             if (_expression.UserId != 0)
                 return _ => _expression.UserId;
-            else
-                return base.GetNumericValueProvider();
+            return base.GetNumericValueProvider();
         }
 
         public override Func<TwitterStatus, IReadOnlyCollection<long>> GetSetValueProvider()
         {
-            return _ => _expression.Users;
+            return _ => _setCache;
         }
 
         public override string ToQuery()
@@ -43,10 +45,13 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 
     public sealed class LocalUserFollowings : ValueBase
     {
-        private UserExpressionBase _expression;
+        private readonly UserExpressionBase _expression;
+        private readonly IReadOnlyCollection<long> _setCache;
+
         public LocalUserFollowings(UserExpressionBase expression)
         {
             this._expression = expression;
+            _setCache = _expression.Followings;
         }
 
         public override IEnumerable<FilterExpressionType> SupportedTypes
@@ -56,7 +61,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 
         public override Func<TwitterStatus, IReadOnlyCollection<long>> GetSetValueProvider()
         {
-            return _ => _expression.Followings;
+            return _ => _setCache;
         }
 
         public override string ToQuery()
@@ -67,10 +72,13 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 
     public sealed class LocalUserFollowers : ValueBase
     {
-        private UserExpressionBase _expression;
+        private readonly UserExpressionBase _expression;
+        private readonly IReadOnlyCollection<long> _setCache;
+
         public LocalUserFollowers(UserExpressionBase expression)
         {
             this._expression = expression;
+            _setCache = _expression.Followers;
         }
 
         public override IEnumerable<FilterExpressionType> SupportedTypes
@@ -80,7 +88,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 
         public override Func<TwitterStatus, IReadOnlyCollection<long>> GetSetValueProvider()
         {
-            return _ => _expression.Followers;
+            return _ => _setCache;
         }
 
         public override string ToQuery()
