@@ -46,11 +46,15 @@ namespace StarryEyes.Models.Tab
             }
             catch (Exception ex)
             {
-                AppInformationHub.PublishInformation(new AppInformation(
-                    AppInformationKind.Error,
-                    "MAINAREA_LOAD_QUERY_ERROR",
-                    "クエリ エラー",
-                    "設定ファイルに保存されたクエリに誤りが存在するため、タブの情報が初期化されました。"));
+                AppInformationHub.PublishInformation(
+                    new AppInformation(
+                        AppInformationKind.Error,
+                        "MAINAREA_LOAD_QUERY_ERROR",
+                        "クエリ エラー",
+                        "設定ファイルに保存されたクエリに誤りが存在するため、タブの情報が初期化されました。" +
+                        Environment.NewLine +
+                        "トレース: " + Environment.NewLine +
+                        ex));
                 // reset tab information
                 Setting.ResetTabInfo();
                 // retry

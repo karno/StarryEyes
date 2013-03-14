@@ -6,7 +6,7 @@ namespace StarryEyes.Filters.Expressions.Values.Immediates
 {
     public class StringValue : ValueBase
     {
-        private string _value;
+        private readonly string _value;
 
         public StringValue(string value)
         {

@@ -1,19 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using StarryEyes.Breezy.DataModel;
 
 namespace StarryEyes.Filters.Expressions.Values.Immediates
 {
     public class NumericValue : ValueBase
     {
-        private long _value;
+        private readonly long _value;
 
         public NumericValue(long value)
         {
             this._value = value;
         }
 
-        public override IEnumerable<FilterExpressionType>  SupportedTypes
+        public override IEnumerable<FilterExpressionType> SupportedTypes
         {
             get { yield return FilterExpressionType.Numeric; }
         }
@@ -25,7 +26,7 @@ namespace StarryEyes.Filters.Expressions.Values.Immediates
 
         public override string ToQuery()
         {
-            return _value.ToString();
+            return _value.ToString(CultureInfo.InvariantCulture);
         }
     }
 }

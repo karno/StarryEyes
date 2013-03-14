@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using StarryEyes.Albireo.Data;
 using StarryEyes.Models.Stores;
@@ -66,7 +67,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
         public override string ToQuery()
         {
             if (String.IsNullOrEmpty(_originalScreenName))
-                return "#" + _userId.ToString();
+                return "#" + _userId.ToString(CultureInfo.InvariantCulture);
             return "@" + _originalScreenName;
         }
 
