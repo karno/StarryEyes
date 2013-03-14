@@ -53,6 +53,11 @@ namespace StarryEyes.Settings
             };
         }
 
+        internal static void ResetTabInfo()
+        {
+            _columns.Value = null;
+        }
+
         #endregion
 
         #region Authentication and accounts
@@ -174,6 +179,9 @@ namespace StarryEyes.Settings
 
         public static readonly SettingItemStruct<int> UserInfoReceivePeriod =
             new SettingItemStruct<int>("UserInfoReceivePeriod", 600);
+
+        public static readonly SettingItemStruct<int> UserRelationReceivePeriod =
+            new SettingItemStruct<int>("RESTReceivePeriod", 5400);
 
         public static readonly SettingItemStruct<int> RESTReceivePeriod =
             new SettingItemStruct<int>("RESTReceivePeriod", 90);

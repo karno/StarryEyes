@@ -166,7 +166,7 @@
     <Compile Include="Filters\Expressions\Operators\OperatorSets.cs" />
     <Compile Include="Filters\Expressions\Values\Locals\UserAny.cs" />
     <Compile Include="Filters\Expressions\Values\Locals\UserSpecified.cs" />
-    <Compile Include="Filters\Expressions\Values\Locals\UserRepresentationBase.cs" />
+    <Compile Include="Filters\Expressions\Values\Locals\UserExpressionBase.cs" />
     <Compile Include="Filters\Expressions\Values\Locals\Values.cs" />
     <Compile Include="Filters\Expressions\Values\Immediates\NumericValue.cs" />
     <Compile Include="Filters\Expressions\Values\Immediates\StringValue.cs" />
@@ -211,6 +211,7 @@
     <Compile Include="Models\Connections\Extends\ListReceiver.cs" />
     <Compile Include="Models\Connections\Extends\SearchReceiver.cs" />
     <Compile Include="Models\Connections\UserDependencies\UserInfoReceiver.cs" />
+    <Compile Include="Models\Connections\UserDependencies\UserRelationReceiver.cs" />
     <Compile Include="Models\Hubs\EventHub.cs" />
     <Compile Include="Models\Hubs\StoreHub.cs" />
     <Compile Include="Models\InputAreaModel.cs" />

@@ -92,6 +92,17 @@ namespace StarryEyes.Filters.Parsing
         }
     }
 
+    internal static class TokenExtensions
+    {
+        internal static bool IsMatchTokenLiteral(this Token token, string value, bool ignoreCase = true)
+        {
+            if (token.Type != TokenType.Literal) return false;
+            if (ignoreCase) return token.Value.ToUpper() == value.ToUpper();
+            return token.Value == value;
+        }
+
+    }
+
     /// <summary>
     /// Types of token.
     /// </summary>

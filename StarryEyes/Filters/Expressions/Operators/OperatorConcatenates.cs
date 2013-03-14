@@ -10,7 +10,7 @@ namespace StarryEyes.Filters.Expressions.Operators
     {
         protected override string OperatorString
         {
-            get { return "&&"; }
+            get { return "&"; }
         }
 
         public override Func<TwitterStatus, bool> GetBooleanValueProvider()
@@ -32,7 +32,7 @@ namespace StarryEyes.Filters.Expressions.Operators
     {
         protected override string OperatorString
         {
-            get { return "||"; }
+            get { return "|"; }
         }
 
         public override Func<TwitterStatus, bool> GetBooleanValueProvider()

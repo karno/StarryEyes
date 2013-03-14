@@ -32,6 +32,16 @@ namespace StarryEyes.Filters.Expressions.Operators
     public abstract class FilterSingleValueOperator : FilterOperatorBase
     {
         public FilterOperatorBase Value { get; set; }
+
+        public override void BeginLifecycle()
+        {
+            Value.BeginLifecycle();
+        }
+
+        public override void EndLifecycle()
+        {
+            Value.EndLifecycle();
+        }
     }
 
     public abstract class FilterTwoValueOperator : FilterOperatorBase
@@ -46,5 +56,17 @@ namespace StarryEyes.Filters.Expressions.Operators
         }
 
         protected abstract string OperatorString { get; }
+
+        public override void BeginLifecycle()
+        {
+            LeftValue.BeginLifecycle();
+            RightValue.BeginLifecycle();
+        }
+
+        public override void EndLifecycle()
+        {
+            LeftValue.EndLifecycle();
+            RightValue.EndLifecycle();
+        }
     }
 }

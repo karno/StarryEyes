@@ -11,8 +11,8 @@ namespace StarryEyes.Models.Stores
     /// </summary>
     public static class AccountRelationDataStore
     {
-        private static object storeLocker = new object();
-        private static SortedDictionary<long, AccountData> store = new SortedDictionary<long, AccountData>();
+        private static readonly object StoreLocker = new object();
+        private static readonly SortedDictionary<long, AccountRelationData> Store = new SortedDictionary<long, AccountRelationData>();
 
         /// <summary>
         /// Get account data fot the account id.<para />
@@ -20,15 +20,15 @@ namespace StarryEyes.Models.Stores
         /// </summary>
         /// <param name="id">account id</param>
         /// <returns>account data</returns>
-        public static AccountData GetAccountData(long id)
+        public static AccountRelationData Get(long id)
         {
-            AccountData data;
-            lock (storeLocker)
+            lock (StoreLocker)
             {
-                if (store.TryGetValue(id, out data))
+                AccountRelationData data;
+                if (Store.TryGetValue(id, out data))
                     return data;
-                data = new AccountData(id);
-                store.Add(id, data);
+                data = new AccountRelationData(id);
+                Store.Add(id, data);
                 return data;
             }
         }
@@ -38,20 +38,20 @@ namespace StarryEyes.Models.Stores
         /// </summary>
         /// <param name="info">lookup account</param>
         /// <returns>account data</returns>
-        public static AccountData GetAccountData(this AuthenticateInfo info)
+        public static AccountRelationData Get(this AuthenticateInfo info)
         {
-            return GetAccountData(info.Id);
+            return Get(info.Id);
         }
 
         /// <summary>
         /// Store data for an account.
         /// </summary>
         /// <param name="data">storing data</param>
-        public static void SetAccountData(AccountData data)
+        public static void Set(AccountRelationData data)
         {
-            lock (storeLocker)
+            lock (StoreLocker)
             {
-                store[data.AccountId] = data;
+                Store[data.AccountId] = data;
             }
         }
 
@@ -59,13 +59,13 @@ namespace StarryEyes.Models.Stores
         /// Get all existed datas.
         /// </summary>
         /// <returns></returns>
-        public static IEnumerable<AccountData> AccountDatas
+        public static IEnumerable<AccountRelationData> AccountRelations
         {
             get
             {
-                lock (storeLocker)
+                lock (StoreLocker)
                 {
-                    return store.Values.ToArray();
+                    return Store.Values.ToArray();
                 }
             }
         }
@@ -74,19 +74,19 @@ namespace StarryEyes.Models.Stores
     /// <summary>
     /// Store relation info for the account
     /// </summary>
-    public class AccountData
+    public class AccountRelationData
     {
         /// <summary>
-        /// Integrated event for trigger any AccountData changed.
+        /// Integrated event for trigger any AccountRelationData changed.
         /// </summary>
-        public static event Action<AccountDataChangedInfo> OnAccountDataUpdated;
+        public static event Action<RelationDataChangedInfo> OnAccountDataUpdated;
 
-        private void RaiseOnAccountDataUpdated(long targetUser, bool isAdded, AccountDataChange change)
+        private void RaiseOnAccountDataUpdated(long targetUser, bool isAdded, RelationDataChange change)
         {
             var handler = OnAccountDataUpdated;
             if (handler != null)
             {
-                handler(new AccountDataChangedInfo()
+                handler(new RelationDataChangedInfo
                 {
                     AccountUserId = this.AccountId,
                     IsIdAdded = isAdded,
@@ -96,26 +96,26 @@ namespace StarryEyes.Models.Stores
             }
         }
 
-        private long accountId;
+        private readonly long _accountId;
         /// <summary>
         /// Bound account Id
         /// </summary>
         public long AccountId
         {
-            get { return accountId; }
+            get { return _accountId; }
         }
 
         /// <summary>
         /// Initialize account data info
         /// </summary>
         /// <param name="accountId">bound account id</param>
-        public AccountData(long accountId)
+        public AccountRelationData(long accountId)
         {
-            this.accountId = accountId;
+            this._accountId = accountId;
         }
 
-        private object followingsLocker = new object();
-        private AVLTree<long> followings = new AVLTree<long>();
+        private readonly object _followingsLocker = new object();
+        private readonly AVLTree<long> _followings = new AVLTree<long>();
 
         /// <summary>
         /// Get all followings.
@@ -124,9 +124,9 @@ namespace StarryEyes.Models.Stores
         {
             get
             {
-                lock (followingsLocker)
+                lock (_followingsLocker)
                 {
-                    return followings.ToArray();
+                    return _followings.ToArray();
                 }
             }
         }
@@ -138,9 +138,9 @@ namespace StarryEyes.Models.Stores
         /// <returns>if true, you have followed him/her.</returns>
         public bool IsFollowing(long id)
         {
-            lock (followingsLocker)
+            lock (_followingsLocker)
             {
-                return followings.Contains(id);
+                return _followings.Contains(id);
             }
         }
 
@@ -151,14 +151,14 @@ namespace StarryEyes.Models.Stores
         /// <param name="isAdded">flag of follow/remove</param>
         public void SetFollowing(long id, bool isAdded)
         {
-            lock (followingsLocker)
+            lock (_followingsLocker)
             {
                 if (isAdded)
-                    followings.Add(id);
+                    _followings.Add(id);
                 else
-                    followings.Remove(id);
+                    _followings.Remove(id);
             }
-            RaiseOnAccountDataUpdated(id, isAdded, AccountDataChange.Following);
+            RaiseOnAccountDataUpdated(id, isAdded, RelationDataChange.Following);
         }
 
         /// <summary>
@@ -167,11 +167,11 @@ namespace StarryEyes.Models.Stores
         /// <param name="id">add user's id</param>
         public void AddFollowing(long id)
         {
-            lock (followingsLocker)
+            lock (_followingsLocker)
             {
-                followings.Add(id);
+                _followings.Add(id);
             }
-            RaiseOnAccountDataUpdated(id, true, AccountDataChange.Following);
+            RaiseOnAccountDataUpdated(id, true, RelationDataChange.Following);
         }
 
         /// <summary>
@@ -180,15 +180,15 @@ namespace StarryEyes.Models.Stores
         /// <param name="id">remove user's id</param>
         public void RemoveFollowing(long id)
         {
-            lock (followingsLocker)
+            lock (_followingsLocker)
             {
-                followings.Remove(id);
+                _followings.Remove(id);
             }
-            RaiseOnAccountDataUpdated(id, false, AccountDataChange.Following);
+            RaiseOnAccountDataUpdated(id, false, RelationDataChange.Following);
         }
 
-        private object followersLocker = new object();
-        private AVLTree<long> followers = new AVLTree<long>();
+        private readonly object _followersLocker = new object();
+        private readonly AVLTree<long> _followers = new AVLTree<long>();
 
         /// <summary>
         /// Get all followers.
@@ -197,9 +197,9 @@ namespace StarryEyes.Models.Stores
         {
             get
             {
-                lock (followersLocker)
+                lock (_followersLocker)
                 {
-                    return followers.ToArray();
+                    return _followers.ToArray();
                 }
             }
         }
@@ -211,9 +211,9 @@ namespace StarryEyes.Models.Stores
         /// <returns>if true, you are followed by him/her.</returns>
         public bool IsFollowedBy(long id)
         {
-            lock (followersLocker)
+            lock (_followersLocker)
             {
-                return followers.Contains(id);
+                return _followers.Contains(id);
             }
         }
 
@@ -224,14 +224,14 @@ namespace StarryEyes.Models.Stores
         /// <param name="isAdded">flag of followed/removed</param>
         public void SetFollower(long id, bool isAdded)
         {
-            lock (followersLocker)
+            lock (_followersLocker)
             {
                 if (isAdded)
-                    followers.Add(id);
+                    _followers.Add(id);
                 else
-                    followers.Remove(id);
+                    _followers.Remove(id);
             }
-            RaiseOnAccountDataUpdated(id, isAdded, AccountDataChange.Follower);
+            RaiseOnAccountDataUpdated(id, isAdded, RelationDataChange.Follower);
         }
 
         /// <summary>
@@ -240,11 +240,11 @@ namespace StarryEyes.Models.Stores
         /// <param name="id">add user's id</param>
         public void AddFollower(long id)
         {
-            lock (followersLocker)
+            lock (_followersLocker)
             {
-                followers.Add(id);
+                _followers.Add(id);
             }
-            RaiseOnAccountDataUpdated(id, true, AccountDataChange.Follower);
+            RaiseOnAccountDataUpdated(id, true, RelationDataChange.Follower);
         }
 
         /// <summary>
@@ -253,15 +253,15 @@ namespace StarryEyes.Models.Stores
         /// <param name="id">remove user's id</param>
         public void RemoveFollower(long id)
         {
-            lock (followersLocker)
+            lock (_followersLocker)
             {
-                followers.Remove(id);
+                _followers.Remove(id);
             }
-            RaiseOnAccountDataUpdated(id, false, AccountDataChange.Follower);
+            RaiseOnAccountDataUpdated(id, false, RelationDataChange.Follower);
         }
 
-        private object blockingsLocker = new object();
-        private AVLTree<long> blockings = new AVLTree<long>();
+        private readonly object _blockingsLocker = new object();
+        private readonly AVLTree<long> _blockings = new AVLTree<long>();
 
         /// <summary>
         /// Get all blockings
@@ -270,9 +270,9 @@ namespace StarryEyes.Models.Stores
         {
             get
             {
-                lock (blockingsLocker)
+                lock (_blockingsLocker)
                 {
-                    return blockings.ToArray();
+                    return _blockings.ToArray();
                 }
             }
         }
@@ -284,9 +284,9 @@ namespace StarryEyes.Models.Stores
         /// <returns>if true, he/she has been blocked me.</returns>
         public bool IsBlocking(long id)
         {
-            lock (blockingsLocker)
+            lock (_blockingsLocker)
             {
-                return blockings.Contains(id);
+                return _blockings.Contains(id);
             }
         }
 
@@ -297,14 +297,14 @@ namespace StarryEyes.Models.Stores
         /// <param name="isAdded">flag of blocked/unblocked</param>
         public void SetBlocking(long id, bool isAdded)
         {
-            lock (blockingsLocker)
+            lock (_blockingsLocker)
             {
                 if (isAdded)
-                    blockings.Add(id);
+                    _blockings.Add(id);
                 else
-                    blockings.Remove(id);
+                    _blockings.Remove(id);
             }
-            RaiseOnAccountDataUpdated(id, isAdded, AccountDataChange.Blocking);
+            RaiseOnAccountDataUpdated(id, isAdded, RelationDataChange.Blocking);
         }
 
         /// <summary>
@@ -313,11 +313,11 @@ namespace StarryEyes.Models.Stores
         /// <param name="id">add user's id</param>
         public void AddBlocking(long id)
         {
-            lock (blockingsLocker)
+            lock (_blockingsLocker)
             {
-                blockings.Add(id);
+                _blockings.Add(id);
             }
-            RaiseOnAccountDataUpdated(id, true, AccountDataChange.Blocking);
+            RaiseOnAccountDataUpdated(id, true, RelationDataChange.Blocking);
         }
 
         /// <summary>
@@ -326,23 +326,23 @@ namespace StarryEyes.Models.Stores
         /// <param name="id">remove user's id</param>
         public void RemoveBlocking(long id)
         {
-            lock (blockingsLocker)
+            lock (_blockingsLocker)
             {
-                blockings.Remove(id);
+                _blockings.Remove(id);
             }
-            RaiseOnAccountDataUpdated(id, false, AccountDataChange.Blocking);
+            RaiseOnAccountDataUpdated(id, false, RelationDataChange.Blocking);
         }
     }
 
     /// <summary>
     /// Information of changing relation
     /// </summary>
-    public class AccountDataChangedInfo
+    public class RelationDataChangedInfo
     {
         /// <summary>
         /// Change description
         /// </summary>
-        public AccountDataChange Change { get; set; }
+        public RelationDataChange Change { get; set; }
 
         /// <summary>
         /// Flag of user is added or removed
@@ -363,7 +363,7 @@ namespace StarryEyes.Models.Stores
     /// <summary>
     /// Describe changed data
     /// </summary>
-    public enum AccountDataChange
+    public enum RelationDataChange
     {
         /// <summary>
         /// Following users is updated

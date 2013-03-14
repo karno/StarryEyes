@@ -20,7 +20,7 @@ namespace StarryEyes.Filters.Sources
         public override Func<TwitterStatus, bool> GetEvaluator()
         {
             var ads = GetAccountsFromString(_screenName)
-                .Select(a => AccountRelationDataStore.GetAccountData(a.Id));
+                .Select(a => AccountRelationDataStore.Get(a.Id));
             return _ => ads.Any(ad => FilterSystemUtil.InReplyToUsers(_).Contains(ad.AccountId));
         }
 

@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace StarryEyes.Filters.Parsing
 {
-    internal class Tokenizer
+    internal static class Tokenizer
     {
         public static IEnumerable<Token> Tokenize(string query)
         {
@@ -14,14 +14,10 @@ namespace StarryEyes.Filters.Parsing
                 switch (query[strptr])
                 {
                     case '&':
-                        AssertNext(query, strptr, '&');
                         yield return new Token(TokenType.OperatorAnd, strptr);
-                        strptr++;
                         break;
                     case '|':
-                        AssertNext(query, strptr, '|');
                         yield return new Token(TokenType.OperatorOr, strptr);
-                        strptr++;
                         break;
                     case '<':
                         if (query.Length <= strptr + 1)
@@ -154,8 +150,8 @@ namespace StarryEyes.Filters.Parsing
         /// エスケープシーケンスを考慮します。
         /// </summary>
         /// <param name="query">クエリ文字列</param>
+        /// <param name="cursor">文字列の開始ダブルクオートのインデックスを渡してください。解析終了後は、文字列終了のダブルクオートを示します</param>
         /// <returns>文字列部分</returns>
-        /// <param name="nextIndex">文字列の開始ダブルクオートのインデックスを渡してください。解析終了後は、文字列終了のダブルクオートを示します</param>
         /// <exception cref="System.ArgumentException">文字列の解析に失敗</exception>
         public static string GetInQuoteString(string query, ref int cursor)
         {
@@ -169,7 +165,7 @@ namespace StarryEyes.Filters.Parsing
                     {
                         throw new ArgumentException("クエリはバックスラッシュで終了しています。");
                     }
-                    else if (query[cursor + 1] == '"' || query[cursor + 1] == '\\')
+                    if (query[cursor + 1] == '"' || query[cursor + 1] == '\\')
                     {
                         cursor++;
                     }
@@ -188,8 +184,7 @@ namespace StarryEyes.Filters.Parsing
         {
             if (i + 1 >= q.Length || q[i] != c)
                 return false;
-            else
-                return true;
+            return true;
         }
 
         public static void AssertNext(string q, int i, char c)

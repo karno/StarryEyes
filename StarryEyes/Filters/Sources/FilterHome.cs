@@ -21,11 +21,11 @@ namespace StarryEyes.Filters.Sources
         public override Func<TwitterStatus, bool> GetEvaluator()
         {
             var ads = GetAccountsFromString(_screenName)
-                .Select(a => AccountRelationDataStore.GetAccountData(a.Id));
+                .Select(a => AccountRelationDataStore.Get(a.Id));
             return _ => CheckVisibleTimeline(_, ads);
         }
 
-        private bool CheckVisibleTimeline(TwitterStatus status, IEnumerable<AccountData> datas)
+        private bool CheckVisibleTimeline(TwitterStatus status, IEnumerable<AccountRelationData> datas)
         {
             if (status.StatusType == StatusType.DirectMessage)
                 return false;

@@ -9,14 +9,14 @@ namespace StarryEyes.Models.Connections.UserDependencies
     /// <summary>
     /// Receives user individual information.
     /// </summary>
-    public class UserInfoReceiver : PollingConnectionBase
+    public sealed class UserInfoReceiver : PollingConnectionBase
     {
         public UserInfoReceiver(AuthenticateInfo info)
             : base(info) { }
 
         protected override int IntervalSec
         {
-            get { return Setting.RESTReceivePeriod.Value; }
+            get { return Setting.UserInfoReceivePeriod.Value; }
         }
 
         protected override void DoReceive()

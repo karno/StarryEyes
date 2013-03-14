@@ -2,7 +2,7 @@
 
 namespace StarryEyes.Filters.Expressions.Values.Locals
 {
-    public abstract class UserRepresentationBase
+    public abstract class UserExpressionBase
     {
         public abstract long UserId { get; }
 

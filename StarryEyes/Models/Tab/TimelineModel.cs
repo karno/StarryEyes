@@ -15,8 +15,8 @@ namespace StarryEyes.Models.Tab
 {
     public class TimelineModel : IDisposable
     {
-        public static readonly int TimelineChunkCount = 120;
-        public static readonly int TimelineChunkCountBounce = 30;
+        public static readonly int TimelineChunkCount = 1024;
+        public static readonly int TimelineChunkCountBounce = 256;
 
         private readonly CompositeDisposable _disposable;
         private readonly Func<long?, int, bool, IObservable<TwitterStatus>> _fetcher;

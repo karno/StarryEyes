@@ -33,7 +33,7 @@ namespace StarryEyes.Filters.Expressions.Values.Statuses
 
         public override Func<TwitterStatus, bool> GetBooleanValueProvider()
         {
-            return _ => AccountRelationDataStore.AccountDatas
+            return _ => AccountRelationDataStore.AccountRelations
                 .Any(ad => _.FavoritedUsers.Contains(ad.AccountId));
         }
 
@@ -52,7 +52,7 @@ namespace StarryEyes.Filters.Expressions.Values.Statuses
 
         public override Func<TwitterStatus, bool> GetBooleanValueProvider()
         {
-            return _ => AccountRelationDataStore.AccountDatas
+            return _ => AccountRelationDataStore.AccountRelations
                 .Any(ad => _.RetweetedUsers.Contains(ad.AccountId));
         }
 

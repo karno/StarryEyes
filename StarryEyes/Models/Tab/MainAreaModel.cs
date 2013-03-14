@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Livet;
+using StarryEyes.Models.Hubs;
 using StarryEyes.Settings;
 
 namespace StarryEyes.Models.Tab
@@ -32,14 +33,29 @@ namespace StarryEyes.Models.Tab
         /// </summary>
         internal static void Load()
         {
-            Setting.Columns
-                .Select(c => new ColumnModel(c.Tabs.Select(d => d.ToTabModel()).ToArray()))
-                .ForEach(_columns.Add);
-            if (_columns.Count == 0)
+            try
             {
-                _columns.Add(new ColumnModel(Enumerable.Empty<TabModel>()));
+                Setting.Columns
+                       .Select(c => new ColumnModel(c.Tabs.Select(d => d.ToTabModel()).ToArray()))
+                       .ForEach(_columns.Add);
+                if (_columns.Count == 0)
+                {
+                    _columns.Add(new ColumnModel(Enumerable.Empty<TabModel>()));
+                }
+                App.RaiseUserInterfaceReady();
             }
-            App.RaiseUserInterfaceReady();
+            catch (Exception ex)
+            {
+                AppInformationHub.PublishInformation(new AppInformation(
+                    AppInformationKind.Error,
+                    "MAINAREA_LOAD_QUERY_ERROR",
+                    "クエリ エラー",
+                    "設定ファイルに保存されたクエリに誤りが存在するため、タブの情報が初期化されました。"));
+                // reset tab information
+                Setting.ResetTabInfo();
+                // retry
+                Load();
+            }
         }
 
         /// <summary>

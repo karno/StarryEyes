@@ -5,7 +5,7 @@ using StarryEyes.Models.Stores;
 
 namespace StarryEyes.Filters.Expressions.Values.Locals
 {
-    public sealed class UserAny : UserRepresentationBase
+    public sealed class UserAny : UserExpressionBase
     {
         public override IReadOnlyCollection<long> Users
         {
@@ -21,7 +21,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
             {
                 var followers = new AVLTree<long>();
                 AccountsStore.Accounts
-                    .SelectMany(a => AccountRelationDataStore.GetAccountData(a.UserId).Followings)
+                    .SelectMany(a => AccountRelationDataStore.Get(a.UserId).Followings)
                     .ForEach(followers.Add);
                 return followers;
             }
@@ -33,7 +33,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
             {
                 var followings = new AVLTree<long>();
                 AccountsStore.Accounts
-                    .SelectMany(a => AccountRelationDataStore.GetAccountData(a.UserId).Followings)
+                    .SelectMany(a => AccountRelationDataStore.Get(a.UserId).Followings)
                     .ForEach(followings.Add);
                 return followings;
             }

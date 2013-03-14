@@ -18,32 +18,28 @@ namespace StarryEyes.Filters.Parsing
         {
             try
             {
-                Token[] tokens = Tokenizer.Tokenize(query).ToArray();
+                var tokens = Tokenizer.Tokenize(query).ToArray();
                 // (from (sources)) (where (filters))
-                Token first = tokens.FirstOrDefault();
-                if (first.Type == TokenType.Literal &&
-                    first.Value.Equals("from", StringComparison.CurrentCultureIgnoreCase))
+                var first = tokens.FirstOrDefault();
+                if (first.IsMatchTokenLiteral("from"))
                 {
                     // compile with sources && predicates
-                    FilterSourceBase[] sources =
-                        CompileSources(tokens.Skip(1).TakeWhile(t => t.Type != TokenType.Literal || t.Value != "where"))
-                            .ToArray();
-                    if (!tokens.Skip(1).SkipWhile(t => t.Type != TokenType.Literal || t.Value != "where").Any())
+                    var sourceSequence = tokens.Skip(1).TakeWhile(t => !t.IsMatchTokenLiteral("where"));
+                    var sources = CompileSources(sourceSequence).ToArray();
+                    var predicateSequence = tokens.SkipWhile(t => !t.IsMatchTokenLiteral("where")).Skip(1).ToArray();
+                    if (predicateSequence.Length == 0)
                     {
                         // without predicates
                         return new FilterQuery { Sources = sources, PredicateTreeRoot = new FilterExpressionRoot() };
                     }
-                    FilterExpressionRoot filters =
-                        CompileFilters(
-                            tokens.Skip(1).SkipWhile(t => t.Type != TokenType.Literal || t.Value != "where").Skip(1));
+                    FilterExpressionRoot filters = CompileFilters(predicateSequence);
                     return new FilterQuery { Sources = sources, PredicateTreeRoot = filters };
                 }
-                if (first.Type == TokenType.Literal &&
-                    first.Value.Equals("where", StringComparison.CurrentCultureIgnoreCase))
+                if (first.IsMatchTokenLiteral("where"))
                 {
-                    // compile with predicates
+                    // compile without sources
                     var sources = new FilterSourceBase[] { new FilterLocal() }; // implicit "from all"
-                    FilterExpressionRoot filters = CompileFilters(tokens.Skip(1));
+                    var filters = CompileFilters(tokens.Skip(1));
                     return new FilterQuery { Sources = sources, PredicateTreeRoot = filters };
                 }
                 throw new FormatException("クエリは\"from\"キーワードか\"where\"キーワードで始まらなければなりません。");
@@ -162,9 +158,9 @@ namespace StarryEyes.Filters.Parsing
         }
 
         // Operators:
-        // All: + - * / || && <- -> == > >= < <= != ! 
-        // L0: ||
-        // L1: &&
+        // All: + - * / | & <- -> == > >= < <= != ! 
+        // L0: |
+        // L1: &
         // L2: == !=
         // L3: < <= > >=
         // L4: <- ->
@@ -175,7 +171,7 @@ namespace StarryEyes.Filters.Parsing
 
         private static FilterOperatorBase CompileL0(TokenReader reader)
         {
-            // ||
+            // |
             FilterOperatorBase left = CompileL1(reader);
             if (!reader.IsRemainToken)
                 return left;
@@ -192,7 +188,7 @@ namespace StarryEyes.Filters.Parsing
 
         private static FilterOperatorBase CompileL1(TokenReader reader)
         {
-            // &&
+            // &
             FilterOperatorBase left = CompileL2(reader);
             if (!reader.IsRemainToken)
                 return left;
@@ -333,7 +329,7 @@ namespace StarryEyes.Filters.Parsing
                 reader.AssertGet(TokenType.CloseBracket);
                 return new FilterBracket(ret);
             }
-            return InstantiateValue(reader);
+            return GetValue(reader);
         }
 
         private static FilterOperatorBase GenerateSink(
@@ -350,7 +346,7 @@ namespace StarryEyes.Filters.Parsing
             return oper;
         }
 
-        private static ValueBase InstantiateValue(TokenReader reader)
+        private static ValueBase GetValue(TokenReader reader)
         {
             Token literal = reader.LookAhead();
             if (literal.Type == TokenType.String)
@@ -373,40 +369,40 @@ namespace StarryEyes.Filters.Parsing
             {
                 case '@':
                     // user screen name
-                    return InstantiateLocalUsers(literal.Value.Substring(1), reader);
+                    return GetAccountValue(literal.Value.Substring(1), reader);
                 case '#':
                     // user id
-                    return InstantiateLocalUsers(literal.Value, reader);
+                    return GetAccountValue(literal.Value, reader);
             }
             // check first layers
             switch (literal.Value)
             {
                 case "*":
-                    return InstantiateLocalUsers("*", reader);
+                    return GetAccountValue("*", reader);
                 case "@":
                     reader.AssertGet(TokenType.Period);
-                    return InstantiateLocalUsers(reader.AssertGet(TokenType.Literal).Value, reader);
+                    return GetAccountValue(reader.AssertGet(TokenType.Literal).Value, reader);
                 case "user":
                 case "retweeter":
-                    return InstantiateUserValue(literal.Value == "retweeter", reader);
+                    return GetUserValue(literal.Value == "retweeter", reader);
                 default:
                     long iv;
                     if (Int64.TryParse(literal.Value, out iv))
                     {
                         return new NumericValue(iv);
                     }
-                    return InstantiateStatusValue(literal.Value, reader);
+                    return GetStatusValue(literal.Value, reader);
             }
         }
 
-        private static ValueBase InstantiateLocalUsers(string value, TokenReader reader)
+        private static ValueBase GetAccountValue(string value, TokenReader reader)
         {
-            UserRepresentationBase repl = GetRepresentation(value);
+            UserExpressionBase repl = GetUserExpr(value);
             if (reader.IsRemainToken && reader.LookAhead().Type == TokenType.Period)
             {
                 reader.AssertGet(TokenType.Period);
                 Token literal = reader.AssertGet(TokenType.Literal);
-                switch (literal.Value)
+                switch (literal.Value.ToLower())
                 {
                     case "friend":
                     case "friends":
@@ -424,7 +420,7 @@ namespace StarryEyes.Filters.Parsing
             return new LocalUser(repl);
         }
 
-        private static UserRepresentationBase GetRepresentation(string key)
+        private static UserExpressionBase GetUserExpr(string key)
         {
             if (key == "*")
             {
@@ -438,18 +434,18 @@ namespace StarryEyes.Filters.Parsing
             return new UserSpecified(key);
         }
 
-        private static ValueBase InstantiateUserValue(bool isRetweeter, TokenReader reader)
+        private static ValueBase GetUserValue(bool isRetweeter, TokenReader reader)
         {
             var selector = (Func<ValueBase, ValueBase, ValueBase>)
                            ((user, retweeter) => isRetweeter ? retweeter : user);
             if (reader.IsRemainToken && reader.LookAhead().Type != TokenType.Period)
             {
-                // user representation
+                // user expression
                 return selector(new User(), new Retweeter());
             }
             reader.AssertGet(TokenType.Period);
             Token literal = reader.AssertGet(TokenType.Literal);
-            switch (literal.Value)
+            switch (literal.Value.ToLower())
             {
                 case "protected":
                 case "isProtected":
@@ -534,7 +530,7 @@ namespace StarryEyes.Filters.Parsing
             }
         }
 
-        private static ValueBase InstantiateStatusValue(string value, TokenReader reader)
+        private static ValueBase GetStatusValue(string value, TokenReader reader)
         {
             switch (value)
             {

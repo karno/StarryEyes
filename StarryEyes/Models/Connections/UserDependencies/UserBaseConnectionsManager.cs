@@ -211,7 +211,7 @@ namespace StarryEyes.Models.Connections.UserDependencies
                     if (tracked != null) // if track-resolver bind key to null value, that's dangling word.
                     {
                         TrackResolver.Remove(keyword);
-                    System.Diagnostics.Debug.WriteLine("*** TRACK REMOVE: " + keyword);
+                        System.Diagnostics.Debug.WriteLine("*** TRACK REMOVE: " + keyword);
                         tracked.TrackKeywords = tracked.TrackKeywords.Except(new[] { keyword });
                         tracked.Connect();
                     }
@@ -226,9 +226,10 @@ namespace StarryEyes.Models.Connections.UserDependencies
     internal sealed class ConnectionGroup : IDisposable
     {
         private readonly long _userId;
+        private bool _isDisposed;
         private readonly UserInfoReceiver _userInfoReceiver;
         private readonly UserTimelinesReceiver _userTimelineReceiver;
-        private bool _isDisposed;
+        private readonly UserRelationReceiver _userRelationReceiver;
         private UserStreamsConnection _userStreams;
 
         public ConnectionGroup(long id)
@@ -236,6 +237,7 @@ namespace StarryEyes.Models.Connections.UserDependencies
             _userId = id;
             _userTimelineReceiver = new UserTimelinesReceiver(AuthInfo) { IsActivated = true };
             _userInfoReceiver = new UserInfoReceiver(AuthInfo) { IsActivated = true };
+            _userRelationReceiver = new UserRelationReceiver(AuthInfo) { IsActivated = true };
         }
 
         public long UserId
@@ -261,6 +263,11 @@ namespace StarryEyes.Models.Connections.UserDependencies
         public UserInfoReceiver UserInfoReceiver
         {
             get { return _userInfoReceiver; }
+        }
+
+        public UserRelationReceiver UserRelationReceiver
+        {
+            get { return _userRelationReceiver; }
         }
 
         public UserStreamsConnection UserStreamsConnection

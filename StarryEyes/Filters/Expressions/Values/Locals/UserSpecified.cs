@@ -6,11 +6,11 @@ using StarryEyes.Models.Stores;
 
 namespace StarryEyes.Filters.Expressions.Values.Locals
 {
-    public sealed class UserSpecified : UserRepresentationBase
+    public sealed class UserSpecified : UserExpressionBase
     {
         readonly string _originalScreenName;
         readonly long _userId;
-        AccountData _adata;
+        AccountRelationData _adata;
 
         public UserSpecified(string screenName)
         {
@@ -30,7 +30,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 
         private void GetAccountData()
         {
-            _adata = AccountRelationDataStore.GetAccountData(_userId);
+            _adata = AccountRelationDataStore.Get(_userId);
         }
 
         public override IReadOnlyCollection<long> Users
