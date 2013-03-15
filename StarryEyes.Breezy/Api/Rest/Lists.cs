@@ -133,7 +133,7 @@ namespace StarryEyes.Breezy.Api.Rest
                 {"owner_id", owner_id},
                 {"since_id", since_id},
                 {"max_id", max_id},
-                {"per_page", per_page},
+                {"count", per_page},
                 {"include_entities", include_entities},
                 {"include_rts", include_rts},
             }.Parametalize();

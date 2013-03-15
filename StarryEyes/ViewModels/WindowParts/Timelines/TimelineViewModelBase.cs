@@ -31,7 +31,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         private StatusViewModel _focusedStatus;
         private ObservableCollection<StatusViewModel> _timeline;
 
-        public virtual ObservableCollection<StatusViewModel> Timeline
+        public ObservableCollection<StatusViewModel> Timeline
         {
             get
             {

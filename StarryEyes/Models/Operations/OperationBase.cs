@@ -61,7 +61,7 @@ namespace StarryEyes.Models.Operations
 
         private string ParseErrorMessage(string error)
         {
-            if (error.StartsWith("{error:") && error.EndsWith("}"))
+            if (error.StartsWith("{errors:") && error.EndsWith("}"))
                 return error.Substring(7, error.Length - 8);
             return error;
         }
