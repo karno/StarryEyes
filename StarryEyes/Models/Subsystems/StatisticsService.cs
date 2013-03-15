@@ -22,7 +22,7 @@ namespace StarryEyes.Models.Subsystems
                           }
                       });
             App.OnUserInterfaceReady +=
-                () => Observable.Interval(TimeSpan.FromSeconds(8.0))
+                () => Observable.Interval(TimeSpan.FromSeconds(20.0))
                                 .Subscribe(_ =>
                                 {
                                     if (!_tpsAccess)
@@ -95,7 +95,7 @@ namespace StarryEyes.Models.Subsystems
             get { return _estimatedGrossTweetCount; }
         }
 
-        private static bool _tpsAccess = false;
+        private static bool _tpsAccess;
 
         private static double _tweetsPerSeconds;
         /// <summary>
