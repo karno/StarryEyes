@@ -36,6 +36,8 @@ namespace StarryEyes.Views.Behaviors
         public static readonly DependencyProperty ItemsSourceProperty =
             DependencyProperty.Register("ItemsSource", typeof(IList), typeof(TimelineScrollLockerBehavior), new PropertyMetadata(null));
 
+        private int _previousItemCount;
+
         protected override void OnAttached()
         {
             base.OnAttached();
@@ -47,6 +49,9 @@ namespace StarryEyes.Views.Behaviors
                           .Subscribe(
                               e =>
                               {
+                                  var itemCount = ItemsSource.Count;
+                                  if (_previousItemCount == itemCount) return;
+                                  _previousItemCount = itemCount;
                                   if (e.ExtentHeightChange > 0 && IsScrollLockEnabled)
                                   {
                                       this.AssociatedObject.ScrollToVerticalOffset(

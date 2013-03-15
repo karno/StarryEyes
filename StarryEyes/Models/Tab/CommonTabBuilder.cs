@@ -17,7 +17,7 @@ namespace StarryEyes.Models.Tab
 
         public static TabModel GenerateHomeTab()
         {
-            return new TabModel("home", "from local where user <- *.followings | (retweet & retweeter <- *.followings) | to -> *").SetDefaultParams();
+            return new TabModel("home", "from local where user <- *.followings | (retweet & retweeter <- *.followings) | user <- * | to -> *").SetDefaultParams();
         }
 
         public static TabModel GenerateMentionTab()
