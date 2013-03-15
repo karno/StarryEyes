@@ -96,15 +96,22 @@ namespace StarryEyes.Models
 
         public static void NotifyChangeFocusingTab(TabModel tabModel)
         {
+            if (_currentFocusTabModel == tabModel) return;
             _currentFocusTabModel = null;
-            _bindingAuthInfos.Clear();
-            tabModel.BindingAccountIds
-                    .Select(AccountsStore.GetAccountSetting)
-                    .Where(_ => _ != null)
-                    .Select(_ => _.AuthenticateInfo)
-                    .ForEach(_bindingAuthInfos.Add);
-            _bindingHashtags.Clear();
-            tabModel.BindingHashtags.ForEach(_bindingHashtags.Add);
+            if (!_bindingAuthInfos.Select(ai => ai.Id).SequenceEqual(tabModel.BindingAccountIds))
+            {
+                _bindingAuthInfos.Clear();
+                tabModel.BindingAccountIds
+                        .Select(AccountsStore.GetAccountSetting)
+                        .Where(_ => _ != null)
+                        .Select(_ => _.AuthenticateInfo)
+                        .ForEach(_bindingAuthInfos.Add);
+            }
+            if (!_bindingHashtags.SequenceEqual(tabModel.BindingHashtags))
+            {
+                _bindingHashtags.Clear();
+                tabModel.BindingHashtags.ForEach(_bindingHashtags.Add);
+            }
             _currentFocusTabModel = tabModel;
         }
 
