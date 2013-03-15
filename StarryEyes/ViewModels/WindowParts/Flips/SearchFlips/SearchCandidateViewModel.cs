@@ -91,7 +91,9 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 IsSearchCandidateAvailable = true;
                 aid.AuthenticateInfo.GetSavedSearches()
                     .ObserveOnDispatcher()
-                   .Subscribe(j => _searchCandidates.Add(new SearchCandidateItemViewModel(this, aid.AuthenticateInfo, j.id, j.query)), ex => BackpanelModel.RegisterEvent(new OperationFailedEvent(ex.Message)));
+                   .Subscribe(
+                   j => _searchCandidates.Add(new SearchCandidateItemViewModel(this, aid.AuthenticateInfo, j.id, j.query)),
+                   ex => BackpanelModel.RegisterEvent(new OperationFailedEvent(ex.Message)));
             }
         }
     }

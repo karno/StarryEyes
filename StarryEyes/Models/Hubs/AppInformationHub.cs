@@ -14,35 +14,34 @@ namespace StarryEyes.Models.Hubs
             App.OnUserInterfaceReady += DispatchQueue;
         }
 
-        private static bool isUiReady = false;
+        private static bool _isUiReady;
         private static void DispatchQueue()
         {
-            isUiReady = true;
-            if (localQueue == null) return;
-            var q = localQueue;
-            localQueue = null;
+            _isUiReady = true;
+            if (_localQueue == null) return;
+            var q = _localQueue;
+            _localQueue = null;
             while (q.Count > 0)
             {
                 PublishInformation(q.Dequeue());
             }
         }
 
-        private static Queue<AppInformation> localQueue = new Queue<AppInformation>();
+        private static Queue<AppInformation> _localQueue = new Queue<AppInformation>();
 
         internal static event Action<AppInformation> OnInformationPublished;
 
         public static void PublishInformation(AppInformation information)
         {
-            if (!isUiReady)
+            if (!_isUiReady)
             {
-                localQueue.Enqueue(information);
+                _localQueue.Enqueue(information);
             }
             else
             {
                 var handler = OnInformationPublished;
                 if (handler != null)
                     handler(information);
-                BackpanelModel.RegisterEvent(new OperationFailedEvent(information.Detail));
             }
         }
     }

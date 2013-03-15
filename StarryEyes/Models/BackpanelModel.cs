@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Linq;
 using Livet;
 using StarryEyes.Models.Backpanels;
+using StarryEyes.Models.Backpanels.SystemEvents;
 using StarryEyes.Models.Backpanels.TwitterEvents;
+using StarryEyes.Models.Hubs;
 
 namespace StarryEyes.Models
 {
@@ -10,6 +13,35 @@ namespace StarryEyes.Models
     /// </summary>
     public static class BackpanelModel
     {
+        static BackpanelModel()
+        {
+            AppInformationHub.OnInformationPublished += AppInformationHub_OnInformationPublished;
+        }
+
+        #region Bind AppInformationHub
+
+        private static readonly object _infoAddLockObject = new object();
+        static void AppInformationHub_OnInformationPublished(AppInformation info)
+        {
+            lock (_infoAddLockObject)
+            {
+                _infoCollection.RemoveWhere(item => item.Id == info.Id);
+                _infoCollection.Add(info);
+            }
+            RegisterEvent(new InternalErrorEvent(info.Header + ": " + info.Detail));
+        }
+
+
+        private static readonly ObservableSynchronizedCollectionEx<AppInformation> _infoCollection =
+            new ObservableSynchronizedCollectionEx<AppInformation>();
+
+        public static ObservableSynchronizedCollectionEx<AppInformation> InfoCollection
+        {
+            get { return _infoCollection; }
+        }
+
+        #endregion
+
         #region Account connection state management
 
         #endregion

@@ -34,33 +34,14 @@ namespace StarryEyes.Models.Tab
         /// </summary>
         internal static void Load()
         {
-            try
+            Setting.Columns
+                   .Select(c => new ColumnModel(c.Tabs.Select(d => d.ToTabModel()).ToArray()))
+                   .ForEach(_columns.Add);
+            if (_columns.Count == 0)
             {
-                Setting.Columns
-                       .Select(c => new ColumnModel(c.Tabs.Select(d => d.ToTabModel()).ToArray()))
-                       .ForEach(_columns.Add);
-                if (_columns.Count == 0)
-                {
-                    _columns.Add(new ColumnModel(Enumerable.Empty<TabModel>()));
-                }
-                App.RaiseUserInterfaceReady();
+                _columns.Add(new ColumnModel(Enumerable.Empty<TabModel>()));
             }
-            catch (FilterQueryException ex)
-            {
-                AppInformationHub.PublishInformation(
-                    new AppInformation(
-                        AppInformationKind.Error,
-                        "MAINAREA_LOAD_QUERY_ERROR",
-                        "クエリ エラー",
-                        "設定ファイルに保存されたクエリに誤りが存在するため、タブの情報が初期化されました。" +
-                        Environment.NewLine +
-                        "トレース: " + Environment.NewLine +
-                        ex));
-                // reset tab information
-                Setting.ResetTabInfo();
-                // retry
-                Load();
-            }
+            App.RaiseUserInterfaceReady();
         }
 
         /// <summary>
