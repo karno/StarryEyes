@@ -193,20 +193,28 @@ namespace StarryEyes.Albireo.Data
             }
             else
             {
-                var parent = trace.Peek();
-                // has a child or no children
-                AVLTreeLeaf leaf;
-                if (current.LeftLeaf != null)
-                    leaf = current.LeftLeaf;
-                else if (current.RightLeaf != null)
-                    leaf = current.RightLeaf;
-                else // has no children
-                    leaf = null;
-
-                if (parent.Item2 == Direction.Left)
-                    parent.Item1.LeftLeaf = leaf;
+                if (trace.Count == 0)
+                {
+                    // top of the tree
+                    _root = current.LeftLeaf ?? current.RightLeaf;
+                }
                 else
-                    parent.Item1.RightLeaf = leaf;
+                {
+                    var parent = trace.Peek();
+                    // has a child or no children
+                    AVLTreeLeaf leaf;
+                    if (current.LeftLeaf != null)
+                        leaf = current.LeftLeaf;
+                    else if (current.RightLeaf != null)
+                        leaf = current.RightLeaf;
+                    else // has no children
+                        leaf = null;
+
+                    if (parent.Item2 == Direction.Left)
+                        parent.Item1.LeftLeaf = leaf;
+                    else
+                        parent.Item1.RightLeaf = leaf;
+                }
             }
 
             // rotate and balance
