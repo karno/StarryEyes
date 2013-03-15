@@ -98,25 +98,30 @@ namespace StarryEyes.Models.Tab
                     throw new InvalidOperationException("タブ情報がアクティブな状態のままフィルタクエリの交換を行うことはできません。");
                 if (value.Equals(_filterQuery)) return;
                 _filterQuery = value;
-                try
-                {
-                    if (_filterQuery != null)
-                        _evaluator = _filterQuery.GetEvaluator();
-                    else
-                        _evaluator = _ => false;
-                }
-                catch (Exception fex)
-                {
-                    AppInformationHub.PublishInformation(
-                        new AppInformation(AppInformationKind.Warning,
-                                           "TABINFO_QUERY_CORRUPTED_" + Name,
-                                           "クエリが壊れています。",
-                                           "タブ " + Name +
-                                           " のクエリは破損しているため、フィルタが初期化されました。" +
-                                           Environment.NewLine +
-                                           "送出された例外: " + fex));
+                RefreshEvaluator();
+            }
+        }
+
+        public void RefreshEvaluator()
+        {
+            try
+            {
+                if (_filterQuery != null)
+                    _evaluator = _filterQuery.GetEvaluator();
+                else
                     _evaluator = _ => false;
-                }
+            }
+            catch (FilterQueryException fex)
+            {
+                AppInformationHub.PublishInformation(
+                    new AppInformation(AppInformationKind.Warning,
+                                       "TABINFO_QUERY_CORRUPTED_" + Name,
+                                       "クエリが壊れています。",
+                                       "タブ " + Name +
+                                       " のクエリは破損しているため、フィルタが初期化されました。" +
+                                       Environment.NewLine +
+                                       "送出された例外: " + fex));
+                _evaluator = _ => false;
             }
         }
 
@@ -149,7 +154,7 @@ namespace StarryEyes.Models.Tab
 
         public bool IsActivated { get; private set; }
 
-        private void InvalidateCollection()
+        public void InvalidateCollection()
         {
             TimelineModel oldt = Timeline;
             Timeline = new TimelineModel(_evaluator, GetChunk);
@@ -183,7 +188,6 @@ namespace StarryEyes.Models.Tab
                 if (FilterQuery != null)
                 {
                     FilterQuery.Activate();
-                    FilterQuery.OnInvalidateRequired += InvalidateCollection;
                 }
             }
             IsActivated = true;
@@ -204,7 +208,6 @@ namespace StarryEyes.Models.Tab
             {
                 if (FilterQuery != null)
                 {
-                    FilterQuery.OnInvalidateRequired -= InvalidateCollection;
                     FilterQuery.Deactivate();
                 }
                 if (Timeline != null)

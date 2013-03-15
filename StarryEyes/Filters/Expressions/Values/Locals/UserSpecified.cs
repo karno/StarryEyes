@@ -11,7 +11,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
     {
         readonly string _originalScreenName;
         readonly long _userId;
-        AccountRelationData _adata;
+        readonly AccountRelationData _adata;
 
         public UserSpecified(string screenName)
         {
@@ -20,18 +20,31 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
                 .Where(u => u.AuthenticateInfo.UnreliableScreenName == screenName)
                 .Select(u => u.UserId)
                 .FirstOrDefault();
-            GetAccountData();
+            _adata = AccountRelationDataStore.Get(_userId);
         }
 
         public UserSpecified(long id)
         {
             _userId = id;
-            GetAccountData();
+            _adata = AccountRelationDataStore.Get(_userId);
         }
 
-        private void GetAccountData()
+        public override void BeginLifecycle()
         {
-            _adata = AccountRelationDataStore.Get(_userId);
+            AccountRelationData.OnAccountDataUpdated += AccountRelationData_OnAccountDataUpdated;
+        }
+
+        public override void EndLifecycle()
+        {
+            AccountRelationData.OnAccountDataUpdated -= AccountRelationData_OnAccountDataUpdated;
+        }
+
+        void AccountRelationData_OnAccountDataUpdated(RelationDataChangedInfo obj)
+        {
+            if (obj.AccountUserId == _userId)
+            {
+                RequestReapplyFilter(obj);
+            }
         }
 
         public override IReadOnlyCollection<long> Users
@@ -64,16 +77,26 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
             }
         }
 
-        public override string ToQuery()
+        public override IReadOnlyCollection<long> Blockings
         {
-            if (String.IsNullOrEmpty(_originalScreenName))
-                return "#" + _userId.ToString(CultureInfo.InvariantCulture);
-            return "@" + _originalScreenName;
+            get
+            {
+                if (_adata == null)
+                    return new List<long>();
+                return new AVLTree<long>(_adata.Blockings);
+            }
         }
 
         public override long UserId
         {
             get { return _userId; }
+        }
+
+        public override string ToQuery()
+        {
+            if (String.IsNullOrEmpty(_originalScreenName))
+                return "#" + _userId.ToString(CultureInfo.InvariantCulture);
+            return "@" + _originalScreenName;
         }
     }
 }

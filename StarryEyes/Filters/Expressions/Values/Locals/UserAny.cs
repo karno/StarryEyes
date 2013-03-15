@@ -39,6 +39,18 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
             }
         }
 
+        public override IReadOnlyCollection<long> Blockings
+        {
+            get
+            {
+                var blockings = new AVLTree<long>();
+                AccountsStore.Accounts
+                    .SelectMany(a => AccountRelationDataStore.Get(a.UserId).Blockings)
+                    .ForEach(blockings.Add);
+                return blockings;
+            }
+        }
+
         public override string ToQuery()
         {
             return "*";
@@ -47,6 +59,21 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
         public override long UserId
         {
             get { return 0; } // an representive user is not existed.
+        }
+
+        public override void BeginLifecycle()
+        {
+            AccountRelationData.OnAccountDataUpdated += AccountRelationData_OnAccountDataUpdated;
+        }
+
+        public override void EndLifecycle()
+        {
+            AccountRelationData.OnAccountDataUpdated -= AccountRelationData_OnAccountDataUpdated;
+        }
+
+        void AccountRelationData_OnAccountDataUpdated(RelationDataChangedInfo obj)
+        {
+            RequestReapplyFilter(obj);
         }
     }
 }

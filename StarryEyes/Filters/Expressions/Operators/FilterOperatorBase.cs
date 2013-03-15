@@ -31,24 +31,67 @@ namespace StarryEyes.Filters.Expressions.Operators
 
     public abstract class FilterSingleValueOperator : FilterOperatorBase
     {
-        public FilterOperatorBase Value { get; set; }
+        private FilterOperatorBase _value;
+        public FilterOperatorBase Value
+        {
+            get { return _value; }
+            set
+            {
+                if (_value != null)
+                    _value.OnReapplyRequested -= RequestReapplyFilter;
+                _value = value;
+                if (_value != null)
+                    _value.OnReapplyRequested += RequestReapplyFilter;
+            }
+        }
 
         public override void BeginLifecycle()
         {
-            Value.BeginLifecycle();
+            if (Value != null)
+            {
+                Value.BeginLifecycle();
+            }
         }
 
         public override void EndLifecycle()
         {
-            Value.EndLifecycle();
+            if (Value != null)
+            {
+                Value.EndLifecycle();
+            }
         }
     }
 
     public abstract class FilterTwoValueOperator : FilterOperatorBase
     {
-        public FilterOperatorBase LeftValue { get; set; }
+        private FilterOperatorBase _leftValue;
+        private FilterOperatorBase _rightValue;
 
-        public FilterOperatorBase RightValue { get; set; }
+        public FilterOperatorBase LeftValue
+        {
+            get { return _leftValue; }
+            set
+            {
+                if (_leftValue != null)
+                    _leftValue.OnReapplyRequested -= RequestReapplyFilter;
+                _leftValue = value;
+                if (_leftValue != null)
+                    _leftValue.OnReapplyRequested += RequestReapplyFilter;
+            }
+        }
+
+        public FilterOperatorBase RightValue
+        {
+            get { return _rightValue; }
+            set
+            {
+                if (_rightValue != null)
+                    _rightValue.OnReapplyRequested -= RequestReapplyFilter;
+                _rightValue = value;
+                if (_rightValue != null)
+                    _rightValue.OnReapplyRequested += RequestReapplyFilter;
+            }
+        }
 
         public override string ToQuery()
         {

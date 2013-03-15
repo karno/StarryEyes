@@ -29,7 +29,7 @@ namespace StarryEyes.Filters.Expressions.Operators
     /// </summary>
     public class FilterBracket : FilterSingleValueOperator
     {
-        private FilterOperatorBase _inner;
+        private readonly FilterOperatorBase _inner;
         public FilterBracket(FilterOperatorBase inner)
         {
             this._inner = inner;
@@ -44,19 +44,15 @@ namespace StarryEyes.Filters.Expressions.Operators
                     // behave as "true" boolean value or empty set.
                     return new[] { FilterExpressionType.Boolean, FilterExpressionType.Set };
                 }
-                else
-                {
-                    return _inner.SupportedTypes;
-                }
+                return _inner.SupportedTypes;
             }
         }
 
         public override Func<TwitterStatus, bool> GetBooleanValueProvider()
         {
             if (_inner == null)
-                return _ => true;
-            else
-                return _inner.GetBooleanValueProvider();
+                return Tautology;
+            return _inner.GetBooleanValueProvider();
         }
 
         public override Func<TwitterStatus, long> GetNumericValueProvider()
@@ -70,8 +66,7 @@ namespace StarryEyes.Filters.Expressions.Operators
         {
             if (_inner == null)
                 return _ => new List<long>();
-            else
-                return _inner.GetSetValueProvider();
+            return _inner.GetSetValueProvider();
         }
 
         public override Func<TwitterStatus, string> GetStringValueProvider()
@@ -85,8 +80,7 @@ namespace StarryEyes.Filters.Expressions.Operators
         {
             if (_inner == null)
                 return "()";
-            else
-                return "(" + _inner.ToQuery() + ")";
+            return "(" + _inner.ToQuery() + ")";
         }
     }
 }

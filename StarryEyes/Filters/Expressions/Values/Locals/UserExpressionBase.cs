@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using StarryEyes.Models.Stores;
 
 namespace StarryEyes.Filters.Expressions.Values.Locals
 {
@@ -12,6 +14,20 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 
         public abstract IReadOnlyCollection<long> Followers { get; }
 
+        public abstract IReadOnlyCollection<long> Blockings { get; }
+
         public abstract string ToQuery();
+
+        public virtual void BeginLifecycle() { }
+
+        public virtual void EndLifecycle() { }
+
+        protected void RequestReapplyFilter(RelationDataChangedInfo relInfo)
+        {
+            var handler = OnReapplyRequested;
+            if (handler != null) handler(relInfo);
+        }
+
+        public event Action<RelationDataChangedInfo> OnReapplyRequested;
     }
 }

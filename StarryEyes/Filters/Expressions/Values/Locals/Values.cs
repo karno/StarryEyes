@@ -1,18 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using StarryEyes.Breezy.DataModel;
+using StarryEyes.Models.Stores;
 
 namespace StarryEyes.Filters.Expressions.Values.Locals
 {
     public sealed class LocalUser : ValueBase
     {
         private readonly UserExpressionBase _expression;
-        private readonly IReadOnlyCollection<long> _setCache;
 
         public LocalUser(UserExpressionBase expression)
         {
             this._expression = expression;
-            _setCache = _expression.Users;
         }
 
         public override IEnumerable<FilterExpressionType> SupportedTypes
@@ -34,7 +33,18 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 
         public override Func<TwitterStatus, IReadOnlyCollection<long>> GetSetValueProvider()
         {
-            return _ => _setCache;
+            var cache = _expression.Users;
+            return _ => cache;
+        }
+
+        public override void BeginLifecycle()
+        {
+            _expression.BeginLifecycle();
+        }
+
+        public override void EndLifecycle()
+        {
+            _expression.EndLifecycle();
         }
 
         public override string ToQuery()
@@ -46,12 +56,19 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
     public sealed class LocalUserFollowings : ValueBase
     {
         private readonly UserExpressionBase _expression;
-        private readonly IReadOnlyCollection<long> _setCache;
 
         public LocalUserFollowings(UserExpressionBase expression)
         {
             this._expression = expression;
-            _setCache = _expression.Followings;
+            this._expression.OnReapplyRequested += _expression_OnReapplyRequested;
+        }
+
+        private void _expression_OnReapplyRequested(RelationDataChangedInfo obj)
+        {
+            if (obj.Change == RelationDataChange.Following)
+            {
+                RequestReapplyFilter();
+            }
         }
 
         public override IEnumerable<FilterExpressionType> SupportedTypes
@@ -61,7 +78,18 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 
         public override Func<TwitterStatus, IReadOnlyCollection<long>> GetSetValueProvider()
         {
-            return _ => _setCache;
+            var cache = _expression.Followings;
+            return _ => cache;
+        }
+
+        public override void BeginLifecycle()
+        {
+            _expression.BeginLifecycle();
+        }
+
+        public override void EndLifecycle()
+        {
+            _expression.EndLifecycle();
         }
 
         public override string ToQuery()
@@ -73,12 +101,19 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
     public sealed class LocalUserFollowers : ValueBase
     {
         private readonly UserExpressionBase _expression;
-        private readonly IReadOnlyCollection<long> _setCache;
 
         public LocalUserFollowers(UserExpressionBase expression)
         {
             this._expression = expression;
-            _setCache = _expression.Followers;
+            this._expression.OnReapplyRequested += _expression_OnReapplyRequested;
+        }
+
+        private void _expression_OnReapplyRequested(RelationDataChangedInfo obj)
+        {
+            if (obj.Change == RelationDataChange.Follower)
+            {
+                RequestReapplyFilter();
+            }
         }
 
         public override IEnumerable<FilterExpressionType> SupportedTypes
@@ -88,12 +123,68 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 
         public override Func<TwitterStatus, IReadOnlyCollection<long>> GetSetValueProvider()
         {
-            return _ => _setCache;
+            var cache = _expression.Followers;
+            return _ => cache;
+        }
+
+        public override void BeginLifecycle()
+        {
+            _expression.BeginLifecycle();
+        }
+
+        public override void EndLifecycle()
+        {
+            _expression.EndLifecycle();
         }
 
         public override string ToQuery()
         {
             return _expression.ToQuery() + ".followers";
+        }
+    }
+
+    public sealed class LocalUserBlockings : ValueBase
+    {
+        private readonly UserExpressionBase _expression;
+
+        public LocalUserBlockings(UserExpressionBase expression)
+        {
+            _expression = expression;
+            this._expression.OnReapplyRequested += _expression_OnReapplyRequested;
+        }
+
+        private void _expression_OnReapplyRequested(RelationDataChangedInfo obj)
+        {
+            if (obj.Change == RelationDataChange.Blocking)
+            {
+                RequestReapplyFilter();
+            }
+        }
+
+        public override IEnumerable<FilterExpressionType> SupportedTypes
+        {
+            get { yield return FilterExpressionType.Set; }
+        }
+
+        public override Func<TwitterStatus, IReadOnlyCollection<long>> GetSetValueProvider()
+        {
+            var cache = _expression.Blockings;
+            return _ => cache;
+        }
+
+        public override void BeginLifecycle()
+        {
+            _expression.BeginLifecycle();
+        }
+
+        public override void EndLifecycle()
+        {
+            _expression.EndLifecycle();
+        }
+
+        public override string ToQuery()
+        {
+            return _expression.ToQuery() + ".blockings";
         }
     }
 }

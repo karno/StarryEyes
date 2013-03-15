@@ -69,16 +69,30 @@ namespace StarryEyes.Filters
             return ToQuery();
         }
 
-        public void Deactivate()
-        {
-            if (Sources != null)
-                Sources.ForEach(s => s.Deactivate());
-        }
-
         public void Activate()
         {
             if (Sources != null)
+            {
                 Sources.ForEach(s => s.Activate());
+            }
+            if (PredicateTreeRoot != null)
+            {
+                PredicateTreeRoot.BeginLifecycle();
+                PredicateTreeRoot.OnReapplyRequested += RaiseInvalidateRequired;
+            }
+        }
+
+        public void Deactivate()
+        {
+            if (Sources != null)
+            {
+                Sources.ForEach(s => s.Deactivate());
+            }
+            if (PredicateTreeRoot != null)
+            {
+                PredicateTreeRoot.EndLifecycle();
+                PredicateTreeRoot.OnReapplyRequested -= RaiseInvalidateRequired;
+            }
         }
     }
 }

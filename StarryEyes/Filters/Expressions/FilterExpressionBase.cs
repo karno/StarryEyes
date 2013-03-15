@@ -19,11 +19,31 @@ namespace StarryEyes.Filters.Expressions
         public virtual void EndLifecycle()
         {
         }
+
+        protected void RequestReapplyFilter()
+        {
+            var handler = OnReapplyRequested;
+            if (handler != null) handler();
+        }
+
+        public event Action OnReapplyRequested;
     }
 
     public sealed class FilterExpressionRoot : FilterExpressionBase
     {
-        public FilterOperatorBase Operator { get; set; }
+        private FilterOperatorBase _operator;
+        public FilterOperatorBase Operator
+        {
+            get { return _operator; }
+            set
+            {
+                if (_operator != null)
+                    _operator.OnReapplyRequested -= RequestReapplyFilter;
+                _operator = value;
+                if (_operator != null)
+                    _operator.OnReapplyRequested += RequestReapplyFilter;
+            }
+        }
 
         public override string ToQuery()
         {
@@ -48,5 +68,6 @@ namespace StarryEyes.Filters.Expressions
         {
             Operator.EndLifecycle();
         }
+
     }
 }

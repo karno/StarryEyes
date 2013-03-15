@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Livet;
+using StarryEyes.Filters;
 using StarryEyes.Models.Hubs;
 using StarryEyes.Settings;
 
@@ -44,7 +45,7 @@ namespace StarryEyes.Models.Tab
                 }
                 App.RaiseUserInterfaceReady();
             }
-            catch (Exception ex)
+            catch (FilterQueryException ex)
             {
                 AppInformationHub.PublishInformation(
                     new AppInformation(

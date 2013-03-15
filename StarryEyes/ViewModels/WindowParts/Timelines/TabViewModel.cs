@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Windows.Threading;
 using Livet.Messaging;
 using StarryEyes.Breezy.DataModel;
@@ -31,6 +32,8 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         private int _unreadCount;
 
+        private int _refreshCount;
+
         /// <summary>
         ///     for design time support.
         /// </summary>
@@ -55,6 +58,27 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                               RaisePropertyChanged(() => IsScrollLockExplicitEnabled);
                           }));
             CompositeDisposable.Add(() => Model.Deactivate());
+            if (Model.FilterQuery.PredicateTreeRoot != null)
+            {
+                CompositeDisposable.Add(
+                    Observable.FromEvent(
+                        h => Model.FilterQuery.OnInvalidateRequired += h,
+                        h => Model.FilterQuery.OnInvalidateRequired -= h)
+                              .Subscribe(_ =>
+                              {
+                                  var count = Interlocked.Increment(ref _refreshCount) + 1;
+                                  Observable.Timer(TimeSpan.FromSeconds(3))
+                                            .Where(__ => Interlocked.CompareExchange(ref _refreshCount, 0, count) == count)
+                                            .Subscribe(__ =>
+                                            {
+                                                System.Diagnostics.Debug.WriteLine("* invalidate executed.");
+                                                // regenerate filter query
+                                                Model.RefreshEvaluator();
+                                                Model.InvalidateCollection();
+                                                BindTimeline();
+                                            });
+                              }));
+            }
             CompositeDisposable.Add(
                 Observable.FromEvent(
                     h => tabModel.OnBindingAccountIdsChanged += h,
@@ -108,7 +132,9 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                       .Finally(() => IsLoading = false)
                       .Subscribe();
             if (UnreadCount > 0)
+            {
                 UnreadCount = 0;
+            }
         }
 
         public string Name

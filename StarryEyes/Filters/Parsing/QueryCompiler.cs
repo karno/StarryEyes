@@ -412,6 +412,9 @@ namespace StarryEyes.Filters.Parsing
                     case "follower":
                     case "followers":
                         return new LocalUserFollowers(repl);
+                    case "blocking":
+                    case "blockings":
+                        return new LocalUserBlockings(repl);
                     default:
                         throw new FilterQueryException("不正なトークンです: " + literal.Value,
                                                        repl.ToQuery() + "." + literal.Value + " " + reader.RemainQuery);
