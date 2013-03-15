@@ -535,32 +535,38 @@ namespace StarryEyes.Filters.Parsing
 
         private static ValueBase GetStatusValue(string value, TokenReader reader)
         {
-            switch (value)
+            switch (value.ToLower())
             {
                 case "dm":
-                case "isDm":
+                case "isdm":
                 case "is_dm":
-                case "isMessage":
+                case "message":
+                case "ismessage":
                 case "is_message":
-                case "isDirectMessage":
+                case "directmessage":
+                case "direct_message":
+                case "isdirectmessage":
                 case "is_direct_message":
                     return new StatusIsDirectMessage();
                 case "rt":
                 case "retweet":
-                case "isRetweet":
+                case "isretweet":
                 case "is_retweet":
                     return new StatusIsRetweet();
+                case "faved":
                 case "favorited":
-                case "isFavorited":
+                case "isfavorited":
                 case "is_favorited":
                     return new StatusIsFavorited();
+                case "rted":
                 case "retweeted":
-                case "isRetweeted":
+                case "isretweeted":
                 case "is_retweeted":
                     return new StatusIsRetweeted();
-                case "replyTo":
+                case "mention":
+                case "replyto":
                 case "reply_to":
-                case "inReplyTo":
+                case "inreplyto":
                 case "in_reply_to":
                     return new StatusInReplyTo();
                 case "to":

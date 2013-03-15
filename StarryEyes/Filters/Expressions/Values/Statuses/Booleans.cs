@@ -20,7 +20,7 @@ namespace StarryEyes.Filters.Expressions.Values.Statuses
 
         public override string ToQuery()
         {
-            return "is_dm"; // is_direct_message / is_message are also ok
+            return "direct_message";
         }
     }
 
@@ -39,7 +39,7 @@ namespace StarryEyes.Filters.Expressions.Values.Statuses
 
         public override string ToQuery()
         {
-            return "is_favorited";
+            return "favorited";
         }
     }
 
@@ -58,7 +58,7 @@ namespace StarryEyes.Filters.Expressions.Values.Statuses
 
         public override string ToQuery()
         {
-            return "is_retweeted";
+            return "retweeted";
         }
     }
 
@@ -76,7 +76,7 @@ namespace StarryEyes.Filters.Expressions.Values.Statuses
 
         public override string ToQuery()
         {
-            return "is_retweet";
+            return "retweet";
         }
     }
 
