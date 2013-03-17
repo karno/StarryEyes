@@ -42,7 +42,7 @@ namespace StarryEyes.Settings
                         CommonTabBuilder.GenerateGeneralTab(),
                         CommonTabBuilder.GenerateHomeTab(),
                         CommonTabBuilder.GenerateMentionTab(),
-                        CommonTabBuilder.GenerateMeTab(),
+                        CommonTabBuilder.GenerateMeTab()
                     }.Select(t => new TabDescription(t)).ToArray()
                 },
                 new ColumnDescription
@@ -368,6 +368,9 @@ namespace StarryEyes.Settings
 
         #endregion
 
+        /// <summary>
+        /// The flag identifies newbies of Krile.
+        /// </summary>
         public static bool IsFirstGenerated { get; private set; }
 
         public static bool LoadSettings()

@@ -1420,24 +1420,6 @@
                         Height="32"
                         Margin="12,4"
                         Template="{DynamicResource MetroBlackCircleButtonTemplate}"
-                        ToolTip="選択したツイートをお気に入りに追加">
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="Click">
-                            <ei:CallMethodAction MethodName="FavoriteSelecteds" TargetObject="{Binding Mode=OneWay}" />
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                    <Path Width="18"
-                          Height="17"
-                          HorizontalAlignment="Center"
-                          VerticalAlignment="Center"
-                          Data="F1 M 19.1538,24.1539L 21.2308,24.1539L 21.2308,27.6154L 24.6923,27.6154L 24.6923,29.6923L 21.2308,29.6923L 21.2308,33.1539L 19.1538,33.1539L 19.1538,29.6923L 15.6923,29.6923L 15.6923,27.6154L 19.1538,27.6154L 19.1538,24.1539 Z M 15,22.0769L 21.7747,22.0769L 24,15.8462L 26.2253,22.0769L 33,22.0769L 27.358,26.119L 29.8846,32.4615L 25.3846,29.8145L 25.3846,26.9231L 21.9231,26.9231L 21.9231,23.4615L 18.4615,23.4616L 18.4615,24.5613L 15,22.0769 Z "
-                          Fill="#FF000000"
-                          Stretch="Fill" />
-                </Button>
-                <Button Width="32"
-                        Height="32"
-                        Margin="12,4"
-                        Template="{DynamicResource MetroBlackCircleButtonTemplate}"
                         ToolTip="選択したユーザー全員に返信">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="Click">
@@ -1450,6 +1432,24 @@
                           HorizontalAlignment="Center"
                           VerticalAlignment="Center"
                           Data="F1 M 21,32L 23,39L 15,32L 12,32L 12,14L 36,14L 36,32L 21,32 Z "
+                          Fill="#FF000000"
+                          Stretch="Fill" />
+                </Button>
+                <Button Width="32"
+                        Height="32"
+                        Margin="12,4"
+                        Template="{DynamicResource MetroBlackCircleButtonTemplate}"
+                        ToolTip="選択したツイートをお気に入りに追加">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <ei:CallMethodAction MethodName="FavoriteSelecteds" TargetObject="{Binding Mode=OneWay}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                    <Path Width="18"
+                          Height="17"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center"
+                          Data="F1 M 19.1538,24.1539L 21.2308,24.1539L 21.2308,27.6154L 24.6923,27.6154L 24.6923,29.6923L 21.2308,29.6923L 21.2308,33.1539L 19.1538,33.1539L 19.1538,29.6923L 15.6923,29.6923L 15.6923,27.6154L 19.1538,27.6154L 19.1538,24.1539 Z M 15,22.0769L 21.7747,22.0769L 24,15.8462L 26.2253,22.0769L 33,22.0769L 27.358,26.119L 29.8846,32.4615L 25.3846,29.8145L 25.3846,26.9231L 21.9231,26.9231L 21.9231,23.4615L 18.4615,23.4616L 18.4615,24.5613L 15,22.0769 Z "
                           Fill="#FF000000"
                           Stretch="Fill" />
                 </Button>
