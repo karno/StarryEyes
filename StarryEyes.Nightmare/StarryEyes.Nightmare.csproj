@@ -57,6 +57,7 @@
     <Compile Include="Windows\Forms\WinFormsIcon.cs" />
     <Compile Include="Windows\Forms\WinFormsMouseEventArgs.cs" />
     <Compile Include="Windows\Application.cs" />
+    <Compile Include="Windows\SystemInformation.cs" />
     <Compile Include="Windows\WindowNativeExtension.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
