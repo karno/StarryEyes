@@ -375,7 +375,7 @@ namespace StarryEyes.Filters.Parsing
                     return GetAccountValue(literal.Value, reader);
             }
             // check first layers
-            switch (literal.Value)
+            switch (literal.Value.ToLower())
             {
                 case "*":
                     return GetAccountValue("*", reader);

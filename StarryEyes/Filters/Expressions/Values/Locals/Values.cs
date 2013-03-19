@@ -12,6 +12,14 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
         public LocalUser(UserExpressionBase expression)
         {
             this._expression = expression;
+            this._expression.OnReapplyRequested += _expression_OnReapplyRequested;
+        }
+
+        private void _expression_OnReapplyRequested(RelationDataChangedInfo obj)
+        {
+            if (obj != null) return;
+            System.Diagnostics.Debug.WriteLine("local user reapply");
+            RequestReapplyFilter();
         }
 
         public override IEnumerable<FilterExpressionType> SupportedTypes
@@ -65,7 +73,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 
         private void _expression_OnReapplyRequested(RelationDataChangedInfo obj)
         {
-            if (obj.Change == RelationDataChange.Following)
+            if (obj == null || obj.Change == RelationDataChange.Following)
             {
                 RequestReapplyFilter();
             }
@@ -110,7 +118,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 
         private void _expression_OnReapplyRequested(RelationDataChangedInfo obj)
         {
-            if (obj.Change == RelationDataChange.Follower)
+            if (obj == null || obj.Change == RelationDataChange.Follower)
             {
                 RequestReapplyFilter();
             }
@@ -155,7 +163,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 
         private void _expression_OnReapplyRequested(RelationDataChangedInfo obj)
         {
-            if (obj.Change == RelationDataChange.Blocking)
+            if (obj == null || obj.Change == RelationDataChange.Blocking)
             {
                 RequestReapplyFilter();
             }

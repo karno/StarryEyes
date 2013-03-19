@@ -1,6 +1,6 @@
 ﻿using System;
-using StarryEyes.Filters.Expressions.Operators;
 using StarryEyes.Breezy.DataModel;
+using StarryEyes.Filters.Expressions.Operators;
 
 namespace StarryEyes.Filters.Expressions
 {

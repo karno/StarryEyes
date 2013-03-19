@@ -75,7 +75,7 @@ namespace StarryEyes.Settings
             new SettingItemStruct<bool>("IsBacktrackFallback", true);
 
         // ReSharper disable InconsistentNaming
-        internal static IEnumerable<AccountSetting> @Infrastructure_Accounts
+        internal static IEnumerable<AccountSetting> Infrastructure_Accounts
         {
             get { return _accounts.Value; }
             set { _accounts.Value = value.ToList(); }

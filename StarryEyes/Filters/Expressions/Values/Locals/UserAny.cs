@@ -1,5 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using System.Threading;
 using StarryEyes.Albireo.Data;
 using StarryEyes.Models.Stores;
 
@@ -7,6 +11,8 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 {
     public sealed class UserAny : UserExpressionBase
     {
+        private CompositeDisposable _disposables = new CompositeDisposable();
+
         public override IReadOnlyCollection<long> Users
         {
             get
@@ -63,17 +69,20 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 
         public override void BeginLifecycle()
         {
-            AccountRelationData.OnAccountDataUpdated += AccountRelationData_OnAccountDataUpdated;
+            _disposables.Add(
+                AccountsStore.Accounts
+                             .ListenCollectionChanged()
+                             .Subscribe(_ => RequestReapplyFilter(null)));
+            _disposables.Add(
+                Observable.FromEvent<RelationDataChangedInfo>(
+                    h => AccountRelationData.OnAccountDataUpdated += h,
+                    h => AccountRelationData.OnAccountDataUpdated -= h)
+                          .Subscribe(RequestReapplyFilter));
         }
 
         public override void EndLifecycle()
         {
-            AccountRelationData.OnAccountDataUpdated -= AccountRelationData_OnAccountDataUpdated;
-        }
-
-        void AccountRelationData_OnAccountDataUpdated(RelationDataChangedInfo obj)
-        {
-            RequestReapplyFilter(obj);
+            Interlocked.Exchange(ref _disposables, new CompositeDisposable()).Dispose();
         }
     }
 }

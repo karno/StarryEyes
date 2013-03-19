@@ -66,12 +66,12 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                         h => Model.FilterQuery.OnInvalidateRequired -= h)
                               .Subscribe(_ =>
                               {
-                                  var count = Interlocked.Increment(ref _refreshCount) + 1;
+                                  var count = Interlocked.Increment(ref _refreshCount);
                                   Observable.Timer(TimeSpan.FromSeconds(3))
                                             .Where(__ => Interlocked.CompareExchange(ref _refreshCount, 0, count) == count)
                                             .Subscribe(__ =>
                                             {
-                                                System.Diagnostics.Debug.WriteLine("* invalidate executed.");
+                                                System.Diagnostics.Debug.WriteLine("* invalidate executed: " + Name);
                                                 // regenerate filter query
                                                 Model.RefreshEvaluator();
                                                 Model.InvalidateCollection();

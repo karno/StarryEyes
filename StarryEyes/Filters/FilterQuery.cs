@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
+using StarryEyes.Breezy.DataModel;
 using StarryEyes.Filters.Expressions;
 using StarryEyes.Filters.Sources;
-using StarryEyes.Breezy.DataModel;
 
 namespace StarryEyes.Filters
 {

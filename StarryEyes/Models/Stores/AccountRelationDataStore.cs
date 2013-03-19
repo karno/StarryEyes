@@ -358,6 +358,11 @@ namespace StarryEyes.Models.Stores
         /// Acted account user's id
         /// </summary>
         public long AccountUserId { get; set; }
+
+        public override string ToString()
+        {
+            return Change.ToString() + " " + AccountUserId + " => " + TargetUserId;
+        }
     }
 
     /// <summary>
