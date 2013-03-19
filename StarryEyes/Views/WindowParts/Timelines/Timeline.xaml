@@ -781,7 +781,7 @@
 
                                         </StackPanel>
                                     </DockPanel>
-                                    <Grid Height="Auto" Margin="10,0,0,0">
+                                    <Grid Height="Auto" Margin="10,2,0,0">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition />
                                             <ColumnDefinition Width="Auto" />
@@ -820,7 +820,7 @@
                                     </Grid>
                                     <Grid Grid.Row="3"
                                           Grid.Column="1"
-                                          Margin="8,4,8,0">
+                                          Margin="8,2,8,0">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto" />
                                             <ColumnDefinition />
