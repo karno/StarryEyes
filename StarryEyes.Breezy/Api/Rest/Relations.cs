@@ -220,7 +220,7 @@ namespace StarryEyes.Breezy.Api.Rest
                 {"screen_name", screen_name},
             }.Parametalize();
             return info.GetOAuthClient()
-                .SetEndpoint(ApiEndpoint.EndpointApiV1a.JoinUrl("/report_spam.json"))
+                .SetEndpoint(ApiEndpoint.EndpointApiV1a.JoinUrl("users/report_spam.json"))
                 .SetParameters(param)
                 .SetMethodType(Codeplex.OAuth.MethodType.Post)
                 .GetResponse()
