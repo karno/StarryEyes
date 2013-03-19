@@ -120,7 +120,7 @@ namespace StarryEyes.Filters.Parsing
                     default:
                         int begin = strptr;
                         // 何らかのトークン分割子に出会うまで空回し
-                        const string tokens = "&|.,:!()\"= \t\r\n";
+                        const string tokens = "&|.,:!()<>\"= \t\r\n";
                         do
                         {
                             if (tokens.Contains(query[strptr]))
