@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Windows;
 using Livet;
 using Livet.Commands;
 using StarryEyes.Breezy.Authorize;
@@ -13,10 +14,9 @@ using StarryEyes.Models.Hubs;
 using StarryEyes.Models.Operations;
 using StarryEyes.Models.Stores;
 using StarryEyes.Settings;
-using StarryEyes.Views.Utils;
 using StarryEyes.Views.Messaging;
+using StarryEyes.Views.Utils;
 using TaskDialogInterop;
-using System.Windows;
 
 namespace StarryEyes.ViewModels.WindowParts.Timelines
 {
@@ -388,6 +388,11 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         }
 
         public void ShowUserProfile()
+        {
+
+        }
+
+        public void OpenRetweeterProfile()
         {
 
         }
