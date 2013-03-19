@@ -145,10 +145,10 @@ namespace StarryEyes.Views.Utils
             {
                 yield return GenerateText(status.Text);
             }
-            else if (prevEntity.EndIndex < status.Text.Length)
+            else if (prevEntity.EndIndex < escaped.Length)
             {
                 yield return GenerateText(
-                    XmlParser.ResolveEntity(escaped.Substring(prevEntity.EndIndex, status.Text.Length - prevEntity.EndIndex)));
+                    XmlParser.ResolveEntity(escaped.Substring(prevEntity.EndIndex, escaped.Length - prevEntity.EndIndex)));
             }
         }
 
