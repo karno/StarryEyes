@@ -19,6 +19,8 @@ namespace StarryEyes.Models.Stores
     /// </summary>
     public static class StatusStore
     {
+        private const int ChunkCount = 1;
+
         #region publish block
 
         private static readonly Subject<StatusNotification> _statusPublisher =
@@ -46,12 +48,12 @@ namespace StarryEyes.Models.Stores
             {
                 _store = new PersistentDataStore<long, TwitterStatus>
                     (_ => _.Id, Path.Combine(App.DataStorePath, "statuses"), new IdReverseComparer(),
-                    manageData: StoreOnMemoryObjectPersistence.GetPersistentData("statuses"));
+                    manageData: StoreOnMemoryObjectPersistence.GetPersistentData("statuses"), chunkNum: ChunkCount);
             }
             else
             {
                 _store = new PersistentDataStore<long, TwitterStatus>
-                    (_ => _.Id, Path.Combine(App.DataStorePath, "statuses"), new IdReverseComparer());
+                    (_ => _.Id, Path.Combine(App.DataStorePath, "statuses"), new IdReverseComparer(), chunkNum: ChunkCount);
             }
             _dispatcher = new SingleThreadDispatcher<TwitterStatus>(_store.Store);
             App.OnApplicationFinalize += Shutdown;
@@ -114,7 +116,7 @@ namespace StarryEyes.Models.Stores
                 return result;
             return result
                 .Distinct(_ => _.Id)
-                .OrderByDescending(_ => _.Id)
+                // .OrderByDescending(_ => _.Id)
                 .Take(count.Value);
         }
 
@@ -167,7 +169,7 @@ namespace StarryEyes.Models.Stores
             }
             return batch
                 .Where(predicate)
-                .OrderByDescending(_ => _.Id)
+                // .OrderByDescending(_ => _.Id)
                 .Take(count);
         }
 

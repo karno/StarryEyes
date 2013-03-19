@@ -12,6 +12,8 @@ namespace StarryEyes.Models.Stores
 {
     public static class UserStore
     {
+        private const int ChunkCount = 1;
+
         private static DataStoreBase<long, TwitterUser> _store;
 
         private static SingleThreadDispatcher<TwitterUser> _dispatcher;
@@ -27,13 +29,13 @@ namespace StarryEyes.Models.Stores
             if (StoreOnMemoryObjectPersistence.IsPersistentDataExisted("users"))
             {
                 _store = new PersistentDataStore<long, TwitterUser>
-                    (_ => _.Id, Path.Combine(App.DataStorePath, "users"), chunkNum: 16,
+                    (_ => _.Id, Path.Combine(App.DataStorePath, "users"), chunkNum: ChunkCount,
                     manageData: StoreOnMemoryObjectPersistence.GetPersistentData("users"));
             }
             else
             {
                 _store = new PersistentDataStore<long, TwitterUser>
-                    (_ => _.Id, Path.Combine(App.DataStorePath, "users"), chunkNum: 16);
+                    (_ => _.Id, Path.Combine(App.DataStorePath, "users"), chunkNum: ChunkCount);
             }
             _dispatcher = new SingleThreadDispatcher<TwitterUser>(_store.Store);
             LoadScreenNameResolverCache();
