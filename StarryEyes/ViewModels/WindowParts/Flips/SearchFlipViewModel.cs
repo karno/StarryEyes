@@ -297,7 +297,8 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         public void OnEnterKeyDown()
         {
             // check difference
-            if (_previousCommit != Text && (!IsQueryMode || ErrorText == null))
+            if ((_previousCommit != Text || !IsSearchResultAvailable) &&
+                (!IsQueryMode || ErrorText == null))
             {
                 // commit search query
                 CommitSearch();
