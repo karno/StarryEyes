@@ -29,15 +29,12 @@ namespace StarryEyes.Models.Operations
         protected override IObservable<TwitterStatus> RunCore()
         {
             return AuthInfo.SendDirectMessage(Text, TargetUserId)
-                .ObserveOnDispatcher()
-                // .Do(s => ShowToast(s.ToString(), "DM SENT"))
+                           .ObserveOnDispatcher()
                 .SelectMany(StoreHelper.MergeStore)
-                .Catch((Exception ex) =>
-                {
-                    return GetExceptionDetail(ex)
-                        .Select(s => Observable.Throw<TwitterStatus>(new WebException(s)))
-                        .SelectMany(_ => _);
-                });
+                           .Catch((Exception ex) =>
+                                  GetExceptionDetail(ex)
+                                      .Select(s => Observable.Throw<TwitterStatus>(new WebException(s)))
+                                      .SelectMany(_ => _));
         }
     }
 }
