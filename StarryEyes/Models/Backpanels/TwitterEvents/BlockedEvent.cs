@@ -20,10 +20,7 @@ namespace StarryEyes.Models.Backpanels.TwitterEvents
 
         public override System.Windows.Media.Color Background
         {
-            get
-            {
-                return MetroColors.Magenta;
-            }
+            get { return MetroColors.Magenta; }
         }
     }
 }

@@ -90,7 +90,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             // look-up in-reply-to
             if (status.InReplyToStatusId.HasValue)
             {
-                var subscribe = StoreHub.GetTweet(status.InReplyToStatusId.Value)
+                var subscribe = StoreHelper.GetTweet(status.InReplyToStatusId.Value)
                         .Subscribe(replyTo =>
                         {
                             _inReplyTo = replyTo;

@@ -32,5 +32,35 @@ namespace StarryEyes.Models.Backpanels
         /// Foreground color of the event.
         /// </summary>
         public virtual Color Foreground { get { return Colors.White; } }
+
+        public virtual string Id { get { return string.Empty; } }
+
+        public virtual bool IsActionable { get { return false; } }
+
+        public virtual void Action()
+        {
+        }
+
+        public virtual EventRegistingKind RegisterKind { get { return EventRegistingKind.None; } }
+    }
+
+    public enum EventRegistingKind
+    {
+        /// <summary>
+        /// No registering
+        /// </summary>
+        None,
+        /// <summary>
+        /// Exclusive store with ID
+        /// </summary>
+        IdExclusive,
+        /// <summary>
+        /// Use twitter queue mode
+        /// </summary>
+        TwitterQueue,
+        /// <summary>
+        /// Always store
+        /// </summary>
+        Always,
     }
 }

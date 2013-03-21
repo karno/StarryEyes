@@ -4,14 +4,13 @@ using System.Reactive.Linq;
 using StarryEyes.Breezy.Api.Rest;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
-using StarryEyes.Models.Stores;
 
-namespace StarryEyes.Models.Hubs
+namespace StarryEyes.Models.Stores
 {
     /// <summary>
     /// Find local cache, if not existed, query to Twitter.
     /// </summary>
-    public static class StoreHub
+    public static class StoreHelper
     {
         public static IObservable<TwitterStatus> MergeStore(TwitterStatus status)
         {

@@ -31,7 +31,7 @@ namespace StarryEyes.Models.Operations
             return AuthInfo.SendDirectMessage(Text, TargetUserId)
                 .ObserveOnDispatcher()
                 // .Do(s => ShowToast(s.ToString(), "DM SENT"))
-                .SelectMany(StoreHub.MergeStore)
+                .SelectMany(StoreHelper.MergeStore)
                 .Catch((Exception ex) =>
                 {
                     return GetExceptionDetail(ex)

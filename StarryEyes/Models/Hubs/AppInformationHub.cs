@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using StarryEyes.Models.Backpanels.SystemEvents;
 
 namespace StarryEyes.Models.Hubs
 {

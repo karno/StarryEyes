@@ -143,25 +143,25 @@ namespace StarryEyes.Models.Connections.UserDependencies
             switch (elem.EventType)
             {
                 case EventType.Blocked:
-                    EventHub.NotifyBlocked(elem.EventSourceUser, elem.EventTargetUser);
+                    StreamingEventsHub.NotifyBlocked(elem.EventSourceUser, elem.EventTargetUser);
                     break;
                 case EventType.Unblocked:
-                    EventHub.NotifyUnblocked(elem.EventSourceUser, elem.EventTargetUser);
+                    StreamingEventsHub.NotifyUnblocked(elem.EventSourceUser, elem.EventTargetUser);
                     break;
                 case EventType.Favorite:
-                    EventHub.NotifyFavorited(elem.EventSourceUser, elem.EventTargetTweet);
+                    StreamingEventsHub.NotifyFavorited(elem.EventSourceUser, elem.EventTargetTweet);
                     break;
                 case EventType.Unfavorite:
-                    EventHub.NotifyUnfavorited(elem.EventSourceUser, elem.EventTargetTweet);
+                    StreamingEventsHub.NotifyUnfavorited(elem.EventSourceUser, elem.EventTargetTweet);
                     break;
                 case EventType.Follow:
-                    EventHub.NotifyFollowed(elem.EventSourceUser, elem.EventTargetUser);
+                    StreamingEventsHub.NotifyFollowed(elem.EventSourceUser, elem.EventTargetUser);
                     break;
                 case EventType.Unfollow:
-                    EventHub.NotifyUnfollwed(elem.EventSourceUser, elem.EventTargetUser);
+                    StreamingEventsHub.NotifyUnfollwed(elem.EventSourceUser, elem.EventTargetUser);
                     break;
                 case EventType.LimitationInfo:
-                    EventHub.NotifyLimitationInfoGot(AuthInfo, elem.TrackLimit.GetValueOrDefault());
+                    StreamingEventsHub.NotifyLimitationInfoGot(AuthInfo, elem.TrackLimit.GetValueOrDefault());
                     break;
                 default:
                     return;

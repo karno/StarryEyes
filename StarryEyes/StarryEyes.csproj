@@ -191,7 +191,8 @@
     <Compile Include="Hotfixes\ReadOnlyDispatcherCollectionRx.cs" />
     <Compile Include="Hotfixes\ViewModelHelperRx.cs" />
     <Compile Include="Models\BackpanelModel.cs" />
-    <Compile Include="Models\Backpanels\BackpanelActionEventBase.cs" />
+    <Compile Include="Models\Backpanels\AppEvents\AppEventBase.cs" />
+    <Compile Include="Models\Backpanels\AppEvents\AppEventKind.cs" />
     <Compile Include="Models\Backpanels\BackpanelEventBase.cs" />
     <Compile Include="Models\Backpanels\PostEvents\FallbackedEvent.cs" />
     <Compile Include="Models\Backpanels\SystemEvents\InternalErrorEvent.cs" />
@@ -213,8 +214,8 @@
     <Compile Include="Models\Connections\Extends\SearchReceiver.cs" />
     <Compile Include="Models\Connections\UserDependencies\UserInfoReceiver.cs" />
     <Compile Include="Models\Connections\UserDependencies\UserRelationReceiver.cs" />
-    <Compile Include="Models\Hubs\EventHub.cs" />
-    <Compile Include="Models\Hubs\StoreHub.cs" />
+    <Compile Include="Models\Connections\StreamingEventsHub.cs" />
+    <Compile Include="Models\Stores\StoreHelper.cs" />
     <Compile Include="Models\InputAreaModel.cs" />
     <Compile Include="Models\MainWindowModel.cs" />
     <Compile Include="Models\Notifications\NotificationModel.cs" />

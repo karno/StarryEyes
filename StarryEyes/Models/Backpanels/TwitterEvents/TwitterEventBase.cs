@@ -48,5 +48,10 @@ namespace StarryEyes.Models.Backpanels.TwitterEvents
         {
             get { return MetroColors.Blue; }
         }
+
+        public override EventRegistingKind RegisterKind
+        {
+            get { return EventRegistingKind.TwitterQueue; }
+        }
     }
 }

@@ -213,7 +213,7 @@ namespace StarryEyes.Models
                               return true;
                           }
                       })
-                      .Select(u => Observable.Start(() => StoreHub.GetUser(u)))
+                      .Select(u => Observable.Start(() => StoreHelper.GetUser(u)))
                       .Merge()
                       .SelectMany(_ => _)
                       .Do(_ =>
@@ -243,7 +243,7 @@ namespace StarryEyes.Models
                               return true;
                           }
                       })
-                      .Select(u => Observable.Start(() => StoreHub.GetUser(u)))
+                      .Select(u => Observable.Start(() => StoreHelper.GetUser(u)))
                       .Merge()
                       .SelectMany(_ => _)
                       .Do(_ =>
@@ -283,7 +283,7 @@ namespace StarryEyes.Models
 
         public void AddFavoritedUser(long userId)
         {
-            StoreHub.GetUser(userId).Subscribe(AddFavoritedUser);
+            StoreHelper.GetUser(userId).Subscribe(AddFavoritedUser);
         }
 
         public void AddFavoritedUser(TwitterUser user)
@@ -345,7 +345,7 @@ namespace StarryEyes.Models
 
         public void AddRetweetedUser(long userId)
         {
-            StoreHub.GetUser(userId).Subscribe(AddRetweetedUser);
+            StoreHelper.GetUser(userId).Subscribe(AddRetweetedUser);
         }
 
         public void AddRetweetedUser(TwitterUser user)

@@ -291,7 +291,7 @@ namespace StarryEyes.Models
                                          new DirectMessageOperation(authInfo, MessageRecipient, Text)
                                        : new TweetOperation(authInfo, Text, InReplyTo, AttachedGeoInfo, AttachedImage)
                                   ).Run()
-                                   .SelectMany(StoreHub.MergeStore)
+                                   .SelectMany(StoreHelper.MergeStore)
                                    .Select(_ => new PostResult(authInfo, _))
                                    .Catch((Exception ex) => Observable.Return(new PostResult(authInfo, ex))))
                       .Subscribe(postResults.Add,

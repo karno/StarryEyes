@@ -39,7 +39,7 @@ namespace StarryEyes.Filters.Sources
         public IObservable<TwitterStatus> Receive(long? maxId)
         {
             return ReceiveSink(maxId)
-                .SelectMany(StoreHub.MergeStore);
+                .SelectMany(StoreHelper.MergeStore);
         }
 
         protected virtual IObservable<TwitterStatus> ReceiveSink(long? maxId)

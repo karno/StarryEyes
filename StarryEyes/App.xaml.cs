@@ -12,7 +12,7 @@ using System.Threading;
 using System.Windows;
 using Livet;
 using StarryEyes.Breezy.Api;
-using StarryEyes.Models.Hubs;
+using StarryEyes.Models.Connections;
 using StarryEyes.Models.Plugins;
 using StarryEyes.Models.Stores;
 using StarryEyes.Models.Subsystems;
@@ -139,7 +139,7 @@ namespace StarryEyes
             }
             AccountsStore.Initialize();
             StatisticsService.Initialize();
-            EventHub.Initialize();
+            StreamingEventsHub.Initialize();
 
             // Activate plugins
             PluginManager.LoadedPlugins.ForEach(p => p.Initialize());
@@ -147,7 +147,7 @@ namespace StarryEyes
             // Activate scripts
             ScriptingManager.ExecuteScripts();
 
-            EventHub.RegisterDefaultHandlers();
+            StreamingEventsHub.RegisterDefaultHandlers();
             RaiseSystemReady();
         }
 

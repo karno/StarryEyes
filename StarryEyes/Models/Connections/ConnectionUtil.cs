@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reactive.Linq;
 using StarryEyes.Breezy.DataModel;
-using StarryEyes.Models.Hubs;
+using StarryEyes.Models.Stores;
 
 namespace StarryEyes.Models.Connections
 {
@@ -10,7 +10,7 @@ namespace StarryEyes.Models.Connections
         public static void RegisterToStore(this IObservable<TwitterStatus> observable)
         {
             observable
-                .SelectMany(StoreHub.MergeStore)
+                .SelectMany(StoreHelper.MergeStore)
                 .Subscribe(_ => { },
                 ex => System.Diagnostics.Debug.WriteLine(ex));
         }

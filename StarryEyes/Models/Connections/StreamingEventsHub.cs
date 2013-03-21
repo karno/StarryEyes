@@ -8,9 +8,9 @@ using StarryEyes.Models.Backpanels.SystemEvents;
 using StarryEyes.Models.Backpanels.TwitterEvents;
 using StarryEyes.Models.Stores;
 
-namespace StarryEyes.Models.Hubs
+namespace StarryEyes.Models.Connections
 {
-    public static class EventHub
+    public static class StreamingEventsHub
     {
         public static bool OverrideDefaultHandlers { get; set; }
 
