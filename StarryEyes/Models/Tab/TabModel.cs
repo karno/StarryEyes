@@ -198,7 +198,6 @@ namespace StarryEyes.Models.Tab
             return (isBatch
                         ? StatusStore.FindBatch(_evaluator, chunkCount)
                         : StatusStore.Find(_evaluator, maxId != null ? FindRange<long>.By(maxId.Value) : null, chunkCount))
-                // .OrderByDescending(_ => _.CreatedAt)
                 .Take(chunkCount);
         }
 
