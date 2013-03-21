@@ -18,7 +18,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         where TKey : IComparable<TKey>
         where TValue : IBinarySerializable, new()
     {
-        private readonly int _chunkNum;
+        private readonly int _chunkCount;
         private readonly PersistentChunk<TKey, TValue>[] _chunks;
 
         /// <summary>
@@ -27,22 +27,22 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// <param name="keyProvider">key provider for the value</param>
         /// <param name="baseDirectoryPath">path for serialize objects</param>
         /// <param name="comparer">comparer for ordering key</param>
-        /// <param name="chunkNum">cache separate count</param>
+        /// <param name="chunkCount">cache separate count</param>
         /// <param name="manageData">ToC/NIoPs</param>
         public PersistentDataStore(Func<TValue, TKey> keyProvider, string baseDirectoryPath,
                                    IComparer<TKey> comparer = null,
-                                   int chunkNum = 32,
+                                   int chunkCount = 4,
                                    IEnumerable<Tuple<IDictionary<TKey, int>, IEnumerable<int>>> manageData = null)
             : base(keyProvider)
         {
-            _chunkNum = chunkNum;
+            _chunkCount = chunkCount;
             EnsurePath(baseDirectoryPath);
             if (manageData != null)
             {
                 var tna = manageData.ToArray();
-                if (tna.Length != chunkNum)
+                if (tna.Length != chunkCount)
                     throw new ArgumentException("ToC/NIoPs array length is not suitable.");
-                _chunks = Enumerable.Range(0, chunkNum)
+                _chunks = Enumerable.Range(0, chunkCount)
                                     .Zip(tna, (_, t) => new { Index = _, ToPNIoPs = t })
                                     .Select(_ => new PersistentChunk<TKey, TValue>(this,
                                                                                    GeneratePath(baseDirectoryPath,
@@ -52,7 +52,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
             }
             else
             {
-                _chunks = Enumerable.Range(0, chunkNum)
+                _chunks = Enumerable.Range(0, chunkCount)
                                     .Select(
                                         _ =>
                                         new PersistentChunk<TKey, TValue>(this, GeneratePath(baseDirectoryPath, _),
@@ -65,9 +65,9 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// <summary>
         ///     Number of chunks
         /// </summary>
-        public int ChunkNum
+        public int ChunkCount
         {
-            get { return _chunkNum; }
+            get { return _chunkCount; }
         }
 
         /// <summary>
@@ -147,7 +147,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
 
         private PersistentChunk<TKey, TValue> GetChunk(TKey key)
         {
-            return _chunks[Math.Abs(key.GetHashCode()) % _chunkNum];
+            return _chunks[Math.Abs(key.GetHashCode()) % _chunkCount];
         }
 
         protected override void Dispose(bool disposing)
