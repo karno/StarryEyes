@@ -13,10 +13,18 @@ namespace StarryEyes.Filters.Parsing
             {
                 switch (query[strptr])
                 {
-                    case '&':
+                    case '&': // &, &&
+                        if (CheckNext(query, strptr, '&'))
+                        {
+                            strptr++;
+                        }
                         yield return new Token(TokenType.OperatorAnd, strptr);
                         break;
                     case '|':
+                        if (CheckNext(query, strptr, '|'))
+                        {
+                            strptr++;
+                        }
                         yield return new Token(TokenType.OperatorOr, strptr);
                         break;
                     case '<':
@@ -50,6 +58,12 @@ namespace StarryEyes.Filters.Parsing
                                 yield return new Token(TokenType.OperatorGreaterThan, strptr);
                                 break;
                         }
+                        break;
+                    case '(':
+                        yield return new Token(TokenType.OpenBracket, strptr);
+                        break;
+                    case ')':
+                        yield return new Token(TokenType.CloseBracket, strptr);
                         break;
                     case '+':
                         yield return new Token(TokenType.OperatorPlus, strptr);
@@ -102,12 +116,6 @@ namespace StarryEyes.Filters.Parsing
                                 break;
                         }
                         break;
-                    case '(':
-                        yield return new Token(TokenType.OpenBracket, strptr);
-                        break;
-                    case ')':
-                        yield return new Token(TokenType.CloseBracket, strptr);
-                        break;
                     case '"':
                         yield return new Token(TokenType.String, GetInQuoteString(query, ref strptr), strptr);
                         break;
@@ -120,7 +128,7 @@ namespace StarryEyes.Filters.Parsing
                     default:
                         int begin = strptr;
                         // 何らかのトークン分割子に出会うまで空回し
-                        const string tokens = "&|.,:!()<>\"= \t\r\n";
+                        const string tokens = "&|<>()+-*/.,:=!\" \t\r\n";
                         do
                         {
                             if (tokens.Contains(query[strptr]))
