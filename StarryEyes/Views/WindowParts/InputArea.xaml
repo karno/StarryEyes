@@ -341,7 +341,7 @@
                                   Fill="#FFFEFEFE"
                                   Stretch="Fill" />
                         </Button>
-                        <StackPanel VerticalAlignment="Top" Orientation="Horizontal">
+                        <StackPanel VerticalAlignment="Top" Orientation="Horizontal" Height="26">
                             <controls:DropDownMenuButton Width="28"
                                                          Style="{DynamicResource MetroSquareUnfocusableFlatButton}"
                                                          ToolTip="下書き"
