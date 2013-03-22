@@ -1,7 +1,8 @@
-﻿using StarryEyes.Breezy.Authorize;
+﻿using System.Windows.Media;
+using StarryEyes.Breezy.Authorize;
 using StarryEyes.Views;
 
-namespace StarryEyes.Models.Backpanels.SystemEvents
+namespace StarryEyes.Models.Backpanels.NotificationEvents
 {
     public sealed class TrackLimitEvent : BackpanelEventBase
     {
@@ -21,10 +22,10 @@ namespace StarryEyes.Models.Backpanels.SystemEvents
 
         public override string Detail
         {
-            get { return _drop + " 件のツイートを受信できませんでした。(タイムラインが速すぎます。トラック設定を見直すことをお勧めします。)"; }
+            get { return _drop + " 件のツイートを受信できませんでした。 " + _info.UnreliableScreenName + " のタイムラインが速すぎます。"; }
         }
 
-        public override System.Windows.Media.Color Background
+        public override Color Background
         {
             get { return MetroColors.Brown; }
         }

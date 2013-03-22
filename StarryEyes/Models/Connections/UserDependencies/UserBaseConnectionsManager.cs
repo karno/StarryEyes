@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using StarryEyes.Breezy.Authorize;
-using StarryEyes.Models.Hubs;
+using StarryEyes.Models.Backpanels.SystemEvents;
 using StarryEyes.Models.Stores;
 using StarryEyes.Settings;
 
@@ -131,11 +131,11 @@ namespace StarryEyes.Models.Connections.UserDependencies
         {
             if (_danglingKeywords.Count > 0)
             {
-                AppInformationHub.PublishInformation(
-                    new AppInformation(AppInformationKind.Warning,
-                                       "ConnectionManager_UserStreamsTrackDanglings",
-                                       "受信されていないトラッキング キーワードがあります。",
-                                       "トラッキング キーワードに対し、ユーザーストリーム接続数が不足しています。"));
+                BackpanelModel.RegisterEvent(new StreamingKeywordDanglingEvent());
+            }
+            else
+            {
+                BackpanelModel.RemoveEvent(new StreamingKeywordDanglingEvent().Id);
             }
         }
 
@@ -143,7 +143,6 @@ namespace StarryEyes.Models.Connections.UserDependencies
         ///     Add tracking keywords.
         /// </summary>
         /// <param name="keyword">adding keyword</param>
-        /// <param name="reconnectImmediate">reconnect user streams immediately if required.</param>
         public static void AddTrackKeyword(string keyword)
         {
             lock (TrackingLocker)
@@ -194,8 +193,7 @@ namespace StarryEyes.Models.Connections.UserDependencies
         ///     Remove tracking keywords.
         /// </summary>
         /// <param name="keyword">removing keyword</param>
-        /// <param name="reconnectImmediate">reconnect user streams immediately if required.</param>
-        public static void RemoveTrackKeyword(string keyword, bool? reconnectImmediate = null)
+        public static void RemoveTrackKeyword(string keyword)
         {
             lock (TrackingLocker)
             {
@@ -339,6 +337,7 @@ namespace StarryEyes.Models.Connections.UserDependencies
                 Dispose(false);
         }
 
+        // ReSharper disable UnusedParameter.Local
         private void Dispose(bool disposing)
         {
             if (_userStreams != null)
@@ -349,5 +348,6 @@ namespace StarryEyes.Models.Connections.UserDependencies
             }
             _userTimelineReceiver.Dispose();
         }
+        // ReSharper restore UnusedParameter.Local
     }
 }

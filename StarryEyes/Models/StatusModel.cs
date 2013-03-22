@@ -11,7 +11,6 @@ using Livet;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Breezy.Imaging;
-using StarryEyes.Models.Hubs;
 using StarryEyes.Models.Stores;
 using StarryEyes.Settings;
 

@@ -5,7 +5,6 @@ using System.Reactive.Linq;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Filters.Expressions.Operators;
-using StarryEyes.Models.Hubs;
 using StarryEyes.Models.Stores;
 
 namespace StarryEyes.Filters.Sources

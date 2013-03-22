@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using StarryEyes.Albireo.Data;
 using StarryEyes.Breezy.Api.Rest;
 using StarryEyes.Breezy.Authorize;
+using StarryEyes.Models.Backpanels.NotificationEvents;
 using StarryEyes.Models.Backpanels.SystemEvents;
 using StarryEyes.Models.Stores;
 using StarryEyes.Settings;

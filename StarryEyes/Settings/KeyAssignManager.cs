@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using StarryEyes.Models.Hubs;
+using StarryEyes.Models;
+using StarryEyes.Models.Backpanels.NotificationEvents;
+using StarryEyes.Models.Backpanels.SystemEvents;
 using StarryEyes.Settings.KeyAssigns;
 
 namespace StarryEyes.Settings
@@ -42,6 +44,7 @@ namespace StarryEyes.Settings
 
         private static void Load(string file)
         {
+            if (!File.Exists(file)) return;
             try
             {
                 var profile = KeyAssignProfile.FromFile(file);
@@ -49,14 +52,7 @@ namespace StarryEyes.Settings
             }
             catch (Exception ex)
             {
-                AppInformationHub.PublishInformation(
-                    new AppInformation(
-                        AppInformationKind.Error,
-                        "KEYASSIGN_LOAD_FAILED_" +
-                        Path.GetFileNameWithoutExtension(file),
-                        "キーバインドファイル " + Path.GetFileNameWithoutExtension(file) + " をロードできません。",
-                        ex.Message,
-                        "リロード", () => Load(file)));
+                BackpanelModel.RegisterEvent(new KeyAssignCouldNotLoadEvent(file, ex, () => Load(file)));
             }
         }
 
@@ -90,12 +86,7 @@ namespace StarryEyes.Settings
                 }
 
                 // not found
-                AppInformationHub.PublishInformation(
-                    new AppInformation(
-                        AppInformationKind.Error,
-                        "KEYASSIGN_PROFILE_NOT_FOUND",
-                        "現在のプロファイルが見つかりません。",
-                        "プロファイル " + profileId + " が見つかりません。"));
+                BackpanelModel.RegisterEvent(new KeyAssignProfileNotFoundEvent(profileId));
                 return DefaultAssignProvider.GetEmpty();
             }
         }
@@ -168,14 +159,11 @@ namespace StarryEyes.Settings
         {
             if (_hasArgument != null && _hasArgument.Value == !String.IsNullOrEmpty(argument))
             {
-                AppInformationHub.PublishInformation(
-                    new AppInformation(
-                        AppInformationKind.Error,
-                        "KEYASSIGN_INVOKE_ERROR_" + Name,
-                        "キーバインドを起動できません。",
-                        _hasArgument.Value
-                            ? "このキーバインドには引数の指定が必要です。"
-                            : "このキーバインドに引数を指定することはできません。"));
+                BackpanelModel.RegisterEvent(
+                    new OperationFailedEvent(
+                        String.Format(_hasArgument.Value
+                                          ? "キーバインド {0} には引数の指定が必要です。"
+                                          : "キーバインド {0} に引数を指定することはできません。", Name)));
             }
             else
             {

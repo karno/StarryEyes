@@ -4,7 +4,7 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
-using StarryEyes.Models.Backpanels.SystemEvents;
+using StarryEyes.Models.Backpanels.NotificationEvents;
 using StarryEyes.Models.Backpanels.TwitterEvents;
 using StarryEyes.Models.Stores;
 

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Net;
 using System.Reactive.Linq;
-using StarryEyes.Models.Hubs;
 using StarryEyes.Models.Stores;
 using StarryEyes.Breezy.Api.Rest;
 using StarryEyes.Breezy.Authorize;

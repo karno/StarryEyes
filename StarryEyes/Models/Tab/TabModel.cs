@@ -10,7 +10,7 @@ using StarryEyes.Albireo.Data;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Filters;
 using StarryEyes.Filters.Parsing;
-using StarryEyes.Models.Hubs;
+using StarryEyes.Models.Backpanels.SystemEvents;
 using StarryEyes.Models.Notifications;
 using StarryEyes.Models.Stores;
 using StarryEyes.Vanille.DataStore;
@@ -113,14 +113,7 @@ namespace StarryEyes.Models.Tab
             }
             catch (FilterQueryException fex)
             {
-                AppInformationHub.PublishInformation(
-                    new AppInformation(AppInformationKind.Warning,
-                                       "TABINFO_QUERY_CORRUPTED_" + Name,
-                                       "クエリが壊れています。",
-                                       "タブ " + Name +
-                                       " のクエリは破損しているため、フィルタが初期化されました。" +
-                                       Environment.NewLine +
-                                       "送出された例外: " + fex));
+                BackpanelModel.RegisterEvent(new QueryCorruptionEvent(Name, fex));
                 _evaluator = _ => false;
             }
         }
@@ -139,15 +132,7 @@ namespace StarryEyes.Models.Tab
                 }
                 catch (FilterQueryException fex)
                 {
-                    Debug.WriteLine(fex);
-                    AppInformationHub.PublishInformation(
-                        new AppInformation(AppInformationKind.Warning,
-                                           "TABINFO_QUERY_CORRUPTED_" + Name,
-                                           "クエリが壊れています。",
-                                           "タブ " + Name +
-                                           " のクエリは破損しているため、フィルタが初期化されました。" +
-                                           Environment.NewLine +
-                                           "送出された例外: " + fex));
+                    BackpanelModel.RegisterEvent(new QueryCorruptionEvent(Name, fex));
                 }
             }
         }

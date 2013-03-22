@@ -1,5 +1,4 @@
 ﻿using StarryEyes.Breezy.Authorize;
-using StarryEyes.Models.Hubs;
 using System;
 
 namespace StarryEyes.Models.Connections
@@ -10,21 +9,6 @@ namespace StarryEyes.Models.Connections
         protected AuthenticateInfo AuthInfo
         {
             get { return _authInfo; }
-        }
-
-        protected void RaiseInfoNotification(string id, string abst, string description, bool isWarning = false)
-        {
-            AppInformationHub.PublishInformation(
-                new AppInformation(isWarning ? AppInformationKind.Warning : AppInformationKind.Notify, id,
-                    "@" + _authInfo.UnreliableScreenName + " - " + abst, description));
-        }
-
-        protected void RaiseErrorNotification(string id, string abst, string desc, string fixName, Action fix)
-        {
-            AppInformationHub.PublishInformation(
-                new AppInformation(AppInformationKind.Error, id,
-                    "@" + _authInfo.UnreliableScreenName + " - " + abst, desc,
-                    fixName, fix));
         }
 
         protected ConnectionBase(AuthenticateInfo authInfo)

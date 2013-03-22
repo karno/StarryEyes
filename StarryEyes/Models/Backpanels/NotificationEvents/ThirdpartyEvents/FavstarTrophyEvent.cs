@@ -1,7 +1,7 @@
 ﻿using StarryEyes.Breezy.DataModel;
 using StarryEyes.Views;
 
-namespace StarryEyes.Models.Backpanels.ThirdpartyEvents
+namespace StarryEyes.Models.Backpanels.NotificationEvents.ThirdpartyEvents
 {
     public class TrophyScceededEvent : BackpanelEventBase
     {

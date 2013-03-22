@@ -8,7 +8,7 @@ using StarryEyes.Breezy.DataModel;
 using StarryEyes.Filters;
 using StarryEyes.Filters.Parsing;
 using StarryEyes.Models;
-using StarryEyes.Models.Backpanels.SystemEvents;
+using StarryEyes.Models.Backpanels.NotificationEvents;
 using StarryEyes.Models.Stores;
 using StarryEyes.Models.Tab;
 using StarryEyes.Vanille.DataStore;

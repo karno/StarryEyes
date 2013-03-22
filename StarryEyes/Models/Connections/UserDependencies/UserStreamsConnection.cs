@@ -7,7 +7,7 @@ using System.Reactive.Linq;
 using StarryEyes.Breezy.Api.Streaming;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
-using StarryEyes.Models.Hubs;
+using StarryEyes.Models.Backpanels.SystemEvents;
 using StarryEyes.Models.Stores;
 
 namespace StarryEyes.Models.Connections.UserDependencies
@@ -299,14 +299,14 @@ namespace StarryEyes.Models.Connections.UserDependencies
 
         private void RaiseDisconnectedByError(string header, string detail)
         {
-            RaiseErrorNotification(
-                "UserStreams_Reconnection_" + AuthInfo.UnreliableScreenName,
-                header, detail,
-                "再接続", () =>
-                {
-                    if (!IsDisposed)
-                        Connect();
-                });
+            BackpanelModel.RegisterEvent(
+                new UserStreamsDisconnectedEvent(
+                    AuthInfo, header + detail,
+                    () =>
+                    {
+                        if (!IsDisposed)
+                            Connect();
+                    }));
         }
 
         protected override void Dispose(bool disposing)

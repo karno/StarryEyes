@@ -1,19 +1,19 @@
 ﻿using StarryEyes.Views;
 
-namespace StarryEyes.Models.Backpanels.SystemEvents
+namespace StarryEyes.Models.Backpanels.NotificationEvents
 {
-    internal sealed class InternalErrorEvent : BackpanelEventBase
+    public class OperationFailedEvent : BackpanelEventBase
     {
         private readonly string _description;
 
-        public InternalErrorEvent(string description)
+        public OperationFailedEvent(string description)
         {
             this._description = description;
         }
 
         public override string Title
         {
-            get { return "ERROR"; }
+            get { return "FAILED"; }
         }
 
         public override string Detail

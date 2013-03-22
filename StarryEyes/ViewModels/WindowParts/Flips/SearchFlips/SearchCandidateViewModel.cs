@@ -6,7 +6,7 @@ using Livet;
 using StarryEyes.Breezy.Api.Rest;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Models;
-using StarryEyes.Models.Backpanels.SystemEvents;
+using StarryEyes.Models.Backpanels.NotificationEvents;
 using StarryEyes.Models.Stores;
 using StarryEyes.Models.Tab;
 

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using StarryEyes.Breezy.Api.Rest;
-using StarryEyes.Models.Hubs;
+using StarryEyes.Models.Backpanels.NotificationEvents;
 using StarryEyes.Models.Stores;
 
 namespace StarryEyes.Models.Connections.Extends
@@ -69,10 +69,7 @@ namespace StarryEyes.Models.Connections.Extends
             var authInfo = AccountsStore.Accounts.Shuffle().Select(s => s.AuthenticateInfo).FirstOrDefault();
             if (authInfo == null)
             {
-                AppInformationHub.PublishInformation(new AppInformation(AppInformationKind.Warning,
-                    "SEARCH_RECEIVE_ACCOUNT_NOT_FOUND",
-                    "アカウントが存在しないため、検索タイムラインを受信できません。",
-                    "アカウントを一つ以上登録してください。"));
+                BackpanelModel.RegisterEvent(new OperationFailedEvent("アカウントが登録されていないため、検索タイムラインを受信できませんでした。"));
                 return;
             }
             authInfo.SearchTweets(query, max_id: maxId)

@@ -9,8 +9,7 @@ using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Filters;
 using StarryEyes.Models;
-using StarryEyes.Models.Backpanels.SystemEvents;
-using StarryEyes.Models.Hubs;
+using StarryEyes.Models.Backpanels.NotificationEvents;
 using StarryEyes.Models.Operations;
 using StarryEyes.Models.Stores;
 using StarryEyes.Settings;
@@ -770,13 +769,8 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                 new DeleteOperation(info, OriginalStatus)
                     .Run()
                     .Subscribe(_ => StatusStore.Remove(_.Id),
-                               ex => AppInformationHub.PublishInformation(
-                                   new AppInformation(AppInformationKind.Error,
-                                                      "ERR_DELETE_MSG_" +
-                                                      Status.Id,
-                                                      "ステータスを削除できませんでした。",
-                                                      ex.Message,
-                                                      "再試行", Delete)));
+                               ex =>
+                               BackpanelModel.RegisterEvent(new OperationFailedEvent("ツイートを削除できませんでした: " + ex.Message)));
             }
         }
 

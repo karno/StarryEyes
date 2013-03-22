@@ -10,7 +10,6 @@ using System.Windows.Media.Imaging;
 using Livet;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
-using StarryEyes.Models.Hubs;
 using StarryEyes.Models.Operations;
 using StarryEyes.Models.Stores;
 using StarryEyes.Models.Tab;
@@ -297,6 +296,7 @@ namespace StarryEyes.Models
                       .Subscribe(postResults.Add,
                                  () =>
                                  {
+                                     // ReSharper disable AccessToDisposedClosure
                                      postResults.GroupBy(_ => _.IsSucceeded)
                                                 .ForEach(_ =>
                                                 {
@@ -320,6 +320,7 @@ namespace StarryEyes.Models
                                                         });
                                                     }
                                                 });
+                                     // ReSharper restore AccessToDisposedClosure
                                      subject.OnCompleted();
                                      subject.Dispose();
                                  });

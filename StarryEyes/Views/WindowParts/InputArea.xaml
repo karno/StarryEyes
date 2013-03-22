@@ -320,7 +320,7 @@
                     </TextBox>
                     <DockPanel Grid.Row="2"
                                Grid.ColumnSpan="3"
-                               VerticalAlignment="Top">
+                               VerticalAlignment="Top" Height="26">
                         <DockPanel.Background>
                             <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}" />
                         </DockPanel.Background>

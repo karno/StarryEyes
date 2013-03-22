@@ -4,7 +4,7 @@ using System.Linq;
 using StarryEyes.Breezy.Api.Rest;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
-using StarryEyes.Models.Hubs;
+using StarryEyes.Models.Backpanels.SystemEvents;
 using StarryEyes.Models.Stores;
 
 namespace StarryEyes.Models.Connections.Extends
@@ -21,15 +21,13 @@ namespace StarryEyes.Models.Connections.Extends
         {
             var ai = AccountsStore.Accounts.FirstOrDefault(aset => aset.AuthenticateInfo.UnreliableScreenName == info.OwnerScreenName);
             if (ai != null)
+            {
                 StartReceive(ai.AuthenticateInfo, info);
+            }
             else
-                AppInformationHub.PublishInformation(new AppInformation(AppInformationKind.Warning,
-                    "LIST_RECEIVER_NOT_FOUND_" + info,
-                    "リストを受信するアカウントが検索できません。(対象リスト: " + info + ")",
-                    "リストをどのアカウントで受信するのか分かりませんでした。" + Environment.NewLine +
-                    "(他者のリストは受信アカウントを自動決定できません。明示的にどのアカウントから受信するか指定する必要があります。)" + Environment.NewLine +
-                    "(アカウントの@IDを変更した場合は、リストの所属@IDも変更しなければいけません。)" + Environment.NewLine +
-                    "最も手早い方法として、リスト受信しているタブの受信設定をやり直すのが良いと思います。"));
+            {
+                BackpanelModel.RegisterEvent(new ListReceiveFailedEvent(info));
+            }
         }
 
         public static void StartReceive(string receiverScreenName, ListInfo info)

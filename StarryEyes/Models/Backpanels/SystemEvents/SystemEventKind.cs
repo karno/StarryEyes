@@ -1,7 +1,7 @@
 ﻿
-namespace StarryEyes.Models.Backpanels.AppEvents
+namespace StarryEyes.Models.Backpanels.SystemEvents
 {
-    public enum AppEventKind
+    public enum SystemEventKind
     {        /// <summary>
         /// User action is not required.
         /// </summary>

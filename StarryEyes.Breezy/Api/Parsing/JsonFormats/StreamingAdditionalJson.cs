@@ -28,7 +28,7 @@ namespace StarryEyes.Breezy.Api.Parsing.JsonFormats
             {
                 EventType = EventType.Empty,
                 DeletedId = (status != null ? long.Parse(status.id_str) :
-                            (direct_message != null ? long.Parse(status.id_str) : 0)),
+                            (direct_message != null ? long.Parse(direct_message.id_str) : 0)),
             };
         }
     }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows.Media;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Views;
 
@@ -11,7 +12,6 @@ namespace StarryEyes.Models.Backpanels.TwitterEvents
         {
             get { return _createdAt; }
         }
-
 
         private readonly TwitterUser _source;
         public TwitterUser Source
@@ -44,14 +44,9 @@ namespace StarryEyes.Models.Backpanels.TwitterEvents
             this._targetStatus = target;
         }
 
-        public override System.Windows.Media.Color Background
+        public override Color Background
         {
             get { return MetroColors.Blue; }
-        }
-
-        public override EventRegistingKind RegisterKind
-        {
-            get { return EventRegistingKind.TwitterQueue; }
         }
     }
 }

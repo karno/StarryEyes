@@ -1,7 +1,7 @@
 ﻿using StarryEyes.Breezy.Authorize;
 using StarryEyes.Views;
 
-namespace StarryEyes.Models.Backpanels.PostEvents
+namespace StarryEyes.Models.Backpanels.NotificationEvents.PostEvents
 {
     public sealed class FallbackedEvent : BackpanelEventBase
     {
