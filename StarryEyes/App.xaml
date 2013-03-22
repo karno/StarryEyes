@@ -1,9 +1,7 @@
 ﻿<Application x:Class="StarryEyes.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:Custom="http://metro.mahapps.com/winfx/xaml/shared"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:ed="http://schemas.microsoft.com/expression/2010/drawing"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              Startup="Application_Startup"
              StartupUri="Views\MainWindow.xaml"
@@ -170,7 +168,7 @@
                         <VisualStateGroup x:Name="CommonStates">
                             <VisualState x:Name="MouseOver">
                                 <Storyboard>
-                                    <ColorAnimationUsingKeyFrames Storyboard.TargetName="arc" Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)">
+                                    <ColorAnimationUsingKeyFrames Storyboard.TargetName="circle" Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)">
                                         <EasingColorKeyFrame KeyTime="0" Value="#0CFFFFFF" />
                                     </ColorAnimationUsingKeyFrames>
                                     <DoubleAnimationUsingKeyFrames Storyboard.TargetName="grid" Storyboard.TargetProperty="(UIElement.Opacity)">
@@ -180,7 +178,7 @@
                             </VisualState>
                             <VisualState x:Name="Pressed">
                                 <Storyboard>
-                                    <ColorAnimationUsingKeyFrames Storyboard.TargetName="arc" Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)">
+                                    <ColorAnimationUsingKeyFrames Storyboard.TargetName="circle" Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)">
                                         <EasingColorKeyFrame KeyTime="0" Value="#19FFFFFF" />
                                     </ColorAnimationUsingKeyFrames>
                                 </Storyboard>
@@ -202,18 +200,14 @@
                             <VisualState x:Name="InvalidUnfocused" />
                         </VisualStateGroup>
                     </VisualStateManager.VisualStateGroups>
-                    <ed:Arc x:Name="arc"
-                            Width="Auto"
-                            Height="Auto"
-                            HorizontalAlignment="Stretch"
-                            VerticalAlignment="Stretch"
-                            ArcThickness="1"
-                            ArcThicknessUnit="Percent"
-                            EndAngle="360"
-                            Fill="#00000000"
-                            StartAngle="0"
-                            Stretch="None"
-                            Stroke="White" />
+                    <Ellipse x:Name="circle"
+                             Width="Auto"
+                             Height="Auto"
+                             HorizontalAlignment="Stretch"
+                             VerticalAlignment="Stretch"
+                             Fill="#00000000"
+                             Stroke="White"
+                             StrokeThickness="1.5" />
                     <ContentPresenter Width="Auto"
                                       Height="Auto"
                                       Margin="2"
@@ -278,7 +272,7 @@
                         <VisualStateGroup x:Name="CommonStates">
                             <VisualState x:Name="MouseOver">
                                 <Storyboard>
-                                    <ColorAnimationUsingKeyFrames Storyboard.TargetName="arc" Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)">
+                                    <ColorAnimationUsingKeyFrames Storyboard.TargetName="circle" Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)">
                                         <EasingColorKeyFrame KeyTime="0" Value="#0CFFFFFF" />
                                     </ColorAnimationUsingKeyFrames>
                                     <DoubleAnimationUsingKeyFrames Storyboard.TargetName="grid" Storyboard.TargetProperty="(UIElement.Opacity)">
@@ -288,7 +282,7 @@
                             </VisualState>
                             <VisualState x:Name="Pressed">
                                 <Storyboard>
-                                    <ColorAnimationUsingKeyFrames Storyboard.TargetName="arc" Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)">
+                                    <ColorAnimationUsingKeyFrames Storyboard.TargetName="circle" Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)">
                                         <EasingColorKeyFrame KeyTime="0" Value="#19FFFFFF" />
                                     </ColorAnimationUsingKeyFrames>
                                 </Storyboard>
@@ -310,18 +304,14 @@
                             <VisualState x:Name="InvalidUnfocused" />
                         </VisualStateGroup>
                     </VisualStateManager.VisualStateGroups>
-                    <ed:Arc x:Name="arc"
-                            Width="Auto"
-                            Height="Auto"
-                            HorizontalAlignment="Stretch"
-                            VerticalAlignment="Stretch"
-                            ArcThickness="1"
-                            ArcThicknessUnit="Percent"
-                            EndAngle="360"
-                            Fill="#00000000"
-                            StartAngle="0"
-                            Stretch="None"
-                            Stroke="Black" />
+                    <Ellipse x:Name="circle"
+                             Width="Auto"
+                             Height="Auto"
+                             HorizontalAlignment="Stretch"
+                             VerticalAlignment="Stretch"
+                             Fill="#00000000"
+                             Stroke="Black"
+                             StrokeThickness="1.5" />
                     <ContentPresenter Width="Auto"
                                       Height="Auto"
                                       Margin="2"
