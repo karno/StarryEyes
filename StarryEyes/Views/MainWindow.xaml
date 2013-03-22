@@ -189,7 +189,7 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="13*" />
             </Grid.RowDefinitions>
-            <windowParts:InputArea Margin="3,4" DataContext="{Binding InputAreaViewModel}" />
+            <windowParts:InputArea Margin="3,4,3,0" DataContext="{Binding InputAreaViewModel}" />
             <windowParts:MainArea Grid.Row="1"
                                   Margin="-8,0,0,0"
                                   DataContext="{Binding MainAreaViewModel}" />
