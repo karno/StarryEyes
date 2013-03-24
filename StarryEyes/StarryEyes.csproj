@@ -242,7 +242,7 @@
     <Compile Include="Models\Tab\ColumnInfo.cs" />
     <Compile Include="Models\Tab\ColumnModel.cs" />
     <Compile Include="Models\Tab\CommonTabBuilder.cs" />
-    <Compile Include="Models\Tab\MainAreaModel.cs" />
+    <Compile Include="Models\Tab\TabManager.cs" />
     <Compile Include="Models\Plugins\IPlugin.cs" />
     <Compile Include="Models\Tab\TimelineModel.cs" />
     <Compile Include="Models\UserModel.cs" />

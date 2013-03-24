@@ -113,7 +113,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             }
         }
 
-        const string DefaultQueryString = "from all where ()";
+        const string DefaultQueryString = "from local where ()";
         public void CreateNewTab()
         {
             var creating = new TabModel(string.Empty, DefaultQueryString);
@@ -148,7 +148,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         public void RestoreLastClosedTab()
         {
             Focus();
-            MainAreaModel.ReviveTab();
+            TabManager.ReviveTab();
         }
         #endregion
     }

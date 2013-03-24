@@ -168,7 +168,7 @@ namespace StarryEyes.ViewModels
                     SearchFlipViewModel.FocusToSearchBox();
                     break;
                 case FocusRequest.Timeline:
-                    MainAreaModel.CurrentFocusTab.SetPhysicalFocus();
+                    TabManager.CurrentFocusTab.SetPhysicalFocus();
                     SearchFlipViewModel.Close();
                     break;
                 case FocusRequest.Input:
@@ -260,16 +260,8 @@ namespace StarryEyes.ViewModels
                                          typeof(AuthorizationWindow),
                                          auth, TransitionMode.Modal, null));
             }
-            MainAreaModel.Load();
-            MainAreaModel.Save();
-            /*
-            MainAreaModel.CreateTab(new TabModel("hello", "from all where ()"));
-            MainAreaModel.CreateTab(new TabModel("home", "from all where user <- *.following"));
-            MainAreaModel.CreateTab(new TabModel("replies", "from all where to -> *"));
-            MainAreaModel.CreateTab(new TabModel("my", "from all where user <- *"));
-            MainAreaModel.CreateTab(new TabModel("Krile", "from all where source == \"Krile\""));
-            MainAreaModel.CreateColumn(new TabModel("Favorites", "from all where user <- * && ( favs > 0 || rts > 0)"));
-            */
+            TabManager.Load();
+            TabManager.Save();
         }
 
         public bool OnClosing()

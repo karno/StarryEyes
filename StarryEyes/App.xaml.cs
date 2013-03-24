@@ -336,6 +336,14 @@ namespace StarryEyes
             }
         }
 
+        public static string TabTempFilePath
+        {
+            get
+            {
+                return Path.Combine(ConfigurationDirectoryPath, TabTempFileName);
+            }
+        }
+
         private static FileVersionInfo _version;
         public static FileVersionInfo Version
         {
@@ -409,6 +417,8 @@ namespace StarryEyes
 
         public static readonly string ConfigurationFileName = "krile.xml";
 
+        public static readonly string TabTempFileName = "tabs.cache";
+
         public static readonly string ProfileFileName = "krile.profile";
 
         public static readonly string FeedbackAppName = "reporter.exe";
@@ -419,7 +429,7 @@ namespace StarryEyes
 
         public static readonly string RemoteVersionXml = "http://update.starwing.net/starryeyes/update.xml";
 
-        public static readonly string PublicKeyFile = "kup.pub";
+        public static readonly string PublicKeyFile = "krile.pub";
 
         public static readonly string MentionWavFile = "mention.wav";
 

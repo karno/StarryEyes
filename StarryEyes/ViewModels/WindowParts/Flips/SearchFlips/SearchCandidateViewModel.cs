@@ -70,7 +70,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
         public void UpdateInfo()
         {
             // update current binding accounts
-            var ctab = MainAreaModel.CurrentFocusTab;
+            var ctab = TabManager.CurrentFocusTab;
             long cid = 0;
             if (ctab != null && ctab.BindingAccountIds.Count == 1)
             {

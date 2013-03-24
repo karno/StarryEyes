@@ -12,7 +12,7 @@ namespace StarryEyes.Settings
         /// <summary>
         /// User ID
         /// </summary>
-        [DataMember]
+        [IgnoreDataMember]
         public long UserId
         {
             get { return AuthenticateInfo.Id; }

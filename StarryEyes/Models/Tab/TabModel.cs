@@ -27,15 +27,18 @@ namespace StarryEyes.Models.Tab
         private Func<TwitterStatus, bool> _evaluator = _ => false;
         private FilterQuery _filterQuery;
 
+        public long[] TabContentCache { get; set; }
+
         public TabModel()
         {
         }
 
-        public TabModel(string name, string query)
+        public TabModel(string name, string query, long[] cache = null)
             : this()
         {
             Name = name;
             FilterQueryString = query;
+            TabContentCache = cache;
         }
 
         /// <summary>
@@ -59,7 +62,7 @@ namespace StarryEyes.Models.Tab
         {
             Action handler = OnBindingAccountIdsChanged;
             if (handler != null) handler();
-            MainAreaModel.Save();
+            TabManager.Save();
         }
 
         /// <summary>
@@ -79,7 +82,7 @@ namespace StarryEyes.Models.Tab
             set
             {
                 _bindingHashtags = (value ?? Enumerable.Empty<string>()).ToList();
-                MainAreaModel.Save();
+                TabManager.Save();
             }
         }
 
@@ -139,6 +142,7 @@ namespace StarryEyes.Models.Tab
 
         public bool IsActivated { get; private set; }
 
+
         public void InvalidateCollection()
         {
             TimelineModel oldt = Timeline;
@@ -194,6 +198,7 @@ namespace StarryEyes.Models.Tab
                 {
                     FilterQuery.Deactivate();
                 }
+                TabContentCache = Timeline.Statuses.Select(s => s.Id).ToArray();
                 if (Timeline != null)
                 {
                     Timeline.OnNewStatusArrival -= OnNewStatusArrival;

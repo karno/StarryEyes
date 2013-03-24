@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Xaml;
+using System.Xml;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Breezy.Imaging;
 using StarryEyes.Filters;
@@ -441,7 +443,7 @@ namespace StarryEyes.Settings
 
         public static void Save()
         {
-            using (FileStream fs = File.Open(App.ConfigurationFilePath, FileMode.Create, FileAccess.ReadWrite))
+            using (var fs = File.Open(App.ConfigurationFilePath, FileMode.Create, FileAccess.ReadWrite))
             {
                 XamlServices.Save(fs, _settingValueHolder);
             }

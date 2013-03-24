@@ -73,9 +73,9 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
         {
             if (_option == SearchOption.Quick)
             {
-                if (MainAreaModel.CurrentFocusTab == null)
+                if (TabManager.CurrentFocusTab == null)
                     return Observable.Empty<TwitterStatus>();
-                return Observable.Start(() => MainAreaModel.CurrentFocusTab.Timeline.Statuses)
+                return Observable.Start(() => TabManager.CurrentFocusTab.Timeline.Statuses)
                                  .SelectMany(_ => _)
                                  .Where(s => _predicate(s));
             }
@@ -118,7 +118,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
         {
             get
             {
-                var ctab = MainAreaModel.CurrentFocusTab;
+                var ctab = TabManager.CurrentFocusTab;
                 return ctab != null ? ctab.BindingAccountIds : Enumerable.Empty<long>();
             }
         }

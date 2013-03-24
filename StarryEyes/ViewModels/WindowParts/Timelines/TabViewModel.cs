@@ -8,6 +8,7 @@ using System.Windows.Threading;
 using Livet.Messaging;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Models;
+using StarryEyes.Models.Stores;
 using StarryEyes.Models.Tab;
 using StarryEyes.Settings;
 
@@ -126,11 +127,18 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             // invalidate cache
             ReInitializeTimeline();
             IsLoading = true;
-            Observable.Start(() => Model.Timeline.ReadMore(null, true))
-                      .Merge(Observable.Start(() => Model.ReceiveTimelines(null)))
-                      .SelectMany(_ => _)
-                      .Finally(() => IsLoading = false)
-                      .Subscribe();
+
+            var cache = Model.TabContentCache;
+            Model.TabContentCache = null;
+
+            var initload = cache != null
+                                       ? Observable.Start(() => Model.Timeline.ReadFromCache(cache))
+                                       : Observable.Start(() => Model.Timeline.ReadMore(null, true));
+
+            initload.Merge(Observable.Start(() => Model.ReceiveTimelines(null)))
+                    .SelectMany(_ => _)
+                    .Finally(() => IsLoading = false)
+                    .Subscribe();
             if (UnreadCount > 0)
             {
                 UnreadCount = 0;
@@ -237,8 +245,10 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public void CopyTab()
         {
-            Owner.Model.CreateTab(new TabModel(this.Name + "_",
-                                                 this.Model.FilterQueryString));
+            Owner.Model.CreateTab(
+                new TabModel(this.Name + "_",
+                             this.Model.FilterQueryString,
+                             Model.Timeline.Statuses.Select(s => s.Id).ToArray()));
         }
         #endregion
 

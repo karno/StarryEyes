@@ -17,14 +17,14 @@ namespace StarryEyes.ViewModels.WindowParts
             CompositeDisposable.Add(
                 _columns =
                 ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
-                    MainAreaModel.Columns,
+                    TabManager.Columns,
                     cm => new ColumnViewModel(this, cm),
                     DispatcherHelper.UIDispatcher));
             CompositeDisposable.Add(
                 Observable.FromEvent(
-                    h => MainAreaModel.OnCurrentFocusColumnChanged += h,
-                    h => MainAreaModel.OnCurrentFocusColumnChanged -= h)
-                          .Select(_ => MainAreaModel.CurrentFocusColumnIndex)
+                    h => TabManager.OnCurrentFocusColumnChanged += h,
+                    h => TabManager.OnCurrentFocusColumnChanged -= h)
+                          .Select(_ => TabManager.CurrentFocusColumnIndex)
                           .Subscribe(UpdateFocusFromModel));
             RegisterEvents();
         }
@@ -37,11 +37,11 @@ namespace StarryEyes.ViewModels.WindowParts
         private int _oldFocus;
         public ColumnViewModel FocusedColumn
         {
-            get { return _columns[MainAreaModel.CurrentFocusColumnIndex]; }
+            get { return _columns[TabManager.CurrentFocusColumnIndex]; }
             set
             {
                 var previous = FocusedColumn;
-                MainAreaModel.CurrentFocusColumnIndex = _oldFocus = _columns.IndexOf(value);
+                TabManager.CurrentFocusColumnIndex = _oldFocus = _columns.IndexOf(value);
                 previous.UpdateFocus();
                 value.UpdateFocus();
                 RaisePropertyChanged();
@@ -64,7 +64,7 @@ namespace StarryEyes.ViewModels.WindowParts
         {
             var ci = _columns.IndexOf(column);
             var ti = column.Tabs.IndexOf(tab);
-            MainAreaModel.CloseTab(ci, ti);
+            TabManager.CloseTab(ci, ti);
         }
 
         void MainWindowModel_OnTimelineFocusRequested(TimelineFocusRequest req)

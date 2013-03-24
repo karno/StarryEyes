@@ -301,7 +301,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             var users = SelectedStatuses
                 .Select(s => s.OriginalStatus.User.ScreenName)
                 .Distinct();
-            MainAreaModel.CreateTab(
+            TabManager.CreateTab(
                 new TabModel("extracted",
                              "from all where " +
                              users.Select(u => "user == \"^" + u + "$\"")

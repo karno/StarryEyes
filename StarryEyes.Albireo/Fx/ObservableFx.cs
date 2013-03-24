@@ -169,9 +169,11 @@ namespace System.Reactive.Linq
                                                                    Func<T, TKey> keySelector, bool descending)
         {
             var queues = new List<CompletableQueue<T>>();
-            return orderedObservables
+            var observablePair = orderedObservables
                 .Select(observable => new { Queue = new CompletableQueue<T>(), Observable = observable })
-                .Do(set => queues.Add(set.Queue))
+                .Do(pair => queues.Add(pair.Queue))
+                .ToArray();
+            return observablePair
                 .ToObservable()
                 .SelectMany(set => set.Observable
                                       .Do(set.Queue.SynchronizedEnqueue)
@@ -179,26 +181,29 @@ namespace System.Reactive.Linq
                 .Materialize()
                 .SelectMany(n =>
                 {
-                    var returns = new List<Notification<T>>();
-                    // dequeue and check items
-                    while (queues.All(q => q.IsCompleted || q.SynchorizedCount > 0) &&
-                           queues.Any(q => q.SynchorizedCount > 0))
+                    lock (queues)
                     {
-                        var dequeues = queues.Where(q => q.SynchorizedCount > 0)
-                                             .Select(q => q.SynchornizedDequeue());
-                        var ordered = descending
-                                          ? dequeues.OrderByDescending(keySelector)
-                                          : dequeues.OrderBy(keySelector);
-                        ordered
-                            .Select(Notification.CreateOnNext)
-                            .ForEach(returns.Add);
+                        var returns = new List<Notification<T>>();
+                        // dequeue and check items
+                        while (queues.All(q => q.IsCompleted || q.SynchorizedCount > 0) &&
+                               queues.Any(q => q.SynchorizedCount > 0))
+                        {
+                            var dequeues = queues.Where(q => q.SynchorizedCount > 0)
+                                                 .Select(q => q.SynchornizedDequeue());
+                            var ordered = descending
+                                              ? dequeues.OrderByDescending(keySelector)
+                                              : dequeues.OrderBy(keySelector);
+                            ordered
+                                .Select(Notification.CreateOnNext)
+                                .ForEach(returns.Add);
+                        }
+                        if (n.Kind == NotificationKind.OnCompleted)
+                        {
+                            // clean up all queues
+                            returns.Add(Notification.CreateOnCompleted<T>());
+                        }
+                        return returns;
                     }
-                    if (n.Kind == NotificationKind.OnCompleted)
-                    {
-                        // clean up all queues
-                        returns.Add(Notification.CreateOnCompleted<T>());
-                    }
-                    return returns;
                 })
                 .Dematerialize();
         }

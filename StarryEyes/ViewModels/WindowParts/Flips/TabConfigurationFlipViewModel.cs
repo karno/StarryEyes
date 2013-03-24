@@ -57,7 +57,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             {
                 _currentConfigurationTarget.Name = value;
                 RaisePropertyChanged();
-                MainAreaModel.Save();
+                TabManager.Save();
             }
         }
 
@@ -68,7 +68,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             {
                 _currentConfigurationTarget.IsShowUnreadCounts = value;
                 RaisePropertyChanged();
-                MainAreaModel.Save();
+                TabManager.Save();
             }
         }
 
@@ -79,7 +79,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             {
                 _currentConfigurationTarget.IsNotifyNewArrivals = value;
                 RaisePropertyChanged();
-                MainAreaModel.Save();
+                TabManager.Save();
             }
         }
 
@@ -154,11 +154,13 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 }
                 else
                 {
+                    // writeback query edit result
+                    _currentConfigurationTarget.FilterQuery = _filterQuery;
                     _currentConfigurationTarget.ConfigurationUpdated(false);
                 }
                 // regenerate timeline
             }
-            MainAreaModel.Save();
+            TabManager.Save();
         }
     }
 }
