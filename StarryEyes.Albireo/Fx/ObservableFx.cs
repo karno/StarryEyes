@@ -200,14 +200,7 @@ namespace System.Reactive.Linq
                     }
                     return returns;
                 })
-                .Dematerialize()
-                .Finally(() =>
-                {
-                    if (queues.Any(q => q.Queue.Count > 0))
-                    {
-                        throw new InvalidOperationException("QUEUE REMAIN!");
-                    }
-                });
+                .Dematerialize();
         }
 
         private class CompletableQueue<T>
