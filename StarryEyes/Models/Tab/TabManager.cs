@@ -72,7 +72,6 @@ namespace StarryEyes.Models.Tab
             App.RaiseUserInterfaceReady();
         }
 
-
         /// <summary>
         /// Save tab info to configuration file.
         /// </summary>

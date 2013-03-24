@@ -39,6 +39,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         public StatusViewModel(TimelineViewModelBase parent, TwitterStatus status,
                                IEnumerable<long> initialBoundAccounts)
         {
+            var sw = new System.Diagnostics.Stopwatch();
             _parent = parent;
             // get status model
             Model = StatusModel.Get(status);

@@ -89,7 +89,6 @@
     <Compile Include="Api\Parsing\JsonFormats\LookupInfoJson.cs" />
     <Compile Include="Api\Parsing\JsonFormats\SavedSearchJson.cs" />
     <Compile Include="Api\Parsing\JsonFormats\SearchJson.cs" />
-    <Compile Include="Api\Parsing\JsonFormats\SearchTweetJson.cs" />
     <Compile Include="Api\Parsing\JsonFormats\StreamingAdditionalJson.cs" />
     <Compile Include="Api\Parsing\JsonFormats\StreamingEventJson.cs" />
     <Compile Include="Api\Parsing\JsonFormats\TrendAvailableInfoJson.cs" />

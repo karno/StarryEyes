@@ -143,19 +143,26 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             this.IsConfigurationActive = false;
             if (_currentConfigurationTarget != null)
             {
-                if (_filterQuery.ToQuery() != _initialQuery && _currentConfigurationTarget.IsActivated)
+                if (_filterQuery.ToQuery() != _initialQuery)
                 {
-                    _currentConfigurationTarget.Deactivate();
-                    // update query info
-                    _currentConfigurationTarget.FilterQuery = _filterQuery;
-                    // finalize
-                    _currentConfigurationTarget.Activate();
+
+                    if (_currentConfigurationTarget.IsActivated)
+                    {
+                        _currentConfigurationTarget.Deactivate();
+                        // update query info
+                        _currentConfigurationTarget.FilterQuery = _filterQuery;
+                        // finalize
+                        _currentConfigurationTarget.Activate();
+                    }
+                    else
+                    {
+                        _currentConfigurationTarget.FilterQuery = _filterQuery;
+                    }
                     _currentConfigurationTarget.ConfigurationUpdated(true);
                 }
                 else
                 {
                     // writeback query edit result
-                    _currentConfigurationTarget.FilterQuery = _filterQuery;
                     _currentConfigurationTarget.ConfigurationUpdated(false);
                 }
                 // regenerate timeline

@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Livet;
 using Livet.Messaging;
 using StarryEyes.Filters.Expressions;
@@ -241,7 +242,7 @@ namespace StarryEyes.ViewModels
             // Start receiving
             if (AccountsStore.Accounts.Any())
             {
-                UserBaseConnectionsManager.Update();
+                Task.Run(() => UserBaseConnectionsManager.Update());
             }
             else
             {
@@ -254,7 +255,7 @@ namespace StarryEyes.ViewModels
                             AuthenticateInfo = _,
                             IsUserStreamsEnabled = true
                         });
-                    UserBaseConnectionsManager.Update();
+                    Task.Run(() => UserBaseConnectionsManager.Update());
                 });
                 Messenger.RaiseAsync(new TransitionMessage(
                                          typeof(AuthorizationWindow),

@@ -19,7 +19,7 @@ namespace StarryEyes.Models.Stores
     /// </summary>
     public static class StatusStore
     {
-        private const int ChunkCount = 32;
+        private const int ChunkCount = 4;
 
         #region publish block
 

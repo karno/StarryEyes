@@ -97,6 +97,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         private void Rebind(ObservableCollection<StatusViewModel> ctl)
         {
+            if (TimelineModel == null) return;
             lock (_collectionLock)
             {
                 _isCollectionAddEnabled = false;

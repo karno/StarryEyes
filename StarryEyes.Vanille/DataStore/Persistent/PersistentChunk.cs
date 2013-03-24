@@ -246,7 +246,6 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                 // release memory
                 workingCopy.Clear();
 
-                GC.Collect(); // collect garbage.
                 Thread.Sleep(0);
             }
         }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -46,7 +47,7 @@ namespace StarryEyes.Views.Utils
             "TwitterStatus",
             typeof(TwitterStatus),
             typeof(StatusStylizer),
-            new PropertyMetadata((o, e) =>
+            new PropertyMetadata(async (o, e) =>
             {
                 var status = (TwitterStatus)e.NewValue;
                 var textBlock = (TextBlock)o;
@@ -57,14 +58,8 @@ namespace StarryEyes.Views.Utils
                     return;
 
                 // generate contents
-                if (status.IsDataLacking)
-                {
-                    GenerateInlines(o, status.Text).ForEach(textBlock.Inlines.Add);
-                }
-                else
-                {
-                    GenerateInlines(o, status).ForEach(textBlock.Inlines.Add);
-                }
+                var inlines = await Task.Run(() => GenerateInlines(o, status.Text));
+                inlines.ForEach(textBlock.Inlines.Add);
             }));
 
         public static string GetText(DependencyObject obj)

@@ -170,6 +170,7 @@ namespace StarryEyes.Models.Connections.UserDependencies
 
         private void HandleException(Exception ex)
         {
+            System.Diagnostics.Debug.WriteLine(ex);
             Disconnect();
             var wex = ex as WebException;
             if (wex != null)
@@ -299,6 +300,7 @@ namespace StarryEyes.Models.Connections.UserDependencies
 
         private void RaiseDisconnectedByError(string header, string detail)
         {
+            System.Diagnostics.Debug.WriteLine(header + detail);
             BackpanelModel.RegisterEvent(
                 new UserStreamsDisconnectedEvent(
                     AuthInfo, header + detail,

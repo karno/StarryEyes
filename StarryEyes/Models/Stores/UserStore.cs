@@ -12,7 +12,7 @@ namespace StarryEyes.Models.Stores
 {
     public static class UserStore
     {
-        private const int ChunkCount = 16;
+        private const int ChunkCount = 8;
 
         private static DataStoreBase<long, TwitterUser> _store;
 

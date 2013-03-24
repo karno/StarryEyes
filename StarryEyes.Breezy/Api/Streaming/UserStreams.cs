@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reactive.Concurrency;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using Codeplex.OAuth;
 using Newtonsoft.Json;
@@ -30,10 +31,9 @@ namespace StarryEyes.Breezy.Api.Streaming
             return info.GetOAuthClient(useGzip: false)
                        .SetEndpoint(EndpointUserStreams)
                        .SetParameters(param)
-                       .GetResponse()
-                       .SelectMany(res => res.DownloadStringLineAsync())
+                       .GetResponseLines()
                        .Where(s => !String.IsNullOrEmpty(s))
-                       .ObserveOn(TaskPoolScheduler.Default)
+                       .ObserveOn(new EventLoopScheduler())
                        .ParseStreamingElement();
         }
 

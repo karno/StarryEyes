@@ -130,6 +130,11 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
             var cache = Model.TabContentCache;
             Model.TabContentCache = null;
+            if (cache != null && cache.Length <= TimelineModel.TimelineChunkCount)
+            {
+                // empty cache, maybe corrupted
+                cache = null;
+            }
 
             var initload = cache != null
                                        ? Observable.Start(() => Model.Timeline.ReadFromCache(cache))

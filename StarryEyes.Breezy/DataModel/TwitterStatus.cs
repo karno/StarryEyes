@@ -38,12 +38,6 @@ namespace StarryEyes.Breezy.DataModel
         public StatusType StatusType { get; set; }
 
         /// <summary>
-        /// Lacking status data (get from search api?)
-        /// </summary>
-        [DataMember]
-        public bool IsDataLacking { get; set; }
-
-        /// <summary>
         /// User of this tweet/message.
         /// </summary>
         [DataMember]
@@ -241,7 +235,6 @@ namespace StarryEyes.Breezy.DataModel
         {
             writer.Write(Id);
             writer.Write((int)StatusType);
-            writer.Write(IsDataLacking);
             writer.Write(User);
             writer.Write(Text);
             writer.Write(CreatedAt);
@@ -272,7 +265,6 @@ namespace StarryEyes.Breezy.DataModel
         {
             Id = reader.ReadInt64();
             StatusType = (StatusType)reader.ReadInt32();
-            IsDataLacking = reader.ReadBoolean();
             User = reader.ReadObject<TwitterUser>();
             Text = reader.ReadString();
             CreatedAt = reader.ReadDateTime();

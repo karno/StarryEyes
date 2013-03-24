@@ -166,7 +166,6 @@ namespace StarryEyes.Models.Tab
             finally
             {
                 Interlocked.Exchange(ref _trimCount, 0);
-                GC.Collect();
             }
         }
     }

@@ -44,7 +44,6 @@ namespace StarryEyes.Breezy.Api.Parsing.JsonFormats
             {
                 StatusType = StatusType.Tweet,
                 Id = id_str.ParseLong(),
-                IsDataLacking = false,
                 Source = source,
                 Text = XmlParser.ResolveEntity(text),
                 IsFavored = favorited,
