@@ -99,6 +99,19 @@ namespace StarryEyes.Settings.KeyAssigns
 
         public IEnumerable<KeyAssignActionDescription> Actions { get; set; }
 
+        public string GetKeyDescribeString()
+        {
+            var builder = new StringBuilder();
+            if (Modifiers.HasFlag(ModifierKeys.Control))
+                builder.Append("Ctrl+");
+            if (Modifiers.HasFlag(ModifierKeys.Alt))
+                builder.Append("Alt+");
+            if (Modifiers.HasFlag(ModifierKeys.Shift))
+                builder.Append("Shift+");
+            builder.Append(Key.ToString());
+            return builder.ToString();
+        }
+
         /// <summary>
         /// Get formatted string.
         /// </summary>
@@ -107,13 +120,7 @@ namespace StarryEyes.Settings.KeyAssigns
             var builder = new StringBuilder();
             if (HandlePreview)
                 builder.Append("!");
-            if (Modifiers.HasFlag(ModifierKeys.Control))
-                builder.Append("Ctrl+");
-            if (Modifiers.HasFlag(ModifierKeys.Alt))
-                builder.Append("Alt+");
-            if (Modifiers.HasFlag(ModifierKeys.Shift))
-                builder.Append("Shift+");
-            builder.Append(Key.ToString());
+            builder.Append(GetKeyDescribeString());
             builder.Append(": ");
             builder.Append(Actions.Select(a => a.ToString()).JoinString(","));
             return builder.ToString();

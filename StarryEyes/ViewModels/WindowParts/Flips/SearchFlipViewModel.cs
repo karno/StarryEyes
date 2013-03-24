@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using System.Reactive.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -6,7 +8,9 @@ using Livet.Messaging;
 using StarryEyes.Filters;
 using StarryEyes.Filters.Parsing;
 using StarryEyes.Models;
+using StarryEyes.Settings;
 using StarryEyes.ViewModels.WindowParts.Flips.SearchFlips;
+using StarryEyes.Views.Triggers;
 using StarryEyes.Views.Utils;
 
 namespace StarryEyes.ViewModels.WindowParts.Flips
@@ -27,6 +31,11 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         {
             if (DesignTimeUtil.IsInDesignMode) return;
             _candidateViewModel = new SearchCandidateViewModel(this);
+            this.CompositeDisposable.Add(
+                Observable.FromEvent(
+                    h => KeyAssignManager.OnKeyAssignChanged += h,
+                    h => KeyAssignManager.OnKeyAssignChanged -= h)
+                          .Subscribe(_ => RaisePropertyChanged(() => SearchHintLabel)));
         }
 
         private bool _isSearchResultAvailable;
@@ -211,9 +220,26 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             }
         }
 
+        private string _searchHintKeyAssign;
         public string SearchHintLabel
         {
-            get { return "search (Ctrl+Q)"; }
+            get
+            {
+                if (_searchHintKeyAssign == null)
+                {
+                    var action = KeyAssignManager.CurrentProfile.FindAssignFromActionName("FocusToSearch")
+                                                 .FirstOrDefault();
+                    if (action != null)
+                    {
+                        _searchHintKeyAssign = " (" + action.GetKeyDescribeString() + ")";
+                    }
+                    else
+                    {
+                        _searchHintKeyAssign = String.Empty;
+                    }
+                }
+                return "search" + _searchHintKeyAssign;
+            }
         }
 
         private readonly Regex _userScreenNameRegex = new Regex("^[A-Za-z0-9_]+$", RegexOptions.Compiled);

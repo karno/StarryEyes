@@ -145,5 +145,45 @@ namespace StarryEyes.Settings.KeyAssigns
             }
             return iteration;
         }
+
+        public IEnumerable<KeyAssign> FindAssignFromActionName(string actionName, KeyAssignGroup? searchFrom = null)
+        {
+            return EnumerateAssigns(searchFrom)
+                .Where(k => k.Actions.Count() == 1 &&
+                    k.Actions.First().ActionName == actionName);
+        }
+
+        public IEnumerable<KeyAssign> FindAssignFromActionName(IEnumerable<string> actionNames, KeyAssignGroup? searchFrom = null)
+        {
+            return EnumerateAssigns(searchFrom)
+                .Where(k => k.Actions.Count() == 1 &&
+                    k.Actions.Select(a => a.ActionName).SequenceEqual(actionNames));
+        }
+
+        private IEnumerable<KeyAssign> EnumerateAssigns(KeyAssignGroup? searchFrom = null)
+        {
+            if (searchFrom == null)
+            {
+                return EnumerableEx.Concat(
+                    GlobalBindings.Values,
+                    TimelineBindings.Values,
+                    InputBindings.Values,
+                    SearchBindings.Values)
+                                   .SelectMany(items => items);
+            }
+            switch (searchFrom.Value)
+            {
+                case KeyAssignGroup.Global:
+                    return GlobalBindings.Values.SelectMany(items => items);
+                case KeyAssignGroup.Timeline:
+                    return TimelineBindings.Values.SelectMany(items => items);
+                case KeyAssignGroup.Input:
+                    return InputBindings.Values.SelectMany(items => items);
+                case KeyAssignGroup.Search:
+                    return SearchBindings.Values.SelectMany(items => items);
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
     }
 }
