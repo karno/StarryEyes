@@ -332,40 +332,45 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// <returns></returns>
         public IObservable<TValue> Find(Func<TValue, bool> predicate, FindRange<TKey> range, int? returnLowerBound)
         {
-            return
-                Observable.Defer(() => Observable.Merge(
-                    Observable.Start(() =>
+            return new[]
+            {
+                Observable.Start(() =>
+                {
+                    lock (_aliveCachesLocker)
                     {
-                        lock (_aliveCachesLocker)
-                        {
-                            return _aliveCaches
-                                .CheckRange(range, _parent.GetKey)
-                                .Where(predicate)
-                                .ToArray();
-                        }
+                        return _aliveCaches
+                            .CheckRange(range, _parent.GetKey)
+                            .Where(predicate)
+                            .OrderBy(_parent.GetKey)
+                            .ToArray();
+                    }
 
-                    }),
-                    Observable.Start(() =>
+                }),
+                Observable.Start(() =>
+                {
+                    lock (_deadlyCachesLocker)
                     {
-                        lock (_deadlyCachesLocker)
-                        {
-                            return _deadlyCaches
-                                .Select(v => v.Item)
-                                .CheckRange(range, _parent.GetKey)
-                                .Where(predicate)
-                                .ToArray();
-                        }
-                    }),
-                    Observable.Start(() =>
+                        return _deadlyCaches
+                            .Select(v => v.Item)
+                            .CheckRange(range, _parent.GetKey)
+                            .Where(predicate)
+                            .OrderBy(_parent.GetKey)
+                            .ToArray();
+                    }
+                }),
+                Observable.Start(() =>
+                {
+                    using (AcquireDriveLock())
                     {
-                        using (AcquireDriveLock())
-                        {
-                            return _persistentDrive
-                                .Find(predicate, range, returnLowerBound)
-                                .ToArray();
-                        }
-                    })))
-                .SelectMany(_ => _)
+                        return _persistentDrive
+                            .Find(predicate, range, returnLowerBound)
+                            .ToArray();
+                    }
+                }
+                    )
+            }
+                .Select(observable => observable.SelectMany(items => items))
+                .MergeOrderByDescending(_parent.GetKey)
                 .Distinct(v => _parent.GetKey(v));
         }
 

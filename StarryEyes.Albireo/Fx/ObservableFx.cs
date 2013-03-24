@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reactive.Concurrency;
+using System.Reactive.Subjects;
 
 // ReSharper disable CheckNamespace
 namespace System.Reactive.Linq
@@ -150,6 +151,106 @@ namespace System.Reactive.Linq
                     next().Materialize() : Observable.Return(n))
                 .SelectMany(ns => ns)
                 .Dematerialize();
+        }
+
+        public static IObservable<T> MergeOrderBy<T, TKey>(this IEnumerable<IObservable<T>> orderedObservables,
+                                                           Func<T, TKey> keySelector)
+        {
+            return orderedObservables.MergeOrderByCore(keySelector, false);
+        }
+
+        public static IObservable<T> MergeOrderByDescending<T, TKey>(this IEnumerable<IObservable<T>> orderedObservables,
+                                                                   Func<T, TKey> keySelector)
+        {
+            return orderedObservables.MergeOrderByCore(keySelector, true);
+        }
+
+        private static IObservable<T> MergeOrderByCore<T, TKey>(this IEnumerable<IObservable<T>> orderedObservables,
+                                                                   Func<T, TKey> keySelector, bool descending)
+        {
+            var queues = new List<CompletableQueue<T>>();
+            return orderedObservables
+                .Select(observable => new { Queue = new CompletableQueue<T>(), Observable = observable })
+                .Do(set => queues.Add(set.Queue))
+                .ToObservable()
+                .SelectMany(set => set.Observable
+                                      .Do(set.Queue.SynchronizedEnqueue)
+                                      .Finally(() => set.Queue.IsCompleted = true))
+                .Materialize()
+                .SelectMany(n =>
+                {
+                    var returns = new List<Notification<T>>();
+                    // dequeue and check items
+                    while (queues.All(q => q.IsCompleted || q.SynchorizedCount > 0) &&
+                           queues.Any(q => q.SynchorizedCount > 0))
+                    {
+                        var dequeues = queues.Where(q => q.SynchorizedCount > 0)
+                                             .Select(q => q.SynchornizedDequeue());
+                        var ordered = descending
+                                          ? dequeues.OrderByDescending(keySelector)
+                                          : dequeues.OrderBy(keySelector);
+                        ordered
+                            .Select(Notification.CreateOnNext)
+                            .ForEach(returns.Add);
+                    }
+                    if (n.Kind == NotificationKind.OnCompleted)
+                    {
+                        // clean up all queues
+                        returns.Add(Notification.CreateOnCompleted<T>());
+                    }
+                    return returns;
+                })
+                .Dematerialize()
+                .Finally(() =>
+                {
+                    if (queues.Any(q => q.Queue.Count > 0))
+                    {
+                        throw new InvalidOperationException("QUEUE REMAIN!");
+                    }
+                });
+        }
+
+        private class CompletableQueue<T>
+        {
+            public bool IsCompleted { get; set; }
+
+            private readonly Queue<T> _queue = new Queue<T>();
+            public Queue<T> Queue
+            {
+                get { return _queue; }
+            }
+
+            public void SynchronizedEnqueue(T item)
+            {
+                lock (_queue)
+                {
+                    _queue.Enqueue(item);
+                }
+            }
+
+            public int SynchorizedCount
+            {
+                get
+                {
+                    lock (_queue)
+                    {
+                        return _queue.Count;
+                    }
+                }
+            }
+
+            public T SynchornizedDequeue()
+            {
+                lock (_queue)
+                {
+                    return _queue.Dequeue();
+                }
+            }
+
+            public override string ToString()
+            {
+                return "Queue: " + _queue + " , Completed: " + IsCompleted;
+            }
         }
 
         public static IObservable<T> OrderBy<T, TKey>(this IObservable<T> observable,

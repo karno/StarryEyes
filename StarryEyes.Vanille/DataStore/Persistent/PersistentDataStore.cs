@@ -123,8 +123,8 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                                                  FindRange<TKey> range = null, int? itemCount = null)
         {
             return _chunks
-                .ToObservable()
-                .SelectMany(c => c.Find(predicate, range, itemCount));
+                .Select(c => c.Find(predicate, range, itemCount))
+                .MergeOrderByDescending(GetKey);
         }
 
         /// <summary>

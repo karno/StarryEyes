@@ -115,9 +115,7 @@ namespace StarryEyes.Models.Stores
             if (count == null)
                 return result;
             return result
-                .Distinct(_ => _.Id)
-                .OrderByDescending(_ => _.Id)
-                .Take(count.Value);
+                .Distinct(_ => _.Id);
         }
 
         private const int BatchWaitSec = 5;
@@ -169,7 +167,6 @@ namespace StarryEyes.Models.Stores
             }
             return batch
                 .Where(predicate)
-                .OrderByDescending(_ => _.Id)
                 .Take(count);
         }
 

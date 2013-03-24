@@ -13,7 +13,7 @@ namespace StarryEyes.Models.Backpanels.SystemEvents
 
         public override SystemEventKind Kind
         {
-            get { return SystemEventKind.Error; }
+            get { return SystemEventKind.Warning; }
         }
 
         public override string Id

@@ -1,5 +1,6 @@
 ﻿using System;
 using StarryEyes.Breezy.Authorize;
+using StarryEyes.Views;
 
 namespace StarryEyes.Models.Backpanels.SystemEvents
 {
