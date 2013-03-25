@@ -57,6 +57,7 @@ namespace StarryEyes.Breezy.Api.Streaming
             return observable
                 .Select(s =>
                 {
+                    System.Diagnostics.Debug.WriteLine("JSON: " + s);
                     var desz = s.DeserializeJson<StreamingEventJson>();
                     EventType eventType = (desz == null ? null : desz.event_kind).ToEventType();
                     switch (eventType)
@@ -68,14 +69,14 @@ namespace StarryEyes.Breezy.Api.Streaming
                                 {
                                     Status = tweet.Spawn(),
                                 };
-                            var dmsg = s.DeserializeJson<DirectMessageJson>();
-                            if (dmsg != null && dmsg.id_str != null)
+                            var dmsg = s.DeserializeJson<DirectMessageWrappedJson>();
+                            if (dmsg != null && dmsg.direct_message != null)
                                 return new TwitterStreamingElement
                                 {
                                     Status = dmsg.Spawn(),
                                 };
                             var deleted = s.DeserializeJson<StreamingDeleteJson>();
-                            if (deleted != null && deleted.status != null)
+                            if (deleted != null && deleted.delete != null)
                                 return deleted.Spawn();
                             var track = s.DeserializeJson<StreamingTrackJson>();
                             if (track != null && track.track != 0)

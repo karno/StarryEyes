@@ -90,6 +90,9 @@ namespace StarryEyes.Models.Connections.UserDependencies
 
         private void Register(TwitterStreamingElement elem)
         {
+            System.Diagnostics.Debug.WriteLine(elem.EventType + (elem.EventType != EventType.Empty
+                                                                     ? ""
+                                                                     : "-> " + elem.Status + " DEL: " + elem.DeletedId));
             _hardErrorRetryCount = 0; // initialize error count
             switch (elem.EventType)
             {

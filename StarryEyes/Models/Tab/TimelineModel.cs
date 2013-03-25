@@ -36,16 +36,23 @@ namespace StarryEyes.Models.Tab
             _statusIdCache = new AVLTree<long>();
             _disposable = new CompositeDisposable();
 
-            // add handler
+            // register handler
             _disposable.Add(StatusStore.StatusPublisher
-                                       .Where(sn => sn.IsAdded && evaluator(sn.Status))
-                                       .Select(s => s.Status)
-                                       .Subscribe(AddStatus));
-            // remove handler
-            _disposable.Add(StatusStore.StatusPublisher
-                                       .Where(sn => !sn.IsAdded || !evaluator(sn.Status))
-                                       .Select(s => s.StatusId)
-                                       .Subscribe(RemoveStatus));
+                .Subscribe(sn =>
+                {
+                    if (sn.IsAdded && evaluator(sn.Status))
+                    {
+                        AddStatus(sn.Status);
+                    }
+                    else
+                    {
+                        if (!sn.IsAdded)
+                        {
+                            System.Diagnostics.Debug.WriteLine("ツイ消しを見た: " + sn.StatusId);
+                        }
+                        RemoveStatus(sn.StatusId);
+                    }
+                }));
         }
 
         public ObservableSynchronizedCollectionEx<TwitterStatus> Statuses
@@ -121,6 +128,7 @@ namespace StarryEyes.Models.Tab
             }
             if (remove)
             {
+                System.Diagnostics.Debug.WriteLine("消さなあかんな: " + id);
                 // remove
                 _statuses.RemoveWhere(s => s.Id == id);
             }

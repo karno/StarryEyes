@@ -253,6 +253,9 @@
     <Compile Include="Settings\KeyAssigns\KeyAssignProfile.cs" />
     <Compile Include="Settings\TabDescription.cs" />
     <Compile Include="ViewModels\Dialogs\KeyOverrideViewModel.cs" />
+    <Compile Include="ViewModels\WindowParts\Common\FilterEditControlViewModel.cs" />
+    <Compile Include="ViewModels\WindowParts\Common\FilterEditor\FilterPredicateViewModelBase.cs" />
+    <Compile Include="ViewModels\WindowParts\Common\FilterEditor\FilterSourceViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\AccountSelectionFlipViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\BackpanelViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\PartialFlipViewModelBase.cs" />
@@ -472,6 +475,7 @@
     <Folder Include="ViewModels\Notifications\" />
     <Folder Include="ViewModels\WindowParts\Backpanels\" />
     <Folder Include="Views\Notifications\" />
+    <Folder Include="Views\WindowParts\Common\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ReactiveOAuth\ReactiveOAuth.csproj">

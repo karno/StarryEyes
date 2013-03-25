@@ -95,7 +95,9 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             {
                 _currentQueryString = value;
                 RaisePropertyChanged();
-                CheckCompile(value);
+                Observable.Timer(TimeSpan.FromMilliseconds(100))
+                          .Where(_ => _currentQueryString == value)
+                          .Subscribe(_ => CheckCompile(value));
             }
         }
 

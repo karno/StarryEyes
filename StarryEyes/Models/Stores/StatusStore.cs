@@ -175,16 +175,19 @@ namespace StarryEyes.Models.Stores
         /// </summary>
         /// <param name="id">removing tweet's id</param>
         /// <param name="publish">publish removing notification to children</param>
-        public static async void Remove(long id, bool publish = true)
+        public static void Remove(long id, bool publish = true)
         {
             if (_isInShutdown) return;
             if (publish)
                 _statusPublisher.OnNext(new StatusNotification(id, false));
-            var removal = await Get(id);
-            if (removal == null) return;
-            _store.Remove(id);
-            if (publish)
-                _statusPublisher.OnNext(new StatusNotification(removal, false));
+            Get(id)
+                .Subscribe(removal =>
+                {
+                    if (removal == null) return;
+                    _store.Remove(id);
+                    if (publish)
+                        _statusPublisher.OnNext(new StatusNotification(removal, false));
+                });
         }
 
         /// <summary>

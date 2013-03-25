@@ -68,6 +68,5 @@ namespace StarryEyes.Filters.Expressions
         {
             Operator.EndLifecycle();
         }
-
     }
 }

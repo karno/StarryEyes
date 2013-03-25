@@ -18,6 +18,16 @@ namespace StarryEyes.Breezy.Api.Parsing.JsonFormats
 
     public class StreamingDeleteJson : ITwitterStreamingElementSpawnable
     {
+        public StreamingDeleteContentJson delete { get; set; }
+
+        public TwitterStreamingElement Spawn()
+        {
+            return delete.Spawn();
+        }
+    }
+
+    public class StreamingDeleteContentJson : ITwitterStreamingElementSpawnable
+    {
         public StreamingIdJson status { get; set; }
 
         public StreamingIdJson direct_message { get; set; }

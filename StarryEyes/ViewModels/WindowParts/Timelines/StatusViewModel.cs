@@ -226,12 +226,12 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public bool CanFavorite
         {
-            get { return !IsDirectMessage; }
+            get { return !IsDirectMessage && (Setting.AllowFavoriteMyself.Value || !IsMyself); }
         }
 
         public bool CanFavoriteImmediate
         {
-            get { return CanFavorite && (Setting.AllowFavoriteMyself.Value || !IsMyselfStrict); }
+            get { return CanFavorite; }
         }
 
         public bool CanRetweet
@@ -546,10 +546,16 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         public void ToggleFavoriteImmediate()
         {
             if (!AssertQuickActionEnabled()) return;
+            if (IsDirectMessage)
+            {
+                NotifyQuickActionFailed("このツイートはお気に入り登録できません。",
+                                        "ダイレクトメッセージはお気に入り登録できません。");
+                return;
+            }
             if (!CanFavoriteImmediate && !IsFavorited)
             {
-                NotifyQuickActionFailed("このツイートは現在のアカウントからお気に入り登録できません。",
-                    "Krile上で自分自身のツイートをお気に入り登録しないよう設定されています。");
+                NotifyQuickActionFailed("このツイートはお気に入り登録できません。",
+                                        "自分自身のツイートをお気に入り登録しないよう設定されています。");
                 return;
             }
             Favorite(GetImmediateAccounts(), !IsFavorited);
@@ -639,6 +645,13 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public void ToggleFavorite()
         {
+            if (!CanFavorite)
+            {
+                NotifyQuickActionFailed("このツイートはお気に入り登録できません。",
+                                        IsDirectMessage ? "ダイレクトメッセージはお気に入り登録できません。" :
+                                        "自分自身のツイートをお気に入り登録しないよう設定されています。");
+                return;
+            }
             AuthenticateInfo[] favoriteds =
                 AccountsStore.Accounts
                              .Where(a => Model.IsFavorited(a.UserId))
@@ -663,6 +676,10 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public void ToggleRetweet()
         {
+            if (!CanRetweet)
+            {
+                return;
+            }
             AuthenticateInfo[] retweeteds =
                 AccountsStore.Accounts
                              .Where(a => Model.IsRetweeted(a.UserId))

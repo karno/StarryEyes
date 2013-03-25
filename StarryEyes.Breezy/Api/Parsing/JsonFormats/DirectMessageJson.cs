@@ -4,6 +4,15 @@ using StarryEyes.Breezy.Util;
 
 namespace StarryEyes.Breezy.Api.Parsing.JsonFormats
 {
+    public class DirectMessageWrappedJson
+    {
+        public DirectMessageJson direct_message { get; set; }
+
+        public TwitterStatus Spawn()
+        {
+            return direct_message.Spawn();
+        }
+    }
     public class DirectMessageJson
     {
         public string id_str { get; set; }

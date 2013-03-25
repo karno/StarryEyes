@@ -22,10 +22,7 @@ namespace StarryEyes.Breezy.Api
 
         public static string JoinUrl(this string endpoint, string url)
         {
-            if (url.StartsWith("/"))
-                return endpoint + url.Substring(1);
-            else
-                return endpoint + url;
+            return endpoint + (url.StartsWith("/") ? url.Substring(1) : url);
         }
 
         /// <summary>
@@ -41,16 +38,14 @@ namespace StarryEyes.Breezy.Api
         /// <summary>
         /// Get OAuth client.
         /// </summary>
-        /// <param name="info"></param>
+        /// <param name="info">authentication information</param>
+        /// <param name="useGzip">flag of GZip enabled</param>
         /// <returns></returns>
         internal static OAuthClient GetOAuthClient(this AuthenticateInfo info, bool useGzip = true)
         {
             OAuthClient client = info.AccessToken.GetOAuthClient(
                 info.OverridedConsumerKey, info.OverridedConsumerSecret);
-            if (useGzip)
-                return client.UseGZip();
-            else
-                return client;
+            return useGzip ? client.UseGZip() : client;
         }
 
         internal static OAuthClient GetOAuthClient(this AccessToken token,
@@ -60,7 +55,10 @@ namespace StarryEyes.Breezy.Api
                 overrideConsumerSecret ?? DefaultConsumerSecret,
                 token)
             {
-                ApplyBeforeRequest = req => req.UserAgent = UserAgent
+                ApplyBeforeRequest = req =>
+                {
+                    req.UserAgent = UserAgent;
+                }
             };
         }
 
