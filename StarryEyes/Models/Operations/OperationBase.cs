@@ -1,7 +1,6 @@
 using System;
 using System.Net;
 using System.Reactive;
-using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 
@@ -51,7 +50,6 @@ namespace StarryEyes.Models.Operations
                     if (wex != null && wex.Response != null)
                     {
                         return Observable.Return(wex.Response)
-                            .ObserveOn(TaskPoolScheduler.Default)
                             .SelectMany(r => r.DownloadStringAsync())
                             .Select(ParseErrorMessage);
                     }

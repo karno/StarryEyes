@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading;
 
@@ -75,7 +76,7 @@ namespace StarryEyes.Models.Operations
             {
                 // operation acquired.
                 Observable.Defer(() => Observable.Return(operation))
-                    // .ObserveOn(TaskPoolScheduler.Default)
+                    .ObserveOn(TaskPoolScheduler.Default)
                     .SelectMany(_ => _.Run())
                     .Finally(() =>
                     {

@@ -4,8 +4,8 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Reactive;
-using System.Reactive.Concurrency;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 using System.Windows.Threading;
 using Livet;
 using Livet.EventListeners;
@@ -101,12 +101,10 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             lock (_collectionLock)
             {
                 _isCollectionAddEnabled = false;
-                StatusViewModel[] cache = ctl.ToArray();
+                var cache = ctl.ToArray();
                 ctl.Clear();
-                cache.ToObservable()
-                     .ObserveOn(TaskPoolScheduler.Default)
-                     .Subscribe(_ => _.Dispose());
-                TwitterStatus[] collection = TimelineModel.Statuses.ToArray();
+                Task.Run(() => cache.ForEach(c => c.Dispose()));
+                var collection = TimelineModel.Statuses.ToArray();
                 _isCollectionAddEnabled = true;
                 collection
                     .Select(GenerateStatusViewModel)

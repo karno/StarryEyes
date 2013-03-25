@@ -58,7 +58,7 @@ namespace StarryEyes.Views.Utils
                     return;
 
                 // generate contents
-                var inlines = await Task.Run(() => GenerateInlines(o, status.Text));
+                var inlines = await Task.Run(() => GenerateInlines(o, status));
                 inlines.ForEach(textBlock.Inlines.Add);
             }));
 
@@ -107,6 +107,14 @@ namespace StarryEyes.Views.Utils
 
         private static IEnumerable<Inline> GenerateInlines(DependencyObject obj, TwitterStatus status)
         {
+            if (status.Entities == null)
+            {
+                foreach (var inline in GenerateInlines(obj, status.Text))
+                {
+                    yield return inline;
+                }
+                yield break;
+            }
             if (status.RetweetedOriginal != null)
                 status = status.RetweetedOriginal; // change target
             var escaped = XmlParser.EscapeEntity(status.Text);
