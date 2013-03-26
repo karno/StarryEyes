@@ -45,9 +45,9 @@ namespace StarryEyes.Breezy.Api.Parsing.JsonFormats
                 StatusType = StatusType.Tweet,
                 Id = id_str.ParseLong(),
                 Source = source,
-                Text = XmlParser.ResolveEntity(text),
+                Text = ParsingExtension.ResolveEntity(text),
                 IsFavored = favorited,
-                CreatedAt = created_at.ParseDateTime(XmlParser.TwitterDateTimeFormat),
+                CreatedAt = created_at.ParseDateTime(ParsingExtension.TwitterDateTimeFormat),
                 InReplyToStatusId = in_reply_to_status_id_str == null || in_reply_to_status_id_str == "0" ? null :
                     (long?)in_reply_to_status_id_str.ParseLong(),
                 InReplyToUserId = in_reply_to_user_id_str == null || in_reply_to_user_id_str == "0" ? null :

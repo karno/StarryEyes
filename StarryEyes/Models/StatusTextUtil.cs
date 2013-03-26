@@ -42,12 +42,12 @@ namespace StarryEyes.Models
                 .JoinString("");
         }
 
-        private static string HtmlEscape(string raw)
+        private static string InternalEscape(string raw)
         {
             return raw.Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;").Replace("\"", "&quot;");
         }
 
-        private static string HtmlUnescape(string escaped)
+        private static string InternalUnescape(string escaped)
         {
             return escaped.Replace("&quot;", "\"").Replace("&lt;", "<").Replace("&gt;", ">").Replace("&amp;", "&");
         }
@@ -58,7 +58,7 @@ namespace StarryEyes.Models
         public static IEnumerable<TextToken> Tokenize(string raw)
         {
             if (String.IsNullOrEmpty(raw)) yield break;
-            var escaped = HtmlEscape(raw);
+            var escaped = InternalEscape(raw);
             escaped = RegexHelper.UrlRegex.Replace(escaped, m =>
             {
                 // # => &sharp; (ハッシュタグで再識別されることを防ぐ)
@@ -80,7 +80,7 @@ namespace StarryEyes.Models
                 if (s.Contains('>'))
                 {
                     var kind = s[0];
-                    var body = HtmlUnescape(s.Substring(2));
+                    var body = InternalUnescape(s.Substring(2));
                     switch (kind)
                     {
                         case 'U':
@@ -99,7 +99,7 @@ namespace StarryEyes.Models
                 }
                 else
                 {
-                    yield return new TextToken(TokenKind.Text, HtmlUnescape(s));
+                    yield return new TextToken(TokenKind.Text, InternalUnescape(s));
                 }
             }
         }

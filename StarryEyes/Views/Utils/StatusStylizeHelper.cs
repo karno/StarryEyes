@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -47,7 +46,7 @@ namespace StarryEyes.Views.Utils
             "TwitterStatus",
             typeof(TwitterStatus),
             typeof(StatusStylizer),
-            new PropertyMetadata(async (o, e) =>
+            new PropertyMetadata((o, e) =>
             {
                 var status = (TwitterStatus)e.NewValue;
                 var textBlock = (TextBlock)o;
@@ -58,8 +57,8 @@ namespace StarryEyes.Views.Utils
                     return;
 
                 // generate contents
-                var inlines = await Task.Run(() => GenerateInlines(o, status));
-                inlines.ForEach(textBlock.Inlines.Add);
+                GenerateInlines(o, status)
+                    .ForEach(textBlock.Inlines.Add);
             }));
 
         public static string GetText(DependencyObject obj)
@@ -118,7 +117,7 @@ namespace StarryEyes.Views.Utils
             }
             if (status.RetweetedOriginal != null)
                 status = status.RetweetedOriginal; // change target
-            var resolved = status.Text;
+            var escaped = ParsingExtension.EscapeEntity(status.Text);
             TwitterEntity prevEntity = null;
             foreach (var entity in status.Entities.Guard().OrderBy(e => e.StartIndex))
             {
@@ -128,20 +127,19 @@ namespace StarryEyes.Views.Utils
                 if (pidx < entity.StartIndex)
                 {
                     // output raw
-                    // yield return GenerateText(XmlParser.ResolveEntity(escaped.Substring(pidx, entity.StartIndex - pidx)));
-                    yield return GenerateText(resolved.Substring(pidx, entity.StartIndex - pidx));
+                    yield return GenerateText(ParsingExtension.ResolveEntity(escaped.Substring(pidx, entity.StartIndex - pidx)));
                 }
                 switch (entity.EntityType)
                 {
                     case EntityType.Hashtags:
-                        yield return GenerateHashtagLink(obj, XmlParser.ResolveEntity(entity.DisplayText));
+                        yield return GenerateHashtagLink(obj, ParsingExtension.ResolveEntity(entity.DisplayText));
                         break;
                     case EntityType.Media:
                     case EntityType.Urls:
-                        yield return GenerateLink(obj, entity.DisplayText, XmlParser.ResolveEntity(entity.OriginalText));
+                        yield return GenerateLink(obj, entity.DisplayText, ParsingExtension.ResolveEntity(entity.OriginalText));
                         break;
                     case EntityType.UserMentions:
-                        yield return GenerateUserLink(obj, entity.DisplayText, XmlParser.ResolveEntity(entity.DisplayText));
+                        yield return GenerateUserLink(obj, entity.DisplayText, ParsingExtension.ResolveEntity(entity.DisplayText));
                         break;
                 }
                 prevEntity = entity;
@@ -150,19 +148,11 @@ namespace StarryEyes.Views.Utils
             {
                 yield return GenerateText(status.Text);
             }
-            else if (prevEntity.EndIndex < resolved.Length)
+            else if (prevEntity.EndIndex < escaped.Length)
             {
                 yield return GenerateText(
-                    XmlParser.ResolveEntity(resolved.Substring(prevEntity.EndIndex, resolved.Length - prevEntity.EndIndex)));
+                    ParsingExtension.ResolveEntity(escaped.Substring(prevEntity.EndIndex, escaped.Length - prevEntity.EndIndex)));
             }
-
-            /*
-        else if (prevEntity.EndIndex < escaped.Length)
-        {
-            yield return GenerateText(
-                XmlParser.ResolveEntity(escaped.Substring(prevEntity.EndIndex, escaped.Length - prevEntity.EndIndex)));
-        }
-        */
         }
 
         private static IEnumerable<Inline> GenerateInlines(DependencyObject obj, string text)

@@ -6,7 +6,7 @@ namespace StarryEyes.Breezy.Util
     /// <summary>
     /// XML Node Parser
     /// </summary>
-    public static class XmlParser
+    public static class ParsingExtension
     {
         public const string TwitterDateTimeFormat = "ddd MMM d HH':'mm':'ss zzz yyyy";
 
@@ -229,7 +229,7 @@ namespace StarryEyes.Breezy.Util
         public static string ResolveEntity(string text)
         {
             return text
-                .Replace("&quot;", "\"")
+                // .Replace("&quot;", "\"")
                 .Replace("&lt;", "<")
                 .Replace("&gt;", ">")
                 .Replace("&amp;", "&");
@@ -239,9 +239,9 @@ namespace StarryEyes.Breezy.Util
         {
             return text
                 .Replace("&", "&amp;")
-                .Replace("\"", "&quot;")
-                .Replace("<", "&lt;")
-                .Replace(">", "&gt;");
+                .Replace(">", "&gt;")
+                .Replace("<", "&lt;");
+            // .Replace("\"", "&quot;")
         }
 
         #endregion

@@ -177,7 +177,7 @@ namespace StarryEyes.Breezy.DataModel
             var status = this;
             if (status.RetweetedOriginal != null)
                 status = status.RetweetedOriginal; // change target
-            var escaped = XmlParser.EscapeEntity(status.Text);
+            var escaped = ParsingExtension.EscapeEntity(status.Text);
             TwitterEntity prevEntity = null;
             foreach (var entity in status.Entities.Guard().OrderBy(e => e.StartIndex))
             {
@@ -187,7 +187,7 @@ namespace StarryEyes.Breezy.DataModel
                 if (pidx < entity.StartIndex)
                 {
                     // output raw
-                    builder.Append(XmlParser.ResolveEntity(escaped.Substring(pidx, entity.StartIndex - pidx)));
+                    builder.Append(ParsingExtension.ResolveEntity(escaped.Substring(pidx, entity.StartIndex - pidx)));
                 }
                 switch (entity.EntityType)
                 {
@@ -196,13 +196,13 @@ namespace StarryEyes.Breezy.DataModel
                         break;
                     case EntityType.Urls:
                         builder.Append(showFullUrl
-                                           ? XmlParser.ResolveEntity(entity.OriginalText)
-                                           : XmlParser.ResolveEntity(entity.DisplayText));
+                                           ? ParsingExtension.ResolveEntity(entity.OriginalText)
+                                           : ParsingExtension.ResolveEntity(entity.DisplayText));
                         break;
                     case EntityType.Media:
                         builder.Append(showFullUrl
-                                           ? XmlParser.ResolveEntity(entity.MediaUrl)
-                                           : XmlParser.ResolveEntity(entity.DisplayText));
+                                           ? ParsingExtension.ResolveEntity(entity.MediaUrl)
+                                           : ParsingExtension.ResolveEntity(entity.DisplayText));
                         break;
                     case EntityType.UserMentions:
                         builder.Append("@" + entity.DisplayText);
@@ -212,11 +212,11 @@ namespace StarryEyes.Breezy.DataModel
             }
             if (prevEntity == null)
             {
-                builder.Append(XmlParser.ResolveEntity(escaped));
+                builder.Append(ParsingExtension.ResolveEntity(escaped));
             }
             else if (prevEntity.EndIndex < escaped.Length)
             {
-                builder.Append(XmlParser.ResolveEntity(
+                builder.Append(ParsingExtension.ResolveEntity(
                     escaped.Substring(prevEntity.EndIndex, escaped.Length - prevEntity.EndIndex)));
             }
             return builder.ToString();

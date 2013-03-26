@@ -131,7 +131,7 @@
     <Compile Include="Util\HttpUtility.cs" />
     <Compile Include="Util\ObservableEx.cs" />
     <Compile Include="Util\UnixEpoch.cs" />
-    <Compile Include="Util\XmlParser.cs" />
+    <Compile Include="Util\ParsingExtension.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

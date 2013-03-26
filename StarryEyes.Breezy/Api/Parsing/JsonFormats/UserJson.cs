@@ -87,7 +87,7 @@ namespace StarryEyes.Breezy.Api.Parsing.JsonFormats
                 ListedCount = listed_count.GetValueOrDefault(),
                 Language = lang,
                 IsGeoEnabled = is_geo_enabled,
-                CreatedAt = created_at.ParseDateTime(XmlParser.TwitterDateTimeFormat)
+                CreatedAt = created_at.ParseDateTime(ParsingExtension.TwitterDateTimeFormat)
             };
         }
     }

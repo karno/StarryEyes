@@ -37,8 +37,8 @@ namespace StarryEyes.Breezy.Api.Parsing.JsonFormats
                 StatusType = StatusType.DirectMessage,
                 Id = id_str.ParseLong(),
                 User = sender.Spawn(),
-                Text = XmlParser.ResolveEntity(text),
-                CreatedAt = created_at.ParseDateTime(XmlParser.TwitterDateTimeFormat),
+                Text = ParsingExtension.ResolveEntity(text),
+                CreatedAt = created_at.ParseDateTime(ParsingExtension.TwitterDateTimeFormat),
                 Recipient = recipient.Spawn(),
                 Entities = entities != null ? entities.Spawn().ToArray() : new TwitterEntity[0]
             };

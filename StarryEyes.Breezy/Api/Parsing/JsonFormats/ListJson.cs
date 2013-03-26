@@ -32,7 +32,7 @@ namespace StarryEyes.Breezy.Api.Parsing.JsonFormats
             return new TwitterList()
             {
                 Id = id_str.ParseLong(),
-                CreatedAt = created_at.ParseDateTime(XmlParser.TwitterDateTimeFormat),
+                CreatedAt = created_at.ParseDateTime(ParsingExtension.TwitterDateTimeFormat),
                 Uri = uri.ParseUri(),
                 Name = name,
                 FullName = full_name,
