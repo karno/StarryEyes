@@ -86,21 +86,21 @@ namespace System.Reactive.Linq
                     exAction(ex);
                 }
 
-                //リトライ回数1回の場合はリトライしない
-                if (retryCount == 1)
+                //リトライ回数0回の場合はリトライしない
+                if (retryCount == 0)
                 {
                     return Observable.Throw<T>(ex);
                 }
 
-                //リトライ回数0(一応0未満)の場合無限リトライ
-                if (retryCount <= 0)
+                //リトライ回数0未満)の場合無限リトライ
+                if (retryCount < 0)
                 {
                     return Observable.Timer(delaySpan, scheduler).SelectMany(_ => source.Retry(retryCount, exAction, delaySpan, scheduler));
                 }
 
                 return
                     Observable.Timer(delaySpan, scheduler)
-                              .SelectMany(_ => source.Retry(retryCount, exAction, delaySpan, scheduler, 1));
+                              .SelectMany(_ => source.Retry(retryCount, exAction, delaySpan, scheduler, 0));
             });
         }
 

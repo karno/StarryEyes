@@ -8,6 +8,9 @@ namespace StarryEyes.Models.Operations
 {
     public abstract class OperationBase<T> : IRunnerQueueable
     {
+        private const int RetryCount = 3;
+        private const double RetryDelaySec = 3.0;
+
         private readonly Subject<T> _resultHandler = new Subject<T>();
         protected Subject<T> ResultHandler
         {
@@ -34,6 +37,7 @@ namespace StarryEyes.Models.Operations
         public IObservable<T> RunImmediate()
         {
             return Observable.Defer(() => Observable.Start(() => RunCore()))
+                .Retry(RetryCount, TimeSpan.FromSeconds(RetryDelaySec))
                 .SelectMany(_ => _);
         }
 
@@ -50,8 +54,8 @@ namespace StarryEyes.Models.Operations
                     if (wex != null && wex.Response != null)
                     {
                         return Observable.Return(wex.Response)
-                            .SelectMany(r => r.DownloadStringAsync())
-                            .Select(ParseErrorMessage);
+                                         .SelectMany(r => r.DownloadStringAsync())
+                                         .Select(ParseErrorMessage);
                     }
                     return Observable.Return(ex.Message);
                 });
@@ -67,6 +71,7 @@ namespace StarryEyes.Models.Operations
         IObservable<Unit> IRunnerQueueable.Run()
         {
             return Observable.Defer(RunCore)
+                .Retry(RetryCount, TimeSpan.FromSeconds(RetryDelaySec))
                 .Publish(connectable =>
                 {
                     connectable.Subscribe(_resultHandler);
