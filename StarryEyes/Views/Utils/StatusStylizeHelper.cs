@@ -109,6 +109,7 @@ namespace StarryEyes.Views.Utils
         {
             if (status.Entities == null)
             {
+                System.Diagnostics.Debug.WriteLine("compatible mode");
                 foreach (var inline in GenerateInlines(obj, status.Text))
                 {
                     yield return inline;
@@ -117,7 +118,7 @@ namespace StarryEyes.Views.Utils
             }
             if (status.RetweetedOriginal != null)
                 status = status.RetweetedOriginal; // change target
-            var escaped = XmlParser.EscapeEntity(status.Text);
+            var resolved = status.Text;
             TwitterEntity prevEntity = null;
             foreach (var entity in status.Entities.Guard().OrderBy(e => e.StartIndex))
             {
@@ -127,7 +128,8 @@ namespace StarryEyes.Views.Utils
                 if (pidx < entity.StartIndex)
                 {
                     // output raw
-                    yield return GenerateText(XmlParser.ResolveEntity(escaped.Substring(pidx, entity.StartIndex - pidx)));
+                    // yield return GenerateText(XmlParser.ResolveEntity(escaped.Substring(pidx, entity.StartIndex - pidx)));
+                    yield return GenerateText(resolved.Substring(pidx, entity.StartIndex - pidx));
                 }
                 switch (entity.EntityType)
                 {
@@ -148,11 +150,19 @@ namespace StarryEyes.Views.Utils
             {
                 yield return GenerateText(status.Text);
             }
-            else if (prevEntity.EndIndex < escaped.Length)
+            else if (prevEntity.EndIndex < resolved.Length)
             {
                 yield return GenerateText(
-                    XmlParser.ResolveEntity(escaped.Substring(prevEntity.EndIndex, escaped.Length - prevEntity.EndIndex)));
+                    XmlParser.ResolveEntity(resolved.Substring(prevEntity.EndIndex, resolved.Length - prevEntity.EndIndex)));
             }
+
+            /*
+        else if (prevEntity.EndIndex < escaped.Length)
+        {
+            yield return GenerateText(
+                XmlParser.ResolveEntity(escaped.Substring(prevEntity.EndIndex, escaped.Length - prevEntity.EndIndex)));
+        }
+        */
         }
 
         private static IEnumerable<Inline> GenerateInlines(DependencyObject obj, string text)
