@@ -12,6 +12,7 @@ using System.Threading;
 using System.Windows;
 using Livet;
 using StarryEyes.Breezy.Api;
+using StarryEyes.Helpers;
 using StarryEyes.Models.Connections;
 using StarryEyes.Models.Plugins;
 using StarryEyes.Models.Stores;

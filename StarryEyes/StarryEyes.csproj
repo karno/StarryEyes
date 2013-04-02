@@ -182,6 +182,7 @@
     <Compile Include="Filters\Sources\FilterSearch.cs" />
     <Compile Include="Filters\Sources\FilterTrack.cs" />
     <Compile Include="Helpers\FreezableHelper.cs" />
+    <Compile Include="Helpers\TwitterRegexPatterns.cs" />
     <Compile Include="Hotfixes\DispatcherCollectionRx.cs" />
     <Compile Include="Hotfixes\DispatcherEx.cs" />
     <Compile Include="Helpers\RegexHelper.cs" />
@@ -246,6 +247,7 @@
     <Compile Include="Models\Tab\TabManager.cs" />
     <Compile Include="Models\Plugins\IPlugin.cs" />
     <Compile Include="Models\Tab\TimelineModel.cs" />
+    <Compile Include="Models\TwitterConfiguration.cs" />
     <Compile Include="Models\UserModel.cs" />
     <Compile Include="Settings\KeyAssignManager.cs" />
     <Compile Include="Settings\KeyAssigns\KeyAssignGroup.cs" />
@@ -280,6 +282,7 @@
     <Compile Include="Views\Behaviors\TimelineTriggerBehavior.cs" />
     <Compile Include="Views\Controls\DropDownMenuButton.cs" />
     <Compile Include="Views\Controls\LazyImage.cs" />
+    <Compile Include="Views\Controls\SuggestableTextBox.cs" />
     <Compile Include="Views\Dialogs\KeyOverrideWindow.xaml.cs">
       <DependentUpon>KeyOverrideWindow.xaml</DependentUpon>
     </Compile>

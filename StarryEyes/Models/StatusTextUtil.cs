@@ -1,45 +1,45 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using StarryEyes.Albireo;
+using StarryEyes.Helpers;
 
 namespace StarryEyes.Models
 {
     public static class StatusTextUtil
     {
-        public const int MaxTextLength = 140;
-
-        public const int HttpUrlLength = 20; // http
-        public const int HttpsUrlLength = HttpUrlLength + 1; // https
-
         public static int CountText(string text)
         {
-            return RegexHelper.UrlRegex.Tokenize(text.Replace("\r\n", "\n"))
-                .SelectMany(s =>
-                {
-                    if (s.Item2) // URL matched
-                        return new[] { s };
-                    return RegexHelper.TwitterUrlTLDRegex.Tokenize(s.Item1);
-                })
-                .Sum(s => s.Item2 ?
-                    (s.Item1.StartsWith("https", StringComparison.CurrentCultureIgnoreCase) ?
-                    HttpsUrlLength : HttpUrlLength) :
-                    s.Item1.Length);
+            return TwitterRegexPatterns.ValidUrl
+                                       .Tokenize(text.Replace("\r\n", "\n"))
+                                       .Sum(s => s.Item2
+                                                     ? (s.Item1.StartsWith("https",
+                                                                           StringComparison.CurrentCultureIgnoreCase)
+                                                            ? TwitterConfiguration.HttpsUrlLength
+                                                            : TwitterConfiguration.HttpUrlLength)
+                                                     : s.Item1.Length);
         }
 
         public static string AutoEscape(string text)
         {
-            return RegexHelper.UrlRegex.Tokenize(text)
-                .Select(s =>
-                {
-                    if (s.Item2) // URL matched
-                        return s;
-                    return Tuple.Create(
-                        RegexHelper.TwitterUrlTLDRegex.Replace(s.Item1,
-                                                               match => match.Groups[1].Value + " " + match.Groups[2].Value
-                            ), true);
-                })
-                .Select(s => s.Item1)
-                .JoinString("");
+            return TwitterRegexPatterns.ValidUrl.Replace(text, match =>
+            {
+                if (match.Groups[TwitterRegexPatterns.ValidUrlGroupProtocol].Value.IsNullOrEmpty())
+                    return match.Groups[TwitterRegexPatterns.ValidUrlGroupBefore].Value +
+                           EscapeCore(match.Groups[TwitterRegexPatterns.ValidUrlGroupDomain].Value) +
+                           match.Groups[TwitterRegexPatterns.ValidUrlGroupPort] +
+                           match.Groups[TwitterRegexPatterns.ValidUrlGroupPath] +
+                           match.Groups[TwitterRegexPatterns.ValidUrlGroupQueryString];
+                return match.Value;
+            });
+        }
+
+        private static string EscapeCore(string domain)
+        {
+            var pidx1 = domain.LastIndexOf('.');
+            if (pidx1 <= 0) return domain; // invalid data
+            var pidx2 = domain.LastIndexOf('.', pidx1 - 1);
+            return domain.Insert(pidx2 <= 0 ? pidx1 : pidx2, " ");
         }
 
         private static string InternalEscape(string raw)
@@ -59,21 +59,14 @@ namespace StarryEyes.Models
         {
             if (String.IsNullOrEmpty(raw)) yield break;
             var escaped = InternalEscape(raw);
-            escaped = RegexHelper.UrlRegex.Replace(escaped, m =>
+            escaped = TwitterRegexPatterns.ValidUrl.Replace(escaped, m =>
             {
                 // # => &sharp; (ハッシュタグで再識別されることを防ぐ)
                 var repl = m.Groups[1].Value.Replace("#", "&sharp;");
                 return "<U>" + repl + "<";
             });
-            escaped = RegexHelper.AtRegex.Replace(escaped, "<A>@$1<");
-            escaped = RegexHelper.HashRegex.Replace(escaped, m =>
-            {
-                if (m.Groups.Count > 0)
-                {
-                    return "<H>" + m.Groups[0].Value + "<";
-                }
-                return m.Value;
-            });
+            escaped = TwitterRegexPatterns.ValidMentionOrList.Replace(escaped, m => "<A>" + m.Value + "<");
+            escaped = TwitterRegexPatterns.ValidHashtag.Replace(escaped, m => "<H>" + m.Value + "<");
             var splitted = escaped.Split(new[] { '<' }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var s in splitted)
             {

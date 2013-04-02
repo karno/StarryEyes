@@ -11,8 +11,9 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 {
     public class TabConfigurationFlipViewModel : ViewModel
     {
-        private bool _isConfigurationActive;
+        private TabModel _currentConfigurationTarget;
 
+        private bool _isConfigurationActive;
         public bool IsConfigurationActive
         {
             get { return _isConfigurationActive; }
@@ -24,8 +25,6 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 RaisePropertyChanged();
             }
         }
-
-        private TabModel _currentConfigurationTarget;
 
         public TabConfigurationFlipViewModel()
         {

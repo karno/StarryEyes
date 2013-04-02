@@ -16,6 +16,7 @@ using Livet.Messaging.IO;
 using StarryEyes.Breezy.Api.Rest;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
+using StarryEyes.Helpers;
 using StarryEyes.Models;
 using StarryEyes.Models.Backpanels.NotificationEvents.PostEvents;
 using StarryEyes.Models.Operations;
@@ -172,6 +173,8 @@ namespace StarryEyes.ViewModels.WindowParts
                         OverrideSelectedAccounts(infos);
                         DirectMessageTo = new UserViewModel(user);
                     }));
+
+            CompositeDisposable.Add(InitPostLimitPrediction());
 
             _geoWatcher = new GeoCoordinateWatcher(GeoPositionAccuracy.Default);
             _geoWatcher.StatusChanged += (_, e) =>
@@ -451,9 +454,11 @@ namespace StarryEyes.ViewModels.WindowParts
                 int currentTextLength = StatusTextUtil.CountText(InputText);
                 if (IsImageAttached)
                 {
-                    currentTextLength += Setting.GetImageUploader().UrlLengthPerImages + 1;
+                    currentTextLength += Setting.GetImageUploader().UseHttpsUrl
+                                             ? TwitterConfiguration.HttpsUrlLength
+                                             : TwitterConfiguration.HttpUrlLength;
                 }
-                string[] tags = RegexHelper.HashRegex.Matches(InputText)
+                string[] tags = TwitterRegexPatterns.ValidHashtag.Matches(InputText)
                                            .OfType<Match>()
                                            .Select(_ => _.Value)
                                            .ToArray();
@@ -470,7 +475,7 @@ namespace StarryEyes.ViewModels.WindowParts
 
         public int RemainTextCount
         {
-            get { return StatusTextUtil.MaxTextLength - TextCount; }
+            get { return TwitterConfiguration.TextMaxLength - TextCount; }
         }
 
         public bool CanSend
@@ -479,7 +484,7 @@ namespace StarryEyes.ViewModels.WindowParts
             {
                 if (AccountSelectionFlip.SelectedAccounts.FirstOrDefault() == null)
                     return false; // send account is not found.
-                if (TextCount > StatusTextUtil.MaxTextLength)
+                if (TextCount > TwitterConfiguration.TextMaxLength)
                     return false;
                 return CanSaveToDraft;
             }
@@ -580,9 +585,9 @@ namespace StarryEyes.ViewModels.WindowParts
         /// <summary>
         ///     Start ALPS.
         /// </summary>
-        private void InitPostLimitPrediction()
+        private IDisposable InitPostLimitPrediction()
         {
-            Observable.Interval(TimeSpan.FromSeconds(60))
+            return Observable.Interval(TimeSpan.FromSeconds(60))
                       .Where(_ => IsPostLimitPredictionEnabled)
                       .Subscribe(_ => { });
         }
@@ -591,7 +596,7 @@ namespace StarryEyes.ViewModels.WindowParts
 
         private void UpdateHashtagCandidates()
         {
-            string[] hashtags = RegexHelper.HashRegex.Matches(InputText)
+            string[] hashtags = TwitterRegexPatterns.ValidHashtag.Matches(InputText)
                                            .OfType<Match>()
                                            .Select(_ => _.Value)
                                            .Distinct()
@@ -877,7 +882,7 @@ namespace StarryEyes.ViewModels.WindowParts
                 // warn third reply
 
                 // filters screen names which were replied
-                string[] replies = RegexHelper.AtRegex.Matches(InReplyTo.Status.Text)
+                string[] replies = TwitterRegexPatterns.ValidMentionOrList.Matches(InReplyTo.Status.Text)
                                               .Cast<Match>()
                                               .Select(_ => _.Value.Substring(1))
                                               .Where(_ => !String.IsNullOrEmpty(_))

@@ -20,9 +20,9 @@ namespace StarryEyes.Breezy.Imaging
             return info.Update(status, inReplyToId, geoLat, geoLong);
         }
 
-        public virtual int UrlLengthPerImages
+        public virtual bool UseHttpsUrl
         {
-            get { return 20; } // if HTTPS, this param is 21.
+            get { return false; }
         }
     }
 }
