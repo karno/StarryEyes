@@ -70,7 +70,7 @@ namespace StarryEyes.ViewModels.Dialogs
                     Setting.GlobalConsumerKey.Value = this.OverrideConsumerKey;
                     Setting.GlobalConsumerSecret.Value = this.OverrideConsumerSecret;
                     UpdateEndpointKey();
-                    this.Messenger.Raise(new WindowActionMessage(null, WindowAction.Close));
+                    this.Messenger.Raise(new WindowActionMessage(WindowAction.Close));
                 },
                 ex => this.Messenger.Raise(new TaskDialogMessage(
                                                new TaskDialogInterop.TaskDialogOptions
@@ -103,12 +103,12 @@ namespace StarryEyes.ViewModels.Dialogs
                      }));
                 if (m.Response.Result == TaskDialogInterop.TaskDialogSimpleResult.Ok)
                 {
-                    this.Messenger.Raise(new WindowActionMessage(null, WindowAction.Close));
+                    this.Messenger.Raise(new WindowActionMessage(WindowAction.Close));
                 }
             }
             else
             {
-                this.Messenger.Raise(new WindowActionMessage(null, WindowAction.Close));
+                this.Messenger.Raise(new WindowActionMessage(WindowAction.Close));
             }
         }
 

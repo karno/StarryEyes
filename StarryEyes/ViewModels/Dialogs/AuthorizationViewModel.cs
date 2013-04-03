@@ -114,7 +114,7 @@ namespace StarryEyes.ViewModels.Dialogs
                     var id = long.Parse(r.ExtraData["user_id"].First());
                     var sn = r.ExtraData["screen_name"].First();
                     _returnSubject.OnNext(new AuthenticateInfo(id, sn, r.Token));
-                    this.Messenger.Raise(new WindowActionMessage(null, WindowAction.Close));
+                    this.Messenger.Raise(new WindowActionMessage(WindowAction.Close));
                 },
                 ex =>
                 {
