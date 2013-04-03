@@ -1195,7 +1195,7 @@ namespace StarryEyes.ViewModels.WindowParts
                 {
                     var find = token.Substring(1);
                     var idx = array.Select((v, i) => new { Item = v, Index = i })
-                                   .Where(t => t.Item.StartsWith(find))
+                                   .Where(t => t.Item.StartsWith(find, StringComparison.CurrentCultureIgnoreCase))
                                    .Select(t => t.Index)
                                    .Append(-1)
                                    .First();
