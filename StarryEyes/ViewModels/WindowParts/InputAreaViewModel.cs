@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Device.Location;
 using System.Diagnostics;
 using System.IO;
@@ -13,6 +15,7 @@ using Livet.Commands;
 using Livet.EventListeners;
 using Livet.Messaging;
 using Livet.Messaging.IO;
+using StarryEyes.Albireo;
 using StarryEyes.Breezy.Api.Rest;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
@@ -24,6 +27,7 @@ using StarryEyes.Models.Stores;
 using StarryEyes.Settings;
 using StarryEyes.ViewModels.WindowParts.Flips;
 using StarryEyes.ViewModels.WindowParts.Timelines;
+using StarryEyes.Views.Controls;
 using StarryEyes.Views.Messaging;
 using TaskDialogInterop;
 
@@ -37,6 +41,8 @@ namespace StarryEyes.ViewModels.WindowParts
 
         private readonly ReadOnlyDispatcherCollectionRx<BindHashtagViewModel> _bindingHashtags;
         private readonly ReadOnlyDispatcherCollectionRx<TweetInputInfoViewModel> _draftedInputs;
+        private readonly InputAreaSuggestItemProvider _provider;
+
         private readonly GeoCoordinateWatcher _geoWatcher;
         private long[] _baseSelectedAccounts;
         private UserViewModel _directMessageToCache;
@@ -51,6 +57,7 @@ namespace StarryEyes.ViewModels.WindowParts
         /// </summary>
         public InputAreaViewModel()
         {
+            _provider = new InputAreaSuggestItemProvider();
             _accountSelectionFlip = new AccountSelectionFlipViewModel();
             _accountSelectionFlip.OnClosed += () =>
             {
@@ -231,6 +238,11 @@ namespace StarryEyes.ViewModels.WindowParts
         public ReadOnlyDispatcherCollectionRx<AuthenticateInfoViewModel> BindingAuthInfos
         {
             get { return _bindingAuthInfos; }
+        }
+
+        public InputAreaSuggestItemProvider Provider
+        {
+            get { return _provider; }
         }
 
         public int AuthInfoGridRowColumn
@@ -1137,6 +1149,119 @@ namespace StarryEyes.ViewModels.WindowParts
         public void ToggleBind()
         {
             _callback();
+        }
+    }
+
+    public class InputAreaSuggestItemProvider : SuggestItemProviderBase
+    {
+        public override int CandidateSelectionIndex { get; set; }
+        public override string FindNearestToken(string text, int caretIndex, out int tokenStart, out int tokenLength)
+        {
+            tokenStart = caretIndex - 1;
+            tokenLength = 1;
+            while (tokenStart >= 0)
+            {
+                if (CheckTriggerCharInputted(text[tokenStart]))
+                {
+                    return text.Substring(tokenStart, tokenLength);
+                }
+                tokenStart--;
+                tokenLength++;
+            }
+            return null;
+        }
+
+        public override void UpdateCandidateList(string token, int offset)
+        {
+            if (token.IsNullOrEmpty() || (token[0] != '@' && token[0] != '#'))
+            {
+                _items.Clear();
+            }
+            else
+            {
+                if (token[0] == '@')
+                {
+                    _items.Clear();
+                    AddUserItems(token.Substring(1));
+                }
+                else
+                {
+                    _items.Clear();
+                    AddHashItems(token.Substring(1));
+                }
+                var array = _items.Select(s => s.Body.Substring(1))
+                    .ToArray();
+                while (token.Length > 1)
+                {
+                    var find = token.Substring(1);
+                    var idx = array.Select((v, i) => new { Item = v, Index = i })
+                                   .Where(t => t.Item.StartsWith(find))
+                                   .Select(t => t.Index)
+                                   .Append(-1)
+                                   .First();
+                    if (idx >= 0)
+                    {
+                        CandidateSelectionIndex = idx;
+                        RaisePropertyChanged("CandidateSelectionIndex");
+                        break;
+                    }
+                    token = token.Substring(0, token.Length - 1);
+                }
+            }
+        }
+
+        public override bool CheckTriggerCharInputted(char inputchar)
+        {
+            switch (inputchar)
+            {
+                case '@':
+                case '#':
+                    return true;
+            }
+            return false;
+        }
+
+        private void AddUserItems(string key)
+        {
+            UserStore.GetScreenNameResolverTable()
+                     .Select(s => s.Key)
+                     .Where(s => key.IsNullOrEmpty() ||
+                                 s.IndexOf(key, StringComparison.CurrentCultureIgnoreCase) >= 0)
+                     .OrderBy(_ => _)
+                     .Select(s => new SuggestItemViewModel("@" + s))
+                     .ForEach(s => _items.Add(s));
+        }
+
+        private void AddHashItems(string key)
+        {
+            CacheStore.HashtagCache
+                      .Where(s => key.IsNullOrEmpty() ||
+                          s.IndexOf(key, StringComparison.CurrentCultureIgnoreCase) >= 0)
+                      .OrderBy(_ => _)
+                      .Select(s => new SuggestItemViewModel("#" + s))
+                      .ForEach(s => _items.Add(s));
+        }
+
+        private readonly ObservableCollection<SuggestItemViewModel> _items = new ObservableCollection<SuggestItemViewModel>();
+        public override IList CandidateCollection
+        {
+            get { return _items; }
+        }
+
+    }
+
+    public class SuggestItemViewModel : ViewModel
+    {
+        public SuggestItemViewModel(string body)
+        {
+            this.Body = body;
+        }
+
+        public string Body { get; set; }
+
+        public override string ToString()
+        {
+            return Body;
         }
     }
 }

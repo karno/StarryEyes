@@ -219,6 +219,7 @@
     <Compile Include="Models\Connections\UserDependencies\UserInfoReceiver.cs" />
     <Compile Include="Models\Connections\UserDependencies\UserRelationReceiver.cs" />
     <Compile Include="Models\Connections\StreamingEventsHub.cs" />
+    <Compile Include="Models\Stores\CacheStore.cs" />
     <Compile Include="Models\Stores\StoreHelper.cs" />
     <Compile Include="Models\InputAreaModel.cs" />
     <Compile Include="Models\MainWindowModel.cs" />
@@ -249,6 +250,7 @@
     <Compile Include="Models\Tab\TimelineModel.cs" />
     <Compile Include="Models\TwitterConfiguration.cs" />
     <Compile Include="Models\UserModel.cs" />
+    <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Settings\KeyAssignManager.cs" />
     <Compile Include="Settings\KeyAssigns\KeyAssignGroup.cs" />
     <Compile Include="Settings\KeyAssigns\DefaultAssignProvider.cs" />

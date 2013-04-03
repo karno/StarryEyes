@@ -295,15 +295,17 @@
                                    Foreground="White"
                                    Text="アカウントが選択されていません。左側のエリアをクリックして、投稿するアカウントを選択してください。" />
                     </DockPanel>
-                    <TextBox Grid.Row="1"
-                             AcceptsReturn="True"
-                             BorderBrush="{x:Null}"
-                             BorderThickness="0"
-                             Text="{Binding InputText,
-                                            UpdateSourceTrigger=PropertyChanged}"
-                             TextAlignment="Justify"
-                             TextWrapping="Wrap"
-                             VerticalScrollBarVisibility="Auto">
+                    <controls:SuggestableTextBox Grid.Row="1"
+                                                 AcceptsReturn="True"
+                                                 BorderBrush="{x:Null}"
+                                                 BorderThickness="0"
+                                                 Padding="2,4"
+                                                 SuggestItemProvider="{Binding Provider}"
+                                                 Text="{Binding InputText,
+                                                                UpdateSourceTrigger=PropertyChanged}"
+                                                 TextAlignment="Justify"
+                                                 TextWrapping="Wrap"
+                                                 VerticalScrollBarVisibility="Auto">
                         <i:Interaction.Triggers>
                             <l:InteractionMessageTrigger MessageKey="FocusToTextBox" Messenger="{Binding Messenger}">
                                 <l:SetFocusAction />
@@ -317,10 +319,16 @@
                                                              SelectionLength="{Binding SelectionLength}"
                                                              SelectionStart="{Binding SelectionStart}" />
                         </i:Interaction.Behaviors>
-                    </TextBox>
+                        <controls:SuggestableTextBox.ListItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Foreground="White" Text="{Binding Body}" />
+                            </DataTemplate>
+                        </controls:SuggestableTextBox.ListItemTemplate>
+                    </controls:SuggestableTextBox>
                     <DockPanel Grid.Row="2"
                                Grid.ColumnSpan="3"
-                               VerticalAlignment="Top" Height="26">
+                               Height="26"
+                               VerticalAlignment="Top">
                         <DockPanel.Background>
                             <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}" />
                         </DockPanel.Background>
@@ -341,7 +349,9 @@
                                   Fill="#FFFEFEFE"
                                   Stretch="Fill" />
                         </Button>
-                        <StackPanel VerticalAlignment="Top" Orientation="Horizontal" Height="26">
+                        <StackPanel Height="26"
+                                    VerticalAlignment="Top"
+                                    Orientation="Horizontal">
                             <controls:DropDownMenuButton Width="28"
                                                          Style="{DynamicResource MetroSquareUnfocusableFlatButton}"
                                                          ToolTip="下書き"
