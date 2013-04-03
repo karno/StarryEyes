@@ -207,7 +207,8 @@ namespace StarryEyes.Views.Controls
                 panel.Children.Add(_suggestListPopup);
             }
             int tokenStart, _;
-            _provider.FindNearestToken(this.Text, this.CaretIndex, out tokenStart, out _);
+            var token = _provider.FindNearestToken(this.Text, this.CaretIndex, out tokenStart, out _);
+            if (token == null) return;
             _suggestListPopup.PlacementTarget = this;
             _suggestListPopup.PlacementRectangle = this.GetRectFromCharacterIndex(tokenStart);
             _suggestListPopup.IsOpen = true;
