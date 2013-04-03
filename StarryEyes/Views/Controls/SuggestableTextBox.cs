@@ -83,7 +83,7 @@ namespace StarryEyes.Views.Controls
         protected override void OnTextChanged(TextChangedEventArgs e)
         {
             if (!_suggestListPopup.IsOpen && e.Changes.Any(c => c.AddedLength > 0) &&
-                this.Text.Length > this.CaretIndex - 1)
+                this.CaretIndex >= 1 && this.Text.Length > this.CaretIndex - 1)
             {
                 CheckTrigger(this.Text[this.CaretIndex - 1]);
             }
