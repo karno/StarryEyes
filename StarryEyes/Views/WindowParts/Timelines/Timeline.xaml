@@ -820,7 +820,7 @@
                                     </Grid>
                                     <Grid Grid.Row="3"
                                           Grid.Column="1"
-                                          Margin="8,2,8,0">
+                                          Margin="8,3,8,0">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto" />
                                             <ColumnDefinition />
