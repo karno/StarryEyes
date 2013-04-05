@@ -12,7 +12,6 @@ using System.Threading;
 using System.Windows;
 using Livet;
 using StarryEyes.Breezy.Api;
-using StarryEyes.Helpers;
 using StarryEyes.Models.Connections;
 using StarryEyes.Models.Plugins;
 using StarryEyes.Models.Stores;
@@ -33,7 +32,7 @@ namespace StarryEyes
         {
             // enable multi-core JIT.
             // see reference: http://msdn.microsoft.com/en-us/library/system.runtime.profileoptimization.aspx
-            if (IsMulticoreJITEnabled)
+            if (IsMulticoreJitEnabled)
             {
                 ProfileOptimization.SetProfileRoot(ConfigurationDirectoryPath);
                 ProfileOptimization.StartProfile(ProfileFileName);
@@ -68,8 +67,11 @@ namespace StarryEyes
                 Environment.Exit(0);
             }
 
+            // set exception handlers
             Current.DispatcherUnhandledException += (sender2, e2) => HandleException(e2.Exception);
             AppDomain.CurrentDomain.UnhandledException += (sender2, e2) => HandleException(e2.ExceptionObject as Exception);
+
+            // set exit handler
             Current.Exit += (_, __) => AppFinalize(true);
 
             // Initialize service points
@@ -94,8 +96,11 @@ namespace StarryEyes
             ApiEndpoint.DefaultConsumerSecret = Setting.GlobalConsumerSecret.Value ?? ConsumerSecret;
             ApiEndpoint.UserAgent = Setting.UserAgent.Value;
 
-            // Load key bindings
+            // Load key assigns
             KeyAssignManager.Initialize();
+
+            // Load cache store
+            CacheStore.Initialize();
 
             // Initialize core systems
             try
@@ -197,7 +202,7 @@ namespace StarryEyes
                 builder.AppendLine("Krile STARRYEYES #" + FormattedVersion);
                 builder.AppendLine(Environment.OSVersion + " " + (Environment.Is64BitProcess ? "x64" : "x86"));
                 builder.AppendLine("execution mode: " + ExecutionMode.ToString() + " " +
-                    "multicore JIT: " + IsMulticoreJITEnabled.ToString() + " " +
+                    "multicore JIT: " + IsMulticoreJitEnabled.ToString() + " " +
                     "hardware rendering: " + IsHardwareRenderingEnabled.ToString());
                 builder.AppendLine();
                 builder.AppendLine("thrown:");
@@ -280,7 +285,7 @@ namespace StarryEyes
             }
         }
 
-        public static bool IsMulticoreJITEnabled
+        public static bool IsMulticoreJitEnabled
         {
             get
             {
@@ -342,6 +347,14 @@ namespace StarryEyes
             get
             {
                 return Path.Combine(ConfigurationDirectoryPath, TabTempFileName);
+            }
+        }
+
+        public static string HashtagTempFilePath
+        {
+            get
+            {
+                return Path.Combine(ConfigurationDirectoryPath, HashtagCacheFileName);
             }
         }
 
@@ -419,6 +432,8 @@ namespace StarryEyes
         public static readonly string ConfigurationFileName = "krile.xml";
 
         public static readonly string TabTempFileName = "tabs.cache";
+
+        public static readonly string HashtagCacheFileName = "tags.cache";
 
         public static readonly string ProfileFileName = "krile.profile";
 
