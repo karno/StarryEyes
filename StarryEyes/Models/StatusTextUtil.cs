@@ -39,7 +39,7 @@ namespace StarryEyes.Models
             var pidx1 = domain.LastIndexOf('.');
             if (pidx1 <= 0) return domain; // invalid data
             var pidx2 = domain.LastIndexOf('.', pidx1 - 1);
-            return domain.Insert(pidx2 <= 0 ? pidx1 : pidx2, " ");
+            return domain.Insert(pidx2 <= 0 ? pidx1 : pidx2, "\u200c");
         }
 
         private static string InternalEscape(string raw)

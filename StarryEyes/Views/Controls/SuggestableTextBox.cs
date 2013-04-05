@@ -78,6 +78,13 @@ namespace StarryEyes.Views.Controls
                 Width = 250
             };
             _candidateList.PreviewKeyDown += (_, e) => OnPreviewKeyDown(e);
+            _candidateList.AddHandler(MouseLeftButtonDownEvent, new MouseButtonEventHandler(OnListMouseDown), true);
+        }
+
+        private void OnListMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            ApplySelected();
+            this.CloseCandidates();
         }
 
         protected override void OnTextChanged(TextChangedEventArgs e)

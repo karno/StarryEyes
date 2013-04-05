@@ -444,7 +444,7 @@
                                           Stretch="Fill" />
                                 </Border>
                                 <Border VerticalAlignment="Center"
-                                        ToolTip="URLリンク化自動回避を行います。"
+                                        ToolTip="URLリンク化自動回避を行います(スキームのないURLのTLDの前にゼロ幅スペースが自動挿入されます)。"
                                         Visibility="{Binding IsChecked,
                                                              Converter={StaticResource BooleanToVisibleConverter},
                                                              ElementName=ToggleUrlAutoEscapeButton}">
