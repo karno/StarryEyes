@@ -104,10 +104,6 @@ namespace StarryEyes.Views.Controls
             if (_suggestListPopup.IsOpen && !e.Handled)
             {
                 var key = e.Key;
-                if (key == Key.ImeProcessed)
-                {
-                    key = e.ImeProcessedKey;
-                }
                 e.Handled = true;
                 switch (key)
                 {
