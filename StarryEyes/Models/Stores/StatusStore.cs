@@ -47,13 +47,13 @@ namespace StarryEyes.Models.Stores
             if (StoreOnMemoryObjectPersistence.IsPersistentDataExisted("statuses"))
             {
                 _store = new PersistentDataStore<long, TwitterStatus>
-                    (_ => _.Id, Path.Combine(App.DataStorePath, "statuses"), new IdReverseComparer(),
-                    manageData: StoreOnMemoryObjectPersistence.GetPersistentData("statuses"), chunkCount: ChunkCount);
+                    (_ => _.Id, Path.Combine(App.DataStorePath, "statuses"), ChunkCount, new IdReverseComparer(),
+                    StoreOnMemoryObjectPersistence.GetPersistentData("statuses"));
             }
             else
             {
                 _store = new PersistentDataStore<long, TwitterStatus>
-                    (_ => _.Id, Path.Combine(App.DataStorePath, "statuses"), new IdReverseComparer(), ChunkCount);
+                    (_ => _.Id, Path.Combine(App.DataStorePath, "statuses"), ChunkCount, new IdReverseComparer());
             }
             _dispatcher = new SingleThreadDispatcher<TwitterStatus>(_store.Store);
             App.OnApplicationFinalize += Shutdown;

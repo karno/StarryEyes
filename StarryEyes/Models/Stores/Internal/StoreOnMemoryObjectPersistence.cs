@@ -74,13 +74,10 @@ namespace StarryEyes.Models.Stores.Internal
                 NextIndexOfPackets.Clear();
                 return;
             }
-            else
-            {
-                idx++;
-                // trim tail '-1's
-                if (idx > 0 && idx < NextIndexOfPackets.Count)
-                    NextIndexOfPackets.RemoveRange(idx, NextIndexOfPackets.Count - idx);
-            }
+            idx++;
+            // trim tail '-1's
+            if (idx > 0 && idx < NextIndexOfPackets.Count)
+                NextIndexOfPackets.RemoveRange(idx, NextIndexOfPackets.Count - idx);
         }
 
         public Dictionary<long, int> TableOfContents { get; set; }
@@ -101,7 +98,7 @@ namespace StarryEyes.Models.Stores.Internal
                 writer.Write(kvp.Value);
             });
             writer.Write(NextIndexOfPackets.Count);
-            NextIndexOfPackets.ForEach(i => writer.Write(i));
+            NextIndexOfPackets.ForEach(writer.Write);
         }
 
         public void Deserialize(BinaryReader reader)

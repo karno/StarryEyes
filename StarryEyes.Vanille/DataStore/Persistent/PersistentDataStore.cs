@@ -30,8 +30,8 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// <param name="chunkCount">cache separate count</param>
         /// <param name="manageData">ToC/NIoPs</param>
         public PersistentDataStore(Func<TValue, TKey> keyProvider, string baseDirectoryPath,
+                                   int chunkCount,
                                    IComparer<TKey> comparer = null,
-                                   int chunkCount = 4,
                                    IEnumerable<Tuple<IDictionary<TKey, int>, IEnumerable<int>>> manageData = null)
             : base(keyProvider)
         {
