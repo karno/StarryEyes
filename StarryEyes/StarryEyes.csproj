@@ -196,6 +196,12 @@
     <Compile Include="Helpers\RegexHelper.cs" />
     <Compile Include="Hotfixes\ReadOnlyDispatcherCollectionRx.cs" />
     <Compile Include="Hotfixes\ViewModelHelperRx.cs" />
+    <Compile Include="InputFormats\ArithmeticFunctions.cs" />
+    <Compile Include="InputFormats\DescriptionCompiler.cs" />
+    <Compile Include="InputFormats\CommonFunctions.cs" />
+    <Compile Include="InputFormats\FormatDescription.cs" />
+    <Compile Include="InputFormats\FormatElement.cs" />
+    <Compile Include="InputFormats\InputFormatFunctionBase.cs" />
     <Compile Include="Models\BackpanelModel.cs" />
     <Compile Include="Models\Backpanels\SystemEvents\KeyAssignCouldNotLoadEvent.cs" />
     <Compile Include="Models\Backpanels\SystemEvents\KeyAssignProfileNotFoundEvent.cs" />
