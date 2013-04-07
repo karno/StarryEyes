@@ -40,12 +40,6 @@ namespace StarryEyes.InputFormats
             return _elements.Select(e => e.GetText()).JoinString("");
         }
 
-        public IEnumerable<int> EnumerateId()
-        {
-            _elements.OfType<ExpressionElement>()
-                .SelectMany(e => e.Expr)
-        }
-
         public void AddElement(FormatElement element)
         {
             Elements.Add(element);
