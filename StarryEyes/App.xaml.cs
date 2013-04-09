@@ -141,6 +141,7 @@ namespace StarryEyes
                 _appMutex.Dispose();
                 Process.Start(ResourceAssembly.Location);
                 Current.Shutdown();
+                Process.GetCurrentProcess().Kill();
                 return;
             }
             AccountsStore.Initialize();
