@@ -122,9 +122,18 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         public override IObservable<TValue> Find(Func<TValue, bool> predicate,
                                                  FindRange<TKey> range = null, int? itemCount = null)
         {
-            return _chunks
-                .Select(c => c.Find(predicate, range, itemCount))
-                .MergeOrderByDescending(GetKey);
+            return Observable.Defer(() =>
+            {
+                var dictionary = _chunks.SelectMany(c => c.FindCaches(predicate, range))
+                                        .ToDictionary(GetKey);
+                var keys = _chunks.SelectMany(c => c.GetIndexKeyValues(range))
+                                  .OrderByDescending(_ => _.Key);
+                return Observable.Start(() =>
+                                        keys.Select(k => GetChunk(k.Key).GetFromDrive(k.Value))
+                                            .Where(predicate)
+                                            .TakeIfNotNull(itemCount))
+                                 .SelectMany(_ => _);
+            });
         }
 
         /// <summary>

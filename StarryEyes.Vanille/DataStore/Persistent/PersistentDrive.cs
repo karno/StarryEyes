@@ -258,6 +258,11 @@ namespace StarryEyes.Vanille.DataStore.Persistent
             return Load(readFrom);
         }
 
+        internal TValue LoadFromExactIndex(int index)
+        {
+            return Load(index);
+        }
+
         /// <summary>
         /// Find values with predicate.
         /// </summary>

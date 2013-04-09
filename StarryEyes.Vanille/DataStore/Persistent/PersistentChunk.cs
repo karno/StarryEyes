@@ -322,55 +322,42 @@ namespace StarryEyes.Vanille.DataStore.Persistent
             .SelectMany(_ => _);
         }
 
-        /// <summary>
-        /// Find item with predicate
-        /// </summary>
-        /// <param name="predicate">predicate for finding items.</param>
-        /// <param name="range">range value</param>
-        /// <param name="returnLowerBound">lower bound count of returning items.</param>
-        /// <returns></returns>
-        public IObservable<TValue> Find(Func<TValue, bool> predicate, FindRange<TKey> range, int? returnLowerBound)
+        public TValue GetFromDrive(int index)
         {
-            return new[]
+            using (AcquireDriveLock())
             {
-                Observable.Start(() =>
-                {
-                    lock (_aliveCachesLocker)
-                    {
-                        return _aliveCaches
-                            .CheckRange(range, _parent.GetKey)
-                            .Where(predicate)
-                            .OrderBy(_parent.GetKey)
-                            .ToArray();
-                    }
-
-                }),
-                Observable.Start(() =>
-                {
-                    lock (_deadlyCachesLocker)
-                    {
-                        return _deadlyCaches
-                            .Select(v => v.Item)
-                            .CheckRange(range, _parent.GetKey)
-                            .Where(predicate)
-                            .OrderBy(_parent.GetKey)
-                            .ToArray();
-                    }
-                }),
-                Observable.Start(() =>
-                {
-                    using (AcquireDriveLock())
-                    {
-                        return _persistentDrive
-                            .Find(predicate, range, returnLowerBound)
-                            .ToArray();
-                    }
-                }
-                    )
+                return _persistentDrive.LoadFromExactIndex(index);
             }
-                .Select(observable => observable.SelectMany(items => items))
-                .MergeOrderByDescending(_parent.GetKey)
-                .Distinct(v => _parent.GetKey(v));
+        }
+        public IEnumerable<TValue> FindCaches(Func<TValue, bool> predicate, FindRange<TKey> range)
+        {
+            var list = new List<TValue>();
+            lock (_aliveCachesLocker)
+            {
+                _aliveCaches
+                    .CheckRange(range, _parent.GetKey)
+                    .Where(predicate)
+                    .ForEach(list.Add);
+            }
+            lock (_deadlyCachesLocker)
+            {
+                _deadlyCaches
+                    .Select(p => p.Item)
+                    .CheckRange(range, _parent.GetKey)
+                    .Where(predicate)
+                    .ForEach(list.Add);
+            }
+            return list;
+        }
+
+        public IEnumerable<KeyValuePair<TKey, int>> GetIndexKeyValues(FindRange<TKey> range)
+        {
+            using (AcquireDriveLock())
+            {
+                return _persistentDrive.GetTableOfContents()
+                                       .CheckRange(range, _ => _.Key)
+                                       .ToArray();
+            }
         }
 
         /// <summary>
