@@ -49,7 +49,9 @@ namespace StarryEyes.Views.Behaviors
                           .Subscribe(
                               e =>
                               {
-                                  var itemCount = ItemsSource.Count;
+                                  var source = ItemsSource;
+                                  if (source == null) return;
+                                  var itemCount = source.Count;
                                   if (_previousItemCount == itemCount) return;
                                   _previousItemCount = itemCount;
                                   if (e.ExtentHeightChange > 0 && IsScrollLockEnabled)
