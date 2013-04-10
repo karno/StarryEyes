@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interactivity;
@@ -54,12 +56,41 @@ namespace StarryEyes.Views.Behaviors
                                   var itemCount = source.Count;
                                   if (_previousItemCount == itemCount) return;
                                   _previousItemCount = itemCount;
-                                  if (e.ExtentHeightChange > 0 && IsScrollLockEnabled)
+                                  if (e.ExtentHeightChange > 0)
                                   {
                                       this.AssociatedObject.ScrollToVerticalOffset(
                                           e.VerticalOffset + e.ExtentHeightChange);
+                                      if (!IsScrollLockEnabled)
+                                      {
+                                          RunAnimation(e.VerticalOffset + e.ExtentHeightChange, e.ExtentHeightChange);
+                                      }
                                   }
                               }));
+        }
+
+        private double _currentOffset;
+        private double _remainHeight;
+        private volatile bool _isAnimationRunning;
+        private void RunAnimation(double offset, double height)
+        {
+            if (_remainHeight < 0) _remainHeight = 0;
+            if (_currentOffset < 0) _currentOffset = 0;
+            _currentOffset = offset;
+            _remainHeight += height;
+            if (_isAnimationRunning) return;
+            _isAnimationRunning = true;
+            Task.Run(() =>
+            {
+                for (int i = 20; i > 0; i--)
+                {
+                    Thread.Sleep(10);
+                    var dx = _remainHeight / i;
+                    _remainHeight -= dx;
+                    _currentOffset -= dx;
+                    DispatcherHolder.Enqueue(() => this.AssociatedObject.ScrollToVerticalOffset(_currentOffset));
+                }
+                _isAnimationRunning = false;
+            });
         }
 
         protected override void OnDetaching()
