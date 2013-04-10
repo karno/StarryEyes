@@ -141,13 +141,6 @@ namespace StarryEyes.Models.Tab
                              .OfType<Unit>();
         }
 
-        internal IObservable<Unit> ReadFromCache(IEnumerable<long> ids)
-        {
-            return Observable.Defer(() => ids.ToObservable().SelectMany(StatusStore.Get))
-                             .Do(AddStatus)
-                             .OfType<Unit>();
-        }
-
         private int _trimCount;
         private void TrimTimeline()
         {

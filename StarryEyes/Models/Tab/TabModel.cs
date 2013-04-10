@@ -27,18 +27,15 @@ namespace StarryEyes.Models.Tab
         private Func<TwitterStatus, bool> _evaluator = _ => false;
         private FilterQuery _filterQuery;
 
-        public long[] TabContentCache { get; set; }
-
         public TabModel()
         {
         }
 
-        public TabModel(string name, string query, long[] cache = null)
+        public TabModel(string name, string query)
             : this()
         {
             Name = name;
             FilterQueryString = query;
-            TabContentCache = cache;
         }
 
         /// <summary>
@@ -198,7 +195,6 @@ namespace StarryEyes.Models.Tab
                 {
                     FilterQuery.Deactivate();
                 }
-                TabContentCache = Timeline.Statuses.Select(s => s.Id).ToArray();
                 if (Timeline != null)
                 {
                     Timeline.OnNewStatusArrival -= OnNewStatusArrival;

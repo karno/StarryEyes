@@ -44,7 +44,6 @@ namespace StarryEyes.Models.Tab
         /// </summary>
         internal static void Load()
         {
-            _loaded = true;
             Setting.Columns
                    .Select(c => new ColumnModel(c.Tabs.Select(d => d.ToTabModel()).ToArray()))
                    .ForEach(_columns.Add);
@@ -52,7 +51,11 @@ namespace StarryEyes.Models.Tab
             {
                 _columns.Add(new ColumnModel(Enumerable.Empty<TabModel>()));
             }
-            App.RaiseUserInterfaceReady();
+            if (!_loaded)
+            {
+                App.RaiseUserInterfaceReady();
+                _loaded = true;
+            }
         }
 
         /// <summary>

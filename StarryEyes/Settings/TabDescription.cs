@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-using System.IO.Compression;
-using System.Linq;
+﻿using System.Linq;
 using System.Runtime.Serialization;
 using StarryEyes.Models.Tab;
 
@@ -42,9 +39,9 @@ namespace StarryEyes.Settings
             this.Query = model.FilterQueryString;
         }
 
-        public TabModel ToTabModel(long[] cache = null)
+        public TabModel ToTabModel()
         {
-            var model = new TabModel(this.Name, this.Query, cache)
+            var model = new TabModel(this.Name, this.Query)
              {
                  BindingHashtags = this.BindingHashtags,
                  IsNotifyNewArrivals = this.IsNotifyNewArrivals,
