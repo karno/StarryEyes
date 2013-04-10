@@ -20,7 +20,14 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
                 .Where(u => u.AuthenticateInfo.UnreliableScreenName == screenName)
                 .Select(u => u.UserId)
                 .FirstOrDefault();
-            _adata = AccountRelationDataStore.Get(_userId);
+            if (_userId == 0)
+            {
+                _userId = UserStore.GetId(screenName);
+            }
+            else
+            {
+                _adata = AccountRelationDataStore.Get(_userId);
+            }
         }
 
         public UserSpecified(long id)
@@ -51,9 +58,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
         {
             get
             {
-                if (_adata == null)
-                    return new List<long>();
-                return new List<long>(new[] { _adata.AccountId });
+                return new List<long>(new[] { _userId });
             }
         }
 

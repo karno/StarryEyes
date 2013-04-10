@@ -78,6 +78,15 @@ namespace StarryEyes.Models.Stores
             }
         }
 
+        public static long GetId(string screenName)
+        {
+            lock (_snResolverLocker)
+            {
+                long id;
+                return !_screenNameResolver.TryGetValue(screenName, out id) ? 0 : id;
+            }
+        }
+
         public static IObservable<TwitterUser> Find(Func<TwitterUser, bool> predicate)
         {
             if (_isInShutdown) return Observable.Empty<TwitterUser>();
