@@ -45,26 +45,9 @@ namespace StarryEyes.Models.Tab
         internal static void Load()
         {
             _loaded = true;
-            var cache = LoadCache();
-            if (cache != null)
-            {
-                Setting.Columns.Zip(cache,
-                                    (col, colc) =>
-                                    new ColumnModel(
-                                        col.Tabs
-                                           .Zip(colc,
-                                                (tab, tabc) =>
-                                                tab.ToTabModel(tabc.ToArray()))
-                                           .ToArray()))
-                       .ForEach(_columns.Add);
-            }
-            else
-            {
-                Setting.Columns
-                       .Select(c => new ColumnModel(c.Tabs.Select(d => d.ToTabModel()).ToArray()))
-                       .ForEach(_columns.Add);
-            }
-
+            Setting.Columns
+                   .Select(c => new ColumnModel(c.Tabs.Select(d => d.ToTabModel()).ToArray()))
+                   .ForEach(_columns.Add);
             if (_columns.Count == 0)
             {
                 _columns.Add(new ColumnModel(Enumerable.Empty<TabModel>()));
@@ -81,85 +64,6 @@ namespace StarryEyes.Models.Tab
             if (!_loaded) return;
             Setting.Columns = Columns.Select(c => c.Tabs.Select(t => new TabDescription(t)))
                                      .Select(ts => new ColumnDescription { Tabs = ts.ToArray() }).ToArray();
-            SaveCache(Columns.Select(c => c.Tabs.Select(t => t.TabContentCache ?? new long[0])));
-        }
-
-        private static readonly object _cacheLock = new object();
-
-        private static IEnumerable<IEnumerable<IEnumerable<long>>> LoadCache()
-        {
-            lock (_cacheLock)
-            {
-                try
-                {
-                    if (!File.Exists(App.TabTempFilePath)) return null;
-                    using (var fs = File.OpenRead(App.TabTempFilePath))
-                    using (var ds = new DeflateStream(fs, CompressionMode.Decompress))
-                    using (var br = new BinaryReader(ds))
-                    {
-                        // ReSharper disable AccessToDisposedClosure
-                        return Enumerable
-                            .Range(0, br.ReadInt32())
-                            .Select(_ => Enumerable
-                                             .Range(0, br.ReadInt32())
-                                             .Select(__ => Enumerable
-                                                               .Range(0, br.ReadInt32())
-                                                               .Select(___ => br.ReadInt64())
-                                                               .ToArray())
-                                             .ToArray())
-                            .ToArray();
-                        // ReSharper restore AccessToDisposedClosure
-                    }
-                }
-                catch
-                {
-                    return null;
-                }
-            }
-        }
-
-        private static void SaveCache(IEnumerable<IEnumerable<IEnumerable<long>>> cache)
-        {
-            lock (_cacheLock)
-            {
-                try
-                {
-                    var array = cache.Select(ci => ci.Select(ids => ids.ToArray()).ToArray()).ToArray();
-                    using (var fs = File.OpenWrite(App.TabTempFilePath))
-                    using (var ds = new DeflateStream(fs, CompressionMode.Compress))
-                    using (var bw = new BinaryWriter(ds))
-                    {
-                        bw.Write(array.Length);
-                        foreach (var column in array)
-                        {
-                            bw.Write(column.Length);
-                            foreach (var tab in column)
-                            {
-                                bw.Write(tab.Length);
-                                foreach (var id in tab)
-                                {
-                                    bw.Write(id);
-                                }
-                            }
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine(ex);
-                    BackpanelModel.RegisterEvent(new OperationFailedEvent("キャッシュの更新に失敗しました: " + ex.Message));
-                    try
-                    {
-                        if (File.Exists(App.TabTempFilePath))
-                        {
-                            File.Delete(App.TabTempFilePath);
-                        }
-                    }
-                    catch
-                    {
-                    }
-                }
-            }
         }
 
         /// <summary>

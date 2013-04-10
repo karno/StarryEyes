@@ -59,7 +59,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 
         public override string ToQuery()
         {
-            return "*";
+            return "our";
         }
 
         public override long UserId

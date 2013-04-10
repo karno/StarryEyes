@@ -158,12 +158,12 @@ namespace StarryEyes.Filters.Parsing
         }
 
         // Operators:
-        // All: + - * / | & <- -> == > >= < <= != ! 
+        // All: + - * / | & <- -> == > >= < <= != ! in contains
         // L0: |
         // L1: &
         // L2: == !=
         // L3: < <= > >=
-        // L4: <- ->
+        // L4: <- -> in contains
         // L5: + -
         // L6: * /
         // L7: !
@@ -247,7 +247,7 @@ namespace StarryEyes.Filters.Parsing
 
         private static FilterOperatorBase CompileL4(TokenReader reader)
         {
-            // <- ->
+            // <- -> in contains
             FilterOperatorBase left = CompileL5(reader);
             if (!reader.IsRemainToken)
                 return left;
@@ -259,6 +259,19 @@ namespace StarryEyes.Filters.Parsing
                     return generate(TokenType.OperatorContains, new FilterOperatorContains());
                 case TokenType.OperatorContainedBy:
                     return generate(TokenType.OperatorContainedBy, new FilterOperatorContainedBy());
+                case TokenType.Literal:
+                    switch (reader.LookAhead().Value.ToLower())
+                    {
+                        case "in":
+                            // <-
+                            return generate(TokenType.Literal, new FilterOperatorContainedBy());
+                        case "contains":
+                            // ->
+                            return generate(TokenType.Literal, new FilterOperatorContains());
+                        default:
+                            return left;
+                    }
+                    break;
                 default:
                     return left;
             }
@@ -378,6 +391,9 @@ namespace StarryEyes.Filters.Parsing
             switch (literal.Value.ToLower())
             {
                 case "*":
+                case "we":
+                case "our":
+                case "us":
                     return GetAccountValue("*", reader);
                 case "@":
                     reader.AssertGet(TokenType.Period);

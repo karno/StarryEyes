@@ -247,9 +247,9 @@ namespace StarryEyes
 
         #region Definitions
 
-        internal static string ConsumerKey = "HzbATXmr3JpNXRPDNtkXww";
+        internal static readonly string ConsumerKey = "HzbATXmr3JpNXRPDNtkXww";
 
-        internal static string ConsumerSecret = "BfBH1h68S45X4kAlVdJAoopbEIEyF43kaRQe1vC2po";
+        internal static readonly string ConsumerSecret = "BfBH1h68S45X4kAlVdJAoopbEIEyF43kaRQe1vC2po";
 
         public static bool IsOperatingSystemSupported
         {
@@ -343,14 +343,6 @@ namespace StarryEyes
             }
         }
 
-        public static string TabTempFilePath
-        {
-            get
-            {
-                return Path.Combine(ConfigurationDirectoryPath, TabTempFileName);
-            }
-        }
-
         public static string HashtagTempFilePath
         {
             get
@@ -431,8 +423,6 @@ namespace StarryEyes
         public static readonly string ScriptDirectiory = "scripts";
 
         public static readonly string ConfigurationFileName = "krile.xml";
-
-        public static readonly string TabTempFileName = "tabs.cache";
 
         public static readonly string HashtagCacheFileName = "tags.cache";
 

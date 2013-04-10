@@ -263,6 +263,25 @@ namespace StarryEyes.ViewModels
             }
             TabManager.Load();
             TabManager.Save();
+            if (TabManager.Columns.Count == 1 && TabManager.Columns[0].Tabs.Count == 0)
+            {
+                var response = this.Messenger.GetResponse(new TaskDialogMessage(new TaskDialogOptions
+                {
+                    Title = "タブ情報の警告",
+                    CommonButtons = TaskDialogCommonButtons.YesNo,
+                    MainIcon = VistaTaskDialogIcon.Warning,
+                    MainInstruction = "タブ情報が失われた可能性があります。",
+                    Content = "タブが空です。" + Environment.NewLine +
+                    "初回起動時に生成されるタブを再生成しますか？",
+                }));
+                if (response.Response.Result == TaskDialogSimpleResult.Yes)
+                {
+                    Setting.ResetTabInfo();
+                    TabManager.Columns.Clear();
+                    TabManager.Load();
+                    TabManager.Save();
+                }
+            }
         }
 
         public bool OnClosing()
