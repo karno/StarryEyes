@@ -47,5 +47,11 @@ namespace StarryEyes.Models.Tab
             _tabs.Add(info);
             CurrentFocusTabIndex = _tabs.Count - 1;
         }
+
+        public void RemoveTab(int index)
+        {
+            _tabs.RemoveAt(index);
+            CurrentFocusTabIndex = index < _tabs.Count - 1 ? index : index > 0 ? index - 1 : -1;
+        }
     }
 }

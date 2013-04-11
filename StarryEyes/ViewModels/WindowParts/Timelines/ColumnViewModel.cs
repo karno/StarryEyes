@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Specialized;
+using System.Linq;
 using System.Reactive.Linq;
 using Livet;
 using StarryEyes.Models;
@@ -28,11 +28,8 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             get { return _tabs != null && _tabs.Count > 0 ? _tabs[_model.CurrentFocusTabIndex] : null; }
             set
             {
-                var previous = FocusedTab;
                 _model.CurrentFocusTabIndex = _currentFocus = _tabs.IndexOf(value);
-                if (previous != null)
-                    previous.UpdateFocus();
-                value.UpdateFocus();
+                _tabs.ForEach(item => item.UpdateFocus());
                 RaisePropertyChanged();
             }
         }
@@ -41,10 +38,8 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         {
             DispatcherHolder.Enqueue(() =>
             {
-                if (newFocus == _currentFocus) return;
-                _tabs[_currentFocus].UpdateFocus();
-                _tabs[newFocus].UpdateFocus();
                 _currentFocus = newFocus;
+                _tabs.ForEach(item => item.UpdateFocus());
                 RaisePropertyChanged(() => FocusedTab);
             });
         }
@@ -58,17 +53,6 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                     model.Tabs,
                     _ => new TabViewModel(this, _),
                     DispatcherHelper.UIDispatcher));
-            this.CompositeDisposable.Add(
-                model.Tabs.ListenCollectionChanged()
-                .Subscribe(arg =>
-                {
-                    switch (arg.Action)
-                    {
-                        case NotifyCollectionChangedAction.Add:
-                            _currentFocus = arg.NewStartingIndex;
-                            break;
-                    }
-                }));
             this.CompositeDisposable.Add(
                 Observable.FromEvent(
                 h => _model.OnCurrentFocusTabChanged += h,

@@ -227,7 +227,7 @@ namespace StarryEyes.Models.Tab
             var ti = _columns[colIndex].Tabs[tabIndex];
             ti.Deactivate();
             _closedTabsStack.Push(ti);
-            _columns[colIndex].Tabs.RemoveAt(tabIndex);
+            _columns[colIndex].RemoveTab(tabIndex);
             if (_columns[colIndex].Tabs.Count == 0 && _columns.Count > 2)
             {
                 CloseColumn(colIndex);

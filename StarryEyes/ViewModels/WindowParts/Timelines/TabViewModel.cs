@@ -6,6 +6,7 @@ using System.Reactive.Linq;
 using System.Threading;
 using System.Windows.Threading;
 using Livet.Messaging;
+using StarryEyes.Annotations;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Models;
 using StarryEyes.Models.Tab;
@@ -37,6 +38,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         /// <summary>
         ///     for design time support.
         /// </summary>
+        [UsedImplicitly]
         public TabViewModel()
         {
             _model = null;
