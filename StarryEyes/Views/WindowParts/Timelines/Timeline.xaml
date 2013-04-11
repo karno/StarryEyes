@@ -796,7 +796,7 @@
                                                 Grid.ColumnSpan="1"
                                                 Width="60"
                                                 Height="60"
-                                                Margin="0,0,10,0"
+                                                Margin="8,0"
                                                 HorizontalAlignment="Left"
                                                 VerticalAlignment="Top"
                                                 Background="#FFF0F0F0"
