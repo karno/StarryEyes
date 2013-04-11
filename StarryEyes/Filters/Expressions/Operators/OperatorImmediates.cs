@@ -15,7 +15,8 @@ namespace StarryEyes.Filters.Expressions.Operators
         {
             if (!FilterExpressionUtil.Assert(FilterExpressionType.Boolean, Value.SupportedTypes))
                 throw new FilterQueryException("Negate operator must be have boolean value.", ToQuery());
-            return _ => !Value.GetBooleanValueProvider()(_);
+            var bvp = Value.GetBooleanValueProvider();
+            return _ => !bvp(_);
         }
 
         public override string ToQuery()
@@ -39,20 +40,14 @@ namespace StarryEyes.Filters.Expressions.Operators
         {
             get
             {
-                if (_inner == null)
-                {
-                    // behave as "true" boolean value or empty set.
-                    return new[] { FilterExpressionType.Boolean, FilterExpressionType.Set };
-                }
-                return _inner.SupportedTypes;
+                return _inner == null ? new[] { FilterExpressionType.Boolean, FilterExpressionType.Set } :
+                    _inner.SupportedTypes;
             }
         }
 
         public override Func<TwitterStatus, bool> GetBooleanValueProvider()
         {
-            if (_inner == null)
-                return Tautology;
-            return _inner.GetBooleanValueProvider();
+            return _inner == null ? Tautology : _inner.GetBooleanValueProvider();
         }
 
         public override Func<TwitterStatus, long> GetNumericValueProvider()
@@ -64,9 +59,7 @@ namespace StarryEyes.Filters.Expressions.Operators
 
         public override Func<TwitterStatus, IReadOnlyCollection<long>> GetSetValueProvider()
         {
-            if (_inner == null)
-                return _ => new List<long>();
-            return _inner.GetSetValueProvider();
+            return _inner == null ? (_ => new List<long>()) : _inner.GetSetValueProvider();
         }
 
         public override Func<TwitterStatus, string> GetStringValueProvider()
