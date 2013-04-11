@@ -48,7 +48,7 @@ namespace StarryEyes.Models.Stores
             _dispatcher.Send(user);
             lock (_snResolverLocker)
             {
-                _screenNameResolver[user.ScreenName] = user.Id;
+                _screenNameResolver[user.ScreenName.ToLower()] = user.Id;
             }
         }
 
@@ -64,7 +64,7 @@ namespace StarryEyes.Models.Stores
             long id;
             lock (_snResolverLocker)
             {
-                if (!_screenNameResolver.TryGetValue(screenName, out id))
+                if (!_screenNameResolver.TryGetValue(screenName.ToLower(), out id))
                     return Observable.Empty<TwitterUser>();
             }
             return Get(id);
@@ -83,7 +83,7 @@ namespace StarryEyes.Models.Stores
             lock (_snResolverLocker)
             {
                 long id;
-                return !_screenNameResolver.TryGetValue(screenName, out id) ? 0 : id;
+                return !_screenNameResolver.TryGetValue(screenName.ToLower(), out id) ? 0 : id;
             }
         }
 
@@ -144,7 +144,7 @@ namespace StarryEyes.Models.Stores
                     {
                         var key = br.ReadString();
                         var value = br.ReadInt64();
-                        _screenNameResolver.Add(key, value);
+                        _screenNameResolver.Add(key.ToLower(), value);
                     }
                 }
             }

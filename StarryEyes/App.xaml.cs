@@ -30,6 +30,14 @@ namespace StarryEyes
         private static Mutex _appMutex;
         private void Application_Startup(object sender, StartupEventArgs e)
         {
+            try
+            {
+                StarryEyes.Filters.Parsing.QueryCompiler.Compile("where user == @kriletan").GetEvaluator();
+            }
+            catch (Exception ex)
+            {
+
+            }
             // enable multi-core JIT.
             // see reference: http://msdn.microsoft.com/en-us/library/system.runtime.profileoptimization.aspx
             if (IsMulticoreJitEnabled)
