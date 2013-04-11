@@ -203,7 +203,7 @@ namespace StarryEyes
                 builder.AppendLine("Krile STARRYEYES #" + FormattedVersion);
                 builder.AppendLine(Environment.OSVersion + " " + (Environment.Is64BitProcess ? "x64" : "x86"));
                 builder.AppendLine("execution mode: " + ExecutionMode.ToString() + " " +
-                    "multicore JIT: " + IsMulticoreJitEnabled.ToString() + " " +
+                    "multicore JIT: " + IsMulticoreJitEnabled.ToString() + ", " +
                     "hardware rendering: " + IsHardwareRenderingEnabled.ToString());
                 builder.AppendLine();
                 builder.AppendLine("thrown:");
