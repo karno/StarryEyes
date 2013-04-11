@@ -19,6 +19,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         where TValue : IBinarySerializable, new()
     {
         private readonly int _chunkCount;
+        private readonly IComparer<TKey> _comparer;
         private readonly PersistentChunk<TKey, TValue>[] _chunks;
 
         /// <summary>
@@ -36,6 +37,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
             : base(keyProvider)
         {
             _chunkCount = chunkCount;
+            _comparer = comparer;
             EnsurePath(baseDirectoryPath);
             if (manageData != null)
             {
@@ -126,10 +128,15 @@ namespace StarryEyes.Vanille.DataStore.Persistent
             {
                 var dictionary = _chunks.SelectMany(c => c.FindCaches(predicate, range))
                                         .ToDictionary(GetKey);
-                var keys = _chunks.SelectMany(c => c.GetIndexKeyValues(range))
-                                  .OrderByDescending(_ => _.Key);
+                var keys = dictionary.Select(d => new KeyValuePair<TKey, int>(d.Key, -1))
+                                     .Concat(_chunks.SelectMany(c => c.GetIndexKeyValues(range)))
+                                     .Distinct(k => k.Key);
+                if (_comparer != null)
+                {
+                    keys = keys.OrderBy(i => i.Key, _comparer);
+                }
                 return Observable.Start(() =>
-                                        keys.Select(k => GetChunk(k.Key).GetFromDrive(k.Value))
+                                        keys.Select(k => k.Value == -1 ? dictionary[k.Key] : GetChunk(k.Key).GetFromDrive(k.Value))
                                             .Where(predicate)
                                             .TakeIfNotNull(itemCount))
                                  .SelectMany(_ => _);
