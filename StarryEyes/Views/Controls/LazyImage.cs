@@ -4,7 +4,6 @@ using System.IO;
 using System.Net;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -117,6 +116,7 @@ namespace StarryEyes.Views.Controls
             }
         }
 
+        private const int MaxRetryCount = 3;
         private const int ThreadMaxCount = 8;
         private static int _threadCount;
         private static readonly ConcurrentQueue<Tuple<Uri, Subject<byte[]>>> WaitObjects = new ConcurrentQueue<Tuple<Uri, Subject<byte[]>>>();
@@ -141,7 +141,25 @@ namespace StarryEyes.Views.Controls
                         }
                         else
                         {
-                            result = client.DownloadData(uri);
+                            int errorCount = 0;
+                            while (true)
+                            {
+                                errorCount++;
+                                try
+                                {
+                                    result = client.DownloadData(uri);
+                                }
+                                catch (Exception ex)
+                                {
+                                    if (errorCount > MaxRetryCount)
+                                    {
+                                        throw;
+                                    }
+                                    System.Diagnostics.Debug.WriteLine(ex.ToString());
+                                    continue;
+                                }
+                                break;
+                            }
                         }
                         IObservable<byte[]> removal;
                         _imageStreamer.TryRemove(uri, out removal);
