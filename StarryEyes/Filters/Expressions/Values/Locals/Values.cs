@@ -26,8 +26,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
         {
             get
             {
-                if (_expression.UserId != 0)
-                    yield return FilterExpressionType.Numeric;
+                yield return FilterExpressionType.Numeric;
                 yield return FilterExpressionType.Set;
             }
         }

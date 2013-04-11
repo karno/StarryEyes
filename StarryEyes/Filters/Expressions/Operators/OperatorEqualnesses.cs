@@ -21,10 +21,10 @@ namespace StarryEyes.Filters.Expressions.Operators
                 FilterExpressionType.Boolean,
                 FilterExpressionType.Numeric,
                 FilterExpressionType.String,
-                FilterExpressionType.Set,
+                FilterExpressionType.Set
             };
-            var intersect = LeftValue.SupportedTypes.Intersect(RightValue.SupportedTypes);
-            if (intersect.Count() == 0)
+            var intersect = LeftValue.SupportedTypes.Intersect(RightValue.SupportedTypes).ToArray();
+            if (!intersect.Any())
                 throw new FilterQueryException("Value type is mismatched. Can't compare each other." + Environment.NewLine +
                     "Left argument is: " + LeftValue.SupportedTypes
                     .Select(t => t.ToString()).JoinString(", ") + Environment.NewLine +
@@ -88,30 +88,24 @@ namespace StarryEyes.Filters.Expressions.Operators
                     return false;
                 }
             }
-            else
+            var startsWith = right.StartsWith("^");
+            var endsWith = right.EndsWith("$");
+            if (startsWith && endsWith)
             {
-                var startsWith = right.StartsWith("^");
-                var endsWith = right.EndsWith("$");
-                if (startsWith && endsWith)
-                {
-                    return left.Equals(right.Substring(1, right.Length - 2),
-                        StringComparison.CurrentCultureIgnoreCase);
-                }
-                else if (startsWith)
-                {
-                    return left.StartsWith(right.Substring(1),
-                        StringComparison.CurrentCultureIgnoreCase);
-                }
-                else if (endsWith)
-                {
-                    return left.EndsWith(right.Substring(right.Length - 1),
-                        StringComparison.CurrentCultureIgnoreCase);
-                }
-                else
-                {
-                    return left.IndexOf(right, StringComparison.CurrentCultureIgnoreCase) >= 0;
-                }
+                return left.Equals(right.Substring(1, right.Length - 2),
+                                   StringComparison.CurrentCultureIgnoreCase);
             }
+            if (startsWith)
+            {
+                return left.StartsWith(right.Substring(1),
+                                       StringComparison.CurrentCultureIgnoreCase);
+            }
+            if (endsWith)
+            {
+                return left.EndsWith(right.Substring(right.Length - 1),
+                                     StringComparison.CurrentCultureIgnoreCase);
+            }
+            return left.IndexOf(right, StringComparison.CurrentCultureIgnoreCase) >= 0;
         }
 
         public enum StringArgumentSide
