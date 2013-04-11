@@ -29,16 +29,17 @@ namespace StarryEyes.Models.Operations
         protected override IObservable<TwitterStatus> RunCore()
         {
             return ExecFavorite()
-                .Catch((Exception ex) => GetExceptionDetail(ex)
-                                             .SelectMany(s =>
-                                             {
-                                                 if (s.Contains("You have already favorited this status"))
-                                                 {
-                                                     // favorited
-                                                     return Observable.Empty<TwitterStatus>();
-                                                 }
-                                                 throw ex;
-                                             }));
+                .Catch((Exception ex) =>
+                       GetExceptionDetail(ex)
+                           .SelectMany(s =>
+                           {
+                               if (s.Contains("You have already favorited this status"))
+                               {
+                                   // favorited
+                                   return Observable.Empty<TwitterStatus>();
+                               }
+                               throw ex;
+                           }));
         }
 
         private IObservable<TwitterStatus> ExecFavorite()
