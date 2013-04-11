@@ -850,6 +850,7 @@ namespace StarryEyes.ViewModels.WindowParts
             {
                 // can't send now.
                 RaisePropertyChanged(() => CanSend);
+                FocusToTextBox();
                 return;
             }
             if (InputInfo.PostedTweets != null && Setting.IsWarnAmendTweet.Value)
@@ -885,6 +886,7 @@ namespace StarryEyes.ViewModels.WindowParts
                 return;
             Send(InputInfo);
             ClearInput();
+            FocusToTextBox();
         }
 
         private bool CheckInput()
