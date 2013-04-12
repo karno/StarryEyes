@@ -26,14 +26,15 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
         {
             get
             {
-                yield return FilterExpressionType.Numeric;
+                if (_expression.UserId != -1)
+                    yield return FilterExpressionType.Numeric;
                 yield return FilterExpressionType.Set;
             }
         }
 
         public override Func<TwitterStatus, long> GetNumericValueProvider()
         {
-            if (_expression.UserId != 0)
+            if (_expression.UserId != -1)
                 return _ => _expression.UserId;
             return base.GetNumericValueProvider();
         }

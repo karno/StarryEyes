@@ -64,7 +64,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 
         public override long UserId
         {
-            get { return 0; } // an representive user is not existed.
+            get { return -1; } // an representive user is not existed.
         }
 
         public override void BeginLifecycle()
