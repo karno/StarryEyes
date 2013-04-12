@@ -34,9 +34,8 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 
         public override Func<TwitterStatus, long> GetNumericValueProvider()
         {
-            if (_expression.UserId != -1)
-                return _ => _expression.UserId;
-            return base.GetNumericValueProvider();
+            var cache = _expression.UserId;
+            return _ => cache;
         }
 
         public override Func<TwitterStatus, IReadOnlyCollection<long>> GetSetValueProvider()

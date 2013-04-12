@@ -30,14 +30,6 @@ namespace StarryEyes
         private static Mutex _appMutex;
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            try
-            {
-                StarryEyes.Filters.Parsing.QueryCompiler.Compile("where user == @kriletan").GetEvaluator();
-            }
-            catch (Exception ex)
-            {
-
-            }
             // enable multi-core JIT.
             // see reference: http://msdn.microsoft.com/en-us/library/system.runtime.profileoptimization.aspx
             if (IsMulticoreJitEnabled)
@@ -111,47 +103,49 @@ namespace StarryEyes
             CacheStore.Initialize();
 
             // Initialize core systems
-            try
-            {
-                if (Setting.DatabaseCorruption.Value)
-                {
-                    throw new DataPersistenceException("データストアの不整合が検出されています。");
-                }
-                StatusStore.Initialize();
-                UserStore.Initialize();
-            }
-            catch (Exception ex)
+            if (Setting.DatabaseCorruption.Value)
             {
                 var option = new TaskDialogOptions
                 {
                     MainIcon = VistaTaskDialogIcon.Error,
                     Title = "Krile データストア初期化エラー",
-                    MainInstruction = "Krileの起動中にエラーが発生しました。",
-                    Content = "データストアが破損しています。" + Environment.NewLine +
+                    MainInstruction = "データストアの破損が検出されています。",
+                    Content = "データストアが破損している可能性があります。" + Environment.NewLine +
                     "データストアを初期化するか、またはKrileを終了してバックアップを取ることができます。",
-                    ExpandedInfo = ex.ToString(),
-                    CommandButtons = new[] { "データストアを初期化して再起動", "Krileを終了" }
+                    CommandButtons = new[] { "データストアを初期化して再起動", "Krileを終了", "無視して起動を続ける" }
                 };
                 var result = TaskDialog.Show(option);
-                if (!result.CommandButtonResult.HasValue ||
-                    result.CommandButtonResult.Value == 1)
+                if (result.CommandButtonResult.HasValue)
                 {
-                    // shutdown
-                    Current.Shutdown();
-                    return;
+                    switch (result.CommandButtonResult.Value)
+                    {
+                        case 0:
+                            _appMutex.Dispose();
+                            // shutdown
+                            Current.Shutdown();
+                            Process.GetCurrentProcess().Kill();
+                            return;
+                        case 1:
+                            StatusStore.Shutdown();
+                            UserStore.Shutdown();
+                            // clear data
+                            ClearStoreData();
+                            Setting.DatabaseCorruption.Value = false;
+                            Setting.Save();
+                            _appMutex.Dispose();
+                            Process.Start(ResourceAssembly.Location);
+                            Current.Shutdown();
+                            Process.GetCurrentProcess().Kill();
+                            return;
+                        case 2:
+                            Setting.DatabaseCorruption.Value = false;
+                            break;
+                    }
                 }
-                StatusStore.Shutdown();
-                UserStore.Shutdown();
-                // clear data
-                ClearStoreData();
-                Setting.DatabaseCorruption.Value = false;
-                Setting.Save();
-                _appMutex.Dispose();
-                Process.Start(ResourceAssembly.Location);
-                Current.Shutdown();
-                Process.GetCurrentProcess().Kill();
-                return;
             }
+
+            StatusStore.Initialize();
+            UserStore.Initialize();
             AccountsStore.Initialize();
             StatisticsService.Initialize();
             StreamingEventsHub.Initialize();
