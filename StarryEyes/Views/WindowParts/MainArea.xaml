@@ -76,7 +76,7 @@
                 </DataTemplate.Triggers>
             </DataTemplate>
             <DataTemplate x:Key="ColumnTemplate">
-                <Grid Margin="8,8,8,0" Background="{x:Null}">
+                <Grid Margin="8,4,8,0" Background="{x:Null}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition />
