@@ -39,7 +39,6 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         public StatusViewModel(TimelineViewModelBase parent, TwitterStatus status,
                                IEnumerable<long> initialBoundAccounts)
         {
-            var sw = new System.Diagnostics.Stopwatch();
             _parent = parent;
             // get status model
             Model = StatusModel.Get(status);
@@ -345,9 +344,12 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             {
                 if (IsSourceIsLink)
                 {
-                    int start = Status.Source.IndexOf(">", StringComparison.Ordinal);
-                    int end = Status.Source.IndexOf("<", start + 1, StringComparison.Ordinal);
-                    return Status.Source.Substring(start + 1, end - start - 1);
+                    var start = Status.Source.IndexOf(">", StringComparison.Ordinal);
+                    var end = Status.Source.IndexOf("<", start + 1, StringComparison.Ordinal);
+                    if (start >= 0 && end >= 0)
+                    {
+                        return Status.Source.Substring(start + 1, end - start - 1);
+                    }
                 }
                 return Status.Source;
             }
@@ -425,16 +427,19 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         public void OpenSourceLink()
         {
             if (!IsSourceIsLink) return;
-            int start = Status.Source.IndexOf("\"", StringComparison.Ordinal);
-            int end = Status.Source.IndexOf("\"", start + 1, StringComparison.Ordinal);
-            string url = Status.Source.Substring(start + 1, end - start - 1);
-            BrowserHelper.Open(url);
+            var start = Status.Source.IndexOf("\"", StringComparison.Ordinal);
+            var end = Status.Source.IndexOf("\"", start + 1, StringComparison.Ordinal);
+            if (start >= 0 && end >= 0)
+            {
+                var url = Status.Source.Substring(start + 1, end - start - 1);
+                BrowserHelper.Open(url);
+            }
         }
 
         public void OpenFirstImage()
         {
             if (Model.Images == null) return;
-            Tuple<Uri, Uri> tuple = Model.Images.FirstOrDefault();
+            var tuple = Model.Images.FirstOrDefault();
             if (tuple == null) return;
             BrowserHelper.Open(tuple.Item1);
         }
@@ -652,7 +657,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                                         "自分自身のツイートをお気に入り登録しないよう設定されています。");
                 return;
             }
-            AuthenticateInfo[] favoriteds =
+            var favoriteds =
                 AccountsStore.Accounts
                              .Where(a => Model.IsFavorited(a.UserId))
                              .Select(a => a.AuthenticateInfo)
@@ -663,11 +668,11 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                 favoriteds,
                 infos =>
                 {
-                    AuthenticateInfo[] authenticateInfos =
+                    var authenticateInfos =
                         infos as AuthenticateInfo[] ?? infos.ToArray();
-                    IEnumerable<AuthenticateInfo> adds =
+                    var adds =
                         authenticateInfos.Except(favoriteds);
-                    IEnumerable<AuthenticateInfo> rmvs =
+                    var rmvs =
                         favoriteds.Except(authenticateInfos);
                     Favorite(adds, true);
                     Favorite(rmvs, false);
@@ -680,7 +685,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             {
                 return;
             }
-            AuthenticateInfo[] retweeteds =
+            var retweeteds =
                 AccountsStore.Accounts
                              .Where(a => Model.IsRetweeted(a.UserId))
                              .Select(a => a.AuthenticateInfo)
@@ -691,11 +696,11 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                 retweeteds,
                 infos =>
                 {
-                    AuthenticateInfo[] authenticateInfos =
+                    var authenticateInfos =
                         infos as AuthenticateInfo[] ?? infos.ToArray();
-                    IEnumerable<AuthenticateInfo> adds =
+                    var adds =
                         authenticateInfos.Except(retweeteds);
-                    IEnumerable<AuthenticateInfo> rmvs =
+                    var rmvs =
                         retweeteds.Except(authenticateInfos);
                     Retweet(adds, true);
                     Retweet(rmvs, false);
@@ -776,7 +781,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             }
             else
             {
-                AccountSetting ai = AccountsStore.GetAccountSetting(OriginalStatus.User.Id);
+                var ai = AccountsStore.GetAccountSetting(OriginalStatus.User.Id);
                 if (ai != null)
                 {
                     info = ai.AuthenticateInfo;
@@ -927,7 +932,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public void OpenLink(string parameter)
         {
-            Tuple<LinkType, string> param = StatusStylizer.ResolveInternalUrl(parameter);
+            var param = StatusStylizer.ResolveInternalUrl(parameter);
             switch (param.Item1)
             {
                 case LinkType.User:
