@@ -9,6 +9,7 @@
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:seb="clr-namespace:StarryEyes.Views.Behaviors"
              xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:utils="clr-namespace:StarryEyes.Views.Utils"
              xmlns:windowParts="clr-namespace:StarryEyes.ViewModels.WindowParts"
@@ -297,6 +298,7 @@
                     </DockPanel>
                     <controls:SuggestableTextBox Grid.Row="1"
                                                  AcceptsReturn="True"
+                                                 AllowDrop="True"
                                                  BorderBrush="{x:Null}"
                                                  BorderThickness="0"
                                                  Padding="2,4"
@@ -318,6 +320,7 @@
                             <l:TextBoxBindingSupportBehavior SelectedText="{Binding SelectedText}"
                                                              SelectionLength="{Binding SelectionLength}"
                                                              SelectionStart="{Binding SelectionStart}" />
+                            <seb:DropAcceptBehavior Description="{Binding DropAcceptDescription}" />
                         </i:Interaction.Behaviors>
                         <controls:SuggestableTextBox.ListItemTemplate>
                             <DataTemplate>

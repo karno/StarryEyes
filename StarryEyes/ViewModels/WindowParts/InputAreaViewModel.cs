@@ -9,6 +9,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media.Imaging;
 using Livet;
 using Livet.Commands;
@@ -24,12 +25,12 @@ using StarryEyes.Models;
 using StarryEyes.Models.Backpanels.NotificationEvents.PostEvents;
 using StarryEyes.Models.Operations;
 using StarryEyes.Models.Stores;
+using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
 using StarryEyes.ViewModels.WindowParts.Flips;
 using StarryEyes.ViewModels.WindowParts.Timelines;
 using StarryEyes.Views.Controls;
 using StarryEyes.Views.Messaging;
-using TaskDialogInterop;
 
 namespace StarryEyes.ViewModels.WindowParts
 {
@@ -776,6 +777,9 @@ namespace StarryEyes.ViewModels.WindowParts
             InputInfo = InputAreaModel.PreviousPosted;
         }
 
+
+        #region Image attach control
+
         public void AttachImage()
         {
             var msg = new OpeningFileSelectionMessage
@@ -797,9 +801,36 @@ namespace StarryEyes.ViewModels.WindowParts
             AttachedImage = null;
         }
 
-        public void OpenAttachedImage()
+        private DropAcceptDescription _description;
+        public DropAcceptDescription DropAcceptDescription
         {
+            get
+            {
+                if (_description == null)
+                {
+                    _description = new DropAcceptDescription();
+                    _description.DragOver += args =>
+                    {
+                        args.Effects = args.Data.GetData(DataFormats.FileDrop) != null
+                                           ? DragDropEffects.Link
+                                           : DragDropEffects.None;
+                        args.Handled = true;
+                    };
+                    _description.DragDrop += args =>
+                    {
+                        var files = args.Data.GetData(DataFormats.FileDrop) as string[];
+                        if (files != null && files.Length > 0)
+                        {
+                            AttachedImage = new ImageDescriptionViewModel(files[0]);
+                        }
+                    };
+                }
+                return _description;
+            }
         }
+
+
+        #endregion
 
         public void AttachLocation()
         {

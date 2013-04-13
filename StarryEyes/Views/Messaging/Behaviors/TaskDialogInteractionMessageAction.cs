@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using Livet.Behaviors.Messaging;
 using Livet.Messaging;
-using TaskDialogInterop;
+using StarryEyes.Nightmare.Windows;
 
 namespace StarryEyes.Views.Messaging.Behaviors
 {

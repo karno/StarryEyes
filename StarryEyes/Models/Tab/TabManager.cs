@@ -120,12 +120,47 @@ namespace StarryEyes.Models.Tab
         }
 
         /// <summary>
+        ///     Find column info where existed.
+        /// </summary>
+        /// <param name="column">find column</param>
+        /// <returns>If found, returns >= 0. Otherwise, return -1.</returns>
+        public static int FindColumnIndex(ColumnModel column)
+        {
+            for (int ci = 0; ci < _columns.Count; ci++)
+            {
+                if (_columns[ci] == column)
+                {
+                    return ci;
+                }
+            }
+            return -1;
+        }
+
+        /// <summary>
         ///     Find tab info where existed.
         /// </summary>
         /// <param name="info">tab info</param>
         /// <param name="colIndex">column index</param>
         /// <param name="tabIndex">tab index</param>
-        public static void GetTabInfoIndexes(TabModel info, out int colIndex, out int tabIndex)
+        public static int FindTabIndex(TabModel info, int colIndex)
+        {
+            for (int ti = 0; ti < _columns[colIndex].Tabs.Count; ti++)
+            {
+                if (_columns[colIndex].Tabs[ti] == info)
+                {
+                    return ti;
+                }
+            }
+            return -1;
+        }
+
+        /// <summary>
+        ///     Find tab info where existed.
+        /// </summary>
+        /// <param name="info">tab info</param>
+        /// <param name="colIndex">column index</param>
+        /// <param name="tabIndex">tab index</param>
+        public static bool FindColumnTabIndex(TabModel info, out int colIndex, out int tabIndex)
         {
             for (int ci = 0; ci < _columns.Count; ci++)
             {
@@ -135,11 +170,13 @@ namespace StarryEyes.Models.Tab
                     {
                         colIndex = ci;
                         tabIndex = ti;
-                        return;
+                        return true;
                     }
                 }
             }
-            throw new ArgumentException("specified TabInfo was not found.");
+            colIndex = -1;
+            tabIndex = -1;
+            return false;
         }
 
         /// <summary>
@@ -150,7 +187,7 @@ namespace StarryEyes.Models.Tab
         public static void MoveTo(TabModel info, int columnIndex, int tabIndex)
         {
             int fci, fti;
-            GetTabInfoIndexes(info, out fci, out fti);
+            if (!FindColumnTabIndex(info, out fci, out fti)) return;
             MoveTo(fci, fti, columnIndex, tabIndex);
         }
 
@@ -162,13 +199,13 @@ namespace StarryEyes.Models.Tab
             if (fromColumnIndex == destColumnIndex)
             {
                 // in-column moving
-                _columns[fromColumnIndex].Tabs.Move(fromTabIndex, fromColumnIndex);
+                _columns[fromColumnIndex].Tabs.Move(fromTabIndex, destTabIndex);
             }
             else
             {
                 TabModel tab = _columns[fromColumnIndex].Tabs[fromTabIndex];
                 _columns[fromColumnIndex].Tabs.RemoveAt(fromTabIndex);
-                _columns[destTabIndex].Tabs.Insert(destTabIndex, tab);
+                _columns[destColumnIndex].Tabs.Insert(destTabIndex, tab);
             }
             Save();
         }

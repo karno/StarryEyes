@@ -38,10 +38,15 @@ namespace StarryEyes.Models.Tab
             FilterQueryString = query;
         }
 
+        private string _name;
         /// <summary>
         ///     Name of this tab.
         /// </summary>
-        public string Name { get; set; }
+        public string Name
+        {
+            get { return String.IsNullOrEmpty(_name) ? "(empty)" : _name; }
+            set { _name = value; }
+        }
 
         /// <summary>
         /// Notify new arrivals.

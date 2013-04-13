@@ -36,6 +36,9 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.WindowsAPICodePack">
+      <HintPath>..\packages\LivetExtensions.1.1.0.0\lib\net45\Microsoft.WindowsAPICodePack.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
@@ -48,6 +51,9 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="TaskDialog">
+      <HintPath>..\StarryEyes\bin\Debug\TaskDialog.dll</HintPath>
+    </Reference>
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
@@ -58,6 +64,9 @@
     <Compile Include="Windows\Forms\WinFormsMouseEventArgs.cs" />
     <Compile Include="Windows\Application.cs" />
     <Compile Include="Windows\SystemInformation.cs" />
+    <Compile Include="Windows\TaskDialog.cs" />
+    <Compile Include="Windows\TaskDialogOptions.cs" />
+    <Compile Include="Windows\TaskDialogResult.cs" />
     <Compile Include="Windows\WindowNativeExtension.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

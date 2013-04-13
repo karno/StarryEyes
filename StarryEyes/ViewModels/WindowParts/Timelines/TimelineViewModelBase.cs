@@ -13,9 +13,9 @@ using StarryEyes.Breezy.DataModel;
 using StarryEyes.Models;
 using StarryEyes.Models.Stores;
 using StarryEyes.Models.Tab;
+using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
 using StarryEyes.Views.Messaging;
-using TaskDialogInterop;
 
 namespace StarryEyes.ViewModels.WindowParts.Timelines
 {

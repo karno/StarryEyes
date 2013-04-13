@@ -19,10 +19,10 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
     /// </summary>
     public sealed class TabViewModel : TimelineViewModelBase
     {
-        private readonly ColumnViewModel _owner;
-        public ColumnViewModel Owner
+        private readonly ColumnViewModel _parent;
+        public ColumnViewModel Parent
         {
-            get { return _owner; }
+            get { return _parent; }
         }
 
         private readonly TabModel _model;
@@ -44,9 +44,9 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             _model = null;
         }
 
-        public TabViewModel(ColumnViewModel owner, TabModel tabModel)
+        public TabViewModel(ColumnViewModel parent, TabModel tabModel)
         {
-            _owner = owner;
+            _parent = parent;
             _model = tabModel;
             tabModel.Activate();
             BindTimeline();
@@ -111,7 +111,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public override void GotPhysicalFocus()
         {
-            _owner.Focus();
+            _parent.Focus();
         }
 
         private void BindTimeline()
@@ -153,7 +153,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public bool IsFocused
         {
-            get { return Owner.FocusedTab == this; }
+            get { return Parent.FocusedTab == this; }
         }
 
         internal void UpdateFocus()
@@ -195,9 +195,9 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public void Focus()
         {
-            Owner.FocusedTab = this;
+            Parent.FocusedTab = this;
             // propagate focus
-            Owner.Focus();
+            Parent.Focus();
         }
 
         public override void ReadMore(long id)
@@ -240,7 +240,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public void CopyTab()
         {
-            Owner.Model.CreateTab(
+            Parent.Model.CreateTab(
                 new TabModel(this.Name + "_",
                              this.Model.FilterQueryString));
         }
@@ -256,7 +256,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public void CloseTab()
         {
-            Owner.CloseTab(this);
+            Parent.CloseTab(this);
         }
         #endregion
     }

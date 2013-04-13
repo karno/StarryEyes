@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 using Livet.Messaging;
-using TaskDialogInterop;
+using StarryEyes.Nightmare.Windows;
 
 namespace StarryEyes.Views.Messaging
 {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reactive.Linq;
 using Livet;
 using StarryEyes.Models;
@@ -27,6 +28,16 @@ namespace StarryEyes.ViewModels.WindowParts
                           .Select(_ => TabManager.CurrentFocusColumnIndex)
                           .Subscribe(UpdateFocusFromModel));
             RegisterEvents();
+        }
+
+        public void StartDragDrop()
+        {
+            Columns.ForEach(c => c.IsDragDropping = true);
+        }
+
+        public void FinishDragDrop()
+        {
+            Columns.ForEach(c => c.IsDragDropping = false);
         }
 
         public ReadOnlyDispatcherCollectionRx<ColumnViewModel> Columns

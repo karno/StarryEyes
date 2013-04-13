@@ -11,13 +11,13 @@ using StarryEyes.Models.Connections.UserDependencies;
 using StarryEyes.Models.Stores;
 using StarryEyes.Models.Subsystems;
 using StarryEyes.Models.Tab;
+using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
 using StarryEyes.ViewModels.Dialogs;
 using StarryEyes.ViewModels.WindowParts;
 using StarryEyes.ViewModels.WindowParts.Flips;
 using StarryEyes.Views.Dialogs;
 using StarryEyes.Views.Messaging;
-using TaskDialogInterop;
 
 namespace StarryEyes.ViewModels
 {

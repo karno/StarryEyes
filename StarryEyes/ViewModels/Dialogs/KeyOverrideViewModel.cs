@@ -5,6 +5,7 @@ using Livet;
 using Livet.Messaging.Windows;
 using StarryEyes.Breezy.Api;
 using StarryEyes.Models.Stores;
+using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
 using StarryEyes.Views.Messaging;
 
@@ -73,14 +74,14 @@ namespace StarryEyes.ViewModels.Dialogs
                     this.Messenger.Raise(new WindowActionMessage(WindowAction.Close));
                 },
                 ex => this.Messenger.Raise(new TaskDialogMessage(
-                                               new TaskDialogInterop.TaskDialogOptions
+                                               new TaskDialogOptions
                                                {
                                                    Title = "認証失敗",
-                                                   MainIcon = TaskDialogInterop.VistaTaskDialogIcon.Error,
+                                                   MainIcon = VistaTaskDialogIcon.Error,
                                                    MainInstruction = "API Keyの正当性を確認できませんでした。",
                                                    Content = "キーの入力を確認し、再度お試しください。",
-                                                   CommonButtons = TaskDialogInterop.TaskDialogCommonButtons.Close,
-                                                   FooterIcon = TaskDialogInterop.VistaTaskDialogIcon.Information,
+                                                   CommonButtons = TaskDialogCommonButtons.Close,
+                                                   FooterIcon = VistaTaskDialogIcon.Information,
                                                    FooterText = "Twitterの調子が悪いときやコンピュータの時計が大幅にずれている場合も認証が行えないことがあります。"
                                                })));
         }
@@ -90,18 +91,18 @@ namespace StarryEyes.ViewModels.Dialogs
             if (String.IsNullOrEmpty(Setting.GlobalConsumerKey.Value) && String.IsNullOrEmpty(Setting.GlobalConsumerSecret.Value))
             {
                 var m = this.Messenger.GetResponse(new TaskDialogMessage(
-                     new TaskDialogInterop.TaskDialogOptions
+                     new TaskDialogOptions
                      {
                          Title = "APIキー設定のスキップ",
-                         MainIcon = TaskDialogInterop.VistaTaskDialogIcon.Warning,
+                         MainIcon = VistaTaskDialogIcon.Warning,
                          MainInstruction = "APIキーの設定をスキップしますか？",
                          Content = "スキップする場合、いくつか制限が適用されます。" + Environment.NewLine +
                          "後からもキーを設定できますが、その際にすべてのアカウントを認証しなおす必要があります。",
-                         CommonButtons = TaskDialogInterop.TaskDialogCommonButtons.OKCancel,
+                         CommonButtons = TaskDialogCommonButtons.OKCancel,
                          ExpandedInfo = "APIキーの状況によってはアカウントが登録できないことがあります。" + Environment.NewLine +
                          "また、最大登録可能アカウント数も制限されます。"
                      }));
-                if (m.Response.Result == TaskDialogInterop.TaskDialogSimpleResult.Ok)
+                if (m.Response.Result == TaskDialogSimpleResult.Ok)
                 {
                     this.Messenger.Raise(new WindowActionMessage(WindowAction.Close));
                 }

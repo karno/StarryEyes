@@ -4,6 +4,7 @@
              xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
              xmlns:Timelines="clr-namespace:StarryEyes.Views.WindowParts.Timelines"
              xmlns:Utils="clr-namespace:StarryEyes.Views.Utils"
+             xmlns:behaviors="clr-namespace:StarryEyes.Views.Behaviors"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
@@ -20,6 +21,11 @@
             <Utils:BooleanToVisibleConverter x:Key="BooleanToVisibleConverter" />
             <DataTemplate x:Key="TabHeaderTemplate">
                 <StackPanel Margin="0,8,8,4" Orientation="Horizontal">
+                    <i:Interaction.Behaviors>
+                        <behaviors:DragStartBehavior AfterDragDropCommand="{Binding Parent.DragDropFinishCommand}"
+                                                     BeforeDragDropCommand="{Binding Parent.DragDropStartCommand}"
+                                                     DragDropData="{Binding}" />
+                    </i:Interaction.Behaviors>
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="MouseLeftButtonDown">
                             <ei:CallMethodAction MethodName="Focus" TargetObject="{Binding}" />
@@ -30,8 +36,8 @@
                             <MenuItem Command="{Binding EditTabCommand}" Header="編集..." />
                             <MenuItem Command="{Binding CopyTabCommand}" Header="このタブをコピーして追加" />
                             <Separator />
-                            <MenuItem Command="{Binding Owner.CreateNewTabCommand}" Header="新しいタブの追加..." />
-                            <MenuItem Command="{Binding Owner.RestoreLastClosedTabCommand}" Header="最後に閉じたタブを元に戻す" />
+                            <MenuItem Command="{Binding Parent.CreateNewTabCommand}" Header="新しいタブの追加..." />
+                            <MenuItem Command="{Binding Parent.RestoreLastClosedTabCommand}" Header="最後に閉じたタブを元に戻す" />
                             <Separator />
                             <MenuItem Command="{Binding CloseTabCommand}" Header="タブを閉じる" />
                         </ContextMenu>
@@ -54,14 +60,14 @@
                     <MultiDataTrigger>
                         <MultiDataTrigger.Conditions>
                             <Condition Binding="{Binding IsFocused}" Value="True" />
-                            <Condition Binding="{Binding Owner.IsFocused}" Value="True" />
+                            <Condition Binding="{Binding Parent.IsFocused}" Value="True" />
                         </MultiDataTrigger.Conditions>
                         <Setter TargetName="TabName" Property="Foreground" Value="Black" />
                     </MultiDataTrigger>
                     <MultiDataTrigger>
                         <MultiDataTrigger.Conditions>
                             <Condition Binding="{Binding IsFocused}" Value="True" />
-                            <Condition Binding="{Binding Owner.IsFocused}" Value="False" />
+                            <Condition Binding="{Binding Parent.IsFocused}" Value="False" />
                         </MultiDataTrigger.Conditions>
                         <Setter TargetName="TabName" Property="Foreground" Value="#FF1BA1E2" />
                     </MultiDataTrigger>
@@ -75,9 +81,13 @@
                     </Grid.RowDefinitions>
                     <ItemsControl MinHeight="16"
                                   Margin="8,0"
+                                  AllowDrop="True"
                                   Background="White"
                                   ItemTemplate="{StaticResource TabHeaderTemplate}"
                                   ItemsSource="{Binding Tabs}">
+                        <i:Interaction.Behaviors>
+                            <behaviors:AdornedDropAcceptBehavior Description="{Binding DropAcceptDescription}" />
+                        </i:Interaction.Behaviors>
                         <ItemsControl.ContextMenu>
                             <ContextMenu DataContext="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
                                 <MenuItem Command="{Binding CreateNewTabCommand}" Header="新しいタブの追加..." />

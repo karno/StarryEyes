@@ -2,16 +2,14 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.Serialization;
 using System.Xaml;
-using System.Xml;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Breezy.Imaging;
 using StarryEyes.Filters;
 using StarryEyes.Filters.Expressions;
 using StarryEyes.Filters.Parsing;
 using StarryEyes.Models.Tab;
-using TaskDialogInterop;
+using StarryEyes.Nightmare.Windows;
 
 namespace StarryEyes.Settings
 {

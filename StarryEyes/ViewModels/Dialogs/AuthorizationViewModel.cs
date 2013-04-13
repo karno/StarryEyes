@@ -7,6 +7,7 @@ using Livet;
 using Livet.Commands;
 using Livet.Messaging.Windows;
 using StarryEyes.Breezy.Authorize;
+using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
 using StarryEyes.Views.Messaging;
 
@@ -46,14 +47,14 @@ namespace StarryEyes.ViewModels.Dialogs
                     BrowserHelper.Open(_authorizer.BuildAuthorizeUrl(AuthorizationEndpoint, t.Token));
                 },
                 ex => this.Messenger.Raise(new TaskDialogMessage(
-                                               new TaskDialogInterop.TaskDialogOptions
+                                               new TaskDialogOptions
                                                {
                                                    Title = "認証失敗",
-                                                   MainIcon = TaskDialogInterop.VistaTaskDialogIcon.Error,
+                                                   MainIcon = VistaTaskDialogIcon.Error,
                                                    MainInstruction = "Twitterと正しく通信できませんでした。",
                                                    Content = "何度も繰り返し発生する場合は、しばらく時間を置いて試してみてください。",
-                                                   CommonButtons = TaskDialogInterop.TaskDialogCommonButtons.Close,
-                                                   FooterIcon = TaskDialogInterop.VistaTaskDialogIcon.Information,
+                                                   CommonButtons = TaskDialogCommonButtons.Close,
+                                                   FooterIcon = VistaTaskDialogIcon.Information,
                                                    FooterText = "コンピュータの時計が大幅にずれている場合も認証が行えないことがあります。"
                                                })));
         }
@@ -120,14 +121,14 @@ namespace StarryEyes.ViewModels.Dialogs
                 {
                     CurrentAuthenticationStep = AuthenticationStep.WaitingPinInput;
                     this.Messenger.Raise(new TaskDialogMessage(
-                        new TaskDialogInterop.TaskDialogOptions
+                        new TaskDialogOptions
                         {
                             Title = "アクセス許可取得失敗",
-                            MainIcon = TaskDialogInterop.VistaTaskDialogIcon.Error,
+                            MainIcon = VistaTaskDialogIcon.Error,
                             MainInstruction = "アカウントを認証できませんでした。",
                             Content = "PINを確認しもう一度入力するか、最初からやり直してみてください。",
-                            CommonButtons = TaskDialogInterop.TaskDialogCommonButtons.Close,
-                            FooterIcon = TaskDialogInterop.VistaTaskDialogIcon.Information,
+                            CommonButtons = TaskDialogCommonButtons.Close,
+                            FooterIcon = VistaTaskDialogIcon.Information,
                             FooterText = "コンピュータの時計が大幅にずれている場合も認証が行えないことがあります。"
                         }));
                 });

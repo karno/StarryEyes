@@ -12,10 +12,10 @@ using StarryEyes.Models;
 using StarryEyes.Models.Backpanels.NotificationEvents;
 using StarryEyes.Models.Operations;
 using StarryEyes.Models.Stores;
+using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
 using StarryEyes.Views.Messaging;
 using StarryEyes.Views.Utils;
-using TaskDialogInterop;
 
 namespace StarryEyes.ViewModels.WindowParts.Timelines
 {

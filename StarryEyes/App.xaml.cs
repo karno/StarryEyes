@@ -16,9 +16,9 @@ using StarryEyes.Models.Connections;
 using StarryEyes.Models.Plugins;
 using StarryEyes.Models.Stores;
 using StarryEyes.Models.Subsystems;
+using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
 using StarryEyes.Vanille.DataStore.Persistent;
-using TaskDialogInterop;
 
 namespace StarryEyes
 {
