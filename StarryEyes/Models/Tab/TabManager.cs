@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using Livet;
-using StarryEyes.Models.Backpanels.NotificationEvents;
 using StarryEyes.Settings;
 
 namespace StarryEyes.Models.Tab
@@ -97,7 +94,7 @@ namespace StarryEyes.Models.Tab
                 _currentFocusColumnIndex = value;
                 var col = _columns[_currentFocusColumnIndex];
                 InputAreaModel.NotifyChangeFocusingTab(col.Tabs[col.CurrentFocusTabIndex]);
-                Action handler = OnCurrentFocusColumnChanged;
+                var handler = OnCurrentFocusColumnChanged;
                 if (handler != null) handler();
             }
         }
@@ -126,7 +123,7 @@ namespace StarryEyes.Models.Tab
         /// <returns>If found, returns >= 0. Otherwise, return -1.</returns>
         public static int FindColumnIndex(ColumnModel column)
         {
-            for (int ci = 0; ci < _columns.Count; ci++)
+            for (var ci = 0; ci < _columns.Count; ci++)
             {
                 if (_columns[ci] == column)
                 {
@@ -141,10 +138,9 @@ namespace StarryEyes.Models.Tab
         /// </summary>
         /// <param name="info">tab info</param>
         /// <param name="colIndex">column index</param>
-        /// <param name="tabIndex">tab index</param>
         public static int FindTabIndex(TabModel info, int colIndex)
         {
-            for (int ti = 0; ti < _columns[colIndex].Tabs.Count; ti++)
+            for (var ti = 0; ti < _columns[colIndex].Tabs.Count; ti++)
             {
                 if (_columns[colIndex].Tabs[ti] == info)
                 {
@@ -162,9 +158,9 @@ namespace StarryEyes.Models.Tab
         /// <param name="tabIndex">tab index</param>
         public static bool FindColumnTabIndex(TabModel info, out int colIndex, out int tabIndex)
         {
-            for (int ci = 0; ci < _columns.Count; ci++)
+            for (var ci = 0; ci < _columns.Count; ci++)
             {
-                for (int ti = 0; ti < _columns[ci].Tabs.Count; ti++)
+                for (var ti = 0; ti < _columns[ci].Tabs.Count; ti++)
                 {
                     if (_columns[ci].Tabs[ti] == info)
                     {
@@ -180,47 +176,23 @@ namespace StarryEyes.Models.Tab
         }
 
         /// <summary>
-        /// </summary>
-        /// <param name="info"></param>
-        /// <param name="columnIndex"></param>
-        /// <param name="tabIndex"></param>
-        public static bool MoveTo(TabModel info, int columnIndex, int tabIndex)
-        {
-            int fci, fti;
-            if (!FindColumnTabIndex(info, out fci, out fti)) return false;
-            return MoveTo(fci, fti, columnIndex, tabIndex);
-        }
-
-        /// <summary>
         ///     Move specified tab.
         /// </summary>
-        public static bool MoveTo(int fromColumnIndex, int fromTabIndex, int destColumnIndex, int destTabIndex)
+        public static void MoveTo(int fromColumnIndex, int fromTabIndex, int destColumnIndex, int destTabIndex)
         {
             if (fromColumnIndex == destColumnIndex)
             {
-                if (fromTabIndex < destTabIndex)
-                {
-                    destTabIndex--;
-                }
-                if (destTabIndex == -1)
-                {
-                    destTabIndex = 0;
-                }
-                if (fromTabIndex == destTabIndex)
-                {
-                    return false;
-                }
+
                 // in-column moving
                 _columns[fromColumnIndex].Tabs.Move(fromTabIndex, destTabIndex);
             }
             else
             {
-                TabModel tab = _columns[fromColumnIndex].Tabs[fromTabIndex];
+                var tab = _columns[fromColumnIndex].Tabs[fromTabIndex];
                 _columns[fromColumnIndex].Tabs.RemoveAt(fromTabIndex);
                 _columns[destColumnIndex].Tabs.Insert(destTabIndex, tab);
             }
             Save();
-            return true;
         }
 
         /// <summary>
@@ -302,7 +274,7 @@ namespace StarryEyes.Models.Tab
         /// </summary>
         public static void ReviveTab()
         {
-            TabModel ti = _closedTabsStack.Pop();
+            var ti = _closedTabsStack.Pop();
             CreateTab(ti);
         }
 

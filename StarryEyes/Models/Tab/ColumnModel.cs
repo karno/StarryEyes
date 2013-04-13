@@ -26,7 +26,7 @@ namespace StarryEyes.Models.Tab
             {
                 _currentFocusTabIndex = value;
                 InputAreaModel.NotifyChangeFocusingTab(_tabs[value]);
-                Action handler = OnCurrentFocusTabChanged;
+                var handler = OnCurrentFocusTabChanged;
                 if (handler != null) handler();
             }
         }

@@ -109,36 +109,40 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                         var dataPreviousParent = data.Parent;
                         var source = e.OriginalSource as FrameworkElement;
                         if (source == null) return;
-                        int nci = -1, nti = -1;
+                        int destColumnIndex, destTabIndex;
                         var tvm = source.DataContext as TabViewModel;
                         var cvm = source.DataContext as ColumnViewModel;
                         if (tvm != null)
                         {
                             if (tvm == data) return;
-                            nci = TabManager.FindColumnIndex(this.Model);
-                            nti = TabManager.FindTabIndex(tvm.Model, nci);
+                            destColumnIndex = TabManager.FindColumnIndex(this.Model);
+                            destTabIndex = TabManager.FindTabIndex(tvm.Model, destColumnIndex);
                         }
                         else if (cvm != null)
                         {
-                            nci = TabManager.FindColumnIndex(this.Model);
-                            nti = this.Model.Tabs.Count;
-                            if (TabManager.FindTabIndex(data.Model, nci) >= 0)
-                            {
-                                nti = this.Model.Tabs.Count - 1;
-                            }
+                            destColumnIndex = TabManager.FindColumnIndex(this.Model);
+                            destTabIndex = this.Model.Tabs.Count;
                         }
                         else
                         {
                             return;
                         }
-                        if (!TabManager.MoveTo(data.Model, nci, nti))
+
+                        int fromColumnIndex, fromTabIndex;
+                        if (!TabManager.FindColumnTabIndex(data.Model, out fromColumnIndex, out fromTabIndex))
                         {
                             return;
                         }
+                        if (fromColumnIndex == destColumnIndex)
+                        {
+                            if (fromTabIndex < destTabIndex) destTabIndex--;
+                            if (destTabIndex == -1) destTabIndex = 0;
+                            if (destTabIndex == fromTabIndex) return;
+                        }
+                        TabManager.MoveTo(fromColumnIndex, fromTabIndex, destColumnIndex, destTabIndex);
                         if (this.Model != dataPreviousParent.Model)
                         {
-                            if (dataPreviousParent.Model.CurrentFocusTabIndex >=
-                                dataPreviousParent.Tabs.Count)
+                            if (dataPreviousParent.Model.CurrentFocusTabIndex >= dataPreviousParent.Tabs.Count)
                             {
                                 dataPreviousParent.Model.CurrentFocusTabIndex--;
                             }
@@ -149,7 +153,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                                     dataPreviousParent.Model.CurrentFocusTabIndex;
                             }
                         }
-                        this.Model.CurrentFocusTabIndex = nti;
+                        this.Model.CurrentFocusTabIndex = destTabIndex;
                         this.Focus();
                     };
                 }

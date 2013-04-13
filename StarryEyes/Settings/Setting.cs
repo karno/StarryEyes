@@ -256,7 +256,7 @@ namespace StarryEyes.Settings
                     {
                         Save();
                     }
-                    Action<FilterExpressionBase> handler = OnValueChanged;
+                    var handler = OnValueChanged;
                     if (handler != null)
                         OnValueChanged(value);
                 }
