@@ -271,7 +271,6 @@ namespace StarryEyes.Filters.Parsing
                         default:
                             return left;
                     }
-                    break;
                 default:
                     return left;
             }

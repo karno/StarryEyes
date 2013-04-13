@@ -4,6 +4,8 @@ using System.Reactive.Linq;
 using StarryEyes.Breezy.Api.Rest;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
+using StarryEyes.Models.Notifications;
+using StarryEyes.Settings;
 
 namespace StarryEyes.Models.Stores
 {
@@ -14,11 +16,21 @@ namespace StarryEyes.Models.Stores
     {
         public static IObservable<TwitterStatus> MergeStore(TwitterStatus status)
         {
-            return StatusStore
-                .Get(status.Id)
+            return StatusStore.Get(status.Id)
                 .ConcatIfEmpty(() =>
                 {
                     StatusStore.Store(status);
+                    return Observable.Return(status);
+                });
+        }
+
+        public static IObservable<TwitterStatus> NotifyAndMergeStore(TwitterStatus status)
+        {
+            return StatusStore.Get(status.Id)
+                .ConcatIfEmpty(() =>
+                {
+                    StatusStore.Store(status);
+                    NotificationModel.NotifyNewArrival(status);
                     return Observable.Return(status);
                 });
         }

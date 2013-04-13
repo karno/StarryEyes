@@ -202,6 +202,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// <param name="value">store value</param>
         public void Store(TKey key, TValue value)
         {
+            CheckDisposed();
             // remove old data, if existed.
             Remove(key);
 
@@ -234,6 +235,11 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// <returns>key is found or not</returns>
         public bool TryLoad(TKey key, out TValue value)
         {
+            if (_disposed)
+            {
+                value = default(TValue);
+                return false;
+            }
             int readFrom;
             if (!_tableOfContents.TryGetValue(key, out readFrom) || readFrom < 0)
             {
@@ -252,6 +258,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// <returns>value</returns>
         public TValue Load(TKey key)
         {
+            CheckDisposed();
             int readFrom;
             if (!_tableOfContents.TryGetValue(key, out readFrom) || readFrom < 0)
                 throw new KeyNotFoundException("Not found key in this persistent drive.");
@@ -260,6 +267,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
 
         internal TValue LoadFromExactIndex(int index)
         {
+            CheckDisposed();
             return Load(index);
         }
 
@@ -272,6 +280,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// <returns>value sequence</returns>
         public IEnumerable<TValue> Find(Func<TValue, bool> predicate, FindRange<TKey> range, int? returnLowerBound)
         {
+            CheckDisposed();
             IEnumerable<int> indexes;
             if (range != null)
             {
@@ -319,6 +328,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// <returns>succeeded or not</returns>
         public bool Remove(TKey key)
         {
+            CheckDisposed();
             int idx;
             if (!_tableOfContents.TryGetValue(key, out idx))
                 return false; // not found
@@ -438,6 +448,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// </summary>
         public void Optimize()
         {
+            CheckDisposed();
             // TODO: Impl
             throw new NotImplementedException();
         }
@@ -445,13 +456,16 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// <summary>
         /// Store the parity bits.
         /// </summary>
-        public void StoreParity()
+        private void StoreParity()
         {
             StoreInternal(GetParity(), 0);
         }
 
+        private volatile bool _disposed;
         public void Dispose()
         {
+            CheckDisposed();
+            _disposed = true;
             StoreParity();
             lock (_fslock)
             {
@@ -459,6 +473,14 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                 _fstream.Close();
                 _fstream.Dispose();
                 _fstream = null;
+            }
+        }
+
+        private void CheckDisposed()
+        {
+            if (_disposed)
+            {
+                throw new ObjectDisposedException("PersistentDrive is already disposed.");
             }
         }
     }

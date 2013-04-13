@@ -20,42 +20,44 @@
             <Utils:BooleanToInvisibleConverter x:Key="BooleanToInvisibleConverter" />
             <Utils:BooleanToVisibleConverter x:Key="BooleanToVisibleConverter" />
             <DataTemplate x:Key="TabHeaderTemplate">
-                <StackPanel Margin="0,8,8,4" Orientation="Horizontal">
-                    <i:Interaction.Behaviors>
-                        <behaviors:DragStartBehavior AfterDragDropCommand="{Binding Parent.DragDropFinishCommand}"
-                                                     BeforeDragDropCommand="{Binding Parent.DragDropStartCommand}"
-                                                     DragDropData="{Binding}" />
-                    </i:Interaction.Behaviors>
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="MouseLeftButtonDown">
-                            <ei:CallMethodAction MethodName="Focus" TargetObject="{Binding}" />
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                    <StackPanel.ContextMenu>
-                        <ContextMenu DataContext="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
-                            <MenuItem Command="{Binding EditTabCommand}" Header="編集..." />
-                            <MenuItem Command="{Binding CopyTabCommand}" Header="このタブをコピーして追加" />
-                            <Separator />
-                            <MenuItem Command="{Binding Parent.CreateNewTabCommand}" Header="新しいタブの追加..." />
-                            <MenuItem Command="{Binding Parent.RestoreLastClosedTabCommand}" Header="最後に閉じたタブを元に戻す" />
-                            <Separator />
-                            <MenuItem Command="{Binding CloseTabCommand}" Header="タブを閉じる" />
-                        </ContextMenu>
-                    </StackPanel.ContextMenu>
-                    <TextBlock x:Name="TabName"
-                               Margin="0,3,0,0"
-                               VerticalAlignment="Center"
-                               FontFamily="Segoe UI"
-                               FontSize="16"
-                               Foreground="#FF999999"
-                               Text="{Binding Name}" />
-                    <TextBlock VerticalAlignment="Top"
-                               FontFamily="Segoe UI"
-                               Foreground="#FF1BA1E2"
-                               Text="{Binding UnreadCount}"
-                               Visibility="{Binding IsUnreadExisted,
-                                                    Converter={StaticResource BooleanToVisibleConverter}}" />
-                </StackPanel>
+                <Border Margin="0,4,0,4" Background="White">
+                    <StackPanel Margin="0,0,8,0" Orientation="Horizontal">
+                        <i:Interaction.Behaviors>
+                            <behaviors:DragStartBehavior AfterDragDropCommand="{Binding Parent.DragDropFinishCommand}"
+                                                         BeforeDragDropCommand="{Binding Parent.DragDropStartCommand}"
+                                                         DragDropData="{Binding}" />
+                        </i:Interaction.Behaviors>
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="MouseLeftButtonDown">
+                                <ei:CallMethodAction MethodName="Focus" TargetObject="{Binding}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                        <StackPanel.ContextMenu>
+                            <ContextMenu DataContext="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                                <MenuItem Command="{Binding EditTabCommand}" Header="編集..." />
+                                <MenuItem Command="{Binding CopyTabCommand}" Header="このタブをコピーして追加" />
+                                <Separator />
+                                <MenuItem Command="{Binding Parent.CreateNewTabCommand}" Header="新しいタブの追加..." />
+                                <MenuItem Command="{Binding Parent.RestoreLastClosedTabCommand}" Header="最後に閉じたタブを元に戻す" />
+                                <Separator />
+                                <MenuItem Command="{Binding CloseTabCommand}" Header="タブを閉じる" />
+                            </ContextMenu>
+                        </StackPanel.ContextMenu>
+                        <TextBlock x:Name="TabName"
+                                   Margin="0,3,0,0"
+                                   VerticalAlignment="Center"
+                                   FontFamily="Segoe UI"
+                                   FontSize="16"
+                                   Foreground="#FF999999"
+                                   Text="{Binding Name}" />
+                        <TextBlock VerticalAlignment="Top"
+                                   FontFamily="Segoe UI"
+                                   Foreground="#FF1BA1E2"
+                                   Text="{Binding UnreadCount}"
+                                   Visibility="{Binding IsUnreadExisted,
+                                                        Converter={StaticResource BooleanToVisibleConverter}}" />
+                    </StackPanel>
+                </Border>
                 <DataTemplate.Triggers>
                     <MultiDataTrigger>
                         <MultiDataTrigger.Conditions>

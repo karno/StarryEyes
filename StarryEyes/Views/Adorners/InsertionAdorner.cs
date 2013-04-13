@@ -21,7 +21,7 @@ namespace StarryEyes.Views.Adorners
         {
             return new RegularPolygon
             {
-                Margin = new Thickness(-8, -8, 0, 0),
+                Margin = new Thickness(-8, -10, 0, 0),
                 Fill = Brushes.Black,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Top,

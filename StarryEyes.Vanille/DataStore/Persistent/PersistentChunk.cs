@@ -108,6 +108,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// <param name="value">add value</param>
         public void AddOrUpdate(TKey key, TValue value)
         {
+            CheckDisposed();
             AddToAlive(key, value);
         }
 
@@ -272,6 +273,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// <param name="key">delete item key</param>
         public void Remove(TKey key)
         {
+            CheckDisposed();
             /*
              * DELETE STRATEGY:
              * 1: add DeletedItems collection
@@ -289,6 +291,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// </summary>
         public IObservable<TValue> Get(TKey key)
         {
+            CheckDisposed();
             return Observable.Start(() =>
             {
                 lock (_deletedItemKeyLocker)
@@ -324,13 +327,16 @@ namespace StarryEyes.Vanille.DataStore.Persistent
 
         public TValue GetFromDrive(int index)
         {
+            CheckDisposed();
             using (AcquireDriveLock())
             {
                 return _persistentDrive.LoadFromExactIndex(index);
             }
         }
+
         public IEnumerable<TValue> FindCaches(Func<TValue, bool> predicate, FindRange<TKey> range)
         {
+            CheckDisposed();
             var list = new List<TValue>();
             lock (_aliveCachesLocker)
             {
@@ -379,11 +385,14 @@ namespace StarryEyes.Vanille.DataStore.Persistent
             }
         }
 
+        private volatile bool _disposed;
         /// <summary>
         /// clean up all resources.
         /// </summary>
         public void Dispose()
         {
+            CheckDisposed();
+            _disposed = true;
             lock (_writeBackSync)
             {
                 _writeBackThreadAlive = false;
@@ -405,6 +414,14 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                 workingCopy
                     .ForEach(v => _persistentDrive.Store(_parent.GetKey(v), v));
                 _persistentDrive.Dispose();
+            }
+        }
+
+        private void CheckDisposed()
+        {
+            if (_disposed)
+            {
+                throw new ObjectDisposedException("PersistentChunk is already disposed.");
             }
         }
     }

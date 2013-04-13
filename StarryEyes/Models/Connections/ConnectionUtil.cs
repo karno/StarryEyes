@@ -10,7 +10,7 @@ namespace StarryEyes.Models.Connections
         public static void RegisterToStore(this IObservable<TwitterStatus> observable)
         {
             observable
-                .SelectMany(StoreHelper.MergeStore)
+                .SelectMany(StoreHelper.NotifyAndMergeStore)
                 .Subscribe(_ => { },
                 ex => System.Diagnostics.Debug.WriteLine(ex));
         }

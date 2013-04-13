@@ -120,12 +120,6 @@ namespace StarryEyes
                     switch (result.CommandButtonResult.Value)
                     {
                         case 0:
-                            _appMutex.Dispose();
-                            // shutdown
-                            Current.Shutdown();
-                            Process.GetCurrentProcess().Kill();
-                            return;
-                        case 1:
                             StatusStore.Shutdown();
                             UserStore.Shutdown();
                             // clear data
@@ -134,6 +128,12 @@ namespace StarryEyes
                             Setting.Save();
                             _appMutex.Dispose();
                             Process.Start(ResourceAssembly.Location);
+                            Current.Shutdown();
+                            Process.GetCurrentProcess().Kill();
+                            return;
+                        case 1:
+                            _appMutex.Dispose();
+                            // shutdown
                             Current.Shutdown();
                             Process.GetCurrentProcess().Kill();
                             return;

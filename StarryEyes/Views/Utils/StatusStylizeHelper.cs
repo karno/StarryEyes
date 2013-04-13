@@ -219,7 +219,12 @@ namespace StarryEyes.Views.Utils
             return true;
         }
 
-        public event EventHandler CanExecuteChanged;
+        event EventHandler ICommand.CanExecuteChanged
+        {
+            add { }
+            remove { }
+        }
+
         private readonly Action<object> _callback;
 
         public void Execute(object parameter)

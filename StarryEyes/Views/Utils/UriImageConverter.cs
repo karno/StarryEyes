@@ -16,7 +16,7 @@ namespace StarryEyes.Views.Utils
                     CacheOption = BitmapCacheOption.OnDemand,
                 };
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return null;
             }

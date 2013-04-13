@@ -131,10 +131,23 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                         {
                             return;
                         }
-                        TabManager.MoveTo(data.Model, nci, nti);
-                        if (dataPreviousParent.Model.CurrentFocusTabIndex >= dataPreviousParent.Tabs.Count)
+                        if (!TabManager.MoveTo(data.Model, nci, nti))
                         {
-                            dataPreviousParent.Model.CurrentFocusTabIndex--;
+                            return;
+                        }
+                        if (this.Model != dataPreviousParent.Model)
+                        {
+                            if (dataPreviousParent.Model.CurrentFocusTabIndex >=
+                                dataPreviousParent.Tabs.Count)
+                            {
+                                dataPreviousParent.Model.CurrentFocusTabIndex--;
+                            }
+                            else
+                            {
+                                // invoke update handler
+                                dataPreviousParent.Model.CurrentFocusTabIndex =
+                                    dataPreviousParent.Model.CurrentFocusTabIndex;
+                            }
                         }
                         this.Model.CurrentFocusTabIndex = nti;
                         this.Focus();

@@ -100,6 +100,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// <param name="value">store item</param>
         public override void Store(TValue value)
         {
+            CheckDisposed();
             TKey key = GetKey(value);
             GetChunk(key).AddOrUpdate(key, value);
         }
@@ -111,6 +112,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// <returns>found item or empty.</returns>
         public override IObservable<TValue> Get(TKey key)
         {
+            CheckDisposed();
             return GetChunk(key).Get(key);
         }
 
@@ -124,6 +126,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         public override IObservable<TValue> Find(Func<TValue, bool> predicate,
                                                  FindRange<TKey> range = null, int? itemCount = null)
         {
+            CheckDisposed();
             return Observable.Defer(() =>
             {
                 var dictionary = _chunks.SelectMany(c => c.FindCaches(predicate, range))
@@ -149,6 +152,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         /// <param name="key">removing item's key.</param>
         public override void Remove(TKey key)
         {
+            CheckDisposed();
             GetChunk(key).Remove(key);
         }
 

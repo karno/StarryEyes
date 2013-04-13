@@ -184,20 +184,32 @@ namespace StarryEyes.Models.Tab
         /// <param name="info"></param>
         /// <param name="columnIndex"></param>
         /// <param name="tabIndex"></param>
-        public static void MoveTo(TabModel info, int columnIndex, int tabIndex)
+        public static bool MoveTo(TabModel info, int columnIndex, int tabIndex)
         {
             int fci, fti;
-            if (!FindColumnTabIndex(info, out fci, out fti)) return;
-            MoveTo(fci, fti, columnIndex, tabIndex);
+            if (!FindColumnTabIndex(info, out fci, out fti)) return false;
+            return MoveTo(fci, fti, columnIndex, tabIndex);
         }
 
         /// <summary>
         ///     Move specified tab.
         /// </summary>
-        public static void MoveTo(int fromColumnIndex, int fromTabIndex, int destColumnIndex, int destTabIndex)
+        public static bool MoveTo(int fromColumnIndex, int fromTabIndex, int destColumnIndex, int destTabIndex)
         {
             if (fromColumnIndex == destColumnIndex)
             {
+                if (fromTabIndex < destTabIndex)
+                {
+                    destTabIndex--;
+                }
+                if (destTabIndex == -1)
+                {
+                    destTabIndex = 0;
+                }
+                if (fromTabIndex == destTabIndex)
+                {
+                    return false;
+                }
                 // in-column moving
                 _columns[fromColumnIndex].Tabs.Move(fromTabIndex, destTabIndex);
             }
@@ -208,6 +220,7 @@ namespace StarryEyes.Models.Tab
                 _columns[destColumnIndex].Tabs.Insert(destTabIndex, tab);
             }
             Save();
+            return true;
         }
 
         /// <summary>
