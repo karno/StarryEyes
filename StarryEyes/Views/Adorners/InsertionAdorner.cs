@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using Microsoft.Expression.Shapes;
 using StarryEyes.Annotations;
 
 namespace StarryEyes.Views.Adorners
@@ -18,12 +19,17 @@ namespace StarryEyes.Views.Adorners
 
         private UIElement CreateCursor()
         {
-            return new Rectangle
+            return new RegularPolygon
             {
-                Margin = new Thickness(-1.5, 0, 0, 0),
-                Width = 3,
+                Margin = new Thickness(-8, -8, 0, 0),
                 Fill = Brushes.Black,
-                Opacity = 0.7,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Top,
+                Height = 8,
+                Width = 8,
+                PointCount = 3,
+                RenderTransformOrigin = new Point(0.5, 0.5),
+                RenderTransform = new ScaleTransform(1, -1),
             };
         }
     }
