@@ -21,12 +21,13 @@ namespace StarryEyes.Views.Adorners
         {
             return new RegularPolygon
             {
-                Margin = new Thickness(-8, -10, 0, 0),
+                Margin = new Thickness(-6, -10, 0, 0),
                 Fill = Brushes.Black,
+                Opacity = 0.5,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Top,
-                Height = 8,
-                Width = 8,
+                Height = 6,
+                Width = 6,
                 PointCount = 3,
                 RenderTransformOrigin = new Point(0.5, 0.5),
                 RenderTransform = new ScaleTransform(1, -1),
