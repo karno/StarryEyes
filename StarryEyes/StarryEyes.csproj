@@ -229,6 +229,7 @@
     <Compile Include="Models\Connections\UserDependencies\UserInfoReceiver.cs" />
     <Compile Include="Models\Connections\UserDependencies\UserRelationReceiver.cs" />
     <Compile Include="Models\Connections\StreamingEventsHub.cs" />
+    <Compile Include="Models\Operations\UpdateRelationOperation.cs" />
     <Compile Include="Models\Stores\CacheStore.cs" />
     <Compile Include="Models\Stores\StoreHelper.cs" />
     <Compile Include="Models\InputAreaModel.cs" />

@@ -867,8 +867,13 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             if (response.Response.Result == TaskDialogSimpleResult.Ok)
             {
                 // report as a spam
-                // TODO
-                System.Diagnostics.Debug.WriteLine("R4S: " + Status.User.ScreenName);
+                var accounts = AccountsStore.Accounts.ToArray();
+                var reporter = accounts.FirstOrDefault();
+                if (reporter == null) return;
+                accounts.Select(a => a.AuthenticateInfo)
+                    .Select(a => new UpdateRelationOperation(a, Status.User, OperationType.Block))
+                    .ForEach(a => a.Run());
+                new UpdateRelationOperation(reporter.AuthenticateInfo, Status.User, OperationType.ReportAsSpam).Run();
             }
         }
 
