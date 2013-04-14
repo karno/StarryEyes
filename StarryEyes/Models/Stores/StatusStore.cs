@@ -110,12 +110,9 @@ namespace StarryEyes.Models.Stores
         public static IObservable<TwitterStatus> Find(Func<TwitterStatus, bool> predicate,
             FindRange<long> range = null, int? count = null)
         {
-            if (_isInShutdown) return Observable.Empty<TwitterStatus>();
-            var result = _store.Find(predicate, range, count);
-            if (count == null)
-                return result;
-            return result
-                .Distinct(_ => _.Id);
+            return _isInShutdown
+                       ? Observable.Empty<TwitterStatus>()
+                       : _store.Find(predicate, range, count);
         }
 
         private const int BatchWaitSec = 5;
@@ -132,7 +129,7 @@ namespace StarryEyes.Models.Stores
         public static IObservable<TwitterStatus> FindBatch(Func<TwitterStatus, bool> predicate, int count)
         {
             Subject<TwitterStatus> batch;
-            bool register = false;
+            var register = false;
             lock (_batchLock)
             {
                 if (_batchResult == null)

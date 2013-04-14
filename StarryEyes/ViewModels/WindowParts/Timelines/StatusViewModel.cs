@@ -10,6 +10,7 @@ using StarryEyes.Breezy.DataModel;
 using StarryEyes.Filters;
 using StarryEyes.Models;
 using StarryEyes.Models.Backpanels.NotificationEvents;
+using StarryEyes.Models.Backpanels.TwitterEvents;
 using StarryEyes.Models.Operations;
 using StarryEyes.Models.Stores;
 using StarryEyes.Nightmare.Windows;
@@ -871,9 +872,23 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                 var reporter = accounts.FirstOrDefault();
                 if (reporter == null) return;
                 accounts.Select(a => a.AuthenticateInfo)
-                    .Select(a => new UpdateRelationOperation(a, Status.User, OperationType.Block))
-                    .ForEach(a => a.Run());
-                new UpdateRelationOperation(reporter.AuthenticateInfo, Status.User, OperationType.ReportAsSpam).Run();
+                        .Select(a => new UpdateRelationOperation(a, Status.User, RelationKind.Block))
+                        .Append(new UpdateRelationOperation(reporter.AuthenticateInfo, Status.User,
+                                                            RelationKind.ReportAsSpam))
+                        .ToObservable()
+                        .SelectMany(
+                            o => o.Run()
+                                  .Do(
+                                      r =>
+                                      BackpanelModel.RegisterEvent(new BlockedEvent(o.Info.UserInfo, o.Target))))
+                        .Subscribe(
+                            _ => { },
+                            ex => BackpanelModel.RegisterEvent(new InternalErrorEvent(ex.Message)),
+                            () => StatusStore.Find(
+                                s =>
+                                s.User.Id == this.Status.User.Id ||
+                                (s.RetweetedOriginal != null && s.RetweetedOriginal.User.Id == this.Status.User.Id))
+                                             .Subscribe(s => StatusStore.Remove(s.Id)));
             }
         }
 

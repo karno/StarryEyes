@@ -78,9 +78,7 @@ namespace System.Linq
 
         public static IEnumerable<T> TakeIfNotNull<T>(this IEnumerable<T> source, int? take)
         {
-            if (take == null)
-                return source;
-            return source.Take(take.Value);
+            return take == null ? source : source.Take(take.Value);
         }
     }
 }

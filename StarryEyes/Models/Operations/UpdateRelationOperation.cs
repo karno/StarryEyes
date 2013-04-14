@@ -9,36 +9,51 @@ namespace StarryEyes.Models.Operations
     {
         private readonly AuthenticateInfo _info;
         private readonly TwitterUser _target;
-        private readonly OperationType _operationType;
+        private readonly RelationKind _relationKind;
 
-        public UpdateRelationOperation(AuthenticateInfo info, TwitterUser target, OperationType operationType)
+        public AuthenticateInfo Info
         {
-            _info = info;
-            _target = target;
-            _operationType = operationType;
+            get { return this._info; }
+        }
+
+        public TwitterUser Target
+        {
+            get { return this._target; }
+        }
+
+        public RelationKind RelationKind
+        {
+            get { return this._relationKind; }
+        }
+
+        public UpdateRelationOperation(AuthenticateInfo info, TwitterUser target, RelationKind relationKind)
+        {
+            this._info = info;
+            this._target = target;
+            this._relationKind = relationKind;
         }
 
         protected override IObservable<TwitterUser> RunCore()
         {
-            switch (_operationType)
+            switch (this.RelationKind)
             {
-                case OperationType.Follow:
-                    return _info.CreateFriendship(_target.Id);
-                case OperationType.Unfollow:
-                    return _info.DestroyFriendship(_target.Id);
-                case OperationType.Block:
-                    return _info.CreateBlock(_target.Id);
-                case OperationType.ReportAsSpam:
-                    return _info.ReportSpam(_target.Id);
-                case OperationType.Unblock:
-                    return _info.DestroyBlock(_target.Id);
+                case RelationKind.Follow:
+                    return this.Info.CreateFriendship(this.Target.Id);
+                case RelationKind.Unfollow:
+                    return this.Info.DestroyFriendship(this.Target.Id);
+                case RelationKind.Block:
+                    return this.Info.CreateBlock(this.Target.Id);
+                case RelationKind.ReportAsSpam:
+                    return this.Info.ReportSpam(this.Target.Id);
+                case RelationKind.Unblock:
+                    return this.Info.DestroyBlock(this.Target.Id);
                 default:
                     throw new ArgumentOutOfRangeException();
             }
         }
     }
 
-    public enum OperationType
+    public enum RelationKind
     {
         Follow,
         Unfollow,

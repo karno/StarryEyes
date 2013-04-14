@@ -202,5 +202,21 @@ namespace StarryEyes.Breezy.DataModel
             if (!IsDataLacking)
                 CreatedAt = reader.ReadDateTime();
         }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null || GetType() != obj.GetType())
+            {
+                return false;
+            }
+
+            return this.Id == ((TwitterUser)obj).Id;
+        }
+
+        // override object.GetHashCode
+        public override int GetHashCode()
+        {
+            return this.Id.GetHashCode();
+        }
     }
 }

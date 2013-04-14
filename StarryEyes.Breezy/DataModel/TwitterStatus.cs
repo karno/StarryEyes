@@ -286,6 +286,22 @@ namespace StarryEyes.Breezy.DataModel
             Recipient = reader.ReadObject<TwitterUser>();
             Entities = reader.ReadCollection<TwitterEntity>().ToArray();
         }
+
+        // override object.Equals
+        public override bool Equals(object obj)
+        {
+            if (obj == null || GetType() != obj.GetType())
+            {
+                return false;
+            }
+            return this.Id == ((TwitterStatus)obj).Id;
+        }
+
+        // override object.GetHashCode
+        public override int GetHashCode()
+        {
+            return Id.GetHashCode();
+        }
     }
 
     /// <summary>

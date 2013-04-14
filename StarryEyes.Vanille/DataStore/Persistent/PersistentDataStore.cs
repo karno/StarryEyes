@@ -139,7 +139,9 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                     keys = keys.OrderBy(i => i.Key, _comparer);
                 }
                 return Observable.Start(() =>
-                                        keys.Select(k => k.Value == -1 ? dictionary[k.Key] : GetChunk(k.Key).GetFromDrive(k.Value))
+                                        keys.Select(k => k.Value == -1
+                                                             ? dictionary[k.Key]
+                                                             : GetChunk(k.Key).GetFromDrive(k.Value))
                                             .Where(predicate)
                                             .TakeIfNotNull(itemCount))
                                  .SelectMany(_ => _);
