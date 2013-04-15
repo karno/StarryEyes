@@ -34,8 +34,9 @@ namespace StarryEyes.Models.Backpanels.NotificationEvents.PostEvents
             get
             {
                 return _authInfo.UnreliableScreenName +
-                    " is post limited. fallback to " +
-                    _fallbackToAuthInfo.UnreliableScreenName;
+                    " はPOST規制されているため、 " +
+                    _fallbackToAuthInfo.UnreliableScreenName +
+                    " へフォールバックされました。";
             }
         }
 

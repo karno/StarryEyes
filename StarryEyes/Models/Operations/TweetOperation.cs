@@ -76,12 +76,14 @@ namespace StarryEyes.Models.Operations
                                    (fallbackAccount = AccountsStore.GetAccountSetting(cas.FallbackNext)) != null)
                                {
                                    // Post limit, go fallback
-                                   if (this.OriginalAuthInfo != null)
+                                   if (this.OriginalAuthInfo == null)
+                                   {
                                        this.OriginalAuthInfo = AuthInfo;
+                                   }
+                                   var source = this.AuthInfo;
                                    this.AuthInfo = fallbackAccount.AuthenticateInfo;
-                                   BackpanelModel.RegisterEvent(new FallbackedEvent(this.AuthInfo,
-                                                                                    fallbackAccount.AuthenticateInfo));
-                                   return this.Run(OperationPriority.High);
+                                   BackpanelModel.RegisterEvent(new FallbackedEvent(source, this.AuthInfo));
+                                   return this.ExecPost();
                                }
                                return Observable.Throw<TwitterStatus>(new TweetFailedException(s, ex));
                            }));
@@ -89,7 +91,7 @@ namespace StarryEyes.Models.Operations
 
         private IObservable<TwitterStatus> ExecPost()
         {
-            long? reply = InReplyTo == 0 ? null : (long?)InReplyTo;
+            var reply = InReplyTo == 0 ? null : (long?)InReplyTo;
             double? geoLat = null;
             double? geoLong = null;
             if (GeoLocation != null)

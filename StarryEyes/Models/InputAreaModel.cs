@@ -302,7 +302,7 @@ namespace StarryEyes.Models
                                                 {
                                                     if (_.Key)
                                                     {
-                                                        TweetInputInfo ret = Clone();
+                                                        var ret = Clone();
                                                         ret.AuthInfos = _.Select(pr => pr.AuthInfo).ToArray();
                                                         ret.PostedTweets =
                                                             _.Select(pr => Tuple.Create(pr.AuthInfo, pr.Status))
@@ -313,7 +313,7 @@ namespace StarryEyes.Models
                                                     {
                                                         _.ForEach(pr =>
                                                         {
-                                                            TweetInputInfo ret = Clone();
+                                                            var ret = Clone();
                                                             ret.AuthInfos = new[] { pr.AuthInfo };
                                                             ret.ThrownException = pr.ThrownException;
                                                             subject.OnNext(ret);

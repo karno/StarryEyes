@@ -975,7 +975,7 @@ namespace StarryEyes.ViewModels.WindowParts
                          }
                          else
                          {
-                             Tuple<bool, string> result = AnalysisFailedReason(_);
+                             var result = AnalysisFailedReason(_);
                              if (result.Item1)
                                  InputAreaModel.Drafts.Add(_);
                              BackpanelModel.RegisterEvent(new PostFailedEvent(_, result.Item2));
