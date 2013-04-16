@@ -1,10 +1,11 @@
-﻿<UserControl
+﻿<UserControl x:Class="StarryEyes.Views.WindowParts.InputArea"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:behaviors="clr-namespace:StarryEyes.Views.Messaging.Behaviors"
              xmlns:controls="clr-namespace:StarryEyes.Views.Controls"
              xmlns:custom="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:ed="http://schemas.microsoft.com/expression/2010/drawing"
              xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"
@@ -13,7 +14,6 @@
              xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:utils="clr-namespace:StarryEyes.Views.Utils"
              xmlns:windowParts="clr-namespace:StarryEyes.ViewModels.WindowParts"
-             xmlns:ed="http://schemas.microsoft.com/expression/2010/drawing" x:Class="StarryEyes.Views.WindowParts.InputArea"
              x:Name="UserControl"
              MaxHeight="200"
              d:DataContext="{d:DesignInstance Type={x:Type windowParts:InputAreaViewModel}}"
@@ -29,19 +29,20 @@
             </ResourceDictionary.MergedDictionaries>
             <utils:BooleanToVisibleConverter x:Key="BooleanToVisibleConverter" />
             <utils:BooleanToInvisibleConverter x:Key="BooleanToInvisibleConverter" />
+            <utils:StringRemoveLineConverter x:Key="StringRemoveLineConverter" />
             <DataTemplate x:Key="HashtagDataTemplate">
-            	<Button Width="Auto"
-            		HorizontalAlignment="Left"
-            		VerticalAlignment="Top"
-            		VerticalContentAlignment="Stretch"
-            		Content="{Binding Hashtag}"
-            		Style="{DynamicResource MetroSquareUnfocusableFlatButton}">
-            		<i:Interaction.Triggers>
-            			<i:EventTrigger EventName="Click">
-            				<ei:CallMethodAction MethodName="ToggleBind" TargetObject="{Binding Mode=OneWay}" />
-            			</i:EventTrigger>
-            		</i:Interaction.Triggers>
-            	</Button>
+                <Button Width="Auto"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        VerticalContentAlignment="Stretch"
+                        Content="{Binding Hashtag}"
+                        Style="{DynamicResource MetroSquareUnfocusableFlatButton}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <ei:CallMethodAction MethodName="ToggleBind" TargetObject="{Binding Mode=OneWay}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </Button>
             </DataTemplate>
         </ResourceDictionary>
     </UserControl.Resources>
@@ -59,495 +60,526 @@
             <behaviors:TaskDialogInteractionMessageAction />
         </l:InteractionMessageTrigger>
     </i:Interaction.Triggers>
-	<Grid>
-		<Grid.ColumnDefinitions>
-			<ColumnDefinition Width="Auto" />
-			<ColumnDefinition Width="183*" />
-			<ColumnDefinition Width="253*" />
-		</Grid.ColumnDefinitions>
-		<VisualStateManager.VisualStateGroups>
-			<VisualStateGroup x:Name="ButtonSizeControl">
-				<VisualState x:Name="OpenState">
-					<Storyboard>
-						<DoubleAnimationUsingKeyFrames Storyboard.TargetName="ItemsControl" Storyboard.TargetProperty="(FrameworkElement.Width)">
-							<EasingDoubleKeyFrame KeyTime="0" Value="48" />
-						</DoubleAnimationUsingKeyFrames>
-						<DoubleAnimationUsingKeyFrames Storyboard.TargetName="ItemsControl" Storyboard.TargetProperty="(FrameworkElement.Height)">
-							<EasingDoubleKeyFrame KeyTime="0" Value="48" />
-						</DoubleAnimationUsingKeyFrames>
-					</Storyboard>
-				</VisualState>
-				<VisualState x:Name="CloseState" />
-			</VisualStateGroup>
-			<VisualStateGroup x:Name="ImageAttachControl">
-				<VisualState x:Name="MouseOverState">
-					<Storyboard>
-						<DoubleAnimationUsingKeyFrames Storyboard.TargetName="Border" Storyboard.TargetProperty="(UIElement.Opacity)">
-							<EasingDoubleKeyFrame KeyTime="0" Value="0.4" />
-						</DoubleAnimationUsingKeyFrames>
-					</Storyboard>
-				</VisualState>
-				<VisualState x:Name="MouseOutState" />
-			</VisualStateGroup>
-		</VisualStateManager.VisualStateGroups>
-		<Button Margin="4,0,0,0"
-			HorizontalAlignment="Left"
-			VerticalAlignment="Top"
-			BorderThickness="0"
-			Padding="0"
-			Style="{DynamicResource MetroSquareUnfocusableFlatButton}">
-			<i:Interaction.Triggers>
-				<i:EventTrigger EventName="Click">
-					<ei:CallMethodAction MethodName="SelectAccounts" TargetObject="{Binding Mode=OneWay}" />
-				</i:EventTrigger>
-			</i:Interaction.Triggers>
-			<Button.ToolTip>
-				<TextBlock Foreground="White"><Run Text="{Binding AuthInfoScreenNames, Mode=OneWay}" /><LineBreak /><Run Text="クリックすると変更することができます。" /></TextBlock>
-			</Button.ToolTip>
-			<ItemsControl x:Name="ItemsControl"
-				Width="24"
-				Height="24"
-				ItemsSource="{Binding BindingAuthInfos}"
-				d:IsHidden="True">
-				<ItemsControl.ItemsPanel>
-					<ItemsPanelTemplate>
-						<UniformGrid Columns="{Binding AuthInfoGridRowColumn}" Rows="{Binding AuthInfoGridRowColumn}" />
-					</ItemsPanelTemplate>
-				</ItemsControl.ItemsPanel>
-				<ItemsControl.ItemTemplate>
-					<DataTemplate>
-						<controls:LazyImage UriSource="{Binding ProfileImageUri}" />
-					</DataTemplate>
-				</ItemsControl.ItemTemplate>
-			</ItemsControl>
-		</Button>
-		<Grid x:Name="Default"
-			Grid.Column="1"
-			Grid.ColumnSpan="2"
-			Margin="4,0"
-			Visibility="{Binding IsOpening, Converter={StaticResource BooleanToInvisibleConverter}}">
-			<i:Interaction.Triggers>
-				<i:EventTrigger EventName="MouseLeftButtonDown">
-					<ei:CallMethodAction MethodName="OpenInput" TargetObject="{Binding Mode=OneWay}" />
-				</i:EventTrigger>
-			</i:Interaction.Triggers>
-			<Border Background="White"
-				BorderBrush="Gray"
-				BorderThickness="1"
-				Cursor="IBeam"
-				SnapsToDevicePixels="True">
-				<Grid Margin="4" VerticalAlignment="Center">
-					<Grid.ColumnDefinitions>
-						<ColumnDefinition />
-						<ColumnDefinition Width="Auto" />
-						<ColumnDefinition Width="Auto" />
-						<ColumnDefinition Width="Auto" />
-					</Grid.ColumnDefinitions>
-					<TextBlock Text="What's happening?">
-						<TextBlock.Foreground>
-							<SolidColorBrush Color="{DynamicResource {x:Static SystemColors.GrayTextColorKey}}" />
-						</TextBlock.Foreground>
-					</TextBlock>
-					<TextBlock Grid.Column="1"
-						Margin="4,0,4,0"
-						Foreground="Green"
-						Visibility="{Binding IsDraftsExisted, Converter={StaticResource BooleanToVisibleConverter}}"><Run Text="{Binding DraftCount, Mode=OneWay}" /><Run Text="件の下書きがあります" /></TextBlock>
-					<Grid Grid.Column="2"
-						Width="{Binding MaxControlWidth}"
-						Height="12"
-						Background="Gainsboro"
-						SnapsToDevicePixels="True"
-						Visibility="{Binding IsPostLimitPredictionEnabled, Converter={StaticResource BooleanToVisibleConverter}}">
-						<Grid.ToolTip>
-							<StackPanel Orientation="Vertical">
-								<TextBlock Foreground="White"><Run Text="規制までおよそ" /><Run Text=" "/><Run Text="{Binding RemainUpdate, Mode=OneWay}" /><Run Text=" "/><Run Text="ツイート" /></TextBlock>
-								<TextBlock Foreground="White"><Run Text="約" /><Run Text=" "/><Run Text="{Binding WindowTime, Mode=OneWay}" /><Run Text=" "/><Run Text="分で1ツイート分回復します。" /></TextBlock>
-							</StackPanel>
-						</Grid.ToolTip>
-						<Grid Width="{Binding ControlWidth}"
-							HorizontalAlignment="Left"
-							VerticalAlignment="Stretch"
-							Background="#FF1BA1E2"
-							SnapsToDevicePixels="True" />
-					</Grid>
-				</Grid>
-			</Border>
-		</Grid>
-		<Grid x:Name="Opening"
-			Grid.Column="1"
-			Grid.ColumnSpan="2"
-			Margin="4,0"
-			Visibility="{Binding IsOpening, Converter={StaticResource BooleanToVisibleConverter}}">
-			<Border Background="White"
-				BorderBrush="Gray"
-				BorderThickness="1"
-				SnapsToDevicePixels="True">
-				<Grid>
-					<Grid.ColumnDefinitions>
-						<ColumnDefinition />
-						<ColumnDefinition Width="Auto" />
-						<ColumnDefinition Width="Auto" />
-					</Grid.ColumnDefinitions>
-					<Grid.RowDefinitions>
-						<RowDefinition Height="Auto" />
-						<RowDefinition />
-						<RowDefinition Height="Auto" />
-					</Grid.RowDefinitions>
-					<DockPanel Grid.ColumnSpan="3"
-						Height="26"
-						Background="#FFF09609"
-						LastChildFill="True"
-						Visibility="{Binding IsInReplyToEnabled, Converter={StaticResource BooleanToVisibleConverter}}">
-						<Path Width="12"
-							Height="11"
-							Margin="6"
-							VerticalAlignment="Center"
-							Data="F1 M 26.0556,21.9444L 22.0556,21.9444L 24.2778,24.1667L 21.6759,24.1667L 18.5,21.1018L 21.6759,17.9444L 24.2778,17.9444L 22.0556,20.1667L 26.0556,20.1667C 28.5101,20.1667 30.5,22.1565 30.5,24.6111C 30.5,27.0657 28.5101,29.0556 26.0555,29.0556L 24.7222,29.0556L 24.7222,27.2778L 26.0556,27.2778C 27.5283,27.2778 28.7222,26.0839 28.7222,24.6111C 28.7222,23.1384 27.5283,21.9444 26.0556,21.9444 Z "
-							Fill="#FFFFFFFF"
-							Stretch="Fill" />
-						<Button Width="32"
-							DockPanel.Dock="Right"
-							Style="{DynamicResource MetroSquareTransparentButtonStyle}">
-							<i:Interaction.Triggers>
-								<i:EventTrigger EventName="Click">
-									<ei:CallMethodAction MethodName="ClearInReplyTo" TargetObject="{Binding Mode=OneWay}" />
-								</i:EventTrigger>
-							</i:Interaction.Triggers>
-							<Path Width="8"
-								Height="8"
-								Data="F1 M 21.2,20L 24,22.8L 26.7999,20.0001L 27.9999,21.2001L 25.2,24L 28,26.8L 26.8,28L 24,25.2L 21.2,28L 20,26.8L 22.8,24L 20,21.2L 21.2,20 Z "
-								Fill="#FFFFFFFF"
-								Stretch="Fill" />
-						</Button>
-						<TextBlock VerticalAlignment="Center" Foreground="White">
-							<TextBlock.Text>
-								<MultiBinding StringFormat="@{0}: {1}">
-									<Binding Path="InReplyTo.User.ScreenName" />
-									<Binding Path="InReplyTo.Status.Text" />
-								</MultiBinding>
-							</TextBlock.Text>
-						</TextBlock>
-					</DockPanel>
-					<DockPanel Grid.ColumnSpan="3"
-						Height="26"
-						Background="#FFA05000"
-						LastChildFill="True"
-						Visibility="{Binding IsDirectMessageEnabled, Converter={StaticResource BooleanToVisibleConverter}}">
-						<Path Width="13.44"
-							Height="14"
-							Margin="6"
-							HorizontalAlignment="Center"
-							VerticalAlignment="Center"
-							Data="F1 M 22.32,29.58L 23.44,33.5L 18.96,29.58L 17.28,29.58L 17.28,19.5L 30.72,19.5L 30.72,29.58L 22.32,29.58 Z "
-							Fill="#FFFFFFFF"
-							Stretch="Fill" />
-						<Button Width="32"
-							DockPanel.Dock="Right"
-							Style="{DynamicResource MetroSquareTransparentButtonStyle}">
-							<i:Interaction.Triggers>
-								<i:EventTrigger EventName="Click">
-									<ei:CallMethodAction MethodName="ClearDirectMessage" TargetObject="{Binding Mode=OneWay}" />
-								</i:EventTrigger>
-							</i:Interaction.Triggers>
-							<Path Width="8"
-								Height="8"
-								Data="F1 M 21.2,20L 24,22.8L 26.7999,20.0001L 27.9999,21.2001L 25.2,24L 28,26.8L 26.8,28L 24,25.2L 21.2,28L 20,26.8L 22.8,24L 20,21.2L 21.2,20 Z "
-								Fill="#FFFFFFFF"
-								Stretch="Fill" />
-						</Button>
-						<TextBlock VerticalAlignment="Center"
-							Foreground="White"
-							Text="{Binding DirectMessageTo.User.ScreenName, StringFormat=@\{0\}}" />
-					</DockPanel>
-					<DockPanel Grid.ColumnSpan="3"
-						Height="26"
-						Background="#FFD80073"
-						LastChildFill="True"
-						Visibility="{Binding IsBindingAuthInfoExisted, Converter={StaticResource BooleanToInvisibleConverter}}">
-						<Path Width="14"
-							Height="13.2"
-							Margin="6"
-							HorizontalAlignment="Center"
-							VerticalAlignment="Center"
-							Data="F1 M 24,17.7727C 25.2727,17.7727 31.6364,29.8636 31,30.5C 30.3636,31.1364 17.6364,31.1364 17,30.5C 16.3636,29.8636 22.7273,17.7727 24,17.7727 Z M 24,27.3182C 23.4728,27.3182 23.0454,27.7456 23.0454,28.2727C 23.0454,28.7999 23.4728,29.2273 24,29.2273C 24.5272,29.2273 24.9545,28.7999 24.9545,28.2727C 24.9545,27.7456 24.5272,27.3182 24,27.3182 Z M 23.0454,21.5909L 23.3636,26.6818L 24.6364,26.6818L 24.9545,21.5909L 23.0454,21.5909 Z "
-							Fill="#FFFFFFFF"
-							Stretch="Fill" />
-						<TextBlock VerticalAlignment="Center"
-							Foreground="White"
-							Text="アカウントが選択されていません。左側のエリアをクリックして、投稿するアカウントを選択してください。" />
-					</DockPanel>
-					<controls:SuggestableTextBox Grid.Row="1"
-						AcceptsReturn="True"
-						AllowDrop="True"
-						BorderBrush="{x:Null}"
-						BorderThickness="0"
-						Padding="2,4"
-						SuggestItemProvider="{Binding Provider}"
-						Text="{Binding InputText, UpdateSourceTrigger=PropertyChanged}"
-						TextAlignment="Justify"
-						TextWrapping="Wrap"
-						VerticalScrollBarVisibility="Auto">
-						<i:Interaction.Triggers>
-							<l:InteractionMessageTrigger MessageKey="FocusToTextBox" Messenger="{Binding Messenger}">
-								<l:SetFocusAction />
-							</l:InteractionMessageTrigger>
-							<l:InteractionMessageTrigger Messenger="{Binding Messenger}">
-								<behaviors:TextBoxSetCaretInteractionMessageAction />
-							</l:InteractionMessageTrigger>
-						</i:Interaction.Triggers>
-						<i:Interaction.Behaviors>
-							<l:TextBoxBindingSupportBehavior SelectedText="{Binding SelectedText}"
-								SelectionLength="{Binding SelectionLength}"
-								SelectionStart="{Binding SelectionStart}" />
-							<seb:DropAcceptBehavior Description="{Binding DropAcceptDescription}" />
-						</i:Interaction.Behaviors>
-						<controls:SuggestableTextBox.ListItemTemplate>
-							<DataTemplate>
-								<TextBlock Foreground="White" Text="{Binding Body}" />
-							</DataTemplate>
-						</controls:SuggestableTextBox.ListItemTemplate>
-					</controls:SuggestableTextBox>
-					<DockPanel Grid.Row="2"
-						Grid.ColumnSpan="3"
-						Height="26"
-						VerticalAlignment="Top">
-						<DockPanel.Background>
-							<SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}" />
-						</DockPanel.Background>
-						<Button Width="80"
-							HorizontalAlignment="Left"
-							DockPanel.Dock="Right"
-							FontSize="10.667"
-							IsEnabled="{Binding CanSend}"
-							Style="{DynamicResource MetroSquareDefaultButtonStyle}">
-							<i:Interaction.Triggers>
-								<i:EventTrigger EventName="Click">
-									<ei:CallMethodAction MethodName="Send" TargetObject="{Binding Mode=OneWay}" />
-								</i:EventTrigger>
-							</i:Interaction.Triggers>
-							<Path Width="14.766"
-								Height="12"
-								Data="F1 M 871.18,611.587C 870.636,611.828 870.053,611.991 869.44,612.064C 870.065,611.689 870.546,611.095 870.772,610.388C 870.186,610.735 869.538,610.987 868.848,611.123C 868.295,610.534 867.508,610.166 866.637,610.166C 864.964,610.166 863.607,611.523 863.607,613.196C 863.607,613.433 863.634,613.664 863.686,613.886C 861.168,613.76 858.936,612.554 857.442,610.721C 857.181,611.168 857.032,611.689 857.032,612.244C 857.032,613.295 857.566,614.222 858.379,614.765C 857.883,614.75 857.416,614.613 857.007,614.386C 857.007,614.399 857.007,614.412 857.007,614.425C 857.007,615.892 858.051,617.117 859.437,617.395C 859.183,617.464 858.915,617.501 858.639,617.501C 858.444,617.501 858.254,617.482 858.069,617.447C 858.454,618.65 859.573,619.526 860.899,619.551C 859.862,620.363 858.556,620.848 857.136,620.848C 856.892,620.848 856.651,620.833 856.414,620.805C 857.754,621.665 859.347,622.166 861.058,622.166C 866.63,622.166 869.677,617.55 869.677,613.547C 869.677,613.416 869.674,613.285 869.668,613.155C 870.26,612.728 870.774,612.194 871.18,611.587 Z "
-								Fill="#FFFEFEFE"
-								Stretch="Fill" />
-						</Button>
-						<StackPanel Height="26"
-							VerticalAlignment="Top"
-							Orientation="Horizontal">
-							<controls:DropDownMenuButton
-								Style="{DynamicResource MetroSquareUnfocusableFlatButton}"
-								ToolTip="下書き"
-								Visibility="{Binding IsDraftsExisted, Converter={StaticResource BooleanToVisibleConverter}}">
-								<controls:DropDownMenuButton.DropDownContextMenu>
-									<ContextMenu DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}"
-										DisplayMemberPath="Text"
-										ItemsSource="{Binding DraftedInputs}">
-										<ContextMenu.ItemContainerStyle>
-											<Style TargetType="{x:Type MenuItem}">
-												<Setter Property="Command" Value="{Binding WritebackCommand}" />
-											</Style>
-										</ContextMenu.ItemContainerStyle>
-									</ContextMenu>
-								</controls:DropDownMenuButton.DropDownContextMenu>
-								<StackPanel Orientation="Horizontal">
-									<Path
-										Height="14"
-										Data="F1 M 23.6818,25.5455L 20.1818,21.0909L 22.0909,21.0909L 22.0909,16L 25.9091,16L 25.9091,21.0909L 27.8182,21.0909L 24.3182,25.5455L 23.6818,25.5455 Z M 16.3636,23.6364L 18.2727,19.1818L 20.6591,19.1818L 20.6591,20.4545L 19.2273,20.4545L 17.9545,23.6364L 21.1364,23.6364C 21.1364,25.2179 22.4185,26.5 24,26.5C 25.5815,26.5 26.8636,25.2179 26.8636,23.6364L 30.0454,23.6364L 28.7727,20.4545L 27.3409,20.4545L 27.3409,19.1818L 29.7273,19.1818L 31.6364,23.6364L 31.6364,30L 16.3636,30L 16.3636,23.6364 Z "
-										Fill="#FF000000"
-										Stretch="Fill" Width="15" VerticalAlignment="Center" />
-									<TextBlock TextWrapping="Wrap" Text="{Binding DraftCount}" Margin="4,0,2,0" FontWeight="Normal" VerticalAlignment="Center"/>
-								</StackPanel>
-							</controls:DropDownMenuButton>
-							<Button Width="28"
-								Style="{DynamicResource MetroSquareUnfocusableFlatButton}"
-								ToolTip="画像の添付"
-								Visibility="{Binding IsImageAttached, Converter={StaticResource BooleanToInvisibleConverter}}">
-								<i:Interaction.Triggers>
-									<i:EventTrigger EventName="Click">
-										<ei:CallMethodAction MethodName="AttachImage" TargetObject="{Binding Mode=OneWay}" />
-									</i:EventTrigger>
-								</i:Interaction.Triggers>
-								<Path Width="16.546"
-									Height="14"
-									Data="F1 M 15.7273,17L 32.2727,17L 32.2727,31L 15.7273,31L 15.7273,17 Z M 17,18.2727L 17,29.7273L 31,29.7273L 31,18.2727L 17,18.2727 Z M 18.2727,29.0909L 20.8182,26.5455L 22.0909,27.8182L 27.1818,22.7273L 29.0909,24.6364L 30.3636,23.3636L 30.3636,29.0909L 18.2727,29.0909 Z M 20.8182,19.5455C 20.8182,20.9513 19.6785,22.0909 18.2727,22.0909C 18.053,22.0909 17.8398,22.0631 17.6364,22.0107L 17.6364,18.9091L 20.738,18.9091C 20.7903,19.1125 20.8182,19.3257 20.8182,19.5455 Z "
-									Fill="#FF000000"
-									Stretch="Fill" />
-							</Button>
-							<Button Width="28"
-								Style="{DynamicResource MetroSquareUnfocusableFlatButton}"
-								ToolTip="位置情報の追加・更新"
-								Visibility="{Binding IsLocationEnabled, Converter={StaticResource BooleanToVisibleConverter}}">
-								<i:Interaction.Triggers>
-									<i:EventTrigger EventName="Click">
-										<ei:CallMethodAction MethodName="AttachLocation" TargetObject="{Binding Mode=OneWay}" />
-									</i:EventTrigger>
-								</i:Interaction.Triggers>
-								<Path Width="6.72"
-									Height="14"
-									Data="F1 M 21.14,17.375L 27.86,17.375L 27.86,24.655L 21.14,31.375L 21.14,17.375 Z M 23.828,18.831L 23.828,20.175L 22.484,20.175L 22.484,21.519L 23.828,21.519L 23.828,22.863L 25.172,22.863L 25.172,21.519L 26.516,21.519L 26.516,20.175L 25.172,20.175L 25.172,18.831L 23.828,18.831 Z "
-									Fill="#FF000000"
-									Stretch="Fill" />
-							</Button>
-							<Button Width="28"
-								Style="{DynamicResource MetroSquareUnfocusableFlatButton}"
-								ToolTip="位置情報の削除"
-								Visibility="{Binding IsLocationAttached, Converter={StaticResource BooleanToVisibleConverter}}">
-								<i:Interaction.Triggers>
-									<i:EventTrigger EventName="Click">
-										<ei:CallMethodAction MethodName="DetachLocation" TargetObject="{Binding Mode=OneWay}" />
-									</i:EventTrigger>
-								</i:Interaction.Triggers>
-								<Path Width="6.72"
-									Height="14"
-									Data="F1 M 21.14,17.375L 27.86,17.375L 27.86,24.655L 21.14,31.375L 21.14,17.375 Z M 22.3753,19.6726L 23.5496,20.847L 22.3753,22.0213L 23.3256,22.9717L 24.5,21.7973L 25.6744,22.9717L 26.6247,22.0213L 25.4503,20.847L 26.6247,19.6726L 25.6743,18.7223L 24.5,19.8966L 23.3256,18.7223L 22.3753,19.6726 Z "
-									Fill="#FF000000"
-									Stretch="Fill" />
-							</Button>
-							<TextBlock VerticalAlignment="Center"
-								Text="{Binding AttachedLocation.Location}"
-								TextWrapping="Wrap"
-								Visibility="{Binding IsLocationAttached, Converter={StaticResource BooleanToVisibleConverter}}" />
-							<Grid Margin="4,0">
-								<Grid.ColumnDefinitions>
-									<ColumnDefinition Width="Auto" />
-									<ColumnDefinition />
-								</Grid.ColumnDefinitions>
-								<Border VerticalAlignment="Center"
-									ToolTip="URLリンク化自動回避は行われません。"
-									Visibility="{Binding IsChecked, Converter={StaticResource BooleanToInvisibleConverter}, ElementName=ToggleUrlAutoEscapeButton}">
-									<Path Height="12.928"
-										Data="F1 M 17.8932,27.756L 18.5598,28.9107L 20.3812,29.3987L 22.1132,28.3987L 22.6906,28.0654L 23.8453,27.3987L 24.1786,27.9761L 23.6906,29.7974L 20.8038,31.4641L 17.1611,30.488L 15.8278,28.1786L 16.8039,24.5359L 19.6906,22.8692L 21.512,23.3573L 21.8453,23.9346L 20.6906,24.6013L 20.1132,24.9346L 18.3812,25.9346L 17.8932,27.756 Z M 24.3094,20.2026L 27.1961,18.5359L 30.8389,19.512L 32.1722,21.8214L 31.1961,25.4641L 28.3094,27.1308L 26.488,26.6427L 26.1547,26.0654L 27.3094,25.3987L 27.8867,25.0654L 29.6188,24.0654L 30.1068,22.244L 29.4402,21.0893L 27.6188,20.6013L 25.8867,21.6013L 25.3094,21.9346L 24.1547,22.6013L 23.8214,22.0239L 24.3094,20.2026 Z M 22.2739,27.3437L 21.3632,27.0997L 20.8632,26.2337L 21.1073,25.323L 25.7261,22.6563L 26.6367,22.9003L 27.1367,23.7664L 26.8927,24.677L 22.2739,27.3437 Z "
-										Fill="#FF000000"
-										Stretch="Fill" />
-								</Border>
-								<Border VerticalAlignment="Center"
-									ToolTip="URLリンク化自動回避を行います(スキームのないURLのTLDの前にゼロ幅スペースが自動挿入されます)。"
-									Visibility="{Binding IsChecked, Converter={StaticResource BooleanToVisibleConverter}, ElementName=ToggleUrlAutoEscapeButton}">
-									<Path Height="13.464"
-										Data="F1 M 17.8932,27.756L 18.5598,28.9107L 20.3812,29.3987L 22.1132,28.3987L 22.6906,28.0654L 23.8453,27.3987L 24.1786,27.9761L 23.6906,29.7974L 20.8038,31.4641L 17.1611,30.488L 15.8278,28.1786L 16.8039,24.5359L 19.6906,22.8692L 21.512,23.3573L 21.8453,23.9346L 20.6906,24.6013L 20.1132,24.9346L 18.3812,25.9346L 17.8932,27.756 Z M 24.3094,20.2026L 27.1961,18.5359L 30.8389,19.512L 32.1722,21.8214L 31.1961,25.4641L 28.3094,27.1308L 26.488,26.6427L 26.1547,26.0654L 27.3094,25.3987L 27.8867,25.0654L 29.6188,24.0654L 30.1068,22.244L 29.4401,21.0893L 27.6188,20.6013L 25.8867,21.6013L 25.3094,21.9346L 24.1547,22.6013L 23.8214,22.0239L 24.3094,20.2026 Z M 22.2739,27.3437L 21.3632,27.0997L 20.8632,26.2337L 21.1073,25.323L 25.7261,22.6563L 26.6367,22.9003L 27.1367,23.7664L 26.8927,24.677L 22.2739,27.3437 Z M 27.6937,27.375L 29.3125,28.9938L 30.9312,27.375L 31.625,28.0688L 30.0062,29.6875L 31.625,31.3063L 30.9312,32L 29.3125,30.3813L 27.6937,32L 27,31.3062L 28.6187,29.6875L 27,28.0687L 27.6937,27.375 Z "
-										Fill="#FF000000"
-										Stretch="Fill" />
-								</Border>
-								<Viewbox Grid.Column="1"
-									Height="12"
-									Margin="4,0"
-									HorizontalAlignment="Left"
-									VerticalAlignment="Center">
-									<custom:ToggleSwitchButton x:Name="ToggleUrlAutoEscapeButton"
-										Content="ToggleSwitchButton"
-										IsChecked="{Binding IsUrlAutoEsacpeEnabled}"
-										ToolTip="URLリンク化自動回避のオンオフを切り替えます。" />
-								</Viewbox>
-							</Grid>
-						</StackPanel>
-						<DockPanel LastChildFill="False">
-							<Border Width="14"
-								Height="14"
-								Margin="7,0"
-								ToolTip="ロックされているハッシュタグ"
-								Visibility="{Binding IsBindingHashtagExisted, Converter={StaticResource BooleanToVisibleConverter}}">
-								<Path Margin="0,0,2.332,-0.002"
-									Data="F1 M 18.1693,23.4199L 19.3361,23.4199L 19.3361,21.6697C 19.3361,19.092 21.4257,17.0024 24.0034,17.0024C 26.5811,17.0024 28.6707,19.092 28.6707,21.6697L 28.6707,23.4199L 29.8376,23.4199L 29.8376,31.0043L 18.1693,31.0043L 18.1693,23.4199 Z M 26.9205,21.6697C 26.9205,20.0586 25.6145,18.7526 24.0034,18.7526C 22.3923,18.7526 21.0863,20.0586 21.0863,21.6697L 21.0863,23.4199L 26.9205,23.4199L 26.9205,21.6697 Z "
-									Fill="#FF000000"
-									Stretch="Fill" />
-							</Border>
-							<ItemsControl ItemTemplate="{DynamicResource HashtagDataTemplate}" ItemsSource="{Binding BindingHashtags}">
-								<ItemsControl.ItemsPanel>
-									<ItemsPanelTemplate>
-										<StackPanel Orientation="Horizontal" />
-									</ItemsPanelTemplate>
-								</ItemsControl.ItemsPanel>
-							</ItemsControl>
-							<Border Width="14"
-								Height="14"
-								Margin="7,0"
-								ToolTip="ロック可能なハッシュタグ"
-								Visibility="{Binding IsBindableHashtagExisted, Converter={StaticResource BooleanToVisibleConverter}}">
-								<Path Data="F1 M 18.8704,16.7929L 22.1351,16.7929L 30.4452,25.103C 30.9088,25.5666 30.9088,26.3183 30.4452,26.7819L 26.7819,30.4452C 26.3183,30.9088 25.5666,30.9088 25.103,30.4452L 16.7929,22.1351L 16.7929,18.8704C 16.7929,18.1779 16.7929,17.4854 17.1391,17.1392C 17.4854,16.7929 18.1779,16.7929 18.8704,16.7929 Z M 19.7608,18.5736C 19.1051,18.5736 18.5736,19.1051 18.5736,19.7608C 18.5736,20.4164 19.1051,20.9479 19.7608,20.9479C 20.4164,20.9479 20.9479,20.4164 20.9479,19.7608C 20.9479,19.1051 20.4164,18.5736 19.7608,18.5736 Z "
-									Fill="#FF000000"
-									Stretch="Fill" />
-							</Border>
-							<ItemsControl ItemTemplate="{DynamicResource HashtagDataTemplate}" ItemsSource="{Binding BindableHashtagCandidates}">
-								<ItemsControl.ItemsPanel>
-									<ItemsPanelTemplate>
-										<StackPanel Orientation="Horizontal" />
-									</ItemsPanelTemplate>
-								</ItemsControl.ItemsPanel>
-							</ItemsControl>
-						</DockPanel>
-					</DockPanel>
-					<DockPanel Grid.Row="1"
-						Grid.Column="2"
-						MinWidth="32"
-						LastChildFill="False">
-						<Button Height="26"
-							DockPanel.Dock="Top"
-							Style="{DynamicResource MetroSquareUnfocusableFlatButton}">
-							<i:Interaction.Triggers>
-								<i:EventTrigger EventName="Click">
-									<ei:CallMethodAction MethodName="CloseInput" TargetObject="{Binding Mode=OneWay}" />
-								</i:EventTrigger>
-							</i:Interaction.Triggers>
-							<Path Width="8"
-								Height="8"
-								Data="F1 M 21.2,20L 24,22.8L 26.7999,20.0001L 27.9999,21.2001L 25.2,24L 28,26.8L 26.8,28L 24,25.2L 21.2,28L 20,26.8L 22.8,24L 20,21.2L 21.2,20 Z "
-								Fill="#FF000000"
-								Stretch="Fill" />
-						</Button>
-						<TextBlock Margin="4"
-							DockPanel.Dock="Bottom"
-							Foreground="DimGray"
-							Text="{Binding RemainTextCount}"
-							TextAlignment="Right"
-							TextWrapping="Wrap" />
-					</DockPanel>
-					<Border Grid.Row="1"
-						Grid.Column="1"
-						MinWidth="40"
-						MinHeight="40"
-						MaxWidth="100"
-						MaxHeight="100"
-						Margin="4"
-						HorizontalAlignment="Left"
-						VerticalAlignment="Center"
-						BorderThickness="1"
-						ToolTip="クリックで画像の添付を解除します。"
-						Visibility="{Binding IsImageAttached, Converter={StaticResource BooleanToVisibleConverter}}">
-						<Border.Background>
-							<SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}" />
-						</Border.Background>
-						<i:Interaction.Triggers>
-							<i:EventTrigger EventName="MouseLeftButtonDown">
-								<ei:CallMethodAction MethodName="DetachImage" TargetObject="{Binding Mode=OneWay}" />
-							</i:EventTrigger>
-							<i:EventTrigger EventName="MouseEnter">
-								<ei:GoToStateAction StateName="MouseOverState" />
-							</i:EventTrigger>
-							<i:EventTrigger EventName="MouseLeave">
-								<ei:GoToStateAction StateName="MouseOutState" />
-							</i:EventTrigger>
-						</i:Interaction.Triggers>
-						<Border.BorderBrush>
-							<SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ActiveBorderColorKey}}" />
-						</Border.BorderBrush>
-						<Grid>
-							<Image Source="{Binding AttachedImage.Source}" Stretch="Uniform" />
-							<Border x:Name="Border"
-								Background="#FFE51400"
-								Opacity="0">
-								<Path Width="10"
-									Height="10"
-									Margin="0,6,6,0"
-									HorizontalAlignment="Right"
-									VerticalAlignment="Top"
-									Data="F1 M 20.5,19L 24,22.5L 27.4999,19.0001L 28.9999,20.5001L 25.5,24L 29,27.5L 27.5,29L 24,25.5L 20.5,29L 19,27.5L 22.5,24L 19,20.5L 20.5,19 Z "
-									Fill="#FFFFFFFF"
-									Stretch="Fill" />
-							</Border>
-						</Grid>
-					</Border>
-				</Grid>
-			</Border>
-		</Grid>
-	</Grid>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="183*" />
+            <ColumnDefinition Width="253*" />
+        </Grid.ColumnDefinitions>
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="ButtonSizeControl">
+                <VisualState x:Name="OpenState">
+                    <Storyboard>
+                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="ItemsControl" Storyboard.TargetProperty="(FrameworkElement.Width)">
+                            <EasingDoubleKeyFrame KeyTime="0" Value="48" />
+                        </DoubleAnimationUsingKeyFrames>
+                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="ItemsControl" Storyboard.TargetProperty="(FrameworkElement.Height)">
+                            <EasingDoubleKeyFrame KeyTime="0" Value="48" />
+                        </DoubleAnimationUsingKeyFrames>
+                    </Storyboard>
+                </VisualState>
+                <VisualState x:Name="CloseState" />
+            </VisualStateGroup>
+            <VisualStateGroup x:Name="ImageAttachControl">
+                <VisualState x:Name="MouseOverState">
+                    <Storyboard>
+                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Border" Storyboard.TargetProperty="(UIElement.Opacity)">
+                            <EasingDoubleKeyFrame KeyTime="0" Value="0.4" />
+                        </DoubleAnimationUsingKeyFrames>
+                    </Storyboard>
+                </VisualState>
+                <VisualState x:Name="MouseOutState" />
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+        <Button Margin="4,0,0,0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                BorderThickness="0"
+                Padding="0"
+                Style="{DynamicResource MetroSquareUnfocusableFlatButton}">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="Click">
+                    <ei:CallMethodAction MethodName="SelectAccounts" TargetObject="{Binding Mode=OneWay}" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+            <Button.ToolTip>
+                <TextBlock Foreground="White"><Run Text="{Binding AuthInfoScreenNames, Mode=OneWay}" />
+                    <LineBreak /><Run Text="クリックすると変更することができます。" />
+                </TextBlock>
+            </Button.ToolTip>
+            <ItemsControl x:Name="ItemsControl"
+                          Width="24"
+                          Height="24"
+                          ItemsSource="{Binding BindingAuthInfos}"
+                          d:IsHidden="True">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid Columns="{Binding AuthInfoGridRowColumn}" Rows="{Binding AuthInfoGridRowColumn}" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <controls:LazyImage UriSource="{Binding ProfileImageUri}" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Button>
+        <Grid x:Name="Default"
+              Grid.Column="1"
+              Grid.ColumnSpan="2"
+              Margin="4,0"
+              Visibility="{Binding IsOpening,
+                                   Converter={StaticResource BooleanToInvisibleConverter}}">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="MouseLeftButtonDown">
+                    <ei:CallMethodAction MethodName="OpenInput" TargetObject="{Binding Mode=OneWay}" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+            <Border Background="White"
+                    BorderBrush="Gray"
+                    BorderThickness="1"
+                    Cursor="IBeam"
+                    SnapsToDevicePixels="True">
+                <Grid Margin="4" VerticalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="What's happening?">
+                        <TextBlock.Foreground>
+                            <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.GrayTextColorKey}}" />
+                        </TextBlock.Foreground>
+                    </TextBlock>
+                    <TextBlock Grid.Column="1"
+                               Margin="4,0,4,0"
+                               Foreground="Green"
+                               Visibility="{Binding IsDraftsExisted,
+                                                    Converter={StaticResource BooleanToVisibleConverter}}"><Run Text="{Binding DraftCount, Mode=OneWay}" /><Run Text="件の下書きがあります" />
+                    </TextBlock>
+                    <Grid Grid.Column="2"
+                          Width="{Binding MaxControlWidth}"
+                          Height="12"
+                          Background="Gainsboro"
+                          SnapsToDevicePixels="True"
+                          Visibility="{Binding IsPostLimitPredictionEnabled,
+                                               Converter={StaticResource BooleanToVisibleConverter}}">
+                        <Grid.ToolTip>
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock Foreground="White"><Run Text="規制までおよそ" /><Run Text=" " /><Run Text="{Binding RemainUpdate, Mode=OneWay}" /><Run Text=" " /><Run Text="ツイート" />
+                                </TextBlock>
+                                <TextBlock Foreground="White"><Run Text="約" /><Run Text=" " /><Run Text="{Binding WindowTime, Mode=OneWay}" /><Run Text=" " /><Run Text="分で1ツイート分回復します。" />
+                                </TextBlock>
+                            </StackPanel>
+                        </Grid.ToolTip>
+                        <Grid Width="{Binding ControlWidth}"
+                              HorizontalAlignment="Left"
+                              VerticalAlignment="Stretch"
+                              Background="#FF1BA1E2"
+                              SnapsToDevicePixels="True" />
+                    </Grid>
+                </Grid>
+            </Border>
+        </Grid>
+        <Grid x:Name="Opening"
+              Grid.Column="1"
+              Grid.ColumnSpan="2"
+              Margin="4,0"
+              Visibility="{Binding IsOpening,
+                                   Converter={StaticResource BooleanToVisibleConverter}}">
+            <Border Background="White"
+                    BorderBrush="Gray"
+                    BorderThickness="1"
+                    SnapsToDevicePixels="True">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <DockPanel Grid.ColumnSpan="3"
+                               Height="26"
+                               Background="#FFF09609"
+                               LastChildFill="True"
+                               Visibility="{Binding IsInReplyToEnabled,
+                                                    Converter={StaticResource BooleanToVisibleConverter}}">
+                        <Path Width="12"
+                              Height="11"
+                              Margin="6"
+                              VerticalAlignment="Center"
+                              Data="F1 M 26.0556,21.9444L 22.0556,21.9444L 24.2778,24.1667L 21.6759,24.1667L 18.5,21.1018L 21.6759,17.9444L 24.2778,17.9444L 22.0556,20.1667L 26.0556,20.1667C 28.5101,20.1667 30.5,22.1565 30.5,24.6111C 30.5,27.0657 28.5101,29.0556 26.0555,29.0556L 24.7222,29.0556L 24.7222,27.2778L 26.0556,27.2778C 27.5283,27.2778 28.7222,26.0839 28.7222,24.6111C 28.7222,23.1384 27.5283,21.9444 26.0556,21.9444 Z "
+                              Fill="#FFFFFFFF"
+                              Stretch="Fill" />
+                        <Button Width="32"
+                                DockPanel.Dock="Right"
+                                Style="{DynamicResource MetroSquareTransparentButtonStyle}">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="Click">
+                                    <ei:CallMethodAction MethodName="ClearInReplyTo" TargetObject="{Binding Mode=OneWay}" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                            <Path Width="8"
+                                  Height="8"
+                                  Data="F1 M 21.2,20L 24,22.8L 26.7999,20.0001L 27.9999,21.2001L 25.2,24L 28,26.8L 26.8,28L 24,25.2L 21.2,28L 20,26.8L 22.8,24L 20,21.2L 21.2,20 Z "
+                                  Fill="#FFFFFFFF"
+                                  Stretch="Fill" />
+                        </Button>
+                        <TextBlock VerticalAlignment="Center" Foreground="White">
+                            <TextBlock.Text>
+                                <MultiBinding StringFormat="@{0}: {1}">
+                                    <Binding Path="InReplyTo.User.ScreenName" />
+                                    <Binding Converter="{StaticResource StringRemoveLineConverter}" Path="InReplyTo.Status.Text" />
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
+                    </DockPanel>
+                    <DockPanel Grid.ColumnSpan="3"
+                               Height="26"
+                               Background="#FFA05000"
+                               LastChildFill="True"
+                               Visibility="{Binding IsDirectMessageEnabled,
+                                                    Converter={StaticResource BooleanToVisibleConverter}}">
+                        <Path Width="13.44"
+                              Height="14"
+                              Margin="6"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center"
+                              Data="F1 M 22.32,29.58L 23.44,33.5L 18.96,29.58L 17.28,29.58L 17.28,19.5L 30.72,19.5L 30.72,29.58L 22.32,29.58 Z "
+                              Fill="#FFFFFFFF"
+                              Stretch="Fill" />
+                        <Button Width="32"
+                                DockPanel.Dock="Right"
+                                Style="{DynamicResource MetroSquareTransparentButtonStyle}">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="Click">
+                                    <ei:CallMethodAction MethodName="ClearDirectMessage" TargetObject="{Binding Mode=OneWay}" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                            <Path Width="8"
+                                  Height="8"
+                                  Data="F1 M 21.2,20L 24,22.8L 26.7999,20.0001L 27.9999,21.2001L 25.2,24L 28,26.8L 26.8,28L 24,25.2L 21.2,28L 20,26.8L 22.8,24L 20,21.2L 21.2,20 Z "
+                                  Fill="#FFFFFFFF"
+                                  Stretch="Fill" />
+                        </Button>
+                        <TextBlock VerticalAlignment="Center"
+                                   Foreground="White"
+                                   Text="{Binding DirectMessageTo.User.ScreenName,
+                                                  StringFormat=@\{0\}}" />
+                    </DockPanel>
+                    <DockPanel Grid.ColumnSpan="3"
+                               Height="26"
+                               Background="#FFD80073"
+                               LastChildFill="True"
+                               Visibility="{Binding IsBindingAuthInfoExisted,
+                                                    Converter={StaticResource BooleanToInvisibleConverter}}">
+                        <Path Width="14"
+                              Height="13.2"
+                              Margin="6"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center"
+                              Data="F1 M 24,17.7727C 25.2727,17.7727 31.6364,29.8636 31,30.5C 30.3636,31.1364 17.6364,31.1364 17,30.5C 16.3636,29.8636 22.7273,17.7727 24,17.7727 Z M 24,27.3182C 23.4728,27.3182 23.0454,27.7456 23.0454,28.2727C 23.0454,28.7999 23.4728,29.2273 24,29.2273C 24.5272,29.2273 24.9545,28.7999 24.9545,28.2727C 24.9545,27.7456 24.5272,27.3182 24,27.3182 Z M 23.0454,21.5909L 23.3636,26.6818L 24.6364,26.6818L 24.9545,21.5909L 23.0454,21.5909 Z "
+                              Fill="#FFFFFFFF"
+                              Stretch="Fill" />
+                        <TextBlock VerticalAlignment="Center"
+                                   Foreground="White"
+                                   Text="アカウントが選択されていません。左側のエリアをクリックして、投稿するアカウントを選択してください。" />
+                    </DockPanel>
+                    <controls:SuggestableTextBox Grid.Row="1"
+                                                 AcceptsReturn="True"
+                                                 AllowDrop="True"
+                                                 BorderBrush="{x:Null}"
+                                                 BorderThickness="0"
+                                                 Padding="2,4"
+                                                 SuggestItemProvider="{Binding Provider}"
+                                                 Text="{Binding InputText,
+                                                                UpdateSourceTrigger=PropertyChanged}"
+                                                 TextAlignment="Justify"
+                                                 TextWrapping="Wrap"
+                                                 VerticalScrollBarVisibility="Auto">
+                        <i:Interaction.Triggers>
+                            <l:InteractionMessageTrigger MessageKey="FocusToTextBox" Messenger="{Binding Messenger}">
+                                <l:SetFocusAction />
+                            </l:InteractionMessageTrigger>
+                            <l:InteractionMessageTrigger Messenger="{Binding Messenger}">
+                                <behaviors:TextBoxSetCaretInteractionMessageAction />
+                            </l:InteractionMessageTrigger>
+                        </i:Interaction.Triggers>
+                        <i:Interaction.Behaviors>
+                            <l:TextBoxBindingSupportBehavior SelectedText="{Binding SelectedText}"
+                                                             SelectionLength="{Binding SelectionLength}"
+                                                             SelectionStart="{Binding SelectionStart}" />
+                            <seb:DropAcceptBehavior Description="{Binding DropAcceptDescription}" />
+                        </i:Interaction.Behaviors>
+                        <controls:SuggestableTextBox.ListItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Foreground="White" Text="{Binding Body}" />
+                            </DataTemplate>
+                        </controls:SuggestableTextBox.ListItemTemplate>
+                    </controls:SuggestableTextBox>
+                    <DockPanel Grid.Row="2"
+                               Grid.ColumnSpan="3"
+                               Height="26"
+                               VerticalAlignment="Top">
+                        <DockPanel.Background>
+                            <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}" />
+                        </DockPanel.Background>
+                        <Button Width="80"
+                                HorizontalAlignment="Left"
+                                DockPanel.Dock="Right"
+                                FontSize="10.667"
+                                IsEnabled="{Binding CanSend}"
+                                Style="{DynamicResource MetroSquareDefaultButtonStyle}">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="Click">
+                                    <ei:CallMethodAction MethodName="Send" TargetObject="{Binding Mode=OneWay}" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                            <Path Width="14.766"
+                                  Height="12"
+                                  Data="F1 M 871.18,611.587C 870.636,611.828 870.053,611.991 869.44,612.064C 870.065,611.689 870.546,611.095 870.772,610.388C 870.186,610.735 869.538,610.987 868.848,611.123C 868.295,610.534 867.508,610.166 866.637,610.166C 864.964,610.166 863.607,611.523 863.607,613.196C 863.607,613.433 863.634,613.664 863.686,613.886C 861.168,613.76 858.936,612.554 857.442,610.721C 857.181,611.168 857.032,611.689 857.032,612.244C 857.032,613.295 857.566,614.222 858.379,614.765C 857.883,614.75 857.416,614.613 857.007,614.386C 857.007,614.399 857.007,614.412 857.007,614.425C 857.007,615.892 858.051,617.117 859.437,617.395C 859.183,617.464 858.915,617.501 858.639,617.501C 858.444,617.501 858.254,617.482 858.069,617.447C 858.454,618.65 859.573,619.526 860.899,619.551C 859.862,620.363 858.556,620.848 857.136,620.848C 856.892,620.848 856.651,620.833 856.414,620.805C 857.754,621.665 859.347,622.166 861.058,622.166C 866.63,622.166 869.677,617.55 869.677,613.547C 869.677,613.416 869.674,613.285 869.668,613.155C 870.26,612.728 870.774,612.194 871.18,611.587 Z "
+                                  Fill="#FFFEFEFE"
+                                  Stretch="Fill" />
+                        </Button>
+                        <StackPanel Height="26"
+                                    VerticalAlignment="Top"
+                                    Orientation="Horizontal">
+                            <controls:DropDownMenuButton Style="{DynamicResource MetroSquareUnfocusableFlatButton}"
+                                                         ToolTip="下書き"
+                                                         Visibility="{Binding IsDraftsExisted,
+                                                                              Converter={StaticResource BooleanToVisibleConverter}}">
+                                <controls:DropDownMenuButton.DropDownContextMenu>
+                                    <ContextMenu DataContext="{Binding PlacementTarget.DataContext,
+                                                                       RelativeSource={RelativeSource Self}}"
+                                                 DisplayMemberPath="Text"
+                                                 ItemsSource="{Binding DraftedInputs}">
+                                        <ContextMenu.ItemContainerStyle>
+                                            <Style TargetType="{x:Type MenuItem}">
+                                                <Setter Property="Command" Value="{Binding WritebackCommand}" />
+                                            </Style>
+                                        </ContextMenu.ItemContainerStyle>
+                                    </ContextMenu>
+                                </controls:DropDownMenuButton.DropDownContextMenu>
+                                <StackPanel Orientation="Horizontal">
+                                    <Path Width="15"
+                                          Height="14"
+                                          VerticalAlignment="Center"
+                                          Data="F1 M 23.6818,25.5455L 20.1818,21.0909L 22.0909,21.0909L 22.0909,16L 25.9091,16L 25.9091,21.0909L 27.8182,21.0909L 24.3182,25.5455L 23.6818,25.5455 Z M 16.3636,23.6364L 18.2727,19.1818L 20.6591,19.1818L 20.6591,20.4545L 19.2273,20.4545L 17.9545,23.6364L 21.1364,23.6364C 21.1364,25.2179 22.4185,26.5 24,26.5C 25.5815,26.5 26.8636,25.2179 26.8636,23.6364L 30.0454,23.6364L 28.7727,20.4545L 27.3409,20.4545L 27.3409,19.1818L 29.7273,19.1818L 31.6364,23.6364L 31.6364,30L 16.3636,30L 16.3636,23.6364 Z "
+                                          Fill="#FF000000"
+                                          Stretch="Fill" />
+                                    <TextBlock Margin="4,0,2,0"
+                                               VerticalAlignment="Center"
+                                               FontWeight="Normal"
+                                               Text="{Binding DraftCount}"
+                                               TextWrapping="Wrap" />
+                                </StackPanel>
+                            </controls:DropDownMenuButton>
+                            <Button Width="28"
+                                    Style="{DynamicResource MetroSquareUnfocusableFlatButton}"
+                                    ToolTip="画像の添付"
+                                    Visibility="{Binding IsImageAttached,
+                                                         Converter={StaticResource BooleanToInvisibleConverter}}">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="Click">
+                                        <ei:CallMethodAction MethodName="AttachImage" TargetObject="{Binding Mode=OneWay}" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                                <Path Width="16.546"
+                                      Height="14"
+                                      Data="F1 M 15.7273,17L 32.2727,17L 32.2727,31L 15.7273,31L 15.7273,17 Z M 17,18.2727L 17,29.7273L 31,29.7273L 31,18.2727L 17,18.2727 Z M 18.2727,29.0909L 20.8182,26.5455L 22.0909,27.8182L 27.1818,22.7273L 29.0909,24.6364L 30.3636,23.3636L 30.3636,29.0909L 18.2727,29.0909 Z M 20.8182,19.5455C 20.8182,20.9513 19.6785,22.0909 18.2727,22.0909C 18.053,22.0909 17.8398,22.0631 17.6364,22.0107L 17.6364,18.9091L 20.738,18.9091C 20.7903,19.1125 20.8182,19.3257 20.8182,19.5455 Z "
+                                      Fill="#FF000000"
+                                      Stretch="Fill" />
+                            </Button>
+                            <Button Width="28"
+                                    Style="{DynamicResource MetroSquareUnfocusableFlatButton}"
+                                    ToolTip="位置情報の追加・更新"
+                                    Visibility="{Binding IsLocationEnabled,
+                                                         Converter={StaticResource BooleanToVisibleConverter}}">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="Click">
+                                        <ei:CallMethodAction MethodName="AttachLocation" TargetObject="{Binding Mode=OneWay}" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                                <Path Width="6.72"
+                                      Height="14"
+                                      Data="F1 M 21.14,17.375L 27.86,17.375L 27.86,24.655L 21.14,31.375L 21.14,17.375 Z M 23.828,18.831L 23.828,20.175L 22.484,20.175L 22.484,21.519L 23.828,21.519L 23.828,22.863L 25.172,22.863L 25.172,21.519L 26.516,21.519L 26.516,20.175L 25.172,20.175L 25.172,18.831L 23.828,18.831 Z "
+                                      Fill="#FF000000"
+                                      Stretch="Fill" />
+                            </Button>
+                            <Button Width="28"
+                                    Style="{DynamicResource MetroSquareUnfocusableFlatButton}"
+                                    ToolTip="位置情報の削除"
+                                    Visibility="{Binding IsLocationAttached,
+                                                         Converter={StaticResource BooleanToVisibleConverter}}">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="Click">
+                                        <ei:CallMethodAction MethodName="DetachLocation" TargetObject="{Binding Mode=OneWay}" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                                <Path Width="6.72"
+                                      Height="14"
+                                      Data="F1 M 21.14,17.375L 27.86,17.375L 27.86,24.655L 21.14,31.375L 21.14,17.375 Z M 22.3753,19.6726L 23.5496,20.847L 22.3753,22.0213L 23.3256,22.9717L 24.5,21.7973L 25.6744,22.9717L 26.6247,22.0213L 25.4503,20.847L 26.6247,19.6726L 25.6743,18.7223L 24.5,19.8966L 23.3256,18.7223L 22.3753,19.6726 Z "
+                                      Fill="#FF000000"
+                                      Stretch="Fill" />
+                            </Button>
+                            <TextBlock VerticalAlignment="Center"
+                                       Text="{Binding AttachedLocation.Location}"
+                                       TextWrapping="Wrap"
+                                       Visibility="{Binding IsLocationAttached,
+                                                            Converter={StaticResource BooleanToVisibleConverter}}" />
+                            <Grid Margin="4,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <Border VerticalAlignment="Center"
+                                        ToolTip="URLリンク化自動回避は行われません。"
+                                        Visibility="{Binding IsChecked,
+                                                             Converter={StaticResource BooleanToInvisibleConverter},
+                                                             ElementName=ToggleUrlAutoEscapeButton}">
+                                    <Path Height="12.928"
+                                          Data="F1 M 17.8932,27.756L 18.5598,28.9107L 20.3812,29.3987L 22.1132,28.3987L 22.6906,28.0654L 23.8453,27.3987L 24.1786,27.9761L 23.6906,29.7974L 20.8038,31.4641L 17.1611,30.488L 15.8278,28.1786L 16.8039,24.5359L 19.6906,22.8692L 21.512,23.3573L 21.8453,23.9346L 20.6906,24.6013L 20.1132,24.9346L 18.3812,25.9346L 17.8932,27.756 Z M 24.3094,20.2026L 27.1961,18.5359L 30.8389,19.512L 32.1722,21.8214L 31.1961,25.4641L 28.3094,27.1308L 26.488,26.6427L 26.1547,26.0654L 27.3094,25.3987L 27.8867,25.0654L 29.6188,24.0654L 30.1068,22.244L 29.4402,21.0893L 27.6188,20.6013L 25.8867,21.6013L 25.3094,21.9346L 24.1547,22.6013L 23.8214,22.0239L 24.3094,20.2026 Z M 22.2739,27.3437L 21.3632,27.0997L 20.8632,26.2337L 21.1073,25.323L 25.7261,22.6563L 26.6367,22.9003L 27.1367,23.7664L 26.8927,24.677L 22.2739,27.3437 Z "
+                                          Fill="#FF000000"
+                                          Stretch="Fill" />
+                                </Border>
+                                <Border VerticalAlignment="Center"
+                                        ToolTip="URLリンク化自動回避を行います(スキームのないURLのTLDの前にゼロ幅スペースが自動挿入されます)。"
+                                        Visibility="{Binding IsChecked,
+                                                             Converter={StaticResource BooleanToVisibleConverter},
+                                                             ElementName=ToggleUrlAutoEscapeButton}">
+                                    <Path Height="13.464"
+                                          Data="F1 M 17.8932,27.756L 18.5598,28.9107L 20.3812,29.3987L 22.1132,28.3987L 22.6906,28.0654L 23.8453,27.3987L 24.1786,27.9761L 23.6906,29.7974L 20.8038,31.4641L 17.1611,30.488L 15.8278,28.1786L 16.8039,24.5359L 19.6906,22.8692L 21.512,23.3573L 21.8453,23.9346L 20.6906,24.6013L 20.1132,24.9346L 18.3812,25.9346L 17.8932,27.756 Z M 24.3094,20.2026L 27.1961,18.5359L 30.8389,19.512L 32.1722,21.8214L 31.1961,25.4641L 28.3094,27.1308L 26.488,26.6427L 26.1547,26.0654L 27.3094,25.3987L 27.8867,25.0654L 29.6188,24.0654L 30.1068,22.244L 29.4401,21.0893L 27.6188,20.6013L 25.8867,21.6013L 25.3094,21.9346L 24.1547,22.6013L 23.8214,22.0239L 24.3094,20.2026 Z M 22.2739,27.3437L 21.3632,27.0997L 20.8632,26.2337L 21.1073,25.323L 25.7261,22.6563L 26.6367,22.9003L 27.1367,23.7664L 26.8927,24.677L 22.2739,27.3437 Z M 27.6937,27.375L 29.3125,28.9938L 30.9312,27.375L 31.625,28.0688L 30.0062,29.6875L 31.625,31.3063L 30.9312,32L 29.3125,30.3813L 27.6937,32L 27,31.3062L 28.6187,29.6875L 27,28.0687L 27.6937,27.375 Z "
+                                          Fill="#FF000000"
+                                          Stretch="Fill" />
+                                </Border>
+                                <Viewbox Grid.Column="1"
+                                         Height="12"
+                                         Margin="4,0"
+                                         HorizontalAlignment="Left"
+                                         VerticalAlignment="Center">
+                                    <custom:ToggleSwitchButton x:Name="ToggleUrlAutoEscapeButton"
+                                                               Content="ToggleSwitchButton"
+                                                               IsChecked="{Binding IsUrlAutoEsacpeEnabled}"
+                                                               ToolTip="URLリンク化自動回避のオンオフを切り替えます。" />
+                                </Viewbox>
+                            </Grid>
+                        </StackPanel>
+                        <DockPanel LastChildFill="False">
+                            <Border Width="14"
+                                    Height="14"
+                                    Margin="7,0"
+                                    ToolTip="ロックされているハッシュタグ"
+                                    Visibility="{Binding IsBindingHashtagExisted,
+                                                         Converter={StaticResource BooleanToVisibleConverter}}">
+                                <Path Margin="0,0,2.332,-0.002"
+                                      Data="F1 M 18.1693,23.4199L 19.3361,23.4199L 19.3361,21.6697C 19.3361,19.092 21.4257,17.0024 24.0034,17.0024C 26.5811,17.0024 28.6707,19.092 28.6707,21.6697L 28.6707,23.4199L 29.8376,23.4199L 29.8376,31.0043L 18.1693,31.0043L 18.1693,23.4199 Z M 26.9205,21.6697C 26.9205,20.0586 25.6145,18.7526 24.0034,18.7526C 22.3923,18.7526 21.0863,20.0586 21.0863,21.6697L 21.0863,23.4199L 26.9205,23.4199L 26.9205,21.6697 Z "
+                                      Fill="#FF000000"
+                                      Stretch="Fill" />
+                            </Border>
+                            <ItemsControl ItemTemplate="{DynamicResource HashtagDataTemplate}" ItemsSource="{Binding BindingHashtags}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+                            <Border Width="14"
+                                    Height="14"
+                                    Margin="7,0"
+                                    ToolTip="ロック可能なハッシュタグ"
+                                    Visibility="{Binding IsBindableHashtagExisted,
+                                                         Converter={StaticResource BooleanToVisibleConverter}}">
+                                <Path Data="F1 M 18.8704,16.7929L 22.1351,16.7929L 30.4452,25.103C 30.9088,25.5666 30.9088,26.3183 30.4452,26.7819L 26.7819,30.4452C 26.3183,30.9088 25.5666,30.9088 25.103,30.4452L 16.7929,22.1351L 16.7929,18.8704C 16.7929,18.1779 16.7929,17.4854 17.1391,17.1392C 17.4854,16.7929 18.1779,16.7929 18.8704,16.7929 Z M 19.7608,18.5736C 19.1051,18.5736 18.5736,19.1051 18.5736,19.7608C 18.5736,20.4164 19.1051,20.9479 19.7608,20.9479C 20.4164,20.9479 20.9479,20.4164 20.9479,19.7608C 20.9479,19.1051 20.4164,18.5736 19.7608,18.5736 Z "
+                                      Fill="#FF000000"
+                                      Stretch="Fill" />
+                            </Border>
+                            <ItemsControl ItemTemplate="{DynamicResource HashtagDataTemplate}" ItemsSource="{Binding BindableHashtagCandidates}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+                        </DockPanel>
+                    </DockPanel>
+                    <DockPanel Grid.Row="1"
+                               Grid.Column="2"
+                               MinWidth="32"
+                               LastChildFill="False">
+                        <Button Height="26"
+                                DockPanel.Dock="Top"
+                                Style="{DynamicResource MetroSquareUnfocusableFlatButton}">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="Click">
+                                    <ei:CallMethodAction MethodName="CloseInput" TargetObject="{Binding Mode=OneWay}" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                            <Path Width="8"
+                                  Height="8"
+                                  Data="F1 M 21.2,20L 24,22.8L 26.7999,20.0001L 27.9999,21.2001L 25.2,24L 28,26.8L 26.8,28L 24,25.2L 21.2,28L 20,26.8L 22.8,24L 20,21.2L 21.2,20 Z "
+                                  Fill="#FF000000"
+                                  Stretch="Fill" />
+                        </Button>
+                        <TextBlock Margin="4"
+                                   DockPanel.Dock="Bottom"
+                                   Foreground="DimGray"
+                                   Text="{Binding RemainTextCount}"
+                                   TextAlignment="Right"
+                                   TextWrapping="Wrap" />
+                    </DockPanel>
+                    <Border Grid.Row="1"
+                            Grid.Column="1"
+                            MinWidth="40"
+                            MinHeight="40"
+                            MaxWidth="100"
+                            MaxHeight="100"
+                            Margin="4"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            BorderThickness="1"
+                            ToolTip="クリックで画像の添付を解除します。"
+                            Visibility="{Binding IsImageAttached,
+                                                 Converter={StaticResource BooleanToVisibleConverter}}">
+                        <Border.Background>
+                            <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}" />
+                        </Border.Background>
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="MouseLeftButtonDown">
+                                <ei:CallMethodAction MethodName="DetachImage" TargetObject="{Binding Mode=OneWay}" />
+                            </i:EventTrigger>
+                            <i:EventTrigger EventName="MouseEnter">
+                                <ei:GoToStateAction StateName="MouseOverState" />
+                            </i:EventTrigger>
+                            <i:EventTrigger EventName="MouseLeave">
+                                <ei:GoToStateAction StateName="MouseOutState" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                        <Border.BorderBrush>
+                            <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ActiveBorderColorKey}}" />
+                        </Border.BorderBrush>
+                        <Grid>
+                            <Image Source="{Binding AttachedImage.Source}" Stretch="Uniform" />
+                            <Border x:Name="Border"
+                                    Background="#FFE51400"
+                                    Opacity="0">
+                                <Path Width="10"
+                                      Height="10"
+                                      Margin="0,6,6,0"
+                                      HorizontalAlignment="Right"
+                                      VerticalAlignment="Top"
+                                      Data="F1 M 20.5,19L 24,22.5L 27.4999,19.0001L 28.9999,20.5001L 25.5,24L 29,27.5L 27.5,29L 24,25.5L 20.5,29L 19,27.5L 22.5,24L 19,20.5L 20.5,19 Z "
+                                      Fill="#FFFFFFFF"
+                                      Stretch="Fill" />
+                            </Border>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
 </UserControl>

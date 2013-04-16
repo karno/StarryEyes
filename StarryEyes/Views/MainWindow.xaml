@@ -18,6 +18,7 @@
                       Height="350"
                       Background="White"
                       Closing="OnClosing"
+                      ResizeMode="CanResizeWithGrip"
                       ShowIconOnTitleBar="True"
                       TitleCaps="False"
                       mc:Ignorable="d">
@@ -255,7 +256,7 @@
                                Text="{Binding StartupTime}" />
                 </StackPanel>
                 <Canvas Grid.Column="4"
-                        Width="10"
+                        Width="12"
                         Visibility="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
                                                                             AncestorType={x:Type Window}},
                                              Path=WindowState,
