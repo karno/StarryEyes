@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
+using System.Threading;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Models.Backpanels.SystemEvents;
 using StarryEyes.Models.Stores;
-using StarryEyes.Settings;
 
 namespace StarryEyes.Models.Connections.UserDependencies
 {
@@ -43,19 +44,20 @@ namespace StarryEyes.Models.Connections.UserDependencies
         public static void Update(bool enforceReconnection = false)
         {
             // create look-up dictionary.
-            ILookup<long, AccountSetting> settings = AccountsStore.Accounts.ToLookup(k => k.UserId);
+            var settings = AccountsStore.Accounts.ToDictionary(k => k.UserId);
+
             lock (ConnectionGroupsLocker)
             {
                 // determine removed users ids and finalize for each.
                 ConnectionGroups.Values
                                 .Select(g => g.UserId)
-                                .Where(g => !settings.Contains(g))
+                                .Where(g => !settings.ContainsKey(g))
                                 .Select(s => ConnectionGroups[s])
                                 .ToArray() // freeze once
                                 .Do(c => ConnectionGroups.Remove(c.UserId))
                                 .Do(c =>
                                 {
-                                    UserStreamsConnection con = c.UserStreamsConnection;
+                                    var con = c.UserStreamsConnection;
                                     if (con != null && con.TrackKeywords != null)
                                     {
                                         con.TrackKeywords.ForEach(s => _danglingKeywords.Add(s));
@@ -63,38 +65,40 @@ namespace StarryEyes.Models.Connections.UserDependencies
                                 })
                                 .ForEach(c => c.Dispose());
 
-                // determine cancelled streamings
+                // add new users
+                settings.Select(s => s.Key)
+                        .Except(ConnectionGroups.Keys)
+                        .Select(i => new ConnectionGroup(i))
+                        .ForEach(c => ConnectionGroups.Add(c.UserId, c));
+
+                // stop cancelled streamings
                 ConnectionGroups.Values
                                 .Where(c => c.IsUserStreamsEnabled &&
-                                            !settings[c.UserId].First().IsUserStreamsEnabled)
+                                            !settings[c.UserId].IsUserStreamsEnabled)
                                 .Do(c =>
                                 {
-                                    UserStreamsConnection con = c.UserStreamsConnection;
+                                    var con = c.UserStreamsConnection;
                                     if (con != null && con.TrackKeywords != null)
                                     {
                                         con.TrackKeywords.ForEach(s => _danglingKeywords.Add(s));
                                     }
                                 })
-                                .ForEach(c => c.IsUserStreamsEnabled = false);
+                                .ForEach(c => c.StopStreaming());
 
-                // connects new.
-                // dangling keywords are mostly assigned for it.
-                settings.Select(s => s.Key)
-                        .Except(ConnectionGroups.Keys)
-                        .Select(i => new ConnectionGroup(i))
-                        .Do(g => ConnectionGroups.Add(g.UserId, g))
-                        .Where(g => settings[g.UserId].First().IsUserStreamsEnabled)
-                        .ForEach(f =>
-                        {
-                            // take danglings
-                            IEnumerable<string> assign = _danglingKeywords
-                                .Take(UserStreamsConnection.MaxTrackingKeywordCounts);
-                            f.UserStreamsStartsWith(assign);
-                            // update dangling list.
-                            _danglingKeywords = _danglingKeywords
-                                .Skip(UserStreamsConnection.MaxTrackingKeywordCounts)
-                                .ToList();
-                        });
+                // start new streamings
+                ConnectionGroups.Values
+                                .Where(c => !c.IsUserStreamsEnabled && settings[c.UserId].IsUserStreamsEnabled)
+                                .ForEach(c =>
+                                {
+                                    // take danglings
+                                    var assign = _danglingKeywords
+                                        .Take(UserStreamsConnection.MaxTrackingKeywordCounts);
+                                    c.StartStreaming(assign);
+                                    // update dangling list.
+                                    _danglingKeywords = _danglingKeywords
+                                        .Skip(UserStreamsConnection.MaxTrackingKeywordCounts)
+                                        .ToList();
+                                });
 
                 if (_danglingKeywords.Count > 0 || enforceReconnection)
                 {
@@ -110,7 +114,7 @@ namespace StarryEyes.Models.Connections.UserDependencies
                                     .TakeWhile(_ => _danglingKeywords.Count > 0 || enforceReconnection)
                                     .ForEach(f =>
                                     {
-                                        int assignable = UserStreamsConnection.MaxTrackingKeywordCounts -
+                                        var assignable = UserStreamsConnection.MaxTrackingKeywordCounts -
                                                          f.TrackKeywords.Count();
                                         f.TrackKeywords = f.TrackKeywords.Concat(_danglingKeywords.Take(assignable));
                                         // reconnect this
@@ -157,7 +161,7 @@ namespace StarryEyes.Models.Connections.UserDependencies
                     System.Diagnostics.Debug.WriteLine("*** TRACK ADD:" + keyword);
                     TrackReferenceCount[keyword] = 1;
                     // connect
-                    UserStreamsConnection connection = GetMostSuitableConnection();
+                    var connection = GetMostSuitableConnection();
                     if (connection == null)
                     {
                         _danglingKeywords.Add(keyword);
@@ -205,7 +209,7 @@ namespace StarryEyes.Models.Connections.UserDependencies
                 if (TrackReferenceCount[keyword] == 0)
                 {
                     TrackReferenceCount.Remove(keyword);
-                    UserStreamsConnection tracked = TrackResolver[keyword];
+                    var tracked = TrackResolver[keyword];
                     if (tracked != null) // if track-resolver bind key to null value, that's dangling word.
                     {
                         TrackResolver.Remove(keyword);
@@ -283,23 +287,6 @@ namespace StarryEyes.Models.Connections.UserDependencies
                 CheckDispose();
                 return _userStreams != null;
             }
-            set
-            {
-                CheckDispose();
-                if (value == IsUserStreamsEnabled) return;
-                if (value && AuthInfo != null)
-                {
-                    // connect
-                    _userStreams = new UserStreamsConnection(AuthInfo);
-                    _userStreams.Connect();
-                }
-                else if (_userStreams != null)
-                {
-                    // disconnect
-                    _userStreams.Dispose();
-                    _userStreams = null;
-                }
-            }
         }
 
         public void Dispose()
@@ -309,20 +296,50 @@ namespace StarryEyes.Models.Connections.UserDependencies
             GC.SuppressFinalize(this);
         }
 
-        public void UserStreamsStartsWith(IEnumerable<string> trackKeywords)
+        public void StopStreaming()
         {
-            CheckDispose();
-            if (IsUserStreamsEnabled) // already connected
-                return;
-            _userStreams = new UserStreamsConnection(AuthInfo);
-            _userStreams.IsConnectionAliveEvent += UserStreamsStateChanged;
-            _userStreams.TrackKeywords = trackKeywords;
-            _userStreams.Connect();
+            this.CheckDispose();
+            var stream = Interlocked.Exchange(ref _userStreams, null);
+            if (stream == null) return;
+            stream.Dispose();
         }
 
-        private void UserStreamsStateChanged(bool state)
+        public bool StartStreaming(IEnumerable<string> trackings = null)
         {
-            // TODO: Implementation
+            CheckDispose();
+            var newcon = new UserStreamsConnection(AuthInfo);
+            var connection = Interlocked.CompareExchange(ref _userStreams, newcon, null);
+            if (connection != null)
+            {
+                // already established
+                newcon.Dispose();
+                return false;
+            }
+            newcon.OnAccidentallyDisconnected += OnAccidentallyDisconnected;
+            newcon.TrackKeywords = trackings ?? Enumerable.Empty<string>();
+            newcon.Connect();
+            return true;
+        }
+
+        private void ReconnectStreaming()
+        {
+            if (_isDisposed) return;
+            var newcon = new UserStreamsConnection(AuthInfo);
+            var connection = Interlocked.CompareExchange(ref _userStreams, newcon, null);
+            if (connection == null)
+            {
+                // streaming cancelled
+                return;
+            }
+            newcon.OnAccidentallyDisconnected += OnAccidentallyDisconnected;
+            newcon.TrackKeywords = connection.TrackKeywords ?? Enumerable.Empty<string>();
+            newcon.Connect();
+        }
+
+        private void OnAccidentallyDisconnected()
+        {
+            Observable.Timer(TimeSpan.FromMinutes(5))
+                      .Subscribe(_ => this.ReconnectStreaming());
         }
 
         private void CheckDispose()
@@ -334,20 +351,21 @@ namespace StarryEyes.Models.Connections.UserDependencies
         ~ConnectionGroup()
         {
             if (!_isDisposed)
+            {
                 Dispose(false);
+            }
         }
 
-        // ReSharper disable UnusedParameter.Local
         private void Dispose(bool disposing)
         {
-            if (_userStreams != null)
+            if (!disposing) return;
+            if (this._userStreams != null)
             {
-                UserStreamsConnection disposal = _userStreams;
-                _userStreams = null;
+                var disposal = this._userStreams;
+                this._userStreams = null;
                 disposal.Dispose();
             }
-            _userTimelineReceiver.Dispose();
+            this._userTimelineReceiver.Dispose();
         }
-        // ReSharper restore UnusedParameter.Local
     }
 }

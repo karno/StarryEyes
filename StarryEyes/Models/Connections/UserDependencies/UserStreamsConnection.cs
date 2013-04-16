@@ -45,7 +45,13 @@ namespace StarryEyes.Models.Connections.UserDependencies
             get { return _connection != null; }
         }
 
-        public event Action<bool> IsConnectionAliveEvent;
+        public event Action OnAccidentallyDisconnected;
+
+        private void RaiseAccidentallyDisconnected()
+        {
+            var handler = this.OnAccidentallyDisconnected;
+            if (handler != null) handler();
+        }
 
         /// <summary>
         ///     Connect to user streams.
@@ -65,13 +71,10 @@ namespace StarryEyes.Models.Connections.UserDependencies
                                       {
                                           if (_connection != null)
                                           {
-                                              // make reconnect.
-                                              Disconnect();
-                                              Debug.WriteLine("***Auto reconnect***");
+                                              // reconnect.
                                               Connect();
                                           }
                                       });
-            RaiseIsConnectedEvent(true);
         }
 
         /// <summary>
@@ -81,18 +84,14 @@ namespace StarryEyes.Models.Connections.UserDependencies
         {
             if (_connection != null)
             {
-                IDisposable disposal = _connection;
+                var disposal = _connection;
                 _connection = null;
                 disposal.Dispose();
-                RaiseIsConnectedEvent(false);
             }
         }
 
         private void Register(TwitterStreamingElement elem)
         {
-            System.Diagnostics.Debug.WriteLine(elem.EventType + (elem.EventType != EventType.Empty
-                                                                     ? ""
-                                                                     : "-> " + elem.Status + " DEL: " + elem.DeletedId));
             _hardErrorRetryCount = 0; // initialize error count
             switch (elem.EventType)
             {
@@ -109,9 +108,9 @@ namespace StarryEyes.Models.Connections.UserDependencies
                     break;
                 case EventType.Follow:
                 case EventType.Unfollow:
-                    long source = elem.EventSourceUser.Id;
-                    long target = elem.EventTargetUser.Id;
-                    bool isFollowed = elem.EventType == EventType.Follow;
+                    var source = elem.EventSourceUser.Id;
+                    var target = elem.EventTargetUser.Id;
+                    var isFollowed = elem.EventType == EventType.Follow;
                     if (source == AuthInfo.Id) // follow or remove
                     {
                         AuthInfo.Get().SetFollowing(target, isFollowed);
@@ -173,8 +172,7 @@ namespace StarryEyes.Models.Connections.UserDependencies
 
         private void HandleException(Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine(ex);
-            Disconnect();
+            this.Disconnect();
             var wex = ex as WebException;
             if (wex != null)
             {
@@ -294,15 +292,9 @@ namespace StarryEyes.Models.Connections.UserDependencies
             return false;
         }
 
-        private void RaiseIsConnectedEvent(bool connected)
-        {
-            var handler = IsConnectionAliveEvent;
-            if (handler != null)
-                handler(connected);
-        }
-
         private void RaiseDisconnectedByError(string header, string detail)
         {
+            Debug.WriteLine("*** USER STREAM DISCONNECT ***" + Environment.NewLine + header + Environment.NewLine + detail + Environment.NewLine);
             BackpanelModel.RegisterEvent(
                 new UserStreamsDisconnectedEvent(
                     AuthInfo, header + detail,
@@ -311,6 +303,7 @@ namespace StarryEyes.Models.Connections.UserDependencies
                         if (!IsDisposed)
                             Connect();
                     }));
+            this.RaiseAccidentallyDisconnected();
         }
 
         protected override void Dispose(bool disposing)

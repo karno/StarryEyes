@@ -4,9 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reactive.Concurrency;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using Codeplex.OAuth;
 using Newtonsoft.Json;
 using StarryEyes.Breezy.Api.Parsing.JsonFormats;
 using StarryEyes.Breezy.Authorize;
@@ -22,12 +20,12 @@ namespace StarryEyes.Breezy.Api.Streaming
                                                                                 IEnumerable<string> trackKeywords = null)
         {
             var paradic = new Dictionary<string, object>();
-            string tracks = trackKeywords != null ? trackKeywords.Distinct().JoinString(",") : null;
+            var tracks = trackKeywords != null ? trackKeywords.Distinct().JoinString(",") : null;
             if (!String.IsNullOrWhiteSpace(tracks))
             {
                 paradic.Add("track", tracks);
             }
-            ParameterCollection param = paradic.Parametalize();
+            var param = paradic.Parametalize();
             return info.GetOAuthClient(useGzip: false)
                        .SetEndpoint(EndpointUserStreams)
                        .SetParameters(param)
