@@ -57,9 +57,8 @@ namespace StarryEyes.Breezy.Api.Streaming
             return observable
                 .Select(s =>
                 {
-                    System.Diagnostics.Debug.WriteLine("JSON: " + s);
                     var desz = s.DeserializeJson<StreamingEventJson>();
-                    EventType eventType = (desz == null ? null : desz.event_kind).ToEventType();
+                    var eventType = (desz == null ? null : desz.event_kind).ToEventType();
                     switch (eventType)
                     {
                         case EventType.Empty:

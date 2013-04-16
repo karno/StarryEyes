@@ -296,14 +296,13 @@ namespace StarryEyes.Models.Connections.UserDependencies
 
         private void RaiseIsConnectedEvent(bool connected)
         {
-            Action<bool> handler = IsConnectionAliveEvent;
+            var handler = IsConnectionAliveEvent;
             if (handler != null)
                 handler(connected);
         }
 
         private void RaiseDisconnectedByError(string header, string detail)
         {
-            System.Diagnostics.Debug.WriteLine(header + detail);
             BackpanelModel.RegisterEvent(
                 new UserStreamsDisconnectedEvent(
                     AuthInfo, header + detail,

@@ -967,7 +967,6 @@ namespace StarryEyes.ViewModels.WindowParts
             inputInfo.Send()
                      .Subscribe(_ =>
                      {
-                         Debug.WriteLine("Completed!");
                          if (_.PostedTweets != null)
                          {
                              InputAreaModel.PreviousPosted = _;
@@ -980,11 +979,7 @@ namespace StarryEyes.ViewModels.WindowParts
                                  InputAreaModel.Drafts.Add(_);
                              BackpanelModel.RegisterEvent(new PostFailedEvent(_, result.Item2));
                          }
-                     }, ex =>
-                     {
-                         Debug.WriteLine("Exception is thrown...");
-                         Debug.WriteLine(ex);
-                     });
+                     }, ex => Debug.WriteLine(ex));
         }
 
         private static Tuple<bool, string> AnalysisFailedReason(TweetInputInfo info)

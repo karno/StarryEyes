@@ -55,6 +55,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                 _favoritedUsers.ListenCollectionChanged()
                                .Subscribe(_ =>
                                {
+                                   RaisePropertyChanged(() => IsFavorited);
                                    RaisePropertyChanged(() => IsFavoritedUserExists);
                                    RaisePropertyChanged(() => FavoriteCount);
                                }));
@@ -65,9 +66,22 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                 _retweetedUsers.ListenCollectionChanged()
                                .Subscribe(_ =>
                                {
+                                   RaisePropertyChanged(() => IsRetweeted);
                                    RaisePropertyChanged(() => IsRetweetedUserExists);
                                    RaisePropertyChanged(() => RetweetCount);
                                }));
+
+            // bind retweeted original notification
+            if (status.RetweetedOriginal != null)
+            {
+                var origModel = StatusModel.Get(status.RetweetedOriginal);
+                CompositeDisposable.Add(
+                    origModel.FavoritedUsers.ListenCollectionChanged()
+                             .Subscribe(_ => this.RaisePropertyChanged(() => IsFavorited)));
+                CompositeDisposable.Add(
+                    origModel.RetweetedUsers.ListenCollectionChanged()
+                             .Subscribe(_ => this.RaisePropertyChanged(() => IsRetweeted)));
+            }
 
             // resolve images
             var imgsubj = Model.ImagesSubject;
@@ -130,9 +144,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         {
             get
             {
-                if (Model.Status.RetweetedOriginal != null)
-                    return Model.Status.RetweetedOriginal;
-                return Model.Status;
+                return this.Model.Status.RetweetedOriginal ?? this.Model.Status;
             }
         }
 
@@ -611,6 +623,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                 .ToObservable()
                 .Publish();
             if (!IsFavorited)
+            {
                 accounts.Do(a => Model.AddFavoritedUser(a.Id))
                         .Do(_ => RaisePropertyChanged(() => IsFavorited))
                         .SelectMany(a => new FavoriteOperation(a, Status, true)
@@ -622,18 +635,21 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                                              }))
                         .Do(_ => RaisePropertyChanged(() => IsFavorited))
                         .Subscribe();
+            }
             if (!IsRetweeted)
+            {
                 accounts.Do(a => Model.AddRetweetedUser(a.Id))
-                        .Do(_ => RaisePropertyChanged(() => IsRetweeted))
-                        .SelectMany(a => new RetweetOperation(a, Status, true)
-                                             .Run()
-                                             .Catch((Exception ex) =>
-                                             {
-                                                 Model.RemoveRetweetedUser(a.Id);
-                                                 return Observable.Empty<TwitterStatus>();
-                                             }))
-                        .Do(_ => RaisePropertyChanged(() => IsRetweeted))
-                        .Subscribe();
+                          .Do(_ => RaisePropertyChanged(() => IsRetweeted))
+                          .SelectMany(a => new RetweetOperation(a, Status, true)
+                                               .Run()
+                                               .Catch((Exception ex) =>
+                                               {
+                                                   Model.RemoveRetweetedUser(a.Id);
+                                                   return Observable.Empty<TwitterStatus>();
+                                               }))
+                          .Do(_ => RaisePropertyChanged(() => IsRetweeted))
+                          .Subscribe();
+            }
             accounts.Connect();
         }
 

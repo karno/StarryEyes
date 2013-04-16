@@ -46,10 +46,6 @@ namespace StarryEyes.Models.Tab
                     }
                     else
                     {
-                        if (!sn.IsAdded)
-                        {
-                            System.Diagnostics.Debug.WriteLine("ツイ消しを見た: " + sn.StatusId);
-                        }
                         RemoveStatus(sn.StatusId);
                     }
                 }));
@@ -128,7 +124,6 @@ namespace StarryEyes.Models.Tab
             }
             if (remove)
             {
-                System.Diagnostics.Debug.WriteLine("消さなあかんな: " + id);
                 // remove
                 _statuses.RemoveWhere(s => s.Id == id);
             }

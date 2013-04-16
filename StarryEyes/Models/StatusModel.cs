@@ -52,7 +52,7 @@ namespace StarryEyes.Models
 
         public static StatusModel Get(TwitterStatus status)
         {
-            object lockerobj = _generateLock.GetOrAdd(status.Id, new object());
+            var lockerobj = _generateLock.GetOrAdd(status.Id, new object());
             try
             {
                 lock (lockerobj)
