@@ -347,10 +347,12 @@ namespace StarryEyes
 
         public static string HashtagTempFilePath
         {
-            get
-            {
-                return Path.Combine(ConfigurationDirectoryPath, HashtagCacheFileName);
-            }
+            get { return Path.Combine(ConfigurationDirectoryPath, HashtagCacheFileName); }
+        }
+
+        public static string ListUserTempFilePath
+        {
+            get { return Path.Combine(ConfigurationDirectoryPath, ListCacheFileName); }
         }
 
         private static FileVersionInfo _version;
@@ -427,6 +429,8 @@ namespace StarryEyes
         public static readonly string ConfigurationFileName = "krile.xml";
 
         public static readonly string HashtagCacheFileName = "tags.cache";
+
+        public static readonly string ListCacheFileName = "lists.cache";
 
         public static readonly string ProfileFileName = "krile.profile";
 
