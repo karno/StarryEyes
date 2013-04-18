@@ -46,7 +46,7 @@ namespace StarryEyes.Models
             return model;
         }
 
-        private const int CleanupInterval = 65535;
+        private const int CleanupInterval = 5000;
 
         private static int _cleanupCount;
 

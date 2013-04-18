@@ -43,6 +43,10 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             _parent = parent;
             // get status model
             Model = StatusModel.Get(status);
+            if (status.RetweetedOriginal != null)
+            {
+                RetweetedOriginalModel = StatusModel.Get(status.RetweetedOriginal);
+            }
 
             // bind accounts 
             _bindingAccounts = initialBoundAccounts.Guard().ToArray();
@@ -72,15 +76,14 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                                }));
 
             // bind retweeted original notification
-            if (status.RetweetedOriginal != null)
+            if (RetweetedOriginalModel != null)
             {
-                var origModel = StatusModel.Get(status.RetweetedOriginal);
                 CompositeDisposable.Add(
-                    origModel.FavoritedUsers.ListenCollectionChanged()
-                             .Subscribe(_ => this.RaisePropertyChanged(() => IsFavorited)));
+                    RetweetedOriginalModel.FavoritedUsers.ListenCollectionChanged()
+                                          .Subscribe(_ => this.RaisePropertyChanged(() => IsFavorited)));
                 CompositeDisposable.Add(
-                    origModel.RetweetedUsers.ListenCollectionChanged()
-                             .Subscribe(_ => this.RaisePropertyChanged(() => IsRetweeted)));
+                    RetweetedOriginalModel.RetweetedUsers.ListenCollectionChanged()
+                                          .Subscribe(_ => this.RaisePropertyChanged(() => IsRetweeted)));
             }
 
             // resolve images
@@ -127,6 +130,8 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         ///     Represents status model.
         /// </summary>
         public StatusModel Model { get; private set; }
+
+        public StatusModel RetweetedOriginalModel { get; private set; }
 
         /// <summary>
         ///     Represents ORIGINAL status. 
@@ -253,7 +258,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public bool CanRetweetImmediate
         {
-            get { return CanRetweet && !IsMyselfStrict && (!IsRetweet || CheckUserIsBind(Status.RetweetedOriginal.User.Id)); }
+            get { return CanRetweet && !IsMyselfStrict; }
         }
 
         public bool CanDelete
