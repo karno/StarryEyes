@@ -253,7 +253,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public bool CanRetweetImmediate
         {
-            get { return CanRetweet && !IsMyselfStrict; }
+            get { return CanRetweet && !IsMyselfStrict && (!IsRetweet || CheckUserIsBind(Status.RetweetedOriginal.User.Id)); }
         }
 
         public bool CanDelete
@@ -268,7 +268,12 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public bool IsMyselfStrict
         {
-            get { return _bindingAccounts.Length == 1 && _bindingAccounts[0] == Status.User.Id; }
+            get { return CheckUserIsBind(Status.User.Id); }
+        }
+
+        private bool CheckUserIsBind(long id)
+        {
+            return _bindingAccounts.Length == 1 && _bindingAccounts[0] == id;
         }
 
         public bool IsInReplyToExists
