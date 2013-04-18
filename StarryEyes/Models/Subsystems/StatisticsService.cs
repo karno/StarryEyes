@@ -21,16 +21,18 @@ namespace StarryEyes.Models.Subsystems
                               Monitor.Pulse(StatisticsWorkProcSync);
                           }
                       });
-            App.OnUserInterfaceReady +=
-                () => Observable.Interval(TimeSpan.FromSeconds(20.0))
-                                .Subscribe(_ =>
-                                {
-                                    if (!_tpsAccess)
+            /*
+                App.OnUserInterfaceReady +=
+                    () => Observable.Interval(TimeSpan.FromSeconds(20.0))
+                                    .Subscribe(_ =>
                                     {
-                                        TooFastWarning = true;
-                                    }
-                                    _tpsAccess = false;
-                                });
+                                        if (!_tpsAccess)
+                                        {
+                                            TooFastWarning = true;
+                                        }
+                                        _tpsAccess = false;
+                                    });
+            */
             _estimatedGrossTweetCount = StatusStore.Count;
             App.OnApplicationFinalize += StopThread;
             Task.Factory.StartNew(UpdateStatisticWorkProc, TaskCreationOptions.LongRunning);
