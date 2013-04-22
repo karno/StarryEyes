@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using Livet;
-using Livet.EventListeners;
 using StarryEyes.Models;
 using StarryEyes.Models.Backpanels;
 using StarryEyes.Models.Backpanels.TwitterEvents;

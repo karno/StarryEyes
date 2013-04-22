@@ -184,10 +184,16 @@ namespace StarryEyes.Settings
             new SettingItemStruct<int>("UserInfoReceivePeriod", 600);
 
         public static readonly SettingItemStruct<int> UserRelationReceivePeriod =
-            new SettingItemStruct<int>("RESTReceivePeriod", 5400);
+            new SettingItemStruct<int>("UserRelationReceivePeriod", 5400);
 
         public static readonly SettingItemStruct<int> RESTReceivePeriod =
             new SettingItemStruct<int>("RESTReceivePeriod", 90);
+
+        public static readonly SettingItemStruct<int> RESTSearchReceivePeriod =
+            new SettingItemStruct<int>("RESTSearchReceivePeriod", 90);
+
+        public static readonly SettingItemStruct<int> ListReceivePeriod =
+            new SettingItemStruct<int>("ListReceivePeriod", 90);
 
         public static readonly SettingItemStruct<int> PostWindowTimeSec =
             new SettingItemStruct<int>("PostWindowTimeSec", 10800);

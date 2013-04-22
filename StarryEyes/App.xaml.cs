@@ -12,8 +12,8 @@ using System.Threading;
 using System.Windows;
 using Livet;
 using StarryEyes.Breezy.Api;
-using StarryEyes.Models.Connections;
 using StarryEyes.Models.Plugins;
+using StarryEyes.Models.Receivers;
 using StarryEyes.Models.Stores;
 using StarryEyes.Models.Subsystems;
 using StarryEyes.Nightmare.Windows;
@@ -149,6 +149,7 @@ namespace StarryEyes
             AccountsStore.Initialize();
             StatisticsService.Initialize();
             StreamingEventsHub.Initialize();
+            ReceiveInbox.Initialize();
 
             // Activate plugins
             PluginManager.LoadedPlugins.ForEach(p => p.Initialize());
@@ -156,7 +157,9 @@ namespace StarryEyes
             // Activate scripts
             ScriptingManager.ExecuteScripts();
 
+            // finalize handlers
             StreamingEventsHub.RegisterDefaultHandlers();
+            ReceiversManager.Initialize();
             RaiseSystemReady();
         }
 
@@ -467,6 +470,7 @@ namespace StarryEyes
         public static event Action OnSystemReady;
         internal static void RaiseSystemReady()
         {
+            System.Diagnostics.Debug.WriteLine("# System ready.");
             var osr = OnSystemReady;
             OnSystemReady = null;
             if (osr != null)
@@ -479,6 +483,7 @@ namespace StarryEyes
         public static event Action OnUserInterfaceReady;
         internal static void RaiseUserInterfaceReady()
         {
+            System.Diagnostics.Debug.WriteLine("# UI ready.");
             var usr = OnUserInterfaceReady;
             OnUserInterfaceReady = null;
             if (usr != null)
@@ -492,6 +497,7 @@ namespace StarryEyes
         public static event Action OnApplicationExit;
         internal static void RaiseApplicationExit()
         {
+            System.Diagnostics.Debug.WriteLine("# App exit.");
             var apx = OnApplicationExit;
             OnApplicationExit = null;
             if (apx != null)
@@ -504,6 +510,7 @@ namespace StarryEyes
         public static event Action OnApplicationFinalize;
         internal static void RaiseApplicationFinalize()
         {
+            System.Diagnostics.Debug.WriteLine("# App finalize.");
             var apf = OnApplicationFinalize;
             OnApplicationFinalize = null;
             if (apf != null)

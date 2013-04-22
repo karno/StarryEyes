@@ -1,4 +1,4 @@
-﻿using StarryEyes.Models.Connections.Extends;
+﻿using StarryEyes.Models.Receivers;
 
 namespace StarryEyes.Models.Backpanels.SystemEvents
 {

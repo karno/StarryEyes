@@ -5,7 +5,8 @@ using System.Threading;
 using StarryEyes.Albireo.Data;
 using StarryEyes.Breezy.Api.Rest;
 using StarryEyes.Breezy.DataModel;
-using StarryEyes.Models.Connections.Extends;
+using StarryEyes.Models.Receivers;
+using StarryEyes.Models.Receivers.ReceiveElements;
 using StarryEyes.Models.Stores;
 using StarryEyes.Settings;
 
@@ -117,7 +118,14 @@ namespace StarryEyes.Filters.Sources
         {
             if (_isActivated) return;
             _isActivated = true;
-            ListReceiver.StartReceive(_listInfo);
+            if (!String.IsNullOrEmpty(_receiver))
+            {
+                ReceiversManager.RegisterList(_receiver, _listInfo);
+            }
+            else
+            {
+                ReceiversManager.RegisterList(_listInfo);
+            }
             _timer = new Timer(_ => this.TimerCallback(), null, TimeSpan.FromSeconds(0), TimeSpan.FromMinutes(30));
         }
 
@@ -125,7 +133,7 @@ namespace StarryEyes.Filters.Sources
         {
             if (!_isActivated) return;
             _isActivated = false;
-            ListReceiver.StopReceive(_listInfo);
+            ReceiversManager.UnregisterList(_listInfo);
             if (_timer != null)
             {
                 _timer.Dispose();

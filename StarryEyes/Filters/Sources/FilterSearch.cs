@@ -3,7 +3,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using StarryEyes.Breezy.Api.Rest;
 using StarryEyes.Breezy.DataModel;
-using StarryEyes.Models.Connections.Extends;
+using StarryEyes.Models.Receivers;
 using StarryEyes.Models.Stores;
 
 namespace StarryEyes.Filters.Sources
@@ -32,14 +32,14 @@ namespace StarryEyes.Filters.Sources
         {
             if (_isActivated) return;
             _isActivated = true;
-            SearchReceiver.RegisterSearchQuery(_query);
+            ReceiversManager.RegisterSearchQuery(_query);
         }
 
         public override void Deactivate()
         {
             if (!_isActivated) return;
             _isActivated = false;
-            SearchReceiver.RemoveSearchQuery(_query);
+            ReceiversManager.UnregisterSearchQuery(_query);
         }
 
         public override string FilterKey

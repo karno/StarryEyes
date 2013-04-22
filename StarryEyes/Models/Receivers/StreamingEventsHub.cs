@@ -8,7 +8,7 @@ using StarryEyes.Models.Backpanels.NotificationEvents;
 using StarryEyes.Models.Backpanels.TwitterEvents;
 using StarryEyes.Models.Stores;
 
-namespace StarryEyes.Models.Connections
+namespace StarryEyes.Models.Receivers
 {
     public static class StreamingEventsHub
     {

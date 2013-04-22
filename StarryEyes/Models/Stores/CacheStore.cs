@@ -6,7 +6,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using StarryEyes.Albireo;
 using StarryEyes.Breezy.DataModel;
-using StarryEyes.Models.Connections.Extends;
+using StarryEyes.Models.Receivers;
 
 namespace StarryEyes.Models.Stores
 {

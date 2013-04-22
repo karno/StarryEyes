@@ -41,6 +41,7 @@ namespace StarryEyes.Models
 
         public static void RegisterEvent(BackpanelEventBase ev)
         {
+            System.Diagnostics.Debug.WriteLine("EVENT: " + ev.Title + " - " + ev.Detail);
             var handler = OnEventRegistered;
             if (handler != null)
                 OnEventRegistered(ev);

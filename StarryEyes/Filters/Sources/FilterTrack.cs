@@ -1,6 +1,6 @@
 ﻿using System;
 using StarryEyes.Breezy.DataModel;
-using StarryEyes.Models.Connections.UserDependencies;
+using StarryEyes.Models.Receivers;
 
 namespace StarryEyes.Filters.Sources
 {
@@ -22,14 +22,14 @@ namespace StarryEyes.Filters.Sources
         {
             if (_isActivated) return;
             _isActivated = true;
-            UserBaseConnectionsManager.AddTrackKeyword(_query);
+            ReceiversManager.RegisterStreamingQuery(_query);
         }
 
         public override void Deactivate()
         {
             if (!_isActivated) return;
             _isActivated = false;
-            UserBaseConnectionsManager.RemoveTrackKeyword(_query);
+            ReceiversManager.UnregisterStreamingQuery(_query);
         }
 
         public override string FilterKey

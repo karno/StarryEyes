@@ -2,12 +2,10 @@
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using Livet;
 using Livet.Messaging;
 using StarryEyes.Filters.Expressions;
 using StarryEyes.Models;
-using StarryEyes.Models.Connections.UserDependencies;
 using StarryEyes.Models.Stores;
 using StarryEyes.Models.Subsystems;
 using StarryEyes.Models.Tab;
@@ -240,23 +238,16 @@ namespace StarryEyes.ViewModels
             }
 
             // Start receiving
-            if (AccountsStore.Accounts.Any())
-            {
-                Task.Run(() => UserBaseConnectionsManager.Update());
-            }
-            else
+            if (!AccountsStore.Accounts.Any())
             {
                 var auth = new AuthorizationViewModel();
-                auth.AuthorizeObservable.Subscribe(_ =>
-                {
-                    AccountsStore.Accounts.Add(
+                auth.AuthorizeObservable.Subscribe(
+                    _ => AccountsStore.Accounts.Add(
                         new AccountSetting
                         {
                             AuthenticateInfo = _,
                             IsUserStreamsEnabled = true
-                        });
-                    Task.Run(() => UserBaseConnectionsManager.Update());
-                });
+                        }));
                 Messenger.RaiseAsync(new TransitionMessage(
                                          typeof(AuthorizationWindow),
                                          auth, TransitionMode.Modal, null));
