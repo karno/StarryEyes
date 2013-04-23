@@ -228,6 +228,7 @@ namespace StarryEyes.Views.Controls
             }
             int tokenStart, tokenLength;
             _provider.FindNearestToken(this.Text, this.CaretIndex, out tokenStart, out tokenLength);
+            if (tokenStart < 0) return;
             this.SelectionStart = tokenStart;
             this.SelectionLength = tokenLength;
             var replace = _candidateList.SelectedItem.ToString();
