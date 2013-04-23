@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Threading;
 
 namespace StarryEyes.Models.Receivers.ReceiveElements
 {
@@ -13,7 +14,7 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
             get { return _disposable; }
         }
 
-        private int _currentSec;
+        private int _remainCountDown;
 
         private bool _isDisposed;
 
@@ -32,15 +33,13 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
                 .Subscribe(_ => this.Dispose()));
             CompositeDisposable.Add(Observable.Interval(TimeSpan.FromSeconds(1))
                 .Subscribe(_ => OnTimer()));
-            // ReSharper disable DoNotCallOverridableMethodsInConstructor
-            _currentSec = IntervalSec; // first receive occurs immediately.
         }
 
         private void OnTimer()
         {
-            _currentSec++;
-            if (_currentSec < IntervalSec) return;
-            _currentSec = 0;
+            if (_isDisposed) return;
+            if (Interlocked.Decrement(ref _remainCountDown) > 0) return;
+            _remainCountDown = IntervalSec;
             DoReceive();
         }
 

@@ -186,14 +186,10 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
                             case (HttpStatusCode)420:
                                 // ERR: Too many connections
                                 // (other client is already connected?)
-                                if (CheckHardError())
-                                {
-                                    RaiseDisconnectedByError(
-                                        "ユーザーストリーム接続が制限されています。",
-                                        "Krileが多重起動していないか確認してください。短時間に何度も接続を試みていた場合は、しばらく待つと再接続できるようになります。");
-                                    return;
-                                }
-                                break;
+                                RaiseDisconnectedByError(
+                                    "ユーザーストリーム接続が制限されています。",
+                                    "Krileが多重起動していないか確認してください。短時間に何度も接続を試みていた場合は、しばらく待つと再接続できるようになります。");
+                                return;
                         }
                     }
                     // else -> backoff
@@ -269,7 +265,7 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
             Debug.WriteLine("*** USER STREAM DISCONNECT ***" + Environment.NewLine + header + Environment.NewLine + detail + Environment.NewLine);
             ConnectionState = UserStreamsConnectionState.WaitForReconnection;
             _currentConnection.Add(
-                Observable.Timer(TimeSpan.FromMinutes(3))
+                Observable.Timer(TimeSpan.FromMinutes(5))
                           .Subscribe(_ => Reconnect()));
         }
 
