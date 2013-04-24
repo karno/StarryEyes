@@ -251,7 +251,7 @@
                     <ei:GoToStateAction StateName="ShowForePanel" />
                 </ei:DataTrigger>
             </i:Interaction.Triggers>
-            <Grid Background="Gainsboro" Visibility="{Binding IsBackstageVisible, Converter={StaticResource BooleanToVisibleConverter}}">
+            <Grid Background="Gainsboro">
                 <windowParts:Backstage DataContext="{Binding BackstageViewModel}" />
             </Grid>
             <Grid x:Name="MainAreaGrid"
