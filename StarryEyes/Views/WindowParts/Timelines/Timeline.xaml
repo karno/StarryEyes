@@ -502,7 +502,7 @@
                                 Background="#00000000"
                                 Padding="0">
                             <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="MouseLeftButtonDown">
+                                <i:EventTrigger EventName="MouseLeftButtonUp">
                                     <ei:CallMethodAction MethodName="ToggleFocus" TargetObject="{Binding Mode=OneTime}" />
                                 </i:EventTrigger>
                             </i:Interaction.Triggers>
@@ -791,7 +791,53 @@
                                                    helpers:StatusStylizer.LinkNavigationCommand="{Binding OpenLinkCommand,
                                                                                                           Mode=OneTime}"
                                                    helpers:StatusStylizer.TwitterStatus="{Binding Status,
-                                                                                                  Mode=OneTime}" />
+                                                                                                  Mode=OneTime}">
+                                            <i:Interaction.Behaviors>
+                                                <behaviors:TextBlockDragSelectableBehavior SelectedText="{Binding SelectedText, Mode=OneWayToSource}">
+                                                    <behaviors:TextBlockDragSelectableBehavior.SelectContextMenu>
+                                                        <ContextMenu DataContext="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                                                            <MenuItem Header="クリップボードにコピー(_C)">
+                                                                <i:Interaction.Triggers>
+                                                                    <i:EventTrigger EventName="Click">
+                                                                        <ei:CallMethodAction MethodName="CopyText" TargetObject="{Binding}" />
+                                                                    </i:EventTrigger>
+                                                                </i:Interaction.Triggers>
+                                                            </MenuItem>
+                                                            <MenuItem Header="ツイート入力欄に設定(_I)">
+                                                                <i:Interaction.Triggers>
+                                                                    <i:EventTrigger EventName="Click">
+                                                                        <ei:CallMethodAction MethodName="SetTextToInputBox" TargetObject="{Binding}" />
+                                                                    </i:EventTrigger>
+                                                                </i:Interaction.Triggers>
+                                                            </MenuItem>
+                                                            <Separator />
+                                                            <MenuItem Header="Krile内のツイートを検索(_K)">
+                                                                <i:Interaction.Triggers>
+                                                                    <i:EventTrigger EventName="Click">
+                                                                        <ei:CallMethodAction MethodName="FindOnKrile" TargetObject="{Binding}" />
+                                                                    </i:EventTrigger>
+                                                                </i:Interaction.Triggers>
+                                                            </MenuItem>
+                                                            <MenuItem Header="Twitterからツイートを検索(_T)">
+                                                                <i:Interaction.Triggers>
+                                                                    <i:EventTrigger EventName="Click">
+                                                                        <ei:CallMethodAction MethodName="FindOnTwitter" TargetObject="{Binding}" />
+                                                                    </i:EventTrigger>
+                                                                </i:Interaction.Triggers>
+                                                            </MenuItem>
+                                                            <Separator />
+                                                            <MenuItem Header="Googleで検索(_G)">
+                                                                <i:Interaction.Triggers>
+                                                                    <i:EventTrigger EventName="Click">
+                                                                        <ei:CallMethodAction MethodName="FindOnGoogle" TargetObject="{Binding}" />
+                                                                    </i:EventTrigger>
+                                                                </i:Interaction.Triggers>
+                                                            </MenuItem>
+                                                        </ContextMenu>
+                                                    </behaviors:TextBlockDragSelectableBehavior.SelectContextMenu>
+                                                </behaviors:TextBlockDragSelectableBehavior>
+                                            </i:Interaction.Behaviors>
+                                        </TextBlock>
                                         <Border Grid.Column="1"
                                                 Grid.ColumnSpan="1"
                                                 Width="60"

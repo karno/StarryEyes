@@ -241,6 +241,7 @@
     <Compile Include="Models\Receivers\Managers\SearchReceiveManager.cs" />
     <Compile Include="Models\Receivers\Managers\UserReceiveManager.cs" />
     <Compile Include="Models\Receivers\ReceiversManager.cs" />
+    <Compile Include="Models\SearchFlipModel.cs" />
     <Compile Include="Models\Stores\CacheStore.cs" />
     <Compile Include="Models\Stores\StoreHelper.cs" />
     <Compile Include="Models\InputAreaModel.cs" />
@@ -307,6 +308,7 @@
     <Compile Include="Views\Behaviors\KeyHandlingBehavior.cs" />
     <Compile Include="Views\Behaviors\Planerator.cs" />
     <Compile Include="Views\Behaviors\SquaredScrollBehavior.cs" />
+    <Compile Include="Views\Behaviors\TextBlockDragSelectableBehavior.cs" />
     <Compile Include="Views\Behaviors\TimelineScrollLockerBehavior.cs" />
     <Compile Include="Views\Behaviors\TimelineTriggerBehavior.cs" />
     <Compile Include="Views\Controls\DropDownMenuButton.cs" />

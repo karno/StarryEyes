@@ -32,7 +32,7 @@ namespace StarryEyes.Breezy.Util
         public static string UrlEncode(string s, Encoding enc)
         {
             var rt = new StringBuilder();
-            foreach (byte i in enc.GetBytes(s))
+            foreach (var i in enc.GetBytes(s))
                 if (i == 0x20)
                     rt.Append('+');
                 else if (i >= 0x30 && i <= 0x39 || i >= 0x41 && i <= 0x5a || i >= 0x61 && i <= 0x7a)
@@ -54,10 +54,10 @@ namespace StarryEyes.Breezy.Util
         public static string UrlEncodeStrict(string value, Encoding encoding, bool upper)
         {
             var result = new StringBuilder();
-            byte[] data = encoding.GetBytes(value);
-            int len = data.Length;
+            var data = encoding.GetBytes(value);
+            var len = data.Length;
 
-            for (int i = 0; i < len; i++)
+            for (var i = 0; i < len; i++)
             {
                 int c = data[i];
                 if (c < 0x80 && AllowedChars.IndexOf((char)c) != -1)
@@ -94,15 +94,21 @@ namespace StarryEyes.Breezy.Util
         public static string UrlDecode(string s, Encoding enc)
         {
             var bytes = new List<byte>();
-            for (int i = 0; i < s.Length; i++)
+            for (var i = 0; i < s.Length; i++)
             {
-                char c = s[i];
-                if (c == '%')
-                    bytes.Add((byte)int.Parse(s[++i].ToString() + s[++i].ToString(), NumberStyles.HexNumber));
-                else if (c == '+')
-                    bytes.Add((byte)0x20);
-                else
-                    bytes.Add((byte)c);
+                var c = s[i];
+                switch (c)
+                {
+                    case '%':
+                        bytes.Add((byte)int.Parse(s[++i].ToString() + s[++i].ToString(), NumberStyles.HexNumber));
+                        break;
+                    case '+':
+                        bytes.Add((byte)0x20);
+                        break;
+                    default:
+                        bytes.Add((byte)c);
+                        break;
+                }
             }
             return enc.GetString(bytes.ToArray(), 0, bytes.Count);
         }

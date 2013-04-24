@@ -10,7 +10,6 @@ using StarryEyes.Filters.Parsing;
 using StarryEyes.Models;
 using StarryEyes.Settings;
 using StarryEyes.ViewModels.WindowParts.Flips.SearchFlips;
-using StarryEyes.Views.Triggers;
 using StarryEyes.Views.Utils;
 
 namespace StarryEyes.ViewModels.WindowParts.Flips
@@ -36,6 +35,16 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                     h => KeyAssignManager.OnKeyAssignChanged += h,
                     h => KeyAssignManager.OnKeyAssignChanged -= h)
                           .Subscribe(_ => RaisePropertyChanged(() => SearchHintLabel)));
+            this.CompositeDisposable.Add(
+                new Livet.EventListeners.EventListener<Action<string, SearchMode>>(
+                    h => SearchFlipModel.OnSearchRequested += h,
+                    h => SearchFlipModel.OnSearchRequested -= h,
+                    (query, mode) =>
+                    {
+                        this.Open();
+                        Text = query;
+                        SearchMode = mode;
+                    }));
         }
 
         private bool _isSearchResultAvailable;
@@ -380,12 +389,4 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         }
     }
 
-    public enum SearchMode
-    {
-        Quick,
-        Local,
-        Web,
-        UserWeb,
-        UserScreenName,
-    }
 }

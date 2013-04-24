@@ -8,7 +8,6 @@ using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Models.Stores.Internal;
-using StarryEyes.Models.Subsystems;
 using StarryEyes.Vanille.DataStore;
 using StarryEyes.Vanille.DataStore.Persistent;
 
@@ -36,8 +35,6 @@ namespace StarryEyes.Models.Stores
         private static volatile bool _isInShutdown;
 
         private static DataStoreBase<long, TwitterStatus> _store;
-
-        private static DateTime _dispatch = DateTime.Now;
 
         private static SingleThreadDispatcher<TwitterStatus> _dispatcher;
 
@@ -78,12 +75,7 @@ namespace StarryEyes.Models.Stores
             if (_isInShutdown) return;
             if (publish)
             {
-                if (!StatisticsService.TooFastWarning ||
-                    (DateTime.Now - _dispatch).TotalSeconds > 1)
-                {
-                    _dispatch = DateTime.Now;
-                    Task.Run(() => _statusPublisher.OnNext(new StatusNotification(status, true)));
-                }
+                Task.Run(() => _statusPublisher.OnNext(new StatusNotification(status, true)));
             }
             _dispatcher.Send(status);
             UserStore.Store(status.User);

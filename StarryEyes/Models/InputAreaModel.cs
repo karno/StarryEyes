@@ -128,7 +128,7 @@ namespace StarryEyes.Models
                 MainWindowModel.SetFocusTo(FocusRequest.Input);
         }
 
-        public static void SetText(IEnumerable<long> infos = null, string body = null,
+        public static void SetText(IEnumerable<long> infos, string body = null,
                                    CursorPosition cursor = CursorPosition.End, TwitterStatus inReplyTo = null,
                                    bool focusToInputArea = true)
         {

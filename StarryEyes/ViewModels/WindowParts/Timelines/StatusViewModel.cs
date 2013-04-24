@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Windows;
@@ -7,6 +8,7 @@ using Livet;
 using Livet.Commands;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
+using StarryEyes.Breezy.Util;
 using StarryEyes.Filters;
 using StarryEyes.Models;
 using StarryEyes.Models.Backpanels.NotificationEvents;
@@ -466,6 +468,61 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             if (tuple == null) return;
             BrowserHelper.Open(tuple.Item1);
         }
+
+        #region Text selection control
+
+        public string SelectedText
+        {
+            get { return this._selectedText ?? String.Empty; }
+            set
+            {
+                this._selectedText = value;
+                this.RaisePropertyChanged();
+            }
+        }
+
+        public void CopyText()
+        {
+            try
+            {
+                Clipboard.SetText(SelectedText);
+            }
+            catch
+            {
+            }
+        }
+
+        public void SetTextToInputBox()
+        {
+            InputAreaModel.SetText(body: SelectedText);
+        }
+
+        public void FindOnKrile()
+        {
+            SearchFlipModel.SearchRequest(SelectedText, SearchMode.Local);
+        }
+
+        public void FindOnTwitter()
+        {
+            SearchFlipModel.SearchRequest(SelectedText, SearchMode.Web);
+        }
+
+        private const string GoogleUrl = @"http://www.google.com/search?q={0}";
+        public void FindOnGoogle()
+        {
+            var encoded = HttpUtility.UrlEncode(SelectedText);
+            var url = String.Format(GoogleUrl, encoded);
+            try
+            {
+                Process.Start(url);
+            }
+            catch
+            {
+
+            }
+        }
+
+        #endregion
 
         #region Execution commands
 
@@ -970,6 +1027,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         #region OpenLinkCommand
 
         private ListenerCommand<string> _openLinkCommand;
+        private string _selectedText;
 
         public ListenerCommand<string> OpenLinkCommand
         {
