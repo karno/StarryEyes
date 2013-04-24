@@ -21,18 +21,6 @@ namespace StarryEyes.Models.Subsystems
                               Monitor.Pulse(StatisticsWorkProcSync);
                           }
                       });
-            /*
-                App.OnUserInterfaceReady +=
-                    () => Observable.Interval(TimeSpan.FromSeconds(20.0))
-                                    .Subscribe(_ =>
-                                    {
-                                        if (!_tpsAccess)
-                                        {
-                                            TooFastWarning = true;
-                                        }
-                                        _tpsAccess = false;
-                                    });
-            */
             _estimatedGrossTweetCount = StatusStore.Count;
             App.OnApplicationFinalize += StopThread;
             Task.Factory.StartNew(UpdateStatisticWorkProc, TaskCreationOptions.LongRunning);
@@ -64,6 +52,8 @@ namespace StarryEyes.Models.Subsystems
                 }
                 if (!_isThreadAlive) return;
                 // update statistics params
+
+                // TODO: Improve algorithm.
                 var previousGross = _estimatedGrossTweetCount;
                 _estimatedGrossTweetCount = StatusStore.Count;
                 var previousTimestamp = _timestamp;
@@ -97,8 +87,6 @@ namespace StarryEyes.Models.Subsystems
             get { return _estimatedGrossTweetCount; }
         }
 
-        private static bool _tpsAccess;
-
         private static double _tweetsPerSeconds;
         /// <summary>
         /// Tweets per seconds, estimated.
@@ -107,19 +95,8 @@ namespace StarryEyes.Models.Subsystems
         {
             get
             {
-                _tpsAccess = true;
                 return _tweetsPerSeconds;
             }
-        }
-
-        /// <summary>
-        /// When too fast timeline current, this flags will indicates true.
-        /// </summary>
-        public static bool TooFastWarning { get; internal set; }
-
-        public static void ResetTooFastWarning()
-        {
-            TooFastWarning = false;
         }
     }
 }

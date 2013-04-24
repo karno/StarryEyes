@@ -5,7 +5,7 @@ namespace StarryEyes.Views.Utils
     {
         protected override string ToTarget(string input, object parameter)
         {
-            return input.Replace("\r", "").Replace("\n", " ");
+            return input == null ? string.Empty : input.Replace("\r", "").Replace("\n", " ");
         }
     }
 }
