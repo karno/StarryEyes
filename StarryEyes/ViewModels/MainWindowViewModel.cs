@@ -313,6 +313,7 @@ namespace StarryEyes.ViewModels
         public void ToggleShowBackstage()
         {
             IsBackstageVisible = !IsBackstageVisible;
+            ShowWindowCommands = !IsBackstageVisible;
         }
 
         #endregion
