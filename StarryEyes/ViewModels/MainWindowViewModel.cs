@@ -298,8 +298,28 @@ namespace StarryEyes.ViewModels
 
         #endregion
 
+        #region Toggle backpanel display
+
+        public bool IsBackpanelVisible
+        {
+            get { return this._isBackpanelVisible; }
+            set
+            {
+                this._isBackpanelVisible = value;
+                this.RaisePropertyChanged();
+            }
+        }
+
+        public void ToggleShowBackpanel()
+        {
+            IsBackpanelVisible = !IsBackpanelVisible;
+        }
+
+        #endregion
+
         #region ShowSettingCommand
         private Livet.Commands.ViewModelCommand _showSettingCommand;
+        private bool _isBackpanelVisible;
 
         public Livet.Commands.ViewModelCommand ShowSettingCommand
         {

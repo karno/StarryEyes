@@ -182,22 +182,105 @@
                     </Storyboard>
                 </VisualState>
             </VisualStateGroup>
+            <VisualStateGroup x:Name="ForePanelStates">
+                <VisualState x:Name="HideForePanel">
+                    <Storyboard>
+                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="MainAreaGrid" Storyboard.TargetProperty="(UIElement.Opacity)">
+                            <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="0">
+                                <EasingDoubleKeyFrame.EasingFunction>
+                                    <CircleEase EasingMode="EaseIn" />
+                                </EasingDoubleKeyFrame.EasingFunction>
+                            </EasingDoubleKeyFrame>
+                        </DoubleAnimationUsingKeyFrames>
+                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="MainAreaGrid" Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.Y)">
+                            <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="800">
+                                <EasingDoubleKeyFrame.EasingFunction>
+                                    <CubicEase EasingMode="EaseIn" />
+                                </EasingDoubleKeyFrame.EasingFunction>
+                            </EasingDoubleKeyFrame>
+                        </DoubleAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="MainAreaGrid" Storyboard.TargetProperty="(UIElement.Visibility)">
+                            <DiscreteObjectKeyFrame KeyTime="0:0:0.2" Value="{x:Static Visibility.Collapsed}" />
+                        </ObjectAnimationUsingKeyFrames>
+                    </Storyboard>
+                </VisualState>
+                <VisualState x:Name="ShowForePanel">
+                    <Storyboard>
+                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="MainAreaGrid" Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.Y)">
+                            <EasingDoubleKeyFrame KeyTime="0" Value="800">
+                                <EasingDoubleKeyFrame.EasingFunction>
+                                    <CircleEase EasingMode="EaseOut" />
+                                </EasingDoubleKeyFrame.EasingFunction>
+                            </EasingDoubleKeyFrame>
+                            <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="0">
+                                <EasingDoubleKeyFrame.EasingFunction>
+                                    <CircleEase EasingMode="EaseOut" />
+                                </EasingDoubleKeyFrame.EasingFunction>
+                            </EasingDoubleKeyFrame>
+                        </DoubleAnimationUsingKeyFrames>
+                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="MainAreaGrid" Storyboard.TargetProperty="(UIElement.Opacity)">
+                            <EasingDoubleKeyFrame KeyTime="0" Value="0">
+                                <EasingDoubleKeyFrame.EasingFunction>
+                                    <CircleEase EasingMode="EaseOut" />
+                                </EasingDoubleKeyFrame.EasingFunction>
+                            </EasingDoubleKeyFrame>
+                            <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="1">
+                                <EasingDoubleKeyFrame.EasingFunction>
+                                    <CircleEase EasingMode="EaseOut" />
+                                </EasingDoubleKeyFrame.EasingFunction>
+                            </EasingDoubleKeyFrame>
+                        </DoubleAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="MainAreaGrid" Storyboard.TargetProperty="(UIElement.Visibility)">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}" />
+                            <DiscreteObjectKeyFrame KeyTime="0:0:0.2" Value="{x:Static Visibility.Visible}" />
+                        </ObjectAnimationUsingKeyFrames>
+                    </Storyboard>
+                </VisualState>
+            </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
         <Grid.RowDefinitions>
             <RowDefinition />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="13*" />
-            </Grid.RowDefinitions>
-            <windowParts:InputArea Margin="3,4,3,0" DataContext="{Binding InputAreaViewModel}" />
-            <windowParts:MainArea Grid.Row="1"
-                                  Margin="-8,0,0,0"
-                                  DataContext="{Binding MainAreaViewModel}" />
+            <i:Interaction.Triggers>
+                <ei:DataTrigger Binding="{Binding IsBackpanelVisible, Mode=OneWay}" Value="True">
+                    <ei:GoToStateAction StateName="HideForePanel" />
+                </ei:DataTrigger>
+                <ei:DataTrigger Binding="{Binding IsBackpanelVisible, Mode=OneWay}" Value="False">
+                    <ei:GoToStateAction StateName="ShowForePanel" />
+                </ei:DataTrigger>
+            </i:Interaction.Triggers>
+            <Grid Background="Gainsboro" Visibility="{Binding IsBackpanelVisible, Converter={StaticResource BooleanToVisibleConverter}}">
+                <windowParts:Backpanel DataContext="{Binding BackpanelViewModel}" />
+            </Grid>
+            <Grid x:Name="MainAreaGrid"
+                  Background="White"
+                  RenderTransformOrigin="0.5,0.5">
+                <Grid.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform />
+                        <SkewTransform />
+                        <RotateTransform />
+                        <TranslateTransform />
+                    </TransformGroup>
+                </Grid.RenderTransform>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="13*" />
+                </Grid.RowDefinitions>
+                <windowParts:InputArea Margin="3,4,3,0" DataContext="{Binding InputAreaViewModel}" />
+                <windowParts:MainArea Grid.Row="1"
+                                      Margin="-8,0,0,0"
+                                      DataContext="{Binding MainAreaViewModel}" />
+            </Grid>
         </Grid>
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="1" Background="White">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="MouseLeftButtonDown">
+                    <ei:CallMethodAction MethodName="ToggleShowBackpanel" TargetObject="{Binding}" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
             <Grid Margin="0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition />
