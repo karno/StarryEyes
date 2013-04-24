@@ -8,7 +8,7 @@ using StarryEyes.Breezy.DataModel;
 using StarryEyes.Filters;
 using StarryEyes.Filters.Parsing;
 using StarryEyes.Models;
-using StarryEyes.Models.Backpanels.NotificationEvents;
+using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Models.Stores;
 using StarryEyes.Models.Tab;
 using StarryEyes.Vanille.DataStore;
@@ -102,7 +102,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 return fetch.Merge(info.SearchTweets(_query, count: count, max_id: maxId)
                                        .Catch((Exception ex) =>
                                        {
-                                           BackpanelModel.RegisterEvent(new OperationFailedEvent(ex.Message));
+                                           BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message));
                                            return Observable.Empty<TwitterStatus>();
                                        }));
             }

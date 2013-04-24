@@ -1,9 +1,9 @@
 ﻿using StarryEyes.Breezy.Authorize;
 using StarryEyes.Views;
 
-namespace StarryEyes.Models.Backpanels.NotificationEvents.PostEvents
+namespace StarryEyes.Models.Backstages.NotificationEvents.PostEvents
 {
-    public sealed class FallbackedEvent : BackpanelEventBase
+    public sealed class FallbackedEvent : BackstageEventBase
     {
         private readonly AuthenticateInfo _authInfo;
         public AuthenticateInfo AuthInfo

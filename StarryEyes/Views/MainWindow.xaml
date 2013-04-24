@@ -108,13 +108,13 @@
     </controls:MetroWindow.WindowCommands>
     <Grid>
         <i:Interaction.Triggers>
-            <ei:DataTrigger Binding="{Binding BackpanelViewModel.ShowCurrentEvent,
+            <ei:DataTrigger Binding="{Binding BackstageViewModel.ShowCurrentEvent,
                                               Mode=OneWay}"
                             Comparison="Equal"
                             Value="True">
                 <ei:GoToStateAction StateName="ShowCurrentEvent" />
             </ei:DataTrigger>
-            <ei:DataTrigger Binding="{Binding BackpanelViewModel.ShowCurrentEvent,
+            <ei:DataTrigger Binding="{Binding BackstageViewModel.ShowCurrentEvent,
                                               Mode=OneWay}"
                             Comparison="Equal"
                             Value="False">
@@ -244,15 +244,15 @@
         </Grid.RowDefinitions>
         <Grid>
             <i:Interaction.Triggers>
-                <ei:DataTrigger Binding="{Binding IsBackpanelVisible, Mode=OneWay}" Value="True">
+                <ei:DataTrigger Binding="{Binding IsBackstageVisible, Mode=OneWay}" Value="True">
                     <ei:GoToStateAction StateName="HideForePanel" />
                 </ei:DataTrigger>
-                <ei:DataTrigger Binding="{Binding IsBackpanelVisible, Mode=OneWay}" Value="False">
+                <ei:DataTrigger Binding="{Binding IsBackstageVisible, Mode=OneWay}" Value="False">
                     <ei:GoToStateAction StateName="ShowForePanel" />
                 </ei:DataTrigger>
             </i:Interaction.Triggers>
-            <Grid Background="Gainsboro" Visibility="{Binding IsBackpanelVisible, Converter={StaticResource BooleanToVisibleConverter}}">
-                <windowParts:Backpanel DataContext="{Binding BackpanelViewModel}" />
+            <Grid Background="Gainsboro" Visibility="{Binding IsBackstageVisible, Converter={StaticResource BooleanToVisibleConverter}}">
+                <windowParts:Backstage DataContext="{Binding BackstageViewModel}" />
             </Grid>
             <Grid x:Name="MainAreaGrid"
                   Background="White"
@@ -278,7 +278,7 @@
         <Grid Grid.Row="1" Background="White">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="MouseLeftButtonDown">
-                    <ei:CallMethodAction MethodName="ToggleShowBackpanel" TargetObject="{Binding}" />
+                    <ei:CallMethodAction MethodName="ToggleShowBackstage" TargetObject="{Binding}" />
                 </i:EventTrigger>
             </i:Interaction.Triggers>
             <Grid Margin="0">
@@ -291,7 +291,7 @@
                 </Grid.ColumnDefinitions>
                 <TextBlock Margin="8"
                            Text="{Binding StateString}"
-                           ToolTip="ここをクリックすると、バックパネルを開くことができます。" />
+                           ToolTip="ここをクリックすると、バックステージを開くことができます。" />
                 <StackPanel Grid.Column="1"
                             Margin="8"
                             Orientation="Horizontal"
@@ -360,36 +360,36 @@
                     </TransformGroup>
                 </Border.RenderTransform>
                 <Border.Background>
-                    <SolidColorBrush Color="{Binding BackpanelViewModel.CurrentEvent.Background, Mode=OneWay}" />
+                    <SolidColorBrush Color="{Binding BackstageViewModel.CurrentEvent.Background, Mode=OneWay}" />
                 </Border.Background>
                 <StackPanel Orientation="Horizontal">
                     <Image Width="16"
                            Height="16"
                            Margin="8,8,4,8"
                            VerticalAlignment="Center"
-                           Source="{Binding BackpanelViewModel.CurrentEvent.TitleImage,
+                           Source="{Binding BackstageViewModel.CurrentEvent.TitleImage,
                                             Mode=OneWay}"
-                           Visibility="{Binding BackpanelViewModel.CurrentEvent.IsImageAvailable,
+                           Visibility="{Binding BackstageViewModel.CurrentEvent.IsImageAvailable,
                                                 Converter={StaticResource BooleanToVisibleConverter},
                                                 Mode=OneWay}" />
                     <TextBlock Margin="8,8,4,8"
                                VerticalAlignment="Center"
                                FontWeight="Bold"
-                               Text="{Binding BackpanelViewModel.CurrentEvent.Title,
+                               Text="{Binding BackstageViewModel.CurrentEvent.Title,
                                               Mode=OneWay}"
-                               Visibility="{Binding BackpanelViewModel.CurrentEvent.IsImageAvailable,
+                               Visibility="{Binding BackstageViewModel.CurrentEvent.IsImageAvailable,
                                                     Converter={StaticResource BooleanToInvisibleConverter},
                                                     Mode=OneWay}">
                         <TextBlock.Foreground>
-                            <SolidColorBrush Color="{Binding BackpanelViewModel.CurrentEvent.Foreground, Mode=OneWay}" />
+                            <SolidColorBrush Color="{Binding BackstageViewModel.CurrentEvent.Foreground, Mode=OneWay}" />
                         </TextBlock.Foreground>
                     </TextBlock>
                     <TextBlock Margin="4,8,8,8"
                                VerticalAlignment="Center"
-                               Text="{Binding BackpanelViewModel.CurrentEvent.Detail,
+                               Text="{Binding BackstageViewModel.CurrentEvent.Detail,
                                               Mode=OneWay}">
                         <TextBlock.Foreground>
-                            <SolidColorBrush Color="{Binding BackpanelViewModel.CurrentEvent.Foreground, Mode=OneWay}" />
+                            <SolidColorBrush Color="{Binding BackstageViewModel.CurrentEvent.Foreground, Mode=OneWay}" />
                         </TextBlock.Foreground>
                     </TextBlock>
                 </StackPanel>

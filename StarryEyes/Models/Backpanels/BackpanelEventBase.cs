@@ -1,11 +1,11 @@
 ﻿using System.Windows.Media;
 
-namespace StarryEyes.Models.Backpanels
+namespace StarryEyes.Models.Backstages
 {
     /// <summary>
     /// Represents event.
     /// </summary>
-    public abstract class BackpanelEventBase
+    public abstract class BackstageEventBase
     {
         /// <summary>
         /// Title of the event.

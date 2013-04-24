@@ -2,9 +2,9 @@
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Views;
 
-namespace StarryEyes.Models.Backpanels.NotificationEvents
+namespace StarryEyes.Models.Backstages.NotificationEvents
 {
-    public sealed class TrackLimitEvent : BackpanelEventBase
+    public sealed class TrackLimitEvent : BackstageEventBase
     {
         private readonly AuthenticateInfo _info;
         private readonly int _drop;

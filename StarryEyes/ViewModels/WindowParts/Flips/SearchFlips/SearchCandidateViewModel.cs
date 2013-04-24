@@ -6,7 +6,7 @@ using Livet;
 using StarryEyes.Breezy.Api.Rest;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Models;
-using StarryEyes.Models.Backpanels.NotificationEvents;
+using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Models.Stores;
 using StarryEyes.Models.Tab;
 
@@ -96,7 +96,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                               j =>
                               _searchCandidates.Add(new SearchCandidateItemViewModel(this, aid.AuthenticateInfo, j.id,
                                                                                      j.query)),
-                              ex => BackpanelModel.RegisterEvent(new OperationFailedEvent(ex.Message)));
+                              ex => BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message)));
             }
         }
     }
@@ -152,7 +152,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
         {
             _authenticateInfo.DestroySavedSearch(_id)
                              .Subscribe(_ => _parent.UpdateInfo(),
-                                        ex => BackpanelModel.RegisterEvent(new OperationFailedEvent(ex.Message)));
+                                        ex => BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message)));
         }
         #endregion
     }

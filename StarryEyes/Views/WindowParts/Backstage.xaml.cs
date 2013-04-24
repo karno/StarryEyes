@@ -15,11 +15,11 @@ using System.Windows.Shapes;
 namespace StarryEyes.Views.WindowParts
 {
     /// <summary>
-    /// Backpanel.xaml の相互作用ロジック
+    /// Backstage.xaml の相互作用ロジック
     /// </summary>
-    public partial class Backpanel : UserControl
+    public partial class Backstage : UserControl
     {
-        public Backpanel()
+        public Backstage()
         {
             InitializeComponent();
         }

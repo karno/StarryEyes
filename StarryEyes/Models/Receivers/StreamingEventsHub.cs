@@ -4,8 +4,8 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
-using StarryEyes.Models.Backpanels.NotificationEvents;
-using StarryEyes.Models.Backpanels.TwitterEvents;
+using StarryEyes.Models.Backstages.NotificationEvents;
+using StarryEyes.Models.Backstages.TwitterEvents;
 using StarryEyes.Models.Stores;
 
 namespace StarryEyes.Models.Receivers
@@ -97,22 +97,22 @@ namespace StarryEyes.Models.Receivers
         {
             // optional default handlers
             if (OverrideDefaultHandlers) return;
-            OnFollowed += ue => BackpanelModel.RegisterEvent(new FollowedEvent(ue.Source, ue.Target));
-            OnUnfollowed += ue => BackpanelModel.RegisterEvent(new UnfollowedEvent(ue.Source, ue.Target));
-            OnBlocked += ue => BackpanelModel.RegisterEvent(new BlockedEvent(ue.Source, ue.Target));
-            OnUnblocked += ue => BackpanelModel.RegisterEvent(new UnblockedEvent(ue.Source, ue.Target));
-            OnFavorited += te => BackpanelModel.RegisterEvent(new FavoritedEvent(te.Source, te.Target));
-            OnUnfavorited += te => BackpanelModel.RegisterEvent(new UnfavoritedEvent(te.Source, te.Target));
+            OnFollowed += ue => BackstageModel.RegisterEvent(new FollowedEvent(ue.Source, ue.Target));
+            OnUnfollowed += ue => BackstageModel.RegisterEvent(new UnfollowedEvent(ue.Source, ue.Target));
+            OnBlocked += ue => BackstageModel.RegisterEvent(new BlockedEvent(ue.Source, ue.Target));
+            OnUnblocked += ue => BackstageModel.RegisterEvent(new UnblockedEvent(ue.Source, ue.Target));
+            OnFavorited += te => BackstageModel.RegisterEvent(new FavoritedEvent(te.Source, te.Target));
+            OnUnfavorited += te => BackstageModel.RegisterEvent(new UnfavoritedEvent(te.Source, te.Target));
             OnRetweeted += te =>
             {
                 // check user
                 if (AccountsStore.AccountIds.Contains(te.Source.Id) ||
                     AccountsStore.AccountIds.Contains(te.Target.User.Id))
                 {
-                    BackpanelModel.RegisterEvent(new RetweetedEvent(te.Source, te.Target));
+                    BackstageModel.RegisterEvent(new RetweetedEvent(te.Source, te.Target));
                 }
             };
-            OnLimitationInfoGot += (auth, limit) => BackpanelModel.RegisterEvent(new TrackLimitEvent(auth, limit));
+            OnLimitationInfoGot += (auth, limit) => BackstageModel.RegisterEvent(new TrackLimitEvent(auth, limit));
         }
 
         public static event Action<TwitterStatus> OnReceived;

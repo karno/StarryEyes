@@ -3,9 +3,9 @@ using System.Windows.Media;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Views;
 
-namespace StarryEyes.Models.Backpanels.TwitterEvents
+namespace StarryEyes.Models.Backstages.TwitterEvents
 {
-    public abstract class TwitterEventBase : BackpanelEventBase
+    public abstract class TwitterEventBase : BackstageEventBase
     {
         private readonly DateTime _createdAt;
         public DateTime CreatedAt

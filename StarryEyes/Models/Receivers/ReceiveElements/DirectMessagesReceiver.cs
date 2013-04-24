@@ -1,7 +1,7 @@
 ﻿using System;
 using StarryEyes.Breezy.Api.Rest;
 using StarryEyes.Breezy.Authorize;
-using StarryEyes.Models.Backpanels.NotificationEvents;
+using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Settings;
 
 namespace StarryEyes.Models.Receivers.ReceiveElements
@@ -24,13 +24,13 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
         {
             _authInfo.GetDirectMessages(count: 50)
                      .Subscribe(ReceiveInbox.Queue,
-                                ex => BackpanelModel.RegisterEvent(
+                                ex => BackstageModel.RegisterEvent(
                                     new OperationFailedEvent("messages receive error: " +
                                                              _authInfo.UnreliableScreenName + " - " +
                                                              ex.Message)));
             _authInfo.GetSentDirectMessages(count: 50)
                      .Subscribe(ReceiveInbox.Queue,
-                                ex => BackpanelModel.RegisterEvent(
+                                ex => BackstageModel.RegisterEvent(
                                     new OperationFailedEvent("sent messages receive error: " +
                                                              _authInfo.UnreliableScreenName + " - " +
                                                              ex.Message)));

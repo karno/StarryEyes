@@ -4,7 +4,7 @@ using System.Reactive.Linq;
 using StarryEyes.Albireo.Data;
 using StarryEyes.Breezy.Api.Rest;
 using StarryEyes.Breezy.Authorize;
-using StarryEyes.Models.Backpanels.NotificationEvents;
+using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Models.Stores;
 using StarryEyes.Settings;
 
@@ -43,7 +43,7 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
                          .Do(id => beforeBlockings.Remove(id))
                          .Do(reldata.AddBlocking))
                       .Subscribe(_ => { },
-                                 ex => BackpanelModel.RegisterEvent(
+                                 ex => BackstageModel.RegisterEvent(
                                      new OperationFailedEvent("relation receive error: " +
                                                               _authInfo.UnreliableScreenName + " - " +
                                                               ex.Message)),

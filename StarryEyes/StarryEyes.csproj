@@ -198,7 +198,7 @@
     <Compile Include="InputFormats\FormatDescription.cs" />
     <Compile Include="InputFormats\FormatElement.cs" />
     <Compile Include="InputFormats\InputFormatFunctionBase.cs" />
-    <Compile Include="Models\BackpanelModel.cs" />
+    <Compile Include="Models\BackstageModel.cs" />
     <Compile Include="Models\Backpanels\SystemEvents\KeyAssignCouldNotLoadEvent.cs" />
     <Compile Include="Models\Backpanels\SystemEvents\KeyAssignProfileNotFoundEvent.cs" />
     <Compile Include="Models\Backpanels\SystemEvents\ListReceiveFailedEvent.cs" />
@@ -286,7 +286,7 @@
     <Compile Include="ViewModels\WindowParts\Common\FilterEditor\FilterPredicateViewModelBase.cs" />
     <Compile Include="ViewModels\WindowParts\Common\FilterEditor\FilterSourceViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\AccountSelectionFlipViewModel.cs" />
-    <Compile Include="ViewModels\WindowParts\BackpanelViewModel.cs" />
+    <Compile Include="ViewModels\WindowParts\BackstageViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\PartialFlipViewModelBase.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\SearchFlipViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\SearchCandidateViewModel.cs" />
@@ -343,8 +343,8 @@
     <Compile Include="Views\WindowParts\Flips\AccountSelectionFlip.xaml.cs">
       <DependentUpon>AccountSelectionFlip.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\WindowParts\Backpanel.xaml.cs">
-      <DependentUpon>Backpanel.xaml</DependentUpon>
+    <Compile Include="Views\WindowParts\Backstage.xaml.cs">
+      <DependentUpon>Backstage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\WindowParts\Flips\FlipContent.cs" />
     <Compile Include="Views\WindowParts\Flips\SearchFlip.xaml.cs">
@@ -440,7 +440,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\WindowParts\Backpanel.xaml">
+    <Page Include="Views\WindowParts\Backstage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -504,7 +504,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ViewModels\Notifications\" />
-    <Folder Include="ViewModels\WindowParts\Backpanels\" />
+    <Folder Include="ViewModels\WindowParts\Backstages\" />
     <Folder Include="Views\Notifications\" />
     <Folder Include="Views\WindowParts\Common\" />
   </ItemGroup>

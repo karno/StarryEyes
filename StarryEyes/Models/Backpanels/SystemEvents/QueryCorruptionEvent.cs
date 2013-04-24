@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace StarryEyes.Models.Backpanels.SystemEvents
+namespace StarryEyes.Models.Backstages.SystemEvents
 {
     public sealed class QueryCorruptionEvent : SystemEventBase
     {

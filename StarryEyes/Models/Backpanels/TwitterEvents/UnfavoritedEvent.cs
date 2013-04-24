@@ -1,7 +1,7 @@
 ﻿using System.Windows.Media;
 using StarryEyes.Breezy.DataModel;
 
-namespace StarryEyes.Models.Backpanels.TwitterEvents
+namespace StarryEyes.Models.Backstages.TwitterEvents
 {
     public sealed class UnfavoritedEvent : TwitterEventBase
     {

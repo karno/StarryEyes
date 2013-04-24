@@ -1,7 +1,7 @@
 ﻿using System;
 using StarryEyes.Breezy.Api.Rest;
 using StarryEyes.Breezy.Authorize;
-using StarryEyes.Models.Backpanels.NotificationEvents;
+using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Settings;
 
 namespace StarryEyes.Models.Receivers.ReceiveElements
@@ -24,7 +24,7 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
         {
             _authInfo.GetMentions(count: 100)
                      .Subscribe(ReceiveInbox.Queue,
-                                ex => BackpanelModel.RegisterEvent(
+                                ex => BackstageModel.RegisterEvent(
                                     new OperationFailedEvent("mentions receive error: " +
                                                              _authInfo.UnreliableScreenName + " - " +
                                                              ex.Message)));

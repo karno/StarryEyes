@@ -1,5 +1,5 @@
 ﻿
-namespace StarryEyes.Models.Backpanels.SystemEvents
+namespace StarryEyes.Models.Backstages.SystemEvents
 {
     public enum SystemEventKind
     {

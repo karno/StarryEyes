@@ -1,8 +1,8 @@
 ﻿using StarryEyes.Views;
 
-namespace StarryEyes.Models.Backpanels.NotificationEvents
+namespace StarryEyes.Models.Backstages.NotificationEvents
 {
-    public class OperationFailedEvent : BackpanelEventBase
+    public class OperationFailedEvent : BackstageEventBase
     {
         private readonly string _description;
 

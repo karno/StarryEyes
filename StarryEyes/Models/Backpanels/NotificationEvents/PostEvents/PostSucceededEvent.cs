@@ -1,8 +1,8 @@
 ﻿using StarryEyes.Views;
 
-namespace StarryEyes.Models.Backpanels.NotificationEvents.PostEvents
+namespace StarryEyes.Models.Backstages.NotificationEvents.PostEvents
 {
-    public sealed class PostSucceededEvent : BackpanelEventBase
+    public sealed class PostSucceededEvent : BackstageEventBase
     {
         private readonly TweetInputInfo _tweetInputInfo;
 

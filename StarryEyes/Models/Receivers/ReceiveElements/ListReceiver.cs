@@ -3,7 +3,7 @@ using System.Linq;
 using StarryEyes.Breezy.Api.Rest;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
-using StarryEyes.Models.Backpanels.NotificationEvents;
+using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Models.Stores;
 using StarryEyes.Settings;
 
@@ -40,12 +40,12 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
             }
             if (authInfo == null)
             {
-                BackpanelModel.RegisterEvent(new OperationFailedEvent("アカウントが登録されていないため、検索タイムラインを受信できませんでした。"));
+                BackstageModel.RegisterEvent(new OperationFailedEvent("アカウントが登録されていないため、検索タイムラインを受信できませんでした。"));
                 return;
             }
             authInfo.GetListStatuses(slug: _listInfo.Slug, owner_screen_name: _listInfo.OwnerScreenName)
                     .Subscribe(ReceiveInbox.Queue,
-                               ex => BackpanelModel.RegisterEvent(
+                               ex => BackstageModel.RegisterEvent(
                                    new OperationFailedEvent("search receive error: \"" +
                                                             _listInfo.ToString() + "\", " +
                                                             authInfo.UnreliableScreenName + " - " +

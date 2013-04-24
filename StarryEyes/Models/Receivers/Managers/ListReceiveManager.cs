@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using StarryEyes.Breezy.Authorize;
-using StarryEyes.Models.Backpanels.SystemEvents;
+using StarryEyes.Models.Backstages.SystemEvents;
 using StarryEyes.Models.Receivers.ReceiveElements;
 using StarryEyes.Models.Stores;
 
@@ -24,7 +24,7 @@ namespace StarryEyes.Models.Receivers.Managers
             }
             else
             {
-                BackpanelModel.RegisterEvent(new ListReceiveFailedEvent(info));
+                BackstageModel.RegisterEvent(new ListReceiveFailedEvent(info));
             }
         }
 

@@ -1,9 +1,9 @@
 ﻿using StarryEyes.Breezy.DataModel;
 using StarryEyes.Views;
 
-namespace StarryEyes.Models.Backpanels.NotificationEvents.ThirdpartyEvents
+namespace StarryEyes.Models.Backstages.NotificationEvents.ThirdpartyEvents
 {
-    public class TrophyScceededEvent : BackpanelEventBase
+    public class TrophyScceededEvent : BackstageEventBase
     {
         public TwitterStatus Status { get; set; }
 
@@ -28,7 +28,7 @@ namespace StarryEyes.Models.Backpanels.NotificationEvents.ThirdpartyEvents
         }
     }
 
-    public class TrophyFailedEvent : BackpanelEventBase
+    public class TrophyFailedEvent : BackstageEventBase
     {
         public TwitterStatus Status { get; set; }
         public string Response { get; set; }

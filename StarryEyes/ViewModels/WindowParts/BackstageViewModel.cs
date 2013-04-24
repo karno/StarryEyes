@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 using System.Windows.Media;
 using Livet;
 using StarryEyes.Models;
-using StarryEyes.Models.Backpanels;
-using StarryEyes.Models.Backpanels.TwitterEvents;
+using StarryEyes.Models.Backstages;
+using StarryEyes.Models.Backstages.TwitterEvents;
 using StarryEyes.Settings;
 
 namespace StarryEyes.ViewModels.WindowParts
@@ -15,31 +15,31 @@ namespace StarryEyes.ViewModels.WindowParts
     /// <summary>
     ///     バックパネル ViewModel
     /// </summary>
-    public class BackpanelViewModel : ViewModel
+    public class BackstageViewModel : ViewModel
     {
         private readonly ReadOnlyDispatcherCollectionRx<TwitterEventViewModel> _events;
         private readonly object _syncLock = new object();
 
-        private readonly Queue<BackpanelEventBase> _waitingEvents =
-            new Queue<BackpanelEventBase>();
+        private readonly Queue<BackstageEventBase> _waitingEvents =
+            new Queue<BackstageEventBase>();
 
-        private BackpanelEventViewModel _currentEvent;
+        private BackstageEventViewModel _currentEvent;
 
         private bool _isDisposed;
 
         /// <summary>
         ///     for design-time support.
         /// </summary>
-        public BackpanelViewModel()
+        public BackstageViewModel()
         {
             _events = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
-                BackpanelModel.TwitterEvents,
+                BackstageModel.TwitterEvents,
                 tev => new TwitterEventViewModel(tev),
                 DispatcherHelper.UIDispatcher);
             CompositeDisposable.Add(
-                Observable.FromEvent<BackpanelEventBase>(
-                    h => BackpanelModel.OnEventRegistered += h,
-                    h => BackpanelModel.OnEventRegistered -= h)
+                Observable.FromEvent<BackstageEventBase>(
+                    h => BackstageModel.OnEventRegistered += h,
+                    h => BackstageModel.OnEventRegistered -= h)
                           .Subscribe(ev =>
                           {
                               lock (_syncLock)
@@ -75,7 +75,7 @@ namespace StarryEyes.ViewModels.WindowParts
             }
         }
 
-        public BackpanelEventViewModel CurrentEvent
+        public BackstageEventViewModel CurrentEvent
         {
             get { return _currentEvent; }
             set
@@ -101,7 +101,7 @@ namespace StarryEyes.ViewModels.WindowParts
         {
             while (true)
             {
-                BackpanelEventBase ev;
+                BackstageEventBase ev;
                 lock (_syncLock)
                 {
                     if (_isDisposed) return;
@@ -110,7 +110,7 @@ namespace StarryEyes.ViewModels.WindowParts
                     if (_isDisposed) return;
                     ev = _waitingEvents.Dequeue();
                 }
-                CurrentEvent = new BackpanelEventViewModel(ev);
+                CurrentEvent = new BackstageEventViewModel(ev);
                 ShowCurrentEvent = true;
                 Thread.Sleep(Math.Max(Setting.EventDisplayMinimumMSec.Value, 100));
                 lock (_syncLock)
@@ -125,16 +125,16 @@ namespace StarryEyes.ViewModels.WindowParts
         }
     }
 
-    public class BackpanelEventViewModel : ViewModel
+    public class BackstageEventViewModel : ViewModel
     {
-        private readonly BackpanelEventBase _sourceEvent;
+        private readonly BackstageEventBase _sourceEvent;
 
-        public BackpanelEventViewModel(BackpanelEventBase ev)
+        public BackstageEventViewModel(BackstageEventBase ev)
         {
             _sourceEvent = ev;
         }
 
-        public BackpanelEventBase SourceEvent
+        public BackstageEventBase SourceEvent
         {
             get { return _sourceEvent; }
         }
@@ -170,7 +170,7 @@ namespace StarryEyes.ViewModels.WindowParts
         }
     }
 
-    public class TwitterEventViewModel : BackpanelEventViewModel
+    public class TwitterEventViewModel : BackstageEventViewModel
     {
         public TwitterEventViewModel(TwitterEventBase tev)
             : base(tev)

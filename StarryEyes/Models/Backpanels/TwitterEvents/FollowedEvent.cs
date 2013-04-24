@@ -1,6 +1,6 @@
 ﻿using StarryEyes.Breezy.DataModel;
 
-namespace StarryEyes.Models.Backpanels.TwitterEvents
+namespace StarryEyes.Models.Backstages.TwitterEvents
 {
     public class FollowedEvent : TwitterEventBase
     {

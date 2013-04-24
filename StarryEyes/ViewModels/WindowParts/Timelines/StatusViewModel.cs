@@ -11,8 +11,8 @@ using StarryEyes.Breezy.DataModel;
 using StarryEyes.Breezy.Util;
 using StarryEyes.Filters;
 using StarryEyes.Models;
-using StarryEyes.Models.Backpanels.NotificationEvents;
-using StarryEyes.Models.Backpanels.TwitterEvents;
+using StarryEyes.Models.Backstages.NotificationEvents;
+using StarryEyes.Models.Backstages.TwitterEvents;
 using StarryEyes.Models.Operations;
 using StarryEyes.Models.Stores;
 using StarryEyes.Nightmare.Windows;
@@ -584,7 +584,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                                       .Catch((Exception ex) =>
                                       {
                                           onFail(a);
-                                          BackpanelModel.RegisterEvent(
+                                          BackstageModel.RegisterEvent(
                                               new OperationFailedEvent((add ? "" : "un") + "favorite failed: " +
                                                                        a.UnreliableScreenName + " -> " +
                                                                        Status.User.ScreenName + " :" +
@@ -617,7 +617,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                                       .Catch((Exception ex) =>
                                       {
                                           onFail(a);
-                                          BackpanelModel.RegisterEvent(
+                                          BackstageModel.RegisterEvent(
                                               new OperationFailedEvent((add ? "" : "un") + "retweet failed: " +
                                                                        a.UnreliableScreenName + " -> " +
                                                                        Status.User.ScreenName + " :" +
@@ -877,7 +877,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                     .Run()
                     .Subscribe(_ => StatusStore.Remove(_.Id),
                                ex =>
-                               BackpanelModel.RegisterEvent(new OperationFailedEvent("ツイートを削除できませんでした: " + ex.Message)));
+                               BackstageModel.RegisterEvent(new OperationFailedEvent("ツイートを削除できませんでした: " + ex.Message)));
             }
         }
 
@@ -963,10 +963,10 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                             o => o.Run()
                                   .Do(
                                       r =>
-                                      BackpanelModel.RegisterEvent(new BlockedEvent(o.Info.UserInfo, o.Target))))
+                                      BackstageModel.RegisterEvent(new BlockedEvent(o.Info.UserInfo, o.Target))))
                         .Subscribe(
                             _ => { },
-                            ex => BackpanelModel.RegisterEvent(new InternalErrorEvent(ex.Message)),
+                            ex => BackstageModel.RegisterEvent(new InternalErrorEvent(ex.Message)),
                             () => StatusStore.Find(
                                 s =>
                                 s.User.Id == this.Status.User.Id ||

@@ -1,8 +1,8 @@
 ﻿using StarryEyes.Views;
 
-namespace StarryEyes.Models.Backpanels.NotificationEvents
+namespace StarryEyes.Models.Backstages.NotificationEvents
 {
-    internal sealed class InternalErrorEvent : BackpanelEventBase
+    internal sealed class InternalErrorEvent : BackstageEventBase
     {
         private readonly string _description;
 

@@ -9,7 +9,7 @@ using System.Threading;
 using StarryEyes.Breezy.Api.Streaming;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
-using StarryEyes.Models.Backpanels.SystemEvents;
+using StarryEyes.Models.Backstages.SystemEvents;
 using StarryEyes.Models.Stores;
 
 namespace StarryEyes.Models.Receivers.ReceiveElements
@@ -265,11 +265,11 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
             CleanupConnection();
             Debug.WriteLine("*** USER STREAM DISCONNECT ***" + Environment.NewLine + header + Environment.NewLine + detail + Environment.NewLine);
             var discone = new UserStreamsDisconnectedEvent(AuthInfo, header + " - " + detail, this.Reconnect);
-            BackpanelModel.RegisterEvent(discone);
+            BackstageModel.RegisterEvent(discone);
             ConnectionState = UserStreamsConnectionState.WaitForReconnection;
             _currentConnection.Add(
                 Observable.Timer(TimeSpan.FromMinutes(5))
-                          .Do(_ => BackpanelModel.RemoveEvent(discone))
+                          .Do(_ => BackstageModel.RemoveEvent(discone))
                           .Subscribe(_ => Reconnect()));
         }
 

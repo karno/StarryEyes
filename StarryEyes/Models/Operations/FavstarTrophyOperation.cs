@@ -8,7 +8,7 @@ using StarryEyes.Breezy.Api.Parsing;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Breezy.Net;
-using StarryEyes.Models.Backpanels.NotificationEvents.ThirdpartyEvents;
+using StarryEyes.Models.Backstages.NotificationEvents.ThirdpartyEvents;
 using StarryEyes.Settings;
 
 namespace StarryEyes.Models.Operations
@@ -44,12 +44,12 @@ namespace StarryEyes.Models.Operations
                          .DeserializeJson<FavstarJsonResponse>()
                          .Select(response =>
                          {
-                             BackpanelModel.RegisterEvent(new TrophyScceededEvent(TargetStatus));
+                             BackstageModel.RegisterEvent(new TrophyScceededEvent(TargetStatus));
                              return Unit.Default;
                          })
                          .Catch((Exception ex) =>
                          {
-                             BackpanelModel.RegisterEvent(new TrophyFailedEvent(TargetStatus, ex.Message));
+                             BackstageModel.RegisterEvent(new TrophyFailedEvent(TargetStatus, ex.Message));
                              return Observable.Empty<Unit>();
                          });
         }

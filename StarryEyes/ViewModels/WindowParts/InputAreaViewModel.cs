@@ -22,7 +22,7 @@ using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Helpers;
 using StarryEyes.Models;
-using StarryEyes.Models.Backpanels.NotificationEvents.PostEvents;
+using StarryEyes.Models.Backstages.NotificationEvents.PostEvents;
 using StarryEyes.Models.Operations;
 using StarryEyes.Models.Stores;
 using StarryEyes.Nightmare.Windows;
@@ -970,14 +970,14 @@ namespace StarryEyes.ViewModels.WindowParts
                          if (_.PostedTweets != null)
                          {
                              InputAreaModel.PreviousPosted = _;
-                             BackpanelModel.RegisterEvent(new PostSucceededEvent(_));
+                             BackstageModel.RegisterEvent(new PostSucceededEvent(_));
                          }
                          else
                          {
                              var result = AnalysisFailedReason(_);
                              if (result.Item1)
                                  InputAreaModel.Drafts.Add(_);
-                             BackpanelModel.RegisterEvent(new PostFailedEvent(_, result.Item2));
+                             BackstageModel.RegisterEvent(new PostFailedEvent(_, result.Item2));
                          }
                      }, ex => Debug.WriteLine(ex));
         }

@@ -1,17 +1,17 @@
 ﻿using System;
 using Livet;
-using StarryEyes.Models.Backpanels;
-using StarryEyes.Models.Backpanels.SystemEvents;
-using StarryEyes.Models.Backpanels.TwitterEvents;
+using StarryEyes.Models.Backstages;
+using StarryEyes.Models.Backstages.SystemEvents;
+using StarryEyes.Models.Backstages.TwitterEvents;
 
 namespace StarryEyes.Models
 {
     /// <summary>
     /// バックパネル及びステータスエリアのモデル
     /// </summary>
-    public static class BackpanelModel
+    public static class BackstageModel
     {
-        static BackpanelModel()
+        static BackstageModel()
         {
         }
 
@@ -37,9 +37,9 @@ namespace StarryEyes.Models
             get { return _twitterEvents; }
         }
 
-        public static event Action<BackpanelEventBase> OnEventRegistered;
+        public static event Action<BackstageEventBase> OnEventRegistered;
 
-        public static void RegisterEvent(BackpanelEventBase ev)
+        public static void RegisterEvent(BackstageEventBase ev)
         {
             System.Diagnostics.Debug.WriteLine("EVENT: " + ev.Title + " - " + ev.Detail);
             var handler = OnEventRegistered;
@@ -71,7 +71,7 @@ namespace StarryEyes.Models
             }
         }
 
-        public static void RemoveEvent(BackpanelEventBase ev)
+        public static void RemoveEvent(BackstageEventBase ev)
         {
             var tev = ev as TwitterEventBase;
             if (tev != null)

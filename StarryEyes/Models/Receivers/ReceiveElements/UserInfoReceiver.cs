@@ -1,7 +1,7 @@
 ﻿using System;
 using StarryEyes.Breezy.Api.Rest;
 using StarryEyes.Breezy.Authorize;
-using StarryEyes.Models.Backpanels.NotificationEvents;
+using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Models.Stores;
 using StarryEyes.Settings;
 
@@ -31,7 +31,7 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
                          _authInfo.UserInfo = u;
                          UserStore.Store(u);
                      },
-                                ex => BackpanelModel.RegisterEvent(
+                                ex => BackstageModel.RegisterEvent(
                                     new OperationFailedEvent("user info receive error: " +
                                                              _authInfo.UnreliableScreenName + " - " +
                                                              ex.Message)));

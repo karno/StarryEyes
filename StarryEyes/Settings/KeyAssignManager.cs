@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using StarryEyes.Models;
-using StarryEyes.Models.Backpanels.NotificationEvents;
-using StarryEyes.Models.Backpanels.SystemEvents;
+using StarryEyes.Models.Backstages.NotificationEvents;
+using StarryEyes.Models.Backstages.SystemEvents;
 using StarryEyes.Settings.KeyAssigns;
 
 namespace StarryEyes.Settings
@@ -52,7 +52,7 @@ namespace StarryEyes.Settings
             }
             catch (Exception ex)
             {
-                BackpanelModel.RegisterEvent(new KeyAssignCouldNotLoadEvent(file, ex, () => Load(file)));
+                BackstageModel.RegisterEvent(new KeyAssignCouldNotLoadEvent(file, ex, () => Load(file)));
             }
         }
 
@@ -86,7 +86,7 @@ namespace StarryEyes.Settings
                 }
 
                 // not found
-                BackpanelModel.RegisterEvent(new KeyAssignProfileNotFoundEvent(profileId));
+                BackstageModel.RegisterEvent(new KeyAssignProfileNotFoundEvent(profileId));
                 return DefaultAssignProvider.GetEmpty();
             }
         }
@@ -159,7 +159,7 @@ namespace StarryEyes.Settings
         {
             if (_hasArgument != null && _hasArgument.Value == !String.IsNullOrEmpty(argument))
             {
-                BackpanelModel.RegisterEvent(
+                BackstageModel.RegisterEvent(
                     new OperationFailedEvent(
                         String.Format(_hasArgument.Value
                                           ? "キーバインド {0} には引数の指定が必要です。"

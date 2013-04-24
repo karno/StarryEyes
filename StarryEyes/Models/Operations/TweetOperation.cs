@@ -5,7 +5,7 @@ using System.Windows.Media.Imaging;
 using StarryEyes.Breezy.Api.Rest;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
-using StarryEyes.Models.Backpanels.NotificationEvents.PostEvents;
+using StarryEyes.Models.Backstages.NotificationEvents.PostEvents;
 using StarryEyes.Models.Stores;
 using StarryEyes.Settings;
 
@@ -82,7 +82,7 @@ namespace StarryEyes.Models.Operations
                                    }
                                    var source = this.AuthInfo;
                                    this.AuthInfo = fallbackAccount.AuthenticateInfo;
-                                   BackpanelModel.RegisterEvent(new FallbackedEvent(source, this.AuthInfo));
+                                   BackstageModel.RegisterEvent(new FallbackedEvent(source, this.AuthInfo));
                                    return this.ExecPost();
                                }
                                return Observable.Throw<TwitterStatus>(new TweetFailedException(s, ex));

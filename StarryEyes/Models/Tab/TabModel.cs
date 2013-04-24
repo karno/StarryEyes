@@ -10,7 +10,7 @@ using StarryEyes.Albireo.Data;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Filters;
 using StarryEyes.Filters.Parsing;
-using StarryEyes.Models.Backpanels.SystemEvents;
+using StarryEyes.Models.Backstages.SystemEvents;
 using StarryEyes.Models.Notifications;
 using StarryEyes.Models.Stores;
 using StarryEyes.Vanille.DataStore;
@@ -118,7 +118,7 @@ namespace StarryEyes.Models.Tab
             }
             catch (FilterQueryException fex)
             {
-                BackpanelModel.RegisterEvent(new QueryCorruptionEvent(Name, fex));
+                BackstageModel.RegisterEvent(new QueryCorruptionEvent(Name, fex));
                 _evaluator = _ => false;
             }
         }
@@ -137,7 +137,7 @@ namespace StarryEyes.Models.Tab
                 }
                 catch (FilterQueryException fex)
                 {
-                    BackpanelModel.RegisterEvent(new QueryCorruptionEvent(Name, fex));
+                    BackstageModel.RegisterEvent(new QueryCorruptionEvent(Name, fex));
                 }
             }
         }

@@ -23,7 +23,7 @@ namespace StarryEyes.ViewModels
     {
         #region Included viewmodels
 
-        private readonly BackpanelViewModel _backpanelViewModel;
+        private readonly BackstageViewModel _BackstageViewModel;
 
         private readonly AccountSelectionFlipViewModel _globalAccountSelectionFlipViewModel;
 
@@ -35,9 +35,9 @@ namespace StarryEyes.ViewModels
 
         private readonly SearchFlipViewModel _searchFlipViewModel;
 
-        public BackpanelViewModel BackpanelViewModel
+        public BackstageViewModel BackstageViewModel
         {
-            get { return _backpanelViewModel; }
+            get { return _BackstageViewModel; }
         }
 
         public InputAreaViewModel InputAreaViewModel
@@ -100,7 +100,7 @@ namespace StarryEyes.ViewModels
 
         public MainWindowViewModel()
         {
-            CompositeDisposable.Add(_backpanelViewModel = new BackpanelViewModel());
+            CompositeDisposable.Add(_BackstageViewModel = new BackstageViewModel());
             CompositeDisposable.Add(_inputAreaViewModel = new InputAreaViewModel());
             CompositeDisposable.Add(_mainAreaViewModel = new MainAreaViewModel());
             CompositeDisposable.Add(_globalAccountSelectionFlipViewModel = new AccountSelectionFlipViewModel());
@@ -114,7 +114,7 @@ namespace StarryEyes.ViewModels
                 h => MainWindowModel.OnConfirmMuteRequested += h,
                 h => MainWindowModel.OnConfirmMuteRequested -= h)
                 .Subscribe(OnMuteRequested));
-            _backpanelViewModel.Initialize();
+            _BackstageViewModel.Initialize();
         }
 
         private void SetFocus(FocusRequest req)
@@ -298,28 +298,28 @@ namespace StarryEyes.ViewModels
 
         #endregion
 
-        #region Toggle backpanel display
+        #region Toggle Backstage display
 
-        public bool IsBackpanelVisible
+        public bool IsBackstageVisible
         {
-            get { return this._isBackpanelVisible; }
+            get { return this._isBackstageVisible; }
             set
             {
-                this._isBackpanelVisible = value;
+                this._isBackstageVisible = value;
                 this.RaisePropertyChanged();
             }
         }
 
-        public void ToggleShowBackpanel()
+        public void ToggleShowBackstage()
         {
-            IsBackpanelVisible = !IsBackpanelVisible;
+            IsBackstageVisible = !IsBackstageVisible;
         }
 
         #endregion
 
         #region ShowSettingCommand
         private Livet.Commands.ViewModelCommand _showSettingCommand;
-        private bool _isBackpanelVisible;
+        private bool _isBackstageVisible;
 
         public Livet.Commands.ViewModelCommand ShowSettingCommand
         {

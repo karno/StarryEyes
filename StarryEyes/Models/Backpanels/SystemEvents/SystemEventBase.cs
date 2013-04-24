@@ -2,9 +2,9 @@
 using System.Windows.Media;
 using StarryEyes.Views;
 
-namespace StarryEyes.Models.Backpanels.SystemEvents
+namespace StarryEyes.Models.Backstages.SystemEvents
 {
-    public abstract class SystemEventBase : BackpanelEventBase
+    public abstract class SystemEventBase : BackstageEventBase
     {
         public override string Title
         {
