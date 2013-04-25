@@ -156,6 +156,12 @@ namespace StarryEyes.Views.Behaviors
             var highlight = new TextRange(_selectionStart, point);
             highlight.ApplyPropertyValue(TextElement.BackgroundProperty, this.HighlightBrush);
             highlight.ApplyPropertyValue(TextElement.ForegroundProperty, this.HighlightForegroundBrush);
+            var beforeRange = new TextRange(this.AssociatedObject.ContentStart, highlight.Start);
+            beforeRange.ApplyPropertyValue(TextElement.BackgroundProperty, Brushes.Transparent);
+            beforeRange.ApplyPropertyValue(TextElement.ForegroundProperty, Brushes.Black);
+            var afterRange = new TextRange(highlight.End, this.AssociatedObject.ContentEnd);
+            afterRange.ApplyPropertyValue(TextElement.BackgroundProperty, Brushes.Transparent);
+            afterRange.ApplyPropertyValue(TextElement.ForegroundProperty, Brushes.Black);
             this.SelectedText = highlight.Text;
         }
 
