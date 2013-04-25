@@ -308,7 +308,7 @@
     <Compile Include="Views\Behaviors\KeyHandlingBehavior.cs" />
     <Compile Include="Views\Behaviors\Planerator.cs" />
     <Compile Include="Views\Behaviors\SquaredScrollBehavior.cs" />
-    <Compile Include="Views\Behaviors\TextBlockDragSelectableBehavior.cs" />
+    <Compile Include="Views\Behaviors\TextBlockDragSelectBehavior.cs" />
     <Compile Include="Views\Behaviors\TimelineScrollLockerBehavior.cs" />
     <Compile Include="Views\Behaviors\TimelineTriggerBehavior.cs" />
     <Compile Include="Views\Controls\DropDownMenuButton.cs" />

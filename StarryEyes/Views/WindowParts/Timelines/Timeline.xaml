@@ -793,8 +793,8 @@
                                                    helpers:StatusStylizer.TwitterStatus="{Binding Status,
                                                                                                   Mode=OneTime}">
                                             <i:Interaction.Behaviors>
-                                                <behaviors:TextBlockDragSelectableBehavior SelectedText="{Binding SelectedText, Mode=OneWayToSource}">
-                                                    <behaviors:TextBlockDragSelectableBehavior.SelectContextMenu>
+                                                <behaviors:TextBlockDragSelectBehavior SelectedText="{Binding SelectedText, Mode=OneWayToSource}">
+                                                    <behaviors:TextBlockDragSelectBehavior.SelectContextMenu>
                                                         <ContextMenu DataContext="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
                                                             <MenuItem Header="クリップボードにコピー(_C)">
                                                                 <i:Interaction.Triggers>
@@ -803,7 +803,7 @@
                                                                     </i:EventTrigger>
                                                                 </i:Interaction.Triggers>
                                                             </MenuItem>
-                                                            <MenuItem Header="ツイート入力欄に設定(_I)">
+                                                            <MenuItem Header="ツイート入力欄にコピー(_I)">
                                                                 <i:Interaction.Triggers>
                                                                     <i:EventTrigger EventName="Click">
                                                                         <ei:CallMethodAction MethodName="SetTextToInputBox" TargetObject="{Binding}" />
@@ -834,8 +834,8 @@
                                                                 </i:Interaction.Triggers>
                                                             </MenuItem>
                                                         </ContextMenu>
-                                                    </behaviors:TextBlockDragSelectableBehavior.SelectContextMenu>
-                                                </behaviors:TextBlockDragSelectableBehavior>
+                                                    </behaviors:TextBlockDragSelectBehavior.SelectContextMenu>
+                                                </behaviors:TextBlockDragSelectBehavior>
                                             </i:Interaction.Behaviors>
                                         </TextBlock>
                                         <Border Grid.Column="1"

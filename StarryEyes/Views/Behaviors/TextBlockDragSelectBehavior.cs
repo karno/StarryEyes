@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Windows;
@@ -12,7 +11,7 @@ using System.Windows.Media;
 
 namespace StarryEyes.Views.Behaviors
 {
-    public class TextBlockDragSelectableBehavior : Behavior<TextBlock>
+    public class TextBlockDragSelectBehavior : Behavior<TextBlock>
     {
         private bool _initialized;
         private bool _isSelectingText;
@@ -28,7 +27,7 @@ namespace StarryEyes.Views.Behaviors
         // Using a DependencyProperty as the backing store for HighlightBrush.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty HighlightBrushProperty =
             DependencyProperty.Register("HighlightBrush", typeof(Brush),
-                                        typeof(TextBlockDragSelectableBehavior),
+                                        typeof(TextBlockDragSelectBehavior),
                                         new PropertyMetadata(SystemColors.HighlightBrush));
 
 
@@ -42,7 +41,7 @@ namespace StarryEyes.Views.Behaviors
         // Using a DependencyProperty as the backing store for HighlightForegroundBrush.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty HighlightForegroundBrushProperty =
             DependencyProperty.Register("HighlightForegroundBrush", typeof(Brush),
-                                        typeof(TextBlockDragSelectableBehavior),
+                                        typeof(TextBlockDragSelectBehavior),
                                         new PropertyMetadata(SystemColors.HighlightTextBrush));
 
         public string SelectedText
@@ -54,7 +53,7 @@ namespace StarryEyes.Views.Behaviors
         // Using a DependencyProperty as the backing store for SelectedText.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty SelectedTextProperty =
             DependencyProperty.Register("SelectedText", typeof(string),
-            typeof(TextBlockDragSelectableBehavior),
+            typeof(TextBlockDragSelectBehavior),
                                         new PropertyMetadata(null));
 
         public ContextMenu SelectContextMenu
@@ -66,7 +65,7 @@ namespace StarryEyes.Views.Behaviors
         // Using a DependencyProperty as the backing store for SelectContextMenu.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty SelectContextMenuProperty =
             DependencyProperty.Register("SelectContextMenu", typeof(ContextMenu),
-                                        typeof(TextBlockDragSelectableBehavior),
+                                        typeof(TextBlockDragSelectBehavior),
                                         new PropertyMetadata(null));
 
         protected override void OnAttached()
