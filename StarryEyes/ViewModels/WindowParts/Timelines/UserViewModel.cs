@@ -91,8 +91,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public void OpenUserDetail()
         {
-            if (Keyboard.Modifiers.HasFlag(Key.LeftCtrl) ||
-                Keyboard.Modifiers.HasFlag(Key.RightCtrl))
+            if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
             {
                 OpenUserDetailOnTwitter();
             }
