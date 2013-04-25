@@ -415,12 +415,12 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public void ShowUserProfile()
         {
-
+            SearchFlipModel.RequestSearch(this.User.ScreenName, SearchMode.UserScreenName);
         }
 
-        public void OpenRetweeterProfile()
+        public void ShowRetweeterProfile()
         {
-
+            SearchFlipModel.RequestSearch(this.Retweeter.ScreenName, SearchMode.UserScreenName);
         }
 
         public void OpenWeb()

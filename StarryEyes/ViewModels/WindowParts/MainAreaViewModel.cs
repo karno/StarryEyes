@@ -148,6 +148,8 @@ namespace StarryEyes.ViewModels.WindowParts
                 KeyAssignAction.Create("Copy", () => ExecuteStatusAction(s => s.CopyBody())),
                 KeyAssignAction.Create("CopySTOT", () => ExecuteStatusAction(s => s.CopySTOT())),
                 KeyAssignAction.Create("CopyPermalink", () => ExecuteStatusAction(s => s.CopyPermalink())),
+                KeyAssignAction.Create("ShowUserProfile", () => ExecuteStatusAction(s => s.ShowUserProfile())),
+                KeyAssignAction.Create("ShowRetweeterProfile", () => ExecuteStatusAction(s => s.ShowRetweeterProfile())),
                 KeyAssignAction.Create("OpenWeb", () => ExecuteStatusAction(s => s.OpenWeb())),
                 KeyAssignAction.Create("OpenFavstar", () => ExecuteStatusAction(s => s.OpenFavstar())),
                 KeyAssignAction.Create("OpenUserWeb", () => ExecuteStatusAction(s => s.OpenUserWeb())),

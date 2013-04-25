@@ -1234,7 +1234,7 @@
                                                    TextWrapping="NoWrap">
                                             <i:Interaction.Triggers>
                                                 <i:EventTrigger EventName="MouseLeftButtonDown">
-                                                    <ei:CallMethodAction MethodName="OpenRetweeterProfile" TargetObject="{Binding}" />
+                                                    <ei:CallMethodAction MethodName="ShowRetweeterProfile" TargetObject="{Binding}" />
                                                 </i:EventTrigger>
                                             </i:Interaction.Triggers>
                                         </TextBlock>
