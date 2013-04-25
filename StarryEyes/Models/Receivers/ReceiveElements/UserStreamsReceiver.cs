@@ -100,6 +100,7 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
 
         public void Reconnect()
         {
+            System.Diagnostics.Debug.WriteLine("*** USER STREAMS RECONNECTING ***");
             if (!IsEnabled)
             {
                 Disconnect();
