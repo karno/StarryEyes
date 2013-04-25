@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Windows;
@@ -499,12 +498,12 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public void FindOnKrile()
         {
-            SearchFlipModel.SearchRequest(SelectedText, SearchMode.Local);
+            SearchFlipModel.RequestSearch(SelectedText, SearchMode.Local);
         }
 
         public void FindOnTwitter()
         {
-            SearchFlipModel.SearchRequest(SelectedText, SearchMode.Web);
+            SearchFlipModel.RequestSearch(SelectedText, SearchMode.Web);
         }
 
         private const string GoogleUrl = @"http://www.google.com/search?q={0}";
@@ -512,14 +511,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         {
             var encoded = HttpUtility.UrlEncode(SelectedText);
             var url = String.Format(GoogleUrl, encoded);
-            try
-            {
-                Process.Start(url);
-            }
-            catch
-            {
-
-            }
+            BrowserHelper.Open(url);
         }
 
         #endregion
@@ -1040,10 +1032,10 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             switch (param.Item1)
             {
                 case LinkType.User:
-                    BrowserHelper.Open("http://twitter.com/" + param.Item2);
+                    SearchFlipModel.RequestSearch(param.Item2, SearchMode.UserScreenName);
                     break;
                 case LinkType.Hash:
-                    BrowserHelper.Open("http://twitter.com/search/?q=" + param.Item2);
+                    SearchFlipModel.RequestSearch(param.Item2, SearchMode.Web);
                     break;
                 case LinkType.Url:
                     BrowserHelper.Open(param.Item2);

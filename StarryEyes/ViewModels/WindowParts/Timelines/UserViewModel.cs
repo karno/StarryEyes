@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows.Input;
 using Livet;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Models;
@@ -86,6 +87,29 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                     return uri;
                 return null;
             }
+        }
+
+        public void OpenUserDetail()
+        {
+            if (Keyboard.Modifiers.HasFlag(Key.LeftCtrl) ||
+                Keyboard.Modifiers.HasFlag(Key.RightCtrl))
+            {
+                OpenUserDetailOnTwitter();
+            }
+            else
+            {
+                OpenUserDetailLocal();
+            }
+        }
+
+        public void OpenUserDetailLocal()
+        {
+            SearchFlipModel.RequestSearch(this.ScreenName, SearchMode.UserScreenName);
+        }
+
+        public void OpenUserDetailOnTwitter()
+        {
+            BrowserHelper.Open("http://twitter.com/" + this.ScreenName);
         }
     }
 }

@@ -32,7 +32,13 @@
                                     ToolTip="{Binding ScreenName,
                                                       Mode=OneTime}"
                                     UriSource="{Binding ProfileImageUri,
-                                                        Mode=OneTime}" />
+                                                        Mode=OneTime}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="MouseLeftButtonDown">
+                            <ei:CallMethodAction MethodName="OpenUserDetail" TargetObject="{Binding Mode=OneTime}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </controls:LazyImage>
             </DataTemplate>
             <DataTemplate x:Key="StatusItemTemplate">
                 <Border x:Name="MainBorder"
