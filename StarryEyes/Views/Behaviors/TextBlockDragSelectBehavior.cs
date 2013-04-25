@@ -112,6 +112,10 @@ namespace StarryEyes.Views.Behaviors
                 e.Handled = true;
                 this.SelectFinished();
             }
+            else
+            {
+                this.FinalizeSelect();
+            }
         }
 
         void AssociatedObject_MouseLeave(object sender, MouseEventArgs e)

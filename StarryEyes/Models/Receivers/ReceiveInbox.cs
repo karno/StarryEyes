@@ -28,6 +28,8 @@ namespace StarryEyes.Models.Receivers
             _pumpThread.Start();
         }
 
+        // ReSharper disable FunctionNeverReturns
+        // ReSharper disable TooWideLocalVariableScope
         private static async void PumpQueuedStatuses()
         {
             TwitterStatus status;
@@ -45,7 +47,10 @@ namespace StarryEyes.Models.Receivers
                 }
                 System.Diagnostics.Debug.WriteLine("*INBOX* wait for receiving...");
                 _signal.WaitOne();
+
             }
         }
+        // ReSharper restore TooWideLocalVariableScope
+        // ReSharper restore FunctionNeverReturns
     }
 }
