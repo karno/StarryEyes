@@ -250,13 +250,6 @@
                                 </MenuItem>
                             </MenuItem>
                             <MenuItem Header="ミュート(_X)">
-                                <MenuItem Header="キーワードをミュート(_K)">
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="Click">
-                                            <ei:CallMethodAction MethodName="MuteKeyword" TargetObject="{Binding}" />
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                </MenuItem>
                                 <MenuItem Header="ユーザーをミュート(_U)">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="Click">
@@ -836,6 +829,14 @@
                                                                 <i:Interaction.Triggers>
                                                                     <i:EventTrigger EventName="Click">
                                                                         <ei:CallMethodAction MethodName="FindOnGoogle" TargetObject="{Binding}" />
+                                                                    </i:EventTrigger>
+                                                                </i:Interaction.Triggers>
+                                                            </MenuItem>
+                                                            <Separator />
+                                                            <MenuItem Header="キーワードをミュート(_M)">
+                                                                <i:Interaction.Triggers>
+                                                                    <i:EventTrigger EventName="Click">
+                                                                        <ei:CallMethodAction MethodName="MuteKeyword" TargetObject="{Binding}" />
                                                                     </i:EventTrigger>
                                                                 </i:Interaction.Triggers>
                                                             </MenuItem>

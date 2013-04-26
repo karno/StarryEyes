@@ -828,7 +828,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             var msg = new TaskDialogMessage(new TaskDialogOptions
             {
                 AllowDialogCancellation = true,
-                CommonButtons = TaskDialogCommonButtons.OKCancel,
+                CustomButtons = new[] { "削除", "キャンセル" },
                 Content = "削除したツイートはもとに戻せません。",
                 FooterIcon = VistaTaskDialogIcon.Information,
                 MainIcon = VistaTaskDialogIcon.Warning,
@@ -837,7 +837,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                 Title = "ツイートの削除",
             });
             var response = this.Parent.Messenger.GetResponse(msg);
-            if (response.Response.Result == TaskDialogSimpleResult.Ok)
+            if (response.Response.CustomButtonResult == 0)
             {
                 Delete();
             }
@@ -933,43 +933,67 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             var msg = new TaskDialogMessage(new TaskDialogOptions
             {
                 AllowDialogCancellation = true,
-                CommonButtons = TaskDialogCommonButtons.OKCancel,
+                CustomButtons = new[] { "スパム報告", "キャンセル" },
                 MainIcon = VistaTaskDialogIcon.Warning,
                 MainInstruction = "ユーザー " + Status.User.ScreenName + " をスパム報告しますか？",
                 Content = "全てのアカウントからブロックし、代表のアカウントからスパム報告します。",
                 Title = "ユーザーをスパムとして報告",
             });
             var response = this.Parent.Messenger.GetResponse(msg);
-            if (response.Response.Result == TaskDialogSimpleResult.Ok)
-            {
-                // report as a spam
-                var accounts = AccountsStore.Accounts.ToArray();
-                var reporter = accounts.FirstOrDefault();
-                if (reporter == null) return;
-                accounts.Select(a => a.AuthenticateInfo)
-                        .Select(a => new UpdateRelationOperation(a, Status.User, RelationKind.Block))
-                        .Append(new UpdateRelationOperation(reporter.AuthenticateInfo, Status.User,
-                                                            RelationKind.ReportAsSpam))
-                        .ToObservable()
-                        .SelectMany(
-                            o => o.Run()
-                                  .Do(
-                                      r =>
-                                      BackstageModel.RegisterEvent(new BlockedEvent(o.Info.UserInfo, o.Target))))
-                        .Subscribe(
-                            _ => { },
-                            ex => BackstageModel.RegisterEvent(new InternalErrorEvent(ex.Message)),
-                            () => StatusStore.Find(
-                                s =>
-                                s.User.Id == this.Status.User.Id ||
-                                (s.RetweetedOriginal != null && s.RetweetedOriginal.User.Id == this.Status.User.Id))
-                                             .Subscribe(s => StatusStore.Remove(s.Id)));
-            }
+            if (response.Response.CustomButtonResult != 0) return;
+            // report as a spam
+            var accounts = AccountsStore.Accounts.ToArray();
+            var reporter = accounts.FirstOrDefault();
+            if (reporter == null) return;
+            accounts.Select(a => a.AuthenticateInfo)
+                    .Select(a => new UpdateRelationOperation(a, this.Status.User, RelationKind.Block))
+                    .Append(new UpdateRelationOperation(reporter.AuthenticateInfo, this.Status.User,
+                                                        RelationKind.ReportAsSpam))
+                    .ToObservable()
+                    .SelectMany(
+                        o => o.Run()
+                              .Do(
+                                  r =>
+                                  BackstageModel.RegisterEvent(new BlockedEvent(o.Info.UserInfo, o.Target))))
+                    .Subscribe(
+                        _ => { },
+                        ex => BackstageModel.RegisterEvent(new InternalErrorEvent(ex.Message)),
+                        () => StatusStore.Find(
+                            s =>
+                            s.User.Id == this.Status.User.Id ||
+                            (s.RetweetedOriginal != null && s.RetweetedOriginal.User.Id == this.Status.User.Id))
+                                         .Subscribe(s => StatusStore.Remove(s.Id)));
         }
 
         public void MuteKeyword()
         {
+            if (String.IsNullOrWhiteSpace(SelectedText))
+            {
+                this.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
+                {
+                    CommonButtons = TaskDialogCommonButtons.Close,
+                    MainIcon = VistaTaskDialogIcon.Information,
+                    MainInstruction = "キーワードを選択してください。",
+                    Content = "ミュートしたいキーワードをドラッグで選択できます。",
+                    Title = "キーワードのミュート",
+                }));
+            }
             // TODO
+            var msg = new TaskDialogMessage(new TaskDialogOptions
+            {
+                AllowDialogCancellation = true,
+                CustomButtons = new[] { "ミュート", "キャンセル" },
+                MainIcon = VistaTaskDialogIcon.Warning,
+                MainInstruction = "キーワード " + SelectedText + " をミュートしますか？",
+                Content = "このキーワードを含むツイートが全てのタブから除外されるようになります。",
+                FooterIcon = VistaTaskDialogIcon.Information,
+                FooterText = "ミュートの解除は設定画面から行えます。",
+                Title = "キーワードミュート",
+            });
+            var response = this.Parent.Messenger.GetResponse(msg);
+            if (response.Response.CustomButtonResult != 0) return;
+            // TODO: Mute
+            System.Diagnostics.Debug.WriteLine("Mute: " + Status.User.ScreenName);
         }
 
         public void MuteUser()
@@ -977,7 +1001,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             var msg = new TaskDialogMessage(new TaskDialogOptions
             {
                 AllowDialogCancellation = true,
-                CommonButtons = TaskDialogCommonButtons.OKCancel,
+                CustomButtons = new[] { "ミュート", "キャンセル" },
                 MainIcon = VistaTaskDialogIcon.Warning,
                 MainInstruction = "ユーザー " + Status.User.ScreenName + " をミュートしますか？",
                 Content = "このユーザーのツイートが全てのタブから除外されるようになります。",
@@ -986,12 +1010,9 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                 Title = "ユーザーのミュート",
             });
             var response = this.Parent.Messenger.GetResponse(msg);
-            if (response.Response.Result == TaskDialogSimpleResult.Ok)
-            {
-                // report as a spam
-                // TODO
-                System.Diagnostics.Debug.WriteLine("Mute: " + Status.User.ScreenName);
-            }
+            if (response.Response.CustomButtonResult != 0) return;
+            // TODO: Mute
+            System.Diagnostics.Debug.WriteLine("Mute: " + Status.User.ScreenName);
         }
 
         public void MuteClient()
@@ -1001,7 +1022,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                 AllowDialogCancellation = true,
                 CommonButtons = TaskDialogCommonButtons.OKCancel,
                 MainIcon = VistaTaskDialogIcon.Warning,
-                MainInstruction = "クライアント " + SourceText + " をスパム報告しますか？",
+                MainInstruction = "クライアント " + SourceText + " をミュートしますか？",
                 Content = "このクライアントからのツイートが全てのタブから除外されるようになります。",
                 FooterIcon = VistaTaskDialogIcon.Information,
                 FooterText = "ミュートの解除は設定画面から行えます。",

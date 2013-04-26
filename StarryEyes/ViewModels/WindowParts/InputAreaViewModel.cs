@@ -703,26 +703,26 @@ namespace StarryEyes.ViewModels.WindowParts
         {
             if (CanSaveToDraft && InputInfo.InitialText != InputInfo.Text)
             {
-                TweetBoxClosingAction action = Setting.TweetBoxClosingAction.Value;
+                var action = Setting.TweetBoxClosingAction.Value;
                 if (action == TweetBoxClosingAction.Confirm)
                 {
-                    TaskDialogMessage msg = Messenger.GetResponse(new TaskDialogMessage(
-                                                                      new TaskDialogOptions
-                                                                      {
-                                                                          MainInstruction = "現在の内容を下書きに保存しますか？",
-                                                                          AllowDialogCancellation = true,
-                                                                          CommonButtons =
-                                                                              TaskDialogCommonButtons.YesNoCancel,
-                                                                          MainIcon = VistaTaskDialogIcon.Information,
-                                                                          Title = "下書きへの保存",
-                                                                          VerificationText = "次回から表示しない"
-                                                                      }));
-                    switch (msg.Response.Result)
+                    var msg = Messenger.GetResponse(
+                        new TaskDialogMessage(
+                            new TaskDialogOptions
+                            {
+                                MainInstruction = "現在の内容を下書きに保存しますか？",
+                                AllowDialogCancellation = true,
+                                CustomButtons = new[] { "保存(&Y)", "破棄(&N)", "キャンセル" },
+                                MainIcon = VistaTaskDialogIcon.Information,
+                                Title = "下書きへの保存",
+                                VerificationText = "次回から表示しない"
+                            }));
+                    switch (msg.Response.CustomButtonResult)
                     {
-                        case TaskDialogSimpleResult.Yes:
+                        case 0:
                             action = TweetBoxClosingAction.SaveToDraft;
                             break;
-                        case TaskDialogSimpleResult.No:
+                        case 1:
                             action = TweetBoxClosingAction.Discard;
                             break;
                         default:

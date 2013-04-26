@@ -158,7 +158,6 @@ namespace StarryEyes.ViewModels.WindowParts
                 KeyAssignAction.Create("OpenSource", () => ExecuteStatusAction(s => s.OpenSourceLink())),
                 KeyAssignAction.Create("OpenThumbnail", () => ExecuteStatusAction(s => s.OpenFirstImage())),
                 KeyAssignAction.Create("OpenConversation", () => ExecuteStatusAction(s => s.ShowConversation())),
-                KeyAssignAction.Create("MuteKeyword", () => ExecuteStatusAction(s => s.MuteKeyword())),
                 KeyAssignAction.Create("MuteUser", () => ExecuteStatusAction(s => s.MuteUser())),
                 KeyAssignAction.Create("MuteClient", () => ExecuteStatusAction(s => s.MuteClient())),
                 KeyAssignAction.Create("ReportAsSpam", () => ExecuteStatusAction(s => s.ReportAsSpam())),

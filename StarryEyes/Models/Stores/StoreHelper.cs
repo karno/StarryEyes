@@ -53,8 +53,11 @@ namespace StarryEyes.Models.Stores
         public static IObservable<TwitterUser> GetUser(string screenName)
         {
             return UserStore.Get(screenName)
-                .Where(_ => _ != null)
-                .ConcatIfEmpty(() => GetRandomAuthInfo().SelectMany(a => a.ShowUser(screenName: screenName).Do(UserStore.Store)));
+                            .Where(_ => _ != null)
+                            .ConcatIfEmpty(() =>
+                                           GetRandomAuthInfo()
+                                               .SelectMany(a => a.ShowUser(screenName: screenName)
+                                                                 .Do(UserStore.Store)));
         }
 
         public static IObservable<AuthenticateInfo> GetRandomAuthInfo()

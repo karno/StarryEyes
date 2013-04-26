@@ -98,11 +98,11 @@ namespace StarryEyes.ViewModels.Dialogs
                          MainInstruction = "APIキーの設定をスキップしますか？",
                          Content = "スキップする場合、いくつか制限が適用されます。" + Environment.NewLine +
                          "後からもキーを設定できますが、その際にすべてのアカウントを認証しなおす必要があります。",
-                         CommonButtons = TaskDialogCommonButtons.OKCancel,
+                         CommandButtons = new[] { "スキップ", "キャンセル" },
                          ExpandedInfo = "APIキーの状況によってはアカウントが登録できないことがあります。" + Environment.NewLine +
                          "また、最大登録可能アカウント数も制限されます。"
                      }));
-                if (m.Response.Result == TaskDialogSimpleResult.Ok)
+                if (m.Response.CustomButtonResult.HasValue && m.Response.CustomButtonResult.Value == 0)
                 {
                     this.Messenger.Raise(new WindowActionMessage(WindowAction.Close));
                 }
