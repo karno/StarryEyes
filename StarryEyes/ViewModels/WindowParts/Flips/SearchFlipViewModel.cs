@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Text.RegularExpressions;
@@ -23,7 +24,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         private readonly SearchCandidateViewModel _candidateViewModel;
         private SearchResultViewModel _resultViewModel;
-        private UserCandidateViewModel _userViewModel;
+        private UserResultViewModel _userViewModel;
         private UserInfoViewModel _userInfoViewModel;
 
         public SearchFlipViewModel()
@@ -75,7 +76,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 }
             }
         }
-        public UserCandidateViewModel UserCandidate
+        public UserResultViewModel UserResult
         {
             get { return _userViewModel; }
             private set
@@ -346,18 +347,24 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         #endregion
 
+        private readonly Stack<Tuple<string, SearchMode>> _backStack = new Stack<Tuple<string, SearchMode>>();
         private string _previousCommit;
         private void CommitSearch()
         {
             _previousCommit = Text;
+            if (_backStack.Count > 0 && (_backStack.Peek().Item1 == Text || _backStack.Peek().Item2 == SearchMode.Quick))
+            {
+                _backStack.Pop();
+            }
+            _backStack.Push(Tuple.Create(Text, SearchMode));
             if (String.IsNullOrWhiteSpace(Text))
             {
                 IsSearchResultAvailable = false;
                 return;
             }
-            SearchResult = null;
-            UserCandidate = null;
-            UserInfo = null;
+            this.SearchResult = null;
+            this.UserResult = null;
+            this.UserInfo = null;
             if (IsQueryMode)
             {
                 SearchResult = new SearchResultViewModel(this, Text.Substring(1), SearchOption.Query);
@@ -376,9 +383,10 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                         SearchResult = new SearchResultViewModel(this, Text, SearchOption.Web);
                         break;
                     case SearchMode.UserWeb:
-                        UserCandidate = new UserCandidateViewModel(Text);
+                        this.UserResult = new UserResultViewModel(this, Text);
                         break;
                     case SearchMode.UserScreenName:
+                        this.UserInfo = new UserInfoViewModel(this, Text);
                         break;
                     default:
                         IsSearchResultAvailable = false;
@@ -387,6 +395,31 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             }
             IsSearchResultAvailable = true;
         }
-    }
 
+        public void RewindStack()
+        {
+            if (_backStack.Count == 0)
+            {
+                this.Close();
+            }
+            _backStack.Pop();
+            if (_backStack.Count == 0)
+            {
+                this.Close();
+            }
+            else
+            {
+                var item = _backStack.Peek();
+                this.Text = item.Item1;
+                if (this.SearchMode == item.Item2)
+                {
+                    this.CommitSearch();
+                }
+                else
+                {
+                    this.SearchMode = item.Item2;
+                }
+            }
+        }
+    }
 }

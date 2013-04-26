@@ -301,11 +301,11 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
                     var isFollowed = elem.EventType == EventType.Follow;
                     if (source == AuthInfo.Id) // follow or remove
                     {
-                        AuthInfo.Get().SetFollowing(target, isFollowed);
+                        AuthInfo.GetRelationData().SetFollowing(target, isFollowed);
                     }
                     else if (target == AuthInfo.Id) // followed or removed
                     {
-                        AuthInfo.Get().SetFollower(source, isFollowed);
+                        AuthInfo.GetRelationData().SetFollower(source, isFollowed);
                     }
                     else
                     {
@@ -316,11 +316,11 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
                     break;
                 case EventType.Blocked:
                     if (elem.EventSourceUser.Id != AuthInfo.Id) return;
-                    AuthInfo.Get().AddBlocking(elem.EventTargetUser.Id);
+                    AuthInfo.GetRelationData().AddBlocking(elem.EventTargetUser.Id);
                     break;
                 case EventType.Unblocked:
                     if (elem.EventSourceUser.Id != AuthInfo.Id) return;
-                    AuthInfo.Get().RemoveBlocking(elem.EventTargetUser.Id);
+                    AuthInfo.GetRelationData().RemoveBlocking(elem.EventTargetUser.Id);
                     break;
                 default:
                     RegisterEvent(elem);

@@ -3,6 +3,8 @@ namespace StarryEyes.Models.Tab
 {
     public static class CommonTabBuilder
     {
+        public static readonly string Empty = "from all where ()";
+
         private static TabModel SetDefaultParams(this TabModel model)
         {
             model.IsShowUnreadCounts = true;

@@ -43,7 +43,7 @@ namespace StarryEyes.Breezy.Api
         /// <returns></returns>
         internal static OAuthClient GetOAuthClient(this AuthenticateInfo info, bool useGzip = true)
         {
-            OAuthClient client = info.AccessToken.GetOAuthClient(
+            var client = info.AccessToken.GetOAuthClient(
                 info.OverridedConsumerKey, info.OverridedConsumerSecret);
             return useGzip ? client.UseGZip() : client;
         }

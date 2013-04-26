@@ -92,10 +92,11 @@ namespace StarryEyes.Views.Behaviors
 
         private void ItemsSourceChanged()
         {
-            var nc = ItemsSource as INotifyCollectionChanged;
+            var capture = ItemsSource;
+            var nc = capture as INotifyCollectionChanged;
             if (nc == null) return;
 
-            this._previousItemCount = this.ItemsSource.Count;
+            this._previousItemCount = capture.Count;
             var listener = nc.ListenCollectionChanged()
                              .Subscribe(ev =>
                              {
@@ -108,13 +109,13 @@ namespace StarryEyes.Views.Behaviors
                                              new GeneratorPosition(0, 0));
                                          if (ev.NewStartingIndex > index)
                                          {
-                                             this._previousItemCount = this.ItemsSource.Count;
+                                             this._previousItemCount = capture.Count;
                                          }
                                      }
                                  }
                                  else
                                  {
-                                     this._previousItemCount = this.ItemsSource.Count;
+                                     this._previousItemCount = capture.Count;
                                  }
                              });
             var disposable = Interlocked.Exchange(

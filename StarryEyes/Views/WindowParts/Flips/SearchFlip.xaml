@@ -70,6 +70,7 @@
     <i:Interaction.Triggers>
         <custom:InteractionMessageTrigger Messenger="{Binding Messenger}">
             <behaviors:GoToStateInteractionMessageAction />
+            <behaviors:TaskDialogInteractionMessageAction />
         </custom:InteractionMessageTrigger>
     </i:Interaction.Triggers>
     <Grid x:Name="OuterGrid">
@@ -263,6 +264,9 @@
             </i:Interaction.Triggers>
             <DockPanel Visibility="{Binding SearchResult, Converter={StaticResource NotNullToVisibleConverter}}">
                 <SearchFlips:SearchResult DataContext="{Binding SearchResult}" />
+            </DockPanel>
+            <DockPanel Visibility="{Binding UserResult, Converter={StaticResource NotNullToVisibleConverter}}">
+                <SearchFlips:UserResult DataContext="{Binding UserResult}" />
             </DockPanel>
         </Grid>
 
@@ -463,7 +467,7 @@
                         <Style TargetType="Grid">
                             <Setter Property="Background" Value="Transparent" />
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding SearchMode}" Value="UserId">
+                                <DataTrigger Binding="{Binding SearchMode}" Value="UserScreenName">
                                     <Setter Property="Background" Value="#FF5C83C2" />
                                 </DataTrigger>
                             </Style.Triggers>

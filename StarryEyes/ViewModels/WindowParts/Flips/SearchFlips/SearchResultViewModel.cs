@@ -19,6 +19,12 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
     public class SearchResultViewModel : TimelineViewModelBase
     {
         private readonly SearchFlipViewModel _parent;
+
+        public SearchFlipViewModel Parent
+        {
+            get { return this._parent; }
+        }
+
         private readonly string _query;
         public string Query
         {
@@ -33,7 +39,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
 
         public SearchResultViewModel(SearchFlipViewModel parent, string query, SearchOption option)
         {
-            _parent = parent;
+            this._parent = parent;
             _query = query;
             _option = option;
             _timelineModel = new TimelineModel(
@@ -98,7 +104,9 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                                         .Select(s => s.AuthenticateInfo)
                                         .FirstOrDefault();
                 if (info == null)
+                {
                     return Observable.Empty<TwitterStatus>();
+                }
                 return fetch.Merge(info.SearchTweets(_query, count: count, max_id: maxId)
                                        .Catch((Exception ex) =>
                                        {
@@ -136,14 +144,41 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
         public void Close()
         {
             MainAreaViewModel.TimelineActionTargetOverride = null;
-            _parent.Close();
+            this.Parent.RewindStack();
         }
 
         public void PinToTab()
         {
-            // TODO: Implement
+            TabManager.CreateTab(
+                new TabModel(Query, this.CreateFilterQuery(Query, _option)));
             Close();
         }
+
+        private string CreateFilterQuery(string query, SearchOption option)
+        {
+            if (option == SearchOption.Query)
+            {
+                try
+                {
+                    QueryCompiler.Compile(query).GetEvaluator();
+                    return _query;
+                }
+                catch
+                {
+                    return CommonTabBuilder.Empty;
+                }
+            }
+            var splitted = query.Split(new[] { " ", "\t", "　" },
+                                       StringSplitOptions.RemoveEmptyEntries)
+                                .Distinct().ToArray();
+            var positive = splitted.Where(s => !s.StartsWith("-")).ToArray();
+            var negative = splitted.Where(s => s.StartsWith("-")).Select(s => s.Substring(1)).ToArray();
+            return
+                positive.Select(s => "text == \"" + s + "\"")
+                        .Concat(negative.Select(s => "text != \"" + s + "\""))
+                        .JoinString("&&");
+        }
+
     }
 
     /// <summary>

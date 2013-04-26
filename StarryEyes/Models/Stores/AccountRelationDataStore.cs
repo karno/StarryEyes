@@ -38,7 +38,7 @@ namespace StarryEyes.Models.Stores
         /// </summary>
         /// <param name="info">lookup account</param>
         /// <returns>account data</returns>
-        public static AccountRelationData Get(this AuthenticateInfo info)
+        public static AccountRelationData GetRelationData(this AuthenticateInfo info)
         {
             return Get(info.Id);
         }

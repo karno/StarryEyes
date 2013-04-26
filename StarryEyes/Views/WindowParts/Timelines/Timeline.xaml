@@ -646,7 +646,13 @@
                                         <controls:LazyImage DecodePixelWidth="48"
                                                             UriSource="{Binding User.ProfileImageUri,
                                                                                 Mode=OneTime}"
-                                                            UseLayoutRounding="True" />
+                                                            UseLayoutRounding="True">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="MouseLeftButtonDown">
+                                                    <ei:CallMethodAction MethodName="ShowUserProfile" TargetObject="{Binding}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </controls:LazyImage>
                                     </Border>
                                     <Border x:Name="CheckBoxBorder"
                                             Grid.ColumnSpan="1"
@@ -713,7 +719,13 @@
                                                    Text="{Binding User.ScreenName,
                                                                   FallbackValue=uSeR,
                                                                   Mode=OneTime}"
-                                                   TextWrapping="NoWrap" />
+                                                   TextWrapping="NoWrap">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="MouseLeftButtonDown">
+                                                    <ei:CallMethodAction MethodName="ShowUserProfile" TargetObject="{Binding}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBlock>
                                         <TextBlock Height="Auto"
                                                    Margin="3,-4,3,0"
                                                    VerticalAlignment="Bottom"

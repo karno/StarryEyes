@@ -288,10 +288,12 @@
     <Compile Include="ViewModels\WindowParts\Flips\AccountSelectionFlipViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\BackstageViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\PartialFlipViewModelBase.cs" />
+    <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\UserFriendsViewModel.cs" />
+    <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\UserStatusesViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\SearchFlipViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\SearchCandidateViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\SearchResultViewModel.cs" />
-    <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\UserCandidateViewModel.cs" />
+    <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\UserResultViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\UserInfoViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\TabConfigurationFlipViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\InputAreaViewModel.cs" />
@@ -352,6 +354,12 @@
     </Compile>
     <Compile Include="Views\WindowParts\Flips\SearchFlips\SearchResult.xaml.cs">
       <DependentUpon>SearchResult.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\WindowParts\Flips\SearchFlips\UserPresenter.xaml.cs">
+      <DependentUpon>UserPresenter.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\WindowParts\Flips\SearchFlips\UserResult.xaml.cs">
+      <DependentUpon>UserResult.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\WindowParts\Flips\TabConfigurationFlip.xaml.cs">
       <DependentUpon>TabConfigurationFlip.xaml</DependentUpon>
@@ -449,6 +457,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\WindowParts\Flips\SearchFlips\SearchResult.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\WindowParts\Flips\SearchFlips\UserPresenter.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\WindowParts\Flips\SearchFlips\UserResult.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

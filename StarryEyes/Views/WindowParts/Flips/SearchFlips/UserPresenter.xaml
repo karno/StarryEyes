@@ -1,0 +1,121 @@
+﻿<UserControl x:Class="StarryEyes.Views.WindowParts.Flips.SearchFlips.UserPresenter"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:behaviors="clr-namespace:Livet.Behaviors;assembly=Livet"
+             xmlns:controls="clr-namespace:StarryEyes.Views.Controls"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:ei="clr-namespace:Microsoft.Expression.Interactivity.Core;assembly=Microsoft.Expression.Interactions"
+             xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+             xmlns:l="clr-namespace:Livet.Behaviors.Messaging;assembly=Livet"
+             xmlns:mahapps="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+             xmlns:mbehaviors="clr-namespace:StarryEyes.Views.Messaging.Behaviors"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:searchFlips="clr-namespace:StarryEyes.ViewModels.WindowParts.Flips.SearchFlips"
+             xmlns:sebehavior="clr-namespace:StarryEyes.Views.Behaviors"
+             xmlns:utils="clr-namespace:StarryEyes.Views.Utils"
+             d:DataContext="{d:DesignInstance searchFlips:UserResultViewModel}"
+             d:DesignHeight="300"
+             d:DesignWidth="300"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <utils:BooleanToVisibleConverter x:Key="BooleanToVisibleConverter" />
+        <DataTemplate x:Key="UserItemTemplate" DataType="searchFlips:UserResultItemViewModel">
+            <Grid Background="White">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseLeftButtonDown">
+                        <ei:CallMethodAction MethodName="Select" TargetObject="{Binding}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <controls:LazyImage Grid.RowSpan="2"
+                                    Width="48"
+                                    Height="48"
+                                    Margin="8"
+                                    VerticalAlignment="Top"
+                                    UriSource="{Binding ProfileImageUri,
+                                                        Mode=OneTime}" />
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <TextBlock Margin="2,8,0,2"
+                               VerticalAlignment="Center"
+                               FontWeight="Bold"
+                               Foreground="#FF1BA1E2"
+                               Text="{Binding ScreenName,
+                                              Mode=OneTime}" />
+                    <TextBlock Margin="2,8,0,2"
+                               VerticalAlignment="Center"
+                               Text="{Binding Name,
+                                              Mode=OneTime}" />
+                </StackPanel>
+                <TextBlock Grid.Row="1"
+                           Grid.Column="1"
+                           Margin="2,2,2,8"
+                           VerticalAlignment="Top"
+                           Text="{Binding Bio,
+                                          Mode=OneTime}"
+                           TextWrapping="Wrap" />
+            </Grid>
+        </DataTemplate>
+    </UserControl.Resources>
+    <DockPanel>
+        <Border x:Name="LoadingBlock"
+                VerticalAlignment="Top"
+                DockPanel.Dock="Top"
+                Visibility="{Binding IsLoading,
+                                     Converter={StaticResource BooleanToVisibleConverter}}">
+            <StackPanel Margin="4"
+                        HorizontalAlignment="Center"
+                        Orientation="Horizontal">
+                <Viewbox Width="20" Height="20">
+                    <mahapps:ProgressRing IsActive="True" />
+                </Viewbox>
+                <TextBlock Margin="4"
+                           VerticalAlignment="Center"
+                           Text="loading..." />
+            </StackPanel>
+        </Border>
+        <ItemsControl Focusable="True"
+                      ItemTemplate="{StaticResource UserItemTemplate}"
+                      ItemsSource="{Binding Users,
+                                            Mode=OneWay}"
+                      ScrollViewer.CanContentScroll="True"
+                      VirtualizingPanel.IsVirtualizing="True"
+                      VirtualizingPanel.ScrollUnit="Pixel"
+                      VirtualizingPanel.VirtualizationMode="Recycling">
+            <i:Interaction.Triggers>
+                <l:InteractionMessageTrigger Messenger="{Binding Messenger, Mode=OneTime}">
+                    <mbehaviors:TaskDialogInteractionMessageAction />
+                </l:InteractionMessageTrigger>
+                <l:InteractionMessageTrigger MessageKey="SetPhysicalFocus" Messenger="{Binding Messenger, Mode=OneWay}">
+                    <behaviors:SetFocusAction />
+                </l:InteractionMessageTrigger>
+                <i:EventTrigger EventName="MouseDown">
+                    <behaviors:SetFocusAction />
+                    <ei:CallMethodAction MethodName="GotPhysicalFocus" TargetObject="{Binding}" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel Orientation="Vertical" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.Template>
+                <ControlTemplate TargetType="{x:Type ItemsControl}">
+                    <ScrollViewer Focusable="False" VerticalScrollBarVisibility="Visible">
+                        <i:Interaction.Behaviors>
+                            <sebehavior:TimelineTriggerBehavior IsScrollOnBottom="{Binding IsScrollInBottom, Mode=OneWayToSource}" />
+                            <sebehavior:SquaredScrollBehavior />
+                        </i:Interaction.Behaviors>
+                        <ItemsPresenter />
+                    </ScrollViewer>
+                </ControlTemplate>
+            </ItemsControl.Template>
+        </ItemsControl>
+    </DockPanel>
+</UserControl>
