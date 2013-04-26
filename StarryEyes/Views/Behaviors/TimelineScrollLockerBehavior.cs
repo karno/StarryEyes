@@ -43,7 +43,6 @@ namespace StarryEyes.Views.Behaviors
                                         new PropertyMetadata(null, ItemsSourceChanged));
 
         private int _previousItemCount;
-        private double _previousScrollIndex;
         private IDisposable _itemSourceCollectionChangeListener;
 
         protected override void OnAttached()
@@ -66,20 +65,18 @@ namespace StarryEyes.Views.Behaviors
                           .Subscribe(
                               e =>
                               {
-                                  _previousScrollIndex = this.AssociatedObject.VerticalOffset;
                                   var source = ItemsSource;
                                   if (source == null) return;
                                   var itemCount = source.Count;
                                   if (_previousItemCount == itemCount) return;
                                   _previousItemCount = itemCount;
-                                  if (e.ExtentHeightChange > 0)
+                                  if (e.ExtentHeightChange <= 0) return;
+                                  this.AssociatedObject.ScrollToVerticalOffset(
+                                      e.VerticalOffset + e.ExtentHeightChange);
+                                  if (!this.IsScrollLockEnabled)
                                   {
-                                      this.AssociatedObject.ScrollToVerticalOffset(
-                                          e.VerticalOffset + e.ExtentHeightChange);
-                                      if (!IsScrollLockEnabled)
-                                      {
-                                          RunAnimation(e.VerticalOffset + e.ExtentHeightChange, e.ExtentHeightChange);
-                                      }
+                                      this.RunAnimation(e.VerticalOffset + e.ExtentHeightChange,
+                                                        e.ExtentHeightChange);
                                   }
                               }));
         }
@@ -95,57 +92,53 @@ namespace StarryEyes.Views.Behaviors
 
         private void ItemsSourceChanged()
         {
-            _previousItemCount = ItemsSource.Count;
             var nc = ItemsSource as INotifyCollectionChanged;
-            if (nc != null)
+            if (nc == null) return;
+
+            this._previousItemCount = this.ItemsSource.Count;
+            var listener = nc.ListenCollectionChanged()
+                             .Subscribe(ev =>
+                             {
+                                 if (ev.Action == NotifyCollectionChangedAction.Add)
+                                 {
+                                     var vsp = FindVisualChild<VirtualizingStackPanel>(this.AssociatedObject);
+                                     if (vsp != null)
+                                     {
+                                         var index = vsp.ItemContainerGenerator.IndexFromGeneratorPosition(
+                                             new GeneratorPosition(0, 0));
+                                         if (ev.NewStartingIndex > index)
+                                         {
+                                             this._previousItemCount = this.ItemsSource.Count;
+                                         }
+                                     }
+                                 }
+                                 else
+                                 {
+                                     this._previousItemCount = this.ItemsSource.Count;
+                                 }
+                             });
+            var disposable = Interlocked.Exchange(
+                ref this._itemSourceCollectionChangeListener, listener);
+            if (disposable != null)
             {
-                var listener = nc.ListenCollectionChanged()
-                              .Subscribe(ev =>
-                              {
-                                  if (ev.Action == NotifyCollectionChangedAction.Add)
-                                  {
-                                      var vsp = FindVisualChild<VirtualizingStackPanel>(this.AssociatedObject);
-                                      if (vsp != null)
-                                      {
-                                          var index = vsp.ItemContainerGenerator.IndexFromGeneratorPosition(
-                                              new GeneratorPosition(0, 0));
-                                          if (ev.NewStartingIndex > index)
-                                          {
-                                              _previousItemCount = ItemsSource.Count;
-                                          }
-                                      }
-                                  }
-                                  else
-                                  {
-                                      _previousItemCount = ItemsSource.Count;
-                                  }
-                              });
-                var disposable = Interlocked.Exchange(
-                    ref _itemSourceCollectionChangeListener, listener);
-                if (disposable != null)
-                {
-                    disposable.Dispose();
-                }
+                disposable.Dispose();
             }
         }
 
         private static T FindVisualChild<T>(DependencyObject obj) where T : DependencyObject
         {
-            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
+            for (var i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
             {
-                DependencyObject child = VisualTreeHelper.GetChild(obj, i);
-
-                if (child is T)
+                var child = VisualTreeHelper.GetChild(obj, i);
+                var cTyped = child as T;
+                if (cTyped != null)
                 {
-                    return (T)child;
+                    return cTyped;
                 }
-                else
+                var descendant = FindVisualChild<T>(child);
+                if (descendant != null)
                 {
-                    child = FindVisualChild<T>(child);
-                    if (child != null)
-                    {
-                        return (T)child;
-                    }
+                    return descendant;
                 }
             }
             return null;
@@ -164,7 +157,7 @@ namespace StarryEyes.Views.Behaviors
             _isAnimationRunning = true;
             Task.Run(() =>
             {
-                for (int i = 20; i > 0; i--)
+                for (var i = 20; i > 0; i--)
                 {
                     Thread.Sleep(10);
                     var dx = _remainHeight / i;
