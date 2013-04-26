@@ -200,7 +200,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             Parent.Focus();
         }
 
-        public override void ReadMore(long id)
+        protected override void ReadMore(long id)
         {
             base.ReadMore(id);
             ReadMoreFromWeb(id);
@@ -208,7 +208,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public void ReadMoreFromWeb(long? id)
         {
-            IsSuppressTimelineAutoTrim = true;
+            TimelineModel.IsSuppressTimelineTrimming = true;
             IsLoading = true;
             Model.ReceiveTimelines(id)
                  .Finally(() => IsLoading = false)

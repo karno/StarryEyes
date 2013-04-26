@@ -61,7 +61,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                                     DispatcherPriority.Background);
                             }
                         }));
-                TwitterStatus[] collection = TimelineModel.Statuses.ToArray();
+                var collection = TimelineModel.Statuses.ToArray();
                 _isCollectionAddEnabled = true;
                 collection
                     .Select(GenerateStatusViewModel)
@@ -159,6 +159,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                 _isScrollInTop = value;
                 RaisePropertyChanged();
                 RaisePropertyChanged(() => IsScrollLock);
+                TimelineModel.IsSuppressTimelineTrimming = false;
             }
         }
 
@@ -167,10 +168,14 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             get { return _isScrollInBottom; }
             set
             {
+                System.Diagnostics.Debug.WriteLine("BOTTOM DETECT: " + value);
                 if (_isScrollInBottom == value) return;
                 _isScrollInBottom = value;
                 RaisePropertyChanged();
-                RaisePropertyChanged(() => IsScrollLock);
+                if (value)
+                {
+                    this.ReadMore();
+                }
             }
         }
 
@@ -215,28 +220,20 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public void ReadMore()
         {
-            ReadMore(TimelineModel.Statuses.Select(_ => _.Id).Min());
+            if (IsScrollInTop || !_isCollectionAddEnabled || IsLoading) return;
+            ReadMore(TimelineModel.Statuses.Select(_ => _.Id).Append(long.MaxValue).Min());
         }
 
-        public virtual void ReadMore(long id)
+        protected virtual void ReadMore(long id)
         {
-            IsSuppressTimelineAutoTrim = true;
+            if (IsScrollInTop || !_isCollectionAddEnabled || IsLoading) return;
+            TimelineModel.IsSuppressTimelineTrimming = true;
             IsLoading = true;
-            TimelineModel.ReadMore(id)
+            TimelineModel.ReadMore(id == long.MaxValue ? (long?)null : id)
                  .Finally(() => IsLoading = false)
                  .OnErrorResumeNext(Observable.Empty<Unit>())
                  .Subscribe();
         }
-
-        #region Call by code-behind
-
-        public bool IsSuppressTimelineAutoTrim
-        {
-            get { return TimelineModel.IsSuppressTimelineTrimming; }
-            set { TimelineModel.IsSuppressTimelineTrimming = value; }
-        }
-
-        #endregion
 
         #region Selection Control
 

@@ -61,11 +61,11 @@ namespace StarryEyes.Models.Tab
             get { return _isSuppressTimelineTrimming; }
             set
             {
-                if (_isSuppressTimelineTrimming != value)
+                if (this._isSuppressTimelineTrimming == value) return;
+                this._isSuppressTimelineTrimming = value;
+                if (!value)
                 {
-                    _isSuppressTimelineTrimming = value;
-                    if (!value)
-                        TrimTimeline();
+                    this.TrimTimeline();
                 }
             }
         }
@@ -143,7 +143,7 @@ namespace StarryEyes.Models.Tab
             if (_statuses.Count <= TimelineChunkCount) return;
             try
             {
-                DateTime lastCreatedAt = _statuses[TimelineChunkCount].CreatedAt;
+                var lastCreatedAt = _statuses[TimelineChunkCount].CreatedAt;
                 var removedIds = new List<long>();
                 _statuses.RemoveWhere(t =>
                 {

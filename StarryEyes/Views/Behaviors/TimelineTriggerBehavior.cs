@@ -83,8 +83,8 @@ namespace StarryEyes.Views.Behaviors
                           .Subscribe(e =>
                           {
                               var vo = e.VerticalOffset;
-                              bool top = vo < 1;
-                              bool bottom = vo > this.AssociatedObject.ScrollableHeight - 1;
+                              var top = vo < 1;
+                              var bottom = vo > this.AssociatedObject.ScrollableHeight - 1;
                               IsScrollOnTop = top;
                               IsScrollOnBottom = bottom;
                           }));
