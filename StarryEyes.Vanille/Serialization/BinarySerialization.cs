@@ -43,7 +43,6 @@ namespace StarryEyes.Vanille.Serialization
                 return br.ReadCollection<T>().ToArray();
             }
         }
-
     }
 
     public static class SerializationHelper

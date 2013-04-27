@@ -141,17 +141,22 @@ namespace StarryEyes.Views.Utils
                     // output raw
                     yield return GenerateText(ParsingExtension.ResolveEntity(escaped.Substring(pidx, entity.StartIndex - pidx)));
                 }
+                var display = entity.DisplayText;
+                if (String.IsNullOrWhiteSpace(display))
+                {
+                    display = entity.OriginalText;
+                }
                 switch (entity.EntityType)
                 {
                     case EntityType.Hashtags:
-                        yield return GenerateHashtagLink(obj, ParsingExtension.ResolveEntity(entity.DisplayText));
+                        yield return GenerateHashtagLink(obj, display);
                         break;
                     case EntityType.Media:
                     case EntityType.Urls:
-                        yield return GenerateLink(obj, entity.DisplayText, ParsingExtension.ResolveEntity(entity.OriginalText));
+                        yield return GenerateLink(obj, display, ParsingExtension.ResolveEntity(entity.OriginalText));
                         break;
                     case EntityType.UserMentions:
-                        yield return GenerateUserLink(obj, entity.DisplayText, ParsingExtension.ResolveEntity(entity.DisplayText));
+                        yield return GenerateUserLink(obj, display, ParsingExtension.ResolveEntity(entity.DisplayText));
                         break;
                 }
                 prevEntity = entity;
