@@ -106,20 +106,18 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             }
 
             // look-up in-reply-to
-            if (status.InReplyToStatusId.HasValue)
-            {
-                var subscribe = StoreHelper.GetTweet(status.InReplyToStatusId.Value)
-                        .Subscribe(replyTo =>
-                        {
-                            _inReplyTo = replyTo;
-                            RaisePropertyChanged(() => IsInReplyToExists);
-                            RaisePropertyChanged(() => InReplyToUserImage);
-                            RaisePropertyChanged(() => InReplyToUserName);
-                            RaisePropertyChanged(() => InReplyToUserScreenName);
-                            RaisePropertyChanged(() => InReplyToBody);
-                        });
-                CompositeDisposable.Add(subscribe);
-            }
+            if (!status.InReplyToStatusId.HasValue) return;
+            var inReplyTo = StoreHelper.GetTweet(status.InReplyToStatusId.Value)
+                                       .Subscribe(replyTo =>
+                                       {
+                                           this._inReplyTo = replyTo;
+                                           this.RaisePropertyChanged(() => this.IsInReplyToExists);
+                                           this.RaisePropertyChanged(() => this.InReplyToUserImage);
+                                           this.RaisePropertyChanged(() => this.InReplyToUserName);
+                                           this.RaisePropertyChanged(() => this.InReplyToUserScreenName);
+                                           this.RaisePropertyChanged(() => this.InReplyToBody);
+                                       });
+            this.CompositeDisposable.Add(inReplyTo);
         }
 
         public TimelineViewModelBase Parent
@@ -343,12 +341,10 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             get { return _isSelected; }
             set
             {
-                if (_isSelected != value && Parent != null)
-                {
-                    _isSelected = value;
-                    RaisePropertyChanged(() => IsSelected);
-                    Parent.OnSelectionUpdated();
-                }
+                if (this._isSelected == value || this.Parent == null) return;
+                this._isSelected = value;
+                this.RaisePropertyChanged(() => this.IsSelected);
+                this.Parent.OnSelectionUpdated();
             }
         }
 
@@ -433,19 +429,19 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             BrowserHelper.Open(Status.FavstarPermalink);
         }
 
-        public void OpenUserWeb()
+        public void OpenUserDetailOnTwitter()
         {
-            BrowserHelper.Open(Status.UserPermalink);
+            User.OpenUserDetailOnTwitter();
         }
 
         public void OpenUserFavstar()
         {
-            BrowserHelper.Open(Status.FavstarUserPermalink);
+            User.OpenUserFavstar();
         }
 
         public void OpenUserTwilog()
         {
-            BrowserHelper.Open(Status.TwilogUserPermalink);
+            User.OpenUserTwilog();
         }
 
         public void OpenSourceLink()
@@ -453,11 +449,9 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             if (!IsSourceIsLink) return;
             var start = Status.Source.IndexOf("\"", StringComparison.Ordinal);
             var end = Status.Source.IndexOf("\"", start + 1, StringComparison.Ordinal);
-            if (start >= 0 && end >= 0)
-            {
-                var url = Status.Source.Substring(start + 1, end - start - 1);
-                BrowserHelper.Open(url);
-            }
+            if (start < 0 || end < 0) return;
+            var url = this.Status.Source.Substring(start + 1, end - start - 1);
+            BrowserHelper.Open(url);
         }
 
         public void OpenFirstImage()
@@ -483,6 +477,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public void CopyText()
         {
+            // ReSharper disable EmptyGeneralCatchClause
             try
             {
                 Clipboard.SetText(SelectedText);
@@ -490,6 +485,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             catch
             {
             }
+            // ReSharper restore EmptyGeneralCatchClause
         }
 
         public void SetTextToInputBox()
@@ -919,14 +915,12 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                             Title = "Favstar ツイート賞の授与",
                         });
             var response = this.Parent.Messenger.GetResponse(msg);
-            if (response.Response.Result == TaskDialogSimpleResult.Ok)
-            {
-                var accounts = GetImmediateAccounts()
-                    .ToObservable();
-                accounts.SelectMany(a => new FavstarTrophyOperation(a, this.Status).Run())
-                        .Do(_ => RaisePropertyChanged(() => IsFavorited))
-                        .Subscribe();
-            }
+            if (response.Response.Result != TaskDialogSimpleResult.Ok) return;
+            var accounts = this.GetImmediateAccounts()
+                .ToObservable();
+            accounts.SelectMany(a => new FavstarTrophyOperation(a, this.Status).Run())
+                    .Do(_ => this.RaisePropertyChanged(() => this.IsFavorited))
+                    .Subscribe();
         }
 
         public void ReportAsSpam()

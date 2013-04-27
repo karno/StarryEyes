@@ -23,7 +23,8 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
         private readonly string _screenName;
         private UserStatusesViewModel _statuses;
         private UserFavoritesViewModel _favorites;
-        private UserFriendsViewModel _friends;
+        private UserFollowingViewModel _following;
+        private UserFollowersViewModel _followers;
         private bool _communicating = true;
         private UserViewModel _user;
 
@@ -38,8 +39,9 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 this._displayKind = value;
                 this.RaisePropertyChanged();
                 this.RaisePropertyChanged(() => IsVisibleStatuses);
-                this.RaisePropertyChanged(() => IsVisibleFriends);
                 this.RaisePropertyChanged(() => IsVisibleFavorites);
+                this.RaisePropertyChanged(() => IsVisibleFollowing);
+                this.RaisePropertyChanged(() => IsVisibleFollowers);
             }
         }
 
@@ -89,9 +91,14 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             get { return this._favorites; }
         }
 
-        public UserFriendsViewModel Friends
+        public UserFollowingViewModel Following
         {
-            get { return this._friends; }
+            get { return this._following; }
+        }
+
+        public UserFollowersViewModel Followers
+        {
+            get { return this._followers; }
         }
 
         public bool IsVisibleStatuses
@@ -104,9 +111,14 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             get { return DisplayKind == UserDisplayKind.Favorites; }
         }
 
-        public bool IsVisibleFriends
+        public bool IsVisibleFollowing
         {
-            get { return DisplayKind == UserDisplayKind.Following || DisplayKind == UserDisplayKind.Followers; }
+            get { return DisplayKind == UserDisplayKind.Following; }
+        }
+
+        public bool IsVisibleFollowers
+        {
+            get { return DisplayKind == UserDisplayKind.Followers; }
         }
 
         public UserInfoViewModel(SearchFlipViewModel parent, string screenName)
@@ -123,8 +135,10 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                                this.RaisePropertyChanged(() => Statuses);
                                this._favorites = new UserFavoritesViewModel(this);
                                this.RaisePropertyChanged(() => Favorites);
-                               this._friends = new UserFriendsViewModel(this);
-                               this.RaisePropertyChanged(() => Friends);
+                               this._following = new UserFollowingViewModel(this);
+                               this.RaisePropertyChanged(() => Following);
+                               this._followers = new UserFollowersViewModel(this);
+                               this.RaisePropertyChanged(() => Followers);
                            },
                            ex =>
                            {
@@ -158,13 +172,11 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
         public void ShowFollowing()
         {
             DisplayKind = UserDisplayKind.Following;
-            Friends.RelationKind = RelationKind.Following;
         }
 
         public void ShowFollowers()
         {
             DisplayKind = UserDisplayKind.Followers;
-            Friends.RelationKind = RelationKind.Followers;
         }
 
         #region Text selection control

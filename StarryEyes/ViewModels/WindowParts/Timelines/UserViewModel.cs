@@ -120,5 +120,16 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         {
             BrowserHelper.Open("http://twitter.com/" + this.ScreenName);
         }
+
+        public void OpenUserFavstar()
+        {
+            BrowserHelper.Open(User.FavstarUserPermalink);
+        }
+
+        public void OpenUserTwilog()
+        {
+            BrowserHelper.Open(User.TwilogUserPermalink);
+        }
+
     }
 }

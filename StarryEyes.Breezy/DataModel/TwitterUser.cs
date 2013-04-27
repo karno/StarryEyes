@@ -10,6 +10,10 @@ namespace StarryEyes.Breezy.DataModel
     [DataContract]
     public class TwitterUser : IBinarySerializable
     {
+        public const string TwitterUserUrl = "https://twitter.com/{0}";
+        public const string FavstarUserUrl = "http://favstar.fm/users/{0}";
+        public const string TwilogUserUrl = "http://twilog.org/{0}";
+
         /// <summary>
         /// Exactly Numeric ID of this user. (PRIMARY KEY)
         /// </summary>
@@ -160,6 +164,21 @@ namespace StarryEyes.Breezy.DataModel
         /// </summary>
         [DataMember]
         public TwitterEntity[] DescriptionEntities { get; set; }
+
+        public string UserPermalink
+        {
+            get { return String.Format(TwitterUserUrl, ScreenName); }
+        }
+
+        public string FavstarUserPermalink
+        {
+            get { return String.Format(FavstarUserUrl, ScreenName); }
+        }
+
+        public string TwilogUserPermalink
+        {
+            get { return String.Format(TwilogUserUrl, ScreenName); }
+        }
 
         public void Serialize(System.IO.BinaryWriter writer)
         {

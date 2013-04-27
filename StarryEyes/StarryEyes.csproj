@@ -289,7 +289,9 @@
     <Compile Include="ViewModels\WindowParts\BackstageViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\PartialFlipViewModelBase.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\UserFavoritesViewModel.cs" />
-    <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\UserFriendsViewModel.cs" />
+    <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\UserFollowersViewModel.cs" />
+    <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\UserFollowingViewModel.cs" />
+    <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\UserListViewModelBase.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\UserStatusesViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\SearchFlipViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\SearchCandidateViewModel.cs" />

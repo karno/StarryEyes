@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
+using System.Windows.Threading;
 using Livet;
 using StarryEyes.Breezy.Api.Rest;
 using StarryEyes.Breezy.DataModel;
@@ -107,7 +107,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                     BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message));
                     return Observable.Empty<TwitterUser>();
                 })
-                .ObserveOn(DispatcherHolder.Dispatcher)
+                .ObserveOn(DispatcherHolder.Dispatcher, DispatcherPriority.Render)
                 .Finally(() => this.IsLoading = false)
                 .Subscribe(u => Users.Add(new UserResultItemViewModel(u)));
         }

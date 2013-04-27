@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading;
-using Livet;
+using System.Windows.Threading;
 using StarryEyes.Breezy.Api.Rest;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Models;
@@ -16,52 +14,21 @@ using StarryEyes.Views.Messaging;
 
 namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
 {
-    public class UserFriendsViewModel : ViewModel
+    public class UserFollowingViewModel : UserListViewModelBase
     {
         private readonly UserInfoViewModel _parent;
 
         private List<long> _following;
-        private List<long> _followers;
 
-        private readonly ObservableCollection<UserResultItemViewModel> _users = new ObservableCollection<UserResultItemViewModel>();
-        private RelationKind _relationKind;
-
-        public ObservableCollection<UserResultItemViewModel> Users
-        {
-            get { return this._users; }
-        }
-
-        public UserFriendsViewModel(UserInfoViewModel parent)
+        public UserFollowingViewModel(UserInfoViewModel parent)
         {
             _parent = parent;
             this.InitCollection();
         }
 
-        public RelationKind RelationKind
-        {
-            get { return this._relationKind; }
-            set
-            {
-                if (this._relationKind == value) return;
-                this._relationKind = value;
-                this.InitCollection();
-            }
-        }
-
-        public bool IsLoading
-        {
-            get { return this._isLoading; }
-            set
-            {
-                this._isLoading = value;
-                this.RaisePropertyChanged();
-            }
-        }
-
         private void InitCollection()
         {
             this.IsLoading = true;
-            _users.Clear();
             var info = AccountsStore.Accounts
                                     .Shuffle()
                                     .Select(s => s.AuthenticateInfo)
@@ -79,35 +46,19 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             var finishHandler = new Action(() =>
             {
                 IsLoading = false;
-                this.LoadMore();
+                this.ReadMore();
             });
-            switch (RelationKind)
-            {
-                case RelationKind.Following:
-                    _following = new List<long>();
-                    info.GetFriendsIdsAll(_parent.User.User.Id)
-                        .Subscribe(
-                            id => _following.Add(id),
-                            errorHandler,
-                            finishHandler);
-                    break;
-                case RelationKind.Followers:
-                    _followers = new List<long>();
-                    info.GetFollowerIdsAll(_parent.User.User.Id)
-                        .Subscribe(
-                            id => _followers.Add(id),
-                            errorHandler,
-                            finishHandler);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            _following = new List<long>();
+            info.GetFriendsIdsAll(_parent.User.User.Id)
+                .Subscribe(
+                    id => _following.Add(id),
+                    errorHandler,
+                    finishHandler);
         }
 
         private int _currentPageCount = -1;
         private bool _isDeferLoadEnabled = true;
-        private bool _isLoading;
-        public void LoadMore()
+        protected override void ReadMore()
         {
             if (!_isDeferLoadEnabled || this.IsLoading) return;
             this.IsLoading = true;
@@ -116,11 +67,11 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                                     .Select(s => s.AuthenticateInfo)
                                     .FirstOrDefault();
             var page = Interlocked.Increment(ref _currentPageCount);
-            var target = RelationKind == RelationKind.Following ? _following : _followers;
-            var ids = target.Skip(page * 100).Take(100).ToArray();
+            var ids = _following.Skip(page * 100).Take(100).ToArray();
             if (ids.Length == 0)
             {
                 _isDeferLoadEnabled = false;
+                IsLoading = false;
                 return;
             }
             info.LookupUser(ids)
@@ -137,15 +88,9 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                     BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message));
                     return Observable.Empty<TwitterUser>();
                 })
-                .ObserveOn(DispatcherHolder.Dispatcher)
+                .ObserveOn(DispatcherHolder.Dispatcher, DispatcherPriority.Render)
                 .Finally(() => this.IsLoading = false)
                 .Subscribe(u => Users.Add(new UserResultItemViewModel(u)));
         }
-    }
-
-    public enum RelationKind
-    {
-        Following,
-        Followers,
     }
 }

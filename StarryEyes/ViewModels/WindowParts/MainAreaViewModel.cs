@@ -152,7 +152,7 @@ namespace StarryEyes.ViewModels.WindowParts
                 KeyAssignAction.Create("ShowRetweeterProfile", () => ExecuteStatusAction(s => s.ShowRetweeterProfile())),
                 KeyAssignAction.Create("OpenWeb", () => ExecuteStatusAction(s => s.OpenWeb())),
                 KeyAssignAction.Create("OpenFavstar", () => ExecuteStatusAction(s => s.OpenFavstar())),
-                KeyAssignAction.Create("OpenUserWeb", () => ExecuteStatusAction(s => s.OpenUserWeb())),
+                KeyAssignAction.Create("OpenUserDetailOnTwitter", () => ExecuteStatusAction(s => s.OpenUserDetailOnTwitter())),
                 KeyAssignAction.Create("OpenUserFavstar", () => ExecuteStatusAction(s => s.OpenUserFavstar())),
                 KeyAssignAction.Create("OpenUserTwilog", () => ExecuteStatusAction(s => s.OpenUserTwilog())),
                 KeyAssignAction.Create("OpenSource", () => ExecuteStatusAction(s => s.OpenSourceLink())),

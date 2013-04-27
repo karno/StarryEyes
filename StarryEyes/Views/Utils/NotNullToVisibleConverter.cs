@@ -9,4 +9,12 @@ namespace StarryEyes.Views.Utils
             return input != null ? Visibility.Visible : Visibility.Collapsed;
         }
     }
+
+    public sealed class NotNullOrEmptyToVisibleConverter : OneWayConverter<string, Visibility>
+    {
+        protected override Visibility ToTarget(string input, object parameter)
+        {
+            return string.IsNullOrEmpty(input) ? Visibility.Collapsed : Visibility.Visible;
+        }
+    }
 }

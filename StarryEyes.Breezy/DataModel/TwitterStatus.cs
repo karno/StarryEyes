@@ -14,11 +14,8 @@ namespace StarryEyes.Breezy.DataModel
     [DataContract]
     public class TwitterStatus : IBinarySerializable
     {
-        public const string TwitterUserUrl = "https://twitter.com/{0}";
         public const string TwitterStatusUrl = "https://twitter.com/{0}/status/{1}";
-        public const string FavstarUserUrl = "http://favstar.fm/users/{0}";
         public const string FavstarStatusUrl = "http://favstar.fm/users/{0}/status/{1}";
-        public const string TwilogUserUrl = "http://twilog.org/{0}";
 
         public TwitterStatus()
         {
@@ -141,20 +138,6 @@ namespace StarryEyes.Breezy.DataModel
         [DataMember]
         public TwitterEntity[] Entities { get; set; }
 
-        public string UserPermalink
-        {
-            get { return String.Format(TwitterUserUrl, User.ScreenName); }
-        }
-
-        public string FavstarUserPermalink
-        {
-            get { return String.Format(FavstarUserUrl, User.ScreenName); }
-        }
-
-        public string TwilogUserPermalink
-        {
-            get { return String.Format(TwilogUserUrl, User.ScreenName); }
-        }
 
         public string Permalink
         {
