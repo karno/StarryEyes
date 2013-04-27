@@ -102,7 +102,7 @@ namespace StarryEyes.Views.Utils
                 }
 
                 // generate contents
-                GenerateInlines(o, user.Description, user.Entities)
+                GenerateInlines(o, user.Description, user.DescriptionEntities)
                     .Select(inline =>
                     {
                         var run = inline as Run;
@@ -123,7 +123,6 @@ namespace StarryEyes.Views.Utils
         {
             if (entities == null)
             {
-                System.Diagnostics.Debug.WriteLine("compatible mode");
                 foreach (var inline in GenerateInlines(obj, text))
                 {
                     yield return inline;
@@ -132,7 +131,7 @@ namespace StarryEyes.Views.Utils
             }
             var escaped = ParsingExtension.EscapeEntity(text);
             TwitterEntity prevEntity = null;
-            foreach (var entity in entities.Guard().OrderBy(e => e.StartIndex))
+            foreach (var entity in entities.OrderBy(e => e.StartIndex))
             {
                 int pidx = 0;
                 if (prevEntity != null)

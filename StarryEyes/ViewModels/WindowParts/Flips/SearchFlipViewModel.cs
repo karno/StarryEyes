@@ -324,6 +324,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             if (!this.IsVisible) return;
             Text = String.Empty;
             base.Close();
+            _backStack.Clear();
             MainWindowModel.SetFocusTo(FocusRequest.Timeline);
         }
 

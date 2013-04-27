@@ -23,7 +23,7 @@ namespace StarryEyes.ViewModels
     {
         #region Included viewmodels
 
-        private readonly BackstageViewModel _BackstageViewModel;
+        private readonly BackstageViewModel _backstageViewModel;
 
         private readonly AccountSelectionFlipViewModel _globalAccountSelectionFlipViewModel;
 
@@ -37,7 +37,7 @@ namespace StarryEyes.ViewModels
 
         public BackstageViewModel BackstageViewModel
         {
-            get { return _BackstageViewModel; }
+            get { return this._backstageViewModel; }
         }
 
         public InputAreaViewModel InputAreaViewModel
@@ -100,7 +100,7 @@ namespace StarryEyes.ViewModels
 
         public MainWindowViewModel()
         {
-            CompositeDisposable.Add(_BackstageViewModel = new BackstageViewModel());
+            CompositeDisposable.Add(this._backstageViewModel = new BackstageViewModel());
             CompositeDisposable.Add(_inputAreaViewModel = new InputAreaViewModel());
             CompositeDisposable.Add(_mainAreaViewModel = new MainAreaViewModel());
             CompositeDisposable.Add(_globalAccountSelectionFlipViewModel = new AccountSelectionFlipViewModel());
@@ -114,7 +114,7 @@ namespace StarryEyes.ViewModels
                 h => MainWindowModel.OnConfirmMuteRequested += h,
                 h => MainWindowModel.OnConfirmMuteRequested -= h)
                 .Subscribe(OnMuteRequested));
-            _BackstageViewModel.Initialize();
+            this._backstageViewModel.Initialize();
         }
 
         private void SetFocus(FocusRequest req)
@@ -146,7 +146,7 @@ namespace StarryEyes.ViewModels
         {
             MainWindowModel.OnWindowCommandDisplayChanged += visible =>
             {
-                int offset = visible ? Interlocked.Increment(ref _visibleCount) : Interlocked.Decrement(ref _visibleCount);
+                var offset = visible ? Interlocked.Increment(ref _visibleCount) : Interlocked.Decrement(ref _visibleCount);
                 ShowWindowCommands = offset >= 0;
             };
 
@@ -177,12 +177,10 @@ namespace StarryEyes.ViewModels
                                                   h => _globalAccountSelectionFlipViewModel.OnClosed -= h)
                                        .Subscribe(_ =>
                                        {
-                                           if (disposable != null)
-                                           {
-                                               disposable.Dispose();
-                                               disposable = null;
-                                               aftercall(_globalAccountSelectionFlipViewModel.SelectedAccounts);
-                                           }
+                                           if (disposable == null) return;
+                                           disposable.Dispose();
+                                           disposable = null;
+                                           aftercall(this._globalAccountSelectionFlipViewModel.SelectedAccounts);
                                        });
                 _globalAccountSelectionFlipViewModel.Open();
             };
@@ -199,45 +197,42 @@ namespace StarryEyes.ViewModels
             if (!AccountsStore.Accounts.Any())
             {
                 var auth = new AuthorizationViewModel();
-                auth.AuthorizeObservable.Subscribe(
-                    _ => AccountsStore.Accounts.Add(
-                        new AccountSetting
-                        {
-                            AuthenticateInfo = _,
-                            IsUserStreamsEnabled = true
-                        }));
+                auth.AuthorizeObservable
+                    .Subscribe(info =>
+                               AccountsStore.Accounts.Add(
+                                   new AccountSetting
+                                   {
+                                       AuthenticateInfo = info,
+                                       IsUserStreamsEnabled = true
+                                   }));
                 Messenger.RaiseAsync(new TransitionMessage(
                                          typeof(AuthorizationWindow),
                                          auth, TransitionMode.Modal, null));
             }
             TabManager.Load();
             TabManager.Save();
-            if (TabManager.Columns.Count == 1 && TabManager.Columns[0].Tabs.Count == 0)
+            if (TabManager.Columns.Count != 1 || TabManager.Columns[0].Tabs.Count != 0) return;
+            var response = this.Messenger.GetResponse(new TaskDialogMessage(new TaskDialogOptions
             {
-                var response = this.Messenger.GetResponse(new TaskDialogMessage(new TaskDialogOptions
-                {
-                    Title = "タブ情報の警告",
-                    CommonButtons = TaskDialogCommonButtons.YesNo,
-                    MainIcon = VistaTaskDialogIcon.Warning,
-                    MainInstruction = "タブ情報が失われた可能性があります。",
-                    Content = "タブが空です。" + Environment.NewLine +
-                    "初回起動時に生成されるタブを再生成しますか？",
-                }));
-                if (response.Response.Result == TaskDialogSimpleResult.Yes)
-                {
-                    Setting.ResetTabInfo();
-                    TabManager.Columns.Clear();
-                    TabManager.Load();
-                    TabManager.Save();
-                }
-            }
+                Title = "タブ情報の警告",
+                CommonButtons = TaskDialogCommonButtons.YesNo,
+                MainIcon = VistaTaskDialogIcon.Warning,
+                MainInstruction = "タブ情報が失われた可能性があります。",
+                Content = "タブが空です。" + Environment.NewLine +
+                          "初回起動時に生成されるタブを再生成しますか？",
+            }));
+            if (response.Response.Result != TaskDialogSimpleResult.Yes) return;
+            Setting.ResetTabInfo();
+            TabManager.Columns.Clear();
+            TabManager.Load();
+            TabManager.Save();
         }
 
         public bool OnClosing()
         {
             if (Setting.ConfirmOnExitApp.Value)
             {
-                TaskDialogMessage ret = Messenger.GetResponse(
+                var ret = Messenger.GetResponse(
                     new TaskDialogMessage(new TaskDialogOptions
                     {
                         Title = "Krileの終了",
@@ -280,7 +275,7 @@ namespace StarryEyes.ViewModels
         {
             get
             {
-                TimeSpan duration = DateTime.Now - App.StartupDateTime;
+                var duration = DateTime.Now - App.StartupDateTime;
                 if (duration.TotalHours >= 1)
                 {
                     return (int)duration.TotalHours + ":" + duration.ToString("mm\\:ss");

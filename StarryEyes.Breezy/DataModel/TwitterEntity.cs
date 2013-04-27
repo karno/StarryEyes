@@ -21,6 +21,10 @@ namespace StarryEyes.Breezy.DataModel
             this.EntityType = entityType;
             this.DisplayText = display;
             this.OriginalText = original;
+            if (string.IsNullOrEmpty(original))
+            {
+                this.OriginalText = display;
+            }
             this.StartIndex = start;
             this.EndIndex = end;
         }

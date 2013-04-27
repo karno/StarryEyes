@@ -58,7 +58,7 @@ namespace StarryEyes.Breezy.Api.Parsing.JsonFormats
                 Latitude = coordinates == null ? null : (double?)coordinates.coordinates[1],
                 RetweetedOriginal = retweeted_status == null ? null : retweeted_status.Spawn(),
                 RetweetedOriginalId = retweeted_status == null ? null : (long?)retweeted_status.id_str.ParseLong(),
-                Entities = entities != null ? entities.Spawn().ToArray() : new TwitterEntity[0]
+                Entities = entities != null ? entities.Spawn().ToArray() : null
                 // contributors?
             };
         }

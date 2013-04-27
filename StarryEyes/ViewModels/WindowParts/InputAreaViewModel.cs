@@ -110,7 +110,7 @@ namespace StarryEyes.ViewModels.WindowParts
                                         .ListenCollectionChanged()
                                         .Subscribe(_ => RaisePropertyChanged(() => IsBindingAuthInfoExisted)));
 
-            bool accountSelectReflecting = false;
+            var accountSelectReflecting = false;
             _accountSelectionFlip.OnSelectedAccountsChanged += () =>
             {
                 if (!_isSuppressAccountChangeRelay)
@@ -464,14 +464,14 @@ namespace StarryEyes.ViewModels.WindowParts
         {
             get
             {
-                int currentTextLength = StatusTextUtil.CountText(InputText);
+                var currentTextLength = StatusTextUtil.CountText(InputText);
                 if (IsImageAttached)
                 {
                     currentTextLength += Setting.GetImageUploader().UseHttpsUrl
                                              ? TwitterConfiguration.HttpsUrlLength
                                              : TwitterConfiguration.HttpUrlLength;
                 }
-                string[] tags = TwitterRegexPatterns.ValidHashtag.Matches(InputText)
+                var tags = TwitterRegexPatterns.ValidHashtag.Matches(InputText)
                                            .OfType<Match>()
                                            .Select(_ => _.Value)
                                            .ToArray();
@@ -602,14 +602,17 @@ namespace StarryEyes.ViewModels.WindowParts
         {
             return Observable.Interval(TimeSpan.FromSeconds(60))
                       .Where(_ => IsPostLimitPredictionEnabled)
-                      .Subscribe(_ => { });
+                      .Subscribe(_ =>
+                      {
+                          //TODO: Post limit prediction
+                      });
         }
 
         #endregion
 
         private void UpdateHashtagCandidates()
         {
-            string[] hashtags = TwitterRegexPatterns.ValidHashtag.Matches(InputText)
+            var hashtags = TwitterRegexPatterns.ValidHashtag.Matches(InputText)
                                            .OfType<Match>()
                                            .Select(_ => _.Value)
                                            .Distinct()
@@ -638,7 +641,7 @@ namespace StarryEyes.ViewModels.WindowParts
             // if null, not override default.
             if (infos == null) return;
             _isSuppressAccountChangeRelay = true;
-            AuthenticateInfo[] accounts = infos as AuthenticateInfo[] ?? infos.ToArray();
+            var accounts = infos as AuthenticateInfo[] ?? infos.ToArray();
             AccountSelectionFlip.SelectedAccounts = accounts;
             InputAreaModel.BindingAuthInfos.Clear();
             accounts.ForEach(InputAreaModel.BindingAuthInfos.Add);
@@ -675,7 +678,7 @@ namespace StarryEyes.ViewModels.WindowParts
                 FocusToTextBox();
                 if (restorePreviousStashed && InputAreaModel.Drafts.Count > 0)
                 {
-                    TweetInputInfo last = InputAreaModel.Drafts[InputAreaModel.Drafts.Count - 1];
+                    var last = InputAreaModel.Drafts[InputAreaModel.Drafts.Count - 1];
                     InputAreaModel.Drafts.RemoveAt(InputAreaModel.Drafts.Count - 1);
                     InputInfo = last;
                     Messenger.Raise(new TextBoxSetCaretMessage(InputInfo.Text.Length));
@@ -844,12 +847,10 @@ namespace StarryEyes.ViewModels.WindowParts
 
         public void BindHashtag(string hashtag)
         {
-            if (!InputAreaModel.BindingHashtags.Contains(hashtag))
-            {
-                InputAreaModel.BindingHashtags.Add(hashtag);
-                UpdateHashtagCandidates();
-                UpdateTextCount();
-            }
+            if (InputAreaModel.BindingHashtags.Contains(hashtag)) return;
+            InputAreaModel.BindingHashtags.Add(hashtag);
+            this.UpdateHashtagCandidates();
+            this.UpdateTextCount();
         }
 
         public void UnbindHashtag(string hashtag)
@@ -861,17 +862,15 @@ namespace StarryEyes.ViewModels.WindowParts
 
         private void EscapeUrl()
         {
-            string escaped = StatusTextUtil.AutoEscape(InputText);
-            if (escaped != InputText)
-            {
-                InputInfo.Text = escaped;
-                RaisePropertyChanged(() => InputText);
-                UpdateHashtagCandidates();
-                UpdateTextCount();
+            var escaped = StatusTextUtil.AutoEscape(InputText);
+            if (escaped == this.InputText) return;
+            this.InputInfo.Text = escaped;
+            this.RaisePropertyChanged(() => this.InputText);
+            this.UpdateHashtagCandidates();
+            this.UpdateTextCount();
 
-                int diff = escaped.Length - InputText.Length;
-                SelectionStart += diff;
-            }
+            var diff = escaped.Length - this.InputText.Length;
+            this.SelectionStart += diff;
         }
 
         public void Send()
@@ -886,28 +885,29 @@ namespace StarryEyes.ViewModels.WindowParts
             if (InputInfo.PostedTweets != null && Setting.IsWarnAmendTweet.Value)
             {
                 // amend mode
-                TaskDialogMessage amend = Messenger.GetResponse(new TaskDialogMessage(
-                                                                    new TaskDialogOptions
-                                                                    {
-                                                                        Title = "ツイートの訂正",
-                                                                        MainIcon = VistaTaskDialogIcon.Information,
-                                                                        Content =
-                                                                            "直前に投稿されたツイートを削除し、投稿し直します。" +
-                                                                            Environment.NewLine +
-                                                                            "(削除に失敗した場合でも投稿は行われます。)",
-                                                                        ExpandedInfo = "削除されるツイート: " +
-                                                                                       InputInfo.PostedTweets.First()
-                                                                                                .Item2 +
-                                                                                       (InputInfo.PostedTweets.Count() >
-                                                                                        1
-                                                                                            ? Environment.NewLine + "(" +
-                                                                                              (InputInfo.PostedTweets
-                                                                                                        .Count() - 1) +
-                                                                                              " 件のツイートも同時に削除されます)"
-                                                                                            : ""),
-                                                                        VerificationText = "次回から表示しない",
-                                                                        CommonButtons = TaskDialogCommonButtons.OKCancel,
-                                                                    }));
+                var amend = Messenger.GetResponse(
+                    new TaskDialogMessage(
+                        new TaskDialogOptions
+                        {
+                            Title = "ツイートの訂正",
+                            MainIcon = VistaTaskDialogIcon.Information,
+                            Content =
+                                "直前に投稿されたツイートを削除し、投稿し直します。" +
+                                Environment.NewLine +
+                                "(削除に失敗した場合でも投稿は行われます。)",
+                            ExpandedInfo = "削除されるツイート: " +
+                                           InputInfo.PostedTweets.First()
+                                                    .Item2 +
+                                           (InputInfo.PostedTweets.Count() >
+                                            1
+                                                ? Environment.NewLine + "(" +
+                                                  (InputInfo.PostedTweets
+                                                            .Count() - 1) +
+                                                  " 件のツイートも同時に削除されます)"
+                                                : ""),
+                            VerificationText = "次回から表示しない",
+                            CommonButtons = TaskDialogCommonButtons.OKCancel,
+                        }));
                 Setting.IsWarnAmendTweet.Value = amend.Response.VerificationChecked.GetValueOrDefault();
                 if (amend.Response.Result == TaskDialogSimpleResult.Cancel)
                     return;
@@ -926,7 +926,7 @@ namespace StarryEyes.ViewModels.WindowParts
                 // warn third reply
 
                 // filters screen names which were replied
-                string[] replies = TwitterRegexPatterns.ValidMentionOrList.Matches(InReplyTo.Status.Text)
+                var replies = TwitterRegexPatterns.ValidMentionOrList.Matches(InReplyTo.Status.Text)
                                               .Cast<Match>()
                                               .Select(_ => _.Value.Substring(1))
                                               .Where(_ => !String.IsNullOrEmpty(_))
@@ -941,7 +941,7 @@ namespace StarryEyes.ViewModels.WindowParts
                              .Select(_ => _.UnreliableScreenName)
                              .Any(replies.Contains))
                 {
-                    TaskDialogMessage thirdreply = Messenger.GetResponse(
+                    var thirdreply = Messenger.GetResponse(
                         new TaskDialogMessage(new TaskDialogOptions
                         {
                             Title = "割込みリプライ警告",
@@ -987,7 +987,7 @@ namespace StarryEyes.ViewModels.WindowParts
                 throw new ArgumentNullException("info");
             if (info.ThrownException == null)
                 throw new ArgumentException("info.ThrownException is null.");
-            string msg = info.ThrownExceptionMessage;
+            var msg = info.ThrownExceptionMessage;
             if (msg != null)
             {
                 if (msg.Contains("duplicate"))
@@ -1135,10 +1135,11 @@ namespace StarryEyes.ViewModels.WindowParts
                 if (_authInfo.UnreliableProfileImageUri == null)
                 {
                     Task.Run(() => _authInfo.ShowUser(_authInfo.Id)
-                                            .Subscribe(_ =>
+                                            .Catch(Observable.Empty<TwitterUser>())
+                                            .Subscribe(user =>
                                             {
                                                 _authInfo.UnreliableProfileImageUriString =
-                                                    _.ProfileImageUri.OriginalString;
+                                                    user.ProfileImageUri.OriginalString;
                                                 RaisePropertyChanged(() => ProfileImageUri);
                                             }));
                 }

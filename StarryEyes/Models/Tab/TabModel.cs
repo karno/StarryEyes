@@ -147,7 +147,7 @@ namespace StarryEyes.Models.Tab
 
         public void InvalidateCollection()
         {
-            TimelineModel oldt = Timeline;
+            var oldt = Timeline;
             Timeline = new TimelineModel(_evaluator, GetChunk);
             oldt.Dispose();
         }

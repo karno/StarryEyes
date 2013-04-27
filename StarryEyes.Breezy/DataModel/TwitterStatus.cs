@@ -241,24 +241,36 @@ namespace StarryEyes.Breezy.DataModel
             writer.Write(IsFavored);
             writer.Write(Source != null);
             if (Source != null)
+            {
                 writer.Write(Source);
+            }
             writer.Write(InReplyToStatusId);
             writer.Write(InReplyToUserId);
             writer.Write(InReplyToScreenName != null);
             if (InReplyToScreenName != null)
+            {
                 writer.Write(InReplyToScreenName);
+            }
             writer.Write(RetweetedOriginalId);
             writer.Write(Latitude);
             writer.Write(Longitude);
             writer.Write(FavoritedUsers != null);
             if (FavoritedUsers != null)
+            {
                 writer.Write(FavoritedUsers);
+            }
             writer.Write(RetweetedUsers != null);
             if (RetweetedUsers != null)
+            {
                 writer.Write(RetweetedUsers);
+            }
             writer.Write(RetweetedOriginal);
             writer.Write(Recipient);
-            writer.Write(Entities);
+            writer.Write(Entities != null);
+            if (Entities != null)
+            {
+                writer.Write(Entities);
+            }
         }
 
         public void Deserialize(System.IO.BinaryReader reader)
@@ -270,21 +282,32 @@ namespace StarryEyes.Breezy.DataModel
             CreatedAt = reader.ReadDateTime();
             IsFavored = reader.ReadBoolean();
             if (reader.ReadBoolean())
+            {
                 Source = reader.ReadString();
+            }
             InReplyToStatusId = reader.ReadNullableLong();
             InReplyToUserId = reader.ReadNullableLong();
             if (reader.ReadBoolean())
+            {
                 InReplyToScreenName = reader.ReadString();
+            }
             RetweetedOriginalId = reader.ReadNullableLong();
             Latitude = reader.ReadNullableDouble();
             Longitude = reader.ReadNullableDouble();
             if (reader.ReadBoolean())
+            {
                 FavoritedUsers = reader.ReadIds().ToArray();
+            }
             if (reader.ReadBoolean())
+            {
                 RetweetedUsers = reader.ReadIds().ToArray();
+            }
             RetweetedOriginal = reader.ReadObject<TwitterStatus>();
             Recipient = reader.ReadObject<TwitterUser>();
-            Entities = reader.ReadCollection<TwitterEntity>().ToArray();
+            if (reader.ReadBoolean())
+            {
+                Entities = reader.ReadCollection<TwitterEntity>().ToArray();
+            }
         }
 
         // override object.Equals

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Livet;
 using StarryEyes.Breezy.Api.Rest;
 using StarryEyes.Breezy.Authorize;
+using StarryEyes.Breezy.DataModel;
 using StarryEyes.Models.Stores;
 
 namespace StarryEyes.ViewModels.WindowParts.Flips
@@ -125,11 +127,12 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 if (_info.UnreliableProfileImageUri == null)
                 {
                     Task.Run(() => _info.ShowUser(_info.Id)
-                        .Subscribe(_ =>
-                        {
-                            _info.UnreliableProfileImageUriString = _.ProfileImageUri.OriginalString;
-                            RaisePropertyChanged(() => ProfileImageUri);
-                        }));
+                                        .Catch(Observable.Empty<TwitterUser>())
+                                        .Subscribe(user =>
+                                        {
+                                            _info.UnreliableProfileImageUriString = user.ProfileImageUri.OriginalString;
+                                            RaisePropertyChanged(() => ProfileImageUri);
+                                        }));
                 }
                 return _info.UnreliableProfileImageUri;
             }

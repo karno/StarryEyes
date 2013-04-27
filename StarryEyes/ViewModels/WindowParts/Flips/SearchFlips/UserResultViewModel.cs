@@ -8,8 +8,11 @@ using Livet;
 using StarryEyes.Breezy.Api.Rest;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Models;
+using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Models.Stores;
+using StarryEyes.Nightmare.Windows;
 using StarryEyes.ViewModels.WindowParts.Timelines;
+using StarryEyes.Views.Messaging;
 
 namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
 {
@@ -91,7 +94,20 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                     _isDeferLoadEnabled = false;
                     return Observable.Empty<TwitterUser>();
                 })
-                .ObserveOnDispatcher()
+                .Catch((Exception ex) =>
+                {
+                    _parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
+                       {
+                           CommonButtons = TaskDialogCommonButtons.Close,
+                           MainIcon = VistaTaskDialogIcon.Error,
+                           MainInstruction = "ユーザーの読み込みに失敗しました。",
+                           Content = ex.Message,
+                           Title = "読み込みエラー"
+                       }));
+                    BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message));
+                    return Observable.Empty<TwitterUser>();
+                })
+                .ObserveOn(DispatcherHolder.Dispatcher)
                 .Finally(() => this.IsLoading = false)
                 .Subscribe(u => Users.Add(new UserResultItemViewModel(u)));
         }

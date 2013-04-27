@@ -58,7 +58,7 @@ namespace StarryEyes.Breezy.Api.Parsing.JsonFormats
 
         public string created_at { get; set; }
 
-        public EntityJson entities { get; set; }
+        public UserEntityJson entities { get; set; }
 
         /// <summary>
         /// Convert JSON internal object model to Twintail object model.
@@ -91,7 +91,8 @@ namespace StarryEyes.Breezy.Api.Parsing.JsonFormats
                 ListedCount = listed_count.GetValueOrDefault(),
                 Language = lang,
                 IsGeoEnabled = is_geo_enabled,
-                Entities = entities != null ? entities.Spawn().ToArray() : new TwitterEntity[0]
+                UrlEntities = entities != null && entities.url != null ? entities.url.Spawn().ToArray() : null,
+                DescriptionEntities = entities != null && entities.description != null ? entities.description.Spawn().ToArray() : null
             };
         }
     }

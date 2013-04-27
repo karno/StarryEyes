@@ -150,10 +150,16 @@ namespace StarryEyes.Breezy.DataModel
         public DateTime CreatedAt { get; set; }
 
         /// <summary>
-        /// Entities of this tweet
+        /// Entities of this user url
         /// </summary>
         [DataMember]
-        public TwitterEntity[] Entities { get; set; }
+        public TwitterEntity[] UrlEntities { get; set; }
+
+        /// <summary>
+        /// Entities of this user description
+        /// </summary>
+        [DataMember]
+        public TwitterEntity[] DescriptionEntities { get; set; }
 
         public void Serialize(System.IO.BinaryWriter writer)
         {
@@ -176,7 +182,16 @@ namespace StarryEyes.Breezy.DataModel
             writer.Write(FavoritesCount);
             writer.Write(ListedCount);
             writer.Write(Language ?? String.Empty);
-            writer.Write(Entities);
+            writer.Write(UrlEntities != null);
+            if (UrlEntities != null)
+            {
+                writer.Write(UrlEntities);
+            }
+            writer.Write(DescriptionEntities != null);
+            if (DescriptionEntities != null)
+            {
+                writer.Write(DescriptionEntities);
+            }
         }
 
         public void Deserialize(System.IO.BinaryReader reader)
@@ -200,7 +215,14 @@ namespace StarryEyes.Breezy.DataModel
             FavoritesCount = reader.ReadInt64();
             ListedCount = reader.ReadInt64();
             Language = reader.ReadString();
-            Entities = reader.ReadCollection<TwitterEntity>().ToArray();
+            if (reader.ReadBoolean())
+            {
+                UrlEntities = reader.ReadCollection<TwitterEntity>().ToArray();
+            }
+            if (reader.ReadBoolean())
+            {
+                DescriptionEntities = reader.ReadCollection<TwitterEntity>().ToArray();
+            }
         }
 
         public override bool Equals(object obj)
@@ -213,12 +235,25 @@ namespace StarryEyes.Breezy.DataModel
             return this.Id == ((TwitterUser)obj).Id;
         }
 
-        public string GetEntityAidedText(bool showFullUrl = false)
+        public string GetEntityAidedUrl()
+        {
+            if (this.UrlEntities != null)
+            {
+                var entity = this.UrlEntities.FirstOrDefault(u => u.EntityType == EntityType.Urls);
+                if (entity != null)
+                {
+                    return entity.OriginalText;
+                }
+            }
+            return Url;
+        }
+
+        public string GetEntityAidedDescription(bool showFullUrl = false)
         {
             var builder = new StringBuilder();
             var escaped = ParsingExtension.EscapeEntity(this.Description);
             TwitterEntity prevEntity = null;
-            foreach (var entity in this.Entities.Guard().OrderBy(e => e.StartIndex))
+            foreach (var entity in this.DescriptionEntities.Guard().OrderBy(e => e.StartIndex))
             {
                 int pidx = 0;
                 if (prevEntity != null)

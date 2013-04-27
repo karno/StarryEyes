@@ -70,7 +70,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public string Web
         {
-            get { return User.Url; }
+            get { return User.GetEntityAidedUrl(); }
         }
 
         public bool IsWellformed

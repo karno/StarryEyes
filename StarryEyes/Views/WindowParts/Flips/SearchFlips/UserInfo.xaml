@@ -69,14 +69,21 @@
             <ColumnDefinition Width="286" />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
-
         <StackPanel x:Name="LeftPanel"
                     Background="#111111"
                     Orientation="Vertical">
-            <controls:LazyImage Width="270"
-                                Height="270"
-                                Margin="8,8,8,4"
-                                UriSource="{Binding User.ProfileImageUri}" />
+            <Grid Height="143" Background="Black">
+                <controls:LazyImage Width="286"
+                                    Height="143"
+                                    Margin="0"
+                                    VerticalAlignment="Top"
+                                    Stretch="UniformToFill"
+                                    UriSource="{Binding User.HeaderImageUri}" />
+                <controls:LazyImage Width="131"
+                                    Height="131"
+                                    Margin="8,8,8,4"
+                                    UriSource="{Binding User.ProfileImageUri}" />
+            </Grid>
             <TextBlock Margin="8,4"
                        VerticalAlignment="Center"
                        FontSize="24"

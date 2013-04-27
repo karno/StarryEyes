@@ -35,6 +35,12 @@ namespace StarryEyes.Breezy.Api.Parsing.JsonFormats
         }
     }
 
+    public class UserEntityJson
+    {
+        public EntityJson url { get; set; }
+        public EntityJson description { get; set; }
+    }
+
     public class MediaEntityJson
     {
         public string id_str { get; set; }
