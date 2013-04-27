@@ -17,8 +17,8 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
         private DisplayMode _currentDisplayMode = DisplayMode.None;
         private readonly SearchFlipViewModel _parent;
         private readonly string _screenName;
-        private readonly UserStatusesViewModel _statuses;
-        private readonly UserFriendsViewModel _friends;
+        private UserStatusesViewModel _statuses;
+        private UserFriendsViewModel _friends;
         private bool _communicating = true;
         private UserViewModel _user;
 
@@ -93,23 +93,27 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
         {
             this._parent = parent;
             this._screenName = screenName;
-            this._statuses = new UserStatusesViewModel(this);
-            this._friends = new UserFriendsViewModel(this);
             StoreHelper.GetUser(screenName)
                        .Finally(() => Communicating = false)
-                       .Subscribe(user => User = new UserViewModel(user),
-                                  ex =>
-                                  {
-                                      parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
-                                      {
-                                          Title = "ユーザー表示エラー",
-                                          MainIcon = VistaTaskDialogIcon.Error,
-                                          MainInstruction = "ユーザーを表示できません。",
-                                          Content = ex.Message,
-                                          CommonButtons = TaskDialogCommonButtons.Close
-                                      }));
-                                      User = null;
-                                  });
+                       .Subscribe(
+                           user =>
+                           {
+                               User = new UserViewModel(user);
+                               this._statuses = new UserStatusesViewModel(this);
+                               this._friends = new UserFriendsViewModel(this);
+                           },
+                           ex =>
+                           {
+                               parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
+                               {
+                                   Title = "ユーザー表示エラー",
+                                   MainIcon = VistaTaskDialogIcon.Error,
+                                   MainInstruction = "ユーザーを表示できません。",
+                                   Content = ex.Message,
+                                   CommonButtons = TaskDialogCommonButtons.Close
+                               }));
+                               User = null;
+                           });
         }
 
         public void ShowStatuses()
