@@ -777,7 +777,6 @@ namespace StarryEyes.ViewModels.WindowParts
             InputInfo = InputAreaModel.PreviousPosted;
         }
 
-
         #region Image attach control
 
         public void AttachImage()
@@ -789,7 +788,7 @@ namespace StarryEyes.ViewModels.WindowParts
                 MultiSelect = false,
                 Title = "添付する画像ファイルを指定"
             };
-            OpeningFileSelectionMessage m = Messenger.GetResponse(msg);
+            var m = Messenger.GetResponse(msg);
             if (m.Response == null || m.Response.Length <= 0 || String.IsNullOrEmpty(m.Response[0]) ||
                 !File.Exists(m.Response[0])) return;
             AttachedImage = new ImageDescriptionViewModel(m.Response[0]);
@@ -1015,7 +1014,12 @@ namespace StarryEyes.ViewModels.WindowParts
     {
         public ImageDescriptionViewModel(string p)
         {
-            Source = new BitmapImage(new Uri(p));
+            var bitmap = new BitmapImage();
+            bitmap.BeginInit();
+            bitmap.CacheOption = BitmapCacheOption.OnLoad;
+            bitmap.UriSource = new Uri(p);
+            bitmap.EndInit();
+            Source = bitmap;
         }
 
         public ImageDescriptionViewModel(BitmapImage image)
