@@ -114,19 +114,19 @@ namespace StarryEyes.Models.Stores
             this._accountId = accountId;
         }
 
-        private readonly object _followingsLocker = new object();
-        private readonly AVLTree<long> _followings = new AVLTree<long>();
+        private readonly object _followingLocker = new object();
+        private readonly AVLTree<long> _following = new AVLTree<long>();
 
         /// <summary>
         /// Get all followings.
         /// </summary>
-        public IEnumerable<long> Followings
+        public IEnumerable<long> Following
         {
             get
             {
-                lock (_followingsLocker)
+                lock (this._followingLocker)
                 {
-                    return _followings.ToArray();
+                    return this._following.ToArray();
                 }
             }
         }
@@ -138,9 +138,9 @@ namespace StarryEyes.Models.Stores
         /// <returns>if true, you have followed him/her.</returns>
         public bool IsFollowing(long id)
         {
-            lock (_followingsLocker)
+            lock (this._followingLocker)
             {
-                return _followings.Contains(id);
+                return this._following.Contains(id);
             }
         }
 
@@ -151,12 +151,12 @@ namespace StarryEyes.Models.Stores
         /// <param name="isAdded">flag of follow/remove</param>
         public void SetFollowing(long id, bool isAdded)
         {
-            lock (_followingsLocker)
+            lock (this._followingLocker)
             {
                 if (isAdded)
-                    _followings.Add(id);
+                    this._following.Add(id);
                 else
-                    _followings.Remove(id);
+                    this._following.Remove(id);
             }
             RaiseOnAccountDataUpdated(id, isAdded, RelationDataChange.Following);
         }
@@ -167,9 +167,9 @@ namespace StarryEyes.Models.Stores
         /// <param name="id">add user's id</param>
         public void AddFollowing(long id)
         {
-            lock (_followingsLocker)
+            lock (this._followingLocker)
             {
-                _followings.Add(id);
+                this._following.Add(id);
             }
             RaiseOnAccountDataUpdated(id, true, RelationDataChange.Following);
         }
@@ -180,9 +180,9 @@ namespace StarryEyes.Models.Stores
         /// <param name="id">remove user's id</param>
         public void RemoveFollowing(long id)
         {
-            lock (_followingsLocker)
+            lock (this._followingLocker)
             {
-                _followings.Remove(id);
+                this._following.Remove(id);
             }
             RaiseOnAccountDataUpdated(id, false, RelationDataChange.Following);
         }

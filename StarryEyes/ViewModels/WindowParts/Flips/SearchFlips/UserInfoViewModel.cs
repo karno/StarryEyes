@@ -1,35 +1,45 @@
 ﻿using System;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Windows;
 using Livet;
+using Livet.Commands;
 using StarryEyes.Breezy.Api.Rest;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
+using StarryEyes.Breezy.Util;
+using StarryEyes.Models;
 using StarryEyes.Models.Stores;
 using StarryEyes.Nightmare.Windows;
 using StarryEyes.ViewModels.WindowParts.Timelines;
 using StarryEyes.Views.Messaging;
+using StarryEyes.Views.Utils;
 
 namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
 {
     public class UserInfoViewModel : ViewModel
     {
-        private DisplayMode _currentDisplayMode = DisplayMode.None;
         private readonly SearchFlipViewModel _parent;
         private readonly string _screenName;
         private UserStatusesViewModel _statuses;
+        private UserFavoritesViewModel _favorites;
         private UserFriendsViewModel _friends;
         private bool _communicating = true;
         private UserViewModel _user;
 
-        private DisplayMode CurrentDisplayMode
+        private UserDisplayKind _displayKind = UserDisplayKind.Statuses;
+        public UserDisplayKind DisplayKind
         {
-            get { return this._currentDisplayMode; }
+
+            get { return _displayKind; }
             set
             {
-                this._currentDisplayMode = value;
+                if (_displayKind == value) return;
+                this._displayKind = value;
+                this.RaisePropertyChanged();
                 this.RaisePropertyChanged(() => IsVisibleStatuses);
                 this.RaisePropertyChanged(() => IsVisibleFriends);
+                this.RaisePropertyChanged(() => IsVisibleFavorites);
             }
         }
 
@@ -74,6 +84,11 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             get { return this._statuses; }
         }
 
+        public UserFavoritesViewModel Favorites
+        {
+            get { return this._favorites; }
+        }
+
         public UserFriendsViewModel Friends
         {
             get { return this._friends; }
@@ -81,12 +96,17 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
 
         public bool IsVisibleStatuses
         {
-            get { return CurrentDisplayMode == DisplayMode.Statuses; }
+            get { return DisplayKind == UserDisplayKind.Statuses; }
+        }
+
+        public bool IsVisibleFavorites
+        {
+            get { return DisplayKind == UserDisplayKind.Favorites; }
         }
 
         public bool IsVisibleFriends
         {
-            get { return CurrentDisplayMode == DisplayMode.Friends; }
+            get { return DisplayKind == UserDisplayKind.Following || DisplayKind == UserDisplayKind.Followers; }
         }
 
         public UserInfoViewModel(SearchFlipViewModel parent, string screenName)
@@ -100,7 +120,11 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                            {
                                User = new UserViewModel(user);
                                this._statuses = new UserStatusesViewModel(this);
+                               this.RaisePropertyChanged(() => Statuses);
+                               this._favorites = new UserFavoritesViewModel(this);
+                               this.RaisePropertyChanged(() => Favorites);
                                this._friends = new UserFriendsViewModel(this);
+                               this.RaisePropertyChanged(() => Friends);
                            },
                            ex =>
                            {
@@ -116,28 +140,119 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                            });
         }
 
-        public void ShowStatuses()
+        public void Close()
         {
-            CurrentDisplayMode = DisplayMode.Statuses;
+            Parent.RewindStack();
         }
 
-        public void ShowFollowings()
+        public void ShowStatuses()
         {
-            CurrentDisplayMode = DisplayMode.Friends;
+            DisplayKind = UserDisplayKind.Statuses;
+        }
 
+        public void ShowFavorites()
+        {
+            DisplayKind = UserDisplayKind.Favorites;
+        }
+
+        public void ShowFollowing()
+        {
+            DisplayKind = UserDisplayKind.Following;
+            Friends.RelationKind = RelationKind.Following;
         }
 
         public void ShowFollowers()
         {
-            CurrentDisplayMode = DisplayMode.Friends;
+            DisplayKind = UserDisplayKind.Followers;
+            Friends.RelationKind = RelationKind.Followers;
         }
 
-        enum DisplayMode
+        #region Text selection control
+
+        private string _selectedText;
+        public string SelectedText
         {
-            None,
-            Statuses,
-            Friends,
+            get { return this._selectedText ?? String.Empty; }
+            set
+            {
+                this._selectedText = value;
+                this.RaisePropertyChanged();
+            }
         }
+
+        public void CopyText()
+        {
+            try
+            {
+                Clipboard.SetText(SelectedText);
+            }
+            // ReSharper disable EmptyGeneralCatchClause
+            catch
+            // ReSharper restore EmptyGeneralCatchClause
+            {
+            }
+        }
+
+        public void SetTextToInputBox()
+        {
+            InputAreaModel.SetText(body: SelectedText);
+        }
+
+        public void FindOnKrile()
+        {
+            SearchFlipModel.RequestSearch(SelectedText, SearchMode.Local);
+        }
+
+        public void FindOnTwitter()
+        {
+            SearchFlipModel.RequestSearch(SelectedText, SearchMode.Web);
+        }
+
+        private const string GoogleUrl = @"http://www.google.com/search?q={0}";
+        public void FindOnGoogle()
+        {
+            var encoded = HttpUtility.UrlEncode(SelectedText);
+            var url = String.Format(GoogleUrl, encoded);
+            BrowserHelper.Open(url);
+        }
+
+        #endregion
+
+        #region OpenLinkCommand
+
+        private ListenerCommand<string> _openLinkCommand;
+
+        public ListenerCommand<string> OpenLinkCommand
+        {
+            get { return _openLinkCommand ?? (_openLinkCommand = new ListenerCommand<string>(OpenLink)); }
+        }
+
+        public void OpenLink(string parameter)
+        {
+            var param = TextBlockStylizer.ResolveInternalUrl(parameter);
+            switch (param.Item1)
+            {
+                case LinkType.User:
+                    SearchFlipModel.RequestSearch(param.Item2, SearchMode.UserScreenName);
+                    break;
+                case LinkType.Hash:
+                    SearchFlipModel.RequestSearch(param.Item2, SearchMode.Web);
+                    break;
+                case LinkType.Url:
+                    BrowserHelper.Open(param.Item2);
+                    break;
+            }
+        }
+
+        #endregion
+    }
+
+    public enum UserDisplayKind
+    {
+        Statuses,
+        Favorites,
+        Following,
+        Followers,
     }
 
     public class RelationControllerViewModel : ViewModel
@@ -220,10 +335,11 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             IsFollowing = rds.IsFollowing(target.Id);
             IsFollowedBack = rds.IsFollowedBy(target.Id);
             IsBlocking = rds.IsBlocking(target.Id);
-            source.GetFriendship(source_id: source.Id, target_id: target.Id)
+            source.GetFriendship(source.Id, target_id: target.Id)
                   .Subscribe(
                       r =>
                       {
+                          // ReSharper disable InvertIf
                           if (IsFollowing != r.relationship.source.following)
                           {
                               IsFollowing = r.relationship.source.following;
@@ -260,6 +376,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                                   rds.RemoveBlocking(target.Id);
                               }
                           }
+                          // ReSharper restore InvertIf
                       },
                       ex =>
                       {

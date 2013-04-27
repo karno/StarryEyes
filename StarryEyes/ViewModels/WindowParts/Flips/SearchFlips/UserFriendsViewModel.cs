@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading;
 using Livet;
@@ -16,7 +17,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
     {
         private readonly UserInfoViewModel _parent;
 
-        private List<long> _followings;
+        private List<long> _following;
         private List<long> _followers;
 
         private readonly ObservableCollection<UserResultItemViewModel> _users = new ObservableCollection<UserResultItemViewModel>();
@@ -30,6 +31,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
         public UserFriendsViewModel(UserInfoViewModel parent)
         {
             _parent = parent;
+            this.InitCollection();
         }
 
         public RelationKind RelationKind
@@ -78,11 +80,11 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             });
             switch (RelationKind)
             {
-                case RelationKind.Friends:
-                    _followings = new List<long>();
+                case RelationKind.Following:
+                    _following = new List<long>();
                     info.GetFriendsIdsAll(_parent.User.User.Id)
                         .Subscribe(
-                            id => _followings.Add(id),
+                            id => _following.Add(id),
                             errorHandler,
                             finishHandler);
                     break;
@@ -111,7 +113,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                                     .Select(s => s.AuthenticateInfo)
                                     .FirstOrDefault();
             var page = Interlocked.Increment(ref _currentPageCount);
-            var target = RelationKind == RelationKind.Friends ? _followings : _followers;
+            var target = RelationKind == RelationKind.Following ? _following : _followers;
             var ids = target.Skip(page * 100).Take(100).ToArray();
             if (ids.Length == 0)
             {
@@ -119,7 +121,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 return;
             }
             info.LookupUser(ids)
-                .ObserveOnDispatcher()
+                .ObserveOn(DispatcherHolder.Dispatcher)
                 .Finally(() => this.IsLoading = false)
                 .Subscribe(u => Users.Add(new UserResultItemViewModel(u)));
         }
@@ -127,7 +129,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
 
     public enum RelationKind
     {
-        Friends,
+        Following,
         Followers,
     }
 }

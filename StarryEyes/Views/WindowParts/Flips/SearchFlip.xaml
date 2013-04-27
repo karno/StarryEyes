@@ -268,6 +268,9 @@
             <DockPanel Visibility="{Binding UserResult, Converter={StaticResource NotNullToVisibleConverter}}">
                 <SearchFlips:UserResult DataContext="{Binding UserResult}" />
             </DockPanel>
+            <DockPanel Visibility="{Binding UserInfo, Converter={StaticResource NotNullToVisibleConverter}}">
+                <SearchFlips:UserInfo DataContext="{Binding UserInfo}" />
+            </DockPanel>
         </Grid>
 
         <!--  Search navigations  -->
@@ -351,9 +354,6 @@
                         <TranslateTransform />
                     </TransformGroup>
                 </StackPanel.LayoutTransform>
-                <TextBlock Margin="8"
-                           Foreground="White"
-                           Text="検索対象:" />
                 <Grid>
                     <Grid.Style>
                         <Style TargetType="Grid">

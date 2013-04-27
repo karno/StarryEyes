@@ -12,7 +12,7 @@ using StarryEyes.Models;
 
 namespace StarryEyes.Views.Utils
 {
-    public class StatusStylizer
+    public class TextBlockStylizer
     {
         const string UserNavigation = "user://";
 
@@ -31,6 +31,8 @@ namespace StarryEyes.Views.Utils
             return new Tuple<LinkType, string>(LinkType.Url, iurl);
         }
 
+        #region Twitter Status
+
         public static TwitterStatus GetTwitterStatus(DependencyObject obj)
         {
             return (TwitterStatus)obj.GetValue(TwitterStatusProperty);
@@ -45,7 +47,7 @@ namespace StarryEyes.Views.Utils
             DependencyProperty.RegisterAttached(
             "TwitterStatus",
             typeof(TwitterStatus),
-            typeof(StatusStylizer),
+            typeof(TextBlockStylizer),
             new PropertyMetadata((o, e) =>
             {
                 var status = (TwitterStatus)e.NewValue;
@@ -54,72 +56,83 @@ namespace StarryEyes.Views.Utils
                 textBlock.Inlines.Clear();
 
                 if (status == null)
+                {
                     return;
+                }
 
                 // generate contents
-                GenerateInlines(o, status)
+                if (status.RetweetedOriginal != null)
+                {
+                    status = status.RetweetedOriginal;
+                }
+                GenerateInlines(o, status.Text, status.Entities)
                     .ForEach(textBlock.Inlines.Add);
             }));
 
-        public static string GetText(DependencyObject obj)
+        #endregion
+
+        #region Twitter Users
+
+        public static TwitterUser GetTwitterUser(DependencyObject obj)
         {
-            return (string)obj.GetValue(TextProperty);
+            return (TwitterUser)obj.GetValue(TwitterUserProperty);
         }
 
-        public static void SetText(DependencyObject obj, string value)
+        public static void SetTwitterUser(DependencyObject obj, TwitterUser value)
         {
-            obj.SetValue(TextProperty, value);
+            obj.SetValue(TwitterUserProperty, value);
         }
 
-        public static readonly DependencyProperty TextProperty =
+        public static readonly DependencyProperty TwitterUserProperty =
             DependencyProperty.RegisterAttached(
-            "Text",
-            typeof(string),
-            typeof(StatusStylizer),
+            "TwitterUser",
+            typeof(TwitterUser),
+            typeof(TextBlockStylizer),
             new PropertyMetadata((o, e) =>
             {
-                var text = (string)e.NewValue;
+                var user = (TwitterUser)e.NewValue;
                 var textBlock = (TextBlock)o;
+                var foreground = textBlock.Foreground;
 
                 textBlock.Inlines.Clear();
 
+                if (user == null)
+                {
+                    return;
+                }
+
                 // generate contents
-                GenerateInlines(o, text).ForEach(textBlock.Inlines.Add);
+                GenerateInlines(o, user.Description, user.Entities)
+                    .Select(inline =>
+                    {
+                        var run = inline as Run;
+                        if (run != null)
+                        {
+                            run.Foreground = foreground;
+                        }
+                        return inline;
+                    })
+                    .ForEach(textBlock.Inlines.Add);
             }));
 
-        public static ICommand GetLinkNavigationCommand(DependencyObject obj)
-        {
-            return (ICommand)obj.GetValue(LinkNavigationCommandProperty);
-        }
+        #endregion
 
-        public static void SetLinkNavigationCommand(DependencyObject obj, ICommand value)
-        {
-            obj.SetValue(LinkNavigationCommandProperty, value);
-        }
+        #region Common Entitied Text Utility
 
-        public static readonly DependencyProperty LinkNavigationCommandProperty =
-            DependencyProperty.RegisterAttached(
-            "LinkNavigationCommand",
-            typeof(ICommand),
-            typeof(StatusStylizer),
-            new PropertyMetadata(null));
-
-        private static IEnumerable<Inline> GenerateInlines(DependencyObject obj, TwitterStatus status)
+        private static IEnumerable<Inline> GenerateInlines(DependencyObject obj, string text, IEnumerable<TwitterEntity> entities)
         {
-            if (status.Entities == null)
+            if (entities == null)
             {
                 System.Diagnostics.Debug.WriteLine("compatible mode");
-                foreach (var inline in GenerateInlines(obj, status.Text))
+                foreach (var inline in GenerateInlines(obj, text))
                 {
                     yield return inline;
                 }
                 yield break;
             }
-            if (status.RetweetedOriginal != null)
-                status = status.RetweetedOriginal; // change target
-            var escaped = ParsingExtension.EscapeEntity(status.Text);
+            var escaped = ParsingExtension.EscapeEntity(text);
             TwitterEntity prevEntity = null;
-            foreach (var entity in status.Entities.Guard().OrderBy(e => e.StartIndex))
+            foreach (var entity in entities.Guard().OrderBy(e => e.StartIndex))
             {
                 int pidx = 0;
                 if (prevEntity != null)
@@ -146,7 +159,7 @@ namespace StarryEyes.Views.Utils
             }
             if (prevEntity == null)
             {
-                yield return GenerateText(status.Text);
+                yield return GenerateText(text);
             }
             else if (prevEntity.EndIndex < escaped.Length)
             {
@@ -154,6 +167,36 @@ namespace StarryEyes.Views.Utils
                     ParsingExtension.ResolveEntity(escaped.Substring(prevEntity.EndIndex, escaped.Length - prevEntity.EndIndex)));
             }
         }
+
+        #endregion
+
+        #region Generic Text
+
+        public static string GetText(DependencyObject obj)
+        {
+            return (string)obj.GetValue(TextProperty);
+        }
+
+        public static void SetText(DependencyObject obj, string value)
+        {
+            obj.SetValue(TextProperty, value);
+        }
+
+        public static readonly DependencyProperty TextProperty =
+            DependencyProperty.RegisterAttached(
+            "Text",
+            typeof(string),
+            typeof(TextBlockStylizer),
+            new PropertyMetadata((o, e) =>
+            {
+                var text = (string)e.NewValue;
+                var textBlock = (TextBlock)o;
+
+                textBlock.Inlines.Clear();
+
+                // generate contents
+                GenerateInlines(o, text).ForEach(textBlock.Inlines.Add);
+            }));
 
         private static IEnumerable<Inline> GenerateInlines(DependencyObject obj, string text)
         {
@@ -176,6 +219,29 @@ namespace StarryEyes.Views.Utils
                 }
             }
         }
+
+        #endregion
+
+        #region Link Navigation
+
+        public static ICommand GetLinkNavigationCommand(DependencyObject obj)
+        {
+            return (ICommand)obj.GetValue(LinkNavigationCommandProperty);
+        }
+
+        public static void SetLinkNavigationCommand(DependencyObject obj, ICommand value)
+        {
+            obj.SetValue(LinkNavigationCommandProperty, value);
+        }
+
+        public static readonly DependencyProperty LinkNavigationCommandProperty =
+            DependencyProperty.RegisterAttached(
+            "LinkNavigationCommand",
+            typeof(ICommand),
+            typeof(TextBlockStylizer),
+            new PropertyMetadata(null));
+
+        #endregion
 
         private static Inline GenerateText(string surface)
         {

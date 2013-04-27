@@ -40,7 +40,7 @@ namespace StarryEyes.Filters.Expressions.Values.Users
         }
     }
 
-    public sealed class UserFriends : ValueBase
+    public sealed class UserFollowing : ValueBase
     {
         public override IEnumerable<FilterExpressionType> SupportedTypes
         {
@@ -54,7 +54,7 @@ namespace StarryEyes.Filters.Expressions.Values.Users
 
         public override string ToQuery()
         {
-            return "user.followings"; // user.followings_count, user.friends, user.friends_count is also ok
+            return "user.following"; // user.followings_count, user.friends, user.friends_count is also ok
         }
     }
 
@@ -148,7 +148,7 @@ namespace StarryEyes.Filters.Expressions.Values.Users
         }
     }
 
-    public sealed class RetweeterFriends : ValueBase
+    public sealed class RetweeterFollowing : ValueBase
     {
         public override IEnumerable<FilterExpressionType> SupportedTypes
         {
@@ -162,7 +162,7 @@ namespace StarryEyes.Filters.Expressions.Values.Users
 
         public override string ToQuery()
         {
-            return "retweeter.followings"; // user.followings_count, user_friends, user.friends_count is also ok
+            return "retweeter.following"; // user.followings_count, user_friends, user.friends_count is also ok
         }
     }
 

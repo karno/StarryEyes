@@ -1,7 +1,7 @@
 ﻿<UserControl x:Class="StarryEyes.Views.WindowParts.Flips.SearchFlips.SearchResult"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:Timelines="clr-namespace:StarryEyes.Views.WindowParts.Timelines"
+             xmlns:Timelines="clr-namespace:StarryEyes.Views.WindowParts.Primitives"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:ei="clr-namespace:Microsoft.Expression.Interactivity.Core;assembly=Microsoft.Expression.Interactions"
              xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"

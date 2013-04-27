@@ -62,13 +62,13 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
             }
         }
 
-        public override IReadOnlyCollection<long> Followings
+        public override IReadOnlyCollection<long> Following
         {
             get
             {
                 if (_adata == null)
                     return new List<long>(); // returns empty list
-                return new AVLTree<long>(_adata.Followings);
+                return new AVLTree<long>(_adata.Following);
             }
         }
 

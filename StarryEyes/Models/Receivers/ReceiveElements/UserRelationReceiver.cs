@@ -28,7 +28,7 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
         {
             // get relation info
             var reldata = AccountRelationDataStore.Get(_authInfo.Id);
-            var beforeFollowing = new AVLTree<long>(reldata.Followings);
+            var beforeFollowing = new AVLTree<long>(reldata.Following);
             var beforeFollowers = new AVLTree<long>(reldata.Followers);
             var beforeBlockings = new AVLTree<long>(reldata.Blockings);
             // get followings / followers

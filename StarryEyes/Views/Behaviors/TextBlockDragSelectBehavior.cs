@@ -18,6 +18,17 @@ namespace StarryEyes.Views.Behaviors
         private TextPointer _selectionStart;
         private Inline[] _origInlines;
 
+        public Brush ForegroundBrush
+        {
+            get { return (Brush)GetValue(ForegroundBrushProperty); }
+            set { SetValue(ForegroundBrushProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for ForegroundBrush.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty ForegroundBrushProperty =
+            DependencyProperty.Register("ForegroundBrush", typeof(Brush), typeof(TextBlockDragSelectBehavior),
+                                        new PropertyMetadata(Brushes.Black));
+
         public Brush HighlightBrush
         {
             get { return (Brush)GetValue(HighlightBrushProperty); }
@@ -29,8 +40,6 @@ namespace StarryEyes.Views.Behaviors
             DependencyProperty.Register("HighlightBrush", typeof(Brush),
                                         typeof(TextBlockDragSelectBehavior),
                                         new PropertyMetadata(SystemColors.HighlightBrush));
-
-
 
         public Brush HighlightForegroundBrush
         {
@@ -162,10 +171,10 @@ namespace StarryEyes.Views.Behaviors
             highlight.ApplyPropertyValue(TextElement.ForegroundProperty, this.HighlightForegroundBrush);
             var beforeRange = new TextRange(this.AssociatedObject.ContentStart, highlight.Start);
             beforeRange.ApplyPropertyValue(TextElement.BackgroundProperty, Brushes.Transparent);
-            beforeRange.ApplyPropertyValue(TextElement.ForegroundProperty, Brushes.Black);
+            beforeRange.ApplyPropertyValue(TextElement.ForegroundProperty, this.ForegroundBrush);
             var afterRange = new TextRange(highlight.End, this.AssociatedObject.ContentEnd);
             afterRange.ApplyPropertyValue(TextElement.BackgroundProperty, Brushes.Transparent);
-            afterRange.ApplyPropertyValue(TextElement.ForegroundProperty, Brushes.Black);
+            afterRange.ApplyPropertyValue(TextElement.ForegroundProperty, this.ForegroundBrush);
             this.SelectedText = highlight.Text;
         }
 
@@ -197,7 +206,7 @@ namespace StarryEyes.Views.Behaviors
                 _selectionStart = null;
                 var range = new TextRange(this.AssociatedObject.ContentStart, this.AssociatedObject.ContentEnd);
                 range.ApplyPropertyValue(TextElement.BackgroundProperty, Brushes.Transparent);
-                range.ApplyPropertyValue(TextElement.ForegroundProperty, Brushes.Black);
+                range.ApplyPropertyValue(TextElement.ForegroundProperty, this.ForegroundBrush);
                 if (_origInlines != null)
                 {
                     this.AssociatedObject.Inlines.Clear();

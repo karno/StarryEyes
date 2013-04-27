@@ -13,14 +13,14 @@ using StarryEyes.ViewModels.WindowParts.Timelines;
 
 namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
 {
-    public class UserStatusesViewModel : TimelineViewModelBase
+    public class UserFavoritesViewModel : TimelineViewModelBase
     {
         private readonly UserInfoViewModel _parent;
 
         private readonly TimelineModel _timelineModel;
         protected override TimelineModel TimelineModel
         {
-            get { return _timelineModel; }
+            get { return this._timelineModel; }
         }
 
         protected override IEnumerable<long> CurrentAccounts
@@ -32,10 +32,10 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             }
         }
 
-        public UserStatusesViewModel(UserInfoViewModel parent)
+        public UserFavoritesViewModel(UserInfoViewModel parent)
         {
-            _parent = parent;
-            _timelineModel = new TimelineModel(
+            this._parent = parent;
+            this._timelineModel = new TimelineModel(
                 s => s.User.Id == parent.User.User.Id,
                 (id, c, _) =>
                 {
@@ -47,7 +47,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                     {
                         return Observable.Empty<TwitterStatus>();
                     }
-                    return info.GetUserTimeline(_parent.User.User.Id, max_id: id, count: c)
+                    return info.GetFavorites(this._parent.User.User.Id, max_id: id, count: c)
                                .Catch((Exception ex) =>
                                {
                                    BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message));
@@ -73,7 +73,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
         public void PinToTab()
         {
             TabManager.CreateTab(
-                new TabModel(_parent.ScreenName, "from local where user == \"" + _parent.ScreenName + "\""));
+                new TabModel(this._parent.ScreenName, "from local where favs contains @" + this._parent.ScreenName));
         }
     }
 }

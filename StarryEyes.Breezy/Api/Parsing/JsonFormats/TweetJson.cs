@@ -30,10 +30,10 @@ namespace StarryEyes.Breezy.Api.Parsing.JsonFormats
 
         public TweetJson retweeted_status { get; set; }
 
+        public EntityJson entities { get; set; }
+
         // geo is deprecated parameter.
         // public int[] geo { get; set; }
-
-        public EntityJson entities { get; set; }
 
         /// <summary>
         /// Create actual TwitterStatus.

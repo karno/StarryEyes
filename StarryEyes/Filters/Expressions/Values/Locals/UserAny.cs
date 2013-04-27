@@ -27,21 +27,21 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
             {
                 var followers = new AVLTree<long>();
                 AccountsStore.Accounts
-                    .SelectMany(a => AccountRelationDataStore.Get(a.UserId).Followings)
+                    .SelectMany(a => AccountRelationDataStore.Get(a.UserId).Following)
                     .ForEach(followers.Add);
                 return followers;
             }
         }
 
-        public override IReadOnlyCollection<long> Followings
+        public override IReadOnlyCollection<long> Following
         {
             get
             {
-                var followings = new AVLTree<long>();
+                var following = new AVLTree<long>();
                 AccountsStore.Accounts
-                    .SelectMany(a => AccountRelationDataStore.Get(a.UserId).Followings)
-                    .ForEach(followings.Add);
-                return followings;
+                    .SelectMany(a => AccountRelationDataStore.Get(a.UserId).Following)
+                    .ForEach(following.Add);
+                return following;
             }
         }
 

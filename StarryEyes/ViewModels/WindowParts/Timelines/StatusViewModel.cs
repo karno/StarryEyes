@@ -470,6 +470,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         #region Text selection control
 
+        private string _selectedText;
         public string SelectedText
         {
             get { return this._selectedText ?? String.Empty; }
@@ -1040,7 +1041,6 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         #region OpenLinkCommand
 
         private ListenerCommand<string> _openLinkCommand;
-        private string _selectedText;
 
         public ListenerCommand<string> OpenLinkCommand
         {
@@ -1049,7 +1049,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public void OpenLink(string parameter)
         {
-            var param = StatusStylizer.ResolveInternalUrl(parameter);
+            var param = TextBlockStylizer.ResolveInternalUrl(parameter);
             switch (param.Item1)
             {
                 case LinkType.User:

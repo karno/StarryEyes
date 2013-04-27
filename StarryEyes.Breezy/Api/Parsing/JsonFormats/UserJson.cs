@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.Linq;
+using Newtonsoft.Json;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Breezy.Util;
 
@@ -57,6 +58,8 @@ namespace StarryEyes.Breezy.Api.Parsing.JsonFormats
 
         public string created_at { get; set; }
 
+        public EntityJson entities { get; set; }
+
         /// <summary>
         /// Convert JSON internal object model to Twintail object model.
         /// </summary>
@@ -68,6 +71,7 @@ namespace StarryEyes.Breezy.Api.Parsing.JsonFormats
                 Id = id_str.ParseLong(),
                 ScreenName = screen_name,
                 Name = name,
+                CreatedAt = created_at.ParseDateTime(ParsingExtension.TwitterDateTimeFormat),
                 Description = description,
                 Location = location,
                 Url = url,
@@ -87,7 +91,7 @@ namespace StarryEyes.Breezy.Api.Parsing.JsonFormats
                 ListedCount = listed_count.GetValueOrDefault(),
                 Language = lang,
                 IsGeoEnabled = is_geo_enabled,
-                CreatedAt = created_at.ParseDateTime(ParsingExtension.TwitterDateTimeFormat)
+                Entities = entities != null ? entities.Spawn().ToArray() : new TwitterEntity[0]
             };
         }
     }

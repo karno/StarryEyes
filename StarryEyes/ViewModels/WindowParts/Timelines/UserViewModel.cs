@@ -84,8 +84,18 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             {
                 Uri uri;
                 if (Uri.TryCreate(User.Url, UriKind.Absolute, out uri))
+                {
                     return uri;
+                }
                 return null;
+            }
+        }
+
+        public void OpenUserWeb()
+        {
+            if (!String.IsNullOrWhiteSpace(Web))
+            {
+                BrowserHelper.Open(Web);
             }
         }
 

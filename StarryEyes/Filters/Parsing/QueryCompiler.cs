@@ -423,7 +423,7 @@ namespace StarryEyes.Filters.Parsing
                     case "friends":
                     case "following":
                     case "followings":
-                        return new LocalUserFollowings(repl);
+                        return new LocalUserFollowing(repl);
                     case "follower":
                     case "followers":
                         return new LocalUserFollowers(repl);
@@ -504,7 +504,7 @@ namespace StarryEyes.Filters.Parsing
                 case "friends_count":
                 case "followingsCount":
                 case "followings_count":
-                    return selector(new UserFriends(), new RetweeterFriends());
+                    return selector(new UserFollowing(), new RetweeterFollowing());
                 case "follower":
                 case "followers":
                 case "followersCount":

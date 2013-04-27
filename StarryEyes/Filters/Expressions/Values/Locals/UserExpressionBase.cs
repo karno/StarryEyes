@@ -10,7 +10,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 
         public abstract IReadOnlyCollection<long> Users { get; }
 
-        public abstract IReadOnlyCollection<long> Followings { get; }
+        public abstract IReadOnlyCollection<long> Following { get; }
 
         public abstract IReadOnlyCollection<long> Followers { get; }
 

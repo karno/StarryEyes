@@ -1,0 +1,296 @@
+﻿<UserControl x:Class="StarryEyes.Views.WindowParts.Flips.SearchFlips.UserInfo"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:Primitives="clr-namespace:StarryEyes.Views.WindowParts.Primitives"
+             xmlns:behaviors="clr-namespace:StarryEyes.Views.Behaviors"
+             xmlns:controls="clr-namespace:StarryEyes.Views.Controls"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:ei="clr-namespace:Microsoft.Expression.Interactivity.Core;assembly=Microsoft.Expression.Interactions"
+             xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:utils="clr-namespace:StarryEyes.Views.Utils"
+             xmlns:vm="clr-namespace:StarryEyes.ViewModels.WindowParts.Flips.SearchFlips"
+             d:DataContext="{d:DesignInstance vm:UserInfoViewModel}"
+             d:DesignHeight="300"
+             d:DesignWidth="300"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Krile;component/DefaultContextMenus.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <utils:BooleanToInvisibleConverter x:Key="BooleanToInvisibleConverter" />
+            <utils:BooleanToVisibleConverter x:Key="BooleanToVisibleConverter" />
+            <utils:NotNullToVisibleConverter x:Key="NotNullToVisibleConverter" />
+            <Style x:Key="FloatTextBlockStyle" TargetType="TextBlock">
+                <Style.Resources>
+                    <ResourceDictionary>
+                        <ResourceDictionary.MergedDictionaries>
+                            <ResourceDictionary Source="pack://application:,,,/Krile;component/DefaultContextMenus.xaml" />
+                        </ResourceDictionary.MergedDictionaries>
+                        <Storyboard x:Key="DefaultStoryBoard">
+                            <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(TextBlock.Background).(SolidColorBrush.Color)">
+                                <SplineColorKeyFrame KeyTime="0:0:0" Value="#00000000" />
+                            </ColorAnimationUsingKeyFrames>
+                        </Storyboard>
+                        <Storyboard x:Key="HighlightStoryBoard">
+                            <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(TextBlock.Background).(SolidColorBrush.Color)">
+                                <SplineColorKeyFrame KeyTime="0:0:0" Value="#FF333333" />
+                            </ColorAnimationUsingKeyFrames>
+                        </Storyboard>
+                        <Storyboard x:Key="PressStoryBoard">
+                            <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(TextBlock.Background).(SolidColorBrush.Color)">
+                                <SplineColorKeyFrame KeyTime="0:0:0" Value="#FF444444" />
+                            </ColorAnimationUsingKeyFrames>
+                        </Storyboard>
+                    </ResourceDictionary>
+                </Style.Resources>
+                <Setter Property="Background" Value="#001BA1E2" />
+                <Setter Property="Foreground" Value="White" />
+                <Style.Triggers>
+                    <EventTrigger RoutedEvent="MouseEnter">
+                        <BeginStoryboard Storyboard="{StaticResource HighlightStoryBoard}" />
+                    </EventTrigger>
+                    <EventTrigger RoutedEvent="MouseLeave">
+                        <BeginStoryboard Storyboard="{StaticResource DefaultStoryBoard}" />
+                    </EventTrigger>
+                    <EventTrigger RoutedEvent="MouseLeftButtonDown">
+                        <BeginStoryboard Storyboard="{StaticResource PressStoryBoard}" />
+                    </EventTrigger>
+                    <EventTrigger RoutedEvent="MouseLeftButtonUp">
+                        <BeginStoryboard Storyboard="{StaticResource HighlightStoryBoard}" />
+                    </EventTrigger>
+                </Style.Triggers>
+            </Style>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="286" />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+
+        <StackPanel x:Name="LeftPanel"
+                    Background="#111111"
+                    Orientation="Vertical">
+            <controls:LazyImage Width="270"
+                                Height="270"
+                                Margin="8,8,8,4"
+                                UriSource="{Binding User.ProfileImageUri}" />
+            <TextBlock Margin="8,4"
+                       VerticalAlignment="Center"
+                       FontSize="24"
+                       FontWeight="Bold"
+                       Foreground="#FF1BA1E2"
+                       Text="{Binding ScreenName,
+                                      Mode=OneTime}" />
+            <TextBlock Margin="8,4"
+                       Foreground="White"
+                       Text="{Binding User.Name,
+                                      Mode=OneWay}" />
+            <TextBlock Margin="8,4"
+                       VerticalAlignment="Top"
+                       Foreground="White"
+                       TextWrapping="Wrap"
+                       utils:TextBlockStylizer.LinkNavigationCommand="{Binding OpenLinkCommand,
+                                                                               Mode=OneTime}"
+                       utils:TextBlockStylizer.TwitterUser="{Binding User.User}">
+                <i:Interaction.Behaviors>
+                    <behaviors:TextBlockDragSelectBehavior ForegroundBrush="White" SelectedText="{Binding SelectedText, Mode=OneWayToSource}">
+                        <behaviors:TextBlockDragSelectBehavior.SelectContextMenu>
+                            <ContextMenu DataContext="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                                <MenuItem Header="クリップボードにコピー(_C)">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="Click">
+                                            <ei:CallMethodAction MethodName="CopyText" TargetObject="{Binding}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </MenuItem>
+                                <MenuItem Header="ツイート入力欄にコピー(_I)">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="Click">
+                                            <ei:CallMethodAction MethodName="SetTextToInputBox" TargetObject="{Binding}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </MenuItem>
+                                <Separator />
+                                <MenuItem Header="Krile内のツイートを検索(_K)">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="Click">
+                                            <ei:CallMethodAction MethodName="FindOnKrile" TargetObject="{Binding}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </MenuItem>
+                                <MenuItem Header="Twitterからツイートを検索(_T)">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="Click">
+                                            <ei:CallMethodAction MethodName="FindOnTwitter" TargetObject="{Binding}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </MenuItem>
+                                <Separator />
+                                <MenuItem Header="Googleで検索(_G)">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="Click">
+                                            <ei:CallMethodAction MethodName="FindOnGoogle" TargetObject="{Binding}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </MenuItem>
+                                <Separator />
+                                <MenuItem Header="キーワードをミュート(_M)">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="Click">
+                                            <ei:CallMethodAction MethodName="MuteKeyword" TargetObject="{Binding}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </MenuItem>
+                            </ContextMenu>
+                        </behaviors:TextBlockDragSelectBehavior.SelectContextMenu>
+                    </behaviors:TextBlockDragSelectBehavior>
+                </i:Interaction.Behaviors>
+            </TextBlock>
+            <TextBlock Margin="8,4"
+                       Foreground="White"
+                       Text="{Binding User.Location}" />
+            <TextBlock Margin="8,4"
+                       Foreground="White"
+                       Text="{Binding User.Web}">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseLeftButtonDown">
+                        <ei:CallMethodAction MethodName="OpenUserWeb" TargetObject="{Binding User}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </TextBlock>
+            <Grid>
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Setter Property="Background" Value="Transparent" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding DisplayKind}" Value="Statuses">
+                                <Setter Property="Background" Value="#FF222222" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <TextBlock Padding="8"
+                           Style="{StaticResource FloatTextBlockStyle}"
+                           Text="{Binding User.StatusesCount,
+                                          StringFormat={}{0} tweets}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="MouseLeftButtonDown">
+                            <ei:CallMethodAction MethodName="ShowStatuses" TargetObject="{Binding}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </TextBlock>
+            </Grid>
+            <Grid>
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Setter Property="Background" Value="Transparent" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding DisplayKind}" Value="Following">
+                                <Setter Property="Background" Value="#FF222222" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <TextBlock Padding="8"
+                           Style="{StaticResource FloatTextBlockStyle}"
+                           Text="{Binding User.FollowingsCount,
+                                          StringFormat={}{0} following}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="MouseLeftButtonDown">
+                            <ei:CallMethodAction MethodName="ShowFollowing" TargetObject="{Binding}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </TextBlock>
+            </Grid>
+            <Grid>
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Setter Property="Background" Value="Transparent" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding DisplayKind}" Value="Followers">
+                                <Setter Property="Background" Value="#FF222222" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <TextBlock Padding="8"
+                           Style="{StaticResource FloatTextBlockStyle}"
+                           Text="{Binding User.FollowersCount,
+                                          StringFormat={}{0} followers}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="MouseLeftButtonDown">
+                            <ei:CallMethodAction MethodName="ShowFollowers" TargetObject="{Binding}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </TextBlock>
+            </Grid>
+            <Grid>
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Setter Property="Background" Value="Transparent" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding DisplayKind}" Value="Favorites">
+                                <Setter Property="Background" Value="#FF222222" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <TextBlock Padding="8"
+                           Style="{StaticResource FloatTextBlockStyle}"
+                           Text="{Binding User.FavoritesCount,
+                                          StringFormat={}{0} favorites}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="MouseLeftButtonDown">
+                            <ei:CallMethodAction MethodName="ShowFavorites" TargetObject="{Binding}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </TextBlock>
+            </Grid>
+        </StackPanel>
+        <Ellipse Width="52"
+                 Height="52"
+                 Margin="-8,-8,0,0"
+                 HorizontalAlignment="Left"
+                 VerticalAlignment="Top"
+                 Fill="#99000000" />
+        <Button Grid.ColumnSpan="2"
+                Width="48"
+                Height="48"
+                Margin="-6,-6,12,12"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Template="{DynamicResource MetroCircleButtonTemplate}">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="Click">
+                    <ei:CallMethodAction MethodName="Close" TargetObject="{Binding Mode=OneWay}" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+            <Path Width="25"
+                  Height="18"
+                  Data="F1 M 36,22L 36,26L 19.75,26L 27,33L 20.5,33L 11,24L 20.5,15L 27,15L 19.75,22L 36,22 Z "
+                  Fill="White"
+                  Stretch="Fill" />
+        </Button>
+        <DockPanel x:Name="RightStatusPanel"
+                   Grid.Column="1"
+                   Visibility="{Binding IsVisibleStatuses,
+                                        Converter={StaticResource BooleanToVisibleConverter}}">
+            <Primitives:Timeline DataContext="{Binding Statuses}" />
+        </DockPanel>
+        <DockPanel x:Name="RightFavoritesPanel"
+                   Grid.Column="1"
+                   Visibility="{Binding IsVisibleFavorites,
+                                        Converter={StaticResource BooleanToVisibleConverter}}">
+            <Primitives:Timeline DataContext="{Binding Favorites}" />
+        </DockPanel>
+        <DockPanel x:Name="RightUserPanel"
+                   Grid.Column="1"
+                   Visibility="{Binding IsVisibleFriends,
+                                        Converter={StaticResource BooleanToVisibleConverter}}">
+            <Primitives:UsersList DataContext="{Binding Friends}" />
+        </DockPanel>
+    </Grid>
+</UserControl>

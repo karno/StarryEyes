@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace StarryEyes.Views.WindowParts.Flips.SearchFlips
 {
     /// <summary>
-    /// UserPresenter.xaml の相互作用ロジック
+    /// UserInfo.xaml の相互作用ロジック
     /// </summary>
-    public partial class UserPresenter : UserControl
+    public partial class UserInfo : UserControl
     {
-        public UserPresenter()
+        public UserInfo()
         {
             InitializeComponent();
         }

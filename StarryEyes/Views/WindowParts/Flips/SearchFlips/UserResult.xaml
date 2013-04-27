@@ -5,6 +5,7 @@
              xmlns:ei="clr-namespace:Microsoft.Expression.Interactivity.Core;assembly=Microsoft.Expression.Interactions"
              xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:primitives="clr-namespace:StarryEyes.Views.WindowParts.Primitives"
              xmlns:searchFlips="clr-namespace:StarryEyes.Views.WindowParts.Flips.SearchFlips"
              d:DesignHeight="300"
              d:DesignWidth="300"
@@ -38,6 +39,6 @@
                        FontSize="32"
                        Text="{Binding Query}" />
         </DockPanel>
-        <searchFlips:UserPresenter Grid.Row="1" DataContext="{Binding}" />
+        <primitives:UsersList Grid.Row="1" DataContext="{Binding}" />
     </Grid>
 </UserControl>

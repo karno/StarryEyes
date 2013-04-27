@@ -43,8 +43,17 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                     (query, mode) =>
                     {
                         this.Open();
+                        // to do nothing.
+                        if (Text == query && SearchMode == mode) return;
                         Text = query;
-                        SearchMode = mode;
+                        if (SearchMode == mode)
+                        {
+                            this.CommitSearch();
+                        }
+                        else
+                        {
+                            SearchMode = mode;
+                        }
                     }));
         }
 
@@ -252,7 +261,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             }
         }
 
-        private readonly Regex _userScreenNameRegex = new Regex("^[A-Za-z0-9_]+$", RegexOptions.Compiled);
+        private readonly Regex _userScreenNameRegex = new Regex("^@?[A-Za-z0-9_]+$", RegexOptions.Compiled);
         private async void OnTextChanged(string value)
         {
             if (value != null && value.StartsWith("?"))

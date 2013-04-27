@@ -60,11 +60,11 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
         }
     }
 
-    public sealed class LocalUserFollowings : ValueBase
+    public sealed class LocalUserFollowing : ValueBase
     {
         private readonly UserExpressionBase _expression;
 
-        public LocalUserFollowings(UserExpressionBase expression)
+        public LocalUserFollowing(UserExpressionBase expression)
         {
             this._expression = expression;
             this._expression.OnReapplyRequested += _expression_OnReapplyRequested;
@@ -85,7 +85,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 
         public override Func<TwitterStatus, IReadOnlyCollection<long>> GetSetValueProvider()
         {
-            var cache = _expression.Followings;
+            var cache = _expression.Following;
             return _ => cache;
         }
 
@@ -101,7 +101,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 
         public override string ToQuery()
         {
-            return _expression.ToQuery() + ".followings"; // "friends" also ok
+            return _expression.ToQuery() + ".following"; // "friends" also ok
         }
     }
 

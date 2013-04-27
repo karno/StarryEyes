@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Linq;
 using System.Runtime.Serialization;
+using System.Text;
+using StarryEyes.Breezy.Util;
 using StarryEyes.Vanille.Serialization;
 
 namespace StarryEyes.Breezy.DataModel
@@ -18,13 +21,6 @@ namespace StarryEyes.Breezy.DataModel
         /// </summary>
         [DataMember]
         public string ScreenName { get; set; }
-
-        /// <summary>
-        /// Lacking data (assert this contains only ID and ScreenName and some features, 
-        /// so should be reload for showing all data)
-        /// </summary>
-        [DataMember]
-        public bool IsDataLacking { get; set; }
 
         /// <summary>
         /// Name for the display of this user.
@@ -153,12 +149,18 @@ namespace StarryEyes.Breezy.DataModel
         [DataMember]
         public DateTime CreatedAt { get; set; }
 
+        /// <summary>
+        /// Entities of this tweet
+        /// </summary>
+        [DataMember]
+        public TwitterEntity[] Entities { get; set; }
+
         public void Serialize(System.IO.BinaryWriter writer)
         {
             writer.Write(Id);
             writer.Write(ScreenName);
-            writer.Write(IsDataLacking);
             writer.Write(Name ?? String.Empty);
+            writer.Write(CreatedAt);
             writer.Write(Description ?? String.Empty);
             writer.Write(Location ?? String.Empty);
             writer.Write(Url ?? String.Empty);
@@ -174,16 +176,15 @@ namespace StarryEyes.Breezy.DataModel
             writer.Write(FavoritesCount);
             writer.Write(ListedCount);
             writer.Write(Language ?? String.Empty);
-            if (!IsDataLacking)
-                writer.Write(CreatedAt);
+            writer.Write(Entities);
         }
 
         public void Deserialize(System.IO.BinaryReader reader)
         {
             Id = reader.ReadInt64();
             ScreenName = reader.ReadString();
-            IsDataLacking = reader.ReadBoolean();
             Name = reader.ReadString();
+            CreatedAt = reader.ReadDateTime();
             Description = reader.ReadString();
             Location = reader.ReadString();
             Url = reader.ReadString();
@@ -199,8 +200,7 @@ namespace StarryEyes.Breezy.DataModel
             FavoritesCount = reader.ReadInt64();
             ListedCount = reader.ReadInt64();
             Language = reader.ReadString();
-            if (!IsDataLacking)
-                CreatedAt = reader.ReadDateTime();
+            Entities = reader.ReadCollection<TwitterEntity>().ToArray();
         }
 
         public override bool Equals(object obj)
@@ -211,6 +211,54 @@ namespace StarryEyes.Breezy.DataModel
             }
 
             return this.Id == ((TwitterUser)obj).Id;
+        }
+
+        public string GetEntityAidedText(bool showFullUrl = false)
+        {
+            var builder = new StringBuilder();
+            var escaped = ParsingExtension.EscapeEntity(this.Description);
+            TwitterEntity prevEntity = null;
+            foreach (var entity in this.Entities.Guard().OrderBy(e => e.StartIndex))
+            {
+                int pidx = 0;
+                if (prevEntity != null)
+                    pidx = prevEntity.EndIndex;
+                if (pidx < entity.StartIndex)
+                {
+                    // output raw
+                    builder.Append(ParsingExtension.ResolveEntity(escaped.Substring(pidx, entity.StartIndex - pidx)));
+                }
+                switch (entity.EntityType)
+                {
+                    case EntityType.Hashtags:
+                        builder.Append("#" + entity.DisplayText);
+                        break;
+                    case EntityType.Urls:
+                        builder.Append(showFullUrl
+                                           ? ParsingExtension.ResolveEntity(entity.OriginalText)
+                                           : ParsingExtension.ResolveEntity(entity.DisplayText));
+                        break;
+                    case EntityType.Media:
+                        builder.Append(showFullUrl
+                                           ? ParsingExtension.ResolveEntity(entity.MediaUrl)
+                                           : ParsingExtension.ResolveEntity(entity.DisplayText));
+                        break;
+                    case EntityType.UserMentions:
+                        builder.Append("@" + entity.DisplayText);
+                        break;
+                }
+                prevEntity = entity;
+            }
+            if (prevEntity == null)
+            {
+                builder.Append(ParsingExtension.ResolveEntity(escaped));
+            }
+            else if (prevEntity.EndIndex < escaped.Length)
+            {
+                builder.Append(ParsingExtension.ResolveEntity(
+                    escaped.Substring(prevEntity.EndIndex, escaped.Length - prevEntity.EndIndex)));
+            }
+            return builder.ToString();
         }
 
         // override object.GetHashCode

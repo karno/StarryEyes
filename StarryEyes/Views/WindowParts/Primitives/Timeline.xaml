@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="StarryEyes.Views.WindowParts.Timelines.Timeline"
+﻿<UserControl x:Class="StarryEyes.Views.WindowParts.Primitives.Timeline"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
@@ -799,10 +799,10 @@
                                         </Grid.ColumnDefinitions>
                                         <TextBlock VerticalAlignment="Top"
                                                    TextWrapping="Wrap"
-                                                   helpers:StatusStylizer.LinkNavigationCommand="{Binding OpenLinkCommand,
-                                                                                                          Mode=OneTime}"
-                                                   helpers:StatusStylizer.TwitterStatus="{Binding Status,
-                                                                                                  Mode=OneTime}">
+                                                   helpers:TextBlockStylizer.LinkNavigationCommand="{Binding OpenLinkCommand,
+                                                                                                            Mode=OneTime}"
+                                                   helpers:TextBlockStylizer.TwitterStatus="{Binding Status,
+                                                                                                    Mode=OneTime}">
                                             <i:Interaction.Behaviors>
                                                 <behaviors:TextBlockDragSelectBehavior SelectedText="{Binding SelectedText, Mode=OneWayToSource}">
                                                     <behaviors:TextBlockDragSelectBehavior.SelectContextMenu>

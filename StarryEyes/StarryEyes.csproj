@@ -288,6 +288,7 @@
     <Compile Include="ViewModels\WindowParts\Flips\AccountSelectionFlipViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\BackstageViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\PartialFlipViewModelBase.cs" />
+    <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\UserFavoritesViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\UserFriendsViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\UserStatusesViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\SearchFlipViewModel.cs" />
@@ -324,7 +325,7 @@
     <Compile Include="Views\Triggers\KeyAssignTrigger.cs" />
     <Compile Include="Views\Triggers\KeyTriggerBase.cs" />
     <Compile Include="Views\Utils\NotNullToVisibleConverter.cs" />
-    <Compile Include="Views\Utils\StatusStylizeHelper.cs" />
+    <Compile Include="Views\Utils\TextBlockStylizer.cs" />
     <Compile Include="Views\Messaging\Behaviors\BringIntoViewInteractionMessageAction.cs" />
     <Compile Include="Views\Messaging\Behaviors\GoToStateInteractionMessageAction.cs" />
     <Compile Include="Views\Messaging\Behaviors\TaskDialogInteractionMessageAction.cs" />
@@ -355,8 +356,11 @@
     <Compile Include="Views\WindowParts\Flips\SearchFlips\SearchResult.xaml.cs">
       <DependentUpon>SearchResult.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\WindowParts\Flips\SearchFlips\UserPresenter.xaml.cs">
-      <DependentUpon>UserPresenter.xaml</DependentUpon>
+    <Compile Include="Views\WindowParts\Flips\SearchFlips\UserInfo.xaml.cs">
+      <DependentUpon>UserInfo.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\WindowParts\Primitives\UsersList.xaml.cs">
+      <DependentUpon>UsersList.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\WindowParts\Flips\SearchFlips\UserResult.xaml.cs">
       <DependentUpon>UserResult.xaml</DependentUpon>
@@ -373,7 +377,7 @@
     <Compile Include="Views\WindowParts\MainArea.xaml.cs">
       <DependentUpon>MainArea.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\WindowParts\Timelines\Timeline.xaml.cs">
+    <Compile Include="Views\WindowParts\Primitives\Timeline.xaml.cs">
       <DependentUpon>Timeline.xaml</DependentUpon>
     </Compile>
     <Page Include="DefaultContextMenus.xaml">
@@ -460,7 +464,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\WindowParts\Flips\SearchFlips\UserPresenter.xaml">
+    <Page Include="Views\WindowParts\Flips\SearchFlips\UserInfo.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\WindowParts\Primitives\UsersList.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -484,7 +492,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\WindowParts\Timelines\Timeline.xaml">
+    <Page Include="Views\WindowParts\Primitives\Timeline.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -522,7 +530,6 @@
     <Folder Include="ViewModels\Notifications\" />
     <Folder Include="ViewModels\WindowParts\Backstages\" />
     <Folder Include="Views\Notifications\" />
-    <Folder Include="Views\WindowParts\Common\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ReactiveOAuth\ReactiveOAuth.csproj">
