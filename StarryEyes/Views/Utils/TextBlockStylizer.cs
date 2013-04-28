@@ -133,7 +133,7 @@ namespace StarryEyes.Views.Utils
             TwitterEntity prevEntity = null;
             foreach (var entity in entities.OrderBy(e => e.StartIndex))
             {
-                int pidx = 0;
+                var pidx = 0;
                 if (prevEntity != null)
                     pidx = prevEntity.EndIndex;
                 if (pidx < entity.StartIndex)
