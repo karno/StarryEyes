@@ -44,15 +44,10 @@ namespace StarryEyes.Models.Tab
             Setting.Columns
                    .Select(c => new ColumnModel(c.Tabs.Select(d => d.ToTabModel()).ToArray()))
                    .ForEach(_columns.Add);
-            if (_columns.Count == 0)
-            {
-                _columns.Add(new ColumnModel(Enumerable.Empty<TabModel>()));
-            }
-            if (!_loaded)
-            {
-                App.RaiseUserInterfaceReady();
-                _loaded = true;
-            }
+            GCColumn();
+            if (_loaded) return;
+            App.RaiseUserInterfaceReady();
+            _loaded = true;
         }
 
         /// <summary>
@@ -192,6 +187,7 @@ namespace StarryEyes.Models.Tab
                 _columns[fromColumnIndex].Tabs.RemoveAt(fromTabIndex);
                 _columns[destColumnIndex].Tabs.Insert(destTabIndex, tab);
             }
+            GCColumn();
             Save();
         }
 
@@ -242,6 +238,18 @@ namespace StarryEyes.Models.Tab
         }
 
         /// <summary>
+        ///     Create column
+        /// </summary>
+        /// <param name="index">insertion index</param>
+        /// <param name="info">initial created tab</param>
+        public static void CreateColumn(int index, params TabModel[] info)
+        {
+            _columns.Insert(index, new ColumnModel(info));
+            CurrentFocusColumnIndex = index;
+            Save();
+        }
+
+        /// <summary>
         ///     Close a tab.
         /// </summary>
         public static void CloseTab(int colIndex, int tabIndex)
@@ -250,13 +258,14 @@ namespace StarryEyes.Models.Tab
             ti.Deactivate();
             _closedTabsStack.Push(ti);
             _columns[colIndex].RemoveTab(tabIndex);
-            if (_columns[colIndex].Tabs.Count == 0 && _columns.Count > 2)
-            {
-                CloseColumn(colIndex);
-            }
+            GCColumn();
             Save();
         }
 
+        /// <summary>
+        /// Close column
+        /// </summary>
+        /// <param name="colIndex">column index</param>
         public static void CloseColumn(int colIndex)
         {
             var col = _columns[colIndex];
@@ -286,6 +295,9 @@ namespace StarryEyes.Models.Tab
             _closedTabsStack.Clear();
         }
 
+        /// <summary>
+        /// Register key assign events.
+        /// </summary>
         public static void RegisterEvents()
         {
             MainWindowModel.OnTimelineFocusRequested += MainWindowModel_OnTimelineFocusRequested;
@@ -300,7 +312,23 @@ namespace StarryEyes.Models.Tab
 
         }
 
-        static void MainWindowModel_OnTimelineFocusRequested(TimelineFocusRequest req)
+        /// <summary>
+        /// Clean-up empty columns.
+        /// </summary>
+        public static void GCColumn()
+        {
+            Columns.Select((c, i) => new { Column = c, Index = i })
+                .Where(t => t.Column.Tabs.Count == 0)
+                .Select(t => t.Index)
+                .OrderByDescending(i => i)
+                .ForEach(CloseColumn);
+            if (_columns.Count == 0)
+            {
+                _columns.Add(new ColumnModel(Enumerable.Empty<TabModel>()));
+            }
+        }
+
+        private static void MainWindowModel_OnTimelineFocusRequested(TimelineFocusRequest req)
         {
             var ccolumn = Columns[CurrentFocusColumnIndex];
             if (ccolumn.Tabs.Count == 0) return; // not available
