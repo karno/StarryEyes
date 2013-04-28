@@ -86,6 +86,7 @@ namespace StarryEyes.Models.Tab
             get { return _currentFocusColumnIndex; }
             set
             {
+                if (_currentFocusColumnIndex == value) return;
                 _currentFocusColumnIndex = value;
                 var col = _columns[_currentFocusColumnIndex];
                 InputAreaModel.NotifyChangeFocusingTab(col.Tabs[col.CurrentFocusTabIndex]);

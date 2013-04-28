@@ -124,19 +124,19 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                     <Grid Grid.Row="1"
-                          Margin="0,0,-10,0"
+                          Margin="-3,0,-13,0"
                           HorizontalAlignment="Stretch"
                           VerticalAlignment="Stretch"
                           Visibility="{Binding IsDragDropping,
                                                Converter={StaticResource BooleanToVisibleConverter}}">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="30" />
+                            <ColumnDefinition Width="33" />
                             <ColumnDefinition />
-                            <ColumnDefinition Width="30" />
+                            <ColumnDefinition Width="33" />
                         </Grid.ColumnDefinitions>
                         <Border Grid.Column="0"
                                 AllowDrop="True"
-                                Background="#33333333"
+                                Background="#11111111"
                                 IsHitTestVisible="True">
                             <i:Interaction.Behaviors>
                                 <behaviors:DropAcceptBehavior Description="{Binding LeftAcceptDescription}" />
@@ -144,7 +144,7 @@
                         </Border>
                         <Border Grid.Column="2"
                                 AllowDrop="True"
-                                Background="#33333333"
+                                Background="#11111111"
                                 IsHitTestVisible="True">
                             <i:Interaction.Behaviors>
                                 <behaviors:DropAcceptBehavior Description="{Binding RightAcceptDescription}" />

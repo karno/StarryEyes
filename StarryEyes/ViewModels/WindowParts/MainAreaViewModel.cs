@@ -45,13 +45,12 @@ namespace StarryEyes.ViewModels.WindowParts
             get { return _columns; }
         }
 
-        private int _oldFocus;
         public ColumnViewModel FocusedColumn
         {
             get { return _columns[TabManager.CurrentFocusColumnIndex]; }
             set
             {
-                TabManager.CurrentFocusColumnIndex = _oldFocus = _columns.IndexOf(value);
+                TabManager.CurrentFocusColumnIndex = _columns.IndexOf(value);
                 _columns.ForEach(c => c.UpdateFocus());
                 RaisePropertyChanged();
             }
@@ -61,10 +60,7 @@ namespace StarryEyes.ViewModels.WindowParts
         {
             DispatcherHolder.Enqueue(() =>
             {
-                if (newFocus == _oldFocus) return;
-                _columns[_oldFocus].UpdateFocus();
-                _columns[newFocus].UpdateFocus();
-                _oldFocus = newFocus;
+                _columns.ForEach(c => c.UpdateFocus());
                 RaisePropertyChanged(() => FocusedColumn);
             });
         }
