@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Reactive;
+using System.Collections.ObjectModel;
 using System.Reactive.Linq;
 using System.Windows;
+using System.Windows.Threading;
 using Livet;
 using Livet.Commands;
-using StarryEyes.Breezy.Api.Rest;
-using StarryEyes.Breezy.Authorize;
-using StarryEyes.Breezy.DataModel;
 using StarryEyes.Breezy.Util;
 using StarryEyes.Models;
 using StarryEyes.Models.Stores;
@@ -43,6 +41,13 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 this.RaisePropertyChanged(() => IsVisibleFollowing);
                 this.RaisePropertyChanged(() => IsVisibleFollowers);
             }
+        }
+
+        private ObservableCollection<RelationControlViewModel> _relationControls = new ObservableCollection<RelationControlViewModel>();
+        public ObservableCollection<RelationControlViewModel> RelationControls
+        {
+            get { return this._relationControls; }
+            set { this._relationControls = value; }
         }
 
         public SearchFlipViewModel Parent
@@ -139,6 +144,12 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                                this.RaisePropertyChanged(() => Following);
                                this._followers = new UserFollowersViewModel(this);
                                this.RaisePropertyChanged(() => Followers);
+                               Observable.Start(() => AccountsStore.Accounts)
+                                         .SelectMany(a => a)
+                                         .Where(a => a.UserId != user.Id)
+                                         .Select(a => new RelationControlViewModel(this, a.AuthenticateInfo, user))
+                                         .ObserveOn(DispatcherHolder.Dispatcher, DispatcherPriority.Render)
+                                         .Subscribe(RelationControls.Add);
                            },
                            ex =>
                            {
@@ -265,241 +276,5 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
         Favorites,
         Following,
         Followers,
-    }
-
-    public class RelationControllerViewModel : ViewModel
-    {
-        private readonly UserInfoViewModel _parent;
-        private readonly AuthenticateInfo _source;
-        private readonly TwitterUser _target;
-        private bool _isCommunicating;
-        private bool _enabled;
-        private bool _isFollowing;
-        private bool _isFollowedBack;
-        private bool _isBlocking;
-
-        public string SourceUserScreenName
-        {
-            get { return _source.UnreliableScreenName; }
-        }
-
-        public Uri SourceUserProfileImage
-        {
-            get { return _source.UnreliableProfileImageUri; }
-        }
-
-        public bool IsCommunicating
-        {
-            get { return this._isCommunicating; }
-            set
-            {
-                this._isCommunicating = value;
-                this.RaisePropertyChanged();
-            }
-        }
-
-        public bool Enabled
-        {
-            get { return this._enabled; }
-            set
-            {
-                this._enabled = value;
-                this.RaisePropertyChanged();
-            }
-        }
-
-        public bool IsFollowing
-        {
-            get { return this._isFollowing; }
-            set
-            {
-                this._isFollowing = value;
-                this.RaisePropertyChanged();
-            }
-        }
-
-        public bool IsFollowedBack
-        {
-            get { return this._isFollowedBack; }
-            set
-            {
-                this._isFollowedBack = value;
-                this.RaisePropertyChanged();
-            }
-        }
-
-        public bool IsBlocking
-        {
-            get { return this._isBlocking; }
-            set
-            {
-                this._isBlocking = value;
-                this.RaisePropertyChanged();
-            }
-        }
-
-        public RelationControllerViewModel(UserInfoViewModel parent, AuthenticateInfo source, TwitterUser target)
-        {
-            _parent = parent;
-            _source = source;
-            _target = target;
-            var rds = source.GetRelationData();
-            IsFollowing = rds.IsFollowing(target.Id);
-            IsFollowedBack = rds.IsFollowedBy(target.Id);
-            IsBlocking = rds.IsBlocking(target.Id);
-            source.GetFriendship(source.Id, target_id: target.Id)
-                  .Subscribe(
-                      r =>
-                      {
-                          // ReSharper disable InvertIf
-                          if (IsFollowing != r.relationship.source.following)
-                          {
-                              IsFollowing = r.relationship.source.following;
-                              if (r.relationship.source.following)
-                              {
-                                  rds.AddFollowing(target.Id);
-                              }
-                              else
-                              {
-                                  rds.RemoveFollowing(target.Id);
-                              }
-                          }
-                          if (IsFollowedBack != r.relationship.source.followed_by)
-                          {
-                              IsFollowedBack = r.relationship.source.followed_by;
-                              if (r.relationship.source.followed_by)
-                              {
-                                  rds.AddFollower(target.Id);
-                              }
-                              else
-                              {
-                                  rds.RemoveFollower(target.Id);
-                              }
-                          }
-                          if (IsBlocking != r.relationship.source.blocking)
-                          {
-                              IsBlocking = r.relationship.source.blocking;
-                              if (r.relationship.source.blocking)
-                              {
-                                  rds.AddBlocking(target.Id);
-                              }
-                              else
-                              {
-                                  rds.RemoveBlocking(target.Id);
-                              }
-                          }
-                          // ReSharper restore InvertIf
-                      },
-                      ex =>
-                      {
-                          Enabled = false;
-                      });
-        }
-
-        public void Follow()
-        {
-            this.DispatchAction(
-                () =>
-                this._source.CreateFriendship(_target.Id)
-                    .Select(_ => new Unit()),
-                () => IsFollowing = true,
-                ex => _parent.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
-                {
-                    CommonButtons = TaskDialogCommonButtons.Close,
-                    MainIcon = VistaTaskDialogIcon.Error,
-                    MainInstruction = "フォローできませんでした。",
-                    Content = ex.Message,
-                    Title = "フォロー エラー",
-                })));
-        }
-
-        public void Remove()
-        {
-            this.DispatchAction(
-                () =>
-                this._source.DestroyFriendship(_target.Id)
-                    .Select(_ => new Unit()),
-                () => IsFollowing = false,
-                ex => _parent.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
-                {
-                    CommonButtons = TaskDialogCommonButtons.Close,
-                    MainIcon = VistaTaskDialogIcon.Error,
-                    MainInstruction = "フォロー解除できませんでした。",
-                    Content = ex.Message,
-                    Title = "アンフォロー エラー",
-                })));
-        }
-
-        public void Block()
-        {
-            this.DispatchAction(
-                () =>
-                this._source.CreateBlock(_target.Id)
-                    .Select(_ => new Unit()),
-                () =>
-                {
-                    IsFollowing = false;
-                    IsBlocking = true;
-                },
-                ex => _parent.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
-                {
-                    CommonButtons = TaskDialogCommonButtons.Close,
-                    MainIcon = VistaTaskDialogIcon.Error,
-                    MainInstruction = "ブロックできませんでした。",
-                    Content = ex.Message,
-                    Title = "ブロック エラー",
-                })));
-        }
-
-        public void Unblock()
-        {
-            this.DispatchAction(
-                () =>
-                this._source.DestroyBlock(_target.Id)
-                    .Select(_ => new Unit()),
-                () =>
-                {
-                    IsBlocking = false;
-                },
-                ex => _parent.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
-                {
-                    CommonButtons = TaskDialogCommonButtons.Close,
-                    MainIcon = VistaTaskDialogIcon.Error,
-                    MainInstruction = "ブロックを解除できませんでした。",
-                    Content = ex.Message,
-                    Title = "アンブロック エラー",
-                })));
-        }
-
-        public void ReportForSpam()
-        {
-            this.DispatchAction(
-                () =>
-                this._source.ReportSpam(_target.Id)
-                    .Select(_ => new Unit()),
-                () =>
-                {
-                    IsFollowing = false;
-                    IsBlocking = true;
-                },
-                ex => _parent.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
-                {
-                    CommonButtons = TaskDialogCommonButtons.Close,
-                    MainIcon = VistaTaskDialogIcon.Error,
-                    MainInstruction = "スパム報告できませんでした。",
-                    Content = ex.Message,
-                    Title = "スパム報告 エラー",
-                })));
-        }
-
-        private void DispatchAction(Func<IObservable<Unit>> work, Action succeeded, Action<Exception> failed)
-        {
-            this.IsCommunicating = true;
-            work().Retry(3)
-                  .Finally(() => IsCommunicating = false)
-                  .Subscribe(_ => { },
-                             failed,
-                             succeeded);
-        }
     }
 }

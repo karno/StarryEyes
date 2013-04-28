@@ -288,6 +288,7 @@
     <Compile Include="ViewModels\WindowParts\Flips\AccountSelectionFlipViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\BackstageViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\PartialFlipViewModelBase.cs" />
+    <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\RelationControlViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\UserFavoritesViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\UserFollowersViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\UserFollowingViewModel.cs" />
