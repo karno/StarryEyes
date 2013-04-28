@@ -268,12 +268,16 @@ namespace StarryEyes.Views.Utils
 
         private static Inline GenerateUserLink(DependencyObject obj, string surface, string userScreenName)
         {
-            return GenerateLink(obj, "@" + surface, UserNavigation + userScreenName);
+            return GenerateLink(obj,
+                surface.StartsWith("@") ? surface : "@" + surface,
+                UserNavigation + userScreenName);
         }
 
         private static Inline GenerateHashtagLink(DependencyObject obj, string surface)
         {
-            return GenerateLink(obj, "#" + surface, HashtagNavigation + surface);
+            return GenerateLink(obj,
+                surface.StartsWith("#") ? surface : "#" + surface,
+                HashtagNavigation + surface);
         }
     }
 
