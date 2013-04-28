@@ -49,7 +49,7 @@ namespace StarryEyes.Filters.Expressions.Values.Users
 
         public override Func<TwitterStatus, long> GetNumericValueProvider()
         {
-            return _ => _.GetOriginal().User.FriendsCount;
+            return _ => _.GetOriginal().User.FollowingCount;
         }
 
         public override string ToQuery()
@@ -157,7 +157,7 @@ namespace StarryEyes.Filters.Expressions.Values.Users
 
         public override Func<TwitterStatus, long> GetNumericValueProvider()
         {
-            return _ => _.RetweetedOriginal != null ? _.User.FriendsCount : -1;
+            return _ => _.RetweetedOriginal != null ? _.User.FollowingCount : -1;
         }
 
         public override string ToQuery()

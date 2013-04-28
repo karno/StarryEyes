@@ -88,7 +88,15 @@ namespace StarryEyes.Vanille.Serialization
 
         public static void Write(this BinaryWriter writer, Uri value)
         {
-            writer.Write(value.OriginalString);
+            if (value != null)
+            {
+                writer.Write(true);
+                writer.Write(value.OriginalString);
+            }
+            else
+            {
+                writer.Write(false);
+            }
         }
 
         public static void Write(this BinaryWriter writer, DateTime value)
@@ -152,8 +160,12 @@ namespace StarryEyes.Vanille.Serialization
 
         public static Uri ReadUri(this BinaryReader reader)
         {
-            var uristr = reader.ReadString();
-            return new Uri(uristr);
+            if (reader.ReadBoolean())
+            {
+                var uristr = reader.ReadString();
+                return new Uri(uristr);
+            }
+            return null;
         }
 
         public static DateTime ReadDateTime(this BinaryReader reader)

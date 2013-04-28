@@ -41,6 +41,8 @@ namespace StarryEyes.Breezy.Api.Parsing.JsonFormats
 
         public string profile_background_image_url_https { get; set; }
 
+        public string profile_banner_url { get; set; }
+
         public int statuses_count { get; set; }
 
         public int friends_count { get; set; }
@@ -83,16 +85,17 @@ namespace StarryEyes.Breezy.Api.Parsing.JsonFormats
                 ProfileImageUriHttps = profile_image_url_https.ParseUriAbsolute(),
                 ProfileBackgroundImageUri = profile_background_image_url.ParseUriAbsolute(),
                 ProfileBackgroundImageUriHttps = profile_background_image_url_https.ParseUriAbsolute(),
+                ProfileBannerUri = profile_banner_url.ParseUriAbsolute(),
                 IsDefaultProfileImage = is_default_profile_image,
                 StatusesCount = statuses_count,
-                FriendsCount = friends_count,
+                FollowingCount = friends_count,
                 FollowersCount = followers_count,
                 FavoritesCount = favourites_count,
                 ListedCount = listed_count.GetValueOrDefault(),
                 Language = lang,
                 IsGeoEnabled = is_geo_enabled,
                 UrlEntities = entities != null && entities.url != null ? entities.url.Spawn().ToArray() : null,
-                DescriptionEntities = entities != null && entities.description != null ? entities.description.Spawn().ToArray() : null
+                DescriptionEntities = entities != null && entities.description != null ? entities.description.Spawn().ToArray() : null,
             };
         }
     }

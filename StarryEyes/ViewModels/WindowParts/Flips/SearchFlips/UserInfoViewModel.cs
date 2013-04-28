@@ -162,6 +162,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                                    CommonButtons = TaskDialogCommonButtons.Close
                                }));
                                User = null;
+                               parent.CloseResults();
                            });
         }
 

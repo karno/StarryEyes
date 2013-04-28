@@ -141,7 +141,7 @@ namespace StarryEyes.Views.Controls
                         }
                         else
                         {
-                            int errorCount = 0;
+                            var errorCount = 0;
                             while (true)
                             {
                                 errorCount++;
@@ -153,6 +153,7 @@ namespace StarryEyes.Views.Controls
                                 {
                                     if (errorCount > MaxRetryCount)
                                     {
+                                        System.Diagnostics.Debug.WriteLine("could not load:" + uri + Environment.NewLine + ex.Message);
                                         throw;
                                     }
                                     System.Diagnostics.Debug.WriteLine(ex.ToString());

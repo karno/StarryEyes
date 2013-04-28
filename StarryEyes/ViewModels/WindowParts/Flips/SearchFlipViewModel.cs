@@ -406,6 +406,15 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             IsSearchResultAvailable = true;
         }
 
+        public void CloseResults()
+        {
+            IsSearchResultAvailable = false;
+            this.SearchResult = null;
+            this.UserResult = null;
+            this.UserInfo = null;
+            this.FocusToSearchBox();
+        }
+
         public void RewindStack()
         {
             if (_backStack.Count == 0)

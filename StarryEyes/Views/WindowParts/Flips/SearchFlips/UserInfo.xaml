@@ -75,7 +75,7 @@
                                     Margin="0"
                                     VerticalAlignment="Top"
                                     Stretch="UniformToFill"
-                                    UriSource="{Binding User.HeaderImageUri}" />
+                                    UriSource="{Binding User.UserSubImageUri}" />
                 <controls:LazyImage Width="127"
                                     Height="127"
                                     Margin="8"

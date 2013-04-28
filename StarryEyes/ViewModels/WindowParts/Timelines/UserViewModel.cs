@@ -22,12 +22,47 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public Uri ProfileImageUri
         {
-            get { return User.ProfileImageUri; }
+            get
+            {
+                if (User.ProfileImageUri == null) return null;
+                var uri = User.ProfileImageUri.OriginalString;
+                if (uri.EndsWith("normal.png"))
+                {
+                    uri = uri.Substring(0, uri.Length - 10) + "bigger.png";
+                }
+                try
+                {
+                    return new Uri(uri);
+                }
+                catch (UriFormatException)
+                {
+                    return User.ProfileImageUri;
+                }
+            }
         }
 
-        public Uri HeaderImageUri
+        public Uri BackgroundImageUri
         {
             get { return User.ProfileBackgroundImageUri; }
+        }
+
+        public Uri BannerImageUri
+        {
+            get
+            {
+                if (User.ProfileBannerUri == null) return null;
+                var uri = User.ProfileBannerUri.OriginalString;
+                if (!uri.EndsWith("/"))
+                {
+                    uri += "/";
+                }
+                return new Uri(uri + "web");
+            }
+        }
+
+        public Uri UserSubImageUri
+        {
+            get { return BannerImageUri ?? BackgroundImageUri; }
         }
 
         public bool IsProtected { get { return User.IsProtected; } }
@@ -38,7 +73,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public long StatusesCount { get { return User.StatusesCount; } }
 
-        public long FollowingsCount { get { return User.FriendsCount; } }
+        public long FollowingsCount { get { return User.FollowingCount; } }
 
         public long FollowersCount { get { return User.FollowersCount; } }
 

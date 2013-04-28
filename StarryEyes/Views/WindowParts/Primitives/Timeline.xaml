@@ -222,7 +222,7 @@
                                 <MenuItem Header="Twitterで見る(_T)">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="Click">
-                                            <ei:CallMethodAction MethodName="OpenUserWeb" TargetObject="{Binding}" />
+                                            <ei:CallMethodAction MethodName="OpenUserDetailOnTwitter" TargetObject="{Binding}" />
                                         </i:EventTrigger>
                                     </i:Interaction.Triggers>
                                 </MenuItem>
