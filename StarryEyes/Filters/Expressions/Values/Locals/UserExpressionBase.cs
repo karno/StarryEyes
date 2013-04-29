@@ -22,12 +22,12 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 
         public virtual void EndLifecycle() { }
 
-        protected void RequestReapplyFilter(RelationDataChangedInfo relInfo)
+        protected void RaiseReapplyFilter(RelationDataChangedInfo relInfo)
         {
-            var handler = OnReapplyRequested;
+            var handler = this.ReapplyRequested;
             if (handler != null) handler(relInfo);
         }
 
-        public event Action<RelationDataChangedInfo> OnReapplyRequested;
+        public event Action<RelationDataChangedInfo> ReapplyRequested;
     }
 }

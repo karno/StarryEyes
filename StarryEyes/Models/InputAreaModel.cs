@@ -35,40 +35,38 @@ namespace StarryEyes.Models
         static InputAreaModel()
         {
             _bindingAuthInfos.CollectionChanged += (_, __) =>
+            {
+                if (_currentFocusTabModel == null) return;
+                switch (__.Action)
                 {
-                    if (_currentFocusTabModel != null)
-                    {
-                        switch (__.Action)
-                        {
-                            case NotifyCollectionChangedAction.Add:
-                                __.NewItems
-                                  .OfType<AuthenticateInfo>()
-                                  .Select(i => i.Id)
-                                  .ForEach(_currentFocusTabModel.BindingAccountIds.Add);
-                                break;
-                            case NotifyCollectionChangedAction.Remove:
-                                __.OldItems
-                                  .OfType<AuthenticateInfo>()
-                                  .ForEach(i => _currentFocusTabModel.BindingAccountIds.Remove(i.Id));
-                                break;
-                            case NotifyCollectionChangedAction.Replace:
-                                __.OldItems
-                                  .OfType<AuthenticateInfo>()
-                                  .ForEach(i => _currentFocusTabModel.BindingAccountIds.Remove(i.Id));
-                                __.NewItems
-                                  .OfType<AuthenticateInfo>()
-                                  .Select(i => i.Id)
-                                  .ForEach(_currentFocusTabModel.BindingAccountIds.Add);
-                                break;
-                            case NotifyCollectionChangedAction.Reset:
-                                _currentFocusTabModel.BindingAccountIds.Clear();
-                                _bindingAuthInfos
-                                    .Select(i => i.Id)
-                                    .ForEach(_currentFocusTabModel.BindingAccountIds.Add);
-                                break;
-                        }
-                    }
-                };
+                    case NotifyCollectionChangedAction.Add:
+                        __.NewItems
+                          .OfType<AuthenticateInfo>()
+                          .Select(i => i.Id)
+                          .ForEach(_currentFocusTabModel.BindingAccountIds.Add);
+                        break;
+                    case NotifyCollectionChangedAction.Remove:
+                        __.OldItems
+                          .OfType<AuthenticateInfo>()
+                          .ForEach(i => _currentFocusTabModel.BindingAccountIds.Remove(i.Id));
+                        break;
+                    case NotifyCollectionChangedAction.Replace:
+                        __.OldItems
+                          .OfType<AuthenticateInfo>()
+                          .ForEach(i => _currentFocusTabModel.BindingAccountIds.Remove(i.Id));
+                        __.NewItems
+                          .OfType<AuthenticateInfo>()
+                          .Select(i => i.Id)
+                          .ForEach(_currentFocusTabModel.BindingAccountIds.Add);
+                        break;
+                    case NotifyCollectionChangedAction.Reset:
+                        _currentFocusTabModel.BindingAccountIds.Clear();
+                        _bindingAuthInfos
+                            .Select(i => i.Id)
+                            .ForEach(_currentFocusTabModel.BindingAccountIds.Add);
+                        break;
+                }
+            };
             _bindingHashtags.CollectionChanged += (_, __) =>
                 {
                     if (_currentFocusTabModel != null)
@@ -115,17 +113,19 @@ namespace StarryEyes.Models
         }
 
         public static event Action<IEnumerable<AuthenticateInfo>, string, CursorPosition, TwitterStatus>
-            OnSetTextRequested;
+            SetTextRequested;
 
         public static void SetText(IEnumerable<AuthenticateInfo> infos = null, string body = null,
                                    CursorPosition cursor = CursorPosition.End, TwitterStatus inReplyTo = null,
                                    bool focusToInputArea = true)
         {
-            var handler = OnSetTextRequested;
+            var handler = SetTextRequested;
             if (handler != null)
                 handler(infos, body, cursor, inReplyTo);
             if (focusToInputArea)
+            {
                 MainWindowModel.SetFocusTo(FocusRequest.Input);
+            }
         }
 
         public static void SetText(IEnumerable<long> infos, string body = null,
@@ -139,12 +139,12 @@ namespace StarryEyes.Models
             SetText(accounts, body, cursor, inReplyTo, focusToInputArea);
         }
 
-        public static event Action<IEnumerable<AuthenticateInfo>, TwitterUser> OnSendDirectMessageRequested;
+        public static event Action<IEnumerable<AuthenticateInfo>, TwitterUser> SendDirectMessageRequested;
 
         public static void SetDirectMessage(IEnumerable<AuthenticateInfo> info, TwitterUser recipient,
                                             bool focusToInputArea = true)
         {
-            Action<IEnumerable<AuthenticateInfo>, TwitterUser> handler = OnSendDirectMessageRequested;
+            var handler = SendDirectMessageRequested;
             if (handler != null)
                 handler(info, recipient);
             if (focusToInputArea)

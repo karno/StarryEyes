@@ -10,6 +10,8 @@ namespace StarryEyes.Filters.Expressions
 
         public static readonly Func<TwitterStatus, bool> NonTautology = _ => false;
 
+        public event Action ReapplyRequested;
+
         public abstract string ToQuery();
 
         public virtual void BeginLifecycle()
@@ -20,13 +22,12 @@ namespace StarryEyes.Filters.Expressions
         {
         }
 
-        protected void RequestReapplyFilter()
+        protected void RaiseReapplyFilter()
         {
-            var handler = OnReapplyRequested;
+            var handler = this.ReapplyRequested;
             if (handler != null) handler();
         }
 
-        public event Action OnReapplyRequested;
     }
 
     public sealed class FilterExpressionRoot : FilterExpressionBase
@@ -38,10 +39,10 @@ namespace StarryEyes.Filters.Expressions
             set
             {
                 if (_operator != null)
-                    _operator.OnReapplyRequested -= RequestReapplyFilter;
+                    _operator.ReapplyRequested -= this.RaiseReapplyFilter;
                 _operator = value;
                 if (_operator != null)
-                    _operator.OnReapplyRequested += RequestReapplyFilter;
+                    _operator.ReapplyRequested += this.RaiseReapplyFilter;
             }
         }
 

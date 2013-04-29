@@ -1,20 +1,37 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Reactive.Disposables;
 using StarryEyes.Breezy.Authorize;
-using StarryEyes.Breezy.DataModel;
 using StarryEyes.Filters.Expressions;
 using StarryEyes.Models.Tab;
+using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
 
 namespace StarryEyes.Models
 {
     public static class MainWindowModel
     {
-        public static event Action<bool> OnWindowCommandDisplayChanged;
+        static MainWindowModel()
+        {
+            App.UserInterfaceReady += () =>
+            {
+                _isUserInterfaceReady = true;
+                RegisterKeyAssigns();
+                var handler = TaskDialogRequested;
+                if (handler == null) return;
+                TaskDialogOptions options;
+                while (_taskDialogQueue.TryDequeue(out options))
+                {
+                    handler(options);
+                }
+            };
+        }
+
+        public static event Action<bool> WindowCommandsDisplayChanged;
         public static void SetShowMainWindowCommands(bool show)
         {
-            var handler = OnWindowCommandDisplayChanged;
+            var handler = WindowCommandsDisplayChanged;
             if (handler != null)
                 handler(show);
         }
@@ -42,36 +59,48 @@ namespace StarryEyes.Models
 
         #region Focus and timeline action control
 
-        public static event Action<FocusRequest> OnFocusRequested;
+        public static event Action<FocusRequest> FocusRequested;
+
         public static void SetFocusTo(FocusRequest req)
         {
-            var handler = OnFocusRequested;
+            var handler = FocusRequested;
             if (handler != null)
                 handler(req);
         }
 
-        public static event Action<TimelineFocusRequest> OnTimelineFocusRequested;
+        public static event Action<TimelineFocusRequest> TimelineFocusRequested;
+
         public static void SetTimelineFocusTo(TimelineFocusRequest req)
         {
-            var handler = OnTimelineFocusRequested;
+            var handler = TimelineFocusRequested;
             if (handler != null)
                 handler(req);
         }
 
         #endregion
 
-        public static event Action<AccountSelectionAction, TwitterStatus, IEnumerable<AuthenticateInfo>, Action<IEnumerable<AuthenticateInfo>>> OnExecuteAccountSelectActionRequested;
+        public static event Action<AccountSelectDescription> AccountSelectActionRequested;
+
         public static void ExecuteAccountSelectAction(
-            AccountSelectionAction action, TwitterStatus targetStatus,
-            IEnumerable<AuthenticateInfo> defaultSelected, Action<IEnumerable<AuthenticateInfo>> after)
+            AccountSelectionAction action, IEnumerable<AuthenticateInfo> defaultSelected,
+            Action<IEnumerable<AuthenticateInfo>> after)
         {
-            var handler = OnExecuteAccountSelectActionRequested;
-            if (handler != null)
-                handler(action, targetStatus, defaultSelected, after);
+            ExecuteAccountSelectAction(new AccountSelectDescription
+            {
+                AccountSelectionAction = action,
+                SelectionAccounts = defaultSelected,
+                Callback = after
+            });
+        }
+
+        public static void ExecuteAccountSelectAction(AccountSelectDescription desc)
+        {
+            var handler = AccountSelectActionRequested;
+            if (handler != null) handler(desc);
         }
 
         private static readonly LinkedList<string> _stateStack = new LinkedList<string>();
-        public static event Action OnStateStringChanged;
+        public static event Action StateStringChanged;
 
         public static string StateString
         {
@@ -99,38 +128,61 @@ namespace StarryEyes.Models
 
         private static void RaiseStateStringChanged()
         {
-            var handler = OnStateStringChanged;
+            var handler = StateStringChanged;
             if (handler != null) handler();
         }
 
-        public static void ShowUserInfo(TwitterUser user)
-        {
-        }
+        public static event Action<Tuple<string, FilterExpressionBase>> ConfirmMuteRequested;
 
-        public static event Action<Tuple<string, FilterExpressionBase>> OnConfirmMuteRequested;
         public static void ConfirmMute(string description, FilterExpressionBase addExpr)
         {
-            var handler = OnConfirmMuteRequested;
+            var handler = ConfirmMuteRequested;
             if (handler != null)
             {
                 handler(Tuple.Create(description, addExpr));
             }
         }
 
-        public static event Action<TabModel> OnTabModelConfigureRaised;
+        public static event Action<TabModel> TabModelConfigureRaised;
+
         public static void ShowTabConfigure(TabModel model)
         {
-            var handler = OnTabModelConfigureRaised;
+            var handler = TabModelConfigureRaised;
             if (handler != null) handler(model);
         }
 
-        public static event Action<bool> OnBackstageTransitionRequested;
+        public static event Action<bool> BackstageTransitionRequested;
+
         public static void TransitionBackstage(bool open)
         {
-            var handler = OnBackstageTransitionRequested;
+            var handler = BackstageTransitionRequested;
             if (handler != null) handler(open);
         }
+
+        private static volatile bool _isUserInterfaceReady;
+        private static readonly ConcurrentQueue<TaskDialogOptions> _taskDialogQueue = new ConcurrentQueue<TaskDialogOptions>();
+        public static event Action<TaskDialogOptions> TaskDialogRequested;
+
+        public static void ShowTaskDialog(TaskDialogOptions options)
+        {
+            if (!_isUserInterfaceReady)
+            {
+                _taskDialogQueue.Enqueue(options);
+            }
+            var handler = TaskDialogRequested;
+            if (handler != null) handler(options);
+        }
     }
+
+    public class AccountSelectDescription
+    {
+        public AccountSelectionAction AccountSelectionAction { get; set; }
+
+        public IEnumerable<AuthenticateInfo> SelectionAccounts { get; set; }
+
+        public Action<IEnumerable<AuthenticateInfo>> Callback { get; set; }
+    }
+
 
     public enum AccountSelectionAction
     {

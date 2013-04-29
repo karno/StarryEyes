@@ -12,7 +12,7 @@ namespace StarryEyes.Models.Tab
 
         private int _currentFocusTabIndex;
 
-        public event Action OnCurrentFocusTabChanged;
+        public event Action CurrentFocusTabChanged;
 
         public ObservableSynchronizedCollection<TabModel> Tabs
         {
@@ -26,7 +26,7 @@ namespace StarryEyes.Models.Tab
             {
                 _currentFocusTabIndex = value;
                 InputAreaModel.NotifyChangeFocusingTab(_tabs[value]);
-                var handler = OnCurrentFocusTabChanged;
+                var handler = this.CurrentFocusTabChanged;
                 if (handler != null) handler();
             }
         }

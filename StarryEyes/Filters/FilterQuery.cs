@@ -8,10 +8,10 @@ namespace StarryEyes.Filters
 {
     public sealed class FilterQuery : IEquatable<FilterQuery>
     {
-        public event Action OnInvalidateRequired;
+        public event Action InvalidateRequired;
         private void RaiseInvalidateRequired()
         {
-            var handler = OnInvalidateRequired;
+            var handler = this.InvalidateRequired;
             if (handler != null)
                 handler();
         }
@@ -75,11 +75,9 @@ namespace StarryEyes.Filters
             {
                 Sources.ForEach(s => s.Activate());
             }
-            if (PredicateTreeRoot != null)
-            {
-                PredicateTreeRoot.BeginLifecycle();
-                PredicateTreeRoot.OnReapplyRequested += RaiseInvalidateRequired;
-            }
+            if (this.PredicateTreeRoot == null) return;
+            this.PredicateTreeRoot.BeginLifecycle();
+            this.PredicateTreeRoot.ReapplyRequested += this.RaiseInvalidateRequired;
         }
 
         public void Deactivate()
@@ -88,11 +86,9 @@ namespace StarryEyes.Filters
             {
                 Sources.ForEach(s => s.Deactivate());
             }
-            if (PredicateTreeRoot != null)
-            {
-                PredicateTreeRoot.EndLifecycle();
-                PredicateTreeRoot.OnReapplyRequested -= RaiseInvalidateRequired;
-            }
+            if (this.PredicateTreeRoot == null) return;
+            this.PredicateTreeRoot.EndLifecycle();
+            this.PredicateTreeRoot.ReapplyRequested -= this.RaiseInvalidateRequired;
         }
     }
 }

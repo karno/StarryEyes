@@ -26,22 +26,20 @@ namespace StarryEyes.Models.Receivers
                        .Select(n => n.Status)
                        .Subscribe(NotifyDeleted);
             // required default handlers
-            OnReceived += status =>
+            Received += status =>
             {
                 if (status.RetweetedOriginal != null)
                 {
                     Task.Run(() =>
                     {
-                        bool isAdd = false;
+                        var isAdd = false;
                         StatusModel.UpdateStatusInfo(
                             status.RetweetedOriginal,
                             model =>
                             {
-                                if (!model.IsRetweeted(status.User.Id))
-                                {
-                                    isAdd = true;
-                                    model.AddRetweetedUser(status.User);
-                                }
+                                if (model.IsRetweeted(status.User.Id)) return;
+                                isAdd = true;
+                                model.AddRetweetedUser(status.User);
                             },
                             persist =>
                             {
@@ -62,7 +60,7 @@ namespace StarryEyes.Models.Receivers
                     });
                 }
             };
-            OnDeleted += status =>
+            Deleted += status =>
             {
                 if (status.RetweetedOriginal != null)
                 {
@@ -75,7 +73,7 @@ namespace StarryEyes.Models.Receivers
                                  persist.RetweetedUsers.Guard().Where(id => id != status.User.Id).ToArray()));
                 }
             };
-            OnFavorited += ue =>
+            Favorited += ue =>
                            Task.Run(() =>
                                     StatusModel.UpdateStatusInfo(
                                         ue.Target,
@@ -83,7 +81,7 @@ namespace StarryEyes.Models.Receivers
                                         status =>
                                         status.FavoritedUsers =
                                         status.FavoritedUsers.Guard().Where(id => id != ue.Source.Id).ToArray()));
-            OnUnfavorited += ue =>
+            Unfavorited += ue =>
                              Task.Run(() =>
                                       StatusModel.UpdateStatusInfo(
                                           ue.Target,
@@ -97,13 +95,13 @@ namespace StarryEyes.Models.Receivers
         {
             // optional default handlers
             if (OverrideDefaultHandlers) return;
-            OnFollowed += ue => BackstageModel.RegisterEvent(new FollowedEvent(ue.Source, ue.Target));
-            OnUnfollowed += ue => BackstageModel.RegisterEvent(new UnfollowedEvent(ue.Source, ue.Target));
-            OnBlocked += ue => BackstageModel.RegisterEvent(new BlockedEvent(ue.Source, ue.Target));
-            OnUnblocked += ue => BackstageModel.RegisterEvent(new UnblockedEvent(ue.Source, ue.Target));
-            OnFavorited += te => BackstageModel.RegisterEvent(new FavoritedEvent(te.Source, te.Target));
-            OnUnfavorited += te => BackstageModel.RegisterEvent(new UnfavoritedEvent(te.Source, te.Target));
-            OnRetweeted += te =>
+            Followed += ue => BackstageModel.RegisterEvent(new FollowedEvent(ue.Source, ue.Target));
+            Unfollowed += ue => BackstageModel.RegisterEvent(new UnfollowedEvent(ue.Source, ue.Target));
+            Blocked += ue => BackstageModel.RegisterEvent(new BlockedEvent(ue.Source, ue.Target));
+            Unblocked += ue => BackstageModel.RegisterEvent(new UnblockedEvent(ue.Source, ue.Target));
+            Favorited += te => BackstageModel.RegisterEvent(new FavoritedEvent(te.Source, te.Target));
+            Unfavorited += te => BackstageModel.RegisterEvent(new UnfavoritedEvent(te.Source, te.Target));
+            Retweeted += te =>
             {
                 // check user
                 if (AccountsStore.AccountIds.Contains(te.Source.Id) ||
@@ -112,95 +110,95 @@ namespace StarryEyes.Models.Receivers
                     BackstageModel.RegisterEvent(new RetweetedEvent(te.Source, te.Target));
                 }
             };
-            OnLimitationInfoGot += (auth, limit) => BackstageModel.RegisterEvent(new TrackLimitEvent(auth, limit));
+            LimitationInfoGot += (auth, limit) => BackstageModel.RegisterEvent(new TrackLimitEvent(auth, limit));
         }
 
-        public static event Action<TwitterStatus> OnReceived;
+        public static event Action<TwitterStatus> Received;
 
         public static void NotifyReceived(TwitterStatus status)
         {
-            Action<TwitterStatus> handler = OnReceived;
+            var handler = Received;
             if (handler != null)
                 handler(status);
         }
 
-        public static event Action<TwitterUserEvent> OnFollowed;
+        public static event Action<TwitterUserEvent> Followed;
 
         public static void NotifyFollowed(TwitterUser source, TwitterUser target)
         {
-            Action<TwitterUserEvent> handler = OnFollowed;
+            var handler = Followed;
             if (handler != null)
                 handler(new TwitterUserEvent(source, target));
         }
 
-        public static event Action<TwitterUserEvent> OnUnfollowed;
+        public static event Action<TwitterUserEvent> Unfollowed;
 
         public static void NotifyUnfollwed(TwitterUser source, TwitterUser target)
         {
-            Action<TwitterUserEvent> handler = OnUnfollowed;
+            var handler = Unfollowed;
             if (handler != null)
                 handler(new TwitterUserEvent(source, target));
         }
 
-        public static event Action<TwitterUserEvent> OnBlocked;
+        public static event Action<TwitterUserEvent> Blocked;
 
         public static void NotifyBlocked(TwitterUser source, TwitterUser target)
         {
-            Action<TwitterUserEvent> handler = OnBlocked;
+            var handler = Blocked;
             if (handler != null)
                 handler(new TwitterUserEvent(source, target));
         }
 
-        public static event Action<TwitterUserEvent> OnUnblocked;
+        public static event Action<TwitterUserEvent> Unblocked;
 
         public static void NotifyUnblocked(TwitterUser source, TwitterUser target)
         {
-            Action<TwitterUserEvent> handler = OnUnblocked;
+            var handler = Unblocked;
             if (handler != null)
                 handler(new TwitterUserEvent(source, target));
         }
 
-        public static event Action<TwitterStatusEvent> OnFavorited;
+        public static event Action<TwitterStatusEvent> Favorited;
 
         public static void NotifyFavorited(TwitterUser source, TwitterStatus target)
         {
-            Action<TwitterStatusEvent> handler = OnFavorited;
+            var handler = Favorited;
             if (handler != null)
                 handler(new TwitterStatusEvent(source, target));
         }
 
-        public static event Action<TwitterStatusEvent> OnUnfavorited;
+        public static event Action<TwitterStatusEvent> Unfavorited;
 
         public static void NotifyUnfavorited(TwitterUser source, TwitterStatus status)
         {
-            Action<TwitterStatusEvent> handler = OnUnfavorited;
+            var handler = Unfavorited;
             if (handler != null)
                 handler(new TwitterStatusEvent(source, status));
         }
 
-        public static event Action<TwitterStatusEvent> OnRetweeted;
+        public static event Action<TwitterStatusEvent> Retweeted;
 
         public static void NotifyRetweeted(TwitterUser source, TwitterStatus status)
         {
-            Action<TwitterStatusEvent> handler = OnRetweeted;
+            var handler = Retweeted;
             if (handler != null)
                 handler(new TwitterStatusEvent(source, status));
         }
 
-        public static event Action<TwitterStatus> OnDeleted;
+        public static event Action<TwitterStatus> Deleted;
 
         public static void NotifyDeleted(TwitterStatus deleted)
         {
-            Action<TwitterStatus> handler = OnDeleted;
+            var handler = Deleted;
             if (handler != null)
                 handler(deleted);
         }
 
-        public static event Action<AuthenticateInfo, int> OnLimitationInfoGot;
+        public static event Action<AuthenticateInfo, int> LimitationInfoGot;
 
         public static void NotifyLimitationInfoGot(AuthenticateInfo auth, int trackLimit)
         {
-            Action<AuthenticateInfo, int> handler = OnLimitationInfoGot;
+            var handler = LimitationInfoGot;
             if (handler != null)
                 handler(auth, trackLimit);
         }

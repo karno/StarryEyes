@@ -33,13 +33,13 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             _candidateViewModel = new SearchCandidateViewModel(this);
             this.CompositeDisposable.Add(
                 Observable.FromEvent(
-                    h => KeyAssignManager.OnKeyAssignChanged += h,
-                    h => KeyAssignManager.OnKeyAssignChanged -= h)
+                    h => KeyAssignManager.KeyAssignChanged += h,
+                    h => KeyAssignManager.KeyAssignChanged -= h)
                           .Subscribe(_ => RaisePropertyChanged(() => SearchHintLabel)));
             this.CompositeDisposable.Add(
                 new Livet.EventListeners.EventListener<Action<string, SearchMode>>(
-                    h => SearchFlipModel.OnSearchRequested += h,
-                    h => SearchFlipModel.OnSearchRequested -= h,
+                    h => SearchFlipModel.SearchRequested += h,
+                    h => SearchFlipModel.SearchRequested -= h,
                     (query, mode) =>
                     {
                         this.Open();

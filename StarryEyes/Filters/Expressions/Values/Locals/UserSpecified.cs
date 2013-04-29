@@ -38,19 +38,19 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 
         public override void BeginLifecycle()
         {
-            AccountRelationData.OnAccountDataUpdated += AccountRelationData_OnAccountDataUpdated;
+            AccountRelationData.AccountDataUpdated += this.AccountRelationDataAccountDataUpdated;
         }
 
         public override void EndLifecycle()
         {
-            AccountRelationData.OnAccountDataUpdated -= AccountRelationData_OnAccountDataUpdated;
+            AccountRelationData.AccountDataUpdated -= this.AccountRelationDataAccountDataUpdated;
         }
 
-        void AccountRelationData_OnAccountDataUpdated(RelationDataChangedInfo obj)
+        void AccountRelationDataAccountDataUpdated(RelationDataChangedInfo obj)
         {
             if (obj.AccountUserId == _userId)
             {
-                RequestReapplyFilter(obj);
+                this.RaiseReapplyFilter(obj);
             }
         }
 

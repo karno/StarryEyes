@@ -15,7 +15,7 @@ namespace StarryEyes.Models.Tab
 
         private static int _currentFocusColumnIndex;
 
-        public static event Action OnCurrentFocusColumnChanged;
+        public static event Action CurrentFocusColumnChanged;
 
         public static ObservableSynchronizedCollection<ColumnModel> Columns
         {
@@ -25,10 +25,10 @@ namespace StarryEyes.Models.Tab
         static TabManager()
         {
             RegisterEvents();
-            App.OnApplicationExit += App_OnApplicationExit;
+            App.ApplicationExit += AppApplicationExit;
         }
 
-        static void App_OnApplicationExit()
+        static void AppApplicationExit()
         {
             // save cache
             Save();
@@ -90,7 +90,7 @@ namespace StarryEyes.Models.Tab
                 _currentFocusColumnIndex = value;
                 var col = _columns[_currentFocusColumnIndex];
                 InputAreaModel.NotifyChangeFocusingTab(col.Tabs[col.CurrentFocusTabIndex]);
-                var handler = OnCurrentFocusColumnChanged;
+                var handler = CurrentFocusColumnChanged;
                 if (handler != null) handler();
             }
         }
@@ -158,12 +158,10 @@ namespace StarryEyes.Models.Tab
             {
                 for (var ti = 0; ti < _columns[ci].Tabs.Count; ti++)
                 {
-                    if (_columns[ci].Tabs[ti] == info)
-                    {
-                        colIndex = ci;
-                        tabIndex = ti;
-                        return true;
-                    }
+                    if (_columns[ci].Tabs[ti] != info) continue;
+                    colIndex = ci;
+                    tabIndex = ti;
+                    return true;
                 }
             }
             colIndex = -1;
@@ -301,7 +299,7 @@ namespace StarryEyes.Models.Tab
         /// </summary>
         public static void RegisterEvents()
         {
-            MainWindowModel.OnTimelineFocusRequested += MainWindowModel_OnTimelineFocusRequested;
+            MainWindowModel.TimelineFocusRequested += MainWindowModelTimelineFocusRequested;
             KeyAssignManager.RegisterActions(
                 KeyAssignAction.Create("RestoreTab", ReviveTab),
                 KeyAssignAction.Create("CloseTab", () =>
@@ -329,7 +327,7 @@ namespace StarryEyes.Models.Tab
             }
         }
 
-        private static void MainWindowModel_OnTimelineFocusRequested(TimelineFocusRequest req)
+        private static void MainWindowModelTimelineFocusRequested(TimelineFocusRequest req)
         {
             var ccolumn = Columns[CurrentFocusColumnIndex];
             if (ccolumn.Tabs.Count == 0) return; // not available

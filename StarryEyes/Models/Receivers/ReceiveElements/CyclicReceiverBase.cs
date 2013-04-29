@@ -28,8 +28,8 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
         protected CyclicReceiverBase()
         {
             CompositeDisposable.Add(Observable.FromEvent(
-                h => App.OnApplicationFinalize += h,
-                h => App.OnApplicationFinalize -= h)
+                h => App.ApplicationFinalize += h,
+                h => App.ApplicationFinalize -= h)
                 .Subscribe(_ => this.Dispose()));
             CompositeDisposable.Add(Observable.Interval(TimeSpan.FromSeconds(1))
                 .Subscribe(_ => OnTimer()));

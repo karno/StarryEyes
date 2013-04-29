@@ -107,16 +107,16 @@ namespace StarryEyes.ViewModels
             CompositeDisposable.Add(_tabConfigurationFlipViewModel = new TabConfigurationFlipViewModel());
             CompositeDisposable.Add(_searchFlipViewModel = new SearchFlipViewModel());
             CompositeDisposable.Add(Observable.FromEvent<FocusRequest>(
-                h => MainWindowModel.OnFocusRequested += h,
-                h => MainWindowModel.OnFocusRequested -= h)
+                h => MainWindowModel.FocusRequested += h,
+                h => MainWindowModel.FocusRequested -= h)
                 .Subscribe(SetFocus));
             CompositeDisposable.Add(Observable.FromEvent<Tuple<string, FilterExpressionBase>>(
-                h => MainWindowModel.OnConfirmMuteRequested += h,
-                h => MainWindowModel.OnConfirmMuteRequested -= h)
+                h => MainWindowModel.ConfirmMuteRequested += h,
+                h => MainWindowModel.ConfirmMuteRequested -= h)
                 .Subscribe(OnMuteRequested));
             CompositeDisposable.Add(Observable.FromEvent<bool>(
-                h => MainWindowModel.OnBackstageTransitionRequested += h,
-                h => MainWindowModel.OnBackstageTransitionRequested -= h)
+                h => MainWindowModel.BackstageTransitionRequested += h,
+                h => MainWindowModel.BackstageTransitionRequested -= h)
                 .Subscribe(this.TransitionBackstage));
             this._backstageViewModel.Initialize();
         }
@@ -148,46 +148,70 @@ namespace StarryEyes.ViewModels
 
         public void Initialize()
         {
-            MainWindowModel.OnWindowCommandDisplayChanged += visible =>
-            {
-                var offset = visible ? Interlocked.Increment(ref _visibleCount) : Interlocked.Decrement(ref _visibleCount);
-                ShowWindowCommands = offset >= 0;
-            };
+            CompositeDisposable.Add(
+                Observable.FromEvent<bool>(
+                    h => MainWindowModel.WindowCommandsDisplayChanged += h,
+                    h => MainWindowModel.WindowCommandsDisplayChanged -= h)
+                          .Subscribe(visible =>
+                          {
+                              var offset = visible
+                                               ? Interlocked.Increment(ref _visibleCount)
+                                               : Interlocked.Decrement(ref _visibleCount);
+                              ShowWindowCommands = offset >= 0;
+                          }));
+            CompositeDisposable.Add(
+                Observable.FromEvent<TaskDialogOptions>(
+                    h => MainWindowModel.TaskDialogRequested += h,
+                    h => MainWindowModel.TaskDialogRequested -= h)
+                          .Subscribe(options => this.Messenger.Raise(new TaskDialogMessage(options))));
+            CompositeDisposable.Add(
+                Observable.FromEvent(
+                    h => MainWindowModel.StateStringChanged += h,
+                    h => MainWindowModel.StateStringChanged -= h)
+                          .Subscribe(_ => RaisePropertyChanged(() => StateString)));
+            CompositeDisposable.Add(
+                Observable.FromEvent(
+                    h => StatisticsService.StatisticsParamsUpdated += h,
+                    h => StatisticsService.StatisticsParamsUpdated -= h)
+                          .Subscribe(_ => UpdateStatistics()));
 
-            CompositeDisposable.Add(Observable.FromEvent(
-                h => MainWindowModel.OnStateStringChanged += h,
-                h => MainWindowModel.OnStateStringChanged -= h)
-                                              .Subscribe(_ => RaisePropertyChanged(() => StateString)));
-            CompositeDisposable.Add(Observable.FromEvent(
-                h => StatisticsService.OnStatisticsParamsUpdated += h,
-                h => StatisticsService.OnStatisticsParamsUpdated -= h)
-                                              .Subscribe(_ => UpdateStatistics()));
-
-            MainWindowModel.OnExecuteAccountSelectActionRequested += (action, status, selecteds, aftercall) =>
-            {
-                _globalAccountSelectionFlipViewModel.SelectedAccounts = selecteds;
-                _globalAccountSelectionFlipViewModel.SelectionReason = "";
-                switch (action)
-                {
-                    case AccountSelectionAction.Favorite:
-                        _globalAccountSelectionFlipViewModel.SelectionReason = "favorite";
-                        break;
-                    case AccountSelectionAction.Retweet:
-                        _globalAccountSelectionFlipViewModel.SelectionReason = "retweet";
-                        break;
-                }
-                IDisposable disposable = null;
-                disposable = Observable.FromEvent(h => _globalAccountSelectionFlipViewModel.OnClosed += h,
-                                                  h => _globalAccountSelectionFlipViewModel.OnClosed -= h)
-                                       .Subscribe(_ =>
-                                       {
-                                           if (disposable == null) return;
-                                           disposable.Dispose();
-                                           disposable = null;
-                                           aftercall(this._globalAccountSelectionFlipViewModel.SelectedAccounts);
-                                       });
-                _globalAccountSelectionFlipViewModel.Open();
-            };
+            CompositeDisposable.Add(
+                Observable.FromEvent<AccountSelectDescription>(
+                    h => MainWindowModel.AccountSelectActionRequested += h,
+                    h => MainWindowModel.AccountSelectActionRequested -= h)
+                          .Subscribe(
+                              desc =>
+                              {
+                                  _globalAccountSelectionFlipViewModel.SelectedAccounts =
+                                      desc.SelectionAccounts;
+                                  _globalAccountSelectionFlipViewModel.SelectionReason = "";
+                                  switch (desc.AccountSelectionAction)
+                                  {
+                                      case AccountSelectionAction.Favorite:
+                                          _globalAccountSelectionFlipViewModel.SelectionReason =
+                                              "favorite";
+                                          break;
+                                      case AccountSelectionAction.Retweet:
+                                          _globalAccountSelectionFlipViewModel.SelectionReason =
+                                              "retweet";
+                                          break;
+                                  }
+                                  IDisposable disposable = null;
+                                  disposable = Observable.FromEvent(
+                                      h => _globalAccountSelectionFlipViewModel.Closed += h,
+                                      h => _globalAccountSelectionFlipViewModel.Closed -= h)
+                                                         .Subscribe(_ =>
+                                                         {
+                                                             if (disposable == null) return;
+                                                             disposable.Dispose();
+                                                             disposable = null;
+                                                             desc.Callback(
+                                                                 this
+                                                                     ._globalAccountSelectionFlipViewModel
+                                                                     .SelectedAccounts);
+                                                         });
+                                  _globalAccountSelectionFlipViewModel.Open();
+                              }));
 
             if (Setting.IsFirstGenerated)
             {
@@ -215,6 +239,7 @@ namespace StarryEyes.ViewModels
             }
             TabManager.Load();
             TabManager.Save();
+
             if (TabManager.Columns.Count != 1 || TabManager.Columns[0].Tabs.Count != 0) return;
             var response = this.Messenger.GetResponse(new TaskDialogMessage(new TaskDialogOptions
             {

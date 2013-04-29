@@ -265,7 +265,7 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
         {
             CleanupConnection();
             Debug.WriteLine("*** USER STREAM DISCONNECT ***" + Environment.NewLine + header + Environment.NewLine + detail + Environment.NewLine);
-            var discone = new UserStreamsDisconnectedEvent(AuthInfo, header + " - " + detail, this.Reconnect);
+            var discone = new UserStreamsDisconnectedEvent(AuthInfo, header + " - " + detail);
             BackstageModel.RegisterEvent(discone);
             ConnectionState = UserStreamsConnectionState.WaitForReconnection;
             _currentConnection.Add(

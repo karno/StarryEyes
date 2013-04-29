@@ -18,25 +18,37 @@ namespace StarryEyes.ViewModels.WindowParts
     {
         private readonly ReadOnlyDispatcherCollectionRx<BackstageAccountViewModel> _accounts;
 
-        private readonly ReadOnlyDispatcherCollectionRx<TwitterEventViewModel> _events;
+        private readonly ReadOnlyDispatcherCollectionRx<TwitterEventViewModel> _twitterEvents;
         private readonly object _syncLock = new object();
 
         private readonly Queue<BackstageEventBase> _waitingEvents =
             new Queue<BackstageEventBase>();
 
         private bool _showCurrentEvent;
+        private BackstageViewItem _viewItem = BackstageViewItem.TwitterEvents;
         private BackstageEventViewModel _currentEvent;
 
         private bool _isDisposed;
 
-        public ReadOnlyDispatcherCollectionRx<TwitterEventViewModel> Events
-        {
-            get { return _events; }
-        }
-
         public ReadOnlyDispatcherCollectionRx<BackstageAccountViewModel> Accounts
         {
             get { return this._accounts; }
+        }
+
+        public ReadOnlyDispatcherCollectionRx<TwitterEventViewModel> TwitterEvents
+        {
+            get { return this._twitterEvents; }
+        }
+
+        public BackstageViewItem ViewItem
+        {
+            get { return _viewItem; }
+            set
+            {
+                if (_viewItem == value) return;
+                _viewItem = value;
+                this.RaisePropertyChanged();
+            }
         }
 
         public string CurrentVersion
@@ -75,20 +87,25 @@ namespace StarryEyes.ViewModels.WindowParts
         /// </summary>
         public BackstageViewModel()
         {
-            _events = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
+            _twitterEvents = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
                 BackstageModel.TwitterEvents,
                 tev => new TwitterEventViewModel(tev),
                 DispatcherHelper.UIDispatcher);
-            CompositeDisposable.Add(_events);
+            CompositeDisposable.Add(_twitterEvents);
             _accounts = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
                 BackstageModel.Accounts,
                 a => new BackstageAccountViewModel(this, a),
                 DispatcherHelper.UIDispatcher);
             CompositeDisposable.Add(_accounts);
             CompositeDisposable.Add(
+                Observable.FromEvent(
+                    h => BackstageModel.CloseBackstage += h,
+                    h => BackstageModel.CloseBackstage -= h)
+                          .Subscribe(_ => this.Close()));
+            CompositeDisposable.Add(
                 Observable.FromEvent<BackstageEventBase>(
-                    h => BackstageModel.OnEventRegistered += h,
-                    h => BackstageModel.OnEventRegistered -= h)
+                    h => BackstageModel.EventRegistered += h,
+                    h => BackstageModel.EventRegistered -= h)
                           .Subscribe(ev =>
                           {
                               lock (_syncLock)
@@ -144,5 +161,11 @@ namespace StarryEyes.ViewModels.WindowParts
         {
             MainWindowModel.TransitionBackstage(false);
         }
+    }
+
+    public enum BackstageViewItem
+    {
+        TwitterEvents,
+        SystemEvents
     }
 }

@@ -95,18 +95,11 @@ namespace StarryEyes.Models.Subsystems
                     statuses.First == null
                         ? null
                         : EnumerableEx.Generate(statuses.First, n => n.Next != null, n => n.Next, n => n)
-                                      .FirstOrDefault(n => n.Value.Id <= status.Id);
-                // check duplication
+                                      .TakeWhile(n => n.Value.Id >= status.Id)
+                                      .LastOrDefault();
                 if (afterThis == null)
                 {
-                    if (statuses.First == null || statuses.First.Value.Id < status.Id)
-                    {
-                        statuses.AddFirst(status);
-                    }
-                    else
-                    {
-                        statuses.AddLast(status);
-                    }
+                    statuses.AddFirst(status);
                 }
                 else if (afterThis.Value.Id == status.Id)
                 {

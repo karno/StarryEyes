@@ -7,10 +7,16 @@
              xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
              xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:utils="clr-namespace:StarryEyes.Views.Utils"
              xmlns:windowParts="clr-namespace:StarryEyes.ViewModels.WindowParts"
-             d:DesignHeight="300"
-             d:DesignWidth="300"
+             d:DesignHeight="250"
+             d:DesignWidth="600"
              mc:Ignorable="d">
+    <UserControl.Resources>
+        <utils:BooleanToVisibleConverter x:Key="BooleanToVisibleConverter" />
+        <utils:BooleanToInvisibleConverter x:Key="BooleanToInvisibleConverter" />
+        <utils:StringToVisibleConverter x:Key="StringToVisibleConverter" />
+    </UserControl.Resources>
     <UserControl.DataContext>
         <windowParts:BackstageViewModel />
     </UserControl.DataContext>
@@ -93,11 +99,11 @@
                                                     <Style TargetType="{x:Type TextBlock}">
                                                         <Setter Property="Text" Value="{Binding ConnectionState}" />
                                                         <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}" Value="True">
+                                                            <Trigger Property="IsMouseOver" Value="True">
                                                                 <Setter Property="Text" Value="Reconnect" />
                                                                 <Setter Property="Foreground" Value="#FF1BA1E2" />
                                                                 <Setter Property="TextDecorations" Value="Underline" />
-                                                            </DataTrigger>
+                                                            </Trigger>
                                                         </Style.Triggers>
                                                     </Style>
                                                 </TextBlock.Style>
@@ -113,6 +119,62 @@
         </Border>
         <Border Grid.Column="1" Background="White">
             <!--  Main area  -->
+            <ScrollViewer Grid.Row="1"
+                          HorizontalAlignment="Stretch"
+                          VerticalAlignment="Stretch">
+                <ItemsControl ItemsSource="{Binding TwitterEvents}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="4" />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <Border>
+                                    <Border.Background>
+                                        <SolidColorBrush Color="{Binding Background, Mode=OneWay}" />
+                                    </Border.Background>
+                                </Border>
+                                <Border Grid.Column="1" Opacity="0.1">
+                                    <Border.Background>
+                                        <SolidColorBrush Color="{Binding Background, Mode=OneWay}" />
+                                    </Border.Background>
+                                </Border>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="MouseLeftButtonDown">
+                                            <ei:CallMethodAction MethodName="OpenEventSourceUserProfile" TargetObject="{Binding}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                    <Image Width="16"
+                                           Height="16"
+                                           Margin="8,8,4,8"
+                                           VerticalAlignment="Center"
+                                           Source="{Binding TitleImage,
+                                                            Mode=OneWay}"
+                                           Visibility="{Binding IsImageAvailable,
+                                                                Converter={StaticResource BooleanToVisibleConverter},
+                                                                Mode=OneWay}" />
+                                    <TextBlock Margin="8,8,4,8"
+                                               VerticalAlignment="Center"
+                                               FontWeight="Bold"
+                                               Foreground="Black"
+                                               Text="{Binding Title,
+                                                              Mode=OneWay}"
+                                               Visibility="{Binding IsImageAvailable,
+                                                                    Converter={StaticResource BooleanToInvisibleConverter},
+                                                                    Mode=OneWay}" />
+                                    <TextBlock Margin="4,8,8,8"
+                                               VerticalAlignment="Center"
+                                               Foreground="Black"
+                                               Text="{Binding Detail,
+                                                              Mode=OneWay}" />
+                                </StackPanel>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
         </Border>
     </Grid>
 </UserControl>

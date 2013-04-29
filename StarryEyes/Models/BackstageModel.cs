@@ -3,9 +3,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Reactive.Linq;
 using Livet;
-using StarryEyes.Breezy.Authorize;
 using StarryEyes.Models.Backstages;
-using StarryEyes.Models.Backstages.SystemEvents;
 using StarryEyes.Models.Backstages.TwitterEvents;
 using StarryEyes.Models.Receivers;
 using StarryEyes.Models.Stores;
@@ -82,13 +80,6 @@ namespace StarryEyes.Models
 
         #region Event management
 
-        private static readonly ObservableSynchronizedCollectionEx<SystemEventBase> _systemEvents =
-            new ObservableSynchronizedCollectionEx<SystemEventBase>();
-        public static ObservableSynchronizedCollectionEx<SystemEventBase> SystemEvents
-        {
-            get { return _systemEvents; }
-        }
-
         public const int TwitterEventMaxHoldCount = 256;
 
         private static readonly ObservableSynchronizedCollection<TwitterEventBase> _twitterEvents =
@@ -98,71 +89,41 @@ namespace StarryEyes.Models
             get { return _twitterEvents; }
         }
 
-        public static event Action<BackstageEventBase> OnEventRegistered;
+        public static event Action<BackstageEventBase> EventRegistered;
 
         public static void RegisterEvent(BackstageEventBase ev)
         {
             System.Diagnostics.Debug.WriteLine("EVENT: " + ev.Title + " - " + ev.Detail);
-            var handler = OnEventRegistered;
+            var handler = EventRegistered;
             if (handler != null)
-                OnEventRegistered(ev);
+                EventRegistered(ev);
             var tev = ev as TwitterEventBase;
-            if (tev != null)
+            if (tev == null) return;
+            lock (_twitterEvents.SyncRoot)
             {
-                lock (_twitterEvents.SyncRoot)
-                {
-                    _twitterEvents.Insert(0, tev);
-                    if (_twitterEvents.Count > TwitterEventMaxHoldCount)
-                        _twitterEvents.RemoveAt(_twitterEvents.Count - 1);
-                }
-                return;
-            }
-            var sev = ev as SystemEventBase;
-            if (sev != null)
-            {
-                lock (SystemEvents.SyncRoot)
-                {
-                    if (!String.IsNullOrEmpty(sev.Id))
-                    {
-                        SystemEvents.RemoveWhere(e => e.Id == sev.Id);
-                    }
-                    SystemEvents.Add(sev);
-                }
-                return;
+                _twitterEvents.Insert(0, tev);
+                if (_twitterEvents.Count > TwitterEventMaxHoldCount)
+                    _twitterEvents.RemoveAt(_twitterEvents.Count - 1);
             }
         }
 
         public static void RemoveEvent(BackstageEventBase ev)
         {
             var tev = ev as TwitterEventBase;
-            if (tev != null)
+            if (tev == null) return;
+            lock (_twitterEvents.SyncRoot)
             {
-                lock (_twitterEvents.SyncRoot)
-                {
-                    _twitterEvents.Remove(tev);
-                }
-                return;
-            }
-            var sev = ev as SystemEventBase;
-            if (sev != null)
-            {
-                lock (SystemEvents.SyncRoot)
-                {
-                    SystemEvents.Remove(sev);
-                }
-                return;
-            }
-        }
-
-        public static void RemoveEvent(string id)
-        {
-            lock (SystemEvents.SyncRoot)
-            {
-                SystemEvents.RemoveWhere(e => e.Id == id);
+                _twitterEvents.Remove(tev);
             }
         }
 
         #endregion
 
+        public static event Action CloseBackstage;
+        public static void RaiseCloseBackstage()
+        {
+            var handler = CloseBackstage;
+            if (handler != null) handler();
+        }
     }
 }

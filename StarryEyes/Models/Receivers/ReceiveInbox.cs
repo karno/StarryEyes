@@ -23,7 +23,7 @@ namespace StarryEyes.Models.Receivers
 
         internal static void Initialize()
         {
-            App.OnApplicationExit += () => _pumpThread.Abort();
+            App.ApplicationExit += () => _pumpThread.Abort();
             _pumpThread = new Thread(PumpQueuedStatuses);
             _pumpThread.Start();
         }

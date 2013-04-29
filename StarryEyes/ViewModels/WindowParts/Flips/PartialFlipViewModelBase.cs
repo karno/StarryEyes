@@ -7,7 +7,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 {
     public abstract class PartialFlipViewModelBase : ViewModel
     {
-        public event Action OnClosed;
+        public event Action Closed;
 
         private bool _isVisible;
         public bool IsVisible
@@ -43,7 +43,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             {
                 MainWindowModel.SetShowMainWindowCommands(true);
             }
-            var handler = OnClosed;
+            var handler = this.Closed;
             if (handler != null)
                 handler();
         }

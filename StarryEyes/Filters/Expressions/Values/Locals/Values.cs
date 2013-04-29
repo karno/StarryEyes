@@ -12,14 +12,14 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
         public LocalUser(UserExpressionBase expression)
         {
             this._expression = expression;
-            this._expression.OnReapplyRequested += _expression_OnReapplyRequested;
+            this._expression.ReapplyRequested += this.ExpressionReapplyRequested;
         }
 
-        private void _expression_OnReapplyRequested(RelationDataChangedInfo obj)
+        private void ExpressionReapplyRequested(RelationDataChangedInfo obj)
         {
             if (obj != null) return;
             System.Diagnostics.Debug.WriteLine("local user reapply");
-            RequestReapplyFilter();
+            this.RaiseReapplyFilter();
         }
 
         public override IEnumerable<FilterExpressionType> SupportedTypes
@@ -67,14 +67,14 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
         public LocalUserFollowing(UserExpressionBase expression)
         {
             this._expression = expression;
-            this._expression.OnReapplyRequested += _expression_OnReapplyRequested;
+            this._expression.ReapplyRequested += this.ExpressionReapplyRequested;
         }
 
-        private void _expression_OnReapplyRequested(RelationDataChangedInfo obj)
+        private void ExpressionReapplyRequested(RelationDataChangedInfo obj)
         {
             if (obj == null || obj.Change == RelationDataChange.Following)
             {
-                RequestReapplyFilter();
+                this.RaiseReapplyFilter();
             }
         }
 
@@ -112,14 +112,14 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
         public LocalUserFollowers(UserExpressionBase expression)
         {
             this._expression = expression;
-            this._expression.OnReapplyRequested += _expression_OnReapplyRequested;
+            this._expression.ReapplyRequested += this.ExpressionReapplyRequested;
         }
 
-        private void _expression_OnReapplyRequested(RelationDataChangedInfo obj)
+        private void ExpressionReapplyRequested(RelationDataChangedInfo obj)
         {
             if (obj == null || obj.Change == RelationDataChange.Follower)
             {
-                RequestReapplyFilter();
+                this.RaiseReapplyFilter();
             }
         }
 
@@ -157,14 +157,14 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
         public LocalUserBlockings(UserExpressionBase expression)
         {
             _expression = expression;
-            this._expression.OnReapplyRequested += _expression_OnReapplyRequested;
+            this._expression.ReapplyRequested += this.ExpressionReapplyRequested;
         }
 
-        private void _expression_OnReapplyRequested(RelationDataChangedInfo obj)
+        private void ExpressionReapplyRequested(RelationDataChangedInfo obj)
         {
             if (obj == null || obj.Change == RelationDataChange.Blocking)
             {
-                RequestReapplyFilter();
+                this.RaiseReapplyFilter();
             }
         }
 

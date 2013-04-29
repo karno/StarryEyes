@@ -61,7 +61,7 @@ namespace StarryEyes.ViewModels.WindowParts
         {
             _provider = new InputAreaSuggestItemProvider();
             _accountSelectionFlip = new AccountSelectionFlipViewModel();
-            _accountSelectionFlip.OnClosed += () =>
+            _accountSelectionFlip.Closed += () =>
             {
                 // After selection accounts, return focus to text box
                 // if input area is opened.
@@ -112,7 +112,7 @@ namespace StarryEyes.ViewModels.WindowParts
                                         .Subscribe(_ => RaisePropertyChanged(() => IsBindingAuthInfoExisted)));
 
             var accountSelectReflecting = false;
-            _accountSelectionFlip.OnSelectedAccountsChanged += () =>
+            _accountSelectionFlip.SelectedAccountsChanged += () =>
             {
                 if (!_isSuppressAccountChangeRelay)
                 {
@@ -146,8 +146,8 @@ namespace StarryEyes.ViewModels.WindowParts
 
             CompositeDisposable.Add(
                 new EventListener<Action<IEnumerable<AuthenticateInfo>, string, CursorPosition, TwitterStatus>>(
-                    _ => InputAreaModel.OnSetTextRequested += _,
-                    _ => InputAreaModel.OnSetTextRequested -= _,
+                    _ => InputAreaModel.SetTextRequested += _,
+                    _ => InputAreaModel.SetTextRequested -= _,
                     (infos, body, cursor, inReplyTo) =>
                     {
                         OpenInput(false);
@@ -173,8 +173,8 @@ namespace StarryEyes.ViewModels.WindowParts
 
             CompositeDisposable.Add(
                 new EventListener<Action<IEnumerable<AuthenticateInfo>, TwitterUser>>(
-                    _ => InputAreaModel.OnSendDirectMessageRequested += _,
-                    _ => InputAreaModel.OnSendDirectMessageRequested -= _,
+                    _ => InputAreaModel.SendDirectMessageRequested += _,
+                    _ => InputAreaModel.SendDirectMessageRequested -= _,
                     (infos, user) =>
                     {
                         OpenInput(false);

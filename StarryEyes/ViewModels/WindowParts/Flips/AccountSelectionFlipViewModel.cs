@@ -64,10 +64,10 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             }
         }
 
-        public event Action OnSelectedAccountsChanged;
+        public event Action SelectedAccountsChanged;
         private void RaiseSelectedAccountsChanged()
         {
-            var handler = OnSelectedAccountsChanged;
+            var handler = this.SelectedAccountsChanged;
             if (handler != null)
                 handler();
         }
@@ -101,12 +101,10 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             get { return _isSelected; }
             set
             {
-                if (_isSelected != value)
-                {
-                    _isSelected = value;
-                    RaisePropertyChanged(() => IsSelected);
-                    _onSelectionChanged();
-                }
+                if (this._isSelected == value) return;
+                this._isSelected = value;
+                this.RaisePropertyChanged(() => this.IsSelected);
+                this._onSelectionChanged();
             }
         }
 

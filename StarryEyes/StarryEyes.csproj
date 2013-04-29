@@ -143,6 +143,10 @@
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
+    <Reference Include="TaskDialog, Version=1.7.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Debug\TaskDialog.dll</HintPath>
+    </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -200,11 +204,8 @@
     <Compile Include="InputFormats\InputFormatFunctionBase.cs" />
     <Compile Include="Models\BackstageModel.cs" />
     <Compile Include="Models\Backstages\BackstageAccountModel.cs" />
-    <Compile Include="Models\Backstages\SystemEvents\KeyAssignCouldNotLoadEvent.cs" />
     <Compile Include="Models\Backstages\SystemEvents\KeyAssignProfileNotFoundEvent.cs" />
-    <Compile Include="Models\Backstages\SystemEvents\ListReceiveFailedEvent.cs" />
     <Compile Include="Models\Backstages\SystemEvents\QueryCorruptionEvent.cs" />
-    <Compile Include="Models\Backstages\SystemEvents\StreamingKeywordDanglingEvent.cs" />
     <Compile Include="Models\Backstages\SystemEvents\SystemEventBase.cs" />
     <Compile Include="Models\Backstages\SystemEvents\SystemEventKind.cs" />
     <Compile Include="Models\Backstages\NotificationEvents\PostEvents\FallbackedEvent.cs" />

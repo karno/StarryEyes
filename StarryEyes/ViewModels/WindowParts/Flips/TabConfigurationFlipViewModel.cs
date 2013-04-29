@@ -29,8 +29,8 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         public TabConfigurationFlipViewModel()
         {
             this.CompositeDisposable.Add(Observable.FromEvent<TabModel>(
-                h => MainWindowModel.OnTabModelConfigureRaised += h,
-                h => MainWindowModel.OnTabModelConfigureRaised -= h)
+                h => MainWindowModel.TabModelConfigureRaised += h,
+                h => MainWindowModel.TabModelConfigureRaised -= h)
                 .Subscribe(OnConfigurationStart));
         }
 
@@ -159,12 +159,12 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                     {
                         _currentConfigurationTarget.FilterQuery = _filterQuery;
                     }
-                    _currentConfigurationTarget.ConfigurationUpdated(true);
+                    _currentConfigurationTarget.RaiseConfigurationUpdated(true);
                 }
                 else
                 {
                     // writeback query edit result
-                    _currentConfigurationTarget.ConfigurationUpdated(false);
+                    _currentConfigurationTarget.RaiseConfigurationUpdated(false);
                 }
                 // regenerate timeline
             }

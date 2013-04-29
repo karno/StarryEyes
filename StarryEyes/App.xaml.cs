@@ -454,12 +454,12 @@ namespace StarryEyes
         /// Call on kernel systems are ready<para />
         /// (But UI is not prepared)
         /// </summary>
-        public static event Action OnSystemReady;
+        public static event Action SystemReady;
         internal static void RaiseSystemReady()
         {
-            System.Diagnostics.Debug.WriteLine("# System ready.");
-            var osr = OnSystemReady;
-            OnSystemReady = null;
+            Debug.WriteLine("# System ready.");
+            var osr = SystemReady;
+            SystemReady = null;
             if (osr != null)
                 osr();
         }
@@ -467,12 +467,12 @@ namespace StarryEyes
         /// <summary>
         /// Call on user interfaces are ready
         /// </summary>
-        public static event Action OnUserInterfaceReady;
+        public static event Action UserInterfaceReady;
         internal static void RaiseUserInterfaceReady()
         {
-            System.Diagnostics.Debug.WriteLine("# UI ready.");
-            var usr = OnUserInterfaceReady;
-            OnUserInterfaceReady = null;
+            Debug.WriteLine("# UI ready.");
+            var usr = UserInterfaceReady;
+            UserInterfaceReady = null;
             if (usr != null)
                 usr();
         }
@@ -481,12 +481,12 @@ namespace StarryEyes
         /// Call on aplication is exit from user action<para />
         /// (On crash app, this handler won't call!)
         /// </summary>
-        public static event Action OnApplicationExit;
+        public static event Action ApplicationExit;
         internal static void RaiseApplicationExit()
         {
-            System.Diagnostics.Debug.WriteLine("# App exit.");
-            var apx = OnApplicationExit;
-            OnApplicationExit = null;
+            Debug.WriteLine("# App exit.");
+            var apx = ApplicationExit;
+            ApplicationExit = null;
             if (apx != null)
                 apx();
         }
@@ -494,12 +494,12 @@ namespace StarryEyes
         /// <summary>
         /// Call on application is exit from user action or crashed
         /// </summary>
-        public static event Action OnApplicationFinalize;
+        public static event Action ApplicationFinalize;
         internal static void RaiseApplicationFinalize()
         {
-            System.Diagnostics.Debug.WriteLine("# App finalize.");
-            var apf = OnApplicationFinalize;
-            OnApplicationFinalize = null;
+            Debug.WriteLine("# App finalize.");
+            var apf = ApplicationFinalize;
+            ApplicationFinalize = null;
             if (apf != null)
                 apf();
         }

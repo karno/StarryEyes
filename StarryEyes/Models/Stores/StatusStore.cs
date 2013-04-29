@@ -53,7 +53,7 @@ namespace StarryEyes.Models.Stores
                     (_ => _.Id, Path.Combine(App.DataStorePath, "statuses"), ChunkCount, new IdReverseComparer());
             }
             _dispatcher = new SingleThreadDispatcher<TwitterStatus>(_store.Store);
-            App.OnApplicationFinalize += Shutdown;
+            App.ApplicationFinalize += Shutdown;
         }
 
         /// <summary>

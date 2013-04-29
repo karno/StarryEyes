@@ -39,7 +39,7 @@ namespace StarryEyes.Models.Stores
             }
             _dispatcher = new SingleThreadDispatcher<TwitterUser>(_store.Store);
             LoadScreenNameResolverCache();
-            App.OnApplicationFinalize += Shutdown;
+            App.ApplicationFinalize += Shutdown;
         }
 
         public static void Store(TwitterUser user)

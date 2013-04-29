@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Models.Backstages.SystemEvents;
 using StarryEyes.Models.Receivers.ReceiveElements;
 using StarryEyes.Models.Stores;
+using StarryEyes.Nightmare.Windows;
 
 namespace StarryEyes.Models.Receivers.Managers
 {
@@ -24,7 +26,17 @@ namespace StarryEyes.Models.Receivers.Managers
             }
             else
             {
-                BackstageModel.RegisterEvent(new ListReceiveFailedEvent(info));
+                MainWindowModel.ShowTaskDialog(new TaskDialogOptions
+                {
+                    MainIcon = VistaTaskDialogIcon.Error,
+                    MainInstruction = "リスト受信を開始できません。",
+                    Content = "リスト " + info + " を受信するアカウントを特定できませんでした。",
+                    ExpandedInfo = "自分以外が作成したリストを受信する際は、そのリストをどのアカウントで受信するかを明示的に記述しなければなりません。" + Environment.NewLine +
+                                   "例: receiver/user/listname",
+                    ExpandedByDefault = true,
+                    Title = "リスト受信エラー",
+                    CommonButtons = TaskDialogCommonButtons.Close,
+                });
             }
         }
 
@@ -63,14 +75,12 @@ namespace StarryEyes.Models.Receivers.Managers
                     return;
                 }
 
-                if (--_listReceiverReferenceCount[info] == 0)
-                {
-                    // dispose connection
-                    _listReceiverReferenceCount.Remove(info);
-                    var lr = _listReceiverResolver[info];
-                    _listReceiverResolver.Remove(info);
-                    lr.Dispose();
-                }
+                if (--this._listReceiverReferenceCount[info] != 0) return;
+                // dispose connection
+                this._listReceiverReferenceCount.Remove(info);
+                var lr = this._listReceiverResolver[info];
+                this._listReceiverResolver.Remove(info);
+                lr.Dispose();
             }
         }
     }

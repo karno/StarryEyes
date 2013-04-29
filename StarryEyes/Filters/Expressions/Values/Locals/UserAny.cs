@@ -72,12 +72,12 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
             _disposables.Add(
                 AccountsStore.Accounts
                              .ListenCollectionChanged()
-                             .Subscribe(_ => RequestReapplyFilter(null)));
+                             .Subscribe(_ => this.RaiseReapplyFilter(null)));
             _disposables.Add(
                 Observable.FromEvent<RelationDataChangedInfo>(
-                    h => AccountRelationData.OnAccountDataUpdated += h,
-                    h => AccountRelationData.OnAccountDataUpdated -= h)
-                          .Subscribe(RequestReapplyFilter));
+                    h => AccountRelationData.AccountDataUpdated += h,
+                    h => AccountRelationData.AccountDataUpdated -= h)
+                          .Subscribe(this.RaiseReapplyFilter));
         }
 
         public override void EndLifecycle()

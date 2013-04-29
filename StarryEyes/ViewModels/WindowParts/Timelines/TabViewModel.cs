@@ -52,8 +52,8 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             BindTimeline();
             CompositeDisposable.Add(
                 Observable.FromEvent<ScrollLockStrategy>(
-                    handler => Setting.ScrollLockStrategy.OnValueChanged += handler,
-                    handler => Setting.ScrollLockStrategy.OnValueChanged -= handler)
+                    handler => Setting.ScrollLockStrategy.ValueChanged += handler,
+                    handler => Setting.ScrollLockStrategy.ValueChanged -= handler)
                           .Subscribe(_ =>
                           {
                               RaisePropertyChanged(() => IsScrollLock);
@@ -64,8 +64,8 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             {
                 CompositeDisposable.Add(
                     Observable.FromEvent(
-                        h => Model.FilterQuery.OnInvalidateRequired += h,
-                        h => Model.FilterQuery.OnInvalidateRequired -= h)
+                        h => Model.FilterQuery.InvalidateRequired += h,
+                        h => Model.FilterQuery.InvalidateRequired -= h)
                               .Subscribe(_ =>
                               {
                                   var count = Interlocked.Increment(ref _refreshCount);
@@ -83,16 +83,16 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             }
             CompositeDisposable.Add(
                 Observable.FromEvent(
-                    h => tabModel.OnBindingAccountIdsChanged += h,
-                    h => tabModel.OnBindingAccountIdsChanged -= h)
+                    h => tabModel.BindingAccountIdsChanged += h,
+                    h => tabModel.BindingAccountIdsChanged -= h)
                           .Subscribe(
                               _ => DispatcherHolder.Enqueue(
                                   () => Timeline.ForEach(t => t.BindingAccounts = Model.BindingAccountIds),
                                   DispatcherPriority.Background)));
             CompositeDisposable.Add(
                 Observable.FromEvent<bool>(
-                    h => tabModel.OnConfigurationUpdated += h,
-                    h => tabModel.OnConfigurationUpdated -= h)
+                    h => tabModel.ConfigurationUpdated += h,
+                    h => tabModel.ConfigurationUpdated -= h)
                           .Subscribe(timelineModelRegenerated =>
                           {
                               RaisePropertyChanged(() => Name);
@@ -104,8 +104,8 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                           }));
             CompositeDisposable.Add(
                 Observable.FromEvent(
-                h => tabModel.OnSetPhysicalFocusRequired += h,
-                h => tabModel.OnSetPhysicalFocusRequired -= h)
+                h => tabModel.SetPhysicalFocusRequired += h,
+                h => tabModel.SetPhysicalFocusRequired -= h)
                 .Subscribe(_ => this.Messenger.Raise(new InteractionMessage("SetPhysicalFocus"))));
         }
 
@@ -118,11 +118,11 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         {
             CompositeDisposable.Add(
                 Observable.FromEvent<TwitterStatus>(
-                    h => Model.Timeline.OnNewStatusArrival += h,
+                    h => Model.Timeline.NewStatusArrival += h,
                     h =>
                     {
                         if (Model.Timeline != null)
-                            Model.Timeline.OnNewStatusArrival -= h;
+                            Model.Timeline.NewStatusArrival -= h;
                     })
                           .Subscribe(_ => UnreadCount++));
             // invalidate cache

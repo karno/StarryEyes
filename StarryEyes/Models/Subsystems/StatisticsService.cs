@@ -22,7 +22,7 @@ namespace StarryEyes.Models.Subsystems
                           }
                       });
             _estimatedGrossTweetCount = StatusStore.Count;
-            App.OnApplicationFinalize += StopThread;
+            App.ApplicationFinalize += StopThread;
             Task.Factory.StartNew(UpdateStatisticWorkProc, TaskCreationOptions.LongRunning);
         }
         private static DateTime _timestamp = DateTime.Now;
@@ -67,7 +67,7 @@ namespace StarryEyes.Models.Subsystems
                     // -> 
                     _tweetsPerSeconds = (_tweetsPerSeconds * 119 + cptps) / 120;
                 }
-                var handler = OnStatisticsParamsUpdated;
+                var handler = StatisticsParamsUpdated;
                 if (handler != null)
                     handler();
             }
@@ -76,7 +76,7 @@ namespace StarryEyes.Models.Subsystems
         /// <summary>
         /// Events callbacked when statistics parameters are updated.
         /// </summary>
-        public static event Action OnStatisticsParamsUpdated;
+        public static event Action StatisticsParamsUpdated;
 
         private static int _estimatedGrossTweetCount;
         /// <summary>

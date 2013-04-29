@@ -43,31 +43,5 @@ namespace StarryEyes.Models.Backstages.SystemEvents
         }
 
         public abstract SystemEventKind Kind { get; }
-
-        public virtual string Id { get { return null; } }
-
-        public virtual SystemEventAction Action { get { return null; } }
-    }
-
-    public sealed class SystemEventAction
-    {
-        private readonly string _description;
-        private readonly Action _callback;
-
-        public SystemEventAction(string description, Action callback)
-        {
-            _description = description;
-            _callback = callback;
-        }
-
-        public string Description
-        {
-            get { return _description; }
-        }
-
-        public Action Callback
-        {
-            get { return _callback; }
-        }
     }
 }

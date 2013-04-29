@@ -38,10 +38,10 @@ namespace StarryEyes.Filters.Expressions.Operators
             set
             {
                 if (_value != null)
-                    _value.OnReapplyRequested -= RequestReapplyFilter;
+                    _value.ReapplyRequested -= this.RaiseReapplyFilter;
                 _value = value;
                 if (_value != null)
-                    _value.OnReapplyRequested += RequestReapplyFilter;
+                    _value.ReapplyRequested += this.RaiseReapplyFilter;
             }
         }
 
@@ -73,10 +73,10 @@ namespace StarryEyes.Filters.Expressions.Operators
             set
             {
                 if (_leftValue != null)
-                    _leftValue.OnReapplyRequested -= RequestReapplyFilter;
+                    _leftValue.ReapplyRequested -= this.RaiseReapplyFilter;
                 _leftValue = value;
                 if (_leftValue != null)
-                    _leftValue.OnReapplyRequested += RequestReapplyFilter;
+                    _leftValue.ReapplyRequested += this.RaiseReapplyFilter;
             }
         }
 
@@ -86,10 +86,10 @@ namespace StarryEyes.Filters.Expressions.Operators
             set
             {
                 if (_rightValue != null)
-                    _rightValue.OnReapplyRequested -= RequestReapplyFilter;
+                    _rightValue.ReapplyRequested -= this.RaiseReapplyFilter;
                 _rightValue = value;
                 if (_rightValue != null)
-                    _rightValue.OnReapplyRequested += RequestReapplyFilter;
+                    _rightValue.ReapplyRequested += this.RaiseReapplyFilter;
             }
         }
 

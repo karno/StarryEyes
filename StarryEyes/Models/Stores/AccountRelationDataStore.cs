@@ -79,11 +79,11 @@ namespace StarryEyes.Models.Stores
         /// <summary>
         /// Integrated event for trigger any AccountRelationData changed.
         /// </summary>
-        public static event Action<RelationDataChangedInfo> OnAccountDataUpdated;
+        public static event Action<RelationDataChangedInfo> AccountDataUpdated;
 
         private void RaiseOnAccountDataUpdated(long targetUser, bool isAdded, RelationDataChange change)
         {
-            var handler = OnAccountDataUpdated;
+            var handler = AccountDataUpdated;
             if (handler != null)
             {
                 handler(new RelationDataChangedInfo

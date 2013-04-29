@@ -69,7 +69,7 @@ namespace StarryEyes.Models.Receivers.Managers
             System.Diagnostics.Debug.WriteLine("UserReceiveManager initialized.");
             AccountsStore.Accounts.ListenCollectionChanged()
                          .Subscribe(_ => NotifySettingChanged());
-            App.OnUserInterfaceReady += NotifySettingChanged;
+            App.UserInterfaceReady += NotifySettingChanged;
         }
 
         // ReSharper disable AccessToModifiedClosure

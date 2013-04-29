@@ -5,6 +5,7 @@ using System.Linq;
 using StarryEyes.Models;
 using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Models.Backstages.SystemEvents;
+using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings.KeyAssigns;
 
 namespace StarryEyes.Settings
@@ -39,7 +40,7 @@ namespace StarryEyes.Settings
             }
             CheckSetting();
             // listen setting changed
-            Setting.KeyAssign.OnValueChanged += _ => RaiseKeyAssignChanged();
+            Setting.KeyAssign.ValueChanged += _ => RaiseKeyAssignChanged();
         }
 
         private static void Load(string file)
@@ -52,7 +53,25 @@ namespace StarryEyes.Settings
             }
             catch (Exception ex)
             {
-                BackstageModel.RegisterEvent(new KeyAssignCouldNotLoadEvent(file, ex, () => Load(file)));
+                MainWindowModel.ShowTaskDialog(
+                    new TaskDialogOptions
+                    {
+                        MainIcon = VistaTaskDialogIcon.Error,
+                        MainInstruction = "キーアサインファイルを読み込めませんでした。",
+                        Content = "キーアサインファイルの記述に誤りがあります:" + Environment.NewLine +
+                                  file,
+                        ExpandedInfo = ex.Message,
+                        CustomButtons = new[] { "再読込", "無視" },
+                        Title = "キーアサイン エラー",
+                        Callback = (dlg, args, _) =>
+                        {
+                            if (args.ButtonId == 0)
+                            {
+                                Load(file);
+                            }
+                            return true;
+                        },
+                    });
             }
         }
 
@@ -60,19 +79,15 @@ namespace StarryEyes.Settings
         {
             // check assign is existed
             var group = Setting.KeyAssign.Value ?? DefaultAssignProvider.DefaultAssignName;
-            if (!Profiles.ContainsKey(group))
-            {
-                // load default
-                Setting.KeyAssign.Value = DefaultAssignProvider.DefaultAssignName;
-                if (!Profiles.ContainsKey(DefaultAssignProvider.DefaultAssignName))
-                {
-                    // default binding is not found
-                    // make default
-                    var defbind = DefaultAssignProvider.GetDefault();
-                    defbind.Save(KeyAssignsProfileDirectoryPath);
-                    Profiles.Add(defbind.Name, defbind);
-                }
-            }
+            if (Profiles.ContainsKey(group)) return;
+            // load default
+            Setting.KeyAssign.Value = DefaultAssignProvider.DefaultAssignName;
+            if (Profiles.ContainsKey(DefaultAssignProvider.DefaultAssignName)) return;
+            // default binding is not found
+            // make default
+            var defbind = DefaultAssignProvider.GetDefault();
+            defbind.Save(KeyAssignsProfileDirectoryPath);
+            Profiles.Add(defbind.Name, defbind);
         }
 
         public static KeyAssignProfile CurrentProfile
@@ -112,11 +127,11 @@ namespace StarryEyes.Settings
             return false;
         }
 
-        public static event Action OnKeyAssignChanged;
+        public static event Action KeyAssignChanged;
 
         private static void RaiseKeyAssignChanged()
         {
-            Action handler = OnKeyAssignChanged;
+            var handler = KeyAssignChanged;
             if (handler != null) handler();
         }
     }

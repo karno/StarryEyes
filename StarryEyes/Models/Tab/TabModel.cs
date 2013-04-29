@@ -58,11 +58,11 @@ namespace StarryEyes.Models.Tab
         /// </summary>
         public bool IsShowUnreadCounts { get; set; }
 
-        public event Action OnBindingAccountIdsChanged;
+        public event Action BindingAccountIdsChanged;
 
         private void RaiseOnBindingAccountIdsChanged()
         {
-            Action handler = OnBindingAccountIdsChanged;
+            var handler = this.BindingAccountIdsChanged;
             if (handler != null) handler();
             TabManager.Save();
         }
@@ -144,7 +144,6 @@ namespace StarryEyes.Models.Tab
 
         public bool IsActivated { get; private set; }
 
-
         public void InvalidateCollection()
         {
             var oldt = Timeline;
@@ -175,7 +174,7 @@ namespace StarryEyes.Models.Tab
                 if (Timeline != null)
                     Timeline.Dispose();
                 Timeline = new TimelineModel(_evaluator, GetChunk);
-                Timeline.OnNewStatusArrival += OnNewStatusArrival;
+                Timeline.NewStatusArrival += this.OnNewStatusArrival;
                 if (FilterQuery != null)
                 {
                     FilterQuery.Activate();
@@ -202,7 +201,7 @@ namespace StarryEyes.Models.Tab
                 }
                 if (Timeline != null)
                 {
-                    Timeline.OnNewStatusArrival -= OnNewStatusArrival;
+                    Timeline.NewStatusArrival -= this.OnNewStatusArrival;
                     Timeline.Dispose();
                     Timeline = null;
                 }
@@ -280,19 +279,19 @@ namespace StarryEyes.Models.Tab
             }
         }
 
-        public event Action<bool> OnConfigurationUpdated;
+        public event Action<bool> ConfigurationUpdated;
 
-        public void ConfigurationUpdated(bool isQueryUpdated)
+        public void RaiseConfigurationUpdated(bool isQueryUpdated)
         {
-            var handler = OnConfigurationUpdated;
+            var handler = this.ConfigurationUpdated;
             if (handler != null) handler(isQueryUpdated);
         }
 
-        public event Action OnSetPhysicalFocusRequired;
+        public event Action SetPhysicalFocusRequired;
 
         public void SetPhysicalFocus()
         {
-            var handler = OnSetPhysicalFocusRequired;
+            var handler = this.SetPhysicalFocusRequired;
             if (handler != null) handler();
         }
     }

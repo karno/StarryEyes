@@ -23,8 +23,8 @@ namespace StarryEyes.ViewModels.WindowParts
                     DispatcherHelper.UIDispatcher));
             CompositeDisposable.Add(
                 Observable.FromEvent(
-                    h => TabManager.OnCurrentFocusColumnChanged += h,
-                    h => TabManager.OnCurrentFocusColumnChanged -= h)
+                    h => TabManager.CurrentFocusColumnChanged += h,
+                    h => TabManager.CurrentFocusColumnChanged -= h)
                           .Select(_ => TabManager.CurrentFocusColumnIndex)
                           .Subscribe(UpdateFocusFromModel));
             RegisterEvents();
@@ -72,7 +72,7 @@ namespace StarryEyes.ViewModels.WindowParts
             TabManager.CloseTab(ci, ti);
         }
 
-        void MainWindowModel_OnTimelineFocusRequested(TimelineFocusRequest req)
+        void MainWindowModelTimelineFocusRequested(TimelineFocusRequest req)
         {
             switch (req)
             {
@@ -123,7 +123,7 @@ namespace StarryEyes.ViewModels.WindowParts
         {
             if (_isRegisteredEvents) throw new InvalidOperationException();
             _isRegisteredEvents = true;
-            MainWindowModel.OnTimelineFocusRequested += MainWindowModel_OnTimelineFocusRequested;
+            MainWindowModel.TimelineFocusRequested += this.MainWindowModelTimelineFocusRequested;
             // Timeline actions
             KeyAssignManager.RegisterActions(
                 KeyAssignAction.Create("CreateTab", () => FocusedColumn.CreateNewTab()),

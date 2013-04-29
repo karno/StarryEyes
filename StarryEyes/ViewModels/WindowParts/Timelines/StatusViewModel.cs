@@ -737,7 +737,6 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                              .ToArray();
             MainWindowModel.ExecuteAccountSelectAction(
                 AccountSelectionAction.Favorite,
-                Status,
                 favoriteds,
                 infos =>
                 {
@@ -765,7 +764,6 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                              .ToArray();
             MainWindowModel.ExecuteAccountSelectAction(
                 AccountSelectionAction.Retweet,
-                Status,
                 retweeteds,
                 infos =>
                 {

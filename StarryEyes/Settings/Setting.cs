@@ -262,9 +262,9 @@ namespace StarryEyes.Settings
                     {
                         Save();
                     }
-                    var handler = OnValueChanged;
+                    var handler = this.ValueChanged;
                     if (handler != null)
-                        OnValueChanged(value);
+                        this.ValueChanged(value);
                 }
             }
 
@@ -273,7 +273,7 @@ namespace StarryEyes.Settings
                 get { return _evaluatorCache ?? (_evaluatorCache = Value.GetEvaluator()); }
             }
 
-            public event Action<FilterExpressionBase> OnValueChanged;
+            public event Action<FilterExpressionBase> ValueChanged;
         }
 
         public class SettingItem<T> where T : class
@@ -317,13 +317,13 @@ namespace StarryEyes.Settings
                     {
                         Save();
                     }
-                    Action<T> handler = OnValueChanged;
+                    var handler = this.ValueChanged;
                     if (handler != null)
-                        OnValueChanged(value);
+                        this.ValueChanged(value);
                 }
             }
 
-            public event Action<T> OnValueChanged;
+            public event Action<T> ValueChanged;
         }
 
         public class SettingItemStruct<T> where T : struct
@@ -366,13 +366,13 @@ namespace StarryEyes.Settings
                     {
                         Save();
                     }
-                    Action<T> handler = OnValueChanged;
+                    var handler = this.ValueChanged;
                     if (handler != null)
-                        OnValueChanged(value);
+                        this.ValueChanged(value);
                 }
             }
 
-            public event Action<T> OnValueChanged;
+            public event Action<T> ValueChanged;
         }
 
         #endregion
@@ -389,7 +389,7 @@ namespace StarryEyes.Settings
             {
                 try
                 {
-                    using (FileStream fs = File.Open(App.ConfigurationFilePath, FileMode.Open, FileAccess.Read))
+                    using (var fs = File.Open(App.ConfigurationFilePath, FileMode.Open, FileAccess.Read))
                     {
                         _settingValueHolder = new SortedDictionary<string, object>(
                             XamlServices.Load(fs) as IDictionary<string, object> ?? new Dictionary<string, object>());
@@ -408,7 +408,7 @@ namespace StarryEyes.Settings
                         ExpandedInfo = ex.ToString(),
                         CommandButtons = new[] { "設定を初期化", "バックアップを作成し初期化", "Krileを終了" },
                     };
-                    TaskDialogResult result = TaskDialog.Show(option);
+                    var result = TaskDialog.Show(option);
                     if (!result.CommandButtonResult.HasValue ||
                         result.CommandButtonResult.Value == 2)
                     {
@@ -419,7 +419,7 @@ namespace StarryEyes.Settings
                     {
                         try
                         {
-                            string cpfn = "Krile_CorruptedConfig_" + Path.GetRandomFileName() + ".xml";
+                            var cpfn = "Krile_CorruptedConfig_" + Path.GetRandomFileName() + ".xml";
                             File.Copy(App.ConfigurationFilePath, Path.Combine(
                                 Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
                                 cpfn));

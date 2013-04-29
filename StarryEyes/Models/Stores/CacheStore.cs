@@ -43,7 +43,7 @@ namespace StarryEyes.Models.Stores
             catch
             {
             }
-            App.OnApplicationFinalize += Shutdown;
+            App.ApplicationFinalize += Shutdown;
         }
 
         private static void Shutdown()

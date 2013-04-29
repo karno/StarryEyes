@@ -252,8 +252,8 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                     DispatcherHelper.UIDispatcher));
             this.CompositeDisposable.Add(
                 Observable.FromEvent(
-                h => _model.OnCurrentFocusTabChanged += h,
-                h => _model.OnCurrentFocusTabChanged -= h)
+                h => _model.CurrentFocusTabChanged += h,
+                h => _model.CurrentFocusTabChanged -= h)
                 .Select(_ => _model.CurrentFocusTabIndex)
                 .Subscribe(UpdateFocusFromModel));
             if (_tabs.Count > 0)
@@ -300,8 +300,8 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             var creating = new TabModel(string.Empty, DefaultQueryString);
             IDisposable subscribe = null;
             subscribe = Observable.FromEvent<bool>(
-                h => creating.OnConfigurationUpdated += h,
-                h => creating.OnConfigurationUpdated -= h)
+                h => creating.ConfigurationUpdated += h,
+                h => creating.ConfigurationUpdated -= h)
                                   .Subscribe(_ =>
                                   {
                                       if (subscribe != null) subscribe.Dispose();

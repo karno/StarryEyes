@@ -77,7 +77,7 @@ namespace StarryEyes.Models.Tab
             _statuses.Clear();
         }
 
-        public event Action<TwitterStatus> OnNewStatusArrival;
+        public event Action<TwitterStatus> NewStatusArrival;
 
         private void AddStatus(TwitterStatus status)
         {
@@ -86,33 +86,31 @@ namespace StarryEyes.Models.Tab
             {
                 add = _statusIdCache.AddDistinct(status.Id);
             }
-            if (add)
+            if (!add) return;
+            // estimate point
+            if (!this._isSuppressTimelineTrimming)
             {
-                // estimate point
-                if (!_isSuppressTimelineTrimming)
+                var addpoint = this._statuses.TakeWhile(_ => _.CreatedAt > status.CreatedAt).Count();
+                if (addpoint > TimelineChunkCount)
                 {
-                    var addpoint = _statuses.TakeWhile(_ => _.CreatedAt > status.CreatedAt).Count();
-                    if (addpoint > TimelineChunkCount)
+                    lock (this._sicLocker)
                     {
-                        lock (_sicLocker)
-                        {
-                            _statusIdCache.Remove(status.Id);
-                        }
-                        return;
+                        this._statusIdCache.Remove(status.Id);
                     }
+                    return;
                 }
-                _statuses.Insert(
-                    i => i.TakeWhile(_ => _.CreatedAt > status.CreatedAt).Count(),
-                    status);
-                if (_statusIdCache.Count > TimelineChunkCount + TimelineChunkCountBounce &&
-                    Interlocked.Exchange(ref _trimCount, 1) == 0)
-                {
-                    Task.Run(() => TrimTimeline());
-                }
-                var handler = OnNewStatusArrival;
-                if (handler != null)
-                    handler(status);
             }
+            this._statuses.Insert(
+                i => i.TakeWhile(_ => _.CreatedAt > status.CreatedAt).Count(),
+                status);
+            if (this._statusIdCache.Count > TimelineChunkCount + TimelineChunkCountBounce &&
+                Interlocked.Exchange(ref this._trimCount, 1) == 0)
+            {
+                Task.Run(() => this.TrimTimeline());
+            }
+            var handler = this.NewStatusArrival;
+            if (handler != null)
+                handler(status);
         }
 
         private void RemoveStatus(long id)

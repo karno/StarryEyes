@@ -1,4 +1,5 @@
-﻿using StarryEyes.Models.Backstages.TwitterEvents;
+﻿using StarryEyes.Models;
+using StarryEyes.Models.Backstages.TwitterEvents;
 
 namespace StarryEyes.ViewModels.WindowParts.Backstages
 {
@@ -12,6 +13,14 @@ namespace StarryEyes.ViewModels.WindowParts.Backstages
         public TwitterEventBase TwitterEvent
         {
             get { return this.SourceEvent as TwitterEventBase; }
+        }
+
+        public void OpenEventSourceUserProfile()
+        {
+            var ev = TwitterEvent;
+            if (ev == null || ev.Source == null) return;
+            BackstageModel.RaiseCloseBackstage();
+            SearchFlipModel.RequestSearch(ev.Source.ScreenName, SearchMode.UserScreenName);
         }
     }
 }
