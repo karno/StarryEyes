@@ -18,6 +18,7 @@
                       Height="750"
                       Background="White"
                       Closing="OnClosing"
+                      FontFamily="Meiryo"
                       ResizeMode="CanResizeWithGrip"
                       ShowIconOnTitleBar="True"
                       TitleCaps="False"
@@ -251,9 +252,7 @@
                     <ei:GoToStateAction StateName="ShowForePanel" />
                 </ei:DataTrigger>
             </i:Interaction.Triggers>
-            <Grid Background="Gainsboro">
-                <windowParts:Backstage DataContext="{Binding BackstageViewModel}" />
-            </Grid>
+            <windowParts:Backstage DataContext="{Binding BackstageViewModel}" />
             <Grid x:Name="MainAreaGrid"
                   Background="White"
                   RenderTransformOrigin="0.5,0.5">

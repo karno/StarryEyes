@@ -6,17 +6,17 @@ using StarryEyes.Views.Controls;
 
 namespace StarryEyes.Models.Subsystems
 {
-    public static class SpecialImageResolverRegister
+    public static class SpecialImageResolvers
     {
-        private static readonly Regex PixivRegex = new Regex("(http://[^\"]+?\\.pixiv\\.net/[^\"]+?_m\\.jpg)", RegexOptions.Compiled | RegexOptions.Singleline);
+        private static readonly Regex PixivRegex = new Regex("(http://[^\"]+?\\.pixiv\\.net/[^\"]+?_m\\.jpg)",
+                                                             RegexOptions.Compiled | RegexOptions.Singleline);
         public static void Initialize()
         {
             LazyImage.RegisterSpecialResolverTable("pixiv", uri =>
             {
                 try
                 {
-                    var builder = new UriBuilder(uri);
-                    builder.Scheme = "http";
+                    var builder = new UriBuilder(uri) { Scheme = "http" };
                     uri = builder.Uri;
                     using (var wc = new WebClientEx())
                     {
@@ -40,26 +40,28 @@ namespace StarryEyes.Models.Subsystems
                 return new byte[0];
             });
         }
-    }
 
-    class WebClientEx : System.Net.WebClient
-    {
-        public CookieContainer CookieContainer { get; set; }
-
-        public string Referer { get; set; }
-
-        protected override WebRequest GetWebRequest(Uri uri)
+        #region Extended WebClient
+        private sealed class WebClientEx : WebClient
         {
-            WebRequest req = base.GetWebRequest(uri);
+            public CookieContainer CookieContainer { get; set; }
 
-            var hwr = req as HttpWebRequest;
-            if (hwr != null)
+            public string Referer { get; set; }
+
+            protected override WebRequest GetWebRequest(Uri uri)
             {
-                hwr.CookieContainer = this.CookieContainer;
-                hwr.UserAgent = "Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.0; Trident/5.0)";
-                hwr.Referer = this.Referer;
+                var req = base.GetWebRequest(uri);
+
+                var hwr = req as HttpWebRequest;
+                if (hwr != null)
+                {
+                    hwr.CookieContainer = this.CookieContainer;
+                    hwr.UserAgent = "Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.0; Trident/5.0)";
+                    hwr.Referer = this.Referer;
+                }
+                return req;
             }
-            return req;
         }
+        #endregion
     }
 }

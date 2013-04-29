@@ -100,7 +100,7 @@ namespace StarryEyes.ViewModels
 
         public MainWindowViewModel()
         {
-            CompositeDisposable.Add(this._backstageViewModel = new BackstageViewModel());
+            CompositeDisposable.Add(_backstageViewModel = new BackstageViewModel());
             CompositeDisposable.Add(_inputAreaViewModel = new InputAreaViewModel());
             CompositeDisposable.Add(_mainAreaViewModel = new MainAreaViewModel());
             CompositeDisposable.Add(_globalAccountSelectionFlipViewModel = new AccountSelectionFlipViewModel());
@@ -114,6 +114,10 @@ namespace StarryEyes.ViewModels
                 h => MainWindowModel.OnConfirmMuteRequested += h,
                 h => MainWindowModel.OnConfirmMuteRequested -= h)
                 .Subscribe(OnMuteRequested));
+            CompositeDisposable.Add(Observable.FromEvent<bool>(
+                h => MainWindowModel.OnBackstageTransitionRequested += h,
+                h => MainWindowModel.OnBackstageTransitionRequested -= h)
+                .Subscribe(this.TransitionBackstage));
             this._backstageViewModel.Initialize();
         }
 
@@ -294,6 +298,12 @@ namespace StarryEyes.ViewModels
         #endregion
 
         #region Toggle Backstage display
+
+        private void TransitionBackstage(bool show)
+        {
+            if (IsBackstageVisible == show) return;
+            this.ToggleShowBackstage();
+        }
 
         public bool IsBackstageVisible
         {

@@ -58,7 +58,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                             {
                                 DispatcherHolder.Enqueue(
                                     () => ReflectCollectionChanged(e, ctl),
-                                    DispatcherPriority.Background);
+                                    DispatcherPriority.Render);
                             }
                         }));
                 var collection = TimelineModel.Statuses.ToArray();
@@ -82,7 +82,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                         ctl.Move(e.OldStartingIndex, e.NewStartingIndex);
                         break;
                     case NotifyCollectionChangedAction.Remove:
-                        StatusViewModel removal = ctl[e.OldStartingIndex];
+                        var removal = ctl[e.OldStartingIndex];
                         ctl.RemoveAt(e.OldStartingIndex);
                         removal.Dispose();
                         break;
@@ -168,7 +168,6 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             get { return _isScrollInBottom; }
             set
             {
-                System.Diagnostics.Debug.WriteLine("BOTTOM DETECT: " + value);
                 if (_isScrollInBottom == value) return;
                 _isScrollInBottom = value;
                 RaisePropertyChanged();

@@ -12,6 +12,7 @@ using System.Threading;
 using System.Windows;
 using Livet;
 using StarryEyes.Breezy.Api;
+using StarryEyes.Models;
 using StarryEyes.Models.Plugins;
 using StarryEyes.Models.Receivers;
 using StarryEyes.Models.Stores;
@@ -79,7 +80,7 @@ namespace StarryEyes
             ServicePointManager.DefaultConnectionLimit = Int32.MaxValue; // Limit Break!
 
             // Initialize special image handlers
-            SpecialImageResolverRegister.Initialize();
+            SpecialImageResolvers.Initialize();
 
             // Load plugins
             PluginManager.Load();
@@ -148,6 +149,7 @@ namespace StarryEyes
             UserStore.Initialize();
             AccountsStore.Initialize();
             StatisticsService.Initialize();
+            PostLimitPredictionService.Initialize();
             StreamingEventsHub.Initialize();
             ReceiveInbox.Initialize();
 
@@ -160,6 +162,7 @@ namespace StarryEyes
             // finalize handlers
             StreamingEventsHub.RegisterDefaultHandlers();
             ReceiversManager.Initialize();
+            BackstageModel.Initialize();
             RaiseSystemReady();
         }
 
@@ -373,8 +376,9 @@ namespace StarryEyes
             get
             {
                 return Version.FileMajorPart + "." +
-                    Version.FileMinorPart + "." +
-                    Version.FilePrivatePart + FileKind(Version.FileBuildPart);
+                       Version.FileMinorPart + "." +
+                       Version.FilePrivatePart +
+                       (IsNightlyVersion ? " BETA" : "");
             }
         }
 
@@ -382,24 +386,7 @@ namespace StarryEyes
         {
             get
             {
-                return Version.FilePrivatePart >= 1;
-            }
-        }
-
-        private static string FileKind(int value)
-        {
-            switch (value)
-            {
-                case 0:
-                    return String.Empty;
-                case 1:
-                    return " BETA"; // release test version
-                case 2:
-                    return " UNSTABLE"; // periodic test version
-                case 3:
-                    return " NIGHTMARE"; // under construction version
-                default:
-                    return " #" + value;
+                return Version.FilePrivatePart % 2 == 1;
             }
         }
 

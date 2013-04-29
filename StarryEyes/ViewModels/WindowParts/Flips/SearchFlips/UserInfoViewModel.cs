@@ -260,7 +260,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                     SearchFlipModel.RequestSearch(param.Item2, SearchMode.UserScreenName);
                     break;
                 case LinkType.Hash:
-                    SearchFlipModel.RequestSearch(param.Item2, SearchMode.Web);
+                    SearchFlipModel.RequestSearch("#" + param.Item2, SearchMode.Web);
                     break;
                 case LinkType.Url:
                     BrowserHelper.Open(param.Item2);

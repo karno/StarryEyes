@@ -17,7 +17,23 @@ namespace StarryEyes.Models.Receivers.Managers
         private readonly SortedDictionary<long, UserReceiveBundle> _bundles =
             new SortedDictionary<long, UserReceiveBundle>();
 
-        internal event Action TrackRearranged;
+        public event Action TrackRearranged;
+
+        public event Action<long> ConnectionStateChanged;
+
+        protected virtual void OnConnectionStateChanged(long obj)
+        {
+            var handler = this.ConnectionStateChanged;
+            if (handler != null) handler(obj);
+        }
+
+        public UserStreamsConnectionState GetConnectionState(long id)
+        {
+            UserReceiveBundle bundle;
+            return !this._bundles.TryGetValue(id, out bundle)
+                       ? UserStreamsConnectionState.Invalid
+                       : bundle.ConnectionState;
+        }
 
         public IKeywordTrackable GetSuitableKeywordTracker()
         {
@@ -75,6 +91,7 @@ namespace StarryEyes.Models.Receivers.Managers
                 // add new users
                 settings.Where(s => !_bundles.ContainsKey(s.Key))
                         .Select(s => new UserReceiveBundle(s.Value.AuthenticateInfo))
+                        .Do(s => s.StateChanged += this.OnConnectionStateChanged)
                         .ForEach(b => _bundles.Add(b.UserId, b));
 
                 // stop cancelled streamings
@@ -113,13 +130,19 @@ namespace StarryEyes.Models.Receivers.Managers
                     danglings = danglings.Skip(assignable).ToList();
                 }
             }
-            if (rearranged)
-            {
-                var handler = TrackRearranged;
-                if (handler != null) handler();
-            }
+            if (!rearranged) return;
+            var handler = this.TrackRearranged;
+            if (handler != null) handler();
         }
         // ReSharper restore AccessToModifiedClosure
+
+        public void ReconnectStreams(long id)
+        {
+            lock (_bundlesLocker)
+            {
+                _bundles.Values.Where(b => b.UserId == id).ForEach(c => c.ReconnectUserStreams());
+            }
+        }
 
         public void ReconnectAllStreams()
         {
@@ -129,7 +152,7 @@ namespace StarryEyes.Models.Receivers.Managers
             }
         }
 
-        private class UserReceiveBundle : IDisposable, IKeywordTrackable
+        private sealed class UserReceiveBundle : IDisposable, IKeywordTrackable
         {
             private readonly AuthenticateInfo _authInfo;
             private readonly CompositeDisposable _disposable;
@@ -145,6 +168,15 @@ namespace StarryEyes.Models.Receivers.Managers
             private readonly UserInfoReceiver _userInfoReceiver;
             [UsedImplicitly]
             private readonly UserRelationReceiver _userRelationReceiver;
+
+            public event Action<long> StateChanged;
+
+            private void OnStateChanged(long obj)
+            {
+                System.Diagnostics.Debug.WriteLine("bundle state changed.");
+                var handler = this.StateChanged;
+                if (handler != null) handler(obj);
+            }
 
             public IEnumerable<string> TrackKeywords
             {
@@ -166,12 +198,23 @@ namespace StarryEyes.Models.Receivers.Managers
                 _disposable.Add(_userInfoReceiver = new UserInfoReceiver(authInfo));
                 _disposable.Add(_userRelationReceiver = new UserRelationReceiver(authInfo));
                 // ReSharper restore UseObjectOrCollectionInitializer
+                _userStreamsReceiver.StateChanged += () => this.OnStateChanged(this.UserId);
             }
 
             public bool IsUserStreamsEnabled
             {
                 get { return _userStreamsReceiver.IsEnabled; }
                 set { _userStreamsReceiver.IsEnabled = value; }
+            }
+
+            public UserStreamsConnectionState ConnectionState
+            {
+                get
+                {
+                    return _userRelationReceiver == null
+                               ? UserStreamsConnectionState.Invalid
+                               : _userStreamsReceiver.ConnectionState;
+                }
             }
 
             public void Dispose()

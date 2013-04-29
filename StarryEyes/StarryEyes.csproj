@@ -199,6 +199,7 @@
     <Compile Include="InputFormats\FormatElement.cs" />
     <Compile Include="InputFormats\InputFormatFunctionBase.cs" />
     <Compile Include="Models\BackstageModel.cs" />
+    <Compile Include="Models\Backstages\BackstageAccountModel.cs" />
     <Compile Include="Models\Backstages\SystemEvents\KeyAssignCouldNotLoadEvent.cs" />
     <Compile Include="Models\Backstages\SystemEvents\KeyAssignProfileNotFoundEvent.cs" />
     <Compile Include="Models\Backstages\SystemEvents\ListReceiveFailedEvent.cs" />
@@ -262,9 +263,7 @@
     <Compile Include="Models\Stores\Internal\StoreOnMemoryObjectPersistence.cs" />
     <Compile Include="Models\Subsystems\NotificationOptimizationService.cs" />
     <Compile Include="Models\Subsystems\PostLimitPredictionService.cs" />
-    <Compile Include="Models\Subsystems\SpecialImageResolverRegister.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Include="Models\Subsystems\SpecialImageResolvers.cs" />
     <Compile Include="Models\Tab\ColumnInfo.cs" />
     <Compile Include="Models\Tab\ColumnModel.cs" />
     <Compile Include="Models\Tab\CommonTabBuilder.cs" />
@@ -282,6 +281,8 @@
     <Compile Include="Settings\TabDescription.cs" />
     <Compile Include="ViewModels\Dialogs\KeyOverrideViewModel.cs" />
     <Compile Include="ViewModels\DropAcceptDescription.cs" />
+    <Compile Include="ViewModels\WindowParts\Backstages\BackstageEventViewModel.cs" />
+    <Compile Include="ViewModels\WindowParts\Backstages\BackstageAccountViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Common\FilterEditControlViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Common\FilterEditor\FilterPredicateViewModelBase.cs" />
     <Compile Include="ViewModels\WindowParts\Common\FilterEditor\FilterSourceViewModel.cs" />
@@ -307,6 +308,7 @@
     <Compile Include="ViewModels\WindowParts\Timelines\TabViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Timelines\TimelineViewModelBase.cs" />
     <Compile Include="ViewModels\WindowParts\Timelines\UserViewModel.cs" />
+    <Compile Include="ViewModels\WindowParts\Backstages\TwitterEventViewModel.cs" />
     <Compile Include="Views\Adorners\AdornerBase.cs" />
     <Compile Include="Views\Adorners\InsertionAdorner.cs" />
     <Compile Include="Views\Behaviors\DragStartBehavior.cs" />
@@ -531,7 +533,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ViewModels\Notifications\" />
-    <Folder Include="ViewModels\WindowParts\Backstages\" />
     <Folder Include="Views\Notifications\" />
   </ItemGroup>
   <ItemGroup>

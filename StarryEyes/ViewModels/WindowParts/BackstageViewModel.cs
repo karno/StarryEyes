@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Media;
 using Livet;
 using StarryEyes.Models;
 using StarryEyes.Models.Backstages;
-using StarryEyes.Models.Backstages.TwitterEvents;
 using StarryEyes.Settings;
+using StarryEyes.ViewModels.WindowParts.Backstages;
 
 namespace StarryEyes.ViewModels.WindowParts
 {
@@ -17,15 +16,59 @@ namespace StarryEyes.ViewModels.WindowParts
     /// </summary>
     public class BackstageViewModel : ViewModel
     {
+        private readonly ReadOnlyDispatcherCollectionRx<BackstageAccountViewModel> _accounts;
+
         private readonly ReadOnlyDispatcherCollectionRx<TwitterEventViewModel> _events;
         private readonly object _syncLock = new object();
 
         private readonly Queue<BackstageEventBase> _waitingEvents =
             new Queue<BackstageEventBase>();
 
+        private bool _showCurrentEvent;
         private BackstageEventViewModel _currentEvent;
 
         private bool _isDisposed;
+
+        public ReadOnlyDispatcherCollectionRx<TwitterEventViewModel> Events
+        {
+            get { return _events; }
+        }
+
+        public ReadOnlyDispatcherCollectionRx<BackstageAccountViewModel> Accounts
+        {
+            get { return this._accounts; }
+        }
+
+        public string CurrentVersion
+        {
+            get { return App.FormattedVersion; }
+        }
+
+        public bool ShowCurrentEvent
+        {
+            get { return _showCurrentEvent; }
+            set
+            {
+                _showCurrentEvent = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public bool IsCurrentEventAvailable
+        {
+            get { return _currentEvent != null; }
+        }
+
+        public BackstageEventViewModel CurrentEvent
+        {
+            get { return _currentEvent; }
+            set
+            {
+                _currentEvent = value;
+                RaisePropertyChanged();
+                RaisePropertyChanged(() => IsCurrentEventAvailable);
+            }
+        }
 
         /// <summary>
         ///     for design-time support.
@@ -36,6 +79,12 @@ namespace StarryEyes.ViewModels.WindowParts
                 BackstageModel.TwitterEvents,
                 tev => new TwitterEventViewModel(tev),
                 DispatcherHelper.UIDispatcher);
+            CompositeDisposable.Add(_events);
+            _accounts = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
+                BackstageModel.Accounts,
+                a => new BackstageAccountViewModel(this, a),
+                DispatcherHelper.UIDispatcher);
+            CompositeDisposable.Add(_accounts);
             CompositeDisposable.Add(
                 Observable.FromEvent<BackstageEventBase>(
                     h => BackstageModel.OnEventRegistered += h,
@@ -56,39 +105,6 @@ namespace StarryEyes.ViewModels.WindowParts
                     Monitor.Pulse(_syncLock);
                 }
             });
-        }
-
-        public ReadOnlyDispatcherCollectionRx<TwitterEventViewModel> Events
-        {
-            get { return _events; }
-        }
-
-        private bool _showCurrentEvent;
-
-        public bool ShowCurrentEvent
-        {
-            get { return _showCurrentEvent; }
-            set
-            {
-                _showCurrentEvent = value;
-                RaisePropertyChanged();
-            }
-        }
-
-        public BackstageEventViewModel CurrentEvent
-        {
-            get { return _currentEvent; }
-            set
-            {
-                _currentEvent = value;
-                RaisePropertyChanged();
-                RaisePropertyChanged(() => IsCurrentEventAvailable);
-            }
-        }
-
-        public bool IsCurrentEventAvailable
-        {
-            get { return _currentEvent != null; }
         }
 
         public void Initialize()
@@ -123,63 +139,10 @@ namespace StarryEyes.ViewModels.WindowParts
                 }
             }
         }
-    }
 
-    public class BackstageEventViewModel : ViewModel
-    {
-        private readonly BackstageEventBase _sourceEvent;
-
-        public BackstageEventViewModel(BackstageEventBase ev)
+        public void Close()
         {
-            _sourceEvent = ev;
-        }
-
-        public BackstageEventBase SourceEvent
-        {
-            get { return _sourceEvent; }
-        }
-
-        public Color Background
-        {
-            get { return SourceEvent.Background; }
-        }
-
-        public Color Foreground
-        {
-            get { return SourceEvent.Foreground; }
-        }
-
-        public string Title
-        {
-            get { return SourceEvent.Title; }
-        }
-
-        public ImageSource TitleImage
-        {
-            get { return SourceEvent.TitleImage; }
-        }
-
-        public bool IsImageAvailable
-        {
-            get { return SourceEvent.TitleImage != null; }
-        }
-
-        public string Detail
-        {
-            get { return SourceEvent.Detail.Replace("\r", "").Replace("\n", " "); }
-        }
-    }
-
-    public class TwitterEventViewModel : BackstageEventViewModel
-    {
-        public TwitterEventViewModel(TwitterEventBase tev)
-            : base(tev)
-        {
-        }
-
-        public TwitterEventBase TwitterEvent
-        {
-            get { return SourceEvent as TwitterEventBase; }
+            MainWindowModel.TransitionBackstage(false);
         }
     }
 }

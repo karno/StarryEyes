@@ -22,7 +22,7 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
 
         private bool _isEnabled;
         private string[] _trackKeywords = new string[0];
-        private UserStreamsConnectionState _state;
+        private UserStreamsConnectionState _state = UserStreamsConnectionState.Disconnected;
 
         private readonly AuthenticateInfo _authInfo;
         private CompositeDisposable _currentConnection = new CompositeDisposable();
@@ -80,7 +80,7 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
             get { return _state; }
             private set
             {
-                if (_state != value)
+                if (_state == value)
                 {
                     return;
                 }
@@ -107,7 +107,6 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
                 return;
             }
             CleanupConnection();
-            ConnectionState = UserStreamsConnectionState.Connecting;
             _currentConnection.Add(ConnectCore());
         }
 
@@ -126,6 +125,7 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
         private IDisposable ConnectCore()
         {
             CheckDisposed();
+            ConnectionState = UserStreamsConnectionState.Connecting;
             return AuthInfo.ConnectToUserStreams(_trackKeywords)
                            .Do(_ =>
                            {
@@ -382,10 +382,9 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
         private void Dispose(bool disposing)
         {
             _disposed = true;
-            if (disposing)
-            {
-                this.IsEnabled = false;
-            }
+            if (!disposing) return;
+            this.IsEnabled = false;
+            this.StateChanged = null;
         }
     }
 
@@ -398,6 +397,7 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
 
     public enum UserStreamsConnectionState
     {
+        Invalid,
         Disconnected,
         Connecting,
         Connected,

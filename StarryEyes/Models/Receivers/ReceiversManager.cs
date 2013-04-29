@@ -1,5 +1,7 @@
-﻿using StarryEyes.Breezy.Authorize;
+﻿using System;
+using StarryEyes.Breezy.Authorize;
 using StarryEyes.Models.Receivers.Managers;
+using StarryEyes.Models.Receivers.ReceiveElements;
 
 namespace StarryEyes.Models.Receivers
 {
@@ -10,12 +12,21 @@ namespace StarryEyes.Models.Receivers
         private static UserReceiveManager _userReceiveManager;
         private static StreamTrackReceiveManager _streamTrackReceiveManager;
 
+        public static event Action<long> UserStreamsConnectionStateChanged;
+
+        private static void OnUserStreamsConnectionStateChanged(long obj)
+        {
+            var handler = UserStreamsConnectionStateChanged;
+            if (handler != null) handler(obj);
+        }
+
         public static void Initialize()
         {
             _searchReceiveManager = new SearchReceiveManager();
             _listReceiveManager = new ListReceiveManager();
             _userReceiveManager = new UserReceiveManager();
             _streamTrackReceiveManager = new StreamTrackReceiveManager(_userReceiveManager);
+            _userReceiveManager.ConnectionStateChanged += OnUserStreamsConnectionStateChanged;
         }
 
         public static void RegisterSearchQuery(string query)
@@ -58,9 +69,19 @@ namespace StarryEyes.Models.Receivers
             _listReceiveManager.StopReceive(info);
         }
 
+        public static void ReconnectUserStreams(long id)
+        {
+            _userReceiveManager.ReconnectStreams(id);
+        }
+
         public static void ReconnectUserStreams()
         {
             _userReceiveManager.ReconnectAllStreams();
+        }
+
+        public static UserStreamsConnectionState GetConnectionState(long id)
+        {
+            return _userReceiveManager.GetConnectionState(id);
         }
     }
 }

@@ -30,7 +30,6 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             get { return this._isScrollInBottom; }
             set
             {
-                System.Diagnostics.Debug.WriteLine("BOTTOM DETECT: " + value);
                 if (this._isScrollInBottom == value) return;
                 this._isScrollInBottom = value;
                 this.RaisePropertyChanged();

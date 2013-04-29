@@ -166,18 +166,27 @@
                           Visibility="{Binding IsPostLimitPredictionEnabled,
                                                Converter={StaticResource BooleanToVisibleConverter}}">
                         <Grid.ToolTip>
-                            <StackPanel Orientation="Vertical">
-                                <TextBlock Foreground="White"><Run Text="規制までおよそ" /><Run Text=" " /><Run Text="{Binding RemainUpdate, Mode=OneWay}" /><Run Text=" " /><Run Text="ツイート" />
-                                </TextBlock>
-                                <TextBlock Foreground="White"><Run Text="約" /><Run Text=" " /><Run Text="{Binding WindowTime, Mode=OneWay}" /><Run Text=" " /><Run Text="分で1ツイート分回復します。" />
-                                </TextBlock>
-                            </StackPanel>
+                            <TextBlock Foreground="White">
+                                <Run Text="規制までおよそ " />
+                                <Run Text="{Binding RemainUpdate, Mode=OneWay}" />
+                                <Run Text=" ツイート" />
+                            </TextBlock>
                         </Grid.ToolTip>
                         <Grid Width="{Binding ControlWidth}"
                               HorizontalAlignment="Left"
                               VerticalAlignment="Stretch"
-                              Background="#FF1BA1E2"
-                              SnapsToDevicePixels="True" />
+                              SnapsToDevicePixels="True">
+                            <Grid.Style>
+                                <Style TargetType="{x:Type Grid}">
+                                    <Setter Property="Background" Value="#FF1BA1E2" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsWarningPostLimit}" Value="True">
+                                            <Setter Property="Background" Value="#FFE51400" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Grid.Style>
+                        </Grid>
                     </Grid>
                 </Grid>
             </Border>

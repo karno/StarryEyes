@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Reactive.Linq;
 using System.Text.RegularExpressions;
 
@@ -48,8 +47,7 @@ namespace StarryEyes.Breezy.Imaging
                 {"http://via.me/", s => s + "/thumb/r600x600"},
                 {"http://www.pixiv.net/member_illust.php?", p =>
                 {
-                    var builder = new UriBuilder(p);
-                    builder.Scheme = "pixiv";
+                    var builder = new UriBuilder(p) {Scheme = "pixiv"};
                     return builder.Uri.OriginalString;
                 }}
             };

@@ -25,6 +25,7 @@ using StarryEyes.Models;
 using StarryEyes.Models.Backstages.NotificationEvents.PostEvents;
 using StarryEyes.Models.Operations;
 using StarryEyes.Models.Stores;
+using StarryEyes.Models.Subsystems;
 using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
 using StarryEyes.ViewModels.WindowParts.Flips;
@@ -570,19 +571,13 @@ namespace StarryEyes.ViewModels.WindowParts
             get { return InputAreaModel.BindingAuthInfos.Count == 1; }
         }
 
-        public int WindowTime
-        {
-            get { return 30; }
-        }
+        public int RemainUpdate { get; set; }
 
-        public int RemainUpdate
-        {
-            get { return 32; }
-        }
+        public int MaxUpdate { get; set; }
 
-        public int MaxUpdate
+        public bool IsWarningPostLimit
         {
-            get { return 128; }
+            get { return RemainUpdate < 5; }
         }
 
         public int MaxControlWidth
@@ -595,16 +590,25 @@ namespace StarryEyes.ViewModels.WindowParts
             get { return (double)MaxControlWidth * RemainUpdate / MaxUpdate; }
         }
 
+
         /// <summary>
         ///     Start ALPS.
         /// </summary>
         private IDisposable InitPostLimitPrediction()
         {
-            return Observable.Interval(TimeSpan.FromSeconds(60))
+            return Observable.Interval(TimeSpan.FromSeconds(5))
                       .Where(_ => IsPostLimitPredictionEnabled)
                       .Subscribe(_ =>
                       {
-                          //TODO: Post limit prediction
+                          var account = InputAreaModel.BindingAuthInfos.FirstOrDefault();
+                          if (account == null) return;
+                          var count = PostLimitPredictionService.GetCurrentWindowCount(account.Id);
+                          MaxUpdate = Setting.PostLimitPerWindow.Value;
+                          RemainUpdate = MaxUpdate - count;
+                          this.RaisePropertyChanged(() => RemainUpdate);
+                          this.RaisePropertyChanged(() => MaxUpdate);
+                          this.RaisePropertyChanged(() => ControlWidth);
+                          this.RaisePropertyChanged(() => IsWarningPostLimit);
                       });
         }
 
@@ -804,6 +808,7 @@ namespace StarryEyes.ViewModels.WindowParts
         }
 
         private DropAcceptDescription _description;
+
         public DropAcceptDescription DropAcceptDescription
         {
             get

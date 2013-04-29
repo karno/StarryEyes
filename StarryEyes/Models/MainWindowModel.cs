@@ -123,6 +123,13 @@ namespace StarryEyes.Models
             var handler = OnTabModelConfigureRaised;
             if (handler != null) handler(model);
         }
+
+        public static event Action<bool> OnBackstageTransitionRequested;
+        public static void TransitionBackstage(bool open)
+        {
+            var handler = OnBackstageTransitionRequested;
+            if (handler != null) handler(open);
+        }
     }
 
     public enum AccountSelectionAction
