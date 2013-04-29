@@ -90,7 +90,8 @@ namespace StarryEyes
                 }
                 else
                 {
-                    frozen = source.ToList();
+                    frozen = new List<TModel>();
+                    source.ForEach(frozen.Add);
                     gate = true;
                 }
 
