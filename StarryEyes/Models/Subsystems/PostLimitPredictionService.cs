@@ -44,8 +44,6 @@ namespace StarryEyes.Models.Subsystems
                     break;
                 case NotifyCollectionChangedAction.Move:
                     break;
-                case NotifyCollectionChangedAction.Reset:
-                    break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }

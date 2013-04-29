@@ -148,19 +148,15 @@ namespace Livet
             ReadAndWriteWithLockAction(() => _list.Count,
             count =>
             {
-                if (count != 0)
-                {
-                    _list.Clear();
-                }
+                if (count == 0) return;
+                _list.Clear();
             },
             count =>
             {
-                if (count != 0)
-                {
-                    OnPropertyChanged("Count");
-                    OnPropertyChanged("Item[]");
-                    OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-                }
+                if (count == 0) return;
+                this.OnPropertyChanged("Count");
+                this.OnPropertyChanged("Item[]");
+                this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
             });
         }
 
@@ -189,6 +185,16 @@ namespace Livet
             return ReadWithLockAction(() => _list.ToArray());
         }
 
+        public T[] SynchronizedToArray(Action finishHandler)
+        {
+            return ReadWithLockAction(() =>
+            {
+                var result = _list.ToArray();
+                finishHandler();
+                return result;
+            });
+        }
+
         /// <summary>
         /// 実際に格納されている要素の数を取得します。
         /// </summary>
@@ -215,7 +221,7 @@ namespace Livet
         /// <returns>削除できたかどうか</returns>
         public bool Remove(T item)
         {
-            bool result = false;
+            var result = false;
 
             ReadAndWriteWithLockAction(() => _list.IndexOf(item),
                 index =>
@@ -224,12 +230,10 @@ namespace Livet
                 },
                 index =>
                 {
-                    if (result)
-                    {
-                        OnPropertyChanged("Count");
-                        OnPropertyChanged("Item[]");
-                        OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item, index));
-                    }
+                    if (!result) return;
+                    this.OnPropertyChanged("Count");
+                    this.OnPropertyChanged("Item[]");
+                    this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item, index));
                 });
 
             return result;
@@ -428,7 +432,7 @@ namespace Livet
             _lock.EnterUpgradeableReadLock();
             try
             {
-                TResult readActionResult = readBeforeWriteAction();
+                var readActionResult = readBeforeWriteAction();
 
                 _lock.EnterWriteLock();
 

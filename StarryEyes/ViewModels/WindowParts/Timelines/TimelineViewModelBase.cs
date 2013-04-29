@@ -22,6 +22,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
     public abstract class TimelineViewModelBase : ViewModel
     {
         private readonly object _collectionLock = new object();
+        private volatile bool _isCollectionAddEnabled;
 
         private bool _isLoading;
         private bool _isMouseOver;
@@ -44,7 +45,6 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             }
         }
 
-        private volatile bool _isCollectionAddEnabled;
         private void InitializeCollection(ObservableCollection<StatusViewModel> ctl)
         {
             lock (_collectionLock)
@@ -54,15 +54,12 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                         TimelineModel.Statuses,
                         (sender, e) =>
                         {
-                            if (_isCollectionAddEnabled)
-                            {
-                                DispatcherHolder.Enqueue(
-                                    () => ReflectCollectionChanged(e, ctl),
-                                    DispatcherPriority.Render);
-                            }
+                            if (!_isCollectionAddEnabled) return;
+                            DispatcherHolder.Enqueue(
+                                () => ReflectCollectionChanged(e, ctl),
+                                DispatcherPriority.Render);
                         }));
-                var collection = TimelineModel.Statuses.ToArray();
-                _isCollectionAddEnabled = true;
+                var collection = TimelineModel.Statuses.SynchronizedToArray(() => _isCollectionAddEnabled = true);
                 collection
                     .Select(GenerateStatusViewModel)
                     .ForEach(ctl.Add);
@@ -87,7 +84,10 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                         removal.Dispose();
                         break;
                     case NotifyCollectionChangedAction.Reset:
-                        Rebind(ctl);
+                        // Rebind(ctl);
+                        var cache = ctl.ToArray();
+                        ctl.Clear();
+                        Task.Run(() => cache.ForEach(c => c.Dispose()));
                         break;
                     default:
                         throw new ArgumentException();
@@ -98,18 +98,16 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         private void Rebind(ObservableCollection<StatusViewModel> ctl)
         {
             if (TimelineModel == null) return;
-            lock (_collectionLock)
-            {
-                _isCollectionAddEnabled = false;
-                var cache = ctl.ToArray();
-                ctl.Clear();
-                Task.Run(() => cache.ForEach(c => c.Dispose()));
-                var collection = TimelineModel.Statuses.ToArray();
-                _isCollectionAddEnabled = true;
-                collection
-                    .Select(GenerateStatusViewModel)
-                    .ForEach(ctl.Add);
-            }
+            System.Diagnostics.Debug.WriteLine("REBIND CORE...");
+            _isCollectionAddEnabled = false;
+            var cache = ctl.ToArray();
+            ctl.Clear();
+            Task.Run(() => cache.ForEach(c => c.Dispose()));
+            var collection = TimelineModel.Statuses.ToArray();
+            _isCollectionAddEnabled = true;
+            collection
+                .Select(GenerateStatusViewModel)
+                .ForEach(ctl.Add);
         }
 
         protected StatusViewModel GenerateStatusViewModel(TwitterStatus status)
