@@ -52,7 +52,7 @@ namespace StarryEyes.Models.Tab
         {
             _tabs.RemoveAt(index);
             if (this._tabs.Count <= 0) return;
-            this.CurrentFocusTabIndex = index < this._tabs.Count - 1 ? index : index > 0 ? index - 1 : -1;
+            this.CurrentFocusTabIndex = index > this._tabs.Count - 1 ? index - 1 : index;
         }
     }
 }
