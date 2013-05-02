@@ -60,10 +60,16 @@ namespace StarryEyes.Breezy.Imaging
                 .Select(s => new { key = ResolveTable.Keys.FirstOrDefault(s.StartsWith), value = s })
                 .Select(t =>
                 {
-                    if (SupportedExtents.Any(ext => t.value.EndsWith("." + ext)))
-                        return new { original = t.value, resolved = t.value };
-                    if (t.key != null)
-                        return new { original = t.value, resolved = ResolveTable[t.key](t.value) };
+                    try
+                    {
+                        if (SupportedExtents.Any(ext => t.value.EndsWith("." + ext)))
+                            return new { original = t.value, resolved = t.value };
+                        if (t.key != null)
+                            return new { original = t.value, resolved = ResolveTable[t.key](t.value) };
+                    }
+                    catch
+                    {
+                    }
                     return null;
                 })
                 .Where(t => t != null && t.resolved != null && Uri.IsWellFormedUriString(t.resolved, UriKind.Absolute))
