@@ -125,6 +125,22 @@ namespace Livet
             }
         }
 
+        public bool TryIndexOf(int index, out T item)
+        {
+            var flag = false;
+            item = ReadWithLockAction(() =>
+            {
+                if (index < _list.Count)
+                {
+                    flag = true;
+                    return _list[index];
+                }
+                flag = false;
+                return default(T);
+            });
+            return flag;
+        }
+
         /// <summary>
         /// 末尾にオブジェクトを追加します。
         /// </summary>

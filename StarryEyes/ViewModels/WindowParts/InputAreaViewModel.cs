@@ -148,7 +148,7 @@ namespace StarryEyes.ViewModels.WindowParts
                 new EventListener<Action<IEnumerable<AuthenticateInfo>, string, CursorPosition, TwitterStatus>>(
                     _ => InputAreaModel.SetTextRequested += _,
                     _ => InputAreaModel.SetTextRequested -= _,
-                    (infos, body, cursor, inReplyTo) =>
+                    async (infos, body, cursor, inReplyTo) =>
                     {
                         OpenInput(false);
                         if (!CheckClearInput(body)) return;
@@ -158,15 +158,15 @@ namespace StarryEyes.ViewModels.WindowParts
                         }
                         if (inReplyTo != null)
                         {
-                            InReplyTo = new StatusViewModel(inReplyTo);
+                            InReplyTo = new StatusViewModel(await StatusModel.Get(inReplyTo));
                         }
                         switch (cursor)
                         {
                             case CursorPosition.Begin:
-                                Messenger.RaiseAsync(new TextBoxSetCaretMessage(0));
+                                Messenger.Raise(new TextBoxSetCaretMessage(0));
                                 break;
                             case CursorPosition.End:
-                                Messenger.RaiseAsync(new TextBoxSetCaretMessage(InputText.Length));
+                                Messenger.Raise(new TextBoxSetCaretMessage(InputText.Length));
                                 break;
                         }
                     }));
@@ -341,7 +341,7 @@ namespace StarryEyes.ViewModels.WindowParts
                 }
 
                 if (_inReplyToViewModelCache == null ||
-                    _inReplyToViewModelCache.Status.Id != InputInfo.InReplyTo.Id)
+                    _inReplyToViewModelCache.Status.Id != InputInfo.InReplyTo.Status.Id)
                 {
                     _inReplyToViewModelCache = new StatusViewModel(InputInfo.InReplyTo);
                 }
@@ -361,7 +361,7 @@ namespace StarryEyes.ViewModels.WindowParts
                 else
                 {
                     _inReplyToViewModelCache = value;
-                    InputInfo.InReplyTo = value.Status;
+                    InputInfo.InReplyTo = value.Model;
                 }
                 RaisePropertyChanged(() => InReplyTo);
                 RaisePropertyChanged(() => IsInReplyToEnabled);

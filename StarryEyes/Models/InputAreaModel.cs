@@ -193,7 +193,7 @@ namespace StarryEyes.Models
         /// <summary>
         ///     In reply to someone.
         /// </summary>
-        public TwitterStatus InReplyTo { get; set; }
+        public StatusModel InReplyTo { get; set; }
 
         /// <summary>
         ///     Message recipient target.
@@ -290,9 +290,9 @@ namespace StarryEyes.Models
                                   (MessageRecipient != null
                                        ? (OperationBase<TwitterStatus>)
                                          new DirectMessageOperation(authInfo, MessageRecipient, Text)
-                                       : new TweetOperation(authInfo, Text, InReplyTo, AttachedGeoInfo, AttachedImage)
+                                       : new TweetOperation(authInfo, Text, InReplyTo != null ? InReplyTo.Status : null, AttachedGeoInfo, AttachedImage)
                                   ).Run()
-                                   .SelectMany(StoreHelper.MergeStore)
+                                   .SelectMany(StoreHelper.NotifyAndMergeStore)
                                    .Select(_ => new PostResult(authInfo, _))
                                    .Catch((Exception ex) => Observable.Return(new PostResult(authInfo, ex))))
                       .Subscribe(postResults.Add,

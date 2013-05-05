@@ -33,21 +33,18 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         private UserViewModel _retweeter;
         private UserViewModel _user;
 
-        public StatusViewModel(TwitterStatus status)
+        public StatusViewModel(StatusModel status)
             : this(null, status, null)
         {
         }
 
-        public StatusViewModel(TimelineViewModelBase parent, TwitterStatus status,
+        public StatusViewModel(TimelineViewModelBase parent, StatusModel status,
                                IEnumerable<long> initialBoundAccounts)
         {
             _parent = parent;
             // get status model
-            Model = StatusModel.Get(status);
-            if (status.RetweetedOriginal != null)
-            {
-                RetweetedOriginalModel = StatusModel.Get(status.RetweetedOriginal);
-            }
+            Model = status;
+            RetweetedOriginalModel = status.RetweetedOriginal;
 
             // bind accounts 
             _bindingAccounts = initialBoundAccounts.Guard().ToArray();
@@ -75,13 +72,11 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                                    RaisePropertyChanged(() => IsRetweetedUserExists);
                                    RaisePropertyChanged(() => RetweetCount);
                                }));
-
-            // bind retweeted original notification
             if (RetweetedOriginalModel != null)
             {
                 CompositeDisposable.Add(
-                    RetweetedOriginalModel.FavoritedUsers.ListenCollectionChanged()
-                                          .Subscribe(_ => this.RaisePropertyChanged(() => IsFavorited)));
+                            RetweetedOriginalModel.FavoritedUsers.ListenCollectionChanged()
+                                                  .Subscribe(_ => this.RaisePropertyChanged(() => IsFavorited)));
                 CompositeDisposable.Add(
                     RetweetedOriginalModel.RetweetedUsers.ListenCollectionChanged()
                                           .Subscribe(_ => this.RaisePropertyChanged(() => IsRetweeted)));
@@ -106,8 +101,8 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             }
 
             // look-up in-reply-to
-            if (!status.InReplyToStatusId.HasValue) return;
-            var inReplyTo = StoreHelper.GetTweet(status.InReplyToStatusId.Value)
+            if (!status.Status.InReplyToStatusId.HasValue) return;
+            var inReplyTo = StoreHelper.GetTweet(status.Status.InReplyToStatusId.Value)
                                        .Subscribe(replyTo =>
                                        {
                                            this._inReplyTo = replyTo;
@@ -118,7 +113,9 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                                            this.RaisePropertyChanged(() => this.InReplyToBody);
                                        });
             this.CompositeDisposable.Add(inReplyTo);
+
         }
+
 
         public TimelineViewModelBase Parent
         {
@@ -227,12 +224,22 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public bool IsFavorited
         {
-            get { return Model.IsFavorited(_bindingAccounts); }
+            get
+            {
+                return this.RetweetedOriginalModel != null
+                           ? this.RetweetedOriginalModel.IsFavorited(this._bindingAccounts)
+                           : this.Model.IsFavorited(this._bindingAccounts);
+            }
         }
 
         public bool IsRetweeted
         {
-            get { return Model.IsRetweeted(_bindingAccounts); }
+            get
+            {
+                return this.RetweetedOriginalModel != null
+                           ? this.RetweetedOriginalModel.IsRetweeted(this._bindingAccounts)
+                           : this.Model.IsRetweeted(this._bindingAccounts);
+            }
         }
 
         public bool CanFavoriteAndRetweet

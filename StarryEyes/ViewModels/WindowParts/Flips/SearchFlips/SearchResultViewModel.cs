@@ -77,44 +77,47 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
 
         private IObservable<TwitterStatus> Fetch(long? maxId, int count)
         {
-            if (_option == SearchOption.Quick)
+            switch (_option)
             {
-                if (TabManager.CurrentFocusTab == null)
-                    return Observable.Empty<TwitterStatus>();
-                return Observable.Start(() => TabManager.CurrentFocusTab.Timeline.Statuses)
-                                 .SelectMany(_ => _)
-                                 .Where(s => _predicate(s));
+                case SearchOption.Quick:
+                    if (TabManager.CurrentFocusTab == null)
+                    {
+                        return Observable.Empty<TwitterStatus>();
+                    }
+                    return Observable.Start(() => TabManager.CurrentFocusTab.Timeline.Statuses)
+                                     .SelectMany(s => s)
+                                     .Select(s => s.Status)
+                                     .Where(s => _predicate(s));
+                case SearchOption.Web:
+                    var info = AccountsStore.Accounts
+                                            .Shuffle()
+                                            .Select(s => s.AuthenticateInfo)
+                                            .FirstOrDefault();
+                    if (info == null)
+                    {
+                        return Observable.Empty<TwitterStatus>();
+                    }
+                    return info.SearchTweets(_query, count: count, max_id: maxId)
+                               .Catch((Exception ex) =>
+                               {
+                                   BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message));
+                                   return Observable.Empty<TwitterStatus>();
+                               });
+                default:
+                    var fetch = Observable.Start(() =>
+                                                 StatusStore.Find(_predicate,
+                                                                  maxId != null
+                                                                      ? FindRange<long>.By(maxId.Value)
+                                                                      : null,
+                                                                  count))
+                                          .SelectMany(_ => _);
+                    if (_localQuery != null && _localQuery.Sources != null)
+                    {
+                        fetch = fetch.Merge(
+                            _localQuery.Sources.ToObservable().SelectMany(s => s.Receive(maxId)));
+                    }
+                    return fetch;
             }
-            var fetch = Observable.Start(() =>
-                                         StatusStore.Find(_predicate,
-                                                          maxId != null
-                                                              ? FindRange<long>.By(maxId.Value)
-                                                              : null,
-                                                          count))
-                                  .SelectMany(_ => _);
-            if (_localQuery != null && _localQuery.Sources != null)
-            {
-                fetch = fetch.Merge(
-                    _localQuery.Sources.ToObservable().SelectMany(s => s.Receive(maxId)));
-            }
-            if (_option == SearchOption.Web)
-            {
-                var info = AccountsStore.Accounts
-                                        .Shuffle()
-                                        .Select(s => s.AuthenticateInfo)
-                                        .FirstOrDefault();
-                if (info == null)
-                {
-                    return Observable.Empty<TwitterStatus>();
-                }
-                return fetch.Merge(info.SearchTweets(_query, count: count, max_id: maxId)
-                                       .Catch((Exception ex) =>
-                                       {
-                                           BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message));
-                                           return Observable.Empty<TwitterStatus>();
-                                       }));
-            }
-            return fetch;
         }
 
         protected override TimelineModel TimelineModel

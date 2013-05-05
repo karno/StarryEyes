@@ -50,8 +50,14 @@ namespace StarryEyes.Models
 
         private static int _cleanupCount;
 
-        public static StatusModel Get(TwitterStatus status)
+        public static async Task<StatusModel> Get(TwitterStatus status)
         {
+            status = await StatusStore.Get(status.Id)
+                                      .DefaultIfEmpty(status)
+                                      .FirstAsync();
+            var rto = status.RetweetedOriginal == null
+                          ? null
+                          : await Get(status.RetweetedOriginal);
             var lockerobj = _generateLock.GetOrAdd(status.Id, new object());
             try
             {
@@ -67,11 +73,13 @@ namespace StarryEyes.Models
                     {
                         model = (StatusModel)wr.Target;
                         if (model != null)
+                        {
                             return model;
+                        }
                     }
 
                     // cache is dead/not cached yet
-                    model = new StatusModel(status);
+                    model = new StatusModel(status, rto);
                     wr = new WeakReference(model);
                     lock (_staticCacheLock)
                     {
@@ -83,12 +91,15 @@ namespace StarryEyes.Models
             finally
             {
                 _generateLock.TryRemove(status.Id, out lockerobj);
-                var cc = Interlocked.Increment(ref _cleanupCount);
-                if (cc == CleanupInterval)
+                // ReSharper disable InvertIf
+#pragma warning disable 4014
+                if (Interlocked.Increment(ref _cleanupCount) == CleanupInterval)
                 {
                     Interlocked.Exchange(ref _cleanupCount, 0);
                     Task.Run((Action)CollectGarbages);
                 }
+#pragma warning restore 4014
+                // ReSharper restore InvertIf
             }
         }
 
@@ -105,7 +116,7 @@ namespace StarryEyes.Models
             {
                 lock (_staticCacheLock)
                 {
-                    foreach (long id in ids)
+                    foreach (var id in ids)
                     {
                         WeakReference wr;
                         _staticCache.TryGetValue(id, out wr);
@@ -161,7 +172,15 @@ namespace StarryEyes.Models
                          .Subscribe(l => Images = l);
         }
 
+        private StatusModel(TwitterStatus status, StatusModel retweetedOriginal)
+            : this(status)
+        {
+            this.RetweetedOriginal = retweetedOriginal;
+        }
+
         public TwitterStatus Status { get; private set; }
+
+        public StatusModel RetweetedOriginal { get; private set; }
 
         public ObservableSynchronizedCollection<TwitterUser> FavoritedUsers
         {
@@ -260,7 +279,6 @@ namespace StarryEyes.Models
                                             Action<StatusModel> ifCacheIsAlive,
                                             Action<TwitterStatus> ifCacheIsDead)
         {
-
             WeakReference wr;
             lock (_staticCacheLock)
             {
@@ -276,32 +294,38 @@ namespace StarryEyes.Models
                     return;
                 }
             }
-            ifCacheIsDead(status);
-            StatusStore.Store(status);
+            StatusStore.Get(status.Id)
+                       .DefaultIfEmpty(status)
+                       .Subscribe(s =>
+                       {
+                           ifCacheIsDead(s);
+                           StatusStore.Store(s);
+                       });
         }
 
         public void AddFavoritedUser(long userId)
         {
-            StoreHelper.GetUser(userId).Subscribe(AddFavoritedUser);
+            StoreHelper.GetUser(userId)
+                       .Subscribe(AddFavoritedUser);
         }
 
-        public void AddFavoritedUser(TwitterUser user)
+        public async void AddFavoritedUser(TwitterUser user)
         {
             if (this.Status.RetweetedOriginal != null)
             {
-                Get(this.Status.RetweetedOriginal)
-                    .AddFavoritedUser(user);
+                var status = await Get(this.Status.RetweetedOriginal);
+                status.AddFavoritedUser(user);
             }
             else
             {
-
-                bool added = false;
+                var added = false;
                 lock (_favoritedsLock)
                 {
                     if (!_favoritedUsersDic.ContainsKey(user.Id))
                     {
                         _favoritedUsersDic.Add(user.Id, user);
-                        Status.FavoritedUsers = Status.FavoritedUsers.Guard()
+                        Status.FavoritedUsers = Status.FavoritedUsers
+                                                      .Guard()
                                                       .Append(user.Id)
                                                       .Distinct()
                                                       .ToArray();
@@ -316,12 +340,12 @@ namespace StarryEyes.Models
             }
         }
 
-        public void RemoveFavoritedUser(long id)
+        public async void RemoveFavoritedUser(long id)
         {
             if (this.Status.RetweetedOriginal != null)
             {
-                Get(this.Status.RetweetedOriginal)
-                    .RemoveFavoritedUser(id);
+                var status = await Get(this.Status.RetweetedOriginal);
+                status.RemoveFavoritedUser(id);
             }
             else
             {
@@ -347,16 +371,16 @@ namespace StarryEyes.Models
             StoreHelper.GetUser(userId).Subscribe(AddRetweetedUser);
         }
 
-        public void AddRetweetedUser(TwitterUser user)
+        public async void AddRetweetedUser(TwitterUser user)
         {
             if (this.Status.RetweetedOriginal != null)
             {
-                Get(this.Status.RetweetedOriginal)
-                    .AddRetweetedUser(user);
+                var status = await Get(this.Status.RetweetedOriginal);
+                status.AddRetweetedUser(user);
             }
             else
             {
-                bool added = false;
+                var added = false;
                 lock (_retweetedsLock)
                 {
                     if (!_retweetedUsersDic.ContainsKey(user.Id))
@@ -378,12 +402,12 @@ namespace StarryEyes.Models
             }
         }
 
-        public void RemoveRetweetedUser(long id)
+        public async void RemoveRetweetedUser(long id)
         {
             if (this.Status.RetweetedOriginal != null)
             {
-                Get(this.Status.RetweetedOriginal)
-                    .RemoveRetweetedUser(id);
+                var status = await Get(this.Status.RetweetedOriginal);
+                status.RemoveRetweetedUser(id);
             }
             else
             {
@@ -410,8 +434,7 @@ namespace StarryEyes.Models
             if (ids.Length == 0) return false;
             if (this.Status.RetweetedOriginal != null)
             {
-                return Get(this.Status.RetweetedOriginal)
-                    .IsFavorited(ids);
+                throw new NotSupportedException("You must create another model indicating RetweetedOriginal status.");
             }
             lock (_favoritedsLock)
             {
@@ -424,8 +447,7 @@ namespace StarryEyes.Models
             if (ids.Length == 0) return false;
             if (this.Status.RetweetedOriginal != null)
             {
-                return Get(this.Status.RetweetedOriginal)
-                    .IsRetweeted(ids);
+                throw new NotSupportedException("You must create another model indicating RetweetedOriginal status.");
             }
             lock (_retweetedsLock)
             {
@@ -435,10 +457,10 @@ namespace StarryEyes.Models
 
         public IEnumerable<AuthenticateInfo> GetSuitableReplyAccount()
         {
-            long uid = Status.InReplyToUserId.GetValueOrDefault();
+            var uid = Status.InReplyToUserId.GetValueOrDefault();
             if (Status.StatusType == StatusType.DirectMessage)
                 uid = Status.Recipient.Id;
-            AccountSetting info = AccountsStore.GetAccountSetting(uid);
+            var info = AccountsStore.GetAccountSetting(uid);
             if (info != null)
             {
                 return new[] { BacktrackFallback(info.AuthenticateInfo) };
@@ -450,10 +472,10 @@ namespace StarryEyes.Models
         {
             if (!Setting.IsBacktrackFallback.Value)
                 return info;
-            AuthenticateInfo cinfo = info;
+            var cinfo = info;
             while (true)
             {
-                AccountSetting backtrack = AccountsStore.Accounts
+                var backtrack = AccountsStore.Accounts
                                                         .FirstOrDefault(i => i.FallbackNext == cinfo.Id);
                 if (backtrack == null)
                     return cinfo;
@@ -461,6 +483,22 @@ namespace StarryEyes.Models
                     return info;
                 cinfo = backtrack.AuthenticateInfo;
             }
+        }
+
+        public override bool Equals(object obj)
+        {
+            StatusModel another;
+            if (obj == null || (another = obj as StatusModel) == null)
+            {
+                return false;
+            }
+
+            return this.Status.Id == another.Status.Id;
+        }
+
+        public override int GetHashCode()
+        {
+            return this.Status.GetHashCode();
         }
     }
 }

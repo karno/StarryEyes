@@ -38,14 +38,14 @@ namespace StarryEyes.Models.Receivers
                 _signal.Reset();
                 while (_queue.TryDequeue(out status))
                 {
-                    if ((await StatusStore.Get(status.Id).DefaultIfEmpty()) == null)
+                    if ((await StatusStore.Get(status.Id).DefaultIfEmpty()) != null) continue;
+                    if (status.RetweetedOriginal != null)
                     {
-                        System.Diagnostics.Debug.WriteLine("*INBOX* accept: " + status);
-                        StatusStore.Store(status);
-                        NotificationModel.NotifyNewArrival(status);
+                        Queue(status.RetweetedOriginal);
                     }
+                    StatusStore.Store(status);
+                    NotificationModel.NotifyNewArrival(status);
                 }
-                System.Diagnostics.Debug.WriteLine("*INBOX* wait for receiving...");
                 _signal.WaitOne();
 
             }

@@ -214,7 +214,7 @@ namespace StarryEyes.Models.Tab
             return FilterQuery.Sources
                               .Select(_ => _.Receive(maxId))
                               .Merge()
-                              .SelectMany(StoreHelper.MergeStore)
+                              .SelectMany(StoreHelper.NotifyAndMergeStore)
                               .OfType<Unit>();
         }
 

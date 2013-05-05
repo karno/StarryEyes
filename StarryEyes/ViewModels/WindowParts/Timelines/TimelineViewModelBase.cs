@@ -73,7 +73,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                 switch (e.Action)
                 {
                     case NotifyCollectionChangedAction.Add:
-                        ctl.Insert(e.NewStartingIndex, GenerateStatusViewModel((TwitterStatus)e.NewItems[0]));
+                        ctl.Insert(e.NewStartingIndex, GenerateStatusViewModel((StatusModel)e.NewItems[0]));
                         break;
                     case NotifyCollectionChangedAction.Move:
                         ctl.Move(e.OldStartingIndex, e.NewStartingIndex);
@@ -110,7 +110,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                 .ForEach(ctl.Add);
         }
 
-        protected StatusViewModel GenerateStatusViewModel(TwitterStatus status)
+        protected StatusViewModel GenerateStatusViewModel(StatusModel status)
         {
             return new StatusViewModel(this, status, CurrentAccounts);
         }
@@ -218,7 +218,10 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         public void ReadMore()
         {
             if (IsScrollInTop || !_isCollectionAddEnabled || IsLoading) return;
-            ReadMore(TimelineModel.Statuses.Select(_ => _.Id).Append(long.MaxValue).Min());
+            ReadMore(TimelineModel.Statuses
+                                  .Select(s => s.Status.Id)
+                                  .Append(long.MaxValue)
+                                  .Min());
         }
 
         protected virtual void ReadMore(long id)

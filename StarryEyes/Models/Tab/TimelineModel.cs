@@ -24,8 +24,8 @@ namespace StarryEyes.Models.Tab
         private readonly object _sicLocker = new object();
         private readonly AVLTree<long> _statusIdCache;
 
-        private readonly ObservableSynchronizedCollectionEx<TwitterStatus> _statuses
-            = new ObservableSynchronizedCollectionEx<TwitterStatus>();
+        private readonly ObservableSynchronizedCollectionEx<StatusModel> _statuses
+            = new ObservableSynchronizedCollectionEx<StatusModel>();
 
         private bool _isSuppressTimelineTrimming;
 
@@ -51,7 +51,7 @@ namespace StarryEyes.Models.Tab
                 }));
         }
 
-        public ObservableSynchronizedCollectionEx<TwitterStatus> Statuses
+        public ObservableSynchronizedCollectionEx<StatusModel> Statuses
         {
             get { return _statuses; }
         }
@@ -79,7 +79,7 @@ namespace StarryEyes.Models.Tab
 
         public event Action<TwitterStatus> NewStatusArrival;
 
-        private void AddStatus(TwitterStatus status)
+        private async void AddStatus(TwitterStatus status)
         {
             bool add;
             lock (_sicLocker)
@@ -88,25 +88,31 @@ namespace StarryEyes.Models.Tab
             }
             if (!add) return;
             // estimate point
+            var model = await StatusModel.Get(status);
+            var stamp = model.Status.CreatedAt;
             if (!this._isSuppressTimelineTrimming)
             {
-                var addpoint = this._statuses.TakeWhile(_ => _.CreatedAt > status.CreatedAt).Count();
-                if (addpoint > TimelineChunkCount)
+                StatusModel lastModel;
+                if (this.Statuses.TryIndexOf(TimelineChunkCount, out lastModel) &&
+                    lastModel != null &&
+                    lastModel.Status.CreatedAt > stamp)
                 {
                     lock (this._sicLocker)
                     {
-                        this._statusIdCache.Remove(status.Id);
+                        this._statusIdCache.Remove(model.Status.Id);
                     }
                     return;
                 }
             }
             this._statuses.Insert(
-                i => i.TakeWhile(_ => _.CreatedAt > status.CreatedAt).Count(),
-                status);
+                i => i.TakeWhile(s => s.Status.CreatedAt > stamp).Count(),
+                model);
             if (this._statusIdCache.Count > TimelineChunkCount + TimelineChunkCountBounce &&
                 Interlocked.Exchange(ref this._trimCount, 1) == 0)
             {
+#pragma warning disable 4014
                 Task.Run(() => this.TrimTimeline());
+#pragma warning restore 4014
             }
             var handler = this.NewStatusArrival;
             if (handler != null)
@@ -123,7 +129,7 @@ namespace StarryEyes.Models.Tab
             if (remove)
             {
                 // remove
-                _statuses.RemoveWhere(s => s.Id == id);
+                _statuses.RemoveWhere(s => s.Status.Id == id);
             }
         }
 
@@ -141,13 +147,15 @@ namespace StarryEyes.Models.Tab
             if (_statuses.Count <= TimelineChunkCount) return;
             try
             {
-                var lastCreatedAt = _statuses[TimelineChunkCount].CreatedAt;
+                StatusModel last;
+                if (!_statuses.TryIndexOf(TimelineChunkCount, out last) || last == null) return;
+                var lastCreatedAt = last.Status.CreatedAt;
                 var removedIds = new List<long>();
                 _statuses.RemoveWhere(t =>
                 {
-                    if (t.CreatedAt < lastCreatedAt)
+                    if (t.Status.CreatedAt < lastCreatedAt)
                     {
-                        removedIds.Add(t.Id);
+                        removedIds.Add(t.Status.Id);
                         return true;
                     }
                     return false;

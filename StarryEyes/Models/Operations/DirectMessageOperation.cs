@@ -28,7 +28,7 @@ namespace StarryEyes.Models.Operations
         protected override IObservable<TwitterStatus> RunCore()
         {
             return AuthInfo.SendDirectMessage(Text, TargetUserId)
-                .SelectMany(StoreHelper.MergeStore)
+                .SelectMany(StoreHelper.NotifyAndMergeStore)
                            .Catch((Exception ex) =>
                                   GetExceptionDetail(ex)
                                       .Select(s => Observable.Throw<TwitterStatus>(new WebException(s)))
