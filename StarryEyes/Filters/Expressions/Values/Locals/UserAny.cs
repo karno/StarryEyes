@@ -75,8 +75,8 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
                              .Subscribe(_ => this.RaiseReapplyFilter(null)));
             _disposables.Add(
                 Observable.FromEvent<RelationDataChangedInfo>(
-                    h => AccountRelationData.AccountDataUpdated += h,
-                    h => AccountRelationData.AccountDataUpdated -= h)
+                    h => AccountRelationDataStore.AccountDataUpdated += h,
+                    h => AccountRelationDataStore.AccountDataUpdated -= h)
                           .Subscribe(this.RaiseReapplyFilter));
         }
 

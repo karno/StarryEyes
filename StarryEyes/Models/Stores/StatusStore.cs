@@ -104,7 +104,8 @@ namespace StarryEyes.Models.Stores
         {
             return _isInShutdown
                        ? Observable.Empty<TwitterStatus>()
-                       : _store.Find(predicate, range, count);
+                       : _store.Find(predicate, range, count)
+                               .Catch((ObjectDisposedException ex) => Observable.Empty<TwitterStatus>());
         }
 
         private const int BatchWaitSec = 5;
@@ -185,12 +186,10 @@ namespace StarryEyes.Models.Stores
         internal static void Shutdown()
         {
             _isInShutdown = true;
-            if (_store != null)
-            {
-                _store.Dispose();
-                var pds = (PersistentDataStore<long, TwitterStatus>)_store;
-                StoreOnMemoryObjectPersistence.MakePersistent("statuses", pds.GetManageDatas());
-            }
+            if (_store == null) return;
+            _store.Dispose();
+            var pds = (PersistentDataStore<long, TwitterStatus>)_store;
+            StoreOnMemoryObjectPersistence.MakePersistent("statuses", pds.GetManageDatas());
         }
     }
 

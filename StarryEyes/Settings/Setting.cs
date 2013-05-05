@@ -7,6 +7,7 @@ using StarryEyes.Breezy.DataModel;
 using StarryEyes.Breezy.Imaging;
 using StarryEyes.Filters;
 using StarryEyes.Filters.Expressions;
+using StarryEyes.Filters.Expressions.Operators;
 using StarryEyes.Filters.Parsing;
 using StarryEyes.Models.Tab;
 using StarryEyes.Nightmare.Windows;
@@ -87,9 +88,6 @@ namespace StarryEyes.Settings
         #region Timeline display and action
 
         public static readonly FilterSettingItem Muteds = new FilterSettingItem("Muteds");
-
-        public static readonly SettingItemStruct<bool> ShareBlockings =
-            new SettingItemStruct<bool>("ShareBlockings", true);
 
         public static readonly SettingItemStruct<bool> AllowFavoriteMyself =
             new SettingItemStruct<bool>("AllowFavoriteMyself", false);
@@ -251,7 +249,8 @@ namespace StarryEyes.Settings
                         {
                         }
                     }
-                    return _expression = new FilterExpressionRoot();
+                    // return empty
+                    return _expression = FilterExpressionRoot.GetEmpty(false);
                 }
                 set
                 {

@@ -34,11 +34,11 @@ namespace StarryEyes.Albireo.Data
             }
             else
             {
-                AVLTreeLeaf current = _root;
+                var current = _root;
                 var trace = new Stack<Tuple<AVLTreeLeaf, Direction>>();
                 while (true)
                 {
-                    int d = current.Value.CompareTo(item);
+                    var d = current.Value.CompareTo(item);
                     if (d == 0) // this item is already inserted.
                     {
                         return false;
@@ -140,11 +140,11 @@ namespace StarryEyes.Albireo.Data
                 return false;
             }
             // find node
-            AVLTreeLeaf current = _root;
+            var current = _root;
             var trace = new Stack<Tuple<AVLTreeLeaf, Direction>>();
             while (true)
             {
-                int d = current.Value.CompareTo(item);
+                var d = current.Value.CompareTo(item);
                 if (d == 0) // this item is already inserted.
                 {
                     // found
@@ -220,7 +220,7 @@ namespace StarryEyes.Albireo.Data
             // rotate and balance
             while (trace.Count > 0)
             {
-                bool breakLoop = false;
+                var breakLoop = false;
                 var tuple = trace.Pop();
                 var node = tuple.Item1;
                 if (tuple.Item2 == Direction.Left)
@@ -379,10 +379,10 @@ namespace StarryEyes.Albireo.Data
         public bool Contains(T item)
         {
             if (_root == null) return false; // collection is empty.
-            AVLTreeLeaf current = _root;
+            var current = _root;
             while (true)
             {
-                int d = current.Value.CompareTo(item);
+                var d = current.Value.CompareTo(item);
                 if (d == 0)
                 {
                     return true;
@@ -487,7 +487,7 @@ namespace StarryEyes.Albireo.Data
                 }
                 if (_trace.Count == 0) // init
                 {
-                    AVLTreeLeaf leaf = _target._root;
+                    var leaf = _target._root;
                     do
                     {
                         _trace.Push(Tuple.Create(leaf, Direction.Left));

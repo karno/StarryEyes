@@ -14,6 +14,14 @@ namespace StarryEyes.Models.Stores
         private static readonly object StoreLocker = new object();
         private static readonly SortedDictionary<long, AccountRelationData> Store = new SortedDictionary<long, AccountRelationData>();
 
+        public static event Action<RelationDataChangedInfo> AccountDataUpdated;
+
+        private static void OnAccountDataUpdated(RelationDataChangedInfo obj)
+        {
+            var handler = AccountDataUpdated;
+            if (handler != null) handler(obj);
+        }
+
         /// <summary>
         /// Get account data fot the account id.<para />
         /// If not exited, create it new.
@@ -26,8 +34,11 @@ namespace StarryEyes.Models.Stores
             {
                 AccountRelationData data;
                 if (Store.TryGetValue(id, out data))
+                {
                     return data;
+                }
                 data = new AccountRelationData(id);
+                data.AccountDataUpdated += OnAccountDataUpdated;
                 Store.Add(id, data);
                 return data;
             }
@@ -79,7 +90,7 @@ namespace StarryEyes.Models.Stores
         /// <summary>
         /// Integrated event for trigger any AccountRelationData changed.
         /// </summary>
-        public static event Action<RelationDataChangedInfo> AccountDataUpdated;
+        public event Action<RelationDataChangedInfo> AccountDataUpdated;
 
         private void RaiseOnAccountDataUpdated(long targetUser, bool isAdded, RelationDataChange change)
         {

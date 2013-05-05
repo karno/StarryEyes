@@ -38,12 +38,12 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 
         public override void BeginLifecycle()
         {
-            AccountRelationData.AccountDataUpdated += this.AccountRelationDataAccountDataUpdated;
+            AccountRelationDataStore.AccountDataUpdated += this.AccountRelationDataAccountDataUpdated;
         }
 
         public override void EndLifecycle()
         {
-            AccountRelationData.AccountDataUpdated -= this.AccountRelationDataAccountDataUpdated;
+            AccountRelationDataStore.AccountDataUpdated -= this.AccountRelationDataAccountDataUpdated;
         }
 
         void AccountRelationDataAccountDataUpdated(RelationDataChangedInfo obj)

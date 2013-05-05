@@ -32,6 +32,21 @@ namespace StarryEyes.Filters.Expressions
 
     public sealed class FilterExpressionRoot : FilterExpressionBase
     {
+        public static FilterExpressionRoot GetEmpty(bool tautology)
+        {
+            if (tautology)
+            {
+                return new FilterExpressionRoot();
+            }
+            return new FilterExpressionRoot
+            {
+                Operator = new FilterNegate
+                {
+                    Value = new FilterBracket(null)
+                }
+            };
+        }
+
         private FilterOperatorBase _operator;
         public FilterOperatorBase Operator
         {
@@ -69,5 +84,6 @@ namespace StarryEyes.Filters.Expressions
         {
             Operator.EndLifecycle();
         }
+
     }
 }

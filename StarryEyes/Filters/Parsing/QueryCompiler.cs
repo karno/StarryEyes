@@ -32,7 +32,7 @@ namespace StarryEyes.Filters.Parsing
                         // without predicates
                         return new FilterQuery { Sources = sources, PredicateTreeRoot = new FilterExpressionRoot() };
                     }
-                    FilterExpressionRoot filters = CompileFilters(predicateSequence);
+                    var filters = CompileFilters(predicateSequence);
                     return new FilterQuery { Sources = sources, PredicateTreeRoot = filters };
                 }
                 if (first.IsMatchTokenLiteral("where"))
@@ -58,7 +58,7 @@ namespace StarryEyes.Filters.Parsing
         {
             try
             {
-                IEnumerable<Token> tokens = Tokenizer.Tokenize(query);
+                var tokens = Tokenizer.Tokenize(query);
                 // from (sources) where (filters)
                 return CompileFilters(tokens);
             }
@@ -106,7 +106,7 @@ namespace StarryEyes.Filters.Parsing
             var reader = new TokenReader(token);
             while (reader.IsRemainToken)
             {
-                Token filter = reader.Get();
+                var filter = reader.Get();
                 if (filter.Type != TokenType.Literal && filter.Type != TokenType.OperatorMultiple)
                 {
                     throw new ArgumentException("このトークンは無効です: " + filter.Type +
@@ -120,7 +120,7 @@ namespace StarryEyes.Filters.Parsing
                     reader.AssertGet(TokenType.Collon);
                     do
                     {
-                        Token argument = reader.AssertGet(TokenType.String);
+                        var argument = reader.AssertGet(TokenType.String);
                         yield return Activator.CreateInstance(fstype, argument.Value) as FilterSourceBase;
                         // separated by comma
                         if (reader.IsRemainToken)
@@ -151,7 +151,7 @@ namespace StarryEyes.Filters.Parsing
         private static FilterExpressionRoot CompileFilters(IEnumerable<Token> token)
         {
             var reader = new TokenReader(token);
-            FilterOperatorBase op = CompileL0(reader);
+            var op = CompileL0(reader);
             if (reader.IsRemainToken)
                 throw new FilterQueryException("不正なトークンです: " + reader.Get(), reader.RemainQuery);
             return new FilterExpressionRoot { Operator = op };
@@ -172,7 +172,7 @@ namespace StarryEyes.Filters.Parsing
         private static FilterOperatorBase CompileL0(TokenReader reader)
         {
             // |
-            FilterOperatorBase left = CompileL1(reader);
+            var left = CompileL1(reader);
             if (!reader.IsRemainToken)
                 return left;
             var generate = (Func<TokenType, FilterTwoValueOperator, FilterOperatorBase>)
@@ -189,7 +189,7 @@ namespace StarryEyes.Filters.Parsing
         private static FilterOperatorBase CompileL1(TokenReader reader)
         {
             // &
-            FilterOperatorBase left = CompileL2(reader);
+            var left = CompileL2(reader);
             if (!reader.IsRemainToken)
                 return left;
             var generate = (Func<TokenType, FilterTwoValueOperator, FilterOperatorBase>)
@@ -206,7 +206,7 @@ namespace StarryEyes.Filters.Parsing
         private static FilterOperatorBase CompileL2(TokenReader reader)
         {
             // == !=
-            FilterOperatorBase left = CompileL3(reader);
+            var left = CompileL3(reader);
             if (!reader.IsRemainToken)
                 return left;
             var generate = (Func<TokenType, FilterTwoValueOperator, FilterOperatorBase>)
@@ -225,7 +225,7 @@ namespace StarryEyes.Filters.Parsing
         private static FilterOperatorBase CompileL3(TokenReader reader)
         {
             // < <= > >=
-            FilterOperatorBase left = CompileL4(reader);
+            var left = CompileL4(reader);
             if (!reader.IsRemainToken)
                 return left;
             var generate = (Func<TokenType, FilterTwoValueOperator, FilterOperatorBase>)
@@ -248,7 +248,7 @@ namespace StarryEyes.Filters.Parsing
         private static FilterOperatorBase CompileL4(TokenReader reader)
         {
             // <- -> in contains
-            FilterOperatorBase left = CompileL5(reader);
+            var left = CompileL5(reader);
             if (!reader.IsRemainToken)
                 return left;
             var generate = (Func<TokenType, FilterTwoValueOperator, FilterOperatorBase>)
@@ -279,7 +279,7 @@ namespace StarryEyes.Filters.Parsing
         private static FilterOperatorBase CompileL5(TokenReader reader)
         {
             // parse arithmetic operators
-            FilterOperatorBase left = CompileL6(reader);
+            var left = CompileL6(reader);
             if (!reader.IsRemainToken)
                 return left;
             var generate = (Func<TokenType, FilterTwoValueOperator, FilterOperatorBase>)
@@ -298,7 +298,7 @@ namespace StarryEyes.Filters.Parsing
         private static FilterOperatorBase CompileL6(TokenReader reader)
         {
             // parse arithmetic operators (faster)
-            FilterOperatorBase left = CompileL7(reader);
+            var left = CompileL7(reader);
             if (!reader.IsRemainToken)
                 return left;
             var generate = (Func<TokenType, FilterTwoValueOperator, FilterOperatorBase>)
@@ -337,7 +337,7 @@ namespace StarryEyes.Filters.Parsing
                     reader.AssertGet(TokenType.CloseBracket);
                     return new FilterBracket(null);
                 }
-                FilterOperatorBase ret = CompileL0(reader);
+                var ret = CompileL0(reader);
                 reader.AssertGet(TokenType.CloseBracket);
                 return new FilterBracket(ret);
             }
@@ -352,7 +352,7 @@ namespace StarryEyes.Filters.Parsing
             Func<TokenReader, FilterOperatorBase> selfCall)
         {
             reader.AssertGet(type);
-            FilterOperatorBase rightValue = selfCall(reader);
+            var rightValue = selfCall(reader);
             oper.LeftValue = leftValue;
             oper.RightValue = rightValue;
             return oper;
@@ -360,7 +360,7 @@ namespace StarryEyes.Filters.Parsing
 
         private static ValueBase GetValue(TokenReader reader)
         {
-            Token literal = reader.LookAhead();
+            var literal = reader.LookAhead();
             if (literal.Type == TokenType.String)
             {
                 // immediate string value
@@ -369,7 +369,7 @@ namespace StarryEyes.Filters.Parsing
             if (literal.Type == TokenType.OperatorMultiple)
             {
                 // for parsing asterisk user
-                Token pseudo = reader.AssertGet(TokenType.OperatorMultiple);
+                var pseudo = reader.AssertGet(TokenType.OperatorMultiple);
                 literal = new Token(TokenType.Literal, "*", pseudo.DebugIndex);
             }
             else
@@ -412,11 +412,11 @@ namespace StarryEyes.Filters.Parsing
 
         private static ValueBase GetAccountValue(string value, TokenReader reader)
         {
-            UserExpressionBase repl = GetUserExpr(value);
+            var repl = GetUserExpr(value);
             if (reader.IsRemainToken && reader.LookAhead().Type == TokenType.Period)
             {
                 reader.AssertGet(TokenType.Period);
-                Token literal = reader.AssertGet(TokenType.Literal);
+                var literal = reader.AssertGet(TokenType.Literal);
                 switch (literal.Value.ToLower())
                 {
                     case "friend":
@@ -446,7 +446,7 @@ namespace StarryEyes.Filters.Parsing
             }
             if (key.StartsWith("#"))
             {
-                long id = Int64.Parse(key.Substring(1));
+                var id = Int64.Parse(key.Substring(1));
                 return new UserSpecified(id);
             }
             return new UserSpecified(key);
@@ -462,7 +462,7 @@ namespace StarryEyes.Filters.Parsing
                 return selector(new User(), new Retweeter());
             }
             reader.AssertGet(TokenType.Period);
-            Token literal = reader.AssertGet(TokenType.Literal);
+            var literal = reader.AssertGet(TokenType.Literal);
             switch (literal.Value.ToLower())
             {
                 case "protected":
