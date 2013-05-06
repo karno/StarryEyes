@@ -417,27 +417,22 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public void RewindStack()
         {
-            if (_backStack.Count == 0)
+            if (_backStack.Count <= 1)
             {
+                _backStack.Clear();
                 this.Close();
+                return;
             }
             _backStack.Pop();
-            if (_backStack.Count == 0)
+            var item = _backStack.Peek();
+            this.Text = item.Item1;
+            if (this.SearchMode == item.Item2)
             {
-                this.Close();
+                this.CommitSearch();
             }
             else
             {
-                var item = _backStack.Peek();
-                this.Text = item.Item1;
-                if (this.SearchMode == item.Item2)
-                {
-                    this.CommitSearch();
-                }
-                else
-                {
-                    this.SearchMode = item.Item2;
-                }
+                this.SearchMode = item.Item2;
             }
         }
     }
