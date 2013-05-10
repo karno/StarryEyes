@@ -49,6 +49,14 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             _parent = parent;
             _model = tabModel;
             tabModel.Activate();
+            CompositeDisposable.Add(
+                Observable.FromEvent<TwitterStatus>(
+                    h => Model.Timeline.NewStatusArrival += h,
+                    h =>
+                    {
+                        if (Model.Timeline != null)
+                            Model.Timeline.NewStatusArrival -= h;
+                    }).Subscribe(_ => UnreadCount++));
             BindTimeline();
             CompositeDisposable.Add(
                 Observable.FromEvent<ScrollLockStrategy>(
@@ -116,15 +124,6 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         private void BindTimeline()
         {
-            CompositeDisposable.Add(
-                Observable.FromEvent<TwitterStatus>(
-                    h => Model.Timeline.NewStatusArrival += h,
-                    h =>
-                    {
-                        if (Model.Timeline != null)
-                            Model.Timeline.NewStatusArrival -= h;
-                    })
-                          .Subscribe(_ => UnreadCount++));
             // invalidate cache
             ReInitializeTimeline();
             IsLoading = true;

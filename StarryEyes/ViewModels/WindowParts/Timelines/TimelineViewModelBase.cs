@@ -31,6 +31,18 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         private bool _isScrollLockExplicit;
         private StatusViewModel _focusedStatus;
         private ObservableCollection<StatusViewModel> _timeline;
+        private IDisposable _currentTimelineListener;
+
+        protected TimelineViewModelBase()
+        {
+            this.CompositeDisposable.Add(() =>
+            {
+                if (_currentTimelineListener != null)
+                {
+                    _currentTimelineListener.Dispose();
+                }
+            });
+        }
 
         public ObservableCollection<StatusViewModel> Timeline
         {
@@ -49,7 +61,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         {
             lock (_collectionLock)
             {
-                CompositeDisposable.Add(
+                _currentTimelineListener =
                     new CollectionChangedEventListener(
                         TimelineModel.Statuses,
                         (sender, e) =>
@@ -58,7 +70,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                             DispatcherHolder.Enqueue(
                                 () => ReflectCollectionChanged(e, ctl),
                                 DispatcherPriority.Render);
-                        }));
+                        });
                 var collection = TimelineModel.Statuses.SynchronizedToArray(() => _isCollectionAddEnabled = true);
                 collection
                     .Select(GenerateStatusViewModel)
@@ -84,7 +96,6 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                         removal.Dispose();
                         break;
                     case NotifyCollectionChangedAction.Reset:
-                        // Rebind(ctl);
                         var cache = ctl.ToArray();
                         ctl.Clear();
                         Task.Run(() => cache.ForEach(c => c.Dispose()));
@@ -95,21 +106,6 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             }
         }
 
-        private void Rebind(ObservableCollection<StatusViewModel> ctl)
-        {
-            if (TimelineModel == null) return;
-            System.Diagnostics.Debug.WriteLine("REBIND CORE...");
-            _isCollectionAddEnabled = false;
-            var cache = ctl.ToArray();
-            ctl.Clear();
-            Task.Run(() => cache.ForEach(c => c.Dispose()));
-            var collection = TimelineModel.Statuses.ToArray();
-            _isCollectionAddEnabled = true;
-            collection
-                .Select(GenerateStatusViewModel)
-                .ForEach(ctl.Add);
-        }
-
         protected StatusViewModel GenerateStatusViewModel(StatusModel status)
         {
             return new StatusViewModel(this, status, CurrentAccounts);
@@ -117,8 +113,22 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         protected void ReInitializeTimeline()
         {
+            var prevTimeline = _timeline;
+            var prevListener = _currentTimelineListener;
             _timeline = null;
+            _currentTimelineListener = null;
             RaisePropertyChanged(() => Timeline);
+            Task.Run(() =>
+            {
+                if (prevListener != null)
+                {
+                    prevListener.Dispose();
+                }
+                if (prevTimeline != null)
+                {
+                    prevTimeline.ForEach(vm => vm.Dispose());
+                }
+            });
         }
 
         protected abstract TimelineModel TimelineModel { get; }
