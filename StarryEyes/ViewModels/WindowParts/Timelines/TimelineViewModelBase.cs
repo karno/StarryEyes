@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Threading;
@@ -61,7 +62,10 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         {
             lock (_collectionLock)
             {
-                _currentTimelineListener =
+                var composite = new CompositeDisposable();
+                _currentTimelineListener = composite;
+                composite.Add(Disposable.Create(() => _isCollectionAddEnabled = false));
+                composite.Add(
                     new CollectionChangedEventListener(
                         TimelineModel.Statuses,
                         (sender, e) =>
@@ -70,7 +74,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                             DispatcherHolder.Enqueue(
                                 () => ReflectCollectionChanged(e, ctl),
                                 DispatcherPriority.Render);
-                        });
+                        }));
                 var collection = TimelineModel.Statuses.SynchronizedToArray(() => _isCollectionAddEnabled = true);
                 collection
                     .Select(GenerateStatusViewModel)
@@ -126,7 +130,11 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                 }
                 if (prevTimeline != null)
                 {
-                    prevTimeline.ForEach(vm => vm.Dispose());
+                    lock (_collectionLock)
+                    {
+                        prevTimeline.ForEach(vm => vm.Dispose());
+                    }
+                    DispatcherHolder.Enqueue(prevTimeline.Clear, DispatcherPriority.Background);
                 }
             });
         }
