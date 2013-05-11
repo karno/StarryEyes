@@ -19,7 +19,7 @@ namespace StarryEyes
     public static class ViewModelHelperRx
     {
         public static ReadOnlyDispatcherCollectionRx<TViewModel> CreateReadOnlyDispatcherCollectionRx<TModel, TViewModel>
-            (IList<TModel> source, Func<TModel, TViewModel> converter, Dispatcher dispatcher)
+            (IList<TModel> source, Func<TModel, TViewModel> converter, Dispatcher dispatcher, DispatcherPriority priority = DispatcherPriority.Normal)
         {
             if (source == null) throw new ArgumentNullException("source");
 
@@ -31,7 +31,10 @@ namespace StarryEyes
             var gate = false;
             lock (internalLock)
             {
-                var target = new DispatcherCollectionRx<TViewModel>(initCollection, dispatcher);
+                var target = new DispatcherCollectionRx<TViewModel>(initCollection, dispatcher)
+                {
+                    CollectionChangedDispatcherPriority = priority
+                };
                 var result = new ReadOnlyDispatcherCollectionRx<TViewModel>(target);
 
                 var subscribe =

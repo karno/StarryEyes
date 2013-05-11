@@ -153,7 +153,7 @@
                                 <MenuItem Header="会話を開く(_C)">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="Click">
-                                            <ei:CallMethodAction MethodName="OpenConversation" TargetObject="{Binding}" />
+                                            <ei:CallMethodAction MethodName="ShowConversation" TargetObject="{Binding}" />
                                         </i:EventTrigger>
                                     </i:Interaction.Triggers>
                                 </MenuItem>
@@ -800,9 +800,9 @@
                                         <TextBlock VerticalAlignment="Top"
                                                    TextWrapping="Wrap"
                                                    helpers:TextBlockStylizer.LinkNavigationCommand="{Binding OpenLinkCommand,
-                                                                                                            Mode=OneTime}"
+                                                                                                             Mode=OneTime}"
                                                    helpers:TextBlockStylizer.TwitterStatus="{Binding Status,
-                                                                                                    Mode=OneTime}">
+                                                                                                     Mode=OneTime}">
                                             <i:Interaction.Behaviors>
                                                 <behaviors:TextBlockDragSelectBehavior SelectedText="{Binding SelectedText, Mode=OneWayToSource}">
                                                     <behaviors:TextBlockDragSelectBehavior.SelectContextMenu>

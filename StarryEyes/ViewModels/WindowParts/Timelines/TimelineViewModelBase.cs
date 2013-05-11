@@ -73,7 +73,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                             if (!_isCollectionAddEnabled) return;
                             DispatcherHolder.Enqueue(
                                 () => ReflectCollectionChanged(e, ctl),
-                                DispatcherPriority.Render);
+                                DispatcherPriority.Background);
                         }));
                 var collection = TimelineModel.Statuses.SynchronizedToArray(() => _isCollectionAddEnabled = true);
                 collection

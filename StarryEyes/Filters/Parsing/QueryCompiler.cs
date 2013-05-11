@@ -93,6 +93,10 @@ namespace StarryEyes.Filters.Parsing
             {"find", typeof (FilterSearch)},
             {"track", typeof (FilterTrack)},
             {"stream", typeof (FilterTrack)},
+            {"conv", typeof(FilterConversation)},
+            {"conversation", typeof(FilterConversation)},
+            {"talk", typeof(FilterConversation)},
+            {"tree", typeof(FilterConversation)},
         };
 
         /// <summary>

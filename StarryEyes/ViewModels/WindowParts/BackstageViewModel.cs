@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Threading;
 using Livet;
 using StarryEyes.Models;
 using StarryEyes.Models.Backstages;
@@ -90,7 +91,8 @@ namespace StarryEyes.ViewModels.WindowParts
             _twitterEvents = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
                 BackstageModel.TwitterEvents,
                 tev => new TwitterEventViewModel(tev),
-                DispatcherHelper.UIDispatcher);
+                DispatcherHelper.UIDispatcher,
+                DispatcherPriority.Background);
             CompositeDisposable.Add(_twitterEvents);
             _accounts = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
                 BackstageModel.Accounts,

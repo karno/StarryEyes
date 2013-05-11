@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Windows;
+using System.Windows.Threading;
 using Livet;
 using Livet.Commands;
 using StarryEyes.Breezy.Authorize;
@@ -51,7 +52,8 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
             // initialize users information
             _favoritedUsers = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
-                Model.FavoritedUsers, user => new UserViewModel(user), DispatcherHelper.UIDispatcher);
+                Model.FavoritedUsers, user => new UserViewModel(user),
+                DispatcherHelper.UIDispatcher, DispatcherPriority.Background);
             CompositeDisposable.Add(_favoritedUsers);
             CompositeDisposable.Add(
                 _favoritedUsers.ListenCollectionChanged()
@@ -62,7 +64,8 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                                    RaisePropertyChanged(() => FavoriteCount);
                                }));
             _retweetedUsers = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
-                Model.RetweetedUsers, user => new UserViewModel(user), DispatcherHelper.UIDispatcher);
+                Model.RetweetedUsers, user => new UserViewModel(user),
+                DispatcherHelper.UIDispatcher, DispatcherPriority.Background);
             CompositeDisposable.Add(_retweetedUsers);
             CompositeDisposable.Add(
                 _retweetedUsers.ListenCollectionChanged()
@@ -887,7 +890,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public void ShowConversation()
         {
-            // TODO: Implementation
+            SearchFlipModel.RequestSearch("?from conv:\"" + this.Status.Id + "\"", SearchMode.Local);
         }
 
         public void GiveFavstarTrophy()

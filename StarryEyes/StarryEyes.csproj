@@ -182,6 +182,7 @@
     <Compile Include="Filters\FilterSystemUtil.cs" />
     <Compile Include="Filters\Parsing\QueryCompiler.cs" />
     <Compile Include="Filters\Parsing\TokenReader.cs" />
+    <Compile Include="Filters\Sources\FilterConversation.cs" />
     <Compile Include="Filters\Sources\FilterList.cs" />
     <Compile Include="Filters\Sources\FilterMentions.cs" />
     <Compile Include="Filters\Sources\FilterLocal.cs" />

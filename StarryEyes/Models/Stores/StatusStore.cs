@@ -88,7 +88,10 @@ namespace StarryEyes.Models.Stores
         /// <returns>contains a tweet or empty observable.</returns>
         public static IObservable<TwitterStatus> Get(long id)
         {
-            if (_isInShutdown) return Observable.Empty<TwitterStatus>();
+            if (_isInShutdown)
+            {
+                return Observable.Empty<TwitterStatus>();
+            }
             return _store.Get(id);
         }
 
