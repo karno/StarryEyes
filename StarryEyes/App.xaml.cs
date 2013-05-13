@@ -188,6 +188,7 @@ namespace StarryEyes
             { }
         }
 
+        private static int _observedDpxCount = 0;
         private void HandleException(Exception ex)
         {
             try
@@ -195,6 +196,7 @@ namespace StarryEyes
                 var dex = ex as DataPersistenceException;
                 if (dex != null)
                 {
+                    if (Interlocked.Increment(ref _observedDpxCount) != 0) return;
                     Setting.DatabaseCorruption.Value = true;
                     Setting.Save();
                     _appMutex.Dispose();
