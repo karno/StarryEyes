@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>WPFTaskDialog</id>
+    <version>1.7.1</version>
+    <title>WPF Task Dialog</title>
+    <authors>Sean A. Hanley,  Hedley Muscroft</authors>
+    <owners>Sean A. Hanley,  Hedley Muscroft</owners>
+    <licenseUrl>http://www.codeproject.com/info/cpol10.aspx</licenseUrl>
+    <projectUrl>https://github.com/yadyn/WPF-Task-Dialog</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A TaskDialog wrapper class with fallback emulator (for XP and earlier).</description>
+    <releaseNotes>Added additional button click methods by type and index for use in callbacks
+Callback args now includes the button index if the notification is related to a click
+Radio buttons can now be programmatically clicked as well
+Added support for button enabling/disabling and setting elevation required in callbacks
+Additional info about return values in TaskDialogCallback's XML documentation
+Emulated form now correctly supports common and custom buttons when showing radio buttons, as well as a default OK when no others are specified
+Emulated form now correctly notifies callbacks when the dialog is closed via Esc, Alt+F4, etc.
+Emulated form no longer has Retry/Cancel buttons mistakenly swapped</releaseNotes>
+    <copyright>Copyright 2012</copyright>
+    <language />
+    <tags>wpf taskdialog</tags>
+  </metadata>
+</package>
