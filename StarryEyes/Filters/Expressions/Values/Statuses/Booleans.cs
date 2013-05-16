@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using StarryEyes.Models.Stores;
 using StarryEyes.Breezy.DataModel;
+using StarryEyes.Models.Stores;
 
 namespace StarryEyes.Filters.Expressions.Values.Statuses
 {
@@ -33,8 +33,8 @@ namespace StarryEyes.Filters.Expressions.Values.Statuses
 
         public override Func<TwitterStatus, bool> GetBooleanValueProvider()
         {
-            return _ => AccountRelationDataStore.AccountRelations
-                .Any(ad => _.FavoritedUsers.Contains(ad.AccountId));
+            var accounts = AccountRelationDataStore.AccountRelations.Select(a => a.AccountId).ToArray();
+            return s => s.FavoritedUsers != null && accounts.Any(a => s.FavoritedUsers.Contains(a));
         }
 
         public override string ToQuery()
@@ -52,8 +52,8 @@ namespace StarryEyes.Filters.Expressions.Values.Statuses
 
         public override Func<TwitterStatus, bool> GetBooleanValueProvider()
         {
-            return _ => AccountRelationDataStore.AccountRelations
-                .Any(ad => _.RetweetedUsers.Contains(ad.AccountId));
+            var accounts = AccountRelationDataStore.AccountRelations.Select(a => a.AccountId).ToArray();
+            return s => s.RetweetedUsers != null && accounts.Any(a => s.RetweetedUsers.Contains(a));
         }
 
         public override string ToQuery()
