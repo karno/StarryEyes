@@ -45,6 +45,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             _timelineModel = new TimelineModel(
                 _predicate = CreatePredicate(query, option),
                 (id, c, _) => Fetch(id, c));
+            this.CompositeDisposable.Add(_timelineModel);
             IsLoading = true;
             _timelineModel.ReadMore(null)
                           .Finally(() => IsLoading = false)

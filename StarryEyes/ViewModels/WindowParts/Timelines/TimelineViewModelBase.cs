@@ -119,23 +119,27 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         {
             var prevTimeline = _timeline;
             var prevListener = _currentTimelineListener;
+            if (prevListener == null && prevTimeline == null) return;
             _timeline = null;
             _currentTimelineListener = null;
             RaisePropertyChanged(() => Timeline);
-            Task.Run(() =>
+            Task.Run(async () =>
             {
                 if (prevListener != null)
                 {
                     prevListener.Dispose();
                 }
-                if (prevTimeline != null)
+                if (prevTimeline == null) return;
+                var array = await DispatcherHolder.Dispatcher.BeginInvoke(() =>
                 {
                     lock (_collectionLock)
                     {
-                        prevTimeline.ForEach(vm => vm.Dispose());
+                        var pta = prevTimeline.ToArray();
+                        prevTimeline.Clear();
+                        return pta;
                     }
-                    DispatcherHolder.Enqueue(prevTimeline.Clear, DispatcherPriority.Background);
-                }
+                }, DispatcherPriority.ContextIdle);
+                array.ForEach(a => a.Dispose());
             });
         }
 

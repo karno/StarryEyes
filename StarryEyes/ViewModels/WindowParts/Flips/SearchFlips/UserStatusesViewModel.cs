@@ -56,6 +56,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                                    return Observable.Empty<TwitterStatus>();
                                });
                 });
+            this.CompositeDisposable.Add(_timelineModel);
             IsLoading = true;
             _timelineModel.ReadMore(null)
                           .Finally(() => IsLoading = false)

@@ -136,14 +136,34 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                            user =>
                            {
                                User = new UserViewModel(user);
+                               var ps = this._statuses;
                                this._statuses = new UserStatusesViewModel(this);
                                this.RaisePropertyChanged(() => Statuses);
+                               if (ps != null)
+                               {
+                                   ps.Dispose();
+                               }
+                               var pf = this._favorites;
                                this._favorites = new UserFavoritesViewModel(this);
                                this.RaisePropertyChanged(() => Favorites);
+                               if (pf != null)
+                               {
+                                   pf.Dispose();
+                               }
+                               var pfw = this._following;
                                this._following = new UserFollowingViewModel(this);
                                this.RaisePropertyChanged(() => Following);
+                               if (pfw != null)
+                               {
+                                   pfw.Dispose();
+                               }
+                               var pfr = this._followers;
                                this._followers = new UserFollowersViewModel(this);
                                this.RaisePropertyChanged(() => Followers);
+                               if (pfr != null)
+                               {
+                                   pfr.Dispose();
+                               }
                                Observable.Start(() => AccountsStore.Accounts)
                                          .SelectMany(a => a)
                                          .Where(a => a.UserId != user.Id)
