@@ -5,6 +5,8 @@ using System.Reactive.Linq;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Filters.Expressions.Operators;
+using StarryEyes.Models;
+using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Models.Stores;
 
 namespace StarryEyes.Filters.Sources
@@ -38,7 +40,13 @@ namespace StarryEyes.Filters.Sources
         public IObservable<TwitterStatus> Receive(long? maxId)
         {
             return ReceiveSink(maxId)
-                .SelectMany(StoreHelper.NotifyAndMergeStore);
+                .SelectMany(StoreHelper.NotifyAndMergeStore)
+                .Catch((Exception ex) =>
+                {
+                    BackstageModel.RegisterEvent(
+                        new OperationFailedEvent("source: " + FilterKey + ": " + FilterValue + " => " + ex.Message));
+                    return Observable.Empty<TwitterStatus>();
+                });
         }
 
         protected virtual IObservable<TwitterStatus> ReceiveSink(long? maxId)

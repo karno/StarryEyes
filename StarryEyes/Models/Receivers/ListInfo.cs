@@ -2,7 +2,7 @@
 
 namespace StarryEyes.Models.Receivers
 {
-    public class ListInfo : IEquatable<ListInfo>
+    public class ListInfo : IEquatable<ListInfo>, IComparable<ListInfo>, IComparable
     {
         public string Slug { get; set; }
 
@@ -22,6 +22,16 @@ namespace StarryEyes.Models.Receivers
         public override int GetHashCode()
         {
             return OwnerScreenName.GetHashCode() ^ Slug.GetHashCode();
+        }
+
+        public int CompareTo(object obj)
+        {
+            return CompareTo((ListInfo)obj);
+        }
+
+        public int CompareTo(ListInfo other)
+        {
+            return (OwnerScreenName + Slug).CompareTo(other.OwnerScreenName + other.Slug);
         }
 
         public override string ToString()

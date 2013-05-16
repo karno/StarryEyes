@@ -46,7 +46,7 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
             authInfo.GetListStatuses(slug: _listInfo.Slug, owner_screen_name: _listInfo.OwnerScreenName)
                     .Subscribe(ReceiveInbox.Queue,
                                ex => BackstageModel.RegisterEvent(
-                                   new OperationFailedEvent("search receive error: \"" +
+                                   new OperationFailedEvent("list receive error: \"" +
                                                             _listInfo.ToString() + "\", " +
                                                             authInfo.UnreliableScreenName + " - " +
                                                             ex.Message)));
