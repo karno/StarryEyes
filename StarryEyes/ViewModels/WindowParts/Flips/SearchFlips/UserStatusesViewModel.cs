@@ -48,6 +48,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                         return Observable.Empty<TwitterStatus>();
                     }
                     return info.GetUserTimeline(_parent.User.User.Id, max_id: id, count: c)
+                               .Do(s => StatusStore.Store(s))
                                .OrderByDescending(s => s.CreatedAt)
                                .Catch((Exception ex) =>
                                {
