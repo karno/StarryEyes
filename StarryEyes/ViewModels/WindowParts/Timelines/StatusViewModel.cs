@@ -740,9 +740,10 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                                         "自分自身のツイートをお気に入り登録しないよう設定されています。");
                 return;
             }
+            var model = this.RetweetedOriginalModel ?? this.Model;
             var favoriteds =
                 AccountsStore.Accounts
-                             .Where(a => Model.IsFavorited(a.UserId))
+                             .Where(a => model.IsFavorited(a.UserId))
                              .Select(a => a.AuthenticateInfo)
                              .ToArray();
             MainWindowModel.ExecuteAccountSelectAction(
@@ -767,9 +768,10 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             {
                 return;
             }
+            var model = this.RetweetedOriginalModel ?? this.Model;
             var retweeteds =
                 AccountsStore.Accounts
-                             .Where(a => Model.IsRetweeted(a.UserId))
+                             .Where(a => model.IsRetweeted(a.UserId))
                              .Select(a => a.AuthenticateInfo)
                              .ToArray();
             MainWindowModel.ExecuteAccountSelectAction(
