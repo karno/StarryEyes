@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
 using Livet;
@@ -24,6 +25,12 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 {
     public class StatusViewModel : ViewModel
     {
+        private static int _instanceCount;
+        public static int InstanceCount
+        {
+            get { return _instanceCount; }
+        }
+
         private readonly ReadOnlyDispatcherCollectionRx<UserViewModel> _favoritedUsers;
         private readonly TimelineViewModelBase _parent;
         private readonly ReadOnlyDispatcherCollectionRx<UserViewModel> _retweetedUsers;
@@ -33,6 +40,9 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         private UserViewModel _recipient;
         private UserViewModel _retweeter;
         private UserViewModel _user;
+        private bool _isInReplyToExists;
+        private bool _isInReplyToLoading;
+        private bool _isInReplyToLoaded;
 
         public StatusViewModel(StatusModel status)
             : this(null, status, null)
@@ -42,6 +52,8 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         public StatusViewModel(TimelineViewModelBase parent, StatusModel status,
                                IEnumerable<long> initialBoundAccounts)
         {
+            Interlocked.Increment(ref _instanceCount);
+            CompositeDisposable.Add(() => Interlocked.Decrement(ref _instanceCount));
             _parent = parent;
             // get status model
             Model = status;
@@ -104,21 +116,9 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             }
 
             // look-up in-reply-to
-            if (!status.Status.InReplyToStatusId.HasValue) return;
-            var inReplyTo = StoreHelper.GetTweet(status.Status.InReplyToStatusId.Value)
-                                       .Subscribe(replyTo =>
-                                       {
-                                           this._inReplyTo = replyTo;
-                                           this.RaisePropertyChanged(() => this.IsInReplyToExists);
-                                           this.RaisePropertyChanged(() => this.InReplyToUserImage);
-                                           this.RaisePropertyChanged(() => this.InReplyToUserName);
-                                           this.RaisePropertyChanged(() => this.InReplyToUserScreenName);
-                                           this.RaisePropertyChanged(() => this.InReplyToBody);
-                                       });
-            this.CompositeDisposable.Add(inReplyTo);
+            _isInReplyToExists = status.Status.InReplyToStatusId.HasValue;
 
         }
-
 
         public TimelineViewModelBase Parent
         {
@@ -290,54 +290,12 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             return _bindingAccounts.Length == 1 && _bindingAccounts[0] == id;
         }
 
-        public bool IsInReplyToExists
-        {
-            get { return _inReplyTo != null; }
-        }
-
         public bool IsInReplyToMe
         {
             get
             {
                 return FilterSystemUtil.InReplyToUsers(Status)
                                        .Any(AccountsStore.AccountIds.Contains);
-            }
-        }
-
-        public Uri InReplyToUserImage
-        {
-            get
-            {
-                if (_inReplyTo == null) return null;
-                return _inReplyTo.User.ProfileImageUri;
-            }
-        }
-
-        public string InReplyToUserName
-        {
-            get
-            {
-                if (_inReplyTo == null) return null;
-                return _inReplyTo.User.Name;
-            }
-        }
-
-        public string InReplyToUserScreenName
-        {
-            get
-            {
-                if (_inReplyTo == null)
-                    return Status.InReplyToScreenName;
-                return _inReplyTo.User.ScreenName;
-            }
-        }
-
-        public string InReplyToBody
-        {
-            get
-            {
-                if (_inReplyTo == null) return null;
-                return _inReplyTo.Text;
             }
         }
 
@@ -471,6 +429,101 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             if (tuple == null) return;
             BrowserHelper.Open(tuple.Item1);
         }
+
+        #region Reply Control
+
+        private void NotifyChangeReplyInfo()
+        {
+            this.RaisePropertyChanged(() => this.IsInReplyToExists);
+            this.RaisePropertyChanged(() => this.IsInReplyToLoaded);
+            this.RaisePropertyChanged(() => this.IsInReplyToLoading);
+            this.RaisePropertyChanged(() => this.IsInReplyToAvailable);
+            this.RaisePropertyChanged(() => this.InReplyToUserImage);
+            this.RaisePropertyChanged(() => this.InReplyToUserName);
+            this.RaisePropertyChanged(() => this.InReplyToUserScreenName);
+            this.RaisePropertyChanged(() => this.InReplyToBody);
+        }
+
+        public bool IsInReplyToExists
+        {
+            get { return _isInReplyToExists; }
+        }
+
+        public bool IsInReplyToLoaded
+        {
+            get { return _isInReplyToLoaded; }
+        }
+
+        public bool IsInReplyToLoading
+        {
+            get { return _isInReplyToLoading; }
+        }
+
+        public bool IsInReplyToAvailable
+        {
+            get { return _inReplyTo != null; }
+        }
+
+        public Uri InReplyToUserImage
+        {
+            get
+            {
+                if (_inReplyTo == null) return null;
+                return _inReplyTo.User.ProfileImageUri;
+            }
+        }
+
+        public string InReplyToUserName
+        {
+            get
+            {
+                if (_inReplyTo == null) return null;
+                return _inReplyTo.User.Name;
+            }
+        }
+
+        public string InReplyToUserScreenName
+        {
+            get
+            {
+                if (_inReplyTo == null)
+                    return Status.InReplyToScreenName;
+                return _inReplyTo.User.ScreenName;
+            }
+        }
+
+        public string InReplyToBody
+        {
+            get
+            {
+                if (_inReplyTo == null) return null;
+                return _inReplyTo.Text;
+            }
+        }
+
+        private void LoadInReplyTo()
+        {
+            if (_isInReplyToLoading) return;
+            var inReplyToStatusId = this.Status.InReplyToStatusId;
+            if (inReplyToStatusId == null)
+            {
+                _isInReplyToLoaded = true;
+                this.RaisePropertyChanged(() => IsInReplyToLoaded);
+                return;
+            }
+            _isInReplyToLoading = true;
+            this.RaisePropertyChanged(() => IsInReplyToLoading);
+            StoreHelper.GetTweet(inReplyToStatusId.Value)
+                       .Subscribe(replyTo =>
+                       {
+                           this._inReplyTo = replyTo;
+                           this._isInReplyToLoaded = true;
+                           this._isInReplyToLoading = false;
+                           this.NotifyChangeReplyInfo();
+                       });
+        }
+
+        #endregion
 
         #region Text selection control
 
@@ -888,11 +941,16 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             if (psel != IsSelected) return;
             Parent.FocusedStatus =
                 Parent.FocusedStatus == this ? null : this;
+            if (Parent.FocusedStatus == this)
+            {
+                this.LoadInReplyTo();
+            }
         }
 
         public void ShowConversation()
         {
             SearchFlipModel.RequestSearch("?from conv:\"" + this.Status.Id + "\"", SearchMode.Local);
+            Parent.FocusedStatus = null;
         }
 
         public void GiveFavstarTrophy()

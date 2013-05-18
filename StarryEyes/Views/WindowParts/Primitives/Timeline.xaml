@@ -548,81 +548,94 @@
                                             <ei:CallMethodAction MethodName="ShowConversation" TargetObject="{Binding Mode=OneTime}" />
                                         </i:EventTrigger>
                                     </i:Interaction.Triggers>
-                                    <Grid Height="Auto"
-                                          Background="{x:Null}"
-                                          IsHitTestVisible="False"
-                                          Visibility="{Binding IsInReplyToExists,
-                                                               Mode=OneWay,
-                                                               Converter={StaticResource BooleanToVisibleConverter}}">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="8" />
-                                            <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition Width="48" />
-                                            <ColumnDefinition />
-                                        </Grid.ColumnDefinitions>
-                                        <Border x:Name="PseudoSpaceBorder"
-                                                Grid.Column="1"
-                                                Grid.ColumnSpan="1"
-                                                Width="0"
-                                                Height="Auto"
-                                                HorizontalAlignment="Left"
-                                                VerticalAlignment="Stretch" />
-                                        <Border Grid.RowSpan="1"
-                                                Grid.Column="2"
-                                                Grid.ColumnSpan="1"
-                                                Width="48"
-                                                Height="48"
-                                                Margin="0,7"
-                                                HorizontalAlignment="Right"
-                                                VerticalAlignment="Top"
-                                                Background="#19808080"
-                                                SnapsToDevicePixels="True">
-                                            <controls:LazyImage DecodePixelWidth="48"
-                                                                UriSource="{Binding InReplyToUserImage,
-                                                                                    Mode=OneWay}"
-                                                                UseLayoutRounding="True" />
-                                        </Border>
-                                        <StackPanel Grid.Column="3"
-                                                    Width="Auto"
-                                                    Height="Auto"
-                                                    Margin="0,7"
-                                                    HorizontalAlignment="Stretch"
-                                                    VerticalAlignment="Top">
-                                            <DockPanel Width="Auto"
-                                                       Height="Auto"
-                                                       Margin="0,-2,0,3"
-                                                       HorizontalAlignment="Stretch"
-                                                       VerticalAlignment="Stretch"
-                                                       LastChildFill="False">
-                                                <TextBlock Height="Auto"
-                                                           Margin="10,-4,2,0"
-                                                           VerticalAlignment="Bottom"
-                                                           FontFamily="Segoe UI Semibold"
-                                                           FontSize="13.333"
-                                                           Foreground="Gray"
-                                                           RenderTransformOrigin="0.5,0.5"
-                                                           Text="{Binding InReplyToUserScreenName,
-                                                                          FallbackValue=uSeR,
-                                                                          Mode=OneWay}"
-                                                           TextWrapping="NoWrap" />
-                                                <TextBlock Height="Auto"
-                                                           Margin="3,-4,3,0"
-                                                           VerticalAlignment="Bottom"
-                                                           FontFamily="Segoe UI Semilight"
-                                                           FontSize="12.667"
-                                                           Foreground="Gray"
-                                                           Text="{Binding InReplyToUserName,
-                                                                          FallbackValue=name,
-                                                                          Mode=OneWay}"
-                                                           TextWrapping="NoWrap" />
-                                            </DockPanel>
-                                            <TextBlock Margin="10,0"
-                                                       Foreground="Gray"
-                                                       Text="{Binding InReplyToBody,
-                                                                      Mode=OneWay}"
-                                                       TextWrapping="Wrap" />
+                                    <StackPanel Visibility="{Binding IsInReplyToExists, Converter={StaticResource BooleanToVisibleConverter}, Mode=OneWay}">
+                                        <StackPanel Visibility="{Binding IsInReplyToLoaded, Converter={StaticResource BooleanToVisibleConverter}, Mode=OneWay}">
+                                            <Grid Height="Auto"
+                                                  Background="{x:Null}"
+                                                  IsHitTestVisible="False"
+                                                  Visibility="{Binding IsInReplyToAvailable,
+                                                                       Converter={StaticResource BooleanToVisibleConverter},
+                                                                       Mode=OneWay}">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="8" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="48" />
+                                                    <ColumnDefinition />
+                                                </Grid.ColumnDefinitions>
+                                                <Border x:Name="PseudoSpaceBorder"
+                                                        Grid.Column="1"
+                                                        Grid.ColumnSpan="1"
+                                                        Width="0"
+                                                        Height="Auto"
+                                                        HorizontalAlignment="Left"
+                                                        VerticalAlignment="Stretch" />
+                                                <Border Grid.RowSpan="1"
+                                                        Grid.Column="2"
+                                                        Grid.ColumnSpan="1"
+                                                        Width="48"
+                                                        Height="48"
+                                                        Margin="0,7"
+                                                        HorizontalAlignment="Right"
+                                                        VerticalAlignment="Top"
+                                                        Background="#19808080"
+                                                        SnapsToDevicePixels="True">
+                                                    <controls:LazyImage DecodePixelWidth="48"
+                                                                        UriSource="{Binding InReplyToUserImage,
+                                                                                            Mode=OneWay}"
+                                                                        UseLayoutRounding="True" />
+                                                </Border>
+                                                <StackPanel Grid.Column="3"
+                                                            Width="Auto"
+                                                            Height="Auto"
+                                                            Margin="0,7"
+                                                            HorizontalAlignment="Stretch"
+                                                            VerticalAlignment="Top">
+                                                    <DockPanel Width="Auto"
+                                                               Height="Auto"
+                                                               Margin="0,-2,0,3"
+                                                               HorizontalAlignment="Stretch"
+                                                               VerticalAlignment="Stretch"
+                                                               LastChildFill="False">
+                                                        <TextBlock Height="Auto"
+                                                                   Margin="10,-4,2,0"
+                                                                   VerticalAlignment="Bottom"
+                                                                   FontFamily="Segoe UI Semibold"
+                                                                   FontSize="13.333"
+                                                                   Foreground="Gray"
+                                                                   RenderTransformOrigin="0.5,0.5"
+                                                                   Text="{Binding InReplyToUserScreenName,
+                                                                                  FallbackValue=uSeR,
+                                                                                  Mode=OneWay}"
+                                                                   TextWrapping="NoWrap" />
+                                                        <TextBlock Height="Auto"
+                                                                   Margin="3,-4,3,0"
+                                                                   VerticalAlignment="Bottom"
+                                                                   FontFamily="Segoe UI Semilight"
+                                                                   FontSize="12.667"
+                                                                   Foreground="Gray"
+                                                                   Text="{Binding InReplyToUserName,
+                                                                                  FallbackValue=name,
+                                                                                  Mode=OneWay}"
+                                                                   TextWrapping="NoWrap" />
+                                                    </DockPanel>
+                                                    <TextBlock Margin="10,0"
+                                                               Foreground="Gray"
+                                                               Text="{Binding InReplyToBody,
+                                                                              Mode=OneWay}"
+                                                               TextWrapping="Wrap" />
+                                                </StackPanel>
+                                            </Grid>
+                                            <Grid Margin="7" Visibility="{Binding IsInReplyToAvailable, Converter={StaticResource BooleanToInvisibleConverter}}">
+                                                <TextBlock Foreground="DimGray" Text="返信先を受信できませんでした。ここをクリックすると個別に抽出できます。" />
+                                            </Grid>
                                         </StackPanel>
-                                    </Grid>
+                                        <Grid Margin="7" Visibility="{Binding IsInReplyToLoading, Converter={StaticResource BooleanToVisibleConverter}}">
+                                            <Controls:MetroProgressBar Height="9"
+                                                                       HorizontalAlignment="Stretch"
+                                                                       VerticalAlignment="Center"
+                                                                       IsIndeterminate="True" />
+                                        </Grid>
+                                    </StackPanel>
                                 </Border>
                                 <Grid Grid.Row="1"
                                       Width="Auto"
