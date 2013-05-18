@@ -291,6 +291,9 @@
                 <TextBlock Margin="8"
                            Text="{Binding StateString}"
                            ToolTip="ここをクリックすると、バックステージを開くことができます。" />
+                <TextBlock Margin="8"
+                           HorizontalAlignment="Right"
+                           Text="{Binding InstanceCount}" />
                 <StackPanel Grid.Column="1"
                             Margin="8"
                             Orientation="Horizontal"

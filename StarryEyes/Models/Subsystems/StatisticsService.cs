@@ -1,19 +1,58 @@
 ﻿using System;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using StarryEyes.Models.Stores;
+using StarryEyes.ViewModels.WindowParts.Timelines;
 
 namespace StarryEyes.Models.Subsystems
 {
     /// <summary>
-    /// Provides statistics functionalities.
+    ///     Provides statistics functionalities.
     /// </summary>
     public static class StatisticsService
     {
+        private static DateTime _timestamp = DateTime.Now;
+
+        private static readonly object StatisticsWorkProcSync = new object();
+        private static volatile bool _isThreadAlive = true;
+
+        private static int _estimatedGrossTweetCount;
+
+        private static int _currentInstanceCount;
+
+        private static readonly int[] _tweetsCountArray = new[] { 0, 0, 0, 0, 0, 0 };
+
+        private static int _currentChannel = -1;
+
+        /// <summary>
+        ///     Gross tweet count (ESTIMATED, not ACTUAL)
+        /// </summary>
+        public static int EstimatedGrossTweetCount
+        {
+            get { return _estimatedGrossTweetCount; }
+        }
+
+        public static int CurrentInstanceCount
+        {
+            get { return _currentInstanceCount; }
+        }
+
+        /// <summary>
+        ///     Tweets per seconds, estimated.
+        /// </summary>
+        public static int TweetsPerMinutes
+        {
+            get
+            {
+                return _tweetsCountArray.Sum();
+            }
+        }
+
         public static void Initialize()
         {
-            Observable.Interval(TimeSpan.FromSeconds(0.5))
+            Observable.Interval(TimeSpan.FromSeconds(10))
                       .Subscribe(_ =>
                       {
                           lock (StatisticsWorkProcSync)
@@ -25,10 +64,7 @@ namespace StarryEyes.Models.Subsystems
             App.ApplicationFinalize += StopThread;
             Task.Factory.StartNew(UpdateStatisticWorkProc, TaskCreationOptions.LongRunning);
         }
-        private static DateTime _timestamp = DateTime.Now;
 
-        private static readonly object StatisticsWorkProcSync = new object();
-        private static volatile bool _isThreadAlive = true;
         private static void StopThread()
         {
             lock (StatisticsWorkProcSync)
@@ -39,7 +75,7 @@ namespace StarryEyes.Models.Subsystems
         }
 
         /// <summary>
-        /// Work procedure
+        ///     Work procedure
         /// </summary>
         private static void UpdateStatisticWorkProc()
         {
@@ -51,22 +87,15 @@ namespace StarryEyes.Models.Subsystems
                     Monitor.Wait(StatisticsWorkProcSync);
                 }
                 if (!_isThreadAlive) return;
-                // update statistics params
 
-                // TODO: Improve algorithm.
+                // update statistics params
+                _currentInstanceCount = StatusViewModel.InstanceCount;
                 var previousGross = _estimatedGrossTweetCount;
                 _estimatedGrossTweetCount = StatusStore.Count;
-                var previousTimestamp = _timestamp;
-                _timestamp = DateTime.Now;
-                var duration = (_timestamp - previousTimestamp).TotalSeconds;
-                if (duration > 0)
-                {
-                    // current period of tweets per seconds
-                    var cptps = (_estimatedGrossTweetCount - previousGross) / duration;
-                    // smoothing: 119:1
-                    // -> 
-                    _tweetsPerSeconds = (_tweetsPerSeconds * 119 + cptps) / 120;
-                }
+
+                _currentChannel = (_currentChannel + 1) % 6;
+                _tweetsCountArray[_currentChannel] = _estimatedGrossTweetCount - previousGross;
+
                 var handler = StatisticsParamsUpdated;
                 if (handler != null)
                     handler();
@@ -74,29 +103,8 @@ namespace StarryEyes.Models.Subsystems
         }
 
         /// <summary>
-        /// Events callbacked when statistics parameters are updated.
+        ///     Events callbacked when statistics parameters are updated.
         /// </summary>
         public static event Action StatisticsParamsUpdated;
-
-        private static int _estimatedGrossTweetCount;
-        /// <summary>
-        /// Gross tweet count (ESTIMATED, not ACTUAL)
-        /// </summary>
-        public static int EstimatedGrossTweetCount
-        {
-            get { return _estimatedGrossTweetCount; }
-        }
-
-        private static double _tweetsPerSeconds;
-        /// <summary>
-        /// Tweets per seconds, estimated.
-        /// </summary>
-        public static double TweetsPerSeconds
-        {
-            get
-            {
-                return _tweetsPerSeconds;
-            }
-        }
     }
 }

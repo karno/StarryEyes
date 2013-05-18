@@ -170,11 +170,8 @@ namespace StarryEyes.ViewModels
                     h => MainWindowModel.StateStringChanged -= h)
                           .Subscribe(_ => RaisePropertyChanged(() => StateString)));
             CompositeDisposable.Add(
-                Observable.FromEvent(
-                    h => StatisticsService.StatisticsParamsUpdated += h,
-                    h => StatisticsService.StatisticsParamsUpdated -= h)
+                Observable.Interval(TimeSpan.FromSeconds(0.5))
                           .Subscribe(_ => UpdateStatistics()));
-
             CompositeDisposable.Add(
                 Observable.FromEvent<AccountSelectDescription>(
                     h => MainWindowModel.AccountSelectActionRequested += h,
@@ -292,7 +289,12 @@ namespace StarryEyes.ViewModels
 
         public string TweetsPerMinutes
         {
-            get { return (StatisticsService.TweetsPerSeconds * 60).ToString("0.0"); }
+            get { return (StatisticsService.TweetsPerMinutes).ToString(); }
+        }
+
+        public string InstanceCount
+        {
+            get { return (StatisticsService.CurrentInstanceCount).ToString(); }
         }
 
         public int GrossTweetCount
@@ -315,6 +317,7 @@ namespace StarryEyes.ViewModels
 
         private void UpdateStatistics()
         {
+            RaisePropertyChanged(() => InstanceCount);
             RaisePropertyChanged(() => TweetsPerMinutes);
             RaisePropertyChanged(() => GrossTweetCount);
             RaisePropertyChanged(() => StartupTime);
