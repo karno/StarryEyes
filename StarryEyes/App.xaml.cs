@@ -196,7 +196,7 @@ namespace StarryEyes
                 var dex = ex as DataPersistenceException;
                 if (dex != null)
                 {
-                    if (Interlocked.Increment(ref _observedDpxCount) != 0) return;
+                    if (Interlocked.Increment(ref _observedDpxCount) != 1) return;
                     Setting.DatabaseCorruption.Value = true;
                     Setting.Save();
                     _appMutex.Dispose();
