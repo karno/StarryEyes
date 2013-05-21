@@ -36,7 +36,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
         {
             this._parent = parent;
             this._timelineModel = new TimelineModel(
-                s => s.User.Id == parent.User.User.Id,
+                _ => false,
                 (id, c, _) =>
                 {
                     var info = AccountsStore.Accounts
