@@ -36,11 +36,24 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         protected TimelineViewModelBase()
         {
-            this.CompositeDisposable.Add(() =>
+            this.CompositeDisposable.Add(async () =>
             {
                 if (_currentTimelineListener != null)
                 {
                     _currentTimelineListener.Dispose();
+                }
+                if (_timeline != null)
+                {
+                    var array = await DispatcherHolder.Dispatcher.BeginInvoke(() =>
+                    {
+                        lock (_collectionLock)
+                        {
+                            var pta = _timeline.ToArray();
+                            _timeline.Clear();
+                            return pta;
+                        }
+                    }, DispatcherPriority.ContextIdle);
+                    array.ForEach(a => a.Dispose());
                 }
             });
         }
@@ -62,6 +75,10 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         {
             lock (_collectionLock)
             {
+                if (_currentTimelineListener != null)
+                {
+                    throw new InvalidOperationException();
+                }
                 var composite = new CompositeDisposable();
                 _currentTimelineListener = composite;
                 composite.Add(Disposable.Create(() => _isCollectionAddEnabled = false));
