@@ -1,6 +1,6 @@
 ﻿namespace StarryEyes.Casket.DataModels
 {
-    class StatusEntity
+    public class StatusEntity
     {
     }
 }

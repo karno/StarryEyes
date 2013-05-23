@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
-using System.Threading;
 using StarryEyes.Breezy.Util;
 using StarryEyes.Vanille.Serialization;
 
@@ -137,7 +136,6 @@ namespace StarryEyes.Breezy.DataModel
         /// </summary>
         [DataMember]
         public TwitterEntity[] Entities { get; set; }
-
 
         public string Permalink
         {
