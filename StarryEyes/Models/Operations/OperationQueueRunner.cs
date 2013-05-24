@@ -64,7 +64,6 @@ namespace StarryEyes.Models.Operations
                 return;
             }
 
-
             var operation = DequeueOperation();
 
             if (operation == null)
