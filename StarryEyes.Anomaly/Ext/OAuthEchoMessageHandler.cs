@@ -4,7 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using AsyncOAuth;
 
-namespace StarryEyes.Octave.Ext
+namespace StarryEyes.Anomaly.Ext
 {
     public class OAuthEchoMessageHandler : DelegatingHandler
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 
-namespace StarryEyes.Octave.Utils
+namespace StarryEyes.Anomaly.Utils
 {
     public static class HttpUtility
     {

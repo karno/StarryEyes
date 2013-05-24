@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace StarryEyes.Octave.Parsings.StreamModels
+namespace StarryEyes.Anomaly.Parsings.StreamModels
 {
-    class StreamDelete
+    class StreamListActivity
     {
     }
 }

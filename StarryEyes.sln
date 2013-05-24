@@ -23,7 +23,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AutoUpdateServices", "AutoU
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Detective", "Detective\Detective.csproj", "{F26CDB6B-3D72-4240-BC11-CEB7351672F1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarryEyes.Octave", "StarryEyes.Octave\StarryEyes.Octave.csproj", "{564E23DE-AB35-45B6-B331-395C3943BC23}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarryEyes.Anomaly", "StarryEyes.Anomaly\StarryEyes.Anomaly.csproj", "{564E23DE-AB35-45B6-B331-395C3943BC23}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarryEyes.Casket", "StarryEyes.Casket\StarryEyes.Casket.csproj", "{68D29283-9AF2-413D-890B-0D256973174B}"
 EndProject

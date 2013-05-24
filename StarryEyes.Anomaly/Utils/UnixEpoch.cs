@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace StarryEyes.Octave.Utils
+namespace StarryEyes.Anomaly.Utils
 {
     public static class UnixEpoch
     {

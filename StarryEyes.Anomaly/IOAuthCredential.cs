@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Net.Http;
 using AsyncOAuth;
-using StarryEyes.Octave.Ext;
+using StarryEyes.Anomaly.Ext;
 
-namespace StarryEyes.Octave
+namespace StarryEyes.Anomaly
 {
     public interface IOAuthCredential
     {
@@ -18,11 +18,21 @@ namespace StarryEyes.Octave
 
     public static class OAuthCredentialExtension
     {
+        private static string GetConsumerKey(this IOAuthCredential credential)
+        {
+            return credential.OAuthConsumerKey ?? Core.DefaultConsumerKey;
+        }
+
+        private static string GetConsumerSecret(this IOAuthCredential credential)
+        {
+            return credential.OAuthConsumerSecret ?? Core.DefaultConsumerSecret;
+        }
+
         public static HttpClient CreateOAuthClient(this IOAuthCredential credential,
-            IEnumerable<KeyValuePair<string, string>> optionalHeaders = null)
+                IEnumerable<KeyValuePair<string, string>> optionalHeaders = null)
         {
             return OAuthUtility.CreateOAuthClient(
-                credential.OAuthConsumerKey, credential.OAuthConsumerSecret,
+                credential.GetConsumerKey(), credential.GetConsumerSecret(),
                 new AccessToken(credential.OAuthAccessToken, credential.OAuthAccessTokenSecret),
                 optionalHeaders);
         }
@@ -33,7 +43,8 @@ namespace StarryEyes.Octave
         {
             return new HttpClient(
                 new OAuthEchoMessageHandler(
-                    serviceProvider, realm, credential.OAuthConsumerKey, credential.OAuthConsumerSecret,
+                    serviceProvider, realm,
+                    credential.GetConsumerKey(), credential.GetConsumerSecret(),
                     new AccessToken(credential.OAuthAccessToken, credential.OAuthAccessTokenSecret),
                     optionalHeaders));
         }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace StarryEyes.Octave.Parsings
+namespace StarryEyes.Anomaly.Parsings
 {
     class JsonConverter
     {
