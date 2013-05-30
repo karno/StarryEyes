@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace StarryEyes.Models.Operations
 {
@@ -23,13 +23,13 @@ namespace StarryEyes.Models.Operations
 
         private static int _runningConcurrency;
 
-        private static readonly Mutex OperationQueueMutex = new Mutex(false, "STARRYEYES_OPERATION_QUEUE_MUTEX");
+        private static readonly Mutex _operationQueueMutex = new Mutex(false, "STARRYEYES_OPERATION_QUEUE_MUTEX");
 
-        private static readonly Queue<IRunnerQueueable> HighPriorityQueue = new Queue<IRunnerQueueable>();
+        private static readonly Queue<IRunnerQueueable> _highPriorityQueue = new Queue<IRunnerQueueable>();
 
-        private static readonly Queue<IRunnerQueueable> MiddlePriorityQueue = new Queue<IRunnerQueueable>();
+        private static readonly Queue<IRunnerQueueable> _middlePriorityQueue = new Queue<IRunnerQueueable>();
 
-        private static readonly Queue<IRunnerQueueable> LowPriorityQueue = new Queue<IRunnerQueueable>();
+        private static readonly Queue<IRunnerQueueable> _lowPriorityQueue = new Queue<IRunnerQueueable>();
 
         /// <summary>
         /// Queue item to reserve running.
@@ -39,13 +39,13 @@ namespace StarryEyes.Models.Operations
             switch (priority)
             {
                 case OperationPriority.High:
-                    Lock(() => HighPriorityQueue.Enqueue(runnable));
+                    Lock(() => _highPriorityQueue.Enqueue(runnable));
                     break;
                 case OperationPriority.Middle:
-                    Lock(() => MiddlePriorityQueue.Enqueue(runnable));
+                    Lock(() => _middlePriorityQueue.Enqueue(runnable));
                     break;
                 case OperationPriority.Low:
-                    Lock(() => LowPriorityQueue.Enqueue(runnable));
+                    Lock(() => _lowPriorityQueue.Enqueue(runnable));
                     break;
             }
             SpawnNewRunner();
@@ -75,15 +75,22 @@ namespace StarryEyes.Models.Operations
             else
             {
                 // operation acquired.
-                Observable.Defer(() => Observable.Return(operation))
-                    .ObserveOn(TaskPoolScheduler.Default)
-                    .SelectMany(_ => _.Run())
-                    .Finally(() =>
+                Task.Factory.StartNew(async () =>
+                {
+                    try
+                    {
+                        while (operation != null)
+                        {
+                            await operation.Run().LastOrDefaultAsync();
+                            operation = DequeueOperation();
+                        }
+                    }
+                    finally
                     {
                         Interlocked.Decrement(ref _runningConcurrency);
                         SpawnNewRunner();
-                    })
-                    .Subscribe();
+                    }
+                });
             }
         }
 
@@ -91,12 +98,12 @@ namespace StarryEyes.Models.Operations
         {
             return Lock(() =>
             {
-                if (HighPriorityQueue.Count > 0)
-                    return HighPriorityQueue.Dequeue();
-                if (MiddlePriorityQueue.Count > 0)
-                    return MiddlePriorityQueue.Dequeue();
-                if (LowPriorityQueue.Count > 0)
-                    return LowPriorityQueue.Dequeue();
+                if (_highPriorityQueue.Count > 0)
+                    return _highPriorityQueue.Dequeue();
+                if (_middlePriorityQueue.Count > 0)
+                    return _middlePriorityQueue.Dequeue();
+                if (_lowPriorityQueue.Count > 0)
+                    return _lowPriorityQueue.Dequeue();
                 return null;
             });
         }
@@ -108,7 +115,7 @@ namespace StarryEyes.Models.Operations
 
         private static T Lock<T>(Func<T> func)
         {
-            if (!OperationQueueMutex.WaitOne(10000))
+            if (!_operationQueueMutex.WaitOne(10000))
                 throw new InvalidOperationException("DEAD LOCK In Operation Queue Runner.");
             try
             {
@@ -116,7 +123,7 @@ namespace StarryEyes.Models.Operations
             }
             finally
             {
-                OperationQueueMutex.ReleaseMutex();
+                _operationQueueMutex.ReleaseMutex();
             }
         }
     }

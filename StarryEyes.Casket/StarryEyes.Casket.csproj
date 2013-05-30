@@ -63,17 +63,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core.cs" />
-    <Compile Include="DataModels\List.cs" />
-    <Compile Include="DataModels\Status.cs" />
-    <Compile Include="DataModels\StatusEntity.cs" />
-    <Compile Include="DataModels\User.cs" />
-    <Compile Include="DataModels\UserEntity.cs" />
+    <Compile Include="DataModels\DbList.cs" />
+    <Compile Include="DataModels\DbStatus.cs" />
+    <Compile Include="DataModels\DbEntity.cs" />
+    <Compile Include="DataModels\DbUser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SQLiteInternal\SQLiteHelper.cs" />
     <Compile Include="SQLiteInternal\SQLiteInitializer.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Indexing\" />
+    <Folder Include="Cache\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\StarryEyes.Albireo\StarryEyes.Albireo.csproj">

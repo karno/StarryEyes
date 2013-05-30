@@ -2,16 +2,8 @@
 
 namespace StarryEyes.Casket.DataModels
 {
-    public class Status
+    public class DbStatus
     {
-        public const string TwitterStatusUrl = "https://twitter.com/{0}/status/{1}";
-        public const string FavstarStatusUrl = "http://favstar.fm/users/{0}/status/{1}";
-
-        public Status()
-        {
-            Entities = new StatusEntity[0];
-        }
-
         /// <summary>
         /// Numerical ID of this tweet/message.
         /// </summary>
@@ -32,7 +24,8 @@ namespace StarryEyes.Casket.DataModels
         /// </summary>
         public string Text { get; set; }
 
-        public string NGramText { get; set; }
+        // todo 
+        // public string NGramText { get; set; }
 
         /// <summary>
         /// Created at of this tweet/message.
@@ -65,6 +58,7 @@ namespace StarryEyes.Casket.DataModels
         /// Tweet Id which retweeted as this.
         /// </summary>
         public long? RetweetedOriginalId { get; set; }
+
         /// <summary>
         /// Geographic point, represents longitude.
         /// </summary>
@@ -77,12 +71,21 @@ namespace StarryEyes.Casket.DataModels
 
         #endregion
 
-        #region
+        #region Direct Message
 
         public long? RecipientUserId { get; set; }
 
         #endregion
 
-        public StatusEntity[] Entities { get; set; }
+        public override bool Equals(object obj)
+        {
+            var casted = obj as DbStatus;
+            return casted != null && this.Id == casted.Id;
+        }
+
+        public override int GetHashCode()
+        {
+            return this.Id.GetHashCode();
+        }
     }
 }

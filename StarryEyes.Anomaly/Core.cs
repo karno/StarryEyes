@@ -12,7 +12,13 @@ namespace StarryEyes.Anomaly
         public static void Initialize()
         {
             // init oauth util
-            OAuthUtility.ComputeHash = (key, buffer) => { using (var hmac = new HMACSHA1(key)) { return hmac.ComputeHash(buffer); } };
+            OAuthUtility.ComputeHash = (key, buffer) =>
+            {
+                using (var hmac = new HMACSHA1(key))
+                {
+                    return hmac.ComputeHash(buffer);
+                }
+            };
         }
     }
 }

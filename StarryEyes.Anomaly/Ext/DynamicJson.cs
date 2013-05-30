@@ -7,6 +7,7 @@
 * http://neue.cc/
 * http://dynamicjson.codeplex.com/
 *--------------------------------------------------------------------------*/
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -20,7 +21,7 @@ using System.Text;
 using System.Xml;
 using System.Xml.Linq;
 
-namespace Codeplex.Data
+namespace StarryEyes.Anomaly.Ext
 {
     public class DynamicJson : DynamicObject
     {
