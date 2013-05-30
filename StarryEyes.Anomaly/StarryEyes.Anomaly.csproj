@@ -67,9 +67,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core.cs" />
+    <Compile Include="Ext\BearerMessageHandler.cs" />
     <Compile Include="Imaging\ImageResolver.cs" />
     <Compile Include="OAuthCredentialExtension.cs" />
     <Compile Include="TwitterApi\DataModels\StreamModels\StreamDisconnect.cs" />
+    <Compile Include="TwitterApi\DataModels\TwitterConfiguration.cs" />
     <Compile Include="TwitterApi\DataModels\TwitterEntity.cs" />
     <Compile Include="TwitterApi\DataModels\TwitterList.cs" />
     <Compile Include="TwitterApi\DataModels\TwitterStatus.cs" />
@@ -79,6 +81,9 @@
     <Compile Include="IOAuthCredential.cs" />
     <Compile Include="TwitterApi\ApiEndpoint.cs" />
     <Compile Include="TwitterApi\Rest\Accounts.cs" />
+    <Compile Include="TwitterApi\Rest\Help.cs" />
+    <Compile Include="TwitterApi\Rest\ResultHandlers.cs" />
+    <Compile Include="TwitterApi\Rest\Timelines.cs" />
     <Compile Include="TwitterApi\Streaming\IStreamHandler.cs" />
     <Compile Include="TwitterApi\DataModels\StreamModels\StreamUserActivity.cs" />
     <Compile Include="TwitterApi\DataModels\StreamModels\StreamDelete.cs" />

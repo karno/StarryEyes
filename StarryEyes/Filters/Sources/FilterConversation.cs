@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using StarryEyes.Albireo.Data;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Models.Stores;
-using StarryEyes.Vanille.DataStore;
 
 namespace StarryEyes.Filters.Sources
 {

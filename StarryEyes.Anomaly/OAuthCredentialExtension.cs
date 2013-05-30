@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Http;
 using AsyncOAuth;
 using StarryEyes.Anomaly.Ext;
+using StarryEyes.Anomaly.Utils;
 
 namespace StarryEyes.Anomaly
 {
@@ -48,12 +49,21 @@ namespace StarryEyes.Anomaly
             return new HttpClientHandler();
         }
 
-        internal static FormUrlEncodedContent Parametalize(this Dictionary<string, object> dict)
+        internal static FormUrlEncodedContent ParametalizeForPost(this Dictionary<string, object> dict)
         {
             return new FormUrlEncodedContent(
-                dict.Keys.Select(key => new { key, value = dict[key] })
-                    .Where(t => t.value != null)
-                    .Select(kvp => new KeyValuePair<string, string>(kvp.key, kvp.value.ToString())));
+                dict.Where(kvp => kvp.Value != null)
+                    .Select(kvp => new KeyValuePair<string, string>(kvp.Key, kvp.Value.ToString())));
+        }
+
+        internal static string ParametalizeForGet(this Dictionary<string, object> dict)
+        {
+            return dict.Where(kvp => kvp.Value != null)
+                       .OrderBy(kvp => kvp.Key)
+                       .Select(kvp => HttpUtility.UrlEncode(kvp.Key) +
+                                      "=" +
+                                      HttpUtility.UrlEncode(kvp.Value.ToString()))
+                       .JoinString("&");
         }
     }
 }
