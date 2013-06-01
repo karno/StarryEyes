@@ -1,16 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
+using StarryEyes.Anomaly.Utils;
 
 namespace StarryEyes.Anomaly.TwitterApi.DataModels
 {
     public class TwitterList
     {
+        private const string TwitterListUriPrefix = "http://twitter.com";
+
         public TwitterList() { }
         public TwitterList(dynamic json)
         {
+            Id = Int64.Parse(json.id_str);
+            User = new TwitterUser(json.user);
+            Name = json.name;
+            FullName = json.full_name;
+            Uri = new Uri(TwitterListUriPrefix + json.uri);
+            Slug = json.slug;
+            ListMode = String.Equals(json.mode, "public", StringComparison.InvariantCultureIgnoreCase)
+                           ? ListMode.Public
+                           : ListMode.Private;
+            Description = json.description;
+            MemberCount = json.member_count;
+            SubscriberCount = json.subscriber_count;
+            CreatedAt = ((string)json.created_at).ParseDateTime(ParsingExtension.TwitterDateTimeFormat);
         }
-
-        public DateTime Timestamp { get; set; }
 
         /// <summary>
         /// ID of this list.

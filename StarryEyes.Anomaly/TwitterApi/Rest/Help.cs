@@ -1,6 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using StarryEyes.Anomaly.Ext;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Anomaly.TwitterApi.Rest.Infrastructure;
 
 namespace StarryEyes.Anomaly.TwitterApi.Rest
 {
@@ -8,6 +10,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
     {
         public static async Task<TwitterConfiguration> GetConfiguration(this IOAuthCredential credential)
         {
+            if (credential == null) throw new ArgumentNullException("credential");
             var client = credential.CreateOAuthClient();
             var json = await client.GetStringAsync(new ApiAccess("help/configuration.json"));
             return new TwitterConfiguration(DynamicJson.Parse(json));

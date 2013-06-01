@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
-using StarryEyes.Anomaly.Ext;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Anomaly.TwitterApi.Rest.Infrastructure;
 
 namespace StarryEyes.Anomaly.TwitterApi.Rest
 {
@@ -11,6 +12,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
         public static async Task<TwitterUser> VerifyCredential(
             this IOAuthCredential credential)
         {
+            if (credential == null) throw new ArgumentNullException("credential");
             var param = new Dictionary<string, object>
             {
                 {"skip_status", true}
@@ -25,6 +27,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             string name = null, string url = null,
             string location = null, string description = null)
         {
+            if (credential == null) throw new ArgumentNullException("credential");
             var param = new Dictionary<string, object>
             {
                 {"name", name},
@@ -42,6 +45,8 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             this IOAuthCredential credential,
             byte[] image)
         {
+            if (credential == null) throw new ArgumentNullException("credential");
+            if (image == null) throw new ArgumentNullException("image");
             var content = new MultipartFormDataContent
             {
                 {new StringContent("true"), "skip_status"},

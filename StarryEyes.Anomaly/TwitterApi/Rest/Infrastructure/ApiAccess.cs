@@ -1,4 +1,4 @@
-﻿namespace StarryEyes.Anomaly.TwitterApi.Rest
+﻿namespace StarryEyes.Anomaly.TwitterApi.Rest.Infrastructure
 {
     public class ApiAccess
     {
@@ -7,15 +7,15 @@
 
         public ApiAccess(string path, string param = null)
         {
-            _path = path;
-            _param = param;
+            this._path = path;
+            this._param = param;
         }
 
         public override string ToString()
         {
             return ApiEndpoint.ApiEndpointPrefix +
-                   (_path.StartsWith("/") ? _path.Substring(1) : _path) +
-                   (string.IsNullOrEmpty(_param) ? "" : ("?" + _param));
+                   (this._path.StartsWith("/") ? this._path.Substring(1) : this._path) +
+                   (string.IsNullOrEmpty(this._param) ? "" : ("?" + this._param));
         }
 
         public static implicit operator string(ApiAccess access)

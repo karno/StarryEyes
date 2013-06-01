@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Anomaly.TwitterApi.Rest.Infrastructure;
 
 namespace StarryEyes.Anomaly.TwitterApi.Rest
 {
@@ -10,6 +12,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             this IOAuthCredential credential,
             int? count = null, long? sinceId = null, long? maxId = null)
         {
+            if (credential == null) throw new ArgumentNullException("credential");
             var param = new Dictionary<string, object>
             {
                 {"count", count},
@@ -21,11 +24,13 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return await response.ReadAsStatusCollectionAsync();
         }
 
+        #region User timeline
         public static Task<IEnumerable<TwitterStatus>> GetUserTimeline(
             this IOAuthCredential credential, long userId,
             int? count = null, long? sinceId = null, long? maxId = null,
             bool? excludeReplies = null)
         {
+            if (credential == null) throw new ArgumentNullException("credential");
             return GetUserTimelineCore(credential, userId, null, count, sinceId, maxId, excludeReplies);
         }
 
@@ -34,11 +39,13 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             int? count = null, long? sinceId = null, long? maxId = null,
             bool? excludeReplies = null)
         {
+            if (credential == null) throw new ArgumentNullException("credential");
+            if (screenName == null) throw new ArgumentNullException("screenName");
             return GetUserTimelineCore(credential, null, screenName, count, sinceId, maxId, excludeReplies);
         }
 
         private static async Task<IEnumerable<TwitterStatus>> GetUserTimelineCore(
-            this IOAuthCredential credential, long? userId, string screenName,
+            IOAuthCredential credential, long? userId, string screenName,
             int? count, long? sinceId, long? maxId, bool? excludeReplies)
         {
             var param = new Dictionary<string, object>
@@ -55,6 +62,40 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return await response.ReadAsStatusCollectionAsync();
         }
 
+        #endregion
 
+        public static async Task<IEnumerable<TwitterStatus>> GetMentions(
+            this IOAuthCredential credential,
+            int? count = null, long? sinceId = null, long? maxId = null,
+            bool? includeRts = null)
+        {
+            if (credential == null) throw new ArgumentNullException("credential");
+            var param = new Dictionary<string, object>
+            {
+                {"count", count},
+                {"since_id", sinceId},
+                {"max_id", maxId},
+                {"include_rts", includeRts},
+            }.ParametalizeForGet();
+            var client = credential.CreateOAuthClient();
+            var response = await client.GetAsync(new ApiAccess("statuses/mentions_timeline.json", param));
+            return await response.ReadAsStatusCollectionAsync();
+        }
+
+        public static async Task<IEnumerable<TwitterStatus>> GetRetweetsOfMe(
+            this IOAuthCredential credential,
+            int? count = null, long? sinceId = null, long? maxId = null)
+        {
+            if (credential == null) throw new ArgumentNullException("credential");
+            var param = new Dictionary<string, object>
+            {
+                {"count", count},
+                {"since_id", sinceId},
+                {"max_id", maxId},
+            }.ParametalizeForGet();
+            var client = credential.CreateOAuthClient();
+            var response = await client.GetAsync(new ApiAccess("statuses/retweets_of_me.json", param));
+            return await response.ReadAsStatusCollectionAsync();
+        }
     }
 }
