@@ -1,14 +1,16 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Text;
 using StarryEyes.Anomaly.Utils;
+using StarryEyes.Vanille.Serialization;
 
 namespace StarryEyes.Anomaly.TwitterApi.DataModels
 {
     /// <summary>
     /// Represents twitter status.
     /// </summary>
-    public class TwitterStatus
+    public class TwitterStatus : IBinarySerializable
     {
         public const string TwitterStatusUrl = "https://twitter.com/{0}/status/{1}";
         public const string FavstarStatusUrl = "http://favstar.fm/users/{0}/status/{1}";
@@ -139,6 +141,20 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
 
         #endregion
 
+        #region Infrastructure
+
+        /// <summary>
+        /// Favorited users IDs.
+        /// </summary>
+        public long[] FavoritedUsers { get; set; }
+
+        /// <summary>
+        /// Retweeted users IDs.
+        /// </summary>
+        public long[] RetweetedUsers { get; set; }
+
+        #endregion
+
         /// <summary>
         /// Entities of this tweet
         /// </summary>
@@ -235,6 +251,83 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
         public override int GetHashCode()
         {
             return Id.GetHashCode();
+        }
+
+        public void Serialize(BinaryWriter writer)
+        {
+            writer.Write(Id);
+            writer.Write((int)StatusType);
+            writer.Write(User);
+            writer.Write(Text);
+            writer.Write(CreatedAt);
+            writer.Write(Source != null);
+            if (Source != null)
+            {
+                writer.Write(Source);
+            }
+            writer.Write(InReplyToStatusId);
+            writer.Write(InReplyToUserId);
+            writer.Write(InReplyToScreenName != null);
+            if (InReplyToScreenName != null)
+            {
+                writer.Write(InReplyToScreenName);
+            }
+            writer.Write(RetweetedOriginalId);
+            writer.Write(Latitude);
+            writer.Write(Longitude);
+            writer.Write(FavoritedUsers != null);
+            if (FavoritedUsers != null)
+            {
+                writer.Write(FavoritedUsers);
+            }
+            writer.Write(RetweetedUsers != null);
+            if (RetweetedUsers != null)
+            {
+                writer.Write(RetweetedUsers);
+            }
+            writer.Write(RetweetedOriginal);
+            writer.Write(Recipient);
+            writer.Write(Entities != null);
+            if (Entities != null)
+            {
+                writer.Write(Entities);
+            }
+        }
+
+        public void Deserialize(BinaryReader reader)
+        {
+            Id = reader.ReadInt64();
+            StatusType = (StatusType)reader.ReadInt32();
+            User = reader.ReadObject<TwitterUser>();
+            Text = reader.ReadString();
+            CreatedAt = reader.ReadDateTime();
+            if (reader.ReadBoolean())
+            {
+                Source = reader.ReadString();
+            }
+            InReplyToStatusId = reader.ReadNullableLong();
+            InReplyToUserId = reader.ReadNullableLong();
+            if (reader.ReadBoolean())
+            {
+                InReplyToScreenName = reader.ReadString();
+            }
+            RetweetedOriginalId = reader.ReadNullableLong();
+            Latitude = reader.ReadNullableDouble();
+            Longitude = reader.ReadNullableDouble();
+            if (reader.ReadBoolean())
+            {
+                FavoritedUsers = reader.ReadIds().ToArray();
+            }
+            if (reader.ReadBoolean())
+            {
+                RetweetedUsers = reader.ReadIds().ToArray();
+            }
+            RetweetedOriginal = reader.ReadObject<TwitterStatus>();
+            Recipient = reader.ReadObject<TwitterUser>();
+            if (reader.ReadBoolean())
+            {
+                Entities = reader.ReadCollection<TwitterEntity>().ToArray();
+            }
         }
     }
 
