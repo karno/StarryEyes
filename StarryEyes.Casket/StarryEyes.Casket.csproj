@@ -67,13 +67,14 @@
     <Compile Include="DataModels\DbStatus.cs" />
     <Compile Include="DataModels\DbEntity.cs" />
     <Compile Include="DataModels\DbUser.cs" />
+    <Compile Include="Infrastructure\CachedStore.cs" />
+    <Compile Include="Infrastructure\PersistentItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Querying\IQuery.cs" />
     <Compile Include="SQLiteInternal\SQLiteHelper.cs" />
     <Compile Include="SQLiteInternal\SQLiteInitializer.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Cache\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\StarryEyes.Albireo\StarryEyes.Albireo.csproj">
       <Project>{c2740802-bd1c-4b70-9b3a-f69dae505827}</Project>

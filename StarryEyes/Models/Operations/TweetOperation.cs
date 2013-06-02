@@ -101,9 +101,7 @@ namespace StarryEyes.Models.Operations
             }
             if (AttachedImage != null)
             {
-                return Setting.GetImageUploader()
-                    .Upload(this.AuthInfo, this.Status,
-                    this._attachedImageBin, reply, geoLat, geoLong);
+                return AuthInfo.UpdateWithMedia(this.Status, this._attachedImageBin, "picture.png", geo_lat: geoLat, geo_long: geoLong);
             }
             return AuthInfo.Update(this.Status, reply, geoLat, geoLong);
         }

@@ -124,28 +124,6 @@ namespace StarryEyes.Settings
         public static readonly SettingItem<string> ExternalBrowserPath =
             new SettingItem<string>("ExternalBrowserPath", null);
 
-        private static readonly SettingItemStruct<int> _imageUploaderService =
-            new SettingItemStruct<int>("ImageUploaderService", 0);
-
-        public static ImageUploaderService ImageUploaderService
-        {
-            get { return (ImageUploaderService)_imageUploaderService.Value; }
-            set { _imageUploaderService.Value = (int)value; }
-        }
-
-        public static ImageUploaderBase GetImageUploader()
-        {
-            switch (ImageUploaderService)
-            {
-                case ImageUploaderService.TwitPic:
-                    return new TwitPicUploader();
-                case ImageUploaderService.YFrog:
-                    return new YFrogUploader();
-                default:
-                    return new TwitterPhotoUploader();
-            }
-        }
-
         public static readonly SettingItem<string> FavstarApiKey =
             new SettingItem<string>("FavstarApiKey", null);
 

@@ -469,9 +469,7 @@ namespace StarryEyes.ViewModels.WindowParts
                 var currentTextLength = StatusTextUtil.CountText(InputText);
                 if (IsImageAttached)
                 {
-                    currentTextLength += Setting.GetImageUploader().UseHttpsUrl
-                                             ? TwitterConfiguration.HttpsUrlLength
-                                             : TwitterConfiguration.HttpUrlLength;
+                    currentTextLength += TwitterConfiguration.HttpsUrlLength;
                 }
                 var tags = TwitterRegexPatterns.ValidHashtag.Matches(InputText)
                                            .OfType<Match>()

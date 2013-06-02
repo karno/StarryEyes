@@ -76,6 +76,7 @@
     <Compile Include="TwitterApi\DataModels\StreamModels\StreamDisconnect.cs" />
     <Compile Include="TwitterApi\DataModels\TwitterConfiguration.cs" />
     <Compile Include="TwitterApi\DataModels\TwitterEntity.cs" />
+    <Compile Include="TwitterApi\DataModels\TwitterFriendship.cs" />
     <Compile Include="TwitterApi\DataModels\TwitterList.cs" />
     <Compile Include="TwitterApi\DataModels\TwitterStatus.cs" />
     <Compile Include="TwitterApi\DataModels\TwitterUser.cs" />
@@ -90,6 +91,7 @@
     <Compile Include="TwitterApi\Rest\Help.cs" />
     <Compile Include="TwitterApi\Rest\Infrastructure\CursorResult.cs" />
     <Compile Include="TwitterApi\Rest\Infrastructure\ResultHandlers.cs" />
+    <Compile Include="TwitterApi\Rest\Lists.cs" />
     <Compile Include="TwitterApi\Rest\Relations.cs" />
     <Compile Include="TwitterApi\Rest\Searching.cs" />
     <Compile Include="TwitterApi\Rest\Timelines.cs" />
