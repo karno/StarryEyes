@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using StarryEyes.Vanille.Serialization;
@@ -138,13 +139,15 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                 {
                     keys = keys.OrderBy(i => i.Key, _comparer);
                 }
-                return Observable.Start(() =>
-                                        keys.Select(k => k.Value == -1
-                                                             ? dictionary[k.Key]
-                                                             : GetChunk(k.Key).GetFromDrive(k.Value))
-                                            .Where(predicate)
-                                            .TakeIfNotNull(itemCount))
-                                 .SelectMany(_ => _);
+                int count = 0;
+                return Observable.Return(keys)
+                                 .SelectMany(_ => _)
+                                 .ObserveOn(new EventLoopScheduler())
+                                 .Select(k => k.Value == -1
+                                                  ? dictionary[k.Key]
+                                                  : this.GetChunk(k.Key).GetFromDrive(k.Value))
+                                 .Where(predicate)
+                                 .TakeWhile(_ => itemCount == null || count++ < itemCount.Value);
             });
         }
 

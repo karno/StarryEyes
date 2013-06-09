@@ -292,7 +292,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
         public IObservable<TValue> Get(TKey key)
         {
             CheckDisposed();
-            return Observable.Start(() =>
+            return Observable.Defer(() => Observable.Start(() =>
             {
                 lock (_deletedItemKeyLocker)
                 {
@@ -321,8 +321,7 @@ namespace StarryEyes.Vanille.DataStore.Persistent
                     }
                     return Observable.Empty<TValue>();
                 }
-            })
-            .SelectMany(_ => _);
+            })).SelectMany(_ => _);
         }
 
         public TValue GetFromDrive(int index)

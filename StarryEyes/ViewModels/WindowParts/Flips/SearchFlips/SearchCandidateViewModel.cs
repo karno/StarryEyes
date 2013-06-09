@@ -89,14 +89,13 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 CurrentUserScreenName = aid.AuthenticateInfo.UnreliableScreenName;
                 CurrentUserProfileImage = aid.AuthenticateInfo.UnreliableProfileImageUri;
                 IsSearchCandidateAvailable = true;
-                Observable.Start(() => aid.AuthenticateInfo.GetSavedSearches())
-                          .SelectMany(_ => _)
-                          .ObserveOnDispatcher()
-                          .Subscribe(
-                              j =>
-                              _searchCandidates.Add(new SearchCandidateItemViewModel(this, aid.AuthenticateInfo, j.id,
-                                                                                     j.query)),
-                              ex => BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message)));
+                aid.AuthenticateInfo.GetSavedSearches()
+                   .ObserveOnDispatcher()
+                   .Subscribe(
+                       j =>
+                       _searchCandidates.Add(new SearchCandidateItemViewModel(this, aid.AuthenticateInfo, j.id,
+                                                                              j.query)),
+                       ex => BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message)));
             }
         }
     }

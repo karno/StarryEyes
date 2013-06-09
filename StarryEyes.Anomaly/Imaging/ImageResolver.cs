@@ -47,6 +47,7 @@ namespace StarryEyes.Anomaly.Imaging
                 {"http://via.me/", s => s + "/thumb/r600x600"},
                 {"http://www.pixiv.net/member_illust.php?", p =>
                 {
+                    // for deferred resolver
                     var builder = new UriBuilder(p) {Scheme = "pixiv"};
                     return builder.Uri.OriginalString;
                 }}
@@ -54,26 +55,29 @@ namespace StarryEyes.Anomaly.Imaging
 
         public static IObservable<Tuple<Uri, Uri>> Resolve(string text)
         {
-            return Observable.Start(() => UrlRegex.Matches(text).Cast<Match>())
-                .SelectMany(_ => _)
-                .Select(s => s.Value)
-                .Select(s => new { key = ResolveTable.Keys.FirstOrDefault(s.StartsWith), value = s })
-                .Select(t =>
-                {
-                    try
-                    {
-                        if (SupportedExtents.Any(ext => t.value.EndsWith("." + ext)))
-                            return new { original = t.value, resolved = t.value };
-                        if (t.key != null)
-                            return new { original = t.value, resolved = ResolveTable[t.key](t.value) };
-                    }
-                    catch
-                    {
-                    }
-                    return null;
-                })
-                .Where(t => t != null && t.resolved != null && Uri.IsWellFormedUriString(t.resolved, UriKind.Absolute))
-                .Select(u => Tuple.Create(new Uri(u.original), new Uri(u.resolved)));
+            return Observable.Defer(() => Observable.Start(() => UrlRegex.Matches(text).Cast<Match>()))
+                             .SelectMany(_ => _)
+                             .Select(s => s.Value)
+                             .Select(s => new { key = ResolveTable.Keys.FirstOrDefault(s.StartsWith), value = s })
+                             .Select(t =>
+                             {
+                                 try
+                                 {
+                                     if (SupportedExtents.Any(ext => t.value.EndsWith("." + ext)))
+                                         return new { original = t.value, resolved = t.value };
+                                     if (t.key != null)
+                                         return new { original = t.value, resolved = ResolveTable[t.key](t.value) };
+                                 }
+                                 catch
+                                 {
+                                 }
+                                 return null;
+                             })
+                             .Where(
+                                 t =>
+                                 t != null && t.resolved != null &&
+                                 Uri.IsWellFormedUriString(t.resolved, UriKind.Absolute))
+                             .Select(u => Tuple.Create(new Uri(u.original), new Uri(u.resolved)));
         }
     }
 }
