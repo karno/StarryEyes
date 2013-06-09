@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Threading;
@@ -130,7 +131,9 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
         {
             this._parent = parent;
             this._screenName = screenName;
-            StoreHelper.GetUser(screenName)
+            var cd = new CompositeDisposable();
+            this.CompositeDisposable.Add(cd);
+            cd.Add(StoreHelper.GetUser(screenName)
                        .Finally(() => Communicating = false)
                        .Subscribe(
                            user =>
@@ -139,6 +142,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                                var ps = this._statuses;
                                this._statuses = new UserStatusesViewModel(this);
                                this.RaisePropertyChanged(() => Statuses);
+                               cd.Add(_statuses);
                                if (ps != null)
                                {
                                    ps.Dispose();
@@ -146,6 +150,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                                var pf = this._favorites;
                                this._favorites = new UserFavoritesViewModel(this);
                                this.RaisePropertyChanged(() => Favorites);
+                               cd.Add(_favorites);
                                if (pf != null)
                                {
                                    pf.Dispose();
@@ -153,6 +158,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                                var pfw = this._following;
                                this._following = new UserFollowingViewModel(this);
                                this.RaisePropertyChanged(() => Following);
+                               cd.Add(_following);
                                if (pfw != null)
                                {
                                    pfw.Dispose();
@@ -160,6 +166,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                                var pfr = this._followers;
                                this._followers = new UserFollowersViewModel(this);
                                this.RaisePropertyChanged(() => Followers);
+                               cd.Add(_followers);
                                if (pfr != null)
                                {
                                    pfr.Dispose();
@@ -183,7 +190,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                                }));
                                User = null;
                                parent.CloseResults();
-                           });
+                           }));
         }
 
         public void Close()
