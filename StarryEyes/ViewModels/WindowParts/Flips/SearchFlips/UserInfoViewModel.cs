@@ -168,7 +168,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                                          .SelectMany(a => a)
                                          .Where(a => a.UserId != user.Id)
                                          .Select(a => new RelationControlViewModel(this, a.AuthenticateInfo, user))
-                                         .ObserveOn(DispatcherHolder.Dispatcher, DispatcherPriority.Render)
+                                         .ObserveOn(DispatcherHolder.Dispatcher, DispatcherPriority.Loaded)
                                          .Subscribe(RelationControls.Add);
                            },
                            ex =>

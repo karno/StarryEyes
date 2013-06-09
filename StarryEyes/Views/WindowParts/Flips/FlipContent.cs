@@ -30,7 +30,7 @@ namespace StarryEyes.Views.WindowParts.Flips
             else
             {
                 VisualStateManager.GoToState(fc, "Close", true);
-                var timer = new DispatcherTimer(DispatcherPriority.Render, DispatcherHelper.UIDispatcher);
+                var timer = new DispatcherTimer(DispatcherPriority.Loaded, DispatcherHelper.UIDispatcher);
                 timer.Interval = TimeSpan.FromSeconds(0.2);
                 timer.Tick += (o, args) => { timer.Stop(); fc.OwnerVisibility = Visibility.Collapsed; };
                 timer.Start();

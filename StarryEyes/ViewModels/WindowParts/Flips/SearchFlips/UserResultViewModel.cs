@@ -107,7 +107,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                     BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message));
                     return Observable.Empty<TwitterUser>();
                 })
-                .ObserveOn(DispatcherHolder.Dispatcher, DispatcherPriority.Render)
+                .ObserveOn(DispatcherHolder.Dispatcher, DispatcherPriority.Loaded)
                 .Finally(() => this.IsLoading = false)
                 .Subscribe(u => Users.Add(new UserResultItemViewModel(u)));
         }
