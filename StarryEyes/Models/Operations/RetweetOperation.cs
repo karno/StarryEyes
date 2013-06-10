@@ -55,7 +55,7 @@ namespace StarryEyes.Models.Operations
                                                   if (_originalAuthInfo != null)
                                                       _originalAuthInfo = AuthInfo;
                                                   AuthInfo = fallbackAccount.AuthenticateInfo;
-                                                  return Run(OperationPriority.High);
+                                                  return RunCore();
                                               }
                                               return Observable.Throw<TwitterStatus>(new RetweetFailedException(s, ex));
                                           }));
