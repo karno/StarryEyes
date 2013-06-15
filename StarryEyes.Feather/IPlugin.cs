@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Windows.Controls;
 
-namespace StarryEyes.Models.Plugins
+namespace StarryEyes.Feather
 {
     /// <summary>
     /// Interface for plugins works on Krile StarryEyes
     /// </summary>
     public interface IPlugin
     {
+        string Id { get; }
+
         string Name { get; }
 
         Version Version { get; }

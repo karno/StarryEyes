@@ -188,7 +188,7 @@ namespace StarryEyes
             { }
         }
 
-        private static int _observedDpxCount = 0;
+        private static int _observedDpxCount;
         private void HandleException(Exception ex)
         {
             try
@@ -409,10 +409,6 @@ namespace StarryEyes
         public static readonly string MediaDirectory = "media";
 
         public static readonly string PluginDirectory = "plugins";
-
-        public static readonly string PluginDescriptionFile = "package.xml";
-
-        public static readonly string PluginPublicKeyFile = "pubkey.pub";
 
         public static readonly string PluginSignatureFile = "auth.sig";
 

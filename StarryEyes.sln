@@ -25,6 +25,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Detective", "Detective\Dete
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarryEyes.Anomaly", "StarryEyes.Anomaly\StarryEyes.Anomaly.csproj", "{564E23DE-AB35-45B6-B331-395C3943BC23}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{65C47B8C-93EE-4291-8870-E3092BE22DB5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SweetMagic", "SweetMagic\SweetMagic.csproj", "{11F115EE-8D61-42F3-89CA-E75E591E4E49}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarryJs", "StarryJs\StarryJs.csproj", "{2C279B20-2AA2-4C6A-B7D0-B7BD143697F5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarryEyes.Feather", "StarryEyes.Feather\StarryEyes.Feather.csproj", "{E47FA479-005C-4236-BAFB-ADD664535E59}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -115,8 +123,42 @@ Global
 		{564E23DE-AB35-45B6-B331-395C3943BC23}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{564E23DE-AB35-45B6-B331-395C3943BC23}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{564E23DE-AB35-45B6-B331-395C3943BC23}.Release|x86.ActiveCfg = Release|Any CPU
+		{11F115EE-8D61-42F3-89CA-E75E591E4E49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11F115EE-8D61-42F3-89CA-E75E591E4E49}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11F115EE-8D61-42F3-89CA-E75E591E4E49}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{11F115EE-8D61-42F3-89CA-E75E591E4E49}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{11F115EE-8D61-42F3-89CA-E75E591E4E49}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{11F115EE-8D61-42F3-89CA-E75E591E4E49}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11F115EE-8D61-42F3-89CA-E75E591E4E49}.Release|Any CPU.Build.0 = Release|Any CPU
+		{11F115EE-8D61-42F3-89CA-E75E591E4E49}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{11F115EE-8D61-42F3-89CA-E75E591E4E49}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{11F115EE-8D61-42F3-89CA-E75E591E4E49}.Release|x86.ActiveCfg = Release|Any CPU
+		{2C279B20-2AA2-4C6A-B7D0-B7BD143697F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C279B20-2AA2-4C6A-B7D0-B7BD143697F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C279B20-2AA2-4C6A-B7D0-B7BD143697F5}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{2C279B20-2AA2-4C6A-B7D0-B7BD143697F5}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{2C279B20-2AA2-4C6A-B7D0-B7BD143697F5}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2C279B20-2AA2-4C6A-B7D0-B7BD143697F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C279B20-2AA2-4C6A-B7D0-B7BD143697F5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2C279B20-2AA2-4C6A-B7D0-B7BD143697F5}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{2C279B20-2AA2-4C6A-B7D0-B7BD143697F5}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{2C279B20-2AA2-4C6A-B7D0-B7BD143697F5}.Release|x86.ActiveCfg = Release|Any CPU
+		{E47FA479-005C-4236-BAFB-ADD664535E59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E47FA479-005C-4236-BAFB-ADD664535E59}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E47FA479-005C-4236-BAFB-ADD664535E59}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{E47FA479-005C-4236-BAFB-ADD664535E59}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{E47FA479-005C-4236-BAFB-ADD664535E59}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E47FA479-005C-4236-BAFB-ADD664535E59}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E47FA479-005C-4236-BAFB-ADD664535E59}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E47FA479-005C-4236-BAFB-ADD664535E59}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{E47FA479-005C-4236-BAFB-ADD664535E59}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{E47FA479-005C-4236-BAFB-ADD664535E59}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{11F115EE-8D61-42F3-89CA-E75E591E4E49} = {65C47B8C-93EE-4291-8870-E3092BE22DB5}
+		{2C279B20-2AA2-4C6A-B7D0-B7BD143697F5} = {65C47B8C-93EE-4291-8870-E3092BE22DB5}
 	EndGlobalSection
 EndGlobal

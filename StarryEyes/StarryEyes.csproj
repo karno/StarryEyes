@@ -226,6 +226,8 @@
     <Compile Include="Models\Backstages\TwitterEvents\UnfavoritedEvent.cs" />
     <Compile Include="Models\Backstages\TwitterEvents\UnfollowedEvent.cs" />
     <Compile Include="Models\Backstages\BackstageEventBase.cs" />
+    <Compile Include="Models\Plugins\PluginManager.cs" />
+    <Compile Include="Models\Plugins\ScriptingManager.cs" />
     <Compile Include="Models\Receivers\ListInfo.cs" />
     <Compile Include="Models\Receivers\StreamingEventsHub.cs" />
     <Compile Include="Models\Operations\UpdateRelationOperation.cs" />
@@ -252,11 +254,6 @@
     <Compile Include="Models\Notifications\NotificationModel.cs" />
     <Compile Include="Models\ObservableSynchronizedCollectionEx.cs" />
     <Compile Include="Models\Operations\FavstarTrophyOperation.cs" />
-    <Compile Include="Models\Plugins\ImageUploaderManager.cs" />
-    <Compile Include="Models\Plugins\Packaging\PackageDescription.cs" />
-    <Compile Include="Models\Plugins\Packaging\PluginPackage.cs" />
-    <Compile Include="Models\Plugins\PluginManager.cs" />
-    <Compile Include="Models\Plugins\ScriptingManager.cs" />
     <Compile Include="Models\StatusModel.cs" />
     <Compile Include="Models\StatusTextUtil.cs" />
     <Compile Include="Models\Stores\AccountsStore.cs" />
@@ -270,7 +267,6 @@
     <Compile Include="Models\Tab\ColumnModel.cs" />
     <Compile Include="Models\Tab\CommonTabBuilder.cs" />
     <Compile Include="Models\Tab\TabManager.cs" />
-    <Compile Include="Models\Plugins\IPlugin.cs" />
     <Compile Include="Models\Tab\TimelineModel.cs" />
     <Compile Include="Models\TwitterConfiguration.cs" />
     <Compile Include="Models\UserModel.cs" />
@@ -545,6 +541,10 @@
     <ProjectReference Include="..\StarryEyes.Albireo\StarryEyes.Albireo.csproj">
       <Project>{C2740802-BD1C-4B70-9B3A-F69DAE505827}</Project>
       <Name>StarryEyes.Albireo</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\StarryEyes.Feather\StarryEyes.Feather.csproj">
+      <Project>{E47FA479-005C-4236-BAFB-ADD664535E59}</Project>
+      <Name>StarryEyes.Feather</Name>
     </ProjectReference>
     <ProjectReference Include="..\StarryEyes.Nightmare\StarryEyes.Nightmare.csproj">
       <Project>{3A78CEB3-A112-4A66-8724-BFF2BFA9182B}</Project>

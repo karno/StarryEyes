@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 
-namespace StarryEyes.Models.Plugins.Packaging
+namespace StarryEyes.Feather.Packaging
 {
     public class PackageDescription
     {
