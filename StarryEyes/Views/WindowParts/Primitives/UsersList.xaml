@@ -100,7 +100,9 @@
             </ItemsControl.ItemsPanel>
             <ItemsControl.Template>
                 <ControlTemplate TargetType="{x:Type ItemsControl}">
-                    <ScrollViewer Focusable="False" VerticalScrollBarVisibility="Visible">
+                    <ScrollViewer Focusable="False"
+                                  Style="{StaticResource TouchScrollViewerStyle}"
+                                  VerticalScrollBarVisibility="Visible">
                         <i:Interaction.Behaviors>
                             <sebehavior:TimelineTriggerBehavior IsScrollOnBottom="{Binding IsScrollInBottom, Mode=OneWayToSource}" />
                             <sebehavior:SquaredScrollBehavior />

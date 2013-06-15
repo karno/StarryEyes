@@ -1574,7 +1574,6 @@
                       ItemTemplate="{StaticResource StatusItemTemplate}"
                       ItemsSource="{Binding Timeline,
                                             Mode=OneWay}"
-                      ScrollViewer.CanContentScroll="True"
                       VirtualizingPanel.IsVirtualizing="True"
                       VirtualizingPanel.ScrollUnit="Pixel"
                       VirtualizingPanel.VirtualizationMode="Recycling">
@@ -1597,7 +1596,10 @@
             </ItemsControl.ItemsPanel>
             <ItemsControl.Template>
                 <ControlTemplate TargetType="{x:Type ItemsControl}">
-                    <ScrollViewer Focusable="False" VerticalScrollBarVisibility="Visible">
+                    <ScrollViewer CanContentScroll="True"
+                                  Focusable="False"
+                                  Style="{StaticResource TouchScrollViewerStyle}"
+                                  VerticalScrollBarVisibility="Visible">
                         <i:Interaction.Behaviors>
                             <behaviors:TimelineTriggerBehavior IsMouseOver="{Binding IsMouseOver,
                                                                                      Mode=OneWayToSource}"

@@ -81,7 +81,9 @@
                                     Margin="8"
                                     UriSource="{Binding User.ProfileImageUri}" />
             </Grid>
-            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                          Style="{StaticResource TouchScrollViewerStyle}"
+                          VerticalScrollBarVisibility="Auto">
                 <StackPanel x:Name="LeftPanel" Orientation="Vertical">
                     <StackPanel Orientation="Horizontal">
 

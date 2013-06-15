@@ -520,7 +520,7 @@
                         <ControlTemplate>
                             <ScrollViewer x:Name="ScrollViewer"
                                           Padding="{TemplateBinding Padding}"
-                                          VerticalScrollBarVisibility="Auto">
+                                          VerticalScrollBarVisibility="Auto" Style="{StaticResource TouchScrollViewerStyle}">
                                 <ItemsPresenter />
                             </ScrollViewer>
                         </ControlTemplate>
