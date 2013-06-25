@@ -52,7 +52,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="TaskDialog">
-      <HintPath>..\StarryEyes\bin\Debug\TaskDialog.dll</HintPath>
+      <HintPath>..\packages\WPFTaskDialog.1.7.1\lib\net40-Client\TaskDialog.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
   </ItemGroup>
@@ -68,6 +68,9 @@
     <Compile Include="Windows\TaskDialogOptions.cs" />
     <Compile Include="Windows\TaskDialogResult.cs" />
     <Compile Include="Windows\WindowNativeExtension.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
