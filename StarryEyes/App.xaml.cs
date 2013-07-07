@@ -75,9 +75,13 @@ namespace StarryEyes
             // set exit handler
             Current.Exit += (_, __) => AppFinalize(true);
 
+
             // Initialize service points
             ServicePointManager.Expect100Continue = false; // disable expect 100 continue for User Streams connection.
             ServicePointManager.DefaultConnectionLimit = Int32.MaxValue; // Limit Break!
+            // declare security protocol explicitly
+            // for Windows 8.1 (Preview)
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Ssl3;
 
             // Initialize special image handlers
             SpecialImageResolvers.Initialize();

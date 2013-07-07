@@ -77,12 +77,18 @@ namespace StarryEyes.Filters.Expressions
 
         public override void BeginLifecycle()
         {
-            Operator.BeginLifecycle();
+            if (Operator != null)
+            {
+                Operator.BeginLifecycle();
+            }
         }
 
         public override void EndLifecycle()
         {
-            Operator.EndLifecycle();
+            if (Operator != null)
+            {
+                Operator.EndLifecycle();
+            }
         }
 
     }
