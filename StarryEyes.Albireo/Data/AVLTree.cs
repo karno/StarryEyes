@@ -8,13 +8,21 @@ namespace StarryEyes.Albireo.Data
     /// Implementation of the AVLTree.
     /// </summary>
     /// <typeparam name="T">Item class</typeparam>
-    public sealed class AVLTree<T> : ICollection<T>, IReadOnlyCollection<T> where T : IComparable<T>
+    public sealed class AVLTree<T> : ICollection<T>, IReadOnlyCollection<T>
     {
-        public AVLTree() { }
+        private readonly IComparer<T> _comparer;
+
+        public AVLTree() : this(Comparer<T>.Default) { }
 
         public AVLTree(IEnumerable<T> initial)
+            : this(Comparer<T>.Default)
         {
             initial.ForEach(Add);
+        }
+
+        public AVLTree(IComparer<T> comparer)
+        {
+            _comparer = comparer;
         }
 
         private int _count;
@@ -38,7 +46,7 @@ namespace StarryEyes.Albireo.Data
                 var trace = new Stack<Tuple<AVLTreeLeaf, Direction>>();
                 while (true)
                 {
-                    var d = current.Value.CompareTo(item);
+                    var d = _comparer.Compare(current.Value, item);
                     if (d == 0) // this item is already inserted.
                     {
                         return false;
@@ -144,7 +152,7 @@ namespace StarryEyes.Albireo.Data
             var trace = new Stack<Tuple<AVLTreeLeaf, Direction>>();
             while (true)
             {
-                var d = current.Value.CompareTo(item);
+                var d = _comparer.Compare(current.Value, item);
                 if (d == 0) // this item is already inserted.
                 {
                     // found
@@ -382,7 +390,7 @@ namespace StarryEyes.Albireo.Data
             var current = _root;
             while (true)
             {
-                var d = current.Value.CompareTo(item);
+                var d = _comparer.Compare(current.Value, item);
                 if (d == 0)
                 {
                     return true;
