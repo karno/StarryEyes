@@ -39,14 +39,16 @@ namespace StarryEyes.Anomaly
 
         private static HttpMessageHandler GetInnerHandler(bool useGZip)
         {
-            if (useGZip)
+            var proxy = Core.GetWebProxy();
+            return new HttpClientHandler
             {
-                return new HttpClientHandler
-                {
-                    AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
-                };
-            }
-            return new HttpClientHandler();
+                AutomaticDecompression =
+                    useGZip
+                        ? DecompressionMethods.GZip | DecompressionMethods.Deflate
+                        : DecompressionMethods.None,
+                Proxy = proxy,
+                UseProxy = proxy != null
+            };
         }
 
         internal static FormUrlEncodedContent ParametalizeForPost(this Dictionary<string, object> dict)

@@ -100,6 +100,7 @@ namespace StarryEyes
             ApiEndpoint.DefaultConsumerKey = Setting.GlobalConsumerKey.Value ?? ConsumerKey;
             ApiEndpoint.DefaultConsumerSecret = Setting.GlobalConsumerSecret.Value ?? ConsumerSecret;
             ApiEndpoint.UserAgent = Setting.UserAgent.Value;
+            // TODO: API proxy setting reflect
 
             // Load key assigns
             KeyAssignManager.Initialize();

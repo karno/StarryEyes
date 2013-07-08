@@ -13,7 +13,7 @@
 
         public override string ToString()
         {
-            return ApiEndpoint.ApiEndpointPrefix +
+            return (ApiEndpoint.ApiEndpointProxy ?? ApiEndpoint.ApiEndpointPrefix) +
                    (this._path.StartsWith("/") ? this._path.Substring(1) : this._path) +
                    (string.IsNullOrEmpty(this._param) ? "" : ("?" + this._param));
         }

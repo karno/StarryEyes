@@ -4,10 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Xaml;
 using StarryEyes.Breezy.DataModel;
-using StarryEyes.Breezy.Imaging;
 using StarryEyes.Filters;
 using StarryEyes.Filters.Expressions;
-using StarryEyes.Filters.Expressions.Operators;
 using StarryEyes.Filters.Parsing;
 using StarryEyes.Models.Tab;
 using StarryEyes.Nightmare.Windows;
@@ -138,8 +136,30 @@ namespace StarryEyes.Settings
 
         #region High-level configurations
 
+        #region Web proxy configuration
+
+        public static readonly SettingItemStruct<WebProxyConfiguration> UseWebProxy =
+            new SettingItemStruct<WebProxyConfiguration>("UseWebProxy", WebProxyConfiguration.Default);
+
+        public static readonly SettingItem<string> WebProxyAddress =
+            new SettingItem<string>("WebProxyAddress", String.Empty);
+
+        public static readonly SettingItemStruct<int> WebProxyPort =
+            new SettingItemStruct<int>("WebProxyPort", 0);
+
+        public static readonly SettingItemStruct<bool> IsBypassWebProxyInLocal =
+            new SettingItemStruct<bool>("IsBypassWebProxyInLocal", false);
+
+        public static readonly SettingItem<string[]> WebProxyBypassList =
+            new SettingItem<string[]>("WebProxyBypassList", null);
+
+        #endregion
+
         public static readonly SettingItem<string> UserAgent =
             new SettingItem<string>("UserAgent", "Krile StarryEyes/Breezy TL with ReactiveOAuth");
+
+        public static readonly SettingItem<string> ApiProxy =
+            new SettingItem<string>("ApiProxy", null);
 
         public static readonly SettingItemStruct<bool> LoadUnsafePlugins =
             new SettingItemStruct<bool>("LoadUnsafePlugins", false);
@@ -479,5 +499,12 @@ namespace StarryEyes.Settings
         TwitterOfficial,
         TwitPic,
         YFrog,
+    }
+
+    public enum WebProxyConfiguration
+    {
+        Default,
+        None,
+        Custom
     }
 }

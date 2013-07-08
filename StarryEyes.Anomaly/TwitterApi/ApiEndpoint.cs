@@ -15,5 +15,7 @@ namespace StarryEyes.Anomaly.TwitterApi
         }
 
         public static readonly string ApiEndpointPrefix = "https://api.twitter.com/1.1/";
+
+        public static string ApiEndpointProxy { get; set; }
     }
 }

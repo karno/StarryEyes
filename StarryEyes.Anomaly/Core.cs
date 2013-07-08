@@ -1,4 +1,6 @@
-﻿using System.Security.Cryptography;
+﻿using System;
+using System.Net;
+using System.Security.Cryptography;
 using AsyncOAuth;
 
 namespace StarryEyes.Anomaly
@@ -19,6 +21,20 @@ namespace StarryEyes.Anomaly
                     return hmac.ComputeHash(buffer);
                 }
             };
+        }
+
+        public static bool UseSystemProxy { get; set; }
+
+        public static Func<IWebProxy> ProxyProvider { get; set; }
+
+        internal static IWebProxy GetWebProxy()
+        {
+            if (UseSystemProxy)
+            {
+                return WebRequest.GetSystemWebProxy();
+            }
+            if (ProxyProvider == null) return null;
+            return ProxyProvider();
         }
     }
 }
