@@ -1,0 +1,20 @@
+プロジェクトの名前は一見してわかりづらいですが，それぞれ以下のような機能の実装が含まれます。
+
+* ルート ディレクトリ:
+StarryEyes
+	Krile StarryEyes メイン アセンブリです．(Krile.exe)
+	Krile StarryEyes の主な機能の実装が含まれます．
+StarryEyes.Albireo
+	補助ライブラリです．IEnumerable<T>やIObservable<T>に対する拡張メソッドのほか，
+	AVLTree データ構造やマルチスレッド補助クラスが含まれます．
+StarryEyes.Anomaly
+	Twitter アクセスライブラリです．AsyncOAuthを用いてTwitterにアクセスするための
+	各種メソッドの実装が存在します．
+StarryEyes.Casket
+	SQLite データベースへのデータの読み書きやデータキャッシュの実装が含まれます．
+StarryEyes.Nightmare
+	Windows Formsとの相互運用やWin32 APIとの相互運用が必要な項目についての
+	ラッパを提供するライブラリです．
+	
+* Subsystems フォルダ 以下:
+Detective: クラッシュ レポータ(rescue.exe)です．
