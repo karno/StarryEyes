@@ -64,7 +64,16 @@ namespace StarryEyes
             _appMutex = new Mutex(true, "Krile_StarryEyes_" + mutexStr);
             if (_appMutex.WaitOne(0, false) == false)
             {
-                MessageBox.Show("Krileは既に起動しています。");
+                TaskDialog.Show(new TaskDialogOptions
+                {
+                    MainIcon = VistaTaskDialogIcon.Error,
+                    MainInstruction = "Krileはすでに起動しています。",
+                    Content = "同じ設定を共有するKrileを多重起動することはできません。",
+                    Title = "Krile",
+                    ExpandedInfo = "Krileを多重起動するためには、krile.exe.configを編集する必要があります。" + Environment.NewLine +
+                    "詳しくは公式ウェブサイト上のFAQを参照してください。",
+                    CommonButtons = TaskDialogCommonButtons.Close
+                });
                 Environment.Exit(0);
             }
 
@@ -132,12 +141,14 @@ namespace StarryEyes
                             ClearStoreData();
                             Setting.DatabaseCorruption.Value = false;
                             Setting.Save();
+                            _appMutex.ReleaseMutex();
                             _appMutex.Dispose();
                             Process.Start(ResourceAssembly.Location);
                             Current.Shutdown();
                             Process.GetCurrentProcess().Kill();
                             return;
                         case 1:
+                            _appMutex.ReleaseMutex();
                             _appMutex.Dispose();
                             // shutdown
                             Current.Shutdown();
@@ -187,6 +198,7 @@ namespace StarryEyes
             RaiseApplicationFinalize();
             try
             {
+                _appMutex.ReleaseMutex();
                 _appMutex.Dispose();
             }
             catch (ObjectDisposedException)
@@ -204,6 +216,7 @@ namespace StarryEyes
                     if (Interlocked.Increment(ref _observedDpxCount) != 1) return;
                     Setting.DatabaseCorruption.Value = true;
                     Setting.Save();
+                    _appMutex.ReleaseMutex();
                     _appMutex.Dispose();
                     Process.Start(ResourceAssembly.Location);
                     Current.Shutdown();
