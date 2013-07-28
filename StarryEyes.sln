@@ -46,6 +46,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarryEyes.Albireo.Test", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ripple", "Ripple\Ripple.csproj", "{1F9F2A0A-E5C3-40D2-860E-2E7422346169}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarryEyes.Casket.Test", "StarryEyes.Casket.Test\StarryEyes.Casket.Test.csproj", "{ED437BD8-2E06-40A3-B13B-731AADA11123}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -196,6 +198,16 @@ Global
 		{1F9F2A0A-E5C3-40D2-860E-2E7422346169}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{1F9F2A0A-E5C3-40D2-860E-2E7422346169}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{1F9F2A0A-E5C3-40D2-860E-2E7422346169}.Release|x86.ActiveCfg = Release|Any CPU
+		{ED437BD8-2E06-40A3-B13B-731AADA11123}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED437BD8-2E06-40A3-B13B-731AADA11123}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED437BD8-2E06-40A3-B13B-731AADA11123}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{ED437BD8-2E06-40A3-B13B-731AADA11123}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{ED437BD8-2E06-40A3-B13B-731AADA11123}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{ED437BD8-2E06-40A3-B13B-731AADA11123}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED437BD8-2E06-40A3-B13B-731AADA11123}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED437BD8-2E06-40A3-B13B-731AADA11123}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{ED437BD8-2E06-40A3-B13B-731AADA11123}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{ED437BD8-2E06-40A3-B13B-731AADA11123}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -205,5 +217,6 @@ Global
 		{11F115EE-8D61-42F3-89CA-E75E591E4E49} = {65C47B8C-93EE-4291-8870-E3092BE22DB5}
 		{2C279B20-2AA2-4C6A-B7D0-B7BD143697F5} = {65C47B8C-93EE-4291-8870-E3092BE22DB5}
 		{41D14775-20AA-4CB2-9B8A-371599D2552F} = {21AD8FB0-D270-4940-BACE-B89842E2CBC5}
+		{ED437BD8-2E06-40A3-B13B-731AADA11123} = {21AD8FB0-D270-4940-BACE-B89842E2CBC5}
 	EndGlobalSection
 EndGlobal

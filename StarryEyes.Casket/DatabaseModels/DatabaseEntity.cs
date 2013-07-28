@@ -1,9 +1,11 @@
 ﻿using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Casket.DatabaseModels.Generators;
 
 namespace StarryEyes.Casket.DatabaseModels
 {
-    public class DatabaseEntity
+    public class DatabaseEntity : DbModelBase
     {
+        [DbPrimaryKey]
         public long Id { get; set; }
 
         public long ParentId { get; set; }
@@ -14,6 +16,7 @@ namespace StarryEyes.Casket.DatabaseModels
 
         public string OriginalText { get; set; }
 
+        [DbOptional]
         public string MediaUrl { get; set; }
 
         public int StartIndex { get; set; }

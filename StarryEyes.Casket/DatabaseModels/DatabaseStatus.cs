@@ -1,10 +1,13 @@
 ﻿using System;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Casket.DatabaseModels.Generators;
 
 namespace StarryEyes.Casket.DatabaseModels
 {
-    public class DatabaseStatus
+    [DbName("Status")]
+    public class DatabaseStatus : DbModelBase
     {
+        [DbPrimaryKey]
         public long Id { get; set; }
 
         public StatusType StatusType { get; set; }
@@ -15,12 +18,14 @@ namespace StarryEyes.Casket.DatabaseModels
 
         public DateTime CreatedAt { get; set; }
 
+        [DbOptional]
         public string Source { get; set; }
 
         public long? InReplyToStatusId { get; set; }
 
         public long? InReplyToUserId { get; set; }
 
+        [DbOptional]
         public string InReplyToScreenName { get; set; }
 
         public double? Longitude { get; set; }

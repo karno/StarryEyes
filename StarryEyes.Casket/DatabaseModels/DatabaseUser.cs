@@ -1,9 +1,12 @@
 ﻿using System;
+using StarryEyes.Casket.DatabaseModels.Generators;
 
 namespace StarryEyes.Casket.DatabaseModels
 {
-    public class DatabaseUser
+    [DbName("User")]
+    public class DatabaseUser : DbModelBase
     {
+        [DbPrimaryKey]
         public long Id { get; set; }
 
         public string ScreenName { get; set; }
