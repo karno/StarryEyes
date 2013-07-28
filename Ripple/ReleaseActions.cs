@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Threading.Tasks;
@@ -10,18 +11,24 @@ namespace Ripple
     {
         public static ReleaseActionBase Parse(XElement element)
         {
-            switch (element.Value)
+            switch (element.Name.LocalName.ToLower())
             {
                 case "pack":
                 case "package":
                     return new PackageAction(element.Attribute("url").Value);
+                case "exec":
+                case "execute":
+                    var ap = element.Attribute("await"); // default true
+                    return new ExecuteAction(element.Attribute("path").Value,
+                                             ap == null || ap.Value.ToLower() != "false");
+                default:
+                    throw new ArgumentException("action is not matched:" + element.Name);
             }
         }
     }
 
     public abstract class ReleaseActionBase
     {
-
         public abstract Task DoWork(UpdateTaskExecutor executor);
     }
 
@@ -60,6 +67,27 @@ namespace Ripple
             using (var fstream = File.Create(fn))
             {
                 await entry.Open().CopyToAsync(fstream);
+            }
+        }
+    }
+
+    public sealed class ExecuteAction : ReleaseActionBase
+    {
+        private readonly string _path;
+        private readonly bool _awaitProcess;
+
+        public ExecuteAction(string path, bool awaitProcess)
+        {
+            _path = path;
+            _awaitProcess = awaitProcess;
+        }
+
+        public override async Task DoWork(UpdateTaskExecutor executor)
+        {
+            var process = Process.Start(Path.Combine(executor.BasePath, _path));
+            if (_awaitProcess && process != null)
+            {
+                await Task.Run(() => process.WaitForExit());
             }
         }
     }
