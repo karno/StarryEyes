@@ -229,6 +229,7 @@
     <Compile Include="Models\Plugins\PluginManager.cs" />
     <Compile Include="Models\Plugins\ScriptingManager.cs" />
     <Compile Include="Models\Receivers\ListInfo.cs" />
+    <Compile Include="Models\Receivers\ReceiveElements\UserTimelineReceiver.cs" />
     <Compile Include="Models\Receivers\StreamingEventsHub.cs" />
     <Compile Include="Models\Operations\UpdateRelationOperation.cs" />
     <Compile Include="Models\Receivers\Managers\ListReceiveManager.cs" />

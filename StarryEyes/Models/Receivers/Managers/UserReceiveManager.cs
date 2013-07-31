@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using StarryEyes.Annotations;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Models.Receivers.ReceiveElements;
 using StarryEyes.Models.Stores;
@@ -156,18 +155,7 @@ namespace StarryEyes.Models.Receivers.Managers
         {
             private readonly AuthenticateInfo _authInfo;
             private readonly CompositeDisposable _disposable;
-            [UsedImplicitly]
             private readonly UserStreamsReceiver _userStreamsReceiver;
-            [UsedImplicitly]
-            private readonly HomeTimelineReceiver _homeTimelineReceiver;
-            [UsedImplicitly]
-            private readonly MentionTimelineReceiver _mentionTimelineReceiver;
-            [UsedImplicitly]
-            private readonly DirectMessagesReceiver _directMessagesReceiver;
-            [UsedImplicitly]
-            private readonly UserInfoReceiver _userInfoReceiver;
-            [UsedImplicitly]
-            private readonly UserRelationReceiver _userRelationReceiver;
 
             public event Action<long> StateChanged;
 
@@ -189,15 +177,16 @@ namespace StarryEyes.Models.Receivers.Managers
             public UserReceiveBundle(AuthenticateInfo authInfo)
             {
                 _authInfo = authInfo;
-                // ReSharper disable UseObjectOrCollectionInitializer
-                _disposable = new CompositeDisposable();
-                _disposable.Add(_userStreamsReceiver = new UserStreamsReceiver(authInfo));
-                _disposable.Add(_homeTimelineReceiver = new HomeTimelineReceiver(authInfo));
-                _disposable.Add(_mentionTimelineReceiver = new MentionTimelineReceiver(authInfo));
-                _disposable.Add(_directMessagesReceiver = new DirectMessagesReceiver(authInfo));
-                _disposable.Add(_userInfoReceiver = new UserInfoReceiver(authInfo));
-                _disposable.Add(_userRelationReceiver = new UserRelationReceiver(authInfo));
-                // ReSharper restore UseObjectOrCollectionInitializer
+                _disposable = new CompositeDisposable
+                {
+                    (this._userStreamsReceiver = new UserStreamsReceiver(authInfo)),
+                    new HomeTimelineReceiver(authInfo),
+                    new MentionTimelineReceiver(authInfo),
+                    new DirectMessagesReceiver(authInfo),
+                    new UserInfoReceiver(authInfo),
+                    new UserTimelineReceiver(authInfo),
+                    new UserRelationReceiver(authInfo)
+                };
                 _userStreamsReceiver.StateChanged += () => this.OnStateChanged(this.UserId);
             }
 
@@ -211,7 +200,7 @@ namespace StarryEyes.Models.Receivers.Managers
             {
                 get
                 {
-                    return _userRelationReceiver == null
+                    return _userStreamsReceiver == null
                                ? UserStreamsConnectionState.Invalid
                                : _userStreamsReceiver.ConnectionState;
                 }
