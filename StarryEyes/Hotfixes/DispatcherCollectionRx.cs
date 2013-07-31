@@ -62,7 +62,7 @@ namespace StarryEyes.Hotfixes
                                  {
                                      if (!Dispatcher.CheckAccess())
                                      {
-                                         Dispatcher.Invoke(
+                                         Dispatcher.BeginInvoke(
                                              CollectionChangedDispatcherPriority,
                                              (Action)
                                              (() => OnPropertyChanged(e.PropertyName)));
@@ -75,18 +75,8 @@ namespace StarryEyes.Hotfixes
 
             _disposables.Add(collection
                                  .ListenCollectionChanged()
-                                 .Subscribe(e =>
-                                 {
-                                     if (!Dispatcher.CheckAccess())
-                                     {
-                                         Dispatcher.Invoke(CollectionChangedDispatcherPriority,
-                                                           (Action)(() => OnCollectionChanged(e)));
-                                     }
-                                     else
-                                     {
-                                         OnCollectionChanged(e);
-                                     }
-                                 }));
+                                 .Subscribe(e => this.Dispatcher.BeginInvoke(this.CollectionChangedDispatcherPriority,
+                                                                        (Action)(() => this.OnCollectionChanged(e)))));
         }
 
         /// <summary>
