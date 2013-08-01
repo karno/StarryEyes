@@ -8,6 +8,7 @@ using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
 using Livet;
+using StarryEyes.Albireo.Threading;
 using StarryEyes.Breezy.Authorize;
 using StarryEyes.Breezy.DataModel;
 using StarryEyes.Breezy.Imaging;
@@ -128,6 +129,8 @@ namespace StarryEyes.Models
             }
         }
 
+        private static readonly TaskFactory _factory = LimitedTaskScheduler.GetTaskFactory(8);
+
         #endregion
 
         private readonly ObservableSynchronizedCollection<TwitterUser> _favoritedUsers =
@@ -189,7 +192,7 @@ namespace StarryEyes.Models
                 if (!_isFavoritedUsersLoaded)
                 {
                     _isFavoritedUsersLoaded = true;
-                    LoadFavoritedUsers();
+                    _factory.StartNew(this.LoadFavoritedUsers);
                 }
                 return _favoritedUsers;
             }
@@ -202,7 +205,7 @@ namespace StarryEyes.Models
                 if (!_isRetweetedUsersLoaded)
                 {
                     _isRetweetedUsersLoaded = true;
-                    LoadRetweetedUsers();
+                    _factory.StartNew(this.LoadRetweetedUsers);
                 }
                 return _retweetedUsers;
             }
