@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using StarryEyes.Casket.DatabaseModels.Generators;
 
-namespace StarryEyes.Casket.DatabaseModels.Generators
+namespace StarryEyes.Casket.DatabaseCore.Sqlite
 {
-    public static class DbSentenceGenerator
+    public static class SentenceGenerator
     {
         private static readonly Dictionary<Type, string> TypeMapping =
         new Dictionary<Type, string>{
@@ -42,7 +43,7 @@ namespace StarryEyes.Casket.DatabaseModels.Generators
         public static string GetTableCreator(Type type)
         {
             var builder = new StringBuilder();
-            builder.Append("CREATE TABLE ");
+            builder.Append("CREATE TABLE IF NOT EXISTS ");
             builder.Append(GetTableName(type));
             builder.Append("(");
             var first = true;

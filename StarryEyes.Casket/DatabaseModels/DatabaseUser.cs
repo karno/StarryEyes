@@ -50,5 +50,7 @@ namespace StarryEyes.Casket.DatabaseModels
         public string Language { get; set; }
 
         public DateTime CreatedAt { get; set; }
+
+        public DateTime UpdatedAt { get; set; }
     }
 }

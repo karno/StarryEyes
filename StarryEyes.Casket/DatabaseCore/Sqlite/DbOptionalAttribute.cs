@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace StarryEyes.Casket.DatabaseModels.Generators
+namespace StarryEyes.Casket.DatabaseCore.Sqlite
 {
     [AttributeUsage(AttributeTargets.Property,
         AllowMultiple = false,

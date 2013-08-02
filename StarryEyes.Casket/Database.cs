@@ -1,13 +1,27 @@
-﻿
-using StarryEyes.Casket.Rdb;
+﻿using System;
+using System.Threading.Tasks;
+using StarryEyes.Albireo.Threading;
 
 namespace StarryEyes.Casket
 {
     public static class Database
     {
-        public static void Initialize(string dbfilepath, string kvsfilepath)
+        static readonly LimitedTaskScheduler _scheduler = new LimitedTaskScheduler(16);
+        static readonly TaskFactory _factory = new TaskFactory(_scheduler);
+
+        private static string _basePath;
+        private static bool _isInitialized;
+
+        public static string BasePath { get { return _basePath; } }
+
+        public static void Initialize(string basePath)
         {
-            Sqlite.Initialize(dbfilepath);
+            if (_isInitialized)
+            {
+                throw new InvalidOperationException("Database core is already initialized.");
+            }
+            _isInitialized = true;
+            _basePath = basePath;
         }
     }
 }

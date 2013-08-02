@@ -1,5 +1,6 @@
 ﻿using System;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Casket.DatabaseCore.Sqlite;
 using StarryEyes.Casket.DatabaseModels.Generators;
 
 namespace StarryEyes.Casket.DatabaseModels
