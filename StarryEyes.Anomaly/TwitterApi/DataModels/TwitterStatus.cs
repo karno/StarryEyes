@@ -36,13 +36,13 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
                 this.StatusType = StatusType.Tweet;
                 this.User = new TwitterUser(json.user);
                 this.Source = json.source;
-                if (json.in_reply_to_status_id())
+                if (json.in_reply_to_status_id_str())
                 {
-                    this.InReplyToStatusId = json.in_reply_to_status_id;
+                    this.InReplyToStatusId = ((string)json.in_reply_to_status_id_str).ParseLong();
                 }
-                if (json.in_reply_to_user_id())
+                if (json.in_reply_to_user_id_str())
                 {
-                    this.InReplyToUserId = json.in_reply_to_user_id;
+                    this.InReplyToUserId = ((string)json.in_reply_to_user_id_str).ParseLong();
                 }
                 if (json.in_reply_to_screen_name())
                 {
@@ -53,10 +53,10 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
                     this.RetweetedOriginal = new TwitterStatus(json.retweeted_status);
                     this.RetweetedOriginalId = this.RetweetedOriginal.Id;
                 }
-                if (json.coordinates())
+                if (json.coordinates() && json.coordinates != null)
                 {
-                    this.Longitude = json.coordinates[0];
-                    this.Latitude = json.coordinates[1];
+                    this.Longitude = (double)json.coordinates[0];
+                    this.Latitude = (double)json.coordinates[1];
                 }
             }
         }

@@ -34,8 +34,8 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
                 // delete handler
                 handler.OnDeleted(new StreamDelete
                 {
-                    Id = Int64.Parse(element.delete.id_str),
-                    UserId = Int64.Parse(element.delete.user_id_str)
+                    Id = Int64.Parse(element.delete.status.id_str),
+                    UserId = Int64.Parse(element.delete.status.user_id_str)
                 });
                 return;
             }

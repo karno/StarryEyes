@@ -6,6 +6,7 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
     {
         public static IEnumerable<TwitterEntity> GetEntities(dynamic json)
         {
+
             if (json.IsDefined("hashtags"))
             {
                 var tags = json.hashtags;
@@ -13,7 +14,8 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
                 {
                     yield return new TwitterEntity(
                         EntityType.Hashtags,
-                        tag.text, tag.text, tag.indices[0], tag.indices[1]);
+                        (string)tag.text, (string)tag.text,
+                        (int)tag.indices[0], (int)tag.indices[1]);
                 }
             }
             if (json.IsDefined("media"))
@@ -23,8 +25,8 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
                 {
                     yield return new TwitterEntity(
                         EntityType.Media,
-                        media.display_url, media.url, media.media_url,
-                        media.indices[0], media.indices[1]);
+                        (string)media.display_url, (string)media.url, (string)media.media_url,
+                        (int)media.indices[0], (int)media.indices[1]);
                 }
             }
             if (json.IsDefined("urls"))
@@ -34,8 +36,8 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
                 {
                     yield return new TwitterEntity(
                         EntityType.Urls,
-                        url.display_url, url.expanded_url,
-                        url.indices[0], url.indices[1]);
+                        (string)url.display_url, (string)url.expanded_url,
+                        (int)url.indices[0], (int)url.indices[1]);
                 }
             }
             if (json.IsDefined("user_mentions"))
@@ -45,8 +47,8 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
                 {
                     yield return new TwitterEntity(
                         EntityType.UserMentions,
-                        mention.screen_name, mention.id_str,
-                        mention.indices[0], mention.indices[1]);
+                        (string)mention.screen_name, (string)mention.id_str,
+                        (int)mention.indices[0], (int)mention.indices[1]);
                 }
             }
         }

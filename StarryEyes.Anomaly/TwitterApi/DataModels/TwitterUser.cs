@@ -22,21 +22,27 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
             this.IsDefaultProfileImage = json.default_profile_image;
             this.ProfileImageUri = ((string)json.profile_image_url).ParseUri();
             this.ProfileBackgroundImageUri = ((string)json.profile_background_image_url).ParseUri();
-            this.ProfileBannerUri = ((string)json.profile_banner_url).ParseUri();
+            if (json.profile_banner_url())
+            {
+                this.ProfileBannerUri = ((string)json.profile_banner_url).ParseUri();
+            }
             this.IsProtected = json["protected"];
             this.IsVerified = json.verified;
             this.IsTranslator = json.is_translator;
-            this.IsContributorsEnabled = json.controbutors_enabled;
+            this.IsContributorsEnabled = json.contributors_enabled;
             this.IsGeoEnabled = json.geo_enabled;
-            this.StatusesCount = json.statuses_count;
-            this.FollowingCount = json.friends_count;
-            this.FollowersCount = json.followers_count;
-            this.FavoritesCount = json.favourites_count;
-            this.ListedCount = json.listed_count;
+            this.StatusesCount = (long)json.statuses_count;
+            this.FollowingCount = (long)json.friends_count;
+            this.FollowersCount = (long)json.followers_count;
+            this.FavoritesCount = (long)json.favourites_count;
+            this.ListedCount = (long)json.listed_count;
             this.Language = json.lang;
             this.CreatedAt = ((string)json.created_at).ParseDateTime(ParsingExtension.TwitterDateTimeFormat);
-            UrlEntities = Enumerable.ToArray(TwitterEntity.GetEntities(json.entities.url));
-            DescriptionEntities = Enumerable.ToArray(TwitterEntity.GetEntities(json.entities.description));
+            if (json.entities())
+            {
+                UrlEntities = Enumerable.ToArray(TwitterEntity.GetEntities(json.entities.url));
+                DescriptionEntities = Enumerable.ToArray(TwitterEntity.GetEntities(json.entities.description));
+            }
         }
 
         public const string TwitterUserUrl = "https://twitter.com/{0}";
