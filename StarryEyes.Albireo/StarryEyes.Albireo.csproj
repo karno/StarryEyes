@@ -42,7 +42,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Interactive, Version=0.9.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>c:\Users\Karno\documents\visual studio 2012\Projects\Balse\packages\Ix-Main.0.9.0.2\lib\Net45\System.Interactive.dll</HintPath>
+      <HintPath>..\packages\Ix-Main.0.9.0.2\lib\Net45\System.Interactive.dll</HintPath>
     </Reference>
     <Reference Include="System.Reactive.Core, Version=2.1.30214.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>

@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reactive.Concurrency;
-using System.Reactive.Subjects;
 
 // ReSharper disable CheckNamespace
 namespace System.Reactive.Linq
