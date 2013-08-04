@@ -5,7 +5,7 @@ using System.IO.Compression;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace Ripple
+namespace SweetMagic
 {
     public static class ReleaseActionFactory
     {

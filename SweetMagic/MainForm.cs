@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Ripple
+namespace SweetMagic
 {
     public partial class MainForm : Form
     {

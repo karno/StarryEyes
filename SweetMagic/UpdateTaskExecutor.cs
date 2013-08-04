@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Net.Http;
-using System.Net.Http.Handlers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using SweetMagic.Http;
 
-namespace Ripple
+namespace SweetMagic
 {
     public class UpdateTaskExecutor
     {
@@ -120,11 +120,11 @@ namespace Ripple
         {
             var progress = 0;
             var http = new HttpClientHandler();
-            var pmh = new ProgressMessageHandler(http);
-            pmh.HttpReceiveProgress += (sender, args) =>
+            var ph = new ProgressHandler(http);
+            ph.ReceiveProgress += (sender, args) =>
             {
-                if (progress == args.ProgressPercentage) return;
-                progress = args.ProgressPercentage;
+                if (progress == args.Percentage) return;
+                progress = args.Percentage ?? 0;
                 if (progress % 10 == 0 && progress != 100)
                 {
                     this.NotifyProgress(progress + "%", false);
@@ -134,7 +134,7 @@ namespace Ripple
                     this.NotifyProgress(".", false);
                 }
             };
-            var client = new HttpClient(pmh);
+            var client = new HttpClient(ph);
             var result = await client.GetByteArrayAsync(url);
             this.NotifyProgress("complete.");
             return result;

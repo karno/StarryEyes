@@ -275,6 +275,10 @@ namespace StarryEyes
 
         #region Definitions
 
+        public const string AppShortName = "Krile";
+
+        public const string AppFullName = "Krile STARRYEYES";
+
         internal static readonly string ConsumerKey = "HzbATXmr3JpNXRPDNtkXww";
 
         internal static readonly string ConsumerSecret = "BfBH1h68S45X4kAlVdJAoopbEIEyF43kaRQe1vC2po";
@@ -395,18 +399,41 @@ namespace StarryEyes
         {
             get
             {
-                return Version.FileMajorPart + "." +
-                       Version.FileMinorPart + "." +
-                       Version.FilePrivatePart +
-                       (IsNightlyVersion ? " BETA" : "");
+                var basestr = Version.FileMajorPart + "." +
+                              Version.FileMinorPart + "." +
+                              Version.FilePrivatePart;
+                switch (ReleaseKind)
+                {
+                    case ReleaseKind.Stable:
+                        return basestr;
+                    case ReleaseKind.Daybreak:
+                        return basestr + " daybreak";
+                    case ReleaseKind.Midnight:
+                        return basestr + " midnight #" + Version.FileBuildPart;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
             }
         }
 
-        public static bool IsNightlyVersion
+        public static bool IsUnstableVersion
+        {
+            get { return Version.FilePrivatePart % 2 == 1; }
+        }
+
+        public static ReleaseKind ReleaseKind
         {
             get
             {
-                return Version.FilePrivatePart % 2 == 1;
+                // A.B.C.D
+                // C % 2 == 0 -> Stable
+                // C % 2 == 1 && D % 2 == 0 -> Daybreak
+                // C % 2 == 1 && D % 2 == 1 -> Midnight
+                return Version.FilePrivatePart % 2 == 0
+                           ? ReleaseKind.Stable
+                           : (Version.FileBuildPart % 2 == 0
+                                  ? ReleaseKind.Daybreak
+                                  : ReleaseKind.Midnight);
             }
         }
 
@@ -530,5 +557,12 @@ namespace StarryEyes
         Default,
         Roaming,
         Standalone,
+    }
+
+    public enum ReleaseKind
+    {
+        Stable,
+        Daybreak,
+        Midnight,
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace Ripple
+﻿namespace SweetMagic
 {
     partial class MainForm
     {
@@ -66,7 +66,7 @@
             // 
             // pictureBox1
             // 
-            this.pictureBox1.Image = global::Ripple.Properties.Resources.logo_64;
+            this.pictureBox1.Image = global::SweetMagic.Properties.Resources.logo_64;
             this.pictureBox1.Location = new System.Drawing.Point(436, 0);
             this.pictureBox1.Margin = new System.Windows.Forms.Padding(0);
             this.pictureBox1.Name = "pictureBox1";

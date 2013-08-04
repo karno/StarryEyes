@@ -74,6 +74,24 @@ namespace StarryEyes.ViewModels
 
         #region Properties
 
+        public string WindowTitle
+        {
+            get
+            {
+                var name = App.AppFullName;
+                switch (App.ReleaseKind)
+                {
+                    case ReleaseKind.Stable:
+                        return name;
+                    case ReleaseKind.Daybreak:
+                    case ReleaseKind.Midnight:
+                        return name + " " + App.FormattedVersion;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+        }
+
         private bool _showWindowCommands = true;
 
         public bool ShowWindowCommands

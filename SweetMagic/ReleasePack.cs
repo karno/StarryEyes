@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 
-namespace Ripple
+namespace SweetMagic
 {
     public class ReleasePack
     {
