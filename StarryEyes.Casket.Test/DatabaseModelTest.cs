@@ -1,8 +1,6 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Casket.DatabaseModels;
-using StarryEyes.Casket.DatabaseModels.Generators;
 
 namespace StarryEyes.Casket.Test
 {
@@ -12,63 +10,11 @@ namespace StarryEyes.Casket.Test
     [TestClass]
     public class DatabaseModelTest
     {
-        private DatabaseStatus _dbStatus;
-        private DatabaseUser _dbUser;
-        private DatabaseEntity _dbEntity;
+        private readonly TestModelProvider _modelProvider;
 
         public DatabaseModelTest()
         {
-            _dbStatus = new DatabaseStatus
-            {
-                CreatedAt = new DateTime(2013, 07, 29, 02, 05, 30),
-                Id = 271828182845904L,
-                InReplyToScreenName = "in_reply_to",
-                InReplyToStatusId = 314159265358979L,
-                InReplyToUserId = 14142135623730950L,
-                Latitude = 1.7320508,
-                Longitude = 2.23620679,
-                RecipientId = null,
-                RetweetOriginalId = null,
-                Source = "<a href=\"http://fabrikam.com/\">contoso</a>",
-                StatusType = StatusType.Tweet,
-                Text = "春はあけぼの。やうやう白くなりゆく山際、少しあかりて、紫だちたる雲の細くたなびきたる。",
-                UserId = 114541919810893L
-            };
-            _dbUser = new DatabaseUser
-            {
-
-                CreatedAt = new DateTime(2013, 07, 29, 02, 05, 30),
-                Id = 271828182845904L,
-                Description = "夏は夕暮れ。月の頃はさらなり。闇もなほ、蛍のおほく飛びちがひたる。",
-                FavoritesCount = 1024,
-                FollowersCount = 2048,
-                FollowingCount = 4096,
-                IsContributorsEnabled = false,
-                IsDefaultProfileImage = false,
-                IsGeoEnabled = false,
-                IsProtected = false,
-                IsTranslator = false,
-                IsVerified = false,
-                Language = "ja-JP",
-                ListedCount = 8192,
-                Location = "圏外",
-                Name = "はる",
-                ProfileBackgroundImageUri = "https://www.google.co.jp/images/srpr/logo3w.png",
-                ProfileBannerUri = "https://www.google.co.jp/images/srpr/logo4w.png",
-                ProfileImageUri = "https://www.google.co.jp/images/srpr/logo1w.png",
-                ScreenName = "haru067"
-            };
-            _dbEntity = new DatabaseEntity
-            {
-                DisplayText = "http://fabrikam.com/",
-                EndIndex = 48,
-                EntityType = EntityType.Urls,
-                Id = 271828182845904L,
-                MediaUrl = "http://fabrikam.com/media",
-                OriginalText = "http://fabrikam.com/original",
-                ParentId = 1054571172647L,
-                StartIndex = 24,
-            };
+            _modelProvider = new TestModelProvider();
         }
 
         private string GetStat(DbModelBase model)
@@ -90,7 +36,7 @@ DELETER: DELETE Status WHERE Id = @Id;";
         [TestMethod]
         public void TestStatus()
         {
-            Assert.AreEqual(this.GetStat(_dbStatus), StatusExpected);
+            Assert.AreEqual(this.GetStat(_modelProvider.DbStatus), StatusExpected);
         }
 
         private const string UserExpected = @"CREATOR: CREATE TABLE User(Id INT PRIMARY KEY, ScreenName TEXT NOT NULL, Name TEXT NOT NULL, Description TEXT NOT NULL, Location TEXT NOT NULL, Url TEXT NOT NULL, IsDefaultProfileImage BOOLEAN NOT NULL, ProfileImageUri TEXT NOT NULL, ProfileBackgroundImageUri TEXT NOT NULL, ProfileBannerUri TEXT NOT NULL, IsProtected BOOLEAN NOT NULL, IsVerified BOOLEAN NOT NULL, IsTranslator BOOLEAN NOT NULL, IsContributorsEnabled BOOLEAN NOT NULL, IsGeoEnabled BOOLEAN NOT NULL, StatusesCount INT NOT NULL, FollowingCount INT NOT NULL, FollowersCount INT NOT NULL, FavoritesCount INT NOT NULL, ListedCount INT NOT NULL, Language TEXT NOT NULL, CreatedAt DATETIME NOT NULL, TableName TEXT NOT NULL, TableCreator TEXT NOT NULL, TableInserter TEXT NOT NULL, TableUpdator TEXT NOT NULL, TableDeletor TEXT NOT NULL);
@@ -101,7 +47,7 @@ DELETER: DELETE User WHERE Id = @Id;";
         [TestMethod]
         public void TestUser()
         {
-            Assert.AreEqual(this.GetStat(_dbUser), UserExpected);
+            Assert.AreEqual(this.GetStat(_modelProvider.DbUser), UserExpected);
         }
 
         private const string EntityExpected = @"CREATOR: CREATE TABLE DatabaseEntity(Id INT PRIMARY KEY, ParentId INT NOT NULL, EntityType INT NOT NULL, DisplayText TEXT NOT NULL, OriginalText TEXT NOT NULL, MediaUrl TEXT, StartIndex INT NOT NULL, EndIndex INT NOT NULL, TableName TEXT NOT NULL, TableCreator TEXT NOT NULL, TableInserter TEXT NOT NULL, TableUpdator TEXT NOT NULL, TableDeletor TEXT NOT NULL);
@@ -112,10 +58,8 @@ DELETER: DELETE DatabaseEntity WHERE Id = @Id;";
         [TestMethod]
         public void TestEntity()
         {
-            Assert.AreEqual(this.GetStat(_dbEntity), EntityExpected);
+            Assert.AreEqual(this.GetStat(_modelProvider.DbEntity), EntityExpected);
         }
-
-
 
     }
 }
