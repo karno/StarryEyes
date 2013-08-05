@@ -27,7 +27,7 @@ namespace StarryEyes.Casket.Test
                 InReplyToUserId = 14142135623730950L,
                 Latitude = 1.7320508,
                 Longitude = 2.23620679,
-                Recipient = null,
+                RecipientId = null,
                 RetweetOriginalId = null,
                 Source = "<a href=\"http://fabrikam.com/\">contoso</a>",
                 StatusType = StatusType.Tweet,

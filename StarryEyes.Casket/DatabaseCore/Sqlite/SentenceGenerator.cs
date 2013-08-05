@@ -103,11 +103,11 @@ namespace StarryEyes.Casket.DatabaseCore.Sqlite
             return GetTableInserter(typeof(T));
         }
 
-        public static string GetTableInserter(Type type)
+        public static string GetTableInserter(Type type, bool replaceOnConflict = false)
         {
             var builder = new StringBuilder();
             var values = new StringBuilder();
-            builder.Append("INSERT INTO ");
+            builder.Append(replaceOnConflict ? "INSERT OR REPLACE INTO " : "INSERT INTO ");
             builder.Append(GetTableName(type));
             builder.Append("(");
             values.Append(" VALUES ");
@@ -115,6 +115,12 @@ namespace StarryEyes.Casket.DatabaseCore.Sqlite
             var first = true;
             foreach (var prop in type.GetProperties())
             {
+                var pk = prop.GetTypedCustomAttribute<DbPrimaryKeyAttribute>();
+                if (pk != null && pk.IsAutoIncrement)
+                {
+                    // ignore auto increment primary key
+                    continue;
+                }
                 if (!first)
                 {
                     builder.Append(", ");

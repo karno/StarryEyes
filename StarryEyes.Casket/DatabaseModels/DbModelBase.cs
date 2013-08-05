@@ -5,6 +5,11 @@ namespace StarryEyes.Casket.DatabaseModels
 {
     public abstract class DbModelBase
     {
+        protected virtual bool ReplaceOnConflict
+        {
+            get { return true; }
+        }
+
         private string _tableName;
         public string TableName
         {
@@ -17,22 +22,22 @@ namespace StarryEyes.Casket.DatabaseModels
             get { return this._tableCreator ?? (this._tableCreator = SentenceGenerator.GetTableCreator(this.GetType())); }
         }
 
-        private string _tableInsertor;
+        private string _tableInserter;
         public string TableInserter
         {
-            get { return this._tableInsertor ?? (this._tableInsertor = SentenceGenerator.GetTableInserter(this.GetType())); }
+            get { return this._tableInserter ?? (this._tableInserter = SentenceGenerator.GetTableInserter(this.GetType(), ReplaceOnConflict)); }
         }
 
-        private string _tableUpdator;
+        private string _tableUpdater;
         public string TableUpdator
         {
-            get { return this._tableUpdator ?? (this._tableUpdator = SentenceGenerator.GetTableUpdater(this.GetType())); }
+            get { return this._tableUpdater ?? (this._tableUpdater = SentenceGenerator.GetTableUpdater(this.GetType())); }
         }
 
-        private string _tableDeletor;
+        private string _tableDeleter;
         public string TableDeletor
         {
-            get { return this._tableDeletor ?? (this._tableDeletor = SentenceGenerator.GetTableDeleter(this.GetType())); }
+            get { return this._tableDeleter ?? (this._tableDeleter = SentenceGenerator.GetTableDeleter(this.GetType())); }
         }
     }
 }

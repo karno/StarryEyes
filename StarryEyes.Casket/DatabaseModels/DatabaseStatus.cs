@@ -35,6 +35,6 @@ namespace StarryEyes.Casket.DatabaseModels
 
         public long? RetweetOriginalId { get; set; }
 
-        public long? Recipient { get; set; }
+        public long? RecipientId { get; set; }
     }
 }

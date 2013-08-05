@@ -6,12 +6,19 @@ namespace StarryEyes.Casket.DatabaseModels
 {
     public class DatabaseEntity : DbModelBase
     {
+        protected override bool ReplaceOnConflict
+        {
+            get { return false; }
+        }
+
         [DbPrimaryKey]
         public long Id { get; set; }
 
         public long ParentId { get; set; }
 
         public EntityType EntityType { get; set; }
+
+        public EntityParentType EntityParentType { get; set; }
 
         public string DisplayText { get; set; }
 
@@ -36,5 +43,12 @@ namespace StarryEyes.Casket.DatabaseModels
                 StartIndex = StartIndex,
             };
         }
+    }
+
+    public enum EntityParentType
+    {
+        Status,
+        UserDescription,
+        UserUrl,
     }
 }
