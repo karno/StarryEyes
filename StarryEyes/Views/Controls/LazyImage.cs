@@ -173,7 +173,9 @@ namespace StarryEyes.Views.Controls
             {
                 if (source == null || image.UriSource != sourceFrom) return;
                 if (!source.IsFrozen)
+                {
                     throw new ArgumentException("Image is not frozen.");
+                }
                 image.Source = source;
             }
             // ReSharper disable EmptyGeneralCatchClause
