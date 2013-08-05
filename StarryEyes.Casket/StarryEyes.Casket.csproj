@@ -74,6 +74,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Database.cs" />
+    <Compile Include="DatabaseCore\IDatabase.cs" />
     <Compile Include="DatabaseCore\Maintenance.cs" />
     <Compile Include="DatabaseModels\DatabaseActivity.cs" />
     <Compile Include="DatabaseModels\DatabaseEntity.cs" />
