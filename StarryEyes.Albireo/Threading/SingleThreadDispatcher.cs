@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace StarryEyes.Albireo.Threading
 {
+    [Obsolete]
     public class SingleThreadDispatcher : IDisposable
     {
         private readonly Queue<Action> _operations;
