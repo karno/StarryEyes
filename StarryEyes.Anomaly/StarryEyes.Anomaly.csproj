@@ -110,6 +110,7 @@
     <Compile Include="TwitterApi\Rest\Infrastructure\ApiAccess.cs" />
     <Compile Include="TwitterApi\Streaming\StreamingConnector.cs" />
     <Compile Include="TwitterApi\Streaming\UserStreams.cs" />
+    <Compile Include="TwitterApi\TwitterApiException.cs" />
     <Compile Include="Utils\HttpUtility.cs" />
     <Compile Include="Utils\ParsingExtension.cs" />
     <Compile Include="Utils\ReactiveUtility.cs" />

@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Http;
 using AsyncOAuth;
 using StarryEyes.Anomaly.Ext;
+using StarryEyes.Anomaly.TwitterApi;
 using StarryEyes.Anomaly.Utils;
 
 namespace StarryEyes.Anomaly
@@ -40,15 +41,16 @@ namespace StarryEyes.Anomaly
         private static HttpMessageHandler GetInnerHandler(bool useGZip)
         {
             var proxy = Core.GetWebProxy();
-            return new HttpClientHandler
-            {
-                AutomaticDecompression =
-                    useGZip
-                        ? DecompressionMethods.GZip | DecompressionMethods.Deflate
-                        : DecompressionMethods.None,
-                Proxy = proxy,
-                UseProxy = proxy != null
-            };
+            return new TwitterApiExceptionHandler(
+                new HttpClientHandler
+                {
+                    AutomaticDecompression =
+                        useGZip
+                            ? DecompressionMethods.GZip | DecompressionMethods.Deflate
+                            : DecompressionMethods.None,
+                    Proxy = proxy,
+                    UseProxy = proxy != null
+                });
         }
 
         internal static FormUrlEncodedContent ParametalizeForPost(this Dictionary<string, object> dict)
