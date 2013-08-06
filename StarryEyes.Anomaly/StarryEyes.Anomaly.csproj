@@ -86,6 +86,7 @@
     <Compile Include="IOAuthCredential.cs" />
     <Compile Include="TwitterApi\ApiEndpoint.cs" />
     <Compile Include="TwitterApi\Rest\Accounts.cs" />
+    <Compile Include="TwitterApi\Rest\Blockings.cs" />
     <Compile Include="TwitterApi\Rest\Cursoring.cs" />
     <Compile Include="TwitterApi\Rest\DirectMessages.cs" />
     <Compile Include="TwitterApi\Rest\Favorites.cs" />
