@@ -1,6 +1,6 @@
 ﻿using System;
-using StarryEyes.Breezy.Api.Rest;
-using StarryEyes.Breezy.Authorize;
+using StarryEyes.Anomaly.TwitterApi.Rest;
+using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Models.Stores;
 using StarryEyes.Settings;
@@ -9,11 +9,11 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
 {
     public class UserInfoReceiver : CyclicReceiverBase
     {
-        private readonly AuthenticateInfo _authInfo;
+        private readonly TwitterAccount _account;
 
-        public UserInfoReceiver(AuthenticateInfo authInfo)
+        public UserInfoReceiver(TwitterAccount account)
         {
-            _authInfo = authInfo;
+            this._account = account;
         }
 
         protected override int IntervalSec
@@ -21,20 +21,19 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
             get { return Setting.UserInfoReceivePeriod.Value; }
         }
 
-        protected override void DoReceive()
+        protected override async void DoReceive()
         {
-            _authInfo.ShowUser(this._authInfo.Id)
-                     .Subscribe(u =>
-                     {
-                         _authInfo.UnreliableScreenName = u.ScreenName;
-                         _authInfo.UnreliableProfileImageUriString = u.ProfileImageUri.OriginalString;
-                         _authInfo.UserInfo = u;
-                         UserStore.Store(u);
-                     },
-                                ex => BackstageModel.RegisterEvent(
-                                    new OperationFailedEvent("user info receive error: " +
-                                                             _authInfo.UnreliableScreenName + " - " +
-                                                             ex.Message)));
+            try
+            {
+                var user = await this._account.ShowUser(this._account.Id);
+                this._account.UnreliableScreenName = user.ScreenName;
+                this._account.UnreliableProfileImage = user.ProfileImageUri;
+                UserStore.Store(user);
+            }
+            catch (Exception ex)
+            {
+                BackstageModel.RegisterEvent(new OperationFailedEvent("ユーザ情報を取得できません(@" + this._account.UnreliableScreenName + "): " + ex.Message));
+            }
         }
     }
 }

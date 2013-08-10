@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Reactive.Linq;
-using StarryEyes.Breezy.Authorize;
-using StarryEyes.Breezy.DataModel;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Stores;
 using StarryEyes.Settings;
 
@@ -21,35 +21,38 @@ namespace StarryEyes.Models.Subsystems
 
         public static void Initialize()
         {
-            AccountsStore.Accounts.CollectionChanged += AccountsOnCollectionChanged;
-            AccountsStore.Accounts.ForEach(a => SetupAccount(a.AuthenticateInfo));
+            Setting.Accounts.Collection.ListenCollectionChanged().Subscribe(AccountsChanged);
+            Setting.Accounts.Collection.ForEach(SetupAccount);
             StatusStore.StatusPublisher
                        .Where(d => d.IsAdded)
                        .Select(d => d.Status)
                        .Subscribe(PostDetected);
         }
 
-        private static void AccountsOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private static void AccountsChanged(NotifyCollectionChangedEventArgs e)
         {
-            var target = ((AccountSetting)e.NewItems[0]).AuthenticateInfo;
+            var added = e.NewItems != null ? e.NewItems[0] as TwitterAccount : null;
+            var removed = e.OldItems != null ? e.OldItems[0] as TwitterAccount : null;
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    SetupAccount(target);
+                    SetupAccount(added);
                     break;
                 case NotifyCollectionChangedAction.Remove:
-                    RemoveAccount(target);
+                    RemoveAccount(removed);
                     break;
                 case NotifyCollectionChangedAction.Replace:
+                    RemoveAccount(removed);
+                    SetupAccount(added);
                     break;
-                case NotifyCollectionChangedAction.Move:
+                case NotifyCollectionChangedAction.Reset:
+                    _dictionary.Clear();
+                    Setting.Accounts.Collection.ForEach(SetupAccount);
                     break;
-                default:
-                    throw new ArgumentOutOfRangeException();
             }
         }
 
-        private static void SetupAccount(AuthenticateInfo info)
+        private static void SetupAccount(TwitterAccount info)
         {
             lock (_dictLock)
             {
@@ -60,7 +63,7 @@ namespace StarryEyes.Models.Subsystems
             }
         }
 
-        private static void RemoveAccount(AuthenticateInfo info)
+        private static void RemoveAccount(TwitterAccount info)
         {
             lock (_dictLock)
             {

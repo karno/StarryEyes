@@ -20,6 +20,7 @@
 
         public static implicit operator string(ApiAccess access)
         {
+            System.Diagnostics.Debug.WriteLine("API Access:" + access.ToString());
             return access.ToString();
         }
     }

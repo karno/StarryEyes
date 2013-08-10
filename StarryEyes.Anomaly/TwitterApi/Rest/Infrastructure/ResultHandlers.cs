@@ -73,7 +73,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest.Infrastructure
             return await response.EnsureSuccessStatusCode().Content.ReadAsStringAsync();
         }
 
-        public static async Task<CursorResult<IEnumerable<long>>> ReadAsCursoredIdsAsync(
+        public static async Task<ICursorResult<IEnumerable<long>>> ReadAsCursoredIdsAsync(
             this HttpResponseMessage response)
         {
             var json = await response.ReadAsStringAsync();
@@ -85,7 +85,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest.Infrastructure
                 parsed.previous_cursor_str, parsed.next_cursor_str);
         }
 
-        public static async Task<CursorResult<IEnumerable<TwitterUser>>> ReadAsCursoredUsersAsync(
+        public static async Task<ICursorResult<IEnumerable<TwitterUser>>> ReadAsCursoredUsersAsync(
             this HttpResponseMessage response)
         {
             var json = await response.ReadAsStringAsync();

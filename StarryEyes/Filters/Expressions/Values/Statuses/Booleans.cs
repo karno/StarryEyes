@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using StarryEyes.Breezy.DataModel;
-using StarryEyes.Models.Stores;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Settings;
 
 namespace StarryEyes.Filters.Expressions.Values.Statuses
 {
@@ -33,7 +33,7 @@ namespace StarryEyes.Filters.Expressions.Values.Statuses
 
         public override Func<TwitterStatus, bool> GetBooleanValueProvider()
         {
-            var accounts = AccountRelationDataStore.AccountRelations.Select(a => a.AccountId).ToArray();
+            var accounts = Setting.Accounts.Collection.Select(a => a.Id).ToArray();
             return s => s.FavoritedUsers != null && accounts.Any(a => s.FavoritedUsers.Contains(a));
         }
 
@@ -52,7 +52,7 @@ namespace StarryEyes.Filters.Expressions.Values.Statuses
 
         public override Func<TwitterStatus, bool> GetBooleanValueProvider()
         {
-            var accounts = AccountRelationDataStore.AccountRelations.Select(a => a.AccountId).ToArray();
+            var accounts = Setting.Accounts.Collection.Select(a => a.Id).ToArray();
             return s => s.RetweetedUsers != null && accounts.Any(a => s.RetweetedUsers.Contains(a));
         }
 

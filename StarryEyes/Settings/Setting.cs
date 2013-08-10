@@ -1,12 +1,14 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xaml;
-using StarryEyes.Breezy.DataModel;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Filters;
 using StarryEyes.Filters.Expressions;
 using StarryEyes.Filters.Parsing;
+using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Tab;
 using StarryEyes.Nightmare.Windows;
 
@@ -14,7 +16,7 @@ namespace StarryEyes.Settings
 {
     public static class Setting
     {
-        private static SortedDictionary<string, object> _settingValueHolder;
+        private static ConcurrentDictionary<string, object> _settingValueHolder;
 
         public static readonly SettingItemStruct<bool> IsPowerUser =
             new SettingItemStruct<bool>("IsPowerUser", false);
@@ -61,8 +63,15 @@ namespace StarryEyes.Settings
 
         #region Authentication and accounts
 
-        private static readonly SettingItem<List<AccountSetting>> _accounts =
-            new SettingItem<List<AccountSetting>>("Accounts", new List<AccountSetting>());
+        private static readonly SettingItem<List<TwitterAccount>> _accounts =
+            new SettingItem<List<TwitterAccount>>("Accounts", new List<TwitterAccount>());
+
+        private static AccountManager _manager;
+
+        public static AccountManager Accounts
+        {
+            get { return _manager; }
+        }
 
         public static readonly SettingItem<string> GlobalConsumerKey =
             new SettingItem<string>("GlobalConsumerKey", null);
@@ -72,14 +81,6 @@ namespace StarryEyes.Settings
 
         public static readonly SettingItemStruct<bool> IsBacktrackFallback =
             new SettingItemStruct<bool>("IsBacktrackFallback", true);
-
-        // ReSharper disable InconsistentNaming
-        internal static IEnumerable<AccountSetting> Infrastructure_Accounts
-        {
-            get { return _accounts.Value; }
-            set { _accounts.Value = value.ToList(); }
-        }
-        // ReSharper restore InconsistentNaming
 
         #endregion
 
@@ -388,9 +389,10 @@ namespace StarryEyes.Settings
                 {
                     using (var fs = File.Open(App.ConfigurationFilePath, FileMode.Open, FileAccess.Read))
                     {
-                        _settingValueHolder = new SortedDictionary<string, object>(
+                        _settingValueHolder = new ConcurrentDictionary<string, object>(
                             XamlServices.Load(fs) as IDictionary<string, object> ?? new Dictionary<string, object>());
                     }
+                    _manager = new AccountManager(_accounts);
                     return true;
                 }
                 catch (Exception ex)
@@ -436,12 +438,14 @@ namespace StarryEyes.Settings
                         }
                     }
                     File.Delete(App.ConfigurationFilePath);
-                    _settingValueHolder = new SortedDictionary<string, object>();
+                    _settingValueHolder = new ConcurrentDictionary<string, object>();
+                    _manager = new AccountManager(_accounts);
                     return true;
                 }
             }
-            _settingValueHolder = new SortedDictionary<string, object>();
+            _settingValueHolder = new ConcurrentDictionary<string, object>();
             IsFirstGenerated = true;
+            _manager = new AccountManager(_accounts);
             return true;
         }
 
@@ -449,14 +453,13 @@ namespace StarryEyes.Settings
         {
             using (var fs = File.Open(App.ConfigurationFilePath, FileMode.Create, FileAccess.ReadWrite))
             {
-                XamlServices.Save(fs, _settingValueHolder);
+                // sort by key
+                var sd = new SortedDictionary<string, object>(_settingValueHolder);
+                XamlServices.Save(fs, sd);
             }
         }
 
-        public static void Clear()
-        {
-            Properties.Settings.Default.Reset();
-        }
+
     }
 
     public enum ScrollLockStrategy

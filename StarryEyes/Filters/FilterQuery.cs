@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using StarryEyes.Breezy.DataModel;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Filters.Expressions;
 using StarryEyes.Filters.Sources;
 

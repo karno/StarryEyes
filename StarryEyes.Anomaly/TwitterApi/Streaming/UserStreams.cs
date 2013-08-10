@@ -13,9 +13,14 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
         public static IObservable<string> ConnectUserStreams(
             this IOAuthCredential credential, IEnumerable<string> tracks, bool repliesAll = false)
         {
+            var filteredTracks = tracks != null
+                                     ? tracks.Where(t => !String.IsNullOrEmpty(t))
+                                             .Distinct()
+                                             .JoinString(",")
+                                     : null;
             var param = new Dictionary<string, object>
             {
-                {"track", tracks == null ? null : tracks.JoinString(",")},
+                {"track", String.IsNullOrEmpty(filteredTracks) ? null : filteredTracks },
                 {"replies", repliesAll ? "all" : null},
             }.ParametalizeForGet();
             return Observable.Create<string>(async (observer, cancel) =>
@@ -28,7 +33,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
                     var endpoint = EndpointUserStreams;
                     if (!String.IsNullOrEmpty(param))
                     {
-                        endpoint += param;
+                        endpoint += "?" + param;
                     }
                     using (var stream = await client.GetStreamAsync(endpoint))
                     using (var reader = new StreamReader(stream))

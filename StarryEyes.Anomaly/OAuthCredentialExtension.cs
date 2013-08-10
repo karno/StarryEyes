@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 using AsyncOAuth;
 using StarryEyes.Anomaly.Ext;
 using StarryEyes.Anomaly.TwitterApi;
-using StarryEyes.Anomaly.Utils;
 
 namespace StarryEyes.Anomaly
 {
@@ -64,10 +65,33 @@ namespace StarryEyes.Anomaly
         {
             return dict.Where(kvp => kvp.Value != null)
                        .OrderBy(kvp => kvp.Key)
-                       .Select(kvp => HttpUtility.UrlEncode(kvp.Key) +
+                       .Select(kvp => kvp.Key +
                                       "=" +
-                                      HttpUtility.UrlEncode(kvp.Value.ToString()))
+                                      EncodeForParameters(kvp.Value.ToString()))
                        .JoinString("&");
+        }
+
+        const string AllowedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.~";
+
+        private static string EncodeForParameters(string value)
+        {
+            var result = new StringBuilder();
+            var data = Encoding.UTF8.GetBytes(value);
+            var len = data.Length;
+
+            for (var i = 0; i < len; i++)
+            {
+                int c = data[i];
+                if (c < 0x80 && AllowedChars.IndexOf((char)c) != -1)
+                {
+                    result.Append((char)c);
+                }
+                else
+                {
+                    result.Append('%' + String.Format("{0:x2}", (int)data[i]));
+                }
+            }
+            return result.ToString();
         }
     }
 }

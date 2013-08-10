@@ -2,15 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 using Livet.Messaging;
-using StarryEyes.Breezy.Api.Rest;
-using StarryEyes.Breezy.DataModel;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Anomaly.TwitterApi.Rest;
+using StarryEyes.Anomaly.Utils;
 using StarryEyes.Filters;
 using StarryEyes.Filters.Parsing;
-using StarryEyes.Models;
-using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Models.Stores;
 using StarryEyes.Models.Tab;
+using StarryEyes.Settings;
 using StarryEyes.Vanille.DataStore;
 using StarryEyes.ViewModels.WindowParts.Timelines;
 
@@ -42,14 +43,16 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             this._parent = parent;
             _query = query;
             _option = option;
-            _timelineModel = new TimelineModel(
+            _timelineModel = TimelineModel.FromObservable(
                 _predicate = CreatePredicate(query, option),
                 (id, c, _) => Fetch(id, c));
             this.CompositeDisposable.Add(_timelineModel);
             IsLoading = true;
-            _timelineModel.ReadMore(null)
-                          .Finally(() => IsLoading = false)
-                          .Subscribe();
+            Task.Run(async () =>
+            {
+                await _timelineModel.ReadMore(null);
+                IsLoading = false;
+            });
             MainAreaViewModel.TimelineActionTargetOverride = this;
         }
 
@@ -85,25 +88,12 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                     {
                         return Observable.Empty<TwitterStatus>();
                     }
-                    return Observable.Start(() => TabManager.CurrentFocusTab.Timeline.Statuses)
-                                     .SelectMany(s => s)
+                    return TabManager.CurrentFocusTab.Timeline.Statuses
                                      .Select(s => s.Status)
-                                     .Where(s => _predicate(s));
+                                     .Where(s => _predicate(s))
+                                     .ToObservable();
                 case SearchOption.Web:
-                    var info = AccountsStore.Accounts
-                                            .Shuffle()
-                                            .Select(s => s.AuthenticateInfo)
-                                            .FirstOrDefault();
-                    if (info == null)
-                    {
-                        return Observable.Empty<TwitterStatus>();
-                    }
-                    return info.SearchTweets(_query, count: count, max_id: maxId)
-                               .Catch((Exception ex) =>
-                               {
-                                   BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message));
-                                   return Observable.Empty<TwitterStatus>();
-                               });
+                    return Setting.Accounts.GetRandomOne().Search(_query, maxId: maxId, count: count).ToObservable();
                 default:
                     var fetch = Observable.Start(() =>
                                                  StatusStore.Find(_predicate,

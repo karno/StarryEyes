@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using StarryEyes.Albireo.Data;
 using StarryEyes.Models.Stores;
+using StarryEyes.Settings;
 
 namespace StarryEyes.Filters.Expressions.Values.Locals
 {
@@ -16,34 +17,40 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
         public UserSpecified(string screenName)
         {
             _originalScreenName = screenName;
-            _userId = AccountsStore.Accounts
-                .Where(u => u.AuthenticateInfo.UnreliableScreenName == screenName)
-                .Select(u => u.UserId)
-                .FirstOrDefault();
+            _userId = Setting.Accounts
+                             .Collection
+                             .Where(
+                                 u =>
+                                 u.UnreliableScreenName.Equals(
+                                     screenName, StringComparison.CurrentCultureIgnoreCase))
+                             .Select(u => u.Id)
+                             .FirstOrDefault();
             if (_userId == 0)
             {
                 _userId = UserStore.GetId(screenName);
             }
             else
             {
-                _adata = AccountRelationDataStore.Get(_userId);
+                var account = Setting.Accounts.Get(_userId);
+                _adata = account != null ? account.RelationData : null;
             }
         }
 
         public UserSpecified(long id)
         {
             _userId = id;
-            _adata = AccountRelationDataStore.Get(_userId);
+            var account = Setting.Accounts.Get(_userId);
+            _adata = account != null ? account.RelationData : null;
         }
 
         public override void BeginLifecycle()
         {
-            AccountRelationDataStore.AccountDataUpdated += this.AccountRelationDataAccountDataUpdated;
+            AccountRelationData.AccountDataUpdatedStatic += this.AccountRelationDataAccountDataUpdated;
         }
 
         public override void EndLifecycle()
         {
-            AccountRelationDataStore.AccountDataUpdated -= this.AccountRelationDataAccountDataUpdated;
+            AccountRelationData.AccountDataUpdatedStatic -= this.AccountRelationDataAccountDataUpdated;
         }
 
         void AccountRelationDataAccountDataUpdated(RelationDataChangedInfo obj)

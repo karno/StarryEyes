@@ -6,8 +6,8 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using StarryEyes.Breezy.DataModel;
-using StarryEyes.Breezy.Util;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Anomaly.Utils;
 using StarryEyes.Models;
 
 namespace StarryEyes.Views.Utils

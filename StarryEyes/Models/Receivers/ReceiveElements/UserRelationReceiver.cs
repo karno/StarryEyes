@@ -2,21 +2,20 @@
 using System.Linq;
 using System.Reactive.Linq;
 using StarryEyes.Albireo.Data;
-using StarryEyes.Breezy.Api.Rest;
-using StarryEyes.Breezy.Authorize;
+using StarryEyes.Anomaly.TwitterApi.Rest;
+using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;
-using StarryEyes.Models.Stores;
 using StarryEyes.Settings;
 
 namespace StarryEyes.Models.Receivers.ReceiveElements
 {
     public class UserRelationReceiver : CyclicReceiverBase
     {
-        private readonly AuthenticateInfo _authInfo;
+        private readonly TwitterAccount _account;
 
-        public UserRelationReceiver(AuthenticateInfo authInfo)
+        public UserRelationReceiver(TwitterAccount account)
         {
-            _authInfo = authInfo;
+            this._account = account;
         }
 
         protected override int IntervalSec
@@ -26,27 +25,31 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
 
         protected override void DoReceive()
         {
-            // get relation info
-            var reldata = AccountRelationDataStore.Get(_authInfo.Id);
+            // get relation account
+            var reldata = _account.RelationData;
             var beforeFollowing = new AVLTree<long>(reldata.Following);
             var beforeFollowers = new AVLTree<long>(reldata.Followers);
             var beforeBlockings = new AVLTree<long>(reldata.Blockings);
             // get followings / followers
             Observable.Merge(
-                _authInfo.GetFriendsIdsAll(_authInfo.Id)
-                         .Do(id => beforeFollowing.Remove(id))
-                         .Do(reldata.AddFollowing),
-                _authInfo.GetFollowerIdsAll(_authInfo.Id)
-                         .Do(id => beforeFollowers.Remove(id))
-                         .Do(reldata.AddFollower),
-                _authInfo.GetBlockingsIdsAll()
-                         .Do(id => beforeBlockings.Remove(id))
-                         .Do(reldata.AddBlocking))
+                this._account.RetrieveAllCursor((a, c) => a.GetFriendsIds(_account.Id, c))
+                    .Do(id => beforeFollowing.Remove(id))
+                    .Do(reldata.AddFollowing),
+                this._account.RetrieveAllCursor((a, c) => a.GetFollowersIds(_account.Id, c))
+                    .Do(id => beforeFollowers.Remove(id))
+                    .Do(reldata.AddFollower),
+                this._account.RetrieveAllCursor((a, c) => a.GetBlockingsIds(c))
+                    .Do(id => beforeBlockings.Remove(id))
+                    .Do(reldata.AddBlocking))
                       .Subscribe(_ => { },
-                                 ex => BackstageModel.RegisterEvent(
-                                     new OperationFailedEvent("relation receive error: " +
-                                                              _authInfo.UnreliableScreenName + " - " +
-                                                              ex.Message)),
+                                 ex =>
+                                 {
+                                     BackstageModel.RegisterEvent(
+                                         new OperationFailedEvent("relation receive error: " +
+                                                                  this._account.UnreliableScreenName + " - " +
+                                                                  ex.Message));
+                                     System.Diagnostics.Debug.WriteLine(ex);
+                                 },
                                  () =>
                                  {
                                      // cleanup remains

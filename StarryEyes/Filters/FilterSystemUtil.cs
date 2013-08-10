@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using StarryEyes.Breezy.DataModel;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Filters.Expressions.Operators;
-using StarryEyes.Models.Stores;
 using StarryEyes.Settings;
 
 namespace StarryEyes.Filters
@@ -53,7 +52,7 @@ namespace StarryEyes.Filters
 
         public static bool IsMuted(TwitterStatus status)
         {
-            return !AccountsStore.AccountIds.Contains(status.User.Id) &&
+            return !Setting.Accounts.Contains(status.User.Id) &&
                    (Setting.Muteds.Evaluator(status) || status.RetweetedOriginal != null &&
                     Setting.ApplyMuteToRetweetOriginals.Value &&
                     Setting.Muteds.Evaluator(status.RetweetedOriginal));

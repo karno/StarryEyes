@@ -21,7 +21,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region FriendsIds
 
-        public static Task<CursorResult<IEnumerable<long>>> GetFriendsIds(
+        public static Task<ICursorResult<IEnumerable<long>>> GetFriendsIds(
             this IOAuthCredential credential, long userId,
             long cursor = -1, int? count = null)
         {
@@ -29,7 +29,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return GetFriendsIdsCore(credential, userId, null, cursor, count);
         }
 
-        public static Task<CursorResult<IEnumerable<long>>> GetFriendsIds(
+        public static Task<ICursorResult<IEnumerable<long>>> GetFriendsIds(
             this IOAuthCredential credential, string screenName,
             long cursor = -1, int? count = null)
         {
@@ -38,7 +38,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return GetFriendsIdsCore(credential, null, screenName, cursor, count);
         }
 
-        private static async Task<CursorResult<IEnumerable<long>>> GetFriendsIdsCore(
+        private static async Task<ICursorResult<IEnumerable<long>>> GetFriendsIdsCore(
             IOAuthCredential credential, long? userId, string screenName,
             long cursor, int? count)
         {
@@ -58,7 +58,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region FollowersIds
 
-        public static Task<CursorResult<IEnumerable<long>>> GetFollowersIds(
+        public static Task<ICursorResult<IEnumerable<long>>> GetFollowersIds(
             this IOAuthCredential credential, long userId,
             long cursor = -1, int? count = null)
         {
@@ -66,7 +66,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return GetFollowersIdsCore(credential, userId, null, cursor, count);
         }
 
-        public static Task<CursorResult<IEnumerable<long>>> GetFollowersIds(
+        public static Task<ICursorResult<IEnumerable<long>>> GetFollowersIds(
             this IOAuthCredential credential, string screenName,
             long cursor = -1, int? count = null)
         {
@@ -75,7 +75,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return GetFollowersIdsCore(credential, null, screenName, cursor, count);
         }
 
-        private static async Task<CursorResult<IEnumerable<long>>> GetFollowersIdsCore(
+        private static async Task<ICursorResult<IEnumerable<long>>> GetFollowersIdsCore(
             IOAuthCredential credential, long? userId, string screenName,
             long cursor, int? count)
         {

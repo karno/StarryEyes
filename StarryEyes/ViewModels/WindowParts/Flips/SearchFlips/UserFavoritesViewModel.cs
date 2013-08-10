@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Reactive.Linq;
+using System.Threading.Tasks;
 using Livet.Messaging;
-using StarryEyes.Breezy.Api.Rest;
-using StarryEyes.Breezy.DataModel;
-using StarryEyes.Models;
-using StarryEyes.Models.Backstages.NotificationEvents;
-using StarryEyes.Models.Stores;
+using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Models.Tab;
+using StarryEyes.Settings;
 using StarryEyes.ViewModels.WindowParts.Timelines;
 
 namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
@@ -35,31 +31,21 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
         public UserFavoritesViewModel(UserInfoViewModel parent)
         {
             this._parent = parent;
-            this._timelineModel = new TimelineModel(
+            this._timelineModel = TimelineModel.FromAsyncTask(
                 _ => false,
-                (id, c, _) =>
+                async (id, c, _) =>
                 {
-                    var info = AccountsStore.Accounts
-                                            .Shuffle()
-                                            .Select(s => s.AuthenticateInfo)
-                                            .FirstOrDefault();
-                    if (info == null)
-                    {
-                        return Observable.Empty<TwitterStatus>();
-                    }
-                    return info.GetFavorites(this._parent.User.User.Id, max_id: id, count: c)
-                               .OrderByDescending(s => s.CreatedAt)
-                               .Catch((Exception ex) =>
-                               {
-                                   BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message));
-                                   return Observable.Empty<TwitterStatus>();
-                               });
+                    var info = Setting.Accounts.Collection.FirstOrDefault(a => a.RelationData.IsFollowing(_parent.User.User.Id)) ??
+                               Setting.Accounts.GetRandomOne();
+                    return await info.GetFavorites(this._parent.User.User.Id, c, maxId: id);
                 });
             this.CompositeDisposable.Add(_timelineModel);
             IsLoading = true;
-            _timelineModel.ReadMore(null)
-                          .Finally(() => IsLoading = false)
-                          .Subscribe();
+            Task.Run(async () =>
+            {
+                await _timelineModel.ReadMore(null);
+                IsLoading = false;
+            });
         }
 
         public override void GotPhysicalFocus()

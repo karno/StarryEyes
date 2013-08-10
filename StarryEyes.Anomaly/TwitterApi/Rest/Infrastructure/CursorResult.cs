@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace StarryEyes.Anomaly.TwitterApi.Rest.Infrastructure
 {
@@ -19,7 +15,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest.Infrastructure
     /// Describe cursored result of API Access.
     /// </summary>
     /// <typeparam name="T">Contains result</typeparam>
-    public class CursorResult<T> : ICursorResult<T>
+    internal class CursorResult<T> : ICursorResult<T>
     {
         private readonly T _result;
         private readonly long _previousCursor;

@@ -1,6 +1,7 @@
 ﻿using System;
-using StarryEyes.Breezy.Api.Rest;
-using StarryEyes.Breezy.Authorize;
+using System.Linq;
+using StarryEyes.Anomaly.TwitterApi.Rest;
+using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Settings;
 
@@ -8,11 +9,11 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
 {
     public class MentionTimelineReceiver : CyclicReceiverBase
     {
-        private readonly AuthenticateInfo _authInfo;
+        private readonly TwitterAccount _account;
 
-        public MentionTimelineReceiver(AuthenticateInfo authInfo)
+        public MentionTimelineReceiver(TwitterAccount account)
         {
-            _authInfo = authInfo;
+            this._account = account;
         }
 
         protected override int IntervalSec
@@ -20,14 +21,18 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
             get { return Setting.RESTReceivePeriod.Value; }
         }
 
-        protected override void DoReceive()
+        protected override async void DoReceive()
         {
-            _authInfo.GetMentions(count: 100)
-                     .Subscribe(ReceiveInbox.Queue,
-                                ex => BackstageModel.RegisterEvent(
-                                    new OperationFailedEvent("mentions receive error: " +
-                                                             _authInfo.UnreliableScreenName + " - " +
-                                                             ex.Message)));
+            try
+            {
+                var mentions = await this._account.GetMentions(count: 100);
+                mentions.ForEach(ReceiveInbox.Queue);
+            }
+            catch (Exception ex)
+            {
+                BackstageModel.RegisterEvent(
+                    new OperationFailedEvent("返信を取得できません(@" + _account.UnreliableScreenName + "): " + ex.Message));
+            }
         }
     }
 }

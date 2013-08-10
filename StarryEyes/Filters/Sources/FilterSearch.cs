@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Linq;
 using System.Reactive.Linq;
-using StarryEyes.Breezy.Api.Rest;
-using StarryEyes.Breezy.DataModel;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Anomaly.TwitterApi.Rest;
+using StarryEyes.Anomaly.Utils;
 using StarryEyes.Models.Receivers;
-using StarryEyes.Models.Stores;
+using StarryEyes.Settings;
 
 namespace StarryEyes.Filters.Sources
 {
@@ -18,13 +18,14 @@ namespace StarryEyes.Filters.Sources
 
         public override Func<TwitterStatus, bool> GetEvaluator()
         {
-            return _ => _.Text.IndexOf(_query) >= 0;
+            return _ => _.Text.IndexOf(this._query, StringComparison.Ordinal) >= 0;
         }
 
         protected override IObservable<TwitterStatus> ReceiveSink(long? maxId)
         {
-            return Observable.Defer(() => AccountsStore.Accounts.Shuffle().Take(1).ToObservable())
-                .SelectMany(a => a.AuthenticateInfo.SearchTweets(_query));
+            return Observable.Start(() => Setting.Accounts.GetRandomOne())
+                             .Where(a => a != null)
+                             .SelectMany(a => a.Search(_query, maxId: maxId).ToObservable());
         }
 
         private bool _isActivated;

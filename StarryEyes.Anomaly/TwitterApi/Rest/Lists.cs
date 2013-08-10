@@ -96,18 +96,18 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region Memberships
 
-        public static Task<CursorResult<IEnumerable<TwitterUser>>> GetListMembers(
+        public static Task<ICursorResult<IEnumerable<TwitterUser>>> GetListMembers(
             this IOAuthCredential credential, long listId,
-            int? cursor = null)
+            long? cursor = null)
         {
             if (credential == null) throw new ArgumentNullException("credential");
             return GetListMembersCore(credential, listId, null, null, null,
                                       cursor);
         }
 
-        public static Task<CursorResult<IEnumerable<TwitterUser>>> GetListMembers(
+        public static Task<ICursorResult<IEnumerable<TwitterUser>>> GetListMembers(
             this IOAuthCredential credential, string slug, long userId,
-            int? cursor = null)
+            long? cursor = null)
         {
             if (credential == null) throw new ArgumentNullException("credential");
             if (slug == null) throw new ArgumentNullException("slug");
@@ -115,9 +115,9 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
                                       cursor);
         }
 
-        public static Task<CursorResult<IEnumerable<TwitterUser>>> GetListMembers(
+        public static Task<ICursorResult<IEnumerable<TwitterUser>>> GetListMembers(
             this IOAuthCredential credential, string slug, string screenName,
-            int? cursor = null)
+            long? cursor = null)
         {
             if (credential == null) throw new ArgumentNullException("credential");
             if (slug == null) throw new ArgumentNullException("slug");
@@ -126,9 +126,9 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
                                       cursor);
         }
 
-        private static async Task<CursorResult<IEnumerable<TwitterUser>>> GetListMembersCore(
+        private static async Task<ICursorResult<IEnumerable<TwitterUser>>> GetListMembersCore(
             IOAuthCredential credential, long? listId, string slug, long? userId, string screenName,
-            int? cursor = null)
+            long? cursor = null)
         {
             var param = new Dictionary<string, object>()
             {

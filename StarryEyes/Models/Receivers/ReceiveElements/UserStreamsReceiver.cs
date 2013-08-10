@@ -6,14 +6,23 @@ using System.Net;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
-using StarryEyes.Breezy.Api.Streaming;
-using StarryEyes.Breezy.Authorize;
-using StarryEyes.Breezy.DataModel;
+using System.Threading.Tasks;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Anomaly.TwitterApi.DataModels.StreamModels;
+using StarryEyes.Anomaly.TwitterApi.Streaming;
+using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.SystemEvents;
+using StarryEyes.Models.Backstages.TwitterEvents;
 using StarryEyes.Models.Stores;
 
 namespace StarryEyes.Models.Receivers.ReceiveElements
 {
+    /// <summary>
+    /// Provides connecting User Streams.
+    /// </summary>
+    /// <remarks>
+    /// This class includes error handling strategy.
+    /// </remarks>
     public sealed class UserStreamsReceiver : IDisposable
     {
         public const int MaxTrackingKeywordBytes = 60;
@@ -24,7 +33,7 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
         private string[] _trackKeywords = new string[0];
         private UserStreamsConnectionState _state = UserStreamsConnectionState.Disconnected;
 
-        private readonly AuthenticateInfo _authInfo;
+        private readonly TwitterAccount _account;
         private CompositeDisposable _currentConnection = new CompositeDisposable();
         private BackOffMode _currentBackOffMode = BackOffMode.None;
         private long _currentBackOffWaitCount;
@@ -32,9 +41,9 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
 
         public event Action StateChanged;
 
-        public AuthenticateInfo AuthInfo
+        public TwitterAccount Account
         {
-            get { return _authInfo; }
+            get { return this._account; }
         }
 
         public bool IsEnabled
@@ -93,21 +102,21 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
             }
         }
 
-        public UserStreamsReceiver(AuthenticateInfo authInfo)
+        public UserStreamsReceiver(TwitterAccount account)
         {
-            _authInfo = authInfo;
+            this._account = account;
         }
 
         public void Reconnect()
         {
-            System.Diagnostics.Debug.WriteLine("*** USER STREAMS RECONNECTING ***");
+            Debug.WriteLine("*** USER STREAMS RECONNECTING ***");
             if (!IsEnabled)
             {
                 Disconnect();
                 return;
             }
             CleanupConnection();
-            _currentConnection.Add(ConnectCore());
+            Task.Run(() => _currentConnection.Add(ConnectCore()));
         }
 
         private void Disconnect()
@@ -126,16 +135,130 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
         {
             CheckDisposed();
             ConnectionState = UserStreamsConnectionState.Connecting;
-            return AuthInfo.ConnectToUserStreams(_trackKeywords)
-                           .Do(_ =>
-                           {
-                               ConnectionState = UserStreamsConnectionState.Connected;
-                               _currentBackOffMode = BackOffMode.None;
-                           })
-                           .Subscribe(
-                               Register,
-                               HandleException,
-                               Reconnect);
+            var con = this.Account.ConnectUserStreams(this._trackKeywords, this.Account.IsReceiveRepliesAll)
+                          .Do(_ =>
+                          {
+                              if (this.ConnectionState != UserStreamsConnectionState.Connecting) return;
+                              this.ConnectionState = UserStreamsConnectionState.Connected;
+                              this._currentBackOffMode = BackOffMode.None;
+                          })
+                          .SubscribeWithHandler(new HandleStreams(this),
+                                                this.HandleException,
+                                                this.Reconnect);
+            return con;
+        }
+
+        class HandleStreams : IStreamHandler
+        {
+            private readonly UserStreamsReceiver _parent;
+
+            public HandleStreams(UserStreamsReceiver parent)
+            {
+                _parent = parent;
+            }
+
+            public void OnStatus(TwitterStatus status)
+            {
+                ReceiveInbox.Queue(status);
+            }
+
+            public void OnDeleted(StreamDelete item)
+            {
+                StatusStore.Remove(item.Id);
+            }
+
+            public void OnDisconnect(StreamDisconnect streamDisconnect)
+            {
+                BackstageModel.RegisterEvent(new UserStreamsDisconnectedEvent(_parent.Account, streamDisconnect.Reason));
+            }
+
+            public void OnEnumerationReceived(StreamEnumeration item)
+            {
+            }
+
+            public void OnListActivity(StreamListActivity item)
+            {
+                // TODO: Implementation
+            }
+
+            public void OnStatusActivity(StreamStatusActivity item)
+            {
+                switch (item.Event)
+                {
+                    case StreamStatusActivityEvent.Unknown:
+                        BackstageModel.RegisterEvent(new UnknownEvent(item.Source, item.EventRawString));
+                        break;
+                    case StreamStatusActivityEvent.Favorite:
+                        StreamingEventsHub.NotifyFavorited(item.Source, item.Status);
+                        break;
+                    case StreamStatusActivityEvent.Unfavorite:
+                        StreamingEventsHub.NotifyUnfavorited(item.Source, item.Status);
+                        break;
+                }
+            }
+
+            public void OnTrackLimit(StreamTrackLimit item)
+            {
+                StreamingEventsHub.NotifyLimitationInfoGot(_parent.Account, (int)item.UndeliveredCount);
+            }
+
+            public void OnUserActivity(StreamUserActivity item)
+            {
+                var active = item.Source.Id == _parent.Account.Id;
+                var passive = item.Target.Id == _parent.Account.Id;
+                var reldata = _parent.Account.RelationData;
+                switch (item.Event)
+                {
+                    case StreamUserActivityEvent.Unknown:
+                        BackstageModel.RegisterEvent(new UnknownEvent(item.Source, item.EventRawString));
+                        break;
+                    case StreamUserActivityEvent.Follow:
+                        if (active)
+                        {
+                            reldata.AddFollowing(item.Target.Id);
+                        }
+                        if (passive)
+                        {
+                            reldata.AddFollower(item.Source.Id);
+                        }
+                        StreamingEventsHub.NotifyFollowed(item.Source, item.Target);
+                        break;
+                    case StreamUserActivityEvent.Unfollow:
+                        if (active)
+                        {
+                            reldata.RemoveFollowing(item.Target.Id);
+                        }
+                        if (passive)
+                        {
+                            reldata.RemoveFollower(item.Source.Id);
+                        }
+                        StreamingEventsHub.NotifyUnfollwed(item.Source, item.Target);
+                        break;
+                    case StreamUserActivityEvent.Block:
+                        if (active)
+                        {
+                            reldata.RemoveFollowing(item.Target.Id);
+                            reldata.RemoveFollower(item.Target.Id);
+                            reldata.AddBlocking(item.Target.Id);
+                        }
+                        if (passive)
+                        {
+                            reldata.RemoveFollower(item.Target.Id);
+                        }
+                        StreamingEventsHub.NotifyBlocked(item.Source, item.Target);
+                        break;
+                    case StreamUserActivityEvent.Unblock:
+                        if (active)
+                        {
+                            reldata.RemoveBlocking(item.Target.Id);
+                        }
+                        StreamingEventsHub.NotifyUnblocked(item.Source, item.Target);
+                        break;
+                    case StreamUserActivityEvent.UserUpdate:
+                        StreamingEventsHub.NotifyUserUpdated(item.Source);
+                        break;
+                }
+            }
         }
 
         #region Error handlers
@@ -265,97 +388,13 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
         {
             CleanupConnection();
             Debug.WriteLine("*** USER STREAM DISCONNECT ***" + Environment.NewLine + header + Environment.NewLine + detail + Environment.NewLine);
-            var discone = new UserStreamsDisconnectedEvent(AuthInfo, header + " - " + detail);
+            var discone = new UserStreamsDisconnectedEvent(this.Account, header + " - " + detail);
             BackstageModel.RegisterEvent(discone);
             ConnectionState = UserStreamsConnectionState.WaitForReconnection;
             _currentConnection.Add(
                 Observable.Timer(TimeSpan.FromMinutes(5))
                           .Do(_ => BackstageModel.RemoveEvent(discone))
                           .Subscribe(_ => Reconnect()));
-        }
-
-        #endregion
-
-        #region Handle elements
-
-        private void Register(TwitterStreamingElement elem)
-        {
-            _hardErrorRetryCount = 0; // initialize error count
-            switch (elem.EventType)
-            {
-                case EventType.Empty:
-                    // deliver tweet or something.
-                    if (elem.Status != null)
-                    {
-                        ReceiveInbox.Queue(elem.Status);
-                    }
-                    if (elem.DeletedId != null)
-                    {
-                        StatusStore.Remove(elem.DeletedId.Value);
-                    }
-                    break;
-                case EventType.Follow:
-                case EventType.Unfollow:
-                    var source = elem.EventSourceUser.Id;
-                    var target = elem.EventTargetUser.Id;
-                    var isFollowed = elem.EventType == EventType.Follow;
-                    if (source == AuthInfo.Id) // follow or remove
-                    {
-                        AuthInfo.GetRelationData().SetFollowing(target, isFollowed);
-                    }
-                    else if (target == AuthInfo.Id) // followed or removed
-                    {
-                        AuthInfo.GetRelationData().SetFollower(source, isFollowed);
-                    }
-                    else
-                    {
-                        return;
-                    }
-                    if (isFollowed)
-                        RegisterEvent(elem);
-                    break;
-                case EventType.Blocked:
-                    if (elem.EventSourceUser.Id != AuthInfo.Id) return;
-                    AuthInfo.GetRelationData().AddBlocking(elem.EventTargetUser.Id);
-                    break;
-                case EventType.Unblocked:
-                    if (elem.EventSourceUser.Id != AuthInfo.Id) return;
-                    AuthInfo.GetRelationData().RemoveBlocking(elem.EventTargetUser.Id);
-                    break;
-                default:
-                    RegisterEvent(elem);
-                    break;
-            }
-        }
-
-        private void RegisterEvent(TwitterStreamingElement elem)
-        {
-            switch (elem.EventType)
-            {
-                case EventType.Blocked:
-                    StreamingEventsHub.NotifyBlocked(elem.EventSourceUser, elem.EventTargetUser);
-                    break;
-                case EventType.Unblocked:
-                    StreamingEventsHub.NotifyUnblocked(elem.EventSourceUser, elem.EventTargetUser);
-                    break;
-                case EventType.Favorite:
-                    StreamingEventsHub.NotifyFavorited(elem.EventSourceUser, elem.EventTargetTweet);
-                    break;
-                case EventType.Unfavorite:
-                    StreamingEventsHub.NotifyUnfavorited(elem.EventSourceUser, elem.EventTargetTweet);
-                    break;
-                case EventType.Follow:
-                    StreamingEventsHub.NotifyFollowed(elem.EventSourceUser, elem.EventTargetUser);
-                    break;
-                case EventType.Unfollow:
-                    StreamingEventsHub.NotifyUnfollwed(elem.EventSourceUser, elem.EventTargetUser);
-                    break;
-                case EventType.LimitationInfo:
-                    StreamingEventsHub.NotifyLimitationInfoGot(AuthInfo, elem.TrackLimit.GetValueOrDefault());
-                    break;
-                default:
-                    return;
-            }
         }
 
         #endregion

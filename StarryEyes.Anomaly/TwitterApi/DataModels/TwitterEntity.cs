@@ -36,9 +36,19 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
                 var urls = json.urls;
                 foreach (var url in urls)
                 {
+                    string display = url.url;
+                    string expanded = url.url;
+                    if (url.display_url())
+                    {
+                        display = url.display_url;
+                    }
+                    if (url.expanded_url())
+                    {
+                        expanded = url.expanded_url;
+                    }
                     yield return new TwitterEntity(
                         EntityType.Urls,
-                        (string)url.display_url, (string)url.expanded_url,
+                        display, expanded,
                         (int)url.indices[0], (int)url.indices[1]);
                 }
             }

@@ -6,6 +6,7 @@ using System.Reactive.Linq;
 using System.Threading;
 using StarryEyes.Albireo.Data;
 using StarryEyes.Models.Stores;
+using StarryEyes.Settings;
 
 namespace StarryEyes.Filters.Expressions.Values.Locals
 {
@@ -17,7 +18,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
         {
             get
             {
-                return AccountsStore.AccountIds;
+                return new AVLTree<long>(Setting.Accounts.Ids);
             }
         }
 
@@ -25,10 +26,10 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
         {
             get
             {
-                var followers = new AVLTree<long>();
-                AccountsStore.Accounts
-                    .SelectMany(a => AccountRelationDataStore.Get(a.UserId).Following)
-                    .ForEach(followers.Add);
+                var followers = new AVLTree<long>(
+                    Setting.Accounts
+                           .Collection
+                           .SelectMany(a => a.RelationData.Followers));
                 return followers;
             }
         }
@@ -37,10 +38,10 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
         {
             get
             {
-                var following = new AVLTree<long>();
-                AccountsStore.Accounts
-                    .SelectMany(a => AccountRelationDataStore.Get(a.UserId).Following)
-                    .ForEach(following.Add);
+                var following = new AVLTree<long>(
+                    Setting.Accounts
+                           .Collection
+                           .SelectMany(a => a.RelationData.Following));
                 return following;
             }
         }
@@ -49,10 +50,10 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
         {
             get
             {
-                var blockings = new AVLTree<long>();
-                AccountsStore.Accounts
-                    .SelectMany(a => AccountRelationDataStore.Get(a.UserId).Blockings)
-                    .ForEach(blockings.Add);
+                var blockings = new AVLTree<long>(
+                    Setting.Accounts
+                           .Collection
+                           .SelectMany(a => a.RelationData.Blockings));
                 return blockings;
             }
         }
@@ -70,13 +71,13 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
         public override void BeginLifecycle()
         {
             _disposables.Add(
-                AccountsStore.Accounts
-                             .ListenCollectionChanged()
-                             .Subscribe(_ => this.RaiseReapplyFilter(null)));
+                Setting.Accounts.Collection
+                       .ListenCollectionChanged()
+                       .Subscribe(_ => this.RaiseReapplyFilter(null)));
             _disposables.Add(
                 Observable.FromEvent<RelationDataChangedInfo>(
-                    h => AccountRelationDataStore.AccountDataUpdated += h,
-                    h => AccountRelationDataStore.AccountDataUpdated -= h)
+                    h => AccountRelationData.AccountDataUpdatedStatic += h,
+                    h => AccountRelationData.AccountDataUpdatedStatic -= h)
                           .Subscribe(this.RaiseReapplyFilter));
         }
 

@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Linq;
-using StarryEyes.Breezy.Api.Rest;
+using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Models.Backstages.NotificationEvents;
-using StarryEyes.Models.Stores;
 using StarryEyes.Settings;
 
 namespace StarryEyes.Models.Receivers.ReceiveElements
@@ -21,20 +20,23 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
             get { return Setting.RESTSearchReceivePeriod.Value; }
         }
 
-        protected override void DoReceive()
+        protected override async void DoReceive()
         {
-            var authInfo = AccountsStore.Accounts.Shuffle().Select(s => s.AuthenticateInfo).FirstOrDefault();
-            if (authInfo == null)
+            try
             {
-                BackstageModel.RegisterEvent(new OperationFailedEvent("アカウントが登録されていないため、検索タイムラインを受信できませんでした。"));
-                return;
+                var account = Setting.Accounts.GetRandomOne();
+                if (account == null)
+                {
+                    BackstageModel.RegisterEvent(new OperationFailedEvent("アカウントが登録されていないため、検索タイムラインを受信できませんでした。"));
+                    return;
+                }
+                var resp = await account.Search(_query);
+                resp.ForEach(ReceiveInbox.Queue);
             }
-            authInfo.SearchTweets(_query)
-                    .Subscribe(ReceiveInbox.Queue,
-                               ex => BackstageModel.RegisterEvent(
-                                   new OperationFailedEvent("search receive error: \"" +
-                                                            _query + "\", " + authInfo.UnreliableScreenName + " - " +
-                                                            ex.Message)));
+            catch (Exception ex)
+            {
+                BackstageModel.RegisterEvent(new OperationFailedEvent("検索タイムラインを受信できません: " + ex.Message));
+            }
         }
     }
 }

@@ -42,8 +42,14 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
             this.CreatedAt = ((string)json.created_at).ParseDateTime(ParsingExtension.TwitterDateTimeFormat);
             if (json.entities())
             {
-                UrlEntities = Enumerable.ToArray(TwitterEntity.GetEntities(json.entities.url));
-                DescriptionEntities = Enumerable.ToArray(TwitterEntity.GetEntities(json.entities.description));
+                if (json.entities.url())
+                {
+                    UrlEntities = Enumerable.ToArray(TwitterEntity.GetEntities(json.entities.url));
+                }
+                if (json.entities.description())
+                {
+                    DescriptionEntities = Enumerable.ToArray(TwitterEntity.GetEntities(json.entities.description));
+                }
             }
         }
 

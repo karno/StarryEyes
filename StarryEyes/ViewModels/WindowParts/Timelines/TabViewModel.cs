@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Threading;
 using Livet.Messaging;
 using StarryEyes.Annotations;
-using StarryEyes.Breezy.DataModel;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models;
+using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Models.Tab;
 using StarryEyes.Settings;
 
@@ -128,11 +131,16 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             ReInitializeTimeline();
             IsLoading = true;
 
-            Observable.Start(() => Model.Timeline.ReadMore(null, true))
-                      .Merge(Observable.Start(() => Model.ReceiveTimelines(null)))
-                      .SelectMany(_ => _)
-                      .Finally(() => IsLoading = false)
-                      .Subscribe();
+            Task.Run(() =>
+            {
+                Model.Timeline.ReadMore(null, true)
+                     .ToObservable()
+                     .Merge(Model.ReceiveTimelines(null))
+                     .Subscribe(_ => { },
+                                ex => BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message)),
+                                () => IsLoading = false);
+
+            });
             if (UnreadCount > 0)
             {
                 UnreadCount = 0;

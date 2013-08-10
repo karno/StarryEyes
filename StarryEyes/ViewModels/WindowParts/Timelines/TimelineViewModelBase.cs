@@ -3,16 +3,12 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Reactive;
 using System.Reactive.Disposables;
-using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 using Livet;
 using Livet.EventListeners;
-using StarryEyes.Breezy.DataModel;
 using StarryEyes.Models;
-using StarryEyes.Models.Stores;
 using StarryEyes.Models.Tab;
 using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
@@ -42,19 +38,17 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                 {
                     _currentTimelineListener.Dispose();
                 }
-                if (_timeline != null)
+                if (this._timeline == null) return;
+                var array = await DispatcherHolder.Dispatcher.BeginInvoke(() =>
                 {
-                    var array = await DispatcherHolder.Dispatcher.BeginInvoke(() =>
+                    lock (this._collectionLock)
                     {
-                        lock (_collectionLock)
-                        {
-                            var pta = _timeline.ToArray();
-                            _timeline.Clear();
-                            return pta;
-                        }
-                    }, DispatcherPriority.ContextIdle);
-                    array.ForEach(a => a.Dispose());
-                }
+                        var pta = this._timeline.ToArray();
+                        this._timeline.Clear();
+                        return pta;
+                    }
+                }, DispatcherPriority.ContextIdle);
+                array.ForEach(a => a.Dispose());
             });
         }
 
@@ -268,10 +262,20 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             if (IsScrollInTop || !_isCollectionAddEnabled || IsLoading) return;
             TimelineModel.IsSuppressTimelineTrimming = true;
             IsLoading = true;
-            TimelineModel.ReadMore(id == long.MaxValue ? (long?)null : id)
-                 .Finally(() => IsLoading = false)
-                 .OnErrorResumeNext(Observable.Empty<Unit>())
-                 .Subscribe();
+            Task.Run(async () =>
+            {
+                try
+                {
+                    await this.TimelineModel.ReadMore(id == long.MaxValue ? (long?)null : id);
+                }
+                catch
+                {
+                }
+                finally
+                {
+                    IsLoading = false;
+                }
+            });
         }
 
         #region Selection Control
@@ -308,9 +312,8 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         public void FavoriteSelecteds()
         {
             var accounts = CurrentAccounts
-                .Select(AccountsStore.GetAccountSetting)
+                .Select(Setting.Accounts.Get)
                 .Where(a => a != null)
-                .Select(a => a.AuthenticateInfo)
                 .ToArray();
             if (accounts.Length == 0)
             {
@@ -359,7 +362,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             get { return _focusedStatus; }
             set
             {
-                StatusViewModel previous = _focusedStatus;
+                var previous = _focusedStatus;
                 _focusedStatus = value;
                 if (previous != null)
                     previous.RaiseFocusedChanged();
@@ -371,7 +374,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
         public void FocusUp()
         {
             if (FocusedStatus == null) return;
-            int index = Timeline.IndexOf(FocusedStatus) - 1;
+            var index = Timeline.IndexOf(FocusedStatus) - 1;
             FocusedStatus = index < 0 ? null : Timeline[index];
         }
 
@@ -382,7 +385,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                 FocusTop();
                 return;
             }
-            int index = Timeline.IndexOf(FocusedStatus) + 1;
+            var index = Timeline.IndexOf(FocusedStatus) + 1;
             if (index >= Timeline.Count) return;
             FocusedStatus = Timeline[index];
         }

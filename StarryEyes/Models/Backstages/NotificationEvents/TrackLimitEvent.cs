@@ -1,15 +1,15 @@
 ﻿using System.Windows.Media;
-using StarryEyes.Breezy.Authorize;
+using StarryEyes.Models.Accounting;
 using StarryEyes.Views;
 
 namespace StarryEyes.Models.Backstages.NotificationEvents
 {
     public sealed class TrackLimitEvent : BackstageEventBase
     {
-        private readonly AuthenticateInfo _info;
+        private readonly TwitterAccount _info;
         private readonly int _drop;
 
-        public TrackLimitEvent(AuthenticateInfo relatedInfo, int drop)
+        public TrackLimitEvent(TwitterAccount relatedInfo, int drop)
         {
             this._info = relatedInfo;
             this._drop = drop;

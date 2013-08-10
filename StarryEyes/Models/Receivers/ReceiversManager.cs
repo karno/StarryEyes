@@ -1,5 +1,5 @@
 ﻿using System;
-using StarryEyes.Breezy.Authorize;
+using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Receivers.Managers;
 using StarryEyes.Models.Receivers.ReceiveElements;
 
@@ -59,7 +59,7 @@ namespace StarryEyes.Models.Receivers
             _listReceiveManager.StartReceive(receiver, info);
         }
 
-        public static void RegisterList(AuthenticateInfo authInfo, ListInfo info)
+        public static void RegisterList(TwitterAccount authInfo, ListInfo info)
         {
             _listReceiveManager.StartReceive(authInfo, info);
         }

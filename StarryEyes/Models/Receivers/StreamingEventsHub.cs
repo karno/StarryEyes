@@ -2,11 +2,12 @@
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using StarryEyes.Breezy.Authorize;
-using StarryEyes.Breezy.DataModel;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Models.Backstages.TwitterEvents;
 using StarryEyes.Models.Stores;
+using StarryEyes.Settings;
 
 namespace StarryEyes.Models.Receivers
 {
@@ -104,8 +105,8 @@ namespace StarryEyes.Models.Receivers
             Retweeted += te =>
             {
                 // check user
-                if (AccountsStore.AccountIds.Contains(te.Source.Id) ||
-                    AccountsStore.AccountIds.Contains(te.Target.User.Id))
+                if (Setting.Accounts.Contains(te.Source.Id) ||
+                    Setting.Accounts.Contains(te.Target.User.Id))
                 {
                     BackstageModel.RegisterEvent(new RetweetedEvent(te.Source, te.Target));
                 }
@@ -194,13 +195,21 @@ namespace StarryEyes.Models.Receivers
                 handler(deleted);
         }
 
-        public static event Action<AuthenticateInfo, int> LimitationInfoGot;
+        public static event Action<TwitterAccount, int> LimitationInfoGot;
 
-        public static void NotifyLimitationInfoGot(AuthenticateInfo auth, int trackLimit)
+        public static void NotifyLimitationInfoGot(TwitterAccount account, int trackLimit)
         {
             var handler = LimitationInfoGot;
             if (handler != null)
-                handler(auth, trackLimit);
+                handler(account, trackLimit);
+        }
+
+        public static event Action<TwitterUser> UserProfileUpdated;
+
+        public static void NotifyUserUpdated(TwitterUser source)
+        {
+            var handler = UserProfileUpdated;
+            if (handler != null) handler(source);
         }
     }
 

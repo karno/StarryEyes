@@ -2,8 +2,8 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Reactive.Disposables;
-using StarryEyes.Breezy.Authorize;
 using StarryEyes.Filters.Expressions;
+using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Tab;
 using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
@@ -82,8 +82,8 @@ namespace StarryEyes.Models
         public static event Action<AccountSelectDescription> AccountSelectActionRequested;
 
         public static void ExecuteAccountSelectAction(
-            AccountSelectionAction action, IEnumerable<AuthenticateInfo> defaultSelected,
-            Action<IEnumerable<AuthenticateInfo>> after)
+            AccountSelectionAction action, IEnumerable<TwitterAccount> defaultSelected,
+            Action<IEnumerable<TwitterAccount>> after)
         {
             ExecuteAccountSelectAction(new AccountSelectDescription
             {
@@ -178,9 +178,9 @@ namespace StarryEyes.Models
     {
         public AccountSelectionAction AccountSelectionAction { get; set; }
 
-        public IEnumerable<AuthenticateInfo> SelectionAccounts { get; set; }
+        public IEnumerable<TwitterAccount> SelectionAccounts { get; set; }
 
-        public Action<IEnumerable<AuthenticateInfo>> Callback { get; set; }
+        public Action<IEnumerable<TwitterAccount>> Callback { get; set; }
     }
 
 

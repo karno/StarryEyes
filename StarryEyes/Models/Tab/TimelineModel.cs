@@ -1,20 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Livet;
 using StarryEyes.Albireo.Data;
-using StarryEyes.Breezy.DataModel;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Anomaly.Utils;
+using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Models.Stores;
 
 namespace StarryEyes.Models.Tab
 {
     public class TimelineModel : IDisposable
     {
+        public static TimelineModel FromObservable(
+            Func<TwitterStatus, bool> evaluator,
+            Func<long?, int, bool, IObservable<TwitterStatus>> fetcher)
+        {
+            return new TimelineModel(evaluator, fetcher);
+        }
+
+        public static TimelineModel FromAsyncTask(
+            Func<TwitterStatus, bool> evaluator,
+            Func<long?, int, bool, Task<IEnumerable<TwitterStatus>>> fetcher)
+        {
+            return new TimelineModel(evaluator, (a, b, c) => fetcher(a, b, c).ToObservable());
+        }
+
         public static readonly int TimelineChunkCount = 256;
         public static readonly int TimelineChunkCountBounce = 64;
 
@@ -29,7 +44,7 @@ namespace StarryEyes.Models.Tab
 
         private bool _isSuppressTimelineTrimming;
 
-        public TimelineModel(Func<TwitterStatus, bool> evaluator,
+        private TimelineModel(Func<TwitterStatus, bool> evaluator,
                              Func<long?, int, bool, IObservable<TwitterStatus>> fetcher)
         {
             _fetcher = fetcher;
@@ -133,11 +148,18 @@ namespace StarryEyes.Models.Tab
             }
         }
 
-        public IObservable<Unit> ReadMore(long? maxId, bool batch = false)
+        public async Task ReadMore(long? maxId, bool batch = false)
         {
-            return Observable.Defer(() => _fetcher(maxId, TimelineChunkCount, batch))
-                             .Do(AddStatus)
-                             .OfType<Unit>();
+            try
+            {
+                await _fetcher(maxId, TimelineChunkCount, batch)
+                    .Do(s => StatusStore.Store(s))
+                    .LastOrDefaultAsync();
+            }
+            catch (Exception ex)
+            {
+                BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message));
+            }
         }
 
         private int _trimCount;

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using StarryEyes.Breezy.Authorize;
+using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Receivers.ReceiveElements;
-using StarryEyes.Models.Stores;
+using StarryEyes.Settings;
 
 namespace StarryEyes.Models.Receivers.Managers
 {
@@ -66,36 +66,35 @@ namespace StarryEyes.Models.Receivers.Managers
         public UserReceiveManager()
         {
             System.Diagnostics.Debug.WriteLine("UserReceiveManager initialized.");
-            AccountsStore.Accounts.ListenCollectionChanged()
-                         .Subscribe(_ => NotifySettingChanged());
+            Setting.Accounts.Collection.ListenCollectionChanged().Subscribe(_ => this.NotifySettingChanged());
             App.UserInterfaceReady += NotifySettingChanged;
         }
 
         // ReSharper disable AccessToModifiedClosure
         private void NotifySettingChanged()
         {
-            var settings = AccountsStore.Accounts.ToDictionary(k => k.UserId);
+            var accounts = Setting.Accounts.Collection.ToDictionary(a => a.Id);
             var danglings = new List<string>();
             var rearranged = false;
             lock (_bundlesLocker)
             {
                 // remove deauthroized accounts
                 _bundles.Values
-                    .Where(s => !settings.ContainsKey(s.UserId))
+                    .Where(s => !accounts.ContainsKey(s.UserId))
                     .ToArray()
                     .Do(b => _bundles.Remove(b.UserId))
                     .Do(b => danglings.AddRange(b.TrackKeywords))
                     .ForEach(c => c.Dispose());
 
                 // add new users
-                settings.Where(s => !_bundles.ContainsKey(s.Key))
-                        .Select(s => new UserReceiveBundle(s.Value.AuthenticateInfo))
+                accounts.Where(s => !_bundles.ContainsKey(s.Key))
+                        .Select(s => new UserReceiveBundle(s.Value))
                         .Do(s => s.StateChanged += this.OnConnectionStateChanged)
                         .ForEach(b => _bundles.Add(b.UserId, b));
 
                 // stop cancelled streamings
                 _bundles.Values
-                        .Where(b => b.IsUserStreamsEnabled && !settings[b.UserId].IsUserStreamsEnabled)
+                        .Where(b => b.IsUserStreamsEnabled && !accounts[b.UserId].IsUserStreamsEnabled)
                         .Do(b => danglings.AddRange(b.TrackKeywords))
                         .Do(b => b.IsUserStreamsEnabled = false)
                         .ForEach(b => b.TrackKeywords = null);
@@ -107,7 +106,7 @@ namespace StarryEyes.Models.Receivers.Managers
 
                 // start new streamings
                 _bundles.Values
-                    .Where(b => !b.IsUserStreamsEnabled && settings[b.UserId].IsUserStreamsEnabled)
+                    .Where(b => !b.IsUserStreamsEnabled && accounts[b.UserId].IsUserStreamsEnabled)
                     .ForEach(c =>
                     {
                         c.TrackKeywords = danglings.Take(UserStreamsReceiver.MaxTrackingKeywordCounts);
@@ -153,7 +152,7 @@ namespace StarryEyes.Models.Receivers.Managers
 
         private sealed class UserReceiveBundle : IDisposable, IKeywordTrackable
         {
-            private readonly AuthenticateInfo _authInfo;
+            private readonly TwitterAccount _authInfo;
             private readonly CompositeDisposable _disposable;
             private readonly UserStreamsReceiver _userStreamsReceiver;
 
@@ -174,7 +173,7 @@ namespace StarryEyes.Models.Receivers.Managers
 
             public long UserId { get { return _authInfo.Id; } }
 
-            public UserReceiveBundle(AuthenticateInfo authInfo)
+            public UserReceiveBundle(TwitterAccount authInfo)
             {
                 _authInfo = authInfo;
                 _disposable = new CompositeDisposable

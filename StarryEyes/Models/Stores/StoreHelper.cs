@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Linq;
 using System.Reactive.Linq;
-using StarryEyes.Breezy.Api.Rest;
-using StarryEyes.Breezy.Authorize;
-using StarryEyes.Breezy.DataModel;
-using StarryEyes.Models.Notifications;
+using System.Reactive.Threading.Tasks;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Anomaly.TwitterApi.Rest;
+using StarryEyes.Settings;
 
 namespace StarryEyes.Models.Stores
 {
@@ -13,18 +12,27 @@ namespace StarryEyes.Models.Stores
     /// </summary>
     public static class StoreHelper
     {
+        [Obsolete]
         public static IObservable<TwitterStatus> MergeStore(TwitterStatus status)
         {
-            return StatusStore.Get(status.Id)
-                              .ConcatIfEmpty(() =>
-                              {
-                                  StatusStore.Store(status);
-                                  return Observable.Return(status);
-                              });
+            StatusStore.Store(status);
+            return Observable.Return(status);
+            /*
+                return StatusStore.Get(status.Id)
+                                  .ConcatIfEmpty(() =>
+                                  {
+                                      StatusStore.Store(status);
+                                      return Observable.Return(status);
+                                  });
+            */
         }
 
+        [Obsolete]
         public static IObservable<TwitterStatus> NotifyAndMergeStore(TwitterStatus status)
         {
+            StatusStore.Store(status);
+            return Observable.Return(status);
+            /*
             return StatusStore.Get(status.Id)
                               .ConcatIfEmpty(() =>
                               {
@@ -32,48 +40,31 @@ namespace StarryEyes.Models.Stores
                                   NotificationModel.NotifyNewArrival(status);
                                   return Observable.Return(status);
                               });
+	    */
         }
 
         public static IObservable<TwitterStatus> GetTweet(long id)
         {
             return StatusStore.Get(id)
                               .Where(_ => _ != null)
-                              .ConcatIfEmpty(
-                                  () => GetRandomAuthInfo()
-                                            .SelectMany(
-                                                a => a.ShowTweet(id)
-                                                      .Do(s => StatusStore.Store(s, false))
-                                            ));
+                              .ConcatIfEmpty(() => Setting.Accounts.GetRandomOne().ShowTweet(id).ToObservable()
+                                                          .Do(s => StatusStore.Store(s, false)));
         }
 
         public static IObservable<TwitterUser> GetUser(long id)
         {
             return UserStore.Get(id)
                             .Where(_ => _ != null)
-                            .ConcatIfEmpty(() => GetRandomAuthInfo()
-                                                     .SelectMany(a => a.ShowUser(id)
-                                                                       .Do(UserStore.Store)));
+                            .ConcatIfEmpty(() => Setting.Accounts.GetRandomOne().ShowUser(id).ToObservable()
+                                                        .Do(UserStore.Store));
         }
 
         public static IObservable<TwitterUser> GetUser(string screenName)
         {
             return UserStore.Get(screenName)
                             .Where(_ => _ != null)
-                            .ConcatIfEmpty(() =>
-                                           GetRandomAuthInfo()
-                                               .SelectMany(a => a.ShowUser(screenName: screenName)
-                                                                 .Do(UserStore.Store)));
-        }
-
-        public static IObservable<AuthenticateInfo> GetRandomAuthInfo()
-        {
-            return Observable.Defer(
-                () => Observable.Return(
-                    AccountsStore.Accounts
-                                 .Shuffle()
-                                 .FirstOrDefault()))
-                             .Where(_ => _ != null)
-                             .Select(_ => _.AuthenticateInfo);
+                            .ConcatIfEmpty(() => Setting.Accounts.GetRandomOne().ShowUser(screenName).ToObservable()
+                                                        .Do(UserStore.Store));
         }
     }
 }

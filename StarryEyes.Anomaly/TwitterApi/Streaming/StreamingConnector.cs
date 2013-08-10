@@ -10,7 +10,9 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
 {
     public static class StreamingConnector
     {
-        public static IDisposable SubscribeWithHandler(this IObservable<string> streamElements, IStreamHandler handler)
+        public static IDisposable SubscribeWithHandler(this IObservable<string> streamElements,
+                                                        IStreamHandler handler, Action<Exception> onError = null,
+                                                        Action onCompleted = null)
         {
             if (streamElements == null) throw new ArgumentNullException("streamElements");
             if (handler == null) throw new ArgumentNullException("handler");
@@ -18,7 +20,8 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
                 .Where(s => !String.IsNullOrWhiteSpace(s))
                 .ObserveOn(TaskPoolScheduler.Default)
                 .Select(s => DynamicJson.Parse(s))
-                .Subscribe(s => DispatchStreamingElements(s, handler));
+                .Subscribe(s => DispatchStreamingElements(s, handler),
+                           onError ?? (ex => { }), onCompleted ?? (() => { }));
         }
 
         private static void DispatchStreamingElements(dynamic element, IStreamHandler handler)
@@ -89,7 +92,8 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
                         {
                             Target = new TwitterUser(element.target),
                             Source = new TwitterUser(element.source),
-                            Event = ev,
+                            Event = StreamStatusActivity.ToEnumEvent(ev),
+                            EventRawString = ev,
                             Status = new TwitterStatus(element.target_object),
                             CreatedAt = ((string)element.created_at).ParseDateTime(ParsingExtension.TwitterDateTimeFormat),
                         });
@@ -103,7 +107,8 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
                         {
                             Target = new TwitterUser(element.target),
                             Source = new TwitterUser(element.source),
-                            Event = ev,
+                            Event = StreamUserActivity.ToEnumEvent(ev),
+                            EventRawString = ev,
                             CreatedAt = ((string)element.created_at).ParseDateTime(ParsingExtension.TwitterDateTimeFormat),
                         });
                         return;
@@ -118,7 +123,8 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
                         {
                             Target = new TwitterUser(element.target),
                             Source = new TwitterUser(element.source),
-                            Event = ev,
+                            Event = StreamListActivity.ToEnumEvent(ev),
+                            EventRawString = ev,
                             List = new TwitterList(element.target_object),
                             CreatedAt = ((string)element.created_at).ParseDateTime(ParsingExtension.TwitterDateTimeFormat),
                         });

@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
-using StarryEyes.Breezy.Authorize;
-using StarryEyes.Breezy.DataModel;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Filters.Expressions.Operators;
 using StarryEyes.Models;
+using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Models.Stores;
+using StarryEyes.Settings;
 
 namespace StarryEyes.Filters.Sources
 {
@@ -59,15 +60,16 @@ namespace StarryEyes.Filters.Sources
         /// </summary>
         /// <param name="screenName">partial screen name</param>
         /// <returns>accounts collection</returns>
-        protected IEnumerable<AuthenticateInfo> GetAccountsFromString(string screenName)
+        protected IEnumerable<TwitterAccount> GetAccountsFromString(string screenName)
         {
             if (String.IsNullOrEmpty(screenName))
-                return AccountsStore.Accounts.Select(i => i.AuthenticateInfo);
-            return AccountsStore.Accounts
-                                .Select(i => i.AuthenticateInfo)
-                                .Where(i => FilterOperatorEquals.StringMatch(
-                                    i.UnreliableScreenName, screenName,
-                                    FilterOperatorEquals.StringArgumentSide.Right));
+            {
+                return Setting.Accounts.Collection;
+            }
+            return Setting.Accounts.Collection
+                          .Where(i => FilterOperatorEquals.StringMatch(
+                              i.UnreliableScreenName, screenName,
+                              FilterOperatorEquals.StringArgumentSide.Right));
         }
     }
 }

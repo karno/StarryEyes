@@ -10,8 +10,8 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
     {
         #region Blocking ids
 
-        public static async Task<CursorResult<IEnumerable<long>>> GetBlockingsIds(
-            IOAuthCredential credential, long cursor = -1)
+        public static async Task<ICursorResult<IEnumerable<long>>> GetBlockingsIds(
+            this IOAuthCredential credential, long cursor = -1)
         {
             var param = new Dictionary<string, object>
             {

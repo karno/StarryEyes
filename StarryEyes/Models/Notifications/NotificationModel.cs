@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reactive.Linq;
-using StarryEyes.Albireo.Data;
-using StarryEyes.Breezy.DataModel;
+﻿using StarryEyes.Anomaly.TwitterApi.DataModels;
 
 namespace StarryEyes.Models.Notifications
 {
@@ -18,7 +14,7 @@ namespace StarryEyes.Models.Notifications
         /// <param name="type">notification type</param>
         public static void NotifyNewArrival(TwitterStatus status)
         {
-
+            // TODO: implementation
         }
 
         private static void NotifyCore(TwitterStatus status, NotificationType type)

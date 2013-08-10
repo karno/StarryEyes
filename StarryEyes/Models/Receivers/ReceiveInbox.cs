@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
 using StarryEyes.Albireo.Data;
-using StarryEyes.Breezy.DataModel;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models.Notifications;
 using StarryEyes.Models.Stores;
 using StarryEyes.Settings;
@@ -13,7 +14,7 @@ namespace StarryEyes.Models.Receivers
 {
     public static class ReceiveInbox
     {
-        private static volatile bool _cacheInvalid = true;
+        private static IDisposable _cache;
         private static volatile bool _predicateInvalid = true;
 
         private static AVLTree<long> _blockings = new AVLTree<long>();
@@ -36,7 +37,7 @@ namespace StarryEyes.Models.Receivers
             App.ApplicationExit += () => _pumpThread.Abort();
             _pumpThread = new Thread(PumpQueuedStatuses);
             _pumpThread.Start();
-            AccountRelationDataStore.AccountDataUpdated += _ => InvalidateRelationInfo();
+            Setting.Accounts.Collection.ListenCollectionChanged().Subscribe(_ => InvalidateBlockInfo());
             Setting.Muteds.ValueChanged += _ => InvalidateMutePredicate();
         }
 
@@ -72,14 +73,9 @@ namespace StarryEyes.Models.Receivers
 
         private static bool ValidateStatus(TwitterStatus status)
         {
-            if (_cacheInvalid)
+            if (Interlocked.CompareExchange(ref _cache, null, null) == null)
             {
-                var nbs = new AVLTree<long>();
-                AccountRelationDataStore.AccountRelations
-                                        .SelectMany(a => a.Blockings)
-                                        .ForEach(nbs.Add);
-                _blockings = nbs;
-                _cacheInvalid = false;
+                UpdateCache();
             }
             if (_predicateInvalid)
             {
@@ -92,9 +88,36 @@ namespace StarryEyes.Models.Receivers
             return status.RetweetedOriginal == null || ValidateStatus(status.RetweetedOriginal);
         }
 
-        private static void InvalidateRelationInfo()
+        private static void UpdateCache()
         {
-            _cacheInvalid = true;
+            var disposables = new CompositeDisposable();
+            var nbs = new AVLTree<long>();
+            Setting.Accounts
+        .Collection
+                   .Select(a => a.RelationData)
+                   .Do(r => disposables.Add(
+                       Observable.FromEvent<RelationDataChangedInfo>(h => r.AccountDataUpdated += h,
+                                                                     h => r.AccountDataUpdated -= h)
+                                 .Where(info => info.Change == RelationDataChange.Blocking)
+                                 .Subscribe(_ => InvalidateBlockInfo())))
+                   .SelectMany(r => r.Blockings)
+                   .ForEach(nbs.Add);
+            _blockings = nbs;
+
+            var oc = Interlocked.Exchange(ref _cache, disposables);
+            if (oc != null)
+            {
+                oc.Dispose();
+            }
+        }
+
+        private static void InvalidateBlockInfo()
+        {
+            var oc = Interlocked.Exchange(ref _cache, null);
+            if (oc != null)
+            {
+                oc.Dispose();
+            }
         }
 
         private static void InvalidateMutePredicate()

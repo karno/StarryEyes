@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Reactive.Linq;
+using System.Threading.Tasks;
 using Livet.Messaging;
-using StarryEyes.Breezy.Api.Rest;
-using StarryEyes.Breezy.DataModel;
-using StarryEyes.Models;
-using StarryEyes.Models.Backstages.NotificationEvents;
-using StarryEyes.Models.Stores;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Models.Tab;
+using StarryEyes.Settings;
 using StarryEyes.ViewModels.WindowParts.Timelines;
 
 namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
@@ -35,32 +32,27 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
         public UserStatusesViewModel(UserInfoViewModel parent)
         {
             _parent = parent;
-            _timelineModel = new TimelineModel(
+            _timelineModel = TimelineModel.FromAsyncTask(
                 s => s.User.Id == parent.User.User.Id,
-                (id, c, _) =>
+                async (id, c, _) =>
                 {
-                    var info = AccountsStore.Accounts
-                                            .Shuffle()
-                                            .Select(s => s.AuthenticateInfo)
-                                            .FirstOrDefault();
-                    if (info == null)
+                    var account =
+                        Setting.Accounts.Collection.FirstOrDefault(
+                            a => a.RelationData.IsFollowing(this._parent.User.User.Id)) ??
+                        Setting.Accounts.GetRandomOne();
+                    if (account != null)
                     {
-                        return Observable.Empty<TwitterStatus>();
+                        return await account.GetUserTimeline(this._parent.User.User.Id, maxId: id, count: c);
                     }
-                    return info.GetUserTimeline(_parent.User.User.Id, max_id: id, count: c)
-                               .Do(s => StatusStore.Store(s))
-                               .OrderByDescending(s => s.CreatedAt)
-                               .Catch((Exception ex) =>
-                               {
-                                   BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message));
-                                   return Observable.Empty<TwitterStatus>();
-                               });
+                    return Enumerable.Empty<TwitterStatus>();
                 });
             this.CompositeDisposable.Add(_timelineModel);
             IsLoading = true;
-            _timelineModel.ReadMore(null)
-                          .Finally(() => IsLoading = false)
-                          .Subscribe();
+            Task.Run(async () =>
+            {
+                await _timelineModel.ReadMore(null);
+                IsLoading = false;
+            });
         }
 
         public override void GotPhysicalFocus()

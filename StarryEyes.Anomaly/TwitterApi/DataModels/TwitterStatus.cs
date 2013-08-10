@@ -40,11 +40,11 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
                 this.Source = json.source;
                 if (json.in_reply_to_status_id_str())
                 {
-                    this.InReplyToStatusId = ((string)json.in_reply_to_status_id_str).ParseLong();
+                    this.InReplyToStatusId = ((string)json.in_reply_to_status_id_str).ParseNullableId();
                 }
                 if (json.in_reply_to_user_id_str())
                 {
-                    this.InReplyToUserId = ((string)json.in_reply_to_user_id_str).ParseLong();
+                    this.InReplyToUserId = ((string)json.in_reply_to_user_id_str).ParseNullableId();
                 }
                 if (json.in_reply_to_screen_name())
                 {
@@ -57,8 +57,8 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
                 }
                 if (json.coordinates() && json.coordinates != null)
                 {
-                    this.Longitude = (double)json.coordinates[0];
-                    this.Latitude = (double)json.coordinates[1];
+                    this.Longitude = (double)json.coordinates.coordinates[0];
+                    this.Latitude = (double)json.coordinates.coordinates[1];
                 }
             }
         }
@@ -296,7 +296,38 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
 
         public void Deserialize(BinaryReader reader)
         {
-            throw new NotImplementedException();
+            Id = reader.ReadInt64();
+            StatusType = (StatusType)reader.ReadInt32();
+            User = reader.ReadObject<TwitterUser>();
+            Text = reader.ReadString();
+            CreatedAt = reader.ReadDateTime();
+            if (reader.ReadBoolean())
+            {
+                Source = reader.ReadString();
+            }
+            InReplyToStatusId = reader.ReadNullableLong();
+            InReplyToUserId = reader.ReadNullableLong();
+            if (reader.ReadBoolean())
+            {
+                InReplyToScreenName = reader.ReadString();
+            }
+            RetweetedOriginalId = reader.ReadNullableLong();
+            Latitude = reader.ReadNullableDouble();
+            Longitude = reader.ReadNullableDouble();
+            if (reader.ReadBoolean())
+            {
+                FavoritedUsers = reader.ReadIds().ToArray();
+            }
+            if (reader.ReadBoolean())
+            {
+                RetweetedUsers = reader.ReadIds().ToArray();
+            }
+            RetweetedOriginal = reader.ReadObject<TwitterStatus>();
+            Recipient = reader.ReadObject<TwitterUser>();
+            if (reader.ReadBoolean())
+            {
+                Entities = reader.ReadCollection<TwitterEntity>().ToArray();
+            }
         }
     }
 

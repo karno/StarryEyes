@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Input;
 using Livet;
-using StarryEyes.Breezy.DataModel;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models;
 
 namespace StarryEyes.ViewModels.WindowParts.Timelines

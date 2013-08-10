@@ -6,7 +6,7 @@ using Codeplex.OAuth;
 using Livet;
 using Livet.Commands;
 using Livet.Messaging.Windows;
-using StarryEyes.Breezy.Authorize;
+using StarryEyes.Models.Accounting;
 using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
 using StarryEyes.Views.Messaging;
@@ -19,8 +19,8 @@ namespace StarryEyes.ViewModels.Dialogs
         public const string AuthorizationEndpoint = "https://api.twitter.com/oauth/authorize";
         public const string AccessTokenEndpoint = "https://api.twitter.com/oauth/access_token";
 
-        private readonly Subject<AuthenticateInfo> _returnSubject = new Subject<AuthenticateInfo>();
-        public IObservable<AuthenticateInfo> AuthorizeObservable
+        private readonly Subject<TwitterAccount> _returnSubject = new Subject<TwitterAccount>();
+        public IObservable<TwitterAccount> AuthorizeObservable
         {
             get { return _returnSubject; }
         }
@@ -114,7 +114,7 @@ namespace StarryEyes.ViewModels.Dialogs
                 {
                     var id = long.Parse(r.ExtraData["user_id"].First());
                     var sn = r.ExtraData["screen_name"].First();
-                    _returnSubject.OnNext(new AuthenticateInfo(id, sn, r.Token));
+                    _returnSubject.OnNext(new TwitterAccount(id, sn, r.Token));
                     this.Messenger.Raise(new WindowActionMessage(WindowAction.Close));
                 },
                 ex =>

@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
-using StarryEyes.Breezy.Api.Rest;
-using StarryEyes.Breezy.DataModel;
-using StarryEyes.Models.Stores;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Anomaly.TwitterApi.Rest;
+using StarryEyes.Anomaly.Utils;
+using StarryEyes.Models.Accounting;
+using StarryEyes.Settings;
 
 namespace StarryEyes.Filters.Sources
 {
@@ -20,25 +22,24 @@ namespace StarryEyes.Filters.Sources
 
         public override Func<TwitterStatus, bool> GetEvaluator()
         {
-            var ads = GetAccountsFromString(_screenName)
-                .Select(a => AccountRelationDataStore.Get(a.Id));
+            var ads = GetAccountsFromString(_screenName);
             return _ => CheckVisibleTimeline(_, ads);
         }
 
-        private bool CheckVisibleTimeline(TwitterStatus status, IEnumerable<AccountRelationData> datas)
+        private bool CheckVisibleTimeline(TwitterStatus status, IEnumerable<TwitterAccount> datas)
         {
             if (status.StatusType == StatusType.DirectMessage)
                 return false;
-            return datas.Any(ad =>
-                status.User.Id == ad.AccountId ||
-                ad.IsFollowing(status.User.Id) ||
-                FilterSystemUtil.InReplyToUsers(status).Contains(ad.AccountId));
+            return datas.Any(account =>
+                             status.User.Id == account.Id ||
+                             account.RelationData.IsFollowing(status.User.Id) ||
+                             FilterSystemUtil.InReplyToUsers(status).Contains(account.Id));
         }
 
         protected override IObservable<TwitterStatus> ReceiveSink(long? maxId)
         {
             return Observable.Defer(() => GetAccountsFromString(_screenName).ToObservable())
-                .SelectMany(a => a.GetHomeTimeline(count: 50, max_id: maxId));
+                             .SelectMany(a => a.GetHomeTimeline(count: 50, maxId: maxId).ToObservable());
         }
 
         public override string FilterKey

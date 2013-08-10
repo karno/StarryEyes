@@ -1,10 +1,9 @@
 ﻿using System;
+using System.Linq;
 using System.Reactive.Linq;
 using Codeplex.OAuth;
 using Livet;
 using Livet.Messaging.Windows;
-using StarryEyes.Breezy.Api;
-using StarryEyes.Models.Stores;
 using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
 using StarryEyes.Views.Messaging;
@@ -102,7 +101,7 @@ namespace StarryEyes.ViewModels.Dialogs
                          ExpandedInfo = "APIキーの状況によってはアカウントが登録できないことがあります。" + Environment.NewLine +
                          "また、最大登録可能アカウント数も制限されます。"
                      }));
-                if (m.Response.CustomButtonResult.HasValue && m.Response.CustomButtonResult.Value == 0)
+                if (m.Response.CommandButtonResult.HasValue && m.Response.CommandButtonResult.Value == 0)
                 {
                     this.Messenger.Raise(new WindowActionMessage(WindowAction.Close));
                 }
@@ -115,9 +114,10 @@ namespace StarryEyes.ViewModels.Dialogs
 
         private void UpdateEndpointKey()
         {
-            ApiEndpoint.DefaultConsumerKey = Setting.GlobalConsumerKey.Value ?? App.ConsumerKey;
-            ApiEndpoint.DefaultConsumerSecret = Setting.GlobalConsumerSecret.Value ?? App.ConsumerSecret;
-            AccountsStore.Accounts.Clear();
+            Setting.Accounts.Collection
+                   .Select(a => a.Id)
+                   .ToArray()
+                   .ForEach(Setting.Accounts.RemoveAccountFromId);
         }
 
         #region OpenApiKeyHelpCommand

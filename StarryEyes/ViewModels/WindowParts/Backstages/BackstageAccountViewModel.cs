@@ -50,7 +50,7 @@ namespace StarryEyes.ViewModels.WindowParts.Backstages
                 Observable.Interval(TimeSpan.FromSeconds(5))
                           .Subscribe(_ =>
                           {
-                              var count = PostLimitPredictionService.GetCurrentWindowCount(model.Info.Id);
+                              var count = PostLimitPredictionService.GetCurrentWindowCount(model.Account.Id);
                               MaxUpdate = Setting.PostLimitPerWindow.Value;
                               RemainUpdate = MaxUpdate - count;
                               this.RaisePropertyChanged(() => RemainUpdate);

@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reactive.Linq;
 using Livet;
-using StarryEyes.Breezy.Api.Rest;
-using StarryEyes.Breezy.Authorize;
+using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Models;
+using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;
-using StarryEyes.Models.Stores;
 using StarryEyes.Models.Tab;
+using StarryEyes.Settings;
 
 namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
 {
@@ -67,7 +66,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             get { return _searchCandidates; }
         }
 
-        public void UpdateInfo()
+        public async void UpdateInfo()
         {
             // update current binding accounts
             var ctab = TabManager.CurrentFocusTab;
@@ -76,26 +75,27 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             {
                 cid = ctab.BindingAccountIds.First();
             }
-            if (_currentId != cid)
+            if (this._currentId == cid) return;
+            this._currentId = cid;
+            this._searchCandidates.Clear();
+            var aid = Setting.Accounts.Get(this._currentId);
+            if (aid == null)
             {
-                _currentId = cid;
-                _searchCandidates.Clear();
-                var aid = AccountsStore.GetAccountSetting(_currentId);
-                if (aid == null)
-                {
-                    IsSearchCandidateAvailable = false;
-                    return;
-                }
-                CurrentUserScreenName = aid.AuthenticateInfo.UnreliableScreenName;
-                CurrentUserProfileImage = aid.AuthenticateInfo.UnreliableProfileImageUri;
-                IsSearchCandidateAvailable = true;
-                aid.AuthenticateInfo.GetSavedSearches()
-                   .ObserveOnDispatcher()
-                   .Subscribe(
-                       j =>
-                       _searchCandidates.Add(new SearchCandidateItemViewModel(this, aid.AuthenticateInfo, j.id,
-                                                                              j.query)),
-                       ex => BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message)));
+                this.IsSearchCandidateAvailable = false;
+                return;
+            }
+            this.CurrentUserScreenName = aid.UnreliableScreenName;
+            this.CurrentUserProfileImage = aid.UnreliableProfileImage;
+            this.IsSearchCandidateAvailable = true;
+            try
+            {
+                var searches = await aid.GetSavedSearches();
+                searches.ForEach(
+                    s => this._searchCandidates.Add(new SearchCandidateItemViewModel(this, aid, s.Item1, s.Item2)));
+            }
+            catch (Exception ex)
+            {
+                BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message));
             }
         }
     }
@@ -104,22 +104,22 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
     public class SearchCandidateItemViewModel : ViewModel
     {
         private readonly SearchCandidateViewModel _parent;
-        private readonly AuthenticateInfo _authenticateInfo;
+        private readonly TwitterAccount _account;
         private readonly long _id;
         private readonly string _query;
 
         public SearchCandidateItemViewModel(SearchCandidateViewModel parent,
-            AuthenticateInfo authenticateInfo, long id, string query)
+            TwitterAccount account, long id, string query)
         {
             _parent = parent;
-            _authenticateInfo = authenticateInfo;
+            this._account = account;
             _id = id;
             _query = query;
         }
 
-        public AuthenticateInfo AuthenticateInfo
+        public TwitterAccount TwitterAccount
         {
-            get { return _authenticateInfo; }
+            get { return this._account; }
         }
 
         public long Id
@@ -147,11 +147,16 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             get { return _removeCommand ?? (_removeCommand = new Livet.Commands.ViewModelCommand(Remove)); }
         }
 
-        public void Remove()
+        public async void Remove()
         {
-            _authenticateInfo.DestroySavedSearch(_id)
-                             .Subscribe(_ => _parent.UpdateInfo(),
-                                        ex => BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message)));
+            try
+            {
+                await this._account.DestroySavedSearch(_id);
+            }
+            catch (Exception ex)
+            {
+                BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message));
+            }
         }
         #endregion
     }

@@ -6,7 +6,6 @@ using Livet;
 using Livet.Messaging;
 using StarryEyes.Filters.Expressions;
 using StarryEyes.Models;
-using StarryEyes.Models.Stores;
 using StarryEyes.Models.Subsystems;
 using StarryEyes.Models.Tab;
 using StarryEyes.Nightmare.Windows;
@@ -237,17 +236,11 @@ namespace StarryEyes.ViewModels
             }
 
             // Start receiving
-            if (!AccountsStore.Accounts.Any())
+            if (!Setting.Accounts.Collection.Any())
             {
                 var auth = new AuthorizationViewModel();
                 auth.AuthorizeObservable
-                    .Subscribe(info =>
-                               AccountsStore.Accounts.Add(
-                                   new AccountSetting
-                                   {
-                                       AuthenticateInfo = info,
-                                       IsUserStreamsEnabled = true
-                                   }));
+                    .Subscribe(Setting.Accounts.Collection.Add);
                 Messenger.RaiseAsync(new TransitionMessage(
                                          typeof(AuthorizationWindow),
                                          auth, TransitionMode.Modal, null));

@@ -2,6 +2,7 @@
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
+using StarryEyes.Models.Backstages.NotificationEvents;
 
 namespace StarryEyes.Models.Receivers.ReceiveElements
 {
@@ -40,7 +41,14 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
             if (_isDisposed) return;
             if (Interlocked.Decrement(ref _remainCountDown) > 0) return;
             _remainCountDown = IntervalSec;
-            DoReceive();
+            try
+            {
+                DoReceive();
+            }
+            catch (Exception ex)
+            {
+                BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message));
+            }
         }
 
         protected abstract void DoReceive();

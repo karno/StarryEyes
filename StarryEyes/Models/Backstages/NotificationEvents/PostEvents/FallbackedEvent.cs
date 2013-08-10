@@ -1,27 +1,27 @@
-﻿using StarryEyes.Breezy.Authorize;
+﻿using StarryEyes.Models.Accounting;
 using StarryEyes.Views;
 
 namespace StarryEyes.Models.Backstages.NotificationEvents.PostEvents
 {
     public sealed class FallbackedEvent : BackstageEventBase
     {
-        private readonly AuthenticateInfo _authInfo;
-        public AuthenticateInfo AuthInfo
+        private readonly TwitterAccount _account;
+        public TwitterAccount Account
         {
-            get { return _authInfo; }
+            get { return this._account; }
         }
 
-        private readonly AuthenticateInfo _fallbackToAuthInfo;
-        public AuthenticateInfo FallbackToAuthInfo
+        private readonly TwitterAccount _fallbackAccount;
+        public TwitterAccount FallbackAccount
         {
-            get { return _fallbackToAuthInfo; }
+            get { return this._fallbackAccount; }
         }
 
 
-        public FallbackedEvent(AuthenticateInfo authInfo, AuthenticateInfo fallbackTo)
+        public FallbackedEvent(TwitterAccount account, TwitterAccount fallbackTo)
         {
-            this._authInfo = authInfo;
-            this._fallbackToAuthInfo = fallbackTo;
+            this._account = account;
+            this._fallbackAccount = fallbackTo;
         }
 
         public override string Title
@@ -33,9 +33,9 @@ namespace StarryEyes.Models.Backstages.NotificationEvents.PostEvents
         {
             get
             {
-                return _authInfo.UnreliableScreenName +
+                return this._account.UnreliableScreenName +
                     " はPOST規制されているため、 " +
-                    _fallbackToAuthInfo.UnreliableScreenName +
+                    this._fallbackAccount.UnreliableScreenName +
                     " へフォールバックされました。";
             }
         }

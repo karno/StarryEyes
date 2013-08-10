@@ -51,7 +51,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return await response.ReadAsUserCollectionAsync();
         }
 
-        public static async Task<CursorResult<IEnumerable<long>>> GetRetweeterIds(
+        public static async Task<ICursorResult<IEnumerable<long>>> GetRetweeterIds(
             this IOAuthCredential credential, long id, long cursor = -1)
         {
             if (credential == null) throw new ArgumentNullException("credential");

@@ -27,6 +27,13 @@ namespace StarryEyes.Anomaly.Utils
             return long.TryParse(s, out v) ? v : 0;
         }
 
+        public static long? ParseNullableId(this string s)
+        {
+            long v;
+            return long.TryParse(s, out v) && v != 0 ? v : (long?)null;
+        }
+
+
         public static DateTime ParseDateTime(this string s)
         {
             DateTime dt;

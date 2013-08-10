@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading;
 using System.Windows;
 using Livet;
-using StarryEyes.Breezy.Api;
+using StarryEyes.Anomaly.TwitterApi;
 using StarryEyes.Models;
 using StarryEyes.Models.Plugins;
 using StarryEyes.Models.Receivers;
@@ -84,10 +84,13 @@ namespace StarryEyes
             // set exit handler
             Current.Exit += (_, __) => AppFinalize(true);
 
-
             // Initialize service points
             ServicePointManager.Expect100Continue = false; // disable expect 100 continue for User Streams connection.
             ServicePointManager.DefaultConnectionLimit = Int32.MaxValue; // Limit Break!
+
+            // Initialize Anomaly Core 
+            Anomaly.Core.Initialize();
+
             // declare security protocol explicitly
             // for Windows 8.1 (Preview)
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Ssl3;
@@ -106,8 +109,6 @@ namespace StarryEyes
             }
 
             // Set CK/CS for accessing twitter.
-            ApiEndpoint.DefaultConsumerKey = Setting.GlobalConsumerKey.Value ?? ConsumerKey;
-            ApiEndpoint.DefaultConsumerSecret = Setting.GlobalConsumerSecret.Value ?? ConsumerSecret;
             ApiEndpoint.UserAgent = Setting.UserAgent.Value;
             // TODO: API proxy setting reflect
 
@@ -163,7 +164,6 @@ namespace StarryEyes
 
             StatusStore.Initialize();
             UserStore.Initialize();
-            AccountsStore.Initialize();
             StatisticsService.Initialize();
             PostLimitPredictionService.Initialize();
             StreamingEventsHub.Initialize();

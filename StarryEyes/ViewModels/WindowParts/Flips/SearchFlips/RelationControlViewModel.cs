@@ -1,10 +1,11 @@
 ﻿using System;
-using System.Reactive;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 using Livet;
-using StarryEyes.Breezy.Api.Rest;
-using StarryEyes.Breezy.Authorize;
-using StarryEyes.Breezy.DataModel;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Anomaly.TwitterApi.Rest;
+using StarryEyes.Models.Accounting;
+using StarryEyes.Models.Requests;
 using StarryEyes.Models.Stores;
 using StarryEyes.Nightmare.Windows;
 using StarryEyes.Views.Messaging;
@@ -14,7 +15,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
     public class RelationControlViewModel : ViewModel
     {
         private readonly UserInfoViewModel _parent;
-        private readonly AuthenticateInfo _source;
+        private readonly TwitterAccount _source;
         private readonly TwitterUser _target;
         private bool _isCommunicating;
         private bool _enabled;
@@ -29,7 +30,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
 
         public Uri SourceUserProfileImage
         {
-            get { return this._source.UnreliableProfileImageUri; }
+            get { return this._source.UnreliableProfileImage; }
         }
 
         public bool IsCommunicating
@@ -82,70 +83,74 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             }
         }
 
-        public RelationControlViewModel(UserInfoViewModel parent, AuthenticateInfo source, TwitterUser target)
+        public RelationControlViewModel(UserInfoViewModel parent, TwitterAccount source, TwitterUser target)
         {
             this._parent = parent;
             this._source = source;
             this._target = target;
-            var rds = source.GetRelationData();
+            var rds = source.RelationData;
             this.IsFollowing = rds.IsFollowing(target.Id);
             this.IsFollowedBack = rds.IsFollowedBy(target.Id);
             this.IsBlocking = rds.IsBlocking(target.Id);
-            source.GetFriendship(source.Id, target_id: target.Id)
-                  .Subscribe(
-                      r =>
-                      {
-                          // ReSharper disable InvertIf
-                          if (this.IsFollowing != r.relationship.source.following)
-                          {
-                              this.IsFollowing = r.relationship.source.following;
-                              if (r.relationship.source.following)
-                              {
-                                  rds.AddFollowing(target.Id);
-                              }
-                              else
-                              {
-                                  rds.RemoveFollowing(target.Id);
-                              }
-                          }
-                          if (this.IsFollowedBack != r.relationship.source.followed_by)
-                          {
-                              this.IsFollowedBack = r.relationship.source.followed_by;
-                              if (r.relationship.source.followed_by)
-                              {
-                                  rds.AddFollower(target.Id);
-                              }
-                              else
-                              {
-                                  rds.RemoveFollower(target.Id);
-                              }
-                          }
-                          if (this.IsBlocking != r.relationship.source.blocking)
-                          {
-                              this.IsBlocking = r.relationship.source.blocking;
-                              if (r.relationship.source.blocking)
-                              {
-                                  rds.AddBlocking(target.Id);
-                              }
-                              else
-                              {
-                                  rds.RemoveBlocking(target.Id);
-                              }
-                          }
-                          // ReSharper restore InvertIf
-                      },
-                      ex =>
-                      {
-                          this.Enabled = false;
-                      });
+            Task.Run(() => this.GetFriendship(rds));
+        }
+
+        private async void GetFriendship(AccountRelationData rds)
+        {
+            try
+            {
+                // ReSharper disable InvertIf
+                var fs = await _source.ShowFriendship(_source.Id, _target.Id);
+                if (this.IsFollowing != fs.IsSourceFollowingTarget)
+                {
+                    this.IsFollowing = fs.IsSourceFollowingTarget;
+                    if (fs.IsSourceFollowingTarget)
+                    {
+                        rds.AddFollowing(_target.Id);
+                    }
+                    else
+                    {
+                        rds.RemoveFollowing(_target.Id);
+                    }
+
+                }
+
+                if (this.IsFollowedBack != fs.IsTargetFollowingSource)
+                {
+                    this.IsFollowedBack = fs.IsTargetFollowingSource;
+                    if (fs.IsTargetFollowingSource)
+                    {
+                        rds.AddFollower(_target.Id);
+                    }
+                    else
+                    {
+                        rds.RemoveFollower(_target.Id);
+                    }
+                }
+                if (this.IsBlocking != fs.IsBlocking)
+                {
+                    this.IsBlocking = fs.IsBlocking;
+                    if (fs.IsBlocking)
+                    {
+                        rds.AddBlocking(_target.Id);
+                    }
+                    else
+                    {
+                        rds.RemoveBlocking(_target.Id);
+                    }
+                }
+                // ReSharper restore InvertIf
+            }
+            catch (Exception)
+            {
+                this.Enabled = false;
+            }
         }
 
         public void Follow()
         {
             this.DispatchAction(
-                () =>
-                this._source.CreateFriendship(this._target.Id)
-                    .Select(_ => new Unit()),
+                RelationKind.Follow,
                 () => this.IsFollowing = true,
                 ex => this._parent.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
                 {
@@ -160,9 +165,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
         public void Remove()
         {
             this.DispatchAction(
-                () =>
-                this._source.DestroyFriendship(this._target.Id)
-                    .Select(_ => new Unit()),
+                RelationKind.Unfollow,
                 () => this.IsFollowing = false,
                 ex => this._parent.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
                 {
@@ -177,9 +180,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
         public void Block()
         {
             this.DispatchAction(
-                () =>
-                this._source.CreateBlock(this._target.Id)
-                    .Select(_ => new Unit()),
+                RelationKind.Block,
                 () =>
                 {
                     this.IsFollowing = false;
@@ -198,13 +199,8 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
         public void Unblock()
         {
             this.DispatchAction(
-                () =>
-                this._source.DestroyBlock(this._target.Id)
-                    .Select(_ => new Unit()),
-                () =>
-                {
-                    this.IsBlocking = false;
-                },
+                RelationKind.Unblock,
+                () => this.IsBlocking = false,
                 ex => this._parent.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
                 {
                     CommonButtons = TaskDialogCommonButtons.Close,
@@ -218,9 +214,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
         public void ReportForSpam()
         {
             this.DispatchAction(
-                () =>
-                this._source.ReportSpam(this._target.Id)
-                    .Select(_ => new Unit()),
+                RelationKind.ReportAsSpam,
                 () =>
                 {
                     this.IsFollowing = false;
@@ -236,14 +230,14 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 })));
         }
 
-        private void DispatchAction(Func<IObservable<Unit>> work, Action succeeded, Action<Exception> failed)
+        private void DispatchAction(RelationKind work, Action succeeded, Action<Exception> failed)
         {
             this.IsCommunicating = true;
-            work().Retry(3)
-                  .Finally(() => this.IsCommunicating = false)
-                  .Subscribe(_ => { },
-                             failed,
-                             succeeded);
+            RequestQueue.Enqueue(_source, new UpdateRelationRequest(_target, work))
+                        .Finally(() => this.IsCommunicating = false)
+                        .Subscribe(_ => { },
+                                   failed,
+                                   succeeded);
         }
     }
 }

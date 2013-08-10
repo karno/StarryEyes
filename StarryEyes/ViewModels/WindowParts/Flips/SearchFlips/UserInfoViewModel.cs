@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows;
-using System.Windows.Threading;
 using Livet;
 using Livet.Commands;
-using StarryEyes.Breezy.Util;
+using StarryEyes.Anomaly.Utils;
 using StarryEyes.Models;
 using StarryEyes.Models.Stores;
 using StarryEyes.Nightmare.Windows;
+using StarryEyes.Settings;
 using StarryEyes.ViewModels.WindowParts.Timelines;
 using StarryEyes.Views.Messaging;
 using StarryEyes.Views.Utils;
@@ -171,12 +172,10 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                                {
                                    pfr.Dispose();
                                }
-                               Observable.Start(() => AccountsStore.Accounts)
-                                         .SelectMany(a => a)
-                                         .Where(a => a.UserId != user.Id)
-                                         .Select(a => new RelationControlViewModel(this, a.AuthenticateInfo, user))
-                                         .ObserveOn(DispatcherHolder.Dispatcher, DispatcherPriority.Loaded)
-                                         .Subscribe(RelationControls.Add);
+                               Setting.Accounts.Collection
+                                      .Where(a => a.Id != user.Id)
+                                      .Select(a => new RelationControlViewModel(this, a, user))
+                                      .ForEach(RelationControls.Add);
                            },
                            ex =>
                            {

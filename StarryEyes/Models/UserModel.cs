@@ -1,4 +1,4 @@
-﻿using StarryEyes.Breezy.DataModel;
+﻿using StarryEyes.Anomaly.TwitterApi.DataModels;
 
 namespace StarryEyes.Models
 {

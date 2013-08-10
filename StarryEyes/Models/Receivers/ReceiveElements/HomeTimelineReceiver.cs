@@ -1,6 +1,7 @@
 ﻿using System;
-using StarryEyes.Breezy.Api.Rest;
-using StarryEyes.Breezy.Authorize;
+using System.Linq;
+using StarryEyes.Anomaly.TwitterApi.Rest;
+using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Settings;
 
@@ -8,11 +9,11 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
 {
     public class HomeTimelineReceiver : CyclicReceiverBase
     {
-        private readonly AuthenticateInfo _authInfo;
+        private readonly TwitterAccount _account;
 
-        public HomeTimelineReceiver(AuthenticateInfo authInfo)
+        public HomeTimelineReceiver(TwitterAccount account)
         {
-            _authInfo = authInfo;
+            this._account = account;
         }
 
         protected override int IntervalSec
@@ -20,14 +21,20 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
             get { return Setting.RESTReceivePeriod.Value; }
         }
 
-        protected override void DoReceive()
+        protected override async void DoReceive()
         {
-            _authInfo.GetHomeTimeline(count: 100, include_rts: true, include_entities: true)
-                     .Subscribe(ReceiveInbox.Queue,
-                                ex => BackstageModel.RegisterEvent(
-                                    new OperationFailedEvent("home timeline receive error: " +
-                                                             _authInfo.UnreliableScreenName + " - " +
-                                                             ex.Message)));
+            try
+            {
+                var recv = await this._account.GetHomeTimeline(100);
+                recv.ForEach(ReceiveInbox.Queue);
+            }
+            catch (Exception ex)
+            {
+                BackstageModel.RegisterEvent(
+                    new OperationFailedEvent("タイムラインを受信できません(@" +
+                                             this._account.UnreliableScreenName + "): " +
+                                             ex.Message));
+            }
         }
     }
 }

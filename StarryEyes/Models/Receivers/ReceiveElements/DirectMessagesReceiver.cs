@@ -1,6 +1,7 @@
 ﻿using System;
-using StarryEyes.Breezy.Api.Rest;
-using StarryEyes.Breezy.Authorize;
+using StarryEyes.Anomaly.TwitterApi.Rest;
+using StarryEyes.Anomaly.Utils;
+using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Settings;
 
@@ -8,11 +9,11 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
 {
     public class DirectMessagesReceiver : CyclicReceiverBase
     {
-        private readonly AuthenticateInfo _authInfo;
+        private readonly TwitterAccount _account;
 
-        public DirectMessagesReceiver(AuthenticateInfo authInfo)
+        public DirectMessagesReceiver(TwitterAccount account)
         {
-            _authInfo = authInfo;
+            this._account = account;
         }
 
         protected override int IntervalSec
@@ -22,18 +23,18 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
 
         protected override void DoReceive()
         {
-            _authInfo.GetDirectMessages(count: 50)
-                     .Subscribe(ReceiveInbox.Queue,
-                                ex => BackstageModel.RegisterEvent(
-                                    new OperationFailedEvent("messages receive error: " +
-                                                             _authInfo.UnreliableScreenName + " - " +
-                                                             ex.Message)));
-            _authInfo.GetSentDirectMessages(count: 50)
-                     .Subscribe(ReceiveInbox.Queue,
-                                ex => BackstageModel.RegisterEvent(
-                                    new OperationFailedEvent("sent messages receive error: " +
-                                                             _authInfo.UnreliableScreenName + " - " +
-                                                             ex.Message)));
+            this._account.GetDirectMessages(count: 50).ToObservable()
+                .Subscribe(ReceiveInbox.Queue,
+                           ex => BackstageModel.RegisterEvent(
+                               new OperationFailedEvent("messages receive error: " +
+                                                        this._account.UnreliableScreenName + " - " +
+                                                        ex.Message)));
+            this._account.GetSentDirectMessages(count: 50).ToObservable()
+                .Subscribe(ReceiveInbox.Queue,
+                           ex => BackstageModel.RegisterEvent(
+                               new OperationFailedEvent("sent messages receive error: " +
+                                                        this._account.UnreliableScreenName + " - " +
+                                                        ex.Message)));
         }
     }
 }

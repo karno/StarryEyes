@@ -7,14 +7,14 @@ using System.Windows;
 using System.Windows.Threading;
 using Livet;
 using Livet.Commands;
-using StarryEyes.Breezy.Authorize;
-using StarryEyes.Breezy.DataModel;
-using StarryEyes.Breezy.Util;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Anomaly.Utils;
 using StarryEyes.Filters;
 using StarryEyes.Models;
+using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Models.Backstages.TwitterEvents;
-using StarryEyes.Models.Operations;
+using StarryEyes.Models.Requests;
 using StarryEyes.Models.Stores;
 using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
@@ -116,8 +116,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             }
 
             // look-up in-reply-to
-            _isInReplyToExists = status.Status.InReplyToStatusId.HasValue;
-
+            _isInReplyToExists = Status.InReplyToStatusId.HasValue && Status.InReplyToStatusId != 0;
         }
 
         public TimelineViewModelBase Parent
@@ -272,12 +271,12 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public bool CanDelete
         {
-            get { return IsDirectMessage || AccountsStore.AccountIds.Contains(OriginalStatus.User.Id); }
+            get { return IsDirectMessage || Setting.Accounts.Contains(OriginalStatus.User.Id); }
         }
 
         public bool IsMyself
         {
-            get { return AccountsStore.AccountIds.Contains(OriginalStatus.User.Id); }
+            get { return Setting.Accounts.Contains(OriginalStatus.User.Id); }
         }
 
         public bool IsMyselfStrict
@@ -295,7 +294,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             get
             {
                 return FilterSystemUtil.InReplyToUsers(Status)
-                                       .Any(AccountsStore.AccountIds.Contains);
+                                       .Any(Setting.Accounts.Contains);
             }
         }
 
@@ -613,10 +612,10 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             }
         }
 
-        public void Favorite(IEnumerable<AuthenticateInfo> infos, bool add)
+        public void Favorite(IEnumerable<TwitterAccount> infos, bool add)
         {
-            Action<AuthenticateInfo> expected;
-            Action<AuthenticateInfo> onFail;
+            Action<TwitterAccount> expected;
+            Action<TwitterAccount> onFail;
             if (add)
             {
                 expected = a => Model.AddFavoritedUser(a.Id);
@@ -628,29 +627,29 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                 onFail = a => Model.AddFavoritedUser(a.Id);
             }
 
+            var freq = new FavoriteRequest(Status, add);
             infos.ToObservable()
                  .Do(expected)
                  .Do(_ => RaisePropertyChanged(() => IsFavorited))
-                 .SelectMany(a => new FavoriteOperation(a, Status, add)
-                                      .Run()
-                                      .Catch((Exception ex) =>
-                                      {
-                                          onFail(a);
-                                          BackstageModel.RegisterEvent(
-                                              new OperationFailedEvent((add ? "" : "un") + "favorite failed: " +
-                                                                       a.UnreliableScreenName + " -> " +
-                                                                       Status.User.ScreenName + " :" +
-                                                                       ex.Message));
-                                          return Observable.Empty<TwitterStatus>();
-                                      }))
+                 .SelectMany(a => RequestQueue.Enqueue(a, freq)
+                                              .Catch((Exception ex) =>
+                                              {
+                                                  onFail(a);
+                                                  BackstageModel.RegisterEvent(
+                                                      new OperationFailedEvent((add ? "" : "un") + "favorite failed: " +
+                                                                               a.UnreliableScreenName + " -> " +
+                                                                               Status.User.ScreenName + " :" +
+                                                                               ex.Message));
+                                                  return Observable.Empty<TwitterStatus>();
+                                              }))
                  .Do(_ => RaisePropertyChanged(() => IsFavorited))
                  .Subscribe();
         }
 
-        public void Retweet(IEnumerable<AuthenticateInfo> infos, bool add)
+        public void Retweet(IEnumerable<TwitterAccount> infos, bool add)
         {
-            Action<AuthenticateInfo> expected;
-            Action<AuthenticateInfo> onFail;
+            Action<TwitterAccount> expected;
+            Action<TwitterAccount> onFail;
             if (add)
             {
                 expected = a => Model.AddRetweetedUser(a.Id);
@@ -661,21 +660,21 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                 expected = a => Model.RemoveRetweetedUser(a.Id);
                 onFail = a => Model.AddRetweetedUser(a.Id);
             }
+            var rreq = new RetweetRequest(Status, add);
             infos.ToObservable()
                  .Do(expected)
                  .Do(_ => RaisePropertyChanged(() => IsRetweeted))
-                 .SelectMany(a => new RetweetOperation(a, Status, add)
-                                      .Run()
-                                      .Catch((Exception ex) =>
-                                      {
-                                          onFail(a);
-                                          BackstageModel.RegisterEvent(
-                                              new OperationFailedEvent((add ? "" : "un") + "retweet failed: " +
-                                                                       a.UnreliableScreenName + " -> " +
-                                                                       Status.User.ScreenName + " :" +
-                                                                       ex.Message));
-                                          return Observable.Empty<TwitterStatus>();
-                                      }))
+                 .SelectMany(a => RequestQueue.Enqueue(a, rreq)
+                                              .Catch((Exception ex) =>
+                                              {
+                                                  onFail(a);
+                                                  BackstageModel.RegisterEvent(
+                                                      new OperationFailedEvent((add ? "" : "un") + "retweet failed: " +
+                                                                               a.UnreliableScreenName + " -> " +
+                                                                               Status.User.ScreenName + " :" +
+                                                                               ex.Message));
+                                                  return Observable.Empty<TwitterStatus>();
+                                              }))
                  .Do(_ => RaisePropertyChanged(() => IsRetweeted))
                  .Subscribe();
         }
@@ -743,10 +742,10 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                 .Publish();
             if (!IsFavorited)
             {
+                var freq = new FavoriteRequest(Status, true);
                 accounts.Do(a => Model.AddFavoritedUser(a.Id))
                         .Do(_ => RaisePropertyChanged(() => IsFavorited))
-                        .SelectMany(a => new FavoriteOperation(a, Status, true)
-                                             .Run()
+                        .SelectMany(a => RequestQueue.Enqueue(a, freq)
                                              .Catch((Exception ex) =>
                                              {
                                                  Model.RemoveFavoritedUser(a.Id);
@@ -757,10 +756,10 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             }
             if (!IsRetweeted)
             {
+                var rreq = new RetweetRequest(Status, true);
                 accounts.Do(a => Model.AddRetweetedUser(a.Id))
                           .Do(_ => RaisePropertyChanged(() => IsRetweeted))
-                          .SelectMany(a => new RetweetOperation(a, Status, true)
-                                               .Run()
+                          .SelectMany(a => RequestQueue.Enqueue(a, rreq)
                                                .Catch((Exception ex) =>
                                                {
                                                    Model.RemoveRetweetedUser(a.Id);
@@ -772,11 +771,9 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             accounts.Connect();
         }
 
-        private IEnumerable<AuthenticateInfo> GetImmediateAccounts()
+        private IEnumerable<TwitterAccount> GetImmediateAccounts()
         {
-            return AccountsStore.Accounts
-                                .Where(a => _bindingAccounts.Contains(a.UserId))
-                                .Select(a => a.AuthenticateInfo);
+            return Setting.Accounts.Collection.Where(a => _bindingAccounts.Contains(a.Id));
         }
 
         public void ToggleSelect()
@@ -795,21 +792,18 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             }
             var model = this.RetweetedOriginalModel ?? this.Model;
             var favoriteds =
-                AccountsStore.Accounts
-                             .Where(a => model.IsFavorited(a.UserId))
-                             .Select(a => a.AuthenticateInfo)
-                             .ToArray();
+                Setting.Accounts.Collection
+                       .Where(a => model.IsFavorited(a.Id))
+                       .ToArray();
             MainWindowModel.ExecuteAccountSelectAction(
                 AccountSelectionAction.Favorite,
                 favoriteds,
                 infos =>
                 {
-                    var authenticateInfos =
-                        infos as AuthenticateInfo[] ?? infos.ToArray();
-                    var adds =
-                        authenticateInfos.Except(favoriteds);
-                    var rmvs =
-                        favoriteds.Except(authenticateInfos);
+                    var accounts =
+                        infos as TwitterAccount[] ?? infos.ToArray();
+                    var adds = accounts.Except(favoriteds);
+                    var rmvs = favoriteds.Except(accounts);
                     Favorite(adds, true);
                     Favorite(rmvs, false);
                 });
@@ -822,18 +816,16 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                 return;
             }
             var model = this.RetweetedOriginalModel ?? this.Model;
-            var retweeteds =
-                AccountsStore.Accounts
-                             .Where(a => model.IsRetweeted(a.UserId))
-                             .Select(a => a.AuthenticateInfo)
-                             .ToArray();
+            var retweeteds = Setting.Accounts.Collection
+                                    .Where(a => model.IsRetweeted(a.Id))
+                                    .ToArray();
             MainWindowModel.ExecuteAccountSelectAction(
                 AccountSelectionAction.Retweet,
                 retweeteds,
                 infos =>
                 {
                     var authenticateInfos =
-                        infos as AuthenticateInfo[] ?? infos.ToArray();
+                        infos as TwitterAccount[] ?? infos.ToArray();
                     var adds =
                         authenticateInfos.Except(retweeteds);
                     var rmvs =
@@ -863,24 +855,25 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             }
             else
             {
-                InputAreaModel.SetText(Model.GetSuitableReplyAccount(), "@" + User.ScreenName + " ", inReplyTo: Status);
+                InputAreaModel.SetText(new[] { Model.GetSuitableReplyAccount() },
+                                       "@" + User.ScreenName + " ", inReplyTo: Status);
             }
         }
 
         public void Quote()
         {
-            InputAreaModel.SetText(Model.GetSuitableReplyAccount(),
+            InputAreaModel.SetText(new[] { Model.GetSuitableReplyAccount() },
                 " RT @" + User.ScreenName + " " + Status.GetEntityAidedText(true), CursorPosition.Begin);
         }
 
         public void QuotePermalink()
         {
-            InputAreaModel.SetText(Model.GetSuitableReplyAccount(), " " + Status.Permalink, CursorPosition.Begin);
+            InputAreaModel.SetText(new[] { Model.GetSuitableReplyAccount() }, " " + Status.Permalink, CursorPosition.Begin);
         }
 
         public void DirectMessage()
         {
-            InputAreaModel.SetDirectMessage(Model.GetSuitableReplyAccount(), Status.User);
+            InputAreaModel.SetDirectMessage(new[] { Model.GetSuitableReplyAccount() }, Status.User);
         }
 
         public void ConfirmDelete()
@@ -905,32 +898,24 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public void Delete()
         {
-            AuthenticateInfo info = null;
+            TwitterAccount info;
             if (IsDirectMessage)
             {
                 var ids = new[] { Status.User.Id, Status.Recipient.Id };
                 info = ids
-                    .Select(AccountsStore.GetAccountSetting)
-                    .Where(_ => _ != null)
-                    .Select(_ => _.AuthenticateInfo)
-                    .FirstOrDefault();
+                    .Select(Setting.Accounts.Get).FirstOrDefault(_ => _ != null);
             }
             else
             {
-                var ai = AccountsStore.GetAccountSetting(OriginalStatus.User.Id);
-                if (ai != null)
-                {
-                    info = ai.AuthenticateInfo;
-                }
+                info = Setting.Accounts.Get(OriginalStatus.User.Id);
             }
-            if (info != null)
-            {
-                new DeleteOperation(info, OriginalStatus)
-                    .Run()
-                    .Subscribe(_ => StatusStore.Remove(_.Id),
-                               ex =>
-                               BackstageModel.RegisterEvent(new OperationFailedEvent("ツイートを削除できませんでした: " + ex.Message)));
-            }
+            if (info == null) return;
+            var dreq = new DeletionRequest(this.OriginalStatus);
+            RequestQueue.Enqueue(info, dreq)
+                        .Subscribe(_ => StatusStore.Remove(_.Id),
+                                   ex =>
+                                   BackstageModel.RegisterEvent(
+                                       new OperationFailedEvent("ツイートを削除できませんでした: " + ex.Message)));
         }
 
         private bool _lastSelectState;
@@ -986,9 +971,11 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             if (response.Response.Result != TaskDialogSimpleResult.Ok) return;
             var accounts = this.GetImmediateAccounts()
                 .ToObservable();
-            accounts.SelectMany(a => new FavstarTrophyOperation(a, this.Status).Run())
-                    .Do(_ => this.RaisePropertyChanged(() => this.IsFavorited))
-                    .Subscribe();
+            /*
+                accounts.SelectMany(a => new FavstarTrophyOperation(a, this.Status).Run())
+                        .Do(_ => this.RaisePropertyChanged(() => this.IsFavorited))
+                        .Subscribe();
+            */
         }
 
         public void ReportAsSpam()
@@ -1005,19 +992,15 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             var response = this.Parent.Messenger.GetResponse(msg);
             if (response.Response.CustomButtonResult != 0) return;
             // report as a spam
-            var accounts = AccountsStore.Accounts.ToArray();
+            var accounts = Setting.Accounts.Collection.ToArray();
             var reporter = accounts.FirstOrDefault();
             if (reporter == null) return;
-            accounts.Select(a => a.AuthenticateInfo)
-                    .Select(a => new UpdateRelationOperation(a, this.Status.User, RelationKind.Block))
-                    .Append(new UpdateRelationOperation(reporter.AuthenticateInfo, this.Status.User,
-                                                        RelationKind.ReportAsSpam))
-                    .ToObservable()
-                    .SelectMany(
-                        o => o.Run()
-                              .Do(
-                                  r =>
-                                  BackstageModel.RegisterEvent(new BlockedEvent(o.Info.UserInfo, o.Target))))
+            var rreq = new UpdateRelationRequest(this.User.User, RelationKind.Block);
+            accounts.ToObservable()
+                    .SelectMany(a =>
+                                RequestQueue.Enqueue(a, rreq)
+                                            .Do(r => BackstageModel.RegisterEvent(
+                                                new BlockedEvent(a.GetPserudoUser(), User.User))))
                     .Subscribe(
                         _ => { },
                         ex => BackstageModel.RegisterEvent(new InternalErrorEvent(ex.Message)),

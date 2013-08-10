@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using StarryEyes.Breezy.Authorize;
+using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Receivers.ReceiveElements;
-using StarryEyes.Models.Stores;
 using StarryEyes.Nightmare.Windows;
+using StarryEyes.Settings;
 
 namespace StarryEyes.Models.Receivers.Managers
 {
@@ -18,10 +18,12 @@ namespace StarryEyes.Models.Receivers.Managers
 
         public void StartReceive(ListInfo info)
         {
-            var ai = AccountsStore.Accounts.FirstOrDefault(aset => aset.AuthenticateInfo.UnreliableScreenName == info.OwnerScreenName);
-            if (ai != null)
+            var account =
+                            Setting.Accounts.Collection.FirstOrDefault(
+                                a => a.UnreliableScreenName.Equals(info.OwnerScreenName, StringComparison.CurrentCultureIgnoreCase));
+            if (account != null)
             {
-                StartReceive(ai.AuthenticateInfo, info);
+                StartReceive(account, info);
             }
             else
             {
@@ -41,14 +43,20 @@ namespace StarryEyes.Models.Receivers.Managers
 
         public void StartReceive(string receiverScreenName, ListInfo info)
         {
-            var ai = AccountsStore.Accounts.FirstOrDefault(aset => aset.AuthenticateInfo.UnreliableScreenName == receiverScreenName);
-            if (ai != null)
-                StartReceive(ai.AuthenticateInfo, info);
+            var account =
+                Setting.Accounts.Collection.FirstOrDefault(
+                    a => a.UnreliableScreenName.Equals(receiverScreenName, StringComparison.CurrentCultureIgnoreCase));
+            if (account != null)
+            {
+                StartReceive(account, info);
+            }
             else
+            {
                 StartReceive(info);
+            }
         }
 
-        public void StartReceive(AuthenticateInfo auth, ListInfo info)
+        public void StartReceive(TwitterAccount account, ListInfo info)
         {
             lock (_listReceiverLocker)
             {
@@ -58,7 +66,7 @@ namespace StarryEyes.Models.Receivers.Managers
                 }
                 else
                 {
-                    var lr = new ListReceiver(auth, info);
+                    var lr = new ListReceiver(account, info);
                     _listReceiverReferenceCount.Add(info, 1);
                     _listReceiverResolver.Add(info, lr);
                 }

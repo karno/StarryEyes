@@ -1,5 +1,5 @@
 ﻿using System;
-using StarryEyes.Breezy.DataModel;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Filters.Expressions;
 
 namespace StarryEyes.Filters.Sources

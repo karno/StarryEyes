@@ -7,7 +7,7 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using StarryEyes.Albireo.Data;
-using StarryEyes.Breezy.DataModel;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Filters;
 using StarryEyes.Filters.Parsing;
 using StarryEyes.Models.Backstages.SystemEvents;
@@ -112,9 +112,13 @@ namespace StarryEyes.Models.Tab
             try
             {
                 if (_filterQuery != null)
+                {
                     _evaluator = _filterQuery.GetEvaluator();
+                }
                 else
+                {
                     _evaluator = _ => false;
+                }
             }
             catch (FilterQueryException fex)
             {
@@ -147,7 +151,7 @@ namespace StarryEyes.Models.Tab
         public void InvalidateCollection()
         {
             var oldt = Timeline;
-            Timeline = new TimelineModel(_evaluator, GetChunk);
+            Timeline = TimelineModel.FromObservable(_evaluator, GetChunk);
             oldt.Dispose();
         }
 
@@ -173,7 +177,7 @@ namespace StarryEyes.Models.Tab
             {
                 if (Timeline != null)
                     Timeline.Dispose();
-                Timeline = new TimelineModel(_evaluator, GetChunk);
+                Timeline = TimelineModel.FromObservable(_evaluator, GetChunk);
                 Timeline.NewStatusArrival += this.OnNewStatusArrival;
                 if (FilterQuery != null)
                 {

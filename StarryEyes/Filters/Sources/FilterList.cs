@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using StarryEyes.Albireo.Data;
-using StarryEyes.Breezy.Api.Rest;
-using StarryEyes.Breezy.DataModel;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Anomaly.TwitterApi.Rest;
+using StarryEyes.Models;
+using StarryEyes.Models.Accounting;
+using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Models.Receivers;
 using StarryEyes.Models.Receivers.ReceiveElements;
 using StarryEyes.Models.Stores;
@@ -38,7 +41,7 @@ namespace StarryEyes.Filters.Sources
             this.GetListUsersInfo();
         }
 
-        private void GetListUsersInfo(bool enforceReceive = false)
+        private async void GetListUsersInfo(bool enforceReceive = false)
         {
             IEnumerable<long> users;
             if (!enforceReceive && (users = CacheStore.GetListUsers(_listInfo)).Any())
@@ -49,23 +52,30 @@ namespace StarryEyes.Filters.Sources
                 }
                 return;
             }
-            var info = this.GetAccount();
-            if (info == null) return;
-            var newList = new List<long>();
-            info.AuthenticateInfo.GetListMembersAll(slug: _listInfo.Slug, owner_screen_name: _listInfo.OwnerScreenName)
-                .Subscribe(
-                    l => newList.Add(l.Id),
-                    ex => { },
-                    () =>
-                    {
-                        if (newList.Count <= 0) return;
-                        CacheStore.SetListUsers(this._listInfo, newList);
-                        lock (this._ids)
-                        {
-                            this._ids.Clear();
-                            newList.ForEach(this._ids.Add);
-                        }
-                    });
+            try
+            {
+                var account = this.GetAccount();
+                var memberList = new List<long>();
+                long cursor = -1;
+                do
+                {
+                    var result = await account.GetListMembers(_listInfo.Slug, _listInfo.OwnerScreenName, cursor);
+                    memberList.AddRange(result.Result.Do(UserStore.Store).Select(u => u.Id));
+                    cursor = result.NextCursor;
+                } while (cursor != 0);
+                if (memberList.Count <= 0) return;
+                CacheStore.SetListUsers(this._listInfo, memberList);
+                lock (this._ids)
+                {
+                    this._ids.Clear();
+                    memberList.ForEach(this._ids.Add);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message));
+            }
         }
 
         public override Func<TwitterStatus, bool> GetEvaluator()
@@ -81,19 +91,16 @@ namespace StarryEyes.Filters.Sources
 
         protected override IObservable<TwitterStatus> ReceiveSink(long? maxId)
         {
-            var info = this.GetAccount();
-            return info == null
-                       ? base.ReceiveSink(maxId)
-                       : ListReceiver.DoReceive(info.AuthenticateInfo, this._listInfo, maxId);
+            return ListReceiver.DoReceive(this.GetAccount(), this._listInfo, maxId);
         }
 
-        private AccountSetting GetAccount()
+        private TwitterAccount GetAccount()
         {
-            return AccountsStore
-                .Accounts
-                .Where(a => a.AuthenticateInfo.UnreliableScreenName == _receiver)
-                .Concat(AccountsStore.Accounts)
-                .FirstOrDefault();
+            return Setting.Accounts.Collection
+                          .FirstOrDefault(
+                              a => this._receiver.Equals(a.UnreliableScreenName,
+                                                         StringComparison.CurrentCultureIgnoreCase)) ??
+                   Setting.Accounts.GetRandomOne();
         }
 
         public override string FilterKey

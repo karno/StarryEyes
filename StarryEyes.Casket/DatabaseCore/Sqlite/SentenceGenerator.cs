@@ -11,7 +11,7 @@ namespace StarryEyes.Casket.DatabaseCore.Sqlite
     {
         private static readonly Dictionary<Type, string> TypeMapping =
         new Dictionary<Type, string>{
-            {typeof (String), "TEXT"},
+            {typeof(String), "TEXT"},
             {typeof(Int32), "INT"},
             {typeof(Int64), "INT"},
             {typeof(Single), "REAL"},

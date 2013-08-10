@@ -1,4 +1,4 @@
-﻿using StarryEyes.Breezy.DataModel;
+﻿using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Views;
 
 namespace StarryEyes.Models.Backstages.NotificationEvents.ThirdpartyEvents
