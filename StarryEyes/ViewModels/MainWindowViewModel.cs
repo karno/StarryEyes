@@ -165,6 +165,7 @@ namespace StarryEyes.ViewModels
 
         public void Initialize()
         {
+            #region bind events
             CompositeDisposable.Add(
                 Observable.FromEvent<bool>(
                     h => MainWindowModel.WindowCommandsDisplayChanged += h,
@@ -226,7 +227,9 @@ namespace StarryEyes.ViewModels
                                                          });
                                   _globalAccountSelectionFlipViewModel.Open();
                               }));
+            #endregion
 
+            // check first boot
             if (Setting.IsFirstGenerated)
             {
                 var kovm = new KeyOverrideViewModel();
@@ -235,7 +238,7 @@ namespace StarryEyes.ViewModels
                                          kovm, TransitionMode.Modal, null));
             }
 
-            // Start receiving
+            // register new account if accounts haven't been authorized yet
             if (!Setting.Accounts.Collection.Any())
             {
                 var auth = new AuthorizationViewModel();
@@ -248,7 +251,15 @@ namespace StarryEyes.ViewModels
             TabManager.Load();
             TabManager.Save();
 
-            if (TabManager.Columns.Count != 1 || TabManager.Columns[0].Tabs.Count != 0) return;
+            if (TabManager.Columns.Count == 1 && TabManager.Columns[0].Tabs.Count == 0)
+            {
+                // lost tab info
+                this.ReInitTabs();
+            }
+        }
+
+        private void ReInitTabs()
+        {
             var response = this.Messenger.GetResponse(new TaskDialogMessage(new TaskDialogOptions
             {
                 Title = "タブ情報の警告",
@@ -261,6 +272,7 @@ namespace StarryEyes.ViewModels
             if (response.Response.Result != TaskDialogSimpleResult.Yes) return;
             Setting.ResetTabInfo();
             TabManager.Columns.Clear();
+            // refresh tabs
             TabManager.Load();
             TabManager.Save();
         }

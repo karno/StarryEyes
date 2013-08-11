@@ -135,61 +135,62 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             var cd = new CompositeDisposable();
             this.CompositeDisposable.Add(cd);
             cd.Add(StoreHelper.GetUser(screenName)
-                       .Finally(() => Communicating = false)
-                       .Subscribe(
-                           user =>
-                           {
-                               User = new UserViewModel(user);
-                               var ps = this._statuses;
-                               this._statuses = new UserStatusesViewModel(this);
-                               this.RaisePropertyChanged(() => Statuses);
-                               cd.Add(_statuses);
-                               if (ps != null)
-                               {
-                                   ps.Dispose();
-                               }
-                               var pf = this._favorites;
-                               this._favorites = new UserFavoritesViewModel(this);
-                               this.RaisePropertyChanged(() => Favorites);
-                               cd.Add(_favorites);
-                               if (pf != null)
-                               {
-                                   pf.Dispose();
-                               }
-                               var pfw = this._following;
-                               this._following = new UserFollowingViewModel(this);
-                               this.RaisePropertyChanged(() => Following);
-                               cd.Add(_following);
-                               if (pfw != null)
-                               {
-                                   pfw.Dispose();
-                               }
-                               var pfr = this._followers;
-                               this._followers = new UserFollowersViewModel(this);
-                               this.RaisePropertyChanged(() => Followers);
-                               cd.Add(_followers);
-                               if (pfr != null)
-                               {
-                                   pfr.Dispose();
-                               }
-                               Setting.Accounts.Collection
-                                      .Where(a => a.Id != user.Id)
-                                      .Select(a => new RelationControlViewModel(this, a, user))
-                                      .ForEach(RelationControls.Add);
-                           },
-                           ex =>
-                           {
-                               parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
-                               {
-                                   Title = "ユーザー表示エラー",
-                                   MainIcon = VistaTaskDialogIcon.Error,
-                                   MainInstruction = "ユーザーを表示できません。",
-                                   Content = ex.Message,
-                                   CommonButtons = TaskDialogCommonButtons.Close
-                               }));
-                               User = null;
-                               parent.CloseResults();
-                           }));
+                              .Finally(() => Communicating = false)
+                              .ObserveOnDispatcher()
+                              .Subscribe(
+                                  user =>
+                                  {
+                                      User = new UserViewModel(user);
+                                      var ps = this._statuses;
+                                      this._statuses = new UserStatusesViewModel(this);
+                                      this.RaisePropertyChanged(() => Statuses);
+                                      cd.Add(_statuses);
+                                      if (ps != null)
+                                      {
+                                          ps.Dispose();
+                                      }
+                                      var pf = this._favorites;
+                                      this._favorites = new UserFavoritesViewModel(this);
+                                      this.RaisePropertyChanged(() => Favorites);
+                                      cd.Add(_favorites);
+                                      if (pf != null)
+                                      {
+                                          pf.Dispose();
+                                      }
+                                      var pfw = this._following;
+                                      this._following = new UserFollowingViewModel(this);
+                                      this.RaisePropertyChanged(() => Following);
+                                      cd.Add(_following);
+                                      if (pfw != null)
+                                      {
+                                          pfw.Dispose();
+                                      }
+                                      var pfr = this._followers;
+                                      this._followers = new UserFollowersViewModel(this);
+                                      this.RaisePropertyChanged(() => Followers);
+                                      cd.Add(_followers);
+                                      if (pfr != null)
+                                      {
+                                          pfr.Dispose();
+                                      }
+                                      Setting.Accounts.Collection
+                                             .Where(a => a.Id != user.Id)
+                                             .Select(a => new RelationControlViewModel(this, a, user))
+                                             .ForEach(RelationControls.Add);
+                                  },
+                                  ex =>
+                                  {
+                                      parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
+                                      {
+                                          Title = "ユーザー表示エラー",
+                                          MainIcon = VistaTaskDialogIcon.Error,
+                                          MainInstruction = "ユーザーを表示できません。",
+                                          Content = ex.Message,
+                                          CommonButtons = TaskDialogCommonButtons.Close
+                                      }));
+                                      User = null;
+                                      parent.CloseResults();
+                                  }));
         }
 
         public void Close()
