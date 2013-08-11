@@ -15,7 +15,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
         {
             if (credential == null) throw new ArgumentNullException("credential");
             if (reader == null) throw new ArgumentNullException("reader");
-            long cursor = 0;
+            long cursor = -1;
             var subject = new Subject<T>();
             Task.Run(async () =>
             {

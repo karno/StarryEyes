@@ -79,7 +79,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest.Infrastructure
             var json = await response.ReadAsStringAsync();
             var parsed = DynamicJson.Parse(json);
             var converteds = ((dynamic[])parsed.ids)
-                .Cast<long>();
+                .Select(d => (long)d);
             return new CursorResult<IEnumerable<long>>(
                 converteds,
                 parsed.previous_cursor_str, parsed.next_cursor_str);
