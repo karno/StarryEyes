@@ -8,13 +8,16 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
 
         public TwitterFriendship(dynamic json)
         {
-            SourceId = Int64.Parse(json.source.id_str);
-            SourceScreenName = json.source.screen_name;
-            TargetId = Int64.Parse(json.target.id_str);
-            TargetScreenName = json.target.screen_name;
-            IsSourceFollowingTarget = json.source.following;
-            IsTargetFollowingSource = json.source.followed_by;
-            IsBlocking = json.source.blocking;
+            var rel = json.relationship;
+            var src = rel.source;
+            var tgt = rel.target;
+            SourceId = Int64.Parse(src.id_str);
+            SourceScreenName = src.screen_name;
+            TargetId = Int64.Parse(tgt.id_str);
+            TargetScreenName = tgt.screen_name;
+            IsSourceFollowingTarget = src.following;
+            IsTargetFollowingSource = src.followed_by;
+            IsBlocking = src.blocking;
         }
 
         public long SourceId { get; set; }
