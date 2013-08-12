@@ -3,6 +3,7 @@ using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
+using StarryEyes.Models.Notifications;
 using StarryEyes.Settings;
 
 namespace StarryEyes.Models.Stores
@@ -15,24 +16,17 @@ namespace StarryEyes.Models.Stores
         [Obsolete]
         public static IObservable<TwitterStatus> MergeStore(TwitterStatus status)
         {
-            StatusStore.Store(status);
-            return Observable.Return(status);
-            /*
-                return StatusStore.Get(status.Id)
-                                  .ConcatIfEmpty(() =>
-                                  {
-                                      StatusStore.Store(status);
-                                      return Observable.Return(status);
-                                  });
-            */
+            return StatusStore.Get(status.Id)
+                              .ConcatIfEmpty(() =>
+                              {
+                                  StatusStore.Store(status);
+                                  return Observable.Return(status);
+                              });
         }
 
         [Obsolete]
         public static IObservable<TwitterStatus> NotifyAndMergeStore(TwitterStatus status)
         {
-            StatusStore.Store(status);
-            return Observable.Return(status);
-            /*
             return StatusStore.Get(status.Id)
                               .ConcatIfEmpty(() =>
                               {
@@ -40,7 +34,6 @@ namespace StarryEyes.Models.Stores
                                   NotificationModel.NotifyNewArrival(status);
                                   return Observable.Return(status);
                               });
-	    */
         }
 
         public static IObservable<TwitterStatus> GetTweet(long id)
@@ -55,8 +48,9 @@ namespace StarryEyes.Models.Stores
         {
             return UserStore.Get(id)
                             .Where(_ => _ != null)
-                            .ConcatIfEmpty(() => Setting.Accounts.GetRandomOne().ShowUser(id).ToObservable()
-                                                        .Do(UserStore.Store));
+                            .ConcatIfEmpty(() =>
+                                           Setting.Accounts.GetRandomOne().ShowUser(id).ToObservable()
+                                                  .Do(UserStore.Store));
         }
 
         public static IObservable<TwitterUser> GetUser(string screenName)

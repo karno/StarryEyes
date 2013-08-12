@@ -65,7 +65,6 @@ namespace StarryEyes.Models.Receivers
                     NotificationModel.NotifyNewArrival(status);
                 }
                 _signal.WaitOne();
-
             }
         }
         // ReSharper restore TooWideLocalVariableScope

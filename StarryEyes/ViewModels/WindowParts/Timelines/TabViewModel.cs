@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Threading;
@@ -131,15 +130,20 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             ReInitializeTimeline();
             IsLoading = true;
 
-            Task.Run(() =>
+            Task.Run(async () =>
             {
-                Model.Timeline.ReadMore(null, true)
-                     .ToObservable()
-                     .Merge(Model.ReceiveTimelines(null))
+                Model.ReceiveTimelines(null)
                      .Subscribe(_ => { },
                                 ex => BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message)),
                                 () => IsLoading = false);
-
+                try
+                {
+                    await Model.Timeline.ReadMore(null, true);
+                }
+                catch (Exception ex)
+                {
+                    BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message));
+                }
             });
             if (UnreadCount > 0)
             {

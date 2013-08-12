@@ -32,7 +32,6 @@ using StarryEyes.ViewModels.WindowParts.Flips;
 using StarryEyes.ViewModels.WindowParts.Timelines;
 using StarryEyes.Views.Controls;
 using StarryEyes.Views.Messaging;
-using TwitterConfiguration = StarryEyes.Models.TwitterConfiguration;
 
 namespace StarryEyes.ViewModels.WindowParts
 {
@@ -61,6 +60,8 @@ namespace StarryEyes.ViewModels.WindowParts
         public InputAreaViewModel()
         {
             _provider = new InputAreaSuggestItemProvider();
+
+            #region Account control
             _accountSelectionFlip = new AccountSelectionFlipViewModel();
             _accountSelectionFlip.Closed += () =>
             {
@@ -71,6 +72,39 @@ namespace StarryEyes.ViewModels.WindowParts
                     FocusToTextBox();
                 }
             };
+            var accountSelectReflecting = false;
+            _accountSelectionFlip.SelectedAccountsChanged += () =>
+            {
+                if (!_isSuppressAccountChangeRelay)
+                {
+                    // write-back
+                    accountSelectReflecting = true;
+                    InputAreaModel.BindingAccounts.Clear();
+                    _accountSelectionFlip.SelectedAccounts
+                                    .ForEach(InputAreaModel.BindingAccounts.Add);
+                    accountSelectReflecting = false;
+                    _baseSelectedAccounts = InputAreaModel.BindingAccounts.Select(_ => _.Id).ToArray();
+                }
+                InputInfo.Accounts = AccountSelectionFlip.SelectedAccounts;
+                RaisePropertyChanged(() => AuthInfoGridRowColumn);
+                UpdateTextCount();
+                RaisePropertyChanged(() => IsPostLimitPredictionEnabled);
+            };
+            CompositeDisposable.Add(_accountSelectionFlip);
+            CompositeDisposable.Add(
+                new CollectionChangedEventListener(
+                    InputAreaModel.BindingAccounts,
+                    (_, __) =>
+                    {
+                        RaisePropertyChanged(() => IsPostLimitPredictionEnabled);
+                        if (accountSelectReflecting) return;
+                        _baseSelectedAccounts = InputAreaModel.BindingAccounts
+                                                              .Select(a => a.Id)
+                                                              .ToArray();
+                        ApplyBaseSelectedAccounts();
+                        UpdateTextCount();
+                    }));
+            #endregion
 
             CompositeDisposable.Add(_bindingHashtags =
                                     ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
@@ -105,50 +139,17 @@ namespace StarryEyes.ViewModels.WindowParts
             CompositeDisposable.Add(_bindingAuthInfos =
                                     ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
                                         InputAreaModel.BindingAccounts,
-                                        _ => new TwitterAccountViewModel(_),
+                                        account => new TwitterAccountViewModel(account),
                                         DispatcherHelper.UIDispatcher));
 
             CompositeDisposable.Add(_bindingAuthInfos
                                         .ListenCollectionChanged()
                                         .Subscribe(_ => RaisePropertyChanged(() => IsBindingAuthInfoExisted)));
 
-            var accountSelectReflecting = false;
-            _accountSelectionFlip.SelectedAccountsChanged += () =>
-            {
-                if (!_isSuppressAccountChangeRelay)
-                {
-                    // write-back
-                    accountSelectReflecting = true;
-                    InputAreaModel.BindingAccounts.Clear();
-                    _accountSelectionFlip.SelectedAccounts
-                                    .ForEach(InputAreaModel.BindingAccounts.Add);
-                    accountSelectReflecting = false;
-                    _baseSelectedAccounts = InputAreaModel.BindingAccounts.Select(_ => _.Id).ToArray();
-                }
-                InputInfo.Accounts = AccountSelectionFlip.SelectedAccounts;
-                RaisePropertyChanged(() => AuthInfoGridRowColumn);
-                UpdateTextCount();
-                RaisePropertyChanged(() => IsPostLimitPredictionEnabled);
-            };
-            CompositeDisposable.Add(_accountSelectionFlip);
-            CompositeDisposable.Add(
-                new CollectionChangedEventListener(
-                    InputAreaModel.BindingAccounts,
-                    (_, __) =>
-                    {
-                        RaisePropertyChanged(() => IsPostLimitPredictionEnabled);
-                        if (accountSelectReflecting) return;
-                        _baseSelectedAccounts = InputAreaModel.BindingAccounts
-                                                              .Select(a => a.Id)
-                                                              .ToArray();
-                        ApplyBaseSelectedAccounts();
-                        UpdateTextCount();
-                    }));
-
             CompositeDisposable.Add(
                 new EventListener<Action<IEnumerable<TwitterAccount>, string, CursorPosition, TwitterStatus>>(
-                    _ => InputAreaModel.SetTextRequested += _,
-                    _ => InputAreaModel.SetTextRequested -= _,
+                    h => InputAreaModel.SetTextRequested += h,
+                    h => InputAreaModel.SetTextRequested -= h,
                     async (infos, body, cursor, inReplyTo) =>
                     {
                         OpenInput(false);
@@ -470,7 +471,7 @@ namespace StarryEyes.ViewModels.WindowParts
                 var currentTextLength = StatusTextUtil.CountText(InputText);
                 if (IsImageAttached)
                 {
-                    currentTextLength += TwitterConfiguration.HttpsUrlLength;
+                    currentTextLength += TwitterConfigurationService.HttpsUrlLength;
                 }
                 var tags = TwitterRegexPatterns.ValidHashtag.Matches(InputText)
                                            .OfType<Match>()
@@ -489,7 +490,7 @@ namespace StarryEyes.ViewModels.WindowParts
 
         public int RemainTextCount
         {
-            get { return TwitterConfiguration.TextMaxLength - TextCount; }
+            get { return TwitterConfigurationService.TextMaxLength - TextCount; }
         }
 
         public bool CanSend
@@ -498,7 +499,7 @@ namespace StarryEyes.ViewModels.WindowParts
             {
                 if (AccountSelectionFlip.SelectedAccounts.FirstOrDefault() == null)
                     return false; // send account is not found.
-                if (TextCount > TwitterConfiguration.TextMaxLength)
+                if (TextCount > TwitterConfigurationService.TextMaxLength)
                     return false;
                 return CanSaveToDraft;
             }
@@ -1126,9 +1127,9 @@ namespace StarryEyes.ViewModels.WindowParts
     {
         private readonly TwitterAccount _account;
 
-        public TwitterAccountViewModel(TwitterAccount info)
+        public TwitterAccountViewModel(TwitterAccount account)
         {
-            this._account = info;
+            this._account = account;
         }
 
         public TwitterAccount Account

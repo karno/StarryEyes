@@ -239,5 +239,4 @@ namespace StarryEyes.Models
         MuteUser,
         MuteClient,
     }
-
 }

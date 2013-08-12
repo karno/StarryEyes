@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using StarryEyes.Albireo;
 using StarryEyes.Helpers;
+using StarryEyes.Models.Subsystems;
 
 namespace StarryEyes.Models
 {
@@ -15,8 +16,8 @@ namespace StarryEyes.Models
                                        .Sum(s => s.Item2
                                                      ? (s.Item1.StartsWith("https",
                                                                            StringComparison.CurrentCultureIgnoreCase)
-                                                            ? TwitterConfiguration.HttpsUrlLength
-                                                            : TwitterConfiguration.HttpUrlLength)
+                                                            ? TwitterConfigurationService.HttpsUrlLength
+                                                            : TwitterConfigurationService.HttpUrlLength)
                                                      : s.Item1.Length);
         }
 

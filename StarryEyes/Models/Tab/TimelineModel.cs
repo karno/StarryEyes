@@ -153,6 +153,7 @@ namespace StarryEyes.Models.Tab
             try
             {
                 await _fetcher(maxId, TimelineChunkCount, batch)
+                    .OrderByDescending(k => k.CreatedAt)
                     .Do(s => StatusStore.Store(s))
                     .LastOrDefaultAsync();
             }

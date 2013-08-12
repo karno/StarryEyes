@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Livet;
 using Livet.Messaging;
 using StarryEyes.Filters.Expressions;
@@ -229,6 +230,7 @@ namespace StarryEyes.ViewModels
                               }));
             #endregion
 
+            #region special navigations
             // check first boot
             if (Setting.IsFirstGenerated)
             {
@@ -248,6 +250,8 @@ namespace StarryEyes.ViewModels
                                          typeof(AuthorizationWindow),
                                          auth, TransitionMode.Modal, null));
             }
+            #endregion
+
             TabManager.Load();
             TabManager.Save();
 
@@ -256,6 +260,8 @@ namespace StarryEyes.ViewModels
                 // lost tab info
                 this.ReInitTabs();
             }
+
+            Task.Run(() => App.RaiseUserInterfaceReady());
         }
 
         private void ReInitTabs()

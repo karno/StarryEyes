@@ -46,7 +46,6 @@ namespace StarryEyes.Models.Tab
                    .ForEach(_columns.Add);
             GCColumn();
             if (_loaded) return;
-            App.RaiseUserInterfaceReady();
             _loaded = true;
         }
 

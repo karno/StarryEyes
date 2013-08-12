@@ -126,6 +126,9 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             return new StatusViewModel(this, status, CurrentAccounts);
         }
 
+        /// <summary>
+        /// Clear timeline cache
+        /// </summary>
         protected void ReInitializeTimeline()
         {
             var prevTimeline = _timeline;

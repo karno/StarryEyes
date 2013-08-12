@@ -22,9 +22,9 @@ namespace StarryEyes.Models.Receivers
 
         public static void Initialize()
         {
+            _userReceiveManager = new UserReceiveManager();
             _searchReceiveManager = new SearchReceiveManager();
             _listReceiveManager = new ListReceiveManager();
-            _userReceiveManager = new UserReceiveManager();
             _streamTrackReceiveManager = new StreamTrackReceiveManager(_userReceiveManager);
             _userReceiveManager.ConnectionStateChanged += OnUserStreamsConnectionStateChanged;
         }
@@ -71,7 +71,7 @@ namespace StarryEyes.Models.Receivers
 
         public static void ReconnectUserStreams(long id)
         {
-            _userReceiveManager.ReconnectStreams(id);
+            _userReceiveManager.ReconnectStream(id);
         }
 
         public static void ReconnectUserStreams()

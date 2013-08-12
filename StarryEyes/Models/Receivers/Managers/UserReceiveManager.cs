@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Receivers.ReceiveElements;
 using StarryEyes.Settings;
@@ -66,7 +67,8 @@ namespace StarryEyes.Models.Receivers.Managers
         public UserReceiveManager()
         {
             System.Diagnostics.Debug.WriteLine("UserReceiveManager initialized.");
-            Setting.Accounts.Collection.ListenCollectionChanged().Subscribe(_ => this.NotifySettingChanged());
+            Setting.Accounts.Collection.ListenCollectionChanged()
+                   .Subscribe(_ => Task.Run(() => this.NotifySettingChanged()));
             App.UserInterfaceReady += NotifySettingChanged;
         }
 
@@ -134,7 +136,7 @@ namespace StarryEyes.Models.Receivers.Managers
         }
         // ReSharper restore AccessToModifiedClosure
 
-        public void ReconnectStreams(long id)
+        public void ReconnectStream(long id)
         {
             lock (_bundlesLocker)
             {
