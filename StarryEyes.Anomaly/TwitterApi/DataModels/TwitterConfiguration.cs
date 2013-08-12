@@ -7,10 +7,10 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
 
         public TwitterConfiguration(dynamic json)
         {
-            this.CharactersReservedPerMedia = json.characters_reserved_per_media;
-            this.PhotoSizeLimit = json.photo_size_limit;
-            this.ShortUrlLength = json.short_url_length;
-            this.ShortUrlLengthHttps = json.short_url_length_https;
+            this.CharactersReservedPerMedia = (int)json.characters_reserved_per_media;
+            this.PhotoSizeLimit = (int)json.photo_size_limit;
+            this.ShortUrlLength = (int)json.short_url_length;
+            this.ShortUrlLengthHttps = (int)json.short_url_length_https;
         }
 
         public int CharactersReservedPerMedia { get; set; }
