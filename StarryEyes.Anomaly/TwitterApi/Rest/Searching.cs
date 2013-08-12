@@ -30,9 +30,9 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
                 {"until", untilDate != null ? untilDate.Value.ToString("yyyy-MM-dd") : null},
                 {"since_id", sinceId},
                 {"max_id", maxId},
-            }.ParametalizeForPost();
+            }.ParametalizeForGet();
             var client = credential.CreateOAuthClient();
-            var response = await client.PostAsync(new ApiAccess("search/tweets.json"), param);
+            var response = await client.GetAsync(new ApiAccess("search/tweets.json", param));
             return await response.ReadAsStatusCollectionAsync();
         }
 
