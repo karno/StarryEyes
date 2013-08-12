@@ -129,21 +129,27 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             // invalidate cache
             ReInitializeTimeline();
             IsLoading = true;
-
             Task.Run(async () =>
             {
-                Model.ReceiveTimelines(null)
-                     .Subscribe(_ => { },
-                                ex => BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message)),
-                                () => IsLoading = false);
+                var local = Model.ReceiveTimelines(null).LastOrDefaultAsync();
+                var web = Model.Timeline.ReadMore(null, true);
                 try
                 {
-                    await Model.Timeline.ReadMore(null, true);
+                    await local;
                 }
                 catch (Exception ex)
                 {
                     BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message));
                 }
+                try
+                {
+                    await web;
+                }
+                catch (Exception ex)
+                {
+                    BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message));
+                }
+                IsLoading = false;
             });
             if (UnreadCount > 0)
             {
