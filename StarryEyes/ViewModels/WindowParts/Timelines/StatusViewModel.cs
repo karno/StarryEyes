@@ -855,25 +855,25 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             }
             else
             {
-                InputAreaModel.SetText(new[] { Model.GetSuitableReplyAccount() },
+                InputAreaModel.SetText(Model.GetSuitableReplyAccount(),
                                        "@" + User.ScreenName + " ", inReplyTo: Status);
             }
         }
 
         public void Quote()
         {
-            InputAreaModel.SetText(new[] { Model.GetSuitableReplyAccount() },
+            InputAreaModel.SetText(Model.GetSuitableReplyAccount(),
                 " RT @" + User.ScreenName + " " + Status.GetEntityAidedText(true), CursorPosition.Begin);
         }
 
         public void QuotePermalink()
         {
-            InputAreaModel.SetText(new[] { Model.GetSuitableReplyAccount() }, " " + Status.Permalink, CursorPosition.Begin);
+            InputAreaModel.SetText(Model.GetSuitableReplyAccount(), " " + Status.Permalink, CursorPosition.Begin);
         }
 
         public void DirectMessage()
         {
-            InputAreaModel.SetDirectMessage(new[] { Model.GetSuitableReplyAccount() }, Status.User);
+            InputAreaModel.SetDirectMessage(Model.GetSuitableReplyAccount(), Status.User);
         }
 
         public void ConfirmDelete()

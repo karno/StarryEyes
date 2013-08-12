@@ -458,7 +458,7 @@ namespace StarryEyes.Models
             }
         }
 
-        public TwitterAccount GetSuitableReplyAccount()
+        public IEnumerable<TwitterAccount> GetSuitableReplyAccount()
         {
             var uid = Status.InReplyToUserId.GetValueOrDefault();
             if (Status.StatusType == StatusType.DirectMessage)
@@ -466,7 +466,7 @@ namespace StarryEyes.Models
                 uid = Status.Recipient.Id;
             }
             var account = Setting.Accounts.Get(uid);
-            return account != null ? BacktrackFallback(account) : null;
+            return account != null ? new[] { BacktrackFallback(account) } : null;
         }
 
         public static TwitterAccount BacktrackFallback(TwitterAccount account)
