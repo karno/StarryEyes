@@ -192,6 +192,7 @@
     <Compile Include="Filters\Sources\FilterMessages.cs" />
     <Compile Include="Filters\Sources\FilterSearch.cs" />
     <Compile Include="Filters\Sources\FilterTrack.cs" />
+    <Compile Include="Helpers\DebugHelper.cs" />
     <Compile Include="Helpers\FreezableHelper.cs" />
     <Compile Include="Helpers\TwitterRegexPatterns.cs" />
     <Compile Include="Hotfixes\DispatcherCollectionRx.cs" />
@@ -199,12 +200,6 @@
     <Compile Include="Helpers\RegexHelper.cs" />
     <Compile Include="Hotfixes\ReadOnlyDispatcherCollectionRx.cs" />
     <Compile Include="Hotfixes\ViewModelHelperRx.cs" />
-    <Compile Include="InputFormats\ArithmeticFunctions.cs" />
-    <Compile Include="InputFormats\DescriptionCompiler.cs" />
-    <Compile Include="InputFormats\CommonFunctions.cs" />
-    <Compile Include="InputFormats\FormatDescription.cs" />
-    <Compile Include="InputFormats\FormatElement.cs" />
-    <Compile Include="InputFormats\InputFormatFunctionBase.cs" />
     <Compile Include="Models\BackstageModel.cs" />
     <Compile Include="Models\Backstages\BackstageAccountModel.cs" />
     <Compile Include="Models\Backstages\SystemEvents\KeyAssignProfileNotFoundEvent.cs" />
@@ -283,7 +278,7 @@
     <Compile Include="Models\Tab\CommonTabBuilder.cs" />
     <Compile Include="Models\Tab\TabManager.cs" />
     <Compile Include="Models\Tab\TimelineModel.cs" />
-    <Compile Include="Models\TwitterConfiguration.cs" />
+    <Compile Include="Models\Subsystems\TwitterConfigurationService.cs" />
     <Compile Include="Models\UserModel.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Settings\AccountManager.cs" />

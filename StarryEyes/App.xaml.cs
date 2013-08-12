@@ -12,6 +12,7 @@ using System.Threading;
 using System.Windows;
 using Livet;
 using StarryEyes.Anomaly.TwitterApi;
+using StarryEyes.Helpers;
 using StarryEyes.Models;
 using StarryEyes.Models.Plugins;
 using StarryEyes.Models.Receivers;
@@ -178,6 +179,7 @@ namespace StarryEyes
             // finalize handlers
             StreamingEventsHub.RegisterDefaultHandlers();
             ReceiversManager.Initialize();
+            TwitterConfigurationService.Initialize();
             BackstageModel.Initialize();
             RaiseSystemReady();
         }
@@ -513,6 +515,7 @@ namespace StarryEyes
         public static event Action UserInterfaceReady;
         internal static void RaiseUserInterfaceReady()
         {
+            DebugHelper.EnsureBackgroundThread();
             Debug.WriteLine("# UI ready.");
             var usr = UserInterfaceReady;
             UserInterfaceReady = null;
