@@ -57,7 +57,7 @@ namespace StarryEyes.Models.Subsystems
             }
             try
             {
-                var config = await account.GetConfiguration();
+                var config = await account.GetConfigurationAsync();
                 HttpUrlLength = config.ShortUrlLength;
                 HttpsUrlLength = config.ShortUrlLengthHttps;
                 MediaUrlLength = config.CharactersReservedPerMedia;

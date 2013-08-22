@@ -40,7 +40,7 @@ namespace StarryEyes.Models.Stores
         {
             return StatusStore.Get(id)
                               .Where(_ => _ != null)
-                              .ConcatIfEmpty(() => Setting.Accounts.GetRandomOne().ShowTweet(id).ToObservable()
+                              .ConcatIfEmpty(() => Setting.Accounts.GetRandomOne().ShowTweetAsync(id).ToObservable()
                                                           .Do(s => StatusStore.Store(s, false)));
         }
 
@@ -49,7 +49,7 @@ namespace StarryEyes.Models.Stores
             return UserStore.Get(id)
                             .Where(_ => _ != null)
                             .ConcatIfEmpty(() =>
-                                           Setting.Accounts.GetRandomOne().ShowUser(id).ToObservable()
+                                           Setting.Accounts.GetRandomOne().ShowUserAsync(id).ToObservable()
                                                   .Do(UserStore.Store));
         }
 
@@ -57,7 +57,7 @@ namespace StarryEyes.Models.Stores
         {
             return UserStore.Get(screenName)
                             .Where(_ => _ != null)
-                            .ConcatIfEmpty(() => Setting.Accounts.GetRandomOne().ShowUser(screenName).ToObservable()
+                            .ConcatIfEmpty(() => Setting.Accounts.GetRandomOne().ShowUserAsync(screenName).ToObservable()
                                                         .Do(UserStore.Store));
         }
     }

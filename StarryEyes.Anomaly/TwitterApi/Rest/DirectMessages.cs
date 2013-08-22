@@ -8,7 +8,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 {
     public static class DirectMessages
     {
-        public static async Task<IEnumerable<TwitterStatus>> GetDirectMessages(
+        public static async Task<IEnumerable<TwitterStatus>> GetDirectMessagesAsync(
             this IOAuthCredential credential,
             int? count = null, long? sinceId = null, long? maxId = null)
         {
@@ -24,7 +24,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return await response.ReadAsStatusCollectionAsync();
         }
 
-        public static async Task<IEnumerable<TwitterStatus>> GetSentDirectMessages(
+        public static async Task<IEnumerable<TwitterStatus>> GetSentDirectMessagesAsync(
             this IOAuthCredential credential,
             int? count = null, long? sinceId = null, long? maxId = null, int? page = null)
         {
@@ -41,7 +41,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return await response.ReadAsStatusCollectionAsync();
         }
 
-        public static async Task<TwitterStatus> ShowDirectMessage(
+        public static async Task<TwitterStatus> ShowDirectMessageAsync(
             this IOAuthCredential credential, long id)
         {
             if (credential == null) throw new ArgumentNullException("credential");
@@ -54,24 +54,24 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return await response.ReadAsStatusAsync();
         }
 
-        public static Task<TwitterStatus> SendDirectMessage(
+        public static Task<TwitterStatus> SendDirectMessageAsync(
             this IOAuthCredential credential, long recipientUserId, string text)
         {
             if (credential == null) throw new ArgumentNullException("credential");
             if (text == null) throw new ArgumentNullException("text");
-            return SendDirectMessageCore(credential, recipientUserId, null, text);
+            return SendDirectMessageCoreAsync(credential, recipientUserId, null, text);
         }
 
-        public static Task<TwitterStatus> SendDirectMessage(
+        public static Task<TwitterStatus> SendDirectMessageAsync(
             this IOAuthCredential credential, string recipientUserScreenName, string text)
         {
             if (credential == null) throw new ArgumentNullException("credential");
             if (recipientUserScreenName == null) throw new ArgumentNullException("recipientUserScreenName");
             if (text == null) throw new ArgumentNullException("text");
-            return SendDirectMessageCore(credential, null, recipientUserScreenName, text);
+            return SendDirectMessageCoreAsync(credential, null, recipientUserScreenName, text);
         }
 
-        private static async Task<TwitterStatus> SendDirectMessageCore(
+        private static async Task<TwitterStatus> SendDirectMessageCoreAsync(
             IOAuthCredential credential, long? recipientUserId, string recipientScreenName, string text)
         {
             var param = new Dictionary<string, object>
@@ -85,7 +85,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return await response.ReadAsStatusAsync();
         }
 
-        public static async Task<TwitterStatus> DestroyDirectMessage(
+        public static async Task<TwitterStatus> DestroyDirectMessageAsync(
             this IOAuthCredential credential, long id)
         {
             if (credential == null) throw new ArgumentNullException("credential");

@@ -43,7 +43,7 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
 
             try
             {
-                var statuses = await authInfo.GetListTimeline(_listInfo.Slug, _listInfo.OwnerScreenName);
+                var statuses = await authInfo.GetListTimelineAsync(_listInfo.Slug, _listInfo.OwnerScreenName);
                 statuses.ForEach(ReceiveInbox.Queue);
             }
             catch (Exception ex)
@@ -58,7 +58,7 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
 
         public static IObservable<TwitterStatus> DoReceive(TwitterAccount info, ListInfo list, long? maxId = null)
         {
-            return info.GetListTimeline(list.Slug, list.OwnerScreenName, maxId: maxId).ToObservable();
+            return info.GetListTimelineAsync(list.Slug, list.OwnerScreenName, maxId: maxId).ToObservable();
         }
 
     }

@@ -17,7 +17,7 @@ namespace StarryEyes.Models.Requests
 
         public override Task<TwitterUser> Send(TwitterAccount account)
         {
-            return account.UpdateProfile(Name, Url, Location, DescriptionText);
+            return account.UpdateProfileAsync(Name, Url, Location, DescriptionText);
         }
     }
 }

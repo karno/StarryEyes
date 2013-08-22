@@ -102,7 +102,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             try
             {
                 // ReSharper disable InvertIf
-                var fs = await _source.ShowFriendship(_source.Id, _target.Id);
+                var fs = await _source.ShowFriendshipAsync(_source.Id, _target.Id);
                 if (this.IsFollowing != fs.IsSourceFollowingTarget)
                 {
                     this.IsFollowing = fs.IsSourceFollowingTarget;

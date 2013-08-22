@@ -6,7 +6,6 @@ using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Anomaly.Utils;
 using StarryEyes.Models.Accounting;
-using StarryEyes.Settings;
 
 namespace StarryEyes.Filters.Sources
 {
@@ -39,7 +38,7 @@ namespace StarryEyes.Filters.Sources
         protected override IObservable<TwitterStatus> ReceiveSink(long? maxId)
         {
             return Observable.Defer(() => GetAccountsFromString(_screenName).ToObservable())
-                             .SelectMany(a => a.GetHomeTimeline(count: 50, maxId: maxId).ToObservable());
+                             .SelectMany(a => a.GetHomeTimelineAsync(count: 50, maxId: maxId).ToObservable());
         }
 
         public override string FilterKey

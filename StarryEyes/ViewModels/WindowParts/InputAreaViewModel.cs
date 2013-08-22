@@ -1147,7 +1147,7 @@ namespace StarryEyes.ViewModels.WindowParts
                     {
                         try
                         {
-                            var user = await this._account.ShowUser(this._account.Id);
+                            var user = await this._account.ShowUserAsync(this._account.Id);
                             this._account.UnreliableProfileImage = user.ProfileImageUri;
                             this.RaisePropertyChanged(() => ProfileImageUri);
                         }

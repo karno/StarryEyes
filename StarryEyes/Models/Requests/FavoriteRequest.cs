@@ -38,8 +38,8 @@ namespace StarryEyes.Models.Requests
                 try
                 {
                     return await (this._add
-                                      ? acc.CreateFavorite(this._id)
-                                      : acc.DestroyFavorite(this._id));
+                                      ? acc.CreateFavoriteAsync(this._id)
+                                      : acc.DestroyFavoriteAsync(this._id));
                 }
                 catch (TwitterApiException tae)
                 {

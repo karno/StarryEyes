@@ -62,7 +62,7 @@ namespace StarryEyes.Filters.Sources
                 long cursor = -1;
                 do
                 {
-                    var result = await account.GetListMembers(_listInfo.Slug, _listInfo.OwnerScreenName, cursor);
+                    var result = await account.GetListMembersAsync(_listInfo.Slug, _listInfo.OwnerScreenName, cursor);
                     memberList.AddRange(result.Result.Do(UserStore.Store).Select(u => u.Id));
                     cursor = result.NextCursor;
                 } while (cursor != 0);

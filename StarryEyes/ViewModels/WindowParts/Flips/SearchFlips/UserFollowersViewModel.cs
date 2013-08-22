@@ -15,7 +15,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
 
         protected override Task<ICursorResult<IEnumerable<long>>> GetUsersApiImpl(TwitterAccount info, long id, long cursor)
         {
-            return info.GetFollowersIds(id, cursor);
+            return info.GetFollowersIdsAsync(id, cursor);
         }
     }
 }

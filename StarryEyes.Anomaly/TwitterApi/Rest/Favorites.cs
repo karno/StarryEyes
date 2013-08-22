@@ -8,24 +8,24 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 {
     public static class Favorites
     {
-        public static Task<IEnumerable<TwitterStatus>> GetFavorites(
+        public static Task<IEnumerable<TwitterStatus>> GetFavoritesAsync(
             this IOAuthCredential credential, long userId,
             int? count = null, long? sinceId = null, long? maxId = null)
         {
             if (credential == null) throw new ArgumentNullException("credential");
-            return GetFavoritesCore(credential, userId, null, count, sinceId, maxId);
+            return GetFavoritesCoreAsync(credential, userId, null, count, sinceId, maxId);
         }
 
-        public static Task<IEnumerable<TwitterStatus>> GetFavorites(
+        public static Task<IEnumerable<TwitterStatus>> GetFavoritesAsync(
             this IOAuthCredential credential, string screenName,
             int? count = null, long? sinceId = null, long? maxId = null)
         {
             if (credential == null) throw new ArgumentNullException("credential");
             if (screenName == null) throw new ArgumentNullException("screenName");
-            return GetFavoritesCore(credential, null, screenName, count, sinceId, maxId);
+            return GetFavoritesCoreAsync(credential, null, screenName, count, sinceId, maxId);
         }
 
-        private static async Task<IEnumerable<TwitterStatus>> GetFavoritesCore(
+        private static async Task<IEnumerable<TwitterStatus>> GetFavoritesCoreAsync(
             IOAuthCredential credential, long? userId, string screenName,
             int? count, long? sinceId, long? maxId)
         {
@@ -42,7 +42,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return await response.ReadAsStatusCollectionAsync();
         }
 
-        public static async Task<TwitterStatus> CreateFavorite(
+        public static async Task<TwitterStatus> CreateFavoriteAsync(
             this IOAuthCredential credential, long id)
         {
             if (credential == null) throw new ArgumentNullException("credential");
@@ -55,7 +55,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return await response.ReadAsStatusAsync();
         }
 
-        public static async Task<TwitterStatus> DestroyFavorite(
+        public static async Task<TwitterStatus> DestroyFavoriteAsync(
             this IOAuthCredential credential, long id)
         {
             if (credential == null) throw new ArgumentNullException("credential");

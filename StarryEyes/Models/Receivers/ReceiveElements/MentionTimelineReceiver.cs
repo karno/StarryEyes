@@ -27,7 +27,7 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
             DebugHelper.EnsureBackgroundThread();
             try
             {
-                var mentions = await this._account.GetMentions(count: 100);
+                var mentions = await this._account.GetMentionsAsync(count: 100);
                 mentions.ForEach(ReceiveInbox.Queue);
             }
             catch (Exception ex)

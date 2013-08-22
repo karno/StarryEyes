@@ -10,22 +10,22 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
     {
         #region Lists
 
-        public static Task<IEnumerable<TwitterList>> GetLists(
+        public static Task<IEnumerable<TwitterList>> GetListsAsync(
             this IOAuthCredential credential, long userId)
         {
             if (credential == null) throw new ArgumentNullException("credential");
-            return GetListsCore(credential, userId, null);
+            return GetListsCoreAsync(credential, userId, null);
         }
 
-        public static Task<IEnumerable<TwitterList>> GetLists(
+        public static Task<IEnumerable<TwitterList>> GetListsAsync(
             this IOAuthCredential credential, string screenName)
         {
             if (credential == null) throw new ArgumentNullException("credential");
             if (screenName == null) throw new ArgumentNullException("screenName");
-            return GetListsCore(credential, null, screenName);
+            return GetListsCoreAsync(credential, null, screenName);
         }
 
-        private static async Task<IEnumerable<TwitterList>> GetListsCore(
+        private static async Task<IEnumerable<TwitterList>> GetListsCoreAsync(
             IOAuthCredential credential, long? userId, string screenName)
         {
             var param = new Dictionary<string, object>
@@ -42,37 +42,37 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region Statuses
 
-        public static Task<IEnumerable<TwitterStatus>> GetListTimeline(
+        public static Task<IEnumerable<TwitterStatus>> GetListTimelineAsync(
             this IOAuthCredential credential, long listId,
             long? sinceId = null, long? maxId = null, int? count = null, bool? includeRts = null)
         {
             if (credential == null) throw new ArgumentNullException("credential");
-            return GetListTimelineCore(credential, listId, null, null, null,
-                                       sinceId, maxId, count, includeRts);
+            return GetListTimelineCoreAsync(
+                credential, listId, null, null, null, sinceId, maxId, count, includeRts);
         }
 
-        public static Task<IEnumerable<TwitterStatus>> GetListTimeline(
+        public static Task<IEnumerable<TwitterStatus>> GetListTimelineAsync(
             this IOAuthCredential credential, string slug, long userId,
             long? sinceId = null, long? maxId = null, int? count = null, bool? includeRts = null)
         {
             if (credential == null) throw new ArgumentNullException("credential");
             if (slug == null) throw new ArgumentNullException("slug");
-            return GetListTimelineCore(credential, null, slug, userId, null,
-                                       sinceId, maxId, count, includeRts);
+            return GetListTimelineCoreAsync(
+                credential, null, slug, userId, null, sinceId, maxId, count, includeRts);
         }
 
-        public static Task<IEnumerable<TwitterStatus>> GetListTimeline(
+        public static Task<IEnumerable<TwitterStatus>> GetListTimelineAsync(
             this IOAuthCredential credential, string slug, string screenName,
             long? sinceId = null, long? maxId = null, int? count = null, bool? includeRts = null)
         {
             if (credential == null) throw new ArgumentNullException("credential");
             if (slug == null) throw new ArgumentNullException("slug");
             if (screenName == null) throw new ArgumentNullException("screenName");
-            return GetListTimelineCore(credential, null, slug, null, screenName,
-                                       sinceId, maxId, count, includeRts);
+            return GetListTimelineCoreAsync(
+                credential, null, slug, null, screenName, sinceId, maxId, count, includeRts);
         }
 
-        public static async Task<IEnumerable<TwitterStatus>> GetListTimelineCore(
+        public static async Task<IEnumerable<TwitterStatus>> GetListTimelineCoreAsync(
             IOAuthCredential credential, long? listId, string slug, long? userId, string screenName,
             long? sinceId, long? maxId, int? count, bool? includeRts)
         {
@@ -96,37 +96,37 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region Memberships
 
-        public static Task<ICursorResult<IEnumerable<TwitterUser>>> GetListMembers(
+        public static Task<ICursorResult<IEnumerable<TwitterUser>>> GetListMembersAsync(
             this IOAuthCredential credential, long listId,
             long? cursor = null)
         {
             if (credential == null) throw new ArgumentNullException("credential");
-            return GetListMembersCore(credential, listId, null, null, null,
-                                      cursor);
+            return GetListMembersCoreAsync(
+                credential, listId, null, null, null, cursor);
         }
 
-        public static Task<ICursorResult<IEnumerable<TwitterUser>>> GetListMembers(
+        public static Task<ICursorResult<IEnumerable<TwitterUser>>> GetListMembersAsync(
             this IOAuthCredential credential, string slug, long userId,
             long? cursor = null)
         {
             if (credential == null) throw new ArgumentNullException("credential");
             if (slug == null) throw new ArgumentNullException("slug");
-            return GetListMembersCore(credential, null, slug, userId, null,
-                                      cursor);
+            return GetListMembersCoreAsync(
+                credential, null, slug, userId, null, cursor);
         }
 
-        public static Task<ICursorResult<IEnumerable<TwitterUser>>> GetListMembers(
+        public static Task<ICursorResult<IEnumerable<TwitterUser>>> GetListMembersAsync(
             this IOAuthCredential credential, string slug, string screenName,
             long? cursor = null)
         {
             if (credential == null) throw new ArgumentNullException("credential");
             if (slug == null) throw new ArgumentNullException("slug");
             if (screenName == null) throw new ArgumentNullException("screenName");
-            return GetListMembersCore(credential, null, slug, null, screenName,
-                                      cursor);
+            return GetListMembersCoreAsync(
+                credential, null, slug, null, screenName, cursor);
         }
 
-        private static async Task<ICursorResult<IEnumerable<TwitterUser>>> GetListMembersCore(
+        private static async Task<ICursorResult<IEnumerable<TwitterUser>>> GetListMembersCoreAsync(
             IOAuthCredential credential, long? listId, string slug, long? userId, string screenName,
             long? cursor = null)
         {

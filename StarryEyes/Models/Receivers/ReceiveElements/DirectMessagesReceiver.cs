@@ -23,13 +23,13 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
 
         protected override void DoReceive()
         {
-            this._account.GetDirectMessages(count: 50).ToObservable()
+            this._account.GetDirectMessagesAsync(count: 50).ToObservable()
                 .Subscribe(ReceiveInbox.Queue,
                            ex => BackstageModel.RegisterEvent(
                                new OperationFailedEvent("messages receive error: " +
                                                         this._account.UnreliableScreenName + " - " +
                                                         ex.Message)));
-            this._account.GetSentDirectMessages(count: 50).ToObservable()
+            this._account.GetSentDirectMessagesAsync(count: 50).ToObservable()
                 .Subscribe(ReceiveInbox.Queue,
                            ex => BackstageModel.RegisterEvent(
                                new OperationFailedEvent("sent messages receive error: " +

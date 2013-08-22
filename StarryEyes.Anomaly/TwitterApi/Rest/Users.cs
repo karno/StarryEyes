@@ -10,23 +10,23 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 {
     public static class Users
     {
-        public static Task<IEnumerable<TwitterUser>> LookupUser(
+        public static Task<IEnumerable<TwitterUser>> LookupUserAsync(
             this IOAuthCredential credential, IEnumerable<long> userIds)
         {
             if (credential == null) throw new ArgumentNullException("credential");
             if (userIds == null) throw new ArgumentNullException("userIds");
-            return LookupUserCore(credential, userIds, null);
+            return LookupUserCoreAsync(credential, userIds, null);
         }
 
-        public static Task<IEnumerable<TwitterUser>> LookupUser(
+        public static Task<IEnumerable<TwitterUser>> LookupUserAsync(
             this IOAuthCredential credential, IEnumerable<string> screenNames)
         {
             if (credential == null) throw new ArgumentNullException("credential");
             if (screenNames == null) throw new ArgumentNullException("screenNames");
-            return LookupUserCore(credential, null, screenNames);
+            return LookupUserCoreAsync(credential, null, screenNames);
         }
 
-        private static async Task<IEnumerable<TwitterUser>> LookupUserCore(
+        private static async Task<IEnumerable<TwitterUser>> LookupUserCoreAsync(
             IOAuthCredential credential, IEnumerable<long> userIds, IEnumerable<string> screenNames)
         {
             var param = new Dictionary<string, object>
@@ -45,7 +45,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return await response.ReadAsUserCollectionAsync();
         }
 
-        public static async Task<IEnumerable<TwitterUser>> SearchUser(
+        public static async Task<IEnumerable<TwitterUser>> SearchUserAsync(
             this IOAuthCredential credential, string query, int? page = null, int? count = null)
         {
             if (credential == null) throw new ArgumentNullException("credential");
@@ -61,22 +61,22 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return await response.ReadAsUserCollectionAsync();
         }
 
-        public static Task<TwitterUser> ShowUser(
+        public static Task<TwitterUser> ShowUserAsync(
             this IOAuthCredential credential, long userId)
         {
             if (credential == null) throw new ArgumentNullException("credential");
-            return ShowUserCore(credential, userId, null);
+            return ShowUserCoreAsync(credential, userId, null);
         }
 
-        public static Task<TwitterUser> ShowUser(
+        public static Task<TwitterUser> ShowUserAsync(
             this IOAuthCredential credential, string screenName)
         {
             if (credential == null) throw new ArgumentNullException("credential");
             if (screenName == null) throw new ArgumentNullException("screenName");
-            return ShowUserCore(credential, null, screenName);
+            return ShowUserCoreAsync(credential, null, screenName);
         }
 
-        private static async Task<TwitterUser> ShowUserCore(
+        private static async Task<TwitterUser> ShowUserCoreAsync(
             IOAuthCredential credential, long? userId, string screenName)
         {
             var param = new Dictionary<string, object>

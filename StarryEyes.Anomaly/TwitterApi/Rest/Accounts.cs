@@ -9,7 +9,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 {
     public static class Accounts
     {
-        public static async Task<TwitterUser> VerifyCredential(
+        public static async Task<TwitterUser> VerifyCredentialAsync(
             this IOAuthCredential credential)
         {
             if (credential == null) throw new ArgumentNullException("credential");
@@ -22,7 +22,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return await response.ReadAsUserAsync();
         }
 
-        public static async Task<TwitterUser> UpdateProfile(
+        public static async Task<TwitterUser> UpdateProfileAsync(
             this IOAuthCredential credential,
             string name = null, string url = null,
             string location = null, string description = null)
@@ -41,7 +41,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return await response.ReadAsUserAsync();
         }
 
-        public static async Task<TwitterUser> UpdateProfileImage(
+        public static async Task<TwitterUser> UpdateProfileImageAsync(
             this IOAuthCredential credential,
             byte[] image)
         {

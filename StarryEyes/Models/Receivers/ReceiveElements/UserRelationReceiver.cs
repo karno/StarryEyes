@@ -32,13 +32,13 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
             var beforeBlockings = new AVLTree<long>(reldata.Blockings);
             // get followings / followers
             Observable.Merge(
-                this._account.RetrieveAllCursor((a, c) => a.GetFriendsIds(_account.Id, c))
+                this._account.RetrieveAllCursor((a, c) => a.GetFriendsIdsAsync(_account.Id, c))
                     .Do(id => beforeFollowing.Remove(id))
                     .Do(reldata.AddFollowing),
-                this._account.RetrieveAllCursor((a, c) => a.GetFollowersIds(_account.Id, c))
+                this._account.RetrieveAllCursor((a, c) => a.GetFollowersIdsAsync(_account.Id, c))
                     .Do(id => beforeFollowers.Remove(id))
                     .Do(reldata.AddFollower),
-                this._account.RetrieveAllCursor((a, c) => a.GetBlockingsIds(c))
+                this._account.RetrieveAllCursor((a, c) => a.GetBlockingsIdsAsync(c))
                     .Do(id => beforeBlockings.Remove(id))
                     .Do(reldata.AddBlocking))
                       .Subscribe(_ => { },

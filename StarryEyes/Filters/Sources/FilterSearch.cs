@@ -25,7 +25,7 @@ namespace StarryEyes.Filters.Sources
         {
             return Observable.Start(() => Setting.Accounts.GetRandomOne())
                              .Where(a => a != null)
-                             .SelectMany(a => a.Search(_query, maxId: maxId).ToObservable());
+                             .SelectMany(a => a.SearchAsync(_query, maxId: maxId).ToObservable());
         }
 
         private bool _isActivated;

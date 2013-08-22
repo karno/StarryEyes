@@ -24,8 +24,8 @@ namespace StarryEyes.Models.Requests
         public override Task<TwitterStatus> Send(TwitterAccount account)
         {
             return this._type == StatusType.Tweet
-                       ? account.Destroy(this._id)
-                       : account.DestroyDirectMessage(this._id);
+                       ? account.DestroyAsync(this._id)
+                       : account.DestroyDirectMessageAsync(this._id);
         }
     }
 }

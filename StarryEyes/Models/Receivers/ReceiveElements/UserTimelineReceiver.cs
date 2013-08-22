@@ -27,7 +27,7 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
             DebugHelper.EnsureBackgroundThread();
             try
             {
-                var statuses = await this._account.GetUserTimeline(this._account.Id, count: 100);
+                var statuses = await this._account.GetUserTimelineAsync(this._account.Id, count: 100);
                 statuses.ForEach(ReceiveInbox.Queue);
             }
             catch (Exception ex)

@@ -45,7 +45,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                         Setting.Accounts.GetRandomOne();
                     if (account != null)
                     {
-                        return await account.GetFavorites(this._parent.User.User.Id, c, maxId: id);
+                        return await account.GetFavoritesAsync(this._parent.User.User.Id, c, maxId: id);
                     }
                     return Enumerable.Empty<TwitterStatus>();
                 });

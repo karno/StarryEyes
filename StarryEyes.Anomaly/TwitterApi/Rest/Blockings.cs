@@ -10,7 +10,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
     {
         #region Blocking ids
 
-        public static async Task<ICursorResult<IEnumerable<long>>> GetBlockingsIds(
+        public static async Task<ICursorResult<IEnumerable<long>>> GetBlockingsIdsAsync(
             this IOAuthCredential credential, long cursor = -1)
         {
             var param = new Dictionary<string, object>
@@ -26,22 +26,22 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region Block
 
-        public static Task<TwitterUser> CreateBlock(
+        public static Task<TwitterUser> CreateBlockAsync(
             this IOAuthCredential credential, long userId)
         {
             if (credential == null) throw new ArgumentNullException("credential");
-            return CreateBlockCore(credential, userId, null);
+            return CreateBlockCoreAsync(credential, userId, null);
         }
 
-        public static Task<TwitterUser> CreateBlock(
+        public static Task<TwitterUser> CreateBlockAsync(
             this IOAuthCredential credential, string screenName)
         {
             if (credential == null) throw new ArgumentNullException("credential");
             if (screenName == null) throw new ArgumentNullException("screenName");
-            return CreateBlockCore(credential, null, screenName);
+            return CreateBlockCoreAsync(credential, null, screenName);
         }
 
-        private static async Task<TwitterUser> CreateBlockCore(
+        private static async Task<TwitterUser> CreateBlockCoreAsync(
             IOAuthCredential credential, long? userId, string screenName)
         {
             var param = new Dictionary<string, object>
@@ -58,22 +58,22 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region Unblock
 
-        public static Task<TwitterUser> DestroyBlock(
+        public static Task<TwitterUser> DestroyBlockAsync(
             this IOAuthCredential credential, long userId)
         {
             if (credential == null) throw new ArgumentNullException("credential");
-            return DestroyBlockCore(credential, userId, null);
+            return DestroyBlockCoreAsync(credential, userId, null);
         }
 
-        public static Task<TwitterUser> DestroyBlock(
+        public static Task<TwitterUser> DestroyBlockAsync(
             this IOAuthCredential credential, string screenName)
         {
             if (credential == null) throw new ArgumentNullException("credential");
             if (screenName == null) throw new ArgumentNullException("screenName");
-            return DestroyBlockCore(credential, null, screenName);
+            return DestroyBlockCoreAsync(credential, null, screenName);
         }
 
-        private static async Task<TwitterUser> DestroyBlockCore(
+        private static async Task<TwitterUser> DestroyBlockCoreAsync(
             IOAuthCredential credential, long? userId, string screenName)
         {
             var param = new Dictionary<string, object>
@@ -90,22 +90,22 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region Report Spam
 
-        public static Task<TwitterUser> ReportSpam(
+        public static Task<TwitterUser> ReportSpamAsync(
             this IOAuthCredential credential, long userId)
         {
             if (credential == null) throw new ArgumentNullException("credential");
-            return ReportSpamCore(credential, userId, null);
+            return ReportSpamCoreAsync(credential, userId, null);
         }
 
-        public static Task<TwitterUser> ReportSpam(
+        public static Task<TwitterUser> ReportSpamAsync(
             this IOAuthCredential credential, string screenName)
         {
             if (credential == null) throw new ArgumentNullException("credential");
             if (screenName == null) throw new ArgumentNullException("screenName");
-            return ReportSpamCore(credential, null, screenName);
+            return ReportSpamCoreAsync(credential, null, screenName);
         }
 
-        private static async Task<TwitterUser> ReportSpamCore(
+        private static async Task<TwitterUser> ReportSpamCoreAsync(
             IOAuthCredential credential, long? userId, string screenName)
         {
             var param = new Dictionary<string, object>

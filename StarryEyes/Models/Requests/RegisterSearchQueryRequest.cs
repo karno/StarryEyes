@@ -16,7 +16,7 @@ namespace StarryEyes.Models.Requests
 
         public override Task<Tuple<long, string>> Send(TwitterAccount account)
         {
-            return account.SaveSearch(_query);
+            return account.SaveSearchAsync(_query);
         }
     }
 }

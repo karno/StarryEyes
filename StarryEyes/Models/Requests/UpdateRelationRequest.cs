@@ -27,15 +27,15 @@ namespace StarryEyes.Models.Requests
             switch (_kind)
             {
                 case RelationKind.Follow:
-                    return account.CreateFriendship(_userId);
+                    return account.CreateFriendshipAsync(_userId);
                 case RelationKind.Unfollow:
-                    return account.DestroyFriendship(_userId);
+                    return account.DestroyFriendshipAsync(_userId);
                 case RelationKind.Block:
-                    return account.CreateBlock(_userId);
+                    return account.CreateBlockAsync(_userId);
                 case RelationKind.ReportAsSpam:
-                    return account.ReportSpam(_userId);
+                    return account.ReportSpamAsync(_userId);
                 case RelationKind.Unblock:
-                    return account.DestroyBlock(_userId);
+                    return account.DestroyBlockAsync(_userId);
                 default:
                     throw new ArgumentOutOfRangeException();
             }

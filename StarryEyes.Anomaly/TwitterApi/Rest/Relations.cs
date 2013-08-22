@@ -10,35 +10,35 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 {
     public static class Relations
     {
-        public static async Task<IEnumerable<long>> GetNoRetweetsIds(
+        public static async Task<IEnumerable<long>> GetNoRetweetsIdsAsync(
             this IOAuthCredential credential)
         {
             if (credential == null) throw new ArgumentNullException("credential");
             var client = credential.CreateOAuthClient();
             var respStr = await client.GetStringAsync(new ApiAccess("friendships/no_retweets/ids.json"));
-            return ((dynamic[])DynamicJson.Parse(respStr)).OfType<long>();
+            return await Task.Run(() => ((dynamic[])DynamicJson.Parse(respStr)).OfType<long>());
         }
 
         #region FriendsIds
 
-        public static Task<ICursorResult<IEnumerable<long>>> GetFriendsIds(
+        public static Task<ICursorResult<IEnumerable<long>>> GetFriendsIdsAsync(
             this IOAuthCredential credential, long userId,
             long cursor = -1, int? count = null)
         {
             if (credential == null) throw new ArgumentNullException("credential");
-            return GetFriendsIdsCore(credential, userId, null, cursor, count);
+            return GetFriendsIdsCoreAsync(credential, userId, null, cursor, count);
         }
 
-        public static Task<ICursorResult<IEnumerable<long>>> GetFriendsIds(
+        public static Task<ICursorResult<IEnumerable<long>>> GetFriendsIdsAsync(
             this IOAuthCredential credential, string screenName,
             long cursor = -1, int? count = null)
         {
             if (credential == null) throw new ArgumentNullException("credential");
             if (screenName == null) throw new ArgumentNullException("screenName");
-            return GetFriendsIdsCore(credential, null, screenName, cursor, count);
+            return GetFriendsIdsCoreAsync(credential, null, screenName, cursor, count);
         }
 
-        private static async Task<ICursorResult<IEnumerable<long>>> GetFriendsIdsCore(
+        private static async Task<ICursorResult<IEnumerable<long>>> GetFriendsIdsCoreAsync(
             IOAuthCredential credential, long? userId, string screenName,
             long cursor, int? count)
         {
@@ -58,24 +58,24 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region FollowersIds
 
-        public static Task<ICursorResult<IEnumerable<long>>> GetFollowersIds(
+        public static Task<ICursorResult<IEnumerable<long>>> GetFollowersIdsAsync(
             this IOAuthCredential credential, long userId,
             long cursor = -1, int? count = null)
         {
             if (credential == null) throw new ArgumentNullException("credential");
-            return GetFollowersIdsCore(credential, userId, null, cursor, count);
+            return GetFollowersIdsCoreAsync(credential, userId, null, cursor, count);
         }
 
-        public static Task<ICursorResult<IEnumerable<long>>> GetFollowersIds(
+        public static Task<ICursorResult<IEnumerable<long>>> GetFollowersIdsAsync(
             this IOAuthCredential credential, string screenName,
             long cursor = -1, int? count = null)
         {
             if (credential == null) throw new ArgumentNullException("credential");
             if (screenName == null) throw new ArgumentNullException("screenName");
-            return GetFollowersIdsCore(credential, null, screenName, cursor, count);
+            return GetFollowersIdsCoreAsync(credential, null, screenName, cursor, count);
         }
 
-        private static async Task<ICursorResult<IEnumerable<long>>> GetFollowersIdsCore(
+        private static async Task<ICursorResult<IEnumerable<long>>> GetFollowersIdsCoreAsync(
             IOAuthCredential credential, long? userId, string screenName,
             long cursor, int? count)
         {
@@ -95,22 +95,22 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region Follow
 
-        public static Task<TwitterUser> CreateFriendship(
+        public static Task<TwitterUser> CreateFriendshipAsync(
             this IOAuthCredential credential, long userId)
         {
             if (credential == null) throw new ArgumentNullException("credential");
-            return CreateFriendshipCore(credential, userId, null);
+            return CreateFriendshipCoreAsync(credential, userId, null);
         }
 
-        public static Task<TwitterUser> CreateFriendship(
+        public static Task<TwitterUser> CreateFriendshipAsync(
             this IOAuthCredential credential, string screenName)
         {
             if (credential == null) throw new ArgumentNullException("credential");
             if (screenName == null) throw new ArgumentNullException("screenName");
-            return CreateFriendshipCore(credential, null, screenName);
+            return CreateFriendshipCoreAsync(credential, null, screenName);
         }
 
-        private static async Task<TwitterUser> CreateFriendshipCore(
+        private static async Task<TwitterUser> CreateFriendshipCoreAsync(
             IOAuthCredential credential, long? userId, string screenName)
         {
             var param = new Dictionary<string, object>
@@ -127,22 +127,22 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region Remove
 
-        public static Task<TwitterUser> DestroyFriendship(
+        public static Task<TwitterUser> DestroyFriendshipAsync(
             this IOAuthCredential credential, long userId)
         {
             if (credential == null) throw new ArgumentNullException("credential");
-            return DestroyFriendshipCore(credential, userId, null);
+            return DestroyFriendshipCoreAsync(credential, userId, null);
         }
 
-        public static Task<TwitterUser> DestroyFriendship(
+        public static Task<TwitterUser> DestroyFriendshipAsync(
             this IOAuthCredential credential, string screenName)
         {
             if (credential == null) throw new ArgumentNullException("credential");
             if (screenName == null) throw new ArgumentNullException("screenName");
-            return DestroyFriendshipCore(credential, null, screenName);
+            return DestroyFriendshipCoreAsync(credential, null, screenName);
         }
 
-        private static async Task<TwitterUser> DestroyFriendshipCore(
+        private static async Task<TwitterUser> DestroyFriendshipCoreAsync(
             IOAuthCredential credential, long? userId, string screenName)
         {
             var param = new Dictionary<string, object>
@@ -159,23 +159,23 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region Show friendships
 
-        public static Task<TwitterFriendship> ShowFriendship(
+        public static Task<TwitterFriendship> ShowFriendshipAsync(
             this IOAuthCredential credential, long sourceId, long targetId)
         {
             if (credential == null) throw new ArgumentNullException("credential");
-            return ShowFriendshipCore(credential, sourceId, null, targetId, null);
+            return ShowFriendshipCoreAsync(credential, sourceId, null, targetId, null);
         }
 
-        public static Task<TwitterFriendship> ShowFriendship(
+        public static Task<TwitterFriendship> ShowFriendshipAsync(
             this IOAuthCredential credential, string sourceScreenName, string targetScreenName)
         {
             if (credential == null) throw new ArgumentNullException("credential");
             if (sourceScreenName == null) throw new ArgumentNullException("sourceScreenName");
             if (targetScreenName == null) throw new ArgumentNullException("targetScreenName");
-            return ShowFriendshipCore(credential, null, sourceScreenName, null, targetScreenName);
+            return ShowFriendshipCoreAsync(credential, null, sourceScreenName, null, targetScreenName);
         }
 
-        public static async Task<TwitterFriendship> ShowFriendshipCore(
+        public static async Task<TwitterFriendship> ShowFriendshipCoreAsync(
             IOAuthCredential credential, long? sourceId, string sourceScreenName,
                 long? targetId, string targetScreenName)
         {
@@ -195,22 +195,22 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region Update friendships
 
-        public static Task<TwitterFriendship> UpdateFriendship(
+        public static Task<TwitterFriendship> UpdateFriendshipAsync(
             this IOAuthCredential credential, long userId, bool showRetweet)
         {
             if (credential == null) throw new ArgumentNullException("credential");
-            return UpdateFriendshipCore(credential, userId, null, showRetweet);
+            return UpdateFriendshipCoreAsync(credential, userId, null, showRetweet);
         }
 
-        public static Task<TwitterFriendship> UpdateFriendship(
+        public static Task<TwitterFriendship> UpdateFriendshipAsync(
             this IOAuthCredential credential, string screenName, bool showRetweet)
         {
             if (credential == null) throw new ArgumentNullException("credential");
             if (screenName == null) throw new ArgumentNullException("screenName");
-            return UpdateFriendshipCore(credential, null, screenName, showRetweet);
+            return UpdateFriendshipCoreAsync(credential, null, screenName, showRetweet);
         }
 
-        private static async Task<TwitterFriendship> UpdateFriendshipCore(
+        private static async Task<TwitterFriendship> UpdateFriendshipCoreAsync(
             IOAuthCredential credential, long? userId, string screenName, bool showRetweet)
         {
             var param = new Dictionary<string, object>

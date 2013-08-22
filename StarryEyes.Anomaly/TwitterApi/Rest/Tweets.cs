@@ -11,7 +11,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 {
     public static class Tweets
     {
-        public static async Task<long?> GetMyRetweetIdOfStatus(
+        public static async Task<long?> GetMyRetweetIdOfStatusAsync(
             this IOAuthCredential credential, long id)
         {
             if (credential == null) throw new ArgumentNullException("credential");
@@ -22,13 +22,16 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             }.ParametalizeForGet();
             var client = credential.CreateOAuthClient();
             var respStr = await client.GetStringAsync(new ApiAccess("statuses/show.json", param));
-            var graph = DynamicJson.Parse(respStr);
-            return ((bool)graph.current_user_retweet())
-                       ? Int64.Parse(graph.current_user_retweet.id_str)
-                       : null;
+            return await Task.Run(() =>
+            {
+                var graph = DynamicJson.Parse(respStr);
+                return ((bool)graph.current_user_retweet())
+                           ? Int64.Parse(graph.current_user_retweet.id_str)
+                           : null;
+            });
         }
 
-        public static async Task<IEnumerable<TwitterUser>> GetRetweets(
+        public static async Task<IEnumerable<TwitterUser>> GetRetweetsAsync(
             this IOAuthCredential credential, long id, int? count = null)
         {
             if (credential == null) throw new ArgumentNullException("credential");
@@ -51,7 +54,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return await response.ReadAsUserCollectionAsync();
         }
 
-        public static async Task<ICursorResult<IEnumerable<long>>> GetRetweeterIds(
+        public static async Task<ICursorResult<IEnumerable<long>>> GetRetweeterIdsAsync(
             this IOAuthCredential credential, long id, long cursor = -1)
         {
             if (credential == null) throw new ArgumentNullException("credential");
@@ -65,7 +68,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return await response.ReadAsCursoredIdsAsync();
         }
 
-        public static async Task<TwitterStatus> ShowTweet(
+        public static async Task<TwitterStatus> ShowTweetAsync(
             this IOAuthCredential credential, long id)
         {
             if (credential == null) throw new ArgumentNullException("credential");
@@ -78,7 +81,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return await response.ReadAsStatusAsync();
         }
 
-        public static async Task<TwitterStatus> Update(
+        public static async Task<TwitterStatus> UpdateAsync(
             this IOAuthCredential credential, string status, long? inReplyToStatusId = null,
             Tuple<double, double> geoLatLong = null, string placeId = null, bool? displayCoordinates = null)
         {
@@ -98,7 +101,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return await response.ReadAsStatusAsync();
         }
 
-        public static async Task<TwitterStatus> UpdateWithMedia(
+        public static async Task<TwitterStatus> UpdateWithMediaAsync(
             this IOAuthCredential credential, string status, IEnumerable<byte[]> images,
             bool? possiblySensitive = false, long? inReplyToStatusId = null,
             Tuple<double, double> geoLatLong = null, string placeId = null, bool? displayCoordinates = null)
@@ -123,7 +126,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return await response.ReadAsStatusAsync();
         }
 
-        public static async Task<TwitterStatus> Destroy(
+        public static async Task<TwitterStatus> DestroyAsync(
             this IOAuthCredential credential, long id)
         {
             if (credential == null) throw new ArgumentNullException("credential");
@@ -133,7 +136,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return await response.ReadAsStatusAsync();
         }
 
-        public static async Task<TwitterStatus> Retweet(
+        public static async Task<TwitterStatus> RetweetAsync(
             this IOAuthCredential credential, long id)
         {
             if (credential == null) throw new ArgumentNullException("credential");

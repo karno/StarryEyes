@@ -93,7 +93,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                                      .Where(s => _predicate(s))
                                      .ToObservable();
                 case SearchOption.Web:
-                    return Setting.Accounts.GetRandomOne().Search(_query, maxId: maxId, count: count).ToObservable();
+                    return Setting.Accounts.GetRandomOne().SearchAsync(_query, maxId: maxId, count: count).ToObservable();
                 default:
                     var fetch = Observable.Start(() =>
                                                  StatusStore.Find(_predicate,

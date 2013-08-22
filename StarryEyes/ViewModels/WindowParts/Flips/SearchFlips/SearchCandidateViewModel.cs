@@ -91,7 +91,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             this.IsSearchCandidateAvailable = true;
             try
             {
-                var searches = await aid.GetSavedSearches();
+                var searches = await aid.GetSavedSearchesAsync();
                 searches.ForEach(
                     s => this._searchCandidates.Add(new SearchCandidateItemViewModel(this, aid, s.Item1, s.Item2)));
             }
@@ -154,7 +154,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             DebugHelper.EnsureBackgroundThread();
             try
             {
-                await this._account.DestroySavedSearch(_id);
+                await this._account.DestroySavedSearchAsync(_id);
             }
             catch (Exception ex)
             {

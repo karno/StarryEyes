@@ -27,7 +27,7 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
             DebugHelper.EnsureBackgroundThread();
             try
             {
-                var user = await this._account.ShowUser(this._account.Id);
+                var user = await this._account.ShowUserAsync(this._account.Id);
                 this._account.UnreliableScreenName = user.ScreenName;
                 this._account.UnreliableProfileImage = user.ProfileImageUri;
                 UserStore.Store(user);

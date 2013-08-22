@@ -27,7 +27,7 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
             DebugHelper.EnsureBackgroundThread();
             try
             {
-                var recv = await this._account.GetHomeTimeline(100);
+                var recv = await this._account.GetHomeTimelineAsync(100);
                 recv.ForEach(ReceiveInbox.Queue);
             }
             catch (Exception ex)

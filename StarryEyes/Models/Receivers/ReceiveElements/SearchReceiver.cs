@@ -32,7 +32,7 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
                     BackstageModel.RegisterEvent(new OperationFailedEvent("アカウントが登録されていないため、検索タイムラインを受信できませんでした。"));
                     return;
                 }
-                var resp = await account.Search(_query);
+                var resp = await account.SearchAsync(_query);
                 resp.ForEach(ReceiveInbox.Queue);
             }
             catch (Exception ex)
