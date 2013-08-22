@@ -5,6 +5,7 @@ using System.Windows.Media.Imaging;
 using StarryEyes.Anomaly.TwitterApi;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
+using StarryEyes.Helpers;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Settings;
 
@@ -60,6 +61,7 @@ namespace StarryEyes.Models.Requests
 
         public override async Task<TwitterStatus> Send(TwitterAccount account)
         {
+            DebugHelper.EnsureBackgroundThread();
             var latlong = _geoInfo == null ? null : Tuple.Create(_geoInfo.Latitude, _geoInfo.Longitude);
             Exception thrown;
             // make retweet

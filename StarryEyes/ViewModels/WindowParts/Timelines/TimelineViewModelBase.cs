@@ -32,11 +32,11 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         protected TimelineViewModelBase()
         {
-            this.CompositeDisposable.Add(async () =>
+            this.CompositeDisposable.Add(() => Task.Run(async () =>
             {
-                if (_currentTimelineListener != null)
+                if (this._currentTimelineListener != null)
                 {
-                    _currentTimelineListener.Dispose();
+                    this._currentTimelineListener.Dispose();
                 }
                 if (this._timeline == null) return;
                 var array = await DispatcherHolder.Dispatcher.BeginInvoke(() =>
@@ -49,7 +49,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                     }
                 }, DispatcherPriority.ContextIdle);
                 array.ForEach(a => a.Dispose());
-            });
+            }));
         }
 
         public ObservableCollection<StatusViewModel> Timeline

@@ -9,6 +9,7 @@ using Livet;
 using StarryEyes.Albireo.Data;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.Utils;
+using StarryEyes.Helpers;
 using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Models.Stores;
 
@@ -96,6 +97,7 @@ namespace StarryEyes.Models.Tab
 
         private async void AddStatus(TwitterStatus status)
         {
+            DebugHelper.EnsureBackgroundThread();
             bool add;
             lock (_sicLocker)
             {
@@ -150,6 +152,7 @@ namespace StarryEyes.Models.Tab
 
         public async Task ReadMore(long? maxId, bool batch = false)
         {
+            DebugHelper.EnsureBackgroundThread();
             try
             {
                 await _fetcher(maxId, TimelineChunkCount, batch)

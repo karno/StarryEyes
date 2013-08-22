@@ -21,6 +21,7 @@ namespace StarryEyes.Anomaly
                     return hmac.ComputeHash(buffer);
                 }
             };
+            UseSystemProxy = true;
         }
 
         public static bool UseSystemProxy { get; set; }

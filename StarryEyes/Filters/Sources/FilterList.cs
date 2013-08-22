@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using StarryEyes.Albireo.Data;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
+using StarryEyes.Helpers;
 using StarryEyes.Models;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;
@@ -38,11 +40,12 @@ namespace StarryEyes.Filters.Sources
                 _listInfo = new ListInfo { OwnerScreenName = splited[1], Slug = splited[2] };
                 _receiver = splited[0];
             }
-            this.GetListUsersInfo();
+            Task.Factory.StartNew(() => this.GetListUsersInfo());
         }
 
         private async void GetListUsersInfo(bool enforceReceive = false)
         {
+            DebugHelper.EnsureBackgroundThread();
             IEnumerable<long> users;
             if (!enforceReceive && (users = CacheStore.GetListUsers(_listInfo)).Any())
             {

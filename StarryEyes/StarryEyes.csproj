@@ -192,6 +192,7 @@
     <Compile Include="Filters\Sources\FilterMessages.cs" />
     <Compile Include="Filters\Sources\FilterSearch.cs" />
     <Compile Include="Filters\Sources\FilterTrack.cs" />
+    <Compile Include="Filters\Sql\SqlBuilder.cs" />
     <Compile Include="Helpers\DebugHelper.cs" />
     <Compile Include="Helpers\FreezableHelper.cs" />
     <Compile Include="Helpers\TwitterRegexPatterns.cs" />
@@ -224,11 +225,13 @@
     <Compile Include="Models\Backstages\TwitterEvents\UnfollowedEvent.cs" />
     <Compile Include="Models\Backstages\BackstageEventBase.cs" />
     <Compile Include="Models\Backstages\TwitterEvents\UnknownEvent.cs" />
+    <Compile Include="Models\Databases\Mapper.cs" />
+    <Compile Include="Models\Networking.cs" />
     <Compile Include="Models\Plugins\PluginManager.cs" />
     <Compile Include="Models\Plugins\ScriptingManager.cs" />
     <Compile Include="Models\Receivers\ListInfo.cs" />
     <Compile Include="Models\Receivers\ReceiveElements\UserTimelineReceiver.cs" />
-    <Compile Include="Models\Receivers\StreamingEventsHub.cs" />
+    <Compile Include="Models\Subsystems\TwitterEventService.cs" />
     <Compile Include="Models\Receivers\Managers\ListReceiveManager.cs" />
     <Compile Include="Models\Receivers\Managers\StreamTrackReceiveManager.cs" />
     <Compile Include="Models\Receivers\ReceiveElements\ListReceiver.cs" />
@@ -542,6 +545,10 @@
     <ProjectReference Include="..\StarryEyes.Anomaly\StarryEyes.Anomaly.csproj">
       <Project>{564e23de-ab35-45b6-b331-395c3943bc23}</Project>
       <Name>StarryEyes.Anomaly</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\StarryEyes.Casket\StarryEyes.Casket.csproj">
+      <Project>{316927DE-96C9-47C8-947D-B6D8A8DA1E14}</Project>
+      <Name>StarryEyes.Casket</Name>
     </ProjectReference>
     <ProjectReference Include="..\StarryEyes.Feather\StarryEyes.Feather.csproj">
       <Project>{E47FA479-005C-4236-BAFB-ADD664535E59}</Project>

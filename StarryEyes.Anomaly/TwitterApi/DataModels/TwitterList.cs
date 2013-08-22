@@ -21,8 +21,8 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
                            ? ListMode.Public
                            : ListMode.Private;
             Description = json.description;
-            MemberCount = json.member_count;
-            SubscriberCount = json.subscriber_count;
+            MemberCount = (long)json.member_count;
+            SubscriberCount = (long)json.subscriber_count;
             CreatedAt = ((string)json.created_at).ParseDateTime(ParsingExtension.TwitterDateTimeFormat);
         }
 

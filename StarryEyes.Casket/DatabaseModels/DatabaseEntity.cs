@@ -6,12 +6,28 @@ namespace StarryEyes.Casket.DatabaseModels
 {
     public class DatabaseEntity : DbModelBase
     {
+        public static DatabaseEntity FromTwitterEntity(TwitterEntity entity,
+                                                        long parentId, EntityParentType parentType)
+        {
+            return new DatabaseEntity
+            {
+                DisplayText = entity.DisplayText,
+                EndIndex = entity.EndIndex,
+                EntityParentType = parentType,
+                EntityType = entity.EntityType,
+                MediaUrl = entity.MediaUrl,
+                OriginalText = entity.OriginalText,
+                ParentId = parentId,
+                StartIndex = entity.StartIndex
+            };
+        }
+
         protected override bool ReplaceOnConflict
         {
             get { return false; }
         }
 
-        [DbPrimaryKey]
+        [DbPrimaryKey(true)]
         public long Id { get; set; }
 
         public long ParentId { get; set; }

@@ -93,7 +93,6 @@
     <Compile Include="DatabaseCore\Sqlite\DbOptionalAttribute.cs" />
     <Compile Include="DatabaseCore\Sqlite\DbPrimaryKeyAttribute.cs" />
     <Compile Include="DatabaseCore\Sqlite\SentenceGenerator.cs" />
-    <Compile Include="DatabaseModels\Mapper.cs" />
     <Compile Include="IMultiplexPredicate.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DatabaseCore\Sqlite\Accessor.cs" />

@@ -9,9 +9,9 @@ using StarryEyes.Models.Backstages.TwitterEvents;
 using StarryEyes.Models.Stores;
 using StarryEyes.Settings;
 
-namespace StarryEyes.Models.Receivers
+namespace StarryEyes.Models.Subsystems
 {
-    public static class StreamingEventsHub
+    public static class TwitterEventService
     {
         public static bool OverrideDefaultHandlers { get; set; }
 
@@ -217,8 +217,8 @@ namespace StarryEyes.Models.Receivers
     {
         public TwitterUserEvent(TwitterUser source, TwitterUser target)
         {
-            Source = source;
-            Target = target;
+            this.Source = source;
+            this.Target = target;
         }
 
         public TwitterUser Source { get; set; }
@@ -229,8 +229,8 @@ namespace StarryEyes.Models.Receivers
     {
         public TwitterStatusEvent(TwitterUser source, TwitterStatus target)
         {
-            Source = source;
-            Target = target;
+            this.Source = source;
+            this.Target = target;
         }
 
         public TwitterUser Source { get; set; }

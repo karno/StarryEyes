@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using StarryEyes.Anomaly.TwitterApi.Rest;
+using StarryEyes.Helpers;
 using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Settings;
 
@@ -22,6 +23,7 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
 
         protected override async void DoReceive()
         {
+            DebugHelper.EnsureBackgroundThread();
             try
             {
                 var account = Setting.Accounts.GetRandomOne();

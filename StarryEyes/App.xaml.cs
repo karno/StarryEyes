@@ -32,6 +32,8 @@ namespace StarryEyes
         private static Mutex _appMutex;
         private void Application_Startup(object sender, StartupEventArgs e)
         {
+            #region initialize execution environment
+
             // enable multi-core JIT.
             // see reference: http://msdn.microsoft.com/en-us/library/system.runtime.profileoptimization.aspx
             if (IsMulticoreJitEnabled)
@@ -50,6 +52,10 @@ namespace StarryEyes
                 System.Windows.Media.RenderOptions.ProcessRenderMode = System.Windows.Interop.RenderMode.SoftwareOnly;
             }
 
+            #endregion
+
+            #region detect run duplication
+
             // Check run duplication
             string mutexStr = null;
             switch (ExecutionMode)
@@ -63,6 +69,7 @@ namespace StarryEyes
                     break;
             }
             _appMutex = new Mutex(true, "Krile_StarryEyes_" + mutexStr);
+
             if (_appMutex.WaitOne(0, false) == false)
             {
                 TaskDialog.Show(new TaskDialogOptions
@@ -78,6 +85,10 @@ namespace StarryEyes
                 Environment.Exit(0);
             }
 
+            #endregion
+
+            #region register core handlers
+
             // set exception handlers
             Current.DispatcherUnhandledException += (sender2, e2) => HandleException(e2.Exception);
             AppDomain.CurrentDomain.UnhandledException += (sender2, e2) => HandleException(e2.ExceptionObject as Exception);
@@ -85,103 +96,126 @@ namespace StarryEyes
             // set exit handler
             Current.Exit += (_, __) => AppFinalize(true);
 
-            // Initialize service points
+            #endregion
+
+            #region initialize web connection parameters
+
+            // initialize service points
             ServicePointManager.Expect100Continue = false; // disable expect 100 continue for User Streams connection.
             ServicePointManager.DefaultConnectionLimit = Int32.MaxValue; // Limit Break!
-
-            // Initialize Anomaly Core 
-            Anomaly.Core.Initialize();
 
             // declare security protocol explicitly
             // for Windows 8.1 (Preview)
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Ssl3;
 
-            // Initialize special image handlers
+            // initialize anomaly core system
+            Anomaly.Core.Initialize();
+
+            #endregion
+
+            // initialize special image handlers
             SpecialImageResolvers.Initialize();
 
-            // Load plugins
+            // load plugins
             PluginManager.Load();
 
-            // Load settings
+            // load settings
             if (!Setting.LoadSettings())
             {
+                // fail loading settings
                 Current.Shutdown();
-                return; // fail
+                return;
             }
 
-            // Set CK/CS for accessing twitter.
+            // set parameters for accessing twitter.
             ApiEndpoint.UserAgent = Setting.UserAgent.Value;
-            // TODO: API proxy setting reflect
+            ApiEndpoint.ApiEndpointProxy = Setting.ApiProxy.Value;
 
-            // Load key assigns
+            // web access proxy
+            Networking.Initialize();
+
+            if (!this.CheckDatabase())
+            {
+                // database corrupted
+                Current.Shutdown();
+                return;
+            }
+
+            // load key assigns
             KeyAssignManager.Initialize();
 
-            // Load cache store
+            // load cache manager
             CacheStore.Initialize();
 
-            // Initialize core systems
-            if (Setting.DatabaseCorruption.Value)
-            {
-                var option = new TaskDialogOptions
-                {
-                    MainIcon = VistaTaskDialogIcon.Error,
-                    Title = "Krile データストア初期化エラー",
-                    MainInstruction = "データストアの破損が検出されています。",
-                    Content = "データストアが破損している可能性があります。" + Environment.NewLine +
-                    "データストアを初期化するか、またはKrileを終了してバックアップを取ることができます。",
-                    CommandButtons = new[] { "データストアを初期化して再起動", "Krileを終了", "無視して起動を続ける" }
-                };
-                var result = TaskDialog.Show(option);
-                if (result.CommandButtonResult.HasValue)
-                {
-                    switch (result.CommandButtonResult.Value)
-                    {
-                        case 0:
-                            StatusStore.Shutdown();
-                            UserStore.Shutdown();
-                            // clear data
-                            ClearStoreData();
-                            Setting.DatabaseCorruption.Value = false;
-                            Setting.Save();
-                            _appMutex.ReleaseMutex();
-                            _appMutex.Dispose();
-                            Process.Start(ResourceAssembly.Location);
-                            Current.Shutdown();
-                            Process.GetCurrentProcess().Kill();
-                            return;
-                        case 1:
-                            _appMutex.ReleaseMutex();
-                            _appMutex.Dispose();
-                            // shutdown
-                            Current.Shutdown();
-                            Process.GetCurrentProcess().Kill();
-                            return;
-                        case 2:
-                            Setting.DatabaseCorruption.Value = false;
-                            break;
-                    }
-                }
-            }
-
+            // initialize stores
             StatusStore.Initialize();
             UserStore.Initialize();
+
+            // initialize subsystems
             StatisticsService.Initialize();
             PostLimitPredictionService.Initialize();
-            StreamingEventsHub.Initialize();
+            TwitterEventService.Initialize();
             ReceiveInbox.Initialize();
 
-            // Activate plugins
+            // activate plugins
             PluginManager.LoadedPlugins.ForEach(p => p.Initialize());
 
-            // Activate scripts
+            // activate scripts
             ScriptingManager.ExecuteScripts();
 
             // finalize handlers
-            StreamingEventsHub.RegisterDefaultHandlers();
+            TwitterEventService.RegisterDefaultHandlers();
             ReceiversManager.Initialize();
             TwitterConfigurationService.Initialize();
             BackstageModel.Initialize();
             RaiseSystemReady();
+        }
+
+        private bool CheckDatabase()
+        {
+            // check database corruption
+            if (!Setting.DatabaseCorruption.Value)
+            {
+                return true;
+            }
+            var option = new TaskDialogOptions
+            {
+                MainIcon = VistaTaskDialogIcon.Error,
+                Title = "Krile データベースの初期化Krile データストア初期化エラー",
+                MainInstruction = "データストアの破損が検出されています。",
+                Content = "データストアが破損している可能性があります。" + Environment.NewLine +
+                          "データストアを初期化するか、またはKrileを終了してバックアップを取ることができます。",
+                CommandButtons = new[] { "データストアを初期化して再起動", "Krileを終了", "無視して起動を続ける" }
+            };
+            var result = TaskDialog.Show(option);
+            switch (result.CommandButtonResult ?? -1)
+            {
+                case 0:
+                    StatusStore.Shutdown();
+                    UserStore.Shutdown();
+                    // clear data
+                    this.ClearStoreData();
+                    Setting.DatabaseCorruption.Value = false;
+                    Setting.Save();
+                    _appMutex.ReleaseMutex();
+                    _appMutex.Dispose();
+                    Process.Start(ResourceAssembly.Location);
+                    Current.Shutdown();
+                    Process.GetCurrentProcess().Kill();
+                    return false;
+                case 1:
+                    _appMutex.ReleaseMutex();
+                    _appMutex.Dispose();
+                    // shutdown
+                    Current.Shutdown();
+                    Process.GetCurrentProcess().Kill();
+                    return false;
+                case 2:
+                    Setting.DatabaseCorruption.Value = false;
+                    return true;
+                default:
+                    return false;
+            }
         }
 
         /// <summary>

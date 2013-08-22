@@ -2,6 +2,7 @@
 using System;
 using System.Reactive.Linq;
 using StarryEyes.Anomaly.TwitterApi.Rest;
+using StarryEyes.Helpers;
 using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Settings;
 
@@ -45,6 +46,7 @@ namespace StarryEyes.Models.Subsystems
 
         private static async void UpdateConfiguration()
         {
+            DebugHelper.EnsureBackgroundThread();
             var account = Setting.Accounts.GetRandomOne();
             if (account == null)
             {

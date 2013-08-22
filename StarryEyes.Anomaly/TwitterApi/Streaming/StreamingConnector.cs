@@ -51,7 +51,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
             {
                 handler.OnTrackLimit(new StreamTrackLimit
                 {
-                    UndeliveredCount = element.limit.track
+                    UndeliveredCount = (long)element.limit.track
                 });
                 return;
             }

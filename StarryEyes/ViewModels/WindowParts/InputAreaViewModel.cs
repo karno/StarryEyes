@@ -149,8 +149,7 @@ namespace StarryEyes.ViewModels.WindowParts
             CompositeDisposable.Add(
                 new EventListener<Action<IEnumerable<TwitterAccount>, string, CursorPosition, TwitterStatus>>(
                     h => InputAreaModel.SetTextRequested += h,
-                    h => InputAreaModel.SetTextRequested -= h,
-                    async (infos, body, cursor, inReplyTo) =>
+                    h => InputAreaModel.SetTextRequested -= h, (infos, body, cursor, inReplyTo) =>
                     {
                         OpenInput(false);
                         if (!CheckClearInput(body)) return;
@@ -160,7 +159,7 @@ namespace StarryEyes.ViewModels.WindowParts
                         }
                         if (inReplyTo != null)
                         {
-                            InReplyTo = new StatusViewModel(await StatusModel.Get(inReplyTo));
+                            Task.Run(async () => InReplyTo = new StatusViewModel(await StatusModel.Get(inReplyTo)));
                         }
                         switch (cursor)
                         {
@@ -969,6 +968,7 @@ namespace StarryEyes.ViewModels.WindowParts
 
         internal static async void Send(TweetInputInfo inputInfo)
         {
+            DebugHelper.EnsureBackgroundThread();
             await inputInfo.DeletePrevious();
             inputInfo.Send()
                      .Subscribe(tweetInputInfo =>

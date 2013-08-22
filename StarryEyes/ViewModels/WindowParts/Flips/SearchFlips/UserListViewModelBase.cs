@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Livet;
 using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Anomaly.TwitterApi.Rest.Infrastructure;
+using StarryEyes.Helpers;
 using StarryEyes.Models;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;
@@ -42,7 +43,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
 
         private async void InitCollection()
         {
-
+            DebugHelper.EnsureBackgroundThread();
             this.IsLoading = true;
             var account =
                 Setting.Accounts.Collection.FirstOrDefault(a => a.RelationData.IsFollowing(this._parent.User.User.Id)) ??
@@ -112,6 +113,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
         private bool _isDeferLoadEnabled = true;
         private async void ReadMore()
         {
+            DebugHelper.EnsureBackgroundThread();
             if (!_isDeferLoadEnabled || this.IsLoading) return;
             this.IsLoading = true;
             var info = Setting.Accounts.GetRandomOne();

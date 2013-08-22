@@ -1,6 +1,8 @@
 ﻿using System;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Casket;
 using StarryEyes.Filters.Expressions.Operators;
+using StarryEyes.Filters.Sql;
 
 namespace StarryEyes.Filters.Expressions
 {
@@ -27,10 +29,9 @@ namespace StarryEyes.Filters.Expressions
             var handler = this.ReapplyRequested;
             if (handler != null) handler();
         }
-
     }
 
-    public sealed class FilterExpressionRoot : FilterExpressionBase
+    public sealed class FilterExpressionRoot : FilterExpressionBase, IMultiplexPredicate<TwitterStatus>
     {
         public static FilterExpressionRoot GetEmpty(bool tautology)
         {
@@ -75,6 +76,11 @@ namespace StarryEyes.Filters.Expressions
             return Operator.GetBooleanValueProvider();
         }
 
+        public string GetSqlQuery()
+        {
+            return this.ToSql();
+        }
+
         public override void BeginLifecycle()
         {
             if (Operator != null)
@@ -90,6 +96,5 @@ namespace StarryEyes.Filters.Expressions
                 Operator.EndLifecycle();
             }
         }
-
     }
 }

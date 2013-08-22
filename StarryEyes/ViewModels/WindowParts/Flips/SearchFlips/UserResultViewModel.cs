@@ -5,6 +5,7 @@ using System.Threading;
 using Livet;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
+using StarryEyes.Helpers;
 using StarryEyes.Models;
 using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Nightmare.Windows;
@@ -79,6 +80,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
 
         public async void LoadMore()
         {
+            DebugHelper.EnsureBackgroundThread();
             if (!_isDeferLoadEnabled || this.IsLoading) return;
             this.IsLoading = true;
             var account = Setting.Accounts.GetRandomOne();

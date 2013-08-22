@@ -14,6 +14,7 @@ using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.SystemEvents;
 using StarryEyes.Models.Backstages.TwitterEvents;
 using StarryEyes.Models.Stores;
+using StarryEyes.Models.Subsystems;
 
 namespace StarryEyes.Models.Receivers.ReceiveElements
 {
@@ -189,17 +190,17 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
                         BackstageModel.RegisterEvent(new UnknownEvent(item.Source, item.EventRawString));
                         break;
                     case StreamStatusActivityEvent.Favorite:
-                        StreamingEventsHub.NotifyFavorited(item.Source, item.Status);
+                        TwitterEventService.NotifyFavorited(item.Source, item.Status);
                         break;
                     case StreamStatusActivityEvent.Unfavorite:
-                        StreamingEventsHub.NotifyUnfavorited(item.Source, item.Status);
+                        TwitterEventService.NotifyUnfavorited(item.Source, item.Status);
                         break;
                 }
             }
 
             public void OnTrackLimit(StreamTrackLimit item)
             {
-                StreamingEventsHub.NotifyLimitationInfoGot(_parent.Account, (int)item.UndeliveredCount);
+                TwitterEventService.NotifyLimitationInfoGot(_parent.Account, (int)item.UndeliveredCount);
             }
 
             public void OnUserActivity(StreamUserActivity item)
@@ -221,7 +222,7 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
                         {
                             reldata.AddFollower(item.Source.Id);
                         }
-                        StreamingEventsHub.NotifyFollowed(item.Source, item.Target);
+                        TwitterEventService.NotifyFollowed(item.Source, item.Target);
                         break;
                     case StreamUserActivityEvent.Unfollow:
                         if (active)
@@ -232,7 +233,7 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
                         {
                             reldata.RemoveFollower(item.Source.Id);
                         }
-                        StreamingEventsHub.NotifyUnfollwed(item.Source, item.Target);
+                        TwitterEventService.NotifyUnfollwed(item.Source, item.Target);
                         break;
                     case StreamUserActivityEvent.Block:
                         if (active)
@@ -245,17 +246,17 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
                         {
                             reldata.RemoveFollower(item.Target.Id);
                         }
-                        StreamingEventsHub.NotifyBlocked(item.Source, item.Target);
+                        TwitterEventService.NotifyBlocked(item.Source, item.Target);
                         break;
                     case StreamUserActivityEvent.Unblock:
                         if (active)
                         {
                             reldata.RemoveBlocking(item.Target.Id);
                         }
-                        StreamingEventsHub.NotifyUnblocked(item.Source, item.Target);
+                        TwitterEventService.NotifyUnblocked(item.Source, item.Target);
                         break;
                     case StreamUserActivityEvent.UserUpdate:
-                        StreamingEventsHub.NotifyUserUpdated(item.Source);
+                        TwitterEventService.NotifyUserUpdated(item.Source);
                         break;
                 }
             }

@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Livet;
 using StarryEyes.Anomaly.TwitterApi.Rest;
+using StarryEyes.Helpers;
 using StarryEyes.Models;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;
@@ -68,6 +69,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
 
         public async void UpdateInfo()
         {
+            DebugHelper.EnsureBackgroundThread();
             // update current binding accounts
             var ctab = TabManager.CurrentFocusTab;
             long cid = 0;
@@ -149,6 +151,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
 
         public async void Remove()
         {
+            DebugHelper.EnsureBackgroundThread();
             try
             {
                 await this._account.DestroySavedSearch(_id);
