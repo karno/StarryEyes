@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 
 namespace StarryEyes.Anomaly.TwitterApi.Streaming
 {
@@ -23,7 +24,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
                 {"track", String.IsNullOrEmpty(filteredTracks) ? null : filteredTracks },
                 {"replies", repliesAll ? "all" : null},
             }.ParametalizeForGet();
-            return Observable.Create<string>(async (observer, cancel) =>
+            return Observable.Create<string>((observer, cancel) => Task.Run(async () =>
             {
                 try
                 {
@@ -40,7 +41,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
                     {
                         while (!reader.EndOfStream && !cancel.IsCancellationRequested)
                         {
-                            var line = await reader.ReadLineAsync();
+                            var line = reader.ReadLine();
                             observer.OnNext(line);
                         }
                     }
@@ -53,7 +54,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
                 {
                     observer.OnError(ex);
                 }
-            });
+            }));
         }
     }
 }

@@ -13,14 +13,14 @@
 
         public override string ToString()
         {
-            return (ApiEndpoint.ApiEndpointProxy ?? ApiEndpoint.ApiEndpointPrefix) +
+            return (ApiAccessProperties.ApiEndpoint) +
                    (this._path.StartsWith("/") ? this._path.Substring(1) : this._path) +
                    (string.IsNullOrEmpty(this._param) ? "" : ("?" + this._param));
         }
 
         public static implicit operator string(ApiAccess access)
         {
-            System.Diagnostics.Debug.WriteLine("API Access:" + access.ToString());
+            System.Diagnostics.Debug.WriteLine("API Access:" + access);
             return access.ToString();
         }
     }

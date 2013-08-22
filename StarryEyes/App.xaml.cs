@@ -128,8 +128,8 @@ namespace StarryEyes
             }
 
             // set parameters for accessing twitter.
-            ApiEndpoint.UserAgent = Setting.UserAgent.Value;
-            ApiEndpoint.ApiEndpointProxy = Setting.ApiProxy.Value;
+            ApiAccessProperties.UserAgent = Setting.UserAgent.Value;
+            ApiAccessProperties.ApiEndpoint = Setting.ApiProxy.Value;
 
             // web access proxy
             Networking.Initialize();

@@ -84,7 +84,7 @@
     <Compile Include="Ext\DynamicJson.cs" />
     <Compile Include="Ext\OAuthEchoMessageHandler.cs" />
     <Compile Include="IOAuthCredential.cs" />
-    <Compile Include="TwitterApi\ApiEndpoint.cs" />
+    <Compile Include="TwitterApi\ApiAccessProperties.cs" />
     <Compile Include="TwitterApi\Rest\Accounts.cs" />
     <Compile Include="TwitterApi\Rest\Blockings.cs" />
     <Compile Include="TwitterApi\Rest\Cursoring.cs" />
