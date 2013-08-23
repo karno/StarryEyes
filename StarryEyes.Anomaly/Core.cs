@@ -34,8 +34,7 @@ namespace StarryEyes.Anomaly
             {
                 return WebRequest.GetSystemWebProxy();
             }
-            if (ProxyProvider == null) return null;
-            return ProxyProvider();
+            return ProxyProvider == null ? null : ProxyProvider();
         }
     }
 }

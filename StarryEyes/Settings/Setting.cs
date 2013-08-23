@@ -142,8 +142,8 @@ namespace StarryEyes.Settings
         public static readonly SettingItemStruct<WebProxyConfiguration> UseWebProxy =
             new SettingItemStruct<WebProxyConfiguration>("UseWebProxy", WebProxyConfiguration.Default);
 
-        public static readonly SettingItem<string> WebProxyAddress =
-            new SettingItem<string>("WebProxyAddress", String.Empty);
+        public static readonly SettingItem<string> WebProxyHost =
+            new SettingItem<string>("WebProxyHost", String.Empty);
 
         public static readonly SettingItemStruct<int> WebProxyPort =
             new SettingItemStruct<int>("WebProxyPort", 0);

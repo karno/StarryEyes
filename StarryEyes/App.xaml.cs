@@ -11,7 +11,6 @@ using System.Text;
 using System.Threading;
 using System.Windows;
 using Livet;
-using StarryEyes.Anomaly.TwitterApi;
 using StarryEyes.Helpers;
 using StarryEyes.Models;
 using StarryEyes.Models.Plugins;
@@ -30,7 +29,7 @@ namespace StarryEyes
     public partial class App
     {
         private static Mutex _appMutex;
-        private void Application_Startup(object sender, StartupEventArgs e)
+        private void AppStartup(object sender, StartupEventArgs e)
         {
             #region initialize execution environment
 
@@ -128,10 +127,6 @@ namespace StarryEyes
             }
 
             // set parameters for accessing twitter.
-            ApiAccessProperties.UserAgent = Setting.UserAgent.Value;
-            ApiAccessProperties.ApiEndpoint = Setting.ApiProxy.Value;
-
-            // web access proxy
             Networking.Initialize();
 
             if (!this.CheckDatabase())

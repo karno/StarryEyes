@@ -20,7 +20,9 @@
 
         public static implicit operator string(ApiAccess access)
         {
-            System.Diagnostics.Debug.WriteLine("API Access:" + access);
+            // ReSharper disable RedundantToStringCall
+            System.Diagnostics.Debug.WriteLine("API Access:" + access.ToString());
+            // ReSharper restore RedundantToStringCall
             return access.ToString();
         }
     }
