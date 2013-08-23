@@ -42,7 +42,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest.Infrastructure
             return await ParseAndMapCollectionAsync(json, l => new TwitterList(l));
         }
 
-        private static async Task<IEnumerable<T>> ParseAndMapCollectionAsync<T>(string json, Func<string, T> factory)
+        private static async Task<IEnumerable<T>> ParseAndMapCollectionAsync<T>(string json, Func<dynamic, T> factory)
         {
             return await Task.Run(
                 () => (((dynamic[])DynamicJson.Parse(json))
