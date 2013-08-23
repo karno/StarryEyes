@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
-using StarryEyes.Helpers;
 using StarryEyes.Models.Accounting;
 
 namespace StarryEyes.Models.Requests
@@ -23,7 +22,6 @@ namespace StarryEyes.Models.Requests
         public override async Task<bool> Send(TwitterAccount account)
 #pragma warning restore 1998
         {
-            DebugHelper.EnsureBackgroundThread();
             // not implemented yet.
             return false;
         }

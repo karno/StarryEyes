@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using StarryEyes.Albireo.Data;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
-using StarryEyes.Helpers;
 using StarryEyes.Models;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;
@@ -43,42 +42,45 @@ namespace StarryEyes.Filters.Sources
             Task.Factory.StartNew(() => this.GetListUsersInfo());
         }
 
-        private async void GetListUsersInfo(bool enforceReceive = false)
+        private void GetListUsersInfo(bool enforceReceive = false)
         {
-            DebugHelper.EnsureBackgroundThread();
-            IEnumerable<long> users;
-            if (!enforceReceive && (users = CacheStore.GetListUsers(_listInfo)).Any())
+            Task.Run(async () =>
             {
-                lock (_ids)
+                IEnumerable<long> users;
+                if (!enforceReceive && (users = CacheStore.GetListUsers(_listInfo)).Any())
                 {
-                    users.ForEach(_ids.Add);
+                    lock (_ids)
+                    {
+                        users.ForEach(_ids.Add);
+                    }
+                    return;
                 }
-                return;
-            }
-            try
-            {
-                var account = this.GetAccount();
-                var memberList = new List<long>();
-                long cursor = -1;
-                do
+                try
                 {
-                    var result = await account.GetListMembersAsync(_listInfo.Slug, _listInfo.OwnerScreenName, cursor);
-                    memberList.AddRange(result.Result.Do(UserStore.Store).Select(u => u.Id));
-                    cursor = result.NextCursor;
-                } while (cursor != 0);
-                if (memberList.Count <= 0) return;
-                CacheStore.SetListUsers(this._listInfo, memberList);
-                lock (this._ids)
-                {
-                    this._ids.Clear();
-                    memberList.ForEach(this._ids.Add);
-                }
+                    var account = this.GetAccount();
+                    var memberList = new List<long>();
+                    long cursor = -1;
+                    do
+                    {
+                        var result = await account.GetListMembersAsync(
+                            _listInfo.Slug, _listInfo.OwnerScreenName, cursor);
+                        memberList.AddRange(result.Result.Do(UserStore.Store).Select(u => u.Id));
+                        cursor = result.NextCursor;
+                    } while (cursor != 0);
+                    if (memberList.Count <= 0) return;
+                    CacheStore.SetListUsers(this._listInfo, memberList);
+                    lock (this._ids)
+                    {
+                        this._ids.Clear();
+                        memberList.ForEach(this._ids.Add);
+                    }
 
-            }
-            catch (Exception ex)
-            {
-                BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message));
-            }
+                }
+                catch (Exception ex)
+                {
+                    BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message));
+                }
+            });
         }
 
         public override Func<TwitterStatus, bool> GetEvaluator()

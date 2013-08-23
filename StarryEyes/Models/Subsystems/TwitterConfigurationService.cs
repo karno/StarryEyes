@@ -1,8 +1,7 @@
-﻿
-using System;
+﻿using System;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using StarryEyes.Anomaly.TwitterApi.Rest;
-using StarryEyes.Helpers;
 using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Settings;
 
@@ -40,18 +39,19 @@ namespace StarryEyes.Models.Subsystems
 
         internal static void Initialize()
         {
-            Observable.Timer(TimeSpan.FromSeconds(5), TimeSpan.FromDays(1))
+            Observable.Timer(TimeSpan.FromSeconds(5), TimeSpan.FromDays(0.5))
+                      .ObserveOn(TaskPoolScheduler.Default)
                       .Subscribe(_ => UpdateConfiguration());
         }
 
         private static async void UpdateConfiguration()
         {
-            DebugHelper.EnsureBackgroundThread();
             var account = Setting.Accounts.GetRandomOne();
             if (account == null)
             {
                 // execute later
                 Observable.Timer(TimeSpan.FromMinutes(1))
+                          .ObserveOn(TaskPoolScheduler.Default)
                           .Subscribe(_ => UpdateConfiguration());
                 return;
             }
@@ -67,6 +67,7 @@ namespace StarryEyes.Models.Subsystems
                 BackstageModel.RegisterEvent(new OperationFailedEvent("Configuration receive failed: " + ex.Message));
                 // execute later
                 Observable.Timer(TimeSpan.FromMinutes(5))
+                          .ObserveOn(TaskPoolScheduler.Default)
                           .Subscribe(_ => UpdateConfiguration());
             }
         }

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Anomaly.Utils;
-using StarryEyes.Helpers;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Settings;
@@ -31,29 +31,32 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
             get { return Setting.ListReceivePeriod.Value; }
         }
 
-        protected override async void DoReceive()
+        protected override void DoReceive()
         {
-            DebugHelper.EnsureBackgroundThread();
-            var authInfo = this._auth ?? Setting.Accounts.GetRandomOne();
-            if (authInfo == null)
+            Task.Run(async () =>
             {
-                BackstageModel.RegisterEvent(new OperationFailedEvent("アカウントが登録されていないため、検索タイムラインを受信できませんでした。"));
-                return;
-            }
+                var authInfo = this._auth ?? Setting.Accounts.GetRandomOne();
+                if (authInfo == null)
+                {
+                    BackstageModel.RegisterEvent(new OperationFailedEvent("アカウントが登録されていないため、検索タイムラインを受信できませんでした。"));
+                    return;
+                }
 
-            try
-            {
-                var statuses = await authInfo.GetListTimelineAsync(_listInfo.Slug, _listInfo.OwnerScreenName);
-                statuses.ForEach(ReceiveInbox.Queue);
-            }
-            catch (Exception ex)
-            {
-                BackstageModel.RegisterEvent(
-                    new OperationFailedEvent("list receive error: \"" +
-                                             this._listInfo + "\", " +
-                                             authInfo.UnreliableScreenName + " - " +
-                                             ex.Message));
-            }
+                try
+                {
+                    var statuses =
+                        await authInfo.GetListTimelineAsync(_listInfo.Slug, _listInfo.OwnerScreenName);
+                    statuses.ForEach(ReceiveInbox.Queue);
+                }
+                catch (Exception ex)
+                {
+                    BackstageModel.RegisterEvent(
+                        new OperationFailedEvent("list receive error: \"" +
+                                                 this._listInfo + "\", " +
+                                                 authInfo.UnreliableScreenName + " - " +
+                                                 ex.Message));
+                }
+            });
         }
 
         public static IObservable<TwitterStatus> DoReceive(TwitterAccount info, ListInfo list, long? maxId = null)

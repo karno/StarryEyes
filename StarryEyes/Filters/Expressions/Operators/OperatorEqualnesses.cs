@@ -25,7 +25,8 @@ namespace StarryEyes.Filters.Expressions.Operators
             };
             var intersect = LeftValue.SupportedTypes.Intersect(RightValue.SupportedTypes).ToArray();
             if (!intersect.Any())
-                throw new FilterQueryException("Value type is mismatched. Can't compare each other." + Environment.NewLine +
+                throw new FilterQueryException(
+                    "Value type is mismatched. Can't compare each other." + Environment.NewLine +
                     "Left argument is: " + LeftValue.SupportedTypes
                     .Select(t => t.ToString()).JoinString(", ") + Environment.NewLine +
                     "Right argument is: " + RightValue.SupportedTypes

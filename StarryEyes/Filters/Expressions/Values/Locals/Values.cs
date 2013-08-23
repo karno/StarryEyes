@@ -12,7 +12,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
         public LocalUser(UserExpressionBase expression)
         {
             this._expression = expression;
-            this._expression.ReapplyRequested += this.ExpressionReapplyRequested;
+            expression.ReapplyRequested += this.ExpressionReapplyRequested;
         }
 
         private void ExpressionReapplyRequested(RelationDataChangedInfo obj)
@@ -67,7 +67,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
         public LocalUserFollowing(UserExpressionBase expression)
         {
             this._expression = expression;
-            this._expression.ReapplyRequested += this.ExpressionReapplyRequested;
+            expression.ReapplyRequested += this.ExpressionReapplyRequested;
         }
 
         private void ExpressionReapplyRequested(RelationDataChangedInfo obj)
@@ -112,7 +112,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
         public LocalUserFollowers(UserExpressionBase expression)
         {
             this._expression = expression;
-            this._expression.ReapplyRequested += this.ExpressionReapplyRequested;
+            expression.ReapplyRequested += this.ExpressionReapplyRequested;
         }
 
         private void ExpressionReapplyRequested(RelationDataChangedInfo obj)
@@ -156,8 +156,8 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 
         public LocalUserBlockings(UserExpressionBase expression)
         {
-            _expression = expression;
-            this._expression.ReapplyRequested += this.ExpressionReapplyRequested;
+            this._expression = expression;
+            expression.ReapplyRequested += this.ExpressionReapplyRequested;
         }
 
         private void ExpressionReapplyRequested(RelationDataChangedInfo obj)

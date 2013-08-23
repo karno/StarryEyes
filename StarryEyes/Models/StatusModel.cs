@@ -11,7 +11,6 @@ using Livet;
 using StarryEyes.Albireo.Threading;
 using StarryEyes.Anomaly.Imaging;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
-using StarryEyes.Helpers;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Stores;
 using StarryEyes.Settings;
@@ -54,7 +53,6 @@ namespace StarryEyes.Models
 
         public static async Task<StatusModel> Get(TwitterStatus status)
         {
-            DebugHelper.EnsureBackgroundThread();
             status = await StatusStore.Get(status.Id)
                                       .DefaultIfEmpty(status)
                                       .FirstAsync();
@@ -316,7 +314,6 @@ namespace StarryEyes.Models
 
         public async void AddFavoritedUser(TwitterUser user)
         {
-            DebugHelper.EnsureBackgroundThread();
             if (this.Status.RetweetedOriginal != null)
             {
                 var status = await Get(this.Status.RetweetedOriginal);
@@ -348,7 +345,6 @@ namespace StarryEyes.Models
 
         public async void RemoveFavoritedUser(long id)
         {
-            DebugHelper.EnsureBackgroundThread();
             if (this.Status.RetweetedOriginal != null)
             {
                 var status = await Get(this.Status.RetweetedOriginal);
@@ -380,7 +376,6 @@ namespace StarryEyes.Models
 
         public async void AddRetweetedUser(TwitterUser user)
         {
-            DebugHelper.EnsureBackgroundThread();
             if (this.Status.RetweetedOriginal != null)
             {
                 var status = await Get(this.Status.RetweetedOriginal);
@@ -412,7 +407,6 @@ namespace StarryEyes.Models
 
         public async void RemoveRetweetedUser(long id)
         {
-            DebugHelper.EnsureBackgroundThread();
             if (this.Status.RetweetedOriginal != null)
             {
                 var status = await Get(this.Status.RetweetedOriginal);

@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Livet;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
-using StarryEyes.Helpers;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Requests;
 using StarryEyes.Models.Stores;
@@ -98,7 +97,6 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
 
         private async void GetFriendship(AccountRelationData rds)
         {
-            DebugHelper.EnsureBackgroundThread();
             try
             {
                 // ReSharper disable InvertIf

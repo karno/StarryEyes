@@ -1,6 +1,5 @@
 ﻿using System;
 using StarryEyes.Anomaly.TwitterApi.Rest;
-using StarryEyes.Helpers;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Models.Stores;
@@ -24,7 +23,6 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
 
         protected override async void DoReceive()
         {
-            DebugHelper.EnsureBackgroundThread();
             try
             {
                 var user = await this._account.ShowUserAsync(this._account.Id);

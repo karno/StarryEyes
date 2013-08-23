@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
@@ -32,8 +33,10 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
                 h => App.ApplicationFinalize += h,
                 h => App.ApplicationFinalize -= h)
                 .Subscribe(_ => this.Dispose()));
-            CompositeDisposable.Add(Observable.Interval(TimeSpan.FromSeconds(1))
-                .Subscribe(_ => OnTimer()));
+            CompositeDisposable.Add(
+                Observable.Interval(TimeSpan.FromSeconds(1))
+                          .ObserveOn(TaskPoolScheduler.Default)
+                          .Subscribe(_ => OnTimer()));
         }
 
         private void OnTimer()

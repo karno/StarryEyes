@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Livet;
 using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Anomaly.TwitterApi.Rest.Infrastructure;
-using StarryEyes.Helpers;
 using StarryEyes.Models;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;
@@ -41,42 +40,45 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             this.InitCollection();
         }
 
-        private async void InitCollection()
+        private void InitCollection()
         {
-            DebugHelper.EnsureBackgroundThread();
-            this.IsLoading = true;
-            var account =
-                Setting.Accounts.Collection.FirstOrDefault(a => a.RelationData.IsFollowing(this._parent.User.User.Id)) ??
-                Setting.Accounts.GetRandomOne();
-            if (account == null)
+            Task.Run(async () =>
             {
-                return;
-            }
-            long cursor = -1;
-            try
-            {
-                while (cursor != 0)
+                this.IsLoading = true;
+                var account =
+                    Setting.Accounts.Collection.FirstOrDefault(
+                        a => a.RelationData.IsFollowing(this._parent.User.User.Id)) ??
+                    Setting.Accounts.GetRandomOne();
+                if (account == null)
                 {
-                    _userIds = new List<long>();
-                    var friends = await this.GetUsersApiImpl(account, _parent.User.User.Id, cursor);
-                    friends.Result.ForEach(_userIds.Add);
-                    cursor = friends.NextCursor;
+                    return;
                 }
-                IsLoading = false;
-                this.ReadMore();
-            }
-            catch (Exception ex)
-            {
-                this._parent.Parent.Messenger.Raise(
-                    new TaskDialogMessage(new TaskDialogOptions
+                long cursor = -1;
+                try
+                {
+                    while (cursor != 0)
                     {
-                        CommonButtons = TaskDialogCommonButtons.Close,
-                        MainIcon = VistaTaskDialogIcon.Error,
-                        MainInstruction = "ユーザー情報を受信できませんでした。",
-                        Content = ex.Message,
-                        Title = "ユーザー受信エラー",
-                    }));
-            }
+                        _userIds = new List<long>();
+                        var friends = await this.GetUsersApiImpl(account, _parent.User.User.Id, cursor);
+                        friends.Result.ForEach(_userIds.Add);
+                        cursor = friends.NextCursor;
+                    }
+                    IsLoading = false;
+                    this.ReadMore();
+                }
+                catch (Exception ex)
+                {
+                    this._parent.Parent.Messenger.Raise(
+                        new TaskDialogMessage(new TaskDialogOptions
+                        {
+                            CommonButtons = TaskDialogCommonButtons.Close,
+                            MainIcon = VistaTaskDialogIcon.Error,
+                            MainInstruction = "ユーザー情報を受信できませんでした。",
+                            Content = ex.Message,
+                            Title = "ユーザー受信エラー",
+                        }));
+                }
+            });
         }
 
         protected abstract Task<ICursorResult<IEnumerable<long>>> GetUsersApiImpl(TwitterAccount info, long id, long cursor);
@@ -111,49 +113,51 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
 
         private int _currentPageCount = -1;
         private bool _isDeferLoadEnabled = true;
-        private async void ReadMore()
+        private void ReadMore()
         {
-            DebugHelper.EnsureBackgroundThread();
             if (!_isDeferLoadEnabled || this.IsLoading) return;
             this.IsLoading = true;
-            var info = Setting.Accounts.GetRandomOne();
-            if (info == null)
+            Task.Run(async () =>
             {
-                _parent.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
-              {
-                  CommonButtons = TaskDialogCommonButtons.Close,
-                  MainIcon = VistaTaskDialogIcon.Error,
-                  MainInstruction = "ユーザーの読み込みに失敗しました。",
-                  Content = "アカウントが登録されていません。",
-                  Title = "読み込みエラー"
-              }));
-                BackstageModel.RegisterEvent(new OperationFailedEvent("アカウントが登録されていません。"));
-            }
-            var page = Interlocked.Increment(ref _currentPageCount);
-            var ids = _userIds.Skip(page * 100).Take(100).ToArray();
-            if (ids.Length == 0)
-            {
-                _isDeferLoadEnabled = false;
-                IsLoading = false;
-                return;
-            }
-            try
-            {
-                (await info.LookupUserAsync(ids)).ForEach(u => Users.Add(new UserResultItemViewModel(u)));
-                this.IsLoading = false;
-            }
-            catch (Exception ex)
-            {
-                _parent.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
-               {
-                   CommonButtons = TaskDialogCommonButtons.Close,
-                   MainIcon = VistaTaskDialogIcon.Error,
-                   MainInstruction = "ユーザーの読み込みに失敗しました。",
-                   Content = ex.Message,
-                   Title = "読み込みエラー"
-               }));
-                BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message));
-            }
+                var info = Setting.Accounts.GetRandomOne();
+                if (info == null)
+                {
+                    _parent.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
+                    {
+                        CommonButtons = TaskDialogCommonButtons.Close,
+                        MainIcon = VistaTaskDialogIcon.Error,
+                        MainInstruction = "ユーザーの読み込みに失敗しました。",
+                        Content = "アカウントが登録されていません。",
+                        Title = "読み込みエラー"
+                    }));
+                    BackstageModel.RegisterEvent(new OperationFailedEvent("アカウントが登録されていません。"));
+                }
+                var page = Interlocked.Increment(ref _currentPageCount);
+                var ids = _userIds.Skip(page * 100).Take(100).ToArray();
+                if (ids.Length == 0)
+                {
+                    _isDeferLoadEnabled = false;
+                    IsLoading = false;
+                    return;
+                }
+                try
+                {
+                    (await info.LookupUserAsync(ids)).ForEach(u => Users.Add(new UserResultItemViewModel(u)));
+                    this.IsLoading = false;
+                }
+                catch (Exception ex)
+                {
+                    _parent.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
+                    {
+                        CommonButtons = TaskDialogCommonButtons.Close,
+                        MainIcon = VistaTaskDialogIcon.Error,
+                        MainInstruction = "ユーザーの読み込みに失敗しました。",
+                        Content = ex.Message,
+                        Title = "読み込みエラー"
+                    }));
+                    BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message));
+                }
+            });
         }
     }
 }

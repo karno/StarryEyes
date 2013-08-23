@@ -966,28 +966,30 @@ namespace StarryEyes.ViewModels.WindowParts
             return true;
         }
 
-        internal static async void Send(TweetInputInfo inputInfo)
+        internal static void Send(TweetInputInfo inputInfo)
         {
-            DebugHelper.EnsureBackgroundThread();
-            await inputInfo.DeletePrevious();
-            inputInfo.Send()
-                     .Subscribe(tweetInputInfo =>
-                     {
-                         if (tweetInputInfo.PostedTweets != null)
+            Task.Run(async () =>
+            {
+                await inputInfo.DeletePreviousAsync();
+                inputInfo.Send()
+                         .Subscribe(tweetInputInfo =>
                          {
-                             InputAreaModel.PreviousPosted = tweetInputInfo;
-                             BackstageModel.RegisterEvent(new PostSucceededEvent(tweetInputInfo));
-                         }
-                         else
-                         {
-                             var result = AnalysisFailedReason(tweetInputInfo);
-                             if (result.Item1)
+                             if (tweetInputInfo.PostedTweets != null)
                              {
-                                 InputAreaModel.Drafts.Add(tweetInputInfo);
+                                 InputAreaModel.PreviousPosted = tweetInputInfo;
+                                 BackstageModel.RegisterEvent(new PostSucceededEvent(tweetInputInfo));
                              }
-                             BackstageModel.RegisterEvent(new PostFailedEvent(tweetInputInfo, result.Item2));
-                         }
-                     }, ex => Debug.WriteLine(ex));
+                             else
+                             {
+                                 var result = AnalysisFailedReason(tweetInputInfo);
+                                 if (result.Item1)
+                                 {
+                                     InputAreaModel.Drafts.Add(tweetInputInfo);
+                                 }
+                                 BackstageModel.RegisterEvent(new PostFailedEvent(tweetInputInfo, result.Item2));
+                             }
+                         }, ex => Debug.WriteLine(ex));
+            });
         }
 
         private static Tuple<bool, string> AnalysisFailedReason(TweetInputInfo info)

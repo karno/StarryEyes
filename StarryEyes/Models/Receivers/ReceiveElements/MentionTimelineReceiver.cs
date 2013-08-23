@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using StarryEyes.Anomaly.TwitterApi.Rest;
-using StarryEyes.Helpers;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Settings;
@@ -22,19 +22,21 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
             get { return Setting.RESTReceivePeriod.Value; }
         }
 
-        protected override async void DoReceive()
+        protected override void DoReceive()
         {
-            DebugHelper.EnsureBackgroundThread();
-            try
+            Task.Run(async () =>
             {
-                var mentions = await this._account.GetMentionsAsync(count: 100);
-                mentions.ForEach(ReceiveInbox.Queue);
-            }
-            catch (Exception ex)
-            {
-                BackstageModel.RegisterEvent(
-                    new OperationFailedEvent("返信を取得できません(@" + _account.UnreliableScreenName + "): " + ex.Message));
-            }
+                try
+                {
+                    var mentions = await this._account.GetMentionsAsync(count: 100);
+                    mentions.ForEach(ReceiveInbox.Queue);
+                }
+                catch (Exception ex)
+                {
+                    BackstageModel.RegisterEvent(
+                        new OperationFailedEvent("返信を取得できません(@" + _account.UnreliableScreenName + "): " + ex.Message));
+                }
+            });
         }
     }
 }

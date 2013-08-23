@@ -11,7 +11,6 @@ using System.Text;
 using System.Threading;
 using System.Windows;
 using Livet;
-using StarryEyes.Helpers;
 using StarryEyes.Models;
 using StarryEyes.Models.Plugins;
 using StarryEyes.Models.Receivers;
@@ -544,7 +543,7 @@ namespace StarryEyes
         public static event Action UserInterfaceReady;
         internal static void RaiseUserInterfaceReady()
         {
-            DebugHelper.EnsureBackgroundThread();
+            // this method called by background thread.
             Debug.WriteLine("# UI ready.");
             var usr = UserInterfaceReady;
             UserInterfaceReady = null;

@@ -193,7 +193,6 @@
     <Compile Include="Filters\Sources\FilterSearch.cs" />
     <Compile Include="Filters\Sources\FilterTrack.cs" />
     <Compile Include="Filters\Sql\SqlBuilder.cs" />
-    <Compile Include="Helpers\DebugHelper.cs" />
     <Compile Include="Helpers\FreezableHelper.cs" />
     <Compile Include="Helpers\TwitterRegexPatterns.cs" />
     <Compile Include="Hotfixes\DispatcherCollectionRx.cs" />

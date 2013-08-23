@@ -2,10 +2,10 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Livet;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
-using StarryEyes.Helpers;
 using StarryEyes.Models;
 using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Nightmare.Windows;
@@ -78,52 +78,54 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             this.Parent.RewindStack();
         }
 
-        public async void LoadMore()
+        public void LoadMore()
         {
-            DebugHelper.EnsureBackgroundThread();
             if (!_isDeferLoadEnabled || this.IsLoading) return;
             this.IsLoading = true;
-            var account = Setting.Accounts.GetRandomOne();
-            if (account == null)
+            Task.Run(async () =>
             {
-                _parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
+                var account = Setting.Accounts.GetRandomOne();
+                if (account == null)
                 {
-                    CommonButtons = TaskDialogCommonButtons.Close,
-                    MainIcon = VistaTaskDialogIcon.Error,
-                    MainInstruction = "ユーザーの読み込みに失敗しました。",
-                    Content = "アカウントが登録されていません。",
-                    Title = "読み込みエラー"
-                }));
-                BackstageModel.RegisterEvent(new OperationFailedEvent("アカウントが登録されていません。"));
-            }
-            var page = Interlocked.Increment(ref _currentPageCount);
-            try
-            {
-                var result = await account.SearchUserAsync(this.Query, count: 100, page: page);
-                var twitterUsers = result as TwitterUser[] ?? result.ToArray();
-                if (!twitterUsers.Any())
-                {
-                    _isDeferLoadEnabled = false;
-                    return;
+                    _parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
+                    {
+                        CommonButtons = TaskDialogCommonButtons.Close,
+                        MainIcon = VistaTaskDialogIcon.Error,
+                        MainInstruction = "ユーザーの読み込みに失敗しました。",
+                        Content = "アカウントが登録されていません。",
+                        Title = "読み込みエラー"
+                    }));
+                    BackstageModel.RegisterEvent(new OperationFailedEvent("アカウントが登録されていません。"));
                 }
-                twitterUsers.ForEach(u => Users.Add(new UserResultItemViewModel(u)));
-            }
-            catch (Exception ex)
-            {
-                _parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
+                var page = Interlocked.Increment(ref _currentPageCount);
+                try
                 {
-                    CommonButtons = TaskDialogCommonButtons.Close,
-                    MainIcon = VistaTaskDialogIcon.Error,
-                    MainInstruction = "ユーザーの読み込みに失敗しました。",
-                    Content = ex.Message,
-                    Title = "読み込みエラー"
-                }));
-                BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message));
-            }
-            finally
-            {
-                IsLoading = false;
-            }
+                    var result = await account.SearchUserAsync(this.Query, count: 100, page: page);
+                    var twitterUsers = result as TwitterUser[] ?? result.ToArray();
+                    if (!twitterUsers.Any())
+                    {
+                        _isDeferLoadEnabled = false;
+                        return;
+                    }
+                    twitterUsers.ForEach(u => Users.Add(new UserResultItemViewModel(u)));
+                }
+                catch (Exception ex)
+                {
+                    _parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
+                    {
+                        CommonButtons = TaskDialogCommonButtons.Close,
+                        MainIcon = VistaTaskDialogIcon.Error,
+                        MainInstruction = "ユーザーの読み込みに失敗しました。",
+                        Content = ex.Message,
+                        Title = "読み込みエラー"
+                    }));
+                    BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message));
+                }
+                finally
+                {
+                    IsLoading = false;
+                }
+            });
         }
     }
 

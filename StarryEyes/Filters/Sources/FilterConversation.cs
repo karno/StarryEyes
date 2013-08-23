@@ -23,7 +23,7 @@ namespace StarryEyes.Filters.Sources
                 throw new ArgumentException("argument must be numeric value.");
             }
             this._original = id;
-            this.FindHead(id)
+            this.FindHeadAsync(id)
                 .ContinueWith(s => _head = s.Result)
                 .ContinueWith(_ =>
                 {
@@ -38,7 +38,7 @@ namespace StarryEyes.Filters.Sources
                 });
         }
 
-        private async Task<long> FindHead(long id)
+        private async Task<long> FindHeadAsync(long id)
         {
             lock (_statuses)
             {
@@ -51,7 +51,7 @@ namespace StarryEyes.Filters.Sources
             {
                 return id;
             }
-            return await this.FindHead(replyTo.InReplyToStatusId.Value);
+            return await this.FindHeadAsync(replyTo.InReplyToStatusId.Value);
         }
 
         public override string FilterKey

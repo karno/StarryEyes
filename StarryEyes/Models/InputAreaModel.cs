@@ -324,7 +324,7 @@ namespace StarryEyes.Models
             return subject;
         }
 
-        internal async Task DeletePrevious()
+        internal async Task DeletePreviousAsync()
         {
             if (PostedTweets == null) return;
             Debug.WriteLine("deleting previous...");
