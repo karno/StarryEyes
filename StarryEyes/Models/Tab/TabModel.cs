@@ -27,6 +27,14 @@ namespace StarryEyes.Models.Tab
         private Func<TwitterStatus, bool> _evaluator = _ => false;
         private FilterQuery _filterQuery;
 
+        public event Action InvalidateRequired;
+
+        private void OnInvalidateRequired()
+        {
+            var handler = this.InvalidateRequired;
+            if (handler != null) handler();
+        }
+
         public TabModel()
         {
         }
@@ -182,6 +190,7 @@ namespace StarryEyes.Models.Tab
                 if (FilterQuery != null)
                 {
                     FilterQuery.Activate();
+                    FilterQuery.InvalidateRequired += this.OnInvalidateRequired;
                 }
             }
             IsActivated = true;
@@ -201,6 +210,7 @@ namespace StarryEyes.Models.Tab
             {
                 if (FilterQuery != null)
                 {
+                    FilterQuery.InvalidateRequired -= this.OnInvalidateRequired;
                     FilterQuery.Deactivate();
                 }
                 if (Timeline != null)

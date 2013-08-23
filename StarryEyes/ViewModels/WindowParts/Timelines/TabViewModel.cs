@@ -74,20 +74,22 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             {
                 CompositeDisposable.Add(
                     Observable.FromEvent(
-                        h => Model.FilterQuery.InvalidateRequired += h,
-                        h => Model.FilterQuery.InvalidateRequired -= h)
+                        h => Model.InvalidateRequired += h,
+                        h => Model.InvalidateRequired -= h)
                               .Subscribe(_ =>
                               {
                                   var count = Interlocked.Increment(ref _refreshCount);
                                   Observable.Timer(TimeSpan.FromSeconds(3))
-                                            .Where(__ => Interlocked.CompareExchange(ref _refreshCount, 0, count) == count)
+                                            .Where(
+                                                __ => Interlocked.CompareExchange(ref _refreshCount, 0, count) == count)
                                             .Subscribe(__ =>
                                             {
-                                                System.Diagnostics.Debug.WriteLine("* invalidate executed: " + Name);
+                                                System.Diagnostics.Debug.WriteLine("* invalidate executed: " + Name + " with: " + count);
                                                 // regenerate filter query
                                                 Model.RefreshEvaluator();
                                                 Model.InvalidateCollection();
                                                 BindTimeline();
+                                                System.Diagnostics.Debug.WriteLine("* invalidate finished: " + Name);
                                             });
                               }));
             }
@@ -114,9 +116,9 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                           }));
             CompositeDisposable.Add(
                 Observable.FromEvent(
-                h => tabModel.SetPhysicalFocusRequired += h,
-                h => tabModel.SetPhysicalFocusRequired -= h)
-                .Subscribe(_ => this.Messenger.Raise(new InteractionMessage("SetPhysicalFocus"))));
+                    h => tabModel.SetPhysicalFocusRequired += h,
+                    h => tabModel.SetPhysicalFocusRequired -= h)
+                          .Subscribe(_ => this.Messenger.Raise(new InteractionMessage("SetPhysicalFocus"))));
         }
 
         public override void GotPhysicalFocus()
@@ -197,7 +199,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             get { return _unreadCount; }
             set
             {
-                int newValue = IsFocused || !Model.IsShowUnreadCounts ? 0 : value;
+                var newValue = IsFocused || !Model.IsShowUnreadCounts ? 0 : value;
                 if (_unreadCount == newValue) return;
                 _unreadCount = newValue;
                 RaisePropertyChanged();
