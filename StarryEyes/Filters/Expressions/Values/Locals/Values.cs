@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
-using StarryEyes.Models.Stores;
+using StarryEyes.Models.Accounting;
 
 namespace StarryEyes.Filters.Expressions.Values.Locals
 {

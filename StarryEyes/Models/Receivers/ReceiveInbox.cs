@@ -6,6 +6,7 @@ using System.Reactive.Linq;
 using System.Threading;
 using StarryEyes.Albireo.Data;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Notifications;
 using StarryEyes.Models.Stores;
 using StarryEyes.Settings;

@@ -5,7 +5,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
 using StarryEyes.Albireo.Data;
-using StarryEyes.Models.Stores;
+using StarryEyes.Models.Accounting;
 using StarryEyes.Settings;
 
 namespace StarryEyes.Filters.Expressions.Values.Locals

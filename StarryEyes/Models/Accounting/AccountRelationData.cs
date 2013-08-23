@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using StarryEyes.Albireo.Data;
 
-namespace StarryEyes.Models.Stores
+namespace StarryEyes.Models.Accounting
 {
     /// <summary>
     /// Store relation info for the account
@@ -305,7 +305,7 @@ namespace StarryEyes.Models.Stores
 
         public override string ToString()
         {
-            return Change.ToString() + " " + AccountUserId + " => " + TargetUserId;
+            return this.Change.ToString() + " " + this.AccountUserId + " => " + this.TargetUserId;
         }
     }
 
