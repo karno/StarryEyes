@@ -14,6 +14,7 @@ using Livet;
 using StarryEyes.Models;
 using StarryEyes.Models.Plugins;
 using StarryEyes.Models.Receivers;
+using StarryEyes.Models.Statuses;
 using StarryEyes.Models.Stores;
 using StarryEyes.Models.Subsystems;
 using StarryEyes.Nightmare.Windows;
@@ -149,7 +150,9 @@ namespace StarryEyes
             StatisticsService.Initialize();
             PostLimitPredictionService.Initialize();
             TwitterEventService.Initialize();
-            ReceiveInbox.Initialize();
+            MuteBlockManager.Initialize();
+            StatusBroadcaster.Initialize();
+            StatusInbox.Initialize();
 
             // activate plugins
             PluginManager.LoadedPlugins.ForEach(p => p.Initialize());

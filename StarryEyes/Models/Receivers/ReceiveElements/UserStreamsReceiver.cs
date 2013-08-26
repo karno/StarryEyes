@@ -13,6 +13,7 @@ using StarryEyes.Anomaly.TwitterApi.Streaming;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.SystemEvents;
 using StarryEyes.Models.Backstages.TwitterEvents;
+using StarryEyes.Models.Statuses;
 using StarryEyes.Models.Stores;
 using StarryEyes.Models.Subsystems;
 
@@ -160,7 +161,7 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
 
             public void OnStatus(TwitterStatus status)
             {
-                ReceiveInbox.Queue(status);
+                StatusInbox.Queue(status);
             }
 
             public void OnDeleted(StreamDelete item)

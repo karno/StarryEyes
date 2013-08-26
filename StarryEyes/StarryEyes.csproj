@@ -230,6 +230,9 @@
     <Compile Include="Models\Plugins\ScriptingManager.cs" />
     <Compile Include="Models\Receivers\ListInfo.cs" />
     <Compile Include="Models\Receivers\ReceiveElements\UserTimelineReceiver.cs" />
+    <Compile Include="Models\Statuses\MuteBlockManager.cs" />
+    <Compile Include="Models\Statuses\StatusBroadcaster.cs" />
+    <Compile Include="Models\Statuses\StatusNotification.cs" />
     <Compile Include="Models\Subsystems\TwitterEventService.cs" />
     <Compile Include="Models\Receivers\Managers\ListReceiveManager.cs" />
     <Compile Include="Models\Receivers\Managers\StreamTrackReceiveManager.cs" />
@@ -242,7 +245,7 @@
     <Compile Include="Models\Receivers\ReceiveElements\UserInfoReceiver.cs" />
     <Compile Include="Models\Receivers\ReceiveElements\UserRelationReceiver.cs" />
     <Compile Include="Models\Receivers\ReceiveElements\UserStreamsReceiver.cs" />
-    <Compile Include="Models\Receivers\ReceiveInbox.cs" />
+    <Compile Include="Models\Statuses\StatusInbox.cs" />
     <Compile Include="Models\Receivers\Managers\SearchReceiveManager.cs" />
     <Compile Include="Models\Receivers\Managers\UserReceiveManager.cs" />
     <Compile Include="Models\Receivers\ReceiversManager.cs" />
@@ -281,6 +284,7 @@
     <Compile Include="Models\Tab\TabManager.cs" />
     <Compile Include="Models\Tab\TimelineModel.cs" />
     <Compile Include="Models\Subsystems\TwitterConfigurationService.cs" />
+    <Compile Include="Models\Timeline\TimelineModelBase.cs" />
     <Compile Include="Models\UserModel.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Settings\AccountManager.cs" />
@@ -292,6 +296,7 @@
     <Compile Include="Settings\TabDescription.cs" />
     <Compile Include="ViewModels\Dialogs\KeyOverrideViewModel.cs" />
     <Compile Include="ViewModels\DropAcceptDescription.cs" />
+    <Compile Include="ViewModels\Timeline\TimelineViewModelBase.cs" />
     <Compile Include="ViewModels\WindowParts\Backstages\BackstageEventViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Backstages\BackstageAccountViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Common\FilterEditControlViewModel.cs" />

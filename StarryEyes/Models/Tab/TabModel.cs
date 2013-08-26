@@ -158,8 +158,10 @@ namespace StarryEyes.Models.Tab
 
         public void InvalidateCollection()
         {
-            var oldt = Timeline;
-            Timeline = TimelineModel.FromObservable(_evaluator, GetChunk);
+            if (!this.IsActivated) return;
+            var oldt = this.Timeline;
+            this.Timeline = TimelineModel.FromObservable(this._evaluator, this.GetChunk);
+            this.Timeline.NewStatusArrival += this.OnNewStatusArrival;
             oldt.Dispose();
         }
 

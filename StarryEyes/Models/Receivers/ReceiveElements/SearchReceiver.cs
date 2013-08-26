@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Models.Backstages.NotificationEvents;
+using StarryEyes.Models.Statuses;
 using StarryEyes.Settings;
 
 namespace StarryEyes.Models.Receivers.ReceiveElements
@@ -34,7 +35,7 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
                         return;
                     }
                     var resp = await account.SearchAsync(_query);
-                    resp.ForEach(ReceiveInbox.Queue);
+                    resp.ForEach(StatusInbox.Queue);
                 }
                 catch (Exception ex)
                 {

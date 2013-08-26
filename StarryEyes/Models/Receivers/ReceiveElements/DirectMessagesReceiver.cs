@@ -3,6 +3,7 @@ using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Anomaly.Utils;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;
+using StarryEyes.Models.Statuses;
 using StarryEyes.Settings;
 
 namespace StarryEyes.Models.Receivers.ReceiveElements
@@ -24,13 +25,13 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
         protected override void DoReceive()
         {
             this._account.GetDirectMessagesAsync(count: 50).ToObservable()
-                .Subscribe(ReceiveInbox.Queue,
+                .Subscribe(StatusInbox.Queue,
                            ex => BackstageModel.RegisterEvent(
                                new OperationFailedEvent("messages receive error: " +
                                                         this._account.UnreliableScreenName + " - " +
                                                         ex.Message)));
             this._account.GetSentDirectMessagesAsync(count: 50).ToObservable()
-                .Subscribe(ReceiveInbox.Queue,
+                .Subscribe(StatusInbox.Queue,
                            ex => BackstageModel.RegisterEvent(
                                new OperationFailedEvent("sent messages receive error: " +
                                                         this._account.UnreliableScreenName + " - " +

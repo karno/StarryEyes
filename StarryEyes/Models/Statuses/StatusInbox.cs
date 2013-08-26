@@ -1,0 +1,84 @@
+﻿using System.Collections.Concurrent;
+using System.Reactive.Linq;
+using System.Threading;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Models.Stores;
+
+namespace StarryEyes.Models.Statuses
+{
+    /// <summary>
+    /// Accept received statuses from any sources
+    /// </summary>
+    public static class StatusInbox
+    {
+        private static readonly ManualResetEvent _signal = new ManualResetEvent(false);
+
+        private static readonly ConcurrentQueue<StatusNotification> _queue = new ConcurrentQueue<StatusNotification>();
+
+        private static Thread _pumpThread;
+        private static volatile bool _isHaltRequested;
+
+        static StatusInbox()
+        {
+            App.ApplicationFinalize += () =>
+            {
+                _isHaltRequested = true;
+                _signal.Set();
+            };
+        }
+
+        internal static void Initialize()
+        {
+            _pumpThread = new Thread(PumpQueuedStatuses);
+            _pumpThread.Start();
+        }
+
+        public static void Queue(TwitterStatus status)
+        {
+            // store original status first
+            if (status.RetweetedOriginal != null)
+            {
+                Queue(status.RetweetedOriginal);
+            }
+            _queue.Enqueue(new StatusNotification(status));
+            _signal.Set();
+        }
+
+        public static void QueueRemoval(long id)
+        {
+            _queue.Enqueue(new StatusNotification(id));
+        }
+
+        private static async void PumpQueuedStatuses()
+        {
+            StatusNotification status;
+            while (true)
+            {
+                _signal.Reset();
+                while (_queue.TryDequeue(out status) && !_isHaltRequested)
+                {
+                    if (status.IsAdded)
+                    {
+                        // check status duplication
+                        if ((await StatusStore.Get(status.Status.Id).DefaultIfEmpty()) != null) continue;
+                        // store status
+                        StatusStore.Store(status.Status);
+                    }
+                    else
+                    {
+                        StatusStore.Remove(status.StatusId);
+                    }
+                    // post next 
+                    StatusBroadcaster.Queue(status);
+                    _signal.Reset();
+                }
+                if (_isHaltRequested)
+                {
+                    break;
+                }
+                _signal.WaitOne();
+            }
+        }
+
+    }
+}

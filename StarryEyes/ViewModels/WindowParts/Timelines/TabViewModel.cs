@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Threading;
 using Livet.Messaging;
 using StarryEyes.Annotations;
@@ -70,29 +69,11 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                               RaisePropertyChanged(() => IsScrollLockExplicitEnabled);
                           }));
             CompositeDisposable.Add(() => Model.Deactivate());
-            if (Model.FilterQuery.PredicateTreeRoot != null)
-            {
-                CompositeDisposable.Add(
-                    Observable.FromEvent(
-                        h => Model.InvalidateRequired += h,
-                        h => Model.InvalidateRequired -= h)
-                              .Subscribe(_ =>
-                              {
-                                  var count = Interlocked.Increment(ref _refreshCount);
-                                  Observable.Timer(TimeSpan.FromSeconds(3))
-                                            .Where(
-                                                __ => Interlocked.CompareExchange(ref _refreshCount, 0, count) == count)
-                                            .Subscribe(__ =>
-                                            {
-                                                System.Diagnostics.Debug.WriteLine("* invalidate executed: " + Name + " with: " + count);
-                                                // regenerate filter query
-                                                Model.RefreshEvaluator();
-                                                Model.InvalidateCollection();
-                                                BindTimeline();
-                                                System.Diagnostics.Debug.WriteLine("* invalidate finished: " + Name);
-                                            });
-                              }));
-            }
+            CompositeDisposable.Add(
+                Observable.FromEvent(
+                    h => Model.InvalidateRequired += h,
+                    h => Model.InvalidateRequired -= h)
+                          .Subscribe(_ => this.ReBindTimeline()));
             CompositeDisposable.Add(
                 Observable.FromEvent(
                     h => tabModel.BindingAccountIdsChanged += h,
@@ -126,37 +107,44 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             _parent.Focus();
         }
 
+        private int _bindTicket = 0;
         private void BindTimeline()
         {
             // invalidate cache
             ReInitializeTimeline();
+            var ticket = Interlocked.Increment(ref _bindTicket);
             IsLoading = true;
-            Task.Run(async () =>
-            {
-                var local = Model.ReceiveTimelines(null).LastOrDefaultAsync();
-                var web = Model.Timeline.ReadMore(null, true);
-                try
-                {
-                    await local;
-                }
-                catch (Exception ex)
-                {
-                    BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message));
-                }
-                try
-                {
-                    await web;
-                }
-                catch (Exception ex)
-                {
-                    BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message));
-                }
-                IsLoading = false;
-            });
+            Observable.FromAsync(() => Model.Timeline.ReadMore(null, true))
+                      .Merge(Model.ReceiveTimelines(null))
+                      .Subscribe(_ => { },
+                                 ex => BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message)),
+                                 () =>
+                                 {
+                                     if (_bindTicket == ticket)
+                                     {
+                                         IsLoading = false;
+                                     }
+                                 });
             if (UnreadCount > 0)
             {
                 UnreadCount = 0;
             }
+        }
+
+        private void ReBindTimeline()
+        {
+            var count = Interlocked.Increment(ref _refreshCount);
+            Observable.Timer(TimeSpan.FromSeconds(3))
+                      .Where(__ => Interlocked.CompareExchange(ref _refreshCount, 0, count) == count)
+                      .Subscribe(__ =>
+                      {
+                          System.Diagnostics.Debug.WriteLine("* invalidate executed: " + Name + " with: " + count);
+                          // regenerate filter query
+                          Model.RefreshEvaluator();
+                          Model.InvalidateCollection();
+                          BindTimeline();
+                          System.Diagnostics.Debug.WriteLine("* invalidate finished: " + Name);
+                      });
         }
 
         public string Name
