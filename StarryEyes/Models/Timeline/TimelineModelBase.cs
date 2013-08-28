@@ -10,9 +10,13 @@ using StarryEyes.Albireo.Data;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Filters;
 using StarryEyes.Models.Statuses;
+using StatusNotification = StarryEyes.Models.Statuses.StatusNotification;
 
 namespace StarryEyes.Models.Timeline
 {
+    /// <summary>
+    /// 検索フリップなどのタイムラインの基幹部分
+    /// </summary>
     public abstract class TimelineModelBase : IDisposable
     {
         public static readonly int TimelineChunkCount = 256;
@@ -28,6 +32,10 @@ namespace StarryEyes.Models.Timeline
 
         private readonly AVLTree<long> _statusIdCache;
         private readonly ObservableSynchronizedCollectionEx<StatusModel> _statuses;
+
+        protected Func<TwitterStatus, bool> FilterFunc { get { return _filterFunc; } }
+
+        protected string FilterSql { get { return _filterSql; } }
 
         public bool IsAutoTrimEnabled
         {
