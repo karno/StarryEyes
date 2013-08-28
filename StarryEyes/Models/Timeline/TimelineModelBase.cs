@@ -18,18 +18,12 @@ namespace StarryEyes.Models.Timeline
         public static readonly int TimelineChunkCount = 256;
         public static readonly int TimelineChunkCountBounce = 64;
 
-        public event Action<TwitterStatus> NewStatusArrival;
-
-        protected virtual void OnNewStatusArrival(TwitterStatus obj)
-        {
-            var handler = this.NewStatusArrival;
-            if (handler != null) handler(obj);
-        }
-
         private IDisposable _timelineListener;
         private TimelineModelState _state;
         private readonly object _stateLockObject;
         private FilterQuery _filterQuery;
+        private Func<TwitterStatus, bool> _filterFunc;
+        private string _filterSql;
         private bool _isAutoTrimEnabled;
 
         private readonly AVLTree<long> _statusIdCache;
@@ -38,7 +32,18 @@ namespace StarryEyes.Models.Timeline
         public bool IsAutoTrimEnabled
         {
             get { return this._isAutoTrimEnabled; }
-            set { this._isAutoTrimEnabled = value; }
+            set
+            {
+                if (value == this.IsAutoTrimEnabled)
+                {
+                    return;
+                }
+                this._isAutoTrimEnabled = value;
+                if (value)
+                {
+                    this.TrimTimeline();
+                }
+            }
         }
 
         public FilterQuery FilterQuery
@@ -52,13 +57,15 @@ namespace StarryEyes.Models.Timeline
                     previous = _filterQuery;
                     _filterQuery = value;
                     if (this._state != TimelineModelState.Activated) return;
-                    if (this._filterQuery != null)
+                    if (value != null)
                     {
-                        this._filterQuery.Activate();
+                        value.Activate();
+                        value.InvalidateRequired += this.QueueInvalidateBatch;
                     }
                 }
                 if (previous != null)
                 {
+                    previous.InvalidateRequired -= this.QueueInvalidateBatch;
                     previous.Deactivate();
                 }
             }
@@ -84,14 +91,20 @@ namespace StarryEyes.Models.Timeline
             return Disposable.Create(() => Task.Run(() => this.Deactivate()));
         }
 
-        public void AcceptStatus(StatusNotification status)
+        public void AcceptStatus(StatusNotification n)
         {
-            if (status.IsAdded)
+            var ffn = _filterFunc;
+            if (n.IsAdded && ffn != null && ffn(n.Status))
             {
+                this.AddStatus(n.Status);
+            }
+            else
+            {
+                this.RemoveStatus(n.StatusId);
             }
         }
 
-        private async void AddStatus(TwitterStatus status)
+        protected virtual async void AddStatus(TwitterStatus status)
         {
             lock (_statusIdCache)
             {
@@ -102,42 +115,121 @@ namespace StarryEyes.Models.Timeline
             }
             // estimate point
             var model = await StatusModel.Get(status);
+            var stamp = model.Status.CreatedAt;
+            if (this.IsAutoTrimEnabled)
+            {
+                // check status will not be trimmed
+                StatusModel lastModel;
+                if (this._statuses.TryIndexOf(TimelineChunkCount, out lastModel) &&
+                    lastModel != null &&
+                    lastModel.Status.CreatedAt > stamp)
+                {
+                    // trim target
+                    lock (this._statusIdCache)
+                    {
+                        this._statusIdCache.Remove(model.Status.Id);
+                    }
+                    return;
+                }
+            }
+            this._statuses.Insert(
+                i => i.TakeWhile(s => s.Status.CreatedAt > stamp).Count(),
+                model);
+            // check auto trim
+            if (this.IsAutoTrimEnabled &&
+                this._statusIdCache.Count > TimelineChunkCount + TimelineChunkCountBounce &&
+                Interlocked.Exchange(ref this._trimCount, 1) == 0)
+            {
+                this.TrimTimeline();
+            }
         }
 
-        private void RemoveStatus(long id)
+        protected virtual void RemoveStatus(long id)
         {
-
+            lock (_statusIdCache)
+            {
+                if (!_statusIdCache.Remove(id)) return;
+            }
+            // remove
+            _statuses.RemoveWhere(s => s.Status.Id == id);
         }
 
         private int _trimCount;
-        private async Task TrimTimeline()
+        private void TrimTimeline()
         {
-            if (!_isAutoTrimEnabled) return;
-            if (_statuses.Count <= TimelineChunkCount) return;
-            try
+            Task.Run(() =>
             {
-                StatusModel last;
-                if (!_statuses.TryIndexOf(TimelineChunkCount, out last) || last == null) return;
-                var lastCreatedAt = last.Status.CreatedAt;
-                var removedIds = new List<long>();
-                _statuses.RemoveWhere(t =>
+                if (!this._isAutoTrimEnabled) return;
+                if (this._statuses.Count <= TimelineChunkCount) return;
+                try
                 {
-                    if (t.Status.CreatedAt < lastCreatedAt)
+                    StatusModel last;
+                    if (!this._statuses.TryIndexOf(TimelineChunkCount, out last) || last == null) return;
+                    var lastCreatedAt = last.Status.CreatedAt;
+                    var removedIds = new List<long>();
+                    this._statuses.RemoveWhere(t =>
                     {
-                        removedIds.Add(t.Status.Id);
-                        return true;
+                        if (t.Status.CreatedAt < lastCreatedAt)
+                        {
+                            removedIds.Add(t.Status.Id);
+                            return true;
+                        }
+                        return false;
+                    });
+                    lock (this._statusIdCache)
+                    {
+                        removedIds.ForEach(id => this._statusIdCache.Remove(id));
                     }
-                    return false;
-                });
+                }
+                finally
+                {
+                    Interlocked.Exchange(ref this._trimCount, 0);
+                }
+            });
+        }
+
+        private const int InvalidateSec = 5;
+        private int _invlatch;
+        private void QueueInvalidateBatch()
+        {
+            var stamp = Interlocked.Increment(ref _invlatch);
+            Observable.Timer(TimeSpan.FromSeconds(InvalidateSec))
+                      .Subscribe(_ =>
+                      {
+                          if (Interlocked.CompareExchange(ref _invlatch, 0, stamp) == stamp)
+                          {
+                              Task.Run(() => this.InvalidateTimeline());
+                          }
+                      });
+        }
+
+        protected Task InvalidateTimeline()
+        {
+            return Task.Run(async () =>
+            {
+                var fq = _filterQuery;
+                // invalidate filter query
+                if (fq != null)
+                {
+                    _filterFunc = fq.GetEvaluator();
+                    this._filterSql = fq.PredicateTreeRoot != null
+                                          ? fq.PredicateTreeRoot.GetSqlQuery()
+                                          : null;
+                }
+                else
+                {
+                    _filterFunc = _ => false;
+                    _filterSql = null;
+                }
+                // invalidate and fetch statuses
                 lock (_statusIdCache)
                 {
-                    removedIds.ForEach(id => _statusIdCache.Remove(id));
+                    _statusIdCache.Clear();
+                    _statuses.Clear();
                 }
-            }
-            finally
-            {
-                Interlocked.Exchange(ref _trimCount, 0);
-            }
+                var statuses = await this.FetchBatch(null, null);
+                statuses.ForEach(s => this.AcceptStatus(new StatusNotification(s)));
+            });
         }
 
         protected abstract IObservable<TwitterStatus> Fetch(long? maxId, int? count);
@@ -192,28 +284,16 @@ namespace StarryEyes.Models.Timeline
                 _statusIdCache.Clear();
                 _statuses.Clear();
             }
-            // listen timeline
-            _timelineListener =
-                StatusBroadcaster.BroadcastPoint
-                                 .Subscribe(sn =>
-                                 {
-                                     if (sn.IsAdded)
-                                     {
-                                         this.AddStatus(sn.Status);
-                                     }
-                                     else
-                                     {
-                                         this.RemoveStatus(sn.StatusId);
-                                     }
-                                 });
-            // refresh statuses (with async)
-            this.FetchBatch(null, null);
             if (_timelineListener != null)
             {
                 throw new InvalidOperationException(
                     "Invalid internal state. (timelineListener must be null in deactivated state.)");
             }
-
+            // listen timeline
+            _timelineListener = StatusBroadcaster.BroadcastPoint
+                                                 .Subscribe(this.AcceptStatus);
+            // refresh statuses (with async)
+            Task.Run(() => this.InvalidateTimeline());
         }
 
         private void DeactivateCore()
@@ -227,6 +307,7 @@ namespace StarryEyes.Models.Timeline
                     "Invalid internal state. (timelineListener must not be null in activated state.)");
             }
             _timelineListener.Dispose();
+            _timelineListener = null;
         }
 
         private void DisposeCore()

@@ -17,8 +17,11 @@ namespace StarryEyes.Models.Statuses
             this.StatusId = status.Id;
             this.IsAdded = true;
         }
+
         public bool IsAdded { get; private set; }
+
         public long StatusId { get; private set; }
+
         public TwitterStatus Status { get; private set; }
     }
 }
