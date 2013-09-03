@@ -42,8 +42,17 @@ namespace StarryEyes.Filters
         public Func<TwitterStatus, bool> GetEvaluator()
         {
             var sourcesEvals = Sources.Select(s => s.GetEvaluator());
-            var predEvals = PredicateTreeRoot.GetEvaluator();
+            var predEvals = PredicateTreeRoot != null
+                                ? PredicateTreeRoot.GetEvaluator()
+                                : FilterExpressionBase.Contradiction;
             return _ => sourcesEvals.Any(f => f(_)) && predEvals(_);
+        }
+
+        public string GetSqlQuery()
+        {
+            return PredicateTreeRoot != null
+                       ? PredicateTreeRoot.GetSqlQuery()
+                       : FilterExpressionBase.ContradictionSql;
         }
 
         public bool Equals(FilterQuery other)

@@ -8,9 +8,13 @@ namespace StarryEyes.Filters.Expressions
 {
     public abstract class FilterExpressionBase
     {
+        public const string TautologySql = "1";
+
+        public const string ContradictionSql = "0";
+
         public static readonly Func<TwitterStatus, bool> Tautology = _ => true;
 
-        public static readonly Func<TwitterStatus, bool> NonTautology = _ => false;
+        public static readonly Func<TwitterStatus, bool> Contradiction = _ => false;
 
         public event Action ReapplyRequested;
 
@@ -78,6 +82,10 @@ namespace StarryEyes.Filters.Expressions
 
         public string GetSqlQuery()
         {
+            if (Operator == null)
+                return TautologySql;
+            if (!FilterExpressionUtil.Assert(FilterExpressionType.Boolean, Operator.SupportedTypes))
+                throw new FilterQueryException("Unsupported evaluating as boolean.", Operator.ToQuery());
             return this.ToSql();
         }
 

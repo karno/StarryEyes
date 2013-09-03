@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using Livet;
 using StarryEyes.Albireo.Data;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
-using StarryEyes.Filters;
 using StarryEyes.Models.Statuses;
 using StatusNotification = StarryEyes.Models.Statuses.StatusNotification;
 
@@ -23,19 +22,10 @@ namespace StarryEyes.Models.Timeline
         public static readonly int TimelineChunkCountBounce = 64;
 
         private IDisposable _timelineListener;
-        private TimelineModelState _state;
-        private readonly object _stateLockObject;
-        private FilterQuery _filterQuery;
-        private Func<TwitterStatus, bool> _filterFunc;
-        private string _filterSql;
         private bool _isAutoTrimEnabled;
 
         private readonly AVLTree<long> _statusIdCache;
         private readonly ObservableSynchronizedCollectionEx<StatusModel> _statuses;
-
-        protected Func<TwitterStatus, bool> FilterFunc { get { return _filterFunc; } }
-
-        protected string FilterSql { get { return _filterSql; } }
 
         public bool IsAutoTrimEnabled
         {
@@ -54,55 +44,38 @@ namespace StarryEyes.Models.Timeline
             }
         }
 
-        public FilterQuery FilterQuery
-        {
-            get { return _filterQuery; }
-            set
-            {
-                FilterQuery previous;
-                lock (_stateLockObject)
-                {
-                    previous = _filterQuery;
-                    _filterQuery = value;
-                    if (this._state != TimelineModelState.Activated) return;
-                    if (value != null)
-                    {
-                        value.Activate();
-                        value.InvalidateRequired += this.QueueInvalidateBatch;
-                    }
-                }
-                if (previous != null)
-                {
-                    previous.InvalidateRequired -= this.QueueInvalidateBatch;
-                    previous.Deactivate();
-                }
-            }
-        }
-
         public TimelineModelBase()
         {
             _statusIdCache = new AVLTree<long>();
             _statuses = new ObservableSynchronizedCollectionEx<StatusModel>();
-            _stateLockObject = new object();
-            _state = TimelineModelState.Deactivated;
         }
 
-        public TimelineModelBase(FilterQuery initiateFilter)
-            : this()
-        {
-            FilterQuery = initiateFilter;
-        }
+        #region Status Global Receiver Control
 
-        public IDisposable GetBindTicket()
+        /// <summary>
+        /// Set this timeline is listening global broadcaster
+        /// </summary>
+        protected bool IsGlobalReceiverListening
         {
-            this.Activate();
-            return Disposable.Create(() => Task.Run(() => this.Deactivate()));
+            get { return _timelineListener != null; }
+            set
+            {
+                if (value == this.IsGlobalReceiverListening) return;
+                var ncd = value ? new CompositeDisposable() : null;
+                var old = Interlocked.Exchange(ref _timelineListener, ncd);
+                if (old != null)
+                {
+                    old.Dispose();
+                }
+                if (ncd == null) return;
+                // create timeline composition
+                ncd.Add(StatusBroadcaster.BroadcastPoint.Subscribe(this.AcceptStatus));
+            }
         }
 
         public void AcceptStatus(StatusNotification n)
         {
-            var ffn = _filterFunc;
-            if (n.IsAdded && ffn != null && ffn(n.Status))
+            if (n.IsAdded && this.CheckAcceptStatus(n.Status))
             {
                 this.AddStatus(n.Status);
             }
@@ -162,6 +135,18 @@ namespace StarryEyes.Models.Timeline
             _statuses.RemoveWhere(s => s.Status.Id == id);
         }
 
+        #endregion
+
+        #region Read more and trimming
+
+        public void ReadMore(long? maxId)
+        {
+            this.IsAutoTrimEnabled = false;
+            this.Fetch(maxId, TimelineChunkCount)
+                .Where(this.CheckAcceptStatus)
+                .Subscribe(this.AddStatus);
+        }
+
         private int _trimCount;
         private void TrimTimeline()
         {
@@ -196,9 +181,13 @@ namespace StarryEyes.Models.Timeline
             });
         }
 
+        #endregion
+
+        #region Invalidate whole timeline
+
         private const int InvalidateSec = 5;
         private int _invlatch;
-        private void QueueInvalidateBatch()
+        protected void QueueInvalidateTimeline()
         {
             var stamp = Interlocked.Increment(ref _invlatch);
             Observable.Timer(TimeSpan.FromSeconds(InvalidateSec))
@@ -211,24 +200,11 @@ namespace StarryEyes.Models.Timeline
                       });
         }
 
-        protected Task InvalidateTimeline()
+        private Task InvalidateTimeline()
         {
             return Task.Run(async () =>
             {
-                var fq = _filterQuery;
-                // invalidate filter query
-                if (fq != null)
-                {
-                    _filterFunc = fq.GetEvaluator();
-                    this._filterSql = fq.PredicateTreeRoot != null
-                                          ? fq.PredicateTreeRoot.GetSqlQuery()
-                                          : null;
-                }
-                else
-                {
-                    _filterFunc = _ => false;
-                    _filterSql = null;
-                }
+                this.InvalidateCache();
                 // invalidate and fetch statuses
                 lock (_statusIdCache)
                 {
@@ -239,6 +215,14 @@ namespace StarryEyes.Models.Timeline
                 statuses.ForEach(s => this.AcceptStatus(new StatusNotification(s)));
             });
         }
+
+        #endregion
+
+        #region Abstract Methods
+
+        protected abstract void InvalidateCache();
+
+        protected abstract bool CheckAcceptStatus(TwitterStatus status);
 
         protected abstract IObservable<TwitterStatus> Fetch(long? maxId, int? count);
 
@@ -252,81 +236,6 @@ namespace StarryEyes.Models.Timeline
                           .LastOrDefaultAsync().GetAwaiter();
                 return statuses.AsEnumerable();
             });
-        }
-
-        #region State Control
-
-        protected void Activate()
-        {
-            this.AssertDisposed();
-            lock (_stateLockObject)
-            {
-                if (_state == TimelineModelState.Activated)
-                {
-                    throw new InvalidOperationException("This timeline is already bound.");
-                }
-                this.ActivateCore();
-            }
-        }
-
-        protected void Deactivate()
-        {
-            lock (_stateLockObject)
-            {
-                if (_state == TimelineModelState.Activated)
-                {
-                    this._filterQuery.Deactivate();
-                }
-            }
-        }
-
-        // Below method should call in lock(_stateLockObject).
-
-        private void ActivateCore()
-        {
-            // activate base properties
-            _state = TimelineModelState.Activated;
-            this._filterQuery.Activate();
-            lock (_statusIdCache)
-            {
-                _statusIdCache.Clear();
-                _statuses.Clear();
-            }
-            if (_timelineListener != null)
-            {
-                throw new InvalidOperationException(
-                    "Invalid internal state. (timelineListener must be null in deactivated state.)");
-            }
-            // listen timeline
-            _timelineListener = StatusBroadcaster.BroadcastPoint
-                                                 .Subscribe(this.AcceptStatus);
-            // refresh statuses (with async)
-            Task.Run(() => this.InvalidateTimeline());
-        }
-
-        private void DeactivateCore()
-        {
-            // deactivate basis
-            _state = TimelineModelState.Deactivated;
-            this._filterQuery.Deactivate();
-            if (_timelineListener == null)
-            {
-                throw new InvalidOperationException(
-                    "Invalid internal state. (timelineListener must not be null in activated state.)");
-            }
-            _timelineListener.Dispose();
-            _timelineListener = null;
-        }
-
-        private void DisposeCore()
-        {
-            this.AssertDisposed();
-            var prevState = this._state;
-            this._state = TimelineModelState.Disposed;
-            if (prevState == TimelineModelState.Activated)
-            {
-                this.DeactivateCore();
-            }
         }
 
         #endregion
@@ -344,15 +253,6 @@ namespace StarryEyes.Models.Timeline
         protected virtual void Dispose(bool disposing)
         {
             if (!disposing) return;
-            this.DisposeCore();
-        }
-
-        protected void AssertDisposed()
-        {
-            if (this._state == TimelineModelState.Disposed)
-            {
-                throw new ObjectDisposedException("TimelineViewModelBase");
-            }
         }
 
         protected enum TimelineModelState
