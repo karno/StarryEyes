@@ -81,24 +81,27 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Cruds\MaintenanceCrud.cs" />
+    <Compile Include="Cruds\Scaffolding\CrudBase.cs" />
     <Compile Include="Database.cs" />
-    <Compile Include="DatabaseCore\IDatabase.cs" />
-    <Compile Include="DatabaseCore\Maintenance.cs" />
+    <Compile Include="Cruds\ActivityCrudBase.cs" />
+    <Compile Include="Cruds\EntityCrud.cs" />
+    <Compile Include="Cruds\FavoritesCrud.cs" />
+    <Compile Include="Cruds\RetweetsCrud.cs" />
+    <Compile Include="Cruds\StatusCrud.cs" />
+    <Compile Include="Cruds\UserCrud.cs" />
     <Compile Include="DatabaseModels\DatabaseActivity.cs" />
     <Compile Include="DatabaseModels\DatabaseEntity.cs" />
     <Compile Include="DatabaseModels\DatabaseStatus.cs" />
     <Compile Include="DatabaseModels\DatabaseUser.cs" />
     <Compile Include="DatabaseModels\DbModelBase.cs" />
-    <Compile Include="DatabaseCore\Sqlite\DbNameAttribute.cs" />
-    <Compile Include="DatabaseCore\Sqlite\DbOptionalAttribute.cs" />
-    <Compile Include="DatabaseCore\Sqlite\DbPrimaryKeyAttribute.cs" />
-    <Compile Include="DatabaseCore\Sqlite\SentenceGenerator.cs" />
+    <Compile Include="Cruds\Scaffolding\DbNameAttribute.cs" />
+    <Compile Include="Cruds\Scaffolding\DbOptionalAttribute.cs" />
+    <Compile Include="Cruds\Scaffolding\DbPrimaryKeyAttribute.cs" />
+    <Compile Include="Cruds\Scaffolding\DbUniqueColumnAttribute.cs" />
+    <Compile Include="Cruds\Scaffolding\SentenceGenerator.cs" />
     <Compile Include="IMultiplexPredicate.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="DatabaseCore\Sqlite\Accessor.cs" />
-    <Compile Include="Serialization\BinarySerializableCollection.cs" />
-    <Compile Include="Serialization\BinarySerialization.cs" />
-    <Compile Include="Serialization\IBinarySerializable.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -1,7 +1,9 @@
 ﻿using System.Collections.Concurrent;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Models.Databases;
 using StarryEyes.Models.Stores;
 
 namespace StarryEyes.Models.Statuses
@@ -51,25 +53,29 @@ namespace StarryEyes.Models.Statuses
 
         private static async void PumpQueuedStatuses()
         {
-            StatusNotification status;
+            StatusNotification n;
             while (true)
             {
                 _signal.Reset();
-                while (_queue.TryDequeue(out status) && !_isHaltRequested)
+                while (_queue.TryDequeue(out n) && !_isHaltRequested)
                 {
-                    if (status.IsAdded)
+                    if (n.IsAdded)
                     {
                         // check status duplication
-                        if ((await StatusStore.Get(status.Status.Id).DefaultIfEmpty()) != null) continue;
+                        if ((await StatusStore.Get(n.Status.Id).DefaultIfEmpty()) != null) continue;
                         // store status
-                        StatusStore.Store(status.Status);
+                        StatusStore.Store(n.Status);
+                        await DatabaseProxy.StoreStatusAsync(n.Status);
                     }
                     else
                     {
-                        StatusStore.Remove(status.StatusId);
+                        StatusStore.Remove(n.StatusId);
+                        var rtt = DatabaseProxy.GetRetweetedStatusIds(n.StatusId);
+                        await DatabaseProxy.RemoveStatusAsync(n.StatusId);
+                        (await rtt).ForEach(QueueRemoval);
                     }
                     // post next 
-                    StatusBroadcaster.Queue(status);
+                    StatusBroadcaster.Queue(n);
                     _signal.Reset();
                 }
                 if (_isHaltRequested)

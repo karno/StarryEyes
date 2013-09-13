@@ -141,7 +141,7 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
 
         #endregion
 
-        #region Infrastructure
+        #region Activity Controller
 
         /// <summary>
         /// Favorited users IDs.

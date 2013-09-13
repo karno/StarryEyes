@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using StarryEyes.Casket.DatabaseModels;
+using StarryEyes.Casket.Scaffolds.Generators;
 
 namespace StarryEyes.Casket.Test
 {
@@ -20,10 +21,10 @@ namespace StarryEyes.Casket.Test
         private string GetStat(DbModelBase model)
         {
             var str =
-                "CREATOR: " + model.TableCreator + Environment.NewLine +
-                "INSERTER: " + model.TableInserter + Environment.NewLine +
-                "UPDATER: " + model.TableUpdator + Environment.NewLine +
-                "DELETER: " + model.TableDeletor;
+                "CREATOR: " + SentenceGenerator.GetTableCreator(model.GetType()) + Environment.NewLine +
+                "INSERTER: " + SentenceGenerator.GetTableInserter(model.GetType()) + Environment.NewLine +
+                "UPDATER: " + SentenceGenerator.GetTableUpdater(model.GetType()) + Environment.NewLine +
+                "DELETER: " + SentenceGenerator.GetTableDeleter(model.GetType());
             System.Diagnostics.Debug.WriteLine(str);
             return str;
         }

@@ -1,4 +1,5 @@
 ﻿using System;
+using StarryEyes.Casket.DatabaseCore.Sqlite;
 using StarryEyes.Casket.DatabaseModels.Generators;
 
 namespace StarryEyes.Casket.DatabaseModels
@@ -11,20 +12,27 @@ namespace StarryEyes.Casket.DatabaseModels
 
         public string ScreenName { get; set; }
 
+        [DbOptional]
         public string Name { get; set; }
 
+        [DbOptional]
         public string Description { get; set; }
 
+        [DbOptional]
         public string Location { get; set; }
 
+        [DbOptional]
         public string Url { get; set; }
 
         public bool IsDefaultProfileImage { get; set; }
 
+        [DbOptional]
         public string ProfileImageUri { get; set; }
 
+        [DbOptional]
         public string ProfileBackgroundImageUri { get; set; }
 
+        [DbOptional]
         public string ProfileBannerUri { get; set; }
 
         public bool IsProtected { get; set; }
@@ -47,6 +55,7 @@ namespace StarryEyes.Casket.DatabaseModels
 
         public long ListedCount { get; set; }
 
+        [DbOptional]
         public string Language { get; set; }
 
         public DateTime CreatedAt { get; set; }

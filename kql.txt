@@ -1,0 +1,34 @@
+KQL Krile Query Language
+
+KQL :=
+	{(`from`|`From`|`FROM`) SOURCES} (`where`|`Where`|`WHERE`) EXPRESSIONS
+
+SOURCES :=
+	SOURCE {`,` SOURCES}
+
+SOURCE :=
+	LITERAL 
+	LITERAL `(` STRING `)`
+
+EXPRESSIONS :=
+	`(` EXPRESSIONS `)`
+	EXPRESSION
+
+EXPRESSION :=
+	VALUE
+	EXPRESSIONS {OPERATOR EXPRESSIONS}
+
+VALUE := 
+	OBJECT
+	STRING
+	`@`LITERAL
+	/0-9
+
+OBJECT :=
+	LITERAL {`.` OBJECT}
+
+OPERATOR := (`*`|`/`|`+`|`-`|`|`|`&`|`<`|`>`|`<=`|`=>`|`->`|`<-`|`contains`|`in`|`startswith`|`endswith`|`match`)
+
+LITERAL := /A-Za-z0-9_
+
+STRING := "any (C#-style) string is here."

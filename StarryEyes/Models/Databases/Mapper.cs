@@ -30,18 +30,23 @@ namespace StarryEyes.Models.Databases
                 ListedCount = user.ListedCount,
                 Location = user.Location,
                 Name = user.Name,
-                ProfileBackgroundImageUri = user.ProfileBackgroundImageUri.OriginalString,
-                ProfileBannerUri = user.ProfileBannerUri.OriginalString,
-                ProfileImageUri = user.ProfileImageUri.OriginalString,
+                ProfileBackgroundImageUri = user.ProfileBackgroundImageUri.GetString(),
+                ProfileBannerUri = user.ProfileBannerUri.GetString(),
+                ProfileImageUri = user.ProfileImageUri.GetString(),
                 ScreenName = user.ScreenName,
                 StatusesCount = user.StatusesCount,
                 Url = user.Url,
             };
-            var entities = user.DescriptionEntities.Select(e => Map(user.Id, EntityParentType.UserDescription, e))
-                               .Concat(user.UrlEntities.Select(e => Map(user.Id, EntityParentType.UserUrl, e)))
+            var entities = user.DescriptionEntities.Guard().Select(e => Map(user.Id, EntityParentType.UserDescription, e))
+                               .Concat(user.UrlEntities.Guard().Select(e => Map(user.Id, EntityParentType.UserUrl, e)))
                                .ToArray()
                                .AsEnumerable();
             return Tuple.Create(tu, entities);
+        }
+
+        private static string GetString(this Uri uri)
+        {
+            return uri == null ? null : uri.OriginalString;
         }
 
         private static DatabaseEntity Map(long parentId, EntityParentType parentType, TwitterEntity entity)
@@ -70,7 +75,7 @@ namespace StarryEyes.Models.Databases
                 InReplyToUserId = status.InReplyToUserId,
                 Latitude = status.Latitude,
                 Longitude = status.Longitude,
-                RecipientId = status.Recipient.Id,
+                RecipientId = status.Recipient != null ? status.Recipient.Id : (long?)null,
                 RetweetOriginalId = status.RetweetedOriginalId,
                 Source = status.Source,
                 StatusType = status.StatusType,

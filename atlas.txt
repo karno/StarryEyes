@@ -23,7 +23,7 @@ StarryEyes.Nightmare
 StarryJs: Javascript スクリプティングエンジンをStarryEyesに対して提供するプラグインです．
 
 * Subsystems フォルダ 以下:
-Detective: クラッシュ レポータ(rescue.exe)です．
+Detective: エラーレポータ(rescue.exe)です．
 SweetMagic: 自動アップデータ(kup.exe)です．
 
 * Tests フォルダ 以下:

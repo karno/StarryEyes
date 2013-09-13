@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using StarryEyes.Casket.DatabaseCore.Sqlite;
 using StarryEyes.Casket.DatabaseModels.Generators;
 
-namespace StarryEyes.Casket.DatabaseCore.Sqlite
+namespace StarryEyes.Casket.Scaffolds.Generators
 {
     public static class SentenceGenerator
     {
@@ -94,13 +95,18 @@ namespace StarryEyes.Casket.DatabaseCore.Sqlite
                 }
                 builder.Append(name + " " + typeStr + attrs);
             }
+            var uniques = type.GetCustomAttributes<DbUniqueColumnAttribute>();
+            foreach (var attr in uniques)
+            {
+                builder.Append(", UNIQUE(" + attr.Columns.JoinString(",") + ")");
+            }
             builder.Append(");");
             return builder.ToString();
         }
 
-        public static string GetTableInserter<T>()
+        public static string GetTableInserter<T>(bool replaceOnConflict = false)
         {
-            return GetTableInserter(typeof(T));
+            return GetTableInserter(typeof(T), replaceOnConflict);
         }
 
         public static string GetTableInserter(Type type, bool replaceOnConflict = false)

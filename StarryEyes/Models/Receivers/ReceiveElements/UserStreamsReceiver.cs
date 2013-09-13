@@ -14,7 +14,6 @@ using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.SystemEvents;
 using StarryEyes.Models.Backstages.TwitterEvents;
 using StarryEyes.Models.Statuses;
-using StarryEyes.Models.Stores;
 using StarryEyes.Models.Subsystems;
 
 namespace StarryEyes.Models.Receivers.ReceiveElements
@@ -166,7 +165,7 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
 
             public void OnDeleted(StreamDelete item)
             {
-                StatusStore.Remove(item.Id);
+                StatusInbox.QueueRemoval(item.Id);
             }
 
             public void OnDisconnect(StreamDisconnect streamDisconnect)

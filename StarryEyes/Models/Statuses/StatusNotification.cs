@@ -8,7 +8,7 @@ namespace StarryEyes.Models.Statuses
         {
             this.Status = null;
             this.StatusId = id;
-            this.IsAdded = true;
+            this.IsAdded = false;
         }
 
         public StatusNotification(TwitterStatus status)

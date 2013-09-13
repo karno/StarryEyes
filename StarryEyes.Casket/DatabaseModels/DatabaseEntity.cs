@@ -4,6 +4,7 @@ using StarryEyes.Casket.DatabaseModels.Generators;
 
 namespace StarryEyes.Casket.DatabaseModels
 {
+    [DbName("Entity")]
     public class DatabaseEntity : DbModelBase
     {
         public static DatabaseEntity FromTwitterEntity(TwitterEntity entity,
@@ -20,11 +21,6 @@ namespace StarryEyes.Casket.DatabaseModels
                 ParentId = parentId,
                 StartIndex = entity.StartIndex
             };
-        }
-
-        protected override bool ReplaceOnConflict
-        {
-            get { return false; }
         }
 
         [DbPrimaryKey(true)]

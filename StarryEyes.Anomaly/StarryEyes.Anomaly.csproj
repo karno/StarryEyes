@@ -75,6 +75,7 @@
     <Compile Include="Imaging\ImageResolver.cs" />
     <Compile Include="OAuthCredentialExtension.cs" />
     <Compile Include="TwitterApi\DataModels\StreamModels\StreamDisconnect.cs" />
+    <Compile Include="TwitterApi\DataModels\TwitterActivity.cs" />
     <Compile Include="TwitterApi\DataModels\TwitterConfiguration.cs" />
     <Compile Include="TwitterApi\DataModels\TwitterEntity.cs" />
     <Compile Include="TwitterApi\DataModels\TwitterFriendship.cs" />

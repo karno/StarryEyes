@@ -224,6 +224,7 @@
     <Compile Include="Models\Backstages\TwitterEvents\UnfollowedEvent.cs" />
     <Compile Include="Models\Backstages\BackstageEventBase.cs" />
     <Compile Include="Models\Backstages\TwitterEvents\UnknownEvent.cs" />
+    <Compile Include="Models\Databases\DatabaseProxy.cs" />
     <Compile Include="Models\Databases\Mapper.cs" />
     <Compile Include="Models\Networking.cs" />
     <Compile Include="Models\Plugins\PluginManager.cs" />
@@ -284,6 +285,7 @@
     <Compile Include="Models\Tab\TabManager.cs" />
     <Compile Include="Models\Tab\TimelineModel.cs" />
     <Compile Include="Models\Subsystems\TwitterConfigurationService.cs" />
+    <Compile Include="Models\Timeline\SearchFlipModel.cs" />
     <Compile Include="Models\Timeline\TabModel.cs" />
     <Compile Include="Models\Timeline\TimelineModelBase.cs" />
     <Compile Include="Models\UserModel.cs" />

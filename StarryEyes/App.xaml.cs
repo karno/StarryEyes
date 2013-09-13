@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading;
 using System.Windows;
 using Livet;
+using StarryEyes.Casket;
 using StarryEyes.Models;
 using StarryEyes.Models.Plugins;
 using StarryEyes.Models.Receivers;
@@ -145,6 +146,7 @@ namespace StarryEyes
             // initialize stores
             StatusStore.Initialize();
             UserStore.Initialize();
+            Database.Initialize(DatabaseFilePath);
 
             // initialize subsystems
             StatisticsService.Initialize();
@@ -400,6 +402,11 @@ namespace StarryEyes
             }
         }
 
+        public static string DatabaseFilePath
+        {
+            get { return Path.Combine(ConfigurationDirectoryPath, DatabaseFileName); }
+        }
+
         public static string DataStorePath
         {
             get
@@ -481,6 +488,8 @@ namespace StarryEyes
         }
 
         public static readonly string DataStoreDirectory = "store";
+
+        public static readonly string DatabaseFileName = "krile.db";
 
         public static readonly string KeyAssignProfilesDirectory = "assigns";
 
