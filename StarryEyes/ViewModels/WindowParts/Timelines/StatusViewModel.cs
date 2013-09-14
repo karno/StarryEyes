@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using Livet;
@@ -618,13 +619,13 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             Action<TwitterAccount> onFail;
             if (add)
             {
-                expected = a => Model.AddFavoritedUser(a.Id);
-                onFail = a => Model.RemoveFavoritedUser(a.Id);
+                expected = a => Task.Run(() => Model.AddFavoritedUser(a.Id));
+                onFail = a => Task.Run(() => Model.RemoveFavoritedUser(a.Id));
             }
             else
             {
-                expected = a => Model.RemoveFavoritedUser(a.Id);
-                onFail = a => Model.AddFavoritedUser(a.Id);
+                expected = a => Task.Run(() => Model.RemoveFavoritedUser(a.Id));
+                onFail = a => Task.Run(() => Model.AddFavoritedUser(a.Id));
             }
 
             var freq = new FavoriteRequest(Status, add);
@@ -652,13 +653,13 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             Action<TwitterAccount> onFail;
             if (add)
             {
-                expected = a => Model.AddRetweetedUser(a.Id);
-                onFail = a => Model.RemoveRetweetedUser(a.Id);
+                expected = a => Task.Run(() => Model.AddRetweetedUser(a.Id));
+                onFail = a => Task.Run(() => Model.RemoveRetweetedUser(a.Id));
             }
             else
             {
-                expected = a => Model.RemoveRetweetedUser(a.Id);
-                onFail = a => Model.AddRetweetedUser(a.Id);
+                expected = a => Task.Run(() => Model.RemoveRetweetedUser(a.Id));
+                onFail = a => Task.Run(() => Model.AddRetweetedUser(a.Id));
             }
             var rreq = new RetweetRequest(Status, add);
             infos.ToObservable()
@@ -743,12 +744,12 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             if (!IsFavorited)
             {
                 var freq = new FavoriteRequest(Status, true);
-                accounts.Do(a => Model.AddFavoritedUser(a.Id))
+                accounts.Do(a => Task.Run(() => Model.AddFavoritedUser(a.Id)))
                         .Do(_ => RaisePropertyChanged(() => IsFavorited))
                         .SelectMany(a => RequestQueue.Enqueue(a, freq)
                                              .Catch((Exception ex) =>
                                              {
-                                                 Model.RemoveFavoritedUser(a.Id);
+                                                 Task.Run(() => Model.RemoveFavoritedUser(a.Id));
                                                  return Observable.Empty<TwitterStatus>();
                                              }))
                         .Do(_ => RaisePropertyChanged(() => IsFavorited))
@@ -757,12 +758,12 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
             if (!IsRetweeted)
             {
                 var rreq = new RetweetRequest(Status, true);
-                accounts.Do(a => Model.AddRetweetedUser(a.Id))
+                accounts.Do(a => Task.Run(() => Model.AddRetweetedUser(a.Id)))
                           .Do(_ => RaisePropertyChanged(() => IsRetweeted))
                           .SelectMany(a => RequestQueue.Enqueue(a, rreq)
                                                .Catch((Exception ex) =>
                                                {
-                                                   Model.RemoveRetweetedUser(a.Id);
+                                                   Task.Run(() => Model.RemoveRetweetedUser(a.Id));
                                                    return Observable.Empty<TwitterStatus>();
                                                }))
                           .Do(_ => RaisePropertyChanged(() => IsRetweeted))
