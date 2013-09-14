@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading;
 using System.Windows;
 using Livet;
+using StarryEyes.Annotations;
 using StarryEyes.Casket;
 using StarryEyes.Feather.Scripting;
 using StarryEyes.Models;
@@ -118,7 +119,7 @@ namespace StarryEyes
             SpecialImageResolvers.Initialize();
 
             // load plugins
-            PluginManager.Load(Path.Combine(Path.GetDirectoryName(ExeFilePath),PluginDirectory));
+            PluginManager.Load(Path.Combine(ExeFileDir, PluginDirectory));
 
             // load settings
             if (!Setting.LoadSettings())
@@ -161,7 +162,7 @@ namespace StarryEyes
             PluginManager.LoadedPlugins.ForEach(p => p.Initialize());
 
             // activate scripts
-            ScriptingManager.ExecuteScripts(Path.Combine(Path.GetDirectoryName(ExeFilePath), ScriptDirectiory));
+            ScriptingManager.ExecuteScripts(Path.Combine(ExeFileDir, ScriptDirectiory));
 
             // finalize handlers
             TwitterEventService.RegisterDefaultHandlers();
@@ -327,11 +328,21 @@ namespace StarryEyes
             }
         }
 
+        [NotNull]
         public static string ExeFilePath
         {
             get
             {
                 return Process.GetCurrentProcess().MainModule.FileName;
+            }
+        }
+
+        [NotNull]
+        public static string ExeFileDir
+        {
+            get
+            {
+                return Path.GetDirectoryName(ExeFilePath) ?? ExeFilePath + "_";
             }
         }
 
@@ -374,6 +385,7 @@ namespace StarryEyes
             }
         }
 
+        [NotNull]
         public static string ConfigurationDirectoryPath
         {
             get
@@ -381,7 +393,7 @@ namespace StarryEyes
                 switch (ExecutionMode)
                 {
                     case ExecutionMode.Standalone:
-                        return Path.GetDirectoryName(ExeFilePath);
+                        return ExeFileDir;
                     case ExecutionMode.Roaming:
                         return Path.Combine(
                             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
@@ -395,6 +407,7 @@ namespace StarryEyes
             }
         }
 
+        [NotNull]
         public static string ConfigurationFilePath
         {
             get
@@ -403,6 +416,7 @@ namespace StarryEyes
             }
         }
 
+        [NotNull]
         public static string DatabaseFilePath
         {
             get { return Path.Combine(ConfigurationDirectoryPath, DatabaseFileName); }
@@ -427,6 +441,8 @@ namespace StarryEyes
         }
 
         private static FileVersionInfo _version;
+
+        [NotNull]
         public static FileVersionInfo Version
         {
             get
@@ -436,6 +452,7 @@ namespace StarryEyes
             }
         }
 
+        [NotNull]
         public static string FormattedVersion
         {
             get
