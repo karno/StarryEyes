@@ -2,14 +2,14 @@
 using System.IO;
 using System.Linq;
 
-namespace StarryEyes.Models.Plugins
+namespace StarryEyes.Feather.Scripting
 {
     /// <summary>
     /// Manage script execution.
     /// </summary>
     public static class ScriptingManager
     {
-        private static SortedDictionary<string, IScriptExecutor> executors =
+        private static readonly SortedDictionary<string, IScriptExecutor> _executors =
             new SortedDictionary<string, IScriptExecutor>();
 
         /// <summary>
@@ -17,21 +17,20 @@ namespace StarryEyes.Models.Plugins
         /// </summary>
         public static bool RegisterExecutor(string ext, IScriptExecutor executor)
         {
-            if (executors.ContainsKey(ext))
+            if (_executors.ContainsKey(ext))
                 return false;
-            executors.Add(ext, executor);
+            _executors.Add(ext, executor);
             return true;
         }
 
-        internal static void ExecuteScripts()
+        public static void ExecuteScripts(string path)
         {
-            var path = Path.Combine(Path.GetDirectoryName(App.ExeFilePath), App.ScriptDirectiory);
             Directory.CreateDirectory(path).EnumerateFiles()
                 .ForEach(file =>
                 {
                     var ext = file.Extension.TrimStart('.').ToLower();
                     IScriptExecutor executor;
-                    if (executors.TryGetValue(ext, out executor))
+                    if (_executors.TryGetValue(ext, out executor))
                         executor.ExecuteScript(ext);
                 });
         }

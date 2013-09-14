@@ -12,21 +12,21 @@ namespace StarryEyes.Models.Plugins
             get { return _thrownException; }
         }
 
-        private static readonly object pluginsLocker = new object();
-        private static readonly List<IPlugin> plugins = new List<IPlugin>();
+        private static readonly object _pluginsLocker = new object();
+        private static readonly List<IPlugin> _plugins = new List<IPlugin>();
 
         public static IEnumerable<IPlugin> LoadedPlugins
         {
             get
             {
-                lock (pluginsLocker)
+                lock (_pluginsLocker)
                 {
-                    return plugins.AsReadOnly();
+                    return _plugins.AsReadOnly();
                 }
             }
         }
 
-        internal static void Load()
+        internal static void Load(string path)
         {
             try
             {

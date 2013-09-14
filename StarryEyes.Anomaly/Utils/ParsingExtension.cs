@@ -83,7 +83,7 @@ namespace StarryEyes.Anomaly.Utils
 
         public static string ParseString(this XElement e)
         {
-            return e == null ? null : e.Value.Replace("&lt;", "<").Replace("&gt;", ">");
+            return e == null ? null : ResolveEntity(e.Value);
         }
 
         public static bool ParseBool(this XElement e, bool def = false)
@@ -127,7 +127,7 @@ namespace StarryEyes.Anomaly.Utils
 
         public static string ParseString(this XAttribute e)
         {
-            return e == null ? null : e.Value.Replace("&lt;", "<").Replace("&gt;", ">");
+            return e == null ? null : ResolveEntity(e.Value);
         }
 
         public static bool ParseBool(this XAttribute e, bool def = false)
@@ -181,7 +181,7 @@ namespace StarryEyes.Anomaly.Utils
 
         public static string ParseString(this XText e)
         {
-            return e == null ? null : e.Value.Replace("&lt;", "<").Replace("&gt;", ">");
+            return e == null ? null : ResolveEntity(e.Value);
         }
 
         public static bool ParseBool(this XText e, bool def = false)

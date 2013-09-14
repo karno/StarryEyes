@@ -228,7 +228,6 @@
     <Compile Include="Models\Databases\Mapper.cs" />
     <Compile Include="Models\Networking.cs" />
     <Compile Include="Models\Plugins\PluginManager.cs" />
-    <Compile Include="Models\Plugins\ScriptingManager.cs" />
     <Compile Include="Models\Receivers\ListInfo.cs" />
     <Compile Include="Models\Receivers\ReceiveElements\UserTimelineReceiver.cs" />
     <Compile Include="Models\Statuses\MuteBlockManager.cs" />

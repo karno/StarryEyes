@@ -24,7 +24,7 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
         {
             this.Id = ((string)json.id_str).ParseLong();
             this.CreatedAt = ((string)json.created_at).ParseDateTime(ParsingExtension.TwitterDateTimeFormat);
-            this.Text = json.text;
+            this.Text = ParsingExtension.ResolveEntity(json.text);
             this.Entities = Enumerable.ToArray(TwitterEntity.GetEntities(json.entities));
             if (json.recipient())
             {

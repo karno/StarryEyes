@@ -21,7 +21,7 @@ namespace StarryEyes.Casket.Cruds
             await this.CreateIndexAsync(this.IndexPrefix + "_UID", "UserId", false);
         }
 
-        public Task<IEnumerable<long>> UserIds(long statusId)
+        public Task<IEnumerable<long>> GetUsersAsync(long statusId)
         {
             return
                 this.QueryAsync<long>(

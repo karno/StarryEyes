@@ -1,9 +1,9 @@
 ﻿using System;
 using System.ComponentModel;
 using Codeplex.OAuth;
+using StarryEyes.Annotations;
 using StarryEyes.Anomaly;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
-using StarryEyes.Models.Stores;
 using StarryEyes.Settings;
 
 namespace StarryEyes.Models.Accounting
@@ -15,8 +15,9 @@ namespace StarryEyes.Models.Accounting
     {
         public TwitterAccount() { }
 
-        public TwitterAccount(long id, string screenName, AccessToken token)
+        public TwitterAccount(long id, string screenName, [NotNull] AccessToken token)
         {
+            if (token == null) throw new ArgumentNullException("token");
             this.Id = id;
             this.UnreliableScreenName = screenName;
             this.OAuthAccessToken = token.Key;
@@ -66,6 +67,7 @@ namespace StarryEyes.Models.Accounting
         /// </summary>
         public Uri UnreliableProfileImage { get; set; }
 
+        [NotNull]
         public TwitterUser GetPserudoUser()
         {
             return new TwitterUser

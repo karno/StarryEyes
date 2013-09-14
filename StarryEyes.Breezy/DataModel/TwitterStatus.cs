@@ -168,7 +168,7 @@ namespace StarryEyes.Breezy.DataModel
                 if (pidx < entity.StartIndex)
                 {
                     // output raw
-                    builder.Append(ParsingExtension.ResolveEntity(escaped.Substring(pidx, entity.StartIndex - pidx)));
+                    builder.Append(ParsingExtension.UnescapeEntity(escaped.Substring(pidx, entity.StartIndex - pidx)));
                 }
                 switch (entity.EntityType)
                 {
@@ -177,13 +177,13 @@ namespace StarryEyes.Breezy.DataModel
                         break;
                     case EntityType.Urls:
                         builder.Append(showFullUrl
-                                           ? ParsingExtension.ResolveEntity(entity.OriginalText)
-                                           : ParsingExtension.ResolveEntity(entity.DisplayText));
+                                           ? ParsingExtension.UnescapeEntity(entity.OriginalText)
+                                           : ParsingExtension.UnescapeEntity(entity.DisplayText));
                         break;
                     case EntityType.Media:
                         builder.Append(showFullUrl
-                                           ? ParsingExtension.ResolveEntity(entity.MediaUrl)
-                                           : ParsingExtension.ResolveEntity(entity.DisplayText));
+                                           ? ParsingExtension.UnescapeEntity(entity.MediaUrl)
+                                           : ParsingExtension.UnescapeEntity(entity.DisplayText));
                         break;
                     case EntityType.UserMentions:
                         builder.Append("@" + entity.DisplayText);
@@ -193,11 +193,11 @@ namespace StarryEyes.Breezy.DataModel
             }
             if (prevEntity == null)
             {
-                builder.Append(ParsingExtension.ResolveEntity(escaped));
+                builder.Append(ParsingExtension.UnescapeEntity(escaped));
             }
             else if (prevEntity.EndIndex < escaped.Length)
             {
-                builder.Append(ParsingExtension.ResolveEntity(
+                builder.Append(ParsingExtension.UnescapeEntity(
                     escaped.Substring(prevEntity.EndIndex, escaped.Length - prevEntity.EndIndex)));
             }
             return builder.ToString();

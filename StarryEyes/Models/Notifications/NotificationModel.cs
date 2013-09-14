@@ -1,4 +1,6 @@
-﻿using StarryEyes.Anomaly.TwitterApi.DataModels;
+﻿using System;
+using StarryEyes.Annotations;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
 
 namespace StarryEyes.Models.Notifications
 {
@@ -12,12 +14,13 @@ namespace StarryEyes.Models.Notifications
         /// </summary>
         /// <param name="status">status</param>
         /// <param name="type">notification type</param>
-        public static void NotifyNewArrival(TwitterStatus status)
+        public static void NotifyNewArrival([NotNull] TwitterStatus status)
         {
+            if (status == null) throw new ArgumentNullException("status");
             // TODO: implementation
         }
 
-        private static void NotifyCore(TwitterStatus status, NotificationType type)
+        private static void NotifyCore([NotNull] TwitterStatus status, NotificationType type)
         {
             // TODO: implementation
         }

@@ -226,7 +226,7 @@ namespace StarryEyes.Breezy.Util
 
         #region for General Text
 
-        public static string ResolveEntity(string text)
+        public static string UnescapeEntity(string text)
         {
             return text
                 // .Replace("&quot;", "\"")

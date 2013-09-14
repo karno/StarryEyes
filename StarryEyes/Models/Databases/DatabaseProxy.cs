@@ -1,16 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
+using StarryEyes.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Casket;
+using StarryEyes.Casket.DatabaseModels;
 
 namespace StarryEyes.Models.Databases
 {
     public static class DatabaseProxy
     {
-        public static async Task StoreStatusAsync(TwitterStatus status)
+        public static async Task StoreStatusAsync([NotNull] TwitterStatus status)
         {
+            if (status == null) throw new ArgumentNullException("status");
             if (status.RetweetedOriginal != null)
             {
                 await StoreStatusAsync(status.RetweetedOriginal);
@@ -105,6 +110,45 @@ namespace StarryEyes.Models.Databases
             {
                 System.Diagnostics.Debug.WriteLine(ex);
             }
+        }
+
+        public static async Task<TwitterStatus> GetStatusAsync(long id)
+        {
+            var status = await Database.StatusCrud.GetAsync(id);
+            if (status == null) return null;
+            return await LoadStatusAsync(status);
+        }
+
+        public static async Task<TwitterUser> GetUserAsync(long id)
+        {
+            var u = Database.UserCrud.GetAsync(id);
+            var ude = Database.UserDescriptionEntityCrud.GetEntitiesAsync(id);
+            var uue = Database.UserUrlEntityCrud.GetEntitiesAsync(id);
+            return Mapper.Map(await u, await ude, await uue);
+        }
+
+        public static IObservable<TwitterStatus> LoadAllAsync([NotNull] IEnumerable<DatabaseStatus> dbstatuses)
+        {
+            if (dbstatuses == null) throw new ArgumentNullException("dbstatuses");
+            return dbstatuses
+                .ToObservable()
+                .SelectMany(s => LoadStatusAsync(s).ToObservable());
+        }
+
+        public static async Task<TwitterStatus> LoadStatusAsync([NotNull] DatabaseStatus dbstatus)
+        {
+            if (dbstatus == null) throw new ArgumentNullException("dbstatus");
+            var id = dbstatus.Id;
+            var user = GetUserAsync(dbstatus.UserId);
+            var se = Database.StatusEntityCrud.GetEntitiesAsync(id);
+            var favorers = Database.FavoritesCrud.GetUsersAsync(id);
+            var retweeters = Database.RetweetsCrud.GetUsersAsync(id);
+            if (dbstatus.RetweetOriginalId == null)
+            {
+                return Mapper.Map(dbstatus, await se, await favorers, await retweeters, await user);
+            }
+            var rts = GetStatusAsync(dbstatus.RetweetOriginalId.Value);
+            return Mapper.Map(dbstatus, await se, await favorers, await retweeters, await rts, await user);
         }
     }
 }

@@ -12,6 +12,7 @@ using System.Threading;
 using System.Windows;
 using Livet;
 using StarryEyes.Casket;
+using StarryEyes.Feather.Scripting;
 using StarryEyes.Models;
 using StarryEyes.Models.Plugins;
 using StarryEyes.Models.Receivers;
@@ -117,7 +118,7 @@ namespace StarryEyes
             SpecialImageResolvers.Initialize();
 
             // load plugins
-            PluginManager.Load();
+            PluginManager.Load(Path.Combine(Path.GetDirectoryName(ExeFilePath),PluginDirectory));
 
             // load settings
             if (!Setting.LoadSettings())
@@ -160,7 +161,7 @@ namespace StarryEyes
             PluginManager.LoadedPlugins.ForEach(p => p.Initialize());
 
             // activate scripts
-            ScriptingManager.ExecuteScripts();
+            ScriptingManager.ExecuteScripts(Path.Combine(Path.GetDirectoryName(ExeFilePath), ScriptDirectiory));
 
             // finalize handlers
             TwitterEventService.RegisterDefaultHandlers();

@@ -1,7 +1,9 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
+using StarryEyes.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models.Databases;
 using StarryEyes.Models.Stores;
@@ -35,8 +37,9 @@ namespace StarryEyes.Models.Statuses
             _pumpThread.Start();
         }
 
-        public static void Queue(TwitterStatus status)
+        public static void Queue([NotNull] TwitterStatus status)
         {
+            if (status == null) throw new ArgumentNullException("status");
             // store original status first
             if (status.RetweetedOriginal != null)
             {

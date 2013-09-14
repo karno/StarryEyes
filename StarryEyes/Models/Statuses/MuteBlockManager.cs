@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using StarryEyes.Albireo.Data;
+using StarryEyes.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Settings;
@@ -25,15 +26,17 @@ namespace StarryEyes.Models.Statuses
             Setting.Muteds.ValueChanged += _ => InvalidateMute();
         }
 
-        public static bool IsBlockedOrMuted(TwitterStatus status)
+        public static bool IsBlockedOrMuted([NotNull] TwitterStatus status)
         {
+            if (status == null) throw new ArgumentNullException("status");
             if (IsBlocked(status.User)) return true;
             CheckUpdateMutes();
             return _muteFilter(status);
         }
 
-        public static bool IsBlocked(TwitterUser user)
+        public static bool IsBlocked([NotNull] TwitterUser user)
         {
+            if (user == null) throw new ArgumentNullException("user");
             return IsBlocked(user.Id);
         }
 

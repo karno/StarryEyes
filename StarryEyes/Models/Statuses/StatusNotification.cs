@@ -1,3 +1,5 @@
+using System;
+using StarryEyes.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 
 namespace StarryEyes.Models.Statuses
@@ -11,8 +13,9 @@ namespace StarryEyes.Models.Statuses
             this.IsAdded = false;
         }
 
-        public StatusNotification(TwitterStatus status)
+        public StatusNotification([NotNull] TwitterStatus status)
         {
+            if (status == null) throw new ArgumentNullException("status");
             this.Status = status;
             this.StatusId = status.Id;
             this.IsAdded = true;

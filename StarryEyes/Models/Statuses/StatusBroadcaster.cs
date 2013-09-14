@@ -1,6 +1,8 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Reactive.Subjects;
 using System.Threading;
+using StarryEyes.Annotations;
 using StarryEyes.Models.Notifications;
 
 namespace StarryEyes.Models.Statuses
@@ -36,8 +38,9 @@ namespace StarryEyes.Models.Statuses
             _pumpThread.Start();
         }
 
-        public static void Queue(StatusNotification status)
+        public static void Queue([NotNull] StatusNotification status)
         {
+            if (status == null) throw new ArgumentNullException("status");
             _queue.Enqueue(status);
             _signal.Set();
         }
