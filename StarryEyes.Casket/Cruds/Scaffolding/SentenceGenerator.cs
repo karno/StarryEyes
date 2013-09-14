@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using StarryEyes.Casket.DatabaseCore.Sqlite;
-using StarryEyes.Casket.DatabaseModels.Generators;
 
-namespace StarryEyes.Casket.Scaffolds.Generators
+namespace StarryEyes.Casket.Cruds.Scaffolding
 {
     public static class SentenceGenerator
     {
@@ -98,7 +96,7 @@ namespace StarryEyes.Casket.Scaffolds.Generators
             var uniques = type.GetCustomAttributes<DbUniqueColumnAttribute>();
             foreach (var attr in uniques)
             {
-                builder.Append(", UNIQUE(" + attr.Columns.JoinString(",") + ")");
+                builder.Append(", UNIQUE(" + attr.Columns.JoinString(", ") + ")");
             }
             builder.Append(");");
             return builder.ToString();
@@ -184,7 +182,7 @@ namespace StarryEyes.Casket.Scaffolds.Generators
         public static string GetTableDeleter(Type type)
         {
             var builder = new StringBuilder();
-            builder.Append("DELETE ");
+            builder.Append("DELETE FROM ");
             builder.Append(GetTableName(type));
             builder.Append(" WHERE ");
             type.GetProperties()

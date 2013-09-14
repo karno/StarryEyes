@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace StarryEyes.Casket.Scaffolds.Generators
+namespace StarryEyes.Casket.Cruds.Scaffolding
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = true)]
     public class DbUniqueColumnAttribute : Attribute

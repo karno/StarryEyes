@@ -1,6 +1,5 @@
 ﻿using System;
-using StarryEyes.Casket.DatabaseCore.Sqlite;
-using StarryEyes.Casket.DatabaseModels.Generators;
+using StarryEyes.Casket.Cruds.Scaffolding;
 
 namespace StarryEyes.Casket.DatabaseModels
 {

@@ -1,5 +1,4 @@
-﻿using StarryEyes.Casket.DatabaseModels.Generators;
-using StarryEyes.Casket.Scaffolds.Generators;
+﻿using StarryEyes.Casket.Cruds.Scaffolding;
 
 namespace StarryEyes.Casket.DatabaseModels
 {
@@ -15,8 +14,8 @@ namespace StarryEyes.Casket.DatabaseModels
     }
 
     [DbName("Favorites")]
-    public class DatabaseFavorite : DatabaseActivity { }
+    public sealed class DatabaseFavorite : DatabaseActivity { }
 
     [DbName("Retweets")]
-    public class DatabaseRetweet : DatabaseActivity { }
+    public sealed class DatabaseRetweet : DatabaseActivity { }
 }

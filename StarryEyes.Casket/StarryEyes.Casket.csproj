@@ -83,9 +83,12 @@
   <ItemGroup>
     <Compile Include="Cruds\MaintenanceCrud.cs" />
     <Compile Include="Cruds\Scaffolding\CrudBase.cs" />
+    <Compile Include="Cruds\StatusEntityCrud.cs" />
+    <Compile Include="Cruds\UserDescriptionEntityCrud.cs" />
+    <Compile Include="Cruds\UserUrlEntityCrud.cs" />
     <Compile Include="Database.cs" />
     <Compile Include="Cruds\ActivityCrudBase.cs" />
-    <Compile Include="Cruds\EntityCrud.cs" />
+    <Compile Include="Cruds\EntityCrudBase.cs" />
     <Compile Include="Cruds\FavoritesCrud.cs" />
     <Compile Include="Cruds\RetweetsCrud.cs" />
     <Compile Include="Cruds\StatusCrud.cs" />
@@ -101,6 +104,7 @@
     <Compile Include="Cruds\Scaffolding\DbUniqueColumnAttribute.cs" />
     <Compile Include="Cruds\Scaffolding\SentenceGenerator.cs" />
     <Compile Include="IMultiplexPredicate.cs" />
+    <Compile Include="Infrastructure\SqliteRegExp.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

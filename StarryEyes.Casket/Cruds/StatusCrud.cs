@@ -16,8 +16,8 @@ namespace StarryEyes.Casket.Cruds
         internal override async Task InitializeAsync()
         {
             await base.InitializeAsync();
-            await this.CreateIndexAsync("ST_UID", "UserId");
-            await this.CreateIndexAsync("ST_ROID", "RetweetOriginalId");
+            await this.CreateIndexAsync("ST_UID", "UserId", false);
+            await this.CreateIndexAsync("ST_ROID", "RetweetOriginalId", false);
         }
 
         internal async Task StoreCoreAsync(IEnumerable<Tuple<string, object>> param)
@@ -28,7 +28,7 @@ namespace StarryEyes.Casket.Cruds
         public Task<IEnumerable<DatabaseStatus>> GetRetweetedStatusesAsync(long originalId)
         {
             return this.QueryAsync<DatabaseStatus>(
-                "SELECT * FROM " + this.TableName + " WHERE RetweetedOriginalId = @OriginalId",
+                "SELECT * FROM " + this.TableName + " WHERE RetweetOriginalId = @OriginalId",
                 new { OriginalId = originalId });
         }
     }

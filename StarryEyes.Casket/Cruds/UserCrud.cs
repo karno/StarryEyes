@@ -14,7 +14,7 @@ namespace StarryEyes.Casket.Cruds
         internal override async Task InitializeAsync()
         {
             await base.InitializeAsync();
-            await this.CreateIndexAsync("UT_SN", "ScreenName");
+            await this.CreateIndexAsync("UT_SN", "ScreenName", true);
         }
     }
 }

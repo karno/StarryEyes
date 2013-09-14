@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using StarryEyes.Albireo.Threading;
-using StarryEyes.Casket.Scaffolds.Generators;
 
 namespace StarryEyes.Casket.Cruds.Scaffolding
 {
@@ -66,7 +65,7 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
             }
         }
 
-        public Task<int> ExecuteAsync(string query)
+        protected Task<int> ExecuteAsync(string query)
         {
             return _factory.StartNew(() =>
             {
@@ -81,7 +80,7 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
             });
         }
 
-        public Task<int> ExecuteAsync(string query, dynamic param)
+        protected Task<int> ExecuteAsync(string query, dynamic param)
         {
             return _factory.StartNew(() =>
             {
@@ -96,7 +95,7 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
             });
         }
 
-        public Task ExecuteAllAsync(IEnumerable<Tuple<string, object>> queryAndParams)
+        protected Task ExecuteAllAsync(IEnumerable<Tuple<string, object>> queryAndParams)
         {
             return _factory.StartNew(() =>
             {
@@ -113,7 +112,7 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
             });
         }
 
-        public Task<IEnumerable<T>> QueryAsync<T>(string query, object param)
+        protected Task<IEnumerable<T>> QueryAsync<T>(string query, object param)
         {
             return _factory.StartNew(() =>
             {
@@ -172,9 +171,9 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
             await this.ExecuteAsync(TableCreator);
         }
 
-        protected async Task CreateIndexAsync(string indexName, string column)
+        protected async Task CreateIndexAsync(string indexName, string column, bool unique)
         {
-            await this.ExecuteAsync("CREATE INDEX IF NOT EXISTS " +
+            await this.ExecuteAsync("CREATE " + (unique ? "UNIQUE " : "") + "INDEX IF NOT EXISTS " +
                                     indexName + " ON " + TableName + "(" + column + ")");
         }
 

@@ -17,8 +17,8 @@ namespace StarryEyes.Casket.Cruds
         internal override async Task InitializeAsync()
         {
             await base.InitializeAsync();
-            await this.CreateIndexAsync(this.IndexPrefix + "_SID", "StatusId");
-            await this.CreateIndexAsync(this.IndexPrefix + "_UID", "UserId");
+            await this.CreateIndexAsync(this.IndexPrefix + "_SID", "StatusId", false);
+            await this.CreateIndexAsync(this.IndexPrefix + "_UID", "UserId", false);
         }
 
         public Task<IEnumerable<long>> UserIds(long statusId)

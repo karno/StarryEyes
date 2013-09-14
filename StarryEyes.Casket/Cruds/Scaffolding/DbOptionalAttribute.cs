@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace StarryEyes.Casket.DatabaseCore.Sqlite
+namespace StarryEyes.Casket.Cruds.Scaffolding
 {
     [AttributeUsage(AttributeTargets.Property,
         AllowMultiple = false,

@@ -10,7 +10,7 @@ namespace StarryEyes.Models.Databases
     {
         #region map to database model
 
-        public static Tuple<DatabaseUser, IEnumerable<DatabaseEntity>> Map(TwitterUser user)
+        public static Tuple<DatabaseUser, IEnumerable<DatabaseUserDescriptionEntity>, IEnumerable<DatabaseUserUrlEntity>> Map(TwitterUser user)
         {
             var tu = new DatabaseUser
             {
@@ -37,11 +37,9 @@ namespace StarryEyes.Models.Databases
                 StatusesCount = user.StatusesCount,
                 Url = user.Url,
             };
-            var entities = user.DescriptionEntities.Guard().Select(e => Map(user.Id, EntityParentType.UserDescription, e))
-                               .Concat(user.UrlEntities.Guard().Select(e => Map(user.Id, EntityParentType.UserUrl, e)))
-                               .ToArray()
-                               .AsEnumerable();
-            return Tuple.Create(tu, entities);
+            var de = user.DescriptionEntities.Guard().Select(e => Map<DatabaseUserDescriptionEntity>(user.Id, e));
+            var ue = user.UrlEntities.Guard().Select(e => Map<DatabaseUserUrlEntity>(user.Id, e));
+            return Tuple.Create(tu, de, ue);
         }
 
         private static string GetString(this Uri uri)
@@ -49,14 +47,14 @@ namespace StarryEyes.Models.Databases
             return uri == null ? null : uri.OriginalString;
         }
 
-        private static DatabaseEntity Map(long parentId, EntityParentType parentType, TwitterEntity entity)
+        private static T Map<T>(long parentId, TwitterEntity entity)
+        where T : DatabaseEntity, new()
         {
-            return new DatabaseEntity
+            return new T
             {
                 DisplayText = entity.DisplayText,
                 EndIndex = entity.EndIndex,
                 EntityType = entity.EntityType,
-                EntityParentType = parentType,
                 MediaUrl = entity.MediaUrl,
                 OriginalText = entity.OriginalText,
                 StartIndex = entity.StartIndex,
@@ -64,7 +62,7 @@ namespace StarryEyes.Models.Databases
             };
         }
 
-        public static Tuple<DatabaseStatus, DatabaseUser, IEnumerable<DatabaseEntity>> Map(TwitterStatus status)
+        public static Tuple<DatabaseStatus, IEnumerable<DatabaseStatusEntity>> Map(TwitterStatus status)
         {
             var dbs = new DatabaseStatus
             {
@@ -82,20 +80,22 @@ namespace StarryEyes.Models.Databases
                 Text = status.Text,
                 UserId = status.User.Id,
             };
-            var ents = status.Entities.Select(e => Map(status.Id, EntityParentType.Status, e));
-            var um = Map(status.User);
-            var allEnts = ents.Concat(um.Item2).ToArray().AsEnumerable();
-            return Tuple.Create(dbs, um.Item1, allEnts);
+            var ent = status.Entities.Select(e => Map<DatabaseStatusEntity>(status.Id, e));
+            return Tuple.Create(dbs, ent);
         }
 
         #endregion
 
         #region map to object model
 
-        public static TwitterUser Map(DatabaseUser user, IEnumerable<DatabaseEntity> entities)
+        public static TwitterUser Map(DatabaseUser user,
+            IEnumerable<DatabaseUserDescriptionEntity> descriptionEntities,
+            IEnumerable<DatabaseUserUrlEntity> userEntities)
         {
-            var ent = entities.Memoize();
-            if (ent.Any(e => e.ParentId != user.Id || (e.EntityParentType != EntityParentType.UserDescription && e.EntityParentType != EntityParentType.UserUrl)))
+            var dent = descriptionEntities.Memoize();
+            var uent = userEntities.Memoize();
+            var ent = dent.Cast<DatabaseEntity>().Concat(uent);
+            if (ent.Any(e => e.ParentId != user.Id))
             {
                 throw new ArgumentException("ID mismatched between user and entities.");
             }
@@ -103,7 +103,7 @@ namespace StarryEyes.Models.Databases
             {
                 CreatedAt = user.CreatedAt,
                 Description = user.Description,
-                DescriptionEntities = ent.Where(e => e.EntityParentType == EntityParentType.UserDescription).Select(Map).ToArray(),
+                DescriptionEntities = dent.Select(Map).ToArray(),
                 FavoritesCount = user.FavoritesCount,
                 FollowersCount = user.FollowersCount,
                 FollowingCount = user.FollowingCount,
@@ -124,7 +124,7 @@ namespace StarryEyes.Models.Databases
                 ScreenName = user.ScreenName,
                 StatusesCount = user.StatusesCount,
                 Url = user.Url,
-                UrlEntities = ent.Where(e => e.EntityParentType == EntityParentType.UserUrl).Select(Map).ToArray()
+                UrlEntities = uent.Select(Map).ToArray()
             };
         }
 
@@ -142,8 +142,7 @@ namespace StarryEyes.Models.Databases
         }
 
         public static TwitterStatus Map(DatabaseStatus status, IEnumerable<DatabaseEntity> statusEntities,
-            long[] favorers, long[] retweeters,
-            DatabaseUser user, IEnumerable<DatabaseEntity> userEntities)
+            long[] favorers, long[] retweeters, TwitterUser user)
         {
             if (status.StatusType != StatusType.Tweet)
             {
@@ -170,31 +169,59 @@ namespace StarryEyes.Models.Databases
                 Latitude = status.Latitude,
                 Longitude = status.Longitude,
                 RetweetedUsers = retweeters,
+                StatusType = StatusType.Tweet,
                 Source = status.Source,
                 Text = status.Text,
-                User = Map(user, userEntities),
+                User = user,
             };
         }
 
         public static TwitterStatus Map(DatabaseStatus status, IEnumerable<DatabaseEntity> statusEntities,
-            DatabaseStatus originalStatus, IEnumerable<DatabaseEntity> originalEntities,
-            long[] favorers, long[] retweeters,
-            DatabaseUser user, IEnumerable<DatabaseEntity> userEntities,
-            DatabaseUser retweeter, IEnumerable<DatabaseEntity> retweeterEntities)
+             long[] favorers, long[] retweeters, TwitterStatus originalStatus, TwitterUser user)
         {
 
             if (status.RetweetOriginalId != originalStatus.Id)
             {
                 throw new ArgumentException("Retweet id is mismatched.");
             }
-            throw new NotImplementedException();
+            if (status.StatusType != StatusType.Tweet)
+            {
+                throw new ArgumentException("This overload targeting normal tweet.");
+            }
+            if (status.UserId != user.Id)
+            {
+                throw new ArgumentException("ID mismatched between staus and user.");
+            }
+            var ent = statusEntities.Memoize();
+            if (ent.Any(e => e.ParentId != status.Id))
+            {
+                throw new ArgumentException("ID mismatched between status and entities.");
+            }
+            return new TwitterStatus
+            {
+                CreatedAt = status.CreatedAt,
+                Entities = ent.Select(Map).ToArray(),
+                FavoritedUsers = favorers,
+                Id = status.Id,
+                InReplyToScreenName = status.InReplyToScreenName,
+                InReplyToStatusId = status.InReplyToStatusId,
+                InReplyToUserId = status.InReplyToUserId,
+                Latitude = status.Latitude,
+                Longitude = status.Longitude,
+                RetweetedOriginal = originalStatus,
+                RetweetedOriginalId = originalStatus.Id,
+                RetweetedUsers = retweeters,
+                Source = status.Source,
+                StatusType = StatusType.Tweet,
+                Text = status.Text,
+                User = user,
+            };
         }
 
 
 
         public static TwitterStatus Map(DatabaseStatus status, IEnumerable<DatabaseEntity> statusEntities,
-            DatabaseUser user, IEnumerable<DatabaseEntity> userEntities,
-            DatabaseUser recipient, IEnumerable<DatabaseEntity> recipientEntities)
+        TwitterUser sender, TwitterUser recipient)
         {
             if (status.StatusType != StatusType.DirectMessage)
             {
@@ -215,10 +242,10 @@ namespace StarryEyes.Models.Databases
                 InReplyToUserId = status.InReplyToUserId,
                 Latitude = status.Latitude,
                 Longitude = status.Longitude,
-                Recipient = Map(recipient, recipientEntities),
+                Recipient = recipient,
                 StatusType = StatusType.DirectMessage,
                 Text = status.Text,
-                User = Map(user, userEntities)
+                User = sender,
             };
         }
 

@@ -52,7 +52,7 @@ namespace StarryEyes.Casket.Test
                 ProfileImageUri = "https://www.google.co.jp/images/srpr/logo1w.png",
                 ScreenName = "haru067"
             };
-            this._dbEntity = new DatabaseEntity
+            this._dbEntity = new DatabaseStatusEntity
             {
                 DisplayText = "http://fabrikam.com/",
                 EndIndex = 48,

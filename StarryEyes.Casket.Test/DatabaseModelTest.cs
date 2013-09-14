@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using StarryEyes.Casket.Cruds.Scaffolding;
 using StarryEyes.Casket.DatabaseModels;
-using StarryEyes.Casket.Scaffolds.Generators;
 
 namespace StarryEyes.Casket.Test
 {

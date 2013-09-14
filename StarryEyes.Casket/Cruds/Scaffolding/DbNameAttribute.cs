@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace StarryEyes.Casket.DatabaseModels.Generators
+namespace StarryEyes.Casket.Cruds.Scaffolding
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Property,
         AllowMultiple = false,
