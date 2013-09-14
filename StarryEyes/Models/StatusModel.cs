@@ -12,6 +12,7 @@ using StarryEyes.Albireo.Threading;
 using StarryEyes.Anomaly.Imaging;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models.Accounting;
+using StarryEyes.Models.Databases;
 using StarryEyes.Models.Stores;
 using StarryEyes.Settings;
 
@@ -308,6 +309,7 @@ namespace StarryEyes.Models
 
         public void AddFavoritedUser(long userId)
         {
+            DatabaseProxy.AddFavoritorAsync(this.Status.Id, userId);
             StoreHelper.GetUser(userId)
                        .Subscribe(AddFavoritedUser);
         }
@@ -343,22 +345,23 @@ namespace StarryEyes.Models
             }
         }
 
-        public async void RemoveFavoritedUser(long id)
+        public async void RemoveFavoritedUser(long userId)
         {
+            DatabaseProxy.RemoveFavoritorAsync(this.Status.Id, userId);
             if (this.Status.RetweetedOriginal != null)
             {
                 var status = await Get(this.Status.RetweetedOriginal);
-                status.RemoveFavoritedUser(id);
+                status.RemoveFavoritedUser(userId);
             }
             else
             {
                 TwitterUser remove;
                 lock (_favoritedsLock)
                 {
-                    if (_favoritedUsersDic.TryGetValue(id, out remove))
+                    if (_favoritedUsersDic.TryGetValue(userId, out remove))
                     {
-                        _favoritedUsersDic.Remove(id);
-                        Status.FavoritedUsers = Status.FavoritedUsers.Except(new[] { id }).ToArray();
+                        _favoritedUsersDic.Remove(userId);
+                        Status.FavoritedUsers = Status.FavoritedUsers.Except(new[] { userId }).ToArray();
                     }
                 }
                 if (remove != null)
@@ -371,6 +374,7 @@ namespace StarryEyes.Models
 
         public void AddRetweetedUser(long userId)
         {
+            DatabaseProxy.AddRetweeterAsync(this.Status.Id, userId);
             StoreHelper.GetUser(userId).Subscribe(AddRetweetedUser);
         }
 
@@ -405,22 +409,23 @@ namespace StarryEyes.Models
             }
         }
 
-        public async void RemoveRetweetedUser(long id)
+        public async void RemoveRetweetedUser(long userId)
         {
+            DatabaseProxy.RemoveRetweeterAsync(this.Status.Id, userId);
             if (this.Status.RetweetedOriginal != null)
             {
                 var status = await Get(this.Status.RetweetedOriginal);
-                status.RemoveRetweetedUser(id);
+                status.RemoveRetweetedUser(userId);
             }
             else
             {
                 TwitterUser remove;
                 lock (_retweetedsLock)
                 {
-                    if (_retweetedUsersDic.TryGetValue(id, out remove))
+                    if (_retweetedUsersDic.TryGetValue(userId, out remove))
                     {
-                        _retweetedUsersDic.Remove(id);
-                        Status.RetweetedUsers = Status.RetweetedUsers.Except(new[] { id }).ToArray();
+                        _retweetedUsersDic.Remove(userId);
+                        Status.RetweetedUsers = Status.RetweetedUsers.Except(new[] { userId }).ToArray();
                     }
                 }
                 if (remove != null)
