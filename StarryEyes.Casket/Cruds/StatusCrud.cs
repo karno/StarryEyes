@@ -9,7 +9,7 @@ namespace StarryEyes.Casket.Cruds
     public sealed class StatusCrud : CrudBase<DatabaseStatus>
     {
         public StatusCrud()
-            : base(true)
+            : base(ResolutionMode.Replace)
         {
         }
 

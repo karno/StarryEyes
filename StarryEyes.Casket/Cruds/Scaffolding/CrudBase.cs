@@ -132,11 +132,11 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
         private readonly string _tableUpdater;
         private readonly string _tableDeleter;
 
-        public CrudBase(bool replaceOnConflict)
+        public CrudBase(ResolutionMode onConflict)
         {
             this._tableName = SentenceGenerator.GetTableName<T>();
             this._tableCreator = SentenceGenerator.GetTableCreator<T>();
-            this._tableInserter = SentenceGenerator.GetTableInserter<T>(replaceOnConflict);
+            this._tableInserter = SentenceGenerator.GetTableInserter<T>(onConflict);
             this._tableUpdater = SentenceGenerator.GetTableUpdater<T>();
             this._tableDeleter = SentenceGenerator.GetTableDeleter<T>();
         }

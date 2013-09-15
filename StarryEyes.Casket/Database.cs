@@ -100,7 +100,7 @@ namespace StarryEyes.Casket
 
         private static readonly string _statusInserter = SentenceGenerator.GetTableInserter<DatabaseStatus>();
 
-        private static readonly string _userInserter = SentenceGenerator.GetTableInserter<DatabaseUser>(true);
+        private static readonly string _userInserter = SentenceGenerator.GetTableInserter<DatabaseUser>(ResolutionMode.Replace);
 
         private static readonly string _statusEntityInserter =
             SentenceGenerator.GetTableInserter<DatabaseStatusEntity>();

@@ -56,7 +56,6 @@ namespace StarryEyes.Models.Databases
             {
                 // remove retweets
                 await Database.StatusCrud.DeleteAsync(statusId);
-
             }
             catch (Exception ex)
             {

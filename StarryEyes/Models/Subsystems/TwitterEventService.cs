@@ -6,6 +6,7 @@ using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Models.Backstages.TwitterEvents;
+using StarryEyes.Models.Databases;
 using StarryEyes.Models.Stores;
 using StarryEyes.Settings;
 
@@ -55,6 +56,9 @@ namespace StarryEyes.Models.Subsystems
                                     persist.RetweetedUsers =
                                         persist.RetweetedUsers.Guard().Append(status.User.Id).ToArray();
                                 }
+#pragma warning disable 4014
+                                DatabaseProxy.AddRetweeterAsync(persist.Id, status.User.Id);
+#pragma warning restore 4014
                             });
                         if (isAdd)
                             NotifyRetweeted(status.User, status.RetweetedOriginal);
@@ -70,26 +74,39 @@ namespace StarryEyes.Models.Subsystems
                                  status.RetweetedOriginal,
                                  model => model.RemoveRetweetedUser(status.User.Id),
                                  persist =>
-                                 persist.RetweetedUsers =
-                                 persist.RetweetedUsers.Guard().Where(id => id != status.User.Id).ToArray()));
+                                 {
+                                     DatabaseProxy.RemoveRetweeterAsync(persist.Id, status.User.Id);
+                                     persist.RetweetedUsers =
+                                         persist.RetweetedUsers.Guard().Where(id => id != status.User.Id).ToArray();
+                                 }));
                 }
             };
             Favorited += ue =>
-                           Task.Run(() =>
-                                    StatusModel.UpdateStatusInfo(
-                                        ue.Target,
-                                        model => model.AddFavoritedUser(ue.Source),
-                                        status =>
-                                        status.FavoritedUsers =
-                                        status.FavoritedUsers.Guard().Where(id => id != ue.Source.Id).ToArray()));
+                         Task.Run(() =>
+                                  StatusModel.UpdateStatusInfo(
+                                      ue.Target,
+                                      model => model.AddFavoritedUser(ue.Source),
+                                      status =>
+                                      {
+                                          DatabaseProxy.AddFavoritorAsync(status.Id, ue.Source.Id);
+                                          status.FavoritedUsers =
+                                              status.FavoritedUsers.Guard()
+                                                    .Where(id => id != ue.Source.Id)
+                                                    .ToArray();
+                                      }));
             Unfavorited += ue =>
                              Task.Run(() =>
                                       StatusModel.UpdateStatusInfo(
                                           ue.Target,
                                           model => model.RemoveFavoritedUser(ue.Source.Id),
                                           status =>
-                                          status.FavoritedUsers =
-                                          status.FavoritedUsers.Guard().Where(id => id != ue.Source.Id).ToArray()));
+                                          {
+                                              DatabaseProxy.RemoveFavoritorAsync(status.Id, ue.Source.Id);
+                                              status.FavoritedUsers =
+                                                  status.FavoritedUsers.Guard()
+                                                        .Where(id => id != ue.Source.Id)
+                                                        .ToArray();
+                                          }));
         }
 
         internal static void RegisterDefaultHandlers()

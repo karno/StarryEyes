@@ -102,16 +102,36 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
             return builder.ToString();
         }
 
-        public static string GetTableInserter<T>(bool replaceOnConflict = false)
+        public static string GetTableInserter<T>(ResolutionMode onConflict = ResolutionMode.Abort)
         {
-            return GetTableInserter(typeof(T), replaceOnConflict);
+            return GetTableInserter(typeof(T), onConflict);
         }
 
-        public static string GetTableInserter(Type type, bool replaceOnConflict = false)
+        public static string GetTableInserter(Type type, ResolutionMode onConflict = ResolutionMode.Abort)
         {
             var builder = new StringBuilder();
             var values = new StringBuilder();
-            builder.Append(replaceOnConflict ? "INSERT OR REPLACE INTO " : "INSERT INTO ");
+            builder.Append("INSERT ");
+            switch (onConflict)
+            {
+                case ResolutionMode.Abort:
+                    break;
+                case ResolutionMode.Rollback:
+                    builder.Append("OR ROLLBACK ");
+                    break;
+                case ResolutionMode.Fail:
+                    builder.Append("OR FAIL ");
+                    break;
+                case ResolutionMode.Ignore:
+                    builder.Append("OR IGNORE ");
+                    break;
+                case ResolutionMode.Replace:
+                    builder.Append("OR REPLACE ");
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException("onConflict");
+            }
+            builder.Append("INTO ");
             builder.Append(GetTableName(type));
             builder.Append("(");
             values.Append(" VALUES ");
@@ -210,5 +230,14 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
                        .OfType<T>()
                        .FirstOrDefault();
         }
+    }
+
+    public enum ResolutionMode
+    {
+        Abort,
+        Rollback,
+        Fail,
+        Ignore,
+        Replace
     }
 }

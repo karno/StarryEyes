@@ -7,7 +7,7 @@ namespace StarryEyes.Casket.Cruds
     public sealed class UserCrud : CrudBase<DatabaseUser>
     {
         public UserCrud()
-            : base(true)
+            : base(ResolutionMode.Replace)
         {
         }
 

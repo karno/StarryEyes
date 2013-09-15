@@ -10,7 +10,7 @@ namespace StarryEyes.Casket.Cruds
     public abstract class EntityCrudBase<T> : CrudBase<T> where T : DatabaseEntity, new()
     {
         protected EntityCrudBase()
-            : base(false)
+            : base(ResolutionMode.Abort)
         {
         }
 

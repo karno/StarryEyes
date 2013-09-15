@@ -309,7 +309,6 @@ namespace StarryEyes.Models
 
         public void AddFavoritedUser(long userId)
         {
-            DatabaseProxy.AddFavoritorAsync(this.Status.Id, userId);
             StoreHelper.GetUser(userId)
                        .Subscribe(AddFavoritedUser);
         }
@@ -341,6 +340,9 @@ namespace StarryEyes.Models
                 {
                     _favoritedUsers.Add(user);
                     StatusStore.Store(Status);
+#pragma warning disable 4014
+                    DatabaseProxy.AddFavoritorAsync(this.Status.Id, user.Id);
+#pragma warning restore 4014
                 }
             }
         }
@@ -374,12 +376,12 @@ namespace StarryEyes.Models
 
         public void AddRetweetedUser(long userId)
         {
-            DatabaseProxy.AddRetweeterAsync(this.Status.Id, userId);
             StoreHelper.GetUser(userId).Subscribe(AddRetweetedUser);
         }
 
         public async void AddRetweetedUser(TwitterUser user)
         {
+            DatabaseProxy.AddRetweeterAsync(this.Status.Id, user.Id);
             if (this.Status.RetweetedOriginal != null)
             {
                 var status = await Get(this.Status.RetweetedOriginal);

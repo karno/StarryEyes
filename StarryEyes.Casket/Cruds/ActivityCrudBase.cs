@@ -8,7 +8,7 @@ namespace StarryEyes.Casket.Cruds
     public abstract class ActivityCrudBase<T> : CrudBase<T> where T : DatabaseActivity, new()
     {
         protected ActivityCrudBase()
-            : base(false)
+            : base(ResolutionMode.Ignore)
         {
         }
 
