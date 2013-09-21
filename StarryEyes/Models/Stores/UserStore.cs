@@ -19,7 +19,7 @@ namespace StarryEyes.Models.Stores
         private static SingleThreadDispatcher<TwitterUser> _dispatcher;
 
         private static readonly object _snResolverLocker = new object();
-        private static readonly SortedDictionary<string, long> _screenNameResolver = new SortedDictionary<string, long>();
+        private static readonly IDictionary<string, long> _screenNameResolver = new Dictionary<string, long>();
 
         private static volatile bool _isInShutdown;
 

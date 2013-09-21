@@ -3,7 +3,7 @@
 namespace StarryEyes.Casket.DatabaseModels
 {
     [DbUniqueColumn("StatusId", "UserId")]
-    public abstract class DatabaseActivity : DbModelBase
+    public sealed class DatabaseActivity : DbModelBase
     {
         [DbPrimaryKey(true)]
         public long Id { get; set; }
@@ -12,10 +12,4 @@ namespace StarryEyes.Casket.DatabaseModels
 
         public long UserId { get; set; }
     }
-
-    [DbName("Favorites")]
-    public sealed class DatabaseFavorite : DatabaseActivity { }
-
-    [DbName("Retweets")]
-    public sealed class DatabaseRetweet : DatabaseActivity { }
 }

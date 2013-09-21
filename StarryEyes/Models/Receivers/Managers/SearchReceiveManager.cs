@@ -6,10 +6,10 @@ namespace StarryEyes.Models.Receivers.Managers
     internal class SearchReceiveManager
     {
         private readonly object _searchLocker = new object();
-        private readonly SortedDictionary<string, SearchReceiver> _searchReceiverResolver
-            = new SortedDictionary<string, SearchReceiver>();
-        private readonly SortedDictionary<string, int> _searchReferenceCount
-            = new SortedDictionary<string, int>();
+        private readonly IDictionary<string, SearchReceiver> _searchReceiverResolver
+            = new Dictionary<string, SearchReceiver>();
+        private readonly IDictionary<string, int> _searchReferenceCount
+            = new Dictionary<string, int>();
 
         public void RegisterSearchQuery(string query)
         {

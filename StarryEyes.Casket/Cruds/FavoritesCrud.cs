@@ -1,12 +1,8 @@
-﻿using StarryEyes.Casket.DatabaseModels;
-
+﻿
 namespace StarryEyes.Casket.Cruds
 {
-    public sealed class FavoritesCrud : ActivityCrudBase<DatabaseFavorite>
+    public sealed class FavoritesCrud : ActivityCrudBase
     {
-        protected override string IndexPrefix
-        {
-            get { return "FT"; }
-        }
+        public FavoritesCrud() : base("Favorites") { }
     }
 }

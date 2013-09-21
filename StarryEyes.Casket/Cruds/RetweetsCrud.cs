@@ -1,12 +1,8 @@
-﻿using StarryEyes.Casket.DatabaseModels;
-
+﻿
 namespace StarryEyes.Casket.Cruds
 {
-    public sealed class RetweetsCrud : ActivityCrudBase<DatabaseRetweet>
+    public sealed class RetweetsCrud : ActivityCrudBase
     {
-        protected override string IndexPrefix
-        {
-            get { return "RT"; }
-        }
+        public RetweetsCrud() : base("Retweets") { }
     }
 }

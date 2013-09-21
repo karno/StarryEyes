@@ -16,8 +16,8 @@ namespace StarryEyes.Models.Subsystems
     public static class PostLimitPredictionService
     {
         private static readonly object _dictLock = new object();
-        private static readonly SortedDictionary<long, LinkedList<TwitterStatus>> _dictionary =
-            new SortedDictionary<long, LinkedList<TwitterStatus>>();
+        private static readonly IDictionary<long, LinkedList<TwitterStatus>> _dictionary =
+            new Dictionary<long, LinkedList<TwitterStatus>>();
 
         public static void Initialize()
         {

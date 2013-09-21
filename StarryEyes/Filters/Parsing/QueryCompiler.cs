@@ -74,7 +74,7 @@ namespace StarryEyes.Filters.Parsing
 
         #region sources compiler
 
-        private static readonly IDictionary<string, Type> FilterSourceResolver = new SortedDictionary<string, Type>
+        private static readonly IDictionary<string, Type> FilterSourceResolver = new Dictionary<string, Type>
         {
             {"*", typeof (FilterLocal)},
             {"local", typeof (FilterLocal)},

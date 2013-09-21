@@ -57,7 +57,7 @@ namespace StarryEyes.Models.Subsystems
                                         persist.RetweetedUsers.Guard().Append(status.User.Id).ToArray();
                                 }
 #pragma warning disable 4014
-                                DatabaseProxy.AddRetweeterAsync(persist.Id, status.User.Id);
+                                StatusProxy.AddRetweeterAsync(persist.Id, status.User.Id);
 #pragma warning restore 4014
                             });
                         if (isAdd)
@@ -75,7 +75,7 @@ namespace StarryEyes.Models.Subsystems
                                  model => model.RemoveRetweetedUser(status.User.Id),
                                  persist =>
                                  {
-                                     DatabaseProxy.RemoveRetweeterAsync(persist.Id, status.User.Id);
+                                     StatusProxy.RemoveRetweeterAsync(persist.Id, status.User.Id);
                                      persist.RetweetedUsers =
                                          persist.RetweetedUsers.Guard().Where(id => id != status.User.Id).ToArray();
                                  }));
@@ -88,7 +88,7 @@ namespace StarryEyes.Models.Subsystems
                                       model => model.AddFavoritedUser(ue.Source),
                                       status =>
                                       {
-                                          DatabaseProxy.AddFavoritorAsync(status.Id, ue.Source.Id);
+                                          StatusProxy.AddFavoritorAsync(status.Id, ue.Source.Id);
                                           status.FavoritedUsers =
                                               status.FavoritedUsers.Guard()
                                                     .Where(id => id != ue.Source.Id)
@@ -101,7 +101,7 @@ namespace StarryEyes.Models.Subsystems
                                           model => model.RemoveFavoritedUser(ue.Source.Id),
                                           status =>
                                           {
-                                              DatabaseProxy.RemoveFavoritorAsync(status.Id, ue.Source.Id);
+                                              StatusProxy.RemoveFavoritorAsync(status.Id, ue.Source.Id);
                                               status.FavoritedUsers =
                                                   status.FavoritedUsers.Guard()
                                                         .Where(id => id != ue.Source.Id)

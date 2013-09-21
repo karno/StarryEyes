@@ -40,8 +40,10 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
 
         private static readonly LimitedTaskScheduler _scheduler = new LimitedTaskScheduler(16);
         private static readonly TaskFactory _factory = new TaskFactory(_scheduler);
+        protected static TaskFactory QueryTaskFactory { get { return _factory; } }
 
         #endregion
+
 
         protected SQLiteConnection OpenConnection()
         {
@@ -133,13 +135,29 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
         private readonly string _tableDeleter;
 
         public CrudBase(ResolutionMode onConflict)
+            : this(null, onConflict)
         {
-            this._tableName = SentenceGenerator.GetTableName<T>();
-            this._tableCreator = SentenceGenerator.GetTableCreator<T>();
-            this._tableInserter = SentenceGenerator.GetTableInserter<T>(onConflict);
-            this._tableUpdater = SentenceGenerator.GetTableUpdater<T>();
-            this._tableDeleter = SentenceGenerator.GetTableDeleter<T>();
         }
+
+        public CrudBase(string tableName, ResolutionMode onConflict)
+        {
+            this._tableName = tableName;
+            this._tableCreator = SentenceGenerator.GetTableCreator<T>(tableName);
+            this._tableInserter = SentenceGenerator.GetTableInserter<T>(tableName, onConflict);
+            this._tableUpdater = SentenceGenerator.GetTableUpdater<T>(tableName);
+            this._tableDeleter = SentenceGenerator.GetTableDeleter<T>(tableName);
+        }
+
+        #region query string builder
+
+        protected string CreateSql(string whereClause)
+        {
+            return String.IsNullOrEmpty(whereClause)
+                       ? "select * from " + this.TableName + ";"
+                       : "select * from " + this.TableName + " where " + whereClause + ";";
+        }
+
+        #endregion
 
         public virtual string TableName
         {
@@ -180,11 +198,11 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
         public virtual async Task<T> GetAsync(long key)
         {
             return (await this.QueryAsync<T>(
-                "select * from " + TableName + " where Id = @Id",
+                this.CreateSql("Id = @Id"),
                 new { Id = key })).SingleOrDefault();
         }
 
-        public virtual async Task InsertOrUpdateAsync(T item)
+        public virtual async Task InsertAsync(T item)
         {
             await this.ExecuteAsync(this.TableInserter, item);
         }

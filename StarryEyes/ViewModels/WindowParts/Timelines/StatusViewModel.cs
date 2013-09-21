@@ -1002,6 +1002,12 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
                                 RequestQueue.Enqueue(a, rreq)
                                             .Do(r => BackstageModel.RegisterEvent(
                                                 new BlockedEvent(a.GetPserudoUser(), User.User))))
+                    .Merge(
+                        RequestQueue.Enqueue(reporter,
+                                             new UpdateRelationRequest(this.User.User, RelationKind.ReportAsSpam))
+                                    .Do(r =>
+                                        BackstageModel.RegisterEvent(
+                                            new BlockedEvent(reporter.GetPserudoUser(), User.User))))
                     .Subscribe(
                         _ => { },
                         ex => BackstageModel.RegisterEvent(new InternalErrorEvent(ex.Message)),

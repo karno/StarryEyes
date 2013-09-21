@@ -20,6 +20,7 @@ namespace StarryEyes.Casket
         private static readonly UserUrlEntityCrud _userUrlEntityCrud = new UserUrlEntityCrud();
         private static readonly FavoritesCrud _favoritesCrud = new FavoritesCrud();
         private static readonly RetweetsCrud _retweetsCrud = new RetweetsCrud();
+        private static readonly RelationCrud _relationCrud = new RelationCrud();
         private static readonly MaintenanceCrud _maintenanceCrud = new MaintenanceCrud();
 
         private static string _dbFilePath;
@@ -62,6 +63,11 @@ namespace StarryEyes.Casket
             get { return _retweetsCrud; }
         }
 
+        public static RelationCrud RelationCrud
+        {
+            get { return _relationCrud; }
+        }
+
         public static void Initialize(string dbFilePath)
         {
             System.Diagnostics.Debug.WriteLine("Krile DB Initializing...(" + dbFilePath + ")");
@@ -90,7 +96,8 @@ namespace StarryEyes.Casket
                     UserDescriptionEntityCrud.InitializeAsync(),
                     UserUrlEntityCrud.InitializeAsync(),
                     FavoritesCrud.InitializeAsync(),
-                    RetweetsCrud.InitializeAsync()
+                    RetweetsCrud.InitializeAsync(),
+		    RelationCrud.InitializeAsync()
                 };
             }));
             Task.WaitAll(tasks);
@@ -100,7 +107,8 @@ namespace StarryEyes.Casket
 
         private static readonly string _statusInserter = SentenceGenerator.GetTableInserter<DatabaseStatus>();
 
-        private static readonly string _userInserter = SentenceGenerator.GetTableInserter<DatabaseUser>(ResolutionMode.Replace);
+        private static readonly string _userInserter =
+            SentenceGenerator.GetTableInserter<DatabaseUser>(onConflict: ResolutionMode.Replace);
 
         private static readonly string _statusEntityInserter =
             SentenceGenerator.GetTableInserter<DatabaseStatusEntity>();

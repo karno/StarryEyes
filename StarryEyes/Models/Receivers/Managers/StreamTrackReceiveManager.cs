@@ -12,9 +12,9 @@ namespace StarryEyes.Models.Receivers.Managers
 
         private readonly object _trackLocker = new object();
 
-        private readonly SortedDictionary<string, long> _trackResolver = new SortedDictionary<string, long>();
+        private readonly IDictionary<string, long> _trackResolver = new Dictionary<string, long>();
 
-        private readonly SortedDictionary<string, int> _trackReferenceCount = new SortedDictionary<string, int>();
+        private readonly IDictionary<string, int> _trackReferenceCount = new Dictionary<string, int>();
 
         private readonly object _danglingLocker = new object();
 

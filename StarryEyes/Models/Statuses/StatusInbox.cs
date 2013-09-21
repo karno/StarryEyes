@@ -68,13 +68,13 @@ namespace StarryEyes.Models.Statuses
                         if ((await StatusStore.Get(n.Status.Id).DefaultIfEmpty()) != null) continue;
                         // store status
                         StatusStore.Store(n.Status);
-                        await DatabaseProxy.StoreStatusAsync(n.Status);
+                        await StatusProxy.StoreStatusAsync(n.Status);
                     }
                     else
                     {
                         StatusStore.Remove(n.StatusId);
-                        var rtt = DatabaseProxy.GetRetweetedStatusIds(n.StatusId);
-                        await DatabaseProxy.RemoveStatusAsync(n.StatusId);
+                        var rtt = StatusProxy.GetRetweetedStatusIds(n.StatusId);
+                        await StatusProxy.RemoveStatusAsync(n.StatusId);
                         (await rtt).ForEach(QueueRemoval);
                     }
                     // post next 

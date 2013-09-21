@@ -11,10 +11,10 @@ namespace StarryEyes.Models.Receivers.Managers
     internal class ListReceiveManager
     {
         private readonly object _listReceiverLocker = new object();
-        private readonly SortedDictionary<ListInfo, ListReceiver> _listReceiverResolver
-            = new SortedDictionary<ListInfo, ListReceiver>();
-        private readonly SortedDictionary<ListInfo, int> _listReceiverReferenceCount
-            = new SortedDictionary<ListInfo, int>();
+        private readonly IDictionary<ListInfo, ListReceiver> _listReceiverResolver
+            = new Dictionary<ListInfo, ListReceiver>();
+        private readonly IDictionary<ListInfo, int> _listReceiverReferenceCount
+            = new Dictionary<ListInfo, int>();
 
         public void StartReceive(ListInfo info)
         {

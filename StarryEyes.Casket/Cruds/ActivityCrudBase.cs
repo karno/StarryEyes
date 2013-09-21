@@ -5,20 +5,21 @@ using StarryEyes.Casket.DatabaseModels;
 
 namespace StarryEyes.Casket.Cruds
 {
-    public abstract class ActivityCrudBase<T> : CrudBase<T> where T : DatabaseActivity, new()
+    public abstract class ActivityCrudBase : CrudBase<DatabaseActivity>
     {
-        protected ActivityCrudBase()
-            : base(ResolutionMode.Ignore)
-        {
-        }
+        private readonly string _tableName;
 
-        protected abstract string IndexPrefix { get; }
+        protected ActivityCrudBase(string tableName)
+            : base(tableName, ResolutionMode.Ignore)
+        {
+            _tableName = tableName;
+        }
 
         internal override async Task InitializeAsync()
         {
             await base.InitializeAsync();
-            await this.CreateIndexAsync(this.IndexPrefix + "_SID", "StatusId", false);
-            await this.CreateIndexAsync(this.IndexPrefix + "_UID", "UserId", false);
+            await this.CreateIndexAsync(_tableName + "_SID", "StatusId", false);
+            await this.CreateIndexAsync(_tableName + "_UID", "UserId", false);
         }
 
         public Task<IEnumerable<long>> GetUsersAsync(long statusId)
@@ -31,7 +32,7 @@ namespace StarryEyes.Casket.Cruds
 
         public async Task InsertAsync(long statusId, long userId)
         {
-            await base.InsertOrUpdateAsync(new T
+            await base.InsertAsync(new DatabaseActivity
             {
                 StatusId = statusId,
                 UserId = userId

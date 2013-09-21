@@ -10,18 +10,18 @@ using StarryEyes.Settings;
 
 namespace StarryEyes.Models.Receivers.Managers
 {
-    internal class UserReceiveManager
+    internal sealed class UserReceiveManager
     {
         private readonly object _bundlesLocker = new object();
 
-        private readonly SortedDictionary<long, UserReceiveBundle> _bundles =
-            new SortedDictionary<long, UserReceiveBundle>();
+        private readonly IDictionary<long, UserReceiveBundle> _bundles =
+            new Dictionary<long, UserReceiveBundle>();
 
         public event Action TrackRearranged;
 
         public event Action<long> ConnectionStateChanged;
 
-        protected virtual void OnConnectionStateChanged(long obj)
+        private void OnConnectionStateChanged(long obj)
         {
             var handler = this.ConnectionStateChanged;
             if (handler != null) handler(obj);

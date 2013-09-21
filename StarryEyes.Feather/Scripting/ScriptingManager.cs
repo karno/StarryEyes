@@ -9,8 +9,8 @@ namespace StarryEyes.Feather.Scripting
     /// </summary>
     public static class ScriptingManager
     {
-        private static readonly SortedDictionary<string, IScriptExecutor> _executors =
-            new SortedDictionary<string, IScriptExecutor>();
+        private static readonly IDictionary<string, IScriptExecutor> _executors =
+            new Dictionary<string, IScriptExecutor>();
 
         /// <summary>
         /// Register executor for execution scripts.

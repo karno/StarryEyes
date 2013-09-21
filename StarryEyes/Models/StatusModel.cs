@@ -24,8 +24,8 @@ namespace StarryEyes.Models
 
         private static readonly object _staticCacheLock = new object();
 
-        private static readonly SortedDictionary<long, WeakReference> _staticCache =
-            new SortedDictionary<long, WeakReference>();
+        private static readonly IDictionary<long, WeakReference> _staticCache =
+            new Dictionary<long, WeakReference>();
 
         private static readonly ConcurrentDictionary<long, object> _generateLock =
             new ConcurrentDictionary<long, object>();
@@ -137,7 +137,7 @@ namespace StarryEyes.Models
         private readonly ObservableSynchronizedCollection<TwitterUser> _favoritedUsers =
             new ObservableSynchronizedCollection<TwitterUser>();
 
-        private readonly SortedDictionary<long, TwitterUser> _favoritedUsersDic =
+        private readonly IDictionary<long, TwitterUser> _favoritedUsersDic =
             new SortedDictionary<long, TwitterUser>();
 
         private readonly object _favoritedsLock = new object();
@@ -145,7 +145,7 @@ namespace StarryEyes.Models
         private readonly ObservableSynchronizedCollection<TwitterUser> _retweetedUsers =
             new ObservableSynchronizedCollection<TwitterUser>();
 
-        private readonly SortedDictionary<long, TwitterUser> _retweetedUsersDic =
+        private readonly IDictionary<long, TwitterUser> _retweetedUsersDic =
             new SortedDictionary<long, TwitterUser>();
 
         private readonly object _retweetedsLock = new object();
@@ -341,7 +341,7 @@ namespace StarryEyes.Models
                     _favoritedUsers.Add(user);
                     StatusStore.Store(Status);
 #pragma warning disable 4014
-                    DatabaseProxy.AddFavoritorAsync(this.Status.Id, user.Id);
+                    StatusProxy.AddFavoritorAsync(this.Status.Id, user.Id);
 #pragma warning restore 4014
                 }
             }
@@ -349,7 +349,7 @@ namespace StarryEyes.Models
 
         public async void RemoveFavoritedUser(long userId)
         {
-            DatabaseProxy.RemoveFavoritorAsync(this.Status.Id, userId);
+            StatusProxy.RemoveFavoritorAsync(this.Status.Id, userId);
             if (this.Status.RetweetedOriginal != null)
             {
                 var status = await Get(this.Status.RetweetedOriginal);
@@ -381,7 +381,7 @@ namespace StarryEyes.Models
 
         public async void AddRetweetedUser(TwitterUser user)
         {
-            DatabaseProxy.AddRetweeterAsync(this.Status.Id, user.Id);
+            StatusProxy.AddRetweeterAsync(this.Status.Id, user.Id);
             if (this.Status.RetweetedOriginal != null)
             {
                 var status = await Get(this.Status.RetweetedOriginal);
@@ -413,7 +413,7 @@ namespace StarryEyes.Models
 
         public async void RemoveRetweetedUser(long userId)
         {
-            DatabaseProxy.RemoveRetweeterAsync(this.Status.Id, userId);
+            StatusProxy.RemoveRetweeterAsync(this.Status.Id, userId);
             if (this.Status.RetweetedOriginal != null)
             {
                 var status = await Get(this.Status.RetweetedOriginal);

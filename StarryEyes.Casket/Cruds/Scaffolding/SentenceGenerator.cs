@@ -9,17 +9,18 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
     public static class SentenceGenerator
     {
         private static readonly Dictionary<Type, string> TypeMapping =
-        new Dictionary<Type, string>{
-            {typeof(String), "TEXT"},
-            {typeof(Int32), "INTEGER"},
-            {typeof(Int64), "INTEGER"},
-            {typeof(Single), "REAL"},
-            {typeof(Double), "REAL"},
-            {typeof(Decimal), "REAL"},
-            {typeof(Boolean), "BOOLEAN"},
-            {typeof(Enum), "INT"},
-            {typeof(DateTime), "DATETIME"},
-        };
+            new Dictionary<Type, string>
+            {
+                {typeof (String), "TEXT"},
+                {typeof (Int32), "INTEGER"},
+                {typeof (Int64), "INTEGER"},
+                {typeof (Single), "REAL"},
+                {typeof (Double), "REAL"},
+                {typeof (Decimal), "REAL"},
+                {typeof (Boolean), "BOOLEAN"},
+                {typeof (Enum), "INT"},
+                {typeof (DateTime), "DATETIME"},
+            };
 
         public static string GetTableName<T>()
         {
@@ -34,16 +35,16 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
             return attr != null ? attr.Name : type.Name;
         }
 
-        public static string GetTableCreator<T>()
+        public static string GetTableCreator<T>(string tableName = null)
         {
-            return GetTableCreator(typeof(T));
+            return GetTableCreator(typeof(T), tableName);
         }
 
-        public static string GetTableCreator(Type type)
+        public static string GetTableCreator(Type type, string tableName = null)
         {
             var builder = new StringBuilder();
             builder.Append("CREATE TABLE IF NOT EXISTS ");
-            builder.Append(GetTableName(type));
+            builder.Append(tableName ?? GetTableName(type));
             builder.Append("(");
             var first = true;
             foreach (var prop in type.GetProperties())
@@ -102,12 +103,12 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
             return builder.ToString();
         }
 
-        public static string GetTableInserter<T>(ResolutionMode onConflict = ResolutionMode.Abort)
+        public static string GetTableInserter<T>(string tableName = null, ResolutionMode onConflict = ResolutionMode.Abort)
         {
-            return GetTableInserter(typeof(T), onConflict);
+            return GetTableInserter(typeof(T), tableName, onConflict);
         }
 
-        public static string GetTableInserter(Type type, ResolutionMode onConflict = ResolutionMode.Abort)
+        public static string GetTableInserter(Type type, string tableName = null, ResolutionMode onConflict = ResolutionMode.Abort)
         {
             var builder = new StringBuilder();
             var values = new StringBuilder();
@@ -132,7 +133,7 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
                     throw new ArgumentOutOfRangeException("onConflict");
             }
             builder.Append("INTO ");
-            builder.Append(GetTableName(type));
+            builder.Append(tableName ?? GetTableName(type));
             builder.Append("(");
             values.Append(" VALUES ");
             values.Append("(");
@@ -160,16 +161,16 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
             return builder.ToString();
         }
 
-        public static string GetTableUpdater<T>()
+        public static string GetTableUpdater<T>(string tableName = null)
         {
-            return GetTableUpdater(typeof(T));
+            return GetTableUpdater(typeof(T), tableName);
         }
 
-        public static string GetTableUpdater(Type type)
+        public static string GetTableUpdater(Type type, string tableName = null)
         {
             var builder = new StringBuilder();
             builder.Append("UPDATE ");
-            builder.Append(GetTableName(type));
+            builder.Append(tableName ?? GetTableName(type));
             builder.Append(" SET ");
             var first = true;
             var pk = "";
@@ -194,16 +195,16 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
             return builder.ToString();
         }
 
-        public static string GetTableDeleter<T>()
+        public static string GetTableDeleter<T>(string tableName = null)
         {
-            return GetTableDeleter(typeof(T));
+            return GetTableDeleter(typeof(T), tableName);
         }
 
-        public static string GetTableDeleter(Type type)
+        public static string GetTableDeleter(Type type, string tableName = null)
         {
             var builder = new StringBuilder();
             builder.Append("DELETE FROM ");
-            builder.Append(GetTableName(type));
+            builder.Append(tableName ?? GetTableName(type));
             builder.Append(" WHERE ");
             type.GetProperties()
                 .Where(prop => prop.GetCustomAttributes(typeof(DbPrimaryKeyAttribute), false)
