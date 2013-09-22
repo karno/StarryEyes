@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Threading.Tasks;
 using Livet;
 using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Models;
@@ -67,40 +66,37 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             get { return _searchCandidates; }
         }
 
-        public void UpdateInfo()
+        public async void UpdateInfo()
         {
-            Task.Run(async () =>
+            // update current binding accounts
+            var ctab = TabManager.CurrentFocusTab;
+            long cid = 0;
+            if (ctab != null && ctab.BindingAccountIds.Count == 1)
             {
-                // update current binding accounts
-                var ctab = TabManager.CurrentFocusTab;
-                long cid = 0;
-                if (ctab != null && ctab.BindingAccountIds.Count == 1)
-                {
-                    cid = ctab.BindingAccountIds.First();
-                }
-                if (this._currentId == cid) return;
-                this._currentId = cid;
-                this._searchCandidates.Clear();
-                var aid = Setting.Accounts.Get(this._currentId);
-                if (aid == null)
-                {
-                    this.IsSearchCandidateAvailable = false;
-                    return;
-                }
-                this.CurrentUserScreenName = aid.UnreliableScreenName;
-                this.CurrentUserProfileImage = aid.UnreliableProfileImage;
-                this.IsSearchCandidateAvailable = true;
-                try
-                {
-                    var searches = await aid.GetSavedSearchesAsync();
-                    searches.ForEach(
-                        s => this._searchCandidates.Add(new SearchCandidateItemViewModel(this, aid, s.Item1, s.Item2)));
-                }
-                catch (Exception ex)
-                {
-                    BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message));
-                }
-            });
+                cid = ctab.BindingAccountIds.First();
+            }
+            if (this._currentId == cid) return;
+            this._currentId = cid;
+            this._searchCandidates.Clear();
+            var aid = Setting.Accounts.Get(this._currentId);
+            if (aid == null)
+            {
+                this.IsSearchCandidateAvailable = false;
+                return;
+            }
+            this.CurrentUserScreenName = aid.UnreliableScreenName;
+            this.CurrentUserProfileImage = aid.UnreliableProfileImage;
+            this.IsSearchCandidateAvailable = true;
+            try
+            {
+                var searches = await aid.GetSavedSearchesAsync();
+                searches.ForEach(s => this._searchCandidates.Add(
+                    new SearchCandidateItemViewModel(this, aid, s.Item1, s.Item2)));
+            }
+            catch (Exception ex)
+            {
+                BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message));
+            }
         }
     }
 
