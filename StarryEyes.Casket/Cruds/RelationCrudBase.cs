@@ -10,6 +10,12 @@ namespace StarryEyes.Casket.Cruds
     {
         internal RelationCrudBase(string tableName) : base(tableName, ResolutionMode.Ignore) { }
 
+        internal override async Task InitializeAsync()
+        {
+            await base.InitializeAsync();
+            await this.CreateIndexAsync(TableName + "_IDX_UID", "UserId", false);
+        }
+
         public async Task<IEnumerable<DatabaseRelation>> GetAllAsync()
         {
             return await this.QueryAsync<DatabaseRelation>(this.CreateSql(null), null);
@@ -37,21 +43,21 @@ namespace StarryEyes.Casket.Cruds
         public async Task DeleteAsync(long userId, long targetId)
         {
             await this.QueryAsync<DatabaseRelation>(
-                "delete from " + TableName + "where UserId = @UserId and TargetId = @TargetId;",
+                "delete from " + TableName + " where UserId = @UserId and TargetId = @TargetId;",
                 new { UserId = userId, TargetId = targetId });
         }
 
         public async Task<IEnumerable<long>> GetUsersAsync(long userId)
         {
             return (await this.QueryAsync<long>(
-                "select tid from " + TableName + " where UserId = @UserId;",
+                "select TargetId from " + TableName + " where UserId = @UserId;",
                 new { UserId = userId }));
         }
 
         public async Task<IEnumerable<long>> GetUsersAllAsync()
         {
             return (await this.QueryAsync<long>(
-                "select distinct tid from " + TableName + ";", null));
+                "select distinct TargetId from " + TableName + ";", null));
         }
     }
 
