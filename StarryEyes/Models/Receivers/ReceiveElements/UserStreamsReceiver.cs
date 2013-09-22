@@ -203,7 +203,7 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
                 TwitterEventService.NotifyLimitationInfoGot(_parent.Account, (int)item.UndeliveredCount);
             }
 
-            public void OnUserActivity(StreamUserActivity item)
+            public async void OnUserActivity(StreamUserActivity item)
             {
                 var active = item.Source.Id == _parent.Account.Id;
                 var passive = item.Target.Id == _parent.Account.Id;
@@ -216,42 +216,42 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
                     case StreamUserActivityEvent.Follow:
                         if (active)
                         {
-                            reldata.AddFollowing(item.Target.Id);
+                            await reldata.SetFollowingAsync(item.Target.Id, true);
                         }
                         if (passive)
                         {
-                            reldata.AddFollower(item.Source.Id);
+                            await reldata.SetFollowerAsync(item.Source.Id, true);
                         }
                         TwitterEventService.NotifyFollowed(item.Source, item.Target);
                         break;
                     case StreamUserActivityEvent.Unfollow:
                         if (active)
                         {
-                            reldata.RemoveFollowing(item.Target.Id);
+                            await reldata.SetFollowingAsync(item.Target.Id, false);
                         }
                         if (passive)
                         {
-                            reldata.RemoveFollower(item.Source.Id);
+                            await reldata.SetFollowerAsync(item.Source.Id, false);
                         }
                         TwitterEventService.NotifyUnfollwed(item.Source, item.Target);
                         break;
                     case StreamUserActivityEvent.Block:
                         if (active)
                         {
-                            reldata.RemoveFollowing(item.Target.Id);
-                            reldata.RemoveFollower(item.Target.Id);
-                            reldata.AddBlocking(item.Target.Id);
+                            await reldata.SetFollowingAsync(item.Target.Id, false);
+                            await reldata.SetFollowerAsync(item.Target.Id, false);
+                            await reldata.SetBlockingAsync(item.Target.Id, true);
                         }
                         if (passive)
                         {
-                            reldata.RemoveFollower(item.Target.Id);
+                            await reldata.SetFollowerAsync(item.Target.Id, false);
                         }
                         TwitterEventService.NotifyBlocked(item.Source, item.Target);
                         break;
                     case StreamUserActivityEvent.Unblock:
                         if (active)
                         {
-                            reldata.RemoveBlocking(item.Target.Id);
+                            await reldata.SetBlockingAsync(item.Target.Id, false);
                         }
                         TwitterEventService.NotifyUnblocked(item.Source, item.Target);
                         break;

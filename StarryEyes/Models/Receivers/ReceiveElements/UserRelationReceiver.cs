@@ -34,13 +34,13 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
             Observable.Merge(
                 this._account.RetrieveAllCursor((a, c) => a.GetFriendsIdsAsync(_account.Id, c))
                     .Do(id => beforeFollowing.Remove(id))
-                    .Do(reldata.AddFollowing),
+                    .Do(id => reldata.SetFollowingAsync(id, true)),
                 this._account.RetrieveAllCursor((a, c) => a.GetFollowersIdsAsync(_account.Id, c))
                     .Do(id => beforeFollowers.Remove(id))
-                    .Do(reldata.AddFollower),
+                    .Do(id => reldata.SetFollowerAsync(id, true)),
                 this._account.RetrieveAllCursor((a, c) => a.GetBlockingsIdsAsync(c))
                     .Do(id => beforeBlockings.Remove(id))
-                    .Do(reldata.AddBlocking))
+                    .Do(id => reldata.SetBlockingAsync(id, true)))
                       .Subscribe(_ => { },
                                  ex =>
                                  {
@@ -53,9 +53,9 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
                                  () =>
                                  {
                                      // cleanup remains
-                                     beforeFollowing.ForEach(reldata.RemoveFollowing);
-                                     beforeFollowers.ForEach(reldata.RemoveFollower);
-                                     beforeBlockings.ForEach(reldata.RemoveBlocking);
+                                     beforeFollowing.ForEach(id => reldata.SetFollowingAsync(id, false));
+                                     beforeFollowers.ForEach(id => reldata.SetFollowerAsync(id, false));
+                                     beforeBlockings.ForEach(id => reldata.SetBlockingAsync(id, false));
                                  });
         }
     }

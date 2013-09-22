@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using StarryEyes.Albireo.Data;
+using StarryEyes.Models.Databases;
 
 namespace StarryEyes.Models.Accounting
 {
@@ -56,6 +58,16 @@ namespace StarryEyes.Models.Accounting
         public AccountRelationData(long accountId)
         {
             this._accountId = accountId;
+            // load data from db
+            Task.Run(async () =>
+                     (await UserProxy.GetFollowingsAsync(accountId))
+                         .ForEach(this._following.Add));
+            Task.Run(async () =>
+                     (await UserProxy.GetFollowersAsync(accountId))
+                         .ForEach(this._followers.Add));
+            Task.Run(async () =>
+                     (await UserProxy.GetBlockingsAsync(accountId))
+                         .ForEach(this._blockings.Add));
         }
 
         private readonly object _followingLocker = new object();
@@ -93,42 +105,21 @@ namespace StarryEyes.Models.Accounting
         /// </summary>
         /// <param name="id">target user's id</param>
         /// <param name="isAdded">flag of follow/remove</param>
-        public void SetFollowing(long id, bool isAdded)
+        public async Task SetFollowingAsync(long id, bool isAdded)
         {
             lock (this._followingLocker)
             {
                 if (isAdded)
+                {
                     this._following.Add(id);
+                }
                 else
+                {
                     this._following.Remove(id);
+                }
             }
+            await UserProxy.SetFollowing(_accountId, id, isAdded);
             this.OnAccountDataUpdated(id, isAdded, RelationDataChange.Following);
-        }
-
-        /// <summary>
-        /// Add following user
-        /// </summary>
-        /// <param name="id">add user's id</param>
-        public void AddFollowing(long id)
-        {
-            lock (this._followingLocker)
-            {
-                this._following.Add(id);
-            }
-            this.OnAccountDataUpdated(id, true, RelationDataChange.Following);
-        }
-
-        /// <summary>
-        /// Remove following user
-        /// </summary>
-        /// <param name="id">remove user's id</param>
-        public void RemoveFollowing(long id)
-        {
-            lock (this._followingLocker)
-            {
-                this._following.Remove(id);
-            }
-            this.OnAccountDataUpdated(id, false, RelationDataChange.Following);
         }
 
         private readonly object _followersLocker = new object();
@@ -166,42 +157,21 @@ namespace StarryEyes.Models.Accounting
         /// </summary>
         /// <param name="id">target user's id</param>
         /// <param name="isAdded">flag of followed/removed</param>
-        public void SetFollower(long id, bool isAdded)
+        public async Task SetFollowerAsync(long id, bool isAdded)
         {
             lock (this._followersLocker)
             {
                 if (isAdded)
+                {
                     this._followers.Add(id);
+                }
                 else
+                {
                     this._followers.Remove(id);
+                }
             }
+            await UserProxy.SetFollower(_accountId, id, isAdded);
             this.OnAccountDataUpdated(id, isAdded, RelationDataChange.Follower);
-        }
-
-        /// <summary>
-        /// Add follower user
-        /// </summary>
-        /// <param name="id">add user's id</param>
-        public void AddFollower(long id)
-        {
-            lock (this._followersLocker)
-            {
-                this._followers.Add(id);
-            }
-            this.OnAccountDataUpdated(id, true, RelationDataChange.Follower);
-        }
-
-        /// <summary>
-        /// Remove follower user
-        /// </summary>
-        /// <param name="id">remove user's id</param>
-        public void RemoveFollower(long id)
-        {
-            lock (this._followersLocker)
-            {
-                this._followers.Remove(id);
-            }
-            this.OnAccountDataUpdated(id, false, RelationDataChange.Follower);
         }
 
         private readonly object _blockingsLocker = new object();
@@ -239,42 +209,21 @@ namespace StarryEyes.Models.Accounting
         /// </summary>
         /// <param name="id">target user's id</param>
         /// <param name="isAdded">flag of blocked/unblocked</param>
-        public void SetBlocking(long id, bool isAdded)
+        public async Task SetBlockingAsync(long id, bool isAdded)
         {
             lock (this._blockingsLocker)
             {
                 if (isAdded)
+                {
                     this._blockings.Add(id);
+                }
                 else
+                {
                     this._blockings.Remove(id);
+                }
             }
+            await UserProxy.SetBlocking(_accountId, id, isAdded);
             this.OnAccountDataUpdated(id, isAdded, RelationDataChange.Blocking);
-        }
-
-        /// <summary>
-        /// Add blocking user
-        /// </summary>
-        /// <param name="id">add user's id</param>
-        public void AddBlocking(long id)
-        {
-            lock (this._blockingsLocker)
-            {
-                this._blockings.Add(id);
-            }
-            this.OnAccountDataUpdated(id, true, RelationDataChange.Blocking);
-        }
-
-        /// <summary>
-        /// Remove blocking user
-        /// </summary>
-        /// <param name="id">remove user's id</param>
-        public void RemoveBlocking(long id)
-        {
-            lock (this._blockingsLocker)
-            {
-                this._blockings.Remove(id);
-            }
-            this.OnAccountDataUpdated(id, false, RelationDataChange.Blocking);
         }
     }
 

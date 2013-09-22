@@ -6,7 +6,6 @@ using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Requests;
-using StarryEyes.Models.Stores;
 using StarryEyes.Nightmare.Windows;
 using StarryEyes.Views.Messaging;
 
@@ -104,40 +103,17 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 if (this.IsFollowing != fs.IsSourceFollowingTarget)
                 {
                     this.IsFollowing = fs.IsSourceFollowingTarget;
-                    if (fs.IsSourceFollowingTarget)
-                    {
-                        rds.AddFollowing(_target.Id);
-                    }
-                    else
-                    {
-                        rds.RemoveFollowing(_target.Id);
-                    }
-
+                    await rds.SetFollowingAsync(this._target.Id, fs.IsSourceFollowingTarget);
                 }
-
                 if (this.IsFollowedBack != fs.IsTargetFollowingSource)
                 {
                     this.IsFollowedBack = fs.IsTargetFollowingSource;
-                    if (fs.IsTargetFollowingSource)
-                    {
-                        rds.AddFollower(_target.Id);
-                    }
-                    else
-                    {
-                        rds.RemoveFollower(_target.Id);
-                    }
+                    await rds.SetFollowerAsync(_target.Id, fs.IsTargetFollowingSource);
                 }
                 if (this.IsBlocking != fs.IsBlocking)
                 {
                     this.IsBlocking = fs.IsBlocking;
-                    if (fs.IsBlocking)
-                    {
-                        rds.AddBlocking(_target.Id);
-                    }
-                    else
-                    {
-                        rds.RemoveBlocking(_target.Id);
-                    }
+                    await rds.SetBlockingAsync(_target.Id, fs.IsBlocking);
                 }
                 // ReSharper restore InvertIf
             }
