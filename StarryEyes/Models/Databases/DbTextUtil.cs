@@ -1,5 +1,4 @@
-﻿
-using System.Linq;
+﻿using System.Linq;
 
 namespace StarryEyes.Models.Databases
 {
@@ -11,7 +10,7 @@ namespace StarryEyes.Models.Databases
             {
                 return source;
             }
-            return Enumerable.Range(0, source.Length - n)
+            return Enumerable.Range(0, source.Length - n + 1)
                              .Select(i => source.Substring(i, n))
                              .JoinString(" ");
         }
