@@ -44,7 +44,6 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
 
         #endregion
 
-
         protected SQLiteConnection OpenConnection()
         {
             SQLiteConnection con = null;
@@ -141,11 +140,11 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
 
         public CrudBase(string tableName, ResolutionMode onConflict)
         {
-            this._tableName = tableName;
-            this._tableCreator = SentenceGenerator.GetTableCreator<T>(tableName);
-            this._tableInserter = SentenceGenerator.GetTableInserter<T>(tableName, onConflict);
-            this._tableUpdater = SentenceGenerator.GetTableUpdater<T>(tableName);
-            this._tableDeleter = SentenceGenerator.GetTableDeleter<T>(tableName);
+            this._tableName = tableName ?? SentenceGenerator.GetTableName<T>();
+            this._tableCreator = SentenceGenerator.GetTableCreator<T>(this._tableName);
+            this._tableInserter = SentenceGenerator.GetTableInserter<T>(this._tableName, onConflict);
+            this._tableUpdater = SentenceGenerator.GetTableUpdater<T>(this._tableName);
+            this._tableDeleter = SentenceGenerator.GetTableDeleter<T>(this._tableName);
         }
 
         #region query string builder
