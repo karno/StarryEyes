@@ -30,7 +30,8 @@ namespace StarryEyes.Casket.Cruds
         public async Task<IEnumerable<DatabaseUser>> GetUsersAsync(string partOfScreenName)
         {
             return await this.QueryAsync<DatabaseUser>(
-                this.CreateSql("ScreenName like '%" + partOfScreenName + "%'"), null);
+                this.CreateSql("ScreenName like @Match"),
+                new { Match = "%" + partOfScreenName + "%" });
         }
     }
 }

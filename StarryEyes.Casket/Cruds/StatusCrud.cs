@@ -28,7 +28,7 @@ namespace StarryEyes.Casket.Cruds
         public Task<IEnumerable<DatabaseStatus>> GetRetweetedStatusesAsync(long originalId)
         {
             return this.QueryAsync<DatabaseStatus>(
-                "SELECT * FROM " + this.TableName + " WHERE RetweetOriginalId = @OriginalId",
+                this.CreateSql("RetweetOriginalId = @OriginalId"),
                 new { OriginalId = originalId });
         }
     }

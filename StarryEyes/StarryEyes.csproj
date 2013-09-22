@@ -231,6 +231,7 @@
     <Compile Include="Models\Backstages\TwitterEvents\UnfollowedEvent.cs" />
     <Compile Include="Models\Backstages\BackstageEventBase.cs" />
     <Compile Include="Models\Backstages\TwitterEvents\UnknownEvent.cs" />
+    <Compile Include="Models\Databases\DbTextUtil.cs" />
     <Compile Include="Models\Databases\StatusProxy.cs" />
     <Compile Include="Models\Databases\Mapper.cs" />
     <Compile Include="Models\Databases\UserProxy.cs" />

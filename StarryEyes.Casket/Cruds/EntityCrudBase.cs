@@ -25,7 +25,7 @@ namespace StarryEyes.Casket.Cruds
         public async Task<IEnumerable<T>> GetEntitiesAsync(long parentId)
         {
             return await this.QueryAsync<T>(
-                "SELECT * FROM " + this.TableName + " WHERE ParentId = @Id",
+                this.CreateSql("ParentId = @Id"),
                 new { Id = parentId });
         }
 
