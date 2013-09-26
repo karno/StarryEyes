@@ -24,7 +24,7 @@ namespace StarryEyes.Models.Databases
             var mappedUser = Mapper.Map(status.User);
             try
             {
-                if (await Database.StatusCrud.GetAsync(status.Id) == null)
+                if (!(await Database.StatusCrud.CheckExistsAsync(status.Id)))
                 {
                     await Database.StoreStatus(
                         mappedStatus.Item1, mappedStatus.Item2,

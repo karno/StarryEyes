@@ -115,6 +115,7 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
 
         protected Task<IEnumerable<T>> QueryAsync<T>(string query, object param)
         {
+            System.Diagnostics.Debug.WriteLine("QUERY: " + query);
             return _factory.StartNew(() =>
             {
                 using (var con = this.OpenConnection())

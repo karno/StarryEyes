@@ -42,7 +42,7 @@ namespace StarryEyes.Casket.Cruds
 
         public async Task DeleteAsync(long userId, long targetId)
         {
-            await this.QueryAsync<DatabaseRelation>(
+            await this.ExecuteAsync(
                 "delete from " + TableName + " where UserId = @UserId and TargetId = @TargetId;",
                 new { UserId = userId, TargetId = targetId });
         }
