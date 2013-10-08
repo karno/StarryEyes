@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Filters.Parsing;
 
 namespace StarryEyes.Filters.Expressions.Operators
 {
@@ -29,6 +30,18 @@ namespace StarryEyes.Filters.Expressions.Operators
                 var ls = lsp(_);
                 return rsp(_).Any(ls.Contains);
             };
+        }
+
+        public override string GetBooleanSqlQuery()
+        {
+            var lq = LeftValue.GetSetSqlQuery();
+            if (RightValue.SupportedTypes.Contains(FilterExpressionType.Numeric))
+            {
+                return RightValue.GetNumericSqlQuery() + " IN " + lq;
+            }
+            var rq = RightValue.GetSetSqlQuery();
+            // check intersection
+            return "exists (" + lq.Unparenthesis() + " intersect " + rq.Unparenthesis() + ")";
         }
 
         public override IEnumerable<FilterExpressionType> SupportedTypes
@@ -61,6 +74,18 @@ namespace StarryEyes.Filters.Expressions.Operators
                 var rs = rsp(_);
                 return lsp(_).Any(rs.Contains);
             };
+        }
+
+        public override string GetBooleanSqlQuery()
+        {
+            var rq = RightValue.GetSetSqlQuery();
+            if (LeftValue.SupportedTypes.Contains(FilterExpressionType.Numeric))
+            {
+                return LeftValue.GetNumericSqlQuery() + " IN " + rq;
+            }
+            var lq = LeftValue.GetSetSqlQuery();
+            // check intersection
+            return "exists (" + lq.Unparenthesis() + " intersect " + rq.Unparenthesis() + ")";
         }
 
         public override IEnumerable<FilterExpressionType> SupportedTypes

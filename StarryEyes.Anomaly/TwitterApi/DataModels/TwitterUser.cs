@@ -34,7 +34,7 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
             this.IsContributorsEnabled = json.contributors_enabled;
             this.IsGeoEnabled = json.geo_enabled;
             this.StatusesCount = (long)json.statuses_count;
-            this.FollowingCount = (long)json.friends_count;
+            this.FollowingsCount = (long)json.friends_count;
             this.FollowersCount = (long)json.followers_count;
             this.FavoritesCount = (long)json.favourites_count;
             this.ListedCount = (long)json.listed_count;
@@ -141,7 +141,7 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
         /// <summary>
         /// Amount of friends(a.k.a followings) of this user.
         /// </summary>
-        public long FollowingCount { get; set; }
+        public long FollowingsCount { get; set; }
 
         /// <summary>
         /// Amount of followers of this user.
@@ -210,7 +210,7 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
                 var entity = this.UrlEntities.FirstOrDefault(u => u.EntityType == EntityType.Urls);
                 if (entity != null)
                 {
-                    return entity.OriginalText;
+                    return entity.OriginalUrl;
                 }
             }
             return Url;
@@ -238,7 +238,7 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
                         break;
                     case EntityType.Urls:
                         builder.Append(showFullUrl
-                                           ? ParsingExtension.ResolveEntity(entity.OriginalText)
+                                           ? ParsingExtension.ResolveEntity(entity.OriginalUrl)
                                            : ParsingExtension.ResolveEntity(entity.DisplayText));
                         break;
                     case EntityType.Media:
@@ -288,7 +288,7 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
             writer.Write(IsContributorsEnabled);
             writer.Write(IsGeoEnabled);
             writer.Write(StatusesCount);
-            writer.Write(FollowingCount);
+            writer.Write(this.FollowingsCount);
             writer.Write(FollowersCount);
             writer.Write(FavoritesCount);
             writer.Write(ListedCount);
@@ -324,7 +324,7 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
             IsContributorsEnabled = reader.ReadBoolean();
             IsGeoEnabled = reader.ReadBoolean();
             StatusesCount = reader.ReadInt64();
-            FollowingCount = reader.ReadInt64();
+            this.FollowingsCount = reader.ReadInt64();
             FollowersCount = reader.ReadInt64();
             FavoritesCount = reader.ReadInt64();
             ListedCount = reader.ReadInt64();

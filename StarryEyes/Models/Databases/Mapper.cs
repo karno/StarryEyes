@@ -23,7 +23,7 @@ namespace StarryEyes.Models.Databases
                 Description = user.Description,
                 FavoritesCount = user.FavoritesCount,
                 FollowersCount = user.FollowersCount,
-                FollowingCount = user.FollowingCount,
+                FollowingsCount = user.FollowingsCount,
                 Id = user.Id,
                 IsContributorsEnabled = user.IsContributorsEnabled,
                 IsDefaultProfileImage = user.IsDefaultProfileImage,
@@ -62,7 +62,8 @@ namespace StarryEyes.Models.Databases
                 EndIndex = entity.EndIndex,
                 EntityType = entity.EntityType,
                 MediaUrl = entity.MediaUrl,
-                OriginalText = entity.OriginalText,
+                OriginalUrl = entity.OriginalUrl,
+                UserId = entity.UserId,
                 StartIndex = entity.StartIndex,
                 ParentId = parentId,
             };
@@ -71,21 +72,26 @@ namespace StarryEyes.Models.Databases
         public static Tuple<DatabaseStatus, StatusEnts> Map([NotNull] TwitterStatus status)
         {
             if (status == null) throw new ArgumentNullException("status");
+            var orig = status.RetweetedOriginal ?? status;
             var dbs = new DatabaseStatus
             {
                 CreatedAt = status.CreatedAt,
                 Id = status.Id,
-                InReplyToScreenName = status.InReplyToScreenName,
-                InReplyToStatusId = status.InReplyToStatusId,
-                InReplyToUserId = status.InReplyToUserId,
+                BaseId = status.RetweetedOriginalId ?? status.Id,
+                RetweetId = status.RetweetedOriginal != null ? status.Id : (long?)null,
+                RetweetOriginalId = status.RetweetedOriginalId,
+                InReplyToOrRecipientScreenName = status.Recipient != null ? status.Recipient.ScreenName : status.InReplyToScreenName,
+                InReplyToStatusId = orig.InReplyToStatusId,
+                InReplyToOrRecipientUserId = status.Recipient != null ? status.Recipient.Id : orig.InReplyToUserId,
                 Latitude = status.Latitude,
                 Longitude = status.Longitude,
-                RecipientId = status.Recipient != null ? status.Recipient.Id : (long?)null,
-                RetweetOriginalId = status.RetweetedOriginalId,
                 Source = status.Source,
                 StatusType = status.StatusType,
-                Text = status.Text,
+                Text = orig.Text,
                 UserId = status.User.Id,
+                BaseUserId = orig.User.Id,
+                RetweeterId = status.RetweetedOriginal != null ? status.User.Id : (long?)null,
+                RetweetOriginalUserId = status.RetweetedOriginal != null ? status.RetweetedOriginal.User.Id : (long?)null
             };
             var ent = status.Entities.Select(e => Map<DatabaseStatusEntity>(status.Id, e));
             return Tuple.Create(dbs, ent);
@@ -115,7 +121,7 @@ namespace StarryEyes.Models.Databases
                 DescriptionEntities = dent.Select(Map).ToArray(),
                 FavoritesCount = user.FavoritesCount,
                 FollowersCount = user.FollowersCount,
-                FollowingCount = user.FollowingCount,
+                FollowingsCount = user.FollowingsCount,
                 Id = user.Id,
                 IsContributorsEnabled = user.IsContributorsEnabled,
                 IsDefaultProfileImage = user.IsDefaultProfileImage,
@@ -146,7 +152,8 @@ namespace StarryEyes.Models.Databases
                 EndIndex = entity.EndIndex,
                 EntityType = entity.EntityType,
                 MediaUrl = entity.MediaUrl,
-                OriginalText = entity.OriginalText,
+                OriginalUrl = entity.OriginalUrl,
+                UserId = entity.UserId,
                 StartIndex = entity.StartIndex
             };
         }
@@ -177,9 +184,9 @@ namespace StarryEyes.Models.Databases
                 Entities = ent.Select(Map).ToArray(),
                 FavoritedUsers = favorers.Guard().ToArray(),
                 Id = status.Id,
-                InReplyToScreenName = status.InReplyToScreenName,
+                InReplyToScreenName = status.InReplyToOrRecipientScreenName,
                 InReplyToStatusId = status.InReplyToStatusId,
-                InReplyToUserId = status.InReplyToUserId,
+                InReplyToUserId = status.InReplyToOrRecipientUserId,
                 Latitude = status.Latitude,
                 Longitude = status.Longitude,
                 RetweetedUsers = retweeters.Guard().ToArray(),
@@ -222,9 +229,9 @@ namespace StarryEyes.Models.Databases
                 Entities = ent.Select(Map).ToArray(),
                 FavoritedUsers = favorers.Guard().ToArray(),
                 Id = status.Id,
-                InReplyToScreenName = status.InReplyToScreenName,
+                InReplyToScreenName = status.InReplyToOrRecipientScreenName,
                 InReplyToStatusId = status.InReplyToStatusId,
-                InReplyToUserId = status.InReplyToUserId,
+                InReplyToUserId = status.InReplyToOrRecipientUserId,
                 Latitude = status.Latitude,
                 Longitude = status.Longitude,
                 RetweetedOriginal = originalStatus,
@@ -236,7 +243,6 @@ namespace StarryEyes.Models.Databases
                 User = user,
             };
         }
-
 
 
         public static TwitterStatus Map([NotNull] DatabaseStatus status, [NotNull] StatusEnts statusEntities,
@@ -260,9 +266,9 @@ namespace StarryEyes.Models.Databases
                 CreatedAt = status.CreatedAt,
                 Entities = ent.Select(Map).ToArray(),
                 Id = status.Id,
-                InReplyToScreenName = status.InReplyToScreenName,
+                InReplyToScreenName = status.InReplyToOrRecipientScreenName,
                 InReplyToStatusId = status.InReplyToStatusId,
-                InReplyToUserId = status.InReplyToUserId,
+                InReplyToUserId = status.InReplyToOrRecipientUserId,
                 Latitude = status.Latitude,
                 Longitude = status.Longitude,
                 Recipient = recipient,

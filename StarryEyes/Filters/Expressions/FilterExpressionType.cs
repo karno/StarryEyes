@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
+﻿
 namespace StarryEyes.Filters.Expressions
 {
     public enum FilterExpressionType
@@ -25,13 +23,5 @@ namespace StarryEyes.Filters.Expressions
         /// Numerical set (has 0~N Elements)
         /// </summary>
         Set,
-    }
-
-    public static class FilterExpressionUtil
-    {
-        public static bool Assert(FilterExpressionType type, params IEnumerable<FilterExpressionType>[] checks)
-        {
-            return checks.All(_ => _.Contains(type));
-        }
     }
 }

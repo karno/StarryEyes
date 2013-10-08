@@ -14,17 +14,8 @@ namespace StarryEyes.Filters
                 return Enumerable.Empty<long>();
             return status.Entities
                          .Where(e => e.EntityType == EntityType.UserMentions)
-                         .Select(e =>
-                         {
-                             try
-                             {
-                                 return long.Parse(e.OriginalText);
-                             }
-                             catch
-                             {
-                                 return 0;
-                             }
-                         }).Where(_ => _ != 0);
+                         .Select(e => e.UserId ?? 0)
+                         .Where(_ => _ != 0);
         }
 
         public static TwitterStatus GetOriginal(this TwitterStatus status)

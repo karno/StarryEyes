@@ -202,7 +202,7 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
                         break;
                     case EntityType.Urls:
                         builder.Append(showFullUrl
-                                           ? ParsingExtension.ResolveEntity(entity.OriginalText)
+                                           ? ParsingExtension.ResolveEntity(entity.OriginalUrl)
                                            : ParsingExtension.ResolveEntity(entity.DisplayText));
                         break;
                     case EntityType.Media:

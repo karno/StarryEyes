@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Linq;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Casket;
 using StarryEyes.Filters.Expressions;
 using StarryEyes.Filters.Sources;
 
 namespace StarryEyes.Filters
 {
-    public sealed class FilterQuery : IEquatable<FilterQuery>
+    public sealed class FilterQuery : IEquatable<FilterQuery>, IMultiplexPredicate<TwitterStatus>
     {
         public event Action InvalidateRequired;
         private void RaiseInvalidateRequired()

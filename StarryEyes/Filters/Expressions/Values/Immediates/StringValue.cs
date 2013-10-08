@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Filters.Expressions.Operators;
 
 namespace StarryEyes.Filters.Expressions.Values.Immediates
 {
@@ -11,6 +12,11 @@ namespace StarryEyes.Filters.Expressions.Values.Immediates
         public StringValue(string value)
         {
             this._value = value;
+        }
+
+        protected override string OperatorString
+        {
+            get { return "\"" + _value + "\""; }
         }
 
         public override IEnumerable<FilterExpressionType> SupportedTypes
@@ -24,6 +30,11 @@ namespace StarryEyes.Filters.Expressions.Values.Immediates
         public override Func<TwitterStatus, string> GetStringValueProvider()
         {
             return _ => _value;
+        }
+
+        public override string GetStringSqlQuery()
+        {
+            return _value.Escape().Wrap();
         }
 
         public override string ToQuery()

@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Text.RegularExpressions;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
-using StarryEyes.Filters.Expressions.Operators;
 using StarryEyes.Models;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;
@@ -66,10 +66,19 @@ namespace StarryEyes.Filters.Sources
             {
                 return Setting.Accounts.Collection;
             }
+            // *kar => unkar
+            // kar* => karno
+            // *kar* => dakara
+            var filtered =
+                new string(screenName.Where(c =>
+                                            (c >= 'A' && c <= 'Z') ||
+                                            (c >= 'a' && c <= 'z') ||
+                                            (c >= '0' && c <= '9') ||
+                                            c == '_' || c == '*')
+                                     .ToArray());
+            var pattern = filtered.Replace("*", ".*");
             return Setting.Accounts.Collection
-                          .Where(i => FilterOperatorEquals.StringMatch(
-                              i.UnreliableScreenName, screenName,
-                              FilterOperatorEquals.StringArgumentSide.Right));
+                          .Where(i => Regex.IsMatch(i.UnreliableScreenName, pattern));
         }
     }
 }

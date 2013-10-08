@@ -24,6 +24,11 @@ namespace StarryEyes.Filters.Expressions.Values.Immediates
             return _ => _value;
         }
 
+        public override string GetNumericSqlQuery()
+        {
+            return _value.ToString(CultureInfo.InvariantCulture);
+        }
+
         public override string ToQuery()
         {
             return _value.ToString(CultureInfo.InvariantCulture);

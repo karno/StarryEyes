@@ -2,7 +2,6 @@
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Casket;
 using StarryEyes.Filters.Expressions.Operators;
-using StarryEyes.Filters.Sql;
 
 namespace StarryEyes.Filters.Expressions
 {
@@ -53,6 +52,7 @@ namespace StarryEyes.Filters.Expressions
         }
 
         private FilterOperatorBase _operator;
+
         public FilterOperatorBase Operator
         {
             get { return _operator; }
@@ -71,22 +71,15 @@ namespace StarryEyes.Filters.Expressions
             return Operator == null ? "()" : Operator.ToQuery();
         }
 
-        public Func<TwitterStatus, bool> GetEvaluator()
-        {
-            if (Operator == null)
-                return Tautology;
-            if (!FilterExpressionUtil.Assert(FilterExpressionType.Boolean, Operator.SupportedTypes))
-                throw new FilterQueryException("Unsupported evaluating as boolean.", Operator.ToQuery());
-            return Operator.GetBooleanValueProvider();
-        }
-
         public string GetSqlQuery()
         {
-            if (Operator == null)
-                return TautologySql;
-            if (!FilterExpressionUtil.Assert(FilterExpressionType.Boolean, Operator.SupportedTypes))
-                throw new FilterQueryException("Unsupported evaluating as boolean.", Operator.ToQuery());
-            return this.ToSql();
+            return this.Operator == null ? "1" : this.Operator.GetBooleanSqlQuery();
+        }
+
+        public Func<TwitterStatus, bool> GetEvaluator()
+        {
+            System.Diagnostics.Debug.WriteLine("ちなみに SQL: " + this.GetSqlQuery());
+            return this.Operator == null ? Tautology : this.Operator.GetBooleanValueProvider();
         }
 
         public override void BeginLifecycle()

@@ -73,7 +73,7 @@ namespace StarryEyes.ViewModels.WindowParts.Timelines
 
         public long StatusesCount { get { return User.StatusesCount; } }
 
-        public long FollowingsCount { get { return User.FollowingCount; } }
+        public long FollowingsCount { get { return User.FollowingsCount; } }
 
         public long FollowersCount { get { return User.FollowersCount; } }
 

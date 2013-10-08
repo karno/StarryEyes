@@ -16,6 +16,11 @@ namespace StarryEyes.Filters.Expressions.Values.Users
             return _ => _.GetOriginal().User.Id;
         }
 
+        public override string GetNumericSqlQuery()
+        {
+            return "BaseUserId";
+        }
+
         public override string ToQuery()
         {
             return "user.id";
@@ -34,6 +39,11 @@ namespace StarryEyes.Filters.Expressions.Values.Users
             return _ => _.GetOriginal().User.StatusesCount;
         }
 
+        public override string GetNumericSqlQuery()
+        {
+            return "(select StatusesCount from User where Id = status.BaseUserId limit 1)";
+        }
+
         public override string ToQuery()
         {
             return "user.statuses"; // user.status_count is also ok
@@ -49,7 +59,12 @@ namespace StarryEyes.Filters.Expressions.Values.Users
 
         public override Func<TwitterStatus, long> GetNumericValueProvider()
         {
-            return _ => _.GetOriginal().User.FollowingCount;
+            return _ => _.GetOriginal().User.FollowingsCount;
+        }
+
+        public override string GetNumericSqlQuery()
+        {
+            return "(select FollowingsCount from User where Id = status.BaseUserId limit 1)";
         }
 
         public override string ToQuery()
@@ -70,6 +85,11 @@ namespace StarryEyes.Filters.Expressions.Values.Users
             return _ => _.GetOriginal().User.FollowersCount;
         }
 
+        public override string GetNumericSqlQuery()
+        {
+            return "(select FollowersCount from User where Id = status.BaseUserId limit 1)";
+        }
+
         public override string ToQuery()
         {
             return "user.followers";
@@ -86,6 +106,11 @@ namespace StarryEyes.Filters.Expressions.Values.Users
         public override Func<TwitterStatus, long> GetNumericValueProvider()
         {
             return _ => _.GetOriginal().User.FavoritesCount;
+        }
+
+        public override string GetNumericSqlQuery()
+        {
+            return "(select FavoritesCount from User where Id = status.BaseUserId limit 1)";
         }
 
         public override string ToQuery()
@@ -106,6 +131,11 @@ namespace StarryEyes.Filters.Expressions.Values.Users
             return _ => _.GetOriginal().User.ListedCount;
         }
 
+        public override string GetNumericSqlQuery()
+        {
+            return "(select ListedCount from User where Id = status.BaseUserId limit 1)";
+        }
+
         public override string ToQuery()
         {
             return "user.listed";
@@ -122,6 +152,11 @@ namespace StarryEyes.Filters.Expressions.Values.Users
         public override Func<TwitterStatus, long> GetNumericValueProvider()
         {
             return _ => _.RetweetedOriginal != null ? _.User.Id : -1;
+        }
+
+        public override string GetNumericSqlQuery()
+        {
+            return "RetweetOriginalId";
         }
 
         public override string ToQuery()
@@ -142,6 +177,11 @@ namespace StarryEyes.Filters.Expressions.Values.Users
             return _ => _.RetweetedOriginal != null ? _.User.StatusesCount : -1;
         }
 
+        public override string GetNumericSqlQuery()
+        {
+            return "(select StatusesCount from User where Id = status.RetweeterId limit 1)";
+        }
+
         public override string ToQuery()
         {
             return "retweeter.statuses"; // retweeter.status_count is also ok
@@ -157,7 +197,12 @@ namespace StarryEyes.Filters.Expressions.Values.Users
 
         public override Func<TwitterStatus, long> GetNumericValueProvider()
         {
-            return _ => _.RetweetedOriginal != null ? _.User.FollowingCount : -1;
+            return _ => _.RetweetedOriginal != null ? _.User.FollowingsCount : -1;
+        }
+
+        public override string GetNumericSqlQuery()
+        {
+            return "(select FollowingsCount from User where Id = status.RetweeterId limit 1)";
         }
 
         public override string ToQuery()
@@ -178,6 +223,11 @@ namespace StarryEyes.Filters.Expressions.Values.Users
             return _ => _.RetweetedOriginal != null ? _.User.FollowersCount : -1;
         }
 
+        public override string GetNumericSqlQuery()
+        {
+            return "(select FollowersCount from User where Id = status.RetweeterId limit 1)";
+        }
+
         public override string ToQuery()
         {
             return "retweeter.followers";
@@ -196,6 +246,11 @@ namespace StarryEyes.Filters.Expressions.Values.Users
             return _ => _.RetweetedOriginal != null ? _.User.FavoritesCount : -1;
         }
 
+        public override string GetNumericSqlQuery()
+        {
+            return "(select FavoritesCount from User where Id = status.RetweeterId limit 1)";
+        }
+
         public override string ToQuery()
         {
             return "retweeter.favorites";
@@ -212,6 +267,11 @@ namespace StarryEyes.Filters.Expressions.Values.Users
         public override Func<TwitterStatus, long> GetNumericValueProvider()
         {
             return _ => _.RetweetedOriginal != null ? _.User.ListedCount : -1;
+        }
+
+        public override string GetNumericSqlQuery()
+        {
+            return "(select ListedCount from User where Id = status.RetweeterId limit 1)";
         }
 
         public override string ToQuery()

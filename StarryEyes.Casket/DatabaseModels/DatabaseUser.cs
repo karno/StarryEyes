@@ -46,7 +46,7 @@ namespace StarryEyes.Casket.DatabaseModels
 
         public long StatusesCount { get; set; }
 
-        public long FollowingCount { get; set; }
+        public long FollowingsCount { get; set; }
 
         public long FollowersCount { get; set; }
 

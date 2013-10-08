@@ -16,6 +16,11 @@ namespace StarryEyes.Filters.Expressions.Values.Statuses
             return _ => _.GetOriginal().Id;
         }
 
+        public override string GetNumericSqlQuery()
+        {
+            return "BaseId";
+        }
+
         public override string ToQuery()
         {
             return "id";

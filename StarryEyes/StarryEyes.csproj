@@ -165,6 +165,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Filters\Expressions\Operators\OperatorStrings.cs" />
     <Compile Include="Filters\Expressions\Values\Users\Booleans.cs" />
     <Compile Include="Filters\Expressions\Values\Users\Complexes.cs" />
     <Compile Include="Filters\Expressions\Values\Users\Numerics.cs" />
@@ -199,7 +200,6 @@
     <Compile Include="Filters\Sources\FilterMessages.cs" />
     <Compile Include="Filters\Sources\FilterSearch.cs" />
     <Compile Include="Filters\Sources\FilterTrack.cs" />
-    <Compile Include="Filters\Sql\SqlBuilder.cs" />
     <Compile Include="Helpers\FreezableHelper.cs" />
     <Compile Include="Helpers\TwitterRegexPatterns.cs" />
     <Compile Include="Hotfixes\DispatcherCollectionRx.cs" />

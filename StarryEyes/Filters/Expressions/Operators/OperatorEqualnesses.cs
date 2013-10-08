@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
-using StarryEyes.Filters.Expressions.Values.Immediates;
 
 namespace StarryEyes.Filters.Expressions.Operators
 {
@@ -14,26 +12,14 @@ namespace StarryEyes.Filters.Expressions.Operators
             get { return "=="; }
         }
 
+        protected virtual string SqlOperator
+        {
+            get { return " = "; }
+        }
+
         public override Func<TwitterStatus, bool> GetBooleanValueProvider()
         {
-            var supportedTypes = new[]
-            {
-                FilterExpressionType.Boolean,
-                FilterExpressionType.Numeric,
-                FilterExpressionType.String,
-                FilterExpressionType.Set
-            };
-            var intersect = LeftValue.SupportedTypes.Intersect(RightValue.SupportedTypes).ToArray();
-            if (!intersect.Any())
-                throw new FilterQueryException(
-                    "Value type is mismatched. Can't compare each other." + Environment.NewLine +
-                    "Left argument is: " + LeftValue.SupportedTypes
-                    .Select(t => t.ToString()).JoinString(", ") + Environment.NewLine +
-                    "Right argument is: " + RightValue.SupportedTypes
-                    .Select(t => t.ToString()).JoinString(", "),
-                    this.ToQuery());
-            var type = supportedTypes.Intersect(intersect).First();
-            switch (type)
+            switch (this.GetArgumentIntersectTypes())
             {
                 case FilterExpressionType.Boolean:
                     var lbp = LeftValue.GetBooleanValueProvider();
@@ -44,76 +30,66 @@ namespace StarryEyes.Filters.Expressions.Operators
                     var rnp = RightValue.GetNumericValueProvider();
                     return _ => lnp(_) == rnp(_);
                 case FilterExpressionType.String:
-                    var side = StringArgumentSide.None;
-                    // determine side of argument
-                    if (LeftValue is StringValue)
-                        side = StringArgumentSide.Left;
-                    else if (RightValue is StringValue)
-                        side = StringArgumentSide.Right;
                     var lsp = LeftValue.GetStringValueProvider();
                     var rsp = RightValue.GetStringValueProvider();
-                    return _ => StringMatch(lsp(_), rsp(_), side);
+                    return _ => lsp(_) == rsp(_);
                 default:
-                    throw new FilterQueryException("Unsupported type on equals :" + type.ToString(),
-                        this.ToQuery());
+                    throw new InvalidOperationException("Invalid code path.");
             }
+        }
+
+        public override string GetBooleanSqlQuery()
+        {
+            Func<FilterOperatorBase, string> converter;
+            switch (this.GetArgumentIntersectTypes())
+            {
+                case FilterExpressionType.Boolean:
+                    converter = f => f.GetBooleanSqlQuery();
+                    break;
+                case FilterExpressionType.Numeric:
+                    converter = f => f.GetNumericSqlQuery();
+                    break;
+                case FilterExpressionType.String:
+                    converter = f => f.GetStringSqlQuery();
+                    break;
+                default:
+                    throw new InvalidOperationException("Invalid code path.");
+            }
+            return converter(LeftValue) + SqlOperator + converter(RightValue);
+        }
+
+        private FilterExpressionType GetArgumentIntersectTypes()
+        {
+            var supported = LeftValue.SupportedTypes
+                                     .Intersect(RightValue.SupportedTypes)
+                                     .Except(new[] { FilterExpressionType.Set, })
+                                     .ToArray();
+            if (supported.Any())
+            {
+                return supported.First();
+            }
+            supported = LeftValue.SupportedTypes
+                                 .Except(new[] { FilterExpressionType.Set, })
+                                 .ToArray();
+            if (supported.Any())
+            {
+                return supported.First();
+            }
+            // not matched
+            throw FilterQueryException.CreateUnsupportedType(
+                LeftValue.ToQuery(),
+                new[]
+                {
+                    FilterExpressionType.Boolean,
+                    FilterExpressionType.Numeric,
+                    FilterExpressionType.String
+                },
+                this.ToQuery());
         }
 
         public override IEnumerable<FilterExpressionType> SupportedTypes
         {
             get { yield return FilterExpressionType.Boolean; }
-        }
-
-        public static bool StringMatch(string left, string right, StringArgumentSide side)
-        {
-            if (left == null || right == null) // null value is not accepted.
-                return false;
-            if (side == StringArgumentSide.None)
-                return left == right;
-            if (side == StringArgumentSide.Left)
-            {
-                // set right as argument.
-                var cons = right;
-                right = left;
-                left = cons;
-            }
-            if (right.StartsWith("/"))
-            {
-                // regex
-                try
-                {
-                    return Regex.IsMatch(left, right.Substring(1));
-                }
-                catch // format error?
-                {
-                    return false;
-                }
-            }
-            var startsWith = right.StartsWith("^");
-            var endsWith = right.EndsWith("$");
-            if (startsWith && endsWith)
-            {
-                return left.Equals(right.Substring(1, right.Length - 2),
-                                   StringComparison.CurrentCultureIgnoreCase);
-            }
-            if (startsWith)
-            {
-                return left.StartsWith(right.Substring(1),
-                                       StringComparison.CurrentCultureIgnoreCase);
-            }
-            if (endsWith)
-            {
-                return left.EndsWith(right.Substring(right.Length - 1),
-                                     StringComparison.CurrentCultureIgnoreCase);
-            }
-            return left.IndexOf(right, StringComparison.CurrentCultureIgnoreCase) >= 0;
-        }
-
-        public enum StringArgumentSide
-        {
-            Left,
-            Right,
-            None,
         }
     }
 
@@ -125,6 +101,11 @@ namespace StarryEyes.Filters.Expressions.Operators
             {
                 return "!=";
             }
+        }
+
+        protected override string SqlOperator
+        {
+            get { return " <> "; }
         }
 
         public override Func<TwitterStatus, bool> GetBooleanValueProvider()

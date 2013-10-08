@@ -16,6 +16,11 @@ namespace StarryEyes.Filters.Expressions.Values.Users
             return _ => _.GetOriginal().User.IsProtected;
         }
 
+        public override string GetBooleanSqlQuery()
+        {
+            return "(select IsProtected from User where Id = status.BaseUserId limit 1)";
+        }
+
         public override string ToQuery()
         {
             return "user.is_protected";
@@ -32,6 +37,11 @@ namespace StarryEyes.Filters.Expressions.Values.Users
         public override Func<TwitterStatus, bool> GetBooleanValueProvider()
         {
             return _ => _.GetOriginal().User.IsVerified;
+        }
+
+        public override string GetBooleanSqlQuery()
+        {
+            return "(select IsVerified from User where Id = status.BaseUserId limit 1)";
         }
 
         public override string ToQuery()
@@ -52,6 +62,11 @@ namespace StarryEyes.Filters.Expressions.Values.Users
             return _ => _.GetOriginal().User.IsTranslator;
         }
 
+        public override string GetBooleanSqlQuery()
+        {
+            return "(select IsTranslator from User where Id = status.BaseUserId limit 1)";
+        }
+
         public override string ToQuery()
         {
             return "user.is_translator";
@@ -68,6 +83,11 @@ namespace StarryEyes.Filters.Expressions.Values.Users
         public override Func<TwitterStatus, bool> GetBooleanValueProvider()
         {
             return _ => _.GetOriginal().User.IsContributorsEnabled;
+        }
+
+        public override string GetBooleanSqlQuery()
+        {
+            return "(select IsContributorsEnabled from User where Id = status.BaseUserId limit 1)";
         }
 
         public override string ToQuery()
@@ -88,6 +108,11 @@ namespace StarryEyes.Filters.Expressions.Values.Users
             return _ => _.GetOriginal().User.IsGeoEnabled;
         }
 
+        public override string GetBooleanSqlQuery()
+        {
+            return "(select IsGeoEnabled from User where Id = status.BaseUserId limit 1)";
+        }
+
         public override string ToQuery()
         {
             return "user.is_geo_enabled";
@@ -104,6 +129,11 @@ namespace StarryEyes.Filters.Expressions.Values.Users
         public override Func<TwitterStatus, bool> GetBooleanValueProvider()
         {
             return _ => _.RetweetedOriginal != null && _.User.IsProtected;
+        }
+
+        public override string GetBooleanSqlQuery()
+        {
+            return "(select IsProtected from User where Id = status.RetweeterId limit 1)";
         }
 
         public override string ToQuery()
@@ -124,6 +154,11 @@ namespace StarryEyes.Filters.Expressions.Values.Users
             return _ => _.RetweetedOriginal != null && _.User.IsVerified;
         }
 
+        public override string GetBooleanSqlQuery()
+        {
+            return "(select IsVerified from User where Id = status.RetweeterId limit 1)";
+        }
+
         public override string ToQuery()
         {
             return "retweeter.is_verified";
@@ -140,6 +175,11 @@ namespace StarryEyes.Filters.Expressions.Values.Users
         public override Func<TwitterStatus, bool> GetBooleanValueProvider()
         {
             return _ => _.RetweetedOriginal != null && _.User.IsTranslator;
+        }
+
+        public override string GetBooleanSqlQuery()
+        {
+            return "(select IsTranslator from User where Id = status.RetweeterId limit 1)";
         }
 
         public override string ToQuery()
@@ -160,6 +200,11 @@ namespace StarryEyes.Filters.Expressions.Values.Users
             return _ => _.RetweetedOriginal != null && _.User.IsContributorsEnabled;
         }
 
+        public override string GetBooleanSqlQuery()
+        {
+            return "(select IsContributorsEnabled from User where Id = status.RetweeterId limit 1)";
+        }
+
         public override string ToQuery()
         {
             return "retweeter.is_contributors_enabled";
@@ -176,6 +221,11 @@ namespace StarryEyes.Filters.Expressions.Values.Users
         public override Func<TwitterStatus, bool> GetBooleanValueProvider()
         {
             return _ => _.RetweetedOriginal != null && _.User.IsGeoEnabled;
+        }
+
+        public override string GetBooleanSqlQuery()
+        {
+            return "(select IsGeoEnabled from User where Id = status.RetweeterId limit 1)";
         }
 
         public override string ToQuery()

@@ -79,10 +79,10 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
         {
             this.EntityType = entityType;
             this.DisplayText = display;
-            this.OriginalText = original;
+            this.OriginalUrl = original;
             if (string.IsNullOrEmpty(original))
             {
-                this.OriginalText = display;
+                this.OriginalUrl = display;
             }
             this.StartIndex = start;
             this.EndIndex = end;
@@ -99,12 +99,14 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
         public string DisplayText { get; set; }
 
         /// <summary>
-        /// String that represents original information. <para />
-        /// If this entity describes URL, this property may have original(unshortened) url. <para />
-        /// If this entity describes User, this property may have numerical ID of user. <para />
-        /// Otherwise, it has simply copy of Display string.
+        /// Unshortened URL of this if this entity describes (shortened) url.
         /// </summary>
-        public string OriginalText { get; set; }
+        public string OriginalUrl { get; set; }
+
+        /// <summary>
+        /// Numerical ID of the user if this entity describes user.
+        /// </summary>
+        public long? UserId { get; set; }
 
         /// <summary>
         /// Url of media. used only for Media entity.
@@ -125,7 +127,8 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
         {
             writer.Write((int)EntityType);
             writer.Write(DisplayText ?? string.Empty);
-            writer.Write(OriginalText ?? string.Empty);
+            writer.Write(this.OriginalUrl ?? string.Empty);
+            writer.Write(UserId);
             writer.Write(MediaUrl != null);
             if (MediaUrl != null)
                 writer.Write(MediaUrl);
@@ -137,7 +140,8 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
         {
             EntityType = (EntityType)reader.ReadInt32();
             DisplayText = reader.ReadString();
-            OriginalText = reader.ReadString();
+            this.OriginalUrl = reader.ReadString();
+            this.UserId = reader.ReadNullableLong();
             if (reader.ReadBoolean())
                 MediaUrl = reader.ReadString();
             StartIndex = reader.ReadInt32();

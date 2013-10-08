@@ -16,6 +16,11 @@ namespace StarryEyes.Filters.Expressions.Values.Statuses
             return _ => _.GetOriginal().Text;
         }
 
+        public override string GetStringSqlQuery()
+        {
+            return "Text";
+        }
+
         public override string ToQuery()
         {
             return "text";
@@ -33,6 +38,11 @@ namespace StarryEyes.Filters.Expressions.Values.Statuses
         {
             // Using not original.
             return _ => _.Source;
+        }
+
+        public override string GetStringSqlQuery()
+        {
+            return "Source";
         }
 
         public override string ToQuery()

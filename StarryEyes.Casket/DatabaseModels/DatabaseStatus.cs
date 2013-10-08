@@ -10,9 +10,21 @@ namespace StarryEyes.Casket.DatabaseModels
         [DbPrimaryKey]
         public long Id { get; set; }
 
+        public long BaseId { get; set; }
+
+        public long? RetweetId { get; set; }
+
+        public long? RetweetOriginalId { get; set; }
+
         public StatusType StatusType { get; set; }
 
         public long UserId { get; set; }
+
+        public long BaseUserId { get; set; }
+
+        public long? RetweeterId { get; set; }
+
+        public long? RetweetOriginalUserId { get; set; }
 
         public string Text { get; set; }
 
@@ -23,17 +35,13 @@ namespace StarryEyes.Casket.DatabaseModels
 
         public long? InReplyToStatusId { get; set; }
 
-        public long? InReplyToUserId { get; set; }
+        public long? InReplyToOrRecipientUserId { get; set; }
 
         [DbOptional]
-        public string InReplyToScreenName { get; set; }
+        public string InReplyToOrRecipientScreenName { get; set; }
 
         public double? Longitude { get; set; }
 
         public double? Latitude { get; set; }
-
-        public long? RetweetOriginalId { get; set; }
-
-        public long? RecipientId { get; set; }
     }
 }

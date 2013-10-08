@@ -13,23 +13,31 @@ namespace StarryEyes.Filters.Expressions.Operators
 
         public sealed override Func<TwitterStatus, bool> GetBooleanValueProvider()
         {
-            if (!FilterExpressionUtil.Assert(FilterExpressionType.Numeric,
-                LeftValue.SupportedTypes, RightValue.SupportedTypes))
-                throw new FilterQueryException("Unsupported type in operator " + OperatorString + ". Both sides must be numeric.",
-                    this.ToQuery());
             var l = LeftValue.GetNumericValueProvider();
             var r = RightValue.GetNumericValueProvider();
-            return Evaluate(l, r);
+            return this.BuildEvaluator(l, r);
         }
 
-        protected abstract Func<TwitterStatus, bool> Evaluate(Func<TwitterStatus, long> left, Func<TwitterStatus, long> right);
+        public override string GetBooleanSqlQuery()
+        {
+            return this.BuildEvaluatorSql(LeftValue.GetNumericSqlQuery(), RightValue.GetNumericSqlQuery());
+        }
+
+        protected abstract Func<TwitterStatus, bool> BuildEvaluator(Func<TwitterStatus, long> left, Func<TwitterStatus, long> right);
+
+        protected abstract string BuildEvaluatorSql(string left, string right);
     }
 
     public class FilterOperatorLessThan : FilterComparisonBase
     {
-        protected override Func<TwitterStatus, bool> Evaluate(Func<TwitterStatus, long> left, Func<TwitterStatus, long> right)
+        protected override Func<TwitterStatus, bool> BuildEvaluator(Func<TwitterStatus, long> left, Func<TwitterStatus, long> right)
         {
             return _ => left(_) < right(_);
+        }
+
+        protected override string BuildEvaluatorSql(string left, string right)
+        {
+            return left + " < " + right;
         }
 
         protected override string OperatorString
@@ -40,9 +48,14 @@ namespace StarryEyes.Filters.Expressions.Operators
 
     public class FilterOperatorLessThanOrEqual : FilterComparisonBase
     {
-        protected override Func<TwitterStatus, bool> Evaluate(Func<TwitterStatus, long> left, Func<TwitterStatus, long> right)
+        protected override Func<TwitterStatus, bool> BuildEvaluator(Func<TwitterStatus, long> left, Func<TwitterStatus, long> right)
         {
             return _ => left(_) <= right(_);
+        }
+
+        protected override string BuildEvaluatorSql(string left, string right)
+        {
+            return left + " <= " + right;
         }
 
         protected override string OperatorString
@@ -53,9 +66,14 @@ namespace StarryEyes.Filters.Expressions.Operators
 
     public class FilterOperatorGreaterThan : FilterComparisonBase
     {
-        protected override Func<TwitterStatus, bool> Evaluate(Func<TwitterStatus, long> left, Func<TwitterStatus, long> right)
+        protected override Func<TwitterStatus, bool> BuildEvaluator(Func<TwitterStatus, long> left, Func<TwitterStatus, long> right)
         {
             return _ => left(_) > right(_);
+        }
+
+        protected override string BuildEvaluatorSql(string left, string right)
+        {
+            return left + " > " + right;
         }
 
         protected override string OperatorString
@@ -66,9 +84,14 @@ namespace StarryEyes.Filters.Expressions.Operators
 
     public class FilterOperatorGreaterThanOrEqual : FilterComparisonBase
     {
-        protected override Func<TwitterStatus, bool> Evaluate(Func<TwitterStatus, long> left, Func<TwitterStatus, long> right)
+        protected override Func<TwitterStatus, bool> BuildEvaluator(Func<TwitterStatus, long> left, Func<TwitterStatus, long> right)
         {
             return _ => left(_) >= right(_);
+        }
+
+        protected override string BuildEvaluatorSql(string left, string right)
+        {
+            return left + " >= " + right;
         }
 
         protected override string OperatorString

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Filters.Parsing;
 using StarryEyes.Settings;
 
 namespace StarryEyes.Filters.Expressions.Values.Statuses
@@ -16,6 +18,11 @@ namespace StarryEyes.Filters.Expressions.Values.Statuses
         public override Func<TwitterStatus, bool> GetBooleanValueProvider()
         {
             return _ => _.StatusType == StatusType.DirectMessage;
+        }
+
+        public override string GetBooleanSqlQuery()
+        {
+            return "StatusType = " + ((int)StatusType.DirectMessage).ToString(CultureInfo.InvariantCulture);
         }
 
         public override string ToQuery()
@@ -37,6 +44,15 @@ namespace StarryEyes.Filters.Expressions.Values.Statuses
             return s => s.FavoritedUsers != null && accounts.Any(a => s.FavoritedUsers.Contains(a));
         }
 
+        public override string GetBooleanSqlQuery()
+        {
+            return "exists (select UserId from Favorites where StatusId = status.id intersects " +
+                   Setting.Accounts.Collection
+                          .Select(a => a.Id.ToString(CultureInfo.InvariantCulture))
+                          .JoinString(",").EnumerationToSelectClause()
+                   + ")";
+        }
+
         public override string ToQuery()
         {
             return "favorited";
@@ -56,6 +72,15 @@ namespace StarryEyes.Filters.Expressions.Values.Statuses
             return s => s.RetweetedUsers != null && accounts.Any(a => s.RetweetedUsers.Contains(a));
         }
 
+        public override string GetBooleanSqlQuery()
+        {
+            return "exists (select UserId from Retweets where StatusId = status.id intersects " +
+                   Setting.Accounts.Collection
+                          .Select(a => a.Id.ToString(CultureInfo.InvariantCulture))
+                          .JoinString(",").EnumerationToSelectClause()
+                   + ")";
+        }
+
         public override string ToQuery()
         {
             return "retweeted";
@@ -72,6 +97,11 @@ namespace StarryEyes.Filters.Expressions.Values.Statuses
         public override Func<TwitterStatus, bool> GetBooleanValueProvider()
         {
             return _ => _.RetweetedOriginal != null;
+        }
+
+        public override string GetBooleanSqlQuery()
+        {
+            return "RetweetOriginalId is not null";
         }
 
         public override string ToQuery()

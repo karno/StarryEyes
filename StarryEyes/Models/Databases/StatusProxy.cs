@@ -126,7 +126,21 @@ namespace StarryEyes.Models.Databases
                 .SelectMany(s => LoadStatusAsync(s).ToObservable());
         }
 
-        public static async Task<TwitterStatus> LoadStatusAsync([NotNull] DatabaseStatus dbstatus)
+        public static Task<TwitterStatus> LoadStatusAsync([NotNull] DatabaseStatus dbstatus)
+        {
+            if (dbstatus == null) throw new ArgumentNullException("dbstatus");
+            switch (dbstatus.StatusType)
+            {
+                case StatusType.Tweet:
+                    return LoadPublicStatusAsync(dbstatus);
+                case StatusType.DirectMessage:
+                    return LoadDirectMessageAsync(dbstatus);
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        private static async Task<TwitterStatus> LoadPublicStatusAsync([NotNull] DatabaseStatus dbstatus)
         {
             if (dbstatus == null) throw new ArgumentNullException("dbstatus");
             var id = dbstatus.Id;
@@ -140,6 +154,17 @@ namespace StarryEyes.Models.Databases
             }
             var rts = GetStatusAsync(dbstatus.RetweetOriginalId.Value);
             return Mapper.Map(dbstatus, await se, await favorers, await retweeters, await rts, await user);
+        }
+
+        private static async Task<TwitterStatus> LoadDirectMessageAsync([NotNull] DatabaseStatus dbstatus)
+        {
+            if (dbstatus == null) throw new ArgumentNullException("dbstatus");
+            if (dbstatus.InReplyToOrRecipientUserId == null) throw new ArgumentException("dbstatus.InReplyToUserOrRecipientId is must not be null.");
+            var id = dbstatus.Id;
+            var user = UserProxy.GetUserAsync(dbstatus.UserId);
+            var recipient = UserProxy.GetUserAsync(dbstatus.InReplyToOrRecipientUserId.Value);
+            var se = Database.StatusEntityCrud.GetEntitiesAsync(id);
+            return Mapper.Map(dbstatus, await se, await user, await recipient);
         }
     }
 }

@@ -44,6 +44,16 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
             return _ => cache;
         }
 
+        public override string GetNumericSqlQuery()
+        {
+            return _expression.UserIdSql;
+        }
+
+        public override string GetSetSqlQuery()
+        {
+            return _expression.UsersSql;
+        }
+
         public override void BeginLifecycle()
         {
             _expression.BeginLifecycle();
@@ -85,8 +95,13 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 
         public override Func<TwitterStatus, IReadOnlyCollection<long>> GetSetValueProvider()
         {
-            var cache = _expression.Following;
+            var cache = _expression.Followings;
             return _ => cache;
+        }
+
+        public override string GetSetSqlQuery()
+        {
+            return _expression.FollowingsSql;
         }
 
         public override void BeginLifecycle()
@@ -134,6 +149,11 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
             return _ => cache;
         }
 
+        public override string GetSetSqlQuery()
+        {
+            return _expression.FollowersSql;
+        }
+
         public override void BeginLifecycle()
         {
             _expression.BeginLifecycle();
@@ -177,6 +197,11 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
         {
             var cache = _expression.Blockings;
             return _ => cache;
+        }
+
+        public override string GetSetSqlQuery()
+        {
+            return _expression.BlockingsSql;
         }
 
         public override void BeginLifecycle()

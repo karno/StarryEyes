@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using StarryEyes.Albireo.Data;
+using StarryEyes.Filters.Parsing;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Stores;
 using StarryEyes.Settings;
@@ -62,6 +63,11 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
             }
         }
 
+        public override long UserId
+        {
+            get { return _userId; }
+        }
+
         public override IReadOnlyCollection<long> Users
         {
             get
@@ -70,7 +76,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
             }
         }
 
-        public override IReadOnlyCollection<long> Following
+        public override IReadOnlyCollection<long> Followings
         {
             get
             {
@@ -100,9 +106,29 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
             }
         }
 
-        public override long UserId
+        public override string UserIdSql
         {
-            get { return _userId; }
+            get { return _userId.ToString(CultureInfo.InvariantCulture); }
+        }
+
+        public override string UsersSql
+        {
+            get { return UserIdSql.EnumerationToSelectClause(); }
+        }
+
+        public override string FollowingsSql
+        {
+            get { return "(select Targetid from Followings where UserId = " + UserId + ")"; }
+        }
+
+        public override string FollowersSql
+        {
+            get { return "(select Targetid from Followers where UserId = " + UserId + ")"; }
+        }
+
+        public override string BlockingsSql
+        {
+            get { return "(select Targetid from Blockings where UserId = " + UserId + ")"; }
         }
 
         public override string ToQuery()

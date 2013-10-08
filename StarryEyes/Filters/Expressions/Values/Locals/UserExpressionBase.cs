@@ -10,11 +10,21 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 
         public abstract IReadOnlyCollection<long> Users { get; }
 
-        public abstract IReadOnlyCollection<long> Following { get; }
+        public abstract IReadOnlyCollection<long> Followings { get; }
 
         public abstract IReadOnlyCollection<long> Followers { get; }
 
         public abstract IReadOnlyCollection<long> Blockings { get; }
+
+        public abstract string UserIdSql { get; }
+
+        public abstract string UsersSql { get; }
+
+        public abstract string FollowingsSql { get; }
+
+        public abstract string FollowersSql { get; }
+
+        public abstract string BlockingsSql { get; }
 
         public abstract string ToQuery();
 
