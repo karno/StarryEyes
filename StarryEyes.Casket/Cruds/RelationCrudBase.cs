@@ -6,7 +6,7 @@ using StarryEyes.Casket.DatabaseModels;
 
 namespace StarryEyes.Casket.Cruds
 {
-    public sealed class RelationCrudBase : CrudBase<DatabaseRelation>
+    public sealed class RelationCrudBase : CachedCrudBase<DatabaseRelation>
     {
         internal RelationCrudBase(string tableName) : base(tableName, ResolutionMode.Ignore) { }
 
@@ -58,6 +58,11 @@ namespace StarryEyes.Casket.Cruds
         {
             return (await this.QueryAsync<long>(
                 "select distinct TargetId from " + TableName + ";", null));
+        }
+
+        protected override int DelayMilliSec
+        {
+            get { return 3000; }
         }
     }
 

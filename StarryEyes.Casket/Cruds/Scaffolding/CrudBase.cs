@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Linq;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using Dapper;
 using StarryEyes.Albireo.Threading;
@@ -210,6 +212,44 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
         public virtual async Task DeleteAsync(long key)
         {
             await this.ExecuteAsync(this.TableDeleter, new { Id = key });
+        }
+    }
+
+    public abstract class CachedCrudBase<T> : CrudBase<T> where T : class
+    {
+        protected CachedCrudBase(ResolutionMode onConflict)
+            : base(onConflict)
+        {
+            this.ConnectEntrant();
+        }
+
+        protected CachedCrudBase(string tableName, ResolutionMode onConflict)
+            : base(tableName, onConflict)
+        {
+            this.ConnectEntrant();
+        }
+
+        private readonly Subject<T> _entrant = new Subject<T>();
+
+        protected abstract int DelayMilliSec { get; }
+
+        private void ConnectEntrant()
+        {
+            _entrant.Buffer(TimeSpan.FromMilliseconds(DelayMilliSec))
+                    .Where(l => l.Count > 0)
+                    .Subscribe(this.CyclicWriteback);
+        }
+
+        private async void CyclicWriteback(IEnumerable<T> item)
+        {
+            var array = item.Select(i => Tuple.Create(this.TableInserter, (object)i)).ToArray();
+            System.Diagnostics.Debug.WriteLine("Write " + array.Length + " items in one batch...");
+            await this.ExecuteAllAsync(array);
+        }
+
+        public override async Task InsertAsync(T item)
+        {
+            _entrant.OnNext(item);
         }
     }
 }
