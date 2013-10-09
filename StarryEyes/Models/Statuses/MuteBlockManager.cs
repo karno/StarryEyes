@@ -62,7 +62,7 @@ namespace StarryEyes.Models.Statuses
                 }
                 return String.IsNullOrEmpty(blocksql)
                            ? _muteSqlQuery
-                           : _muteSqlQuery + " AND UserId NOT IN " + blocksql;
+                           : _muteSqlQuery + " AND UserId NOT IN (" + blocksql + ")";
             }
         }
 

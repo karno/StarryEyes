@@ -40,5 +40,10 @@ namespace StarryEyes.Casket.Cruds
                 this.CreateSql("RetweetOriginalId = @OriginalId"),
                 new { OriginalId = originalId });
         }
+
+        public async Task<IEnumerable<DatabaseStatus>> FetchAsync(string sql)
+        {
+            return await this.QueryAsync<DatabaseStatus>(sql, null);
+        }
     }
 }

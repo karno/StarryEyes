@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
@@ -118,12 +119,26 @@ namespace StarryEyes.Models.Databases
             return await LoadStatusAsync(status);
         }
 
-        public static IObservable<TwitterStatus> LoadStatusesAsync([NotNull] IEnumerable<DatabaseStatus> dbstatuses)
+        public static IObservable<TwitterStatus> FetchStatuses(string sql, long? maxId = null, int? count = null)
         {
-            if (dbstatuses == null) throw new ArgumentNullException("dbstatuses");
-            return dbstatuses
-                .ToObservable()
-                .SelectMany(s => LoadStatusAsync(s).ToObservable());
+            if (maxId != null)
+            {
+                var midc = "Id < " + maxId.Value.ToString(CultureInfo.InvariantCulture);
+                sql = String.IsNullOrEmpty(sql) ? midc : sql + " and " + midc;
+            }
+            if (!String.IsNullOrEmpty(sql))
+            {
+                sql = " where " + sql;
+            }
+            if (count != null)
+            {
+                sql += " limit " + count.Value.ToString(CultureInfo.InvariantCulture);
+            }
+            sql = "select * from status" + sql + ";";
+            return Database.StatusCrud.FetchAsync(sql)
+                           .ToObservable()
+                           .SelectMany(_ => _)
+                           .SelectMany(s => LoadStatusAsync(s).ToObservable());
         }
 
         public static Task<TwitterStatus> LoadStatusAsync([NotNull] DatabaseStatus dbstatus)
