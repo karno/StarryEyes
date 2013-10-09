@@ -2,7 +2,7 @@ using System;
 using StarryEyes.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 
-namespace StarryEyes.Models.Statuses
+namespace StarryEyes.Models.Receiving.Handling
 {
     public class StatusNotification
     {

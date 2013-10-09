@@ -10,7 +10,8 @@ using StarryEyes.Models;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Models.Receivers;
-using StarryEyes.Models.Receivers.ReceiveElements;
+using StarryEyes.Models.Receiving;
+using StarryEyes.Models.Receiving.Receivers;
 using StarryEyes.Models.Stores;
 using StarryEyes.Settings;
 
@@ -132,11 +133,11 @@ namespace StarryEyes.Filters.Sources
             _isActivated = true;
             if (!String.IsNullOrEmpty(_receiver))
             {
-                ReceiversManager.RegisterList(_receiver, _listInfo);
+                ReceiveManager.RegisterList(_receiver, _listInfo);
             }
             else
             {
-                ReceiversManager.RegisterList(_listInfo);
+                ReceiveManager.RegisterList(_listInfo);
             }
             _timer = new Timer(_ => this.TimerCallback(), null, TimeSpan.FromSeconds(0), TimeSpan.FromMinutes(30));
         }
@@ -145,7 +146,7 @@ namespace StarryEyes.Filters.Sources
         {
             if (!_isActivated) return;
             _isActivated = false;
-            ReceiversManager.UnregisterList(_listInfo);
+            ReceiveManager.UnregisterList(_listInfo);
             if (_timer != null)
             {
                 _timer.Dispose();

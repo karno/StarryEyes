@@ -7,7 +7,7 @@ using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;
-using StarryEyes.Models.Stores;
+using StarryEyes.Models.Receiving.Handling;
 using StarryEyes.Settings;
 
 namespace StarryEyes.Filters.Sources
@@ -41,7 +41,7 @@ namespace StarryEyes.Filters.Sources
         public IObservable<TwitterStatus> Receive(long? maxId)
         {
             return ReceiveSink(maxId)
-                .SelectMany(StoreHelper.NotifyAndMergeStore)
+                .Do(StatusInbox.Queue)
                 .Catch((Exception ex) =>
                 {
                     BackstageModel.RegisterEvent(

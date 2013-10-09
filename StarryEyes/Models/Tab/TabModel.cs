@@ -11,7 +11,7 @@ using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Filters;
 using StarryEyes.Filters.Parsing;
 using StarryEyes.Models.Backstages.SystemEvents;
-using StarryEyes.Models.Notifications;
+using StarryEyes.Models.Receiving.Handling;
 using StarryEyes.Models.Stores;
 using StarryEyes.Vanille.DataStore;
 
@@ -20,6 +20,7 @@ namespace StarryEyes.Models.Tab
     /// <summary>
     ///     Hold tab information for spawning tab.
     /// </summary>
+    [Obsolete]
     public sealed class TabModel
     {
         private readonly AVLTree<long> _bindingAccountIds = new AVLTree<long>();
@@ -169,7 +170,7 @@ namespace StarryEyes.Models.Tab
         {
             if (IsNotifyNewArrivals)
             {
-                NotificationModel.NotifyNewArrival(status);
+                //
             }
         }
 
@@ -230,7 +231,7 @@ namespace StarryEyes.Models.Tab
             return FilterQuery.Sources
                               .Select(_ => _.Receive(maxId))
                               .Merge()
-                              .SelectMany(StoreHelper.NotifyAndMergeStore)
+                              .Do(StatusInbox.Queue)
                               .OfType<Unit>();
         }
 

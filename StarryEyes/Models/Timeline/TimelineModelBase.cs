@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 using Livet;
 using StarryEyes.Albireo.Data;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
-using StarryEyes.Models.Statuses;
-using StatusNotification = StarryEyes.Models.Statuses.StatusNotification;
+using StarryEyes.Models.Receiving.Handling;
+using StatusNotification = StarryEyes.Models.Receiving.Handling.StatusNotification;
 
 namespace StarryEyes.Models.Timeline
 {

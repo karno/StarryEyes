@@ -1,11 +1,12 @@
 ﻿using System;
 using StarryEyes.Models.Accounting;
-using StarryEyes.Models.Receivers.Managers;
-using StarryEyes.Models.Receivers.ReceiveElements;
+using StarryEyes.Models.Receivers;
+using StarryEyes.Models.Receiving.Managers;
+using StarryEyes.Models.Receiving.Receivers;
 
-namespace StarryEyes.Models.Receivers
+namespace StarryEyes.Models.Receiving
 {
-    public static class ReceiversManager
+    public static class ReceiveManager
     {
         private static SearchReceiveManager _searchReceiveManager;
         private static ListReceiveManager _listReceiveManager;

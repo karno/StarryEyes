@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using StarryEyes.Models.Receivers.ReceiveElements;
+using StarryEyes.Models.Receiving.Receivers;
 
-namespace StarryEyes.Models.Receivers.Managers
+namespace StarryEyes.Models.Receiving.Managers
 {
     internal class SearchReceiveManager
     {
@@ -13,31 +13,31 @@ namespace StarryEyes.Models.Receivers.Managers
 
         public void RegisterSearchQuery(string query)
         {
-            lock (_searchLocker)
+            lock (this._searchLocker)
             {
-                if (_searchReferenceCount.ContainsKey(query))
+                if (this._searchReferenceCount.ContainsKey(query))
                 {
-                    _searchReferenceCount[query]++;
+                    this._searchReferenceCount[query]++;
                 }
                 else
                 {
-                    _searchReferenceCount.Add(query, 1);
+                    this._searchReferenceCount.Add(query, 1);
                     var receiver = new SearchReceiver(query);
-                    _searchReceiverResolver.Add(query, receiver);
+                    this._searchReceiverResolver.Add(query, receiver);
                 }
             }
         }
 
         public void UnregisterSearchQuery(string query)
         {
-            lock (_searchLocker)
+            lock (this._searchLocker)
             {
-                if (!_searchReferenceCount.ContainsKey(query))
+                if (!this._searchReferenceCount.ContainsKey(query))
                     return;
-                if (--_searchReferenceCount[query] != 0) return;
-                _searchReferenceCount.Remove(query);
-                var receiver = _searchReceiverResolver[query];
-                _searchReceiverResolver.Remove(query);
+                if (--this._searchReferenceCount[query] != 0) return;
+                this._searchReferenceCount.Remove(query);
+                var receiver = this._searchReceiverResolver[query];
+                this._searchReceiverResolver.Remove(query);
                 receiver.Dispose();
             }
         }

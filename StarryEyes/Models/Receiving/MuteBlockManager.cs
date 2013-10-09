@@ -8,7 +8,7 @@ using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Settings;
 
-namespace StarryEyes.Models.Statuses
+namespace StarryEyes.Models.Receiving
 {
     public static class MuteBlockManager
     {

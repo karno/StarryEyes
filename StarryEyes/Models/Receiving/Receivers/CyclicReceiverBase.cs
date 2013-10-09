@@ -5,7 +5,7 @@ using System.Reactive.Linq;
 using System.Threading;
 using StarryEyes.Models.Backstages.NotificationEvents;
 
-namespace StarryEyes.Models.Receivers.ReceiveElements
+namespace StarryEyes.Models.Receiving.Receivers
 {
     public abstract class CyclicReceiverBase : IDisposable
     {
@@ -13,7 +13,7 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
 
         protected CompositeDisposable CompositeDisposable
         {
-            get { return _disposable; }
+            get { return this._disposable; }
         }
 
         private int _remainCountDown;
@@ -22,31 +22,31 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
 
         public bool IsDisposed
         {
-            get { return _isDisposed; }
+            get { return this._isDisposed; }
         }
 
         protected abstract int IntervalSec { get; }
 
         protected CyclicReceiverBase()
         {
-            CompositeDisposable.Add(Observable.FromEvent(
+            this.CompositeDisposable.Add(Observable.FromEvent(
                 h => App.ApplicationFinalize += h,
                 h => App.ApplicationFinalize -= h)
                 .Subscribe(_ => this.Dispose()));
-            CompositeDisposable.Add(
+            this.CompositeDisposable.Add(
                 Observable.Interval(TimeSpan.FromSeconds(1))
                           .ObserveOn(TaskPoolScheduler.Default)
-                          .Subscribe(_ => OnTimer()));
+                          .Subscribe(_ => this.OnTimer()));
         }
 
         private void OnTimer()
         {
-            if (_isDisposed) return;
-            if (Interlocked.Decrement(ref _remainCountDown) > 0) return;
-            _remainCountDown = IntervalSec;
+            if (this._isDisposed) return;
+            if (Interlocked.Decrement(ref this._remainCountDown) > 0) return;
+            this._remainCountDown = this.IntervalSec;
             try
             {
-                DoReceive();
+                this.DoReceive();
             }
             catch (Exception ex)
             {
@@ -58,7 +58,7 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
 
         protected void CheckDisposed()
         {
-            if (_isDisposed)
+            if (this._isDisposed)
             {
                 throw new ObjectDisposedException(this.GetType().Name);
             }
@@ -66,19 +66,19 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
 
         public void Dispose()
         {
-            CheckDisposed();
-            _isDisposed = true;
-            Dispose(true);
+            this.CheckDisposed();
+            this._isDisposed = true;
+            this.Dispose(true);
         }
 
         ~CyclicReceiverBase()
         {
-            Dispose(false);
+            this.Dispose(false);
         }
 
         protected virtual void Dispose(bool disposing)
         {
-            CompositeDisposable.Dispose();
+            this.CompositeDisposable.Dispose();
         }
     }
 }

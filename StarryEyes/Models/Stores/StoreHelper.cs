@@ -3,7 +3,6 @@ using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
-using StarryEyes.Models.Notifications;
 using StarryEyes.Settings;
 
 namespace StarryEyes.Models.Stores
@@ -14,24 +13,12 @@ namespace StarryEyes.Models.Stores
     public static class StoreHelper
     {
         [Obsolete]
-        public static IObservable<TwitterStatus> MergeStore(TwitterStatus status)
-        {
-            return StatusStore.Get(status.Id)
-                              .ConcatIfEmpty(() =>
-                              {
-                                  StatusStore.Store(status);
-                                  return Observable.Return(status);
-                              });
-        }
-
-        [Obsolete]
         public static IObservable<TwitterStatus> NotifyAndMergeStore(TwitterStatus status)
         {
             return StatusStore.Get(status.Id)
                               .ConcatIfEmpty(() =>
                               {
                                   StatusStore.Store(status);
-                                  NotificationModel.NotifyNewArrival(status);
                                   return Observable.Return(status);
                               });
         }

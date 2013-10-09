@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Linq;
 using System.Reactive.Linq;
 using Livet;
 using StarryEyes.Models;
 using StarryEyes.Models.Backstages;
-using StarryEyes.Models.Receivers.ReceiveElements;
+using StarryEyes.Models.Receiving.Receivers;
 using StarryEyes.Models.Subsystems;
 using StarryEyes.Settings;
 using StarryEyes.ViewModels.WindowParts.Timelines;

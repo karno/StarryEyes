@@ -7,7 +7,7 @@ using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Settings;
 
-namespace StarryEyes.Models.Receivers.ReceiveElements
+namespace StarryEyes.Models.Receiving.Receivers
 {
     public class UserRelationReceiver : CyclicReceiverBase
     {
@@ -26,16 +26,16 @@ namespace StarryEyes.Models.Receivers.ReceiveElements
         protected override void DoReceive()
         {
             // get relation account
-            var reldata = _account.RelationData;
+            var reldata = this._account.RelationData;
             var beforeFollowing = new AVLTree<long>(reldata.Following);
             var beforeFollowers = new AVLTree<long>(reldata.Followers);
             var beforeBlockings = new AVLTree<long>(reldata.Blockings);
             // get followings / followers
             Observable.Merge(
-                this._account.RetrieveAllCursor((a, c) => a.GetFriendsIdsAsync(_account.Id, c))
+                this._account.RetrieveAllCursor((a, c) => a.GetFriendsIdsAsync(this._account.Id, c))
                     .Do(id => beforeFollowing.Remove(id))
                     .Do(id => reldata.SetFollowingAsync(id, true)),
-                this._account.RetrieveAllCursor((a, c) => a.GetFollowersIdsAsync(_account.Id, c))
+                this._account.RetrieveAllCursor((a, c) => a.GetFollowersIdsAsync(this._account.Id, c))
                     .Do(id => beforeFollowers.Remove(id))
                     .Do(id => reldata.SetFollowerAsync(id, true)),
                 this._account.RetrieveAllCursor((a, c) => a.GetBlockingsIdsAsync(c))

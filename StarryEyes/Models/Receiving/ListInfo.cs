@@ -31,7 +31,10 @@ namespace StarryEyes.Models.Receivers
 
         public int CompareTo(ListInfo other)
         {
-            return (OwnerScreenName + Slug).CompareTo(other.OwnerScreenName + other.Slug);
+            return String.Compare(
+                this.OwnerScreenName + this.Slug,
+                other.OwnerScreenName + other.Slug,
+                StringComparison.Ordinal);
         }
 
         public override string ToString()

@@ -8,7 +8,7 @@ using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models.Databases;
 using StarryEyes.Models.Stores;
 
-namespace StarryEyes.Models.Statuses
+namespace StarryEyes.Models.Receiving.Handling
 {
     /// <summary>
     /// Accept received statuses from any sources
@@ -88,6 +88,5 @@ namespace StarryEyes.Models.Statuses
                 _signal.WaitOne();
             }
         }
-
     }
 }

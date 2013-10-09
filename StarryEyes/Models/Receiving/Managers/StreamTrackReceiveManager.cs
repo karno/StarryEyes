@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
-using StarryEyes.Models.Receivers.ReceiveElements;
+using StarryEyes.Models.Receiving.Receivers;
 
-namespace StarryEyes.Models.Receivers.Managers
+namespace StarryEyes.Models.Receiving.Managers
 {
     internal class StreamTrackReceiveManager
     {
@@ -28,57 +28,57 @@ namespace StarryEyes.Models.Receivers.Managers
 
         public StreamTrackReceiveManager(UserReceiveManager receiveManager)
         {
-            _receiveManager = receiveManager;
-            _receiveManager.TrackRearranged += UpdateTrackInfo;
+            this._receiveManager = receiveManager;
+            this._receiveManager.TrackRearranged += this.UpdateTrackInfo;
         }
 
         void UpdateTrackInfo()
         {
             string[] dang;
-            lock (_trackLocker)
+            lock (this._trackLocker)
             {
-                var allTracks = _trackResolver.Keys.ToArray();
-                _trackResolver.Clear();
-                var trackers = _receiveManager.GetTrackers();
+                var allTracks = this._trackResolver.Keys.ToArray();
+                this._trackResolver.Clear();
+                var trackers = this._receiveManager.GetTrackers();
                 foreach (var track in trackers)
                 {
                     var id = track.UserId;
-                    track.TrackKeywords.ForEach(k => _trackResolver[k] = id);
+                    track.TrackKeywords.ForEach(k => this._trackResolver[k] = id);
                 }
-                dang = allTracks.Except(_trackResolver.Keys).ToArray();
+                dang = allTracks.Except(this._trackResolver.Keys).ToArray();
             }
             if (dang.Length > 0)
             {
-                lock (_danglingLocker)
+                lock (this._danglingLocker)
                 {
-                    _danglingKeywords.AddRange(dang);
-                    NotifyDangling();
+                    this._danglingKeywords.AddRange(dang);
+                    this.NotifyDangling();
                 }
             }
         }
 
         public void AddTrackKeyword(string track)
         {
-            lock (_addTrackLocker)
+            lock (this._addTrackLocker)
             {
-                if (_addTrackWaits == null)
+                if (this._addTrackWaits == null)
                 {
-                    _addTrackWaits = new List<string> { track };
+                    this._addTrackWaits = new List<string> { track };
                     Observable.Timer(TimeSpan.FromSeconds(3))
                               .Subscribe(_ =>
                               {
                                   List<string> tracks;
-                                  lock (_addTrackLocker)
+                                  lock (this._addTrackLocker)
                                   {
-                                      tracks = _addTrackWaits;
-                                      _addTrackWaits = null;
+                                      tracks = this._addTrackWaits;
+                                      this._addTrackWaits = null;
                                   }
-                                  AddTrackKeywordCore(tracks.ToArray());
+                                  this.AddTrackKeywordCore(tracks.ToArray());
                               });
                 }
                 else
                 {
-                    _addTrackWaits.Add(track);
+                    this._addTrackWaits.Add(track);
                 }
             }
         }
@@ -86,41 +86,41 @@ namespace StarryEyes.Models.Receivers.Managers
         public void RemoveTrackKeyword(string track)
         {
             Observable.Timer(TimeSpan.FromSeconds(10))
-                      .Subscribe(_ => RemoveTrackKeywordCore(track));
+                      .Subscribe(_ => this.RemoveTrackKeywordCore(track));
         }
 
         private void AddTrackKeywordCore(string[] tracks)
         {
-            lock (_trackLocker)
+            lock (this._trackLocker)
             {
                 foreach (var track in tracks)
                 {
-                    if (_trackReferenceCount.ContainsKey(track))
+                    if (this._trackReferenceCount.ContainsKey(track))
                     {
-                        _trackReferenceCount[track]++;
+                        this._trackReferenceCount[track]++;
                         return;
                     }
                     System.Diagnostics.Debug.WriteLine("◎ track add: " + track);
-                    _trackReferenceCount[track] = 1;
+                    this._trackReferenceCount[track] = 1;
                 }
 
                 var trackList = new List<string>(tracks);
 
                 while (trackList.Count > 0)
                 {
-                    var tracker = _receiveManager.GetSuitableKeywordTracker();
+                    var tracker = this._receiveManager.GetSuitableKeywordTracker();
                     if (tracker == null)
                     {
-                        lock (_danglingLocker)
+                        lock (this._danglingLocker)
                         {
-                            _danglingKeywords.AddRange(trackList);
+                            this._danglingKeywords.AddRange(trackList);
                         }
-                        NotifyDangling();
+                        this.NotifyDangling();
                         return;
                     }
                     var acceptableCount = UserStreamsReceiver.MaxTrackingKeywordCounts - tracker.TrackKeywords.Count();
                     var acceptables = trackList.Take(acceptableCount).ToArray();
-                    acceptables.ForEach(track => _trackResolver[track] = tracker.UserId);
+                    acceptables.ForEach(track => this._trackResolver[track] = tracker.UserId);
                     tracker.TrackKeywords = tracker.TrackKeywords.Concat(acceptables).ToArray();
                     trackList = trackList.Skip(acceptableCount).ToList();
                 }
@@ -129,32 +129,32 @@ namespace StarryEyes.Models.Receivers.Managers
 
         private void RemoveTrackKeywordCore(string track)
         {
-            lock (_trackLocker)
+            lock (this._trackLocker)
             {
-                if (!_trackReferenceCount.ContainsKey(track) || --_trackReferenceCount[track] > 0)
+                if (!this._trackReferenceCount.ContainsKey(track) || --this._trackReferenceCount[track] > 0)
                 {
                     return;
                 }
-                _trackReferenceCount.Remove(track);
-                if (_trackResolver.ContainsKey(track))
+                this._trackReferenceCount.Remove(track);
+                if (this._trackResolver.ContainsKey(track))
                 {
-                    var id = _trackResolver[track];
-                    _trackResolver.Remove(track);
-                    var tracker = _receiveManager.GetKeywordTrackerFromId(id);
+                    var id = this._trackResolver[track];
+                    this._trackResolver.Remove(track);
+                    var tracker = this._receiveManager.GetKeywordTrackerFromId(id);
                     tracker.TrackKeywords = tracker.TrackKeywords.Except(new[] { track });
                     return;
                 }
             }
-            lock (_danglingLocker)
+            lock (this._danglingLocker)
             {
-                _danglingKeywords.Remove(track);
+                this._danglingKeywords.Remove(track);
             }
         }
 
         private void NotifyDangling()
         {
-            if (_isDanglingNotified) return;
-            _isDanglingNotified = true;
+            if (this._isDanglingNotified) return;
+            this._isDanglingNotified = true;
         }
 
         private void ResolveDanglings()

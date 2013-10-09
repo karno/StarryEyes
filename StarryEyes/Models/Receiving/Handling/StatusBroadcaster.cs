@@ -3,9 +3,9 @@ using System.Collections.Concurrent;
 using System.Reactive.Subjects;
 using System.Threading;
 using StarryEyes.Annotations;
-using StarryEyes.Models.Notifications;
+using StarryEyes.Models.Subsystems;
 
-namespace StarryEyes.Models.Statuses
+namespace StarryEyes.Models.Receiving.Handling
 {
     /// <summary>
     /// Broadcast new statuses to each tab, user interfaces, etc
@@ -18,7 +18,7 @@ namespace StarryEyes.Models.Statuses
         private static Thread _pumpThread;
         private static volatile bool _isHaltRequested;
 
-        public static Subject<StatusNotification> BroadcastPoint
+        public static IObservable<StatusNotification> BroadcastPoint
         {
             get { return _broadcastSubject; }
         }
@@ -62,10 +62,15 @@ namespace StarryEyes.Models.Statuses
                             continue;
                         }
                     }
+                    if (status.IsAdded)
+                    {
+                        NotificationService.NotifyReceived(status.Status);
+                        NotificationService.StartAcceptNewArrival(status.Status);
+                    }
                     _broadcastSubject.OnNext(status);
                     if (status.IsAdded)
                     {
-                        NotificationModel.NotifyNewArrival(status.Status);
+                        NotificationService.EndAcceptNewArrival(status.Status);
                     }
                     _signal.Reset();
                 }

@@ -6,6 +6,7 @@ using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Filters;
 using StarryEyes.Filters.Expressions;
 using StarryEyes.Models.Stores;
+using StarryEyes.Models.Subsystems;
 using StarryEyes.Vanille.DataStore;
 
 namespace StarryEyes.Models.Timeline
@@ -60,6 +61,16 @@ namespace StarryEyes.Models.Timeline
             }
         }
 
+        #region Tab Parameters
+
+        public bool IsNotifyNewArrivals { get; set; }
+
+        public bool IsShowUnreadCounts { get; set; }
+
+        public string NotifySoundSource { get; set; }
+
+        #endregion
+
         #region Filtering Control
 
         private string _filterSql = FilterExpressionBase.ContradictionSql;
@@ -82,6 +93,19 @@ namespace StarryEyes.Models.Timeline
         protected override bool CheckAcceptStatus(TwitterStatus status)
         {
             return _filterFunc(status);
+        }
+
+        #endregion
+
+        #region Notification Chain
+
+        protected override void AddStatus(TwitterStatus status)
+        {
+            if (IsNotifyNewArrivals)
+            {
+                NotificationService.NotifyNewArrival(status, this);
+            }
+            base.AddStatus(status);
         }
 
         #endregion

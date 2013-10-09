@@ -3,7 +3,7 @@ using System.Reactive.Linq;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Anomaly.Utils;
-using StarryEyes.Models.Receivers;
+using StarryEyes.Models.Receiving;
 using StarryEyes.Settings;
 
 namespace StarryEyes.Filters.Sources
@@ -33,14 +33,14 @@ namespace StarryEyes.Filters.Sources
         {
             if (_isActivated) return;
             _isActivated = true;
-            ReceiversManager.RegisterSearchQuery(_query);
+            ReceiveManager.RegisterSearchQuery(_query);
         }
 
         public override void Deactivate()
         {
             if (!_isActivated) return;
             _isActivated = false;
-            ReceiversManager.UnregisterSearchQuery(_query);
+            ReceiveManager.UnregisterSearchQuery(_query);
         }
 
         public override string FilterKey

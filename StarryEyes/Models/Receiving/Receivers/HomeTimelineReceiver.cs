@@ -4,10 +4,10 @@ using System.Threading.Tasks;
 using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;
-using StarryEyes.Models.Statuses;
+using StarryEyes.Models.Receiving.Handling;
 using StarryEyes.Settings;
 
-namespace StarryEyes.Models.Receivers.ReceiveElements
+namespace StarryEyes.Models.Receiving.Receivers
 {
     public class HomeTimelineReceiver : CyclicReceiverBase
     {

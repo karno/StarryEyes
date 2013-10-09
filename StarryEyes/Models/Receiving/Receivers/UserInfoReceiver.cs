@@ -5,7 +5,7 @@ using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Models.Stores;
 using StarryEyes.Settings;
 
-namespace StarryEyes.Models.Receivers.ReceiveElements
+namespace StarryEyes.Models.Receiving.Receivers
 {
     public class UserInfoReceiver : CyclicReceiverBase
     {

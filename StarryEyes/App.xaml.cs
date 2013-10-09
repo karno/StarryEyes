@@ -16,8 +16,8 @@ using StarryEyes.Casket;
 using StarryEyes.Feather.Scripting;
 using StarryEyes.Models;
 using StarryEyes.Models.Plugins;
-using StarryEyes.Models.Receivers;
-using StarryEyes.Models.Statuses;
+using StarryEyes.Models.Receiving;
+using StarryEyes.Models.Receiving.Handling;
 using StarryEyes.Models.Stores;
 using StarryEyes.Models.Subsystems;
 using StarryEyes.Nightmare.Windows;
@@ -153,7 +153,6 @@ namespace StarryEyes
             // initialize subsystems
             StatisticsService.Initialize();
             PostLimitPredictionService.Initialize();
-            TwitterEventService.Initialize();
             MuteBlockManager.Initialize();
             StatusBroadcaster.Initialize();
             StatusInbox.Initialize();
@@ -164,9 +163,7 @@ namespace StarryEyes
             // activate scripts
             ScriptingManager.ExecuteScripts(Path.Combine(ExeFileDir, ScriptDirectiory));
 
-            // finalize handlers
-            TwitterEventService.RegisterDefaultHandlers();
-            ReceiversManager.Initialize();
+            ReceiveManager.Initialize();
             TwitterConfigurationService.Initialize();
             BackstageModel.Initialize();
             RaiseSystemReady();

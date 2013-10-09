@@ -2,8 +2,8 @@
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;
-using StarryEyes.Models.Receivers;
-using StarryEyes.Models.Receivers.ReceiveElements;
+using StarryEyes.Models.Receiving;
+using StarryEyes.Models.Receiving.Receivers;
 using StarryEyes.Models.Stores;
 using StarryEyes.Models.Subsystems;
 
@@ -76,12 +76,12 @@ namespace StarryEyes.Models.Backstages
 
         internal void UpdateConnectionState()
         {
-            this.ConnectionState = ReceiversManager.GetConnectionState(this.Account.Id);
+            this.ConnectionState = ReceiveManager.GetConnectionState(this.Account.Id);
         }
 
         public void Reconnect()
         {
-            ReceiversManager.ReconnectUserStreams(this.Account.Id);
+            ReceiveManager.ReconnectUserStreams(this.Account.Id);
         }
     }
 }

@@ -4,7 +4,7 @@ using System.Reactive.Linq;
 using Livet;
 using StarryEyes.Models.Backstages;
 using StarryEyes.Models.Backstages.TwitterEvents;
-using StarryEyes.Models.Receivers;
+using StarryEyes.Models.Receiving;
 using StarryEyes.Settings;
 
 namespace StarryEyes.Models
@@ -27,7 +27,7 @@ namespace StarryEyes.Models
                        Setting.Accounts.Collection.ForEach(a => _accounts.Add(new BackstageAccountModel(a)));
                    });
             Setting.Accounts.Collection.ForEach(a => _accounts.Add(new BackstageAccountModel(a)));
-            ReceiversManager.UserStreamsConnectionStateChanged += UpdateConnectionState;
+            ReceiveManager.UserStreamsConnectionStateChanged += UpdateConnectionState;
         }
 
         static void UpdateConnectionState(long id)
