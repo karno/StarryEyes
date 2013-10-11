@@ -10,8 +10,14 @@ namespace StarryEyes.Filters
     {
         public static IEnumerable<long> InReplyToUsers(TwitterStatus status)
         {
+            if (status.StatusType == StatusType.DirectMessage)
+            {
+                return new[] { status.Recipient.Id };
+            }
             if (status.Entities == null)
+            {
                 return Enumerable.Empty<long>();
+            }
             return status.Entities
                          .Where(e => e.EntityType == EntityType.UserMentions)
                          .Select(e => e.UserId ?? 0)

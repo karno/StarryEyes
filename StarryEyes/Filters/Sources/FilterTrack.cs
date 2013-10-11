@@ -17,6 +17,11 @@ namespace StarryEyes.Filters.Sources
             return _ => _.Text.IndexOf(_query, StringComparison.Ordinal) >= 0;
         }
 
+        public override string GetSqlQuery()
+        {
+            return "Text like '%" + _query + "%'";
+        }
+
         private bool _isActivated;
         public override void Activate()
         {

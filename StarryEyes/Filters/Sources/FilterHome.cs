@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
@@ -23,6 +24,22 @@ namespace StarryEyes.Filters.Sources
         {
             var ads = GetAccountsFromString(_screenName);
             return _ => CheckVisibleTimeline(_, ads);
+        }
+
+        public override string GetSqlQuery()
+        {
+            var accounts = GetAccountsFromString(_screenName).Memoize();
+            var ads = accounts.Select(a => a.Id.ToString(CultureInfo.InvariantCulture))
+                              .JoinString(",");
+            var userMention = ((int)EntityType.UserMentions).ToString(CultureInfo.InvariantCulture);
+            var followings = accounts.SelectMany(a => a.RelationData.Following)
+                                     .Select(id => id.ToString(CultureInfo.InvariantCulture))
+                                     .JoinString(",");
+            return "(UserId in (" + ads + ") OR " +
+                   "UserId in (" + followings + ") OR " +
+                   "UserId in (select ParentId from StatusEntity where " +
+                   "EntityType = " + userMention + " and " +
+                   "UserId in (" + ads + "))";
         }
 
         private bool CheckVisibleTimeline(TwitterStatus status, IEnumerable<TwitterAccount> datas)

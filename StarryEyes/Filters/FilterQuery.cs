@@ -51,8 +51,23 @@ namespace StarryEyes.Filters
 
         public string GetSqlQuery()
         {
-            return PredicateTreeRoot != null
+            var source =
+                Sources.Guard()
+                       .Select(s => s.GetSqlQuery())
+                       .JoinString(" and ");
+            var predicate = PredicateTreeRoot != null
                        ? PredicateTreeRoot.GetSqlQuery()
+                       : String.Empty;
+            if (!String.IsNullOrEmpty(source))
+            {
+                if (!String.IsNullOrEmpty(predicate))
+                {
+                    return source + " and (" + predicate + ")";
+                }
+                return source;
+            }
+            return !String.IsNullOrEmpty(predicate)
+                       ? predicate
                        : FilterExpressionBase.ContradictionSql;
         }
 
@@ -83,22 +98,34 @@ namespace StarryEyes.Filters
         {
             if (Sources != null)
             {
-                Sources.ForEach(s => s.Activate());
+                Sources.ForEach(s =>
+                {
+                    s.Activate();
+                    s.InvalidateRequired += this.RaiseInvalidateRequired;
+                });
             }
-            if (this.PredicateTreeRoot == null) return;
-            this.PredicateTreeRoot.BeginLifecycle();
-            this.PredicateTreeRoot.ReapplyRequested += this.RaiseInvalidateRequired;
+            if (this.PredicateTreeRoot != null)
+            {
+                this.PredicateTreeRoot.BeginLifecycle();
+                this.PredicateTreeRoot.ReapplyRequested += this.RaiseInvalidateRequired;
+            }
         }
 
         public void Deactivate()
         {
             if (Sources != null)
             {
-                Sources.ForEach(s => s.Deactivate());
+                Sources.ForEach(s =>
+                {
+                    s.Deactivate();
+                    s.InvalidateRequired -= this.RaiseInvalidateRequired;
+                });
             }
-            if (this.PredicateTreeRoot == null) return;
-            this.PredicateTreeRoot.EndLifecycle();
-            this.PredicateTreeRoot.ReapplyRequested -= this.RaiseInvalidateRequired;
+            if (this.PredicateTreeRoot != null)
+            {
+                this.PredicateTreeRoot.EndLifecycle();
+                this.PredicateTreeRoot.ReapplyRequested -= this.RaiseInvalidateRequired;
+            }
         }
     }
 }

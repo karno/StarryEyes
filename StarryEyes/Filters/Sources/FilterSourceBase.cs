@@ -23,6 +23,16 @@ namespace StarryEyes.Filters.Sources
 
         public abstract Func<TwitterStatus, bool> GetEvaluator();
 
+        public abstract string GetSqlQuery();
+
+        public event Action InvalidateRequired;
+
+        protected virtual void RaiseInvalidateRequired()
+        {
+            var handler = this.InvalidateRequired;
+            if (handler != null) handler();
+        }
+
         /// <summary>
         /// Activate dependency receiving method.
         /// </summary>

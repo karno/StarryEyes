@@ -1,18 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
-using System.Reactive.Linq;
 using System.Threading.Tasks;
 using StarryEyes.Albireo.Data;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
-using StarryEyes.Models.Stores;
+using StarryEyes.Models.Databases;
 
 namespace StarryEyes.Filters.Sources
 {
     public class FilterConversation : FilterSourceBase
     {
-        private bool _initialized = false;
         private readonly long _original;
-        private long _head;
         private readonly AVLTree<long> _statuses = new AVLTree<long>();
 
         public FilterConversation(string sid)
@@ -23,35 +22,33 @@ namespace StarryEyes.Filters.Sources
                 throw new ArgumentException("argument must be numeric value.");
             }
             this._original = id;
-            this.FindHeadAsync(id)
-                .ContinueWith(s => _head = s.Result)
-                .ContinueWith(_ =>
-                {
-                    long[] array;
-                    lock (_statuses)
-                    {
-                        array = _statuses.ToArray();
-                    }
-                    array.ToObservable()
-                             .SelectMany(StoreHelper.GetTweet)
-                             .Subscribe(s => StatusStore.Store(s));
-                });
+            this.TraceBackConversations(id);
+        }
+
+        private async void TraceBackConversations(long origin)
+        {
+            var queue = new Queue<long>();
+            var list = new List<long>();
+            queue.Enqueue(await this.FindHeadAsync(origin));
+            while (queue.Count > 0)
+            {
+                var cid = queue.Dequeue();
+                list.Add(cid);
+                var ids = await StatusProxy.FindFromInReplyToAsync(cid);
+                ids.ForEach(queue.Enqueue);
+            }
+            lock (_statuses)
+            {
+                list.ForEach(_statuses.Add);
+            }
+            this.RaiseInvalidateRequired();
         }
 
         private async Task<long> FindHeadAsync(long id)
         {
-            lock (_statuses)
-            {
-                _statuses.Add(id);
-            }
-            var replyTo = await Observable.Start(() => StoreHelper.GetTweet(id))
-                                          .SelectMany(_ => _)
-                                          .FirstOrDefaultAsync();
-            if (replyTo == null || replyTo.InReplyToStatusId == null)
-            {
-                return id;
-            }
-            return await this.FindHeadAsync(replyTo.InReplyToStatusId.Value);
+            var irt = await StatusProxy.GetInReplyToAsync(id);
+            if (irt == null) return id;
+            return await this.FindHeadAsync(irt.Value);
         }
 
         public override string FilterKey
@@ -67,6 +64,16 @@ namespace StarryEyes.Filters.Sources
         public override Func<TwitterStatus, bool> GetEvaluator()
         {
             return this.CheckConversation;
+        }
+
+        public override string GetSqlQuery()
+        {
+            long[] ids;
+            lock (_statuses)
+            {
+                ids = _statuses.ToArray();
+            }
+            return "Id IN (" + ids.Select(i => i.ToString(CultureInfo.InvariantCulture)).JoinString(",") + ")";
         }
 
         private bool CheckConversation(TwitterStatus status)

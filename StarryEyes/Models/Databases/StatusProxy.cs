@@ -119,6 +119,16 @@ namespace StarryEyes.Models.Databases
             return await LoadStatusAsync(status);
         }
 
+        public static async Task<long?> GetInReplyToAsync(long id)
+        {
+            return await Database.StatusCrud.GetInReplyToAsync(id);
+        }
+
+        public static async Task<IEnumerable<long>> FindFromInReplyToAsync(long inReplyTo)
+        {
+            return await Database.StatusCrud.FindFromInReplyToAsync(inReplyTo);
+        }
+
         public static IObservable<TwitterStatus> FetchStatuses(string sql, long? maxId = null, int? count = null)
         {
             if (maxId != null)
@@ -181,5 +191,6 @@ namespace StarryEyes.Models.Databases
             var se = Database.StatusEntityCrud.GetEntitiesAsync(id);
             return Mapper.Map(dbstatus, await se, await user, await recipient);
         }
+
     }
 }

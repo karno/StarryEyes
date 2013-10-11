@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -93,6 +94,16 @@ namespace StarryEyes.Filters.Sources
                     return _ids.Contains(s.User.Id);
                 }
             };
+        }
+
+        public override string GetSqlQuery()
+        {
+            string ida;
+            lock (_ids)
+            {
+                ida = this._ids.Select(i => i.ToString(CultureInfo.InvariantCulture)).JoinString(",");
+            }
+            return "UserId in (" + ida + ")";
         }
 
         protected override IObservable<TwitterStatus> ReceiveSink(long? maxId)

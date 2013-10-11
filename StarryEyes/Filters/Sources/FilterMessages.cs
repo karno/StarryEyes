@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
@@ -20,7 +21,18 @@ namespace StarryEyes.Filters.Sources
         public override Func<TwitterStatus, bool> GetEvaluator()
         {
             var ads = GetAccountsFromString(_screenName);
-            return _ => ads.Any(ad => FilterSystemUtil.InReplyToUsers(_).Contains(ad.Id));
+            return _ => _.StatusType == StatusType.DirectMessage &&
+                        ads.Any(ad => FilterSystemUtil.InReplyToUsers(_).Contains(ad.Id));
+        }
+
+        public override string GetSqlQuery()
+        {
+            var type = ((int)StatusType.DirectMessage).ToString(CultureInfo.InvariantCulture);
+            var aids = GetAccountsFromString(_screenName)
+                .Select(a => a.Id.ToString(CultureInfo.InvariantCulture))
+                .JoinString(",");
+            return "StatusType = " + type + " and " +
+                   "InReplyToOrRecipientUserId IN (" + aids + ")";
         }
 
         protected override IObservable<TwitterStatus> ReceiveSink(long? maxId)

@@ -21,6 +21,11 @@ namespace StarryEyes.Filters.Sources
             return _ => _.Text.IndexOf(this._query, StringComparison.Ordinal) >= 0;
         }
 
+        public override string GetSqlQuery()
+        {
+            return "Text like '%" + _query + "%'";
+        }
+
         protected override IObservable<TwitterStatus> ReceiveSink(long? maxId)
         {
             return Observable.Start(() => Setting.Accounts.GetRandomOne())

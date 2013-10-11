@@ -45,5 +45,23 @@ namespace StarryEyes.Casket.Cruds
         {
             return await this.QueryAsync<DatabaseStatus>(sql, null);
         }
+
+        public async Task<long?> GetInReplyToAsync(long id)
+        {
+            return (await this.QueryAsync<long?>(
+                "select InReplyToStatusId " +
+                "from " + TableName + " " +
+                "where Id = @Id limit 1;", new { Id = id }))
+                .FirstOrDefault();
+        }
+
+        public async Task<IEnumerable<long>> FindFromInReplyToAsync(long inReplyTo)
+        {
+            return await this.QueryAsync<long>(
+                "select Id " +
+                "from " + TableName + " " +
+                "where InReplyToStatusId is not null and" +
+                "InReplyToStatusId = @inReplyTo;", new { inReplyTo });
+        }
     }
 }
