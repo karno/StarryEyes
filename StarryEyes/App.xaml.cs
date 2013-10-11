@@ -107,8 +107,7 @@ namespace StarryEyes
             ServicePointManager.DefaultConnectionLimit = Int32.MaxValue; // Limit Break!
 
             // declare security protocol explicitly
-            // for Windows 8.1 (Preview)
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Ssl3;
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3;
 
             // initialize anomaly core system
             Anomaly.Core.Initialize();
