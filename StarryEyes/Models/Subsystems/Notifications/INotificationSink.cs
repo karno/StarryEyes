@@ -23,7 +23,7 @@ namespace StarryEyes.Models.Subsystems.Notifications
 
         void NotifyRetweeted(TwitterUser source, TwitterStatus status);
 
-        void NotifyDeleted(TwitterStatus deleted);
+        void NotifyDeleted(long statusId, TwitterStatus deleted);
 
         void NotifyLimitationInfoGot(TwitterAccount account, int trackLimit);
 

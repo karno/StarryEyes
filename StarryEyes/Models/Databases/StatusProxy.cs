@@ -113,6 +113,11 @@ namespace StarryEyes.Models.Databases
             }
         }
 
+        public static async Task<bool> IsStatusExistsAsync(long id)
+        {
+            return await Database.StatusCrud.GetAsync(id) != null;
+        }
+
         public static async Task<TwitterStatus> GetStatusAsync(long id)
         {
             var status = await Database.StatusCrud.GetAsync(id);

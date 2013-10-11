@@ -79,11 +79,11 @@ namespace StarryEyes.Models.Subsystems.Notifications
             }
         }
 
-        public void NotifyDeleted(TwitterStatus deleted)
+        public void NotifyDeleted(long statusId, TwitterStatus deleted)
         {
             if (Next != null)
             {
-                Next.NotifyDeleted(deleted);
+                Next.NotifyDeleted(statusId, deleted);
             }
         }
 

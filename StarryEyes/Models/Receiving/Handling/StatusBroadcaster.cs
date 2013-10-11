@@ -61,9 +61,6 @@ namespace StarryEyes.Models.Receiving.Handling
                             System.Diagnostics.Debug.WriteLine("MUTE OR BLOCK CAPTURE: " + status);
                             continue;
                         }
-                    }
-                    if (status.IsAdded)
-                    {
                         NotificationService.NotifyReceived(status.Status);
                         NotificationService.StartAcceptNewArrival(status.Status);
                     }
@@ -71,6 +68,10 @@ namespace StarryEyes.Models.Receiving.Handling
                     if (status.IsAdded)
                     {
                         NotificationService.EndAcceptNewArrival(status.Status);
+                    }
+                    else
+                    {
+                        NotificationService.NotifyDeleted(status.StatusId, status.Status);
                     }
                     _signal.Reset();
                 }

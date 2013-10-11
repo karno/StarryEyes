@@ -7,6 +7,7 @@ using StarryEyes.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Filters;
 using StarryEyes.Models.Accounting;
+using StarryEyes.Models.Databases;
 using StarryEyes.Models.Subsystems.Notifications;
 using StarryEyes.Models.Timeline;
 using StarryEyes.Settings;
@@ -42,9 +43,11 @@ namespace StarryEyes.Models.Subsystems
 
         internal static void NotifyReceived(TwitterStatus status)
         {
-
-            // check condition and call NotifyNewArrival
-            // TODO: impl
+            if (status.RetweetedOriginal != null)
+            {
+                NotifyRetweeted(status.User, status.RetweetedOriginal);
+            }
+            Head.NotifyReceived(status);
         }
 
         #region New Arrival Control
@@ -126,22 +129,57 @@ namespace StarryEyes.Models.Subsystems
 
         internal static void NotifyFavorited(TwitterUser source, TwitterStatus status)
         {
+            Task.Run(() => StatusModel.UpdateStatusInfo(
+                status,
+                model => model.AddFavoritedUser(source),
+                _ =>
+                {
+                    StatusProxy.AddFavoritorAsync(status.Id, source.Id);
+                    _.FavoritedUsers = _.FavoritedUsers.Guard().Append(source.Id).ToArray();
+                }));
             Head.NotifyFavorited(source, status);
         }
 
         internal static void NotifyUnfavorited(TwitterUser source, TwitterStatus status)
         {
+            Task.Run(() => StatusModel.UpdateStatusInfo(
+                status,
+                model => model.RemoveFavoritedUser(source.Id),
+                _ =>
+                {
+                    StatusProxy.RemoveFavoritorAsync(status.Id, source.Id);
+                    _.FavoritedUsers = _.FavoritedUsers.Guard().Where(id => id != source.Id).ToArray();
+                }));
             Head.NotifyUnfavorited(source, status);
         }
 
         internal static void NotifyRetweeted(TwitterUser source, TwitterStatus status)
         {
+            Task.Run(() => StatusModel.UpdateStatusInfo(
+                status,
+                model => model.AddRetweetedUser(source),
+                _ =>
+                {
+                    StatusProxy.AddRetweeterAsync(status.Id, source.Id);
+                    _.RetweetedUsers = _.RetweetedUsers.Guard().Append(source.Id).ToArray();
+                }));
             Head.NotifyRetweeted(source, status);
         }
 
-        internal static void NotifyDeleted(TwitterStatus deleted)
+        internal static void NotifyDeleted(long statusId, TwitterStatus deleted)
         {
-            Head.NotifyDeleted(deleted);
+            if (deleted != null && deleted.RetweetedOriginal != null)
+            {
+                Task.Run(() => StatusModel.UpdateStatusInfo(
+                    deleted.RetweetedOriginal,
+                    model => model.RemoveRetweetedUser(deleted.User.Id),
+                    _ =>
+                    {
+                        StatusProxy.RemoveRetweeterAsync(deleted.RetweetedOriginal.Id, deleted.User.Id);
+                        _.RetweetedUsers = _.RetweetedUsers.Guard().Append(deleted.User.Id).ToArray();
+                    }));
+            }
+            Head.NotifyDeleted(statusId, deleted);
         }
 
         internal static void NotifyLimitationInfoGot(TwitterAccount account, int trackLimit)

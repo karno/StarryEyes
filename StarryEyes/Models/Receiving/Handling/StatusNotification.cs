@@ -13,12 +13,12 @@ namespace StarryEyes.Models.Receiving.Handling
             this.IsAdded = false;
         }
 
-        public StatusNotification([NotNull] TwitterStatus status)
+        public StatusNotification([NotNull] TwitterStatus status, bool added = true)
         {
             if (status == null) throw new ArgumentNullException("status");
             this.Status = status;
             this.StatusId = status.Id;
-            this.IsAdded = true;
+            this.IsAdded = added;
         }
 
         public bool IsAdded { get; private set; }
