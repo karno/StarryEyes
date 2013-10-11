@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Reactive.Linq;
-using System.Threading.Tasks;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Filters;
 using StarryEyes.Filters.Expressions;
-using StarryEyes.Models.Stores;
+using StarryEyes.Models.Databases;
 using StarryEyes.Models.Subsystems;
-using StarryEyes.Vanille.DataStore;
 
 namespace StarryEyes.Models.Timeline
 {
@@ -22,7 +18,7 @@ namespace StarryEyes.Models.Timeline
                 if (value == _isActivated) return;
                 _isActivated = value;
                 this.QueueInvalidateTimeline();
-                IsGlobalReceiverListening = value;
+                IsSubscribeBroadcaster = value;
                 if (_filterQuery == null) return;
                 if (value)
                 {
@@ -76,7 +72,7 @@ namespace StarryEyes.Models.Timeline
         private string _filterSql = FilterExpressionBase.ContradictionSql;
         private Func<TwitterStatus, bool> _filterFunc = FilterExpressionBase.Contradiction;
 
-        protected override void InvalidateCache()
+        protected override void PreInvalidateTimeline()
         {
             if (_filterQuery == null)
             {
@@ -112,17 +108,7 @@ namespace StarryEyes.Models.Timeline
 
         protected override IObservable<TwitterStatus> Fetch(long? maxId, int? count)
         {
-            return StatusStore.Find(_filterFunc,
-                                    maxId != null ? FindRange<long>.By(maxId.Value) : null,
-                                    count);
-        }
-
-        protected override async Task<IEnumerable<TwitterStatus>> FetchBatch(long? maxId, int? count)
-        {
-            var list = new List<TwitterStatus>();
-            await StatusStore.FindBatch(_filterFunc, count ?? 128)
-                             .ForEachAsync(list.Add);
-            return list;
+            return StatusProxy.FetchStatuses(_filterSql, maxId, count);
         }
 
         protected override void Dispose(bool disposing)

@@ -6,6 +6,7 @@ using StarryEyes.Albireo.Data;
 using StarryEyes.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models.Accounting;
+using StarryEyes.Models.Databases;
 using StarryEyes.Settings;
 
 namespace StarryEyes.Models.Receiving
@@ -49,7 +50,7 @@ namespace StarryEyes.Models.Receiving
             }
         }
 
-        public static string MuteBlockSqlQuery
+        public static string FilteringSql
         {
             get
             {
@@ -60,9 +61,11 @@ namespace StarryEyes.Models.Receiving
                 {
                     blocksql = _blockingUserIds.Select(s => s.ToString()).JoinString(",");
                 }
-                return String.IsNullOrEmpty(blocksql)
-                           ? _muteSqlQuery
-                           : _muteSqlQuery + " AND UserId NOT IN (" + blocksql + ")";
+                if (!String.IsNullOrEmpty(blocksql))
+                {
+                    blocksql = "UserId NOT IN (" + blocksql + ")";
+                }
+                return _muteSqlQuery.SqlConcatAnd(blocksql);
             }
         }
 
@@ -115,7 +118,7 @@ namespace StarryEyes.Models.Receiving
         {
             _muteFilter = Setting.Muteds.Evaluator;
             var sql = Setting.Muteds.Value.GetSqlQuery();
-            _muteSqlQuery = String.IsNullOrEmpty(sql) ? string.Empty : " AND (" + sql + ")";
+            _muteSqlQuery = String.IsNullOrEmpty(sql) ? string.Empty : " AND NOT (" + sql + ")";
         }
 
         private static void InvalidateBlockingUsers()

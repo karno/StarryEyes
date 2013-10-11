@@ -53,14 +53,14 @@ namespace StarryEyes.Models.Timeline
         #region Status Global Receiver Control
 
         /// <summary>
-        /// Set this timeline is listening global broadcaster
+        /// Set this timeline is subscribing global broadcaster
         /// </summary>
-        protected bool IsGlobalReceiverListening
+        protected bool IsSubscribeBroadcaster
         {
             get { return _timelineListener != null; }
             set
             {
-                if (value == this.IsGlobalReceiverListening) return;
+                if (value == this.IsSubscribeBroadcaster) return;
                 var ncd = value ? new CompositeDisposable() : null;
                 var old = Interlocked.Exchange(ref _timelineListener, ncd);
                 if (old != null)
@@ -202,17 +202,17 @@ namespace StarryEyes.Models.Timeline
 
         private Task InvalidateTimeline()
         {
-            return Task.Run(async () =>
+            return Task.Run(() =>
             {
-                this.InvalidateCache();
+                this.PreInvalidateTimeline();
                 // invalidate and fetch statuses
                 lock (_statusIdCache)
                 {
                     _statusIdCache.Clear();
                     _statuses.Clear();
                 }
-                var statuses = await this.FetchBatch(null, null);
-                statuses.ForEach(s => this.AcceptStatus(new StatusNotification(s)));
+                this.Fetch(null, TimelineChunkCount)
+                    .Subscribe(s => this.AcceptStatus(new StatusNotification(s)));
             });
         }
 
@@ -220,23 +220,11 @@ namespace StarryEyes.Models.Timeline
 
         #region Abstract Methods
 
-        protected abstract void InvalidateCache();
+        protected abstract void PreInvalidateTimeline();
 
         protected abstract bool CheckAcceptStatus(TwitterStatus status);
 
         protected abstract IObservable<TwitterStatus> Fetch(long? maxId, int? count);
-
-        protected virtual Task<IEnumerable<TwitterStatus>> FetchBatch(long? maxId, int? count)
-        {
-            return Task.Run(async () =>
-            {
-                var statuses = new List<TwitterStatus>();
-                await this.Fetch(maxId, count)
-                          .Do(statuses.Add)
-                          .LastOrDefaultAsync().GetAwaiter();
-                return statuses.AsEnumerable();
-            });
-        }
 
         #endregion
 
@@ -253,6 +241,12 @@ namespace StarryEyes.Models.Timeline
         protected virtual void Dispose(bool disposing)
         {
             if (!disposing) return;
+            IsSubscribeBroadcaster = false;
+            lock (_statusIdCache)
+            {
+                _statusIdCache.Clear();
+            }
+            _statuses.Clear();
         }
 
         protected enum TimelineModelState

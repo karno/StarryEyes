@@ -294,7 +294,8 @@
     <Compile Include="Models\Tab\TabManager.cs" />
     <Compile Include="Models\Tab\TimelineModel.cs" />
     <Compile Include="Models\Subsystems\TwitterConfigurationService.cs" />
-    <Compile Include="Models\Timeline\SearchFlipModel.cs" />
+    <Compile Include="Models\Timeline\SearchFlips\UserTimelineModel.cs" />
+    <Compile Include="Models\Timeline\SearchFlips\SearchResultModel.cs" />
     <Compile Include="Models\Timeline\TabModel.cs" />
     <Compile Include="Models\Timeline\TimelineModelBase.cs" />
     <Compile Include="Models\UserModel.cs" />
