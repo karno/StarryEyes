@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using StarryEyes.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Anomaly.Utils;
 using StarryEyes.Casket.DatabaseModels;
 using StatusEnts = System.Collections.Generic.IEnumerable<StarryEyes.Casket.DatabaseModels.DatabaseStatusEntity>;
 using UserDescEnts = System.Collections.Generic.IEnumerable<StarryEyes.Casket.DatabaseModels.DatabaseUserDescriptionEntity>;
@@ -133,9 +134,9 @@ namespace StarryEyes.Models.Databases
                 ListedCount = user.ListedCount,
                 Location = user.Location,
                 Name = user.Name,
-                ProfileBackgroundImageUri = new Uri(user.ProfileBackgroundImageUri),
-                ProfileBannerUri = new Uri(user.ProfileBannerUri),
-                ProfileImageUri = new Uri(user.ProfileImageUri),
+                ProfileBackgroundImageUri = user.ProfileBackgroundImageUri.ParseUri(),
+                ProfileBannerUri = user.ProfileBannerUri.ParseUri(),
+                ProfileImageUri = user.ProfileImageUri.ParseUri(),
                 ScreenName = user.ScreenName,
                 StatusesCount = user.StatusesCount,
                 Url = user.Url,

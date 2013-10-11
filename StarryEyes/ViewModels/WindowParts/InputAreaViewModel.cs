@@ -798,8 +798,25 @@ namespace StarryEyes.ViewModels.WindowParts
             var m = Messenger.GetResponse(msg);
             if (m.Response == null || m.Response.Length <= 0 || String.IsNullOrEmpty(m.Response[0]) ||
                 !File.Exists(m.Response[0])) return;
-            AttachedImage = new ImageDescriptionViewModel(m.Response[0]);
-            Setting.LastImageOpenDir.Value = Path.GetDirectoryName(m.Response[0]);
+            try
+            {
+                AttachedImage = new ImageDescriptionViewModel(m.Response[0]);
+                Setting.LastImageOpenDir.Value = Path.GetDirectoryName(m.Response[0]);
+            }
+            catch (Exception ex)
+            {
+                this.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
+                {
+                    Title = "画像読み込みエラー",
+                    MainIcon = VistaTaskDialogIcon.Error,
+                    MainInstruction = "画像の添付ができませんでした。",
+                    Content = "画像の読み込み時にエラーが発生しました。" + Environment.NewLine +
+                              "未対応の画像か、データが破損しています。",
+                    ExpandedInfo = ex.ToString(),
+                    CommonButtons = TaskDialogCommonButtons.Close,
+                }));
+                AttachedImage = null;
+            }
         }
 
         public void DetachImage()
@@ -1023,12 +1040,12 @@ namespace StarryEyes.ViewModels.WindowParts
 
     public class ImageDescriptionViewModel : ViewModel
     {
-        public ImageDescriptionViewModel(string p)
+        public ImageDescriptionViewModel(string filePath)
         {
             var bitmap = new BitmapImage();
             bitmap.BeginInit();
             bitmap.CacheOption = BitmapCacheOption.OnLoad;
-            bitmap.UriSource = new Uri(p);
+            bitmap.UriSource = new Uri(filePath);
             bitmap.EndInit();
             Source = bitmap;
         }

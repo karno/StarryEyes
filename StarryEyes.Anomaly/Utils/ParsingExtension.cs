@@ -72,7 +72,7 @@ namespace StarryEyes.Anomaly.Utils
 
         public static Uri ParseUriAbsolute(this string s)
         {
-            Uri ret = s.ParseUri();
+            var ret = s.ParseUri();
             if (ret == null || !ret.IsAbsoluteUri) return null;
             return ret;
         }
