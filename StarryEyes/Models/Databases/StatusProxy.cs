@@ -9,6 +9,7 @@ using StarryEyes.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Casket;
 using StarryEyes.Casket.DatabaseModels;
+using StarryEyes.Models.Receiving;
 
 namespace StarryEyes.Models.Databases
 {
@@ -129,12 +130,16 @@ namespace StarryEyes.Models.Databases
             return await Database.StatusCrud.FindFromInReplyToAsync(inReplyTo);
         }
 
-        public static IObservable<TwitterStatus> FetchStatuses(string sql, long? maxId = null, int? count = null)
+        public static IObservable<TwitterStatus> FetchStatuses(string sql, long? maxId = null, int? count = null, bool applyMuteBlockFilter = true)
         {
             if (maxId != null)
             {
                 var midc = "Id < " + maxId.Value.ToString(CultureInfo.InvariantCulture);
-                sql = String.IsNullOrEmpty(sql) ? midc : sql + " and " + midc;
+                sql = sql.SqlConcatAnd(midc);
+            }
+            if (applyMuteBlockFilter)
+            {
+                sql = sql.SqlConcatAnd(MuteBlockManager.FilteringSql);
             }
             if (!String.IsNullOrEmpty(sql))
             {

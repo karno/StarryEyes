@@ -31,20 +31,5 @@ namespace StarryEyes.Filters.Parsing
         {
             return "\"" + escaped + "\"";
         }
-
-        /// <summary>
-        /// Wrap with parenthesis.
-        /// </summary>
-        /// <param name="str">body</param>
-        /// <returns>(body)</returns>
-        public static string EnumerationToSelectClause(this string str)
-        {
-            return "(select (" + str + "))";
-        }
-
-        public static string Unparenthesis(this string str)
-        {
-            return str.StartsWith("(") && str.EndsWith(")") ? str.Substring(1, str.Length - 2) : str;
-        }
     }
 }

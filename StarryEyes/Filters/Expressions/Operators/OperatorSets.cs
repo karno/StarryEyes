@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
-using StarryEyes.Filters.Parsing;
+using StarryEyes.Models.Databases;
 
 namespace StarryEyes.Filters.Expressions.Operators
 {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
-using StarryEyes.Filters.Parsing;
+using StarryEyes.Models.Databases;
 using StarryEyes.Settings;
 
 namespace StarryEyes.Filters.Expressions.Values.Statuses
