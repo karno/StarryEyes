@@ -1274,13 +1274,13 @@
                     <DataTrigger Binding="{Binding IsMyself, Mode=OneWay}" Value="True">
                         <Setter TargetName="MainBorder" Property="Background" Value="#161BA1E2" />
                     </DataTrigger>
-                    <DataTrigger Binding="{Binding IsDirectMessage, Mode=OneTime}" Value="True">
-                        <Setter TargetName="MainBorder" Property="Background" Value="#16A20025" />
-                        <Setter TargetName="ScreenNameText" Property="Foreground" Value="#FFA20025" />
-                    </DataTrigger>
                     <DataTrigger Binding="{Binding IsInReplyToMe, Mode=OneWay}" Value="True">
                         <Setter TargetName="MainBorder" Property="Background" Value="#16F0A30A" />
                         <Setter TargetName="ScreenNameText" Property="Foreground" Value="#FFFA6800" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding IsDirectMessage, Mode=OneTime}" Value="True">
+                        <Setter TargetName="MainBorder" Property="Background" Value="#16A20025" />
+                        <Setter TargetName="ScreenNameText" Property="Foreground" Value="#FFA20025" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding IsRetweet, Mode=OneTime}" Value="True">
                         <Setter TargetName="MainBorder" Property="Background" Value="#16008A00" />
