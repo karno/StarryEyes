@@ -109,9 +109,9 @@ namespace StarryEyes.Models.Subsystems
             Head.NotifyFollowed(source, target);
         }
 
-        internal static void NotifyUnfollwed(TwitterUser source, TwitterUser target)
+        internal static void NotifyUnfollowed(TwitterUser source, TwitterUser target)
         {
-            Head.NotifyUnfollwed(source, target);
+            Head.NotifyUnfollowed(source, target);
         }
 
         internal static void NotifyBlocked(TwitterUser source, TwitterUser target)
@@ -126,7 +126,7 @@ namespace StarryEyes.Models.Subsystems
 
         internal static void NotifyFavorited(TwitterUser source, TwitterStatus status)
         {
-            Head.NotifyUnfavorited(source, status);
+            Head.NotifyFavorited(source, status);
         }
 
         internal static void NotifyUnfavorited(TwitterUser source, TwitterStatus status)

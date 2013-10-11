@@ -15,7 +15,7 @@ namespace StarryEyes.Models.Subsystems.Notifications
 
         public void NotifyNewArrival(TwitterStatus status, NotificationType type, string explicitSoundSource)
         {
-	    // TODO: implementation
+            // TODO: implementation
         }
 
         public void NotifyFollowed(TwitterUser source, TwitterUser target)
@@ -23,7 +23,7 @@ namespace StarryEyes.Models.Subsystems.Notifications
             BackstageModel.RegisterEvent(new FollowedEvent(source, target));
         }
 
-        public void NotifyUnfollwed(TwitterUser source, TwitterUser target)
+        public void NotifyUnfollowed(TwitterUser source, TwitterUser target)
         {
             BackstageModel.RegisterEvent(new UnfollowedEvent(source, target));
         }

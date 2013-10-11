@@ -11,7 +11,7 @@ namespace StarryEyes.Models.Subsystems.Notifications
 
         void NotifyFollowed(TwitterUser source, TwitterUser target);
 
-        void NotifyUnfollwed(TwitterUser source, TwitterUser target);
+        void NotifyUnfollowed(TwitterUser source, TwitterUser target);
 
         void NotifyBlocked(TwitterUser source, TwitterUser target);
 

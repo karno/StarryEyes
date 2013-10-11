@@ -31,11 +31,11 @@ namespace StarryEyes.Models.Subsystems.Notifications
             }
         }
 
-        public void NotifyUnfollwed(TwitterUser source, TwitterUser target)
+        public void NotifyUnfollowed(TwitterUser source, TwitterUser target)
         {
             if (Next != null)
             {
-                Next.NotifyUnfollwed(source, target);
+                Next.NotifyUnfollowed(source, target);
             }
         }
 

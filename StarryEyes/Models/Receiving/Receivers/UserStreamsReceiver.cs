@@ -233,7 +233,7 @@ namespace StarryEyes.Models.Receiving.Receivers
                         {
                             await reldata.SetFollowerAsync(item.Source.Id, false);
                         }
-                        NotificationService.NotifyUnfollwed(item.Source, item.Target);
+                        NotificationService.NotifyUnfollowed(item.Source, item.Target);
                         break;
                     case StreamUserActivityEvent.Block:
                         if (active)
