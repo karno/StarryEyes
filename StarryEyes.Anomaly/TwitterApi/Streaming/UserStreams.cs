@@ -12,7 +12,8 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
         private const string EndpointUserStreams = "https://userstream.twitter.com/1.1/user.json";
 
         public static IObservable<string> ConnectUserStreams(
-            this IOAuthCredential credential, IEnumerable<string> tracks, bool repliesAll = false)
+            this IOAuthCredential credential, IEnumerable<string> tracks,
+            bool repliesAll = false, bool followingsActivity = false)
         {
             var filteredTracks = tracks != null
                                      ? tracks.Where(t => !String.IsNullOrEmpty(t))
@@ -23,6 +24,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
             {
                 {"track", String.IsNullOrEmpty(filteredTracks) ? null : filteredTracks },
                 {"replies", repliesAll ? "all" : null},
+                {"include_followings_activity", followingsActivity ? "true" : null}
             }.ParametalizeForGet();
             return Observable.Create<string>((observer, cancel) => Task.Run(async () =>
             {
