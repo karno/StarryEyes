@@ -247,9 +247,13 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
             await this.ExecuteAllAsync(array);
         }
 
+#pragma warning disable 1998
+#pragma warning disable 4014
         public override async Task InsertAsync(T item)
         {
-            _entrant.OnNext(item);
+            Task.Run(() => _entrant.OnNext(item));
         }
+#pragma warning restore 1998
+#pragma warning restore 4014
     }
 }
