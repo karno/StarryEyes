@@ -21,7 +21,7 @@ namespace StarryEyes.Casket
         private static readonly FavoritesCrud _favoritesCrud = new FavoritesCrud();
         private static readonly RetweetsCrud _retweetsCrud = new RetweetsCrud();
         private static readonly RelationCrud _relationCrud = new RelationCrud();
-        private static readonly MaintenanceCrud _maintenanceCrud = new MaintenanceCrud();
+        private static readonly ManagementCrud _managementCrud = new ManagementCrud();
 
         private static string _dbFilePath;
         private static bool _isInitialized;
@@ -68,6 +68,11 @@ namespace StarryEyes.Casket
             get { return _relationCrud; }
         }
 
+        public static ManagementCrud ManagementCrud
+        {
+            get { return _managementCrud; }
+        }
+
         public static void Initialize(string dbFilePath)
         {
             System.Diagnostics.Debug.WriteLine("Krile DB Initializing...(" + dbFilePath + ")");
@@ -97,7 +102,8 @@ namespace StarryEyes.Casket
                     UserUrlEntityCrud.InitializeAsync(),
                     FavoritesCrud.InitializeAsync(),
                     RetweetsCrud.InitializeAsync(),
-		    RelationCrud.InitializeAsync()
+                    RelationCrud.InitializeAsync(),
+                    ManagementCrud.InitializeAsync()
                 };
             }));
             Task.WaitAll(tasks);
@@ -157,7 +163,7 @@ namespace StarryEyes.Casket
 
         public static async Task VacuumTables()
         {
-            await _maintenanceCrud.VacuumAsync();
+            await _managementCrud.VacuumAsync();
         }
     }
 }

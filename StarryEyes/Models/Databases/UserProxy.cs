@@ -62,19 +62,49 @@ namespace StarryEyes.Models.Databases
             return await Database.RelationCrud.IsBlockingAsync(userId, targetId);
         }
 
-        public static async Task SetFollowing(long userId, long targetId, bool following)
+        public static async Task SetFollowingAsync(long userId, long targetId, bool following)
         {
-            await Database.RelationCrud.SetFollowing(userId, targetId, following);
+            await Database.RelationCrud.SetFollowingAsync(userId, targetId, following);
         }
 
-        public static async Task SetFollower(long userId, long targetId, bool followed)
+        public static async Task SetFollowerAsync(long userId, long targetId, bool followed)
         {
-            await Database.RelationCrud.SetFollower(userId, targetId, followed);
+            await Database.RelationCrud.SetFollowerAsync(userId, targetId, followed);
         }
 
-        public static async Task SetBlocking(long userId, long targetId, bool blocking)
+        public static async Task SetBlockingAsync(long userId, long targetId, bool blocking)
         {
-            await Database.RelationCrud.SetBlocking(userId, targetId, blocking);
+            await Database.RelationCrud.SetBlockingAsync(userId, targetId, blocking);
+        }
+
+        public static async Task AddFollowingsAsync(long userId, IEnumerable<long> targetIds)
+        {
+            await Database.RelationCrud.AddFollowingsAsync(userId, targetIds);
+        }
+
+        public static async Task RemoveFollowingsAsync(long userId, IEnumerable<long> removals)
+        {
+            await Database.RelationCrud.RemoveFollowingsAsync(userId, removals);
+        }
+
+        public static async Task AddFollowersAsync(long userId, IEnumerable<long> targetIds)
+        {
+            await Database.RelationCrud.AddFollowersAsync(userId, targetIds);
+        }
+
+        public static async Task RemoveFollowersAsync(long userId, IEnumerable<long> removals)
+        {
+            await Database.RelationCrud.RemoveFollowersAsync(userId, removals);
+        }
+
+        public static async Task AddBlockingsAsync(long userId, IEnumerable<long> targetIds)
+        {
+            await Database.RelationCrud.AddBlockingsAsync(userId, targetIds);
+        }
+
+        public static async Task RemoveBlockingsAsync(long userId, IEnumerable<long> removals)
+        {
+            await Database.RelationCrud.RemoveBlockingsAsync(userId, removals);
         }
 
         public static async Task<IEnumerable<long>> GetFollowingsAsync(long userId)

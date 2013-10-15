@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 using StarryEyes.Albireo.Data;
 using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Models.Accounting;
@@ -27,20 +28,20 @@ namespace StarryEyes.Models.Receiving.Receivers
         {
             // get relation account
             var reldata = this._account.RelationData;
-            var beforeFollowing = new AVLTree<long>(reldata.Following);
+            var beforeFollowings = new AVLTree<long>(reldata.Followings);
             var beforeFollowers = new AVLTree<long>(reldata.Followers);
             var beforeBlockings = new AVLTree<long>(reldata.Blockings);
+            var newFollowings = new List<long>();
+            var newFollowers = new List<long>();
+            var newBlockings = new List<long>();
             // get followings / followers
             Observable.Merge(
                 this._account.RetrieveAllCursor((a, c) => a.GetFriendsIdsAsync(this._account.Id, c))
-                    .Do(id => beforeFollowing.Remove(id))
-                    .Do(id => reldata.SetFollowingAsync(id, true)),
+                    .Do(id => this.CheckRemove(id, beforeFollowings, newFollowings)),
                 this._account.RetrieveAllCursor((a, c) => a.GetFollowersIdsAsync(this._account.Id, c))
-                    .Do(id => beforeFollowers.Remove(id))
-                    .Do(id => reldata.SetFollowerAsync(id, true)),
+                    .Do(id => this.CheckRemove(id, beforeFollowers, newFollowers)),
                 this._account.RetrieveAllCursor((a, c) => a.GetBlockingsIdsAsync(c))
-                    .Do(id => beforeBlockings.Remove(id))
-                    .Do(id => reldata.SetBlockingAsync(id, true)))
+                    .Do(id => this.CheckRemove(id, beforeBlockings, newBlockings)))
                       .Subscribe(_ => { },
                                  ex =>
                                  {
@@ -50,13 +51,25 @@ namespace StarryEyes.Models.Receiving.Receivers
                                                                   ex.Message));
                                      System.Diagnostics.Debug.WriteLine(ex);
                                  },
-                                 () =>
+                                 () => Task.Run(async () =>
                                  {
-                                     // cleanup remains
-                                     beforeFollowing.ForEach(id => reldata.SetFollowingAsync(id, false));
-                                     beforeFollowers.ForEach(id => reldata.SetFollowerAsync(id, false));
-                                     beforeBlockings.ForEach(id => reldata.SetBlockingAsync(id, false));
-                                 });
+                                     await reldata.RemoveFollowingsAsync(beforeFollowings);
+                                     await reldata.AddFollowingsAsync(newFollowings);
+                                     await reldata.RemoveFollowersAsync(beforeFollowers);
+                                     await reldata.AddFollowersAsync(newFollowers);
+                                     await reldata.RemoveBlockingsAsync(beforeBlockings);
+                                     await reldata.AddBlockingsAsync(newBlockings);
+                                 }));
+        }
+
+        private void CheckRemove(long id, AVLTree<long> prevList, List<long> newList)
+        {
+            // if fails removing
+            if (!prevList.Remove(id))
+            {
+                // that's new item
+                newList.Add(id);
+            }
         }
     }
 }

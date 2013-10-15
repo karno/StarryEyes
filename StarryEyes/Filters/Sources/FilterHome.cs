@@ -32,7 +32,7 @@ namespace StarryEyes.Filters.Sources
             var ads = accounts.Select(a => a.Id.ToString(CultureInfo.InvariantCulture))
                               .JoinString(",");
             var userMention = ((int)EntityType.UserMentions).ToString(CultureInfo.InvariantCulture);
-            var followings = accounts.SelectMany(a => a.RelationData.Following)
+            var followings = accounts.SelectMany(a => a.RelationData.Followings)
                                      .Select(id => id.ToString(CultureInfo.InvariantCulture))
                                      .JoinString(",");
             return "(UserId in (" + ads + ") OR " +

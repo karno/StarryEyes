@@ -36,7 +36,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
                 var following = new AVLTree<long>(
                     Setting.Accounts
                            .Collection
-                           .SelectMany(a => a.RelationData.Following));
+                           .SelectMany(a => a.RelationData.Followings));
                 return following;
             }
         }

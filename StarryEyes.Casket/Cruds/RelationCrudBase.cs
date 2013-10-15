@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using StarryEyes.Casket.Cruds.Scaffolding;
@@ -6,7 +8,7 @@ using StarryEyes.Casket.DatabaseModels;
 
 namespace StarryEyes.Casket.Cruds
 {
-    public sealed class RelationCrudBase : CachedCrudBase<DatabaseRelation>
+    public sealed class RelationCrudBase : CrudBase<DatabaseRelation>
     {
         internal RelationCrudBase(string tableName) : base(tableName, ResolutionMode.Ignore) { }
 
@@ -40,11 +42,27 @@ namespace StarryEyes.Casket.Cruds
             await this.InsertAsync(new DatabaseRelation(userId, targetId));
         }
 
+        public async Task AddOrUpdateAllAsync(long userId, IEnumerable<long> targetIds)
+        {
+            await
+                this.ExecuteAllAsync(targetIds.Select(
+                    id => Tuple.Create(this.TableInserter, (object)new DatabaseRelation(userId, id))));
+        }
+
         public async Task DeleteAsync(long userId, long targetId)
         {
             await this.ExecuteAsync(
                 "delete from " + TableName + " where UserId = @UserId and TargetId = @TargetId;",
                 new { UserId = userId, TargetId = targetId });
+        }
+
+        public async Task DeleteAllAsync(long userId, IEnumerable<long> targetId)
+        {
+            var tids = targetId.Select(i => i.ToString(CultureInfo.InvariantCulture)).JoinString(",");
+            if (String.IsNullOrEmpty(tids)) return;
+            await this.ExecuteAsync(
+                "delete from " + TableName + " where UserId = @UserId and TargetId IN (" + tids + ")",
+                new { UserId = userId });
         }
 
         public async Task<IEnumerable<long>> GetUsersAsync(long userId)
@@ -58,11 +76,6 @@ namespace StarryEyes.Casket.Cruds
         {
             return (await this.QueryAsync<long>(
                 "select distinct TargetId from " + TableName + ";", null));
-        }
-
-        protected override int DelayMilliSec
-        {
-            get { return 3000; }
         }
     }
 
@@ -104,11 +117,11 @@ namespace StarryEyes.Casket.Cruds
             return await _blockings.ContainsAsync(userId, targetId);
         }
 
-        public async Task SetFollowing(long userId, long targetId, bool following)
+        public async Task SetFollowingAsync(long userId, long targetId, bool following)
         {
             if (following)
             {
-                await _followings.InsertAsync(new DatabaseRelation(userId, targetId));
+                await _followings.AddOrUpdateAsync(userId, targetId);
             }
             else
             {
@@ -116,11 +129,11 @@ namespace StarryEyes.Casket.Cruds
             }
         }
 
-        public async Task SetFollower(long userId, long targetId, bool followed)
+        public async Task SetFollowerAsync(long userId, long targetId, bool followed)
         {
             if (followed)
             {
-                await _followers.InsertAsync(new DatabaseRelation(userId, targetId));
+                await _followers.AddOrUpdateAsync(userId, targetId);
             }
             else
             {
@@ -128,16 +141,46 @@ namespace StarryEyes.Casket.Cruds
             }
         }
 
-        public async Task SetBlocking(long userId, long targetId, bool blocking)
+        public async Task SetBlockingAsync(long userId, long targetId, bool blocking)
         {
             if (blocking)
             {
-                await _blockings.InsertAsync(new DatabaseRelation(userId, targetId));
+                await _blockings.AddOrUpdateAsync(userId, targetId);
             }
             else
             {
                 await _blockings.DeleteAsync(userId, targetId);
             }
+        }
+
+        public async Task AddFollowingsAsync(long userId, IEnumerable<long> targetIds)
+        {
+            await _followings.AddOrUpdateAllAsync(userId, targetIds);
+        }
+
+        public async Task RemoveFollowingsAsync(long userId, IEnumerable<long> removals)
+        {
+            await _followings.DeleteAllAsync(userId, removals);
+        }
+
+        public async Task AddFollowersAsync(long userId, IEnumerable<long> targetIds)
+        {
+            await _followers.AddOrUpdateAllAsync(userId, targetIds);
+        }
+
+        public async Task RemoveFollowersAsync(long userId, IEnumerable<long> removals)
+        {
+            await _followers.DeleteAllAsync(userId, removals);
+        }
+
+        public async Task AddBlockingsAsync(long userId, IEnumerable<long> targetIds)
+        {
+            await _blockings.AddOrUpdateAllAsync(userId, targetIds);
+        }
+
+        public async Task RemoveBlockingsAsync(long userId, IEnumerable<long> removals)
+        {
+            await _blockings.DeleteAllAsync(userId, removals);
         }
 
         public async Task<IEnumerable<long>> GetFollowingsAsync(long userId)

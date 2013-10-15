@@ -61,7 +61,7 @@ namespace StarryEyes.Models.Accounting
             // load data from db
             Task.Run(async () =>
                      (await UserProxy.GetFollowingsAsync(accountId))
-                         .ForEach(this._following.Add));
+                         .ForEach(this._followings.Add));
             Task.Run(async () =>
                      (await UserProxy.GetFollowersAsync(accountId))
                          .ForEach(this._followers.Add));
@@ -71,18 +71,18 @@ namespace StarryEyes.Models.Accounting
         }
 
         private readonly object _followingLocker = new object();
-        private readonly AVLTree<long> _following = new AVLTree<long>();
+        private readonly AVLTree<long> _followings = new AVLTree<long>();
 
         /// <summary>
         /// Get all followings.
         /// </summary>
-        public IEnumerable<long> Following
+        public IEnumerable<long> Followings
         {
             get
             {
                 lock (this._followingLocker)
                 {
-                    return this._following.ToArray();
+                    return this._followings.ToArray();
                 }
             }
         }
@@ -96,7 +96,7 @@ namespace StarryEyes.Models.Accounting
         {
             lock (this._followingLocker)
             {
-                return this._following.Contains(id);
+                return this._followings.Contains(id);
             }
         }
 
@@ -111,15 +111,45 @@ namespace StarryEyes.Models.Accounting
             {
                 if (isAdded)
                 {
-                    this._following.Add(id);
+                    this._followings.Add(id);
                 }
                 else
                 {
-                    this._following.Remove(id);
+                    this._followings.Remove(id);
                 }
             }
-            await UserProxy.SetFollowing(_accountId, id, isAdded);
+            await UserProxy.SetFollowingAsync(_accountId, id, isAdded);
             this.OnAccountDataUpdated(id, isAdded, RelationDataChange.Following);
+        }
+
+        /// <summary>
+        /// Add following users
+        /// </summary>
+        /// <param name="ids">target users' ids</param>
+        public async Task AddFollowingsAsync(IEnumerable<long> ids)
+        {
+            var m = ids.Memoize();
+            lock (this._followingLocker)
+            {
+                m.ForEach(this._followings.Add);
+            }
+            await UserProxy.AddFollowingsAsync(_accountId, m);
+            m.ForEach(id => this.OnAccountDataUpdated(id, true, RelationDataChange.Following));
+        }
+
+        /// <summary>
+        /// Remove following users
+        /// </summary>
+        /// <param name="ids">target users' ids</param>
+        public async Task RemoveFollowingsAsync(IEnumerable<long> ids)
+        {
+            var m = ids.Memoize();
+            lock (this._followingLocker)
+            {
+                m.ForEach(i => this._followings.Remove(i));
+            }
+            await UserProxy.RemoveFollowingsAsync(_accountId, m);
+            m.ForEach(id => this.OnAccountDataUpdated(id, false, RelationDataChange.Following));
         }
 
         private readonly object _followersLocker = new object();
@@ -170,8 +200,38 @@ namespace StarryEyes.Models.Accounting
                     this._followers.Remove(id);
                 }
             }
-            await UserProxy.SetFollower(_accountId, id, isAdded);
+            await UserProxy.SetFollowerAsync(_accountId, id, isAdded);
             this.OnAccountDataUpdated(id, isAdded, RelationDataChange.Follower);
+        }
+
+        /// <summary>
+        /// Add follower users
+        /// </summary>
+        /// <param name="ids">target users' ids</param>
+        public async Task AddFollowersAsync(IEnumerable<long> ids)
+        {
+            var m = ids.Memoize();
+            lock (this._followersLocker)
+            {
+                m.ForEach(this._followers.Add);
+            }
+            await UserProxy.AddFollowersAsync(_accountId, m);
+            m.ForEach(id => this.OnAccountDataUpdated(id, true, RelationDataChange.Follower));
+        }
+
+        /// <summary>
+        /// Remove follower users
+        /// </summary>
+        /// <param name="ids">target users' ids</param>
+        public async Task RemoveFollowersAsync(IEnumerable<long> ids)
+        {
+            var m = ids.Memoize();
+            lock (this._followersLocker)
+            {
+                m.ForEach(i => this._followers.Remove(i));
+            }
+            await UserProxy.RemoveFollowersAsync(_accountId, m);
+            m.ForEach(id => this.OnAccountDataUpdated(id, false, RelationDataChange.Follower));
         }
 
         private readonly object _blockingsLocker = new object();
@@ -222,8 +282,38 @@ namespace StarryEyes.Models.Accounting
                     this._blockings.Remove(id);
                 }
             }
-            await UserProxy.SetBlocking(_accountId, id, isAdded);
+            await UserProxy.SetBlockingAsync(_accountId, id, isAdded);
             this.OnAccountDataUpdated(id, isAdded, RelationDataChange.Blocking);
+        }
+
+        /// <summary>
+        /// Add blocking users
+        /// </summary>
+        /// <param name="ids">target users' ids</param>
+        public async Task AddBlockingsAsync(IEnumerable<long> ids)
+        {
+            var m = ids.Memoize();
+            lock (this._blockingsLocker)
+            {
+                m.ForEach(this._blockings.Add);
+            }
+            await UserProxy.AddBlockingsAsync(_accountId, m);
+            m.ForEach(id => this.OnAccountDataUpdated(id, true, RelationDataChange.Blocking));
+        }
+
+        /// <summary>
+        /// Remove blocking users
+        /// </summary>
+        /// <param name="ids">target users' ids</param>
+        public async Task RemoveBlockingsAsync(IEnumerable<long> ids)
+        {
+            var m = ids.Memoize();
+            lock (this._blockingsLocker)
+            {
+                m.ForEach(i => this._blockings.Remove(i));
+            }
+            await UserProxy.RemoveBlockingsAsync(_accountId, m);
+            m.ForEach(id => this.OnAccountDataUpdated(id, false, RelationDataChange.Blocking));
         }
     }
 

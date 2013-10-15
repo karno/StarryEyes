@@ -81,7 +81,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Cruds\MaintenanceCrud.cs" />
+    <Compile Include="Cruds\ManagementCrud.cs" />
     <Compile Include="Cruds\Scaffolding\CrudBase.cs" />
     <Compile Include="Cruds\RelationCrudBase.cs" />
     <Compile Include="Cruds\StatusEntityCrud.cs" />
@@ -96,6 +96,7 @@
     <Compile Include="Cruds\UserCrud.cs" />
     <Compile Include="DatabaseModels\DatabaseActivity.cs" />
     <Compile Include="DatabaseModels\DatabaseEntity.cs" />
+    <Compile Include="DatabaseModels\DatabaseManagement.cs" />
     <Compile Include="DatabaseModels\DatabaseRelation.cs" />
     <Compile Include="DatabaseModels\DatabaseStatus.cs" />
     <Compile Include="DatabaseModels\DatabaseUser.cs" />

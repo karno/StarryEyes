@@ -31,6 +31,7 @@ namespace StarryEyes
     /// </summary>
     public partial class App
     {
+        private static string DbVersion = "1.0";
         private static Mutex _appMutex;
         private void AppStartup(object sender, StartupEventArgs e)
         {
@@ -131,7 +132,7 @@ namespace StarryEyes
             // set parameters for accessing twitter.
             Networking.Initialize();
 
-            if (!this.CheckDatabase())
+            if (!this.CheckDataStore())
             {
                 // database corrupted
                 Current.Shutdown();
@@ -148,6 +149,12 @@ namespace StarryEyes
             StatusStore.Initialize();
             UserStore.Initialize();
             Database.Initialize(DatabaseFilePath);
+            if (!this.CheckDatabase())
+            {
+                // db migration failed
+                Current.Shutdown();
+                return;
+            }
 
             // initialize subsystems
             StatisticsService.Initialize();
@@ -168,8 +175,9 @@ namespace StarryEyes
             RaiseSystemReady();
         }
 
-        private bool CheckDatabase()
+        private bool CheckDataStore()
         {
+
             // check database corruption
             if (!Setting.DatabaseCorruption.Value)
             {
@@ -213,6 +221,21 @@ namespace StarryEyes
                 default:
                     return false;
             }
+        }
+
+        private bool CheckDatabase()
+        {
+            var ver = Database.ManagementCrud.DatabaseVersion;
+            if (String.IsNullOrEmpty(ver))
+            {
+                Database.ManagementCrud.DatabaseVersion = DbVersion;
+            }
+            else if (ver != DbVersion)
+            {
+                // todo: update db
+                return false;
+            }
+            return true;
         }
 
         /// <summary>

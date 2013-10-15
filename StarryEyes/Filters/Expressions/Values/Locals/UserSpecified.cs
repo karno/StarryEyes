@@ -82,7 +82,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
             {
                 if (_adata == null)
                     return new List<long>(); // returns empty list
-                return new AVLTree<long>(_adata.Following);
+                return new AVLTree<long>(_adata.Followings);
             }
         }
 
