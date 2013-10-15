@@ -14,6 +14,7 @@ namespace StarryEyes.Casket.DatabaseModels
 
         public string DisplayText { get; set; }
 
+        [DbOptional]
         public string OriginalUrl { get; set; }
 
         public long? UserId { get; set; }

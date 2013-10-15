@@ -21,7 +21,7 @@ namespace StarryEyes.Filters
             return status.Entities
                          .Where(e => e.EntityType == EntityType.UserMentions)
                          .Select(e => e.UserId ?? 0)
-                         .Where(_ => _ != 0);
+                         .Where(id => id != 0);
         }
 
         public static TwitterStatus GetOriginal(this TwitterStatus status)
