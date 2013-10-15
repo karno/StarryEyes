@@ -183,12 +183,15 @@ namespace StarryEyes.Models.Databases
             var se = Database.StatusEntityCrud.GetEntitiesAsync(id);
             var favorers = Database.FavoritesCrud.GetUsersAsync(id);
             var retweeters = Database.RetweetsCrud.GetUsersAsync(id);
-            if (dbstatus.RetweetOriginalId == null)
+            if (dbstatus.RetweetOriginalId != null)
             {
-                return Mapper.Map(dbstatus, await se, await favorers, await retweeters, await user);
+                var orig = await GetStatusAsync(dbstatus.RetweetOriginalId.Value);
+                if (orig != null)
+                {
+                    return Mapper.Map(dbstatus, await se, await favorers, await retweeters, orig, await user);
+                }
             }
-            var rts = GetStatusAsync(dbstatus.RetweetOriginalId.Value);
-            return Mapper.Map(dbstatus, await se, await favorers, await retweeters, await rts, await user);
+            return Mapper.Map(dbstatus, await se, await favorers, await retweeters, await user);
         }
 
         private static async Task<TwitterStatus> LoadDirectMessageAsync([NotNull] DatabaseStatus dbstatus)
