@@ -37,7 +37,7 @@ namespace StarryEyes.Filters.Parsing
                                 strptr++;
                                 break;
                             case '-': // <-
-                                yield return new Token(TokenType.OperatorContainedBy, strptr);
+                                yield return new Token(TokenType.OperatorIn, strptr);
                                 strptr++;
                                 break;
                             default: // <

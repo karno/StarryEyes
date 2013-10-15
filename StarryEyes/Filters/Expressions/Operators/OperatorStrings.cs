@@ -25,31 +25,6 @@ namespace StarryEyes.Filters.Expressions.Operators
         }
     }
 
-    public class FilterOperatorStringContains : FilterTwoValueOperator
-    {
-        protected override string OperatorString
-        {
-            get { return "contains"; }
-        }
-
-        public override IEnumerable<FilterExpressionType> SupportedTypes
-        {
-            get { yield return FilterExpressionType.String; }
-        }
-
-        public override Func<TwitterStatus, bool> GetBooleanValueProvider()
-        {
-            var haystack = LeftValue.GetStringValueProvider();
-            var needle = RightValue.GetStringValueProvider();
-            return t => haystack(t).IndexOf(needle(t), StringComparison.CurrentCultureIgnoreCase) >= 0;
-        }
-
-        public override string GetBooleanSqlQuery()
-        {
-            return LeftValue.GetStringSqlQuery() + " LIKE '%" + RightValue.GetStringSqlQuery().Unwrap() + "%' escape '\\'";
-        }
-    }
-
     public class OperatorStringStartsWith : FilterTwoValueOperator
     {
         protected override string OperatorString
@@ -59,14 +34,20 @@ namespace StarryEyes.Filters.Expressions.Operators
 
         public override IEnumerable<FilterExpressionType> SupportedTypes
         {
-            get { yield return FilterExpressionType.String; }
+            get { yield return FilterExpressionType.Boolean; }
         }
 
         public override Func<TwitterStatus, bool> GetBooleanValueProvider()
         {
             var haystack = LeftValue.GetStringValueProvider();
             var needle = RightValue.GetStringValueProvider();
-            return t => haystack(t).StartsWith(needle(t), StringComparison.CurrentCultureIgnoreCase);
+            return t =>
+            {
+                var h = haystack(t);
+                var n = needle(t);
+                if (h == null || n == null) return false;
+                return h.StartsWith(n, StringComparison.CurrentCultureIgnoreCase);
+            };
         }
 
         public override string GetBooleanSqlQuery()
@@ -84,14 +65,20 @@ namespace StarryEyes.Filters.Expressions.Operators
 
         public override IEnumerable<FilterExpressionType> SupportedTypes
         {
-            get { yield return FilterExpressionType.String; }
+            get { yield return FilterExpressionType.Boolean; }
         }
 
         public override Func<TwitterStatus, bool> GetBooleanValueProvider()
         {
             var haystack = LeftValue.GetStringValueProvider();
             var needle = RightValue.GetStringValueProvider();
-            return t => haystack(t).EndsWith(needle(t), StringComparison.CurrentCultureIgnoreCase);
+            return t =>
+            {
+                var h = haystack(t);
+                var n = needle(t);
+                if (h == null || n == null) return false;
+                return h.EndsWith(n, StringComparison.CurrentCultureIgnoreCase);
+            };
         }
 
         public override string GetBooleanSqlQuery()
@@ -109,14 +96,20 @@ namespace StarryEyes.Filters.Expressions.Operators
 
         public override IEnumerable<FilterExpressionType> SupportedTypes
         {
-            get { yield return FilterExpressionType.String; }
+            get { yield return FilterExpressionType.Boolean; }
         }
 
         public override Func<TwitterStatus, bool> GetBooleanValueProvider()
         {
             var haystack = LeftValue.GetStringValueProvider();
             var needle = RightValue.GetStringValueProvider();
-            return t => Regex.IsMatch(haystack(t), needle(t));
+            return t =>
+            {
+                var h = haystack(t);
+                var n = needle(t);
+                if (h == null || n == null) return false;
+                return Regex.IsMatch(h, n);
+            };
         }
 
         public override string GetBooleanSqlQuery()

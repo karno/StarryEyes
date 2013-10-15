@@ -59,7 +59,7 @@ namespace StarryEyes.Filters.Parsing
                     return "|| [論理和]";
                 case TokenType.OperatorContains:
                     return "-> [含む]";
-                case TokenType.OperatorContainedBy:
+                case TokenType.OperatorIn:
                     return "<- [含まれる]";
                 case TokenType.OperatorEquals:
                     return "== [等しい]";
@@ -159,7 +159,7 @@ namespace StarryEyes.Filters.Parsing
         /// <summary>
         /// Set contained in, &lt;-
         /// </summary>
-        OperatorContainedBy,
+        OperatorIn,
         /// <summary>
         /// Equals, ==
         /// </summary>

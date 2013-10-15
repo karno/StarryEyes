@@ -261,8 +261,8 @@ namespace StarryEyes.Filters.Parsing
             {
                 case TokenType.OperatorContains:
                     return generate(TokenType.OperatorContains, new FilterOperatorContains());
-                case TokenType.OperatorContainedBy:
-                    return generate(TokenType.OperatorContainedBy, new FilterOperatorContainedBy());
+                case TokenType.OperatorIn:
+                    return generate(TokenType.OperatorIn, new FilterOperatorContainedBy());
                 case TokenType.Literal:
                     switch (reader.LookAhead().Value.ToLower())
                     {
@@ -272,6 +272,15 @@ namespace StarryEyes.Filters.Parsing
                         case "contains":
                             // ->
                             return generate(TokenType.Literal, new FilterOperatorContains());
+                        case "startswith":
+                        case "startwith":
+                            return generate(TokenType.Literal, new OperatorStringStartsWith());
+                        case "endswith":
+                        case "endwith":
+                            return generate(TokenType.Literal, new OperatorStringEndsWith());
+                        case "match":
+                        case "regex":
+                            return generate(TokenType.Literal, new OperatorStringRegex());
                         default:
                             return left;
                     }
