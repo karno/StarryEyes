@@ -4,7 +4,7 @@ using StarryEyes.Casket.Cruds.Scaffolding;
 namespace StarryEyes.Casket.DatabaseModels
 {
     [DbName("User")]
-    public class DatabaseUser : DbModelBase
+    public class DatabaseUser 
     {
         [DbPrimaryKey]
         public long Id { get; set; }

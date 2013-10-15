@@ -2,8 +2,8 @@
 
 namespace StarryEyes.Casket.DatabaseModels
 {
-    [DbUniqueColumn("StatusId", "UserId")]
-    public sealed class DatabaseActivity : DbModelBase
+    [DbName("Activity"), DbUniqueColumn("StatusId", "UserId")]
+    public sealed class DatabaseActivity
     {
         [DbPrimaryKey(true)]
         public long Id { get; set; }

@@ -3,7 +3,7 @@ using StarryEyes.Casket.Cruds.Scaffolding;
 
 namespace StarryEyes.Casket.DatabaseModels
 {
-    public abstract class DatabaseEntity : DbModelBase
+    public abstract class DatabaseEntity
     {
         [DbPrimaryKey(true)]
         public long Id { get; set; }

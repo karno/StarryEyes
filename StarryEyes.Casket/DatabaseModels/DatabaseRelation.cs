@@ -2,7 +2,7 @@
 
 namespace StarryEyes.Casket.DatabaseModels
 {
-    [DbUniqueColumn("UserId", "TargetId")]
+    [DbName("Relation"), DbUniqueColumn("UserId", "TargetId")]
     public sealed class DatabaseRelation
     {
         public DatabaseRelation() { }

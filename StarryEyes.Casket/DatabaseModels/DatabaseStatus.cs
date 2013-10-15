@@ -5,7 +5,7 @@ using StarryEyes.Casket.Cruds.Scaffolding;
 namespace StarryEyes.Casket.DatabaseModels
 {
     [DbName("Status")]
-    public class DatabaseStatus : DbModelBase
+    public class DatabaseStatus
     {
         [DbPrimaryKey]
         public long Id { get; set; }

@@ -99,7 +99,6 @@
     <Compile Include="DatabaseModels\DatabaseRelation.cs" />
     <Compile Include="DatabaseModels\DatabaseStatus.cs" />
     <Compile Include="DatabaseModels\DatabaseUser.cs" />
-    <Compile Include="DatabaseModels\DbModelBase.cs" />
     <Compile Include="Cruds\Scaffolding\DbNameAttribute.cs" />
     <Compile Include="Cruds\Scaffolding\DbOptionalAttribute.cs" />
     <Compile Include="Cruds\Scaffolding\DbPrimaryKeyAttribute.cs" />
