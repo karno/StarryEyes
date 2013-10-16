@@ -2,13 +2,13 @@
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Livet;
 using Livet.Messaging;
 using StarryEyes.Filters.Expressions;
 using StarryEyes.Models;
-using StarryEyes.Models.Stores;
 using StarryEyes.Models.Subsystems;
-using StarryEyes.Models.Tab;
+using StarryEyes.Models.Timelines.Tabs;
 using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
 using StarryEyes.ViewModels.Dialogs;
@@ -74,6 +74,24 @@ namespace StarryEyes.ViewModels
 
         #region Properties
 
+        public string WindowTitle
+        {
+            get
+            {
+                var name = App.AppFullName;
+                switch (App.ReleaseKind)
+                {
+                    case ReleaseKind.Stable:
+                        return name;
+                    case ReleaseKind.Daybreak:
+                    case ReleaseKind.Midnight:
+                        return name + " " + App.FormattedVersion;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+        }
+
         private bool _showWindowCommands = true;
 
         public bool ShowWindowCommands
@@ -129,7 +147,7 @@ namespace StarryEyes.ViewModels
                     SearchFlipViewModel.FocusToSearchBox();
                     break;
                 case FocusRequest.Timeline:
-                    TabManager.CurrentFocusTab.SetPhysicalFocus();
+                    TabManager.CurrentFocusTab.RequestFocus();
                     SearchFlipViewModel.Close();
                     break;
                 case FocusRequest.Input:
@@ -148,6 +166,7 @@ namespace StarryEyes.ViewModels
 
         public void Initialize()
         {
+            #region bind events
             CompositeDisposable.Add(
                 Observable.FromEvent<bool>(
                     h => MainWindowModel.WindowCommandsDisplayChanged += h,
@@ -209,7 +228,10 @@ namespace StarryEyes.ViewModels
                                                          });
                                   _globalAccountSelectionFlipViewModel.Open();
                               }));
+            #endregion
 
+            #region special navigations
+            // check first boot
             if (Setting.IsFirstGenerated)
             {
                 var kovm = new KeyOverrideViewModel();
@@ -218,26 +240,32 @@ namespace StarryEyes.ViewModels
                                          kovm, TransitionMode.Modal, null));
             }
 
-            // Start receiving
-            if (!AccountsStore.Accounts.Any())
+            // register new account if accounts haven't been authorized yet
+            if (!Setting.Accounts.Collection.Any())
             {
                 var auth = new AuthorizationViewModel();
                 auth.AuthorizeObservable
-                    .Subscribe(info =>
-                               AccountsStore.Accounts.Add(
-                                   new AccountSetting
-                                   {
-                                       AuthenticateInfo = info,
-                                       IsUserStreamsEnabled = true
-                                   }));
+                    .Subscribe(Setting.Accounts.Collection.Add);
                 Messenger.RaiseAsync(new TransitionMessage(
                                          typeof(AuthorizationWindow),
                                          auth, TransitionMode.Modal, null));
             }
+            #endregion
+
             TabManager.Load();
             TabManager.Save();
 
-            if (TabManager.Columns.Count != 1 || TabManager.Columns[0].Tabs.Count != 0) return;
+            if (TabManager.Columns.Count == 1 && TabManager.Columns[0].Tabs.Count == 0)
+            {
+                // lost tab info
+                this.ReInitTabs();
+            }
+
+            Task.Run(() => App.RaiseUserInterfaceReady());
+        }
+
+        private void ReInitTabs()
+        {
             var response = this.Messenger.GetResponse(new TaskDialogMessage(new TaskDialogOptions
             {
                 Title = "タブ情報の警告",
@@ -250,6 +278,7 @@ namespace StarryEyes.ViewModels
             if (response.Response.Result != TaskDialogSimpleResult.Yes) return;
             Setting.ResetTabInfo();
             TabManager.Columns.Clear();
+            // refresh tabs
             TabManager.Load();
             TabManager.Save();
         }

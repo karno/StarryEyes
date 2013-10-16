@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Linq;
 using System.Reactive.Linq;
 using Livet;
 using StarryEyes.Models;
 using StarryEyes.Models.Backstages;
-using StarryEyes.Models.Receivers.ReceiveElements;
+using StarryEyes.Models.Receiving.Receivers;
 using StarryEyes.Models.Subsystems;
 using StarryEyes.Settings;
-using StarryEyes.ViewModels.WindowParts.Timelines;
+using StarryEyes.ViewModels.Timelines.Statuses;
 
 namespace StarryEyes.ViewModels.WindowParts.Backstages
 {
@@ -50,7 +49,7 @@ namespace StarryEyes.ViewModels.WindowParts.Backstages
                 Observable.Interval(TimeSpan.FromSeconds(5))
                           .Subscribe(_ =>
                           {
-                              var count = PostLimitPredictionService.GetCurrentWindowCount(model.Info.Id);
+                              var count = PostLimitPredictionService.GetCurrentWindowCount(model.Account.Id);
                               MaxUpdate = Setting.PostLimitPerWindow.Value;
                               RemainUpdate = MaxUpdate - count;
                               this.RaisePropertyChanged(() => RemainUpdate);

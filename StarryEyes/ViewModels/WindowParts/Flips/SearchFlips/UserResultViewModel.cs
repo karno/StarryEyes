@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reactive.Linq;
 using System.Threading;
-using System.Windows.Threading;
+using System.Threading.Tasks;
 using Livet;
-using StarryEyes.Breezy.Api.Rest;
-using StarryEyes.Breezy.DataModel;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Models;
 using StarryEyes.Models.Backstages.NotificationEvents;
-using StarryEyes.Models.Stores;
 using StarryEyes.Nightmare.Windows;
-using StarryEyes.ViewModels.WindowParts.Timelines;
+using StarryEyes.Settings;
+using StarryEyes.ViewModels.Timelines.Statuses;
 using StarryEyes.Views.Messaging;
 
 namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
@@ -83,33 +82,50 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
         {
             if (!_isDeferLoadEnabled || this.IsLoading) return;
             this.IsLoading = true;
-            var info = AccountsStore.Accounts
-                                    .Shuffle()
-                                    .Select(s => s.AuthenticateInfo)
-                                    .FirstOrDefault();
-            var page = Interlocked.Increment(ref _currentPageCount);
-            info.SearchUser(this.Query, count: 100, page: page)
-                .ConcatIfEmpty(() =>
-                {
-                    _isDeferLoadEnabled = false;
-                    return Observable.Empty<TwitterUser>();
-                })
-                .Catch((Exception ex) =>
+            Task.Run(async () =>
+            {
+                var account = Setting.Accounts.GetRandomOne();
+                if (account == null)
                 {
                     _parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
-                       {
-                           CommonButtons = TaskDialogCommonButtons.Close,
-                           MainIcon = VistaTaskDialogIcon.Error,
-                           MainInstruction = "ユーザーの読み込みに失敗しました。",
-                           Content = ex.Message,
-                           Title = "読み込みエラー"
-                       }));
+                    {
+                        CommonButtons = TaskDialogCommonButtons.Close,
+                        MainIcon = VistaTaskDialogIcon.Error,
+                        MainInstruction = "ユーザーの読み込みに失敗しました。",
+                        Content = "アカウントが登録されていません。",
+                        Title = "読み込みエラー"
+                    }));
+                    BackstageModel.RegisterEvent(new OperationFailedEvent("アカウントが登録されていません。"));
+                }
+                var page = Interlocked.Increment(ref _currentPageCount);
+                try
+                {
+                    var result = await account.SearchUserAsync(this.Query, count: 100, page: page);
+                    var twitterUsers = result as TwitterUser[] ?? result.ToArray();
+                    if (!twitterUsers.Any())
+                    {
+                        _isDeferLoadEnabled = false;
+                        return;
+                    }
+                    twitterUsers.ForEach(u => Users.Add(new UserResultItemViewModel(u)));
+                }
+                catch (Exception ex)
+                {
+                    _parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
+                    {
+                        CommonButtons = TaskDialogCommonButtons.Close,
+                        MainIcon = VistaTaskDialogIcon.Error,
+                        MainInstruction = "ユーザーの読み込みに失敗しました。",
+                        Content = ex.Message,
+                        Title = "読み込みエラー"
+                    }));
                     BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message));
-                    return Observable.Empty<TwitterUser>();
-                })
-                .ObserveOn(DispatcherHolder.Dispatcher, DispatcherPriority.Render)
-                .Finally(() => this.IsLoading = false)
-                .Subscribe(u => Users.Add(new UserResultItemViewModel(u)));
+                }
+                finally
+                {
+                    IsLoading = false;
+                }
+            });
         }
     }
 

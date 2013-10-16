@@ -1,10 +1,12 @@
 ﻿using System;
-using System.Linq;
 using System.Reactive.Linq;
-using StarryEyes.Breezy.Api.Rest;
-using StarryEyes.Breezy.Authorize;
-using StarryEyes.Breezy.DataModel;
-using StarryEyes.Models.Notifications;
+using System.Reactive.Threading.Tasks;
+using System.Threading.Tasks;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Anomaly.TwitterApi.Rest;
+using StarryEyes.Models.Databases;
+using StarryEyes.Models.Receiving.Handling;
+using StarryEyes.Settings;
 
 namespace StarryEyes.Models.Stores
 {
@@ -13,67 +15,34 @@ namespace StarryEyes.Models.Stores
     /// </summary>
     public static class StoreHelper
     {
-        public static IObservable<TwitterStatus> MergeStore(TwitterStatus status)
-        {
-            return StatusStore.Get(status.Id)
-                              .ConcatIfEmpty(() =>
-                              {
-                                  StatusStore.Store(status);
-                                  return Observable.Return(status);
-                              });
-        }
-
-        public static IObservable<TwitterStatus> NotifyAndMergeStore(TwitterStatus status)
-        {
-            return StatusStore.Get(status.Id)
-                              .ConcatIfEmpty(() =>
-                              {
-                                  StatusStore.Store(status);
-                                  NotificationModel.NotifyNewArrival(status);
-                                  return Observable.Return(status);
-                              });
-        }
-
         public static IObservable<TwitterStatus> GetTweet(long id)
         {
-            return StatusStore.Get(id)
+            return StatusProxy.GetStatusAsync(id)
+                              .ToObservable()
                               .Where(_ => _ != null)
-                              .ConcatIfEmpty(
-                                  () => GetRandomAuthInfo()
-                                            .SelectMany(
-                                                a => a.ShowTweet(id)
-                                                      .Do(s => StatusStore.Store(s, false))
-                                            ));
+                              .ConcatIfEmpty(() =>
+                                             Setting.Accounts.GetRandomOne().ShowTweetAsync(id).ToObservable()
+                                                    .Do(StatusInbox.Queue));
         }
 
         public static IObservable<TwitterUser> GetUser(long id)
         {
-            return UserStore.Get(id)
+            return UserProxy.GetUserAsync(id)
+                            .ToObservable()
                             .Where(_ => _ != null)
-                            .ConcatIfEmpty(() => GetRandomAuthInfo()
-                                                     .SelectMany(a => a.ShowUser(id)
-                                                                       .Do(UserStore.Store)));
+                            .ConcatIfEmpty(() =>
+                                           Setting.Accounts.GetRandomOne().ShowUserAsync(id).ToObservable()
+                                                  .Do(u => Task.Run(() => UserProxy.StoreUserAsync(u))));
         }
 
         public static IObservable<TwitterUser> GetUser(string screenName)
         {
-            return UserStore.Get(screenName)
+            return UserProxy.GetUserAsync(screenName)
+                            .ToObservable()
                             .Where(_ => _ != null)
-                            .ConcatIfEmpty(() =>
-                                           GetRandomAuthInfo()
-                                               .SelectMany(a => a.ShowUser(screenName: screenName)
-                                                                 .Do(UserStore.Store)));
-        }
-
-        public static IObservable<AuthenticateInfo> GetRandomAuthInfo()
-        {
-            return Observable.Defer(
-                () => Observable.Return(
-                    AccountsStore.Accounts
-                                 .Shuffle()
-                                 .FirstOrDefault()))
-                             .Where(_ => _ != null)
-                             .Select(_ => _.AuthenticateInfo);
+                            .ConcatIfEmpty(
+                                () => Setting.Accounts.GetRandomOne().ShowUserAsync(screenName).ToObservable()
+                                             .Do(u => Task.Run(() => UserProxy.StoreUserAsync(u))));
         }
     }
 }

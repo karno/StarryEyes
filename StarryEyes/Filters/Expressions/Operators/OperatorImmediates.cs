@@ -1,11 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using StarryEyes.Breezy.DataModel;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
 
 namespace StarryEyes.Filters.Expressions.Operators
 {
     public class FilterNegate : FilterSingleValueOperator
     {
+        protected override string OperatorString
+        {
+            get { return "!"; }
+        }
+
         public override IEnumerable<FilterExpressionType> SupportedTypes
         {
             get { yield return FilterExpressionType.Boolean; }
@@ -13,10 +18,13 @@ namespace StarryEyes.Filters.Expressions.Operators
 
         public override Func<TwitterStatus, bool> GetBooleanValueProvider()
         {
-            if (!FilterExpressionUtil.Assert(FilterExpressionType.Boolean, Value.SupportedTypes))
-                throw new FilterQueryException("Negate operator must be have boolean value.", ToQuery());
             var bvp = Value.GetBooleanValueProvider();
             return _ => !bvp(_);
+        }
+
+        public override string GetBooleanSqlQuery()
+        {
+            return "NOT " + Value.GetBooleanSqlQuery();
         }
 
         public override string ToQuery()
@@ -36,6 +44,11 @@ namespace StarryEyes.Filters.Expressions.Operators
             this._inner = inner;
         }
 
+        protected override string OperatorString
+        {
+            get { return "()"; }
+        }
+
         public override IEnumerable<FilterExpressionType> SupportedTypes
         {
             get
@@ -53,7 +66,9 @@ namespace StarryEyes.Filters.Expressions.Operators
         public override Func<TwitterStatus, long> GetNumericValueProvider()
         {
             if (_inner == null)
-                throw new NotSupportedException();
+            {
+                return _ => 0;
+            }
             return _inner.GetNumericValueProvider();
         }
 
@@ -65,15 +80,35 @@ namespace StarryEyes.Filters.Expressions.Operators
         public override Func<TwitterStatus, string> GetStringValueProvider()
         {
             if (_inner == null)
-                throw new NotSupportedException();
+            {
+                return _ => String.Empty;
+            }
             return _inner.GetStringValueProvider();
+        }
+
+        public override string GetBooleanSqlQuery()
+        {
+            return this._inner == null ? "1" : "(" + this._inner.GetBooleanSqlQuery() + ")";
+        }
+
+        public override string GetNumericSqlQuery()
+        {
+            return this._inner == null ? "1" : "(" + this._inner.GetNumericSqlQuery() + ")";
+        }
+
+        public override string GetSetSqlQuery()
+        {
+            return this._inner == null ? "1" : this._inner.GetSetSqlQuery();
+        }
+
+        public override string GetStringSqlQuery()
+        {
+            return this._inner == null ? "1" : this._inner.GetStringSqlQuery();
         }
 
         public override string ToQuery()
         {
-            if (_inner == null)
-                return "()";
-            return "(" + _inner.ToQuery() + ")";
+            return this._inner == null ? "()" : "(" + this._inner.ToQuery() + ")";
         }
     }
 }

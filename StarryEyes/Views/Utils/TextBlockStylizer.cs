@@ -6,8 +6,8 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using StarryEyes.Breezy.DataModel;
-using StarryEyes.Breezy.Util;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Anomaly.Utils;
 using StarryEyes.Models;
 
 namespace StarryEyes.Views.Utils
@@ -144,7 +144,7 @@ namespace StarryEyes.Views.Utils
                 var display = entity.DisplayText;
                 if (String.IsNullOrWhiteSpace(display))
                 {
-                    display = entity.OriginalText;
+                    display = entity.OriginalUrl;
                 }
                 switch (entity.EntityType)
                 {
@@ -153,7 +153,7 @@ namespace StarryEyes.Views.Utils
                         break;
                     case EntityType.Media:
                     case EntityType.Urls:
-                        yield return GenerateLink(obj, display, ParsingExtension.ResolveEntity(entity.OriginalText));
+                        yield return GenerateLink(obj, display, ParsingExtension.ResolveEntity(entity.OriginalUrl));
                         break;
                     case EntityType.UserMentions:
                         yield return GenerateUserLink(obj, display, ParsingExtension.ResolveEntity(entity.DisplayText));

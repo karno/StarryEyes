@@ -1,22 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using StarryEyes.Breezy.Authorize;
-using StarryEyes.Breezy.DataModel;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;
-using StarryEyes.Models.Receivers;
-using StarryEyes.Models.Receivers.ReceiveElements;
+using StarryEyes.Models.Receiving;
+using StarryEyes.Models.Receiving.Receivers;
 using StarryEyes.Models.Stores;
 using StarryEyes.Models.Subsystems;
-using StarryEyes.Settings;
 
 namespace StarryEyes.Models.Backstages
 {
     public class BackstageAccountModel
     {
-        private readonly AuthenticateInfo _info;
+        private readonly TwitterAccount _account;
         private UserStreamsConnectionState _connectionState;
         private TwitterUser _user;
 
@@ -36,9 +31,9 @@ namespace StarryEyes.Models.Backstages
             if (handler != null) handler();
         }
 
-        public AuthenticateInfo Info
+        public TwitterAccount Account
         {
-            get { return this._info; }
+            get { return this._account; }
         }
 
         public UserStreamsConnectionState ConnectionState
@@ -59,14 +54,14 @@ namespace StarryEyes.Models.Backstages
 
         public int CurrentPostCount
         {
-            get { return PostLimitPredictionService.GetCurrentWindowCount(Info.Id); }
+            get { return PostLimitPredictionService.GetCurrentWindowCount(this.Account.Id); }
         }
 
-        public BackstageAccountModel(AuthenticateInfo info)
+        public BackstageAccountModel(TwitterAccount account)
         {
-            this._info = info;
+            this._account = account;
             this.UpdateConnectionState();
-            StoreHelper.GetUser(_info.Id)
+            StoreHelper.GetUser(this._account.Id)
                        .Subscribe(
                            u =>
                            {
@@ -74,19 +69,19 @@ namespace StarryEyes.Models.Backstages
                                this.OnTwitterUserChanged();
                            },
                            ex => BackstageModel.RegisterEvent(
-                               new OperationFailedEvent("Could not receive user info: " +
-                                                        this._info.UnreliableScreenName +
+                               new OperationFailedEvent("Could not receive user account: " +
+                                                        this._account.UnreliableScreenName +
                                                         " - " + ex.Message)));
         }
 
         internal void UpdateConnectionState()
         {
-            this.ConnectionState = ReceiversManager.GetConnectionState(this.Info.Id);
+            this.ConnectionState = ReceiveManager.GetConnectionState(this.Account.Id);
         }
 
         public void Reconnect()
         {
-            ReceiversManager.ReconnectUserStreams(this.Info.Id);
+            ReceiveManager.ReconnectUserStreams(this.Account.Id);
         }
     }
 }

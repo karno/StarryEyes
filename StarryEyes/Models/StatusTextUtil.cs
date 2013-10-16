@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using StarryEyes.Albireo;
+using StarryEyes.Anomaly.Utils;
 using StarryEyes.Helpers;
+using StarryEyes.Models.Subsystems;
 
 namespace StarryEyes.Models
 {
@@ -15,8 +17,8 @@ namespace StarryEyes.Models
                                        .Sum(s => s.Item2
                                                      ? (s.Item1.StartsWith("https",
                                                                            StringComparison.CurrentCultureIgnoreCase)
-                                                            ? TwitterConfiguration.HttpsUrlLength
-                                                            : TwitterConfiguration.HttpUrlLength)
+                                                            ? TwitterConfigurationService.HttpsUrlLength
+                                                            : TwitterConfigurationService.HttpUrlLength)
                                                      : s.Item1.Length);
         }
 
@@ -42,23 +44,13 @@ namespace StarryEyes.Models
             return domain.Insert(pidx2 <= 0 ? pidx1 : pidx2, "\u200c");
         }
 
-        private static string InternalEscape(string raw)
-        {
-            return raw.Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;").Replace("\"", "&quot;");
-        }
-
-        private static string InternalUnescape(string escaped)
-        {
-            return escaped.Replace("&quot;", "\"").Replace("&lt;", "<").Replace("&gt;", ">").Replace("&amp;", "&");
-        }
-
         /// <summary>
         /// 文字列をトークン化します。
         /// </summary>
         public static IEnumerable<TextToken> Tokenize(string raw)
         {
             if (String.IsNullOrEmpty(raw)) yield break;
-            var escaped = InternalEscape(raw);
+            var escaped = ParsingExtension.EscapeEntity(raw);
             escaped = TwitterRegexPatterns.ValidUrl.Replace(escaped, m =>
             {
                 // # => &sharp; (ハッシュタグで再識別されることを防ぐ)
@@ -73,7 +65,7 @@ namespace StarryEyes.Models
                 if (s.Contains('>'))
                 {
                     var kind = s[0];
-                    var body = InternalUnescape(s.Substring(2));
+                    var body = ParsingExtension.ResolveEntity(s.Substring(2));
                     switch (kind)
                     {
                         case 'U':
@@ -92,7 +84,7 @@ namespace StarryEyes.Models
                 }
                 else
                 {
-                    yield return new TextToken(TokenKind.Text, InternalUnescape(s));
+                    yield return new TextToken(TokenKind.Text, ParsingExtension.ResolveEntity(s));
                 }
             }
         }

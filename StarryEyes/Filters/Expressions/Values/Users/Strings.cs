@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using StarryEyes.Breezy.DataModel;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
 
 namespace StarryEyes.Filters.Expressions.Values.Users
 {
@@ -14,6 +14,11 @@ namespace StarryEyes.Filters.Expressions.Values.Users
         public override Func<TwitterStatus, string> GetStringValueProvider()
         {
             return _ => _.GetOriginal().User.ScreenName;
+        }
+
+        public override string GetStringSqlQuery()
+        {
+            return "(select ScreenName from User where Id = status.BaseUserId limit 1)";
         }
 
         public override string ToQuery()
@@ -34,6 +39,11 @@ namespace StarryEyes.Filters.Expressions.Values.Users
             return _ => _.GetOriginal().User.Name;
         }
 
+        public override string GetStringSqlQuery()
+        {
+            return "(select Name from User where Id = status.BaseUserId limit 1)";
+        }
+
         public override string ToQuery()
         {
             return "user.name";
@@ -50,6 +60,11 @@ namespace StarryEyes.Filters.Expressions.Values.Users
         public override Func<TwitterStatus, string> GetStringValueProvider()
         {
             return _ => _.GetOriginal().User.Description;
+        }
+
+        public override string GetStringSqlQuery()
+        {
+            return "(select Description from User where Id = status.BaseUserId limit 1)";
         }
 
         public override string ToQuery()
@@ -70,6 +85,11 @@ namespace StarryEyes.Filters.Expressions.Values.Users
             return _ => _.GetOriginal().User.Location;
         }
 
+        public override string GetStringSqlQuery()
+        {
+            return "(select Location from User where Id = status.BaseUserId limit 1)";
+        }
+
         public override string ToQuery()
         {
             return "user.location";
@@ -86,6 +106,11 @@ namespace StarryEyes.Filters.Expressions.Values.Users
         public override Func<TwitterStatus, string> GetStringValueProvider()
         {
             return _ => _.GetOriginal().User.Language;
+        }
+
+        public override string GetStringSqlQuery()
+        {
+            return "(select Language from User where Id = status.BaseUserId limit 1)";
         }
 
         public override string ToQuery()
@@ -106,6 +131,11 @@ namespace StarryEyes.Filters.Expressions.Values.Users
             return _ => _.RetweetedOriginal != null ? _.User.ScreenName : null;
         }
 
+        public override string GetStringSqlQuery()
+        {
+            return "(select ScreenName from User where Id = status.RetweeterId limit 1)";
+        }
+
         public override string ToQuery()
         {
             return "retweeter.screen_name";
@@ -122,6 +152,11 @@ namespace StarryEyes.Filters.Expressions.Values.Users
         public override Func<TwitterStatus, string> GetStringValueProvider()
         {
             return _ => _.RetweetedOriginal != null ? _.User.Name : null;
+        }
+
+        public override string GetStringSqlQuery()
+        {
+            return "(select Name from User where Id = status.RetweeterId limit 1)";
         }
 
         public override string ToQuery()
@@ -142,6 +177,11 @@ namespace StarryEyes.Filters.Expressions.Values.Users
             return _ => _.RetweetedOriginal != null ? _.User.Description : null;
         }
 
+        public override string GetStringSqlQuery()
+        {
+            return "(select Description from User where Id = status.RetweeterId limit 1)";
+        }
+
         public override string ToQuery()
         {
             return "retweeter.description";
@@ -160,6 +200,11 @@ namespace StarryEyes.Filters.Expressions.Values.Users
             return _ => _.RetweetedOriginal != null ? _.User.Location : null;
         }
 
+        public override string GetStringSqlQuery()
+        {
+            return "(select Location from User where Id = status.RetweeterId limit 1)";
+        }
+
         public override string ToQuery()
         {
             return "retweeter.location";
@@ -176,6 +221,11 @@ namespace StarryEyes.Filters.Expressions.Values.Users
         public override Func<TwitterStatus, string> GetStringValueProvider()
         {
             return _ => _.RetweetedOriginal != null ? _.User.Language : null;
+        }
+
+        public override string GetStringSqlQuery()
+        {
+            return "(select Language from User where Id = status.RetweeterId limit 1)";
         }
 
         public override string ToQuery()

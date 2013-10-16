@@ -1,10 +1,9 @@
 ﻿using System;
+using System.Linq;
 using System.Reactive.Linq;
 using Codeplex.OAuth;
 using Livet;
 using Livet.Messaging.Windows;
-using StarryEyes.Breezy.Api;
-using StarryEyes.Models.Stores;
 using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
 using StarryEyes.Views.Messaging;
@@ -96,13 +95,12 @@ namespace StarryEyes.ViewModels.Dialogs
                          Title = "APIキー設定のスキップ",
                          MainIcon = VistaTaskDialogIcon.Warning,
                          MainInstruction = "APIキーの設定をスキップしますか？",
-                         Content = "スキップする場合、いくつか制限が適用されます。" + Environment.NewLine +
-                         "後からもキーを設定できますが、その際にすべてのアカウントを認証しなおす必要があります。",
+                         Content = "スキップする場合、最大登録可能アカウント数が2つに制限されます。",
                          CommandButtons = new[] { "スキップ", "キャンセル" },
                          ExpandedInfo = "APIキーの状況によってはアカウントが登録できないことがあります。" + Environment.NewLine +
-                         "また、最大登録可能アカウント数も制限されます。"
+                         "後からAPIキーを設定することもできますが、その際にすべてのアカウントを認証しなおす必要があります。"
                      }));
-                if (m.Response.CustomButtonResult.HasValue && m.Response.CustomButtonResult.Value == 0)
+                if (m.Response.CommandButtonResult.HasValue && m.Response.CommandButtonResult.Value == 0)
                 {
                     this.Messenger.Raise(new WindowActionMessage(WindowAction.Close));
                 }
@@ -115,9 +113,10 @@ namespace StarryEyes.ViewModels.Dialogs
 
         private void UpdateEndpointKey()
         {
-            ApiEndpoint.DefaultConsumerKey = Setting.GlobalConsumerKey.Value ?? App.ConsumerKey;
-            ApiEndpoint.DefaultConsumerSecret = Setting.GlobalConsumerSecret.Value ?? App.ConsumerSecret;
-            AccountsStore.Accounts.Clear();
+            Setting.Accounts.Collection
+                   .Select(a => a.Id)
+                   .ToArray()
+                   .ForEach(Setting.Accounts.RemoveAccountFromId);
         }
 
         #region OpenApiKeyHelpCommand

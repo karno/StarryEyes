@@ -1,31 +1,71 @@
 ﻿using System;
 using System.Collections.Generic;
-using StarryEyes.Breezy.DataModel;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
 
 namespace StarryEyes.Filters.Expressions.Operators
 {
     public abstract class FilterOperatorBase : FilterExpressionBase
     {
+        protected abstract string OperatorString { get; }
+
         public abstract IEnumerable<FilterExpressionType> SupportedTypes { get; }
 
         public virtual Func<TwitterStatus, bool> GetBooleanValueProvider()
         {
-            throw new FilterQueryException("Unsupported transforms to boolean.", ToQuery());
+            this.ThrowMismatchType(FilterExpressionType.Boolean);
+            return null;//unreachable code
         }
 
         public virtual Func<TwitterStatus, long> GetNumericValueProvider()
         {
-            throw new FilterQueryException("Unsupported transforms to numeric.", ToQuery());
+            this.ThrowMismatchType(FilterExpressionType.Numeric);
+            return null;//unreachable code
         }
 
         public virtual Func<TwitterStatus, string> GetStringValueProvider()
         {
-            throw new FilterQueryException("Unsupported transforms to string.", ToQuery());
+            this.ThrowMismatchType(FilterExpressionType.String);
+            return null;//unreachable code
         }
 
         public virtual Func<TwitterStatus, IReadOnlyCollection<long>> GetSetValueProvider()
         {
-            throw new FilterQueryException("Unsupported transforms to set.", ToQuery());
+            this.ThrowMismatchType(FilterExpressionType.Set);
+            return null;//unreachable code
+        }
+
+        public virtual string GetBooleanSqlQuery()
+        {
+            this.ThrowMismatchType(FilterExpressionType.Boolean);
+            return null;//unreachable code
+        }
+
+        public virtual string GetNumericSqlQuery()
+        {
+            this.ThrowMismatchType(FilterExpressionType.Numeric);
+            return null;//unreachable code
+        }
+
+        public virtual string GetStringSqlQuery()
+        {
+            this.ThrowMismatchType(FilterExpressionType.String);
+            return null;//unreachable code
+        }
+
+        public virtual string GetSetSqlQuery()
+        {
+            this.ThrowMismatchType(FilterExpressionType.Set);
+            return null;//unreachable code
+        }
+
+        protected void ThrowMismatchType(FilterExpressionType type)
+        {
+            throw FilterQueryException.CreateUnsupportedType(this.OperatorString, type, this.ToQuery());
+        }
+
+        protected void ThrowMismatchType(params FilterExpressionType[] types)
+        {
+            throw FilterQueryException.CreateUnsupportedType(this.OperatorString, types, this.ToQuery());
         }
     }
 
@@ -97,8 +137,6 @@ namespace StarryEyes.Filters.Expressions.Operators
         {
             return LeftValue.ToQuery() + " " + OperatorString + " " + RightValue.ToQuery();
         }
-
-        protected abstract string OperatorString { get; }
 
         public override void BeginLifecycle()
         {

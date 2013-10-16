@@ -1,17 +1,20 @@
 ﻿using System;
+using System.Reactive;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using Livet;
 using StarryEyes.Filters;
 using StarryEyes.Filters.Parsing;
 using StarryEyes.Models;
-using StarryEyes.Models.Tab;
+using StarryEyes.Models.Timelines.Tabs;
 
 namespace StarryEyes.ViewModels.WindowParts.Flips
 {
     public class TabConfigurationFlipViewModel : ViewModel
     {
         private TabModel _currentConfigurationTarget;
+        private ISubject<Unit> _completeCallback;
 
         private bool _isConfigurationActive;
         public bool IsConfigurationActive
@@ -28,20 +31,23 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public TabConfigurationFlipViewModel()
         {
-            this.CompositeDisposable.Add(Observable.FromEvent<TabModel>(
+            this.CompositeDisposable.Add(Observable.FromEvent<Tuple<TabModel, ISubject<Unit>>>(
                 h => MainWindowModel.TabModelConfigureRaised += h,
                 h => MainWindowModel.TabModelConfigureRaised -= h)
                 .Subscribe(OnConfigurationStart));
         }
 
-        private void OnConfigurationStart(TabModel model)
+        private void OnConfigurationStart(Tuple<TabModel, ISubject<Unit>> args)
         {
+            var model = args.Item1;
+            var callback = args.Item2;
+            this._completeCallback = callback;
             this._currentConfigurationTarget = model;
             this.IsConfigurationActive = true;
             _filterQuery = model.FilterQuery;
-            _initialQuery = _filterQuery.ToQuery();
+            _initialQuery = _filterQuery == null ? String.Empty : _filterQuery.ToQuery();
             _foundError = false;
-            _currentQueryString = model.FilterQueryString;
+            _currentQueryString = _initialQuery;
             RaisePropertyChanged(() => TabName);
             RaisePropertyChanged(() => IsShowUnreadCounts);
             RaisePropertyChanged(() => IsNotifyNewArrivals);
@@ -144,29 +150,16 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             this.IsConfigurationActive = false;
             if (_currentConfigurationTarget != null)
             {
-                if (_filterQuery.ToQuery() != _initialQuery)
+                if (_filterQuery != null && _filterQuery.ToQuery() != _initialQuery)
                 {
-
-                    if (_currentConfigurationTarget.IsActivated)
-                    {
-                        _currentConfigurationTarget.Deactivate();
-                        // update query info
-                        _currentConfigurationTarget.FilterQuery = _filterQuery;
-                        // finalize
-                        _currentConfigurationTarget.Activate();
-                    }
-                    else
-                    {
-                        _currentConfigurationTarget.FilterQuery = _filterQuery;
-                    }
-                    _currentConfigurationTarget.RaiseConfigurationUpdated(true);
+                    _currentConfigurationTarget.FilterQuery = _filterQuery;
                 }
-                else
+                if (_completeCallback != null)
                 {
-                    // writeback query edit result
-                    _currentConfigurationTarget.RaiseConfigurationUpdated(false);
+                    _completeCallback.OnNext(Unit.Default);
+                    _completeCallback.OnCompleted();
+                    _completeCallback = null;
                 }
-                // regenerate timeline
             }
             TabManager.Save();
         }

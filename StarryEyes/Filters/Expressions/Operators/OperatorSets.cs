@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using StarryEyes.Breezy.DataModel;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Models.Databases;
 
 namespace StarryEyes.Filters.Expressions.Operators
 {
@@ -15,20 +16,61 @@ namespace StarryEyes.Filters.Expressions.Operators
             get { return "contains"; }
         }
 
+        private bool CompareAsString()
+        {
+            // lv: string -> string
+            // lv: set|string -> rv: string -> string
+            var lst = LeftValue.SupportedTypes.Memoize();
+            var rst = RightValue.SupportedTypes.Memoize();
+            return !lst.Contains(FilterExpressionType.Set) ||
+                   (lst.Contains(FilterExpressionType.String) &&
+                    !rst.Contains(FilterExpressionType.Set) && !rst.Contains(FilterExpressionType.Numeric));
+        }
+
         public override Func<TwitterStatus, bool> GetBooleanValueProvider()
         {
-            var lsp = LeftValue.GetSetValueProvider();
-            if (RightValue.SupportedTypes.Contains(FilterExpressionType.Numeric))
+            if (this.CompareAsString())
             {
-                var rnp = RightValue.GetNumericValueProvider();
+                var haystack = this.LeftValue.GetStringValueProvider();
+                var needle = this.RightValue.GetStringValueProvider();
+                return t =>
+                {
+                    var h = haystack(t);
+                    var n = needle(t);
+                    if (h == null || n == null) return false;
+                    return h.IndexOf(n, StringComparison.CurrentCultureIgnoreCase) >= 0;
+                };
+            }
+            var lsp = this.LeftValue.GetSetValueProvider();
+            if (this.RightValue.SupportedTypes.Contains(FilterExpressionType.Numeric))
+            {
+                var rnp = this.RightValue.GetNumericValueProvider();
                 return _ => lsp(_).Contains(rnp(_));
             }
-            var rsp = RightValue.GetSetValueProvider();
+            var rsp = this.RightValue.GetSetValueProvider();
             return _ =>
             {
                 var ls = lsp(_);
                 return rsp(_).Any(ls.Contains);
             };
+        }
+
+        public override string GetBooleanSqlQuery()
+        {
+            if (this.CompareAsString())
+            {
+                return this.LeftValue.GetStringSqlQuery() + " LIKE '%" +
+                       this.RightValue.GetStringSqlQuery().Unwrap() +
+                       "%' escape '\\'";
+            }
+            var lq = this.LeftValue.GetSetSqlQuery();
+            if (this.RightValue.SupportedTypes.Contains(FilterExpressionType.Numeric))
+            {
+                return this.RightValue.GetNumericSqlQuery() + " IN " + lq;
+            }
+            var rq = this.RightValue.GetSetSqlQuery();
+            // check intersection
+            return "exists (" + lq.Unparenthesis() + " intersect " + rq.Unparenthesis() + ")";
         }
 
         public override IEnumerable<FilterExpressionType> SupportedTypes
@@ -61,6 +103,18 @@ namespace StarryEyes.Filters.Expressions.Operators
                 var rs = rsp(_);
                 return lsp(_).Any(rs.Contains);
             };
+        }
+
+        public override string GetBooleanSqlQuery()
+        {
+            var rq = RightValue.GetSetSqlQuery();
+            if (LeftValue.SupportedTypes.Contains(FilterExpressionType.Numeric))
+            {
+                return LeftValue.GetNumericSqlQuery() + " IN " + rq;
+            }
+            var lq = LeftValue.GetSetSqlQuery();
+            // check intersection
+            return "exists (" + lq.Unparenthesis() + " intersect " + rq.Unparenthesis() + ")";
         }
 
         public override IEnumerable<FilterExpressionType> SupportedTypes

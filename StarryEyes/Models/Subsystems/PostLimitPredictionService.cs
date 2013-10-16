@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
-using StarryEyes.Breezy.Authorize;
-using StarryEyes.Breezy.DataModel;
-using StarryEyes.Models.Stores;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Models.Accounting;
+using StarryEyes.Models.Databases;
+using StarryEyes.Models.Receiving.Handling;
 using StarryEyes.Settings;
 
 namespace StarryEyes.Models.Subsystems
@@ -16,51 +18,55 @@ namespace StarryEyes.Models.Subsystems
     public static class PostLimitPredictionService
     {
         private static readonly object _dictLock = new object();
-        private static readonly SortedDictionary<long, LinkedList<TwitterStatus>> _dictionary =
-            new SortedDictionary<long, LinkedList<TwitterStatus>>();
+        private static readonly IDictionary<long, LinkedList<TwitterStatus>> _dictionary =
+            new Dictionary<long, LinkedList<TwitterStatus>>();
 
         public static void Initialize()
         {
-            AccountsStore.Accounts.CollectionChanged += AccountsOnCollectionChanged;
-            AccountsStore.Accounts.ForEach(a => SetupAccount(a.AuthenticateInfo));
-            StatusStore.StatusPublisher
-                       .Where(d => d.IsAdded)
-                       .Select(d => d.Status)
-                       .Subscribe(PostDetected);
+            Setting.Accounts.Collection.ListenCollectionChanged().Subscribe(AccountsChanged);
+            Setting.Accounts.Collection.ForEach(SetupAccount);
+            StatusBroadcaster.BroadcastPoint
+                             .Where(d => d.IsAdded)
+                             .Select(d => d.Status)
+                             .Subscribe(PostDetected);
         }
 
-        private static void AccountsOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private static void AccountsChanged(NotifyCollectionChangedEventArgs e)
         {
-            var target = ((AccountSetting)e.NewItems[0]).AuthenticateInfo;
+            var added = e.NewItems != null ? e.NewItems[0] as TwitterAccount : null;
+            var removed = e.OldItems != null ? e.OldItems[0] as TwitterAccount : null;
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    SetupAccount(target);
+                    SetupAccount(added);
                     break;
                 case NotifyCollectionChangedAction.Remove:
-                    RemoveAccount(target);
+                    RemoveAccount(removed);
                     break;
                 case NotifyCollectionChangedAction.Replace:
+                    RemoveAccount(removed);
+                    SetupAccount(added);
                     break;
-                case NotifyCollectionChangedAction.Move:
+                case NotifyCollectionChangedAction.Reset:
+                    _dictionary.Clear();
+                    Setting.Accounts.Collection.ForEach(SetupAccount);
                     break;
-                default:
-                    throw new ArgumentOutOfRangeException();
             }
         }
 
-        private static void SetupAccount(AuthenticateInfo info)
+        private static void SetupAccount(TwitterAccount info)
         {
             lock (_dictLock)
             {
                 if (_dictionary.ContainsKey(info.Id)) return;
                 _dictionary.Add(info.Id, new LinkedList<TwitterStatus>());
-                StatusStore.FindBatch(s => s.User.Id == info.Id, Setting.PostLimitPerWindow.Value)
+                StatusProxy.FetchStatuses(
+                    "UserId = " + info.Id.ToString(CultureInfo.InvariantCulture), count: Setting.PostLimitPerWindow.Value)
                            .Subscribe(PostDetected);
             }
         }
 
-        private static void RemoveAccount(AuthenticateInfo info)
+        private static void RemoveAccount(TwitterAccount info)
         {
             lock (_dictLock)
             {

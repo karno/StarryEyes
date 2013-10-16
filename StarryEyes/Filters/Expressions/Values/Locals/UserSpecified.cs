@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using StarryEyes.Albireo.Data;
-using StarryEyes.Models.Stores;
+using StarryEyes.Albireo.Collections;
+using StarryEyes.Models.Accounting;
+using StarryEyes.Models.Databases;
+using StarryEyes.Settings;
 
 namespace StarryEyes.Filters.Expressions.Values.Locals
 {
@@ -16,34 +18,40 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
         public UserSpecified(string screenName)
         {
             _originalScreenName = screenName;
-            _userId = AccountsStore.Accounts
-                .Where(u => u.AuthenticateInfo.UnreliableScreenName == screenName)
-                .Select(u => u.UserId)
-                .FirstOrDefault();
+            _userId = Setting.Accounts
+                             .Collection
+                             .Where(
+                                 u =>
+                                 u.UnreliableScreenName.Equals(
+                                     screenName, StringComparison.CurrentCultureIgnoreCase))
+                             .Select(u => u.Id)
+                             .FirstOrDefault();
             if (_userId == 0)
             {
-                _userId = UserStore.GetId(screenName);
+                _userId = UserProxy.GetId(screenName);
             }
             else
             {
-                _adata = AccountRelationDataStore.Get(_userId);
+                var account = Setting.Accounts.Get(_userId);
+                _adata = account != null ? account.RelationData : null;
             }
         }
 
         public UserSpecified(long id)
         {
             _userId = id;
-            _adata = AccountRelationDataStore.Get(_userId);
+            var account = Setting.Accounts.Get(_userId);
+            _adata = account != null ? account.RelationData : null;
         }
 
         public override void BeginLifecycle()
         {
-            AccountRelationDataStore.AccountDataUpdated += this.AccountRelationDataAccountDataUpdated;
+            AccountRelationData.AccountDataUpdatedStatic += this.AccountRelationDataAccountDataUpdated;
         }
 
         public override void EndLifecycle()
         {
-            AccountRelationDataStore.AccountDataUpdated -= this.AccountRelationDataAccountDataUpdated;
+            AccountRelationData.AccountDataUpdatedStatic -= this.AccountRelationDataAccountDataUpdated;
         }
 
         void AccountRelationDataAccountDataUpdated(RelationDataChangedInfo obj)
@@ -54,6 +62,11 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
             }
         }
 
+        public override long UserId
+        {
+            get { return _userId; }
+        }
+
         public override IReadOnlyCollection<long> Users
         {
             get
@@ -62,13 +75,13 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
             }
         }
 
-        public override IReadOnlyCollection<long> Following
+        public override IReadOnlyCollection<long> Followings
         {
             get
             {
                 if (_adata == null)
                     return new List<long>(); // returns empty list
-                return new AVLTree<long>(_adata.Following);
+                return new AVLTree<long>(_adata.Followings);
             }
         }
 
@@ -92,9 +105,29 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
             }
         }
 
-        public override long UserId
+        public override string UserIdSql
         {
-            get { return _userId; }
+            get { return _userId.ToString(CultureInfo.InvariantCulture); }
+        }
+
+        public override string UsersSql
+        {
+            get { return UserIdSql.EnumerationToSelectClause(); }
+        }
+
+        public override string FollowingsSql
+        {
+            get { return "(select Targetid from Followings where UserId = " + UserId + ")"; }
+        }
+
+        public override string FollowersSql
+        {
+            get { return "(select Targetid from Followers where UserId = " + UserId + ")"; }
+        }
+
+        public override string BlockingsSql
+        {
+            get { return "(select Targetid from Blockings where UserId = " + UserId + ")"; }
         }
 
         public override string ToQuery()

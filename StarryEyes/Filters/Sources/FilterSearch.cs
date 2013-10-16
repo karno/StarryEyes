@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Linq;
 using System.Reactive.Linq;
-using StarryEyes.Breezy.Api.Rest;
-using StarryEyes.Breezy.DataModel;
-using StarryEyes.Models.Receivers;
-using StarryEyes.Models.Stores;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Anomaly.TwitterApi.Rest;
+using StarryEyes.Anomaly.Utils;
+using StarryEyes.Models.Receiving;
+using StarryEyes.Settings;
 
 namespace StarryEyes.Filters.Sources
 {
@@ -18,13 +18,19 @@ namespace StarryEyes.Filters.Sources
 
         public override Func<TwitterStatus, bool> GetEvaluator()
         {
-            return _ => _.Text.IndexOf(_query) >= 0;
+            return _ => _.Text.IndexOf(this._query, StringComparison.Ordinal) >= 0;
+        }
+
+        public override string GetSqlQuery()
+        {
+            return "Text like '%" + _query + "%'";
         }
 
         protected override IObservable<TwitterStatus> ReceiveSink(long? maxId)
         {
-            return Observable.Defer(() => AccountsStore.Accounts.Shuffle().Take(1).ToObservable())
-                .SelectMany(a => a.AuthenticateInfo.SearchTweets(_query));
+            return Observable.Start(() => Setting.Accounts.GetRandomOne())
+                             .Where(a => a != null)
+                             .SelectMany(a => a.SearchAsync(_query, maxId: maxId).ToObservable());
         }
 
         private bool _isActivated;
@@ -32,14 +38,14 @@ namespace StarryEyes.Filters.Sources
         {
             if (_isActivated) return;
             _isActivated = true;
-            ReceiversManager.RegisterSearchQuery(_query);
+            ReceiveManager.RegisterSearchQuery(_query);
         }
 
         public override void Deactivate()
         {
             if (!_isActivated) return;
             _isActivated = false;
-            ReceiversManager.UnregisterSearchQuery(_query);
+            ReceiveManager.UnregisterSearchQuery(_query);
         }
 
         public override string FilterKey

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using StarryEyes.Breezy.DataModel;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
 
 namespace StarryEyes.Filters.Expressions.Operators
 {
@@ -24,20 +24,26 @@ namespace StarryEyes.Filters.Expressions.Operators
 
         public override Func<TwitterStatus, IReadOnlyCollection<long>> GetSetValueProvider()
         {
-            if (!FilterExpressionUtil.Assert(FilterExpressionType.Set, LeftValue.SupportedTypes, RightValue.SupportedTypes))
-                throw new FilterQueryException("Each side of expression is must be convertable to long.", this.ToQuery());
             var lsp = LeftValue.GetSetValueProvider();
             var rsp = RightValue.GetSetValueProvider();
             return _ => lsp(_).Union(rsp(_)).ToList();
         }
 
+        public override string GetSetSqlQuery()
+        {
+            return LeftValue.GetSetSqlQuery() + " union " + RightValue.GetSetSqlQuery();
+        }
+
         public override Func<TwitterStatus, long> GetNumericValueProvider()
         {
-            if (!FilterExpressionUtil.Assert(FilterExpressionType.Numeric, LeftValue.SupportedTypes, RightValue.SupportedTypes))
-                throw new FilterQueryException("Each side of expression is must be convertable to long.", this.ToQuery());
             var lnp = LeftValue.GetNumericValueProvider();
             var rnp = RightValue.GetNumericValueProvider();
             return _ => lnp(_) + rnp(_);
+        }
+
+        public override string GetNumericSqlQuery()
+        {
+            return LeftValue.GetNumericSqlQuery() + " + " + RightValue.GetNumericSqlQuery();
         }
     }
 
@@ -60,20 +66,26 @@ namespace StarryEyes.Filters.Expressions.Operators
 
         public override Func<TwitterStatus, IReadOnlyCollection<long>> GetSetValueProvider()
         {
-            if (!FilterExpressionUtil.Assert(FilterExpressionType.Set, LeftValue.SupportedTypes, RightValue.SupportedTypes))
-                throw new FilterQueryException("Each side of expression is must be convertable to long.", this.ToQuery());
             var lsp = LeftValue.GetSetValueProvider();
             var rsp = RightValue.GetSetValueProvider();
             return _ => lsp(_).Except(rsp(_)).ToList();
         }
 
+        public override string GetSetSqlQuery()
+        {
+            return LeftValue.GetSetSqlQuery() + " except " + RightValue.GetSetSqlQuery();
+        }
+
         public override Func<TwitterStatus, long> GetNumericValueProvider()
         {
-            if (!FilterExpressionUtil.Assert(FilterExpressionType.Numeric, LeftValue.SupportedTypes, RightValue.SupportedTypes))
-                throw new FilterQueryException("Each side of expression is must be convertable to long.", this.ToQuery());
             var lnp = LeftValue.GetNumericValueProvider();
             var rnp = RightValue.GetNumericValueProvider();
             return _ => lnp(_) - rnp(_);
+        }
+
+        public override string GetNumericSqlQuery()
+        {
+            return LeftValue.GetNumericSqlQuery() + " - " + RightValue.GetNumericSqlQuery();
         }
     }
 
@@ -96,20 +108,26 @@ namespace StarryEyes.Filters.Expressions.Operators
 
         public override Func<TwitterStatus, IReadOnlyCollection<long>> GetSetValueProvider()
         {
-            if (!FilterExpressionUtil.Assert(FilterExpressionType.Set, LeftValue.SupportedTypes, RightValue.SupportedTypes))
-                throw new FilterQueryException("Each side of expression is must be convertable to long.", this.ToQuery());
             var lsp = LeftValue.GetSetValueProvider();
             var rsp = RightValue.GetSetValueProvider();
             return _ => lsp(_).Intersect(rsp(_)).ToList();
         }
 
+        public override string GetSetSqlQuery()
+        {
+            return LeftValue.GetSetSqlQuery() + " instersect " + RightValue.GetSetSqlQuery();
+        }
+
         public override Func<TwitterStatus, long> GetNumericValueProvider()
         {
-            if (!FilterExpressionUtil.Assert(FilterExpressionType.Numeric, LeftValue.SupportedTypes, RightValue.SupportedTypes))
-                throw new FilterQueryException("Each side of expression is must be convertable to long.", this.ToQuery());
             var lnp = LeftValue.GetNumericValueProvider();
             var rnp = RightValue.GetNumericValueProvider();
             return _ => lnp(_) * rnp(_);
+        }
+
+        public override string GetNumericSqlQuery()
+        {
+            return LeftValue.GetNumericSqlQuery() + " * " + RightValue.GetNumericSqlQuery();
         }
     }
 
@@ -124,36 +142,24 @@ namespace StarryEyes.Filters.Expressions.Operators
         {
             get
             {
-                return new[] { FilterExpressionType.Numeric, FilterExpressionType.Set }
-                    .Intersect(LeftValue.SupportedTypes)
-                    .Intersect(RightValue.SupportedTypes);
+                yield return FilterExpressionType.Numeric;
             }
-        }
-
-        public override Func<TwitterStatus, IReadOnlyCollection<long>> GetSetValueProvider()
-        {
-            if (!FilterExpressionUtil.Assert(FilterExpressionType.Set, LeftValue.SupportedTypes, RightValue.SupportedTypes))
-                throw new FilterQueryException("Each side of expression is must be convertable to long.", this.ToQuery());
-            var lsp = LeftValue.GetSetValueProvider();
-            var rsp = RightValue.GetSetValueProvider();
-            return _ => lsp(_).Intersect(rsp(_)).ToList();
         }
 
         public override Func<TwitterStatus, long> GetNumericValueProvider()
         {
-            if (!FilterExpressionUtil.Assert(FilterExpressionType.Numeric, LeftValue.SupportedTypes, RightValue.SupportedTypes))
-                throw new FilterQueryException("Each side of expression is must be convertable to long.", this.ToQuery());
             var lnp = LeftValue.GetNumericValueProvider();
             var rnp = RightValue.GetNumericValueProvider();
             return _ =>
-                {
-                    var divider = rnp(_);
-                    if (divider == 0)
-                        return 0;
-                    else
-                        return lnp(_) / divider;
-                };
+            {
+                var divider = rnp(_);
+                return divider == 0 ? 0 : lnp(_) / divider;
+            };
+        }
+
+        public override string GetNumericSqlQuery()
+        {
+            return LeftValue.GetNumericSqlQuery() + " / " + RightValue.GetNumericSqlQuery();
         }
     }
-
 }

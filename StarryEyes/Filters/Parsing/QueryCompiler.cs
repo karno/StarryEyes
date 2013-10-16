@@ -14,6 +14,13 @@ namespace StarryEyes.Filters.Parsing
 {
     public static class QueryCompiler
     {
+        private const string EmptyQuery = "from all where ()";
+
+        public static FilterQuery GetEmpty()
+        {
+            return Compile(EmptyQuery);
+        }
+
         public static FilterQuery Compile(string query)
         {
             try
@@ -74,7 +81,7 @@ namespace StarryEyes.Filters.Parsing
 
         #region sources compiler
 
-        private static readonly IDictionary<string, Type> FilterSourceResolver = new SortedDictionary<string, Type>
+        private static readonly IDictionary<string, Type> FilterSourceResolver = new Dictionary<string, Type>
         {
             {"*", typeof (FilterLocal)},
             {"local", typeof (FilterLocal)},
@@ -157,7 +164,9 @@ namespace StarryEyes.Filters.Parsing
             var reader = new TokenReader(token);
             var op = CompileL0(reader);
             if (reader.IsRemainToken)
-                throw new FilterQueryException("不正なトークンです: " + reader.Get(), reader.RemainQuery);
+            {
+                throw CreateUnexpectedTokenError(reader.Get().ToString(), reader.RemainQuery);
+            }
             return new FilterExpressionRoot { Operator = op };
         }
 
@@ -261,8 +270,8 @@ namespace StarryEyes.Filters.Parsing
             {
                 case TokenType.OperatorContains:
                     return generate(TokenType.OperatorContains, new FilterOperatorContains());
-                case TokenType.OperatorContainedBy:
-                    return generate(TokenType.OperatorContainedBy, new FilterOperatorContainedBy());
+                case TokenType.OperatorIn:
+                    return generate(TokenType.OperatorIn, new FilterOperatorContainedBy());
                 case TokenType.Literal:
                     switch (reader.LookAhead().Value.ToLower())
                     {
@@ -272,6 +281,15 @@ namespace StarryEyes.Filters.Parsing
                         case "contains":
                             // ->
                             return generate(TokenType.Literal, new FilterOperatorContains());
+                        case "startswith":
+                        case "startwith":
+                            return generate(TokenType.Literal, new OperatorStringStartsWith());
+                        case "endswith":
+                        case "endwith":
+                            return generate(TokenType.Literal, new OperatorStringEndsWith());
+                        case "match":
+                        case "regex":
+                            return generate(TokenType.Literal, new OperatorStringRegex());
                         default:
                             return left;
                     }
@@ -435,8 +453,8 @@ namespace StarryEyes.Filters.Parsing
                     case "blockings":
                         return new LocalUserBlockings(repl);
                     default:
-                        throw new FilterQueryException("不正なトークンです: " + literal.Value,
-                                                       repl.ToQuery() + "." + literal.Value + " " + reader.RemainQuery);
+                        throw CreateUnexpectedTokenError(
+                            literal.Value, repl.ToQuery() + "." + literal.Value + " " + reader.RemainQuery);
                 }
             }
             return new LocalUser(repl);
@@ -547,8 +565,8 @@ namespace StarryEyes.Filters.Parsing
                 case "language":
                     return selector(new UserLanguage(), new RetweeterLanguage());
                 default:
-                    throw new FilterQueryException("不正なトークンです: " + literal.Value,
-                                                   "user." + literal.Value + " " + reader.RemainQuery);
+                    throw CreateUnexpectedTokenError(literal.Value,
+                                                     "user." + literal.Value + " " + reader.RemainQuery);
             }
         }
 
@@ -611,10 +629,16 @@ namespace StarryEyes.Filters.Parsing
                 case "client":
                     return new StatusSource();
                 default:
-                    throw new FilterQueryException("不正なトークンです: " + value, value + " " + reader.RemainQuery);
+                    throw CreateUnexpectedTokenError(value, value + " " + reader.RemainQuery);
             }
         }
 
         #endregion
+
+        internal static FilterQueryException CreateUnexpectedTokenError(string token, string innerQuery)
+        {
+            return new FilterQueryException("不正なトークン: " + token,
+                                     innerQuery);
+        }
     }
 }

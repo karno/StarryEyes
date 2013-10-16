@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
-using StarryEyes.Breezy.Api.Rest;
-using StarryEyes.Breezy.DataModel;
-using StarryEyes.Models.Stores;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Anomaly.TwitterApi.Rest;
+using StarryEyes.Anomaly.Utils;
+using StarryEyes.Models.Accounting;
 
 namespace StarryEyes.Filters.Sources
 {
@@ -20,25 +22,40 @@ namespace StarryEyes.Filters.Sources
 
         public override Func<TwitterStatus, bool> GetEvaluator()
         {
-            var ads = GetAccountsFromString(_screenName)
-                .Select(a => AccountRelationDataStore.Get(a.Id));
+            var ads = GetAccountsFromString(_screenName);
             return _ => CheckVisibleTimeline(_, ads);
         }
 
-        private bool CheckVisibleTimeline(TwitterStatus status, IEnumerable<AccountRelationData> datas)
+        public override string GetSqlQuery()
+        {
+            var accounts = GetAccountsFromString(_screenName).Memoize();
+            var ads = accounts.Select(a => a.Id.ToString(CultureInfo.InvariantCulture))
+                              .JoinString(",");
+            var userMention = ((int)EntityType.UserMentions).ToString(CultureInfo.InvariantCulture);
+            var followings = accounts.SelectMany(a => a.RelationData.Followings)
+                                     .Select(id => id.ToString(CultureInfo.InvariantCulture))
+                                     .JoinString(",");
+            return "(UserId in (" + ads + ") OR " +
+                   "UserId in (" + followings + ") OR " +
+                   "UserId in (select ParentId from StatusEntity where " +
+                   "EntityType = " + userMention + " and " +
+                   "UserId in (" + ads + "))";
+        }
+
+        private bool CheckVisibleTimeline(TwitterStatus status, IEnumerable<TwitterAccount> datas)
         {
             if (status.StatusType == StatusType.DirectMessage)
                 return false;
-            return datas.Any(ad =>
-                status.User.Id == ad.AccountId ||
-                ad.IsFollowing(status.User.Id) ||
-                FilterSystemUtil.InReplyToUsers(status).Contains(ad.AccountId));
+            return datas.Any(account =>
+                             status.User.Id == account.Id ||
+                             account.RelationData.IsFollowing(status.User.Id) ||
+                             FilterSystemUtil.InReplyToUsers(status).Contains(account.Id));
         }
 
         protected override IObservable<TwitterStatus> ReceiveSink(long? maxId)
         {
             return Observable.Defer(() => GetAccountsFromString(_screenName).ToObservable())
-                .SelectMany(a => a.GetHomeTimeline(count: 50, max_id: maxId));
+                             .SelectMany(a => a.GetHomeTimelineAsync(count: 50, maxId: maxId).ToObservable());
         }
 
         public override string FilterKey

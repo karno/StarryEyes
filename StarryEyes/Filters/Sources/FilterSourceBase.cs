@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
-using StarryEyes.Breezy.Authorize;
-using StarryEyes.Breezy.DataModel;
-using StarryEyes.Filters.Expressions.Operators;
+using System.Text.RegularExpressions;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models;
+using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;
-using StarryEyes.Models.Stores;
+using StarryEyes.Models.Receiving.Handling;
+using StarryEyes.Settings;
 
 namespace StarryEyes.Filters.Sources
 {
@@ -21,6 +22,16 @@ namespace StarryEyes.Filters.Sources
         public abstract string FilterValue { get; }
 
         public abstract Func<TwitterStatus, bool> GetEvaluator();
+
+        public abstract string GetSqlQuery();
+
+        public event Action InvalidateRequired;
+
+        protected virtual void RaiseInvalidateRequired()
+        {
+            var handler = this.InvalidateRequired;
+            if (handler != null) handler();
+        }
 
         /// <summary>
         /// Activate dependency receiving method.
@@ -40,7 +51,7 @@ namespace StarryEyes.Filters.Sources
         public IObservable<TwitterStatus> Receive(long? maxId)
         {
             return ReceiveSink(maxId)
-                .SelectMany(StoreHelper.NotifyAndMergeStore)
+                .Do(StatusInbox.Queue)
                 .Catch((Exception ex) =>
                 {
                     BackstageModel.RegisterEvent(
@@ -59,15 +70,25 @@ namespace StarryEyes.Filters.Sources
         /// </summary>
         /// <param name="screenName">partial screen name</param>
         /// <returns>accounts collection</returns>
-        protected IEnumerable<AuthenticateInfo> GetAccountsFromString(string screenName)
+        protected IEnumerable<TwitterAccount> GetAccountsFromString(string screenName)
         {
             if (String.IsNullOrEmpty(screenName))
-                return AccountsStore.Accounts.Select(i => i.AuthenticateInfo);
-            return AccountsStore.Accounts
-                                .Select(i => i.AuthenticateInfo)
-                                .Where(i => FilterOperatorEquals.StringMatch(
-                                    i.UnreliableScreenName, screenName,
-                                    FilterOperatorEquals.StringArgumentSide.Right));
+            {
+                return Setting.Accounts.Collection;
+            }
+            // *kar => unkar
+            // kar* => karno
+            // *kar* => dakara
+            var filtered =
+                new string(screenName.Where(c =>
+                                            (c >= 'A' && c <= 'Z') ||
+                                            (c >= 'a' && c <= 'z') ||
+                                            (c >= '0' && c <= '9') ||
+                                            c == '_' || c == '*')
+                                     .ToArray());
+            var pattern = filtered.Replace("*", ".*");
+            return Setting.Accounts.Collection
+                          .Where(i => Regex.IsMatch(i.UnreliableScreenName, pattern));
         }
     }
 }

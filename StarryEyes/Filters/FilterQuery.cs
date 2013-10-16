@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Linq;
-using StarryEyes.Breezy.DataModel;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Casket;
 using StarryEyes.Filters.Expressions;
 using StarryEyes.Filters.Sources;
 
 namespace StarryEyes.Filters
 {
-    public sealed class FilterQuery : IEquatable<FilterQuery>
+    public sealed class FilterQuery : IEquatable<FilterQuery>, IMultiplexPredicate<TwitterStatus>
     {
         public event Action InvalidateRequired;
         private void RaiseInvalidateRequired()
@@ -42,8 +43,32 @@ namespace StarryEyes.Filters
         public Func<TwitterStatus, bool> GetEvaluator()
         {
             var sourcesEvals = Sources.Select(s => s.GetEvaluator());
-            var predEvals = PredicateTreeRoot.GetEvaluator();
+            var predEvals = PredicateTreeRoot != null
+                                ? PredicateTreeRoot.GetEvaluator()
+                                : FilterExpressionBase.Contradiction;
             return _ => sourcesEvals.Any(f => f(_)) && predEvals(_);
+        }
+
+        public string GetSqlQuery()
+        {
+            var source =
+                Sources.Guard()
+                       .Select(s => s.GetSqlQuery())
+                       .JoinString(" and ");
+            var predicate = PredicateTreeRoot != null
+                       ? PredicateTreeRoot.GetSqlQuery()
+                       : String.Empty;
+            if (!String.IsNullOrEmpty(source))
+            {
+                if (!String.IsNullOrEmpty(predicate))
+                {
+                    return source + " and (" + predicate + ")";
+                }
+                return source;
+            }
+            return !String.IsNullOrEmpty(predicate)
+                       ? predicate
+                       : FilterExpressionBase.ContradictionSql;
         }
 
         public bool Equals(FilterQuery other)
@@ -73,22 +98,34 @@ namespace StarryEyes.Filters
         {
             if (Sources != null)
             {
-                Sources.ForEach(s => s.Activate());
+                Sources.ForEach(s =>
+                {
+                    s.Activate();
+                    s.InvalidateRequired += this.RaiseInvalidateRequired;
+                });
             }
-            if (this.PredicateTreeRoot == null) return;
-            this.PredicateTreeRoot.BeginLifecycle();
-            this.PredicateTreeRoot.ReapplyRequested += this.RaiseInvalidateRequired;
+            if (this.PredicateTreeRoot != null)
+            {
+                this.PredicateTreeRoot.BeginLifecycle();
+                this.PredicateTreeRoot.ReapplyRequested += this.RaiseInvalidateRequired;
+            }
         }
 
         public void Deactivate()
         {
             if (Sources != null)
             {
-                Sources.ForEach(s => s.Deactivate());
+                Sources.ForEach(s =>
+                {
+                    s.Deactivate();
+                    s.InvalidateRequired -= this.RaiseInvalidateRequired;
+                });
             }
-            if (this.PredicateTreeRoot == null) return;
-            this.PredicateTreeRoot.EndLifecycle();
-            this.PredicateTreeRoot.ReapplyRequested -= this.RaiseInvalidateRequired;
+            if (this.PredicateTreeRoot != null)
+            {
+                this.PredicateTreeRoot.EndLifecycle();
+                this.PredicateTreeRoot.ReapplyRequested -= this.RaiseInvalidateRequired;
+            }
         }
     }
 }

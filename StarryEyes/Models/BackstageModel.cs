@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Specialized;
 using System.Linq;
 using System.Reactive.Linq;
 using Livet;
 using StarryEyes.Models.Backstages;
 using StarryEyes.Models.Backstages.TwitterEvents;
-using StarryEyes.Models.Receivers;
-using StarryEyes.Models.Stores;
+using StarryEyes.Models.Receiving;
 using StarryEyes.Settings;
 
 namespace StarryEyes.Models
@@ -22,45 +20,19 @@ namespace StarryEyes.Models
 
         internal static void Initialize()
         {
-            AccountsStore.Accounts
-                        .ListenCollectionChanged()
-                        .Subscribe(e =>
-                        {
-                            var newItem = e.NewItems.Count > 0
-                                              ? new BackstageAccountModel(
-                                                    ((AccountSetting)e.NewItems[0]).AuthenticateInfo)
-                                              : null;
-                            switch (e.Action)
-                            {
-                                case NotifyCollectionChangedAction.Add:
-                                    _accounts.Insert(e.NewStartingIndex, newItem);
-                                    break;
-                                case NotifyCollectionChangedAction.Remove:
-                                    _accounts.RemoveAt(e.OldStartingIndex);
-                                    break;
-                                case NotifyCollectionChangedAction.Replace:
-                                    _accounts[e.NewStartingIndex] = newItem;
-                                    break;
-                                case NotifyCollectionChangedAction.Move:
-                                    _accounts.Move(e.OldStartingIndex, e.NewStartingIndex);
-                                    break;
-                                case NotifyCollectionChangedAction.Reset:
-                                    _accounts.Clear();
-                                    AccountsStore.Accounts.ForEach(
-                                        i => _accounts.Add(new BackstageAccountModel(i.AuthenticateInfo)));
-                                    break;
-                                default:
-                                    throw new ArgumentOutOfRangeException();
-                            }
-                        });
-            AccountsStore.Accounts.ForEach(
-                i => _accounts.Add(new BackstageAccountModel(i.AuthenticateInfo)));
-            ReceiversManager.UserStreamsConnectionStateChanged += UpdateConnectionState;
+            Setting.Accounts.Collection.ListenCollectionChanged()
+                   .Subscribe(_ =>
+                   {
+                       _accounts.Clear();
+                       Setting.Accounts.Collection.ForEach(a => _accounts.Add(new BackstageAccountModel(a)));
+                   });
+            Setting.Accounts.Collection.ForEach(a => _accounts.Add(new BackstageAccountModel(a)));
+            ReceiveManager.UserStreamsConnectionStateChanged += UpdateConnectionState;
         }
 
         static void UpdateConnectionState(long id)
         {
-            var avm = _accounts.FirstOrDefault(vm => vm.Info.Id == id);
+            var avm = _accounts.FirstOrDefault(vm => vm.Account.Id == id);
             if (avm != null)
             {
                 avm.UpdateConnectionState();

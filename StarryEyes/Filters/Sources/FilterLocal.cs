@@ -1,5 +1,5 @@
 ﻿using System;
-using StarryEyes.Breezy.DataModel;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Filters.Expressions;
 
 namespace StarryEyes.Filters.Sources
@@ -9,11 +9,14 @@ namespace StarryEyes.Filters.Sources
     /// </summary>
     public class FilterLocal : FilterSourceBase
     {
-        public FilterLocal() { }
-
         public override Func<TwitterStatus, bool> GetEvaluator()
         {
             return FilterExpressionBase.Tautology;
+        }
+
+        public override string GetSqlQuery()
+        {
+            return "1";
         }
 
         public override string FilterKey

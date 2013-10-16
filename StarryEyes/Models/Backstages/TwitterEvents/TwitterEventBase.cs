@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Windows.Media;
-using StarryEyes.Breezy.DataModel;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Views;
 
 namespace StarryEyes.Models.Backstages.TwitterEvents

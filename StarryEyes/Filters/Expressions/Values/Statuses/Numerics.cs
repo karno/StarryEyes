@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using StarryEyes.Breezy.DataModel;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
 
 namespace StarryEyes.Filters.Expressions.Values.Statuses
 {
@@ -14,6 +14,11 @@ namespace StarryEyes.Filters.Expressions.Values.Statuses
         public override Func<TwitterStatus, long> GetNumericValueProvider()
         {
             return _ => _.GetOriginal().Id;
+        }
+
+        public override string GetNumericSqlQuery()
+        {
+            return "BaseId";
         }
 
         public override string ToQuery()

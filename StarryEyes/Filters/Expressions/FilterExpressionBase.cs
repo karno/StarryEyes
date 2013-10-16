@@ -1,14 +1,19 @@
 ﻿using System;
-using StarryEyes.Breezy.DataModel;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Casket;
 using StarryEyes.Filters.Expressions.Operators;
 
 namespace StarryEyes.Filters.Expressions
 {
     public abstract class FilterExpressionBase
     {
+        public const string TautologySql = "1";
+
+        public const string ContradictionSql = "0";
+
         public static readonly Func<TwitterStatus, bool> Tautology = _ => true;
 
-        public static readonly Func<TwitterStatus, bool> NonTautology = _ => false;
+        public static readonly Func<TwitterStatus, bool> Contradiction = _ => false;
 
         public event Action ReapplyRequested;
 
@@ -27,10 +32,9 @@ namespace StarryEyes.Filters.Expressions
             var handler = this.ReapplyRequested;
             if (handler != null) handler();
         }
-
     }
 
-    public sealed class FilterExpressionRoot : FilterExpressionBase
+    public sealed class FilterExpressionRoot : FilterExpressionBase, IMultiplexPredicate<TwitterStatus>
     {
         public static FilterExpressionRoot GetEmpty(bool tautology)
         {
@@ -48,6 +52,7 @@ namespace StarryEyes.Filters.Expressions
         }
 
         private FilterOperatorBase _operator;
+
         public FilterOperatorBase Operator
         {
             get { return _operator; }
@@ -66,24 +71,30 @@ namespace StarryEyes.Filters.Expressions
             return Operator == null ? "()" : Operator.ToQuery();
         }
 
+        public string GetSqlQuery()
+        {
+            return this.Operator == null ? "1" : this.Operator.GetBooleanSqlQuery();
+        }
+
         public Func<TwitterStatus, bool> GetEvaluator()
         {
-            if (Operator == null)
-                return Tautology;
-            if (!FilterExpressionUtil.Assert(FilterExpressionType.Boolean, Operator.SupportedTypes))
-                throw new FilterQueryException("Unsupported evaluating as boolean.", Operator.ToQuery());
-            return Operator.GetBooleanValueProvider();
+            return this.Operator == null ? Tautology : this.Operator.GetBooleanValueProvider();
         }
 
         public override void BeginLifecycle()
         {
-            Operator.BeginLifecycle();
+            if (Operator != null)
+            {
+                Operator.BeginLifecycle();
+            }
         }
 
         public override void EndLifecycle()
         {
-            Operator.EndLifecycle();
+            if (Operator != null)
+            {
+                Operator.EndLifecycle();
+            }
         }
-
     }
 }

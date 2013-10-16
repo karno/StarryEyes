@@ -86,13 +86,15 @@
     <Reference Include="Microsoft.Expression.Interactions, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\LivetCask.1.1.0.0\lib\net45\Microsoft.Expression.Interactions.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Threading.Tasks">
+      <HintPath>..\packages\Microsoft.Bcl.Async.1.0.16\lib\net45\Microsoft.Threading.Tasks.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Threading.Tasks.Extensions">
+      <HintPath>..\packages\Microsoft.Bcl.Async.1.0.16\lib\net45\Microsoft.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.WindowsAPICodePack, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\LivetExtensions.1.1.0.0\lib\net45\Microsoft.WindowsAPICodePack.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.WindowsAPICodePack.Shell, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\LivetExtensions.1.1.0.0\lib\net45\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
     </Reference>
     <Reference Include="PresentationFramework.Aero" />
     <Reference Include="System" />
@@ -100,14 +102,21 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Data.Entity" />
     <Reference Include="System.Device" />
-    <Reference Include="System.Interactive, Version=1.1.10823.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Ix_Experimental-Main.1.1.10823\lib\Net4\System.Interactive.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Interactive.Providers, Version=1.1.10823.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Ix_Experimental-Providers.1.1.10823\lib\Net4\System.Interactive.Providers.dll</HintPath>
+    <Reference Include="System.Interactive, Version=0.9.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Ix-Main.0.9.0.2\lib\Net45\System.Interactive.dll</HintPath>
     </Reference>
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Net.Http.Extensions">
+      <HintPath>..\packages\Microsoft.Net.Http.2.2.15\lib\net45\System.Net.Http.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http.Primitives">
+      <HintPath>..\packages\Microsoft.Net.Http.2.2.15\lib\net45\System.Net.Http.Primitives.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http.WebRequest" />
     <Reference Include="System.Reactive.Core, Version=2.1.30214.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Rx-Core.2.1.30214.0\lib\Net45\System.Reactive.Core.dll</HintPath>
@@ -156,6 +165,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Filters\Expressions\Operators\OperatorStrings.cs" />
     <Compile Include="Filters\Expressions\Values\Users\Booleans.cs" />
     <Compile Include="Filters\Expressions\Values\Users\Complexes.cs" />
     <Compile Include="Filters\Expressions\Values\Users\Numerics.cs" />
@@ -197,12 +207,6 @@
     <Compile Include="Helpers\RegexHelper.cs" />
     <Compile Include="Hotfixes\ReadOnlyDispatcherCollectionRx.cs" />
     <Compile Include="Hotfixes\ViewModelHelperRx.cs" />
-    <Compile Include="InputFormats\ArithmeticFunctions.cs" />
-    <Compile Include="InputFormats\DescriptionCompiler.cs" />
-    <Compile Include="InputFormats\CommonFunctions.cs" />
-    <Compile Include="InputFormats\FormatDescription.cs" />
-    <Compile Include="InputFormats\FormatElement.cs" />
-    <Compile Include="InputFormats\InputFormatFunctionBase.cs" />
     <Compile Include="Models\BackstageModel.cs" />
     <Compile Include="Models\Backstages\BackstageAccountModel.cs" />
     <Compile Include="Models\Backstages\SystemEvents\KeyAssignProfileNotFoundEvent.cs" />
@@ -226,55 +230,73 @@
     <Compile Include="Models\Backstages\TwitterEvents\UnfavoritedEvent.cs" />
     <Compile Include="Models\Backstages\TwitterEvents\UnfollowedEvent.cs" />
     <Compile Include="Models\Backstages\BackstageEventBase.cs" />
-    <Compile Include="Models\Receivers\ListInfo.cs" />
-    <Compile Include="Models\Receivers\StreamingEventsHub.cs" />
-    <Compile Include="Models\Operations\UpdateRelationOperation.cs" />
-    <Compile Include="Models\Receivers\Managers\ListReceiveManager.cs" />
-    <Compile Include="Models\Receivers\Managers\StreamTrackReceiveManager.cs" />
-    <Compile Include="Models\Receivers\ReceiveElements\ListReceiver.cs" />
-    <Compile Include="Models\Receivers\ReceiveElements\CyclicReceiverBase.cs" />
-    <Compile Include="Models\Receivers\ReceiveElements\DirectMessagesReceiver.cs" />
-    <Compile Include="Models\Receivers\ReceiveElements\HomeTimelineReceiver.cs" />
-    <Compile Include="Models\Receivers\ReceiveElements\MentionTimelineReceiver.cs" />
-    <Compile Include="Models\Receivers\ReceiveElements\SearchReceiver.cs" />
-    <Compile Include="Models\Receivers\ReceiveElements\UserInfoReceiver.cs" />
-    <Compile Include="Models\Receivers\ReceiveElements\UserRelationReceiver.cs" />
-    <Compile Include="Models\Receivers\ReceiveElements\UserStreamsReceiver.cs" />
-    <Compile Include="Models\Receivers\ReceiveInbox.cs" />
-    <Compile Include="Models\Receivers\Managers\SearchReceiveManager.cs" />
-    <Compile Include="Models\Receivers\Managers\UserReceiveManager.cs" />
-    <Compile Include="Models\Receivers\ReceiversManager.cs" />
+    <Compile Include="Models\Backstages\TwitterEvents\UnknownEvent.cs" />
+    <Compile Include="Models\Databases\DbTextUtil.cs" />
+    <Compile Include="Models\Databases\StatusProxy.cs" />
+    <Compile Include="Models\Databases\Mapper.cs" />
+    <Compile Include="Models\Databases\UserProxy.cs" />
+    <Compile Include="Networking.cs" />
+    <Compile Include="Models\Plugins\PluginManager.cs" />
+    <Compile Include="Models\Receiving\ListInfo.cs" />
+    <Compile Include="Models\Receiving\Receivers\UserTimelineReceiver.cs" />
+    <Compile Include="Models\Receiving\MuteBlockManager.cs" />
+    <Compile Include="Models\Receiving\Handling\StatusBroadcaster.cs" />
+    <Compile Include="Models\Receiving\Handling\StatusNotification.cs" />
+    <Compile Include="Models\Subsystems\Notifications\INotificationSink.cs" />
+    <Compile Include="Models\Subsystems\Notifications\NotificationProxy.cs" />
+    <Compile Include="Models\Subsystems\Notifications\NotificationSink.cs" />
+    <Compile Include="Models\Receiving\Managers\ListReceiveManager.cs" />
+    <Compile Include="Models\Receiving\Managers\StreamTrackReceiveManager.cs" />
+    <Compile Include="Models\Receiving\Receivers\ListReceiver.cs" />
+    <Compile Include="Models\Receiving\Receivers\CyclicReceiverBase.cs" />
+    <Compile Include="Models\Receiving\Receivers\DirectMessagesReceiver.cs" />
+    <Compile Include="Models\Receiving\Receivers\HomeTimelineReceiver.cs" />
+    <Compile Include="Models\Receiving\Receivers\MentionTimelineReceiver.cs" />
+    <Compile Include="Models\Receiving\Receivers\SearchReceiver.cs" />
+    <Compile Include="Models\Receiving\Receivers\UserInfoReceiver.cs" />
+    <Compile Include="Models\Receiving\Receivers\UserRelationReceiver.cs" />
+    <Compile Include="Models\Receiving\Receivers\UserStreamsReceiver.cs" />
+    <Compile Include="Models\Receiving\Handling\StatusInbox.cs" />
+    <Compile Include="Models\Receiving\Managers\SearchReceiveManager.cs" />
+    <Compile Include="Models\Receiving\Managers\UserReceiveManager.cs" />
+    <Compile Include="Models\Receiving\ReceiveManager.cs" />
+    <Compile Include="Models\Requests\DeletionRequest.cs" />
+    <Compile Include="Models\Requests\DestroySearchQueryRequest.cs" />
+    <Compile Include="Models\Requests\FavoriteRequest.cs" />
+    <Compile Include="Models\Requests\MessagePostingRequest.cs" />
+    <Compile Include="Models\Requests\GivingTrophyRequest.cs" />
+    <Compile Include="Models\Requests\RetweetRequest.cs" />
+    <Compile Include="Models\Requests\RegisterSearchQueryRequest.cs" />
+    <Compile Include="Models\Requests\TweetPostingRequest.cs" />
+    <Compile Include="Models\Accounting\TwitterAccount.cs" />
+    <Compile Include="Models\Requests\RequestBase.cs" />
+    <Compile Include="Models\Requests\RequestQueue.cs" />
+    <Compile Include="Models\Requests\UpdateProfileRequest.cs" />
+    <Compile Include="Models\Requests\UpdateRelationRequest.cs" />
     <Compile Include="Models\SearchFlipModel.cs" />
+    <Compile Include="Models\Accounting\AccountRelationData.cs" />
     <Compile Include="Models\Stores\CacheStore.cs" />
     <Compile Include="Models\Stores\StoreHelper.cs" />
     <Compile Include="Models\InputAreaModel.cs" />
     <Compile Include="Models\MainWindowModel.cs" />
-    <Compile Include="Models\Notifications\NotificationModel.cs" />
-    <Compile Include="Models\ObservableSynchronizedCollectionEx.cs" />
-    <Compile Include="Models\Operations\FavstarTrophyOperation.cs" />
-    <Compile Include="Models\Plugins\ImageUploaderManager.cs" />
-    <Compile Include="Models\Plugins\Packaging\PackageDescription.cs" />
-    <Compile Include="Models\Plugins\Packaging\PluginPackage.cs" />
-    <Compile Include="Models\Plugins\PluginManager.cs" />
-    <Compile Include="Models\Plugins\ScriptingManager.cs" />
-    <Compile Include="Models\StatusModel.cs" />
+    <Compile Include="Models\Subsystems\NotificationService.cs" />
+    <Compile Include="Hotfixes\ObservableSynchronizedCollectionEx.cs" />
+    <Compile Include="Models\Timelines\Statuses\StatusModel.cs" />
     <Compile Include="Models\StatusTextUtil.cs" />
-    <Compile Include="Models\Stores\AccountsStore.cs" />
-    <Compile Include="Models\Stores\Internal\IdReverseComparer.cs" />
-    <Compile Include="Models\Stores\Internal\SingleThreadDispatcher.cs" />
-    <Compile Include="Models\Stores\Internal\StoreOnMemoryObjectPersistence.cs" />
-    <Compile Include="Models\Subsystems\NotificationOptimizationService.cs" />
     <Compile Include="Models\Subsystems\PostLimitPredictionService.cs" />
     <Compile Include="Models\Subsystems\SpecialImageResolvers.cs" />
-    <Compile Include="Models\Tab\ColumnInfo.cs" />
-    <Compile Include="Models\Tab\ColumnModel.cs" />
-    <Compile Include="Models\Tab\CommonTabBuilder.cs" />
-    <Compile Include="Models\Tab\TabManager.cs" />
-    <Compile Include="Models\Plugins\IPlugin.cs" />
-    <Compile Include="Models\Tab\TimelineModel.cs" />
-    <Compile Include="Models\TwitterConfiguration.cs" />
-    <Compile Include="Models\UserModel.cs" />
+    <Compile Include="Models\Timelines\Tabs\ColumnInfo.cs" />
+    <Compile Include="Models\Timelines\Tabs\ColumnModel.cs" />
+    <Compile Include="Models\Timelines\Tabs\CommonTabBuilder.cs" />
+    <Compile Include="Models\Timelines\Tabs\TabManager.cs" />
+    <Compile Include="Models\Subsystems\TwitterConfigurationService.cs" />
+    <Compile Include="Models\Timelines\SearchFlips\UserTimelineModel.cs" />
+    <Compile Include="Models\Timelines\SearchFlips\SearchResultModel.cs" />
+    <Compile Include="Models\Timelines\Tabs\TabModel.cs" />
+    <Compile Include="Models\Timelines\TimelineModelBase.cs" />
+    <Compile Include="Models\Timelines\Statuses\UserModel.cs" />
     <Compile Include="Properties\Annotations.cs" />
+    <Compile Include="Settings\AccountManager.cs" />
     <Compile Include="Settings\KeyAssignManager.cs" />
     <Compile Include="Settings\KeyAssigns\KeyAssignGroup.cs" />
     <Compile Include="Settings\KeyAssigns\DefaultAssignProvider.cs" />
@@ -283,6 +305,10 @@
     <Compile Include="Settings\TabDescription.cs" />
     <Compile Include="ViewModels\Dialogs\KeyOverrideViewModel.cs" />
     <Compile Include="ViewModels\DropAcceptDescription.cs" />
+    <Compile Include="ViewModels\Timelines\SearchFlips\SearchResultViewModel.cs" />
+    <Compile Include="ViewModels\Timelines\SearchFlips\UserTimelineViewModel.cs" />
+    <Compile Include="ViewModels\Timelines\Tabs\TabViewModel.cs" />
+    <Compile Include="ViewModels\Timelines\TimelineViewModelBase.cs" />
     <Compile Include="ViewModels\WindowParts\Backstages\BackstageEventViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Backstages\BackstageAccountViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Common\FilterEditControlViewModel.cs" />
@@ -292,24 +318,19 @@
     <Compile Include="ViewModels\WindowParts\BackstageViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\PartialFlipViewModelBase.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\RelationControlViewModel.cs" />
-    <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\UserFavoritesViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\UserFollowersViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\UserFollowingViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\UserListViewModelBase.cs" />
-    <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\UserStatusesViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\SearchFlipViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\SearchCandidateViewModel.cs" />
-    <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\SearchResultViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\UserResultViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\UserInfoViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\TabConfigurationFlipViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\InputAreaViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\MainAreaViewModel.cs" />
-    <Compile Include="ViewModels\WindowParts\Timelines\ColumnViewModel.cs" />
-    <Compile Include="ViewModels\WindowParts\Timelines\StatusViewModel.cs" />
-    <Compile Include="ViewModels\WindowParts\Timelines\TabViewModel.cs" />
-    <Compile Include="ViewModels\WindowParts\Timelines\TimelineViewModelBase.cs" />
-    <Compile Include="ViewModels\WindowParts\Timelines\UserViewModel.cs" />
+    <Compile Include="ViewModels\Timelines\Tabs\ColumnViewModel.cs" />
+    <Compile Include="ViewModels\Timelines\Statuses\StatusViewModel.cs" />
+    <Compile Include="ViewModels\Timelines\Statuses\UserViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Backstages\TwitterEventViewModel.cs" />
     <Compile Include="Views\Adorners\AdornerBase.cs" />
     <Compile Include="Views\Adorners\InsertionAdorner.cs" />
@@ -428,24 +449,7 @@
     <Compile Include="Filters\FilterQueryException.cs" />
     <Compile Include="Helpers\BrowserHelper.cs" />
     <Compile Include="Models\Subsystems\StatisticsService.cs" />
-    <Compile Include="Models\Operations\IObservableRunnable.cs" />
-    <Compile Include="Settings\AccountSetting.cs" />
     <Compile Include="Settings\Setting.cs" />
-    <Compile Include="Models\Operations\DeleteOperation.cs" />
-    <Compile Include="Models\Operations\DirectMessageOperation.cs" />
-    <Compile Include="Models\Operations\FavoriteOperation.cs" />
-    <Compile Include="Models\Operations\FeedbackOperation.cs" />
-    <Compile Include="Models\Operations\OperationBase.cs" />
-    <Compile Include="Models\Operations\OperationQueueRunner.cs" />
-    <Compile Include="Models\Operations\RetweetOperation.cs" />
-    <Compile Include="Models\Operations\ScrappingOperation.cs" />
-    <Compile Include="Models\Operations\SearchQueryOperation.cs" />
-    <Compile Include="Models\Operations\TweetOperation.cs" />
-    <Compile Include="Models\Operations\UpdateProfileOperation.cs" />
-    <Compile Include="Models\Stores\AccountRelationDataStore.cs" />
-    <Compile Include="Models\Stores\StatusStore.cs" />
-    <Compile Include="Models\Stores\UserStore.cs" />
-    <Compile Include="Models\Tab\TabModel.cs" />
     <Compile Include="ViewModels\Dialogs\AuthorizationViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="Views\Dialogs\AuthorizationWindow.xaml.cs">
@@ -534,6 +538,7 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Injections\" />
     <Folder Include="ViewModels\Notifications\" />
     <Folder Include="Views\Notifications\" />
   </ItemGroup>
@@ -546,17 +551,21 @@
       <Project>{C2740802-BD1C-4B70-9B3A-F69DAE505827}</Project>
       <Name>StarryEyes.Albireo</Name>
     </ProjectReference>
+    <ProjectReference Include="..\StarryEyes.Anomaly\StarryEyes.Anomaly.csproj">
+      <Project>{564e23de-ab35-45b6-b331-395c3943bc23}</Project>
+      <Name>StarryEyes.Anomaly</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\StarryEyes.Casket\StarryEyes.Casket.csproj">
+      <Project>{316927de-96c9-47c8-947d-b6d8a8da1e14}</Project>
+      <Name>StarryEyes.Casket</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\StarryEyes.Feather\StarryEyes.Feather.csproj">
+      <Project>{E47FA479-005C-4236-BAFB-ADD664535E59}</Project>
+      <Name>StarryEyes.Feather</Name>
+    </ProjectReference>
     <ProjectReference Include="..\StarryEyes.Nightmare\StarryEyes.Nightmare.csproj">
       <Project>{3A78CEB3-A112-4A66-8724-BFF2BFA9182B}</Project>
       <Name>StarryEyes.Nightmare</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\StarryEyes.Vanille\StarryEyes.Vanille.csproj">
-      <Project>{7C1764E1-AF06-48A8-8590-09500A363118}</Project>
-      <Name>StarryEyes.Vanille</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\StarryEyes.Breezy\StarryEyes.Breezy.csproj">
-      <Project>{7E909D43-7BAD-4885-9983-2FF0030D5A5E}</Project>
-      <Name>StarryEyes.Breezy</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -567,6 +576,11 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
+  <Import Project="..\packages\Microsoft.Bcl.Build.1.0.10\tools\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.10\tools\Microsoft.Bcl.Build.targets')" />
+  <Target Name="EnsureBclBuildImported" BeforeTargets="BeforeBuild" Condition="'$(BclBuildImported)' == ''">
+    <Error Condition="!Exists('..\packages\Microsoft.Bcl.Build.1.0.10\tools\Microsoft.Bcl.Build.targets')" Text="This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=317567." HelpKeyword="BCLBUILD2001" />
+    <Error Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.10\tools\Microsoft.Bcl.Build.targets')" Text="The build restored NuGet packages. Build the project again to include these packages in the build. For more information, see http://go.microsoft.com/fwlink/?LinkID=317568." HelpKeyword="BCLBUILD2002" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

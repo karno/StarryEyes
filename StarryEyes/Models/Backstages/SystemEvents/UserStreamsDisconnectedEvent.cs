@@ -1,15 +1,15 @@
-﻿using StarryEyes.Breezy.Authorize;
+﻿using StarryEyes.Models.Accounting;
 
 namespace StarryEyes.Models.Backstages.SystemEvents
 {
     public sealed class UserStreamsDisconnectedEvent : SystemEventBase
     {
-        private readonly AuthenticateInfo _info;
+        private readonly TwitterAccount _account;
         private readonly string _reason;
 
-        public UserStreamsDisconnectedEvent(AuthenticateInfo info, string reason)
+        public UserStreamsDisconnectedEvent(TwitterAccount account, string reason)
         {
-            _info = info;
+            this._account = account;
             _reason = reason;
         }
 
@@ -20,7 +20,7 @@ namespace StarryEyes.Models.Backstages.SystemEvents
 
         public override string Detail
         {
-            get { return "User Streamsが切断されました: " + _info.UnreliableScreenName + ", " + _reason; }
+            get { return "User Streamsが切断されました: " + this._account.UnreliableScreenName + ", " + _reason; }
         }
     }
 }

@@ -1,6 +1,10 @@
 ﻿using System.Linq;
 using System.Runtime.Serialization;
-using StarryEyes.Models.Tab;
+using StarryEyes.Filters;
+using StarryEyes.Filters.Parsing;
+using StarryEyes.Models;
+using StarryEyes.Models.Backstages.SystemEvents;
+using StarryEyes.Models.Timelines.Tabs;
 
 namespace StarryEyes.Settings
 {
@@ -34,20 +38,32 @@ namespace StarryEyes.Settings
             this.Name = model.Name;
             this.IsShowUnreadCounts = model.IsShowUnreadCounts;
             this.IsNotifyNewArrivals = model.IsNotifyNewArrivals;
-            this.BindingAccountIds = model.BindingAccountIds.ToArray();
+            this.BindingAccountIds = model.BindingAccounts.ToArray();
             this.BindingHashtags = model.BindingHashtags.ToArray();
-            this.Query = model.FilterQueryString;
+            this.Query = model.FilterQuery != null ? model.FilterQuery.ToQuery() : null;
         }
 
         public TabModel ToTabModel()
         {
-            var model = new TabModel(this.Name, this.Query)
+            FilterQuery filter;
+            try
+            {
+                filter = QueryCompiler.Compile(Query);
+            }
+            catch (FilterQueryException ex)
+            {
+                BackstageModel.RegisterEvent(new QueryCorruptionEvent(Name, ex));
+                filter = null;
+            }
+            var model = new TabModel
              {
+                 Name = Name,
+                 FilterQuery = filter,
                  BindingHashtags = this.BindingHashtags,
                  IsNotifyNewArrivals = this.IsNotifyNewArrivals,
                  IsShowUnreadCounts = this.IsShowUnreadCounts
              };
-            this.BindingAccountIds.ForEach(model.BindingAccountIds.Add);
+            this.BindingAccountIds.ForEach(model.BindingAccounts.Add);
             return model;
         }
     }

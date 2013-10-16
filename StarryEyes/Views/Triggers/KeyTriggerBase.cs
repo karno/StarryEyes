@@ -8,7 +8,7 @@ namespace StarryEyes.Views.Triggers
     {
         protected override void OnAttached()
         {
-            this.AssociatedObject.KeyUp += CheckFireAction;
+            this.AssociatedObject.KeyDown += this.CheckFireAction;
             base.OnAttached();
         }
 
@@ -20,7 +20,7 @@ namespace StarryEyes.Views.Triggers
 
         protected abstract Key TargetKey { get; }
 
-        void CheckFireAction(object sender, System.Windows.Input.KeyEventArgs e)
+        void CheckFireAction(object sender, KeyEventArgs e)
         {
             if (e.Key == TargetKey)
             {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using StarryEyes.Breezy.DataModel;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
 
 namespace StarryEyes.Filters.Expressions.Values.Immediates
 {
@@ -22,6 +22,11 @@ namespace StarryEyes.Filters.Expressions.Values.Immediates
         public override Func<TwitterStatus, long> GetNumericValueProvider()
         {
             return _ => _value;
+        }
+
+        public override string GetNumericSqlQuery()
+        {
+            return _value.ToString(CultureInfo.InvariantCulture);
         }
 
         public override string ToQuery()

@@ -3,15 +3,26 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             Startup="Application_Startup"
+             Startup="AppStartup"
              StartupUri="Views\MainWindow.xaml"
              mc:Ignorable="d">
     <Application.Resources>
-
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Simple Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <Style x:Key="TouchScrollItemsControlStyle" TargetType="{x:Type ItemsControl}">
+                <Setter Property="ScrollViewer.PanningMode" Value="VerticalOnly" />
+                <Setter Property="ScrollViewer.PanningDeceleration" Value="0.001" />
+            </Style>
+            <Style x:Key="TouchScrollListBoxStyle" TargetType="{x:Type ListBox}">
+                <Setter Property="ScrollViewer.PanningMode" Value="VerticalOnly" />
+                <Setter Property="ScrollViewer.PanningDeceleration" Value="0.001" />
+            </Style>
+            <Style x:Key="TouchScrollViewerStyle" TargetType="{x:Type ScrollViewer}">
+                <Setter Property="PanningMode" Value="VerticalOnly" />
+                <Setter Property="PanningDeceleration" Value="0.001" />
+            </Style>
             <Style x:Key="MetroSquareButtonStyle" TargetType="{x:Type Button}">
                 <Setter Property="Background" Value="#FFD5D5D5" />
                 <Setter Property="Foreground" Value="#FF222222" />

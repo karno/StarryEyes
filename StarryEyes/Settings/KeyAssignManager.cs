@@ -15,11 +15,11 @@ namespace StarryEyes.Settings
     /// </summary>
     public static class KeyAssignManager
     {
-        private static readonly SortedDictionary<string, KeyAssignProfile> Profiles =
-            new SortedDictionary<string, KeyAssignProfile>();
+        private static readonly IDictionary<string, KeyAssignProfile> Profiles =
+            new Dictionary<string, KeyAssignProfile>();
 
-        private static readonly SortedDictionary<string, KeyAssignAction> Actions =
-            new SortedDictionary<string, KeyAssignAction>();
+        private static readonly IDictionary<string, KeyAssignAction> Actions =
+            new Dictionary<string, KeyAssignAction>();
 
         public static string KeyAssignsProfileDirectoryPath
         {

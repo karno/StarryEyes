@@ -1,12 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
-using StarryEyes.Albireo.Data;
-using StarryEyes.Breezy.Api.Rest;
-using StarryEyes.Breezy.DataModel;
+using System.Threading.Tasks;
+using StarryEyes.Albireo.Collections;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Anomaly.TwitterApi.Rest;
+using StarryEyes.Models;
+using StarryEyes.Models.Accounting;
+using StarryEyes.Models.Backstages.NotificationEvents;
+using StarryEyes.Models.Databases;
 using StarryEyes.Models.Receivers;
-using StarryEyes.Models.Receivers.ReceiveElements;
+using StarryEyes.Models.Receiving;
+using StarryEyes.Models.Receiving.Receivers;
 using StarryEyes.Models.Stores;
 using StarryEyes.Settings;
 
@@ -35,37 +42,50 @@ namespace StarryEyes.Filters.Sources
                 _listInfo = new ListInfo { OwnerScreenName = splited[1], Slug = splited[2] };
                 _receiver = splited[0];
             }
-            this.GetListUsersInfo();
+            Task.Factory.StartNew(() => this.GetListUsersInfo());
         }
 
         private void GetListUsersInfo(bool enforceReceive = false)
         {
-            IEnumerable<long> users;
-            if (!enforceReceive && (users = CacheStore.GetListUsers(_listInfo)).Any())
+            Task.Run(async () =>
             {
-                lock (_ids)
+                IEnumerable<long> users;
+                if (!enforceReceive && (users = CacheStore.GetListUsers(_listInfo)).Any())
                 {
-                    users.ForEach(_ids.Add);
-                }
-                return;
-            }
-            var info = this.GetAccount();
-            if (info == null) return;
-            var newList = new List<long>();
-            info.AuthenticateInfo.GetListMembersAll(slug: _listInfo.Slug, owner_screen_name: _listInfo.OwnerScreenName)
-                .Subscribe(
-                    l => newList.Add(l.Id),
-                    ex => { },
-                    () =>
+                    lock (_ids)
                     {
-                        if (newList.Count <= 0) return;
-                        CacheStore.SetListUsers(this._listInfo, newList);
-                        lock (this._ids)
-                        {
-                            this._ids.Clear();
-                            newList.ForEach(this._ids.Add);
-                        }
-                    });
+                        users.ForEach(_ids.Add);
+                    }
+                    return;
+                }
+                try
+                {
+                    var account = this.GetAccount();
+                    var memberList = new List<long>();
+                    long cursor = -1;
+                    do
+                    {
+                        var result = await account.GetListMembersAsync(
+                            _listInfo.Slug, _listInfo.OwnerScreenName, cursor);
+                        memberList.AddRange(result.Result
+                                                  .Do(u => Task.Run(() => UserProxy.StoreUserAsync(u)))
+                                                  .Select(u => u.Id));
+                        cursor = result.NextCursor;
+                    } while (cursor != 0);
+                    if (memberList.Count <= 0) return;
+                    CacheStore.SetListUsers(this._listInfo, memberList);
+                    lock (this._ids)
+                    {
+                        this._ids.Clear();
+                        memberList.ForEach(this._ids.Add);
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message));
+                }
+            });
         }
 
         public override Func<TwitterStatus, bool> GetEvaluator()
@@ -79,21 +99,28 @@ namespace StarryEyes.Filters.Sources
             };
         }
 
-        protected override IObservable<TwitterStatus> ReceiveSink(long? maxId)
+        public override string GetSqlQuery()
         {
-            var info = this.GetAccount();
-            return info == null
-                       ? base.ReceiveSink(maxId)
-                       : ListReceiver.DoReceive(info.AuthenticateInfo, this._listInfo, maxId);
+            string ida;
+            lock (_ids)
+            {
+                ida = this._ids.Select(i => i.ToString(CultureInfo.InvariantCulture)).JoinString(",");
+            }
+            return "UserId in (" + ida + ")";
         }
 
-        private AccountSetting GetAccount()
+        protected override IObservable<TwitterStatus> ReceiveSink(long? maxId)
         {
-            return AccountsStore
-                .Accounts
-                .Where(a => a.AuthenticateInfo.UnreliableScreenName == _receiver)
-                .Concat(AccountsStore.Accounts)
-                .FirstOrDefault();
+            return ListReceiver.DoReceive(this.GetAccount(), this._listInfo, maxId);
+        }
+
+        private TwitterAccount GetAccount()
+        {
+            return Setting.Accounts.Collection
+                          .FirstOrDefault(
+                              a => this._receiver.Equals(a.UnreliableScreenName,
+                                                         StringComparison.CurrentCultureIgnoreCase)) ??
+                   Setting.Accounts.GetRandomOne();
         }
 
         public override string FilterKey
@@ -120,11 +147,11 @@ namespace StarryEyes.Filters.Sources
             _isActivated = true;
             if (!String.IsNullOrEmpty(_receiver))
             {
-                ReceiversManager.RegisterList(_receiver, _listInfo);
+                ReceiveManager.RegisterList(_receiver, _listInfo);
             }
             else
             {
-                ReceiversManager.RegisterList(_listInfo);
+                ReceiveManager.RegisterList(_listInfo);
             }
             _timer = new Timer(_ => this.TimerCallback(), null, TimeSpan.FromSeconds(0), TimeSpan.FromMinutes(30));
         }
@@ -133,7 +160,7 @@ namespace StarryEyes.Filters.Sources
         {
             if (!_isActivated) return;
             _isActivated = false;
-            ReceiversManager.UnregisterList(_listInfo);
+            ReceiveManager.UnregisterList(_listInfo);
             if (_timer != null)
             {
                 _timer.Dispose();

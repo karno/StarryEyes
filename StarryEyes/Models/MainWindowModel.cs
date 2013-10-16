@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Reactive;
 using System.Reactive.Disposables;
-using StarryEyes.Breezy.Authorize;
+using System.Reactive.Subjects;
 using StarryEyes.Filters.Expressions;
-using StarryEyes.Models.Tab;
+using StarryEyes.Models.Accounting;
+using StarryEyes.Models.Timelines.Tabs;
 using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
 
@@ -82,8 +84,8 @@ namespace StarryEyes.Models
         public static event Action<AccountSelectDescription> AccountSelectActionRequested;
 
         public static void ExecuteAccountSelectAction(
-            AccountSelectionAction action, IEnumerable<AuthenticateInfo> defaultSelected,
-            Action<IEnumerable<AuthenticateInfo>> after)
+            AccountSelectionAction action, IEnumerable<TwitterAccount> defaultSelected,
+            Action<IEnumerable<TwitterAccount>> after)
         {
             ExecuteAccountSelectAction(new AccountSelectDescription
             {
@@ -143,12 +145,14 @@ namespace StarryEyes.Models
             }
         }
 
-        public static event Action<TabModel> TabModelConfigureRaised;
+        public static event Action<Tuple<TabModel, ISubject<Unit>>> TabModelConfigureRaised;
 
-        public static void ShowTabConfigure(TabModel model)
+        public static IObservable<Unit> ShowTabConfigure(TabModel model)
         {
+            var notifier = new Subject<Unit>();
             var handler = TabModelConfigureRaised;
-            if (handler != null) handler(model);
+            if (handler != null) handler(Tuple.Create(model, (ISubject<Unit>)notifier));
+            return notifier;
         }
 
         public static event Action<bool> BackstageTransitionRequested;
@@ -178,9 +182,9 @@ namespace StarryEyes.Models
     {
         public AccountSelectionAction AccountSelectionAction { get; set; }
 
-        public IEnumerable<AuthenticateInfo> SelectionAccounts { get; set; }
+        public IEnumerable<TwitterAccount> SelectionAccounts { get; set; }
 
-        public Action<IEnumerable<AuthenticateInfo>> Callback { get; set; }
+        public Action<IEnumerable<TwitterAccount>> Callback { get; set; }
     }
 
 
@@ -239,5 +243,4 @@ namespace StarryEyes.Models
         MuteUser,
         MuteClient,
     }
-
 }

@@ -205,7 +205,6 @@
                           HorizontalContentAlignment="Stretch"
                           ItemTemplate="{DynamicResource SelectableAccountTemplate}"
                           ItemsSource="{Binding Accounts}"
-                          ScrollViewer.CanContentScroll="True"
                           VirtualizingPanel.IsVirtualizing="True"
                           VirtualizingPanel.ScrollUnit="Pixel">
                 <ItemsControl.ItemsPanel>
@@ -215,7 +214,7 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.Template>
                     <ControlTemplate>
-                        <ScrollViewer>
+                        <ScrollViewer CanContentScroll="True" Style="{StaticResource TouchScrollViewerStyle}">
                             <ItemsPresenter />
                         </ScrollViewer>
                     </ControlTemplate>

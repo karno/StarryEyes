@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
-using StarryEyes.Albireo.Data;
-using StarryEyes.Models.Stores;
+using StarryEyes.Albireo.Collections;
+using StarryEyes.Models.Accounting;
+using StarryEyes.Models.Databases;
+using StarryEyes.Settings;
 
 namespace StarryEyes.Filters.Expressions.Values.Locals
 {
@@ -13,11 +16,28 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
     {
         private CompositeDisposable _disposables = new CompositeDisposable();
 
+        public override long UserId
+        {
+            get { return -1; } // an representive user is not existed.
+        }
+
         public override IReadOnlyCollection<long> Users
         {
             get
             {
-                return AccountsStore.AccountIds;
+                return new AVLTree<long>(Setting.Accounts.Ids);
+            }
+        }
+
+        public override IReadOnlyCollection<long> Followings
+        {
+            get
+            {
+                var following = new AVLTree<long>(
+                    Setting.Accounts
+                           .Collection
+                           .SelectMany(a => a.RelationData.Followings));
+                return following;
             }
         }
 
@@ -25,23 +45,11 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
         {
             get
             {
-                var followers = new AVLTree<long>();
-                AccountsStore.Accounts
-                    .SelectMany(a => AccountRelationDataStore.Get(a.UserId).Following)
-                    .ForEach(followers.Add);
+                var followers = new AVLTree<long>(
+                    Setting.Accounts
+                           .Collection
+                           .SelectMany(a => a.RelationData.Followers));
                 return followers;
-            }
-        }
-
-        public override IReadOnlyCollection<long> Following
-        {
-            get
-            {
-                var following = new AVLTree<long>();
-                AccountsStore.Accounts
-                    .SelectMany(a => AccountRelationDataStore.Get(a.UserId).Following)
-                    .ForEach(following.Add);
-                return following;
             }
         }
 
@@ -49,12 +57,43 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
         {
             get
             {
-                var blockings = new AVLTree<long>();
-                AccountsStore.Accounts
-                    .SelectMany(a => AccountRelationDataStore.Get(a.UserId).Blockings)
-                    .ForEach(blockings.Add);
+                var blockings = new AVLTree<long>(
+                    Setting.Accounts
+                           .Collection
+                           .SelectMany(a => a.RelationData.Blockings));
                 return blockings;
             }
+        }
+
+        public override string UserIdSql
+        {
+            get { return "-1"; }
+        }
+
+        public override string UsersSql
+        {
+            get
+            {
+                return Setting.Accounts.Ids
+                              .Select(i => i.ToString(CultureInfo.InvariantCulture))
+                              .JoinString(",")
+                              .EnumerationToSelectClause();
+            }
+        }
+
+        public override string FollowingsSql
+        {
+            get { return "(select Targetid from Followings)"; }
+        }
+
+        public override string FollowersSql
+        {
+            get { return "(select Targetid from Followers)"; }
+        }
+
+        public override string BlockingsSql
+        {
+            get { return "(select Targetid from Blockings)"; }
         }
 
         public override string ToQuery()
@@ -62,21 +101,16 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
             return "our";
         }
 
-        public override long UserId
-        {
-            get { return -1; } // an representive user is not existed.
-        }
-
         public override void BeginLifecycle()
         {
             _disposables.Add(
-                AccountsStore.Accounts
-                             .ListenCollectionChanged()
-                             .Subscribe(_ => this.RaiseReapplyFilter(null)));
+                Setting.Accounts.Collection
+                       .ListenCollectionChanged()
+                       .Subscribe(_ => this.RaiseReapplyFilter(null)));
             _disposables.Add(
                 Observable.FromEvent<RelationDataChangedInfo>(
-                    h => AccountRelationDataStore.AccountDataUpdated += h,
-                    h => AccountRelationDataStore.AccountDataUpdated -= h)
+                    h => AccountRelationData.AccountDataUpdatedStatic += h,
+                    h => AccountRelationData.AccountDataUpdatedStatic -= h)
                           .Subscribe(this.RaiseReapplyFilter));
         }
 

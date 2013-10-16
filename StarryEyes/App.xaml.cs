@@ -11,15 +11,17 @@ using System.Text;
 using System.Threading;
 using System.Windows;
 using Livet;
-using StarryEyes.Breezy.Api;
+using StarryEyes.Annotations;
+using StarryEyes.Casket;
+using StarryEyes.Feather.Scripting;
 using StarryEyes.Models;
 using StarryEyes.Models.Plugins;
-using StarryEyes.Models.Receivers;
+using StarryEyes.Models.Receiving;
+using StarryEyes.Models.Receiving.Handling;
 using StarryEyes.Models.Stores;
 using StarryEyes.Models.Subsystems;
 using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
-using StarryEyes.Vanille.DataStore.Persistent;
 
 namespace StarryEyes
 {
@@ -28,9 +30,12 @@ namespace StarryEyes
     /// </summary>
     public partial class App
     {
+        private static string DbVersion = "1.0";
         private static Mutex _appMutex;
-        private void Application_Startup(object sender, StartupEventArgs e)
+        private void AppStartup(object sender, StartupEventArgs e)
         {
+            #region initialize execution environment
+
             // enable multi-core JIT.
             // see reference: http://msdn.microsoft.com/en-us/library/system.runtime.profileoptimization.aspx
             if (IsMulticoreJitEnabled)
@@ -49,6 +54,10 @@ namespace StarryEyes
                 System.Windows.Media.RenderOptions.ProcessRenderMode = System.Windows.Interop.RenderMode.SoftwareOnly;
             }
 
+            #endregion
+
+            #region detect run duplication
+
             // Check run duplication
             string mutexStr = null;
             switch (ExecutionMode)
@@ -62,11 +71,25 @@ namespace StarryEyes
                     break;
             }
             _appMutex = new Mutex(true, "Krile_StarryEyes_" + mutexStr);
+
             if (_appMutex.WaitOne(0, false) == false)
             {
-                MessageBox.Show("Krileは既に起動しています。");
+                TaskDialog.Show(new TaskDialogOptions
+                {
+                    MainIcon = VistaTaskDialogIcon.Error,
+                    MainInstruction = "Krileはすでに起動しています。",
+                    Content = "同じ設定を共有するKrileを多重起動することはできません。",
+                    Title = "Krile",
+                    ExpandedInfo = "Krileを多重起動するためには、krile.exe.configを編集する必要があります。" + Environment.NewLine +
+                    "詳しくは公式ウェブサイト上のFAQを参照してください。",
+                    CommonButtons = TaskDialogCommonButtons.Close
+                });
                 Environment.Exit(0);
             }
+
+            #endregion
+
+            #region register core handlers
 
             // set exception handlers
             Current.DispatcherUnhandledException += (sender2, e2) => HandleException(e2.Exception);
@@ -75,95 +98,86 @@ namespace StarryEyes
             // set exit handler
             Current.Exit += (_, __) => AppFinalize(true);
 
-            // Initialize service points
+            #endregion
+
+            #region initialize web connection parameters
+
+            // initialize service points
             ServicePointManager.Expect100Continue = false; // disable expect 100 continue for User Streams connection.
             ServicePointManager.DefaultConnectionLimit = Int32.MaxValue; // Limit Break!
 
-            // Initialize special image handlers
+            // declare security protocol explicitly
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3;
+
+            // initialize anomaly core system
+            Anomaly.Core.Initialize();
+
+            #endregion
+
+            // initialize special image handlers
             SpecialImageResolvers.Initialize();
 
-            // Load plugins
-            PluginManager.Load();
+            // load plugins
+            PluginManager.Load(Path.Combine(ExeFileDir, PluginDirectory));
 
-            // Load settings
+            // load settings
             if (!Setting.LoadSettings())
             {
+                // fail loading settings
                 Current.Shutdown();
-                return; // fail
+                return;
             }
 
-            // Set CK/CS for accessing twitter.
-            ApiEndpoint.DefaultConsumerKey = Setting.GlobalConsumerKey.Value ?? ConsumerKey;
-            ApiEndpoint.DefaultConsumerSecret = Setting.GlobalConsumerSecret.Value ?? ConsumerSecret;
-            ApiEndpoint.UserAgent = Setting.UserAgent.Value;
+            // set parameters for accessing twitter.
+            Networking.Initialize();
 
-            // Load key assigns
+            // load key assigns
             KeyAssignManager.Initialize();
 
-            // Load cache store
+            // load cache manager
             CacheStore.Initialize();
 
-            // Initialize core systems
-            if (Setting.DatabaseCorruption.Value)
+            // initialize stores
+            Database.Initialize(DatabaseFilePath);
+            if (!this.CheckDatabase())
             {
-                var option = new TaskDialogOptions
-                {
-                    MainIcon = VistaTaskDialogIcon.Error,
-                    Title = "Krile データストア初期化エラー",
-                    MainInstruction = "データストアの破損が検出されています。",
-                    Content = "データストアが破損している可能性があります。" + Environment.NewLine +
-                    "データストアを初期化するか、またはKrileを終了してバックアップを取ることができます。",
-                    CommandButtons = new[] { "データストアを初期化して再起動", "Krileを終了", "無視して起動を続ける" }
-                };
-                var result = TaskDialog.Show(option);
-                if (result.CommandButtonResult.HasValue)
-                {
-                    switch (result.CommandButtonResult.Value)
-                    {
-                        case 0:
-                            StatusStore.Shutdown();
-                            UserStore.Shutdown();
-                            // clear data
-                            ClearStoreData();
-                            Setting.DatabaseCorruption.Value = false;
-                            Setting.Save();
-                            _appMutex.Dispose();
-                            Process.Start(ResourceAssembly.Location);
-                            Current.Shutdown();
-                            Process.GetCurrentProcess().Kill();
-                            return;
-                        case 1:
-                            _appMutex.Dispose();
-                            // shutdown
-                            Current.Shutdown();
-                            Process.GetCurrentProcess().Kill();
-                            return;
-                        case 2:
-                            Setting.DatabaseCorruption.Value = false;
-                            break;
-                    }
-                }
+                // db migration failed
+                Current.Shutdown();
+                return;
             }
 
-            StatusStore.Initialize();
-            UserStore.Initialize();
-            AccountsStore.Initialize();
+            // initialize subsystems
             StatisticsService.Initialize();
             PostLimitPredictionService.Initialize();
-            StreamingEventsHub.Initialize();
-            ReceiveInbox.Initialize();
+            MuteBlockManager.Initialize();
+            StatusBroadcaster.Initialize();
+            StatusInbox.Initialize();
 
-            // Activate plugins
+            // activate plugins
             PluginManager.LoadedPlugins.ForEach(p => p.Initialize());
 
-            // Activate scripts
-            ScriptingManager.ExecuteScripts();
+            // activate scripts
+            ScriptingManager.ExecuteScripts(Path.Combine(ExeFileDir, ScriptDirectiory));
 
-            // finalize handlers
-            StreamingEventsHub.RegisterDefaultHandlers();
-            ReceiversManager.Initialize();
+            ReceiveManager.Initialize();
+            TwitterConfigurationService.Initialize();
             BackstageModel.Initialize();
             RaiseSystemReady();
+        }
+
+        private bool CheckDatabase()
+        {
+            var ver = Database.ManagementCrud.DatabaseVersion;
+            if (String.IsNullOrEmpty(ver))
+            {
+                Database.ManagementCrud.DatabaseVersion = DbVersion;
+            }
+            else if (ver != DbVersion)
+            {
+                // todo: update db
+                return false;
+            }
+            return true;
         }
 
         /// <summary>
@@ -182,28 +196,18 @@ namespace StarryEyes
             RaiseApplicationFinalize();
             try
             {
+                _appMutex.ReleaseMutex();
                 _appMutex.Dispose();
             }
             catch (ObjectDisposedException)
             { }
         }
 
-        private static int _observedDpxCount = 0;
+        private static int _observedDpxCount;
         private void HandleException(Exception ex)
         {
             try
             {
-                var dex = ex as DataPersistenceException;
-                if (dex != null)
-                {
-                    if (Interlocked.Increment(ref _observedDpxCount) != 1) return;
-                    Setting.DatabaseCorruption.Value = true;
-                    Setting.Save();
-                    _appMutex.Dispose();
-                    Process.Start(ResourceAssembly.Location);
-                    Current.Shutdown();
-                    return;
-                }
                 // TODO:ロギング処理など
                 Debug.WriteLine("##### SYSTEM CRASH! #####");
                 Debug.WriteLine(ex.ToString());
@@ -257,6 +261,10 @@ namespace StarryEyes
 
         #region Definitions
 
+        public const string AppShortName = "Krile";
+
+        public const string AppFullName = "Krile STARRYEYES";
+
         internal static readonly string ConsumerKey = "HzbATXmr3JpNXRPDNtkXww";
 
         internal static readonly string ConsumerSecret = "BfBH1h68S45X4kAlVdJAoopbEIEyF43kaRQe1vC2po";
@@ -269,11 +277,21 @@ namespace StarryEyes
             }
         }
 
+        [NotNull]
         public static string ExeFilePath
         {
             get
             {
                 return Process.GetCurrentProcess().MainModule.FileName;
+            }
+        }
+
+        [NotNull]
+        public static string ExeFileDir
+        {
+            get
+            {
+                return Path.GetDirectoryName(ExeFilePath) ?? ExeFilePath + "_";
             }
         }
 
@@ -316,6 +334,7 @@ namespace StarryEyes
             }
         }
 
+        [NotNull]
         public static string ConfigurationDirectoryPath
         {
             get
@@ -323,7 +342,7 @@ namespace StarryEyes
                 switch (ExecutionMode)
                 {
                     case ExecutionMode.Standalone:
-                        return Path.GetDirectoryName(ExeFilePath);
+                        return ExeFileDir;
                     case ExecutionMode.Roaming:
                         return Path.Combine(
                             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
@@ -337,12 +356,19 @@ namespace StarryEyes
             }
         }
 
+        [NotNull]
         public static string ConfigurationFilePath
         {
             get
             {
                 return Path.Combine(ConfigurationDirectoryPath, ConfigurationFileName);
             }
+        }
+
+        [NotNull]
+        public static string DatabaseFilePath
+        {
+            get { return Path.Combine(ConfigurationDirectoryPath, DatabaseFileName); }
         }
 
         public static string DataStorePath
@@ -364,6 +390,8 @@ namespace StarryEyes
         }
 
         private static FileVersionInfo _version;
+
+        [NotNull]
         public static FileVersionInfo Version
         {
             get
@@ -373,22 +401,46 @@ namespace StarryEyes
             }
         }
 
+        [NotNull]
         public static string FormattedVersion
         {
             get
             {
-                return Version.FileMajorPart + "." +
-                       Version.FileMinorPart + "." +
-                       Version.FilePrivatePart +
-                       (IsNightlyVersion ? " BETA" : "");
+                var basestr = Version.FileMajorPart + "." +
+                              Version.FileMinorPart + "." +
+                              Version.FilePrivatePart;
+                switch (ReleaseKind)
+                {
+                    case ReleaseKind.Stable:
+                        return basestr;
+                    case ReleaseKind.Daybreak:
+                        return basestr + " daybreak";
+                    case ReleaseKind.Midnight:
+                        return basestr + " midnight #" + Version.FileBuildPart;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
             }
         }
 
-        public static bool IsNightlyVersion
+        public static bool IsUnstableVersion
+        {
+            get { return Version.FilePrivatePart % 2 == 1; }
+        }
+
+        public static ReleaseKind ReleaseKind
         {
             get
             {
-                return Version.FilePrivatePart % 2 == 1;
+                // A.B.C.D
+                // C % 2 == 0 -> Stable
+                // C % 2 == 1 && D % 2 == 0 -> Daybreak
+                // C % 2 == 1 && D % 2 == 1 -> Midnight
+                return Version.FilePrivatePart % 2 == 0
+                           ? ReleaseKind.Stable
+                           : (Version.FileBuildPart % 2 == 0
+                                  ? ReleaseKind.Daybreak
+                                  : ReleaseKind.Midnight);
             }
         }
 
@@ -404,15 +456,13 @@ namespace StarryEyes
 
         public static readonly string DataStoreDirectory = "store";
 
+        public static readonly string DatabaseFileName = "krile.db";
+
         public static readonly string KeyAssignProfilesDirectory = "assigns";
 
         public static readonly string MediaDirectory = "media";
 
         public static readonly string PluginDirectory = "plugins";
-
-        public static readonly string PluginDescriptionFile = "package.xml";
-
-        public static readonly string PluginPublicKeyFile = "pubkey.pub";
 
         public static readonly string PluginSignatureFile = "auth.sig";
 
@@ -472,6 +522,7 @@ namespace StarryEyes
         public static event Action UserInterfaceReady;
         internal static void RaiseUserInterfaceReady()
         {
+            // this method called by background thread.
             Debug.WriteLine("# UI ready.");
             var usr = UserInterfaceReady;
             UserInterfaceReady = null;
@@ -516,5 +567,12 @@ namespace StarryEyes
         Default,
         Roaming,
         Standalone,
+    }
+
+    public enum ReleaseKind
+    {
+        Stable,
+        Daybreak,
+        Midnight,
     }
 }

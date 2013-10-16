@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using StarryEyes.Breezy.DataModel;
-using StarryEyes.Models.Stores;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Models.Accounting;
 
 namespace StarryEyes.Filters.Expressions.Values.Locals
 {
@@ -12,7 +12,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
         public LocalUser(UserExpressionBase expression)
         {
             this._expression = expression;
-            this._expression.ReapplyRequested += this.ExpressionReapplyRequested;
+            expression.ReapplyRequested += this.ExpressionReapplyRequested;
         }
 
         private void ExpressionReapplyRequested(RelationDataChangedInfo obj)
@@ -44,6 +44,16 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
             return _ => cache;
         }
 
+        public override string GetNumericSqlQuery()
+        {
+            return _expression.UserIdSql;
+        }
+
+        public override string GetSetSqlQuery()
+        {
+            return _expression.UsersSql;
+        }
+
         public override void BeginLifecycle()
         {
             _expression.BeginLifecycle();
@@ -67,7 +77,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
         public LocalUserFollowing(UserExpressionBase expression)
         {
             this._expression = expression;
-            this._expression.ReapplyRequested += this.ExpressionReapplyRequested;
+            expression.ReapplyRequested += this.ExpressionReapplyRequested;
         }
 
         private void ExpressionReapplyRequested(RelationDataChangedInfo obj)
@@ -85,8 +95,13 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 
         public override Func<TwitterStatus, IReadOnlyCollection<long>> GetSetValueProvider()
         {
-            var cache = _expression.Following;
+            var cache = _expression.Followings;
             return _ => cache;
+        }
+
+        public override string GetSetSqlQuery()
+        {
+            return _expression.FollowingsSql;
         }
 
         public override void BeginLifecycle()
@@ -112,7 +127,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
         public LocalUserFollowers(UserExpressionBase expression)
         {
             this._expression = expression;
-            this._expression.ReapplyRequested += this.ExpressionReapplyRequested;
+            expression.ReapplyRequested += this.ExpressionReapplyRequested;
         }
 
         private void ExpressionReapplyRequested(RelationDataChangedInfo obj)
@@ -132,6 +147,11 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
         {
             var cache = _expression.Followers;
             return _ => cache;
+        }
+
+        public override string GetSetSqlQuery()
+        {
+            return _expression.FollowersSql;
         }
 
         public override void BeginLifecycle()
@@ -156,8 +176,8 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 
         public LocalUserBlockings(UserExpressionBase expression)
         {
-            _expression = expression;
-            this._expression.ReapplyRequested += this.ExpressionReapplyRequested;
+            this._expression = expression;
+            expression.ReapplyRequested += this.ExpressionReapplyRequested;
         }
 
         private void ExpressionReapplyRequested(RelationDataChangedInfo obj)
@@ -177,6 +197,11 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
         {
             var cache = _expression.Blockings;
             return _ => cache;
+        }
+
+        public override string GetSetSqlQuery()
+        {
+            return _expression.BlockingsSql;
         }
 
         public override void BeginLifecycle()

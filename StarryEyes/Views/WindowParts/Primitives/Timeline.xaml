@@ -11,10 +11,10 @@
              xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"
              xmlns:mbehaviors="clr-namespace:StarryEyes.Views.Messaging.Behaviors"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:timelines="clr-namespace:StarryEyes.ViewModels.WindowParts.Timelines"
+             xmlns:tabs="clr-namespace:StarryEyes.ViewModels.Timelines.Tabs"
              xmlns:utils="clr-namespace:StarryEyes.Views.Utils"
              x:Name="userControl"
-             d:DataContext="{d:DesignInstance Type={x:Type timelines:TabViewModel}}"
+             d:DataContext="{d:DesignInstance Type={x:Type tabs:TabViewModel}}"
              d:DesignHeight="300"
              d:DesignWidth="300"
              mc:Ignorable="d">
@@ -1274,13 +1274,13 @@
                     <DataTrigger Binding="{Binding IsMyself, Mode=OneWay}" Value="True">
                         <Setter TargetName="MainBorder" Property="Background" Value="#161BA1E2" />
                     </DataTrigger>
-                    <DataTrigger Binding="{Binding IsDirectMessage, Mode=OneTime}" Value="True">
-                        <Setter TargetName="MainBorder" Property="Background" Value="#16A20025" />
-                        <Setter TargetName="ScreenNameText" Property="Foreground" Value="#FFA20025" />
-                    </DataTrigger>
                     <DataTrigger Binding="{Binding IsInReplyToMe, Mode=OneWay}" Value="True">
                         <Setter TargetName="MainBorder" Property="Background" Value="#16F0A30A" />
                         <Setter TargetName="ScreenNameText" Property="Foreground" Value="#FFFA6800" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding IsDirectMessage, Mode=OneTime}" Value="True">
+                        <Setter TargetName="MainBorder" Property="Background" Value="#16A20025" />
+                        <Setter TargetName="ScreenNameText" Property="Foreground" Value="#FFA20025" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding IsRetweet, Mode=OneTime}" Value="True">
                         <Setter TargetName="MainBorder" Property="Background" Value="#16008A00" />
@@ -1574,7 +1574,6 @@
                       ItemTemplate="{StaticResource StatusItemTemplate}"
                       ItemsSource="{Binding Timeline,
                                             Mode=OneWay}"
-                      ScrollViewer.CanContentScroll="True"
                       VirtualizingPanel.IsVirtualizing="True"
                       VirtualizingPanel.ScrollUnit="Pixel"
                       VirtualizingPanel.VirtualizationMode="Recycling">
@@ -1582,12 +1581,12 @@
                 <l:InteractionMessageTrigger Messenger="{Binding Messenger, Mode=OneTime}">
                     <mbehaviors:TaskDialogInteractionMessageAction />
                 </l:InteractionMessageTrigger>
-                <l:InteractionMessageTrigger MessageKey="SetPhysicalFocus" Messenger="{Binding Messenger, Mode=OneWay}">
+                <l:InteractionMessageTrigger MessageKey="SetFocus" Messenger="{Binding Messenger, Mode=OneWay}">
                     <l:SetFocusAction />
                 </l:InteractionMessageTrigger>
                 <i:EventTrigger EventName="MouseDown">
                     <l:SetFocusAction />
-                    <ei:CallMethodAction MethodName="GotPhysicalFocus" TargetObject="{Binding}" />
+                    <ei:CallMethodAction MethodName="GotFocus" TargetObject="{Binding}" />
                 </i:EventTrigger>
             </i:Interaction.Triggers>
             <ItemsControl.ItemsPanel>
@@ -1597,7 +1596,10 @@
             </ItemsControl.ItemsPanel>
             <ItemsControl.Template>
                 <ControlTemplate TargetType="{x:Type ItemsControl}">
-                    <ScrollViewer Focusable="False" VerticalScrollBarVisibility="Visible">
+                    <ScrollViewer CanContentScroll="True"
+                                  Focusable="False"
+                                  Style="{StaticResource TouchScrollViewerStyle}"
+                                  VerticalScrollBarVisibility="Visible">
                         <i:Interaction.Behaviors>
                             <behaviors:TimelineTriggerBehavior IsMouseOver="{Binding IsMouseOver,
                                                                                      Mode=OneWayToSource}"

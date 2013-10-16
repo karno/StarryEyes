@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using StarryEyes.Breezy.DataModel;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
 
 namespace StarryEyes.Filters.Expressions.Operators
 {
@@ -15,11 +13,14 @@ namespace StarryEyes.Filters.Expressions.Operators
 
         public override Func<TwitterStatus, bool> GetBooleanValueProvider()
         {
-            if (!FilterExpressionUtil.Assert(FilterExpressionType.Boolean, LeftValue.SupportedTypes, RightValue.SupportedTypes))
-                throw new FilterQueryException("Each filters must be convertable as boolean.", this.ToQuery());
             var lbp = LeftValue.GetBooleanValueProvider();
             var rbp = RightValue.GetBooleanValueProvider();
             return _ => lbp(_) && rbp(_);
+        }
+
+        public override string GetBooleanSqlQuery()
+        {
+            return LeftValue.GetBooleanSqlQuery() + " AND " + RightValue.GetBooleanSqlQuery();
         }
 
         public override IEnumerable<FilterExpressionType> SupportedTypes
@@ -37,11 +38,14 @@ namespace StarryEyes.Filters.Expressions.Operators
 
         public override Func<TwitterStatus, bool> GetBooleanValueProvider()
         {
-            if (!FilterExpressionUtil.Assert(FilterExpressionType.Boolean, LeftValue.SupportedTypes, RightValue.SupportedTypes))
-                throw new FilterQueryException("Each filters must be convertable as boolean.", this.ToQuery());
             var lbp = LeftValue.GetBooleanValueProvider();
             var rbp = RightValue.GetBooleanValueProvider();
             return _ => lbp(_) || rbp(_);
+        }
+
+        public override string GetBooleanSqlQuery()
+        {
+            return LeftValue.GetBooleanSqlQuery() + " OR " + RightValue.GetBooleanSqlQuery();
         }
 
         public override IEnumerable<FilterExpressionType> SupportedTypes

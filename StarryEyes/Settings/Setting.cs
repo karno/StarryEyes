@@ -1,22 +1,22 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xaml;
-using StarryEyes.Breezy.DataModel;
-using StarryEyes.Breezy.Imaging;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Filters;
 using StarryEyes.Filters.Expressions;
-using StarryEyes.Filters.Expressions.Operators;
 using StarryEyes.Filters.Parsing;
-using StarryEyes.Models.Tab;
+using StarryEyes.Models.Accounting;
+using StarryEyes.Models.Timelines.Tabs;
 using StarryEyes.Nightmare.Windows;
 
 namespace StarryEyes.Settings
 {
     public static class Setting
     {
-        private static SortedDictionary<string, object> _settingValueHolder;
+        private static ConcurrentDictionary<string, object> _settingValueHolder;
 
         public static readonly SettingItemStruct<bool> IsPowerUser =
             new SettingItemStruct<bool>("IsPowerUser", false);
@@ -63,8 +63,15 @@ namespace StarryEyes.Settings
 
         #region Authentication and accounts
 
-        private static readonly SettingItem<List<AccountSetting>> _accounts =
-            new SettingItem<List<AccountSetting>>("Accounts", new List<AccountSetting>());
+        private static readonly SettingItem<List<TwitterAccount>> _accounts =
+            new SettingItem<List<TwitterAccount>>("Accounts", new List<TwitterAccount>());
+
+        private static AccountManager _manager;
+
+        public static AccountManager Accounts
+        {
+            get { return _manager; }
+        }
 
         public static readonly SettingItem<string> GlobalConsumerKey =
             new SettingItem<string>("GlobalConsumerKey", null);
@@ -74,14 +81,6 @@ namespace StarryEyes.Settings
 
         public static readonly SettingItemStruct<bool> IsBacktrackFallback =
             new SettingItemStruct<bool>("IsBacktrackFallback", true);
-
-        // ReSharper disable InconsistentNaming
-        internal static IEnumerable<AccountSetting> Infrastructure_Accounts
-        {
-            get { return _accounts.Value; }
-            set { _accounts.Value = value.ToList(); }
-        }
-        // ReSharper restore InconsistentNaming
 
         #endregion
 
@@ -124,28 +123,6 @@ namespace StarryEyes.Settings
         public static readonly SettingItem<string> ExternalBrowserPath =
             new SettingItem<string>("ExternalBrowserPath", null);
 
-        private static readonly SettingItemStruct<int> _imageUploaderService =
-            new SettingItemStruct<int>("ImageUploaderService", 0);
-
-        public static ImageUploaderService ImageUploaderService
-        {
-            get { return (ImageUploaderService)_imageUploaderService.Value; }
-            set { _imageUploaderService.Value = (int)value; }
-        }
-
-        public static ImageUploaderBase GetImageUploader()
-        {
-            switch (ImageUploaderService)
-            {
-                case ImageUploaderService.TwitPic:
-                    return new TwitPicUploader();
-                case ImageUploaderService.YFrog:
-                    return new YFrogUploader();
-                default:
-                    return new TwitterPhotoUploader();
-            }
-        }
-
         public static readonly SettingItem<string> FavstarApiKey =
             new SettingItem<string>("FavstarApiKey", null);
 
@@ -160,17 +137,36 @@ namespace StarryEyes.Settings
 
         #region High-level configurations
 
+        #region Web proxy configuration
+
+        public static readonly SettingItemStruct<WebProxyConfiguration> UseWebProxy =
+            new SettingItemStruct<WebProxyConfiguration>("UseWebProxy", WebProxyConfiguration.Default);
+
+        public static readonly SettingItem<string> WebProxyHost =
+            new SettingItem<string>("WebProxyHost", String.Empty);
+
+        public static readonly SettingItemStruct<int> WebProxyPort =
+            new SettingItemStruct<int>("WebProxyPort", 0);
+
+        public static readonly SettingItemStruct<bool> IsBypassWebProxyInLocal =
+            new SettingItemStruct<bool>("IsBypassWebProxyInLocal", false);
+
+        public static readonly SettingItem<string[]> WebProxyBypassList =
+            new SettingItem<string[]>("WebProxyBypassList", null);
+
+        #endregion
+
         public static readonly SettingItem<string> UserAgent =
             new SettingItem<string>("UserAgent", "Krile StarryEyes/Breezy TL with ReactiveOAuth");
+
+        public static readonly SettingItem<string> ApiProxy =
+            new SettingItem<string>("ApiProxy", null);
 
         public static readonly SettingItemStruct<bool> LoadUnsafePlugins =
             new SettingItemStruct<bool>("LoadUnsafePlugins", false);
 
         public static readonly SettingItemStruct<bool> LoadPluginFromDevFolder =
             new SettingItemStruct<bool>("LoadPluginFromDevFolder", false);
-
-        public static readonly SettingItemStruct<bool> ApplyMuteToRetweetOriginals =
-            new SettingItemStruct<bool>("ApplyMuteToRetweetOriginals", true);
 
         public static readonly SettingItemStruct<int> EventDisplayMinimumMSec =
             new SettingItemStruct<int>("EventDisplayMinimumMSec", 200);
@@ -202,9 +198,6 @@ namespace StarryEyes.Settings
         #endregion
 
         #region Krile internal state
-
-        public static readonly SettingItemStruct<bool> DatabaseCorruption =
-            new SettingItemStruct<bool>("DatabaseCorruption", false);
 
         public static readonly SettingItem<string> LastImageOpenDir =
             new SettingItem<string>("LastImageOpenDir", Environment.GetFolderPath(Environment.SpecialFolder.MyPictures));
@@ -390,9 +383,10 @@ namespace StarryEyes.Settings
                 {
                     using (var fs = File.Open(App.ConfigurationFilePath, FileMode.Open, FileAccess.Read))
                     {
-                        _settingValueHolder = new SortedDictionary<string, object>(
+                        _settingValueHolder = new ConcurrentDictionary<string, object>(
                             XamlServices.Load(fs) as IDictionary<string, object> ?? new Dictionary<string, object>());
                     }
+                    _manager = new AccountManager(_accounts);
                     return true;
                 }
                 catch (Exception ex)
@@ -438,12 +432,14 @@ namespace StarryEyes.Settings
                         }
                     }
                     File.Delete(App.ConfigurationFilePath);
-                    _settingValueHolder = new SortedDictionary<string, object>();
+                    _settingValueHolder = new ConcurrentDictionary<string, object>();
+                    _manager = new AccountManager(_accounts);
                     return true;
                 }
             }
-            _settingValueHolder = new SortedDictionary<string, object>();
+            _settingValueHolder = new ConcurrentDictionary<string, object>();
             IsFirstGenerated = true;
+            _manager = new AccountManager(_accounts);
             return true;
         }
 
@@ -451,14 +447,13 @@ namespace StarryEyes.Settings
         {
             using (var fs = File.Open(App.ConfigurationFilePath, FileMode.Create, FileAccess.ReadWrite))
             {
-                XamlServices.Save(fs, _settingValueHolder);
+                // sort by key
+                var sd = new SortedDictionary<string, object>(_settingValueHolder);
+                XamlServices.Save(fs, sd);
             }
         }
 
-        public static void Clear()
-        {
-            Properties.Settings.Default.Reset();
-        }
+
     }
 
     public enum ScrollLockStrategy
@@ -501,5 +496,12 @@ namespace StarryEyes.Settings
         TwitterOfficial,
         TwitPic,
         YFrog,
+    }
+
+    public enum WebProxyConfiguration
+    {
+        Default,
+        None,
+        Custom
     }
 }

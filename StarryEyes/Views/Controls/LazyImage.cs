@@ -1,27 +1,32 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.IO;
-using System.Net;
+using System.Net.Http;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using StarryEyes.Albireo.Threading;
 
 namespace StarryEyes.Views.Controls
 {
     public class LazyImage : Image
     {
-        // Using a DependencyProperty as the backing store for UriSource.  This enables animation, styling, binding, etc...
+        #region Constant variables
+
+        private const int MaxRetryCount = 3;
+        private const int MaxParallelism = 16;
+
+        #endregion
+
+        #region Dependency properties
+
         public static readonly DependencyProperty UriSourceProperty =
             DependencyProperty.Register("UriSource", typeof(Uri), typeof(LazyImage),
                                         new PropertyMetadata(null, UriSourcePropertyChanged));
-
-        private static readonly ConcurrentDictionary<Uri, IObservable<byte[]>> _imageStreamer =
-            new ConcurrentDictionary<Uri, IObservable<byte[]>>();
 
         public Uri UriSource
         {
@@ -29,15 +34,17 @@ namespace StarryEyes.Views.Controls
             set { SetValue(UriSourceProperty, value); }
         }
 
+        public static readonly DependencyProperty DecodePixelWidthProperty =
+            DependencyProperty.Register("DecodePixelWidth", typeof(int), typeof(LazyImage), new PropertyMetadata(0));
+
         public int DecodePixelWidth
         {
             get { return (int)GetValue(DecodePixelWidthProperty); }
             set { SetValue(DecodePixelWidthProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for DecodePixelWidth.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty DecodePixelWidthProperty =
-            DependencyProperty.Register("DecodePixelWidth", typeof(int), typeof(LazyImage), new PropertyMetadata(0));
+        public static readonly DependencyProperty DecodePixelHeightProperty =
+            DependencyProperty.Register("DecodePixelHeight", typeof(int), typeof(LazyImage), new PropertyMetadata(0));
 
         public int DecodePixelHeight
         {
@@ -45,148 +52,63 @@ namespace StarryEyes.Views.Controls
             set { SetValue(DecodePixelHeightProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for DecodePixelHeight.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty DecodePixelHeightProperty =
-            DependencyProperty.Register("DecodePixelHeight", typeof(int), typeof(LazyImage), new PropertyMetadata(0));
+        #endregion
 
-        private static async void UriSourcePropertyChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        private static readonly ConcurrentDictionary<Uri, IObservable<byte[]>> _imageStreamer =
+            new ConcurrentDictionary<Uri, IObservable<byte[]>>();
+
+        private static readonly TaskFactory _taskFactory = LimitedTaskScheduler.GetTaskFactory(MaxParallelism);
+
+        private static void UriSourcePropertyChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
             var img = sender as LazyImage;
             if (img == null) return;
-            var dcw = img.DecodePixelWidth;
-            var dch = img.DecodePixelHeight;
+            var dpw = img.DecodePixelWidth;
+            var dph = img.DecodePixelHeight;
             var uri = e.NewValue as Uri;
-            if (e.NewValue == e.OldValue) return;
-            if (uri != null)
+            if (e.NewValue == e.OldValue || uri == null) return;
+            try
             {
-                try
+                if (uri.Scheme == "pack")
                 {
-                    if (uri.Scheme == "pack")
-                    {
-                        var bi = new BitmapImage(uri) { CacheOption = BitmapCacheOption.OnLoad };
-                        bi.Freeze();
-                        SetImage(img, bi, uri);
-                    }
-                    else
-                    {
-                        img.Source = null;
-                        Subject<byte[]> publisher = null;
-                        _imageStreamer.GetOrAdd(uri, _ => publisher = new Subject<byte[]>())
-                                      .Select(b => new MemoryStream(b, false))
-                                      .Select(ms =>
+                    // PACK image
+                    var bi = new BitmapImage(uri) { CacheOption = BitmapCacheOption.OnLoad };
+                    bi.Freeze();
+                    SetImage(img, bi, uri);
+                }
+                else
+                {
+                    img.Source = null;
+                    Subject<byte[]> publisher = null;
+                    _imageStreamer.GetOrAdd(uri, _ => publisher = new Subject<byte[]>())
+                                  .Select(b =>
+                                  {
+                                      try
                                       {
-                                          try
+                                          using (var ms = new MemoryStream(b, false))
                                           {
                                               var bi = new BitmapImage();
                                               bi.BeginInit();
                                               bi.CacheOption = BitmapCacheOption.OnLoad;
                                               bi.StreamSource = ms;
-                                              bi.DecodePixelWidth = dcw;
-                                              bi.DecodePixelHeight = dch;
+                                              bi.DecodePixelWidth = dpw;
+                                              bi.DecodePixelHeight = dph;
                                               bi.EndInit();
                                               bi.Freeze();
-                                              ms.Dispose();
                                               return bi;
                                           }
-                                          catch
-                                          {
-                                              return null;
-                                          }
-                                      })
-                                      .ObserveOnDispatcher()
-                                      .Subscribe(b => SetImage(img, b, uri), ex => { });
-                        if (publisher != null)
-                        {
-                            WaitObjects.Enqueue(Tuple.Create(uri, publisher));
-                            while (Interlocked.Increment(ref _threadCount) > ThreadMaxCount)
-                            {
-                                if (Interlocked.Decrement(ref _threadCount) > 0)
-                                    return;
-                            }
-                            await Worker();
-                            Interlocked.Decrement(ref _threadCount);
-                        }
-                    }
-                }
-                // ReSharper disable EmptyGeneralCatchClause
-                catch
-                // ReSharper restore EmptyGeneralCatchClause
-                {
-                }
-            }
-        }
-
-        private const int MaxRetryCount = 3;
-        private const int ThreadMaxCount = 8;
-        private static int _threadCount;
-        private static readonly ConcurrentQueue<Tuple<Uri, Subject<byte[]>>> WaitObjects = new ConcurrentQueue<Tuple<Uri, Subject<byte[]>>>();
-
-        private static async Task Worker()
-        {
-            await Task.Run(() =>
-            {
-                Tuple<Uri, Subject<byte[]>> dequeue;
-                var client = new WebClient();
-                while (WaitObjects.TryDequeue(out dequeue))
-                {
-                    try
+                                      }
+                                      catch
+                                      {
+                                          return null;
+                                      }
+                                  })
+                                  .ObserveOnDispatcher()
+                                  .Subscribe(b => SetImage(img, b, uri), ex => { });
+                    if (publisher != null)
                     {
-                        byte[] result;
-                        Func<Uri, byte[]> resolver;
-                        var uri = dequeue.Item1;
-                        if (uri.Scheme != "http" && uri.Scheme != "https" &&
-                            _specialTable.TryGetValue(uri.Scheme, out resolver))
-                        {
-                            result = resolver(uri);
-                        }
-                        else
-                        {
-                            var errorCount = 0;
-                            while (true)
-                            {
-                                errorCount++;
-                                try
-                                {
-                                    result = client.DownloadData(uri);
-                                }
-                                catch (Exception ex)
-                                {
-                                    if (errorCount > MaxRetryCount)
-                                    {
-                                        System.Diagnostics.Debug.WriteLine("could not load:" + uri + Environment.NewLine + ex.Message);
-                                        throw;
-                                    }
-                                    System.Diagnostics.Debug.WriteLine(ex.ToString());
-                                    continue;
-                                }
-                                break;
-                            }
-                        }
-                        IObservable<byte[]> removal;
-                        _imageStreamer.TryRemove(uri, out removal);
-                        dequeue.Item2.OnNext(result);
-                        dequeue.Item2.OnCompleted();
-                        dequeue.Item2.Dispose();
+                        _taskFactory.StartNew(() => LoadBytes(uri, publisher));
                     }
-                    catch (Exception ex)
-                    {
-                        if (dequeue == null) continue;
-                        dequeue.Item2.OnError(ex);
-                        dequeue.Item2.Dispose();
-                    }
-                }
-            });
-        }
-
-        private static void SetImage(LazyImage image, ImageSource source, Uri sourceFrom)
-        {
-            try
-            {
-                if (source != null && image.UriSource == sourceFrom)
-                {
-                    if (!source.IsFrozen)
-                        throw new ArgumentException("Image is not frozen.");
-                    image.Source = source;
                 }
             }
             // ReSharper disable EmptyGeneralCatchClause
@@ -196,6 +118,75 @@ namespace StarryEyes.Views.Controls
             }
         }
 
+        private static async Task LoadBytes(Uri source, Subject<byte[]> subject)
+        {
+            var client = new HttpClient();
+            try
+            {
+                byte[] result;
+                Func<Uri, byte[]> resolver;
+                if (source.Scheme != "http" && source.Scheme != "https" &&
+                    _specialTable.TryGetValue(source.Scheme, out resolver))
+                {
+                    result = resolver(source);
+                }
+                else
+                {
+                    var errorCount = 0;
+                    while (true)
+                    {
+                        errorCount++;
+                        try
+                        {
+                            var response = await client.GetAsync(source);
+                            result = await response.Content.ReadAsByteArrayAsync();
+                        }
+                        catch (Exception ex)
+                        {
+                            if (errorCount > MaxRetryCount)
+                            {
+                                System.Diagnostics.Debug.WriteLine("could not load:" + source + Environment.NewLine + ex.Message);
+                                throw;
+                            }
+                            System.Diagnostics.Debug.WriteLine(ex.ToString());
+                            continue;
+                        }
+                        break;
+                    }
+                }
+                IObservable<byte[]> removal;
+                _imageStreamer.TryRemove(source, out removal);
+                subject.OnNext(result);
+                subject.OnCompleted();
+                subject.Dispose();
+            }
+            catch (Exception ex)
+            {
+                subject.OnError(ex);
+                subject.Dispose();
+            }
+        }
+
+        private static void SetImage(LazyImage image, ImageSource source, Uri sourceFrom)
+        {
+            try
+            {
+                if (source == null || image.UriSource != sourceFrom) return;
+                if (!source.IsFrozen)
+                {
+                    throw new ArgumentException("Image is not frozen.");
+                }
+                image.Source = source;
+            }
+            // ReSharper disable EmptyGeneralCatchClause
+            catch
+            // ReSharper restore EmptyGeneralCatchClause
+            {
+            }
+        }
+
+        #region Special resolver table
+
         private static readonly ConcurrentDictionary<string, Func<Uri, byte[]>> _specialTable =
             new ConcurrentDictionary<string, Func<Uri, byte[]>>();
 
@@ -203,5 +194,7 @@ namespace StarryEyes.Views.Controls
         {
             return _specialTable.TryAdd(scheme, resolver);
         }
+
+        #endregion
     }
 }

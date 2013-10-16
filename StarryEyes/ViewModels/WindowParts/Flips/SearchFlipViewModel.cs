@@ -9,7 +9,9 @@ using Livet.Messaging;
 using StarryEyes.Filters;
 using StarryEyes.Filters.Parsing;
 using StarryEyes.Models;
+using StarryEyes.Models.Timelines.SearchFlips;
 using StarryEyes.Settings;
+using StarryEyes.ViewModels.Timelines.SearchFlips;
 using StarryEyes.ViewModels.WindowParts.Flips.SearchFlips;
 using StarryEyes.Views.Utils;
 
@@ -150,16 +152,16 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         public void SetNextSearchOption()
         {
             if (SearchMode == SearchMode.UserScreenName)
-                SearchMode = SearchMode.Quick;
+                SearchMode = SearchMode.CurrentTab;
             else
                 SearchMode = (SearchMode)(((int)SearchMode) + 1);
             if (SearchMode == SearchMode.UserScreenName && !CanBeUserScreenName)
-                SearchMode = SearchMode.Quick;
+                SearchMode = SearchMode.CurrentTab;
         }
 
         public void SetPreviousSearchOption()
         {
-            if (SearchMode == SearchMode.Quick)
+            if (SearchMode == SearchMode.CurrentTab)
                 SearchMode = SearchMode.UserScreenName;
             else
                 SearchMode = (SearchMode)(((int)SearchMode) - 1);
@@ -167,9 +169,9 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 SearchMode = SearchMode.UserWeb;
         }
 
-        public void SetQuickSearch()
+        public void SetLocalTabSearch()
         {
-            SearchMode = SearchMode.Quick;
+            SearchMode = SearchMode.CurrentTab;
         }
 
         public void SetLocalSearch()
@@ -226,7 +228,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             get { return !String.IsNullOrEmpty(_errorText); }
         }
 
-        private SearchMode _searchMode = SearchMode.Quick;
+        private SearchMode _searchMode = SearchMode.CurrentTab;
         public SearchMode SearchMode
         {
             get { return _searchMode; }
@@ -301,7 +303,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 }
                 else
                 {
-                    IsSearchResultAvailable = SearchMode == SearchMode.Quick;
+                    IsSearchResultAvailable = SearchMode == SearchMode.CurrentTab;
                     if (IsSearchResultAvailable)
                     {
                         CommitSearch();
@@ -315,7 +317,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         {
             if (this.IsVisible) return;
             base.Open();
-            SearchMode = SearchMode.Quick;
+            SearchMode = SearchMode.CurrentTab;
             SearchCandidate.UpdateInfo();
         }
 
@@ -351,7 +353,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             }
             if (SearchResult != null)
             {
-                SearchResult.SetPhysicalFocus();
+                SearchResult.SetFocus();
             }
         }
 
@@ -362,7 +364,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         private void CommitSearch()
         {
             _previousCommit = Text;
-            if (_backStack.Count > 0 && (_backStack.Peek().Item1 == Text || _backStack.Peek().Item2 == SearchMode.Quick))
+            if (_backStack.Count > 0 && (_backStack.Peek().Item1 == Text || _backStack.Peek().Item2 == SearchMode.CurrentTab))
             {
                 _backStack.Pop();
             }
@@ -377,20 +379,20 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             this.UserInfo = null;
             if (IsQueryMode)
             {
-                SearchResult = new SearchResultViewModel(this, Text.Substring(1), SearchOption.Query);
+                this.ShowSearchResult(new SearchResultModel(Text.Substring(1), SearchOption.Query));
             }
             else
             {
                 switch (SearchMode)
                 {
-                    case SearchMode.Quick:
-                        SearchResult = new SearchResultViewModel(this, Text, SearchOption.Quick);
+                    case SearchMode.CurrentTab:
+                        this.ShowSearchResult(new SearchResultModel(Text, SearchOption.CurrentTab));
                         break;
                     case SearchMode.Local:
-                        SearchResult = new SearchResultViewModel(this, Text, SearchOption.None);
+                        this.ShowSearchResult(new SearchResultModel(Text, SearchOption.Local));
                         break;
                     case SearchMode.Web:
-                        SearchResult = new SearchResultViewModel(this, Text, SearchOption.Web);
+                        this.ShowSearchResult(new SearchResultModel(Text, SearchOption.Web));
                         break;
                     case SearchMode.UserWeb:
                         this.UserResult = new UserResultViewModel(this, Text);
@@ -404,6 +406,11 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 }
             }
             IsSearchResultAvailable = true;
+        }
+
+        private void ShowSearchResult(SearchResultModel model)
+        {
+            SearchResult = new SearchResultViewModel(this, model);
         }
 
         public void CloseResults()
