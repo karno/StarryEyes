@@ -163,15 +163,10 @@ namespace Livet
         /// </summary>
         public void Clear()
         {
-            ReadAndWriteWithLockAction(() => _list.Count,
-            count =>
+            ReadAndWriteWithLockAction(
+            () => this._list.Clear(),
+            () =>
             {
-                if (count == 0) return;
-                _list.Clear();
-            },
-            count =>
-            {
-                if (count == 0) return;
                 this.OnPropertyChanged("Count");
                 this.OnPropertyChanged("Item[]");
                 this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -134,8 +133,6 @@ namespace StarryEyes.Casket
         {
             try
             {
-                var sw = new Stopwatch();
-                sw.Start();
                 await StatusCrud.StoreCoreAsync(
                     EnumerableEx.Concat(
                         new[]
@@ -150,14 +147,13 @@ namespace StarryEyes.Casket
                         new[] { _userUrlEntityCrud.CreateDeleter(user.Id) },
                         userUrlEntities.Select(e => Tuple.Create(_userUrlEntityInserter, (object)e))
                         ));
-                sw.Stop();
-                System.Diagnostics.Debug.WriteLine("INSERT total: " + sw.ElapsedMilliseconds + " msec.");
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine(ex);
+                System.Diagnostics.Debug.WriteLine("# FAIL> storing status " + user.ScreenName + ": " + status.Text + Environment.NewLine + ex);
             }
         }
+
 
         public static async Task StoreUser(DatabaseUser user,
             IEnumerable<DatabaseUserDescriptionEntity> userDescriptionEntities,
@@ -165,8 +161,6 @@ namespace StarryEyes.Casket
         {
             try
             {
-                var sw = new Stopwatch();
-                sw.Start();
                 await StatusCrud.StoreCoreAsync(
                     EnumerableEx.Concat(
                         new[]
@@ -178,12 +172,10 @@ namespace StarryEyes.Casket
                         new[] { _userUrlEntityCrud.CreateDeleter(user.Id) },
                         userUrlEntities.Select(e => Tuple.Create(_userUrlEntityInserter, (object)e))
                         ));
-                sw.Stop();
-                System.Diagnostics.Debug.WriteLine("INSERT total: " + sw.ElapsedMilliseconds + " msec.");
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine(ex);
+                System.Diagnostics.Debug.WriteLine("# FAIL> storing user " + user.ScreenName + Environment.NewLine + ex);
             }
         }
         #endregion

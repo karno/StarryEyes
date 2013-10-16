@@ -11,10 +11,10 @@
              xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"
              xmlns:mbehaviors="clr-namespace:StarryEyes.Views.Messaging.Behaviors"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:tabs="clr-namespace:StarryEyes.ViewModels.Timelines.Tabs"
              xmlns:utils="clr-namespace:StarryEyes.Views.Utils"
-             xmlns:tabs2="clr-namespace:StarryEyes.ViewModels.Timelines.Tabs"
              x:Name="userControl"
-             d:DataContext="{d:DesignInstance Type={x:Type tabs2:TabViewModel}}"
+             d:DataContext="{d:DesignInstance Type={x:Type tabs:TabViewModel}}"
              d:DesignHeight="300"
              d:DesignWidth="300"
              mc:Ignorable="d">

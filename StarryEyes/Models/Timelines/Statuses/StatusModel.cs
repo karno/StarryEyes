@@ -335,6 +335,7 @@ namespace StarryEyes.Models.Timelines.Statuses
                     this._favoritedUsers.Add(user);
 #pragma warning disable 4014
                     StatusProxy.AddFavoritorAsync(this.Status.Id, user.Id);
+                    UserProxy.StoreUserAsync(user);
 #pragma warning restore 4014
                 }
             }
@@ -400,6 +401,7 @@ namespace StarryEyes.Models.Timelines.Statuses
                     this._retweetedUsers.Add(user);
 #pragma warning disable 4014
                     StatusProxy.AddRetweeterAsync(this.Status.Id, user.Id);
+                    UserProxy.StoreUserAsync(user);
 #pragma warning restore 4014
                 }
             }

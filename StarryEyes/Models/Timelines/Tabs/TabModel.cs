@@ -25,7 +25,7 @@ namespace StarryEyes.Models.Timelines.Tabs
             var model = new TabModel
             {
                 Name = name,
-                FilterQuery = QueryCompiler.Compile(query),
+                FilterQuery = query != null ? QueryCompiler.Compile(query) : null,
                 IsShowUnreadCounts = true,
                 IsNotifyNewArrivals = true
             };
@@ -48,7 +48,6 @@ namespace StarryEyes.Models.Timelines.Tabs
             {
                 if (value == this._isActivated) return;
                 this._isActivated = value;
-                this.QueueInvalidateTimeline();
                 this.IsSubscribeBroadcaster = value;
                 if (this._filterQuery == null) return;
                 if (value)

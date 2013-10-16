@@ -130,6 +130,7 @@ namespace StarryEyes.Models.Subsystems
 
         internal static void NotifyFavorited(TwitterUser source, TwitterStatus status)
         {
+            Task.Run(() => UserProxy.StoreUserAsync(source));
             Task.Run(() => StatusModel.UpdateStatusInfo(
                 status.Id,
                 model => model.AddFavoritedUser(source),
@@ -148,6 +149,7 @@ namespace StarryEyes.Models.Subsystems
 
         internal static void NotifyRetweeted(TwitterUser source, TwitterStatus status)
         {
+            Task.Run(() => UserProxy.StoreUserAsync(source));
             Task.Run(() => StatusModel.UpdateStatusInfo(
                 status.Id,
                 model => model.AddRetweetedUser(source),

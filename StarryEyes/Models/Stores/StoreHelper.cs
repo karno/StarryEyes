@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
+using System.Threading.Tasks;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Models.Databases;
@@ -31,7 +32,7 @@ namespace StarryEyes.Models.Stores
                             .Where(_ => _ != null)
                             .ConcatIfEmpty(() =>
                                            Setting.Accounts.GetRandomOne().ShowUserAsync(id).ToObservable()
-                                                  .Do(u => UserProxy.StoreUserAsync(u)));
+                                                  .Do(u => Task.Run(() => UserProxy.StoreUserAsync(u))));
         }
 
         public static IObservable<TwitterUser> GetUser(string screenName)
@@ -41,7 +42,7 @@ namespace StarryEyes.Models.Stores
                             .Where(_ => _ != null)
                             .ConcatIfEmpty(
                                 () => Setting.Accounts.GetRandomOne().ShowUserAsync(screenName).ToObservable()
-                                             .Do(u => UserProxy.StoreUserAsync(u)));
+                                             .Do(u => Task.Run(() => UserProxy.StoreUserAsync(u))));
         }
     }
 }

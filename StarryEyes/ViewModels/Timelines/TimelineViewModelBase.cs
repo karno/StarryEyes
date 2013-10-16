@@ -44,6 +44,7 @@ namespace StarryEyes.ViewModels.Timelines
             set
             {
                 if (_isLoading == value) return;
+                System.Diagnostics.Debug.WriteLine("load state: " + value);
                 _isLoading = value;
                 RaisePropertyChanged();
             }
@@ -141,9 +142,12 @@ namespace StarryEyes.ViewModels.Timelines
         {
             if (IsScrollInTop || IsLoading) return;
             this._model.IsAutoTrimEnabled = false;
-            IsLoading = true;
-            Task.Run(() => this._model.ReadMore(id == long.MaxValue ? (long?)null : id,
-                                                () => this.IsLoading = false));
+            Task.Run(async () =>
+            {
+                this.IsLoading = true;
+                await this._model.ReadMore(id == long.MaxValue ? (long?)null : id);
+                this.IsLoading = false;
+            });
         }
 
         #region Selection Control
@@ -278,18 +282,35 @@ namespace StarryEyes.ViewModels.Timelines
             this._model = model;
             this._timeline = new ObservableCollection<StatusViewModel>();
             DispatcherHolder.Enqueue(this.InitializeCollection, DispatcherPriority.Background);
-            this.ReadMore();
+            Task.Run(async () =>
+            {
+                this.IsLoading = true;
+                await this._model.InvalidateTimeline();
+                this.IsLoading = false;
+            });
+            this.CompositeDisposable.Add(() =>
+            {
+                if (_listener != null) _listener.Dispose();
+            });
         }
 
+        private IDisposable _listener = null;
         private void InitializeCollection()
         {
+            if (_listener != null)
+            {
+                _listener.Dispose();
+                _listener = null;
+            }
             lock (this._timelineLock)
             {
-                var sts = this._model.Statuses.SynchronizedToArray(() => this.CompositeDisposable.Add(
-                    this._model.Statuses
-                        .ListenCollectionChanged()
-                        .Subscribe(e => DispatcherHolder.Enqueue(
-                            () => this.ReflectCollectionChanged(e), DispatcherPriority.Background))));
+                var sts = this._model.Statuses.SynchronizedToArray(
+                    () => _listener = this._model.Statuses
+                                          .ListenCollectionChanged()
+                                          .Subscribe(e => DispatcherHolder.Enqueue(
+                                              () => this.ReflectCollectionChanged(e),
+                                              DispatcherPriority.Background)));
+                this._timeline.Clear();
                 sts.Select(this.GenerateStatusViewModel)
                    .ForEach(this._timeline.Add);
             }
@@ -297,29 +318,40 @@ namespace StarryEyes.ViewModels.Timelines
 
         private void ReflectCollectionChanged(NotifyCollectionChangedEventArgs e)
         {
-            lock (this._timelineLock)
+            try
             {
-                switch (e.Action)
+                lock (this._timelineLock)
                 {
-                    case NotifyCollectionChangedAction.Add:
-                        this._timeline.Insert(e.NewStartingIndex, GenerateStatusViewModel((StatusModel)e.NewItems[0]));
-                        break;
-                    case NotifyCollectionChangedAction.Move:
-                        this._timeline.Move(e.OldStartingIndex, e.NewStartingIndex);
-                        break;
-                    case NotifyCollectionChangedAction.Remove:
-                        var removal = this._timeline[e.OldStartingIndex];
-                        this._timeline.RemoveAt(e.OldStartingIndex);
-                        removal.Dispose();
-                        break;
-                    case NotifyCollectionChangedAction.Reset:
-                        var cache = this._timeline.ToArray();
-                        this._timeline.Clear();
-                        Task.Run(() => cache.ForEach(c => c.Dispose()));
-                        break;
-                    default:
-                        throw new ArgumentException();
+                    switch (e.Action)
+                    {
+                        case NotifyCollectionChangedAction.Add:
+                            this._timeline.Insert(e.NewStartingIndex,
+                                                  GenerateStatusViewModel((StatusModel)e.NewItems[0]));
+                            break;
+                        case NotifyCollectionChangedAction.Move:
+                            this._timeline.Move(e.OldStartingIndex, e.NewStartingIndex);
+                            break;
+                        case NotifyCollectionChangedAction.Remove:
+                            var removal = this._timeline[e.OldStartingIndex];
+                            this._timeline.RemoveAt(e.OldStartingIndex);
+                            removal.Dispose();
+                            break;
+                        case NotifyCollectionChangedAction.Reset:
+                            System.Diagnostics.Debug.WriteLine("*** RESET! ***");
+                            var cache = this._timeline.ToArray();
+                            this._timeline.Clear();
+                            Task.Run(() => cache.ForEach(c => c.Dispose()));
+                            break;
+                        default:
+                            throw new ArgumentException();
+                    }
                 }
+            }
+            catch (IndexOutOfRangeException)
+            {
+                System.Diagnostics.Debug.WriteLine("*TIMELINE FAIL*");
+                // timeline consistency error
+                this.InitializeCollection();
             }
         }
 

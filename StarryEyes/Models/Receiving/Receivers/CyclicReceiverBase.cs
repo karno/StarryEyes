@@ -66,7 +66,7 @@ namespace StarryEyes.Models.Receiving.Receivers
 
         public void Dispose()
         {
-            this.CheckDisposed();
+            if (this._isDisposed) return;
             this._isDisposed = true;
             this.Dispose(true);
         }

@@ -26,7 +26,7 @@ namespace StarryEyes.Casket.Cruds
         {
             return
                 this.QueryAsync<long>(
-                    this.CreateSql("StatusId = @Id"),
+                    "select UserId from " + TableName + " where StatusId = @Id;",
                     new { Id = statusId });
         }
 

@@ -1244,7 +1244,7 @@ namespace StarryEyes.ViewModels.WindowParts
                 if (token[0] == '@')
                 {
                     _items.Clear();
-                    AddUserItems(token.Substring(1));
+                    Task.Run(() => AddUserItems(token.Substring(1)));
                 }
                 else
                 {

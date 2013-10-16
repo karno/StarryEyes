@@ -60,7 +60,7 @@ namespace StarryEyes.Casket.Cruds
             return await this.QueryAsync<long>(
                 "select Id " +
                 "from " + TableName + " " +
-                "where InReplyToStatusId is not null and" +
+                "where InReplyToStatusId is not null and " +
                 "InReplyToStatusId = @inReplyTo;", new { inReplyTo });
         }
 

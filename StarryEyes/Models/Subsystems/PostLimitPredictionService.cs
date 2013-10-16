@@ -61,8 +61,7 @@ namespace StarryEyes.Models.Subsystems
                 if (_dictionary.ContainsKey(info.Id)) return;
                 _dictionary.Add(info.Id, new LinkedList<TwitterStatus>());
                 StatusProxy.FetchStatuses(
-                    "UserId = " + info.Id.ToString(CultureInfo.InvariantCulture),
-                    Setting.PostLimitPerWindow.Value)
+                    "UserId = " + info.Id.ToString(CultureInfo.InvariantCulture), count: Setting.PostLimitPerWindow.Value)
                            .Subscribe(PostDetected);
             }
         }

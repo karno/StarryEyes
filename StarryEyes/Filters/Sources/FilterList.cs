@@ -68,7 +68,7 @@ namespace StarryEyes.Filters.Sources
                         var result = await account.GetListMembersAsync(
                             _listInfo.Slug, _listInfo.OwnerScreenName, cursor);
                         memberList.AddRange(result.Result
-                                                  .Do(u => UserProxy.StoreUserAsync(u))
+                                                  .Do(u => Task.Run(() => UserProxy.StoreUserAsync(u)))
                                                   .Select(u => u.Id));
                         cursor = result.NextCursor;
                     } while (cursor != 0);

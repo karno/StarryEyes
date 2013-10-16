@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
 using Livet;
@@ -96,7 +97,7 @@ namespace StarryEyes.Models.Timelines
         {
             lock (this._statusIdCache)
             {
-                if (!this._statusIdCache.AddDistinct(status.Id))
+                if (this._statusIdCache.Contains(status.Id))
                 {
                     return false;
                 }
@@ -112,11 +113,14 @@ namespace StarryEyes.Models.Timelines
                     lastModel != null &&
                     lastModel.Status.CreatedAt > stamp)
                 {
-                    // trim target
-                    lock (this._statusIdCache)
-                    {
-                        this._statusIdCache.Remove(model.Status.Id);
-                    }
+                    // status is in below of trim offset
+                    return false;
+                }
+            }
+            lock (this._statusIdCache)
+            {
+                if (!this._statusIdCache.AddDistinct(status.Id))
+                {
                     return false;
                 }
             }
@@ -147,14 +151,12 @@ namespace StarryEyes.Models.Timelines
 
         #region Read more and trimming
 
-        public void ReadMore(long? maxId, Action completeHandler)
+        public async Task ReadMore(long? maxId)
         {
-#pragma warning disable 4014
-            this.IsAutoTrimEnabled = false;
-            this.Fetch(maxId, TimelineChunkCount)
-                .Where(this.CheckAcceptStatus)
-                .Subscribe(s => this.AddStatus(s, false), completeHandler);
-#pragma warning restore 4014
+            await this.Fetch(maxId, TimelineChunkCount)
+                      .Where(this.CheckAcceptStatus)
+                      .SelectMany(s => this.AddStatus(s, false).ToObservable())
+                      .LastOrDefaultAsync();
         }
 
         private int _trimCount;
@@ -195,7 +197,7 @@ namespace StarryEyes.Models.Timelines
 
         #region Invalidate whole timeline
 
-        private const int InvalidateSec = 5;
+        private const int InvalidateSec = 2;
         private int _invlatch;
         protected void QueueInvalidateTimeline()
         {
@@ -210,19 +212,21 @@ namespace StarryEyes.Models.Timelines
                       });
         }
 
-        private void InvalidateTimeline()
+        public Task InvalidateTimeline()
         {
-            Task.Run(() =>
+            return Task.Run(async () =>
             {
                 this.PreInvalidateTimeline();
                 // invalidate and fetch statuses
                 lock (this._statusIdCache)
                 {
+                    System.Diagnostics.Debug.WriteLine("*** Invalidate! ***");
                     this._statusIdCache.Clear();
                     this.Statuses.Clear();
                 }
-                this.Fetch(null, TimelineChunkCount)
-                    .Subscribe(s => this.AcceptStatus(new StatusNotification(s)));
+                await this.Fetch(null, TimelineChunkCount)
+                          .Do(s => this.AcceptStatus(new StatusNotification(s)))
+                          .LastOrDefaultAsync();
             });
         }
 

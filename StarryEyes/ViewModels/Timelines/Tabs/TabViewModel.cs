@@ -33,6 +33,7 @@ namespace StarryEyes.ViewModels.Timelines.Tabs
             this._model.OnNewStatusArrival += _ => this.UnreadCount++;
             this._model.BindingAccountsChanged += () => this.RaisePropertyChanged(() => this.CurrentAccounts);
             this._model.FocusRequired += this.SetFocus;
+            model.IsActivated = true;
         }
 
         public TabModel Model

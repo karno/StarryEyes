@@ -78,7 +78,6 @@ namespace StarryEyes.Filters.Expressions
 
         public Func<TwitterStatus, bool> GetEvaluator()
         {
-            System.Diagnostics.Debug.WriteLine("ちなみに SQL: " + this.GetSqlQuery());
             return this.Operator == null ? Tautology : this.Operator.GetBooleanValueProvider();
         }
 
