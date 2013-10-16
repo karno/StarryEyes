@@ -72,7 +72,7 @@ namespace StarryEyes.Filters.Parsing
                 RaiseQueryInvalidTerminatedError(type, RemainQuery);
             var token = Get();
             if (token.Type != type)
-                throw new FilterQueryException("不正なトークン: " + token + " in " + token.DebugIndex + ", 予期されるもの: " + type, RemainQuery);
+                throw QueryCompiler.CreateUnexpectedTokenError(token + " in " + token.DebugIndex, RemainQuery);
             return token;
         }
 

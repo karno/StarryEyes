@@ -157,7 +157,9 @@ namespace StarryEyes.Filters.Parsing
             var reader = new TokenReader(token);
             var op = CompileL0(reader);
             if (reader.IsRemainToken)
-                throw new FilterQueryException("不正なトークンです: " + reader.Get(), reader.RemainQuery);
+            {
+                throw CreateUnexpectedTokenError(reader.Get().ToString(), reader.RemainQuery);
+            }
             return new FilterExpressionRoot { Operator = op };
         }
 
@@ -444,8 +446,8 @@ namespace StarryEyes.Filters.Parsing
                     case "blockings":
                         return new LocalUserBlockings(repl);
                     default:
-                        throw new FilterQueryException("不正なトークンです: " + literal.Value,
-                                                       repl.ToQuery() + "." + literal.Value + " " + reader.RemainQuery);
+                        throw CreateUnexpectedTokenError(
+                            literal.Value, repl.ToQuery() + "." + literal.Value + " " + reader.RemainQuery);
                 }
             }
             return new LocalUser(repl);
@@ -556,8 +558,8 @@ namespace StarryEyes.Filters.Parsing
                 case "language":
                     return selector(new UserLanguage(), new RetweeterLanguage());
                 default:
-                    throw new FilterQueryException("不正なトークンです: " + literal.Value,
-                                                   "user." + literal.Value + " " + reader.RemainQuery);
+                    throw CreateUnexpectedTokenError(literal.Value,
+                                                     "user." + literal.Value + " " + reader.RemainQuery);
             }
         }
 
@@ -620,10 +622,16 @@ namespace StarryEyes.Filters.Parsing
                 case "client":
                     return new StatusSource();
                 default:
-                    throw new FilterQueryException("不正なトークンです: " + value, value + " " + reader.RemainQuery);
+                    throw CreateUnexpectedTokenError(value, value + " " + reader.RemainQuery);
             }
         }
 
         #endregion
+
+        internal static FilterQueryException CreateUnexpectedTokenError(string token, string innerQuery)
+        {
+            return new FilterQueryException("不正なトークン: " + token,
+                                     innerQuery);
+        }
     }
 }
