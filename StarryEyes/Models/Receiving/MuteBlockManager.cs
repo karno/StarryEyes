@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -23,7 +24,11 @@ namespace StarryEyes.Models.Receiving
 
         internal static void Initialize()
         {
-            Setting.Accounts.Collection.ListenCollectionChanged().Subscribe(_ => InvalidateBlockingUsers());
+            Setting.Accounts.Collection.ListenCollectionChanged().Subscribe(_ =>
+            {
+                InvalidateBlockingUsers();
+                InvalidateMute();
+            });
             Setting.Muteds.ValueChanged += _ => InvalidateMute();
         }
 
@@ -32,6 +37,11 @@ namespace StarryEyes.Models.Receiving
             if (status == null) throw new ArgumentNullException("status");
             if (IsBlocked(status.User)) return true;
             CheckUpdateMutes();
+            return _muteFilter(status);
+        }
+
+        public static bool IsMuted(TwitterStatus status)
+        {
             return _muteFilter(status);
         }
 
@@ -116,9 +126,15 @@ namespace StarryEyes.Models.Receiving
 
         private static void UpdateMute()
         {
-            _muteFilter = Setting.Muteds.Evaluator;
+            var eval = Setting.Muteds.Evaluator;
             var sql = Setting.Muteds.Value.GetSqlQuery();
-            _muteSqlQuery = String.IsNullOrEmpty(sql) ? string.Empty : " AND NOT (" + sql + ")";
+            var accIds = Setting.Accounts.Ids
+                                .Select(i => i.ToString(CultureInfo.InvariantCulture))
+                                .JoinString(",");
+            _muteFilter = s => !Setting.Accounts.Contains(s.User.Id) && eval(s);
+            _muteSqlQuery = String.IsNullOrEmpty(sql)
+                                ? string.Empty
+                                : "(UserId IN (" + accIds + ") OR NOT (" + sql + "))";
         }
 
         private static void InvalidateBlockingUsers()

@@ -168,9 +168,6 @@ namespace StarryEyes.Settings
         public static readonly SettingItemStruct<bool> LoadPluginFromDevFolder =
             new SettingItemStruct<bool>("LoadPluginFromDevFolder", false);
 
-        public static readonly SettingItemStruct<bool> ApplyMuteToRetweetOriginals =
-            new SettingItemStruct<bool>("ApplyMuteToRetweetOriginals", true);
-
         public static readonly SettingItemStruct<int> EventDisplayMinimumMSec =
             new SettingItemStruct<int>("EventDisplayMinimumMSec", 200);
 

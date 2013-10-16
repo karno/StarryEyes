@@ -2,7 +2,6 @@
 using System.Linq;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Filters.Expressions.Operators;
-using StarryEyes.Settings;
 
 namespace StarryEyes.Filters
 {
@@ -45,14 +44,6 @@ namespace StarryEyes.Filters
                 LeftValue = left,
                 RightValue = right
             };
-        }
-
-        public static bool IsMuted(TwitterStatus status)
-        {
-            return !Setting.Accounts.Contains(status.User.Id) &&
-                   (Setting.Muteds.Evaluator(status) || status.RetweetedOriginal != null &&
-                    Setting.ApplyMuteToRetweetOriginals.Value &&
-                    Setting.Muteds.Evaluator(status.RetweetedOriginal));
         }
     }
 }

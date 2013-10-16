@@ -135,7 +135,8 @@ namespace StarryEyes.Models.Databases
             return await Database.StatusCrud.FindFromInReplyToAsync(inReplyTo);
         }
 
-        public static IObservable<TwitterStatus> FetchStatuses(string sql, long? maxId = null, int? count = null, bool applyMuteBlockFilter = true)
+        public static IObservable<TwitterStatus> FetchStatuses(
+            string sql, long? maxId = null, int? count = null, bool applyMuteBlockFilter = true)
         {
             if (maxId != null)
             {
