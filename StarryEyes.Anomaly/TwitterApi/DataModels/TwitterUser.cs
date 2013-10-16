@@ -1,13 +1,11 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using System.Text;
 using StarryEyes.Anomaly.Utils;
-using StarryEyes.Vanille.Serialization;
 
 namespace StarryEyes.Anomaly.TwitterApi.DataModels
 {
-    public class TwitterUser : IBinarySerializable
+    public class TwitterUser
     {
         public TwitterUser()
         {
@@ -268,76 +266,6 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
         public override int GetHashCode()
         {
             return this.Id.GetHashCode();
-        }
-
-        public void Serialize(BinaryWriter writer)
-        {
-            writer.Write(Id);
-            writer.Write(ScreenName);
-            writer.Write(Name ?? String.Empty);
-            writer.Write(Description ?? String.Empty);
-            writer.Write(Location ?? String.Empty);
-            writer.Write(Url ?? String.Empty);
-            writer.Write(IsDefaultProfileImage);
-            writer.Write(ProfileImageUri);
-            writer.Write(ProfileBackgroundImageUri);
-            writer.Write(ProfileBannerUri);
-            writer.Write(IsProtected);
-            writer.Write(IsVerified);
-            writer.Write(IsTranslator);
-            writer.Write(IsContributorsEnabled);
-            writer.Write(IsGeoEnabled);
-            writer.Write(StatusesCount);
-            writer.Write(this.FollowingsCount);
-            writer.Write(FollowersCount);
-            writer.Write(FavoritesCount);
-            writer.Write(ListedCount);
-            writer.Write(Language ?? String.Empty);
-            writer.Write(CreatedAt);
-            writer.Write(UrlEntities != null);
-            if (UrlEntities != null)
-            {
-                writer.Write(UrlEntities);
-            }
-            writer.Write(DescriptionEntities != null);
-            if (DescriptionEntities != null)
-            {
-                writer.Write(DescriptionEntities);
-            }
-        }
-
-        public void Deserialize(BinaryReader reader)
-        {
-            Id = reader.ReadInt64();
-            ScreenName = reader.ReadString();
-            Name = reader.ReadString();
-            Description = reader.ReadString();
-            Location = reader.ReadString();
-            Url = reader.ReadString();
-            IsDefaultProfileImage = reader.ReadBoolean();
-            ProfileImageUri = reader.ReadUri();
-            ProfileBackgroundImageUri = reader.ReadUri();
-            ProfileBannerUri = reader.ReadUri();
-            IsProtected = reader.ReadBoolean();
-            IsVerified = reader.ReadBoolean();
-            IsTranslator = reader.ReadBoolean();
-            IsContributorsEnabled = reader.ReadBoolean();
-            IsGeoEnabled = reader.ReadBoolean();
-            StatusesCount = reader.ReadInt64();
-            this.FollowingsCount = reader.ReadInt64();
-            FollowersCount = reader.ReadInt64();
-            FavoritesCount = reader.ReadInt64();
-            ListedCount = reader.ReadInt64();
-            Language = reader.ReadString();
-            CreatedAt = reader.ReadDateTime();
-            if (reader.ReadBoolean())
-            {
-                UrlEntities = reader.ReadCollection<TwitterEntity>().ToArray();
-            }
-            if (reader.ReadBoolean())
-            {
-                DescriptionEntities = reader.ReadCollection<TwitterEntity>().ToArray();
-            }
         }
     }
 }

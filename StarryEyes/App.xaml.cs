@@ -22,7 +22,6 @@ using StarryEyes.Models.Stores;
 using StarryEyes.Models.Subsystems;
 using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
-using StarryEyes.Vanille.DataStore.Persistent;
 
 namespace StarryEyes
 {
@@ -209,18 +208,6 @@ namespace StarryEyes
         {
             try
             {
-                var dex = ex as DataPersistenceException;
-                if (dex != null)
-                {
-                    if (Interlocked.Increment(ref _observedDpxCount) != 1) return;
-                    Setting.DatabaseCorruption.Value = true;
-                    Setting.Save();
-                    _appMutex.ReleaseMutex();
-                    _appMutex.Dispose();
-                    Process.Start(ResourceAssembly.Location);
-                    Current.Shutdown();
-                    return;
-                }
                 // TODO:ロギング処理など
                 Debug.WriteLine("##### SYSTEM CRASH! #####");
                 Debug.WriteLine(ex.ToString());

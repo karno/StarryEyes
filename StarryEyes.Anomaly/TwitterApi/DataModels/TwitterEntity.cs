@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using StarryEyes.Vanille.Serialization;
 
 namespace StarryEyes.Anomaly.TwitterApi.DataModels
 {
-    public class TwitterEntity : IBinarySerializable
+    public class TwitterEntity
     {
         public static IEnumerable<TwitterEntity> GetEntities(dynamic json)
         {
@@ -115,31 +113,6 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
         /// End index of this element
         /// </summary>
         public int EndIndex { get; set; }
-
-        public void Serialize(BinaryWriter writer)
-        {
-            writer.Write((int)EntityType);
-            writer.Write(DisplayText ?? string.Empty);
-            writer.Write(OriginalUrl ?? string.Empty);
-            writer.Write(UserId);
-            writer.Write(MediaUrl != null);
-            if (MediaUrl != null)
-                writer.Write(MediaUrl);
-            writer.Write(StartIndex);
-            writer.Write(EndIndex);
-        }
-
-        public void Deserialize(BinaryReader reader)
-        {
-            EntityType = (EntityType)reader.ReadInt32();
-            DisplayText = reader.ReadString();
-            OriginalUrl = reader.ReadString();
-            UserId = reader.ReadNullableLong();
-            if (reader.ReadBoolean())
-                MediaUrl = reader.ReadString();
-            StartIndex = reader.ReadInt32();
-            EndIndex = reader.ReadInt32();
-        }
     }
 
     public enum EntityType

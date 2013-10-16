@@ -121,10 +121,6 @@
       <Project>{564E23DE-AB35-45B6-B331-395C3943BC23}</Project>
       <Name>StarryEyes.Anomaly</Name>
     </ProjectReference>
-    <ProjectReference Include="..\StarryEyes.Vanille\StarryEyes.Vanille.csproj">
-      <Project>{7C1764E1-AF06-48A8-8590-09500A363118}</Project>
-      <Name>StarryEyes.Vanille</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="x64\SQLite.Interop.dll">

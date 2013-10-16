@@ -199,9 +199,6 @@ namespace StarryEyes.Settings
 
         #region Krile internal state
 
-        public static readonly SettingItemStruct<bool> DatabaseCorruption =
-            new SettingItemStruct<bool>("DatabaseCorruption", false);
-
         public static readonly SettingItem<string> LastImageOpenDir =
             new SettingItem<string>("LastImageOpenDir", Environment.GetFolderPath(Environment.SpecialFolder.MyPictures));
 
