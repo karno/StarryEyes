@@ -72,7 +72,7 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
         {
             return _factory.StartNew(() =>
             {
-                System.Diagnostics.Debug.WriteLine("EXECUTE: " + query);
+                // System.Diagnostics.Debug.WriteLine("EXECUTE: " + query);
                 using (var con = this.OpenConnection())
                 using (var tr = con.BeginTransaction())
                 {
@@ -87,7 +87,7 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
         {
             return _factory.StartNew(() =>
             {
-                System.Diagnostics.Debug.WriteLine("EXECUTE: " + query);
+                // System.Diagnostics.Debug.WriteLine("EXECUTE: " + query);
                 using (var con = this.OpenConnection())
                 using (var tr = con.BeginTransaction())
                 {
@@ -107,7 +107,7 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
                 {
                     foreach (var qap in queryAndParams)
                     {
-                        System.Diagnostics.Debug.WriteLine("EXECUTE: " + qap.Item1);
+                        // System.Diagnostics.Debug.WriteLine("EXECUTE: " + qap.Item1);
                         con.Execute(qap.Item1, qap.Item2, tr);
                     }
                     tr.Commit();
@@ -117,7 +117,7 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
 
         protected Task<IEnumerable<T>> QueryAsync<T>(string query, object param)
         {
-            System.Diagnostics.Debug.WriteLine("QUERY: " + query);
+            // System.Diagnostics.Debug.WriteLine("QUERY: " + query);
             return _factory.StartNew(() =>
             {
                 using (var con = this.OpenConnection())

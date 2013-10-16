@@ -132,13 +132,6 @@ namespace StarryEyes
             // set parameters for accessing twitter.
             Networking.Initialize();
 
-            if (!this.CheckDataStore())
-            {
-                // database corrupted
-                Current.Shutdown();
-                return;
-            }
-
             // load key assigns
             KeyAssignManager.Initialize();
 
@@ -146,8 +139,6 @@ namespace StarryEyes
             CacheStore.Initialize();
 
             // initialize stores
-            StatusStore.Initialize();
-            UserStore.Initialize();
             Database.Initialize(DatabaseFilePath);
             if (!this.CheckDatabase())
             {
@@ -173,54 +164,6 @@ namespace StarryEyes
             TwitterConfigurationService.Initialize();
             BackstageModel.Initialize();
             RaiseSystemReady();
-        }
-
-        private bool CheckDataStore()
-        {
-
-            // check database corruption
-            if (!Setting.DatabaseCorruption.Value)
-            {
-                return true;
-            }
-            var option = new TaskDialogOptions
-            {
-                MainIcon = VistaTaskDialogIcon.Error,
-                Title = "Krile データベースの初期化Krile データストア初期化エラー",
-                MainInstruction = "データストアの破損が検出されています。",
-                Content = "データストアが破損している可能性があります。" + Environment.NewLine +
-                          "データストアを初期化するか、またはKrileを終了してバックアップを取ることができます。",
-                CommandButtons = new[] { "データストアを初期化して再起動", "Krileを終了", "無視して起動を続ける" }
-            };
-            var result = TaskDialog.Show(option);
-            switch (result.CommandButtonResult ?? -1)
-            {
-                case 0:
-                    StatusStore.Shutdown();
-                    UserStore.Shutdown();
-                    // clear data
-                    this.ClearStoreData();
-                    Setting.DatabaseCorruption.Value = false;
-                    Setting.Save();
-                    _appMutex.ReleaseMutex();
-                    _appMutex.Dispose();
-                    Process.Start(ResourceAssembly.Location);
-                    Current.Shutdown();
-                    Process.GetCurrentProcess().Kill();
-                    return false;
-                case 1:
-                    _appMutex.ReleaseMutex();
-                    _appMutex.Dispose();
-                    // shutdown
-                    Current.Shutdown();
-                    Process.GetCurrentProcess().Kill();
-                    return false;
-                case 2:
-                    Setting.DatabaseCorruption.Value = false;
-                    return true;
-                default:
-                    return false;
-            }
         }
 
         private bool CheckDatabase()

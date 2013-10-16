@@ -7,9 +7,9 @@
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:primitives="clr-namespace:StarryEyes.Views.WindowParts.Primitives"
-             xmlns:timelines="clr-namespace:StarryEyes.ViewModels.WindowParts.Timelines"
              xmlns:utils="clr-namespace:StarryEyes.Views.Utils"
              xmlns:vm="clr-namespace:StarryEyes.ViewModels.WindowParts"
+             xmlns:tabs2="clr-namespace:StarryEyes.ViewModels.Timelines.Tabs"
              d:DataContext="{d:DesignInstance vm:MainAreaViewModel}"
              d:DesignHeight="300"
              d:DesignWidth="300"
@@ -20,7 +20,7 @@
                 <ResourceDictionary Source="pack://application:,,,/Krile;component/DefaultContextMenus.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <utils:BooleanToVisibleConverter x:Key="BooleanToVisibleConverter" />
-            <DataTemplate x:Key="TabHeaderTemplate" DataType="timelines:TabViewModel">
+            <DataTemplate x:Key="TabHeaderTemplate" DataType="tabs2:TabViewModel">
                 <Border Margin="0,4,0,4" Background="White">
                     <StackPanel Margin="0,0,8,0" Orientation="Horizontal">
                         <i:Interaction.Behaviors>
@@ -30,7 +30,7 @@
                         </i:Interaction.Behaviors>
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="MouseLeftButtonDown">
-                                <ei:CallMethodAction MethodName="Focus" TargetObject="{Binding}" />
+                                <ei:CallMethodAction MethodName="GotFocus" TargetObject="{Binding}" />
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
                         <StackPanel.ContextMenu>
@@ -76,7 +76,7 @@
                     </MultiDataTrigger>
                 </DataTemplate.Triggers>
             </DataTemplate>
-            <DataTemplate x:Key="ColumnTemplate" DataType="timelines:ColumnViewModel">
+            <DataTemplate x:Key="ColumnTemplate" DataType="tabs2:ColumnViewModel">
                 <Grid Margin="8,4,8,0" Background="{x:Null}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />

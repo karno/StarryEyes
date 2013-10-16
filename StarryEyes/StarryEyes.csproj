@@ -235,7 +235,7 @@
     <Compile Include="Models\Databases\StatusProxy.cs" />
     <Compile Include="Models\Databases\Mapper.cs" />
     <Compile Include="Models\Databases\UserProxy.cs" />
-    <Compile Include="Models\Networking.cs" />
+    <Compile Include="Networking.cs" />
     <Compile Include="Models\Plugins\PluginManager.cs" />
     <Compile Include="Models\Receiving\ListInfo.cs" />
     <Compile Include="Models\Receiving\Receivers\UserTimelineReceiver.cs" />
@@ -280,25 +280,21 @@
     <Compile Include="Models\InputAreaModel.cs" />
     <Compile Include="Models\MainWindowModel.cs" />
     <Compile Include="Models\Subsystems\NotificationService.cs" />
-    <Compile Include="Models\ObservableSynchronizedCollectionEx.cs" />
-    <Compile Include="Models\StatusModel.cs" />
+    <Compile Include="Hotfixes\ObservableSynchronizedCollectionEx.cs" />
+    <Compile Include="Models\Timelines\Statuses\StatusModel.cs" />
     <Compile Include="Models\StatusTextUtil.cs" />
-    <Compile Include="Models\Stores\Internal\IdReverseComparer.cs" />
-    <Compile Include="Models\Stores\Internal\SingleThreadDispatcher.cs" />
-    <Compile Include="Models\Stores\Internal\StoreOnMemoryObjectPersistence.cs" />
     <Compile Include="Models\Subsystems\PostLimitPredictionService.cs" />
     <Compile Include="Models\Subsystems\SpecialImageResolvers.cs" />
-    <Compile Include="Models\Tab\ColumnInfo.cs" />
-    <Compile Include="Models\Tab\ColumnModel.cs" />
-    <Compile Include="Models\Tab\CommonTabBuilder.cs" />
-    <Compile Include="Models\Tab\TabManager.cs" />
-    <Compile Include="Models\Tab\TimelineModel.cs" />
+    <Compile Include="Models\Timelines\Tabs\ColumnInfo.cs" />
+    <Compile Include="Models\Timelines\Tabs\ColumnModel.cs" />
+    <Compile Include="Models\Timelines\Tabs\CommonTabBuilder.cs" />
+    <Compile Include="Models\Timelines\Tabs\TabManager.cs" />
     <Compile Include="Models\Subsystems\TwitterConfigurationService.cs" />
-    <Compile Include="Models\Timeline\SearchFlips\UserTimelineModel.cs" />
-    <Compile Include="Models\Timeline\SearchFlips\SearchResultModel.cs" />
-    <Compile Include="Models\Timeline\TabModel.cs" />
-    <Compile Include="Models\Timeline\TimelineModelBase.cs" />
-    <Compile Include="Models\UserModel.cs" />
+    <Compile Include="Models\Timelines\SearchFlips\UserTimelineModel.cs" />
+    <Compile Include="Models\Timelines\SearchFlips\SearchResultModel.cs" />
+    <Compile Include="Models\Timelines\Tabs\TabModel.cs" />
+    <Compile Include="Models\Timelines\TimelineModelBase.cs" />
+    <Compile Include="Models\Timelines\Statuses\UserModel.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Settings\AccountManager.cs" />
     <Compile Include="Settings\KeyAssignManager.cs" />
@@ -309,7 +305,10 @@
     <Compile Include="Settings\TabDescription.cs" />
     <Compile Include="ViewModels\Dialogs\KeyOverrideViewModel.cs" />
     <Compile Include="ViewModels\DropAcceptDescription.cs" />
-    <Compile Include="ViewModels\Timeline\TimelineViewModelBase.cs" />
+    <Compile Include="ViewModels\Timelines\SearchFlips\SearchResultViewModel.cs" />
+    <Compile Include="ViewModels\Timelines\SearchFlips\UserTimelineViewModel.cs" />
+    <Compile Include="ViewModels\Timelines\Tabs\TabViewModel.cs" />
+    <Compile Include="ViewModels\Timelines\TimelineViewModelBase.cs" />
     <Compile Include="ViewModels\WindowParts\Backstages\BackstageEventViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Backstages\BackstageAccountViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Common\FilterEditControlViewModel.cs" />
@@ -319,24 +318,19 @@
     <Compile Include="ViewModels\WindowParts\BackstageViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\PartialFlipViewModelBase.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\RelationControlViewModel.cs" />
-    <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\UserFavoritesViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\UserFollowersViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\UserFollowingViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\UserListViewModelBase.cs" />
-    <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\UserStatusesViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\SearchFlipViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\SearchCandidateViewModel.cs" />
-    <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\SearchResultViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\UserResultViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\UserInfoViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\TabConfigurationFlipViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\InputAreaViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\MainAreaViewModel.cs" />
-    <Compile Include="ViewModels\WindowParts\Timelines\ColumnViewModel.cs" />
-    <Compile Include="ViewModels\WindowParts\Timelines\StatusViewModel.cs" />
-    <Compile Include="ViewModels\WindowParts\Timelines\TabViewModel.cs" />
-    <Compile Include="ViewModels\WindowParts\Timelines\TimelineViewModelBase.cs" />
-    <Compile Include="ViewModels\WindowParts\Timelines\UserViewModel.cs" />
+    <Compile Include="ViewModels\Timelines\Tabs\ColumnViewModel.cs" />
+    <Compile Include="ViewModels\Timelines\Statuses\StatusViewModel.cs" />
+    <Compile Include="ViewModels\Timelines\Statuses\UserViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Backstages\TwitterEventViewModel.cs" />
     <Compile Include="Views\Adorners\AdornerBase.cs" />
     <Compile Include="Views\Adorners\InsertionAdorner.cs" />
@@ -456,9 +450,6 @@
     <Compile Include="Helpers\BrowserHelper.cs" />
     <Compile Include="Models\Subsystems\StatisticsService.cs" />
     <Compile Include="Settings\Setting.cs" />
-    <Compile Include="Models\Stores\StatusStore.cs" />
-    <Compile Include="Models\Stores\UserStore.cs" />
-    <Compile Include="Models\Tab\TabModel.cs" />
     <Compile Include="ViewModels\Dialogs\AuthorizationViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="Views\Dialogs\AuthorizationWindow.xaml.cs">
@@ -565,7 +556,7 @@
       <Name>StarryEyes.Anomaly</Name>
     </ProjectReference>
     <ProjectReference Include="..\StarryEyes.Casket\StarryEyes.Casket.csproj">
-      <Project>{316927DE-96C9-47C8-947D-B6D8A8DA1E14}</Project>
+      <Project>{316927de-96c9-47c8-947d-b6d8a8da1e14}</Project>
       <Name>StarryEyes.Casket</Name>
     </ProjectReference>
     <ProjectReference Include="..\StarryEyes.Feather\StarryEyes.Feather.csproj">

@@ -159,11 +159,39 @@ namespace StarryEyes.Casket
             }
         }
 
+        public static async Task StoreUser(DatabaseUser user,
+            IEnumerable<DatabaseUserDescriptionEntity> userDescriptionEntities,
+            IEnumerable<DatabaseUserUrlEntity> userUrlEntities)
+        {
+            try
+            {
+                var sw = new Stopwatch();
+                sw.Start();
+                await StatusCrud.StoreCoreAsync(
+                    EnumerableEx.Concat(
+                        new[]
+                        {
+                            Tuple.Create(_userInserter, (object) user)
+                        },
+                        new[] { _userDescEntityCrud.CreateDeleter(user.Id) },
+                        userDescriptionEntities.Select(e => Tuple.Create(_userDescEntityInserter, (object)e)),
+                        new[] { _userUrlEntityCrud.CreateDeleter(user.Id) },
+                        userUrlEntities.Select(e => Tuple.Create(_userUrlEntityInserter, (object)e))
+                        ));
+                sw.Stop();
+                System.Diagnostics.Debug.WriteLine("INSERT total: " + sw.ElapsedMilliseconds + " msec.");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex);
+            }
+        }
         #endregion
 
         public static async Task VacuumTables()
         {
             await _managementCrud.VacuumAsync();
         }
+
     }
 }

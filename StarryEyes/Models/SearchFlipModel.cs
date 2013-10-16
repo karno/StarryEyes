@@ -15,7 +15,7 @@ namespace StarryEyes.Models
 
     public enum SearchMode
     {
-        Quick,
+        CurrentTab,
         Local,
         Web,
         UserWeb,

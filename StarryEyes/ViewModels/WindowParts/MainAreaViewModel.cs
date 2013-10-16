@@ -3,9 +3,11 @@ using System.Linq;
 using System.Reactive.Linq;
 using Livet;
 using StarryEyes.Models;
-using StarryEyes.Models.Tab;
+using StarryEyes.Models.Timelines.Tabs;
 using StarryEyes.Settings;
-using StarryEyes.ViewModels.WindowParts.Timelines;
+using StarryEyes.ViewModels.Timelines;
+using StarryEyes.ViewModels.Timelines.Statuses;
+using StarryEyes.ViewModels.Timelines.Tabs;
 
 namespace StarryEyes.ViewModels.WindowParts
 {

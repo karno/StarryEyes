@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Dapper;
 using StarryEyes.Casket.Cruds.Scaffolding;
 using StarryEyes.Casket.DatabaseModels;
 
@@ -25,6 +26,16 @@ namespace StarryEyes.Casket.Cruds
                 this.CreateSql("ScreenName = @ScreenName limit 1"),
                 new { ScreenName = screenName }))
                 .SingleOrDefault();
+        }
+
+        public long GetId(string screenName)
+        {
+            using (var con = this.OpenConnection())
+            {
+                return con.Query<long>("select Id from " + TableName + " where ScreenName = @ScreenName limit 1;",
+                                new { ScreenName = screenName })
+                   .SingleOrDefault();
+            }
         }
 
         public async Task<IEnumerable<DatabaseUser>> GetUsersAsync(string partOfScreenName)

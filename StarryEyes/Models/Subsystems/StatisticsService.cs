@@ -3,8 +3,8 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using StarryEyes.Models.Stores;
-using StarryEyes.ViewModels.WindowParts.Timelines;
+using StarryEyes.Models.Databases;
+using StarryEyes.ViewModels.Timelines.Statuses;
 
 namespace StarryEyes.Models.Subsystems
 {
@@ -13,8 +13,6 @@ namespace StarryEyes.Models.Subsystems
     /// </summary>
     public static class StatisticsService
     {
-        private static DateTime _timestamp = DateTime.Now;
-
         private static readonly object StatisticsWorkProcSync = new object();
         private static volatile bool _isThreadAlive = true;
 
@@ -60,9 +58,14 @@ namespace StarryEyes.Models.Subsystems
                               Monitor.Pulse(StatisticsWorkProcSync);
                           }
                       });
-            _estimatedGrossTweetCount = StatusStore.Count;
             App.ApplicationFinalize += StopThread;
             Task.Factory.StartNew(UpdateStatisticWorkProc, TaskCreationOptions.LongRunning);
+            UpdateTweetCount();
+        }
+
+        private static async void UpdateTweetCount()
+        {
+            _estimatedGrossTweetCount = (int)(await StatusProxy.GetCountAsync());
         }
 
         private static void StopThread()
@@ -91,7 +94,7 @@ namespace StarryEyes.Models.Subsystems
                 // update statistics params
                 _currentInstanceCount = StatusViewModel.InstanceCount;
                 var previousGross = _estimatedGrossTweetCount;
-                _estimatedGrossTweetCount = StatusStore.Count;
+                UpdateTweetCount();
 
                 _currentChannel = (_currentChannel + 1) % 6;
                 _tweetsCountArray[_currentChannel] = _estimatedGrossTweetCount - previousGross;

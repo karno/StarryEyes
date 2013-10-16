@@ -15,6 +15,11 @@ namespace StarryEyes.Models.Databases
 {
     public static class StatusProxy
     {
+        public static Task<long> GetCountAsync()
+        {
+            return Database.StatusCrud.GetCountAsync();
+        }
+
         public static async Task StoreStatusAsync([NotNull] TwitterStatus status)
         {
             if (status == null) throw new ArgumentNullException("status");

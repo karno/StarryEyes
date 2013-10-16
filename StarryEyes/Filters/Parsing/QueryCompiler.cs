@@ -14,6 +14,13 @@ namespace StarryEyes.Filters.Parsing
 {
     public static class QueryCompiler
     {
+        private const string EmptyQuery = "from all where ()";
+
+        public static FilterQuery GetEmpty()
+        {
+            return Compile(EmptyQuery);
+        }
+
         public static FilterQuery Compile(string query)
         {
             try

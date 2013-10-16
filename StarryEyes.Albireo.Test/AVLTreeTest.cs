@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using StarryEyes.Albireo.Data;
+using StarryEyes.Albireo.Collections;
 
 namespace StarryEyes.Albireo.Test
 {

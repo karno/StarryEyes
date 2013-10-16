@@ -70,9 +70,10 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Data\AVLTree.cs" />
-    <Compile Include="Data\ComparableKeyValuePair.cs" />
-    <Compile Include="Data\TreeLeaf.cs" />
+    <Compile Include="Collections\AVLTree.cs" />
+    <Compile Include="Collections\ComparableKeyValuePair.cs" />
+    <Compile Include="Collections\NotifyCollection.cs" />
+    <Compile Include="Collections\TreeLeaf.cs" />
     <Compile Include="Fx\EnumerableFx.cs" />
     <Compile Include="Fx\ObservableDebugHelper.cs" />
     <Compile Include="Fx\ObservableFx.cs" />

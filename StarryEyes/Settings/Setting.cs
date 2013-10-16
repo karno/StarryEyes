@@ -9,7 +9,7 @@ using StarryEyes.Filters;
 using StarryEyes.Filters.Expressions;
 using StarryEyes.Filters.Parsing;
 using StarryEyes.Models.Accounting;
-using StarryEyes.Models.Tab;
+using StarryEyes.Models.Timelines.Tabs;
 using StarryEyes.Nightmare.Windows;
 
 namespace StarryEyes.Settings

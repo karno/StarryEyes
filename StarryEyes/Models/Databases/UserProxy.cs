@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
@@ -12,12 +13,24 @@ namespace StarryEyes.Models.Databases
 {
     public static class UserProxy
     {
+        public static long GetId(string screenName)
+        {
+            return Database.UserCrud.GetId(screenName);
+        }
+
+        public static async Task StoreUserAsync(TwitterUser user)
+        {
+            var map = Mapper.Map(user);
+            await Database.StoreUser(map.Item1, map.Item2, map.Item3);
+        }
+
         public static async Task<TwitterUser> GetUserAsync(long id)
         {
-            var u = Database.UserCrud.GetAsync(id);
+            var u = await Database.UserCrud.GetAsync(id);
+            if (u == null) return null;
             var ude = Database.UserDescriptionEntityCrud.GetEntitiesAsync(id);
             var uue = Database.UserUrlEntityCrud.GetEntitiesAsync(id);
-            return Mapper.Map(await u, await ude, await uue);
+            return Mapper.Map(u, await ude, await uue);
         }
 
         public static async Task<TwitterUser> GetUserAsync(string screenName)
@@ -29,6 +42,13 @@ namespace StarryEyes.Models.Databases
         public static async Task<IObservable<TwitterUser>> GetUsersAsync(string partOfScreenName)
         {
             return LoadUsersAsync(await Database.UserCrud.GetUsersAsync(partOfScreenName));
+        }
+
+        public static async Task<IEnumerable<Tuple<long, string>>> GetUsersFastAsync(string partOfScreenName)
+        {
+            var resp = await Database.UserCrud.GetUsersAsync(partOfScreenName);
+            return resp.Guard()
+                       .Select(d => Tuple.Create(d.Id, d.ScreenName));
         }
 
         public static IObservable<TwitterUser> LoadUsersAsync([NotNull] IEnumerable<DatabaseUser> dbusers)

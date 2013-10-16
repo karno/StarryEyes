@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models.Accounting;
-using StarryEyes.Models.Stores;
+using StarryEyes.Models.Databases;
+using StarryEyes.Models.Receiving.Handling;
 using StarryEyes.Settings;
 
 namespace StarryEyes.Models.Subsystems
@@ -23,10 +25,10 @@ namespace StarryEyes.Models.Subsystems
         {
             Setting.Accounts.Collection.ListenCollectionChanged().Subscribe(AccountsChanged);
             Setting.Accounts.Collection.ForEach(SetupAccount);
-            StatusStore.StatusPublisher
-                       .Where(d => d.IsAdded)
-                       .Select(d => d.Status)
-                       .Subscribe(PostDetected);
+            StatusBroadcaster.BroadcastPoint
+                             .Where(d => d.IsAdded)
+                             .Select(d => d.Status)
+                             .Subscribe(PostDetected);
         }
 
         private static void AccountsChanged(NotifyCollectionChangedEventArgs e)
@@ -58,7 +60,9 @@ namespace StarryEyes.Models.Subsystems
             {
                 if (_dictionary.ContainsKey(info.Id)) return;
                 _dictionary.Add(info.Id, new LinkedList<TwitterStatus>());
-                StatusStore.FindBatch(s => s.User.Id == info.Id, Setting.PostLimitPerWindow.Value)
+                StatusProxy.FetchStatuses(
+                    "UserId = " + info.Id.ToString(CultureInfo.InvariantCulture),
+                    Setting.PostLimitPerWindow.Value)
                            .Subscribe(PostDetected);
             }
         }

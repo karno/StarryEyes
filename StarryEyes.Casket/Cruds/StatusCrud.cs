@@ -63,5 +63,11 @@ namespace StarryEyes.Casket.Cruds
                 "where InReplyToStatusId is not null and" +
                 "InReplyToStatusId = @inReplyTo;", new { inReplyTo });
         }
+
+        public async Task<long> GetCountAsync()
+        {
+            return (await this.QueryAsync<long>("select count(*) from " + TableName + ";", null))
+                .Single();
+        }
     }
 }

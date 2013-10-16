@@ -4,12 +4,13 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using StarryEyes.Albireo.Data;
+using StarryEyes.Albireo.Collections;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Models;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;
+using StarryEyes.Models.Databases;
 using StarryEyes.Models.Receivers;
 using StarryEyes.Models.Receiving;
 using StarryEyes.Models.Receiving.Receivers;
@@ -66,7 +67,9 @@ namespace StarryEyes.Filters.Sources
                     {
                         var result = await account.GetListMembersAsync(
                             _listInfo.Slug, _listInfo.OwnerScreenName, cursor);
-                        memberList.AddRange(result.Result.Do(UserStore.Store).Select(u => u.Id));
+                        memberList.AddRange(result.Result
+                                                  .Do(u => UserProxy.StoreUserAsync(u))
+                                                  .Select(u => u.Id));
                         cursor = result.NextCursor;
                     } while (cursor != 0);
                     if (memberList.Count <= 0) return;

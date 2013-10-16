@@ -23,13 +23,15 @@ using StarryEyes.Helpers;
 using StarryEyes.Models;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents.PostEvents;
+using StarryEyes.Models.Databases;
 using StarryEyes.Models.Requests;
 using StarryEyes.Models.Stores;
 using StarryEyes.Models.Subsystems;
+using StarryEyes.Models.Timelines.Statuses;
 using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
+using StarryEyes.ViewModels.Timelines.Statuses;
 using StarryEyes.ViewModels.WindowParts.Flips;
-using StarryEyes.ViewModels.WindowParts.Timelines;
 using StarryEyes.Views.Controls;
 using StarryEyes.Views.Messaging;
 
@@ -1281,15 +1283,13 @@ namespace StarryEyes.ViewModels.WindowParts
             return false;
         }
 
-        private void AddUserItems(string key)
+        private async Task AddUserItems(string key)
         {
-            UserStore.GetScreenNameResolverTable()
-                     .Select(s => s.Key)
-                     .Where(s => key.IsNullOrEmpty() ||
-                                 s.IndexOf(key, StringComparison.CurrentCultureIgnoreCase) >= 0)
-                     .OrderBy(_ => _)
-                     .Select(s => new SuggestItemViewModel("@" + s))
-                     .ForEach(s => _items.Add(s));
+            (await UserProxy.GetUsersFastAsync(key))
+                .Select(t => t.Item2)
+                .OrderBy(_ => _)
+                .Select(s => new SuggestItemViewModel("@" + s))
+                .ForEach(s => _items.Add(s));
         }
 
         private void AddHashItems(string key)

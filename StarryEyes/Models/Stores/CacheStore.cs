@@ -7,21 +7,18 @@ using System.Reactive.Linq;
 using StarryEyes.Albireo;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models.Receivers;
+using StarryEyes.Models.Receiving.Handling;
 
 namespace StarryEyes.Models.Stores
 {
     public static class CacheStore
     {
-        static CacheStore()
-        {
-            StatusStore.StatusPublisher
-                       .Where(s => s.IsAdded)
-                       .Select(s => s.Status)
-                       .Subscribe(RegisterStatus);
-        }
-
         public static void Initialize()
         {
+            StatusBroadcaster.BroadcastPoint
+                             .Where(n => n.IsAdded)
+                             .Select(n => n.Status)
+                             .Subscribe(RegisterStatus);
             try
             {
                 lock (_hashtagCache)

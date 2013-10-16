@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using StarryEyes.Albireo.Data;
+using StarryEyes.Albireo.Collections;
 using StarryEyes.Models.Databases;
 
 namespace StarryEyes.Models.Accounting

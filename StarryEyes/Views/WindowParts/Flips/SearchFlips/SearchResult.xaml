@@ -6,7 +6,7 @@
              xmlns:ei="clr-namespace:Microsoft.Expression.Interactivity.Core;assembly=Microsoft.Expression.Interactions"
              xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:searchFlips="clr-namespace:StarryEyes.ViewModels.WindowParts.Flips.SearchFlips"
+             xmlns:searchFlips="clr-namespace:StarryEyes.ViewModels.Timelines.SearchFlips"
              d:DataContext="{d:DesignInstance searchFlips:SearchResultViewModel}"
              d:DesignHeight="300"
              d:DesignWidth="300"

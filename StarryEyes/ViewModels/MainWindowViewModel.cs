@@ -8,7 +8,7 @@ using Livet.Messaging;
 using StarryEyes.Filters.Expressions;
 using StarryEyes.Models;
 using StarryEyes.Models.Subsystems;
-using StarryEyes.Models.Tab;
+using StarryEyes.Models.Timelines.Tabs;
 using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
 using StarryEyes.ViewModels.Dialogs;
@@ -147,7 +147,7 @@ namespace StarryEyes.ViewModels
                     SearchFlipViewModel.FocusToSearchBox();
                     break;
                 case FocusRequest.Timeline:
-                    TabManager.CurrentFocusTab.SetPhysicalFocus();
+                    TabManager.CurrentFocusTab.RequestFocus();
                     SearchFlipViewModel.Close();
                     break;
                 case FocusRequest.Input:

@@ -2,7 +2,7 @@
 using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;
-using StarryEyes.Models.Stores;
+using StarryEyes.Models.Databases;
 using StarryEyes.Settings;
 
 namespace StarryEyes.Models.Receiving.Receivers
@@ -28,7 +28,7 @@ namespace StarryEyes.Models.Receiving.Receivers
                 var user = await this._account.ShowUserAsync(this._account.Id);
                 this._account.UnreliableScreenName = user.ScreenName;
                 this._account.UnreliableProfileImage = user.ProfileImageUri;
-                UserStore.Store(user);
+                await UserProxy.StoreUserAsync(user);
             }
             catch (Exception ex)
             {

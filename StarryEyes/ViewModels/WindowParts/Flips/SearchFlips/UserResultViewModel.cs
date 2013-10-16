@@ -10,7 +10,7 @@ using StarryEyes.Models;
 using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
-using StarryEyes.ViewModels.WindowParts.Timelines;
+using StarryEyes.ViewModels.Timelines.Statuses;
 using StarryEyes.Views.Messaging;
 
 namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips

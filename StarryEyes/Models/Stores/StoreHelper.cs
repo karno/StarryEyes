@@ -3,6 +3,8 @@ using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
+using StarryEyes.Models.Databases;
+using StarryEyes.Models.Receiving.Handling;
 using StarryEyes.Settings;
 
 namespace StarryEyes.Models.Stores
@@ -12,40 +14,34 @@ namespace StarryEyes.Models.Stores
     /// </summary>
     public static class StoreHelper
     {
-        [Obsolete]
-        public static IObservable<TwitterStatus> NotifyAndMergeStore(TwitterStatus status)
-        {
-            return StatusStore.Get(status.Id)
-                              .ConcatIfEmpty(() =>
-                              {
-                                  StatusStore.Store(status);
-                                  return Observable.Return(status);
-                              });
-        }
-
         public static IObservable<TwitterStatus> GetTweet(long id)
         {
-            return StatusStore.Get(id)
+            return StatusProxy.GetStatusAsync(id)
+                              .ToObservable()
                               .Where(_ => _ != null)
-                              .ConcatIfEmpty(() => Setting.Accounts.GetRandomOne().ShowTweetAsync(id).ToObservable()
-                                                          .Do(s => StatusStore.Store(s, false)));
+                              .ConcatIfEmpty(() =>
+                                             Setting.Accounts.GetRandomOne().ShowTweetAsync(id).ToObservable()
+                                                    .Do(StatusInbox.Queue));
         }
 
         public static IObservable<TwitterUser> GetUser(long id)
         {
-            return UserStore.Get(id)
+            return UserProxy.GetUserAsync(id)
+                            .ToObservable()
                             .Where(_ => _ != null)
                             .ConcatIfEmpty(() =>
                                            Setting.Accounts.GetRandomOne().ShowUserAsync(id).ToObservable()
-                                                  .Do(UserStore.Store));
+                                                  .Do(u => UserProxy.StoreUserAsync(u)));
         }
 
         public static IObservable<TwitterUser> GetUser(string screenName)
         {
-            return UserStore.Get(screenName)
+            return UserProxy.GetUserAsync(screenName)
+                            .ToObservable()
                             .Where(_ => _ != null)
-                            .ConcatIfEmpty(() => Setting.Accounts.GetRandomOne().ShowUserAsync(screenName).ToObservable()
-                                                        .Do(UserStore.Store));
+                            .ConcatIfEmpty(
+                                () => Setting.Accounts.GetRandomOne().ShowUserAsync(screenName).ToObservable()
+                                             .Do(u => UserProxy.StoreUserAsync(u)));
         }
     }
 }

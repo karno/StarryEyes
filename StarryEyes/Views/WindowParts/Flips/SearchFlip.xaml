@@ -359,7 +359,7 @@
                         <Style TargetType="Grid">
                             <Setter Property="Background" Value="Transparent" />
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding SearchMode}" Value="Quick">
+                                <DataTrigger Binding="{Binding SearchMode}" Value="CurrentTab">
                                     <Setter Property="Background" Value="#FF5C83C2" />
                                 </DataTrigger>
                             </Style.Triggers>
@@ -375,7 +375,7 @@
                         </TextBlock.ToolTip>
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="MouseLeftButtonDown">
-                                <ei:CallMethodAction MethodName="SetQuickSearch" TargetObject="{Binding}" />
+                                <ei:CallMethodAction MethodName="SetLocalTabSearch" TargetObject="{Binding}" />
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
                     </TextBlock>
@@ -520,7 +520,8 @@
                         <ControlTemplate>
                             <ScrollViewer x:Name="ScrollViewer"
                                           Padding="{TemplateBinding Padding}"
-                                          VerticalScrollBarVisibility="Auto" Style="{StaticResource TouchScrollViewerStyle}">
+                                          Style="{StaticResource TouchScrollViewerStyle}"
+                                          VerticalScrollBarVisibility="Auto">
                                 <ItemsPresenter />
                             </ScrollViewer>
                         </ControlTemplate>

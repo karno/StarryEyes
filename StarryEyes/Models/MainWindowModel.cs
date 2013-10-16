@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Reactive;
 using System.Reactive.Disposables;
+using System.Reactive.Subjects;
 using StarryEyes.Filters.Expressions;
 using StarryEyes.Models.Accounting;
-using StarryEyes.Models.Tab;
+using StarryEyes.Models.Timelines.Tabs;
 using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
 
@@ -143,12 +145,14 @@ namespace StarryEyes.Models
             }
         }
 
-        public static event Action<TabModel> TabModelConfigureRaised;
+        public static event Action<Tuple<TabModel, ISubject<Unit>>> TabModelConfigureRaised;
 
-        public static void ShowTabConfigure(TabModel model)
+        public static IObservable<Unit> ShowTabConfigure(TabModel model)
         {
+            var notifier = new Subject<Unit>();
             var handler = TabModelConfigureRaised;
-            if (handler != null) handler(model);
+            if (handler != null) handler(Tuple.Create(model, (ISubject<Unit>)notifier));
+            return notifier;
         }
 
         public static event Action<bool> BackstageTransitionRequested;

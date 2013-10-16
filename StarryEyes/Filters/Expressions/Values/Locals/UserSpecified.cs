@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using StarryEyes.Albireo.Data;
+using StarryEyes.Albireo.Collections;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Databases;
-using StarryEyes.Models.Stores;
 using StarryEyes.Settings;
 
 namespace StarryEyes.Filters.Expressions.Values.Locals
@@ -29,7 +28,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
                              .FirstOrDefault();
             if (_userId == 0)
             {
-                _userId = UserStore.GetId(screenName);
+                _userId = UserProxy.GetId(screenName);
             }
             else
             {

@@ -6,7 +6,7 @@ using StarryEyes.Models.Backstages;
 using StarryEyes.Models.Receiving.Receivers;
 using StarryEyes.Models.Subsystems;
 using StarryEyes.Settings;
-using StarryEyes.ViewModels.WindowParts.Timelines;
+using StarryEyes.ViewModels.Timelines.Statuses;
 
 namespace StarryEyes.ViewModels.WindowParts.Backstages
 {

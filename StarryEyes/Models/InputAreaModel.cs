@@ -10,9 +10,10 @@ using System.Windows.Media.Imaging;
 using Livet;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models.Accounting;
+using StarryEyes.Models.Receiving.Handling;
 using StarryEyes.Models.Requests;
-using StarryEyes.Models.Stores;
-using StarryEyes.Models.Tab;
+using StarryEyes.Models.Timelines.Statuses;
+using StarryEyes.Models.Timelines.Tabs;
 using StarryEyes.Settings;
 
 namespace StarryEyes.Models
@@ -44,27 +45,27 @@ namespace StarryEyes.Models
                         __.NewItems
                           .OfType<TwitterAccount>()
                           .Select(i => i.Id)
-                          .ForEach(_currentFocusTabModel.BindingAccountIds.Add);
+                          .ForEach(_currentFocusTabModel.BindingAccounts.Add);
                         break;
                     case NotifyCollectionChangedAction.Remove:
                         __.OldItems
                           .OfType<TwitterAccount>()
-                          .ForEach(i => _currentFocusTabModel.BindingAccountIds.Remove(i.Id));
+                          .ForEach(i => _currentFocusTabModel.BindingAccounts.Remove(i.Id));
                         break;
                     case NotifyCollectionChangedAction.Replace:
                         __.OldItems
                           .OfType<TwitterAccount>()
-                          .ForEach(i => _currentFocusTabModel.BindingAccountIds.Remove(i.Id));
+                          .ForEach(i => _currentFocusTabModel.BindingAccounts.Remove(i.Id));
                         __.NewItems
                           .OfType<TwitterAccount>()
                           .Select(i => i.Id)
-                          .ForEach(_currentFocusTabModel.BindingAccountIds.Add);
+                          .ForEach(_currentFocusTabModel.BindingAccounts.Add);
                         break;
                     case NotifyCollectionChangedAction.Reset:
-                        _currentFocusTabModel.BindingAccountIds.Clear();
+                        _currentFocusTabModel.BindingAccounts.Clear();
                         _bindingAccounts
                             .Select(i => i.Id)
-                            .ForEach(_currentFocusTabModel.BindingAccountIds.Add);
+                            .ForEach(_currentFocusTabModel.BindingAccounts.Add);
                         break;
                 }
             };
@@ -96,10 +97,10 @@ namespace StarryEyes.Models
         {
             if (_currentFocusTabModel == tabModel) return;
             _currentFocusTabModel = null;
-            if (!_bindingAccounts.Select(a => a.Id).SequenceEqual(tabModel.BindingAccountIds))
+            if (!_bindingAccounts.Select(a => a.Id).SequenceEqual(tabModel.BindingAccounts))
             {
                 _bindingAccounts.Clear();
-                tabModel.BindingAccountIds
+                tabModel.BindingAccounts
                         .Select(Setting.Accounts.Get)
                         .Where(_ => _ != null)
                         .ForEach(_bindingAccounts.Add);
@@ -284,43 +285,43 @@ namespace StarryEyes.Models
                               : new TweetPostingRequest(Text, InReplyTo != null ? InReplyTo.Status : null,
                                                         AttachedGeoInfo, AttachedImage);
             this._accounts.ToObservable()
-                      .SelectMany(account => RequestQueue.Enqueue(account, request)
-                                                         .SelectMany(StoreHelper.NotifyAndMergeStore)
-                                                         .Select(_ => new PostResult(account, _))
-                                                         .Catch(
-                                                             (Exception ex) =>
-                                                             Observable.Return(new PostResult(account, ex))))
-                      .Subscribe(postResults.Add,
-                                 () =>
-                                 {
-                                     // ReSharper disable AccessToDisposedClosure
-                                     postResults.GroupBy(_ => _.IsSucceeded)
-                                                .ForEach(_ =>
-                                                {
-                                                    if (_.Key)
-                                                    {
-                                                        var ret = Clone();
-                                                        ret.Accounts = _.Select(pr => pr.Account).ToArray();
-                                                        ret.PostedTweets =
-                                                            _.Select(pr => Tuple.Create(pr.Account, pr.Status))
-                                                             .ToArray();
-                                                        subject.OnNext(ret);
-                                                    }
-                                                    else
-                                                    {
-                                                        _.ForEach(pr =>
-                                                        {
-                                                            var ret = Clone();
-                                                            ret.Accounts = new[] { pr.Account };
-                                                            ret.ThrownException = pr.ThrownException;
-                                                            subject.OnNext(ret);
-                                                        });
-                                                    }
-                                                });
-                                     // ReSharper restore AccessToDisposedClosure
-                                     subject.OnCompleted();
-                                     subject.Dispose();
-                                 });
+                .SelectMany(account => RequestQueue.Enqueue(account, request)
+                                                   .Do(StatusInbox.Queue)
+                                                   .Select(_ => new PostResult(account, _))
+                                                   .Catch(
+                                                       (Exception ex) =>
+                                                       Observable.Return(new PostResult(account, ex))))
+                .Subscribe(postResults.Add,
+                           () =>
+                           {
+                               // ReSharper disable AccessToDisposedClosure
+                               postResults.GroupBy(_ => _.IsSucceeded)
+                                          .ForEach(_ =>
+                                          {
+                                              if (_.Key)
+                                              {
+                                                  var ret = Clone();
+                                                  ret.Accounts = _.Select(pr => pr.Account).ToArray();
+                                                  ret.PostedTweets =
+                                                      _.Select(pr => Tuple.Create(pr.Account, pr.Status))
+                                                       .ToArray();
+                                                  subject.OnNext(ret);
+                                              }
+                                              else
+                                              {
+                                                  _.ForEach(pr =>
+                                                  {
+                                                      var ret = Clone();
+                                                      ret.Accounts = new[] { pr.Account };
+                                                      ret.ThrownException = pr.ThrownException;
+                                                      subject.OnNext(ret);
+                                                  });
+                                              }
+                                          });
+                               // ReSharper restore AccessToDisposedClosure
+                               subject.OnCompleted();
+                               subject.Dispose();
+                           });
             return subject;
         }
 

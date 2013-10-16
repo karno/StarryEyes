@@ -6,7 +6,7 @@ using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Models;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;
-using StarryEyes.Models.Tab;
+using StarryEyes.Models.Timelines.Tabs;
 using StarryEyes.Settings;
 
 namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
@@ -71,9 +71,9 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             // update current binding accounts
             var ctab = TabManager.CurrentFocusTab;
             long cid = 0;
-            if (ctab != null && ctab.BindingAccountIds.Count == 1)
+            if (ctab != null && ctab.BindingAccounts.Count == 1)
             {
-                cid = ctab.BindingAccountIds.First();
+                cid = ctab.BindingAccounts.First();
             }
             if (this._currentId == cid) return;
             this._currentId = cid;

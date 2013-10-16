@@ -9,9 +9,11 @@ using Livet.Commands;
 using StarryEyes.Anomaly.Utils;
 using StarryEyes.Models;
 using StarryEyes.Models.Stores;
+using StarryEyes.Models.Timelines.SearchFlips;
 using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
-using StarryEyes.ViewModels.WindowParts.Timelines;
+using StarryEyes.ViewModels.Timelines.SearchFlips;
+using StarryEyes.ViewModels.Timelines.Statuses;
 using StarryEyes.Views.Messaging;
 using StarryEyes.Views.Utils;
 
@@ -21,8 +23,8 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
     {
         private readonly SearchFlipViewModel _parent;
         private readonly string _screenName;
-        private UserStatusesViewModel _statuses;
-        private UserFavoritesViewModel _favorites;
+        private UserTimelineViewModel _statuses;
+        private UserTimelineViewModel _favorites;
         private UserFollowingViewModel _following;
         private UserFollowersViewModel _followers;
         private bool _communicating = true;
@@ -88,12 +90,12 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             get { return User != null; }
         }
 
-        public UserStatusesViewModel Statuses
+        public UserTimelineViewModel Statuses
         {
             get { return this._statuses; }
         }
 
-        public UserFavoritesViewModel Favorites
+        public UserTimelineViewModel Favorites
         {
             get { return this._favorites; }
         }
@@ -142,7 +144,8 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                                   {
                                       User = new UserViewModel(user);
                                       var ps = this._statuses;
-                                      this._statuses = new UserStatusesViewModel(this);
+                                      var usm = new UserTimelineModel(user.Id, TimelineType.User);
+                                      this._statuses = new UserTimelineViewModel(this, usm);
                                       this.RaisePropertyChanged(() => Statuses);
                                       cd.Add(_statuses);
                                       if (ps != null)
@@ -150,7 +153,8 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                                           ps.Dispose();
                                       }
                                       var pf = this._favorites;
-                                      this._favorites = new UserFavoritesViewModel(this);
+                                      var ufm = new UserTimelineModel(user.Id, TimelineType.Favorites);
+                                      this._favorites = new UserTimelineViewModel(this, ufm);
                                       this.RaisePropertyChanged(() => Favorites);
                                       cd.Add(_favorites);
                                       if (pf != null)

@@ -11,10 +11,10 @@
              xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"
              xmlns:mbehaviors="clr-namespace:StarryEyes.Views.Messaging.Behaviors"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:timelines="clr-namespace:StarryEyes.ViewModels.WindowParts.Timelines"
              xmlns:utils="clr-namespace:StarryEyes.Views.Utils"
+             xmlns:tabs2="clr-namespace:StarryEyes.ViewModels.Timelines.Tabs"
              x:Name="userControl"
-             d:DataContext="{d:DesignInstance Type={x:Type timelines:TabViewModel}}"
+             d:DataContext="{d:DesignInstance Type={x:Type tabs2:TabViewModel}}"
              d:DesignHeight="300"
              d:DesignWidth="300"
              mc:Ignorable="d">
@@ -1581,12 +1581,12 @@
                 <l:InteractionMessageTrigger Messenger="{Binding Messenger, Mode=OneTime}">
                     <mbehaviors:TaskDialogInteractionMessageAction />
                 </l:InteractionMessageTrigger>
-                <l:InteractionMessageTrigger MessageKey="SetPhysicalFocus" Messenger="{Binding Messenger, Mode=OneWay}">
+                <l:InteractionMessageTrigger MessageKey="SetFocus" Messenger="{Binding Messenger, Mode=OneWay}">
                     <l:SetFocusAction />
                 </l:InteractionMessageTrigger>
                 <i:EventTrigger EventName="MouseDown">
                     <l:SetFocusAction />
-                    <ei:CallMethodAction MethodName="GotPhysicalFocus" TargetObject="{Binding}" />
+                    <ei:CallMethodAction MethodName="GotFocus" TargetObject="{Binding}" />
                 </i:EventTrigger>
             </i:Interaction.Triggers>
             <ItemsControl.ItemsPanel>

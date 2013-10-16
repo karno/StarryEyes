@@ -45,7 +45,7 @@ namespace StarryEyes.Models.Databases
         {
             if (string.IsNullOrEmpty(left)) return right;
             if (string.IsNullOrEmpty(right)) return left;
-            return left + " and " + right;
+            return "(" + left + ") and (" + right + ")";
         }
     }
 }
