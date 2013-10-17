@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
   <metadata>
     <id>AsyncOAuth</id>
-    <version>0.8.2</version>
+    <version>0.8.3</version>
     <title>AsyncOAuth</title>
     <authors>neuecc</authors>
     <owners>neuecc</owners>

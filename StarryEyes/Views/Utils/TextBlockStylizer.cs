@@ -121,6 +121,7 @@ namespace StarryEyes.Views.Utils
 
         private static IEnumerable<Inline> GenerateInlines(DependencyObject obj, string text, IEnumerable<TwitterEntity> entities)
         {
+            text = text ?? String.Empty;
             if (entities == null)
             {
                 foreach (var inline in GenerateInlines(obj, text))
