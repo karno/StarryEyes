@@ -203,7 +203,6 @@ namespace StarryEyes
             { }
         }
 
-        private static int _observedDpxCount;
         private void HandleException(Exception ex)
         {
             try

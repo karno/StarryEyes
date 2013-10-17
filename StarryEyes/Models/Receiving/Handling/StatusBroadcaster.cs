@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Reactive.Subjects;
 using System.Threading;
 using StarryEyes.Annotations;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models.Subsystems;
 
 namespace StarryEyes.Models.Receiving.Handling
@@ -38,10 +39,17 @@ namespace StarryEyes.Models.Receiving.Handling
             _pumpThread.Start();
         }
 
-        public static void Queue([NotNull] StatusNotification status)
+        internal static void Queue([NotNull] StatusNotification status)
         {
             if (status == null) throw new ArgumentNullException("status");
             _queue.Enqueue(status);
+            _signal.Set();
+        }
+
+        public static void Republish([NotNull] TwitterStatus status)
+        {
+            if (status == null) throw new ArgumentNullException("status");
+            _queue.Enqueue(new StatusNotification(status, true, false));
             _signal.Set();
         }
 
@@ -61,13 +69,19 @@ namespace StarryEyes.Models.Receiving.Handling
                             System.Diagnostics.Debug.WriteLine("MUTE OR BLOCK CAPTURE: " + status);
                             continue;
                         }
-                        NotificationService.NotifyReceived(status.Status);
-                        NotificationService.StartAcceptNewArrival(status.Status);
+                        if (status.IsNew)
+                        {
+                            NotificationService.NotifyReceived(status.Status);
+                            NotificationService.StartAcceptNewArrival(status.Status);
+                        }
                     }
                     _broadcastSubject.OnNext(status);
                     if (status.IsAdded)
                     {
-                        NotificationService.EndAcceptNewArrival(status.Status);
+                        if (status.IsNew)
+                        {
+                            NotificationService.EndAcceptNewArrival(status.Status);
+                        }
                     }
                     else
                     {

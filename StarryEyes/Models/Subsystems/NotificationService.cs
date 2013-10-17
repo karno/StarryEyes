@@ -8,6 +8,7 @@ using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Filters;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Databases;
+using StarryEyes.Models.Receiving.Handling;
 using StarryEyes.Models.Subsystems.Notifications;
 using StarryEyes.Models.Timelines.Statuses;
 using StarryEyes.Models.Timelines.Tabs;
@@ -134,7 +135,11 @@ namespace StarryEyes.Models.Subsystems
             Task.Run(() => StatusModel.UpdateStatusInfo(
                 status.Id,
                 model => model.AddFavoritedUser(source),
-                async _ => await StatusProxy.AddFavoritorAsync(status.Id, source.Id)));
+                async _ =>
+                {
+                    await StatusProxy.AddFavoritorAsync(status.Id, source.Id);
+                    StatusBroadcaster.Republish(status);
+                }));
             Head.NotifyFavorited(source, status);
         }
 
@@ -143,7 +148,11 @@ namespace StarryEyes.Models.Subsystems
             Task.Run(() => StatusModel.UpdateStatusInfo(
                 status.Id,
                 model => model.RemoveFavoritedUser(source.Id),
-                async _ => await StatusProxy.RemoveFavoritorAsync(status.Id, source.Id)));
+                async _ =>
+                {
+                    await StatusProxy.RemoveFavoritorAsync(status.Id, source.Id);
+                    StatusBroadcaster.Republish(status);
+                }));
             Head.NotifyUnfavorited(source, status);
         }
 
@@ -153,8 +162,11 @@ namespace StarryEyes.Models.Subsystems
             Task.Run(() => StatusModel.UpdateStatusInfo(
                 status.Id,
                 model => model.AddRetweetedUser(source),
-                async _ => await StatusProxy.AddRetweeterAsync(status.Id, source.Id)));
-
+                async _ =>
+                {
+                    await StatusProxy.AddRetweeterAsync(status.Id, source.Id);
+                    StatusBroadcaster.Republish(status);
+                }));
             Head.NotifyRetweeted(source, status);
         }
 

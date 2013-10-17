@@ -13,6 +13,7 @@ using StarryEyes.Anomaly.Imaging;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Databases;
+using StarryEyes.Models.Receiving.Handling;
 using StarryEyes.Models.Stores;
 using StarryEyes.Settings;
 
@@ -335,7 +336,7 @@ namespace StarryEyes.Models.Timelines.Statuses
                     this._favoritedUsers.Add(user);
 #pragma warning disable 4014
                     StatusProxy.AddFavoritorAsync(this.Status.Id, user.Id);
-                    UserProxy.StoreUserAsync(user);
+                    StatusBroadcaster.Republish(this.Status);
 #pragma warning restore 4014
                 }
             }
@@ -364,6 +365,7 @@ namespace StarryEyes.Models.Timelines.Statuses
                     this._favoritedUsers.Remove(remove);
 #pragma warning disable 4014
                     StatusProxy.RemoveFavoritorAsync(this.Status.Id, userId);
+                    StatusBroadcaster.Republish(this.Status);
 #pragma warning restore 4014
                 }
             }
@@ -401,7 +403,7 @@ namespace StarryEyes.Models.Timelines.Statuses
                     this._retweetedUsers.Add(user);
 #pragma warning disable 4014
                     StatusProxy.AddRetweeterAsync(this.Status.Id, user.Id);
-                    UserProxy.StoreUserAsync(user);
+                    StatusBroadcaster.Republish(this.Status);
 #pragma warning restore 4014
                 }
             }
@@ -431,6 +433,7 @@ namespace StarryEyes.Models.Timelines.Statuses
                     // update persistent info
 #pragma warning disable 4014
                     StatusProxy.RemoveRetweeterAsync(this.Status.Id, userId);
+                    StatusBroadcaster.Republish(this.Status);
 #pragma warning restore 4014
                 }
             }

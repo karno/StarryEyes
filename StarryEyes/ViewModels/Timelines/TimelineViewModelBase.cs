@@ -7,6 +7,7 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 using Livet;
+using Livet.EventListeners;
 using StarryEyes.Models;
 using StarryEyes.Models.Timelines;
 using StarryEyes.Models.Timelines.Statuses;
@@ -282,16 +283,16 @@ namespace StarryEyes.ViewModels.Timelines
             this._model = model;
             this._timeline = new ObservableCollection<StatusViewModel>();
             DispatcherHolder.Enqueue(this.InitializeCollection, DispatcherPriority.Background);
-            Task.Run(async () =>
-            {
-                this.IsLoading = true;
-                await this._model.InvalidateTimeline();
-                this.IsLoading = false;
-            });
+            this.CompositeDisposable.Add(
+                new EventListener<Action<bool>>(
+                    h => model.InvalidationStateChanged += h,
+                    h => model.InvalidationStateChanged -= h,
+                    s => this.IsLoading = s));
             this.CompositeDisposable.Add(() =>
             {
                 if (_listener != null) _listener.Dispose();
             });
+            this._model.QueueInvalidateTimeline();
         }
 
         private IDisposable _listener = null;

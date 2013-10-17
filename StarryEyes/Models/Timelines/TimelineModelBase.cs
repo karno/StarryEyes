@@ -28,6 +28,14 @@ namespace StarryEyes.Models.Timelines
         private readonly AVLTree<long> _statusIdCache;
         private readonly ObservableSynchronizedCollectionEx<StatusModel> _statuses;
 
+        public event Action<bool> InvalidationStateChanged;
+
+        protected virtual void OnInvalidationStateChanged(bool obj)
+        {
+            var handler = this.InvalidationStateChanged;
+            if (handler != null) handler(obj);
+        }
+
         public ObservableSynchronizedCollectionEx<StatusModel> Statuses
         {
             get { return this._statuses; }
@@ -199,7 +207,8 @@ namespace StarryEyes.Models.Timelines
 
         private const int InvalidateSec = 2;
         private int _invlatch;
-        protected void QueueInvalidateTimeline()
+
+        internal void QueueInvalidateTimeline()
         {
             var stamp = Interlocked.Increment(ref this._invlatch);
             Observable.Timer(TimeSpan.FromSeconds(InvalidateSec))
@@ -212,21 +221,22 @@ namespace StarryEyes.Models.Timelines
                       });
         }
 
-        public Task InvalidateTimeline()
+        public void InvalidateTimeline()
         {
-            return Task.Run(async () =>
+            Task.Run(async () =>
             {
+                this.OnInvalidationStateChanged(true);
                 this.PreInvalidateTimeline();
                 // invalidate and fetch statuses
                 lock (this._statusIdCache)
                 {
-                    System.Diagnostics.Debug.WriteLine("*** Invalidate! ***");
                     this._statusIdCache.Clear();
                     this.Statuses.Clear();
                 }
                 await this.Fetch(null, TimelineChunkCount)
                           .Do(s => this.AcceptStatus(new StatusNotification(s)))
                           .LastOrDefaultAsync();
+                this.OnInvalidationStateChanged(false);
             });
         }
 
