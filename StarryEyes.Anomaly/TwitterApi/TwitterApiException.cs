@@ -66,11 +66,25 @@ namespace StarryEyes.Anomaly.TwitterApi
             WebException thrownWex;
             try
             {
-                return await base.SendAsync(request, cancellationToken);
+                var resp = await base.SendAsync(request, cancellationToken);
+                return resp.EnsureSuccessStatusCode();
+            }
+            catch (HttpRequestException hex)
+            {
+                thrownWex = hex.InnerException as WebException;
+                if (thrownWex == null)
+                {
+                    throw;
+                }
             }
             catch (WebException wex)
             {
                 thrownWex = wex;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("$ THROWN: " + ex);
+                throw;
             }
             throw await TwitterApiException.Convert(thrownWex);
         }
