@@ -170,7 +170,7 @@ namespace StarryEyes.Models.Databases
             }
             if (count != null)
             {
-                sql += " limit " + count.Value.ToString(CultureInfo.InvariantCulture);
+                sql += " order by Id desc limit " + count.Value.ToString(CultureInfo.InvariantCulture);
             }
             sql = "select * from status" + sql + ";";
             return Database.StatusCrud.FetchAsync(sql)
