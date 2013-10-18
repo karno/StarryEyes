@@ -149,6 +149,7 @@ namespace StarryEyes.ViewModels.Timelines
                     .ObserveOnDispatcher()
                     .Select(_ => this.CurrentAccounts.ToArray())
                     .Subscribe(a => _timeline.ForEach(s => s.BindingAccounts = a)));
+            this.IsLoading = true;
             this._model.InvalidateTimeline();
         }
 
@@ -237,7 +238,7 @@ namespace StarryEyes.ViewModels.Timelines
             TabManager.CreateTab(TabModel.Create(
                 "extracted",
                 "from all where " +
-                users.Select(u => "user == \"^" + u + "$\"")
+                users.Select(u => "user == \"" + u + "\"")
                      .JoinString("||")));
             DeselectAll();
         }
