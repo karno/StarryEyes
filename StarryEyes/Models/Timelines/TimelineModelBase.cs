@@ -227,19 +227,25 @@ namespace StarryEyes.Models.Timelines
             Interlocked.Increment(ref this._invlatch);
             Task.Run(async () =>
             {
-                this.OnInvalidationStateChanged(true);
-                this.PreInvalidateTimeline();
-                // invalidate and fetch statuses
-                lock (this._statusIdCache)
+                try
                 {
-                    this._statusIdCache.Clear();
-                    this.Statuses.Clear();
+                    this.OnInvalidationStateChanged(true);
+                    this.PreInvalidateTimeline();
+                    // invalidate and fetch statuses
+                    lock (this._statusIdCache)
+                    {
+                        this._statusIdCache.Clear();
+                        this.Statuses.Clear();
+                    }
+                    await this.Fetch(null, TimelineChunkCount)
+                              .Where(this.CheckAcceptStatus)
+                              .SelectMany(s => this.AddStatus(s, false).ToObservable())
+                              .LastOrDefaultAsync();
                 }
-                await this.Fetch(null, TimelineChunkCount)
-                          .Where(this.CheckAcceptStatus)
-                          .SelectMany(s => this.AddStatus(s, false).ToObservable())
-                          .LastOrDefaultAsync();
-                this.OnInvalidationStateChanged(false);
+                finally
+                {
+                    this.OnInvalidationStateChanged(false);
+                }
             });
         }
 

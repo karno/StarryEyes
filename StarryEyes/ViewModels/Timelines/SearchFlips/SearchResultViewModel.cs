@@ -47,6 +47,7 @@ namespace StarryEyes.ViewModels.Timelines.SearchFlips
         public void Close()
         {
             MainAreaViewModel.TimelineActionTargetOverride = null;
+            this._model.Dispose();
             this._parent.RewindStack();
         }
 
@@ -54,6 +55,15 @@ namespace StarryEyes.ViewModels.Timelines.SearchFlips
         {
             TabManager.CreateTab(TabModel.Create(Query, _model.CreateFilterQuery()));
             Close();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+            if (disposing)
+            {
+                this._model.Dispose();
+            }
         }
     }
 }

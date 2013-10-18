@@ -22,7 +22,13 @@ namespace StarryEyes.Filters.Sources
                 throw new ArgumentException("argument must be numeric value.");
             }
             this._original = id;
-            this.TraceBackConversations(id);
+            _statuses.Add(id);
+        }
+
+        public override void Activate()
+        {
+            base.Activate();
+            this.TraceBackConversations(this._original);
         }
 
         private async void TraceBackConversations(long origin)
@@ -73,6 +79,7 @@ namespace StarryEyes.Filters.Sources
             {
                 ids = _statuses.ToArray();
             }
+            System.Diagnostics.Debug.WriteLine("sql: " + "Id IN (" + ids.Select(i => i.ToString(CultureInfo.InvariantCulture)).JoinString(",") + ")");
             return "Id IN (" + ids.Select(i => i.ToString(CultureInfo.InvariantCulture)).JoinString(",") + ")";
         }
 

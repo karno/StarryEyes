@@ -11,11 +11,13 @@ namespace StarryEyes.ViewModels.Timelines.SearchFlips
     public class UserTimelineViewModel : TimelineViewModelBase
     {
         private readonly UserInfoViewModel _parent;
+        private readonly UserTimelineModel _model;
 
         public UserTimelineViewModel(UserInfoViewModel parent, UserTimelineModel model)
             : base(model)
         {
             _parent = parent;
+            _model = model;
         }
 
         protected override IEnumerable<long> CurrentAccounts
@@ -41,6 +43,15 @@ namespace StarryEyes.ViewModels.Timelines.SearchFlips
         {
             TabManager.CreateTab(TabModel.Create(
                 _parent.ScreenName, "from local where user == \"" + _parent.ScreenName + "\""));
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+            if (disposing)
+            {
+                _model.Dispose();
+            }
         }
     }
 }

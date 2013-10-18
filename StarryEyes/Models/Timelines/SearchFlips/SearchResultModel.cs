@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Linq;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using System.Threading;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Anomaly.Utils;
+using StarryEyes.Filters;
 using StarryEyes.Filters.Expressions;
 using StarryEyes.Filters.Parsing;
 using StarryEyes.Models.Databases;
@@ -32,10 +36,17 @@ namespace StarryEyes.Models.Timelines.SearchFlips
             {
                 this.IsSubscribeBroadcaster = true;
             }
+            this.PrepareFilter();
         }
 
-        protected override void PreInvalidateTimeline()
+        private void PrepareFilter()
         {
+            var disposable = new CompositeDisposable();
+            var prev = Interlocked.Exchange(ref _previousFilterListener, disposable);
+            if (prev != null)
+            {
+                prev.Dispose();
+            }
             switch (this._option)
             {
                 case SearchOption.Web:
@@ -45,11 +56,17 @@ namespace StarryEyes.Models.Timelines.SearchFlips
                     try
                     {
                         var fq = QueryCompiler.Compile(this._query);
-                        this._filterFunc = fq.GetEvaluator();
-                        this._filterSql = fq.GetSqlQuery();
+                        _filterQuery = fq;
+                        fq.Activate();
+                        disposable.Add(Disposable.Create(fq.Deactivate));
+                        disposable.Add(Observable.FromEvent(
+                            h => fq.InvalidateRequired += h,
+                            h => fq.InvalidateRequired -= h)
+                                                 .Subscribe(r => this.QueueInvalidateTimeline()));
                     }
                     catch
                     {
+                        _filterQuery = null;
                         this._filterFunc = FilterExpressionBase.Contradiction;
                         this._filterSql = FilterExpressionBase.ContradictionSql;
                     }
@@ -82,6 +99,17 @@ namespace StarryEyes.Models.Timelines.SearchFlips
                         this._filterFunc = filter;
                     }
                     break;
+            }
+        }
+
+        private IDisposable _previousFilterListener;
+        private FilterQuery _filterQuery;
+        protected override void PreInvalidateTimeline()
+        {
+            if (_option == SearchOption.Query && _filterQuery != null)
+            {
+                this._filterFunc = _filterQuery.GetEvaluator();
+                this._filterSql = _filterQuery.GetSqlQuery();
             }
         }
 
