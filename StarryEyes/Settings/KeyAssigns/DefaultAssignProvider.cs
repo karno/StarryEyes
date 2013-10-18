@@ -49,6 +49,10 @@ c+delete: Delete
 c+a+delete: Mute
 d: SendDirectMessage
 w: OpenWeb
+c+w: OpenFavstar
+s+1: OpenUrl(""0"")
+s+2: OpenUrl(""1"")
+s+3: OpenUrl(""2"")
 
 c+c: Copy
 c+s+c: CopySTOT
@@ -61,12 +65,6 @@ c+s+t: RestoreTab
 escape: ClearSelect
 
 OemPeriod: ShowConversation
-
-w: OpenWeb
-c+w: OpenFavstar
-s+1: OpenUrl(""0"")
-s+2: OpenUrl(""1"")
-s+3: OpenUrl(""2"")
 
 [Input]
 escape: CloseInput
