@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using StarryEyes.Albireo.Threading;
@@ -12,6 +14,12 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
 {
     public abstract class CrudBase
     {
+        #region Concurrent lock
+
+        private static ReaderWriterLockSlim _rwlock = new ReaderWriterLockSlim();
+
+        #endregion
+
         #region connection string builder
 
         private static readonly string _baseConStr = CreateBaseConStr();
@@ -46,6 +54,23 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
 
         #endregion
 
+        protected ReaderWriterLockSlim ReaderWriterLock
+        {
+            get { return _rwlock; }
+        }
+
+        protected IDisposable AcquireWriteLock()
+        {
+            _rwlock.EnterWriteLock();
+            return Disposable.Create(() => _rwlock.ExitWriteLock());
+        }
+
+        protected IDisposable AcquireReadLock()
+        {
+            _rwlock.EnterReadLock();
+            return Disposable.Create(() => _rwlock.ExitReadLock());
+        }
+
         protected SQLiteConnection OpenConnection()
         {
             SQLiteConnection con = null;
@@ -73,12 +98,20 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
             return _factory.StartNew(() =>
             {
                 // System.Diagnostics.Debug.WriteLine("EXECUTE: " + query);
-                using (var con = this.OpenConnection())
-                using (var tr = con.BeginTransaction())
+                try
                 {
-                    var result = con.Execute(query, transaction: tr);
-                    tr.Commit();
-                    return result;
+                    ReaderWriterLock.EnterWriteLock();
+                    using (var con = this.OpenConnection())
+                    using (var tr = con.BeginTransaction())
+                    {
+                        var result = con.Execute(query, transaction: tr);
+                        tr.Commit();
+                        return result;
+                    }
+                }
+                finally
+                {
+                    ReaderWriterLock.ExitWriteLock();
                 }
             });
         }
@@ -87,13 +120,21 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
         {
             return _factory.StartNew(() =>
             {
-                // System.Diagnostics.Debug.WriteLine("EXECUTE: " + query);
-                using (var con = this.OpenConnection())
-                using (var tr = con.BeginTransaction())
+                try
                 {
-                    var result = (int)SqlMapper.Execute(con, query, param, tr);
-                    tr.Commit();
-                    return result;
+                    ReaderWriterLock.EnterWriteLock();
+                    // System.Diagnostics.Debug.WriteLine("EXECUTE: " + query);
+                    using (var con = this.OpenConnection())
+                    using (var tr = con.BeginTransaction())
+                    {
+                        var result = (int)SqlMapper.Execute(con, query, param, tr);
+                        tr.Commit();
+                        return result;
+                    }
+                }
+                finally
+                {
+                    ReaderWriterLock.ExitWriteLock();
                 }
             });
         }
@@ -102,15 +143,23 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
         {
             return _factory.StartNew(() =>
             {
-                using (var con = this.OpenConnection())
-                using (var tr = con.BeginTransaction())
+                try
                 {
-                    foreach (var qap in queryAndParams)
+                    ReaderWriterLock.EnterWriteLock();
+                    using (var con = this.OpenConnection())
+                    using (var tr = con.BeginTransaction())
                     {
-                        // System.Diagnostics.Debug.WriteLine("EXECUTE: " + qap.Item1);
-                        con.Execute(qap.Item1, qap.Item2, tr);
+                        foreach (var qap in queryAndParams)
+                        {
+                            // System.Diagnostics.Debug.WriteLine("EXECUTE: " + qap.Item1);
+                            con.Execute(qap.Item1, qap.Item2, tr);
+                        }
+                        tr.Commit();
                     }
-                    tr.Commit();
+                }
+                finally
+                {
+                    ReaderWriterLock.ExitWriteLock();
                 }
             });
         }
@@ -120,9 +169,17 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
             // System.Diagnostics.Debug.WriteLine("QUERY: " + query);
             return _factory.StartNew(() =>
             {
-                using (var con = this.OpenConnection())
+                try
                 {
-                    return con.Query<T>(query, param);
+                    ReaderWriterLock.EnterReadLock();
+                    using (var con = this.OpenConnection())
+                    {
+                        return con.Query<T>(query, param);
+                    }
+                }
+                finally
+                {
+                    ReaderWriterLock.ExitReadLock();
                 }
             });
         }
