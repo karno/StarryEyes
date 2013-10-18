@@ -32,53 +32,12 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             get { return this._users; }
         }
 
-        private List<long> _userIds;
+        private readonly List<long> _userIds = new List<long>();
 
         public UserListViewModelBase(UserInfoViewModel parent)
         {
             this._parent = parent;
-            this.InitCollection();
-        }
-
-        private void InitCollection()
-        {
-            Task.Run(async () =>
-            {
-                this.IsLoading = true;
-                var account =
-                    Setting.Accounts.Collection.FirstOrDefault(
-                        a => a.RelationData.IsFollowing(this._parent.User.User.Id)) ??
-                    Setting.Accounts.GetRandomOne();
-                if (account == null)
-                {
-                    return;
-                }
-                long cursor = -1;
-                try
-                {
-                    while (cursor != 0)
-                    {
-                        _userIds = new List<long>();
-                        var friends = await this.GetUsersApiImpl(account, _parent.User.User.Id, cursor);
-                        friends.Result.ForEach(_userIds.Add);
-                        cursor = friends.NextCursor;
-                    }
-                    IsLoading = false;
-                    this.ReadMore();
-                }
-                catch (Exception ex)
-                {
-                    this._parent.Parent.Messenger.Raise(
-                        new TaskDialogMessage(new TaskDialogOptions
-                        {
-                            CommonButtons = TaskDialogCommonButtons.Close,
-                            MainIcon = VistaTaskDialogIcon.Error,
-                            MainInstruction = "ユーザー情報を受信できませんでした。",
-                            Content = ex.Message,
-                            Title = "ユーザー受信エラー",
-                        }));
-                }
-            });
+            this.ReadMore();
         }
 
         protected abstract Task<ICursorResult<IEnumerable<long>>> GetUsersApiImpl(TwitterAccount info, long id, long cursor);
@@ -136,13 +95,25 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 var ids = _userIds.Skip(page * 100).Take(100).ToArray();
                 if (ids.Length == 0)
                 {
-                    _isDeferLoadEnabled = false;
+                    var result = await this.ReadMoreIds();
                     IsLoading = false;
+                    if (result)
+                    {
+                        // new users fetched
+                        this.ReadMore();
+                    }
+                    else
+                    {
+                        // end of user list
+                        _isDeferLoadEnabled = false;
+                    }
                     return;
                 }
                 try
                 {
-                    (await info.LookupUserAsync(ids)).ForEach(u => Users.Add(new UserResultItemViewModel(u)));
+                    var users = await info.LookupUserAsync(ids);
+                    await DispatcherHelper.UIDispatcher.InvokeAsync(
+                        () => users.ForEach(u => Users.Add(new UserResultItemViewModel(u))));
                     this.IsLoading = false;
                 }
                 catch (Exception ex)
@@ -158,6 +129,36 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                     BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message));
                 }
             });
+        }
+
+        private long _cursor = -1;
+        private async Task<bool> ReadMoreIds()
+        {
+            try
+            {
+                if (this._cursor == 0) return false;
+                var account =
+                    Setting.Accounts.Collection.FirstOrDefault(
+                        a => a.RelationData.IsFollowing(this._parent.User.User.Id)) ??
+                    Setting.Accounts.GetRandomOne();
+                var friends = await this.GetUsersApiImpl(account, _parent.User.User.Id, this._cursor);
+                friends.Result.ForEach(_userIds.Add);
+                this._cursor = friends.NextCursor;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                this._parent.Parent.Messenger.Raise(
+                    new TaskDialogMessage(new TaskDialogOptions
+                    {
+                        CommonButtons = TaskDialogCommonButtons.Close,
+                        MainIcon = VistaTaskDialogIcon.Error,
+                        MainInstruction = "ユーザー情報を受信できませんでした。",
+                        Content = ex.Message,
+                        Title = "ユーザー受信エラー",
+                    }));
+                return false;
+            }
         }
     }
 }

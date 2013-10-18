@@ -1244,7 +1244,8 @@ namespace StarryEyes.ViewModels.WindowParts
                 if (token[0] == '@')
                 {
                     _items.Clear();
-                    Task.Run(() => AddUserItems(token.Substring(1)));
+                    var sn = token.Substring(1);
+                    Task.Run(() => AddUserItems(sn));
                 }
                 else
                 {
@@ -1285,11 +1286,12 @@ namespace StarryEyes.ViewModels.WindowParts
 
         private async Task AddUserItems(string key)
         {
+            System.Diagnostics.Debug.WriteLine("current screen name: " + key);
             (await UserProxy.GetUsersFastAsync(key))
                 .Select(t => t.Item2)
                 .OrderBy(_ => _)
                 .Select(s => new SuggestItemViewModel("@" + s))
-                .ForEach(s => _items.Add(s));
+                .ForEach(s => DispatcherHolder.Enqueue(() => _items.Add(s)));
         }
 
         private void AddHashItems(string key)

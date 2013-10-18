@@ -47,8 +47,7 @@ namespace StarryEyes.Models.Databases
         public static async Task<IEnumerable<Tuple<long, string>>> GetUsersFastAsync(string partOfScreenName)
         {
             var resp = await Database.UserCrud.GetUsersAsync(partOfScreenName);
-            return resp.Guard()
-                       .Select(d => Tuple.Create(d.Id, d.ScreenName));
+            return resp.Guard().Select(d => Tuple.Create(d.Id, d.ScreenName));
         }
 
         public static IObservable<TwitterUser> LoadUsersAsync([NotNull] IEnumerable<DatabaseUser> dbusers)
