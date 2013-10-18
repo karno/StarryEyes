@@ -292,7 +292,7 @@ namespace StarryEyes.ViewModels.Timelines
             {
                 if (_listener != null) _listener.Dispose();
             });
-            this._model.QueueInvalidateTimeline();
+            this._model.InvalidateTimeline();
         }
 
         private IDisposable _listener = null;

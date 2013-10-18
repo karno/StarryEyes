@@ -208,7 +208,7 @@ namespace StarryEyes.Models.Timelines
         private const int InvalidateSec = 2;
         private int _invlatch;
 
-        internal void QueueInvalidateTimeline()
+        protected void QueueInvalidateTimeline()
         {
             var stamp = Interlocked.Increment(ref this._invlatch);
             Observable.Timer(TimeSpan.FromSeconds(InvalidateSec))
@@ -223,6 +223,8 @@ namespace StarryEyes.Models.Timelines
 
         public void InvalidateTimeline()
         {
+            // clear queued invalidates
+            Interlocked.Increment(ref this._invlatch);
             Task.Run(async () =>
             {
                 this.OnInvalidationStateChanged(true);
