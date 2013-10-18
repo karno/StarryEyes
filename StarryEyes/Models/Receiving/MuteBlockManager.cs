@@ -22,32 +22,50 @@ namespace StarryEyes.Models.Receiving
         private static Func<TwitterStatus, bool> _muteFilter = _ => false;
         private static string _muteSqlQuery = string.Empty;
 
+        /// <summary>
+        /// Initializer method
+        /// </summary>
         internal static void Initialize()
         {
             Setting.Accounts.Collection.ListenCollectionChanged().Subscribe(_ =>
             {
-                InvalidateBlockingUsers();
+                InvalidateBlocks();
                 InvalidateMute();
             });
             Setting.Muteds.ValueChanged += _ => InvalidateMute();
         }
 
+        public static string FilteringSql
+        {
+            get
+            {
+                const string blocksql = "UserId NOT IN (select TargetId from Blockings)";
+                CheckUpdateMutes();
+                CheckUpdateBlocks();
+                return _muteSqlQuery.SqlConcatAnd(blocksql);
+            }
+        }
+
         public static bool IsBlockedOrMuted([NotNull] TwitterStatus status)
         {
             if (status == null) throw new ArgumentNullException("status");
-            if (IsBlocked(status.User)) return true;
             CheckUpdateMutes();
+            CheckUpdateBlocks();
+            if (IsBlocked(status.User)) return true;
             return _muteFilter(status);
         }
 
-        public static bool IsMuted(TwitterStatus status)
+        public static bool IsMuted([NotNull] TwitterStatus status)
         {
+            if (status == null) throw new ArgumentNullException("status");
+            CheckUpdateMutes();
             return _muteFilter(status);
         }
 
         public static bool IsBlocked([NotNull] TwitterUser user)
         {
             if (user == null) throw new ArgumentNullException("user");
+            CheckUpdateBlocks();
             return IsBlocked(user.Id);
         }
 
@@ -60,32 +78,13 @@ namespace StarryEyes.Models.Receiving
             }
         }
 
-        public static string FilteringSql
-        {
-            get
-            {
-                CheckUpdateMutes();
-                CheckUpdateBlocks();
-                string blocksql;
-                lock (_blockingUserIds)
-                {
-                    blocksql = _blockingUserIds.Select(s => s.ToString()).JoinString(",");
-                }
-                if (!String.IsNullOrEmpty(blocksql))
-                {
-                    blocksql = "UserId NOT IN (" + blocksql + ")";
-                }
-                return _muteSqlQuery.SqlConcatAnd(blocksql);
-            }
-        }
-
         private static void CheckUpdateMutes()
         {
             lock (_muteFilter)
             {
                 if (!_isMuteInvalidated) return;
                 _isMuteInvalidated = false;
-                UpdateMute();
+                UpdateMutes();
             }
         }
 
@@ -95,36 +94,11 @@ namespace StarryEyes.Models.Receiving
             {
                 if (!_isBlockInvalidated) return;
                 _isBlockInvalidated = false;
-                UpdateBlockingUsers();
+                UpdateBlocks();
             }
         }
 
-        private static void UpdateBlockingUsers()
-        {
-            var disposables = new CompositeDisposable();
-            var nbs = new AVLTree<long>();
-            Setting.Accounts
-                   .Collection
-                   .Select(a => a.RelationData)
-                   .Do(r => disposables.Add(
-                       Observable.FromEvent<RelationDataChangedInfo>(
-                           h => r.AccountDataUpdated += h,
-                           h => r.AccountDataUpdated -= h)
-                                 .Where(info => info.Change == RelationDataChange.Blocking)
-                                 .Subscribe(_ => InvalidateBlockingUsers())))
-                   .SelectMany(r => r.Blockings)
-                   .ForEach(nbs.Add);
-            _blockingUserIds = nbs;
-
-            var prev = _blockingDisposable;
-            _blockingDisposable = disposables;
-            if (prev != null)
-            {
-                prev.Dispose();
-            }
-        }
-
-        private static void UpdateMute()
+        private static void UpdateMutes()
         {
             var eval = Setting.Muteds.Evaluator;
             var sql = Setting.Muteds.Value.GetSqlQuery();
@@ -137,14 +111,41 @@ namespace StarryEyes.Models.Receiving
                                 : "(UserId IN (" + accIds + ") OR NOT (" + sql + "))";
         }
 
-        private static void InvalidateBlockingUsers()
+        private static void UpdateBlocks()
         {
-            _isBlockInvalidated = true;
+            var disposables = new CompositeDisposable();
+            var nbs = new AVLTree<long>();
+            Setting.Accounts
+                   .Collection
+                   .Select(a => a.RelationData)
+                // listen block change info
+                   .Do(r => disposables.Add(
+                       Observable.FromEvent<RelationDataChangedInfo>(
+                           h => r.AccountDataUpdated += h,
+                           h => r.AccountDataUpdated -= h)
+                                 .Where(info => info.Change == RelationDataChange.Blocking)
+                                 .Subscribe(_ => InvalidateBlocks())))
+                // select blocked users
+                   .SelectMany(r => r.Blockings)
+                   .ForEach(nbs.Add);
+            _blockingUserIds = nbs;
+
+            var prev = _blockingDisposable;
+            _blockingDisposable = disposables;
+            if (prev != null)
+            {
+                prev.Dispose();
+            }
         }
 
         private static void InvalidateMute()
         {
             _isMuteInvalidated = true;
+        }
+
+        private static void InvalidateBlocks()
+        {
+            _isBlockInvalidated = true;
         }
     }
 }

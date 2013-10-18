@@ -93,7 +93,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 
         public override string BlockingsSql
         {
-            get { return "(select Targetid from Blockings)"; }
+            get { return "(select TargetId from Blockings)"; }
         }
 
         public override string ToQuery()

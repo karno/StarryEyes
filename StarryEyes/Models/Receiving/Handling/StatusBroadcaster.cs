@@ -61,31 +61,25 @@ namespace StarryEyes.Models.Receiving.Handling
                 _signal.Reset();
                 while (_queue.TryDequeue(out status) && !_isHaltRequested)
                 {
-                    if (status.IsAdded)
+                    if (status.IsAdded && MuteBlockManager.IsBlockedOrMuted(status.Status))
                     {
-                        // check global block/mute
-                        if (MuteBlockManager.IsBlockedOrMuted(status.Status))
-                        {
-                            System.Diagnostics.Debug.WriteLine("MUTE OR BLOCK CAPTURE: " + status);
-                            continue;
-                        }
-                        if (status.IsNew)
-                        {
-                            NotificationService.NotifyReceived(status.Status);
-                            NotificationService.StartAcceptNewArrival(status.Status);
-                        }
+                        // MUTE CAPTURE
+                        System.Diagnostics.Debug.WriteLine("*** Mute or Block Capture: " + status.Status);
+                        continue;
+                    }
+                    if (status.IsAdded && status.IsNew)
+                    {
+                        NotificationService.NotifyReceived(status.Status);
+                        NotificationService.StartAcceptNewArrival(status.Status);
                     }
                     _broadcastSubject.OnNext(status);
-                    if (status.IsAdded)
-                    {
-                        if (status.IsNew)
-                        {
-                            NotificationService.EndAcceptNewArrival(status.Status);
-                        }
-                    }
-                    else
+                    if (!status.IsAdded)
                     {
                         NotificationService.NotifyDeleted(status.StatusId, status.Status);
+                    }
+                    else if (status.IsNew)
+                    {
+                        NotificationService.EndAcceptNewArrival(status.Status);
                     }
                     _signal.Reset();
                 }
