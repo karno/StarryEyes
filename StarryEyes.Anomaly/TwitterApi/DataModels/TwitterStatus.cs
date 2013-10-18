@@ -15,11 +15,13 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
 
         public TwitterStatus()
         {
+            this.GenerateFromJson = false;
             Entities = new TwitterEntity[0];
         }
 
         public TwitterStatus(dynamic json)
         {
+            this.GenerateFromJson = true;
             this.Id = ((string)json.id_str).ParseLong();
             this.CreatedAt = ((string)json.created_at).ParseDateTime(ParsingExtension.TwitterDateTimeFormat);
             this.Text = ParsingExtension.ResolveEntity(json.text);
@@ -60,6 +62,9 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
                 }
             }
         }
+
+        public bool GenerateFromJson { get; private set; }
+
 
         /// <summary>
         /// Numerical ID of this tweet/message.

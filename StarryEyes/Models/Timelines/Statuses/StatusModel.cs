@@ -49,7 +49,7 @@ namespace StarryEyes.Models.Timelines.Statuses
             return model;
         }
 
-        private const int CleanupInterval = 5000;
+        private const int CleanupInterval = 15000;
 
         private static int _cleanupCount;
 
@@ -59,10 +59,9 @@ namespace StarryEyes.Models.Timelines.Statuses
         {
             return GetIfCacheIsAlive(status.Id) ?? await _loader.StartNew(async () =>
             {
-                var lstore = await StatusProxy.GetStatusAsync(status.Id);
-                if (lstore != null)
+                if (status.GenerateFromJson)
                 {
-                    status = lstore;
+                    status = await StatusProxy.SyncStatusActivityAsync(status);
                 }
                 var rto = status.RetweetedOriginal == null
                               ? null

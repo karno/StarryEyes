@@ -130,6 +130,18 @@ namespace StarryEyes.Models.Databases
             return await LoadStatusAsync(status);
         }
 
+        public static async Task<TwitterStatus> SyncStatusActivityAsync(TwitterStatus status)
+        {
+            if (status.StatusType == StatusType.Tweet)
+            {
+                var favorers = await Database.FavoritesCrud.GetUsersAsync(status.Id);
+                var retweeters = await Database.RetweetsCrud.GetUsersAsync(status.Id);
+                status.FavoritedUsers = favorers.Guard().ToArray();
+                status.RetweetedUsers = retweeters.Guard().ToArray();
+            }
+            return status;
+        }
+
         public static async Task<long?> GetInReplyToAsync(long id)
         {
             return await Database.StatusCrud.GetInReplyToAsync(id);
