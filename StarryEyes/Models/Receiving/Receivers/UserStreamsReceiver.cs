@@ -7,6 +7,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using StarryEyes.Anomaly.TwitterApi;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.DataModels.StreamModels;
 using StarryEyes.Anomaly.TwitterApi.Streaming;
@@ -267,104 +268,78 @@ namespace StarryEyes.Models.Receiving.Receivers
         private void HandleException(Exception ex)
         {
             this.CleanupConnection();
-            var wex = ex as WebException;
-            if (wex != null)
+            var tae = ex as TwitterApiException;
+            if (tae != null)
             {
-                if (wex.Status == WebExceptionStatus.ProtocolError)
+                switch (tae.StatusCode)
                 {
-                    var res = wex.Response as HttpWebResponse;
-                    if (res != null)
-                    {
-                        // protocol error
-                        switch (res.StatusCode)
+                    case HttpStatusCode.Unauthorized:
+                        // ERR: Unauthorized, invalid OAuth request?
+                        if (this.CheckHardError())
                         {
-                            case HttpStatusCode.Unauthorized:
-                                // ERR: Unauthorized, invalid OAuth request?
-                                if (this.CheckHardError())
-                                {
-                                    this.RaiseDisconnectedByError(
-                                        "ユーザー認証が行えません。",
-                                        "PCの時刻設定が正しいか確認してください。回復しない場合は、OAuth認証を再度行ってください。");
-                                    return;
-                                }
-                                break;
-                            case HttpStatusCode.Forbidden:
-                            case HttpStatusCode.NotFound:
-                                if (this.CheckHardError())
-                                {
-                                    this.RaiseDisconnectedByError(
-                                        "ユーザーストリーム接続が一時的、または恒久的に利用できなくなっています。",
-                                        "エンドポイントへの接続時にアクセスが拒否されたか、またはエンドポイントが削除されています。");
-                                    return;
-                                }
-                                break;
-                            case HttpStatusCode.NotAcceptable:
-                            case HttpStatusCode.RequestEntityTooLarge:
-                                this.RaiseDisconnectedByError(
-                                    "トラックしているキーワードが長すぎるか、不正な可能性があります。",
-                                    "(トラック中のキーワード:" + this._trackKeywords.JoinString(", ") + ")");
-                                return;
-                            case HttpStatusCode.RequestedRangeNotSatisfiable:
-                                this.RaiseDisconnectedByError(
-                                    "ユーザーストリームに接続できません。",
-                                    "(システム エラー: 416 Range Unacceptable. Elevated permission is required or paramter is out of range.)");
-                                return;
-                            case (HttpStatusCode)420:
-                                // ERR: Too many connections
-                                // (other client is already connected?)
-                                this.RaiseDisconnectedByError(
-                                    "ユーザーストリーム接続が制限されています。",
-                                    "Krileが多重起動していないか確認してください。短時間に何度も接続を試みていた場合は、しばらく待つと再接続できるようになります。");
-                                return;
+                            this.RaiseDisconnectedByError(
+                                "ユーザー認証が行えません。",
+                                "PCの時刻設定が正しいか確認してください。回復しない場合は、OAuth認証を再度行ってください。");
+                            return;
                         }
-                    }
-                    // else -> backoff
-                    if (this._currentBackOffMode == BackOffMode.ProtocolError)
-                        this._currentBackOffWaitCount += this._currentBackOffWaitCount; // wait count is raised exponentially.
-                    else
-                        this._currentBackOffWaitCount = 5000;
-                    if (this._currentBackOffWaitCount >= 320000) // max wait is 320 sec.
-                    {
+                        break;
+                    case HttpStatusCode.Forbidden:
+                    case HttpStatusCode.NotFound:
+                        if (this.CheckHardError())
+                        {
+                            this.RaiseDisconnectedByError(
+                                "ユーザーストリーム接続が一時的、または恒久的に利用できなくなっています。",
+                                "エンドポイントへの接続時にアクセスが拒否されたか、またはエンドポイントが削除されています。");
+                            return;
+                        }
+                        break;
+                    case HttpStatusCode.NotAcceptable:
+                    case HttpStatusCode.RequestEntityTooLarge:
                         this.RaiseDisconnectedByError(
-                            "Twitterが不安定な状態になっています。",
-                            "プロトコル エラーにより、ユーザーストリームに既定のリトライ回数内で接続できませんでした。");
+                            "トラックしているキーワードが長すぎるか、不正な可能性があります。",
+                            "(トラック中のキーワード:" + this._trackKeywords.JoinString(", ") + ")");
                         return;
-                    }
+                    case HttpStatusCode.RequestedRangeNotSatisfiable:
+                        this.RaiseDisconnectedByError(
+                            "ユーザーストリームに接続できません。",
+                            "(システム エラー: 416 Range Unacceptable. Elevated permission is required or paramter is out of range.)");
+                        return;
+                    case (HttpStatusCode)420:
+                        // ERR: Too many connections
+                        // (other client is already connected?)
+                        this.RaiseDisconnectedByError(
+                            "ユーザーストリーム接続が制限されています。",
+                            "Krileが多重起動していないか確認してください。短時間に何度も接続を試みていた場合は、しばらく待つと再接続できるようになります。");
+                        return;
                 }
+                // else -> backoff
+                if (this._currentBackOffMode == BackOffMode.ProtocolError)
+                    this._currentBackOffWaitCount += this._currentBackOffWaitCount;
+                // wait count is raised exponentially.
                 else
+                    this._currentBackOffWaitCount = 5000;
+                if (this._currentBackOffWaitCount >= 320000) // max wait is 320 sec.
                 {
-                    // network error
-                    // -> backoff
-                    if (this._currentBackOffMode == BackOffMode.NetworkError)
-                        this._currentBackOffMode += 250; // wait count is raised linearly.
-                    else
-                        this._currentBackOffWaitCount = 250; // wait starts 250ms
-                    if (this._currentBackOffWaitCount >= 16000) // max wait is 16 sec.
-                    {
-                        this.RaiseDisconnectedByError(
-                            "Twitterが不安定な状態になっています。",
-                            "ネットワーク エラーにより、ユーザーストリームに規定のリトライ回数内で接続できませんでした。");
-                        return;
-                    }
+                    this.RaiseDisconnectedByError(
+                        "Twitterが不安定な状態になっています。",
+                        "プロトコル エラーにより、ユーザーストリームに既定のリトライ回数内で接続できませんでした。");
+                    return;
                 }
             }
             else
             {
-                this._currentBackOffMode = BackOffMode.None;
-                if (this._currentBackOffWaitCount == 110)
+                // network error
+                // -> backoff
+                if (this._currentBackOffMode == BackOffMode.NetworkError)
+                    this._currentBackOffMode += 250; // wait count is raised linearly.
+                else
+                    this._currentBackOffWaitCount = 250; // wait starts 250ms
+                if (this._currentBackOffWaitCount >= 16000) // max wait is 16 sec.
                 {
                     this.RaiseDisconnectedByError(
-                        "ユーザーストリーム接続が何らかのエラーの頻発で停止しました。",
-                        "Twitterが不安定な状態になっているか、仕様が変更された可能性があります: " + ex.Message);
+                        "Twitterが不安定な状態になっています。",
+                        "ネットワーク エラーにより、ユーザーストリームに規定のリトライ回数内で接続できませんでした。");
                     return;
-                }
-                if (this._currentBackOffWaitCount >= 108 && this._currentBackOffWaitCount <= 109)
-                {
-                    this._currentBackOffWaitCount++;
-                }
-                else
-                {
-                    this._currentBackOffWaitCount = 108; // wait shortly
                 }
             }
             Debug.WriteLine("*** USER STREAMS error ***" + Environment.NewLine + ex);

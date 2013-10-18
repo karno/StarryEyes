@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -7,48 +6,30 @@ using StarryEyes.Anomaly.Ext;
 
 namespace StarryEyes.Anomaly.TwitterApi
 {
-    public class TwitterApiException : WebException
+    public class TwitterApiException : Exception
     {
-        public static async Task<TwitterApiException> Convert(WebException wex)
+        public TwitterApiException(HttpStatusCode statusCode, string message, int code)
+            : base(message)
         {
-            if (wex == null)
-            {
-                throw new ArgumentNullException("wex");
-            }
-            var stream = wex.Response != null ? wex.Response.GetResponseStream() : null;
-            if (stream != null)
-            {
-                using (var sr = new StreamReader(stream))
-                {
-                    var resp = DynamicJson.Parse(await sr.ReadToEndAsync());
-                    if (resp.errors() && resp.errors.code() && resp.errors.message())
-                    {
-                        return new TwitterApiException(
-                            resp.errors.message,
-                            (int)resp.errors.code,
-                            wex);
-                    }
-                }
-            }
-            return new TwitterApiException(wex);
+            this.StatusCode = statusCode;
+            this.TwitterErrorCode = code;
         }
 
-        private TwitterApiException(string message, int code, WebException innerException)
-            : base(message, innerException)
+        public TwitterApiException(HttpStatusCode statusCode, string message)
+            : base()
         {
-            this.ErrorCode = code;
+            this.StatusCode = statusCode;
         }
 
-        private TwitterApiException(WebException innerException)
-            : base(innerException.Message, innerException) { }
+        public HttpStatusCode StatusCode { get; private set; }
 
-        public int? ErrorCode { get; private set; }
+        public int? TwitterErrorCode { get; private set; }
 
         public override string ToString()
         {
-            if (ErrorCode.HasValue)
+            if (this.TwitterErrorCode.HasValue)
             {
-                return ErrorCode.Value + ": " + Message;
+                return this.TwitterErrorCode.Value + ": " + Message;
             }
             return InnerException.ToString();
         }
@@ -63,30 +44,27 @@ namespace StarryEyes.Anomaly.TwitterApi
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, System.Threading.CancellationToken cancellationToken)
         {
-            WebException thrownWex;
-            try
+            var resp = await base.SendAsync(request, cancellationToken);
+            if (!resp.IsSuccessStatusCode)
             {
-                var resp = await base.SendAsync(request, cancellationToken);
-                return resp.EnsureSuccessStatusCode();
-            }
-            catch (HttpRequestException hex)
-            {
-                thrownWex = hex.InnerException as WebException;
-                if (thrownWex == null)
+                var rstr = await resp.Content.ReadAsStringAsync();
+                var json = DynamicJson.Parse(rstr);
+                var ex = new TwitterApiException(resp.StatusCode, rstr);
+                try
                 {
-                    throw;
+                    var eflg = json.errors();
+                    var cflg = json.errors[0].code();
+                    var mflg = json.errors[0].message();
+                    if (json.errors() && json.errors[0].code() && json.errors[0].message())
+                    {
+                        ex = new TwitterApiException(resp.StatusCode,
+                                                      json.errors[0].message, (int)json.errors[0].code);
+                    }
                 }
+                catch { }
+                throw ex;
             }
-            catch (WebException wex)
-            {
-                thrownWex = wex;
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("$ THROWN: " + ex);
-                throw;
-            }
-            throw await TwitterApiException.Convert(thrownWex);
+            return resp.EnsureSuccessStatusCode();
         }
     }
 }
