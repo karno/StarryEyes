@@ -130,6 +130,28 @@ namespace StarryEyes.ViewModels.Timelines
             }
         }
 
+        public TimelineViewModelBase(TimelineModelBase model)
+        {
+            this._model = model;
+            this._timeline = new ObservableCollection<StatusViewModel>();
+            DispatcherHolder.Enqueue(this.InitializeCollection, DispatcherPriority.Background);
+            this.CompositeDisposable.Add(
+                new EventListener<Action<bool>>(
+                    h => model.InvalidationStateChanged += h,
+                    h => model.InvalidationStateChanged -= h,
+                    s => this.IsLoading = s));
+            this.CompositeDisposable.Add(() =>
+            {
+                if (_listener != null) _listener.Dispose();
+            });
+            this.CompositeDisposable.Add(
+                this.ListenPropertyChanged(() => this.CurrentAccounts)
+                    .ObserveOnDispatcher()
+                    .Select(_ => this.CurrentAccounts.ToArray())
+                    .Subscribe(a => _timeline.ForEach(s => s.BindingAccounts = a)));
+            this._model.InvalidateTimeline();
+        }
+
         public void ReadMore()
         {
             if (IsScrollInTop || IsLoading) return;
@@ -278,26 +300,10 @@ namespace StarryEyes.ViewModels.Timelines
 
         #endregion
 
-        public TimelineViewModelBase(TimelineModelBase model)
-        {
-            this._model = model;
-            this._timeline = new ObservableCollection<StatusViewModel>();
-            DispatcherHolder.Enqueue(this.InitializeCollection, DispatcherPriority.Background);
-            this.CompositeDisposable.Add(
-                new EventListener<Action<bool>>(
-                    h => model.InvalidationStateChanged += h,
-                    h => model.InvalidationStateChanged -= h,
-                    s => this.IsLoading = s));
-            this.CompositeDisposable.Add(() =>
-            {
-                if (_listener != null) _listener.Dispose();
-            });
-            this._model.InvalidateTimeline();
-        }
-
         private IDisposable _listener = null;
         private void InitializeCollection()
         {
+            // on dispatcher.
             if (_listener != null)
             {
                 _listener.Dispose();
@@ -312,7 +318,8 @@ namespace StarryEyes.ViewModels.Timelines
                                               () => this.ReflectCollectionChanged(e),
                                               DispatcherPriority.Background)));
                 this._timeline.Clear();
-                sts.Select(this.GenerateStatusViewModel)
+                sts.OrderByDescending(s => s.Status.CreatedAt)
+                   .Select(this.GenerateStatusViewModel)
                    .ForEach(this._timeline.Add);
             }
         }
@@ -326,8 +333,11 @@ namespace StarryEyes.ViewModels.Timelines
                     switch (e.Action)
                     {
                         case NotifyCollectionChangedAction.Add:
+                            var sw = new System.Diagnostics.Stopwatch();
+                            sw.Start();
                             this._timeline.Insert(e.NewStartingIndex,
                                                   GenerateStatusViewModel((StatusModel)e.NewItems[0]));
+                            sw.Stop();
                             break;
                         case NotifyCollectionChangedAction.Move:
                             this._timeline.Move(e.OldStartingIndex, e.NewStartingIndex);
@@ -338,7 +348,6 @@ namespace StarryEyes.ViewModels.Timelines
                             removal.Dispose();
                             break;
                         case NotifyCollectionChangedAction.Reset:
-                            System.Diagnostics.Debug.WriteLine("*** RESET! ***");
                             var cache = this._timeline.ToArray();
                             this._timeline.Clear();
                             Task.Run(() => cache.ForEach(c => c.Dispose()));

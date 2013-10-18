@@ -161,7 +161,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             get { return this._bindingAccounts; }
             set
             {
-                this._bindingAccounts = value.ToArray();
+                this._bindingAccounts = (value as long[]) ?? value.ToArray();
                 // raise property changed
                 this.RaisePropertyChanged();
                 this.RaisePropertyChanged(() => this.IsFavorited);

@@ -53,59 +53,64 @@ namespace StarryEyes.Models.Timelines.Statuses
 
         private static int _cleanupCount;
 
+        private static readonly TaskFactory _loader = LimitedTaskScheduler.GetTaskFactory(1);
+
         public static async Task<StatusModel> Get(TwitterStatus status)
         {
-            var lstore = await StatusProxy.GetStatusAsync(status.Id);
-            if (lstore != null)
+            return GetIfCacheIsAlive(status.Id) ?? await _loader.StartNew(async () =>
             {
-                status = lstore;
-            }
-            var rto = status.RetweetedOriginal == null
-                          ? null
-                          : await Get(status.RetweetedOriginal);
-            var lockerobj = _generateLock.GetOrAdd(status.Id, new object());
-            try
-            {
-                lock (lockerobj)
+                var lstore = await StatusProxy.GetStatusAsync(status.Id);
+                if (lstore != null)
                 {
-                    StatusModel model;
-                    WeakReference wr;
-                    lock (_staticCacheLock)
+                    status = lstore;
+                }
+                var rto = status.RetweetedOriginal == null
+                              ? null
+                              : await Get(status.RetweetedOriginal);
+                var lockerobj = _generateLock.GetOrAdd(status.Id, new object());
+                try
+                {
+                    lock (lockerobj)
                     {
-                        _staticCache.TryGetValue(status.Id, out wr);
-                    }
-                    if (wr != null)
-                    {
-                        model = (StatusModel)wr.Target;
-                        if (model != null)
+                        StatusModel model;
+                        WeakReference wr;
+                        lock (_staticCacheLock)
                         {
-                            return model;
+                            _staticCache.TryGetValue(status.Id, out wr);
                         }
-                    }
+                        if (wr != null)
+                        {
+                            model = (StatusModel)wr.Target;
+                            if (model != null)
+                            {
+                                return model;
+                            }
+                        }
 
-                    // cache is dead/not cached yet
-                    model = new StatusModel(status, rto);
-                    wr = new WeakReference(model);
-                    lock (_staticCacheLock)
-                    {
-                        _staticCache[status.Id] = wr;
+                        // cache is dead/not cached yet
+                        model = new StatusModel(status, rto);
+                        wr = new WeakReference(model);
+                        lock (_staticCacheLock)
+                        {
+                            _staticCache[status.Id] = wr;
+                        }
+                        return model;
                     }
-                    return model;
                 }
-            }
-            finally
-            {
-                _generateLock.TryRemove(status.Id, out lockerobj);
-                // ReSharper disable InvertIf
-#pragma warning disable 4014
-                if (Interlocked.Increment(ref _cleanupCount) == CleanupInterval)
+                finally
                 {
-                    Interlocked.Exchange(ref _cleanupCount, 0);
-                    Task.Run((Action)CollectGarbages);
-                }
+                    _generateLock.TryRemove(status.Id, out lockerobj);
+                    // ReSharper disable InvertIf
+#pragma warning disable 4014
+                    if (Interlocked.Increment(ref _cleanupCount) == CleanupInterval)
+                    {
+                        Interlocked.Exchange(ref _cleanupCount, 0);
+                        Task.Run((Action)CollectGarbages);
+                    }
 #pragma warning restore 4014
-                // ReSharper restore InvertIf
-            }
+                    // ReSharper restore InvertIf
+                }
+            }).Unwrap();
         }
 
         public static void CollectGarbages()
@@ -133,9 +138,9 @@ namespace StarryEyes.Models.Timelines.Statuses
             }
         }
 
-        private static readonly TaskFactory _factory = LimitedTaskScheduler.GetTaskFactory(8);
-
         #endregion
+
+        private readonly TaskFactory _factory = LimitedTaskScheduler.GetTaskFactory(8);
 
         private readonly ObservableSynchronizedCollection<TwitterUser> _favoritedUsers =
             new ObservableSynchronizedCollection<TwitterUser>();

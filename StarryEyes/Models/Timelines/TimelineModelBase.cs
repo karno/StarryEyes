@@ -236,7 +236,8 @@ namespace StarryEyes.Models.Timelines
                     this.Statuses.Clear();
                 }
                 await this.Fetch(null, TimelineChunkCount)
-                          .Do(s => this.AcceptStatus(new StatusNotification(s)))
+                          .Where(this.CheckAcceptStatus)
+                          .SelectMany(s => this.AddStatus(s, false).ToObservable())
                           .LastOrDefaultAsync();
                 this.OnInvalidationStateChanged(false);
             });
