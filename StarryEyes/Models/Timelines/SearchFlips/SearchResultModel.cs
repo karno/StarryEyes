@@ -28,14 +28,13 @@ namespace StarryEyes.Models.Timelines.SearchFlips
         {
             this._query = query;
             this._option = option;
-            this.PrepareSearchPredicate();
             if (option != SearchOption.Web)
             {
                 this.IsSubscribeBroadcaster = true;
             }
         }
 
-        private void PrepareSearchPredicate()
+        protected override void PreInvalidateTimeline()
         {
             switch (this._option)
             {
@@ -84,11 +83,6 @@ namespace StarryEyes.Models.Timelines.SearchFlips
                     }
                     break;
             }
-        }
-
-        protected override void PreInvalidateTimeline()
-        {
-            this.PrepareSearchPredicate();
         }
 
         protected override bool CheckAcceptStatus(TwitterStatus status)
