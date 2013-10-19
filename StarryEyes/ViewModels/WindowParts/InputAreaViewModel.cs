@@ -1243,33 +1243,42 @@ namespace StarryEyes.ViewModels.WindowParts
             {
                 if (token[0] == '@')
                 {
-                    _items.Clear();
                     var sn = token.Substring(1);
+                    if (token.Length == 1)
+                    {
+                        // pre-clear
+                        _items.Clear();
+                    }
                     Task.Run(() => AddUserItems(sn));
                 }
                 else
                 {
                     _items.Clear();
                     AddHashItems(token.Substring(1));
+                    this.SelectSuitableItem(token);
                 }
-                var array = _items.Select(s => s.Body.Substring(1))
-                    .ToArray();
-                while (token.Length > 1)
+            }
+        }
+
+        private void SelectSuitableItem(string token)
+        {
+            var array = _items.Select(s => s.Body.Substring(1))
+            .ToArray();
+            while (token.Length > 1)
+            {
+                var find = token.Substring(1);
+                var idx = array.Select((v, i) => new { Item = v, Index = i })
+                               .Where(t => t.Item.StartsWith(find, StringComparison.CurrentCultureIgnoreCase))
+                               .Select(t => t.Index)
+                               .Append(-1)
+                               .First();
+                if (idx >= 0)
                 {
-                    var find = token.Substring(1);
-                    var idx = array.Select((v, i) => new { Item = v, Index = i })
-                                   .Where(t => t.Item.StartsWith(find, StringComparison.CurrentCultureIgnoreCase))
-                                   .Select(t => t.Index)
-                                   .Append(-1)
-                                   .First();
-                    if (idx >= 0)
-                    {
-                        CandidateSelectionIndex = idx;
-                        RaisePropertyChanged("CandidateSelectionIndex");
-                        break;
-                    }
-                    token = token.Substring(0, token.Length - 1);
+                    CandidateSelectionIndex = idx;
+                    RaisePropertyChanged("CandidateSelectionIndex");
+                    break;
                 }
+                token = token.Substring(0, token.Length - 1);
             }
         }
 
@@ -1287,11 +1296,23 @@ namespace StarryEyes.ViewModels.WindowParts
         private async Task AddUserItems(string key)
         {
             System.Diagnostics.Debug.WriteLine("current screen name: " + key);
-            (await UserProxy.GetUsersFastAsync(key))
+            var items = (await UserProxy.GetUsersFastAsync(key))
                 .Select(t => t.Item2)
-                .OrderBy(_ => _)
-                .Select(s => new SuggestItemViewModel("@" + s))
-                .ForEach(s => DispatcherHolder.Enqueue(() => _items.Add(s)));
+                .ToArray();
+            // re-ordering
+            var ordered = items.Where(s => s.StartsWith(key))
+                               .OrderBy(s => s)
+                               .Concat(items.Where(s => !s.StartsWith(key))
+                                            .OrderBy(s => s))
+                               .Select(s => new SuggestItemViewModel("@" + s))
+                               .ToArray();
+            await DispatcherHelper.UIDispatcher.InvokeAsync(
+                () =>
+                {
+                    _items.Clear();
+                    ordered.ForEach(s => _items.Add(s));
+                    this.SelectSuitableItem("@" + key);
+                });
         }
 
         private void AddHashItems(string key)
@@ -1309,7 +1330,6 @@ namespace StarryEyes.ViewModels.WindowParts
         {
             get { return _items; }
         }
-
     }
 
     public class SuggestItemViewModel : ViewModel
