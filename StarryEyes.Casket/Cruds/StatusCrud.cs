@@ -19,6 +19,7 @@ namespace StarryEyes.Casket.Cruds
             await base.InitializeAsync();
             await this.CreateIndexAsync("ST_UID", "UserId", false);
             await this.CreateIndexAsync("ST_ROID", "RetweetOriginalId", false);
+            await this.CreateIndexAsync("ST_IRSID", "InReplyToStatusId", false);
         }
 
         internal async Task StoreCoreAsync(IEnumerable<Tuple<string, object>> param)
