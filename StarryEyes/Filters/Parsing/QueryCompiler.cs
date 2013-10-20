@@ -590,16 +590,6 @@ namespace StarryEyes.Filters.Parsing
                 case "isretweet":
                 case "is_retweet":
                     return new StatusIsRetweet();
-                case "faved":
-                case "favorited":
-                case "isfavorited":
-                case "is_favorited":
-                    return new StatusIsFavorited();
-                case "rted":
-                case "retweeted":
-                case "isretweeted":
-                case "is_retweeted":
-                    return new StatusIsRetweeted();
                 case "mention":
                 case "replyto":
                 case "reply_to":

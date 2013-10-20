@@ -31,62 +31,6 @@ namespace StarryEyes.Filters.Expressions.Values.Statuses
         }
     }
 
-    public sealed class StatusIsFavorited : ValueBase
-    {
-        public override IEnumerable<FilterExpressionType> SupportedTypes
-        {
-            get { yield return FilterExpressionType.Boolean; }
-        }
-
-        public override Func<TwitterStatus, bool> GetBooleanValueProvider()
-        {
-            var accounts = Setting.Accounts.Collection.Select(a => a.Id).ToArray();
-            return s => s.FavoritedUsers != null && accounts.Any(a => s.FavoritedUsers.Contains(a));
-        }
-
-        public override string GetBooleanSqlQuery()
-        {
-            return "exists (select UserId from Favorites where StatusId = status.id intersects " +
-                   Setting.Accounts.Collection
-                          .Select(a => a.Id.ToString(CultureInfo.InvariantCulture))
-                          .JoinString(",").EnumerationToSelectClause()
-                   + ")";
-        }
-
-        public override string ToQuery()
-        {
-            return "favorited";
-        }
-    }
-
-    public sealed class StatusIsRetweeted : ValueBase
-    {
-        public override IEnumerable<FilterExpressionType> SupportedTypes
-        {
-            get { yield return FilterExpressionType.Boolean; }
-        }
-
-        public override Func<TwitterStatus, bool> GetBooleanValueProvider()
-        {
-            var accounts = Setting.Accounts.Collection.Select(a => a.Id).ToArray();
-            return s => s.RetweetedUsers != null && accounts.Any(a => s.RetweetedUsers.Contains(a));
-        }
-
-        public override string GetBooleanSqlQuery()
-        {
-            return "exists (select UserId from Retweets where StatusId = status.id intersects " +
-                   Setting.Accounts.Collection
-                          .Select(a => a.Id.ToString(CultureInfo.InvariantCulture))
-                          .JoinString(",").EnumerationToSelectClause()
-                   + ")";
-        }
-
-        public override string ToQuery()
-        {
-            return "retweeted";
-        }
-    }
-
     public sealed class StatusIsRetweet : ValueBase
     {
         public override IEnumerable<FilterExpressionType> SupportedTypes
