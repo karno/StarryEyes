@@ -334,11 +334,8 @@ namespace StarryEyes.ViewModels.Timelines
                     switch (e.Action)
                     {
                         case NotifyCollectionChangedAction.Add:
-                            var sw = new System.Diagnostics.Stopwatch();
-                            sw.Start();
                             this._timeline.Insert(e.NewStartingIndex,
                                                   GenerateStatusViewModel((StatusModel)e.NewItems[0]));
-                            sw.Stop();
                             break;
                         case NotifyCollectionChangedAction.Move:
                             this._timeline.Move(e.OldStartingIndex, e.NewStartingIndex);
@@ -358,11 +355,14 @@ namespace StarryEyes.ViewModels.Timelines
                     }
                 }
             }
-            catch (IndexOutOfRangeException)
+            catch (ArgumentOutOfRangeException)
             {
                 System.Diagnostics.Debug.WriteLine("*TIMELINE FAIL*");
                 // timeline consistency error
-                this.InitializeCollection();
+                if (!_disposed)
+                {
+                    this.InitializeCollection();
+                }
             }
         }
 
@@ -371,8 +371,10 @@ namespace StarryEyes.ViewModels.Timelines
             return new StatusViewModel(this, status, CurrentAccounts);
         }
 
+        private bool _disposed;
         protected override void Dispose(bool disposing)
         {
+            _disposed = true;
             base.Dispose(disposing);
             if (!disposing) return;
             Task.Run(async () =>
