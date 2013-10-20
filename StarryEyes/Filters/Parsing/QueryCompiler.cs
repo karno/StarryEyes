@@ -554,6 +554,7 @@ namespace StarryEyes.Filters.Parsing
                 case "screen_name":
                     return selector(new UserScreenName(), new RetweeterScreenName());
                 case "name":
+                case "username":
                     return selector(new UserName(), new RetweeterName());
                 case "bio":
                 case "desc":
