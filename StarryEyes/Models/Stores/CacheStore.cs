@@ -17,7 +17,7 @@ namespace StarryEyes.Models.Stores
         {
             StatusBroadcaster.BroadcastPoint
                              .Where(n => n.IsAdded)
-                             .Select(n => n.Status)
+                             .Select(n => n.StatusModel.Status)
                              .Subscribe(RegisterStatus);
             try
             {

@@ -5,6 +5,7 @@ using System.Threading;
 using StarryEyes.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models.Subsystems;
+using StarryEyes.Models.Timelines.Statuses;
 
 namespace StarryEyes.Models.Receiving.Handling
 {
@@ -13,13 +14,13 @@ namespace StarryEyes.Models.Receiving.Handling
     /// </summary>
     public static class StatusBroadcaster
     {
-        private static readonly Subject<StatusNotification> _broadcastSubject = new Subject<StatusNotification>();
+        private static readonly Subject<StatusModelNotification> _broadcastSubject = new Subject<StatusModelNotification>();
         private static readonly ManualResetEvent _signal = new ManualResetEvent(false);
-        private static readonly ConcurrentQueue<StatusNotification> _queue = new ConcurrentQueue<StatusNotification>();
+        private static readonly ConcurrentQueue<StatusModelNotification> _queue = new ConcurrentQueue<StatusModelNotification>();
         private static Thread _pumpThread;
         private static volatile bool _isHaltRequested;
 
-        public static IObservable<StatusNotification> BroadcastPoint
+        public static IObservable<StatusModelNotification> BroadcastPoint
         {
             get { return _broadcastSubject; }
         }
@@ -39,47 +40,55 @@ namespace StarryEyes.Models.Receiving.Handling
             _pumpThread.Start();
         }
 
-        internal static void Queue([NotNull] StatusNotification status)
+        internal static async void Queue([NotNull] StatusNotification status)
         {
             if (status == null) throw new ArgumentNullException("status");
-            _queue.Enqueue(status);
+            _queue.Enqueue(await StatusModelNotification.FromStatusNotification(status, true));
             _signal.Set();
         }
 
-        public static void Republish([NotNull] TwitterStatus status)
+        public static async void Republish([NotNull] TwitterStatus status)
         {
             if (status == null) throw new ArgumentNullException("status");
-            _queue.Enqueue(new StatusNotification(status, true, false));
+            Republish(await StatusModel.Get(status));
+        }
+
+        public static void Republish([NotNull] StatusModel status)
+        {
+            if (status == null) throw new ArgumentNullException("status");
+            _queue.Enqueue(new StatusModelNotification(status, true, false));
             _signal.Set();
         }
+
 
         private static void PumpQueuedStatuses()
         {
-            StatusNotification status;
+            StatusModelNotification notification;
             while (true)
             {
                 _signal.Reset();
-                while (_queue.TryDequeue(out status) && !_isHaltRequested)
+                while (_queue.TryDequeue(out notification) && !_isHaltRequested)
                 {
-                    if (status.IsAdded && MuteBlockManager.IsBlockedOrMuted(status.Status))
+                    var status = notification.StatusModel.Status;
+                    if (notification.IsAdded && MuteBlockManager.IsBlockedOrMuted(status))
                     {
                         // MUTE CAPTURE
-                        System.Diagnostics.Debug.WriteLine("*** Mute or Block Capture: " + status.Status);
+                        System.Diagnostics.Debug.WriteLine("*** Mute or Block Capture: " + status);
                         continue;
                     }
-                    if (status.IsAdded && status.IsNew)
+                    if (notification.IsAdded && notification.IsNew)
                     {
-                        NotificationService.NotifyReceived(status.Status);
-                        NotificationService.StartAcceptNewArrival(status.Status);
+                        NotificationService.NotifyReceived(status);
+                        NotificationService.StartAcceptNewArrival(status);
                     }
-                    _broadcastSubject.OnNext(status);
-                    if (!status.IsAdded)
+                    _broadcastSubject.OnNext(notification);
+                    if (!notification.IsAdded)
                     {
-                        NotificationService.NotifyDeleted(status.StatusId, status.Status);
+                        NotificationService.NotifyDeleted(notification.StatusId, status);
                     }
-                    else if (status.IsNew)
+                    else if (notification.IsNew)
                     {
-                        NotificationService.EndAcceptNewArrival(status.Status);
+                        NotificationService.EndAcceptNewArrival(status);
                     }
                     _signal.Reset();
                 }

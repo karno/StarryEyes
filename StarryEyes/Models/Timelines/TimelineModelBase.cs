@@ -87,13 +87,11 @@ namespace StarryEyes.Models.Timelines
             }
         }
 
-        public void AcceptStatus(StatusNotification n)
+        private void AcceptStatus(StatusModelNotification n)
         {
-            if (n.IsAdded && this.CheckAcceptStatus(n.Status))
+            if (n.IsAdded && this.CheckAcceptStatus(n.StatusModel.Status))
             {
-#pragma warning disable 4014
-                this.AddStatus(n.Status, true);
-#pragma warning restore 4014
+                this.AddStatus(n.StatusModel, true);
             }
             else
             {
@@ -101,7 +99,7 @@ namespace StarryEyes.Models.Timelines
             }
         }
 
-        protected virtual async Task<bool> AddStatus(TwitterStatus status, bool isNewArrival)
+        private async Task<bool> AddStatus(TwitterStatus status, bool isNewArrival)
         {
             lock (this._statusIdCache)
             {
@@ -110,8 +108,13 @@ namespace StarryEyes.Models.Timelines
                     return false;
                 }
             }
-            // estimate point
             var model = await StatusModel.Get(status);
+            return this.AddStatus(model, isNewArrival);
+        }
+
+        protected virtual bool AddStatus(StatusModel model, bool isNewArrival)
+        {
+            // estimate point
             var stamp = model.Status.CreatedAt;
             if (this.IsAutoTrimEnabled)
             {
@@ -127,7 +130,7 @@ namespace StarryEyes.Models.Timelines
             }
             lock (this._statusIdCache)
             {
-                if (!this._statusIdCache.AddDistinct(status.Id))
+                if (!this._statusIdCache.AddDistinct(model.Status.Id))
                 {
                     return false;
                 }

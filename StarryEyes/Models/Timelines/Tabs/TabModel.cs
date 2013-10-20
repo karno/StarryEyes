@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using StarryEyes.Albireo.Collections;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Filters;
@@ -9,6 +8,7 @@ using StarryEyes.Filters.Expressions;
 using StarryEyes.Filters.Parsing;
 using StarryEyes.Models.Databases;
 using StarryEyes.Models.Subsystems;
+using StarryEyes.Models.Timelines.Statuses;
 
 namespace StarryEyes.Models.Timelines.Tabs
 {
@@ -159,15 +159,15 @@ namespace StarryEyes.Models.Timelines.Tabs
 
         public event Action<TwitterStatus> OnNewStatusArrival;
 
-        protected override async Task<bool> AddStatus(TwitterStatus status, bool isNewArrival)
+        protected override bool AddStatus(StatusModel model, bool isNewArrival)
         {
-            var result = await base.AddStatus(status, isNewArrival);
-            if (result)
+            var result = base.AddStatus(model, isNewArrival);
+            if (result && isNewArrival)
             {
-                OnNewStatusArrival(status);
+                OnNewStatusArrival(model.Status);
                 if (this.IsNotifyNewArrivals)
                 {
-                    NotificationService.NotifyNewArrival(status, this);
+                    NotificationService.NotifyNewArrival(model.Status, this);
                 }
             }
             return result;

@@ -27,7 +27,7 @@ namespace StarryEyes.Models.Subsystems
             Setting.Accounts.Collection.ForEach(SetupAccount);
             StatusBroadcaster.BroadcastPoint
                              .Where(d => d.IsAdded)
-                             .Select(d => d.Status)
+                             .Select(d => d.StatusModel.Status)
                              .Subscribe(PostDetected);
         }
 
