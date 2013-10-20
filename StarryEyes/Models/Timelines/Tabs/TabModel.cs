@@ -134,18 +134,17 @@ namespace StarryEyes.Models.Timelines.Tabs
         private string _filterSql = FilterExpressionBase.ContradictionSql;
         private Func<TwitterStatus, bool> _filterFunc = FilterExpressionBase.Contradiction;
 
-        protected override void PreInvalidateTimeline()
+        protected override bool PreInvalidateTimeline()
         {
             if (this._filterQuery == null)
             {
                 this._filterSql = FilterExpressionBase.ContradictionSql;
                 this._filterFunc = FilterExpressionBase.Contradiction;
+                return true;
             }
-            else
-            {
-                this._filterSql = this._filterQuery.GetSqlQuery();
-                this._filterFunc = this._filterQuery.GetEvaluator();
-            }
+            this._filterSql = this._filterQuery.GetSqlQuery();
+            this._filterFunc = this._filterQuery.GetEvaluator();
+            return !this._filterQuery.IsPreparing;
         }
 
         protected override bool CheckAcceptStatus(TwitterStatus status)

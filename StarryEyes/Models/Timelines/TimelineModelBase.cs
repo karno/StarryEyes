@@ -230,10 +230,14 @@ namespace StarryEyes.Models.Timelines
             Interlocked.Increment(ref this._invlatch);
             Task.Run(async () =>
             {
+                var complete = false;
                 try
                 {
                     this.OnInvalidationStateChanged(true);
-                    this.PreInvalidateTimeline();
+                    if (this.PreInvalidateTimeline())
+                    {
+                        complete = true;
+                    }
                     // invalidate and fetch statuses
                     lock (this._statusIdCache)
                     {
@@ -247,7 +251,10 @@ namespace StarryEyes.Models.Timelines
                 }
                 finally
                 {
-                    this.OnInvalidationStateChanged(false);
+                    if (complete)
+                    {
+                        this.OnInvalidationStateChanged(false);
+                    }
                 }
             });
         }
@@ -268,7 +275,11 @@ namespace StarryEyes.Models.Timelines
 
         #region Abstract Methods
 
-        protected abstract void PreInvalidateTimeline();
+        /// <summary>
+        /// Pre-invalidate timeline
+        /// </summary>
+        /// <returns>if returns false, keep loading yet</returns>
+        protected abstract bool PreInvalidateTimeline();
 
         protected abstract bool CheckAcceptStatus(TwitterStatus status);
 

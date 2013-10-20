@@ -21,6 +21,11 @@ namespace StarryEyes.Filters
 
         public FilterExpressionRoot PredicateTreeRoot { get; set; }
 
+        public bool IsPreparing
+        {
+            get { return Sources.Any(s => s.IsPreparing); }
+        }
+
         public string ToQuery()
         {
             return "from " + Sources.GroupBy(s => s.FilterKey)

@@ -24,6 +24,11 @@ namespace StarryEyes.Filters.Sources
         private readonly string _receiver;
         private readonly ListInfo _listInfo;
         private readonly AVLTree<long> _ids = new AVLTree<long>();
+        private bool _isPreparing = false;
+        public override bool IsPreparing
+        {
+            get { return _isPreparing; }
+        }
 
         public FilterList(string ownerAndslug)
         {
@@ -42,24 +47,24 @@ namespace StarryEyes.Filters.Sources
                 _listInfo = new ListInfo { OwnerScreenName = splited[1], Slug = splited[2] };
                 _receiver = splited[0];
             }
-            Task.Factory.StartNew(() => this.GetListUsersInfo());
         }
 
         private void GetListUsersInfo(bool enforceReceive = false)
         {
+            _isPreparing = true;
             Task.Run(async () =>
             {
-                IEnumerable<long> users;
-                if (!enforceReceive && (users = CacheStore.GetListUsers(_listInfo)).Any())
-                {
-                    lock (_ids)
-                    {
-                        users.ForEach(_ids.Add);
-                    }
-                    return;
-                }
                 try
                 {
+                    IEnumerable<long> users;
+                    if (!enforceReceive && (users = CacheStore.GetListUsers(_listInfo)).Any())
+                    {
+                        lock (_ids)
+                        {
+                            users.ForEach(_ids.Add);
+                        }
+                        return;
+                    }
                     var account = this.GetAccount();
                     var memberList = new List<long>();
                     long cursor = -1;
@@ -79,11 +84,15 @@ namespace StarryEyes.Filters.Sources
                         this._ids.Clear();
                         memberList.ForEach(this._ids.Add);
                     }
-
                 }
                 catch (Exception ex)
                 {
                     BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message));
+                }
+                finally
+                {
+                    _isPreparing = false;
+                    this.RaiseInvalidateRequired();
                 }
             });
         }
@@ -153,6 +162,7 @@ namespace StarryEyes.Filters.Sources
             {
                 ReceiveManager.RegisterList(_listInfo);
             }
+            Task.Factory.StartNew(() => this.GetListUsersInfo());
             _timer = new Timer(_ => this.TimerCallback(), null, TimeSpan.FromSeconds(0), TimeSpan.FromMinutes(30));
         }
 

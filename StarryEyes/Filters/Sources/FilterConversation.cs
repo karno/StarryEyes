@@ -14,6 +14,12 @@ namespace StarryEyes.Filters.Sources
         private readonly long _original;
         private readonly AVLTree<long> _statuses = new AVLTree<long>();
 
+        private bool _isPreparing;
+        public override bool IsPreparing
+        {
+            get { return _isPreparing; }
+        }
+
         public FilterConversation(string sid)
         {
             long id;
@@ -33,21 +39,29 @@ namespace StarryEyes.Filters.Sources
 
         private async void TraceBackConversations(long origin)
         {
-            var queue = new Queue<long>();
-            var list = new List<long>();
-            queue.Enqueue(await this.FindHeadAsync(origin));
-            while (queue.Count > 0)
+            try
             {
-                var cid = queue.Dequeue();
-                list.Add(cid);
-                var ids = await StatusProxy.FindFromInReplyToAsync(cid);
-                ids.ForEach(queue.Enqueue);
+                _isPreparing = true;
+                var queue = new Queue<long>();
+                var list = new List<long>();
+                queue.Enqueue(await this.FindHeadAsync(origin));
+                while (queue.Count > 0)
+                {
+                    var cid = queue.Dequeue();
+                    list.Add(cid);
+                    var ids = await StatusProxy.FindFromInReplyToAsync(cid);
+                    ids.ForEach(queue.Enqueue);
+                }
+                lock (_statuses)
+                {
+                    list.ForEach(_statuses.Add);
+                }
             }
-            lock (_statuses)
+            finally
             {
-                list.ForEach(_statuses.Add);
+                _isPreparing = false;
+                this.RaiseInvalidateRequired();
             }
-            this.RaiseInvalidateRequired();
         }
 
         private async Task<long> FindHeadAsync(long id)

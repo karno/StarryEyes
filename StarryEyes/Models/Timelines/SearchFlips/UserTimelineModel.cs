@@ -18,8 +18,9 @@ namespace StarryEyes.Models.Timelines.SearchFlips
             this._type = type;
         }
 
-        protected override void PreInvalidateTimeline()
+        protected override bool PreInvalidateTimeline()
         {
+            return true;
         }
 
         protected override bool CheckAcceptStatus(TwitterStatus status)

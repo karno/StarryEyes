@@ -23,6 +23,8 @@ namespace StarryEyes.Filters.Sources
 
         public abstract Func<TwitterStatus, bool> GetEvaluator();
 
+        public virtual bool IsPreparing { get { return false; } }
+
         public abstract string GetSqlQuery();
 
         public event Action InvalidateRequired;

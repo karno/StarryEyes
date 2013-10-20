@@ -104,13 +104,15 @@ namespace StarryEyes.Models.Timelines.SearchFlips
 
         private IDisposable _previousFilterListener;
         private FilterQuery _filterQuery;
-        protected override void PreInvalidateTimeline()
+        protected override bool PreInvalidateTimeline()
         {
             if (_option == SearchOption.Query && _filterQuery != null)
             {
                 this._filterFunc = _filterQuery.GetEvaluator();
                 this._filterSql = _filterQuery.GetSqlQuery();
+                return !_filterQuery.IsPreparing;
             }
+            return true;
         }
 
         protected override bool CheckAcceptStatus(TwitterStatus status)
