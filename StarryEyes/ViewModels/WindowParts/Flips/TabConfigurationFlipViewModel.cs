@@ -150,6 +150,10 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             this.IsConfigurationActive = false;
             if (_currentConfigurationTarget != null)
             {
+                if (String.IsNullOrEmpty(_currentConfigurationTarget.Name))
+                {
+                    _currentConfigurationTarget.Name = "(empty)";
+                }
                 if (_filterQuery != null && _filterQuery.ToQuery() != _initialQuery)
                 {
                     _currentConfigurationTarget.FilterQuery = _filterQuery;

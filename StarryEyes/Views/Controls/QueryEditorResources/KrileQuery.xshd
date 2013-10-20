@@ -1,0 +1,70 @@
+﻿<?xml version="1.0"?>
+<SyntaxDefinition name="Krile Query Mode" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+
+  <!-- Colors -->
+  <Color name="Keywords" foreground="#008A00" fontWeight="bold" />
+  <Color name="Operators" foreground="#0050EF" />
+  <Color name="Strings" foreground="#825A2C" />
+  <Color name="Numbers" foreground="#A20025" />
+
+  <!-- This is the main ruleset. -->
+  <RuleSet>
+
+    <Span color="Strings">
+      <Begin>"</Begin>
+      <End>"</End>
+      <RuleSet>
+        <!-- nested span for escape sequences -->
+        <Span begin="\\" end="." />
+      </RuleSet>
+    </Span>
+
+    <Rule color="Strings">
+      @[A-Za-z0-9_]+
+    </Rule>
+
+    <Rule color="Strings">
+      \#[0-9]+
+    </Rule>
+
+    <!-- Digits -->
+    <Rule color="Numbers">
+      \b\d
+    </Rule>
+
+    <!-- keywords -->
+    <Keywords color="Keywords">
+      <Word>from</Word>
+      <Word>where</Word>
+    </Keywords>
+
+    <Keywords color="Operators">
+      <Word>!</Word>
+      <Word>*</Word>
+      <Word>/</Word>
+      <Word>+</Word>
+      <Word>-</Word>
+      <Word>&lt;</Word>
+      <Word>&gt;</Word>
+      <Word>&lt;=</Word>
+      <Word>&gt;=</Word>
+      <Word>&lt;-</Word>
+      <Word>-&gt;</Word>
+      <Word>==</Word>
+      <Word>!=</Word>
+      <Word>&amp;</Word>
+      <Word>&amp;&amp;</Word>
+      <Word>|</Word>
+      <Word>||</Word>
+      <Word>in</Word>
+      <Word>contains</Word>
+      <Word>startwith</Word>
+      <Word>startswith</Word>
+      <Word>endwith</Word>
+      <Word>endswith</Word>
+      <Word>regex</Word>
+      <Word>match</Word>
+    </Keywords>
+
+  </RuleSet>
+</SyntaxDefinition>
