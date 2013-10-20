@@ -490,68 +490,68 @@ namespace StarryEyes.Filters.Parsing
             switch (literal.Value.ToLower())
             {
                 case "protected":
-                case "isProtected":
+                case "isprotected":
                 case "is_protected":
                     return selector(new UserIsProtected(), new RetweeterIsProtected());
                 case "verified":
-                case "isVerified":
+                case "isverified":
                 case "is_verified":
                     return selector(new UserIsVerified(), new RetweeterIsVerified());
                 case "translator":
-                case "isTranslator":
+                case "istranslator":
                 case "is_translator":
                     return selector(new UserIsTranslator(), new RetweeterIsTranslator());
-                case "contributorsEnabled":
+                case "contributorsenabled":
                 case "contributors_enabled":
-                case "isContributorsEnabled":
+                case "iscontributorsenabled":
                 case "is_contributors_enabled":
                     return selector(new UserIsContributorsEnabled(), new RetweeterIsContributorsEnabled());
-                case "geoEnabled":
+                case "geoenabled":
                 case "geo_enabled":
-                case "isGeoEnabled":
+                case "isgeoenabled":
                 case "is_geo_enabled":
                     return selector(new UserIsGeoEnabled(), new RetweeterIsGeoEnabled());
                 case "id":
                     return selector(new UserId(), new RetweeterId());
                 case "status":
                 case "statuses":
-                case "statusCount":
+                case "statuscount":
                 case "status_count":
-                case "statusesCount":
+                case "statusescount":
                 case "statuses_count":
                     return selector(new UserStatuses(), new RetweeterStatuses());
                 case "friend":
                 case "friends":
                 case "following":
                 case "followings":
-                case "friendsCount":
+                case "friendscount":
                 case "friends_count":
                 case "followingsCount":
                 case "followings_count":
                     return selector(new UserFollowing(), new RetweeterFollowing());
                 case "follower":
                 case "followers":
-                case "followersCount":
+                case "followerscount":
                 case "followers_count":
                     return selector(new UserFollowers(), new RetweeterFollowers());
                 case "fav":
-                case "favCount":
+                case "favcount":
                 case "favorite":
                 case "favorites":
                 case "fav_count":
-                case "favoriteCount":
+                case "favoritecount":
                 case "favorite_count":
-                case "favoritesCount":
+                case "favoritescount":
                 case "favorites_count":
                     return selector(new UserFavroites(), new RetweeterFavroites());
                 case "list":
                 case "listed":
-                case "listCount":
+                case "listcount":
                 case "list_count":
-                case "listedCount":
+                case "listedcount":
                 case "listed_count":
                     return selector(new UserListed(), new RetweeterListed());
-                case "screenName":
+                case "screenname":
                 case "screen_name":
                     return selector(new UserScreenName(), new RetweeterScreenName());
                 case "name":
