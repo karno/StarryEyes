@@ -449,6 +449,8 @@ namespace StarryEyes.Filters.Parsing
                     case "follower":
                     case "followers":
                         return new LocalUserFollowers(repl);
+                    case "block":
+                    case "blocks":
                     case "blocking":
                     case "blockings":
                         return new LocalUserBlockings(repl);
