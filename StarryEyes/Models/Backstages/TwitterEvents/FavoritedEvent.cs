@@ -1,4 +1,5 @@
-﻿using StarryEyes.Anomaly.TwitterApi.DataModels;
+﻿using System.Windows.Media;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Views;
 
 namespace StarryEyes.Models.Backstages.TwitterEvents
@@ -18,12 +19,9 @@ namespace StarryEyes.Models.Backstages.TwitterEvents
             get { return Source.ScreenName + ": " + TargetStatus; }
         }
 
-        public override System.Windows.Media.Color Background
+        public override Color Background
         {
-            get
-            {
-                return MetroColors.Orange;
-            }
+            get { return MetroColors.Amber; }
         }
     }
 }

@@ -23,7 +23,7 @@ namespace StarryEyes.Models.Backstages.NotificationEvents.PostEvents
 
         public override System.Windows.Media.Color Background
         {
-            get { return MetroColors.Blue; }
+            get { return MetroColors.Cyan; }
         }
     }
 }

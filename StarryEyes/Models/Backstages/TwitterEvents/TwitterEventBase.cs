@@ -46,7 +46,7 @@ namespace StarryEyes.Models.Backstages.TwitterEvents
 
         public override Color Background
         {
-            get { return MetroColors.Blue; }
+            get { return MetroColors.Cyan; }
         }
     }
 }
