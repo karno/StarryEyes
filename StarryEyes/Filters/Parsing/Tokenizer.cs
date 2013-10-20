@@ -6,7 +6,7 @@ namespace StarryEyes.Filters.Parsing
 {
     internal static class Tokenizer
     {
-        public static IEnumerable<Token> Tokenize(string query)
+        public static IEnumerable<Token> Tokenize(string query, bool suppressErrors = false)
         {
             int strptr = 0;
             do
@@ -28,35 +28,30 @@ namespace StarryEyes.Filters.Parsing
                         yield return new Token(TokenType.OperatorOr, strptr);
                         break;
                     case '<':
-                        if (query.Length <= strptr + 1)
-                            throw new ArgumentException("クエリが短すぎます。");
-                        switch (query[strptr + 1])
+                        if (CheckNext(query, strptr, '='))
                         {
-                            case '=': // <=
-                                yield return new Token(TokenType.OperatorLessThanOrEqual, strptr);
-                                strptr++;
-                                break;
-                            case '-': // <-
-                                yield return new Token(TokenType.OperatorIn, strptr);
-                                strptr++;
-                                break;
-                            default: // <
-                                yield return new Token(TokenType.OperatorLessThan, strptr);
-                                break;
+                            yield return new Token(TokenType.OperatorLessThanOrEqual, strptr);
+                            strptr++;
+                        }
+                        else if (CheckNext(query, strptr, '-'))
+                        {
+                            yield return new Token(TokenType.OperatorIn, strptr);
+                            strptr++;
+                        }
+                        else
+                        {
+                            yield return new Token(TokenType.OperatorLessThan, strptr);
                         }
                         break;
                     case '>':
-                        if (query.Length <= strptr + 1)
-                            throw new ArgumentException("クエリが短すぎます。");
-                        switch (query[strptr + 1])
+                        if (CheckNext(query, strptr, '='))
                         {
-                            case '=': // >=
-                                yield return new Token(TokenType.OperatorGreaterThanOrEqual, strptr);
-                                strptr++;
-                                break;
-                            default: // >
-                                yield return new Token(TokenType.OperatorGreaterThan, strptr);
-                                break;
+                            yield return new Token(TokenType.OperatorGreaterThanOrEqual, strptr);
+                            strptr++;
+                        }
+                        else
+                        {
+                            yield return new Token(TokenType.OperatorGreaterThan, strptr);
                         }
                         break;
                     case '(':
@@ -69,17 +64,14 @@ namespace StarryEyes.Filters.Parsing
                         yield return new Token(TokenType.OperatorPlus, strptr);
                         break;
                     case '-':
-                        if (query.Length <= strptr + 1)
-                            throw new ArgumentException("クエリが短すぎます。");
-                        switch (query[strptr + 1])
+                        if (CheckNext(query, strptr, '>'))
                         {
-                            case '>': // ->
-                                yield return new Token(TokenType.OperatorContains, strptr);
-                                strptr++;
-                                break;
-                            default:
-                                yield return new Token(TokenType.OperatorMinus, strptr);
-                                break;
+                            yield return new Token(TokenType.OperatorContains, strptr);
+                            strptr++;
+                        }
+                        else
+                        {
+                            yield return new Token(TokenType.OperatorMinus, strptr);
                         }
                         break;
                     case '*':
@@ -97,27 +89,28 @@ namespace StarryEyes.Filters.Parsing
                     case ':':
                         yield return new Token(TokenType.Collon, strptr);
                         break;
-                    case '=':
-                        AssertNext(query, strptr, '=');
+                    case '=': // == or =
+                        if (CheckNext(query, strptr, '='))
+                        {
+                            strptr++;
+                        }
                         yield return new Token(TokenType.OperatorEquals, strptr);
-                        strptr++;
                         break;
                     case '!':
-                        if (query.Length <= strptr + 1)
-                            throw new ArgumentException("クエリが短すぎます。");
-                        switch (query[strptr + 1])
+                        if (CheckNext(query, strptr, '='))
                         {
-                            case '=': // !=
-                                yield return new Token(TokenType.OperatorNotEquals, strptr);
-                                strptr++;
-                                break;
-                            default:
-                                yield return new Token(TokenType.Exclamation, strptr);
-                                break;
+                            yield return new Token(TokenType.OperatorNotEquals, strptr);
+                            strptr++;
+                        }
+                        else
+                        {
+                            yield return new Token(TokenType.Exclamation, strptr);
                         }
                         break;
                     case '"':
-                        yield return new Token(TokenType.String, GetInQuoteString(query, ref strptr), strptr);
+                        yield return new Token(TokenType.String,
+                                               GetInQuoteString(query, ref strptr, suppressErrors),
+                                               strptr);
                         break;
                     case ' ':
                     case '\t':
@@ -126,7 +119,7 @@ namespace StarryEyes.Filters.Parsing
                         // skip reading
                         break;
                     default:
-                        int begin = strptr;
+                        var begin = strptr;
                         // 何らかのトークン分割子に出会うまで空回し
                         const string tokens = "&|<>()+-*/.,:=!\" \t\r\n";
                         do
@@ -154,16 +147,15 @@ namespace StarryEyes.Filters.Parsing
         }
 
         /// <summary>
-        /// 先頭から終了のダブルクオートに出会うまでのテキストを取得します。<para />
-        /// エスケープシーケンスを考慮します。
+        /// Gets text between quotes. Consider escape-sequences.
         /// </summary>
-        /// <param name="query">クエリ文字列</param>
-        /// <param name="cursor">文字列の開始ダブルクオートのインデックスを渡してください。解析終了後は、文字列終了のダブルクオートを示します</param>
-        /// <returns>文字列部分</returns>
-        /// <exception cref="System.ArgumentException">文字列の解析に失敗</exception>
-        public static string GetInQuoteString(string query, ref int cursor)
+        /// <param name="query">query string</param>
+        /// <param name="cursor">Starting index of quotes, after this method, returns last index of quote.</param>
+        /// <param name="suppressErrors">suppress exceptions</param>
+        /// <returns>string</returns>
+        public static string GetInQuoteString(string query, ref int cursor, bool suppressErrors)
         {
-            int begin = cursor++;
+            var begin = cursor++;
             while (cursor < query.Length)
             {
                 if (query[cursor] == '\\')
@@ -171,6 +163,10 @@ namespace StarryEyes.Filters.Parsing
                     // 次のダブルクオートかバックスラッシュを読み飛ばす
                     if (cursor + 1 == query.Length)
                     {
+                        if (suppressErrors)
+                        {
+                            return query.Substring(begin + 1).UnescapeFromQuery();
+                        }
                         throw new ArgumentException("クエリはバックスラッシュで終了しています。");
                     }
                     if (query[cursor + 1] == '"' || query[cursor + 1] == '\\')
@@ -185,22 +181,17 @@ namespace StarryEyes.Filters.Parsing
                 }
                 cursor++;
             }
+            // 文字列を無理やり終える
+            if (suppressErrors)
+            {
+                return query.Substring(begin + 1).UnescapeFromQuery();
+            }
             throw new ArgumentException("文字列が閉じられていません: " + query.Substring(begin));
         }
 
         public static bool CheckNext(string q, int i, char c)
         {
-            if (i + 1 >= q.Length || q[i] != c)
-                return false;
-            return true;
-        }
-
-        public static void AssertNext(string q, int i, char c)
-        {
-            if (i + 1 >= q.Length)
-                throw new ArgumentException("クエリが短すぎます。");
-            if (q[i] != c)
-                throw new ArgumentException("この文字は予期されていません: " + q[i] + "(in \"" + q + "\" , index " + i + "), 予期されているもの: " + c);
+            return q.Length > i + 1 && q[i + 1] == c;
         }
     }
 }
