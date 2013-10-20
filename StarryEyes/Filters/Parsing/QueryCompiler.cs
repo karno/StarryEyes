@@ -590,12 +590,12 @@ namespace StarryEyes.Filters.Parsing
                 case "isretweet":
                 case "is_retweet":
                     return new StatusIsRetweet();
-                case "mention":
                 case "replyto":
                 case "reply_to":
                 case "inreplyto":
                 case "in_reply_to":
                     return new StatusInReplyTo();
+                case "mention":
                 case "to":
                     return new StatusTo();
                 case "id":
