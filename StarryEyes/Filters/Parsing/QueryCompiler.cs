@@ -526,7 +526,7 @@ namespace StarryEyes.Filters.Parsing
                 case "followings":
                 case "friendscount":
                 case "friends_count":
-                case "followingsCount":
+                case "followingscount":
                 case "followings_count":
                     return selector(new UserFollowing(), new RetweeterFollowing());
                 case "follower":
@@ -535,12 +535,11 @@ namespace StarryEyes.Filters.Parsing
                 case "followers_count":
                     return selector(new UserFollowers(), new RetweeterFollowers());
                 case "fav":
-                case "favcount":
+                case "favs":
                 case "favorite":
                 case "favorites":
-                case "fav_count":
-                case "favoritecount":
-                case "favorite_count":
+                case "favscount":
+                case "favs_count":
                 case "favoritescount":
                 case "favorites_count":
                     return selector(new UserFavroites(), new RetweeterFavroites());
