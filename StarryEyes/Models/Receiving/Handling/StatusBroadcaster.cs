@@ -69,20 +69,21 @@ namespace StarryEyes.Models.Receiving.Handling
                 _signal.Reset();
                 while (_queue.TryDequeue(out notification) && !_isHaltRequested)
                 {
-                    var status = notification.StatusModel.Status;
-                    if (notification.IsAdded && MuteBlockManager.IsBlockedOrMuted(status))
+                    var status = notification.StatusModel == null ? null : notification.StatusModel.Status;
+                    var added = notification.IsAdded && status != null;
+                    if (added && MuteBlockManager.IsBlockedOrMuted(status))
                     {
                         // MUTE CAPTURE
                         System.Diagnostics.Debug.WriteLine("*** Mute or Block Capture: " + status);
                         continue;
                     }
-                    if (notification.IsAdded && notification.IsNew)
+                    if (added && notification.IsNew)
                     {
                         NotificationService.NotifyReceived(status);
                         NotificationService.StartAcceptNewArrival(status);
                     }
                     _broadcastSubject.OnNext(notification);
-                    if (!notification.IsAdded)
+                    if (!added)
                     {
                         NotificationService.NotifyDeleted(notification.StatusId, status);
                     }

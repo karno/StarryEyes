@@ -213,9 +213,9 @@ namespace StarryEyes
 
                 // Build stack trace report file
                 var builder = new StringBuilder();
-                builder.AppendLine("Krile STARRYEYES #" + FormattedVersion);
+                builder.AppendLine("Krile STARRYEYES #" + FormattedVersion + " - " + DateTime.Now.ToString());
                 builder.AppendLine(Environment.OSVersion + " " + (Environment.Is64BitProcess ? "x64" : "x86"));
-                builder.AppendLine("execution mode: " + ExecutionMode.ToString() + " " +
+                builder.AppendLine("execution mode: " + ExecutionMode.ToString() + ", " +
                     "multicore JIT: " + IsMulticoreJitEnabled.ToString() + ", " +
                     "hardware rendering: " + IsHardwareRenderingEnabled.ToString());
                 builder.AppendLine();
