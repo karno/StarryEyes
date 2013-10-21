@@ -22,7 +22,7 @@ namespace StarryEyes.Models.Backstages.TwitterEvents
         {
             get
             {
-                return MetroColors.Green;
+                return MetroColors.Emerald;
             }
         }
     }

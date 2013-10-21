@@ -82,7 +82,7 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
         public TwitterUser User { get; set; }
 
         /// <summary>
-        /// Body of this tweet/message.
+        /// Body of this tweet/message. Escape sequences are already resolved.
         /// </summary>
         public string Text { get; set; }
 
@@ -182,53 +182,73 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
 
         public string GetEntityAidedText(bool showFullUrl = false)
         {
-            var builder = new StringBuilder();
-            var status = this;
-            if (status.RetweetedOriginal != null)
-                status = status.RetweetedOriginal; // change target
-            var escaped = ParsingExtension.EscapeEntity(status.Text);
-            TwitterEntity prevEntity = null;
-            foreach (var entity in status.Entities.Guard().OrderBy(e => e.StartIndex))
+            try
             {
-                int pidx = 0;
-                if (prevEntity != null)
-                    pidx = prevEntity.EndIndex;
-                if (pidx < entity.StartIndex)
+                var builder = new StringBuilder();
+                var status = this;
+                if (status.RetweetedOriginal != null)
+                    status = status.RetweetedOriginal; // change target
+                var escaped = ParsingExtension.EscapeEntity(status.Text);
+                TwitterEntity prevEntity = null;
+                foreach (var entity in status.Entities.Guard().OrderBy(e => e.StartIndex))
                 {
-                    // output raw
-                    builder.Append(ParsingExtension.ResolveEntity(escaped.Substring(pidx, entity.StartIndex - pidx)));
+                    int pidx = 0;
+                    if (prevEntity != null)
+                        pidx = prevEntity.EndIndex;
+                    if (pidx < entity.StartIndex)
+                    {
+                        // output raw
+                        builder.Append(ParsingExtension.ResolveEntity(escaped.Substring(pidx, entity.StartIndex - pidx)));
+                    }
+                    switch (entity.EntityType)
+                    {
+                        case EntityType.Hashtags:
+                            builder.Append("#" + entity.DisplayText);
+                            break;
+                        case EntityType.Urls:
+                            builder.Append(showFullUrl
+                                               ? ParsingExtension.ResolveEntity(entity.OriginalUrl)
+                                               : ParsingExtension.ResolveEntity(entity.DisplayText));
+                            break;
+                        case EntityType.Media:
+                            builder.Append(showFullUrl
+                                               ? ParsingExtension.ResolveEntity(entity.MediaUrl)
+                                               : ParsingExtension.ResolveEntity(entity.DisplayText));
+                            break;
+                        case EntityType.UserMentions:
+                            builder.Append("@" + entity.DisplayText);
+                            break;
+                    }
+                    prevEntity = entity;
                 }
-                switch (entity.EntityType)
+                if (prevEntity == null)
                 {
-                    case EntityType.Hashtags:
-                        builder.Append("#" + entity.DisplayText);
-                        break;
-                    case EntityType.Urls:
-                        builder.Append(showFullUrl
-                                           ? ParsingExtension.ResolveEntity(entity.OriginalUrl)
-                                           : ParsingExtension.ResolveEntity(entity.DisplayText));
-                        break;
-                    case EntityType.Media:
-                        builder.Append(showFullUrl
-                                           ? ParsingExtension.ResolveEntity(entity.MediaUrl)
-                                           : ParsingExtension.ResolveEntity(entity.DisplayText));
-                        break;
-                    case EntityType.UserMentions:
-                        builder.Append("@" + entity.DisplayText);
-                        break;
+                    builder.Append(ParsingExtension.ResolveEntity(escaped));
                 }
-                prevEntity = entity;
+                else if (prevEntity.EndIndex < escaped.Length)
+                {
+                    builder.Append(ParsingExtension.ResolveEntity(
+                        escaped.Substring(prevEntity.EndIndex, escaped.Length - prevEntity.EndIndex)));
+                }
+                return builder.ToString();
             }
-            if (prevEntity == null)
+            catch (ArgumentOutOfRangeException ex)
             {
-                builder.Append(ParsingExtension.ResolveEntity(escaped));
+                var sb = new StringBuilder();
+                sb.AppendLine("Parse Error! : " + Text);
+                if (Entities == null)
+                {
+                    sb.AppendLine("Entities: null");
+                }
+                else
+                {
+                    sb.Append("Entities: ");
+                    Entities.OrderBy(e => e.StartIndex)
+                            .Select(e => e.StartIndex + "- " + e.EndIndex + " : " + e.DisplayText)
+                            .ForEach(s => sb.AppendLine("    " + s));
+                }
+                throw new ArgumentOutOfRangeException(sb.ToString(), ex);
             }
-            else if (prevEntity.EndIndex < escaped.Length)
-            {
-                builder.Append(ParsingExtension.ResolveEntity(
-                    escaped.Substring(prevEntity.EndIndex, escaped.Length - prevEntity.EndIndex)));
-            }
-            return builder.ToString();
         }
 
         /// <summary>
