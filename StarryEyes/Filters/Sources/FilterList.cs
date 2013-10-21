@@ -52,6 +52,7 @@ namespace StarryEyes.Filters.Sources
         private void GetListUsersInfo(bool enforceReceive = false)
         {
             _isPreparing = true;
+            System.Diagnostics.Debug.WriteLine("receiving list: " + this.FilterValue);
             Task.Run(async () =>
             {
                 try
@@ -83,6 +84,7 @@ namespace StarryEyes.Filters.Sources
                     {
                         this._ids.Clear();
                         memberList.ForEach(this._ids.Add);
+                        System.Diagnostics.Debug.WriteLine("updated list: " + this.FilterValue + " users: " + _ids.Count);
                     }
                 }
                 catch (Exception ex)

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
@@ -125,12 +126,10 @@ namespace StarryEyes.Views.Controls
             {
                 return this.QueryOnLeft(froms.Skip(1), inputted);
             }
-            switch (inputted)
+            switch (inputted.ToLower())
             {
-                case "F":
                 case "f":
                     return new[] { new CompletionData("from", "rom", "from につづいて、ソースクエリを指定できます。") };
-                case "W":
                 case "w":
                     return new[] { new CompletionData("where", "here", "where につづいて、フィルタクエリを指定できます。") };
             }
@@ -154,16 +153,226 @@ namespace StarryEyes.Views.Controls
 		    new CompletionData("conv", "conv:", "返信タイムライン(引数: ツイートID)"), 
                 };
             }
+            if (t.Any() &&
+                (t.Last().Type == TokenType.Literal ||
+                 t.Last().Type == TokenType.String) &&
+                inputted == " ")
+            {
+                return new[] { new CompletionData("where", "where につづいて、フィルタクエリを指定できます。") };
+            }
             return null;
         }
 
         private IEnumerable<CompletionData> QueryOnRight(IEnumerable<Token> tokens, string inputted)
         {
-            return null;
+            var accepts = " (.!" + Environment.NewLine;
+            if (!accepts.Contains(inputted))
+            {
+                return null;
+            }
+            var lts = tokens.TakeLast(2).ToArray();
+            if (lts.Length == 0)
+            {
+                // first
+                return this.GetVariableCompletionData();
+            }
+            var lt = lts.LastOrDefault();
+            var plt = lts.FirstOrDefault();
+            if (lts.Length >= 2 && lt.Type == TokenType.Period)
+            {
+                if (plt.IsMatchTokenLiteral("user") || plt.IsMatchTokenLiteral("retweeter"))
+                {
+                    return this.GetUserObjectFieldCompletionData();
+                }
+                return this.GetAccountObjectFieldCompletionData();
+            }
+            return this.CheckPreviousIsVariable(lt) ? null : this.GetVariableCompletionData();
         }
 
+        private bool CheckPreviousIsVariable(Token token)
+        {
+            if (token.Type == TokenType.CloseBracket) return true;
+            if (token.Type == TokenType.String) return false;
+            if (token.Type == TokenType.Literal)
+            {
+                if (String.IsNullOrEmpty(token.Value))
+                {
+                    return true;
+                }
+                #region determine defined variables
+                switch (token.Value.ToLower())
+                {
+                    case "we":
+                    case "our":
+                    case "us":
+                    case "@":
+                    case "block":
+                    case "blocks":
+                    case "blocking":
+                    case "blockings":
+                    case "user":
+                    case "retweeter":
+                    case "protected":
+                    case "isprotected":
+                    case "is_protected":
+                    case "verified":
+                    case "isverified":
+                    case "is_verified":
+                    case "translator":
+                    case "istranslator":
+                    case "is_translator":
+                    case "contributorsenabled":
+                    case "contributors_enabled":
+                    case "iscontributorsenabled":
+                    case "is_contributors_enabled":
+                    case "geoenabled":
+                    case "geo_enabled":
+                    case "isgeoenabled":
+                    case "is_geo_enabled":
+                    case "id":
+                    case "status":
+                    case "statuses":
+                    case "statuscount":
+                    case "status_count":
+                    case "statusescount":
+                    case "statuses_count":
+                    case "friend":
+                    case "friends":
+                    case "following":
+                    case "followings":
+                    case "friendscount":
+                    case "friends_count":
+                    case "followingscount":
+                    case "followings_count":
+                    case "follower":
+                    case "followers":
+                    case "followerscount":
+                    case "followers_count":
+                    case "fav":
+                    case "favs":
+                    case "favorite":
+                    case "favorites":
+                    case "favscount":
+                    case "favs_count":
+                    case "favoritescount":
+                    case "favorites_count":
+                    case "list":
+                    case "listed":
+                    case "listcount":
+                    case "list_count":
+                    case "listedcount":
+                    case "listed_count":
+                    case "screenname":
+                    case "screen_name":
+                    case "name":
+                    case "username":
+                    case "bio":
+                    case "desc":
+                    case "description":
+                    case "loc":
+                    case "location":
+                    case "lang":
+                    case "language":
+                    case "dm":
+                    case "isdm":
+                    case "is_dm":
+                    case "message":
+                    case "ismessage":
+                    case "is_message":
+                    case "directmessage":
+                    case "direct_message":
+                    case "isdirectmessage":
+                    case "is_direct_message":
+                    case "rt":
+                    case "retweet":
+                    case "isretweet":
+                    case "is_retweet":
+                    case "replyto":
+                    case "reply_to":
+                    case "inreplyto":
+                    case "in_reply_to":
+                    case "mention":
+                    case "to":
+                    case "favorer":
+                    case "favorers":
+                    case "rts":
+                    case "retweets":
+                    case "retweeters":
+                    case "text":
+                    case "body":
+                    case "via":
+                    case "from":
+                    case "source":
+                    case "client":
+                        return true;
+                }
+                #endregion
+                switch (token.Value[0])
+                {
+                    case '@':
+                    case '#':
+                        return true;
+                }
+                long n;
+                return Int64.TryParse(token.Value, out n);
+            }
+            return false;
+        }
+
+        private IEnumerable<CompletionData> GetVariableCompletionData()
+        {
+            return new[]
+            {
+		new CompletionData("us", "[Account] Krileに登録済みのアカウント一覧"), 
+		new CompletionData("user", "[User] ツイートのユーザー"), 
+		new CompletionData("retweeter", "[User] リツイートしたユーザー"), 
+		new CompletionData("direct_message", "[Boolean] ダイレクトメッセージであるか"), 
+		new CompletionData("retweet", "[Boolean] リツイートであるか"), 
+		new CompletionData("id", "[Numeric] ツイートのID"), 
+		new CompletionData("in_reply_to", "[Numeric] 返信先ツイートID"),
+		new CompletionData("text", "[String] ツイートの本文"),
+		new CompletionData("body", "[String] ツイートの本文"),
+		new CompletionData("via", "[String] ツイートの送信元クライアント"),
+		new CompletionData("from", "[String] ツイートの送信元クライアント"),
+		new CompletionData("to", "[Num/Str/Set] ツイートの返信先ユーザー"),
+		new CompletionData("favs", "[Num/Set] 被お気に入り登録数"),
+		new CompletionData("rts", "[Num/Set] 被リツイート数"),
+            };
+        }
+
+        private IEnumerable<CompletionData> GetAccountObjectFieldCompletionData()
+        {
+            return new[]
+            {
+		new CompletionData("followings", "[Set] フォローしているユーザー"), 
+		new CompletionData("followers", "[Set] フォローされているユーザー"), 
+		new CompletionData("blockings", "[Set] ブロックしているユーザー"), 
+            };
+        }
+
+        private IEnumerable<CompletionData> GetUserObjectFieldCompletionData()
+        {
+            return new[]
+            {
+                new CompletionData("protected", "[Boolean] ツイートを非公開にしているか"),
+                new CompletionData("verified", "[Boolean] 公式認証済みであるか"),
+                new CompletionData("translator", "[Boolean] 翻訳者であるか"),
+                new CompletionData("contributors_enabled", "[Boolean] コントリビュータを有効にしているか"),
+                new CompletionData("geo_enabled", "[Boolean] 位置情報を有効にしているか"),
+                new CompletionData("id", "[Numeric] ユーザーID"),
+                new CompletionData("statuses", "[Numeric] ツイート数"),
+                new CompletionData("followings", "[Numeric] フォロー数"),
+                new CompletionData("followers", "[Numeric] フォロー数"),
+                new CompletionData("favs", "[Numeric] お気に入り登録数"),
+                new CompletionData("listed_count", "[Numeric] リスト被登録"),
+                new CompletionData("screen_name", "[String] スクリーン名(@ID)"),
+                new CompletionData("name", "[String] ユーザー名"),
+                new CompletionData("bio", "[String] プロフィール"),
+                new CompletionData("loc", "[String] 所在地"),
+                new CompletionData("lang", "[String] 言語"),
+            };
+        }
 
         #endregion
-
     }
 }

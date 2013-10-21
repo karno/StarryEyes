@@ -74,57 +74,48 @@
                           Content="非選択時の新着ツイート数を表示"
                           IsChecked="{Binding IsShowUnreadCounts}" />
             </StackPanel>
-            <TabControl Grid.Row="2"
-                        HorizontalContentAlignment="Stretch"
-                        VerticalContentAlignment="Stretch"
-                        Padding="0">
-                <TabItem Header="ビジュアルエディタ">
-                    <Grid Background="#FFE5E5E5">
-                        <Controls:QueryEditor QueryText="{Binding QueryString, Mode=TwoWay}" />
-                    </Grid>
-                </TabItem>
-                <TabItem Header="クエリエディタ">
-                    <Grid Background="#FFE5E5E5">
-                        <Grid.RowDefinitions>
-                            <RowDefinition />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-                        <TextBox AcceptsReturn="True"
-                                 AcceptsTab="True"
-                                 Background="#FFF0F0F0"
-                                 BorderThickness="0"
-                                 Text="{Binding QueryString,
-                                                UpdateSourceTrigger=PropertyChanged}"
-                                 TextWrapping="Wrap"
-                                 VerticalScrollBarVisibility="Auto" />
-                        <TextBlock Grid.Row="1"
-                                   Background="#60E51400"
-                                   Padding="4"
-                                   Text="{Binding ExceptionMessage}"
-                                   Visibility="{Binding FoundError,
-                                                        Converter={StaticResource BoolVisibleConveter}}" />
-                        <TextBlock Grid.Row="2"
-                                   VerticalAlignment="Top"
-                                   Foreground="White"
-                                   Padding="4"
-                                   TextWrapping="Wrap">
-                            <TextBlock.Style>
-                                <Style TargetType="{x:Type TextBlock}">
-                                    <Setter Property="Background" Value="#FF1BA1E2" />
-                                    <Setter Property="Text" Value="クエリを正しく解析できました。" />
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding FoundError}" Value="True">
-                                            <Setter Property="Background" Value="#FFE51400" />
-                                            <Setter Property="Text" Value="クエリにエラーが存在します。(現在の結果は反映されません)" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
-                    </Grid>
-                </TabItem>
-            </TabControl>
+            <Grid Grid.Row="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid>
+                    <TextBlock Margin="8,8,8,4" Text="このタブのクエリ" />
+                    <TextBlock Margin="8,8,8,4" HorizontalAlignment="Right">
+                        <Hyperlink Command="{Binding OpenQueryReferenceCommand}">Krile Queryのヘルプ...</Hyperlink>
+                    </TextBlock>
+                </Grid>
+                <Controls:QueryEditor Grid.Row="1"
+                                      Background="#FFF0F0F0"
+                                      QueryText="{Binding QueryString,
+                                                          Mode=TwoWay}" />
+                <TextBlock Grid.Row="2"
+                           Background="#60E51400"
+                           Padding="4"
+                           Text="{Binding ExceptionMessage}"
+                           Visibility="{Binding FoundError,
+                                                Converter={StaticResource BoolVisibleConveter}}" />
+                <TextBlock Grid.Row="3"
+                           VerticalAlignment="Top"
+                           Foreground="White"
+                           Padding="4"
+                           TextWrapping="Wrap">
+                    <TextBlock.Style>
+                        <Style TargetType="{x:Type TextBlock}">
+                            <Setter Property="Background" Value="#FF1BA1E2" />
+                            <Setter Property="Text" Value="クエリを正しく解析できました。" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding FoundError}" Value="True">
+                                    <Setter Property="Background" Value="#FFE51400" />
+                                    <Setter Property="Text" Value="クエリにエラーが存在します。(現在の結果は反映されません)" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+            </Grid>
         </Grid>
     </flips:FlipContent>
 </UserControl>

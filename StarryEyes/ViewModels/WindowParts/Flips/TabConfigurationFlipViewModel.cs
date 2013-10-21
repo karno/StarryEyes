@@ -145,6 +145,29 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             }
         }
 
+        private const string QueryReferenceUri = "https://github.com/karno/StarryEyes/wiki";
+        #region OpenQueryReferenceCommand
+        private Livet.Commands.ViewModelCommand _openQueryReferenceCommand;
+
+        public Livet.Commands.ViewModelCommand OpenQueryReferenceCommand
+        {
+            get
+            {
+                if (this._openQueryReferenceCommand == null)
+                {
+                    this._openQueryReferenceCommand = new Livet.Commands.ViewModelCommand(OpenQueryReference);
+                }
+                return this._openQueryReferenceCommand;
+            }
+        }
+
+        public void OpenQueryReference()
+        {
+            BrowserHelper.Open(QueryReferenceUri);
+        }
+        #endregion
+
+
         public void Close()
         {
             this.IsConfigurationActive = false;
