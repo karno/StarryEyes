@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
@@ -30,12 +29,6 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
 {
     public class StatusViewModel : ViewModel
     {
-        private static int _instanceCount;
-        public static int InstanceCount
-        {
-            get { return _instanceCount; }
-        }
-
         private readonly ReadOnlyDispatcherCollectionRx<UserViewModel> _favoritedUsers;
         private readonly TimelineViewModelBase _parent;
         private readonly ReadOnlyDispatcherCollectionRx<UserViewModel> _retweetedUsers;
@@ -57,8 +50,6 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         public StatusViewModel(TimelineViewModelBase parent, StatusModel status,
                                IEnumerable<long> initialBoundAccounts)
         {
-            Interlocked.Increment(ref _instanceCount);
-            this.CompositeDisposable.Add(() => Interlocked.Decrement(ref _instanceCount));
             this._parent = parent;
             // get status model
             this.Model = status;
@@ -942,8 +933,20 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             this.Parent.FocusedStatus = null;
         }
 
+        // this method is not supported yet.
         public void GiveFavstarTrophy()
         {
+            this.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
+            {
+                AllowDialogCancellation = true,
+                CommonButtons = TaskDialogCommonButtons.Close,
+                MainIcon = VistaTaskDialogIcon.Error,
+                MainInstruction = "この操作は実装されていません。",
+                Content = "Favstar は オワコン",
+                Title = "ツイート賞の授与",
+            }));
+            return;
+
             if (!this.AssertQuickActionEnabled()) return;
             if (Setting.FavstarApiKey.Value == null)
             {

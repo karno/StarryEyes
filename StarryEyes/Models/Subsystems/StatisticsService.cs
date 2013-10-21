@@ -18,8 +18,6 @@ namespace StarryEyes.Models.Subsystems
 
         private static int _estimatedGrossTweetCount;
 
-        private static int _currentInstanceCount;
-
         private static readonly int[] _tweetsCountArray = new[] { 0, 0, 0, 0, 0, 0 };
 
         private static int _currentChannel = -1;
@@ -30,11 +28,6 @@ namespace StarryEyes.Models.Subsystems
         public static int EstimatedGrossTweetCount
         {
             get { return _estimatedGrossTweetCount; }
-        }
-
-        public static int CurrentInstanceCount
-        {
-            get { return _currentInstanceCount; }
         }
 
         /// <summary>
@@ -92,7 +85,6 @@ namespace StarryEyes.Models.Subsystems
                 if (!_isThreadAlive) return;
 
                 // update statistics params
-                _currentInstanceCount = StatusViewModel.InstanceCount;
                 var previousGross = _estimatedGrossTweetCount;
                 UpdateTweetCount();
 

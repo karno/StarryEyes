@@ -321,11 +321,6 @@ namespace StarryEyes.ViewModels
             get { return (StatisticsService.TweetsPerMinutes).ToString(); }
         }
 
-        public string InstanceCount
-        {
-            get { return (StatisticsService.CurrentInstanceCount).ToString(); }
-        }
-
         public int GrossTweetCount
         {
             get { return StatisticsService.EstimatedGrossTweetCount; }
@@ -346,7 +341,6 @@ namespace StarryEyes.ViewModels
 
         private void UpdateStatistics()
         {
-            RaisePropertyChanged(() => InstanceCount);
             RaisePropertyChanged(() => TweetsPerMinutes);
             RaisePropertyChanged(() => GrossTweetCount);
             RaisePropertyChanged(() => StartupTime);
