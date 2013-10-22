@@ -4,7 +4,6 @@ using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using StarryEyes.Models.Databases;
-using StarryEyes.ViewModels.Timelines.Statuses;
 
 namespace StarryEyes.Models.Subsystems
 {
@@ -17,6 +16,8 @@ namespace StarryEyes.Models.Subsystems
         private static volatile bool _isThreadAlive = true;
 
         private static int _estimatedGrossTweetCount;
+
+        private static int _tweetsPerMinutes = 0;
 
         private static readonly int[] _tweetsCountArray = new[] { 0, 0, 0, 0, 0, 0 };
 
@@ -37,7 +38,7 @@ namespace StarryEyes.Models.Subsystems
         {
             get
             {
-                return _tweetsCountArray.Sum();
+                return _tweetsPerMinutes;
             }
         }
 
@@ -56,7 +57,7 @@ namespace StarryEyes.Models.Subsystems
             UpdateTweetCount();
         }
 
-        private static async void UpdateTweetCount()
+        private static async Task UpdateTweetCount()
         {
             _estimatedGrossTweetCount = (int)(await StatusProxy.GetCountAsync());
         }
@@ -73,7 +74,7 @@ namespace StarryEyes.Models.Subsystems
         /// <summary>
         ///     Work procedure
         /// </summary>
-        private static void UpdateStatisticWorkProc()
+        private static async void UpdateStatisticWorkProc()
         {
             while (_isThreadAlive)
             {
@@ -86,10 +87,15 @@ namespace StarryEyes.Models.Subsystems
 
                 // update statistics params
                 var previousGross = _estimatedGrossTweetCount;
-                UpdateTweetCount();
+                await UpdateTweetCount();
+                var delta = _estimatedGrossTweetCount - previousGross;
 
+                // indicate next channel
                 _currentChannel = (_currentChannel + 1) % 6;
-                _tweetsCountArray[_currentChannel] = _estimatedGrossTweetCount - previousGross;
+
+                _tweetsCountArray[_currentChannel] = delta;
+
+                Interlocked.Exchange(ref _tweetsPerMinutes, _tweetsCountArray.Sum());
 
                 var handler = StatisticsParamsUpdated;
                 if (handler != null)
