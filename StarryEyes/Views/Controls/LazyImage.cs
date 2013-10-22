@@ -138,14 +138,17 @@ namespace StarryEyes.Views.Controls
                         errorCount++;
                         try
                         {
-                            var response = await client.GetAsync(source);
-                            result = await response.Content.ReadAsByteArrayAsync();
+                            using (var response = await client.GetAsync(source))
+                            {
+                                result = await response.Content.ReadAsByteArrayAsync();
+                            }
                         }
                         catch (Exception ex)
                         {
                             if (errorCount > MaxRetryCount)
                             {
-                                System.Diagnostics.Debug.WriteLine("could not load:" + source + Environment.NewLine + ex.Message);
+                                System.Diagnostics.Debug.WriteLine("could not load:" + source + Environment.NewLine +
+                                                                   ex.Message);
                                 throw;
                             }
                             System.Diagnostics.Debug.WriteLine(ex.ToString());
@@ -164,6 +167,10 @@ namespace StarryEyes.Views.Controls
             {
                 subject.OnError(ex);
                 subject.Dispose();
+            }
+            finally
+            {
+                client.Dispose();
             }
         }
 
