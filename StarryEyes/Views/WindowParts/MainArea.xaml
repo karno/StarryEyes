@@ -7,9 +7,10 @@
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:primitives="clr-namespace:StarryEyes.Views.WindowParts.Primitives"
+             xmlns:tabs2="clr-namespace:StarryEyes.ViewModels.Timelines.Tabs"
+             xmlns:triggers="clr-namespace:StarryEyes.Views.Triggers"
              xmlns:utils="clr-namespace:StarryEyes.Views.Utils"
              xmlns:vm="clr-namespace:StarryEyes.ViewModels.WindowParts"
-             xmlns:tabs2="clr-namespace:StarryEyes.ViewModels.Timelines.Tabs"
              d:DataContext="{d:DesignInstance vm:MainAreaViewModel}"
              d:DesignHeight="300"
              d:DesignWidth="300"
@@ -155,6 +156,9 @@
             </DataTemplate>
         </ResourceDictionary>
     </UserControl.Resources>
+    <i:Interaction.Triggers>
+        <triggers:KeyAssignTrigger Group="Timeline" />
+    </i:Interaction.Triggers>
     <ItemsControl ItemTemplate="{StaticResource ColumnTemplate}" ItemsSource="{Binding Columns}">
         <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>

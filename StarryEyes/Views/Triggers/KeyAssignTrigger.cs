@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interactivity;
 using StarryEyes.Settings;
@@ -22,35 +23,55 @@ namespace StarryEyes.Views.Triggers
         protected override void OnAttached()
         {
             this.AssociatedObject.PreviewKeyDown += HandleKeyPreview;
-            this.AssociatedObject.KeyUp += HandleKey;
             base.OnAttached();
         }
 
         protected override void OnDetaching()
         {
             this.AssociatedObject.PreviewKeyDown -= HandleKeyPreview;
-            this.AssociatedObject.KeyUp -= HandleKey;
             base.OnDetaching();
         }
 
         void HandleKeyPreview(object sender, KeyEventArgs e)
         {
-            e.Handled = CheckActionKey(e.Key, true);
+            e.Handled = CheckActionKey(e.Key);
         }
 
-        void HandleKey(object sender, KeyEventArgs e)
+        private bool CheckActionKey(Key key)
         {
-            e.Handled = CheckActionKey(e.Key, false);
-        }
+            var window = Window.GetWindow(this.AssociatedObject);
+            if (window == null) return false;
+            var modifiers = Keyboard.Modifiers;
+            if ((FocusManager.GetFocusedElement(window) as TextBox) != null)
+            {
+                // only allows modifiered keys
+                if (modifiers == ModifierKeys.None && key != Key.Escape &&
+                    key < Key.F1 && key > Key.F24)
+                {
+                    return false;
+                }
 
-        private bool CheckActionKey(Key key, bool isPreview)
-        {
+                if (modifiers == ModifierKeys.Control)
+                {
+                    switch (key)
+                    {
+                        case Key.A:
+                        case Key.C:
+                        case Key.X:
+                        case Key.V:
+                        case Key.Y:
+                        case Key.Z:
+                            // above keys could not override
+                            return false;
+                    }
+                }
+            }
+            System.Diagnostics.Debug.WriteLine("[" + this.Group + "] key action detected");
             return KeyAssignManager.CurrentProfile.GetAssigns(key, Group)
-                             .Where(b => (b.HandlePreview && isPreview) || !isPreview)
-                             .Where(b => b.Modifiers == Keyboard.Modifiers)
+                             .Where(b => b.Modifiers == modifiers)
                              .SelectMany(b => b.Actions)
                              .Select(KeyAssignManager.InvokeAction)
-                             .ToArray()
+                             .ToArray() // run all actions
                              .Any(r => r);
         }
     }

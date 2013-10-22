@@ -208,6 +208,7 @@ namespace StarryEyes.ViewModels.WindowParts
             };
             CompositeDisposable.Add(_geoWatcher);
             _geoWatcher.Start();
+            this.RegisterEvents();
         }
 
         public AccountSelectionFlipViewModel AccountSelectionFlip
@@ -545,6 +546,42 @@ namespace StarryEyes.ViewModels.WindowParts
             get { return InputAreaModel.PreviousPosted != null && !IsAmending; }
         }
 
+        #region Key assign control
+
+        private static bool _isRegisterEvents;
+        private void RegisterEvents()
+        {
+            if (_isRegisterEvents) throw new InvalidOperationException();
+            _isRegisterEvents = true;
+            KeyAssignManager.RegisterActions(
+                KeyAssignAction.Create("CloseInput", this.CloseInput),
+                KeyAssignAction.Create("Post", this.Send),
+                KeyAssignAction.Create("LoadStash", () =>
+                {
+                    if (this.IsDraftsExisted)
+                    {
+                        _draftedInputs[0].Writeback();
+                    }
+                }),
+                KeyAssignAction.Create("Amend", this.AmendPreviousOne),
+                KeyAssignAction.Create("AttachImage", () =>
+                {
+                    if (this.IsImageAttached)
+                    {
+                        this.DetachImage();
+                    }
+                    else
+                    {
+                        this.AttachImage();
+                    }
+                }),
+                KeyAssignAction.Create("ToggleEscape",
+                                       () => this.IsUrlAutoEsacpeEnabled = !this.IsUrlAutoEsacpeEnabled)
+                );
+        }
+
+        #endregion
+
         #region Text box control
 
         private string _selectedText = "";
@@ -718,6 +755,8 @@ namespace StarryEyes.ViewModels.WindowParts
             if (!IsOpening) return;
             if (CheckClearInput())
                 IsOpening = false;
+            // move focus to timeline
+            MainWindowModel.SetFocusTo(FocusRequest.Timeline);
         }
 
         public void FocusToTextBox()

@@ -12,6 +12,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:seb="clr-namespace:StarryEyes.Views.Behaviors"
              xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:triggers="clr-namespace:StarryEyes.Views.Triggers"
              xmlns:utils="clr-namespace:StarryEyes.Views.Utils"
              xmlns:windowParts="clr-namespace:StarryEyes.ViewModels.WindowParts"
              x:Name="UserControl"
@@ -59,6 +60,7 @@
         <l:InteractionMessageTrigger Messenger="{Binding Messenger}">
             <behaviors:TaskDialogInteractionMessageAction />
         </l:InteractionMessageTrigger>
+        <triggers:KeyAssignTrigger Group="Input" />
     </i:Interaction.Triggers>
     <Grid>
         <Grid.ColumnDefinitions>

@@ -172,7 +172,7 @@ namespace StarryEyes.Settings
 
         public void Invoke(string argument)
         {
-            if (_hasArgument != null && _hasArgument.Value == !String.IsNullOrEmpty(argument))
+            if (_hasArgument != null && _hasArgument.Value == String.IsNullOrEmpty(argument))
             {
                 BackstageModel.RegisterEvent(
                     new OperationFailedEvent(

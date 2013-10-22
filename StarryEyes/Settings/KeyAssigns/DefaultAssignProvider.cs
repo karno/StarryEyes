@@ -20,10 +20,14 @@ c+t: FocusToTimeline
 c+q: FocusToSearch
 c+a+down: SelectNextAccount
 c+a+up: SelectPreviousAccount
-c+a+Left: ClearSelectAccount
-c+a+Right: SelectAllAccount
+c+a+left: ClearSelectAccount
+c+a+right: SelectAllAccount
 
 [Timeline]
+left: SelectLeftTab
+down: MoveDown
+up: MoveUp
+right: SelectRightTab
 h: SelectLeftTab
 j: MoveDown
 k: MoveUp
@@ -70,11 +74,11 @@ OemPeriod: ShowConversation
 escape: CloseInput
 #enter: Post
 c+enter: Post
-c+s: Save
 c+space: LoadStash
 c+o: AttachImage
 c+w: ToggleEscape
 c+b: ToggleBind
+up: Amend
 
 [Search]
 escape: CloseSearch FocusToTimeline

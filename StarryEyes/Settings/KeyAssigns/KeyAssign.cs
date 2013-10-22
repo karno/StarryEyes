@@ -10,7 +10,7 @@ namespace StarryEyes.Settings.KeyAssigns
     public class KeyAssign
     {
         static readonly Regex LineRegex =
-            new Regex(@"^(?<important>!)?(?:[ \t]*(?:(?<mod_ctrl>c(?:trl|ontrol)?)|(?<mod_alt>a(?:lt)?)|(?<mod_shift>s(?:hift)?))[ \t]*[\+＋]+)*(?<key>[^\:\+]+?)\:(?<action>.+?)$",
+            new Regex(@"^(?:[ \t]*(?:(?<mod_ctrl>c(?:trl|ontrol)?)|(?<mod_alt>a(?:lt)?)|(?<mod_shift>s(?:hift)?))[ \t]*[\+＋]+)*(?<key>[^\:\+]+?)\:(?<action>.+?)$",
                       RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
         static readonly Regex ActionsParseRegex =
             new Regex(@"^(?:\s*([^(]+?\s*(?:\("".*?(?<!\\)""\))?\s*),)+$");
@@ -26,14 +26,8 @@ namespace StarryEyes.Settings.KeyAssigns
             {
                 throw new ArgumentException("That line could not be parsed: \"" + line + "\"");
             }
-            var important = false;
             Key key;
             var modifiers = ModifierKeys.None;
-
-            if (result.Groups["important"].Success)
-            {
-                important = true;
-            }
 
             // pre-convert numeric keys
             var keystr = result.Groups["key"].Value;
@@ -80,22 +74,19 @@ namespace StarryEyes.Settings.KeyAssigns
                 });
             }
 
-            return new KeyAssign(key, modifiers, descriptions, important);
+            return new KeyAssign(key, modifiers, descriptions);
         }
 
-        public KeyAssign(Key key, ModifierKeys modifiers, IEnumerable<KeyAssignActionDescription> actions, bool handlePreview = false)
+        public KeyAssign(Key key, ModifierKeys modifiers, IEnumerable<KeyAssignActionDescription> actions)
         {
             Key = key;
             Modifiers = modifiers;
-            HandlePreview = handlePreview;
             Actions = actions.ToArray();
         }
 
         public Key Key { get; set; }
 
         public ModifierKeys Modifiers { get; set; }
-
-        public bool HandlePreview { get; set; }
 
         public IEnumerable<KeyAssignActionDescription> Actions { get; set; }
 
@@ -118,8 +109,6 @@ namespace StarryEyes.Settings.KeyAssigns
         public override string ToString()
         {
             var builder = new StringBuilder();
-            if (HandlePreview)
-                builder.Append("!");
             builder.Append(GetKeyDescribeString());
             builder.Append(": ");
             builder.Append(Actions.Select(a => a.ToString()).JoinString(","));

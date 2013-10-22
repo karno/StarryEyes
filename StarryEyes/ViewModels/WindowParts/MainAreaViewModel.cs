@@ -107,8 +107,10 @@ namespace StarryEyes.ViewModels.WindowParts
                 case TimelineFocusRequest.BelowStatus:
                     ExecuteTimelineAction(tlvm =>
                     {
-                        if (tlvm.Timeline.Count == 0 || tlvm.FocusedStatus == null) return;
-                        var index = tlvm.Timeline.IndexOf(tlvm.FocusedStatus) + 1;
+                        if (tlvm.Timeline.Count == 0) return;
+                        var index = tlvm.FocusedStatus == null
+                                        ? 0
+                                        : tlvm.Timeline.IndexOf(tlvm.FocusedStatus) + 1;
                         if (index < tlvm.Timeline.Count)
                         {
                             tlvm.FocusedStatus = tlvm.Timeline[index];

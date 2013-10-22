@@ -71,6 +71,7 @@
             <sebehaviors:TaskDialogInteractionMessageAction />
         </l:InteractionMessageTrigger>
         <!--  WindowのCloseキャンセル処理に対応する場合は、WindowCloseCancelBehaviorの使用を検討してください  -->
+        <triggers:KeyAssignTrigger />
     </i:Interaction.Triggers>
     <controls:MetroWindow.WindowCommands>
         <controls:WindowCommands>
@@ -103,6 +104,7 @@
                     <triggers:EnterKeyTrigger>
                         <ei:CallMethodAction MethodName="OnEnterKeyDown" TargetObject="{Binding SearchFlipViewModel}" />
                     </triggers:EnterKeyTrigger>
+                    <triggers:KeyAssignTrigger Group="Search" />
                 </i:Interaction.Triggers>
             </TextBox>
         </controls:WindowCommands>
