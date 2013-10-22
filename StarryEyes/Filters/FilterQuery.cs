@@ -59,7 +59,7 @@ namespace StarryEyes.Filters
             var source =
                 Sources.Guard()
                        .Select(s => s.GetSqlQuery())
-                       .JoinString(" and ");
+                       .JoinString(" or ");
             var predicate = PredicateTreeRoot != null
                        ? PredicateTreeRoot.GetSqlQuery()
                        : String.Empty;
@@ -67,7 +67,7 @@ namespace StarryEyes.Filters
             {
                 if (!String.IsNullOrEmpty(predicate))
                 {
-                    return source + " and (" + predicate + ")";
+                    return "(" + source + ") and (" + predicate + ")";
                 }
                 return source;
             }
