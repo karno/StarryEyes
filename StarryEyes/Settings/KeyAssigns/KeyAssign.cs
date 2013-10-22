@@ -13,7 +13,7 @@ namespace StarryEyes.Settings.KeyAssigns
             new Regex(@"^(?:[ \t]*(?:(?<mod_ctrl>c(?:trl|ontrol)?)|(?<mod_alt>a(?:lt)?)|(?<mod_shift>s(?:hift)?))[ \t]*[\+＋]+)*(?<key>[^\:\+]+?)\:(?<action>.+?)$",
                       RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
         static readonly Regex ActionsParseRegex =
-            new Regex(@"^(?:\s*([^(]+?\s*(?:\("".*?(?<!\\)""\))?\s*),)+$");
+            new Regex(@"^(?:\s*([^(]+?\s*(?:\("".*?(?<!\\)""\))?\s*) *[, ] *)+$");
         static readonly Regex ActionParseRegex =
             new Regex(@"^\s*([^(]+?)\s*(?:\(""(.*?)(?<!\\)""\))?\s*$");
         static readonly Regex NumericRegex =
@@ -60,7 +60,10 @@ namespace StarryEyes.Settings.KeyAssigns
                 throw new ArgumentException("Actions are could not be parsed: " + result.Groups["action"].Value);
             }
             var descriptions = new List<KeyAssignActionDescription>();
-            foreach (var capture in actions.Groups[1].Captures.OfType<Capture>().Select(s => s.Value))
+            var capts = actions.Groups [1].Captures
+                                          .OfType<Capture>()
+                                          .Select(s => s.Value);
+            foreach (var capture in capts)
             {
                 var action = ActionParseRegex.Match(capture);
                 if (!action.Success)
