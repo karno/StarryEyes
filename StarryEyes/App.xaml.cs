@@ -229,7 +229,7 @@ namespace StarryEyes
                     sw.WriteLine(builder.ToString());
                 }
 #else
-                var tpath = Path.GetTempFileName();
+                var tpath = Path.GetTempFileName() + ".crashlog";
                 using (var sw = new StreamWriter(tpath))
                 {
                     sw.WriteLine(builder.ToString());

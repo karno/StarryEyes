@@ -117,14 +117,4 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="textBox1.Text" xml:space="preserve">
-    <value>System.InvalidOperationException: この Visual は、PresentationSource に接続されていません。
-   場所 System.Windows.Media.Visual.PointFromScreen(Point point)
-   場所 MahApps.Metro.Behaviours.BorderlessWindowBehavior.HwndHook(IntPtr hWnd, Int32 message, IntPtr wParam, IntPtr lParam, Boolean&amp; handled)
-   場所 System.Windows.Interop.HwndSource.PublicHooksFilterMessage(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam, Boolean&amp; handled)
-   場所 MS.Win32.HwndWrapper.WndProc(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam, Boolean&amp; handled)
-   場所 MS.Win32.HwndSubclass.DispatcherCallbackOperation(Object o)
-   場所 System.Windows.Threading.ExceptionWrapper.InternalRealCall(Delegate callback, Object args, Int32 numArgs)
-   場所 MS.Internal.Threading.ExceptionFilterHelper.TryCatchWhen(Object source, Delegate method, Object args, Int32 numArgs, Delegate catchHandler)</value>
-  </data>
 </root>

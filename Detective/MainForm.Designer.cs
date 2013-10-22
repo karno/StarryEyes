@@ -29,14 +29,13 @@ namespace Detective
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.label1 = new System.Windows.Forms.Label();
             this.mainPanel = new System.Windows.Forms.Panel();
             this.isSendFeedback = new System.Windows.Forms.CheckBox();
             this.restartButton = new System.Windows.Forms.Button();
             this.exitButton = new System.Windows.Forms.Button();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.errorText = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.feedbackLabel = new System.Windows.Forms.Label();
             this.mainPanel.SuspendLayout();
@@ -118,26 +117,25 @@ namespace Detective
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.panel2.BackColor = System.Drawing.SystemColors.Control;
-            this.panel2.Controls.Add(this.textBox1);
+            this.panel2.Controls.Add(this.errorText);
             this.panel2.Location = new System.Drawing.Point(-1, 81);
             this.panel2.Name = "panel2";
             this.panel2.Padding = new System.Windows.Forms.Padding(16, 0, 0, 0);
             this.panel2.Size = new System.Drawing.Size(580, 160);
             this.panel2.TabIndex = 3;
             // 
-            // textBox1
+            // errorText
             // 
-            this.textBox1.BackColor = System.Drawing.SystemColors.Control;
-            this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.textBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.textBox1.Location = new System.Drawing.Point(16, 0);
-            this.textBox1.Multiline = true;
-            this.textBox1.Name = "textBox1";
-            this.textBox1.ReadOnly = true;
-            this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox1.Size = new System.Drawing.Size(564, 160);
-            this.textBox1.TabIndex = 0;
-            this.textBox1.Text = resources.GetString("textBox1.Text");
+            this.errorText.BackColor = System.Drawing.SystemColors.Control;
+            this.errorText.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.errorText.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.errorText.Location = new System.Drawing.Point(16, 0);
+            this.errorText.Multiline = true;
+            this.errorText.Name = "errorText";
+            this.errorText.ReadOnly = true;
+            this.errorText.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.errorText.Size = new System.Drawing.Size(564, 160);
+            this.errorText.TabIndex = 0;
             // 
             // label2
             // 
@@ -194,7 +192,7 @@ namespace Detective
         private System.Windows.Forms.Panel mainPanel;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Panel panel2;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox errorText;
         private System.Windows.Forms.CheckBox isSendFeedback;
         private System.Windows.Forms.Button restartButton;
         private System.Windows.Forms.Button exitButton;

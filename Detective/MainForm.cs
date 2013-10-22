@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,7 +11,7 @@ namespace Detective
     {
         public MainForm()
         {
-            this.Opacity = 0.6;
+            this.Opacity = 0.2;
             InitializeComponent();
             isSendFeedback.Checked = true;
             this.Load += OnFormLoad;
@@ -23,7 +19,8 @@ namespace Detective
 
         private async void OnFormLoad(object sender, EventArgs e)
         {
-            for (int i = 0; i <= 10; i++)
+            errorText.Text = Program.ErrorLogData;
+            for (var i = 0; i <= 10; i++)
             {
                 this.Opacity = (double)i / 10;
                 await Task.Run(() => Thread.Sleep(10));
@@ -32,7 +29,7 @@ namespace Detective
 
         private async void DoClose()
         {
-            for (int i = 10; i >= 0; i--)
+            for (var i = 10; i >= 0; i--)
             {
                 this.Opacity = (double)i / 10;
                 await Task.Run(() => Thread.Sleep(10));
@@ -43,21 +40,68 @@ namespace Detective
         private async void restartButton_Click(object sender, EventArgs e)
         {
             if (isSendFeedback.Checked)
-                await Feedback();
+            {
+                if (!await Feedback())
+                {
+                    return;
+                }
+            }
             this.DoClose();
         }
 
         private async void exitButton_Click(object sender, EventArgs e)
         {
             if (isSendFeedback.Checked)
-                await Feedback();
+            {
+                if (!await Feedback())
+                {
+                    return;
+                }
+            }
             this.DoClose();
         }
 
-        private async Task Feedback()
+        private const string FeedbackUri = "http://krile.starwing.net/shared/report.php";
+        private async Task<bool> Feedback()
         {
-            this.Invoke(new Action(() => mainPanel.Visible = false));
-            await Task.Run(() => Thread.Sleep(1000));
+            mainPanel.Visible = false;
+            try
+            {
+                await Task.Run(() => this.PostString(new Uri(FeedbackUri), Program.ErrorLogData));
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "フィードバック エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+            return true;
+        }
+
+        private void PostString(Uri target, string data)
+        {
+            var post = "error=" + Uri.EscapeDataString(data);
+            var bytes = Encoding.UTF8.GetBytes(post);
+
+            var req = WebRequest.Create(target);
+            req.Proxy = WebRequest.DefaultWebProxy;
+
+            req.Method = "POST";
+            req.ContentType = "application/x-www-form-urlencoded";
+            req.ContentLength = bytes.Length;
+
+            //データをPOST送信するためのStreamを取得
+            using (var rs = req.GetRequestStream())
+            {
+                rs.Write(bytes, 0, bytes.Length);
+            }
+
+            using (var res = (HttpWebResponse)req.GetResponse())
+            {
+                if (res.StatusCode != HttpStatusCode.OK)
+                {
+                    throw new WebException(res.StatusDescription);
+                }
+            }
         }
     }
 }
