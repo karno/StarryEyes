@@ -281,6 +281,7 @@ namespace StarryEyes.ViewModels.Timelines.Tabs
         internal void CloseTab(TabViewModel tab)
         {
             this._parent.CloseTab(this, tab);
+            this._parent.Columns.ForEach(cvm => cvm.RestoreLastClosedTabCommand.RaiseCanExecuteChanged());
         }
 
         #region CreateNewTabCommand
@@ -315,14 +316,25 @@ namespace StarryEyes.ViewModels.Timelines.Tabs
             get
             {
                 return this._restoreLastClosedTabCommand ??
-                       (this._restoreLastClosedTabCommand = new Livet.Commands.ViewModelCommand(this.RestoreLastClosedTab));
+                       (this._restoreLastClosedTabCommand =
+                        new Livet.Commands.ViewModelCommand(this.RestoreLastClosedTab,
+                                                            this.CanRestoreClosedTab));
             }
+        }
+
+        public bool CanRestoreClosedTab()
+        {
+            return TabManager.CanReviveTab;
         }
 
         public void RestoreLastClosedTab()
         {
             this.Focus();
-            TabManager.ReviveTab();
+            if (TabManager.CanReviveTab)
+            {
+                TabManager.ReviveTab();
+            }
+            this._parent.Columns.ForEach(cvm => cvm.RestoreLastClosedTabCommand.RaiseCanExecuteChanged());
         }
         #endregion
     }

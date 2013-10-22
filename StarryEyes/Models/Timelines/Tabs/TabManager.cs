@@ -15,6 +15,11 @@ namespace StarryEyes.Models.Timelines.Tabs
 
         private static int _currentFocusColumnIndex;
 
+        public static bool CanReviveTab
+        {
+            get { return _closedTabsStack.Count > 0; }
+        }
+
         public static event Action CurrentFocusColumnChanged;
 
         public static ObservableSynchronizedCollection<ColumnModel> Columns
