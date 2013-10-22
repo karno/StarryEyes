@@ -24,6 +24,7 @@ namespace StarryEyes.Models
     public static class InputAreaModel
     {
         private static TabModel _currentFocusTabModel;
+        private static TweetInputInfo _previousPosted;
 
         private static readonly ObservableSynchronizedCollection<TwitterAccount> _bindingAccounts =
             new ObservableSynchronizedCollection<TwitterAccount>();
@@ -33,6 +34,14 @@ namespace StarryEyes.Models
 
         private static readonly ObservableSynchronizedCollection<TweetInputInfo> _drafts =
             new ObservableSynchronizedCollection<TweetInputInfo>();
+
+        public static event Action OnPreviousPostUpdated;
+
+        private static void RaisePreviousPostUpdated()
+        {
+            var handler = OnPreviousPostUpdated;
+            if (handler != null) handler();
+        }
 
         static InputAreaModel()
         {
@@ -91,7 +100,15 @@ namespace StarryEyes.Models
             get { return _drafts; }
         }
 
-        public static TweetInputInfo PreviousPosted { get; set; }
+        public static TweetInputInfo PreviousPosted
+        {
+            get { return _previousPosted; }
+            set
+            {
+                _previousPosted = value;
+                RaisePreviousPostUpdated();
+            }
+        }
 
         public static void NotifyChangeFocusingTab(TabModel tabModel)
         {

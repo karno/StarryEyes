@@ -185,6 +185,11 @@ namespace StarryEyes.ViewModels.WindowParts
                         OverrideSelectedAccounts(infos);
                         DirectMessageTo = new UserViewModel(user);
                     }));
+            CompositeDisposable.Add(
+                new EventListener<Action>(
+                    h => InputAreaModel.OnPreviousPostUpdated += h,
+                    h => InputAreaModel.OnPreviousPostUpdated -= h,
+                    () => this.RaisePropertyChanged(() => CanAmend)));
 
             CompositeDisposable.Add(InitPostLimitPrediction());
 
@@ -303,6 +308,8 @@ namespace StarryEyes.ViewModels.WindowParts
                 RaisePropertyChanged(() => IsImageAttached);
                 RaisePropertyChanged(() => AttachedLocation);
                 RaisePropertyChanged(() => IsLocationAttached);
+                RaisePropertyChanged(() => IsAmending);
+                RaisePropertyChanged(() => CanAmend);
                 UpdateHashtagCandidates();
                 UpdateTextCount();
             }
@@ -465,6 +472,11 @@ namespace StarryEyes.ViewModels.WindowParts
             get { return InputInfo.AttachedGeoInfo != null; }
         }
 
+        public bool IsAmending
+        {
+            get { return this.InputInfo != null && this.InputInfo.PostedTweets != null; }
+        }
+
         public int TextCount
         {
             get
@@ -526,6 +538,11 @@ namespace StarryEyes.ViewModels.WindowParts
                              .Replace("\n", "")
                              .Replace(" ", ""));
             }
+        }
+
+        public bool CanAmend
+        {
+            get { return InputAreaModel.PreviousPosted != null && !IsAmending; }
         }
 
         #region Text box control
@@ -776,6 +793,8 @@ namespace StarryEyes.ViewModels.WindowParts
             RaisePropertyChanged(() => IsImageAttached);
             RaisePropertyChanged(() => AttachedLocation);
             RaisePropertyChanged(() => IsLocationAttached);
+            RaisePropertyChanged(() => IsAmending);
+            RaisePropertyChanged(() => CanAmend);
             UpdateHashtagCandidates();
             UpdateTextCount();
         }
@@ -915,10 +934,8 @@ namespace StarryEyes.ViewModels.WindowParts
                         {
                             Title = "ツイートの訂正",
                             MainIcon = VistaTaskDialogIcon.Information,
-                            Content =
-                                "直前に投稿されたツイートを削除し、投稿し直します。" +
-                                Environment.NewLine +
-                                "(削除に失敗した場合でも投稿は行われます。)",
+                            MainInstruction = "直前のツイートを削除し、再投稿します。",
+                            Content = "削除に失敗した場合でも投稿は行われます。",
                             ExpandedInfo = "削除されるツイート: " +
                                            InputInfo.PostedTweets.First()
                                                     .Item2 +
@@ -932,9 +949,11 @@ namespace StarryEyes.ViewModels.WindowParts
                             VerificationText = "次回から表示しない",
                             CommonButtons = TaskDialogCommonButtons.OKCancel,
                         }));
-                Setting.IsWarnAmendTweet.Value = amend.Response.VerificationChecked.GetValueOrDefault();
+                Setting.IsWarnAmendTweet.Value = !amend.Response.VerificationChecked.GetValueOrDefault();
                 if (amend.Response.Result == TaskDialogSimpleResult.Cancel)
+                {
                     return;
+                }
             }
             if (!CheckInput())
                 return;
