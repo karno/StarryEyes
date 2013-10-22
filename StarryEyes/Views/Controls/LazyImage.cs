@@ -9,7 +9,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using StarryEyes.Albireo.Threading;
+using StarryEyes.Annotations;
 
 namespace StarryEyes.Views.Controls
 {
@@ -86,11 +88,12 @@ namespace StarryEyes.Views.Controls
                                       try
                                       {
                                           using (var ms = new MemoryStream(b, false))
+                                          using (var ws = new WrappingStream(ms))
                                           {
                                               var bi = new BitmapImage();
                                               bi.BeginInit();
                                               bi.CacheOption = BitmapCacheOption.OnLoad;
-                                              bi.StreamSource = ms;
+                                              bi.StreamSource = ws;
                                               bi.DecodePixelWidth = dpw;
                                               bi.DecodePixelHeight = dph;
                                               bi.EndInit();
@@ -103,8 +106,9 @@ namespace StarryEyes.Views.Controls
                                           return null;
                                       }
                                   })
-                                  .ObserveOnDispatcher()
-                                  .Subscribe(b => SetImage(img, b, uri), ex => { });
+                                  .Subscribe(b => DispatcherHolder.Enqueue(
+                                      () => SetImage(img, b, uri), DispatcherPriority.Loaded)
+                                             , ex => { });
                     if (publisher != null)
                     {
                         _taskFactory.StartNew(() => LoadBytes(uri, publisher));
@@ -203,5 +207,143 @@ namespace StarryEyes.Views.Controls
         }
 
         #endregion
+
+        // ref:
+        // “Memory leak” with BitmapImage and MemoryStream — Logos Bible Software Code Blog
+        // http://code.logos.com/blog/2008/04/memory_leak_with_bitmapimage_and_memorystream.html
+        private sealed class WrappingStream : Stream
+        {
+            private Stream _stream;
+
+            public WrappingStream([NotNull] Stream stream)
+            {
+                if (stream == null) throw new ArgumentNullException("stream");
+                this._stream = stream;
+            }
+
+            public override bool CanRead
+            {
+                get { return this._stream != null && this._stream.CanRead; }
+            }
+
+            public override bool CanSeek
+            {
+                get { return this._stream != null && this._stream.CanSeek; }
+            }
+
+            public override bool CanWrite
+            {
+                get { return this._stream != null && this._stream.CanWrite; }
+            }
+
+            public override long Length
+            {
+                get
+                {
+                    this.AssertDisposed();
+                    return this._stream.Length;
+                }
+            }
+
+            public override long Position
+            {
+                get
+                {
+                    this.AssertDisposed();
+                    return this._stream.Position;
+                }
+                set
+                {
+                    this.AssertDisposed();
+                    this._stream.Position = value;
+                }
+            }
+
+            public override IAsyncResult BeginRead(
+                byte[] buffer, int offset, int count, AsyncCallback callback, object state)
+            {
+                this.AssertDisposed();
+                return this._stream.BeginRead(buffer, offset, count, callback, state);
+            }
+
+            public override IAsyncResult BeginWrite(
+                byte[] buffer, int offset, int count, AsyncCallback callback, object state)
+            {
+                this.AssertDisposed();
+                return this._stream.BeginWrite(buffer, offset, count, callback, state);
+            }
+
+            public override int EndRead(IAsyncResult asyncResult)
+            {
+                this.AssertDisposed();
+                return this._stream.EndRead(asyncResult);
+            }
+
+            public override void EndWrite(IAsyncResult asyncResult)
+            {
+                this.AssertDisposed();
+                this._stream.EndWrite(asyncResult);
+            }
+
+            public override void Flush()
+            {
+                this.AssertDisposed();
+                this._stream.Flush();
+            }
+
+            public override int Read(byte[] buffer, int offset, int count)
+            {
+                this.AssertDisposed();
+                return this._stream.Read(buffer, offset, count);
+            }
+
+            public override int ReadByte()
+            {
+                this.AssertDisposed();
+                return this._stream.ReadByte();
+            }
+
+            public override long Seek(long offset, SeekOrigin origin)
+            {
+                this.AssertDisposed();
+                return this._stream.Seek(offset, origin);
+            }
+
+            public override void SetLength(long value)
+            {
+                this.AssertDisposed();
+                this._stream.SetLength(value);
+            }
+
+            public override void Write(byte[] buffer, int offset, int count)
+            {
+                this.AssertDisposed();
+                this._stream.Write(buffer, offset, count);
+            }
+
+            public override void WriteByte(byte value)
+            {
+                this.AssertDisposed();
+                this._stream.WriteByte(value);
+            }
+
+            protected override void Dispose(bool disposing)
+            {
+                if (disposing)
+                {
+                    this._stream.Dispose();
+                    this._stream = null;
+                }
+                base.Dispose(disposing);
+            }
+
+            private void AssertDisposed()
+            {
+                if (this._stream == null)
+                {
+                    throw new ObjectDisposedException(GetType().Name);
+                }
+            }
+        }
     }
 }
