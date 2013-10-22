@@ -1,6 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
-using Codeplex.OAuth;
+using AsyncOAuth;
 using StarryEyes.Annotations;
 using StarryEyes.Anomaly;
 using StarryEyes.Anomaly.TwitterApi.DataModels;

@@ -2,7 +2,8 @@
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using Codeplex.OAuth;
+using System.Reactive.Threading.Tasks;
+using AsyncOAuth;
 using Livet;
 using Livet.Commands;
 using Livet.Messaging.Windows;
@@ -38,7 +39,7 @@ namespace StarryEyes.ViewModels.Dialogs
             _authorizer = new OAuthAuthorizer(Setting.GlobalConsumerKey.Value ?? App.ConsumerKey,
              Setting.GlobalConsumerSecret.Value ?? App.ConsumerSecret);
             CurrentAuthenticationStep = AuthenticationStep.RequestingToken;
-            Observable.Defer(() => _authorizer.GetRequestToken(RequestTokenEndpoint))
+            Observable.Defer(() => _authorizer.GetRequestToken(RequestTokenEndpoint).ToObservable())
                 .Retry(3, TimeSpan.FromSeconds(3)) // twitter sometimes returns an error without any troubles.
                 .Subscribe(t =>
                 {
@@ -108,7 +109,7 @@ namespace StarryEyes.ViewModels.Dialogs
         public void VerifyPin()
         {
             CurrentAuthenticationStep = AuthenticationStep.AuthorizingUser;
-            Observable.Defer(() => _authorizer.GetAccessToken(AccessTokenEndpoint, _currentRequestToken, Pin))
+            Observable.Defer(() => _authorizer.GetAccessToken(AccessTokenEndpoint, _currentRequestToken, Pin).ToObservable())
                 .Retry(3, TimeSpan.FromSeconds(3))
                 .Subscribe(r =>
                 {

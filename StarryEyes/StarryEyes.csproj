@@ -70,6 +70,10 @@
     <ApplicationIcon>krile.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AsyncOAuth, Version=0.8.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\AsyncOAuth.0.8.3\lib\AsyncOAuth.dll</HintPath>
+    </Reference>
     <Reference Include="ICSharpCode.AvalonEdit">
       <HintPath>..\packages\AvalonEdit.4.3.1.9430\lib\Net40\ICSharpCode.AvalonEdit.dll</HintPath>
     </Reference>
@@ -542,10 +546,6 @@
     <Folder Include="Views\Notifications\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ReactiveOAuth\ReactiveOAuth.csproj">
-      <Project>{c20883a2-c104-45ef-bade-a888328981eb}</Project>
-      <Name>ReactiveOAuth</Name>
-    </ProjectReference>
     <ProjectReference Include="..\StarryEyes.Albireo\StarryEyes.Albireo.csproj">
       <Project>{C2740802-BD1C-4B70-9B3A-F69DAE505827}</Project>
       <Name>StarryEyes.Albireo</Name>

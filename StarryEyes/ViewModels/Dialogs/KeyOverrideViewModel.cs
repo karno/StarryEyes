@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Reactive.Linq;
-using Codeplex.OAuth;
+using System.Reactive.Threading.Tasks;
+using AsyncOAuth;
 using Livet;
 using Livet.Messaging.Windows;
 using StarryEyes.Nightmare.Windows;
@@ -62,7 +63,7 @@ namespace StarryEyes.ViewModels.Dialogs
             if (IsKeyChecking) return;
             IsKeyChecking = true;
             var authorizer = new OAuthAuthorizer(OverrideConsumerKey, OverrideConsumerSecret);
-            Observable.Defer(() => authorizer.GetRequestToken(AuthorizationViewModel.RequestTokenEndpoint))
+            Observable.Defer(() => authorizer.GetRequestToken(AuthorizationViewModel.RequestTokenEndpoint).ToObservable())
                 .Retry(3, TimeSpan.FromSeconds(3))
                 .Finally(() => IsKeyChecking = false)
                 .Subscribe(_ =>
