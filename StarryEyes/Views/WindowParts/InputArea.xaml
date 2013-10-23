@@ -112,6 +112,7 @@
             <ItemsControl x:Name="ItemsControl"
                           Width="24"
                           Height="24"
+                          FocusVisualStyle="{x:Null}"
                           ItemsSource="{Binding BindingAuthInfos}"
                           d:IsHidden="True">
                 <ItemsControl.ItemsPanel>
@@ -521,7 +522,9 @@
                                       Fill="#FF000000"
                                       Stretch="Fill" />
                             </Border>
-                            <ItemsControl ItemTemplate="{DynamicResource HashtagDataTemplate}" ItemsSource="{Binding BindingHashtags}">
+                            <ItemsControl FocusVisualStyle="{x:Null}"
+                                          ItemTemplate="{DynamicResource HashtagDataTemplate}"
+                                          ItemsSource="{Binding BindingHashtags}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <StackPanel Orientation="Horizontal" />
@@ -538,7 +541,9 @@
                                       Fill="#FF000000"
                                       Stretch="Fill" />
                             </Border>
-                            <ItemsControl ItemTemplate="{DynamicResource HashtagDataTemplate}" ItemsSource="{Binding BindableHashtagCandidates}">
+                            <ItemsControl FocusVisualStyle="{x:Null}"
+                                          ItemTemplate="{DynamicResource HashtagDataTemplate}"
+                                          ItemsSource="{Binding BindableHashtagCandidates}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <StackPanel Orientation="Horizontal" />

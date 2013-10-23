@@ -515,7 +515,7 @@
                         <Run Text="が保存している検索キーワード:" />
                     </TextBlock>
                 </StackPanel>
-                <ItemsControl ItemsSource="{Binding SearchCandidate.SearchCandidates}">
+                <ItemsControl FocusVisualStyle="{x:Null}" ItemsSource="{Binding SearchCandidate.SearchCandidates}">
                     <ItemsControl.Template>
                         <ControlTemplate>
                             <ScrollViewer x:Name="ScrollViewer"

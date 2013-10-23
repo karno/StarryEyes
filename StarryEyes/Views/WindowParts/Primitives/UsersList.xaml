@@ -80,7 +80,8 @@
                            Text="loading..." />
             </StackPanel>
         </Border>
-        <ItemsControl Focusable="True"
+        <ItemsControl FocusVisualStyle="{x:Null}"
+                      Focusable="True"
                       ItemTemplate="{StaticResource UserItemTemplate}"
                       ItemsSource="{Binding Users,
                                             Mode=OneWay}"

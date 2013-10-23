@@ -305,7 +305,7 @@
                             </i:Interaction.Triggers>
                         </TextBlock>
                     </Grid>
-                    <ItemsControl ItemsSource="{Binding RelationControls}">
+                    <ItemsControl FocusVisualStyle="{x:Null}" ItemsSource="{Binding RelationControls}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <DataTemplate.Resources>

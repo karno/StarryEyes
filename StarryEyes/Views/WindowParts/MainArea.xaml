@@ -7,10 +7,11 @@
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:primitives="clr-namespace:StarryEyes.Views.WindowParts.Primitives"
-             xmlns:tabs2="clr-namespace:StarryEyes.ViewModels.Timelines.Tabs"
+             xmlns:tabs="clr-namespace:StarryEyes.ViewModels.Timelines.Tabs"
              xmlns:triggers="clr-namespace:StarryEyes.Views.Triggers"
              xmlns:utils="clr-namespace:StarryEyes.Views.Utils"
              xmlns:vm="clr-namespace:StarryEyes.ViewModels.WindowParts"
+             FocusVisualStyle="{x:Null}"
              d:DataContext="{d:DesignInstance vm:MainAreaViewModel}"
              d:DesignHeight="300"
              d:DesignWidth="300"
@@ -21,7 +22,7 @@
                 <ResourceDictionary Source="pack://application:,,,/Krile;component/DefaultContextMenus.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <utils:BooleanToVisibleConverter x:Key="BooleanToVisibleConverter" />
-            <DataTemplate x:Key="TabHeaderTemplate" DataType="tabs2:TabViewModel">
+            <DataTemplate x:Key="TabHeaderTemplate" DataType="tabs:TabViewModel">
                 <Border Margin="0,4,0,4" Background="White">
                     <StackPanel Margin="0,0,8,0" Orientation="Horizontal">
                         <i:Interaction.Behaviors>
@@ -77,7 +78,7 @@
                     </MultiDataTrigger>
                 </DataTemplate.Triggers>
             </DataTemplate>
-            <DataTemplate x:Key="ColumnTemplate" DataType="tabs2:ColumnViewModel">
+            <DataTemplate x:Key="ColumnTemplate" DataType="tabs:ColumnViewModel">
                 <Grid Margin="8,4,8,0" Background="{x:Null}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -87,6 +88,7 @@
                                   Margin="8,0"
                                   AllowDrop="True"
                                   Background="White"
+                                  FocusVisualStyle="{x:Null}"
                                   ItemTemplate="{StaticResource TabHeaderTemplate}"
                                   ItemsSource="{Binding Tabs}">
                         <i:Interaction.Behaviors>
@@ -107,6 +109,7 @@
                     <ItemsControl Grid.Row="1"
                                   Margin="0,4,0,0"
                                   Background="White"
+                                  FocusVisualStyle="{x:Null}"
                                   ItemsSource="{Binding Tabs}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
@@ -159,7 +162,9 @@
     <i:Interaction.Triggers>
         <triggers:KeyAssignTrigger Group="Timeline" />
     </i:Interaction.Triggers>
-    <ItemsControl ItemTemplate="{StaticResource ColumnTemplate}" ItemsSource="{Binding Columns}">
+    <ItemsControl FocusVisualStyle="{x:Null}"
+                  ItemTemplate="{StaticResource ColumnTemplate}"
+                  ItemsSource="{Binding Columns}">
         <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
                 <UniformGrid Rows="1" />

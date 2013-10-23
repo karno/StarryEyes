@@ -14,6 +14,7 @@
              xmlns:tabs="clr-namespace:StarryEyes.ViewModels.Timelines.Tabs"
              xmlns:utils="clr-namespace:StarryEyes.Views.Utils"
              x:Name="userControl"
+             FocusVisualStyle="{x:Null}"
              d:DataContext="{d:DesignInstance Type={x:Type tabs:TabViewModel}}"
              d:DesignHeight="300"
              d:DesignWidth="300"
@@ -1195,6 +1196,8 @@
                                                                       FallbackValue=00}"
                                                        TextWrapping="Wrap" />
                                             <ItemsControl Height="Auto"
+                                                          FocusVisualStyle="{x:Null}"
+                                                          Focusable="False"
                                                           ItemTemplate="{StaticResource UserItemTemplate}"
                                                           ItemsSource="{Binding FavoritedUsers,
                                                                                 Mode=OneTime}">
@@ -1228,6 +1231,8 @@
                                                                       FallbackValue=00}"
                                                        TextWrapping="Wrap" />
                                             <ItemsControl Height="Auto"
+                                                          FocusVisualStyle="{x:Null}"
+                                                          Focusable="False"
                                                           ItemTemplate="{StaticResource UserItemTemplate}"
                                                           ItemsSource="{Binding RetweetedUsers,
                                                                                 Mode=OneTime}">
@@ -1329,7 +1334,7 @@
             <SolidColorBrush x:Key="OptionMark.Pressed.Glyph" Color="#FF212121" />
             <SolidColorBrush x:Key="OptionMark.Static.Glyph" Color="#FF212121" />
             <Style TargetType="{x:Type CheckBox}">
-                <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}" />
+                <Setter Property="FocusVisualStyle" Value="{x:Null}" />
                 <Setter Property="Background" Value="{StaticResource OptionMark.Static.Background}" />
                 <Setter Property="BorderBrush" Value="{StaticResource OptionMark.Static.Border}" />
                 <Setter Property="Foreground" Value="{StaticResource {x:Static SystemColors.ControlTextBrushKey}}" />
@@ -1381,7 +1386,7 @@
                             </Grid>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="HasContent" Value="true">
-                                    <Setter Property="FocusVisualStyle" Value="{StaticResource OptionMarkFocusVisual}" />
+                                    <Setter Property="FocusVisualStyle" Value="{x:Null}" />
                                     <Setter Property="Padding" Value="4,-1,0,0" />
                                 </Trigger>
                                 <Trigger Property="IsMouseOver" Value="true">
@@ -1572,7 +1577,8 @@
                 </Button>
             </StackPanel>
         </Border>
-        <ItemsControl Focusable="True"
+        <ItemsControl FocusVisualStyle="{x:Null}"
+                      Focusable="True"
                       ItemTemplate="{StaticResource StatusItemTemplate}"
                       ItemsSource="{Binding Timeline,
                                             Mode=OneWay}"

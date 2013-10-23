@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Livet;
 using Livet.Messaging;
+using StarryEyes.Annotations;
 using StarryEyes.Filters.Expressions;
 using StarryEyes.Models;
 using StarryEyes.Models.Subsystems;
@@ -164,6 +165,7 @@ namespace StarryEyes.ViewModels
 
         private int _visibleCount;
 
+        [UsedImplicitly]
         public void Initialize()
         {
             #region bind events

@@ -29,7 +29,7 @@
             <ScrollViewer HorizontalScrollBarVisibility="Disabled"
                           Style="{StaticResource TouchScrollViewerStyle}"
                           VerticalScrollBarVisibility="Auto">
-                <ItemsControl ItemsSource="{Binding Accounts}">
+                <ItemsControl FocusVisualStyle="{x:Null}" ItemsSource="{Binding Accounts}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate DataType="{x:Type backstages:BackstageAccountViewModel}">
                             <Border Margin="8">
@@ -125,7 +125,7 @@
                           HorizontalAlignment="Stretch"
                           VerticalAlignment="Stretch"
                           Style="{StaticResource TouchScrollViewerStyle}">
-                <ItemsControl ItemsSource="{Binding TwitterEvents}">
+                <ItemsControl FocusVisualStyle="{x:Null}" ItemsSource="{Binding TwitterEvents}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Grid>
