@@ -46,7 +46,7 @@ namespace StarryEyes.Views.Triggers
             {
                 // only allows modifiered keys
                 if (modifiers == ModifierKeys.None && key != Key.Escape &&
-                    key < Key.F1 && key > Key.F24)
+                    !(key < Key.F1 && key > Key.F24))
                 {
                     return false;
                 }
