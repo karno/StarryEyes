@@ -107,7 +107,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                         _isDeferLoadEnabled = false;
                         return;
                     }
-                    twitterUsers.ForEach(u => Users.Add(new UserResultItemViewModel(u)));
+                    await DispatcherHelper.UIDispatcher.InvokeAsync(() => twitterUsers.ForEach(u => Users.Add(new UserResultItemViewModel(u))));
                 }
                 catch (Exception ex)
                 {
