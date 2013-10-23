@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // アセンブリに関する一般情報は以下の属性セットをとおして制御されます。
 // アセンブリに関連付けられている情報を変更するには、
 // これらの属性値を変更してください。
-[assembly: AssemblyTitle("Detective")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("reporter")]
+[assembly: AssemblyDescription("Krile Error Reporter Agent")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Detective")]
-[assembly: AssemblyCopyright("Copyright ©  2012")]
+[assembly: AssemblyCompany("starwing network")]
+[assembly: AssemblyProduct("StarryEyes.Detective")]
+[assembly: AssemblyCopyright("Copyright ©  2012 Karno")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
