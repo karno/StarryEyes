@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // アセンブリに関連付けられている情報を変更するには、
 // これらの属性値を変更してください。
 [assembly: AssemblyTitle("StarryEyes.Albireo")]
-[assembly: AssemblyDescription("Krile StarryEyes Data and Extensions Library")]
+[assembly: AssemblyDescription("Krile Data Structure Extensions Library")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Krile")]
+[assembly: AssemblyCompany("starwing network")]
 [assembly: AssemblyProduct("Krile StarryEyes")]
-[assembly: AssemblyCopyright("Copyright© 2012 Karno")]
+[assembly: AssemblyCopyright("Copyright© 2013 Karno")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

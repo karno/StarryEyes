@@ -9,8 +9,8 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("Krile Error Reporter Agent")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("starwing network")]
-[assembly: AssemblyProduct("StarryEyes.Detective")]
-[assembly: AssemblyCopyright("Copyright ©  2012 Karno")]
+[assembly: AssemblyProduct("Krile StarryEyes")]
+[assembly: AssemblyCopyright("Copyright ©  2013 Karno")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
