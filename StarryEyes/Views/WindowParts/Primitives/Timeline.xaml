@@ -310,7 +310,7 @@
                                     <DoubleAnimationUsingKeyFrames Storyboard.TargetName="CheckBoxBorder" Storyboard.TargetProperty="(FrameworkElement.Width)">
                                         <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="24">
                                             <EasingDoubleKeyFrame.EasingFunction>
-                                                <CircleEase EasingMode="EaseOut" />
+                                                <ExponentialEase EasingMode="EaseOut" Exponent="16" />
                                             </EasingDoubleKeyFrame.EasingFunction>
                                         </EasingDoubleKeyFrame>
                                     </DoubleAnimationUsingKeyFrames>
@@ -330,7 +330,7 @@
                                     <DoubleAnimationUsingKeyFrames Storyboard.TargetName="CheckBoxBorder" Storyboard.TargetProperty="(FrameworkElement.Width)">
                                         <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0">
                                             <EasingDoubleKeyFrame.EasingFunction>
-                                                <CircleEase EasingMode="EaseOut" />
+                                                <ExponentialEase EasingMode="EaseOut" Exponent="16" />
                                             </EasingDoubleKeyFrame.EasingFunction>
                                         </EasingDoubleKeyFrame>
                                     </DoubleAnimationUsingKeyFrames>
@@ -346,28 +346,28 @@
                                     <DoubleAnimationUsingKeyFrames Storyboard.TargetName="ViaPanel" Storyboard.TargetProperty="(UIElement.Opacity)">
                                         <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0">
                                             <EasingDoubleKeyFrame.EasingFunction>
-                                                <CircleEase EasingMode="EaseOut" />
+                                                <ExponentialEase EasingMode="EaseOut" Exponent="16" />
                                             </EasingDoubleKeyFrame.EasingFunction>
                                         </EasingDoubleKeyFrame>
                                     </DoubleAnimationUsingKeyFrames>
                                     <DoubleAnimationUsingKeyFrames Storyboard.TargetName="ShortTime" Storyboard.TargetProperty="(UIElement.Opacity)">
                                         <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="1">
                                             <EasingDoubleKeyFrame.EasingFunction>
-                                                <CircleEase EasingMode="EaseOut" />
+                                                <ExponentialEase EasingMode="EaseOut" Exponent="16" />
                                             </EasingDoubleKeyFrame.EasingFunction>
                                         </EasingDoubleKeyFrame>
                                     </DoubleAnimationUsingKeyFrames>
                                     <DoubleAnimationUsingKeyFrames Storyboard.TargetName="LongTime" Storyboard.TargetProperty="(UIElement.Opacity)">
                                         <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0">
                                             <EasingDoubleKeyFrame.EasingFunction>
-                                                <CircleEase EasingMode="EaseOut" />
+                                                <ExponentialEase EasingMode="EaseOut" Exponent="16" />
                                             </EasingDoubleKeyFrame.EasingFunction>
                                         </EasingDoubleKeyFrame>
                                     </DoubleAnimationUsingKeyFrames>
                                     <DoubleAnimationUsingKeyFrames Storyboard.TargetName="stackPanel" Storyboard.TargetProperty="(UIElement.Opacity)">
                                         <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0">
                                             <EasingDoubleKeyFrame.EasingFunction>
-                                                <CircleEase EasingMode="EaseOut" />
+                                                <ExponentialEase EasingMode="EaseOut" Exponent="16" />
                                             </EasingDoubleKeyFrame.EasingFunction>
                                         </EasingDoubleKeyFrame>
                                     </DoubleAnimationUsingKeyFrames>
@@ -378,28 +378,28 @@
                                     <DoubleAnimationUsingKeyFrames Storyboard.TargetName="ViaPanel" Storyboard.TargetProperty="(UIElement.Opacity)">
                                         <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="1">
                                             <EasingDoubleKeyFrame.EasingFunction>
-                                                <CircleEase EasingMode="EaseOut" />
+                                                <ExponentialEase EasingMode="EaseOut" Exponent="16" />
                                             </EasingDoubleKeyFrame.EasingFunction>
                                         </EasingDoubleKeyFrame>
                                     </DoubleAnimationUsingKeyFrames>
                                     <DoubleAnimationUsingKeyFrames Storyboard.TargetName="LongTime" Storyboard.TargetProperty="(UIElement.Opacity)">
                                         <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="1">
                                             <EasingDoubleKeyFrame.EasingFunction>
-                                                <CircleEase EasingMode="EaseOut" />
+                                                <ExponentialEase EasingMode="EaseOut" Exponent="16" />
                                             </EasingDoubleKeyFrame.EasingFunction>
                                         </EasingDoubleKeyFrame>
                                     </DoubleAnimationUsingKeyFrames>
                                     <DoubleAnimationUsingKeyFrames Storyboard.TargetName="ShortTime" Storyboard.TargetProperty="(UIElement.Opacity)">
                                         <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0">
                                             <EasingDoubleKeyFrame.EasingFunction>
-                                                <CircleEase EasingMode="EaseOut" />
+                                                <ExponentialEase EasingMode="EaseOut" Exponent="16" />
                                             </EasingDoubleKeyFrame.EasingFunction>
                                         </EasingDoubleKeyFrame>
                                     </DoubleAnimationUsingKeyFrames>
                                     <DoubleAnimationUsingKeyFrames Storyboard.TargetName="stackPanel" Storyboard.TargetProperty="(UIElement.Opacity)">
                                         <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="1">
                                             <EasingDoubleKeyFrame.EasingFunction>
-                                                <CircleEase EasingMode="EaseOut" />
+                                                <ExponentialEase EasingMode="EaseOut" Exponent="16" />
                                             </EasingDoubleKeyFrame.EasingFunction>
                                         </EasingDoubleKeyFrame>
                                     </DoubleAnimationUsingKeyFrames>
@@ -952,6 +952,7 @@
                                                     Height="22"
                                                     Margin="0,-2"
                                                     Style="{StaticResource MetroSquareUnfocusableFlatButton}"
+                                                    ToolTip="ふぁぼってリツイート"
                                                     Visibility="{Binding CanFavoriteAndRetweet,
                                                                          Mode=OneWay,
                                                                          Converter={StaticResource BooleanToVisibleConverter}}">
@@ -971,6 +972,7 @@
                                                     Height="22"
                                                     Margin="0,-2"
                                                     Style="{StaticResource MetroSquareUnfocusableFlatButton}"
+                                                    ToolTip="アカウントを選択してお気に入り登録"
                                                     Visibility="{Binding CanFavorite,
                                                                          Mode=OneTime,
                                                                          Converter={StaticResource BooleanToVisibleConverter}}">
@@ -990,6 +992,7 @@
                                                     Height="22"
                                                     Margin="-60,-2,0,-2"
                                                     Style="{StaticResource MetroSquareUnfocusableFlatButton}"
+                                                    ToolTip="お気に入り登録"
                                                     Visibility="{Binding CanFavorite,
                                                                          Mode=OneTime,
                                                                          Converter={StaticResource BooleanToVisibleConverter}}">
@@ -1020,6 +1023,7 @@
                                                     Height="22"
                                                     Margin="0,-2"
                                                     Style="{StaticResource MetroSquareUnfocusableFlatButton}"
+                                                    ToolTip="アカウントを選択してリツイート"
                                                     Visibility="{Binding CanRetweet,
                                                                          Mode=OneTime,
                                                                          Converter={StaticResource BooleanToVisibleConverter}}">
@@ -1039,6 +1043,7 @@
                                                     Height="22"
                                                     Margin="-60,-2,0,-2"
                                                     Style="{StaticResource MetroSquareUnfocusableFlatButton}"
+                                                    ToolTip="リツイート"
                                                     Visibility="{Binding CanRetweet,
                                                                          Mode=OneTime,
                                                                          Converter={StaticResource BooleanToVisibleConverter}}">
@@ -1068,7 +1073,8 @@
                                             <Button Width="32"
                                                     Height="22"
                                                     Margin="0,-2"
-                                                    Style="{StaticResource MetroSquareUnfocusableFlatButton}">
+                                                    Style="{StaticResource MetroSquareUnfocusableFlatButton}"
+                                                    ToolTip="このツイートに返信">
                                                 <i:Interaction.Triggers>
                                                     <i:EventTrigger EventName="Click">
                                                         <ei:CallMethodAction MethodName="SendReply" TargetObject="{Binding Mode=OneTime}" />
@@ -1085,6 +1091,7 @@
                                                     Height="22"
                                                     Margin="0,-2"
                                                     Style="{StaticResource MetroSquareUnfocusableFlatButton}"
+                                                    ToolTip="このツイートを削除"
                                                     Visibility="{Binding CanDelete,
                                                                          Mode=OneWay,
                                                                          Converter={StaticResource BooleanToVisibleConverter}}">
@@ -1445,12 +1452,12 @@
                         <DoubleAnimationUsingKeyFrames Storyboard.TargetName="multiOperationBlock" Storyboard.TargetProperty="(FrameworkElement.Height)">
                             <EasingDoubleKeyFrame KeyTime="0" Value="40">
                                 <EasingDoubleKeyFrame.EasingFunction>
-                                    <CircleEase EasingMode="EaseOut" />
+                                    <ExponentialEase EasingMode="EaseOut" Exponent="16" />
                                 </EasingDoubleKeyFrame.EasingFunction>
                             </EasingDoubleKeyFrame>
                             <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="0">
                                 <EasingDoubleKeyFrame.EasingFunction>
-                                    <CircleEase EasingMode="EaseOut" />
+                                    <ExponentialEase EasingMode="EaseOut" Exponent="16" />
                                 </EasingDoubleKeyFrame.EasingFunction>
                             </EasingDoubleKeyFrame>
                         </DoubleAnimationUsingKeyFrames>
@@ -1465,12 +1472,12 @@
                         <DoubleAnimationUsingKeyFrames Storyboard.TargetName="multiOperationBlock" Storyboard.TargetProperty="(FrameworkElement.Height)">
                             <EasingDoubleKeyFrame KeyTime="0" Value="0">
                                 <EasingDoubleKeyFrame.EasingFunction>
-                                    <CircleEase EasingMode="EaseOut" />
+                                    <ExponentialEase EasingMode="EaseOut" Exponent="16" />
                                 </EasingDoubleKeyFrame.EasingFunction>
                             </EasingDoubleKeyFrame>
                             <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="40">
                                 <EasingDoubleKeyFrame.EasingFunction>
-                                    <CircleEase EasingMode="EaseOut" />
+                                    <ExponentialEase EasingMode="EaseOut" Exponent="16" />
                                 </EasingDoubleKeyFrame.EasingFunction>
                             </EasingDoubleKeyFrame>
                         </DoubleAnimationUsingKeyFrames>

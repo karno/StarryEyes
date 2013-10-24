@@ -21,7 +21,9 @@
                       FontFamily="Meiryo"
                       ResizeMode="CanResizeWithGrip"
                       ShowIconOnTitleBar="True"
+                      SnapsToDevicePixels="True"
                       TitleCaps="False"
+                      UseLayoutRounding="False"
                       mc:Ignorable="d">
     <controls:MetroWindow.Icon>
         <DrawingImage>
@@ -131,12 +133,12 @@
                         <DoubleAnimationUsingKeyFrames Storyboard.TargetName="CurrentEventBorder" Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.Y)">
                             <EasingDoubleKeyFrame KeyTime="0" Value="30">
                                 <EasingDoubleKeyFrame.EasingFunction>
-                                    <CircleEase EasingMode="EaseOut" />
+                                    <ExponentialEase EasingMode="EaseOut" Exponent="16" />
                                 </EasingDoubleKeyFrame.EasingFunction>
                             </EasingDoubleKeyFrame>
                             <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0">
                                 <EasingDoubleKeyFrame.EasingFunction>
-                                    <CircleEase EasingMode="EaseOut" />
+                                    <ExponentialEase EasingMode="EaseOut" Exponent="16" />
                                 </EasingDoubleKeyFrame.EasingFunction>
                             </EasingDoubleKeyFrame>
                             <!--  remove calculation error  -->
@@ -145,12 +147,12 @@
                         <DoubleAnimationUsingKeyFrames Storyboard.TargetName="CurrentEventBorder" Storyboard.TargetProperty="(UIElement.Opacity)">
                             <EasingDoubleKeyFrame KeyTime="0" Value="0">
                                 <EasingDoubleKeyFrame.EasingFunction>
-                                    <CircleEase EasingMode="EaseOut" />
+                                    <ExponentialEase EasingMode="EaseOut" Exponent="16" />
                                 </EasingDoubleKeyFrame.EasingFunction>
                             </EasingDoubleKeyFrame>
                             <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="1">
                                 <EasingDoubleKeyFrame.EasingFunction>
-                                    <CircleEase EasingMode="EaseOut" />
+                                    <ExponentialEase EasingMode="EaseOut" Exponent="16" />
                                 </EasingDoubleKeyFrame.EasingFunction>
                             </EasingDoubleKeyFrame>
                         </DoubleAnimationUsingKeyFrames>
@@ -161,24 +163,24 @@
                         <DoubleAnimationUsingKeyFrames Storyboard.TargetName="CurrentEventBorder" Storyboard.TargetProperty="(UIElement.Opacity)">
                             <EasingDoubleKeyFrame KeyTime="0" Value="1">
                                 <EasingDoubleKeyFrame.EasingFunction>
-                                    <CircleEase EasingMode="EaseOut" />
+                                    <ExponentialEase EasingMode="EaseOut" Exponent="16" />
                                 </EasingDoubleKeyFrame.EasingFunction>
                             </EasingDoubleKeyFrame>
                             <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0">
                                 <EasingDoubleKeyFrame.EasingFunction>
-                                    <CircleEase EasingMode="EaseOut" />
+                                    <ExponentialEase EasingMode="EaseOut" Exponent="16" />
                                 </EasingDoubleKeyFrame.EasingFunction>
                             </EasingDoubleKeyFrame>
                         </DoubleAnimationUsingKeyFrames>
                         <DoubleAnimationUsingKeyFrames Storyboard.TargetName="CurrentEventBorder" Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.Y)">
                             <EasingDoubleKeyFrame KeyTime="0" Value="0">
                                 <EasingDoubleKeyFrame.EasingFunction>
-                                    <CircleEase EasingMode="EaseIn" />
+                                    <ExponentialEase EasingMode="EaseIn" Exponent="16" />
                                 </EasingDoubleKeyFrame.EasingFunction>
                             </EasingDoubleKeyFrame>
                             <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="30">
                                 <EasingDoubleKeyFrame.EasingFunction>
-                                    <CircleEase EasingMode="EaseIn" />
+                                    <ExponentialEase EasingMode="EaseIn" Exponent="16" />
                                 </EasingDoubleKeyFrame.EasingFunction>
                             </EasingDoubleKeyFrame>
                         </DoubleAnimationUsingKeyFrames>
@@ -191,7 +193,7 @@
                         <DoubleAnimationUsingKeyFrames Storyboard.TargetName="MainAreaGrid" Storyboard.TargetProperty="(UIElement.Opacity)">
                             <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="0">
                                 <EasingDoubleKeyFrame.EasingFunction>
-                                    <CircleEase EasingMode="EaseIn" />
+                                    <ExponentialEase EasingMode="EaseIn" Exponent="16" />
                                 </EasingDoubleKeyFrame.EasingFunction>
                             </EasingDoubleKeyFrame>
                         </DoubleAnimationUsingKeyFrames>
@@ -212,24 +214,24 @@
                         <DoubleAnimationUsingKeyFrames Storyboard.TargetName="MainAreaGrid" Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.Y)">
                             <EasingDoubleKeyFrame KeyTime="0" Value="800">
                                 <EasingDoubleKeyFrame.EasingFunction>
-                                    <CircleEase EasingMode="EaseOut" />
+                                    <ExponentialEase EasingMode="EaseOut" Exponent="16" />
                                 </EasingDoubleKeyFrame.EasingFunction>
                             </EasingDoubleKeyFrame>
                             <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="0">
                                 <EasingDoubleKeyFrame.EasingFunction>
-                                    <CircleEase EasingMode="EaseOut" />
+                                    <ExponentialEase EasingMode="EaseOut" Exponent="16" />
                                 </EasingDoubleKeyFrame.EasingFunction>
                             </EasingDoubleKeyFrame>
                         </DoubleAnimationUsingKeyFrames>
                         <DoubleAnimationUsingKeyFrames Storyboard.TargetName="MainAreaGrid" Storyboard.TargetProperty="(UIElement.Opacity)">
                             <EasingDoubleKeyFrame KeyTime="0" Value="0">
                                 <EasingDoubleKeyFrame.EasingFunction>
-                                    <CircleEase EasingMode="EaseOut" />
+                                    <ExponentialEase EasingMode="EaseOut" Exponent="16" />
                                 </EasingDoubleKeyFrame.EasingFunction>
                             </EasingDoubleKeyFrame>
                             <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="1">
                                 <EasingDoubleKeyFrame.EasingFunction>
-                                    <CircleEase EasingMode="EaseOut" />
+                                    <ExponentialEase EasingMode="EaseOut" Exponent="16" />
                                 </EasingDoubleKeyFrame.EasingFunction>
                             </EasingDoubleKeyFrame>
                         </DoubleAnimationUsingKeyFrames>
