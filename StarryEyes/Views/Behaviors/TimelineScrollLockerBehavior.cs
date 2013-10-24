@@ -9,7 +9,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Interactivity;
-using System.Windows.Media;
+using StarryEyes.Views.Utils;
 
 namespace StarryEyes.Views.Behaviors
 {
@@ -102,7 +102,7 @@ namespace StarryEyes.Views.Behaviors
                              {
                                  if (ev.Action == NotifyCollectionChangedAction.Add)
                                  {
-                                     var vsp = FindVisualChild<VirtualizingStackPanel>(this.AssociatedObject);
+                                     var vsp = this.AssociatedObject.FindVisualChild<VirtualizingStackPanel>();
                                      if (vsp != null)
                                      {
                                          var index = vsp.ItemContainerGenerator.IndexFromGeneratorPosition(
@@ -126,24 +126,6 @@ namespace StarryEyes.Views.Behaviors
             }
         }
 
-        private static T FindVisualChild<T>(DependencyObject obj) where T : DependencyObject
-        {
-            for (var i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
-            {
-                var child = VisualTreeHelper.GetChild(obj, i);
-                var cTyped = child as T;
-                if (cTyped != null)
-                {
-                    return cTyped;
-                }
-                var descendant = FindVisualChild<T>(child);
-                if (descendant != null)
-                {
-                    return descendant;
-                }
-            }
-            return null;
-        }
 
         private double _currentOffset;
         private double _remainHeight;

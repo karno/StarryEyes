@@ -66,7 +66,6 @@ namespace StarryEyes.Views.Triggers
                     }
                 }
             }
-            System.Diagnostics.Debug.WriteLine("[" + this.Group + "] key action detected");
             return KeyAssignManager.CurrentProfile.GetAssigns(key, Group)
                              .Where(b => b.Modifiers == modifiers)
                              .SelectMany(b => b.Actions)

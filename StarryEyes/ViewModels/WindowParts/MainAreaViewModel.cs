@@ -79,43 +79,16 @@ namespace StarryEyes.ViewModels.WindowParts
             switch (req)
             {
                 case TimelineFocusRequest.TopOfTimeline:
-                    ExecuteTimelineAction(tlvm =>
-                    {
-                        if (tlvm.Timeline.Count >= 0)
-                        {
-                            tlvm.FocusedStatus = tlvm.Timeline[0];
-                        }
-                    });
+                    ExecuteTimelineAction(tlvm => tlvm.FocusTop());
                     break;
                 case TimelineFocusRequest.BottomOfTimeline:
-                    ExecuteTimelineAction(tlvm =>
-                    {
-                        if (tlvm.Timeline.Count >= 0)
-                        {
-                            tlvm.FocusedStatus = tlvm.Timeline[tlvm.Timeline.Count - 1];
-                        }
-                    });
+                    ExecuteTimelineAction(tlvm => tlvm.FocusBottom());
                     break;
                 case TimelineFocusRequest.AboveStatus:
-                    ExecuteTimelineAction(tlvm =>
-                    {
-                        if (tlvm.Timeline.Count == 0 || tlvm.FocusedStatus == null) return;
-                        var index = tlvm.Timeline.IndexOf(tlvm.FocusedStatus) - 1;
-                        tlvm.FocusedStatus = index < 0 ? null : tlvm.Timeline[index];
-                    });
+                    ExecuteTimelineAction(tlvm => tlvm.FocusUp());
                     break;
                 case TimelineFocusRequest.BelowStatus:
-                    ExecuteTimelineAction(tlvm =>
-                    {
-                        if (tlvm.Timeline.Count == 0) return;
-                        var index = tlvm.FocusedStatus == null
-                                        ? 0
-                                        : tlvm.Timeline.IndexOf(tlvm.FocusedStatus) + 1;
-                        if (index < tlvm.Timeline.Count)
-                        {
-                            tlvm.FocusedStatus = tlvm.Timeline[index];
-                        }
-                    });
+                    ExecuteTimelineAction(tlvm => tlvm.FocusDown());
                     break;
             }
         }

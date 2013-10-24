@@ -121,9 +121,11 @@ namespace StarryEyes.Settings
             KeyAssignAction callback;
             if (Actions.TryGetValue(desc.ActionName, out callback))
             {
+                System.Diagnostics.Debug.WriteLine("$ Key assign invoke: " + desc.ActionName);
                 callback.Invoke(desc.Argument);
                 return true;
             }
+            System.Diagnostics.Debug.WriteLine("$ Key assign not matched: " + desc.ActionName);
             return false;
         }
 

@@ -350,10 +350,13 @@
     <Compile Include="Views\Dialogs\KeyOverrideWindow.xaml.cs">
       <DependentUpon>KeyOverrideWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Messaging\Behaviors\ScrollIntoViewInteractionMessageAction.cs" />
+    <Compile Include="Views\Messaging\ScrollIntoViewMessage.cs" />
     <Compile Include="Views\Triggers\EnterKeyTrigger.cs" />
     <Compile Include="Views\Triggers\EscapeKeyTrigger.cs" />
     <Compile Include="Views\Triggers\KeyAssignTrigger.cs" />
     <Compile Include="Views\Triggers\KeyTriggerBase.cs" />
+    <Compile Include="Views\Utils\DependencyObjectExtension.cs" />
     <Compile Include="Views\Utils\NotNullToVisibleConverter.cs" />
     <Compile Include="Views\Utils\TextBlockStylizer.cs" />
     <Compile Include="Views\Messaging\Behaviors\BringIntoViewInteractionMessageAction.cs" />

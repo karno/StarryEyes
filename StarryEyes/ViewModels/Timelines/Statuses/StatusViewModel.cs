@@ -368,7 +368,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             this.RaisePropertyChanged(() => this.IsFocused);
             if (this.IsFocused)
             {
-                this.Messenger.Raise(new BringIntoViewMessage());
+                // this.Messenger.Raise(new BringIntoViewMessage());
             }
         }
 

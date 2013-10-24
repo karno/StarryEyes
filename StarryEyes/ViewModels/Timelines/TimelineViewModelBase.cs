@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows.Threading;
 using Livet;
 using Livet.EventListeners;
+using StarryEyes.Annotations;
 using StarryEyes.Models;
 using StarryEyes.Models.Timelines;
 using StarryEyes.Models.Timelines.Statuses;
@@ -261,26 +262,28 @@ namespace StarryEyes.ViewModels.Timelines
                 _focusedStatus = value;
                 if (previous != null)
                     previous.RaiseFocusedChanged();
-                if (_focusedStatus != null)
-                    _focusedStatus.RaiseFocusedChanged();
+                if (value != null)
+                {
+                    value.RaiseFocusedChanged();
+                    var index = this.Timeline.IndexOf(value);
+                    this.Messenger.RaiseAsync(new ScrollIntoViewMessage(index));
+                }
             }
         }
 
         public void FocusUp()
         {
-            if (FocusedStatus == null) return;
+            if (Timeline.Count == 0 || FocusedStatus == null) return;
             var index = this.Timeline.IndexOf(FocusedStatus) - 1;
             FocusedStatus = index < 0 ? null : this.Timeline[index];
         }
 
         public void FocusDown()
         {
-            if (FocusedStatus == null)
-            {
-                FocusTop();
-                return;
-            }
-            var index = this.Timeline.IndexOf(FocusedStatus) + 1;
+            if (Timeline.Count == 0) return;
+            var index = FocusedStatus == null
+                            ? 0
+                            : this.Timeline.IndexOf(FocusedStatus) + 1;
             if (index >= this.Timeline.Count) return;
             FocusedStatus = this.Timeline[index];
         }
@@ -297,6 +300,8 @@ namespace StarryEyes.ViewModels.Timelines
             FocusedStatus = this.Timeline[this.Timeline.Count - 1];
         }
 
+        // called from xaml
+        [UsedImplicitly]
         public abstract void GotFocus();
 
         #endregion

@@ -1587,6 +1587,9 @@
                       VirtualizingPanel.VirtualizationMode="Recycling">
             <i:Interaction.Triggers>
                 <l:InteractionMessageTrigger Messenger="{Binding Messenger, Mode=OneTime}">
+                    <mbehaviors:ScrollIntoViewInteractionMessageAction />
+                </l:InteractionMessageTrigger>
+                <l:InteractionMessageTrigger Messenger="{Binding Messenger, Mode=OneTime}">
                     <mbehaviors:TaskDialogInteractionMessageAction />
                 </l:InteractionMessageTrigger>
                 <l:InteractionMessageTrigger MessageKey="SetFocus" Messenger="{Binding Messenger, Mode=OneWay}">
