@@ -347,11 +347,26 @@ namespace StarryEyes.Models.Timelines.Tabs
                     break;
                 case TimelineFocusRequest.LeftTab:
                     var ltab = ccolumn.CurrentFocusTabIndex - 1;
-                    ccolumn.CurrentFocusTabIndex = ltab < 0 ? ccolumn.Tabs.Count - 1 : ltab;
+                    if (ltab < 0)
+                    {
+                        // move left column
+                        var lcol = CurrentFocusColumnIndex - 1;
+                        CurrentFocusColumnIndex = lcol < 0 ? Columns.Count - 1 : lcol;
+                        ccolumn = Columns[CurrentFocusColumnIndex];
+                        ltab = ccolumn.Tabs.Count - 1;
+                    }
+                    ccolumn.CurrentFocusTabIndex = ltab;
                     break;
                 case TimelineFocusRequest.RightTab:
                     var rtab = ccolumn.CurrentFocusTabIndex + 1;
-                    ccolumn.CurrentFocusTabIndex = rtab >= ccolumn.Tabs.Count ? 0 : rtab;
+                    if (rtab >= ccolumn.Tabs.Count)
+                    {
+                        var rcol = CurrentFocusColumnIndex + 1;
+                        CurrentFocusColumnIndex = rcol >= Columns.Count ? 0 : rcol;
+                        ccolumn = Columns[CurrentFocusColumnIndex];
+                        rtab = 0;
+                    }
+                    ccolumn.CurrentFocusTabIndex = rtab;
                     break;
             }
         }
