@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Subjects;
-using StarryEyes.Filters.Expressions;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Timelines.Tabs;
 using StarryEyes.Nightmare.Windows;
@@ -132,17 +131,6 @@ namespace StarryEyes.Models
         {
             var handler = StateStringChanged;
             if (handler != null) handler();
-        }
-
-        public static event Action<Tuple<string, FilterExpressionBase>> ConfirmMuteRequested;
-
-        public static void ConfirmMute(string description, FilterExpressionBase addExpr)
-        {
-            var handler = ConfirmMuteRequested;
-            if (handler != null)
-            {
-                handler(Tuple.Create(description, addExpr));
-            }
         }
 
         public static event Action<Tuple<TabModel, ISubject<Unit>>> TabModelConfigureRaised;

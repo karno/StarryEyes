@@ -43,6 +43,7 @@ namespace StarryEyes.ViewModels.Timelines.SearchFlips
         {
             TabManager.CreateTab(TabModel.Create(
                 _parent.ScreenName, "from local where user == \"" + _parent.ScreenName + "\""));
+            _parent.Close();
         }
 
         protected override void Dispose(bool disposing)
@@ -51,6 +52,7 @@ namespace StarryEyes.ViewModels.Timelines.SearchFlips
             if (disposing)
             {
                 _model.Dispose();
+                MainAreaViewModel.TimelineActionTargetOverride = null;
             }
         }
     }

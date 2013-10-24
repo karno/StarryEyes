@@ -74,7 +74,6 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
 
         public void Close()
         {
-            MainAreaViewModel.TimelineActionTargetOverride = null;
             this.Parent.RewindStack();
         }
 

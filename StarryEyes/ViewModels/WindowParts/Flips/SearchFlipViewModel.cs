@@ -85,6 +85,10 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 {
                     previous.Dispose();
                 }
+                if (value != null)
+                {
+                    value.SetFocus();
+                }
             }
         }
         public UserResultViewModel UserResult

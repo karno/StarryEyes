@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Livet.Messaging;
+using StarryEyes.Annotations;
 using StarryEyes.Models.Timelines.SearchFlips;
 using StarryEyes.Models.Timelines.Tabs;
 using StarryEyes.ViewModels.WindowParts;
@@ -44,26 +45,24 @@ namespace StarryEyes.ViewModels.Timelines.SearchFlips
             MainAreaViewModel.TimelineActionTargetOverride = this;
         }
 
+        [UsedImplicitly]
         public void Close()
         {
-            MainAreaViewModel.TimelineActionTargetOverride = null;
-            this._model.Dispose();
             this._parent.RewindStack();
         }
 
         public void PinToTab()
         {
             TabManager.CreateTab(TabModel.Create(Query, _model.CreateFilterQuery()));
-            Close();
+            this._parent.RewindStack();
         }
 
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
-            if (disposing)
-            {
-                this._model.Dispose();
-            }
+            if (!disposing) return;
+            this._model.Dispose();
+            MainAreaViewModel.TimelineActionTargetOverride = null;
         }
     }
 }

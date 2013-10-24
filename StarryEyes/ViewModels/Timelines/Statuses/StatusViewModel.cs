@@ -11,6 +11,10 @@ using Livet.Commands;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.Utils;
 using StarryEyes.Filters;
+using StarryEyes.Filters.Expressions.Operators;
+using StarryEyes.Filters.Expressions.Values.Immediates;
+using StarryEyes.Filters.Expressions.Values.Statuses;
+using StarryEyes.Filters.Expressions.Values.Users;
 using StarryEyes.Models;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;
@@ -1037,7 +1041,6 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                     Title = "キーワードのミュート",
                 }));
             }
-            // TODO
             var msg = new TaskDialogMessage(new TaskDialogOptions
             {
                 AllowDialogCancellation = true,
@@ -1051,8 +1054,12 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             });
             var response = this.Parent.Messenger.GetResponse(msg);
             if (response.Response.CustomButtonResult != 0) return;
-            // TODO: Mute
             System.Diagnostics.Debug.WriteLine("Mute: " + this.Status.User.ScreenName);
+            Setting.Muteds.AddPredicate(new FilterOperatorContains
+            {
+                LeftValue = new StatusText(),
+                RightValue = new StringValue(this.SelectedText)
+            });
         }
 
         public void MuteUser()
@@ -1070,8 +1077,12 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             });
             var response = this.Parent.Messenger.GetResponse(msg);
             if (response.Response.CustomButtonResult != 0) return;
-            // TODO: Mute
             System.Diagnostics.Debug.WriteLine("Mute: " + this.Status.User.ScreenName);
+            Setting.Muteds.AddPredicate(new FilterOperatorEquals
+            {
+                LeftValue = new UserId(),
+                RightValue = new NumericValue(this.Status.User.Id)
+            });
         }
 
         public void MuteClient()
@@ -1079,7 +1090,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             var msg = new TaskDialogMessage(new TaskDialogOptions
             {
                 AllowDialogCancellation = true,
-                CommonButtons = TaskDialogCommonButtons.OKCancel,
+                CustomButtons = new[] { "ミュート", "キャンセル" },
                 MainIcon = VistaTaskDialogIcon.Warning,
                 MainInstruction = "クライアント " + this.SourceText + " をミュートしますか？",
                 Content = "このクライアントからのツイートが全てのタブから除外されるようになります。",
@@ -1088,11 +1099,13 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                 Title = "クライアントのミュート",
             });
             var response = this.Parent.Messenger.GetResponse(msg);
-            if (response.Response.Result == TaskDialogSimpleResult.Ok)
+            if (response.Response.CustomButtonResult != 0) return;
+            System.Diagnostics.Debug.WriteLine("Mute: " + this.Status.Source);
+            Setting.Muteds.AddPredicate(new FilterOperatorEquals
             {
-                // report as a spam
-                System.Diagnostics.Debug.WriteLine("Mute: " + this.Status.Source);
-            }
+                LeftValue = new StatusSource(),
+                RightValue = new StringValue(this.SourceText)
+            });
         }
         #endregion
 

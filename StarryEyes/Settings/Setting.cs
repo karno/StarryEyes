@@ -260,6 +260,21 @@ namespace StarryEyes.Settings
                 }
             }
 
+            public void AddPredicate(FilterExpressionBase expr)
+            {
+                var eq = expr.ToQuery();
+                if (eq.StartsWith("where "))
+                {
+                    eq = eq.Substring(6);
+                }
+                AddPredicate(eq);
+            }
+
+            public void AddPredicate(string query)
+            {
+                Value = QueryCompiler.CompileFilters(Value.ToQuery() + " | " + query);
+            }
+
             public Func<TwitterStatus, bool> Evaluator
             {
                 get { return _evaluatorCache ?? (_evaluatorCache = Value.GetEvaluator()); }
