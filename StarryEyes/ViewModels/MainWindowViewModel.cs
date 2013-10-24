@@ -148,13 +148,13 @@ namespace StarryEyes.ViewModels
                     SearchFlipViewModel.FocusToSearchBox();
                     break;
                 case FocusRequest.Timeline:
-                    TabManager.CurrentFocusTab.RequestFocus();
                     SearchFlipViewModel.Close();
+                    TabManager.CurrentFocusTab.RequestFocus();
                     break;
                 case FocusRequest.Input:
+                    SearchFlipViewModel.Close();
                     InputAreaViewModel.OpenInput();
                     InputAreaViewModel.FocusToTextBox();
-                    SearchFlipViewModel.Close();
                     break;
             }
         }
