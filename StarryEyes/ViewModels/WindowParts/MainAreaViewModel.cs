@@ -108,7 +108,6 @@ namespace StarryEyes.ViewModels.WindowParts
                 KeyAssignAction.Create("ToggleFocus", () => ExecuteStatusAction(s => s.ToggleFocus())),
                 KeyAssignAction.Create("ToggleSelect", () => ExecuteStatusAction(s => s.ToggleSelect())),
                 KeyAssignAction.Create("ClearSelect", () => ExecuteTimelineAction(t => t.DeselectAll())),
-                KeyAssignAction.Create("Reply", () => ExecuteStatusAction(s => s.Reply())),
                 KeyAssignAction.Create("Favorite", () => ExecuteStatusAction(s => s.ToggleFavoriteImmediate())),
                 KeyAssignAction.Create("FavoriteMany", () => ExecuteStatusAction(s => s.ToggleFavorite())),
                 KeyAssignAction.Create("Retweet", () => ExecuteStatusAction(s => s.ToggleRetweetImmediate())),
@@ -124,7 +123,8 @@ namespace StarryEyes.ViewModels.WindowParts
                 KeyAssignAction.Create("ShowRetweeterProfile", () => ExecuteStatusAction(s => s.ShowRetweeterProfile())),
                 KeyAssignAction.Create("OpenWeb", () => ExecuteStatusAction(s => s.OpenWeb())),
                 KeyAssignAction.Create("OpenFavstar", () => ExecuteStatusAction(s => s.OpenFavstar())),
-                KeyAssignAction.Create("OpenUserDetailOnTwitter", () => ExecuteStatusAction(s => s.OpenUserDetailOnTwitter())),
+                KeyAssignAction.Create("OpenUserDetailOnTwitter",
+                                       () => ExecuteStatusAction(s => s.OpenUserDetailOnTwitter())),
                 KeyAssignAction.Create("OpenUserFavstar", () => ExecuteStatusAction(s => s.OpenUserFavstar())),
                 KeyAssignAction.Create("OpenUserTwilog", () => ExecuteStatusAction(s => s.OpenUserTwilog())),
                 KeyAssignAction.Create("OpenSource", () => ExecuteStatusAction(s => s.OpenSourceLink())),
@@ -133,7 +133,10 @@ namespace StarryEyes.ViewModels.WindowParts
                 KeyAssignAction.Create("MuteUser", () => ExecuteStatusAction(s => s.MuteUser())),
                 KeyAssignAction.Create("MuteClient", () => ExecuteStatusAction(s => s.MuteClient())),
                 KeyAssignAction.Create("ReportAsSpam", () => ExecuteStatusAction(s => s.ReportAsSpam())),
-                KeyAssignAction.Create("GiveTrophy", () => ExecuteStatusAction(s => s.GiveFavstarTrophy()))
+                KeyAssignAction.Create("GiveTrophy", () => ExecuteStatusAction(s => s.GiveFavstarTrophy())),
+                KeyAssignAction.CreateWithArgumentOptional("Reply", a => this.ExecuteStatusAction(s => s.Reply(a))),
+                KeyAssignAction.CreateWithArgumentRequired("OpenUrl",
+                                                           a => this.ExecuteStatusAction(s => s.OpenNthLink(a)))
                 );
 
             // Timeline argumentable actions

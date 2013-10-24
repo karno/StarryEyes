@@ -134,9 +134,13 @@ namespace StarryEyes.Models
             SetTextRequested;
 
         public static void SetText(IEnumerable<TwitterAccount> infos = null, string body = null,
-                                   CursorPosition cursor = CursorPosition.End, TwitterStatus inReplyTo = null,
+                                   CursorPosition cursor = null, TwitterStatus inReplyTo = null,
                                    bool focusToInputArea = true)
         {
+            if (cursor == null)
+            {
+                cursor = CursorPosition.End;
+            }
             var handler = SetTextRequested;
             if (handler != null)
                 handler(infos, body, cursor, inReplyTo);
@@ -147,9 +151,13 @@ namespace StarryEyes.Models
         }
 
         public static void SetText(IEnumerable<long> infos, string body = null,
-                                   CursorPosition cursor = CursorPosition.End, TwitterStatus inReplyTo = null,
+                                   CursorPosition cursor = null, TwitterStatus inReplyTo = null,
                                    bool focusToInputArea = true)
         {
+            if (cursor == null)
+            {
+                cursor = CursorPosition.End;
+            }
             var accounts = infos.Guard()
                                 .Select(Setting.Accounts.Get)
                                 .Where(s => s != null);
@@ -378,9 +386,41 @@ namespace StarryEyes.Models
         }
     }
 
-    public enum CursorPosition
+    public class CursorPosition
     {
-        Begin,
-        End,
+        public static readonly CursorPosition Begin = new CursorPosition(0, 0);
+
+        public static readonly CursorPosition End = new CursorPosition(-1, 0);
+
+        private readonly int _index;
+        private readonly int _selectionLength;
+
+        public CursorPosition(int index, int selectionLength)
+        {
+            this._index = index;
+            this._selectionLength = selectionLength;
+        }
+
+        public int Index
+        {
+            get { return this._index; }
+        }
+
+        public int SelectionLength
+        {
+            get { return this._selectionLength; }
+        }
+
+        public override int GetHashCode()
+        {
+            return _index.GetHashCode() ^ this._selectionLength.GetHashCode();
+        }
+
+        // override object.Equals
+        public override bool Equals(object obj)
+        {
+            var cp = obj as CursorPosition;
+            return cp != null && (cp.Index == this._index && cp.SelectionLength == this.SelectionLength);
+        }
     }
 }

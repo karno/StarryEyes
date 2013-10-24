@@ -855,9 +855,36 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             }
             else
             {
+                // except my names and the user name of main target
+                var excepts = this.Model.GetSuitableReplyAccount()
+                                  .Guard()
+                                  .Select(a => a.UnreliableScreenName)
+                                  .Append(this.User.ScreenName);
+                // reply to all users
+                var users = this.Status.Entities
+                                .Where(e => e.EntityType == EntityType.UserMentions)
+                                .Select(e => e.DisplayText)
+                                .Except(excepts)
+                                .Distinct()
+                                .Select(s => "@" + s + " ")
+                                .JoinString("");
                 InputAreaModel.SetText(this.Model.GetSuitableReplyAccount(),
-                                       "@" + this.User.ScreenName + " ", inReplyTo: this.Status);
+                                       "@" + this.User.ScreenName + " " + users,
+                                       new CursorPosition(this.User.ScreenName.Length + 2, users.Length),
+                                       this.Status);
             }
+        }
+
+        public void Reply(string txt)
+        {
+            if (String.IsNullOrEmpty(txt))
+            {
+                this.Reply();
+                return;
+            }
+            var formatted = String.Format(txt, this.User.ScreenName, this.User.Name);
+            InputAreaModel.SetText(this.Model.GetSuitableReplyAccount(),
+                                   formatted, inReplyTo: this.Status);
         }
 
         public void Quote()
@@ -1107,6 +1134,32 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                 RightValue = new StringValue(this.SourceText)
             });
         }
+
+        public void OpenNthLink(string index)
+        {
+            int value;
+            if (!int.TryParse(index, out value)) value = 0;
+            var links = this.Status.Entities
+                           .Select(e =>
+                           {
+                               switch (e.EntityType)
+                               {
+                                   case EntityType.Media:
+                                   case EntityType.Urls:
+                                       return e.OriginalUrl;
+                                   case EntityType.UserMentions:
+                                       return TextBlockStylizer.UserNavigation + e.DisplayText;
+                                   case EntityType.Hashtags:
+                                       return TextBlockStylizer.HashtagNavigation + e.DisplayText;
+                                   default:
+                                       throw new ArgumentOutOfRangeException();
+                               }
+                           })
+                           .ToArray();
+            if (links.Length <= value) return;
+            this.OpenLink(links[value]);
+        }
+
         #endregion
 
         #region OpenLinkCommand

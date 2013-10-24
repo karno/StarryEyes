@@ -14,9 +14,9 @@ namespace StarryEyes.Views.Utils
 {
     public class TextBlockStylizer
     {
-        const string UserNavigation = "user://";
+        public const string UserNavigation = "user://";
 
-        const string HashtagNavigation = "hash://";
+        public const string HashtagNavigation = "hash://";
 
         public static Tuple<LinkType, string> ResolveInternalUrl(string iurl)
         {

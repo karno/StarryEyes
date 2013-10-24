@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Livet;
 using StarryEyes.Albireo.Threading;
+using StarryEyes.Annotations;
 using StarryEyes.Anomaly.Imaging;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models.Accounting;
@@ -469,6 +470,7 @@ namespace StarryEyes.Models.Timelines.Statuses
             }
         }
 
+        [CanBeNull]
         public IEnumerable<TwitterAccount> GetSuitableReplyAccount()
         {
             var uid = this.Status.InReplyToUserId.GetValueOrDefault();

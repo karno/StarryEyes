@@ -48,7 +48,7 @@ c+r: Retweet
 c+s+r: RetweetMany
 c+q: QuoteLink
 c+f: Favorite Retweet
-c+m: Reply(""@{1} もやし"")
+c+m: Reply(""@{0} もやし"")
 c+delete: Delete
 c+a+delete: Mute
 d: SendDirectMessage

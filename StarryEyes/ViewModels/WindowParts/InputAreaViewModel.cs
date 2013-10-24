@@ -163,15 +163,12 @@ namespace StarryEyes.ViewModels.WindowParts
                         {
                             Task.Run(async () => InReplyTo = new StatusViewModel(await StatusModel.Get(inReplyTo)));
                         }
-                        switch (cursor)
+                        var offset = cursor.Index;
+                        if (offset < 0)
                         {
-                            case CursorPosition.Begin:
-                                Messenger.Raise(new TextBoxSetCaretMessage(0));
-                                break;
-                            case CursorPosition.End:
-                                Messenger.Raise(new TextBoxSetCaretMessage(InputText.Length));
-                                break;
+                            offset = InputText.Length - offset + 1;
                         }
+                        Messenger.Raise(new TextBoxSetCaretMessage(offset, cursor.SelectionLength));
                     }));
 
             CompositeDisposable.Add(
@@ -741,7 +738,7 @@ namespace StarryEyes.ViewModels.WindowParts
                     var last = InputAreaModel.Drafts[InputAreaModel.Drafts.Count - 1];
                     InputAreaModel.Drafts.RemoveAt(InputAreaModel.Drafts.Count - 1);
                     InputInfo = last;
-                    Messenger.Raise(new TextBoxSetCaretMessage(InputInfo.Text.Length));
+                    Messenger.Raise(new TextBoxSetCaretMessage(InputInfo.Text.Length, 0));
                 }
             }
             else
