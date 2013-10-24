@@ -9,6 +9,7 @@
              xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:triggers="clr-namespace:StarryEyes.Views.Triggers"
              xmlns:utils="clr-namespace:StarryEyes.Views.Utils"
              xmlns:vm="clr-namespace:StarryEyes.ViewModels.WindowParts.Flips"
              x:Name="userControl"
@@ -68,6 +69,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
     <i:Interaction.Triggers>
+        <triggers:KeyAssignTrigger Group="Timeline" />
         <custom:InteractionMessageTrigger Messenger="{Binding Messenger}">
             <behaviors:GoToStateInteractionMessageAction />
             <behaviors:TaskDialogInteractionMessageAction />
