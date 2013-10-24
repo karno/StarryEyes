@@ -22,7 +22,7 @@ namespace StarryEyes.Models.Databases
         /// <returns>(select (body))</returns>
         public static string EnumerationToSelectClause(this string str)
         {
-            return "(select (" + str + "))";
+            return "(select (" + (string.IsNullOrEmpty(str) ? "-1" : str) + "))";
         }
 
         /// <summary>
