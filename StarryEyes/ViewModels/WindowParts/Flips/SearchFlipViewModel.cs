@@ -85,10 +85,6 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 {
                     previous.Dispose();
                 }
-                if (value != null)
-                {
-                    value.SetFocus();
-                }
             }
         }
         public UserResultViewModel UserResult
@@ -329,6 +325,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         {
             if (!this.IsVisible) return;
             Text = String.Empty;
+            this.CloseResults();
             base.Close();
             _backStack.Clear();
             MainWindowModel.SetFocusTo(FocusRequest.Timeline);

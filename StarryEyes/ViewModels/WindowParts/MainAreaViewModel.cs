@@ -96,6 +96,7 @@ namespace StarryEyes.ViewModels.WindowParts
         #region Key assign control
 
         private static bool _isRegisteredEvents;
+
         private void RegisterEvents()
         {
             if (_isRegisteredEvents) throw new InvalidOperationException();
@@ -156,7 +157,17 @@ namespace StarryEyes.ViewModels.WindowParts
             status(target);
         }
 
-        internal static TimelineViewModelBase TimelineActionTargetOverride { get; set; }
+        private static TimelineViewModelBase _timelineActionTargetOverride;
+        internal static TimelineViewModelBase TimelineActionTargetOverride
+        {
+            get { return _timelineActionTargetOverride; }
+            set
+            {
+                _timelineActionTargetOverride = value;
+                System.Diagnostics.Debug.WriteLine("* set key assign override: " +
+                                                   (value == null ? "null" : value.GetType().ToString()));
+            }
+        }
 
         #endregion
 
