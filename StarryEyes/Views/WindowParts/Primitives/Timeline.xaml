@@ -29,6 +29,7 @@
             <DataTemplate x:Key="UserItemTemplate">
                 <controls:LazyImage Width="20"
                                     Height="20"
+                                    Cursor="Hand"
                                     DecodePixelWidth="20"
                                     ToolTip="{Binding ScreenName,
                                                       Mode=OneTime}"
@@ -537,6 +538,7 @@
                                         HorizontalAlignment="Stretch"
                                         VerticalAlignment="Top"
                                         Background="#0F808080"
+                                        Cursor="Hand"
                                         Visibility="Collapsed">
                                     <Border.LayoutTransform>
                                         <TransformGroup>
@@ -728,6 +730,7 @@
                                                    Height="Auto"
                                                    Margin="10,-4,2,0"
                                                    VerticalAlignment="Bottom"
+                                                   Cursor="Hand"
                                                    FontFamily="Segoe UI Semibold"
                                                    FontSize="13.333"
                                                    Foreground="#FF1BA1E2"
@@ -883,6 +886,7 @@
                                                 Background="#FFF0F0F0"
                                                 BorderBrush="#FF979797"
                                                 BorderThickness="1"
+                                                Cursor="Hand"
                                                 Visibility="{Binding IsImageAvailable,
                                                                      Mode=OneWay,
                                                                      Converter={StaticResource BooleanToVisibleConverter}}">
@@ -1265,6 +1269,7 @@
                                         <TextBlock Margin="1,-2,0,0"
                                                    HorizontalAlignment="Left"
                                                    VerticalAlignment="Center"
+                                                   Cursor="Hand"
                                                    FontFamily="Segoe UI Semilight"
                                                    FontSize="12"
                                                    Foreground="#FF008A00"
