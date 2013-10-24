@@ -59,20 +59,28 @@ namespace StarryEyes.Models.Accounting
         {
             this._accountId = accountId;
             // load data from db
-            InitializeCollection(() => UserProxy.GetFollowingsAsync(accountId), _followingLocker, _followings.Add);
-            InitializeCollection(() => UserProxy.GetFollowersAsync(accountId), _followersLocker, _followers.Add);
-            InitializeCollection(() => UserProxy.GetBlockingsAsync(accountId), _blockingsLocker, _blockings.Add);
+            InitializeCollection(() => UserProxy.GetFollowingsAsync(accountId),
+                                 _followingLocker, _followings.Add,
+                                 id => this.OnAccountDataUpdated(id, true, RelationDataChange.Following));
+            InitializeCollection(() => UserProxy.GetFollowersAsync(accountId),
+                                 _followersLocker, _followers.Add,
+                                 id => this.OnAccountDataUpdated(id, true, RelationDataChange.Follower));
+            InitializeCollection(() => UserProxy.GetBlockingsAsync(accountId),
+                                 _blockingsLocker, _blockings.Add,
+                                 id => this.OnAccountDataUpdated(id, true, RelationDataChange.Blocking));
         }
 
-        private void InitializeCollection(Func<Task<IEnumerable<long>>> reader, object locker, Action<long> adder)
+        private void InitializeCollection(Func<Task<IEnumerable<long>>> reader,
+                                          object locker, Action<long> adder, Action<long> postcall)
         {
             Task.Run(async () =>
             {
-                var items = await reader();
+                var items = (await reader()).Memoize();
                 lock (locker)
                 {
                     items.ForEach(adder);
                 }
+                items.ForEach(postcall);
             });
         }
 

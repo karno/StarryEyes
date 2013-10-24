@@ -49,9 +49,8 @@ namespace StarryEyes.Models.Receiving
         public static bool IsBlockedOrMuted([NotNull] TwitterStatus status)
         {
             if (status == null) throw new ArgumentNullException("status");
-            CheckUpdateMutes();
-            CheckUpdateBlocks();
             if (IsBlocked(status.User)) return true;
+            CheckUpdateMutes();
             return _muteFilter(status);
         }
 
@@ -65,7 +64,6 @@ namespace StarryEyes.Models.Receiving
         public static bool IsBlocked([NotNull] TwitterUser user)
         {
             if (user == null) throw new ArgumentNullException("user");
-            CheckUpdateBlocks();
             return IsBlocked(user.Id);
         }
 
