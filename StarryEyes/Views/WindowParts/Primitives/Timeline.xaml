@@ -311,7 +311,7 @@
                                     <DoubleAnimationUsingKeyFrames Storyboard.TargetName="CheckBoxBorder" Storyboard.TargetProperty="(FrameworkElement.Width)">
                                         <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="24">
                                             <EasingDoubleKeyFrame.EasingFunction>
-                                                <ExponentialEase EasingMode="EaseOut" Exponent="16" />
+                                                <ExponentialEase EasingMode="EaseOut" Exponent="10" />
                                             </EasingDoubleKeyFrame.EasingFunction>
                                         </EasingDoubleKeyFrame>
                                     </DoubleAnimationUsingKeyFrames>
@@ -331,7 +331,7 @@
                                     <DoubleAnimationUsingKeyFrames Storyboard.TargetName="CheckBoxBorder" Storyboard.TargetProperty="(FrameworkElement.Width)">
                                         <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0">
                                             <EasingDoubleKeyFrame.EasingFunction>
-                                                <ExponentialEase EasingMode="EaseOut" Exponent="16" />
+                                                <ExponentialEase EasingMode="EaseOut" Exponent="10" />
                                             </EasingDoubleKeyFrame.EasingFunction>
                                         </EasingDoubleKeyFrame>
                                     </DoubleAnimationUsingKeyFrames>
@@ -347,28 +347,28 @@
                                     <DoubleAnimationUsingKeyFrames Storyboard.TargetName="ViaPanel" Storyboard.TargetProperty="(UIElement.Opacity)">
                                         <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0">
                                             <EasingDoubleKeyFrame.EasingFunction>
-                                                <ExponentialEase EasingMode="EaseOut" Exponent="16" />
+                                                <ExponentialEase EasingMode="EaseOut" Exponent="10" />
                                             </EasingDoubleKeyFrame.EasingFunction>
                                         </EasingDoubleKeyFrame>
                                     </DoubleAnimationUsingKeyFrames>
                                     <DoubleAnimationUsingKeyFrames Storyboard.TargetName="ShortTime" Storyboard.TargetProperty="(UIElement.Opacity)">
                                         <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="1">
                                             <EasingDoubleKeyFrame.EasingFunction>
-                                                <ExponentialEase EasingMode="EaseOut" Exponent="16" />
+                                                <ExponentialEase EasingMode="EaseOut" Exponent="10" />
                                             </EasingDoubleKeyFrame.EasingFunction>
                                         </EasingDoubleKeyFrame>
                                     </DoubleAnimationUsingKeyFrames>
                                     <DoubleAnimationUsingKeyFrames Storyboard.TargetName="LongTime" Storyboard.TargetProperty="(UIElement.Opacity)">
                                         <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0">
                                             <EasingDoubleKeyFrame.EasingFunction>
-                                                <ExponentialEase EasingMode="EaseOut" Exponent="16" />
+                                                <ExponentialEase EasingMode="EaseOut" Exponent="10" />
                                             </EasingDoubleKeyFrame.EasingFunction>
                                         </EasingDoubleKeyFrame>
                                     </DoubleAnimationUsingKeyFrames>
                                     <DoubleAnimationUsingKeyFrames Storyboard.TargetName="stackPanel" Storyboard.TargetProperty="(UIElement.Opacity)">
                                         <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0">
                                             <EasingDoubleKeyFrame.EasingFunction>
-                                                <ExponentialEase EasingMode="EaseOut" Exponent="16" />
+                                                <ExponentialEase EasingMode="EaseOut" Exponent="10" />
                                             </EasingDoubleKeyFrame.EasingFunction>
                                         </EasingDoubleKeyFrame>
                                     </DoubleAnimationUsingKeyFrames>
@@ -379,28 +379,28 @@
                                     <DoubleAnimationUsingKeyFrames Storyboard.TargetName="ViaPanel" Storyboard.TargetProperty="(UIElement.Opacity)">
                                         <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="1">
                                             <EasingDoubleKeyFrame.EasingFunction>
-                                                <ExponentialEase EasingMode="EaseOut" Exponent="16" />
+                                                <ExponentialEase EasingMode="EaseOut" Exponent="10" />
                                             </EasingDoubleKeyFrame.EasingFunction>
                                         </EasingDoubleKeyFrame>
                                     </DoubleAnimationUsingKeyFrames>
                                     <DoubleAnimationUsingKeyFrames Storyboard.TargetName="LongTime" Storyboard.TargetProperty="(UIElement.Opacity)">
                                         <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="1">
                                             <EasingDoubleKeyFrame.EasingFunction>
-                                                <ExponentialEase EasingMode="EaseOut" Exponent="16" />
+                                                <ExponentialEase EasingMode="EaseOut" Exponent="10" />
                                             </EasingDoubleKeyFrame.EasingFunction>
                                         </EasingDoubleKeyFrame>
                                     </DoubleAnimationUsingKeyFrames>
                                     <DoubleAnimationUsingKeyFrames Storyboard.TargetName="ShortTime" Storyboard.TargetProperty="(UIElement.Opacity)">
                                         <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0">
                                             <EasingDoubleKeyFrame.EasingFunction>
-                                                <ExponentialEase EasingMode="EaseOut" Exponent="16" />
+                                                <ExponentialEase EasingMode="EaseOut" Exponent="10" />
                                             </EasingDoubleKeyFrame.EasingFunction>
                                         </EasingDoubleKeyFrame>
                                     </DoubleAnimationUsingKeyFrames>
                                     <DoubleAnimationUsingKeyFrames Storyboard.TargetName="stackPanel" Storyboard.TargetProperty="(UIElement.Opacity)">
                                         <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="1">
                                             <EasingDoubleKeyFrame.EasingFunction>
-                                                <ExponentialEase EasingMode="EaseOut" Exponent="16" />
+                                                <ExponentialEase EasingMode="EaseOut" Exponent="10" />
                                             </EasingDoubleKeyFrame.EasingFunction>
                                         </EasingDoubleKeyFrame>
                                     </DoubleAnimationUsingKeyFrames>
@@ -1457,12 +1457,12 @@
                         <DoubleAnimationUsingKeyFrames Storyboard.TargetName="multiOperationBlock" Storyboard.TargetProperty="(FrameworkElement.Height)">
                             <EasingDoubleKeyFrame KeyTime="0" Value="40">
                                 <EasingDoubleKeyFrame.EasingFunction>
-                                    <ExponentialEase EasingMode="EaseOut" Exponent="16" />
+                                    <ExponentialEase EasingMode="EaseOut" Exponent="10" />
                                 </EasingDoubleKeyFrame.EasingFunction>
                             </EasingDoubleKeyFrame>
                             <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="0">
                                 <EasingDoubleKeyFrame.EasingFunction>
-                                    <ExponentialEase EasingMode="EaseOut" Exponent="16" />
+                                    <ExponentialEase EasingMode="EaseOut" Exponent="10" />
                                 </EasingDoubleKeyFrame.EasingFunction>
                             </EasingDoubleKeyFrame>
                         </DoubleAnimationUsingKeyFrames>
@@ -1477,12 +1477,12 @@
                         <DoubleAnimationUsingKeyFrames Storyboard.TargetName="multiOperationBlock" Storyboard.TargetProperty="(FrameworkElement.Height)">
                             <EasingDoubleKeyFrame KeyTime="0" Value="0">
                                 <EasingDoubleKeyFrame.EasingFunction>
-                                    <ExponentialEase EasingMode="EaseOut" Exponent="16" />
+                                    <ExponentialEase EasingMode="EaseOut" Exponent="10" />
                                 </EasingDoubleKeyFrame.EasingFunction>
                             </EasingDoubleKeyFrame>
                             <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="40">
                                 <EasingDoubleKeyFrame.EasingFunction>
-                                    <ExponentialEase EasingMode="EaseOut" Exponent="16" />
+                                    <ExponentialEase EasingMode="EaseOut" Exponent="10" />
                                 </EasingDoubleKeyFrame.EasingFunction>
                             </EasingDoubleKeyFrame>
                         </DoubleAnimationUsingKeyFrames>
