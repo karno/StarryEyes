@@ -877,11 +877,20 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
 
         public void Reply(string txt)
         {
+            // from key assign
             if (String.IsNullOrEmpty(txt))
             {
-                this.Reply();
+                if (IsDirectMessage)
+                {
+                    this.DirectMessage();
+                }
+                else
+                {
+                    this.Reply();
+                }
                 return;
             }
+            if (IsDirectMessage) return;
             var formatted = String.Format(txt, this.User.ScreenName, this.User.Name);
             InputAreaModel.SetText(this.Model.GetSuitableReplyAccount(),
                                    formatted, inReplyTo: this.Status);
