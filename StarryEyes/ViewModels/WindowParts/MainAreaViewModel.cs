@@ -173,6 +173,5 @@ namespace StarryEyes.ViewModels.WindowParts
         }
 
         #endregion
-
     }
 }

@@ -1,4 +1,7 @@
-﻿using MahApps.Metro.Controls;
+﻿using System;
+using System.Reactive.Linq;
+using System.Windows.Input;
+using MahApps.Metro.Controls;
 using StarryEyes.ViewModels;
 
 namespace StarryEyes.Views
@@ -11,6 +14,14 @@ namespace StarryEyes.Views
         public MainWindow()
         {
             InitializeComponent();
+
+            Observable.Timer(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1))
+                      .ObserveOnDispatcher()
+                      .Subscribe(_ =>
+                      {
+                          var focusElement = Keyboard.FocusedElement;
+                          System.Diagnostics.Debug.WriteLine("focus: " + (focusElement == null ? "null" : focusElement.GetType().ToString()));
+                      });
         }
 
         private void OnClosing(object sender, System.ComponentModel.CancelEventArgs e)

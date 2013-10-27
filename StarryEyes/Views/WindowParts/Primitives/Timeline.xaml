@@ -1591,6 +1591,7 @@
         </Border>
         <ItemsControl FocusVisualStyle="{x:Null}"
                       Focusable="True"
+                      InputMethod.IsInputMethodEnabled="False"
                       ItemTemplate="{StaticResource StatusItemTemplate}"
                       ItemsSource="{Binding Timeline,
                                             Mode=OneWay}"

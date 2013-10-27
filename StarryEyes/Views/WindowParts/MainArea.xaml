@@ -89,6 +89,7 @@
                                   AllowDrop="True"
                                   Background="White"
                                   FocusVisualStyle="{x:Null}"
+                                  InputMethod.IsInputMethodEnabled="False"
                                   ItemTemplate="{StaticResource TabHeaderTemplate}"
                                   ItemsSource="{Binding Tabs}">
                         <i:Interaction.Behaviors>
@@ -110,6 +111,7 @@
                                   Margin="0,4,0,0"
                                   Background="White"
                                   FocusVisualStyle="{x:Null}"
+                                  InputMethod.IsInputMethodEnabled="False"
                                   ItemsSource="{Binding Tabs}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>

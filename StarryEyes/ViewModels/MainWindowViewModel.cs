@@ -262,6 +262,9 @@ namespace StarryEyes.ViewModels
             }
 
             Task.Run(() => App.RaiseUserInterfaceReady());
+
+            // initially focus to timeline
+            MainWindowModel.SetFocusTo(FocusRequest.Timeline);
         }
 
         private void ReInitTabs()

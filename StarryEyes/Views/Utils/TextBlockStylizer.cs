@@ -250,12 +250,12 @@ namespace StarryEyes.Views.Utils
 
         private static Inline GenerateText(string surface)
         {
-            return new Run { Text = surface };
+            return new Run { Text = surface, Focusable = false };
         }
 
         private static Inline GenerateLink(DependencyObject obj, string surface, string linkUrl)
         {
-            var hl = new Hyperlink { Foreground = Brushes.Gray };
+            var hl = new Hyperlink { Foreground = Brushes.Gray, Focusable = false };
             hl.Inlines.Add(surface);
             hl.Command = new ProxyCommand(link =>
             {
