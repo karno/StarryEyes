@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reactive.Linq;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
@@ -18,12 +20,21 @@ namespace StarryEyes.Filters.Sources
 
         public override Func<TwitterStatus, bool> GetEvaluator()
         {
-            return _ => _.Text.IndexOf(this._query, StringComparison.Ordinal) >= 0;
+            var pan = SplitPositiveNegativeQuery(this._query);
+            var positive = pan.Item1;
+            var negative = pan.Item2;
+            return status =>
+                   positive.All(p => status.Text.IndexOf(p, StringComparison.CurrentCultureIgnoreCase) >= 0) &&
+                   negative.All(p => status.Text.IndexOf(p, StringComparison.CurrentCultureIgnoreCase) == -1);
         }
 
         public override string GetSqlQuery()
         {
-            return "Text like '%" + _query + "%'";
+            var pan = SplitPositiveNegativeQuery(this._query);
+            return Enumerable.Concat(
+                pan.Item1.Select(q => "Text like '%" + q + "%'"),
+                pan.Item2.Select(q => "Text not like '%" + q + "%'"))
+                             .JoinString(" and ");
         }
 
         protected override IObservable<TwitterStatus> ReceiveSink(long? maxId)
@@ -56,6 +67,17 @@ namespace StarryEyes.Filters.Sources
         public override string FilterValue
         {
             get { return _query; }
+        }
+
+        public static Tuple<IEnumerable<string>, IEnumerable<string>> SplitPositiveNegativeQuery(string query)
+        {
+
+            var splitted = query.Split(new[] { " ", "\t", "　" },
+                                       StringSplitOptions.RemoveEmptyEntries)
+                                .Distinct().ToArray();
+            var positive = splitted.Where(s => !s.StartsWith("-")).ToArray();
+            var negative = splitted.Where(s => s.StartsWith("-")).Select(s => s.Substring(1)).ToArray();
+            return Tuple.Create(positive.AsEnumerable(), negative.AsEnumerable());
         }
     }
 }

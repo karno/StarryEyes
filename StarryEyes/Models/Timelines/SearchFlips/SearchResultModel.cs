@@ -9,7 +9,9 @@ using StarryEyes.Anomaly.Utils;
 using StarryEyes.Filters;
 using StarryEyes.Filters.Expressions;
 using StarryEyes.Filters.Parsing;
+using StarryEyes.Filters.Sources;
 using StarryEyes.Models.Databases;
+using StarryEyes.Models.Receiving.Handling;
 using StarryEyes.Models.Timelines.Tabs;
 using StarryEyes.Settings;
 
@@ -127,33 +129,37 @@ namespace StarryEyes.Models.Timelines.SearchFlips
                 return Setting.Accounts
                               .GetRandomOne()
                               .SearchAsync(this._query, maxId: maxId, count: count)
-                              .ToObservable();
+                              .ToObservable()
+                              .Do(StatusInbox.Queue);
             }
             return StatusProxy.FetchStatuses(this._filterSql, maxId, count);
         }
 
         public string CreateFilterQuery()
         {
-            if (_option == SearchOption.Query)
+            switch (_option)
             {
-                return this._query;
+                case SearchOption.Local:
+                case SearchOption.CurrentTab:
+                    var pan = FilterSearch.SplitPositiveNegativeQuery(_query);
+                    var query = pan.Item1.Select(s => "text contains \"" + s + "\"")
+                                   .Concat(pan.Item2.Select(s => "!(text contains \"" + s + "\")"))
+                                   .JoinString("&&");
+                    var ctab = TabManager.CurrentFocusTab;
+                    var ctf = ctab != null ? ctab.FilterQuery : null;
+                    if (_option == SearchOption.CurrentTab && ctf != null)
+                    {
+                        return ctf.ToQuery() + " and " + query;
+                    }
+                    return "where " + query;
+                case SearchOption.Query:
+                    return this._query;
+                case SearchOption.Web:
+                    return "from search:\"" + this._query + "\" where ()";
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
-            var splitted = _query.Split(new[] { " ", "\t", "　" },
-                                       StringSplitOptions.RemoveEmptyEntries)
-                                .Distinct().ToArray();
-            var positive = splitted.Where(s => !s.StartsWith("-")).ToArray();
-            var negative = splitted.Where(s => s.StartsWith("-")).Select(s => s.Substring(1)).ToArray();
-            var query = positive.Select(s => "text contains \"" + s + "\"")
-                                .Concat(negative.Select(s => "!(text contains \"" + s + "\")"))
-                                .JoinString("&&");
 
-            var ctab = TabManager.CurrentFocusTab;
-            var ctf = ctab != null ? ctab.FilterQuery : null;
-            if (_option == SearchOption.CurrentTab && ctf != null)
-            {
-                return ctf.ToQuery() + " and " + query;
-            }
-            return "where " + query;
         }
     }
 
