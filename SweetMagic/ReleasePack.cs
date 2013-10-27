@@ -27,6 +27,7 @@ namespace SweetMagic
 
         public IEnumerable<Release> GetPatchesShouldBeApplied(double currentVersion)
         {
+            // get differential patches
             var patches = Releases.OrderBy(r => r.Version).SkipWhile(r => r.Version <= currentVersion).ToArray();
             if (patches.Any(p => p.IsMilestone))
             {
@@ -44,7 +45,6 @@ namespace SweetMagic
                     }
                     return true;
                 }).Reverse();
-
             }
             return patches;
         }
@@ -67,7 +67,7 @@ namespace SweetMagic
         public Release(XElement element)
         {
             this.Version = double.Parse(element.Attribute("version").Value);
-            this.Channel = (ReleaseChannel)Enum.Parse(typeof(ReleaseChannel), element.Attribute("channel").Value);
+            this.Channel = (ReleaseChannel)Enum.Parse(typeof(ReleaseChannel), element.Attribute("channel").Value, true);
             var milestone = element.Attribute("milestone");
             this.IsMilestone = milestone != null && Boolean.Parse(milestone.Value);
             this.ReleaseTime = DateTime.Parse(element.Attribute("date").Value);

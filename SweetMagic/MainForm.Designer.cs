@@ -90,8 +90,8 @@
             this.logField.BackColor = System.Drawing.Color.White;
             this.logField.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.logField.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.logField.Font = new System.Drawing.Font("Segoe UI Symbol", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.logField.ForeColor = System.Drawing.SystemColors.ControlDark;
+            this.logField.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.logField.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
             this.logField.Location = new System.Drawing.Point(10, 0);
             this.logField.Multiline = true;
             this.logField.Name = "logField";

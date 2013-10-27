@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // アセンブリに関する一般情報は以下の属性セットをとおして制御されます。
 // アセンブリに関連付けられている情報を変更するには、
 // これらの属性値を変更してください。
-[assembly: AssemblyTitle("Krile Updater")]
-[assembly: AssemblyDescription("Krile StarryEyes Update Agent")]
+[assembly: AssemblyTitle("Wonder")]
+[assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("starwing network")]
-[assembly: AssemblyProduct("Krile StarryEyes")]
-[assembly: AssemblyCopyright("Copyright ©  2013 Karno")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("Wonder")]
+[assembly: AssemblyCopyright("Copyright ©  2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // 次の GUID は、このプロジェクトが COM に公開される場合の、typelib の ID です
-[assembly: Guid("0ae8a814-fc7c-4cd5-9f63-1cfcc4270b88")]
+[assembly: Guid("57f3275c-85a9-48fc-83d0-8042358c99ef")]
 
 // アセンブリのバージョン情報は、以下の 4 つの値で構成されています:
 //

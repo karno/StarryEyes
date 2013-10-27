@@ -21,6 +21,8 @@ namespace SweetMagic
                     var ap = element.Attribute("await"); // default true
                     return new ExecuteAction(element.Attribute("path").Value,
                                              ap == null || ap.Value.ToLower() != "false");
+                case "delete":
+                    return new DeleteAction(element.Attribute("path").Value);
                 default:
                     throw new ArgumentException("action is not matched:" + element.Name);
             }
@@ -48,22 +50,29 @@ namespace SweetMagic
             using (var ms = new MemoryStream(file))
             using (var ss = new MemoryStream())
             {
+                executor.NotifyProgress("verifying patch pack...", false);
                 if (!Cryptography.Verify(ms, ss, executor.PublicKey))
                 {
                     executor.NotifyProgress("Invalid signature.");
                     throw new Exception("Package signature is not matched.");
                 }
+                executor.NotifyProgress("verified.");
+                executor.NotifyProgress("applying patches.");
                 var archive = new ZipArchive(ss);
                 foreach (var entry in archive.Entries)
                 {
+                    executor.NotifyProgress("patching " + entry.Name + "...");
                     await this.Extract(entry, executor.BasePath);
                 }
+                executor.NotifyProgress("patch completed.");
             }
         }
 
         private async Task Extract(ZipArchiveEntry entry, string basePath)
         {
             var fn = Path.Combine(basePath, entry.FullName);
+            // ensure create directory
+            Directory.CreateDirectory(Path.GetDirectoryName(fn));
             using (var fstream = File.Create(fn))
             {
                 await entry.Open().CopyToAsync(fstream);
@@ -84,11 +93,31 @@ namespace SweetMagic
 
         public override async Task DoWork(UpdateTaskExecutor executor)
         {
+            executor.NotifyProgress("executing binary: " + _path);
             var process = Process.Start(Path.Combine(executor.BasePath, _path));
             if (_awaitProcess && process != null)
             {
+                executor.NotifyProgress("waiting exit...", false);
                 await Task.Run(() => process.WaitForExit());
+                executor.NotifyProgress("ok.");
             }
+        }
+    }
+
+    public sealed class DeleteAction : ReleaseActionBase
+    {
+        private readonly string _path;
+
+        public DeleteAction(string path)
+        {
+            _path = path;
+        }
+
+        public override async Task DoWork(UpdateTaskExecutor executor)
+        {
+            executor.NotifyProgress("removing file: " + _path + " ...", false);
+            await Task.Run(() => File.Delete(Path.Combine(executor.BasePath, _path)));
+            executor.NotifyProgress("ok.");
         }
     }
 }

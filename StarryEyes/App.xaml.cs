@@ -125,7 +125,7 @@ namespace StarryEyes
 
             if (e.Args.Select(a => a.ToLower()).Contains("-maintenance"))
             {
-            showPreExec = true;
+                showPreExec = true;
             }
 #endif
             if (showPreExec)
@@ -578,7 +578,7 @@ namespace StarryEyes
 
         public static readonly string DefaultStatusMessage = "完了";
 
-        public static readonly string RemoteVersionXml = "http://update.starwing.net/starryeyes/update.xml";
+        public static readonly string RemoteVersionXml = "http://krile.starwing.net/shared/update.xml";
 
         public static readonly string PublicKeyFile = "krile.pub";
 
@@ -590,9 +590,9 @@ namespace StarryEyes
 
         public static readonly string EventWavFile = "event.wav";
 
-        public static readonly string ReleaseNoteUrl = "http://krile.starwing.net/updates.html";
+        public static readonly string ReleaseNoteUrl = "https://github.com/karno/StarryEyes/wiki/ReleaseNote";
 
-        public static readonly string KampaUrl = "http://krile.starwing.net/kampa.html";
+        public static readonly string KampaUrl = "http://krile.starwing.net/donation.html";
 
         #endregion
 
