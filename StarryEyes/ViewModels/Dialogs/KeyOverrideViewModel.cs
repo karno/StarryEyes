@@ -97,11 +97,11 @@ namespace StarryEyes.ViewModels.Dialogs
                          MainIcon = VistaTaskDialogIcon.Warning,
                          MainInstruction = "APIキーの設定をスキップしますか？",
                          Content = "スキップする場合、最大登録可能アカウント数が2つに制限されます。",
-                         CommandButtons = new[] { "スキップ", "キャンセル" },
+                         CustomButtons = new[] { "スキップ", "キャンセル" },
                          ExpandedInfo = "APIキーの状況によってはアカウントが登録できないことがあります。" + Environment.NewLine +
                          "後からAPIキーを設定することもできますが、その際にすべてのアカウントを認証しなおす必要があります。"
                      }));
-                if (m.Response.CommandButtonResult.HasValue && m.Response.CommandButtonResult.Value == 0)
+                if (m.Response.CustomButtonResult.HasValue && m.Response.CustomButtonResult.Value == 0)
                 {
                     this.Messenger.Raise(new WindowActionMessage(WindowAction.Close));
                 }

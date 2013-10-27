@@ -34,11 +34,31 @@ namespace StarryEyes
         private static Mutex _appMutex;
         private void AppStartup(object sender, StartupEventArgs e)
         {
-            #region initialize execution environment
+            #region initialize configuration directory
+
+            // create data-store directory
+            try
+            {
+                Directory.CreateDirectory(ConfigurationDirectoryPath);
+            }
+            catch (Exception ex)
+            {
+                TaskDialog.Show(new TaskDialogOptions
+                {
+                    MainIcon = VistaTaskDialogIcon.Error,
+                    MainInstruction = "Krileの起動に失敗しました。",
+                    Content = "設定を保持するディレクトリを作成できません。",
+                    ExpandedInfo = ex.ToString(),
+                    CommonButtons = TaskDialogCommonButtons.Close,
+                    FooterIcon = VistaTaskDialogIcon.Information,
+                    FooterText = "別の場所への配置を試みてください。"
+                });
+                Environment.Exit(-1);
+            }
 
             // enable multi-core JIT.
             // see reference: http://msdn.microsoft.com/en-us/library/system.runtime.profileoptimization.aspx
-            if (IsMulticoreJitEnabled)
+            if (IsMulticoreJitEnabled && !(e.Args.Select(a => a.ToLower()).Contains("-maintenance")))
             {
                 ProfileOptimization.SetProfileRoot(ConfigurationDirectoryPath);
                 ProfileOptimization.StartProfile(ProfileFileName);
@@ -85,6 +105,35 @@ namespace StarryEyes
                     CommonButtons = TaskDialogCommonButtons.Close
                 });
                 Environment.Exit(0);
+            }
+
+            #endregion
+
+            #region clean up update binary
+            if (e.Args.Select(a => a.ToLower()).Contains("-postupdate"))
+            {
+                // remove kup.exe
+            }
+            #endregion
+
+            #region check and show pre-execute dialog
+
+            var showPreExec = false;
+#if DEBUG
+            showPreExec = true;
+#else
+
+            if (e.Args.Select(a => a.ToLower()).Contains("-maintenance"))
+            {
+            showPreExec = true;
+            }
+#endif
+            if (showPreExec)
+            {
+                if (!this.ShowPreExecuteDialog())
+                {
+                    Environment.Exit(0);
+                }
             }
 
             #endregion
@@ -163,6 +212,75 @@ namespace StarryEyes
             TwitterConfigurationService.Initialize();
             BackstageModel.Initialize();
             RaiseSystemReady();
+        }
+
+        private bool ShowPreExecuteDialog()
+        {
+            var resp = TaskDialog.Show(new TaskDialogOptions
+            {
+                Title = "Krileのメンテナンス",
+                MainIcon = VistaTaskDialogIcon.Warning,
+                MainInstruction = "Krileが保持するデータを管理できます。",
+                Content = "消去したデータはもとに戻せません。必要なデータは予めバックアップしてください。",
+                CommandButtons = new[]
+                {
+                    /* 0 */ "このまま起動(&C)",
+                    /* 1 */ "データベースを消去して起動(&D)",
+                    /* 2 */ "すべての設定・データベースを消去して起動(&R)",
+                    /* 3 */ "すべての設定・データベースを消去して終了(&E)",
+                    /* 4 */ "最新版をクリーンインストール(&U)",
+                    /* 5 */ "キャンセル(&X)"
+                },
+                FooterIcon = VistaTaskDialogIcon.Information,
+                FooterText = "クリーンインストールを行うと、全ての設定・データベースが消去されます。"
+            });
+            if (!resp.CommandButtonResult.HasValue || resp.CommandButtonResult.Value == 5)
+            {
+                return false;
+            }
+            switch (resp.CommandButtonResult.Value)
+            {
+                case 1:
+                    // remove database
+                    if (File.Exists(DatabaseFilePath))
+                    {
+                        File.Delete(DatabaseFilePath);
+                    }
+                    break;
+                case 2:
+                case 3:
+                case 4:
+                    // remove all
+                    if (ExecutionMode == ExecutionMode.Standalone)
+                    {
+                        // remove each
+                        var files = new[]
+                        {
+                            DatabaseFilePath, DatabaseFilePath, HashtagTempFilePath, ListUserTempFilePath,
+                            Path.Combine(ConfigurationDirectoryPath, ProfileFileName)
+                        };
+                        var dirs = new[]
+                        {
+                            KeyAssignProfilesDirectory
+                        };
+                        files.ForEach(File.Delete);
+                        dirs.ForEach(d => Directory.Delete(d, true));
+                    }
+                    else
+                    {
+                        // remove whole directory
+                        if (Directory.Exists(ConfigurationDirectoryPath))
+                        {
+                            Directory.Delete(ConfigurationDirectoryPath, true);
+                        }
+                    }
+                    break;
+            }
+            if (resp.CommandButtonResult.Value == 4)
+            {
+                // force update
+            }
+            return resp.CommandButtonResult.Value < 3;
         }
 
         private bool CheckDatabase()
@@ -245,17 +363,6 @@ namespace StarryEyes
             }
 
             Environment.Exit(-1);
-        }
-
-        /// <summary>
-        /// Clear all data stored in data store.
-        /// </summary>
-        internal void ClearStoreData()
-        {
-            if (Directory.Exists(DataStorePath))
-            {
-                Directory.Delete(DataStorePath, true);
-            }
         }
 
         #region Definitions
@@ -370,14 +477,6 @@ namespace StarryEyes
             get { return Path.Combine(ConfigurationDirectoryPath, DatabaseFileName); }
         }
 
-        public static string DataStorePath
-        {
-            get
-            {
-                return Path.Combine(ConfigurationDirectoryPath, DataStoreDirectory);
-            }
-        }
-
         public static string HashtagTempFilePath
         {
             get { return Path.Combine(ConfigurationDirectoryPath, HashtagCacheFileName); }
@@ -452,8 +551,6 @@ namespace StarryEyes
                 return Double.Parse(lvstr);
             }
         }
-
-        public static readonly string DataStoreDirectory = "store";
 
         public static readonly string DatabaseFileName = "krile.db";
 
