@@ -204,7 +204,6 @@
     <Compile Include="Helpers\TwitterRegexPatterns.cs" />
     <Compile Include="Hotfixes\DispatcherCollectionRx.cs" />
     <Compile Include="Hotfixes\DispatcherEx.cs" />
-    <Compile Include="Helpers\RegexHelper.cs" />
     <Compile Include="Hotfixes\ReadOnlyDispatcherCollectionRx.cs" />
     <Compile Include="Hotfixes\ViewModelHelperRx.cs" />
     <Compile Include="Models\BackstageModel.cs" />

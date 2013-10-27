@@ -5,10 +5,13 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using Livet;
+using StarryEyes.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Helpers;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Receiving.Handling;
 using StarryEyes.Models.Requests;
@@ -79,10 +82,10 @@ namespace StarryEyes.Models
                 }
             };
             _bindingHashtags.CollectionChanged += (_, __) =>
-                {
-                    if (_currentFocusTabModel != null)
-                        _currentFocusTabModel.BindingHashtags = _bindingHashtags.ToList();
-                };
+            {
+                if (_currentFocusTabModel != null)
+                    _currentFocusTabModel.BindingHashtags = _bindingHashtags.ToList();
+            };
         }
 
         public static ObservableSynchronizedCollection<TwitterAccount> BindingAccounts
@@ -200,6 +203,7 @@ namespace StarryEyes.Models
         /// <summary>
         ///     Binding authenticate informations.
         /// </summary>
+        [NotNull]
         public IEnumerable<TwitterAccount> Accounts
         {
             get { return this._accounts ?? Enumerable.Empty<TwitterAccount>(); }
@@ -209,10 +213,11 @@ namespace StarryEyes.Models
         /// <summary>
         ///     Binding hashtags.
         /// </summary>
+        [NotNull]
         public IEnumerable<string> Hashtags
         {
             get { return _hashtags ?? Enumerable.Empty<string>(); }
-            set { _hashtags = value.ToArray(); }
+            set { _hashtags = value.Guard().ToArray(); }
         }
 
         /// <summary>
@@ -290,7 +295,7 @@ namespace StarryEyes.Models
             return new TweetInputInfo(_initialText)
                 {
                     _accounts = this._accounts,
-                    _hashtags = _hashtags,
+                    _hashtags = _hashtags == null ? null : _hashtags.ToArray(),
                     InReplyTo = InReplyTo,
                     MessageRecipient = MessageRecipient,
                     Text = Text,
@@ -303,11 +308,21 @@ namespace StarryEyes.Models
 
         public IObservable<TweetInputInfo> Send()
         {
+            var existedTags = TwitterRegexPatterns.ValidHashtag.Matches(Text)
+                                               .OfType<Match>()
+                                               .Select(_ => _.Groups[1].Value)
+                                               .Distinct()
+                                               .ToArray();
+            var binds = _hashtags.Guard().Except(existedTags)
+                                 .Distinct()
+                                 .Select(t => " #" + t)
+                                 .JoinString("");
             var postResults = new List<PostResult>();
             var subject = new Subject<TweetInputInfo>();
             var request = MessageRecipient != null
                               ? (RequestBase<TwitterStatus>)new MessagePostingRequest(MessageRecipient, Text)
-                              : new TweetPostingRequest(Text, InReplyTo != null ? InReplyTo.Status : null,
+                              : new TweetPostingRequest(Text + binds,
+                                                        InReplyTo != null ? InReplyTo.Status : null,
                                                         AttachedGeoInfo, AttachedImage);
             this._accounts.ToObservable()
                 .SelectMany(account => RequestQueue.Enqueue(account, request)

@@ -17,6 +17,7 @@ using Livet.EventListeners;
 using Livet.Messaging;
 using Livet.Messaging.IO;
 using StarryEyes.Albireo;
+using StarryEyes.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Helpers;
@@ -115,7 +116,11 @@ namespace StarryEyes.ViewModels.WindowParts
                                         DispatcherHelper.UIDispatcher));
             CompositeDisposable.Add(_bindingHashtags
                                         .ListenCollectionChanged()
-                                        .Subscribe(_ => RaisePropertyChanged(() => IsBindingHashtagExisted)));
+                                        .Subscribe(_ =>
+                                        {
+                                            InputInfo.Hashtags = _bindingHashtags.Select(h => h.Hashtag).ToArray();
+                                            RaisePropertyChanged(() => IsBindingHashtagExisted);
+                                        }));
 
             _bindableHashtagCandidates =
                 new DispatcherCollection<BindHashtagViewModel>(DispatcherHelper.UIDispatcher);
@@ -280,12 +285,16 @@ namespace StarryEyes.ViewModels.WindowParts
             }
         }
 
+        [NotNull]
         public TweetInputInfo InputInfo
         {
             get
             {
                 if (_inputInfo == null)
+                {
                     ClearInput();
+                }
+                Debug.Assert(_inputInfo != null, "_inputInfo != null");
                 return _inputInfo;
             }
             set
@@ -295,6 +304,7 @@ namespace StarryEyes.ViewModels.WindowParts
                     InputAreaModel.Drafts.Add(InputInfo);
                 }
                 _inputInfo = value;
+                value.Hashtags = this._bindingHashtags.Select(b => b.Hashtag).ToArray();
                 OverrideSelectedAccounts(value.Accounts);
                 RaisePropertyChanged(() => InputInfo);
                 RaisePropertyChanged(() => InputText);
@@ -472,7 +482,7 @@ namespace StarryEyes.ViewModels.WindowParts
 
         public bool IsAmending
         {
-            get { return this.InputInfo != null && this.InputInfo.PostedTweets != null; }
+            get { return this.InputInfo.PostedTweets != null; }
         }
 
         public int TextCount
@@ -486,7 +496,7 @@ namespace StarryEyes.ViewModels.WindowParts
                 }
                 var tags = TwitterRegexPatterns.ValidHashtag.Matches(InputText)
                                            .OfType<Match>()
-                                           .Select(_ => _.Value)
+                                           .Select(_ => _.Groups[1].Value)
                                            .ToArray();
                 if (InputAreaModel.BindingHashtags.Count > 0)
                 {
@@ -670,11 +680,11 @@ namespace StarryEyes.ViewModels.WindowParts
         private void UpdateHashtagCandidates()
         {
             var hashtags = TwitterRegexPatterns.ValidHashtag.Matches(InputText)
-                                           .OfType<Match>()
-                                           .Select(_ => _.Value)
-                                           .Distinct()
-                                           .Except(BindingHashtags.Select(_ => _.Hashtag))
-                                           .ToArray();
+                                               .OfType<Match>()
+                                               .Select(_ => _.Groups[1].Value)
+                                               .Distinct()
+                                               .Except(BindingHashtags.Select(_ => _.Hashtag))
+                                               .ToArray();
             BindableHashtagCandidates
                 .Where(_ => !hashtags.Contains(_.Hashtag))
                 .ToList()
@@ -816,7 +826,10 @@ namespace StarryEyes.ViewModels.WindowParts
             {
                 InputAreaModel.Drafts.Add(InputInfo);
             }
-            _inputInfo = new TweetInputInfo(clearTo);
+            _inputInfo = new TweetInputInfo(clearTo)
+            {
+                Hashtags = _bindingHashtags.Select(t => t.Hashtag).ToArray()
+            };
             ApplyBaseSelectedAccounts();
             InputInfo.Accounts = AccountSelectionFlip.SelectedAccounts;
             RaisePropertyChanged(() => InputInfo);
@@ -1006,11 +1019,11 @@ namespace StarryEyes.ViewModels.WindowParts
 
                 // filters screen names which were replied
                 var replies = TwitterRegexPatterns.ValidMentionOrList.Matches(InReplyTo.Status.Text)
-                                              .Cast<Match>()
-                                              .Select(_ => _.Value.Substring(1))
-                                              .Where(_ => !String.IsNullOrEmpty(_))
-                                              .Distinct()
-                                              .ToArray();
+                                                  .Cast<Match>()
+                                                  .Select(_ => _.Groups[TwitterRegexPatterns.ValidMentionOrListGroupUsername].Value.Substring(1))
+                                                  .Where(_ => !String.IsNullOrEmpty(_))
+                                                  .Distinct()
+                                                  .ToArray();
 
                 // check third-reply mistake.
                 if (!Setting.Accounts
@@ -1258,6 +1271,11 @@ namespace StarryEyes.ViewModels.WindowParts
             _callback = callback;
         }
 
+        public string DisplayHashtag
+        {
+            get { return "#" + _hashtag; }
+        }
+
         public string Hashtag
         {
             get { return _hashtag; }
@@ -1350,7 +1368,7 @@ namespace StarryEyes.ViewModels.WindowParts
 
         private async Task AddUserItems(string key)
         {
-            System.Diagnostics.Debug.WriteLine("current screen name: " + key);
+            Debug.WriteLine("current screen name: " + key);
             var items = (await UserProxy.GetUsersFastAsync(key))
                 .Select(t => t.Item2)
                 .ToArray();

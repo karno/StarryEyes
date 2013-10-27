@@ -12,14 +12,25 @@ namespace StarryEyes.Models
     {
         public static int CountText(string text)
         {
-            return TwitterRegexPatterns.ValidUrl
-                                       .Tokenize(text.Replace("\r\n", "\n"))
-                                       .Sum(s => s.Item2
-                                                     ? (s.Item1.StartsWith("https",
-                                                                           StringComparison.CurrentCultureIgnoreCase)
-                                                            ? TwitterConfigurationService.HttpsUrlLength
-                                                            : TwitterConfigurationService.HttpUrlLength)
-                                                     : s.Item1.Length);
+            var formatted = ParsingExtension.EscapeEntity(text.Replace("\r\n", "\n"));
+            var replaced = TwitterRegexPatterns.ValidUrl.Replace(
+                formatted,
+                m => m.Groups[TwitterRegexPatterns.ValidUrlGroupBefore] + "<>" +
+                     m.Groups[TwitterRegexPatterns.ValidUrlGroupUrl] + "<");
+            return replaced.Split(new[] { "<" }, StringSplitOptions.RemoveEmptyEntries)
+                           .Select(s => new { Text = s, IsUrl = s.StartsWith(">") })
+                           .Select(s =>
+                           {
+                               if (s.IsUrl)
+                               {
+                                   return s.Text.Substring(1)
+                                           .StartsWith("https", StringComparison.CurrentCultureIgnoreCase)
+                                              ? TwitterConfigurationService.HttpsUrlLength
+                                              : TwitterConfigurationService.HttpUrlLength;
+                               }
+                               return ParsingExtension.ResolveEntity(s.Text).Length;
+                           })
+                           .Sum();
         }
 
         public static string AutoEscape(string text)
@@ -54,11 +65,16 @@ namespace StarryEyes.Models
             escaped = TwitterRegexPatterns.ValidUrl.Replace(escaped, m =>
             {
                 // # => &sharp; (ハッシュタグで再識別されることを防ぐ)
-                var repl = m.Groups[1].Value.Replace("#", "&sharp;");
-                return "<U>" + repl + "<";
+                var repl = m.Groups[TwitterRegexPatterns.ValidUrlGroupUrl].Value.Replace("#", "&sharp;");
+                return m.Groups[TwitterRegexPatterns.ValidUrlGroupBefore] + "<U>" + repl + "<";
             });
-            escaped = TwitterRegexPatterns.ValidMentionOrList.Replace(escaped, m => "<A>" + m.Value + "<");
-            escaped = TwitterRegexPatterns.ValidHashtag.Replace(escaped, m => "<H>" + m.Value + "<");
+            escaped = TwitterRegexPatterns.ValidMentionOrList.Replace(
+                escaped,
+                m => m.Groups[TwitterRegexPatterns.ValidMentionOrListGroupBefore].Value +
+                     m.Groups[TwitterRegexPatterns.ValidMentionOrListGroupAt] +
+                     "<A>" + m.Groups[TwitterRegexPatterns.ValidMentionOrListGroupUsername].Value +
+                     m.Groups[TwitterRegexPatterns.ValidMentionOrListGroupList].Value + "<");
+            escaped = TwitterRegexPatterns.ValidHashtag.Replace(escaped, m => m.Groups[1] + "<H>" + m.Groups[1].Value + "<");
             var splitted = escaped.Split(new[] { '<' }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var s in splitted)
             {

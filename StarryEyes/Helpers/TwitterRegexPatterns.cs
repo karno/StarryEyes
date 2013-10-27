@@ -157,7 +157,8 @@ namespace StarryEyes.Helpers
 
         public static readonly Regex ValidHashtag =
             new Regex(
-                "(^|[^&" + HashtagAlphaNumericChars + "])(#|\uFF03)(" + HashtagAlphaNumeric + "*" + HashtagAlpha +
+                "(?:^|[^&" + HashtagAlphaNumericChars + "])" +
+                "(?:#|\uFF03)(" + HashtagAlphaNumeric + "*" + HashtagAlpha +
                 HashtagAlphaNumeric + "*)", RegexOptions.IgnoreCase);
 
         public static readonly int ValidHashtagGroupBefore = 1;

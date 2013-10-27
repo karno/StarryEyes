@@ -60,7 +60,7 @@ namespace StarryEyes.Settings.KeyAssigns
                 throw new ArgumentException("Actions are could not be parsed: " + result.Groups["action"].Value);
             }
             var descriptions = new List<KeyAssignActionDescription>();
-            var capts = actions.Groups [1].Captures
+            var capts = actions.Groups[1].Captures
                                           .OfType<Capture>()
                                           .Select(s => s.Value);
             foreach (var capture in capts)

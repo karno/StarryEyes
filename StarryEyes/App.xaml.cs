@@ -186,7 +186,7 @@ namespace StarryEyes
             {
                 // fail loading settings
                 Current.Shutdown();
-                return;
+                Environment.Exit(0);
             }
 
             // set parameters for accessing twitter.
@@ -204,7 +204,7 @@ namespace StarryEyes
             {
                 // db migration failed
                 Current.Shutdown();
-                return;
+                Environment.Exit(0);
             }
 
             // initialize subsystems
