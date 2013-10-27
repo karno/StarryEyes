@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using Livet.Behaviors.Messaging;
 using Livet.Messaging;
 using StarryEyes.Nightmare.Windows;
@@ -12,10 +13,17 @@ namespace StarryEyes.Views.Messaging.Behaviors
             var tdm = message as TaskDialogMessage;
             if (tdm == null) return;
 
-            var options = tdm.Options;
-            options.Owner = Window.GetWindow(this.AssociatedObject);
-            var result = TaskDialog.Show(options);
-            tdm.Response = result;
+            try
+            {
+                var options = tdm.Options;
+                options.Owner = Window.GetWindow(this.AssociatedObject);
+                tdm.Response = TaskDialog.Show(options);
+            }
+            catch (InvalidOperationException)
+            {
+                var options = tdm.Options;
+                tdm.Response = TaskDialog.Show(options);
+            }
         }
     }
 }
