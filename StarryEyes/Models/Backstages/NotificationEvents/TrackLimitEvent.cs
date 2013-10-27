@@ -27,7 +27,7 @@ namespace StarryEyes.Models.Backstages.NotificationEvents
 
         public override Color Background
         {
-            get { return MetroColors.Brown; }
+            get { return MetroColors.Mauve; }
         }
     }
 }
