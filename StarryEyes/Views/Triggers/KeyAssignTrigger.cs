@@ -42,13 +42,35 @@ namespace StarryEyes.Views.Triggers
             var window = Window.GetWindow(this.AssociatedObject);
             if (window == null) return false;
             var modifiers = Keyboard.Modifiers;
-            if ((FocusManager.GetFocusedElement(window) as TextBox) != null)
+            TextBox tbox;
+            if ((tbox = FocusManager.GetFocusedElement(window) as TextBox) != null)
             {
                 // only allows modifiered keys
                 if (modifiers == ModifierKeys.None && key != Key.Escape &&
                     !(key < Key.F1 && key > Key.F24))
                 {
-                    return false;
+                    var ci = tbox.CaretIndex;
+                    var text = tbox.Text;
+                    switch (key)
+                    {
+                        case Key.Up:
+                            // if cursor is in top of the box, accept key assign.
+                            if (text.Substring(0, ci).Any(c => c == '\n')) return false;
+                            break;
+                        case Key.Down:
+                            // if cursor is in bottom of the box, accept key assign.
+                            if (text.Substring(ci).Any(c => c == '\n')) return false;
+                            break;
+                        case Key.Left:
+                        case Key.Back:
+                            if (ci > 0) return false;
+                            break;
+                        case Key.Right:
+                            if (ci < text.Length) return false;
+                            break;
+                        default:
+                            return false;
+                    }
                 }
 
                 if (modifiers == ModifierKeys.Control)
