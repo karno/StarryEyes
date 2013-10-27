@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interactivity;
+using StarryEyes.Models;
 using StarryEyes.Settings;
 using StarryEyes.Settings.KeyAssigns;
 
@@ -34,6 +35,7 @@ namespace StarryEyes.Views.Triggers
 
         void HandleKeyPreview(object sender, KeyEventArgs e)
         {
+            if (MainWindowModel.SuppressKeyAssigns) return;
             e.Handled = CheckActionKey(e.Key);
         }
 

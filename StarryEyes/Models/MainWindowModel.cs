@@ -13,6 +13,8 @@ namespace StarryEyes.Models
 {
     public static class MainWindowModel
     {
+        public static bool SuppressKeyAssigns { get; set; }
+
         static MainWindowModel()
         {
             App.UserInterfaceReady += () =>
@@ -133,13 +135,28 @@ namespace StarryEyes.Models
             if (handler != null) handler();
         }
 
-        public static event Action<Tuple<TabModel, ISubject<Unit>>> TabModelConfigureRaised;
+        public static event Action<Tuple<TabModel, ISubject<Unit>>> TabConfigureRequested;
 
         public static IObservable<Unit> ShowTabConfigure(TabModel model)
         {
             var notifier = new Subject<Unit>();
-            var handler = TabModelConfigureRaised;
-            if (handler != null) handler(Tuple.Create(model, (ISubject<Unit>)notifier));
+            var handler = TabConfigureRequested;
+            if (handler != null)
+            {
+                handler(Tuple.Create(model, (ISubject<Unit>)notifier));
+            }
+            return notifier;
+        }
+
+        public static event Action<ISubject<Unit>> SettingRequested;
+        public static IObservable<Unit> ShowSetting()
+        {
+            var notifier = new Subject<Unit>();
+            var handler = SettingRequested;
+            if (handler != null)
+            {
+                handler(notifier);
+            }
             return notifier;
         }
 
