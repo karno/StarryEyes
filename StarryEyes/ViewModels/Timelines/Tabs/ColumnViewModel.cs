@@ -31,7 +31,15 @@ namespace StarryEyes.ViewModels.Timelines.Tabs
 
         public TabViewModel FocusedTab
         {
-            get { return this._tabs != null && this._tabs.Count > 0 ? this._tabs[this._model.CurrentFocusTabIndex] : null; }
+            get
+            {
+                if (this._tabs == null || this._tabs.Count == 0) return null;
+                if (this._tabs.Count <= this._model.CurrentFocusTabIndex)
+                {
+                    this._model.CurrentFocusTabIndex = 0;
+                }
+                return this._tabs[this._model.CurrentFocusTabIndex];
+            }
             set
             {
                 this._model.CurrentFocusTabIndex = this._tabs.IndexOf(value);

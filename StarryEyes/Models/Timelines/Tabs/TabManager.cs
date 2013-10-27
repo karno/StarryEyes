@@ -92,11 +92,16 @@ namespace StarryEyes.Models.Timelines.Tabs
             {
                 if (_currentFocusColumnIndex == value) return;
                 _currentFocusColumnIndex = value;
-                var col = _columns[_currentFocusColumnIndex];
-                InputAreaModel.NotifyChangeFocusingTab(col.Tabs[col.CurrentFocusTabIndex]);
-                var handler = CurrentFocusColumnChanged;
-                if (handler != null) handler();
+                RaiseCurrentFocusColumnChanged();
             }
+        }
+
+        private static void RaiseCurrentFocusColumnChanged()
+        {
+            var col = _columns[_currentFocusColumnIndex];
+            InputAreaModel.NotifyChangeFocusingTab(col.Tabs[col.CurrentFocusTabIndex]);
+            var handler = CurrentFocusColumnChanged;
+            if (handler != null) handler();
         }
 
         /// <summary>
@@ -329,6 +334,7 @@ namespace StarryEyes.Models.Timelines.Tabs
             {
                 _columns.Add(new ColumnModel(Enumerable.Empty<TabModel>()));
             }
+            RaiseCurrentFocusColumnChanged();
         }
 
         private static void MainWindowModelTimelineFocusRequested(TimelineFocusRequest req)

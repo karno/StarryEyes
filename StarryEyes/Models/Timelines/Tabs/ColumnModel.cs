@@ -24,6 +24,7 @@ namespace StarryEyes.Models.Timelines.Tabs
             get { return this._currentFocusTabIndex; }
             set
             {
+                if (value < 0 || value >= this._tabs.Count) return;
                 this._currentFocusTabIndex = value;
                 InputAreaModel.NotifyChangeFocusingTab(this._tabs[value]);
                 var handler = this.CurrentFocusTabChanged;
@@ -50,9 +51,11 @@ namespace StarryEyes.Models.Timelines.Tabs
 
         public void RemoveTab(int index)
         {
+            if (this._tabs.Count > 1)
+            {
+                this.CurrentFocusTabIndex = index >= this._tabs.Count - 1 ? index - 1 : index;
+            }
             this._tabs.RemoveAt(index);
-            if (this._tabs.Count <= 0) return;
-            this.CurrentFocusTabIndex = index > this._tabs.Count - 1 ? index - 1 : index;
         }
     }
 }
