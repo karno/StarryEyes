@@ -372,7 +372,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             this.RaisePropertyChanged(() => this.IsFocused);
             if (this.IsFocused)
             {
-                // this.Messenger.Raise(new BringIntoViewMessage());
+                this.LoadInReplyTo();
             }
         }
 
@@ -959,6 +959,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             var psel = this._lastSelectState;
             this._lastSelectState = this.IsSelected;
             if (psel != this.IsSelected) return;
+            // toggle focus
             this.Parent.FocusedStatus =
                 this.Parent.FocusedStatus == this ? null : this;
             if (this.Parent.FocusedStatus == this)
@@ -1149,22 +1150,23 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             int value;
             if (!int.TryParse(index, out value)) value = 0;
             var links = this.Status.Entities
-                           .Select(e =>
-                           {
-                               switch (e.EntityType)
-                               {
-                                   case EntityType.Media:
-                                   case EntityType.Urls:
-                                       return e.OriginalUrl;
-                                   case EntityType.UserMentions:
-                                       return TextBlockStylizer.UserNavigation + e.DisplayText;
-                                   case EntityType.Hashtags:
-                                       return TextBlockStylizer.HashtagNavigation + e.DisplayText;
-                                   default:
-                                       throw new ArgumentOutOfRangeException();
-                               }
-                           })
-                           .ToArray();
+                            .OrderBy(e => e.StartIndex)
+                            .Select(e =>
+                            {
+                                switch (e.EntityType)
+                                {
+                                    case EntityType.Media:
+                                    case EntityType.Urls:
+                                        return e.OriginalUrl;
+                                    case EntityType.UserMentions:
+                                        return TextBlockStylizer.UserNavigation + e.DisplayText;
+                                    case EntityType.Hashtags:
+                                        return TextBlockStylizer.HashtagNavigation + e.DisplayText;
+                                    default:
+                                        throw new ArgumentOutOfRangeException();
+                                }
+                            })
+                            .ToArray();
             if (links.Length <= value) return;
             this.OpenLink(links[value]);
         }

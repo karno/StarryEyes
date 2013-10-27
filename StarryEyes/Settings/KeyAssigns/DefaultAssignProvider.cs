@@ -52,6 +52,7 @@ c+m: Reply(""@{0} もやし"")
 c+delete: Delete
 c+a+delete: Mute
 d: SendDirectMessage
+u: ShowUserProfile
 w: OpenWeb
 c+w: OpenFavstar
 s+1: OpenUrl(""0"")
