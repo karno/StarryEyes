@@ -39,6 +39,7 @@
             this.openKeyFile = new System.Windows.Forms.Button();
             this.generatePackage = new System.Windows.Forms.Button();
             this.generateKeys = new System.Windows.Forms.Button();
+            this.generateSignFile = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // openDirectory
@@ -143,17 +144,28 @@
             // 
             this.generateKeys.Location = new System.Drawing.Point(12, 99);
             this.generateKeys.Name = "generateKeys";
-            this.generateKeys.Size = new System.Drawing.Size(172, 23);
+            this.generateKeys.Size = new System.Drawing.Size(112, 23);
             this.generateKeys.TabIndex = 10;
             this.generateKeys.Text = "Generate keys";
             this.generateKeys.UseVisualStyleBackColor = true;
             this.generateKeys.Click += new System.EventHandler(this.generateKeys_Click);
+            // 
+            // generateSignFile
+            // 
+            this.generateSignFile.Location = new System.Drawing.Point(130, 99);
+            this.generateSignFile.Name = "generateSignFile";
+            this.generateSignFile.Size = new System.Drawing.Size(112, 23);
+            this.generateSignFile.TabIndex = 11;
+            this.generateSignFile.Text = "Get sign for file";
+            this.generateSignFile.UseVisualStyleBackColor = true;
+            this.generateSignFile.Click += new System.EventHandler(this.generateSignFile_Click);
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(484, 131);
+            this.Controls.Add(this.generateSignFile);
             this.Controls.Add(this.generateKeys);
             this.Controls.Add(this.generatePackage);
             this.Controls.Add(this.openKeyFile);
@@ -188,6 +200,7 @@
         private System.Windows.Forms.Button openKeyFile;
         private System.Windows.Forms.Button generatePackage;
         private System.Windows.Forms.Button generateKeys;
+        private System.Windows.Forms.Button generateSignFile;
     }
 }
 

@@ -220,6 +220,7 @@
     <Compile Include="Models\Backstages\NotificationEvents\PostEvents\PostSucceededEvent.cs" />
     <Compile Include="Models\Backstages\NotificationEvents\TrackLimitEvent.cs" />
     <Compile Include="Models\Backstages\NotificationEvents\ThirdpartyEvents\FavstarTrophyEvent.cs" />
+    <Compile Include="Models\Backstages\SystemEvents\UpdateAvailableEvent.cs" />
     <Compile Include="Models\Backstages\SystemEvents\UserStreamsDisconnectedEvent.cs" />
     <Compile Include="Models\Backstages\TwitterEvents\BlockedEvent.cs" />
     <Compile Include="Models\Backstages\TwitterEvents\FavoritedEvent.cs" />
@@ -235,6 +236,7 @@
     <Compile Include="Models\Databases\StatusProxy.cs" />
     <Compile Include="Models\Databases\Mapper.cs" />
     <Compile Include="Models\Databases\UserProxy.cs" />
+    <Compile Include="Models\Subsystems\AutoUpdateService.cs" />
     <Compile Include="Networking.cs" />
     <Compile Include="Models\Plugins\PluginManager.cs" />
     <Compile Include="Models\Receiving\ListInfo.cs" />
@@ -534,6 +536,9 @@
     <None Include="app.config" />
     <None Include="app.manifest">
       <SubType>Designer</SubType>
+    </None>
+    <None Include="krile.pub">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">

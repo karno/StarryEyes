@@ -109,10 +109,22 @@ namespace StarryEyes
 
             #endregion
 
-            #region clean up update binary
+            // set exception handlers
+            Current.DispatcherUnhandledException += (sender2, e2) => HandleException(e2.Exception);
+            AppDomain.CurrentDomain.UnhandledException += (sender2, e2) => HandleException(e2.ExceptionObject as Exception);
+
+            #region execute update or clean up update binary
             if (e.Args.Select(a => a.ToLower()).Contains("-postupdate"))
             {
                 // remove kup.exe
+                AutoUpdateService.PostUpdate();
+            }
+
+            if (AutoUpdateService.IsUpdateBinaryExisted())
+            {
+                // execute update
+                AutoUpdateService.StartUpdate();
+                Environment.Exit(0);
             }
             #endregion
 
@@ -201,6 +213,7 @@ namespace StarryEyes
             MuteBlockManager.Initialize();
             StatusBroadcaster.Initialize();
             StatusInbox.Initialize();
+            AutoUpdateService.StartSchedule();
 
             // activate plugins
             PluginManager.LoadedPlugins.ForEach(p => p.Initialize());
@@ -477,6 +490,11 @@ namespace StarryEyes
             get { return Path.Combine(ConfigurationDirectoryPath, DatabaseFileName); }
         }
 
+        public static string LocalUpdateStorePath
+        {
+            get { return Path.Combine(ConfigurationDirectoryPath, LocalUpdateStoreDirName); }
+        }
+
         public static string HashtagTempFilePath
         {
             get { return Path.Combine(ConfigurationDirectoryPath, HashtagCacheFileName); }
@@ -574,13 +592,15 @@ namespace StarryEyes
 
         public static readonly string FeedbackAppName = "reporter.exe";
 
-        public static readonly string UpdateFileName = "kup.exe";
+        public static readonly string UpdaterFileName = "kup.exe";
 
         public static readonly string DefaultStatusMessage = "完了";
 
         public static readonly string RemoteVersionXml = "http://krile.starwing.net/shared/update.xml";
 
         public static readonly string PublicKeyFile = "krile.pub";
+
+        public static readonly string LocalUpdateStoreDirName = "update";
 
         public static readonly string MentionWavFile = "mention.wav";
 

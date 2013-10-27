@@ -66,7 +66,7 @@ namespace SweetMagic
             }
             foreach (var patch in apply)
             {
-                this.NotifyProgress("applying patch: v" + patch.Version.ToString("0.0") + " - " + patch.ReleaseTime.ToString("yyyy/MM/dd"));
+                this.NotifyProgress("applying patch: v" + patch.Version.ToString("0.00") + " - " + patch.ReleaseTime.ToString("yyyy/MM/dd"));
                 foreach (var action in patch.Actions)
                 {
                     await action.DoWork(this);

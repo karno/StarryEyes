@@ -8,6 +8,8 @@ namespace SweetMagic
 {
     public partial class Behind : Form
     {
+        private string callbackPoint = null;
+
         public Behind()
         {
             InitializeComponent();
@@ -30,6 +32,7 @@ namespace SweetMagic
                 Application.Exit();
                 return null;
             }
+            callbackPoint = cmd[3];
             startInfo.Arguments = String.Join(" ", cmd.Skip(1).Concat(new[] { "runas" }).Select(s => "\"" + s + "\""));
             if (superUser && Environment.OSVersion.Version.Major >= 6)
                 startInfo.Verb = "runas";
@@ -92,7 +95,13 @@ namespace SweetMagic
         {
             try
             {
-                Process.Start(Path.Combine(Application.StartupPath, Program.CallbackFile));
+                var psi = new ProcessStartInfo(Path.Combine(callbackPoint, Program.CallbackFile))
+                {
+                    UseShellExecute = true,
+                    Arguments = "-postupdate",
+                    WorkingDirectory = callbackPoint,
+                };
+                Process.Start(psi);
             }
             finally
             {

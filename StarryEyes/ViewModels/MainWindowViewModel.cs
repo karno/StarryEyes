@@ -4,6 +4,7 @@ using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Livet;
+using Livet.EventListeners;
 using Livet.Messaging;
 using StarryEyes.Annotations;
 using StarryEyes.Models;
@@ -74,6 +75,8 @@ namespace StarryEyes.ViewModels
 
         #region Properties
 
+        private bool _isShutdowining = false;
+
         public string WindowTitle
         {
             get
@@ -127,12 +130,16 @@ namespace StarryEyes.ViewModels
             CompositeDisposable.Add(Observable.FromEvent<FocusRequest>(
                 h => MainWindowModel.FocusRequested += h,
                 h => MainWindowModel.FocusRequested -= h)
-                .Subscribe(SetFocus));
+                                              .Subscribe(SetFocus));
             CompositeDisposable.Add(Observable.FromEvent<bool>(
                 h => MainWindowModel.BackstageTransitionRequested += h,
                 h => MainWindowModel.BackstageTransitionRequested -= h)
-                .Subscribe(this.TransitionBackstage));
+                                              .Subscribe(this.TransitionBackstage));
             this._backstageViewModel.Initialize();
+            CompositeDisposable.Add(new EventListener<Action>(
+                                        a => App.ApplicationExit += a,
+                                        a => App.ApplicationExit -= a,
+                                        () => _isShutdowining = true));
         }
 
         private void SetFocus(FocusRequest req)
@@ -278,7 +285,7 @@ namespace StarryEyes.ViewModels
 
         public bool OnClosing()
         {
-            if (Setting.ConfirmOnExitApp.Value)
+            if (Setting.ConfirmOnExitApp.Value && !_isShutdowining)
             {
                 var ret = Messenger.GetResponse(
                     new TaskDialogMessage(new TaskDialogOptions
