@@ -54,6 +54,9 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
                 {
                     this.RetweetedOriginal = new TwitterStatus(json.retweeted_status);
                     this.RetweetedOriginalId = this.RetweetedOriginal.Id;
+                    // merge text and entities
+                    this.Text = this.RetweetedOriginal.Text;
+                    this.Entities = this.RetweetedOriginal.Entities.ToArray();
                 }
                 if (json.coordinates() && json.coordinates != null)
                 {

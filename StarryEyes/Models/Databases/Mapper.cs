@@ -88,7 +88,7 @@ namespace StarryEyes.Models.Databases
                 Longitude = status.Longitude,
                 Source = status.Source,
                 StatusType = status.StatusType,
-                Text = orig.Text,
+                Text = status.Text,
                 UserId = status.User.Id,
                 BaseUserId = orig.User.Id,
                 RetweeterId = status.RetweetedOriginal != null ? status.User.Id : (long?)null,
