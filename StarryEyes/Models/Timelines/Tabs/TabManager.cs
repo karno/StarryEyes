@@ -334,6 +334,10 @@ namespace StarryEyes.Models.Timelines.Tabs
             {
                 _columns.Add(new ColumnModel(Enumerable.Empty<TabModel>()));
             }
+            if (_currentFocusColumnIndex >= Columns.Count)
+            {
+                _currentFocusColumnIndex = Columns.Count - 1;
+            }
             RaiseCurrentFocusColumnChanged();
         }
 
