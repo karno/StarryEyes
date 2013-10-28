@@ -178,13 +178,6 @@ namespace StarryEyes.Models.Subsystems
 
         public static void StartSchedule()
         {
-            Task.Run(async () =>
-            {
-                if (await CheckUpdate() && await PrepareUpdate())
-                {
-                    BackstageModel.RegisterEvent(new UpdateAvailableEvent());
-                }
-            });
             var rand = new Random(Environment.TickCount);
             var next = 3 + 6 * rand.NextDouble();
             Observable.Timer(TimeSpan.FromHours(next))
