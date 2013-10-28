@@ -81,17 +81,7 @@ namespace StarryEyes.ViewModels
         {
             get
             {
-                var name = App.AppFullName;
-                switch (App.ReleaseKind)
-                {
-                    case ReleaseKind.Stable:
-                        return name;
-                    case ReleaseKind.Daybreak:
-                    case ReleaseKind.Midnight:
-                        return name + " " + App.FormattedVersion;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
+                return !App.IsUnstableVersion ? App.AppFullName : App.AppFullName + " " + App.FormattedVersion;
             }
         }
 

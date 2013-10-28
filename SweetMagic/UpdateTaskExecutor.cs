@@ -10,13 +10,15 @@ namespace SweetMagic
 {
     public class UpdateTaskExecutor
     {
-        private readonly double _version;
+        private readonly Version _version;
         private readonly int _processId;
+        private readonly bool _acceptPreview;
 
-        public UpdateTaskExecutor(double version, string pubkey, string basepath, int processId)
+        public UpdateTaskExecutor(Version version, string pubkey, string basepath, int processId, bool acceptPreview)
         {
             _version = version;
             this._processId = processId;
+            _acceptPreview = acceptPreview;
             this.PublicKey = pubkey;
             this.BasePath = basepath;
         }
@@ -44,7 +46,7 @@ namespace SweetMagic
             this.NotifyProgress("loading definition...", false);
             var pack = ReleasePack.Parse(dlstr);
             this.NotifyProgress("loaded.(patch stamp: " + pack.Timestamp.ToString("yyyy/MM/dd") + ")");
-            var apply = pack.GetPatchesShouldBeApplied(_version).ToArray();
+            var apply = pack.GetPatchesShouldBeApplied(_version, _acceptPreview).ToArray();
             this.NotifyProgress(apply.Length + " patches should be applied.");
             Thread.Sleep(10);
             // find process and kill
@@ -66,7 +68,12 @@ namespace SweetMagic
             }
             foreach (var patch in apply)
             {
-                this.NotifyProgress("applying patch: v" + patch.Version.ToString("0.00") + " - " + patch.ReleaseTime.ToString("yyyy/MM/dd"));
+                var vs = patch.Version.ToString();
+                if (patch.Version.Revision == 0)
+                {
+                    vs = patch.Version.ToString(3);
+                }
+                this.NotifyProgress("applying patch: v" + vs + " - " + patch.ReleaseTime.ToString("yyyy/MM/dd"));
                 foreach (var action in patch.Actions)
                 {
                     await action.DoWork(this);

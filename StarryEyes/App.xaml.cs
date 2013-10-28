@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Configuration;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -505,15 +504,15 @@ namespace StarryEyes
             get { return Path.Combine(ConfigurationDirectoryPath, ListCacheFileName); }
         }
 
-        private static FileVersionInfo _version;
+        private static Version _version;
 
         [NotNull]
-        public static FileVersionInfo Version
+        public static Version Version
         {
             get
             {
                 return _version ??
-                    (_version = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location));
+                       (_version = Assembly.GetEntryAssembly().GetName().Version);
             }
         }
 
@@ -522,52 +521,18 @@ namespace StarryEyes
         {
             get
             {
-                var basestr = Version.FileMajorPart + "." +
-                              Version.FileMinorPart + "." +
-                              Version.FilePrivatePart;
-                switch (ReleaseKind)
+                var basestr = Version.ToString(3);
+                if (Version.Revision >= 0)
                 {
-                    case ReleaseKind.Stable:
-                        return basestr;
-                    case ReleaseKind.Daybreak:
-                        return basestr + " daybreak";
-                    case ReleaseKind.Midnight:
-                        return basestr + " midnight #" + Version.FileBuildPart;
-                    default:
-                        throw new ArgumentOutOfRangeException();
+                    return basestr + " Rev." + Version.Revision;
                 }
+                return basestr;
             }
         }
 
         public static bool IsUnstableVersion
         {
-            get { return Version.FilePrivatePart % 2 == 1; }
-        }
-
-        public static ReleaseKind ReleaseKind
-        {
-            get
-            {
-                // A.B.C.D
-                // C % 2 == 0 -> Stable
-                // C % 2 == 1 && D % 2 == 0 -> Daybreak
-                // C % 2 == 1 && D % 2 == 1 -> Midnight
-                return Version.FilePrivatePart % 2 == 0
-                           ? ReleaseKind.Stable
-                           : (Version.FileBuildPart % 2 == 0
-                                  ? ReleaseKind.Daybreak
-                                  : ReleaseKind.Midnight);
-            }
-        }
-
-        public static double NumericVersion
-        {
-            get
-            {
-                var lvstr = (Version.FileMajorPart * 1000 + Version.FileMinorPart).ToString(CultureInfo.InvariantCulture) + "." +
-                    Version.FilePrivatePart.ToString(CultureInfo.InvariantCulture);
-                return Double.Parse(lvstr);
-            }
+            get { return Version.Revision != 0; }
         }
 
         public static readonly string DatabaseFileName = "krile.db";
@@ -683,12 +648,5 @@ namespace StarryEyes
         Default,
         Roaming,
         Standalone,
-    }
-
-    public enum ReleaseKind
-    {
-        Stable,
-        Daybreak,
-        Midnight,
     }
 }

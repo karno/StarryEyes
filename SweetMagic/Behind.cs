@@ -35,7 +35,9 @@ namespace SweetMagic
             callbackPoint = cmd[3];
             startInfo.Arguments = String.Join(" ", cmd.Skip(1).Concat(new[] { "runas" }).Select(s => "\"" + s + "\""));
             if (superUser && Environment.OSVersion.Version.Major >= 6)
+            {
                 startInfo.Verb = "runas";
+            }
             try
             {
                 var process = new Process();

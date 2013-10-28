@@ -57,7 +57,6 @@ namespace StarryEyes.Views.Controls
         private void LoadXshd()
         {
             var asm = Assembly.GetExecutingAssembly();
-            asm.GetManifestResourceNames().ForEach(n => System.Diagnostics.Debug.WriteLine(n));
             using (var stream = asm.GetManifestResourceStream(resourceName))
             using (var reader = XmlReader.Create(stream))
             {

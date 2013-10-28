@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -11,14 +12,15 @@ using System.Xml.Linq;
 using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Models.Backstages.SystemEvents;
 using StarryEyes.Nightmare.Windows;
+using StarryEyes.Settings;
 using Application = System.Windows.Application;
 
 namespace StarryEyes.Models.Subsystems
 {
     public static class AutoUpdateService
     {
-        private static string patcherUri = null;
-        private static string patcherSignUri = null;
+        private static string _patcherUri = null;
+        private static string _patcherSignUri = null;
 
         private static string ExecutablePath
         {
@@ -41,13 +43,17 @@ namespace StarryEyes.Models.Subsystems
                     verXml = await http.GetStringAsync(App.RemoteVersionXml);
                 }
                 var xdoc = XDocument.Load(new StringReader(verXml));
-                patcherUri = xdoc.Root.Attribute("patcher").Value;
-                patcherSignUri = xdoc.Root.Attribute("sign").Value;
+                if (xdoc.Root == null)
+                {
+                    throw new Exception("could not read definition xml.");
+                }
+                _patcherUri = xdoc.Root.Attribute("patcher").Value;
+                _patcherSignUri = xdoc.Root.Attribute("sign").Value;
                 var releases = xdoc.Root.Descendants("release");
-                var latest = releases.Select(r => double.Parse(r.Attribute("version").Value))
+                var latest = releases.Select(r => Version.Parse(r.Attribute("version").Value))
                                      .OrderByDescending(v => v)
                                      .FirstOrDefault();
-                if (latest > App.NumericVersion)
+                if (latest > App.Version)
                 {
                     return true;
                 }
@@ -62,7 +68,7 @@ namespace StarryEyes.Models.Subsystems
 
         public static async Task<bool> PrepareUpdate()
         {
-            if (String.IsNullOrEmpty(patcherUri) || String.IsNullOrEmpty(patcherSignUri))
+            if (String.IsNullOrEmpty(_patcherUri) || String.IsNullOrEmpty(_patcherSignUri))
             {
                 if (!await CheckUpdate())
                 {
@@ -74,8 +80,8 @@ namespace StarryEyes.Models.Subsystems
                 Directory.CreateDirectory(App.LocalUpdateStorePath);
                 using (var http = new HttpClient())
                 {
-                    var patcher = await http.GetByteArrayAsync(patcherUri);
-                    var patcherSign = await http.GetByteArrayAsync(patcherSignUri);
+                    var patcher = await http.GetByteArrayAsync(_patcherUri);
+                    var patcherSign = await http.GetByteArrayAsync(_patcherSignUri);
                     var pubkey = File.ReadAllText(App.PublicKeyFile);
                     if (!VerifySignature(patcher, patcherSign, pubkey))
                     {
@@ -96,7 +102,11 @@ namespace StarryEyes.Models.Subsystems
         {
             try
             {
-                var ver = App.NumericVersion.ToString("0.00");
+                var ver = App.Version.ToString(3);
+                if (Setting.IsAcceptUnstableVersion.Value)
+                {
+                    ver = App.Version.ToString(4);
+                }
                 var pubkey = Path.Combine(App.ExeFileDir, App.PublicKeyFile);
                 var dest = App.ExeFileDir;
                 var pid = Process.GetCurrentProcess().Id;
@@ -105,7 +115,7 @@ namespace StarryEyes.Models.Subsystems
                     ver,
                     pubkey,
                     dest,
-                    pid.ToString()
+                    pid.ToString(CultureInfo.InvariantCulture)
                 }.Select(s => "\"" + s + "\"").JoinString(" ");
                 var startInfo = new ProcessStartInfo(ExecutablePath)
                 {

@@ -33,14 +33,15 @@ namespace Detective
                     {
                         MessageBox.Show(
                             "ログファイルの読み取りに失敗しました。" + Environment.NewLine +
-                            "エラー:" + ex.Message, "レポーター エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            "エラー:" + ex.Message, "Krile Error Reporter",
+                            MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
             }
             MessageBox.Show(
-                "このソフトウェアはエラーレポートのためのソフトウェアです。" + Environment.NewLine +
+                "このソフトウェアはエラーレポートのためにKrileから利用されます。" + Environment.NewLine +
                 "Krileを使うには、krile.exe を起動してください。",
-                "レポーター", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                "Krile Error Reporter", MessageBoxButtons.OK, MessageBoxIcon.Error);
             Application.Exit();
         }
     }

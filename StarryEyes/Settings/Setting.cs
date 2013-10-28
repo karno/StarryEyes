@@ -137,6 +137,12 @@ namespace StarryEyes.Settings
 
         #region High-level configurations
 
+        public static readonly SettingItemStruct<bool> IsAcceptUnstableVersion =
+                    new SettingItemStruct<bool>("IsAcceptUnstableVersion", App.IsUnstableVersion);
+
+        public static readonly SettingItem<string> UserAgent =
+            new SettingItem<string>("UserAgent", "Krile StarryEyes/Breezy TL with ReactiveOAuth");
+
         #region Web proxy configuration
 
         public static readonly SettingItemStruct<WebProxyConfiguration> UseWebProxy =
@@ -155,9 +161,6 @@ namespace StarryEyes.Settings
             new SettingItem<string[]>("WebProxyBypassList", null);
 
         #endregion
-
-        public static readonly SettingItem<string> UserAgent =
-            new SettingItem<string>("UserAgent", "Krile StarryEyes/Breezy TL with ReactiveOAuth");
 
         public static readonly SettingItem<string> ApiProxy =
             new SettingItem<string>("ApiProxy", null);

@@ -25,10 +25,13 @@ namespace SweetMagic
 
         public IEnumerable<Release> Releases { get; private set; }
 
-        public IEnumerable<Release> GetPatchesShouldBeApplied(double currentVersion)
+        public IEnumerable<Release> GetPatchesShouldBeApplied(Version currentVersion, bool acceptPreviewVersion)
         {
             // get differential patches
-            var patches = Releases.OrderBy(r => r.Version).SkipWhile(r => r.Version <= currentVersion).ToArray();
+            var patches = Releases.OrderBy(r => r.Version)
+                                  .SkipWhile(r => r.Version <= currentVersion)
+                                  .Where(p => acceptPreviewVersion || p.Version.Revision == 0) // check release channel
+                                  .ToArray();
             if (patches.Any(p => p.IsMilestone))
             {
                 // get latest milestone patches and patches after it
@@ -52,9 +55,7 @@ namespace SweetMagic
 
     public class Release
     {
-        public double Version { get; private set; }
-
-        public ReleaseChannel Channel { get; private set; }
+        public Version Version { get; private set; }
 
         public bool IsMilestone { get; private set; }
 
@@ -66,8 +67,7 @@ namespace SweetMagic
 
         public Release(XElement element)
         {
-            this.Version = double.Parse(element.Attribute("version").Value);
-            this.Channel = (ReleaseChannel)Enum.Parse(typeof(ReleaseChannel), element.Attribute("channel").Value, true);
+            this.Version = Version.Parse(element.Attribute("version").Value);
             var milestone = element.Attribute("milestone");
             this.IsMilestone = milestone != null && Boolean.Parse(milestone.Value);
             this.ReleaseTime = DateTime.Parse(element.Attribute("date").Value);
@@ -75,12 +75,5 @@ namespace SweetMagic
             this.CanSkip = skippable == null || Boolean.Parse(skippable.Value);
             this.Actions = element.Elements().Select(ReleaseActionFactory.Parse).ToArray();
         }
-    }
-
-    public enum ReleaseChannel
-    {
-        Stable,
-        Preview,
-        Beta,
     }
 }
