@@ -37,12 +37,12 @@ namespace StarryEyes.Filters.Expressions.Values.Statuses
         public override Func<TwitterStatus, string> GetStringValueProvider()
         {
             // Using not original.
-            return _ => _.Source;
+            return _ => _.Source ?? String.Empty;
         }
 
         public override string GetStringSqlQuery()
         {
-            return "Source";
+            return Coalesce("Source", "");
         }
 
         public override string ToQuery()

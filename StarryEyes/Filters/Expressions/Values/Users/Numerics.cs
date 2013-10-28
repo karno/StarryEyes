@@ -156,7 +156,7 @@ namespace StarryEyes.Filters.Expressions.Values.Users
 
         public override string GetNumericSqlQuery()
         {
-            return "RetweetOriginalId";
+            return Coalesce("RetweetOriginalId", -1);
         }
 
         public override string ToQuery()
@@ -179,7 +179,7 @@ namespace StarryEyes.Filters.Expressions.Values.Users
 
         public override string GetNumericSqlQuery()
         {
-            return "(select StatusesCount from User where Id = status.RetweeterId limit 1)";
+            return Coalesce("(select StatusesCount from User where Id = status.RetweeterId limit 1)", -1);
         }
 
         public override string ToQuery()
@@ -202,7 +202,7 @@ namespace StarryEyes.Filters.Expressions.Values.Users
 
         public override string GetNumericSqlQuery()
         {
-            return "(select FollowingsCount from User where Id = status.RetweeterId limit 1)";
+            return Coalesce("(select FollowingsCount from User where Id = status.RetweeterId limit 1)", -1);
         }
 
         public override string ToQuery()
@@ -225,7 +225,7 @@ namespace StarryEyes.Filters.Expressions.Values.Users
 
         public override string GetNumericSqlQuery()
         {
-            return "(select FollowersCount from User where Id = status.RetweeterId limit 1)";
+            return Coalesce("(select FollowersCount from User where Id = status.RetweeterId limit 1)", -1);
         }
 
         public override string ToQuery()
@@ -248,7 +248,7 @@ namespace StarryEyes.Filters.Expressions.Values.Users
 
         public override string GetNumericSqlQuery()
         {
-            return "(select FavoritesCount from User where Id = status.RetweeterId limit 1)";
+            return Coalesce("(select FavoritesCount from User where Id = status.RetweeterId limit 1)", -1);
         }
 
         public override string ToQuery()
@@ -271,7 +271,7 @@ namespace StarryEyes.Filters.Expressions.Values.Users
 
         public override string GetNumericSqlQuery()
         {
-            return "(select ListedCount from User where Id = status.RetweeterId limit 1)";
+            return Coalesce("(select ListedCount from User where Id = status.RetweeterId limit 1)", -1);
         }
 
         public override string ToQuery()

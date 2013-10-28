@@ -133,7 +133,7 @@ namespace StarryEyes.Filters.Expressions.Values.Users
 
         public override string GetBooleanSqlQuery()
         {
-            return "(select IsProtected from User where Id = status.RetweeterId limit 1)";
+            return Coalesce("(select IsProtected from User where Id = status.RetweeterId limit 1)", 0);
         }
 
         public override string ToQuery()
@@ -156,7 +156,7 @@ namespace StarryEyes.Filters.Expressions.Values.Users
 
         public override string GetBooleanSqlQuery()
         {
-            return "(select IsVerified from User where Id = status.RetweeterId limit 1)";
+            return Coalesce("(select IsVerified from User where Id = status.RetweeterId limit 1)", 0);
         }
 
         public override string ToQuery()
@@ -179,7 +179,7 @@ namespace StarryEyes.Filters.Expressions.Values.Users
 
         public override string GetBooleanSqlQuery()
         {
-            return "(select IsTranslator from User where Id = status.RetweeterId limit 1)";
+            return Coalesce("(select IsTranslator from User where Id = status.RetweeterId limit 1)", 0);
         }
 
         public override string ToQuery()
@@ -202,7 +202,7 @@ namespace StarryEyes.Filters.Expressions.Values.Users
 
         public override string GetBooleanSqlQuery()
         {
-            return "(select IsContributorsEnabled from User where Id = status.RetweeterId limit 1)";
+            return Coalesce("(select IsContributorsEnabled from User where Id = status.RetweeterId limit 1)", 0);
         }
 
         public override string ToQuery()
@@ -225,7 +225,7 @@ namespace StarryEyes.Filters.Expressions.Values.Users
 
         public override string GetBooleanSqlQuery()
         {
-            return "(select IsGeoEnabled from User where Id = status.RetweeterId limit 1)";
+            return Coalesce("(select IsGeoEnabled from User where Id = status.RetweeterId limit 1)", 0);
         }
 
         public override string ToQuery()

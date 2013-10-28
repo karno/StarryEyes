@@ -59,7 +59,7 @@ namespace StarryEyes.Filters.Expressions.Values.Users
 
         public override string GetNumericSqlQuery()
         {
-            return "RetweeterId";
+            return Coalesce("RetweeterId", -1);
         }
 
         public override Func<TwitterStatus, string> GetStringValueProvider()
@@ -69,7 +69,7 @@ namespace StarryEyes.Filters.Expressions.Values.Users
 
         public override string GetStringSqlQuery()
         {
-            return "(select ScreenName from User where Id = status.RetweeterId limit 1)";
+            return Coalesce("(select ScreenName from User where Id = status.RetweeterId limit 1)", "");
         }
 
         public override string ToQuery()

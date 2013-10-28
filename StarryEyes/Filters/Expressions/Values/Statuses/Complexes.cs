@@ -27,19 +27,19 @@ namespace StarryEyes.Filters.Expressions.Values.Statuses
 
         public override string GetNumericSqlQuery()
         {
-            return "InReplyToOrRecipientUserId";
+            return Coalesce("InReplyToOrRecipientUserId", -1);
         }
 
         public override Func<TwitterStatus, string> GetStringValueProvider()
         {
             return _ => _.StatusType == StatusType.Tweet ?
-                _.GetOriginal().InReplyToScreenName ?? string.Empty :
+                _.GetOriginal().InReplyToScreenName ?? String.Empty :
                 _.Recipient.ScreenName;
         }
 
         public override string GetStringSqlQuery()
         {
-            return "InReplyToOrRecipientScreenName";
+            return Coalesce("InReplyToOrRecipientScreenName", "");
         }
 
         public override Func<TwitterStatus, IReadOnlyCollection<long>> GetSetValueProvider()

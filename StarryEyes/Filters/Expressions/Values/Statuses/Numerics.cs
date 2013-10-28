@@ -46,7 +46,7 @@ namespace StarryEyes.Filters.Expressions.Values.Statuses
         {
             // in database entity, in_reply_to_status_id in retweeted status indicates
             // replying status mentioned from original status.
-            return "InReplyToStatusId";
+            return Coalesce("InReplyToStatusId", -1);
         }
 
         public override string ToQuery()
