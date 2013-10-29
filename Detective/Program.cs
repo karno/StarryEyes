@@ -4,9 +4,11 @@ using System.Windows.Forms;
 
 namespace Detective
 {
-    static class Program
+    public static class Program
     {
         public static string ErrorLogData { get; private set; }
+
+        public static string ParentExeName = "krile.exe";
 
         /// <summary>
         /// アプリケーションのメイン エントリ ポイントです。

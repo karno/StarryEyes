@@ -359,7 +359,13 @@ namespace StarryEyes
                     sw.WriteLine(builder.ToString());
                 }
                 var apppath = Path.GetDirectoryName(Environment.GetCommandLineArgs()[0]);
-                System.Diagnostics.Process.Start(Path.Combine(apppath, App.FeedbackAppName), tpath);
+                var psi = new ProcessStartInfo
+                {
+                    Arguments = tpath,
+                    UseShellExecute = true,
+                    FileName = Path.Combine(apppath, App.FeedbackAppName)
+                };
+                Process.Start(psi);
 #endif
             }
             finally

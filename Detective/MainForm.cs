@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics;
+using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading;
@@ -46,6 +48,13 @@ namespace Detective
                     return;
                 }
             }
+            var apppath = Path.GetDirectoryName(Environment.GetCommandLineArgs()[0]);
+            var psi = new ProcessStartInfo
+            {
+                UseShellExecute = true,
+                FileName = Path.Combine(apppath, Program.ParentExeName)
+            };
+            Process.Start(psi);
             this.DoClose();
         }
 
