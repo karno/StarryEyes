@@ -21,6 +21,7 @@ using StarryEyes.Models.Stores;
 using StarryEyes.Models.Subsystems;
 using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
+using StarryEyes.Views.Dialogs;
 
 namespace StarryEyes
 {
@@ -129,17 +130,7 @@ namespace StarryEyes
 
             #region check and show pre-execute dialog
 
-            var showPreExec = false;
-#if DEBUG
-            showPreExec = true;
-#else
-
             if (e.Args.Select(a => a.ToLower()).Contains("-maintenance"))
-            {
-                showPreExec = true;
-            }
-#endif
-            if (showPreExec)
             {
                 if (!this.ShowPreExecuteDialog())
                 {
@@ -291,6 +282,8 @@ namespace StarryEyes
             if (resp.CommandButtonResult.Value == 4)
             {
                 // force update
+                var w = new AwaitDownloadingUpdateWindow();
+                w.ShowDialog();
             }
             return resp.CommandButtonResult.Value < 3;
         }

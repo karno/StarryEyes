@@ -348,6 +348,9 @@
     <Compile Include="Views\Controls\QueryEditor.cs" />
     <Compile Include="Views\Controls\QueryEditorResources\CompletionData.cs" />
     <Compile Include="Views\Controls\SuggestableTextBox.cs" />
+    <Compile Include="Views\Dialogs\AwaitDownloadingUpdateWindow.xaml.cs">
+      <DependentUpon>AwaitDownloadingUpdateWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Dialogs\KeyOverrideWindow.xaml.cs">
       <DependentUpon>KeyOverrideWindow.xaml</DependentUpon>
     </Compile>
@@ -431,6 +434,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Dialogs\AuthorizationWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Dialogs\AwaitDownloadingUpdateWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

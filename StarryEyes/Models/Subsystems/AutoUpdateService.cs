@@ -32,7 +32,7 @@ namespace StarryEyes.Models.Subsystems
             return File.Exists(ExecutablePath);
         }
 
-        public static async Task<bool> CheckUpdate()
+        public static async Task<bool> CheckUpdate(Version version)
         {
             if (IsUpdateBinaryExisted()) return true;
             try
@@ -53,7 +53,7 @@ namespace StarryEyes.Models.Subsystems
                 var latest = releases.Select(r => Version.Parse(r.Attribute("version").Value))
                                      .OrderByDescending(v => v)
                                      .FirstOrDefault();
-                if (latest > App.Version)
+                if (version != null && latest > version)
                 {
                     return true;
                 }
@@ -66,11 +66,11 @@ namespace StarryEyes.Models.Subsystems
             return false;
         }
 
-        public static async Task<bool> PrepareUpdate()
+        internal static async Task<bool> PrepareUpdate(Version version)
         {
             if (String.IsNullOrEmpty(_patcherUri) || String.IsNullOrEmpty(_patcherSignUri))
             {
-                if (!await CheckUpdate())
+                if (!await CheckUpdate(version))
                 {
                     return false;
                 }
@@ -98,7 +98,7 @@ namespace StarryEyes.Models.Subsystems
             }
         }
 
-        public static void StartUpdate()
+        internal static void StartUpdate()
         {
             try
             {
@@ -130,6 +130,7 @@ namespace StarryEyes.Models.Subsystems
             {
                 TaskDialog.Show(new TaskDialogOptions
                 {
+                    Title = "自動アップデート エラー",
                     MainIcon = VistaTaskDialogIcon.Error,
                     MainInstruction = "アップデートを開始できませんでした。",
                     Content = "Krileを再起動してやり直すか、手動で最新版を入手してください。",
@@ -139,7 +140,7 @@ namespace StarryEyes.Models.Subsystems
             }
         }
 
-        public static void PostUpdate()
+        internal static void PostUpdate()
         {
             var retryCount = 0;
             while (Directory.Exists(App.LocalUpdateStorePath))
@@ -183,7 +184,7 @@ namespace StarryEyes.Models.Subsystems
             Observable.Timer(TimeSpan.FromHours(next))
                       .Subscribe(async _ =>
                       {
-                          if (await CheckUpdate() && await PrepareUpdate())
+                          if (await PrepareUpdate(App.Version))
                           {
                               BackstageModel.RegisterEvent(new UpdateAvailableEvent());
                           }
