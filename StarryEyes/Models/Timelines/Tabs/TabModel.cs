@@ -163,7 +163,8 @@ namespace StarryEyes.Models.Timelines.Tabs
             var result = base.AddStatus(model, isNewArrival);
             if (result && isNewArrival)
             {
-                OnNewStatusArrival(model.Status);
+                var handler = OnNewStatusArrival;
+                if (handler != null) handler(model.Status);
                 if (this.IsNotifyNewArrivals)
                 {
                     NotificationService.NotifyNewArrival(model.Status, this);
