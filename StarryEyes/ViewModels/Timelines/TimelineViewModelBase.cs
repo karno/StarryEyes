@@ -253,6 +253,11 @@ namespace StarryEyes.ViewModels.Timelines
 
         #region Focus Control
 
+        public void Focus()
+        {
+            this._model.RequestFocus();
+        }
+
         public StatusViewModel FocusedStatus
         {
             get { return _focusedStatus; }

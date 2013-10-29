@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Threading;
+using Livet.EventListeners;
 using Livet.Messaging;
 using StarryEyes.Annotations;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Filters.Parsing;
 using StarryEyes.Models;
 using StarryEyes.Models.Timelines.Tabs;
@@ -31,9 +33,21 @@ namespace StarryEyes.ViewModels.Timelines.Tabs
         {
             this._parent = parent;
             this._model = model;
-            this._model.OnNewStatusArrival += _ => this.UnreadCount++;
-            this._model.BindingAccountsChanged += () => this.RaisePropertyChanged(() => this.CurrentAccounts);
-            this._model.FocusRequired += this.SetFocus;
+            this.CompositeDisposable.Add(
+                new EventListener<Action<TwitterStatus>>(
+                    h => _model.OnNewStatusArrival += h,
+                    h => model.OnNewStatusArrival -= h,
+                    _ => this.UnreadCount++));
+            this.CompositeDisposable.Add(
+                new EventListener<Action>(
+                    h => _model.BindingAccountsChanged += h,
+                    h => _model.BindingAccountsChanged -= h,
+                    () => this.RaisePropertyChanged(() => this.CurrentAccounts)));
+            this.CompositeDisposable.Add(
+                new EventListener<Action>(
+                    h => _model.FocusRequired += h,
+                    h => _model.FocusRequired -= h,
+                    this.SetFocus));
             model.IsActivated = true;
         }
 

@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using Livet.EventListeners;
 using Livet.Messaging;
 using StarryEyes.Annotations;
 using StarryEyes.Models.Timelines.SearchFlips;
@@ -33,6 +35,11 @@ namespace StarryEyes.ViewModels.Timelines.SearchFlips
         {
             _parent = parent;
             _model = model;
+            this.CompositeDisposable.Add(
+                new EventListener<Action>(
+                    h => _model.FocusRequired += h,
+                    h => _model.FocusRequired -= h,
+                    this.SetFocus));
         }
 
         public void SetFocus()

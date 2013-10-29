@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using Livet.EventListeners;
 using Livet.Messaging;
 using StarryEyes.Models.Timelines.SearchFlips;
 using StarryEyes.Models.Timelines.Tabs;
@@ -18,6 +20,11 @@ namespace StarryEyes.ViewModels.Timelines.SearchFlips
         {
             _parent = parent;
             _model = model;
+            this.CompositeDisposable.Add(
+                new EventListener<Action>(
+                    h => _model.FocusRequired += h,
+                    h => _model.FocusRequired -= h,
+                    this.SetFocus));
         }
 
         protected override IEnumerable<long> CurrentAccounts

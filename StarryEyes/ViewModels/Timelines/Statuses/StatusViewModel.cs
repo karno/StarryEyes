@@ -966,6 +966,14 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             {
                 this.LoadInReplyTo();
             }
+            this.Parent.Focus();
+        }
+
+        public void Focus()
+        {
+            this.Parent.FocusedStatus = this;
+            this.LoadInReplyTo();
+            this.Parent.Focus();
         }
 
         public void ShowConversation()
