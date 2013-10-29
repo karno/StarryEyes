@@ -153,7 +153,7 @@ namespace StarryEyes.ViewModels.Timelines.Tabs
             var index = createNext ? curindex + 1 : curindex;
             TabManager.CreateColumn(index, item);
             var focusTarget = TabManager.Columns[index];
-            TabManager.GCColumn();
+            TabManager.CleanupColumn();
             var focusTargetIndex = TabManager.FindColumnIndex(focusTarget);
             if (focusTargetIndex >= 0)
             {

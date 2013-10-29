@@ -49,7 +49,7 @@ namespace StarryEyes.Models.Timelines.Tabs
             Setting.Columns
                    .Select(c => new ColumnModel(c.Tabs.Select(d => d.ToTabModel()).ToArray()))
                    .ForEach(_columns.Add);
-            GCColumn();
+            CleanupColumn();
             if (_loaded) return;
             _loaded = true;
         }
@@ -185,7 +185,6 @@ namespace StarryEyes.Models.Timelines.Tabs
         {
             if (fromColumnIndex == destColumnIndex)
             {
-
                 // in-column moving
                 _columns[fromColumnIndex].Tabs.Move(fromTabIndex, destTabIndex);
             }
@@ -194,8 +193,13 @@ namespace StarryEyes.Models.Timelines.Tabs
                 var tab = _columns[fromColumnIndex].Tabs[fromTabIndex];
                 _columns[fromColumnIndex].Tabs.RemoveAt(fromTabIndex);
                 _columns[destColumnIndex].Tabs.Insert(destTabIndex, tab);
+                if (_columns[fromColumnIndex].Tabs.Count > 0 &&
+                    _columns[fromColumnIndex].CurrentFocusTabIndex >= _columns[fromColumnIndex].Tabs.Count)
+                {
+                    _columns[fromColumnIndex].CurrentFocusTabIndex = _columns[fromColumnIndex].Tabs.Count - 1;
+                }
             }
-            GCColumn();
+            CleanupColumn();
             Save();
         }
 
@@ -266,7 +270,7 @@ namespace StarryEyes.Models.Timelines.Tabs
             ti.IsActivated = false;
             _closedTabsStack.Push(ti);
             _columns[colIndex].RemoveTab(tabIndex);
-            GCColumn();
+            CleanupColumn();
             Save();
         }
 
@@ -323,7 +327,7 @@ namespace StarryEyes.Models.Timelines.Tabs
         /// <summary>
         /// Clean-up empty columns.
         /// </summary>
-        public static void GCColumn()
+        public static void CleanupColumn()
         {
             Columns.Select((c, i) => new { Column = c, Index = i })
                 .Where(t => t.Column.Tabs.Count == 0)
