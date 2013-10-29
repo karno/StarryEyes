@@ -78,6 +78,8 @@ namespace StarryEyes.ViewModels.Timelines.Tabs
 
         public void SetFocus()
         {
+            this._parent.FocusedTab = this;
+            this._parent.Focus();
             this.Messenger.Raise(new InteractionMessage("SetFocus"));
         }
 

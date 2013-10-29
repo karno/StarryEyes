@@ -42,6 +42,8 @@ namespace StarryEyes.ViewModels.Timelines.Tabs
             }
             set
             {
+                var index = this._tabs.IndexOf(value);
+                if (this._model.CurrentFocusTabIndex == index) return;
                 this._model.CurrentFocusTabIndex = this._tabs.IndexOf(value);
                 this._tabs.ForEach(item => item.UpdateFocus());
                 this.RaisePropertyChanged();

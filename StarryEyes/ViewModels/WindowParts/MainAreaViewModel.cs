@@ -52,7 +52,9 @@ namespace StarryEyes.ViewModels.WindowParts
             get { return _columns[TabManager.CurrentFocusColumnIndex]; }
             set
             {
-                TabManager.CurrentFocusColumnIndex = _columns.IndexOf(value);
+                var index = _columns.IndexOf(value);
+                if (TabManager.CurrentFocusColumnIndex == index) return;
+                TabManager.CurrentFocusColumnIndex = index;
                 _columns.ForEach(c => c.UpdateFocus());
                 RaisePropertyChanged();
             }
