@@ -36,10 +36,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 h => MainWindowModel.TabConfigureRequested += h,
                 h => MainWindowModel.TabConfigureRequested -= h)
                 .Subscribe(this.StartTabConfigure));
-            this.CompositeDisposable.Add(Observable.FromEvent<ISubject<Unit>>(
-                h => MainWindowModel.SettingRequested += h,
-                h => MainWindowModel.SettingRequested -= h)
-                                                   .Subscribe(this.StartSetting));
+
         }
 
         private void StartTabConfigure(Tuple<TabModel, ISubject<Unit>> args)
@@ -58,11 +55,6 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             RaisePropertyChanged(() => IsNotifyNewArrivals);
             RaisePropertyChanged(() => QueryString);
             RaisePropertyChanged(() => FoundError);
-        }
-
-        private void StartSetting(ISubject<Unit> subject)
-        {
-            // todo: impl
         }
 
         public string TabName
@@ -127,6 +119,17 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             }
         }
 
+        private string _exceptionMessage;
+        public string ExceptionMessage
+        {
+            get { return _exceptionMessage; }
+            set
+            {
+                _exceptionMessage = value;
+                RaisePropertyChanged();
+            }
+        }
+
         private async void CheckCompile(string source)
         {
             try
@@ -140,18 +143,6 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             {
                 FoundError = true;
                 ExceptionMessage = ex.Message;
-            }
-        }
-
-        private string _exceptionMessage;
-
-        public string ExceptionMessage
-        {
-            get { return _exceptionMessage; }
-            set
-            {
-                _exceptionMessage = value;
-                RaisePropertyChanged();
             }
         }
 

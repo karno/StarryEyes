@@ -411,8 +411,8 @@ namespace StarryEyes.Settings
                 {
                     var option = new TaskDialogOptions
                     {
-                        MainIcon = VistaTaskDialogIcon.Error,
                         Title = "Krile 設定読み込みエラー",
+                        MainIcon = VistaTaskDialogIcon.Error,
                         MainInstruction = "設定が破損しています。",
                         Content = "設定ファイルに異常があるため、読み込めませんでした。" + Environment.NewLine +
                                   "どのような操作を行うか選択してください。",
@@ -440,6 +440,7 @@ namespace StarryEyes.Settings
                             var noption = new TaskDialogOptions
                             {
                                 Title = "バックアップ失敗",
+                                MainIcon = VistaTaskDialogIcon.Error,
                                 MainInstruction = "何らかの原因により、バックアップが正常に行えませんでした。",
                                 Content = "これ以上の動作を継続できません。",
                                 ExpandedInfo = iex.ToString(),

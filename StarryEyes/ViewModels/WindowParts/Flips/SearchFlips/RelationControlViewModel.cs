@@ -130,11 +130,11 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 () => this.IsFollowing = true,
                 ex => this._parent.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
                 {
-                    CommonButtons = TaskDialogCommonButtons.Close,
+                    Title = "フォロー エラー",
                     MainIcon = VistaTaskDialogIcon.Error,
                     MainInstruction = "フォローできませんでした。",
                     Content = ex.Message,
-                    Title = "フォロー エラー",
+                    CommonButtons = TaskDialogCommonButtons.Close,
                 })));
         }
 
@@ -145,11 +145,11 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 () => this.IsFollowing = false,
                 ex => this._parent.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
                 {
-                    CommonButtons = TaskDialogCommonButtons.Close,
+                    Title = "アンフォロー エラー",
                     MainIcon = VistaTaskDialogIcon.Error,
                     MainInstruction = "フォロー解除できませんでした。",
                     Content = ex.Message,
-                    Title = "アンフォロー エラー",
+                    CommonButtons = TaskDialogCommonButtons.Close,
                 })));
         }
 
@@ -164,11 +164,11 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 },
                 ex => this._parent.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
                 {
-                    CommonButtons = TaskDialogCommonButtons.Close,
+                    Title = "ブロック エラー",
                     MainIcon = VistaTaskDialogIcon.Error,
                     MainInstruction = "ブロックできませんでした。",
                     Content = ex.Message,
-                    Title = "ブロック エラー",
+                    CommonButtons = TaskDialogCommonButtons.Close,
                 })));
         }
 
@@ -179,11 +179,11 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 () => this.IsBlocking = false,
                 ex => this._parent.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
                 {
-                    CommonButtons = TaskDialogCommonButtons.Close,
+                    Title = "アンブロック エラー",
                     MainIcon = VistaTaskDialogIcon.Error,
                     MainInstruction = "ブロックを解除できませんでした。",
                     Content = ex.Message,
-                    Title = "アンブロック エラー",
+                    CommonButtons = TaskDialogCommonButtons.Close,
                 })));
         }
 
@@ -198,11 +198,11 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 },
                 ex => this._parent.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
                 {
-                    CommonButtons = TaskDialogCommonButtons.Close,
+                    Title = "スパム報告 エラー",
                     MainIcon = VistaTaskDialogIcon.Error,
                     MainInstruction = "スパム報告できませんでした。",
                     Content = ex.Message,
-                    Title = "スパム報告 エラー",
+                    CommonButtons = TaskDialogCommonButtons.Close,
                 })));
         }
 

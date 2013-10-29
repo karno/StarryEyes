@@ -30,13 +30,13 @@ namespace StarryEyes.Models.Receiving.Managers
             {
                 MainWindowModel.ShowTaskDialog(new TaskDialogOptions
                 {
+                    Title = "リスト受信エラー",
                     MainIcon = VistaTaskDialogIcon.Error,
                     MainInstruction = "リスト受信を開始できません。",
                     Content = "リスト " + info + " を受信するアカウントを特定できませんでした。",
                     ExpandedInfo = "自分以外が作成したリストを受信する際は、そのリストをどのアカウントで受信するかを明示的に記述しなければなりません。" + Environment.NewLine +
                                    "例: receiver/user/listname",
                     ExpandedByDefault = true,
-                    Title = "リスト受信エラー",
                     CommonButtons = TaskDialogCommonButtons.Close,
                 });
             }

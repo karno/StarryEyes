@@ -88,11 +88,11 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 {
                     _parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
                     {
-                        CommonButtons = TaskDialogCommonButtons.Close,
+                        Title = "読み込みエラー",
                         MainIcon = VistaTaskDialogIcon.Error,
                         MainInstruction = "ユーザーの読み込みに失敗しました。",
                         Content = "アカウントが登録されていません。",
-                        Title = "読み込みエラー"
+                        CommonButtons = TaskDialogCommonButtons.Close,
                     }));
                     BackstageModel.RegisterEvent(new OperationFailedEvent("アカウントが登録されていません。"));
                 }
@@ -116,11 +116,11 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 {
                     _parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
                     {
-                        CommonButtons = TaskDialogCommonButtons.Close,
+                        Title = "読み込みエラー",
                         MainIcon = VistaTaskDialogIcon.Error,
                         MainInstruction = "ユーザーの読み込みに失敗しました。",
                         Content = ex.Message,
-                        Title = "読み込みエラー"
+                        CommonButtons = TaskDialogCommonButtons.Close,
                     }));
                     BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message));
                 }

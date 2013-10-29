@@ -262,11 +262,11 @@ namespace StarryEyes.ViewModels
             var response = this.Messenger.GetResponse(new TaskDialogMessage(new TaskDialogOptions
             {
                 Title = "タブ情報の警告",
-                CommonButtons = TaskDialogCommonButtons.YesNo,
                 MainIcon = VistaTaskDialogIcon.Warning,
                 MainInstruction = "タブ情報が失われた可能性があります。",
                 Content = "タブが空です。" + Environment.NewLine +
                           "初回起動時に生成されるタブを再生成しますか？",
+                CommonButtons = TaskDialogCommonButtons.YesNo,
             }));
             if (response.Response.Result != TaskDialogSimpleResult.Yes) return;
             Setting.ResetTabInfo();
@@ -286,8 +286,8 @@ namespace StarryEyes.ViewModels
                         Title = "Krileの終了",
                         MainIcon = VistaTaskDialogIcon.Warning,
                         MainInstruction = "Krileを終了してもよろしいですか？",
-                        VerificationText = "次回から確認せずに終了",
                         CommonButtons = TaskDialogCommonButtons.OKCancel,
+                        VerificationText = "次回から確認せずに終了",
                     }));
                 if (ret.Response == null) return true;
                 if (ret.Response.VerificationChecked.GetValueOrDefault())

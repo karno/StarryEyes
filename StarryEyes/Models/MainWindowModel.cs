@@ -145,6 +145,10 @@ namespace StarryEyes.Models
             {
                 handler(Tuple.Create(model, (ISubject<Unit>)notifier));
             }
+            else
+            {
+                notifier.OnCompleted();
+            }
             return notifier;
         }
 
@@ -156,6 +160,10 @@ namespace StarryEyes.Models
             if (handler != null)
             {
                 handler(notifier);
+            }
+            else
+            {
+                notifier.OnCompleted();
             }
             return notifier;
         }

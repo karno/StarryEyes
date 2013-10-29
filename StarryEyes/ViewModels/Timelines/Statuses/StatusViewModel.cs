@@ -26,6 +26,7 @@ using StarryEyes.Models.Stores;
 using StarryEyes.Models.Timelines.Statuses;
 using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
+using StarryEyes.Settings.KeyAssigns;
 using StarryEyes.Views.Messaging;
 using StarryEyes.Views.Utils;
 
@@ -602,11 +603,11 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             {
                 var msg = new TaskDialogMessage(new TaskDialogOptions
                             {
-                                CommonButtons = TaskDialogCommonButtons.Close,
+                                Title = "クリップボード エラー",
                                 MainIcon = VistaTaskDialogIcon.Error,
                                 MainInstruction = "コピーを行えませんでした。",
                                 Content = ex.Message,
-                                Title = "クリップボード エラー"
+                                CommonButtons = TaskDialogCommonButtons.Close,
                             });
                 this.Parent.Messenger.Raise(msg);
             }
@@ -725,11 +726,11 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         {
             var msg = new TaskDialogMessage(new TaskDialogOptions
             {
-                CommonButtons = TaskDialogCommonButtons.Close,
+                Title = "クイックアクション エラー",
                 MainIcon = VistaTaskDialogIcon.Error,
                 MainInstruction = main,
                 Content = body,
-                Title = "クイックアクション エラー"
+                CommonButtons = TaskDialogCommonButtons.Close,
             });
             this.Parent.Messenger.Raise(msg);
         }
@@ -914,16 +915,24 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
 
         public void ConfirmDelete()
         {
+            var footer = "直近一件のツイートの訂正は投稿欄から行えます。";
+            var amendkey = KeyAssignManager.CurrentProfile
+                                           .FindAssignFromActionName("Amend", KeyAssignGroup.Input)
+                                           .FirstOrDefault();
+            if (amendkey != null)
+            {
+                footer = "直近一件のツイートの訂正は、投稿欄で" + amendkey.GetKeyDescribeString() + "キーを押すと行えます。";
+            }
             var msg = new TaskDialogMessage(new TaskDialogOptions
             {
-                AllowDialogCancellation = true,
-                CustomButtons = new[] { "削除", "キャンセル" },
-                Content = "削除したツイートはもとに戻せません。",
-                FooterIcon = VistaTaskDialogIcon.Information,
+                Title = "ツイートの削除",
                 MainIcon = VistaTaskDialogIcon.Warning,
                 MainInstruction = "ツイートを削除しますか？",
-                FooterText = "直近一件のツイートの訂正は、投稿欄で↑キーを押すと行えます。",
-                Title = "ツイートの削除",
+                Content = "削除したツイートはもとに戻せません。",
+                CustomButtons = new[] { "削除", "キャンセル" },
+                AllowDialogCancellation = true,
+                FooterIcon = VistaTaskDialogIcon.Information,
+                FooterText = footer,
             });
             var response = this.Parent.Messenger.GetResponse(msg);
             if (response.Response.CustomButtonResult == 0)
@@ -1038,12 +1047,12 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         {
             var msg = new TaskDialogMessage(new TaskDialogOptions
             {
-                AllowDialogCancellation = true,
-                CustomButtons = new[] { "スパム報告", "キャンセル" },
+                Title = "ユーザーをスパムとして報告",
                 MainIcon = VistaTaskDialogIcon.Warning,
                 MainInstruction = "ユーザー " + this.Status.User.ScreenName + " をスパム報告しますか？",
                 Content = "全てのアカウントからブロックし、代表のアカウントからスパム報告します。",
-                Title = "ユーザーをスパムとして報告",
+                CustomButtons = new[] { "スパム報告", "キャンセル" },
+                AllowDialogCancellation = true,
             });
             var response = this.Parent.Messenger.GetResponse(msg);
             if (response.Response.CustomButtonResult != 0) return;
@@ -1079,23 +1088,24 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             {
                 this.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
                 {
-                    CommonButtons = TaskDialogCommonButtons.Close,
+                    Title = "キーワードのミュート",
                     MainIcon = VistaTaskDialogIcon.Information,
                     MainInstruction = "キーワードを選択してください。",
                     Content = "ミュートしたいキーワードをドラッグで選択できます。",
-                    Title = "キーワードのミュート",
+                    CommonButtons = TaskDialogCommonButtons.Close,
                 }));
+                return;
             }
             var msg = new TaskDialogMessage(new TaskDialogOptions
             {
-                AllowDialogCancellation = true,
-                CustomButtons = new[] { "ミュート", "キャンセル" },
+                Title = "キーワードのミュート",
                 MainIcon = VistaTaskDialogIcon.Warning,
                 MainInstruction = "キーワード " + this.SelectedText + " をミュートしますか？",
                 Content = "このキーワードを含むツイートが全てのタブから除外されるようになります。",
+                CustomButtons = new[] { "ミュート", "キャンセル" },
                 FooterIcon = VistaTaskDialogIcon.Information,
                 FooterText = "ミュートの解除は設定画面から行えます。",
-                Title = "キーワードミュート",
+                AllowDialogCancellation = true,
             });
             var response = this.Parent.Messenger.GetResponse(msg);
             if (response.Response.CustomButtonResult != 0) return;
@@ -1111,14 +1121,14 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         {
             var msg = new TaskDialogMessage(new TaskDialogOptions
             {
-                AllowDialogCancellation = true,
-                CustomButtons = new[] { "ミュート", "キャンセル" },
+                Title = "ユーザーのミュート",
                 MainIcon = VistaTaskDialogIcon.Warning,
                 MainInstruction = "ユーザー " + this.Status.User.ScreenName + " をミュートしますか？",
                 Content = "このユーザーのツイートが全てのタブから除外されるようになります。",
+                CustomButtons = new[] { "ミュート", "キャンセル" },
                 FooterIcon = VistaTaskDialogIcon.Information,
                 FooterText = "ミュートの解除は設定画面から行えます。",
-                Title = "ユーザーのミュート",
+                AllowDialogCancellation = true,
             });
             var response = this.Parent.Messenger.GetResponse(msg);
             if (response.Response.CustomButtonResult != 0) return;
@@ -1134,14 +1144,14 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         {
             var msg = new TaskDialogMessage(new TaskDialogOptions
             {
-                AllowDialogCancellation = true,
-                CustomButtons = new[] { "ミュート", "キャンセル" },
+                Title = "クライアントのミュート",
                 MainIcon = VistaTaskDialogIcon.Warning,
                 MainInstruction = "クライアント " + this.SourceText + " をミュートしますか？",
                 Content = "このクライアントからのツイートが全てのタブから除外されるようになります。",
+                CustomButtons = new[] { "ミュート", "キャンセル" },
                 FooterIcon = VistaTaskDialogIcon.Information,
                 FooterText = "ミュートの解除は設定画面から行えます。",
-                Title = "クライアントのミュート",
+                AllowDialogCancellation = true,
             });
             var response = this.Parent.Messenger.GetResponse(msg);
             if (response.Response.CustomButtonResult != 0) return;

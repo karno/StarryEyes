@@ -56,13 +56,13 @@ namespace StarryEyes.Settings
                 MainWindowModel.ShowTaskDialog(
                     new TaskDialogOptions
                     {
+                        Title = "キーアサイン エラー",
                         MainIcon = VistaTaskDialogIcon.Error,
                         MainInstruction = "キーアサインファイルを読み込めませんでした。",
                         Content = "キーアサインファイルの記述に誤りがあります:" + Environment.NewLine +
                                   file,
                         ExpandedInfo = ex.Message,
                         CustomButtons = new[] { "再読込", "無視" },
-                        Title = "キーアサイン エラー",
                         Callback = (dlg, args, _) =>
                         {
                             if (args.ButtonId == 0)

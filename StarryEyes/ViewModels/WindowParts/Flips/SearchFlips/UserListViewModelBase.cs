@@ -83,11 +83,11 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 {
                     _parent.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
                     {
-                        CommonButtons = TaskDialogCommonButtons.Close,
+                        Title = "読み込みエラー",
                         MainIcon = VistaTaskDialogIcon.Error,
                         MainInstruction = "ユーザーの読み込みに失敗しました。",
                         Content = "アカウントが登録されていません。",
-                        Title = "読み込みエラー"
+                        CommonButtons = TaskDialogCommonButtons.Close,
                     }));
                     BackstageModel.RegisterEvent(new OperationFailedEvent("アカウントが登録されていません。"));
                 }
@@ -120,11 +120,11 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 {
                     _parent.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
                     {
-                        CommonButtons = TaskDialogCommonButtons.Close,
+                        Title = "読み込みエラー",
                         MainIcon = VistaTaskDialogIcon.Error,
                         MainInstruction = "ユーザーの読み込みに失敗しました。",
                         Content = ex.Message,
-                        Title = "読み込みエラー"
+                        CommonButtons = TaskDialogCommonButtons.Close,
                     }));
                     BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message));
                 }
@@ -151,11 +151,11 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 this._parent.Parent.Messenger.Raise(
                     new TaskDialogMessage(new TaskDialogOptions
                     {
-                        CommonButtons = TaskDialogCommonButtons.Close,
+                        Title = "ユーザー受信エラー",
                         MainIcon = VistaTaskDialogIcon.Error,
                         MainInstruction = "ユーザー情報を受信できませんでした。",
                         Content = ex.Message,
-                        Title = "ユーザー受信エラー",
+                        CommonButtons = TaskDialogCommonButtons.Close,
                     }));
                 return false;
             }

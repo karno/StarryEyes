@@ -782,12 +782,12 @@ namespace StarryEyes.ViewModels.WindowParts
                         new TaskDialogMessage(
                             new TaskDialogOptions
                             {
-                                MainInstruction = "現在の内容を下書きに保存しますか？",
-                                AllowDialogCancellation = true,
-                                CustomButtons = new[] { "保存(&Y)", "破棄(&N)", "キャンセル" },
-                                MainIcon = VistaTaskDialogIcon.Information,
                                 Title = "下書きへの保存",
-                                VerificationText = "次回から表示しない"
+                                MainIcon = VistaTaskDialogIcon.Information,
+                                MainInstruction = "現在の内容を下書きに保存しますか？",
+                                CustomButtons = new[] { "保存(&Y)", "破棄(&N)", "キャンセル" },
+                                VerificationText = "次回から表示しない",
+                                AllowDialogCancellation = true,
                             }));
                     switch (msg.Response.CustomButtonResult)
                     {
@@ -995,8 +995,8 @@ namespace StarryEyes.ViewModels.WindowParts
                                                             .Count() - 1) +
                                                   " 件のツイートも同時に削除されます)"
                                                 : ""),
-                            VerificationText = "次回から表示しない",
                             CommonButtons = TaskDialogCommonButtons.OKCancel,
+                            VerificationText = "次回から表示しない",
                         }));
                 Setting.IsWarnAmendTweet.Value = !amend.Response.VerificationChecked.GetValueOrDefault();
                 if (amend.Response.Result == TaskDialogSimpleResult.Cancel)

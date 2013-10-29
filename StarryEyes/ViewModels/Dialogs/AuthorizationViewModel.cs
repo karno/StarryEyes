@@ -50,7 +50,7 @@ namespace StarryEyes.ViewModels.Dialogs
                 ex => this.Messenger.Raise(new TaskDialogMessage(
                                                new TaskDialogOptions
                                                {
-                                                   Title = "認証失敗",
+                                                   Title = "OAuth認証エラー",
                                                    MainIcon = VistaTaskDialogIcon.Error,
                                                    MainInstruction = "Twitterと正しく通信できませんでした。",
                                                    Content = "何度も繰り返し発生する場合は、しばらく時間を置いて試してみてください。",

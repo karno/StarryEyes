@@ -215,13 +215,13 @@ namespace StarryEyes.ViewModels.Timelines
             if (accounts.Length == 0)
             {
                 var msg = new TaskDialogMessage(new TaskDialogOptions
-                            {
-                                CommonButtons = TaskDialogCommonButtons.Close,
-                                MainIcon = VistaTaskDialogIcon.Error,
-                                MainInstruction = "ツイートをお気に入り登録できません。",
-                                Content = "アカウントが選択されていません。",
-                                Title = "クイックアクション エラー"
-                            });
+                {
+                    Title = "クイックアクション エラー",
+                    MainIcon = VistaTaskDialogIcon.Error,
+                    MainInstruction = "ツイートをお気に入り登録できません。",
+                    Content = "アカウントが選択されていません。",
+                    CommonButtons = TaskDialogCommonButtons.Close,
+                });
                 this.Messenger.Raise(msg);
                 return;
             }

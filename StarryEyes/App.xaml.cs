@@ -45,6 +45,7 @@ namespace StarryEyes
             {
                 TaskDialog.Show(new TaskDialogOptions
                 {
+                    Title = "Krile StarryEyes",
                     MainIcon = VistaTaskDialogIcon.Error,
                     MainInstruction = "Krileの起動に失敗しました。",
                     Content = "設定を保持するディレクトリを作成できません。",
@@ -96,10 +97,10 @@ namespace StarryEyes
             {
                 TaskDialog.Show(new TaskDialogOptions
                 {
+                    Title = "Krile StarryEyes",
                     MainIcon = VistaTaskDialogIcon.Error,
                     MainInstruction = "Krileはすでに起動しています。",
                     Content = "同じ設定を共有するKrileを多重起動することはできません。",
-                    Title = "Krile",
                     ExpandedInfo = "Krileを多重起動するためには、krile.exe.configを編集する必要があります。" + Environment.NewLine +
                     "詳しくは公式ウェブサイト上のFAQを参照してください。",
                     CommonButtons = TaskDialogCommonButtons.Close
