@@ -1165,7 +1165,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             var response = this.Parent.Messenger.GetResponse(msg);
             if (response.Response.CustomButtonResult != 0) return;
             System.Diagnostics.Debug.WriteLine("Mute: " + this.Status.Source);
-            Setting.Muteds.AddPredicate(new FilterOperatorEquals
+            Setting.Muteds.AddPredicate(new FilterOperatorContains
             {
                 LeftValue = new StatusSource(),
                 RightValue = new StringValue(this.SourceText)
