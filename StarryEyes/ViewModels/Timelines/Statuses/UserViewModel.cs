@@ -2,6 +2,7 @@
 using System.Windows.Input;
 using Livet;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Anomaly.Utils;
 using StarryEyes.Models;
 using StarryEyes.Models.Timelines.Statuses;
 
@@ -25,20 +26,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         {
             get
             {
-                if (this.User.ProfileImageUri == null) return null;
-                var uri = this.User.ProfileImageUri.OriginalString;
-                if (uri.EndsWith("normal.png"))
-                {
-                    uri = uri.Substring(0, uri.Length - 10) + "bigger.png";
-                }
-                try
-                {
-                    return new Uri(uri);
-                }
-                catch (UriFormatException)
-                {
-                    return this.User.ProfileImageUri;
-                }
+                return this.User.ProfileImageUri.ChangeImageSize(ImageSize.Original);
             }
         }
 

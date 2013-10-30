@@ -94,8 +94,11 @@ namespace StarryEyes.Views.Controls
                                               bi.BeginInit();
                                               bi.CacheOption = BitmapCacheOption.OnLoad;
                                               bi.StreamSource = ws;
-                                              bi.DecodePixelWidth = dpw;
-                                              bi.DecodePixelHeight = dph;
+                                              if (dpw > 0 && dph > 0)
+                                              {
+                                                  bi.DecodePixelWidth = dpw;
+                                                  bi.DecodePixelHeight = dph;
+                                              }
                                               bi.EndInit();
                                               bi.Freeze();
                                               return bi;

@@ -1,5 +1,6 @@
 ﻿using System;
 using StarryEyes.Anomaly.TwitterApi.Rest;
+using StarryEyes.Anomaly.Utils;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Models.Databases;
@@ -27,7 +28,7 @@ namespace StarryEyes.Models.Receiving.Receivers
             {
                 var user = await this._account.ShowUserAsync(this._account.Id);
                 this._account.UnreliableScreenName = user.ScreenName;
-                this._account.UnreliableProfileImage = user.ProfileImageUri;
+                this._account.UnreliableProfileImage = user.ProfileImageUri.ChangeImageSize(ImageSize.Original);
                 await UserProxy.StoreUserAsync(user);
             }
             catch (Exception ex)

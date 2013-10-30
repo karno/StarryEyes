@@ -117,4 +117,84 @@ namespace StarryEyes.Anomaly.Utils
             return enc.GetString(bytes.ToArray(), 0, bytes.Count);
         }
     }
+
+    public static class ImageUriUtility
+    {
+        private const string HostDomain = "twimg.com";
+
+        public static Uri ChangeImageSize(this Uri imageUri, ImageSize size)
+        {
+            if (imageUri == null || !imageUri.Host.EndsWith(HostDomain))
+            {
+                return imageUri;
+            }
+            var str = imageUri.ToString();
+            int extpos;
+            if ((extpos = str.LastIndexOf('.')) < 0)
+            {
+                return imageUri;
+            }
+            // stash ext
+            var ext = str.Substring(extpos);
+            // normalize url
+            var body = MakeOriginal(str.Substring(0, extpos));
+            switch (size)
+            {
+                case ImageSize.Normal:
+                    body += "_normal";
+                    break;
+                case ImageSize.Bigger:
+                    body += "_bigger";
+                    break;
+                case ImageSize.Mini:
+                    body += "_mini";
+                    break;
+            }
+            try
+            {
+                return new Uri(body + ext);
+            }
+            catch (UriFormatException)
+            {
+                return imageUri;
+            }
+        }
+
+        private static string MakeOriginal(string uriStr)
+        {
+            if (uriStr.Length < 7) return uriStr;
+            if (uriStr[uriStr.Length - 7] == '_')
+            {
+                // bigger, normal
+                return uriStr.Substring(0, uriStr.Length - 7);
+            }
+            if (uriStr[uriStr.Length - 5] == '_')
+            {
+                // mini
+                return uriStr.Substring(0, uriStr.Length - 5);
+            }
+            // original
+            return uriStr;
+        }
+    }
+
+    public enum ImageSize
+    {
+        /// <summary>
+        /// normal size, 48x48
+        /// </summary>
+        Normal,
+        /// <summary>
+        /// larger size, 73x73
+        /// </summary>
+        Bigger,
+        /// <summary>
+        /// Mini size, 24x24
+        /// </summary>
+        Mini,
+        /// <summary>
+        /// Original size, high resolution
+        /// </summary>
+        Original
+    }
 }
