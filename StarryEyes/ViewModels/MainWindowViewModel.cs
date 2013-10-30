@@ -303,10 +303,7 @@ namespace StarryEyes.ViewModels
                         VerificationText = "次回から確認せずに終了",
                     }));
                 if (ret.Response == null) return true;
-                if (ret.Response.VerificationChecked.GetValueOrDefault())
-                {
-                    Setting.ConfirmOnExitApp.Value = false;
-                }
+                Setting.ConfirmOnExitApp.Value = !ret.Response.VerificationChecked.GetValueOrDefault();
                 if (ret.Response.Result == TaskDialogSimpleResult.Cancel)
                 {
                     return false;

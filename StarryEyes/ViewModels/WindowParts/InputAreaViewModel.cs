@@ -1051,7 +1051,7 @@ namespace StarryEyes.ViewModels.WindowParts
                             CommonButtons = TaskDialogCommonButtons.OKCancel,
                         }));
                     Setting.WarnReplyFromThirdAccount.Value =
-                        thirdreply.Response.VerificationChecked.GetValueOrDefault();
+                        !thirdreply.Response.VerificationChecked.GetValueOrDefault();
                     if (thirdreply.Response.Result == TaskDialogSimpleResult.Cancel)
                         return false;
                 }

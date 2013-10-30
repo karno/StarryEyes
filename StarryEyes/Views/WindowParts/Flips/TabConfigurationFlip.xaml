@@ -89,6 +89,7 @@
                 </Grid>
                 <controls:QueryEditor Grid.Row="1"
                                       Background="#FFF0F0F0"
+                                      IsSourceFilterEditable="True"
                                       QueryText="{Binding QueryString,
                                                           Mode=TwoWay}" />
                 <TextBlock Grid.Row="2"

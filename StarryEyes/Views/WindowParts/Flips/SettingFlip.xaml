@@ -14,6 +14,7 @@
              xmlns:smb="clr-namespace:StarryEyes.Views.Messaging.Behaviors"
              xmlns:utils="clr-namespace:StarryEyes.Views.Utils"
              xmlns:vmp="clr-namespace:StarryEyes.ViewModels.WindowParts.Flips"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              d:DataContext="{d:DesignInstance {x:Type vmp:SettingFlipViewModel}}"
              d:DesignHeight="600"
              d:DesignWidth="800"
@@ -65,12 +66,7 @@
                           Fill="Black"
                           Stretch="Fill" />
                 </Button>
-                <TextBlock Grid.Column="1"
-                           VerticalAlignment="Top"
-                           FontSize="32"
-                           Padding="4,8,4,1"
-                           Text="Setting"
-                           TextWrapping="Wrap" />
+
             </Grid>
             <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
@@ -80,7 +76,7 @@
                 <ListBox x:Name="SettingCategories"
                          Width="180"
                          HorizontalContentAlignment="Stretch"
-                         SelectedIndex="2">
+                         SelectedIndex="0">
                     <ListBox.Resources>
                         <Style TargetType="{x:Type ListBoxItem}">
                             <Setter Property="Margin" Value="0" />
@@ -313,7 +309,7 @@
                                   VerticalAlignment="Top"
                                   Content="自分自身をお気に入り登録できるようにする(_F)"
                                   IsChecked="{Binding IsAllowFavoriteMyself}" />
-                        <StackPanel Orientation="Horizontal">
+                        <StackPanel Margin="0,8" Orientation="Horizontal">
                             <TextBlock Margin="2,0,6,0"
                                        VerticalAlignment="Center"
                                        Text="タイムラインのスクロールロック:" />
@@ -370,6 +366,7 @@
                     <controls:QueryEditor Grid.Row="1"
                                           Margin="16,0"
                                           Background="#FFF0F0F0"
+                                          IsSourceFilterEditable="False"
                                           QueryText="{Binding QueryString,
                                                               Mode=TwoWay}" />
                     <TextBlock Grid.Row="2"
@@ -398,6 +395,248 @@
                             </Style>
                         </TextBlock.Style>
                     </TextBlock>
+                </Grid>
+                <Grid Grid.Column="1" Margin="0,6,0,0">
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ElementName=SettingCategories, Path=SelectedIndex}" Value="3">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <StackPanel Margin="16, 0" Orientation="Vertical">
+                        <CheckBox Margin="0"
+                                  Content="フォールバックアカウントを遡って返信する(_B)"
+                                  IsChecked="{Binding IsBacktrackFallback}" />
+                        <TextBlock Margin="20,0,0,8"
+                                   Text="他のアカウントからのフォールバックになっているアカウントへの返信に対して返信する際に、フォールバック元アカウントを自動指定するようにします。"
+                                   TextWrapping="Wrap" />
+                        <CheckBox Margin="0,8"
+                                  Content="ツイートボックスを開くときに下書きが存在していたら下書きを開く(_R)"
+                                  IsChecked="{Binding RestorePreviousStashed}" />
+                        <StackPanel Margin="0,8" Orientation="Horizontal">
+                            <TextBlock Margin="0,0,8,0"
+                                       VerticalAlignment="Center"
+                                       Text="内容が書き込まれたツイートボックスを閉じるとき:" />
+                            <ComboBox SelectedIndex="{Binding TweetBoxClosingAction}">
+                                <clr:String>下書きへ保存するか確認する</clr:String>
+                                <clr:String>常に下書きへ保存する</clr:String>
+                                <clr:String>確認せずに破棄する</clr:String>
+                            </ComboBox>
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+                <Grid Grid.Column="1" Margin="0,6,0,0">
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ElementName=SettingCategories, Path=SelectedIndex}" Value="4">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <StackPanel Margin="16, 0" Orientation="Vertical">
+                        <CheckBox Margin="0,0,0,8"
+                                  Content="アプリケーションを閉じるときに確認する(_X)"
+                                  IsChecked="{Binding ConfirmOnExitApp}" />
+                        <CheckBox Margin="0,8"
+                                  Content="ツイートの訂正を行うときに警告する(_A)"
+                                  IsChecked="{Binding WarnAmendTweet}" />
+                        <CheckBox Margin="0,8"
+                                  Content="別のアカウントで行われている会話に割り込む場合に警告する(_T)"
+                                  IsChecked="{Binding WarnReplyFromThirdAccount}" />
+                    </StackPanel>
+                </Grid>
+                <Grid Grid.Column="1" Margin="0,6,0,0">
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ElementName=SettingCategories, Path=SelectedIndex}" Value="5">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <StackPanel Margin="16,0,16,4" Orientation="Horizontal">
+                        <TextBlock Margin="0,0,8,0"
+                                   VerticalAlignment="Center"
+                                   Text="使用するキーアサイン:" />
+                        <ComboBox ItemsSource="{Binding KeyAssignCandidateFiles}" SelectedIndex="{Binding KeyAssignFile}" />
+                    </StackPanel>
+                    <TextBox Grid.Row="1"
+                             Margin="16,0,16,16"
+                             IsReadOnly="True"
+                             Text="{Binding KeyAssignFileContents,
+                                            Mode=OneWay}"
+                             VerticalScrollBarVisibility="Visible" />
+                </Grid>
+                <Grid Grid.Column="1" Margin="0,6,0,0">
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ElementName=SettingCategories, Path=SelectedIndex}" Value="6">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <StackPanel Margin="16, 0" Orientation="Vertical">
+                        <DockPanel Margin="0,0,0,8">
+                            <TextBlock VerticalAlignment="Center" Text="呼び出すブラウザのパス(空欄でデフォルトのブラウザ): " />
+                            <TextBox VerticalAlignment="Center" Text="{Binding ExternalBrowserPath}" />
+                        </DockPanel>
+                    </StackPanel>
+                </Grid>
+                <Grid Grid.Column="1" Margin="0,6,0,0">
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ElementName=SettingCategories, Path=SelectedIndex}" Value="7">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <StackPanel Margin="16, 0" Orientation="Vertical">
+                        <DockPanel Margin="0,0,0,8">
+                            <TextBlock VerticalAlignment="Center" Text="API プロキシ(空欄で利用しない): " />
+                            <TextBox VerticalAlignment="Center" Text="{Binding ApiProxy}" />
+                        </DockPanel>
+                        <DockPanel Margin="0,8">
+                            <TextBlock VerticalAlignment="Center" Text="Web プロキシ: " />
+                            <ComboBox SelectedIndex="{Binding UseWebProxy}">
+                                <clr:String>Internet Explorerの設定を使用</clr:String>
+                                <clr:String>プロキシを使用しない</clr:String>
+                                <clr:String>利用するプロキシを指定する</clr:String>
+                            </ComboBox>
+                        </DockPanel>
+                        <GroupBox Header="プロキシ設定" Visibility="{Binding ExplicitSetProxy, Converter={StaticResource BoolVisibleConveter}}">
+                            <StackPanel Margin="8" Orientation="Vertical">
+                                <DockPanel Margin="0,4">
+                                    <TextBlock VerticalAlignment="Center" Text="ホスト: " />
+                                    <xctk:IntegerUpDown Width="80"
+                                                        DockPanel.Dock="Right"
+                                                        Value="{Binding WebProxyPort}" />
+                                    <TextBlock Margin="8,0,0,0"
+                                               VerticalAlignment="Center"
+                                               DockPanel.Dock="Right"
+                                               Text="ポート: " />
+                                    <TextBox VerticalAlignment="Center" Text="{Binding WebProxyHost}" />
+                                </DockPanel>
+                                <CheckBox Margin="0,4"
+                                          Content="ローカルホストを参照するときには使用しない(_B)"
+                                          IsChecked="{Binding BypassProxyInLocal}" />
+                                <TextBlock Margin="0,4" Text="バイパスするホスト リスト(改行区切り):" />
+                                <TextBox Height="120"
+                                         AcceptsReturn="True"
+                                         Text="{Binding BypassList}"
+                                         VerticalScrollBarVisibility="Auto" />
+                            </StackPanel>
+                        </GroupBox>
+
+                    </StackPanel>
+                </Grid>
+                <Grid Grid.Column="1" Margin="0,6,0,0">
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ElementName=SettingCategories, Path=SelectedIndex}" Value="8">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <StackPanel Margin="16, 0" Orientation="Vertical">
+                        <CheckBox Margin="0,0,0,8"
+                                  Content="アンセーフ プラグインをロード(_U)"
+                                  IsChecked="{Binding LoadUnsafePlugin}" />
+                        <CheckBox Margin="0,8"
+                                  Content="開発用フォルダからプラグインをロード(_D)"
+                                  IsChecked="{Binding LoadPluginFromDevFolder}" />
+                        <DockPanel Margin="0,8" LastChildFill="False">
+                            <TextBlock VerticalAlignment="Center" Text="イベント表示時間: " />
+                            <TextBlock Margin="4,0"
+                                       VerticalAlignment="Center"
+                                       Text="最小(msec) " />
+                            <xctk:IntegerUpDown Width="80" Value="{Binding EventDisplayMinimumMillisec}" />
+                            <TextBlock Margin="8,0,4,0"
+                                       VerticalAlignment="Center"
+                                       Text="最大(msec) " />
+                            <xctk:IntegerUpDown Width="80" Value="{Binding EventDisplayMaximumMillisec}" />
+                        </DockPanel>
+
+                        <GroupBox Header="REST APIの受信間隔">
+                            <StackPanel Margin="8,4" Orientation="Vertical">
+                                <StackPanel Margin="0,4" Orientation="Horizontal">
+                                    <TextBlock Width="120"
+                                               Margin="4,0"
+                                               VerticalAlignment="Center"
+                                               Text="ユーザー情報"
+                                               TextAlignment="Right" />
+                                    <xctk:IntegerUpDown Width="80" Value="{Binding UserInfoReceivePeriod}" />
+                                </StackPanel>
+                                <StackPanel Margin="0,4" Orientation="Horizontal">
+                                    <TextBlock Width="120"
+                                               Margin="4,0"
+                                               VerticalAlignment="Center"
+                                               Text="リレーション"
+                                               TextAlignment="Right" />
+                                    <xctk:IntegerUpDown Width="80" Value="{Binding UserRelationReceivePeriod}" />
+                                </StackPanel>
+                                <StackPanel Margin="0,4" Orientation="Horizontal">
+                                    <TextBlock Width="120"
+                                               Margin="4,0"
+                                               VerticalAlignment="Center"
+                                               Text="タイムライン"
+                                               TextAlignment="Right" />
+                                    <xctk:IntegerUpDown Width="80" Value="{Binding RESTReceivePeriod}" />
+                                </StackPanel>
+                                <StackPanel Margin="0,4" Orientation="Horizontal">
+                                    <TextBlock Width="120"
+                                               Margin="4,0"
+                                               VerticalAlignment="Center"
+                                               Text="検索タイムライン"
+                                               TextAlignment="Right" />
+                                    <xctk:IntegerUpDown Width="80" Value="{Binding RESTSearchReceivePeriod}" />
+                                </StackPanel>
+                                <StackPanel Margin="0,4" Orientation="Horizontal">
+                                    <TextBlock Width="120"
+                                               Margin="4,0"
+                                               VerticalAlignment="Center"
+                                               Text="リストタイムライン"
+                                               TextAlignment="Right" />
+                                    <xctk:IntegerUpDown Width="80" Value="{Binding ListReceivePeriod}" />
+                                </StackPanel>
+                            </StackPanel>
+                        </GroupBox>
+
+                        <DockPanel Margin="0,8" LastChildFill="False">
+                            <TextBlock VerticalAlignment="Center" Text="投稿規制パラメータ: " />
+                            <TextBlock Margin="4,0"
+                                       VerticalAlignment="Center"
+                                       Text="ウィンドウタイム(sec) " />
+                            <xctk:IntegerUpDown Width="80" Value="{Binding PostWindowTimeSec}" />
+                            <TextBlock Margin="8,0,4,0"
+                                       VerticalAlignment="Center"
+                                       Text="ウィンドウあたりの投稿上限 " />
+                            <xctk:IntegerUpDown Width="80" Value="{Binding PostLimitPerWindow}" />
+                        </DockPanel>
+
+
+                    </StackPanel>
                 </Grid>
             </Grid>
         </Grid>

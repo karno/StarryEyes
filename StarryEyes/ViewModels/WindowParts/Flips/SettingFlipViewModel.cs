@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
@@ -15,6 +16,7 @@ using StarryEyes.Models;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
+using StarryEyes.Settings.KeyAssigns;
 using StarryEyes.ViewModels.Dialogs;
 using StarryEyes.Views.Dialogs;
 using StarryEyes.Views.Messaging;
@@ -47,16 +49,20 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 h => MainWindowModel.SettingRequested += h,
                 h => MainWindowModel.SettingRequested -= h)
                                                    .Subscribe(this.StartSetting));
-            this.CompositeDisposable.Add(this._accounts = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
-                Setting.Accounts.Collection,
-                a => new TwitterAccountConfigurationViewModel(this, a),
-                DispatcherHelper.UIDispatcher));
+            this.CompositeDisposable.Add(
+                this._accounts = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
+                    Setting.Accounts.Collection,
+                    a => new TwitterAccountConfigurationViewModel(this, a),
+                    DispatcherHelper.UIDispatcher));
         }
 
         private void StartSetting(ISubject<Unit> subject)
         {
+            this.RefreshKeyAssignCandidates();
+
             this.ResetFilter();
             this._completeCallback = subject;
+            this.RaisePropertyChanged();
             this.IsConfigurationActive = true;
         }
 
@@ -278,22 +284,10 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             set { Setting.IsUrlAutoEscapeEnabled.Value = value; }
         }
 
-        public bool IsWarnAmendTweet
+        public int TweetBoxClosingAction
         {
-            get { return Setting.WarnAmending.Value; }
-            set { Setting.WarnAmending.Value = value; }
-        }
-
-        public bool IsWarnReplyFromThirdAccount
-        {
-            get { return Setting.WarnAmending.Value; }
-            set { Setting.WarnReplyFromThirdAccount.Value = value; }
-        }
-
-        public TweetBoxClosingAction TweetBoxClosingAction
-        {
-            get { return Setting.TweetBoxClosingAction.Value; }
-            set { Setting.TweetBoxClosingAction.Value = value; }
+            get { return (int)Setting.TweetBoxClosingAction.Value; }
+            set { Setting.TweetBoxClosingAction.Value = (TweetBoxClosingAction)value; }
         }
 
         public bool IsBacktrackFallback
@@ -310,6 +304,69 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         #endregion
 
+        #region Notification and confirmation property
+
+        public bool ConfirmOnExitApp
+        {
+            get { return Setting.ConfirmOnExitApp.Value; }
+            set { Setting.ConfirmOnExitApp.Value = value; }
+        }
+
+        public bool WarnAmendTweet
+        {
+            get { return Setting.WarnAmending.Value; }
+            set { Setting.WarnAmending.Value = value; }
+        }
+
+        public bool WarnReplyFromThirdAccount
+        {
+            get { return Setting.WarnReplyFromThirdAccount.Value; }
+            set { Setting.WarnReplyFromThirdAccount.Value = value; }
+        }
+
+        #endregion
+
+        #region Key assign property
+
+        private readonly ObservableCollection<string> _keyAssignCandidateFiles = new ObservableCollection<string>();
+        public ObservableCollection<string> KeyAssignCandidateFiles
+        {
+            get { return this._keyAssignCandidateFiles; }
+        }
+
+        public int KeyAssignFile
+        {
+            get
+            {
+                var fn = Setting.KeyAssign.Value ?? DefaultAssignProvider.DefaultAssignName;
+                return this._keyAssignCandidateFiles.IndexOf(fn);
+            }
+            set
+            {
+                var name = DefaultAssignProvider.DefaultAssignName;
+                if (value >= 0 && value <= this._keyAssignCandidateFiles.Count)
+                {
+                    name = this._keyAssignCandidateFiles[value];
+                }
+                Setting.KeyAssign.Value = name;
+                this.RaisePropertyChanged(() => KeyAssignFileContents);
+            }
+        }
+
+        public void RefreshKeyAssignCandidates()
+        {
+            _keyAssignCandidateFiles.Clear();
+            KeyAssignManager.LoadedProfiles.ForEach(f => _keyAssignCandidateFiles.Add(f));
+            this.RaisePropertyChanged(() => KeyAssignFile);
+            this.RaisePropertyChanged(() => KeyAssignFileContents);
+        }
+
+        public string KeyAssignFileContents
+        {
+            get { return KeyAssignManager.CurrentProfile.GetSourceText(); }
+        }
+        #endregion
+
         #region Outer and third party property
 
         public string ExternalBrowserPath
@@ -320,28 +377,24 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         #endregion
 
-        #region Notification and confirmation property
-
-        public bool ConfirmOnExitApp
-        {
-            get { return Setting.ConfirmOnExitApp.Value; }
-            set { Setting.ConfirmOnExitApp.Value = value; }
-        }
-
-        #endregion
-
-        #region Key assign property
-
-        #endregion
-
         #region proxy configuration
 
         #region Web proxy
 
-        public WebProxyConfiguration UseWebProxy
+        public int UseWebProxy
         {
-            get { return Setting.WebProxy.Value; }
-            set { Setting.WebProxy.Value = value; }
+            get { return (int)Setting.WebProxy.Value; }
+            set
+            {
+                Setting.WebProxy.Value = (WebProxyConfiguration)value;
+                this.RaisePropertyChanged();
+                this.RaisePropertyChanged(() => ExplicitSetProxy);
+            }
+        }
+
+        public bool ExplicitSetProxy
+        {
+            get { return Setting.WebProxy.Value == WebProxyConfiguration.Custom; }
         }
 
         public string WebProxyHost

@@ -21,6 +21,11 @@ namespace StarryEyes.Settings
         private static readonly IDictionary<string, KeyAssignAction> Actions =
             new Dictionary<string, KeyAssignAction>();
 
+        public static IEnumerable<string> LoadedProfiles
+        {
+            get { return Profiles.Keys; }
+        }
+
         public static string KeyAssignsProfileDirectoryPath
         {
             get { return Path.Combine(App.ConfigurationDirectoryPath, App.KeyAssignProfilesDirectory); }
@@ -28,10 +33,18 @@ namespace StarryEyes.Settings
 
         internal static void Initialize()
         {
-            var path = KeyAssignsProfileDirectoryPath;
-
             // make sure existing directories.
             Directory.CreateDirectory(KeyAssignsProfileDirectoryPath);
+
+            ReloadCandidates();
+
+            // listen setting changed
+            Setting.KeyAssign.ValueChanged += _ => RaiseKeyAssignChanged();
+        }
+
+        public static void ReloadCandidates()
+        {
+            var path = KeyAssignsProfileDirectoryPath;
 
             // load all assigns.
             foreach (var file in Directory.EnumerateFiles(path, "*.txt"))
@@ -39,8 +52,6 @@ namespace StarryEyes.Settings
                 Load(file);
             }
             CheckSetting();
-            // listen setting changed
-            Setting.KeyAssign.ValueChanged += _ => RaiseKeyAssignChanged();
         }
 
         private static void Load(string file)

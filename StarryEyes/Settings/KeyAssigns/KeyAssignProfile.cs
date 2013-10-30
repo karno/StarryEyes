@@ -37,26 +37,36 @@ namespace StarryEyes.Settings.KeyAssigns
             using (var stream = File.OpenWrite(path))
             using (var writer = new StreamWriter(stream))
             {
-                // write global
-                // ReSharper disable AccessToDisposedClosure
-                writer.WriteLine("[Global]");
-                GlobalBindings
-                    .SelectMany(s => s.Value)
-                    .ForEach(b => writer.WriteLine(b.ToString()));
-                writer.WriteLine("[Timeline]");
-                TimelineBindings
-                    .SelectMany(s => s.Value)
-                    .ForEach(b => writer.WriteLine(b.ToString()));
-                writer.WriteLine("[Input]");
-                InputBindings
-                    .SelectMany(s => s.Value)
-                    .ForEach(b => writer.WriteLine(b.ToString()));
-                writer.WriteLine("[Search]");
-                SearchBindings
-                    .SelectMany(s => s.Value)
-                    .ForEach(b => writer.WriteLine(b.ToString()));
-                // ReSharper restore AccessToDisposedClosure
+                this.DumpText(writer);
             }
+        }
+
+        public string GetSourceText()
+        {
+            var sw = new StringWriter();
+            this.DumpText(sw);
+            return sw.ToString();
+        }
+
+        private void DumpText(TextWriter writer)
+        {
+            // write global
+            writer.WriteLine("[Global]");
+            GlobalBindings
+                .SelectMany(s => s.Value)
+                .ForEach(b => writer.WriteLine(b.ToString()));
+            writer.WriteLine("[Timeline]");
+            TimelineBindings
+                .SelectMany(s => s.Value)
+                .ForEach(b => writer.WriteLine(b.ToString()));
+            writer.WriteLine("[Input]");
+            InputBindings
+                .SelectMany(s => s.Value)
+                .ForEach(b => writer.WriteLine(b.ToString()));
+            writer.WriteLine("[Search]");
+            SearchBindings
+                .SelectMany(s => s.Value)
+                .ForEach(b => writer.WriteLine(b.ToString()));
         }
 
         public void SetAssigns(IEnumerable<string> lines)

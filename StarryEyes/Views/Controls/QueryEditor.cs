@@ -41,7 +41,7 @@ namespace StarryEyes.Views.Controls
 
         // Using a DependencyProperty as the backing store for IsSourceFilterEditable.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty IsSourceFilterEditableProperty =
-            DependencyProperty.Register("IsSourceFilterEditable", typeof(bool), typeof(QueryEditor), new PropertyMetadata(null));
+            DependencyProperty.Register("IsSourceFilterEditable", typeof(bool), typeof(QueryEditor), new PropertyMetadata(true));
 
         public QueryEditor()
             : base()
@@ -113,6 +113,10 @@ namespace StarryEyes.Views.Controls
         private IEnumerable<CompletionData> QueryCompletionData(string beforeCursor, string inputted)
         {
             var tokens = Tokenizer.Tokenize(beforeCursor, true).ToArray();
+            if (IsSourceFilterEditable)
+            {
+                return this.QueryOnRight(tokens, inputted);
+            }
             var wheres = tokens.SkipWhile(t => !t.IsMatchTokenLiteral("where"))
                                .ToArray();
             if (wheres.Length > 0)
