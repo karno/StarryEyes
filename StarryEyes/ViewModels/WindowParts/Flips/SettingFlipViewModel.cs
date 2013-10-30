@@ -135,7 +135,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             }
             var auth = new AuthorizationViewModel();
             auth.AuthorizeObservable.Subscribe(Setting.Accounts.Collection.Add);
-            _parent.Messenger.RaiseAsync(
+            this._parent.Messenger.RaiseAsync(
                 new TransitionMessage(typeof(AuthorizationWindow), auth, TransitionMode.Modal, null));
         }
 
@@ -146,7 +146,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             {
                 reconf = "設定";
             }
-            var resp = await this._parent.Messenger.GetResponseAsync(
+            var resp = await this.Messenger.GetResponseAsync(
                 new TaskDialogMessage(new TaskDialogOptions
                 {
                     Title = "APIキーの" + reconf,
@@ -160,9 +160,8 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 return;
             }
             var kovm = new KeyOverrideViewModel();
-            Messenger.Raise(new TransitionMessage(
-                                     typeof(KeyOverrideWindow),
-                                     kovm, TransitionMode.Modal, null));
+            this._parent.Messenger.Raise(
+                new TransitionMessage(typeof(KeyOverrideWindow), kovm, TransitionMode.Modal, null));
         }
 
         #endregion
@@ -599,7 +598,9 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             {
                 Title = "アカウントの削除",
                 MainIcon = VistaTaskDialogIcon.Warning,
-                MainInstruction = "このアカウントの認証を解除してもよろしいですか？",
+                MainInstruction = "@" + ScreenName + " の認証を解除してもよろしいですか？",
+                Content = "このアカウントに関するタイムラインを取得できなくなり、投稿も行えなくなります。" + Environment.NewLine +
+                          "完全に認証を解除するには、Twitter公式サイトのアプリ管理ページからアクセス権を剥奪する必要があります。",
                 CommonButtons = TaskDialogCommonButtons.OKCancel
             }));
             if (resp.Response.Result == TaskDialogSimpleResult.Ok)
