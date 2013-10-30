@@ -150,7 +150,11 @@ namespace StarryEyes.ViewModels
                     break;
                 case FocusRequest.Timeline:
                     SearchFlipViewModel.Close();
-                    TabManager.CurrentFocusTab.RequestFocus();
+                    var ctab = TabManager.CurrentFocusTab;
+                    if (ctab != null)
+                    {
+                        ctab.RequestFocus();
+                    }
                     break;
                 case FocusRequest.Input:
                     SearchFlipViewModel.Close();

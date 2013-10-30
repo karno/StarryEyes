@@ -99,7 +99,10 @@ namespace StarryEyes.Models.Timelines.Tabs
         private static void RaiseCurrentFocusColumnChanged()
         {
             var col = _columns[_currentFocusColumnIndex];
-            InputAreaModel.NotifyChangeFocusingTab(col.Tabs[col.CurrentFocusTabIndex]);
+            if (col.Tabs.Count > 0)
+            {
+                InputAreaModel.NotifyChangeFocusingTab(col.Tabs[col.CurrentFocusTabIndex]);
+            }
             var handler = CurrentFocusColumnChanged;
             if (handler != null) handler();
         }
