@@ -33,7 +33,7 @@ namespace StarryEyes.Filters.Sources
                 .Select(a => a.Id.ToString(CultureInfo.InvariantCulture))
                 .JoinString(",");
             return "StatusType = " + type + " and " +
-                   "UserId in (select ParentId from StatusEntity where " +
+                   "Id in (select ParentId from StatusEntity where " +
                    "EntityType = " + userMention + " and " +
                    "UserId in (" + ads + "))";
         }

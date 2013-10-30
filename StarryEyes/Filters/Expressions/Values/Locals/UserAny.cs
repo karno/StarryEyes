@@ -75,8 +75,8 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
             get
             {
                 return Setting.Accounts.Ids
-                              .Select(i => i.ToString(CultureInfo.InvariantCulture))
-                              .JoinString(",")
+                              .Select(i => "select (" + i.ToString(CultureInfo.InvariantCulture) + ")")
+                              .JoinString(" union ")
                               .EnumerationToSelectClause();
             }
         }

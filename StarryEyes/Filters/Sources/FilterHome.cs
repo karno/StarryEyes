@@ -37,7 +37,7 @@ namespace StarryEyes.Filters.Sources
                                      .JoinString(",");
             return "(UserId in (" + ads + ") OR " +
                    "UserId in (" + followings + ") OR " +
-                   "UserId in (select ParentId from StatusEntity where " +
+                   "Id in (select ParentId from StatusEntity where " +
                    "EntityType = " + userMention + " and " +
                    "UserId in (" + ads + "))";
         }
