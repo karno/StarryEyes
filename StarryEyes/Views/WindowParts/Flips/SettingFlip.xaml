@@ -11,6 +11,7 @@
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:smb="clr-namespace:StarryEyes.Views.Messaging.Behaviors"
              xmlns:utils="clr-namespace:StarryEyes.Views.Utils"
              xmlns:vmp="clr-namespace:StarryEyes.ViewModels.WindowParts.Flips"
              d:DataContext="{d:DesignInstance {x:Type vmp:SettingFlipViewModel}}"
@@ -32,6 +33,11 @@
                                                  RelativeSource={RelativeSource AncestorType={x:Type UserControl},
                                                                                 Mode=FindAncestor}}"
                        Visibility="Visible">
+        <i:Interaction.Triggers>
+            <l:InteractionMessageTrigger Messenger="{Binding Messenger}">
+                <smb:TaskDialogInteractionMessageAction />
+            </l:InteractionMessageTrigger>
+        </i:Interaction.Triggers>
         <Grid Background="White">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -186,10 +192,24 @@
                                                        Margin="8,4,0,4"
                                                        HorizontalAlignment="Left"
                                                        VerticalAlignment="Top"
-                                                       FontSize="24"
+                                                       FontSize="18"
                                                        Text="{Binding ScreenName,
                                                                       FallbackValue=USER NAME}"
                                                        TextWrapping="Wrap" />
+                                            <Button Grid.Column="1"
+                                                    HorizontalAlignment="Right"
+                                                    VerticalAlignment="Stretch"
+                                                    Background="#FFE51400"
+                                                    Content="このアカウントを削除"
+                                                    Foreground="White"
+                                                    Padding="8,0"
+                                                    Style="{StaticResource MetroSquareButtonStyle}">
+                                                <i:Interaction.Triggers>
+                                                    <i:EventTrigger EventName="Click">
+                                                        <ei:CallMethodAction MethodName="Deauthorize" TargetObject="{Binding Mode=OneWay}" />
+                                                    </i:EventTrigger>
+                                                </i:Interaction.Triggers>
+                                            </Button>
                                             <StackPanel Grid.Row="1"
                                                         Grid.RowSpan="2"
                                                         Grid.Column="1"
@@ -258,25 +278,23 @@
                     <DockPanel Grid.Row="2"
                                Margin="16"
                                LastChildFill="False">
-                        <Button Width="180"
-                                DockPanel.Dock="Right"
-                                Style="{StaticResource MetroSquareDefaultButtonStyle}">
+                        <Button DockPanel.Dock="Right" Style="{StaticResource MetroSquareDefaultButtonStyle}">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="Click">
                                     <ei:CallMethodAction MethodName="AddNewAccount" TargetObject="{Binding Mode=OneWay}" />
                                 </i:EventTrigger>
                             </i:Interaction.Triggers>
-                            <TextBlock Foreground="White" Text="新しいアカウントを追加" />
+                            <TextBlock Margin="8,0"
+                                       Foreground="White"
+                                       Text="新しいアカウントを追加" />
                         </Button>
-                        <Button Width="180"
-                                DockPanel.Dock="Left"
-                                Style="{StaticResource MetroSquareButtonStyle}">
+                        <Button DockPanel.Dock="Left" Style="{StaticResource MetroSquareButtonStyle}">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="Click">
                                     <ei:CallMethodAction MethodName="SetApiKeys" TargetObject="{Binding Mode=OneWay}" />
                                 </i:EventTrigger>
                             </i:Interaction.Triggers>
-                            <TextBlock Text="API キーの再設定" />
+                            <TextBlock Margin="8,0" Text="API キーの再設定" />
                         </Button>
                     </DockPanel>
                 </Grid>

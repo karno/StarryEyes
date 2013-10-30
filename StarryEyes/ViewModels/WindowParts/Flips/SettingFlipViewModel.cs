@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using Livet;
 using Livet.Messaging;
+using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Anomaly.Utils;
 using StarryEyes.Filters.Expressions;
 using StarryEyes.Filters.Parsing;
@@ -48,7 +49,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                                                    .Subscribe(this.StartSetting));
             this.CompositeDisposable.Add(this._accounts = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
                 Setting.Accounts.Collection,
-                a => new TwitterAccountConfigurationViewModel(a),
+                a => new TwitterAccountConfigurationViewModel(this, a),
                 DispatcherHelper.UIDispatcher));
         }
 
@@ -446,10 +447,12 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
     public class TwitterAccountConfigurationViewModel : ViewModel
     {
+        private readonly SettingFlipViewModel _parent;
         private readonly TwitterAccount _account;
 
-        public TwitterAccountConfigurationViewModel(TwitterAccount account)
+        public TwitterAccountConfigurationViewModel(SettingFlipViewModel parent, TwitterAccount account)
         {
+            _parent = parent;
             this._account = account;
             _accounts = new DispatcherCollection<TwitterAccountViewModel>(DispatcherHelper.UIDispatcher);
             Setting.Accounts.Collection.ListenCollectionChanged()
@@ -526,7 +529,23 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public Uri ProfileImage
         {
-            get { return this.Account.UnreliableProfileImage.ChangeImageSize(ImageSize.Bigger); }
+            get
+            {
+                if (this._account.UnreliableProfileImage == null)
+                {
+                    Task.Run(async () =>
+                    {
+                        try
+                        {
+                            var user = await this._account.ShowUserAsync(this._account.Id);
+                            this._account.UnreliableProfileImage = user.ProfileImageUri.ChangeImageSize(ImageSize.Original);
+                            this.RaisePropertyChanged(() => ProfileImage);
+                        }
+                        catch { }
+                    });
+                }
+                return this.Account.UnreliableProfileImage;
+            }
         }
 
         public string ScreenName
@@ -574,5 +593,19 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             set { this.Account.MarkMediaAsPossiblySensitive = value; }
         }
 
+        public void Deauthorize()
+        {
+            var resp = _parent.Messenger.GetResponse(new TaskDialogMessage(new TaskDialogOptions
+            {
+                Title = "アカウントの削除",
+                MainIcon = VistaTaskDialogIcon.Warning,
+                MainInstruction = "このアカウントの認証を解除してもよろしいですか？",
+                CommonButtons = TaskDialogCommonButtons.OKCancel
+            }));
+            if (resp.Response.Result == TaskDialogSimpleResult.Ok)
+            {
+                Setting.Accounts.RemoveAccountFromId(Account.Id);
+            }
+        }
     }
 }
