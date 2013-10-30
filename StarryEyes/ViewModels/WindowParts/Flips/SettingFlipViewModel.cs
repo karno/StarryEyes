@@ -417,7 +417,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public string BypassList
         {
-            get { return Setting.WebProxyBypassList.Value.JoinString(Environment.NewLine); }
+            get { return Setting.WebProxyBypassList.Value.Guard().JoinString(Environment.NewLine); }
             set
             {
                 Setting.WebProxyBypassList.Value =
