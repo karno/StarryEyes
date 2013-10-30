@@ -22,6 +22,8 @@ namespace StarryEyes.Models.Subsystems
         private static string _patcherUri = null;
         private static string _patcherSignUri = null;
 
+        public static event Action UpdateStateChanged;
+
         private static string ExecutablePath
         {
             get { return Path.Combine(App.LocalUpdateStorePath, App.UpdaterFileName); }
@@ -55,6 +57,8 @@ namespace StarryEyes.Models.Subsystems
                                      .FirstOrDefault();
                 if (version != null && latest > version)
                 {
+                    var handler = UpdateStateChanged;
+                    if (handler != null) handler();
                     return true;
                 }
             }
@@ -68,12 +72,13 @@ namespace StarryEyes.Models.Subsystems
 
         internal static async Task<bool> PrepareUpdate(Version version)
         {
+            if (!await CheckUpdate(version))
+            {
+                return false;
+            }
             if (String.IsNullOrEmpty(_patcherUri) || String.IsNullOrEmpty(_patcherSignUri))
             {
-                if (!await CheckUpdate(version))
-                {
-                    return false;
-                }
+                return false;
             }
             try
             {
