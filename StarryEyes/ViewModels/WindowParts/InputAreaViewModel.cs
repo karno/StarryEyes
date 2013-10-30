@@ -151,6 +151,10 @@ namespace StarryEyes.ViewModels.WindowParts
                                         DispatcherHelper.UIDispatcher));
 
             CompositeDisposable.Add(_bindingAuthInfos
+                                    .ListenCollectionChanged()
+                                    .Subscribe(_ => this.RaisePropertyChanged(() => AuthInfoGridRowColumn)));
+
+            CompositeDisposable.Add(_bindingAuthInfos
                                         .ListenCollectionChanged()
                                         .Subscribe(_ => RaisePropertyChanged(() => IsBindingAuthInfoExisted)));
 
