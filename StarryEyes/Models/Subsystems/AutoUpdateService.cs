@@ -132,6 +132,7 @@ namespace StarryEyes.Models.Subsystems
                     UseShellExecute = true,
                     WorkingDirectory = App.LocalUpdateStorePath,
                 };
+                MainWindowModel.SuppressCloseConfirmation = true;
                 Process.Start(startInfo);
                 Application.Current.Shutdown();
             }

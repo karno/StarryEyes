@@ -331,6 +331,7 @@
     <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\UserInfoViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\SettingFlipViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\TabConfigurationFlipViewModel.cs" />
+    <Compile Include="ViewModels\WindowParts\Flips\VersionInfoViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\InputAreaViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\MainAreaViewModel.cs" />
     <Compile Include="ViewModels\Timelines\Tabs\ColumnViewModel.cs" />
@@ -402,6 +403,9 @@
     </Compile>
     <Compile Include="Views\WindowParts\Flips\SettingFlip.xaml.cs">
       <DependentUpon>SettingFlip.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\WindowParts\Flips\VersionInfo.xaml.cs">
+      <DependentUpon>VersionInfo.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\WindowParts\Primitives\UsersList.xaml.cs">
       <DependentUpon>UsersList.xaml</DependentUpon>
@@ -500,6 +504,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\WindowParts\Flips\SettingFlip.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\WindowParts\Flips\VersionInfo.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

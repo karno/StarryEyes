@@ -1,11 +1,11 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Livet;
-using Livet.EventListeners;
 using Livet.Messaging;
 using StarryEyes.Annotations;
 using StarryEyes.Models;
@@ -83,8 +83,6 @@ namespace StarryEyes.ViewModels
 
         #region Properties
 
-        private bool _isShutdowining = false;
-
         public string WindowTitle
         {
             get
@@ -135,10 +133,6 @@ namespace StarryEyes.ViewModels
                 h => MainWindowModel.BackstageTransitionRequested -= h)
                                               .Subscribe(this.TransitionBackstage));
             this._backstageViewModel.Initialize();
-            CompositeDisposable.Add(new EventListener<Action>(
-                                        a => App.ApplicationExit += a,
-                                        a => App.ApplicationExit -= a,
-                                        () => _isShutdowining = true));
         }
 
         private void SetFocus(FocusRequest req)
@@ -291,7 +285,7 @@ namespace StarryEyes.ViewModels
 
         public bool OnClosing()
         {
-            if (Setting.ConfirmOnExitApp.Value && !_isShutdowining)
+            if (Setting.ConfirmOnExitApp.Value && !MainWindowModel.SuppressCloseConfirmation)
             {
                 var ret = Messenger.GetResponse(
                     new TaskDialogMessage(new TaskDialogOptions
@@ -321,7 +315,7 @@ namespace StarryEyes.ViewModels
 
         public string TweetsPerMinutes
         {
-            get { return (StatisticsService.TweetsPerMinutes).ToString(); }
+            get { return (StatisticsService.TweetsPerMinutes).ToString(CultureInfo.InvariantCulture); }
         }
 
         public int GrossTweetCount

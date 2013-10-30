@@ -13,6 +13,8 @@ namespace StarryEyes.Models
 {
     public static class MainWindowModel
     {
+        public static bool SuppressCloseConfirmation { get; set; }
+
         public static bool SuppressKeyAssigns { get; set; }
 
         static MainWindowModel()

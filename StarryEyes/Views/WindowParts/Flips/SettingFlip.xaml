@@ -136,6 +136,7 @@
                     <clr:String>外部サービス</clr:String>
                     <clr:String>プロキシー</clr:String>
                     <clr:String>高度な設定</clr:String>
+                    <clr:String>Krileについて</clr:String>
                 </ListBox>
                 <Grid Grid.Column="1" Margin="0,6,0,0">
                     <Grid.Style>
@@ -634,9 +635,22 @@
                                        Text="ウィンドウあたりの投稿上限 " />
                             <xctk:IntegerUpDown Width="80" Value="{Binding PostLimitPerWindow}" />
                         </DockPanel>
-
-
                     </StackPanel>
+                </Grid>
+                <Grid Grid.Column="1" Margin="0,6,0,0">
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ElementName=SettingCategories, Path=SelectedIndex}" Value="9">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <flips:VersionInfo Margin="12,0"
+                                       HorizontalAlignment="Stretch"
+                                       VerticalAlignment="Stretch" />
                 </Grid>
             </Grid>
         </Grid>

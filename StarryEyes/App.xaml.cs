@@ -581,11 +581,15 @@ namespace StarryEyes
 
         public static readonly string EventWavFile = "event.wav";
 
+        public static readonly string OfficialUrl = "http://krile.starwing.net/";
+
         public static readonly string QueryReferenceUrl = "https://github.com/karno/StarryEyes/wiki";
 
         public static readonly string ReleaseNoteUrl = "https://github.com/karno/StarryEyes/wiki/ReleaseNote";
 
         public static readonly string DonationUrl = "http://krile.starwing.net/donation.html";
+
+        public static readonly string LicenseUrl = "https://raw.github.com/karno/StarryEyes/master/LICENSE.TXT";
 
         #endregion
 
