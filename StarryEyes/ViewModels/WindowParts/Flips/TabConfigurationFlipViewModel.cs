@@ -70,10 +70,10 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public bool IsShowUnreadCounts
         {
-            get { return _currentConfigurationTarget != null && _currentConfigurationTarget.IsShowUnreadCounts; }
+            get { return _currentConfigurationTarget != null && _currentConfigurationTarget.ShowUnreadCounts; }
             set
             {
-                _currentConfigurationTarget.IsShowUnreadCounts = value;
+                _currentConfigurationTarget.ShowUnreadCounts = value;
                 RaisePropertyChanged();
                 TabManager.Save();
             }
@@ -81,10 +81,10 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public bool IsNotifyNewArrivals
         {
-            get { return _currentConfigurationTarget != null && _currentConfigurationTarget.IsNotifyNewArrivals; }
+            get { return _currentConfigurationTarget != null && _currentConfigurationTarget.NotifyNewArrivals; }
             set
             {
-                _currentConfigurationTarget.IsNotifyNewArrivals = value;
+                _currentConfigurationTarget.NotifyNewArrivals = value;
                 RaisePropertyChanged();
                 TabManager.Save();
             }

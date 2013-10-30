@@ -12,8 +12,8 @@ namespace StarryEyes
     {
         internal static void Initialize()
         {
-            Setting.IsBypassWebProxyInLocal.ValueChanged += _ => ApplyWebProxy();
-            Setting.UseWebProxy.ValueChanged += _ => ApplyWebProxy();
+            Setting.BypassWebProxyInLocal.ValueChanged += _ => ApplyWebProxy();
+            Setting.WebProxy.ValueChanged += _ => ApplyWebProxy();
             Setting.WebProxyHost.ValueChanged += _ => ApplyWebProxy();
             Setting.WebProxyBypassList.ValueChanged += _ => ApplyWebProxy();
             Setting.WebProxyPort.ValueChanged += _ => ApplyWebProxy();
@@ -25,7 +25,7 @@ namespace StarryEyes
 
         public static void ApplyWebProxy()
         {
-            switch (Setting.UseWebProxy.Value)
+            switch (Setting.WebProxy.Value)
             {
                 case WebProxyConfiguration.Default:
                     Anomaly.Core.UseSystemProxy = true;
@@ -42,7 +42,7 @@ namespace StarryEyes
                             () => new WebProxy(
                                       new Uri("http://" + Setting.WebProxyHost.Value + ":" +
                                               Setting.WebProxyPort.Value.ToString(CultureInfo.InvariantCulture)),
-                                      Setting.IsBypassWebProxyInLocal.Value,
+                                      Setting.BypassWebProxyInLocal.Value,
                                       Setting.WebProxyBypassList.Value);
                     }
                     catch (Exception ex)

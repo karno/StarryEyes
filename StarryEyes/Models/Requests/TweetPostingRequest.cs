@@ -73,7 +73,7 @@ namespace StarryEyes.Models.Requests
                         return await acc.UpdateWithMediaAsync(
                             _status,
                             new[] { _attachedImageBin },
-                            account.IsMarkMediaAsPossiblySensitive ? true : (bool?)null, // Inherit property
+                            account.MarkMediaAsPossiblySensitive ? true : (bool?)null, // Inherit property
                             _inReplyTo,
                             latlong);
                     }

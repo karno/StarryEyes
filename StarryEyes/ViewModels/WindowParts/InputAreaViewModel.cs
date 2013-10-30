@@ -20,6 +20,7 @@ using StarryEyes.Albireo;
 using StarryEyes.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
+using StarryEyes.Anomaly.Utils;
 using StarryEyes.Helpers;
 using StarryEyes.Models;
 using StarryEyes.Models.Accounting;
@@ -975,7 +976,7 @@ namespace StarryEyes.ViewModels.WindowParts
                 FocusToTextBox();
                 return;
             }
-            if (InputInfo.PostedTweets != null && Setting.IsWarnAmendTweet.Value)
+            if (InputInfo.PostedTweets != null && Setting.WarnAmending.Value)
             {
                 // amend mode
                 var amend = Messenger.GetResponse(
@@ -999,7 +1000,7 @@ namespace StarryEyes.ViewModels.WindowParts
                             CommonButtons = TaskDialogCommonButtons.OKCancel,
                             VerificationText = "次回から表示しない",
                         }));
-                Setting.IsWarnAmendTweet.Value = !amend.Response.VerificationChecked.GetValueOrDefault();
+                Setting.WarnAmending.Value = !amend.Response.VerificationChecked.GetValueOrDefault();
                 if (amend.Response.Result == TaskDialogSimpleResult.Cancel)
                 {
                     return;
@@ -1014,7 +1015,7 @@ namespace StarryEyes.ViewModels.WindowParts
 
         private bool CheckInput()
         {
-            if (InReplyTo != null && Setting.IsWarnReplyFromThirdAccount.Value)
+            if (InReplyTo != null && Setting.WarnReplyFromThirdAccount.Value)
             {
                 // warn third reply
 
@@ -1045,7 +1046,7 @@ namespace StarryEyes.ViewModels.WindowParts
                             VerificationText = "次回から表示しない",
                             CommonButtons = TaskDialogCommonButtons.OKCancel,
                         }));
-                    Setting.IsWarnReplyFromThirdAccount.Value =
+                    Setting.WarnReplyFromThirdAccount.Value =
                         thirdreply.Response.VerificationChecked.GetValueOrDefault();
                     if (thirdreply.Response.Result == TaskDialogSimpleResult.Cancel)
                         return false;
@@ -1222,6 +1223,11 @@ namespace StarryEyes.ViewModels.WindowParts
             this._account = account;
         }
 
+        public long Id
+        {
+            get { return this._account.Id; }
+        }
+
         public TwitterAccount Account
         {
             get { return this._account; }
@@ -1238,7 +1244,7 @@ namespace StarryEyes.ViewModels.WindowParts
                         try
                         {
                             var user = await this._account.ShowUserAsync(this._account.Id);
-                            this._account.UnreliableProfileImage = user.ProfileImageUri;
+                            this._account.UnreliableProfileImage = user.ProfileImageUri.ChangeImageSize(ImageSize.Original);
                             this.RaisePropertyChanged(() => ProfileImageUri);
                         }
                         // ReSharper disable EmptyGeneralCatchClause
@@ -1253,11 +1259,6 @@ namespace StarryEyes.ViewModels.WindowParts
         public string ScreenName
         {
             get { return this._account.UnreliableScreenName; }
-        }
-
-        public long Id
-        {
-            get { return this._account.Id; }
         }
     }
 

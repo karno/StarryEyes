@@ -485,7 +485,9 @@ namespace StarryEyes.Models.Timelines.Statuses
         public static TwitterAccount BacktrackFallback(TwitterAccount account)
         {
             if (!Setting.IsBacktrackFallback.Value)
+            {
                 return account;
+            }
             var cinfo = account;
             while (true)
             {

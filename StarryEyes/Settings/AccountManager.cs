@@ -98,7 +98,5 @@ namespace StarryEyes.Settings
             }
             _settingItem.Value = _accountObservableCollection.ToList();
         }
-
-
     }
 }

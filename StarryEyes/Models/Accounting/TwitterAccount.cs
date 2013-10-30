@@ -133,13 +133,18 @@ namespace StarryEyes.Models.Accounting
         /// <summary>
         /// Receive replies=all
         /// </summary>
-        public bool IsReceiveRepliesAll { get; set; }
+        public bool ReceiveRepliesAll { get; set; }
 
         /// <summary>
         /// Mark uploaded medias as treat sensitive.<para/>
         /// This property value is inherited when fallbacking.
         /// </summary>
-        public bool IsMarkMediaAsPossiblySensitive { get; set; }
+        public bool MarkMediaAsPossiblySensitive { get; set; }
+
+        /// <summary>
+        /// Receive all followings activities
+        /// </summary>
+        public bool ReceiveFollowingsActivity { get; set; }
 
         #endregion
     }

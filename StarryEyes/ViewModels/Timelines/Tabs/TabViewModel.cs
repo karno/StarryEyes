@@ -102,7 +102,7 @@ namespace StarryEyes.ViewModels.Timelines.Tabs
             get { return this._unreadCount; }
             set
             {
-                var newValue = this.IsFocused || !this.Model.IsShowUnreadCounts ? 0 : value;
+                var newValue = this.IsFocused || !this.Model.ShowUnreadCounts ? 0 : value;
                 if (this._unreadCount == newValue) return;
                 this._unreadCount = newValue;
                 this.RaisePropertyChanged();
@@ -172,8 +172,8 @@ namespace StarryEyes.ViewModels.Timelines.Tabs
                 Name = this.Name,
                 FilterQuery = this.Model.FilterQuery != null ? QueryCompiler.Compile(this.Model.FilterQuery.ToQuery()) : null,
                 BindingHashtags = this.Model.BindingHashtags.ToArray(),
-                IsNotifyNewArrivals = this.Model.IsNotifyNewArrivals,
-                IsShowUnreadCounts = this.Model.IsShowUnreadCounts,
+                NotifyNewArrivals = this.Model.NotifyNewArrivals,
+                ShowUnreadCounts = this.Model.ShowUnreadCounts,
                 NotifySoundSource = this.Model.NotifySoundSource
             };
             this.Model.BindingAccounts.ForEach(id => model.BindingAccounts.Add(id));

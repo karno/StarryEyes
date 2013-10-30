@@ -137,7 +137,8 @@ namespace StarryEyes.Models.Receiving.Receivers
         {
             this.CheckDisposed();
             this.ConnectionState = UserStreamsConnectionState.Connecting;
-            var con = this.Account.ConnectUserStreams(this._trackKeywords, this.Account.IsReceiveRepliesAll)
+            var con = this.Account.ConnectUserStreams(this._trackKeywords, this.Account.ReceiveRepliesAll,
+                                                      this.Account.ReceiveFollowingsActivity)
                           .Do(_ =>
                           {
                               if (this.ConnectionState != UserStreamsConnectionState.Connecting) return;

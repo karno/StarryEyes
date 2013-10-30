@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -32,6 +33,8 @@ namespace StarryEyes.ViewModels
 
         private readonly MainAreaViewModel _mainAreaViewModel;
 
+        private readonly SettingFlipViewModel _settingFlipViewModel;
+
         private readonly TabConfigurationFlipViewModel _tabConfigurationFlipViewModel;
 
         private readonly SearchFlipViewModel _searchFlipViewModel;
@@ -59,6 +62,11 @@ namespace StarryEyes.ViewModels
         public AccountSelectionFlipViewModel GlobalAccountSelectionFlipViewModel
         {
             get { return _globalAccountSelectionFlipViewModel; }
+        }
+
+        public SettingFlipViewModel SettingFlipViewModel
+        {
+            get { return _settingFlipViewModel; }
         }
 
         public TabConfigurationFlipViewModel TabConfigurationFlipViewModel
@@ -115,6 +123,7 @@ namespace StarryEyes.ViewModels
             CompositeDisposable.Add(_inputAreaViewModel = new InputAreaViewModel());
             CompositeDisposable.Add(_mainAreaViewModel = new MainAreaViewModel());
             CompositeDisposable.Add(_globalAccountSelectionFlipViewModel = new AccountSelectionFlipViewModel());
+            CompositeDisposable.Add(_settingFlipViewModel = new SettingFlipViewModel(this));
             CompositeDisposable.Add(_tabConfigurationFlipViewModel = new TabConfigurationFlipViewModel());
             CompositeDisposable.Add(_searchFlipViewModel = new SearchFlipViewModel());
             CompositeDisposable.Add(Observable.FromEvent<FocusRequest>(
@@ -376,12 +385,15 @@ namespace StarryEyes.ViewModels
             get { return _showSettingCommand ?? (_showSettingCommand = new Livet.Commands.ViewModelCommand(ShowSetting)); }
         }
 
-        public void ShowSetting()
+        public async void ShowSetting()
         {
+            MainWindowModel.SuppressKeyAssigns = true;
             MainWindowModel.SetShowMainWindowCommands(false);
-            // TODO: show settings.
+            await MainWindowModel.ShowSetting().DefaultIfEmpty(Unit.Default);
             MainWindowModel.SetShowMainWindowCommands(true);
+            MainWindowModel.SuppressKeyAssigns = false;
         }
+
         #endregion
     }
 }

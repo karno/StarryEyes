@@ -54,7 +54,7 @@ namespace StarryEyes.Models.Subsystems
                       });
             App.ApplicationFinalize += StopThread;
             Task.Factory.StartNew(UpdateStatisticWorkProc, TaskCreationOptions.LongRunning);
-            UpdateTweetCount();
+            Task.Run(() => UpdateTweetCount());
         }
 
         private static async Task UpdateTweetCount()

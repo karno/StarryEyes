@@ -21,10 +21,10 @@ namespace StarryEyes.Settings
         public string[] BindingHashtags { get; set; }
 
         [DataMember]
-        public bool IsShowUnreadCounts { get; set; }
+        public bool ShowUnreadCounts { get; set; }
 
         [DataMember]
-        public bool IsNotifyNewArrivals { get; set; }
+        public bool NotifyNewArrivals { get; set; }
 
         [DataMember]
         public string Query { get; set; }
@@ -36,8 +36,8 @@ namespace StarryEyes.Settings
         public TabDescription(TabModel model)
         {
             this.Name = model.Name;
-            this.IsShowUnreadCounts = model.IsShowUnreadCounts;
-            this.IsNotifyNewArrivals = model.IsNotifyNewArrivals;
+            this.ShowUnreadCounts = model.ShowUnreadCounts;
+            this.NotifyNewArrivals = model.NotifyNewArrivals;
             this.BindingAccountIds = model.BindingAccounts.ToArray();
             this.BindingHashtags = model.BindingHashtags.ToArray();
             this.Query = model.FilterQuery != null ? model.FilterQuery.ToQuery() : null;
@@ -60,8 +60,8 @@ namespace StarryEyes.Settings
                  Name = Name,
                  FilterQuery = filter,
                  BindingHashtags = this.BindingHashtags,
-                 IsNotifyNewArrivals = this.IsNotifyNewArrivals,
-                 IsShowUnreadCounts = this.IsShowUnreadCounts
+                 NotifyNewArrivals = this.NotifyNewArrivals,
+                 ShowUnreadCounts = this.ShowUnreadCounts
              };
             this.BindingAccountIds.ForEach(model.BindingAccounts.Add);
             return model;

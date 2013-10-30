@@ -26,8 +26,8 @@ namespace StarryEyes.Models.Timelines.Tabs
             {
                 Name = name,
                 FilterQuery = query != null ? QueryCompiler.Compile(query) : null,
-                IsShowUnreadCounts = true,
-                IsNotifyNewArrivals = true
+                ShowUnreadCounts = true,
+                NotifyNewArrivals = true
             };
             var cf = TabManager.CurrentFocusTab;
             if (cf != null)
@@ -121,9 +121,9 @@ namespace StarryEyes.Models.Timelines.Tabs
             TabManager.Save();
         }
 
-        public bool IsNotifyNewArrivals { get; set; }
+        public bool NotifyNewArrivals { get; set; }
 
-        public bool IsShowUnreadCounts { get; set; }
+        public bool ShowUnreadCounts { get; set; }
 
         public string NotifySoundSource { get; set; }
 
@@ -165,7 +165,7 @@ namespace StarryEyes.Models.Timelines.Tabs
             {
                 var handler = OnNewStatusArrival;
                 if (handler != null) handler(model.Status);
-                if (this.IsNotifyNewArrivals)
+                if (this.NotifyNewArrivals)
                 {
                     NotificationService.NotifyNewArrival(model.Status, this);
                 }

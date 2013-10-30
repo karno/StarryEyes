@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Threading;
 using Livet;
 using Livet.Commands;
+using Livet.EventListeners;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.Utils;
 using StarryEyes.Filters;
@@ -97,6 +98,15 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                     this.RetweetedOriginalModel.RetweetedUsers.ListenCollectionChanged()
                                           .Subscribe(_ => this.RaisePropertyChanged(() => this.IsRetweeted)));
             }
+
+            // listen settings
+            this.CompositeDisposable.Add(
+                new EventListener<Action<bool>>(
+                    h => Setting.AllowFavoriteMyself.ValueChanged += h,
+                    h => Setting.AllowFavoriteMyself.ValueChanged -= h,
+                    _ => this.RaisePropertyChanged(() => CanFavorite)));
+            // when account is added/removed, all timelines are regenerated.
+            // so, we don't have to listen any events which notify accounts addition/deletion.
 
             // resolve images
             var imgsubj = this.Model.ImagesSubject;
@@ -1004,7 +1014,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                 Title = "ツイート賞の授与",
             }));
             return;
-
+            /*
             if (!this.AssertQuickActionEnabled()) return;
             if (Setting.FavstarApiKey.Value == null)
             {
@@ -1036,7 +1046,6 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             if (response.Response.Result != TaskDialogSimpleResult.Ok) return;
             var accounts = this.GetImmediateAccounts()
                 .ToObservable();
-            /*
                 accounts.SelectMany(a => new FavstarTrophyOperation(a, this.Status).Run())
                         .Do(_ => this.RaisePropertyChanged(() => this.IsFavorited))
                         .Subscribe();

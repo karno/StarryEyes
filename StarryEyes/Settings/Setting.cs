@@ -79,9 +79,6 @@ namespace StarryEyes.Settings
         public static readonly SettingItem<string> GlobalConsumerSecret =
             new SettingItem<string>("GlobalConsumerSecret", null);
 
-        public static readonly SettingItemStruct<bool> IsBacktrackFallback =
-            new SettingItemStruct<bool>("IsBacktrackFallback", true);
-
         #endregion
 
         #region Timeline display and action
@@ -104,14 +101,17 @@ namespace StarryEyes.Settings
         public static readonly SettingItemStruct<bool> IsUrlAutoEscapeEnabled =
             new SettingItemStruct<bool>("IsUrlAutoEscapeEnabled", false);
 
-        public static readonly SettingItemStruct<bool> IsWarnAmendTweet =
-            new SettingItemStruct<bool>("IsWarnAmendTweet", true);
+        public static readonly SettingItemStruct<bool> WarnAmending =
+            new SettingItemStruct<bool>("WarnAmending", true);
 
-        public static readonly SettingItemStruct<bool> IsWarnReplyFromThirdAccount =
-            new SettingItemStruct<bool>("IsWarnReplyFromThirdAccount", true);
+        public static readonly SettingItemStruct<bool> WarnReplyFromThirdAccount =
+            new SettingItemStruct<bool>("WarnReplyFromThirdAccount", true);
 
         public static readonly SettingItemStruct<TweetBoxClosingAction> TweetBoxClosingAction =
             new SettingItemStruct<TweetBoxClosingAction>("TweetBoxClosingAction", Settings.TweetBoxClosingAction.Confirm);
+
+        public static readonly SettingItemStruct<bool> IsBacktrackFallback =
+            new SettingItemStruct<bool>("IsBacktrackFallback", true);
 
         public static readonly SettingItemStruct<bool> RestorePreviousStashed =
             new SettingItemStruct<bool>("RestorePreviousStashed", false);
@@ -137,16 +137,16 @@ namespace StarryEyes.Settings
 
         #region High-level configurations
 
-        public static readonly SettingItemStruct<bool> IsAcceptUnstableVersion =
-                    new SettingItemStruct<bool>("IsAcceptUnstableVersion", App.IsUnstableVersion);
+        public static readonly SettingItemStruct<bool> AcceptUnstableVersion =
+                    new SettingItemStruct<bool>("AcceptUnstableVersion", App.IsUnstableVersion);
 
         public static readonly SettingItem<string> UserAgent =
             new SettingItem<string>("UserAgent", "Krile StarryEyes/Breezy TL with ReactiveOAuth");
 
         #region Web proxy configuration
 
-        public static readonly SettingItemStruct<WebProxyConfiguration> UseWebProxy =
-            new SettingItemStruct<WebProxyConfiguration>("UseWebProxy", WebProxyConfiguration.Default);
+        public static readonly SettingItemStruct<WebProxyConfiguration> WebProxy =
+            new SettingItemStruct<WebProxyConfiguration>("WebProxy", WebProxyConfiguration.Default);
 
         public static readonly SettingItem<string> WebProxyHost =
             new SettingItem<string>("WebProxyHost", String.Empty);
@@ -154,8 +154,8 @@ namespace StarryEyes.Settings
         public static readonly SettingItemStruct<int> WebProxyPort =
             new SettingItemStruct<int>("WebProxyPort", 0);
 
-        public static readonly SettingItemStruct<bool> IsBypassWebProxyInLocal =
-            new SettingItemStruct<bool>("IsBypassWebProxyInLocal", false);
+        public static readonly SettingItemStruct<bool> BypassWebProxyInLocal =
+            new SettingItemStruct<bool>("BypassWebProxyInLocal", false);
 
         public static readonly SettingItem<string[]> WebProxyBypassList =
             new SettingItem<string[]>("WebProxyBypassList", null);
@@ -204,6 +204,9 @@ namespace StarryEyes.Settings
 
         public static readonly SettingItem<string> LastImageOpenDir =
             new SettingItem<string>("LastImageOpenDir", Environment.GetFolderPath(Environment.SpecialFolder.MyPictures));
+
+        public static readonly SettingItemStruct<int> SettingVersion =
+            new SettingItemStruct<int>("SettingVersion", 1);
 
         #endregion
 

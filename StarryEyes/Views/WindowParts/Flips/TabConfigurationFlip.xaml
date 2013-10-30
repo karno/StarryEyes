@@ -1,7 +1,7 @@
 ﻿<UserControl x:Class="StarryEyes.Views.WindowParts.Flips.TabConfigurationFlip"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:Controls="clr-namespace:StarryEyes.Views.Controls"
+             xmlns:controls="clr-namespace:StarryEyes.Views.Controls"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
              xmlns:flips="clr-namespace:StarryEyes.Views.WindowParts.Flips"
@@ -87,7 +87,7 @@
                         <Hyperlink Command="{Binding OpenQueryReferenceCommand}">Krile Queryのヘルプ...</Hyperlink>
                     </TextBlock>
                 </Grid>
-                <Controls:QueryEditor Grid.Row="1"
+                <controls:QueryEditor Grid.Row="1"
                                       Background="#FFF0F0F0"
                                       QueryText="{Binding QueryString,
                                                           Mode=TwoWay}" />
