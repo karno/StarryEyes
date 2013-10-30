@@ -98,14 +98,18 @@ namespace StarryEyes.Models.Subsystems
             }
         }
 
-        internal static void StartUpdate()
+        internal static void StartUpdate(Version version)
         {
             try
             {
-                var ver = App.Version.ToString(3);
-                if (Setting.IsAcceptUnstableVersion.Value)
+                var ver = "0.0.0";
+                if (version != null)
                 {
-                    ver = App.Version.ToString(4);
+                    ver = version.ToString(3);
+                    if (Setting.IsAcceptUnstableVersion.Value)
+                    {
+                        ver = App.Version.ToString(4);
+                    }
                 }
                 var pubkey = Path.Combine(App.ExeFileDir, App.PublicKeyFile);
                 var dest = App.ExeFileDir;
@@ -148,8 +152,9 @@ namespace StarryEyes.Models.Subsystems
                 try
                 {
                     Directory.Delete(App.LocalUpdateStorePath, true);
+                    break;
                 }
-                catch (IOException)
+                catch (Exception)
                 {
                     if (retryCount > 10)
                     {

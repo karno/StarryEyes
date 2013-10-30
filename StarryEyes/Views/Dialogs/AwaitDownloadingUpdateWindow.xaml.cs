@@ -30,7 +30,7 @@ namespace StarryEyes.Views.Dialogs
                 this.Close();
                 return;
             }
-            AutoUpdateService.StartUpdate();
+            AutoUpdateService.StartUpdate(null);
             this.Close();
         }
     }

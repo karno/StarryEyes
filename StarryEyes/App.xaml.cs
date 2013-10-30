@@ -114,19 +114,13 @@ namespace StarryEyes
             Current.DispatcherUnhandledException += (sender2, e2) => HandleException(e2.Exception);
             AppDomain.CurrentDomain.UnhandledException += (sender2, e2) => HandleException(e2.ExceptionObject as Exception);
 
-            #region execute update or clean up update binary
+            #region clean up update binary
             if (e.Args.Select(a => a.ToLower()).Contains("-postupdate"))
             {
                 // remove kup.exe
                 AutoUpdateService.PostUpdate();
             }
 
-            if (AutoUpdateService.IsUpdateBinaryExisted())
-            {
-                // execute update
-                AutoUpdateService.StartUpdate();
-                Environment.Exit(0);
-            }
             #endregion
 
             #region check and show pre-execute dialog
@@ -179,6 +173,18 @@ namespace StarryEyes
                 Current.Shutdown();
                 Environment.Exit(0);
             }
+
+            #region Execute update
+
+            // requires settings
+            if (AutoUpdateService.IsUpdateBinaryExisted())
+            {
+                // execute update
+                AutoUpdateService.StartUpdate(App.Version);
+                Environment.Exit(0);
+            }
+
+            #endregion
 
             // set parameters for accessing twitter.
             Networking.Initialize();

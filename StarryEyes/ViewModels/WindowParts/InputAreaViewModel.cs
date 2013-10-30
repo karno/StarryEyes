@@ -682,6 +682,7 @@ namespace StarryEyes.ViewModels.WindowParts
             var hashtags = TwitterRegexPatterns.ValidHashtag.Matches(InputText)
                                                .OfType<Match>()
                                                .Select(_ => _.Groups[1].Value)
+                                               .Where(s => !String.IsNullOrEmpty(s))
                                                .Distinct()
                                                .Except(BindingHashtags.Select(_ => _.Hashtag))
                                                .ToArray();
