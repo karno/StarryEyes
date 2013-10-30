@@ -146,7 +146,6 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             }
         }
 
-        private const string QueryReferenceUri = "https://github.com/karno/StarryEyes/wiki";
         #region OpenQueryReferenceCommand
         private Livet.Commands.ViewModelCommand _openQueryReferenceCommand;
 
@@ -164,7 +163,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public void OpenQueryReference()
         {
-            BrowserHelper.Open(QueryReferenceUri);
+            BrowserHelper.Open(App.QueryReferenceUrl);
         }
         #endregion
 

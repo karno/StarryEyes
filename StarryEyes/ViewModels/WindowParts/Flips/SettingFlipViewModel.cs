@@ -167,6 +167,22 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         #endregion
 
+        #region Timeline property
+
+        public bool IsAllowFavoriteMyself
+        {
+            get { return Setting.AllowFavoriteMyself.Value; }
+            set { Setting.AllowFavoriteMyself.Value = value; }
+        }
+
+        public int ScrollLockStrategy
+        {
+            get { return (int)Setting.ScrollLockStrategy.Value; }
+            set { Setting.ScrollLockStrategy.Value = (ScrollLockStrategy)value; }
+        }
+
+        #endregion
+
         #region Mute filter editor property
 
         private
@@ -228,25 +244,30 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         {
             _currentQueryString = Setting.Muteds.Value.ToQuery();
             _lastCommit = null;
+            FoundError = false;
             this.RaisePropertyChanged(() => QueryString);
         }
 
+        #region OpenQueryReferenceCommand
+        private Livet.Commands.ViewModelCommand _openQueryReferenceCommand;
+
+        public Livet.Commands.ViewModelCommand OpenQueryReferenceCommand
+        {
+            get
+            {
+                if (this._openQueryReferenceCommand == null)
+                {
+                    this._openQueryReferenceCommand = new Livet.Commands.ViewModelCommand(OpenQueryReference);
+                }
+                return this._openQueryReferenceCommand;
+            }
+        }
+
+        public void OpenQueryReference()
+        {
+            BrowserHelper.Open(App.QueryReferenceUrl);
+        }
         #endregion
-
-        #region Timeline property
-
-        public bool IsAllowFavoriteMyself
-        {
-            get { return Setting.AllowFavoriteMyself.Value; }
-            set { Setting.AllowFavoriteMyself.Value = value; }
-        }
-
-        public ScrollLockStrategy ScrollLockStrategy
-        {
-            get { return Setting.ScrollLockStrategy.Value; }
-            set { Setting.ScrollLockStrategy.Value = value; }
-        }
-
         #endregion
 
         #region Input property

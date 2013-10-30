@@ -72,7 +72,6 @@
                            Text="Setting"
                            TextWrapping="Wrap" />
             </Grid>
-
             <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
@@ -81,7 +80,7 @@
                 <ListBox x:Name="SettingCategories"
                          Width="180"
                          HorizontalContentAlignment="Stretch"
-                         SelectedIndex="0">
+                         SelectedIndex="2">
                     <ListBox.Resources>
                         <Style TargetType="{x:Type ListBoxItem}">
                             <Setter Property="Margin" Value="0" />
@@ -142,7 +141,7 @@
                     <clr:String>プロキシー</clr:String>
                     <clr:String>高度な設定</clr:String>
                 </ListBox>
-                <Grid Grid.Column="1">
+                <Grid Grid.Column="1" Margin="0,6,0,0">
                     <Grid.Style>
                         <Style TargetType="Grid">
                             <Setter Property="Visibility" Value="Collapsed" />
@@ -298,8 +297,109 @@
                         </Button>
                     </DockPanel>
                 </Grid>
+                <Grid Grid.Column="1" Margin="0,6,0,0">
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ElementName=SettingCategories, Path=SelectedIndex}" Value="1">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <StackPanel Margin="16,0" Orientation="Vertical">
+                        <CheckBox Margin="0,0,0,8"
+                                  VerticalAlignment="Top"
+                                  Content="自分自身をお気に入り登録できるようにする(_F)"
+                                  IsChecked="{Binding IsAllowFavoriteMyself}" />
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Margin="2,0,6,0"
+                                       VerticalAlignment="Center"
+                                       Text="タイムラインのスクロールロック:" />
+                            <ComboBox SelectedIndex="{Binding ScrollLockStrategy, Mode=TwoWay}">
+                                <clr:String>ロックしない</clr:String>
+                                <clr:String>常にロック</clr:String>
+                                <clr:String>明示的にロック(実装されていません)</clr:String>
+                                <clr:String>スクロールしていたらロック</clr:String>
+                                <clr:String>タイムライン上にマウスがあるときにロック</clr:String>
+                            </ComboBox>
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+                <Grid Grid.Column="1" Margin="0,6,0,0">
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ElementName=SettingCategories, Path=SelectedIndex}" Value="2">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid Margin="16,0" Background="#FFF0F0F0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Margin="24,0"
+                                   HorizontalAlignment="Left"
+                                   VerticalAlignment="Center"
+                                   Text="ミュート クエリの編集" />
+                        <TextBlock Margin="8,8,8,4" HorizontalAlignment="Right">
+                            <Hyperlink Command="{Binding OpenQueryReferenceCommand}">Krile Queryのヘルプ...</Hyperlink>
+                        </TextBlock>
+                        <Button Grid.Column="1"
+                                HorizontalAlignment="Right"
+                                Content="編集をリセット"
+                                Style="{StaticResource MetroSquareButtonStyle}">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="Click">
+                                    <ei:CallMethodAction MethodName="ResetFilter" TargetObject="{Binding}" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </Button>
+                    </Grid>
+                    <controls:QueryEditor Grid.Row="1"
+                                          Margin="16,0"
+                                          Background="#FFF0F0F0"
+                                          QueryText="{Binding QueryString,
+                                                              Mode=TwoWay}" />
+                    <TextBlock Grid.Row="2"
+                               Margin="16,0"
+                               Background="#60E51400"
+                               Padding="4"
+                               Text="{Binding ExceptionMessage}"
+                               Visibility="{Binding FoundError,
+                                                    Converter={StaticResource BoolVisibleConveter}}" />
+                    <TextBlock Grid.Row="3"
+                               Margin="16,0,16,16"
+                               VerticalAlignment="Top"
+                               Foreground="White"
+                               Padding="4"
+                               TextWrapping="Wrap">
+                        <TextBlock.Style>
+                            <Style TargetType="{x:Type TextBlock}">
+                                <Setter Property="Background" Value="#FF1BA1E2" />
+                                <Setter Property="Text" Value="クエリを正しく解析できました。" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding FoundError}" Value="True">
+                                        <Setter Property="Background" Value="#FFE51400" />
+                                        <Setter Property="Text" Value="クエリにエラーが存在します。(現在の結果は反映されません)" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Grid>
             </Grid>
-
         </Grid>
     </flips:FlipContent>
 </UserControl>
