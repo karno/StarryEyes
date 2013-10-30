@@ -467,11 +467,21 @@ namespace StarryEyes.Settings
 
         public static void Save()
         {
-            using (var fs = File.Open(App.ConfigurationFilePath, FileMode.Create, FileAccess.ReadWrite))
+            lock (_settingValueHolder)
             {
-                // sort by key
-                var sd = new SortedDictionary<string, object>(_settingValueHolder);
-                XamlServices.Save(fs, sd);
+                try
+                {
+                    using (var fs = File.Open(App.ConfigurationFilePath, FileMode.Create, FileAccess.ReadWrite))
+                    {
+                        // sort by key
+                        var sd = new SortedDictionary<string, object>(_settingValueHolder);
+                        XamlServices.Save(fs, sd);
+                    }
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    // could not write.
+                }
             }
         }
 
