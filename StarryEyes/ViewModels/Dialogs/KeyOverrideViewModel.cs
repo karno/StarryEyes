@@ -60,6 +60,19 @@ namespace StarryEyes.ViewModels.Dialogs
 
         public void CheckAuthorize()
         {
+            if (OverrideConsumerKey == App.ConsumerKey)
+            {
+                this.Messenger.Raise(new TaskDialogMessage(
+                    new TaskDialogOptions
+                    {
+                        Title = "キー設定エラー",
+                        MainIcon = VistaTaskDialogIcon.Error,
+                        MainInstruction = "このキーは設定できません。",
+                        Content = "APIキーくらい横着しないで自分で取得しろ",
+                        CommonButtons = TaskDialogCommonButtons.Close
+                    }));
+                return;
+            }
             if (IsKeyChecking) return;
             IsKeyChecking = true;
             var authorizer = new OAuthAuthorizer(OverrideConsumerKey, OverrideConsumerSecret);
@@ -67,25 +80,26 @@ namespace StarryEyes.ViewModels.Dialogs
                 () => authorizer.GetRequestToken(AuthorizationViewModel.RequestTokenEndpoint).ToObservable())
                       .Retry(3, TimeSpan.FromSeconds(3))
                       .Finally(() => IsKeyChecking = false)
-                      .Subscribe(_ =>
-                      {
-                          Setting.GlobalConsumerKey.Value = this.OverrideConsumerKey;
-                          Setting.GlobalConsumerSecret.Value = this.OverrideConsumerSecret;
-                          UpdateEndpointKey();
-                          this.Messenger.Raise(new WindowActionMessage(WindowAction.Close));
-                      },
-                                 ex => this.Messenger.Raise(
-                                     new TaskDialogMessage(
-                                         new TaskDialogOptions
-                                         {
-                                             Title = "OAuth認証エラー",
-                                             MainIcon = VistaTaskDialogIcon.Error,
-                                             MainInstruction = "API Keyの正当性を確認できませんでした。",
-                                             Content = "キーの入力を確認し、再度お試しください。",
-                                             CommonButtons = TaskDialogCommonButtons.Close,
-                                             FooterIcon = VistaTaskDialogIcon.Information,
-                                             FooterText = "Twitterの調子が悪いときやコンピュータの時計が大幅にずれている場合も認証が行えないことがあります。"
-                                         })));
+                      .Subscribe(
+                          _ =>
+                          {
+                              Setting.GlobalConsumerKey.Value = this.OverrideConsumerKey;
+                              Setting.GlobalConsumerSecret.Value = this.OverrideConsumerSecret;
+                              UpdateEndpointKey();
+                              this.Messenger.Raise(new WindowActionMessage(WindowAction.Close));
+                          },
+                          ex => this.Messenger.Raise(
+                              new TaskDialogMessage(
+                                  new TaskDialogOptions
+                                  {
+                                      Title = "OAuth認証エラー",
+                                      MainIcon = VistaTaskDialogIcon.Error,
+                                      MainInstruction = "API Keyの正当性を確認できませんでした。",
+                                      Content = "キーの入力を確認し、再度お試しください。",
+                                      CommonButtons = TaskDialogCommonButtons.Close,
+                                      FooterIcon = VistaTaskDialogIcon.Information,
+                                      FooterText = "Twitterの調子が悪いときやコンピュータの時計が大幅にずれている場合も認証が行えないことがあります。"
+                                  })));
         }
 
         public void SkipAuthorize()

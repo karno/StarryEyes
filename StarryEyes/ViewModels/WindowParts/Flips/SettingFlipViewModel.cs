@@ -118,7 +118,8 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         public void AddNewAccount()
         {
             if (Setting.Accounts.Collection.Count >= 2 &&
-                (Setting.GlobalConsumerKey.Value == null || Setting.GlobalConsumerSecret.Value == null))
+                (Setting.GlobalConsumerKey.Value == null || Setting.GlobalConsumerSecret.Value == null) ||
+                Setting.GlobalConsumerKey.Value == App.ConsumerKey)
             {
                 _parent.Messenger.RaiseAsync(
                     new TaskDialogMessage(new TaskDialogOptions
