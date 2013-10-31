@@ -389,9 +389,9 @@ namespace StarryEyes
 
         public const string AppFullName = "Krile STARRYEYES";
 
-        internal static readonly string ConsumerKey = "HzbATXmr3JpNXRPDNtkXww";
+        internal static readonly string ConsumerKey = "oReH15myW0cPq7pHNvAMGw";
 
-        internal static readonly string ConsumerSecret = "BfBH1h68S45X4kAlVdJAoopbEIEyF43kaRQe1vC2po";
+        internal static readonly string ConsumerSecret = "0BkDivB4cqdkKaTmXc8j2urtH9C4xApJBKZFvlb9dec";
 
         public static bool IsOperatingSystemSupported
         {
