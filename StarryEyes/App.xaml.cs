@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Configuration;
+using System.Data.SQLite;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -174,6 +175,29 @@ namespace StarryEyes
                 Environment.Exit(0);
             }
 
+            if (Setting.DatabaseErrorOccured.Value)
+            {
+                var result = TaskDialog.Show(new TaskDialogOptions
+                {
+                    Title = "データベース エラーの検出",
+                    MainIcon = VistaTaskDialogIcon.Warning,
+                    MainInstruction = "データベースでエラーが検出されています。",
+                    Content = "データベースを初期化するまでエラーが継続することがあります。" + Environment.NewLine +
+                              "何度起動しても落ちてしまう場合、データベースを削除すると改善することがあります。。" + Environment.NewLine +
+                              "データベースを初期化しますか？",
+                    CommonButtons = TaskDialogCommonButtons.YesNo,
+                    DefaultButtonIndex = 1
+                });
+                if (result.Result == TaskDialogSimpleResult.Yes)
+                {
+                    if (File.Exists(DatabaseFilePath))
+                    {
+                        File.Delete(DatabaseFilePath);
+                    }
+                }
+                Setting.DatabaseErrorOccured.Value = false;
+            }
+
             #region Execute update
 
             // requires settings
@@ -337,6 +361,12 @@ namespace StarryEyes
         {
             try
             {
+                if (ex is SQLiteException)
+                {
+                    // database error
+                    Setting.DatabaseErrorOccured.Value = true;
+                }
+
                 // TODO:ロギング処理など
                 Debug.WriteLine("##### SYSTEM CRASH! #####");
                 Debug.WriteLine(ex.ToString());
