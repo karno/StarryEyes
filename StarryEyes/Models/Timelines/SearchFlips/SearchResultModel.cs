@@ -149,7 +149,7 @@ namespace StarryEyes.Models.Timelines.SearchFlips
                     var ctf = ctab != null ? ctab.FilterQuery : null;
                     if (_option == SearchOption.CurrentTab && ctf != null)
                     {
-                        return ctf.ToQuery() + " and " + query;
+                        return ctf.ToQuery() + " && " + query;
                     }
                     return "where " + query;
                 case SearchOption.Query:
