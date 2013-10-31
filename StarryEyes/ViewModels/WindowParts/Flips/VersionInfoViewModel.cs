@@ -17,7 +17,8 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public VersionInfoViewModel()
         {
-            AutoUpdateService.UpdateStateChanged += this.CheckUpdates;
+            // when update is available, callback this.
+            AutoUpdateService.UpdateStateChanged += () => _isUpdateAvailable = true;
             Observable.Timer(TimeSpan.FromSeconds(0), TimeSpan.FromHours(8))
                       .Subscribe(_ => UpdateContributors());
             Task.Run(() => this.CheckUpdates());
@@ -128,7 +129,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         {
             _isChecking = true;
             this.RefreshCheckState();
-            _isUpdateAvailable = await AutoUpdateService.PrepareUpdate(App.Version);
+            _isUpdateAvailable = await AutoUpdateService.CheckPrepareUpdate(App.Version);
             _isChecking = false;
             this.RefreshCheckState();
         }

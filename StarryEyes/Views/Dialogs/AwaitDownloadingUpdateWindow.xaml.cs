@@ -17,7 +17,7 @@ namespace StarryEyes.Views.Dialogs
 
         async void AwaitDownloadingUpdateWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            if (!await AutoUpdateService.PrepareUpdate(null))
+            if (!await AutoUpdateService.CheckPrepareUpdate(null))
             {
                 TaskDialog.Show(new TaskDialogOptions
                 {

@@ -34,8 +34,11 @@ namespace StarryEyes.Models.Subsystems
             return File.Exists(ExecutablePath);
         }
 
-        public static async Task<bool> CheckUpdate(Version version)
+        private static int incl = 0;
+
+        private static async Task<bool> CheckUpdate(Version version)
         {
+            incl++;
             if (IsUpdateBinaryExisted()) return true;
             try
             {
@@ -57,8 +60,6 @@ namespace StarryEyes.Models.Subsystems
                                      .FirstOrDefault();
                 if (version != null && latest > version)
                 {
-                    var handler = UpdateStateChanged;
-                    if (handler != null) handler();
                     return true;
                 }
             }
@@ -70,7 +71,7 @@ namespace StarryEyes.Models.Subsystems
             return false;
         }
 
-        internal static async Task<bool> PrepareUpdate(Version version)
+        internal static async Task<bool> CheckPrepareUpdate(Version version)
         {
             if (!await CheckUpdate(version))
             {
@@ -94,6 +95,8 @@ namespace StarryEyes.Models.Subsystems
                     }
                     File.WriteAllBytes(ExecutablePath, patcher);
                 }
+                var handler = UpdateStateChanged;
+                if (handler != null) handler();
                 return true;
             }
             catch (Exception ex)
@@ -195,7 +198,7 @@ namespace StarryEyes.Models.Subsystems
             Observable.Timer(TimeSpan.FromHours(next))
                       .Subscribe(async _ =>
                       {
-                          if (await PrepareUpdate(App.Version))
+                          if (await CheckPrepareUpdate(App.Version))
                           {
                               BackstageModel.RegisterEvent(new UpdateAvailableEvent());
                           }
