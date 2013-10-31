@@ -41,7 +41,7 @@ namespace SweetMagic
         public async Task StartUpdate(CancellationToken ctoken)
         {
             this.NotifyProgress("Requesting update patch definition...");
-            var dlstr = await this.DownloadString("http://krile.starwing.net/shared/update.xml", Encoding.UTF8);
+            var dlstr = await this.DownloadString("http://krile.starwing.net/shared/update2.xml", Encoding.UTF8);
             this.NotifyProgress("patch definition: " + dlstr.Length + " bytes.");
             this.NotifyProgress("loading definition...", false);
             var pack = ReleasePack.Parse(dlstr);

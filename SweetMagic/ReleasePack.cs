@@ -30,7 +30,7 @@ namespace SweetMagic
             // get differential patches
             var patches = Releases.OrderBy(r => r.Version)
                                   .SkipWhile(r => r.Version <= currentVersion)
-                                  .Where(p => acceptPreviewVersion || p.Version.Revision == 0) // check release channel
+                                  .Where(p => acceptPreviewVersion || p.Version.Revision <= 0) // check release channel
                                   .ToArray();
             if (patches.Any(p => p.IsMilestone))
             {
