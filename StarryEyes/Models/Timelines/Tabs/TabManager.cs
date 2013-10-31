@@ -298,6 +298,7 @@ namespace StarryEyes.Models.Timelines.Tabs
         /// </summary>
         public static void ReviveTab()
         {
+            if (_closedTabsStack.Count == 0) return;
             var ti = _closedTabsStack.Pop();
             CreateTab(ti);
         }
