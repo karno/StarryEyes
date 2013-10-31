@@ -528,7 +528,7 @@ namespace StarryEyes
             get
             {
                 var basestr = Version.ToString(3);
-                if (Version.Revision >= 0)
+                if (Version.Revision > 0)
                 {
                     return basestr + " Rev." + Version.Revision;
                 }
