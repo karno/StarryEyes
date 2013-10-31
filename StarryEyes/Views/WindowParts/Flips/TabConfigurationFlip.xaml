@@ -17,7 +17,7 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.AnimatedTabControl.xaml" />
                 <ResourceDictionary Source="/Themes/FlipContent.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <utils:BooleanToVisibleConverter x:Key="BoolVisibleConveter" />
+            <utils:BooleanToVisibleConverter x:Key="BoolVisibleConverter" />
         </ResourceDictionary>
     </UserControl.Resources>
     <flips:FlipContent IsOpen="{Binding IsConfigurationActive}"
@@ -97,7 +97,7 @@
                            Padding="4"
                            Text="{Binding ExceptionMessage}"
                            Visibility="{Binding FoundError,
-                                                Converter={StaticResource BoolVisibleConveter}}" />
+                                                Converter={StaticResource BoolVisibleConverter}}" />
                 <TextBlock Grid.Row="3"
                            VerticalAlignment="Top"
                            Foreground="White"

@@ -25,7 +25,7 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.AnimatedTabControl.xaml" />
                 <ResourceDictionary Source="/Themes/FlipContent.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <utils:BooleanToVisibleConverter x:Key="BoolVisibleConveter" />
+            <utils:BooleanToVisibleConverter x:Key="BoolVisibleConverter" />
         </ResourceDictionary>
     </UserControl.Resources>
     <flips:FlipContent IsOpen="{Binding IsConfigurationActive}"
@@ -154,9 +154,7 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                    <Border Margin="16,0"
-                            BorderBrush="DimGray"
-                            BorderThickness="1">
+                    <Border Margin="16,0" BorderThickness="0">
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <ItemsControl AllowDrop="True" ItemsSource="{Binding Accounts}">
                                 <i:Interaction.Behaviors>
@@ -164,104 +162,108 @@
                                 </i:Interaction.Behaviors>
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate DataType="{x:Type vmp:TwitterAccountConfigurationViewModel}">
-                                        <Grid>
+                                        <Grid Margin="0,0,0,16">
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="Auto" />
                                                 <RowDefinition />
                                             </Grid.RowDefinitions>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto" />
-                                                <ColumnDefinition />
-                                            </Grid.ColumnDefinitions>
-                                            <controls:LazyImage Grid.RowSpan="2"
-                                                                Width="73"
-                                                                Height="73"
-                                                                Margin="8,4,4,4"
-                                                                VerticalAlignment="Top"
-                                                                DecodePixelWidth="73"
-                                                                UriSource="{Binding ProfileImage}">
-                                                <i:Interaction.Behaviors>
-                                                    <behaviors:DragStartBehavior AllowedEffects="Move" DragDropData="{Binding}" />
-                                                </i:Interaction.Behaviors>
-                                            </controls:LazyImage>
-                                            <TextBlock Grid.Column="1"
-                                                       Margin="8,4,0,4"
-                                                       HorizontalAlignment="Left"
-                                                       VerticalAlignment="Top"
-                                                       FontSize="18"
-                                                       Text="{Binding ScreenName,
-                                                                      FallbackValue=USER NAME}"
-                                                       TextWrapping="Wrap" />
-                                            <Button Grid.Column="1"
-                                                    HorizontalAlignment="Right"
-                                                    VerticalAlignment="Stretch"
-                                                    Background="#FFE51400"
-                                                    Content="このアカウントを削除"
-                                                    Foreground="White"
-                                                    Padding="8,0"
-                                                    Style="{StaticResource MetroSquareButtonStyle}">
-                                                <i:Interaction.Triggers>
-                                                    <i:EventTrigger EventName="Click">
-                                                        <ei:CallMethodAction MethodName="Deauthorize" TargetObject="{Binding Mode=OneWay}" />
-                                                    </i:EventTrigger>
-                                                </i:Interaction.Triggers>
-                                            </Button>
-                                            <StackPanel Grid.Row="1"
-                                                        Grid.RowSpan="2"
-                                                        Grid.Column="1"
-                                                        Grid.ColumnSpan="2"
-                                                        Height="Auto"
-                                                        Margin="4,0,0,0"
-                                                        HorizontalAlignment="Stretch"
+                                            <Grid Background="#FF1BA1E2">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <controls:LazyImage Width="42"
+                                                                    Height="42"
+                                                                    VerticalAlignment="Center"
+                                                                    DecodePixelWidth="42"
+                                                                    RenderOptions.BitmapScalingMode="HighQuality"
+                                                                    UriSource="{Binding ProfileImage}">
+                                                    <i:Interaction.Behaviors>
+                                                        <behaviors:DragStartBehavior AllowedEffects="Move" DragDropData="{Binding}" />
+                                                    </i:Interaction.Behaviors>
+                                                </controls:LazyImage>
+                                                <TextBlock Grid.Column="1"
+                                                           Margin="12,0,8,0"
+                                                           HorizontalAlignment="Left"
+                                                           VerticalAlignment="Center"
+                                                           FontSize="18"
+                                                           Foreground="White"
+                                                           Text="{Binding ScreenName,
+                                                                          FallbackValue=USER NAME}"
+                                                           TextWrapping="Wrap" />
+                                                <Button Grid.Column="2"
+                                                        HorizontalAlignment="Right"
                                                         VerticalAlignment="Stretch"
-                                                        Background="Gainsboro"
-                                                        Orientation="Vertical">
-                                                <DockPanel Margin="4" Visibility="{Binding CanFallback}">
-                                                    <CheckBox Margin="0,0,4,0"
-                                                              VerticalAlignment="Center"
-                                                              Content="POST規制時にフォールバック"
-                                                              IsChecked="{Binding IsFallbackEnabled}" />
-                                                    <CheckBox Margin="4"
-                                                              Content="お気に入りもフォールバック"
-                                                              DockPanel.Dock="Right"
-                                                              IsChecked="{Binding FallbackFavorites}"
-                                                              Visibility="{Binding IsFallbackEnabled,
-                                                                                   Converter={StaticResource BoolVisibleConveter}}" />
-                                                    <ComboBox ItemsSource="{Binding Accounts}"
-                                                              SelectedItem="{Binding FallbackAccount}"
-                                                              Visibility="{Binding IsFallbackEnabled,
-                                                                                   Converter={StaticResource BoolVisibleConveter}}">
-                                                        <ComboBox.ItemTemplate>
-                                                            <DataTemplate>
-                                                                <StackPanel Orientation="Horizontal">
-                                                                    <controls:LazyImage Width="16"
-                                                                                        Height="16"
-                                                                                        UriSource="{Binding ProfileImageUri}" />
-                                                                    <TextBlock Text="{Binding ScreenName}" />
-                                                                </StackPanel>
-                                                            </DataTemplate>
-                                                        </ComboBox.ItemTemplate>
-                                                    </ComboBox>
-                                                </DockPanel>
-                                                <StackPanel Orientation="Horizontal">
-                                                    <CheckBox Margin="4"
-                                                              Content="ツイートをリアルタイムに受信する[推奨]"
-                                                              IsChecked="{Binding IsUserStreamsEnabled}" />
-                                                    <CheckBox Margin="4,4,4,4"
-                                                              Content="他人へのリプライを受信する"
-                                                              IsChecked="{Binding ReceiveRepliesAll}"
-                                                              Visibility="{Binding IsUserStreamsEnabled,
-                                                                                   Converter={StaticResource BoolVisibleConveter}}" />
-                                                    <CheckBox Margin="4,4,4,4"
-                                                              Content="他人のアクティビティを受信する"
-                                                              IsChecked="{Binding ReceiveFollowingsActivity}"
-                                                              Visibility="{Binding IsUserStreamsEnabled,
-                                                                                   Converter={StaticResource BoolVisibleConveter}}" />
+                                                        Background="#FFE51400"
+                                                        Content="このアカウントを削除"
+                                                        Foreground="White"
+                                                        Padding="8,0"
+                                                        Style="{StaticResource MetroSquareButtonStyle}">
+                                                    <i:Interaction.Triggers>
+                                                        <i:EventTrigger EventName="Click">
+                                                            <ei:CallMethodAction MethodName="Deauthorize" TargetObject="{Binding Mode=OneWay}" />
+                                                        </i:EventTrigger>
+                                                    </i:Interaction.Triggers>
+                                                </Button>
+                                            </Grid>
+                                            <Border Grid.Row="1"
+                                                    Grid.RowSpan="1"
+                                                    Grid.Column="0"
+                                                    Grid.ColumnSpan="1"
+                                                    Height="Auto"
+                                                    HorizontalAlignment="Stretch"
+                                                    VerticalAlignment="Stretch"
+                                                    BorderBrush="#FF1BA1E2"
+                                                    BorderThickness="1,0,1,1">
+                                                <StackPanel Background="{x:Null}" Orientation="Vertical">
+                                                    <DockPanel Margin="8,8,8,4" Visibility="{Binding CanFallback}">
+                                                        <CheckBox Margin="0,0,4,0"
+                                                                  VerticalAlignment="Center"
+                                                                  Content="POST規制時にフォールバック"
+                                                                  IsChecked="{Binding IsFallbackEnabled}" />
+                                                        <CheckBox Margin="4"
+                                                                  Content="お気に入りもフォールバック"
+                                                                  DockPanel.Dock="Right"
+                                                                  IsChecked="{Binding FallbackFavorites}"
+                                                                  Visibility="{Binding IsFallbackEnabled,
+                                                                                       Converter={StaticResource BoolVisibleConverter}}" />
+                                                        <ComboBox ItemsSource="{Binding Accounts}"
+                                                                  SelectedItem="{Binding FallbackAccount}"
+                                                                  Visibility="{Binding IsFallbackEnabled,
+                                                                                       Converter={StaticResource BoolVisibleConverter}}">
+                                                            <ComboBox.ItemTemplate>
+                                                                <DataTemplate>
+                                                                    <StackPanel Orientation="Horizontal">
+                                                                        <controls:LazyImage Width="16"
+                                                                                            Height="16"
+                                                                                            UriSource="{Binding ProfileImageUri}" />
+                                                                        <TextBlock Text="{Binding ScreenName}" />
+                                                                    </StackPanel>
+                                                                </DataTemplate>
+                                                            </ComboBox.ItemTemplate>
+                                                        </ComboBox>
+                                                    </DockPanel>
+                                                    <StackPanel Margin="8,4" Orientation="Horizontal">
+                                                        <CheckBox Margin="0,0,4,0"
+                                                                  Content="ツイートをリアルタイムに受信する[推奨]"
+                                                                  IsChecked="{Binding IsUserStreamsEnabled}" />
+                                                        <CheckBox Margin="4,0"
+                                                                  Content="他人へのリプライを受信する"
+                                                                  IsChecked="{Binding ReceiveRepliesAll}"
+                                                                  Visibility="{Binding IsUserStreamsEnabled,
+                                                                                       Converter={StaticResource BoolVisibleConverter}}" />
+                                                        <CheckBox Margin="4,0"
+                                                                  Content="他人のアクティビティを受信する"
+                                                                  IsChecked="{Binding ReceiveFollowingsActivity}"
+                                                                  Visibility="{Binding IsUserStreamsEnabled,
+                                                                                       Converter={StaticResource BoolVisibleConverter}}" />
+                                                    </StackPanel>
+                                                    <CheckBox Margin="8,4,8,8"
+                                                              Content="アップロードするメディアにSensitiveフラグを付ける"
+                                                              IsChecked="{Binding IsMarkMediaAsPossiblySensitive}" />
                                                 </StackPanel>
-                                                <CheckBox Margin="4"
-                                                          Content="アップロードするメディアにSensitiveフラグを付ける"
-                                                          IsChecked="{Binding IsMarkMediaAsPossiblySensitive}" />
-                                            </StackPanel>
+                                            </Border>
                                         </Grid>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
@@ -376,7 +378,7 @@
                                Padding="4"
                                Text="{Binding ExceptionMessage}"
                                Visibility="{Binding FoundError,
-                                                    Converter={StaticResource BoolVisibleConveter}}" />
+                                                    Converter={StaticResource BoolVisibleConverter}}" />
                     <TextBlock Grid.Row="3"
                                Margin="16,0,16,16"
                                VerticalAlignment="Top"
@@ -523,7 +525,7 @@
                                 <clr:String>利用するプロキシを指定する</clr:String>
                             </ComboBox>
                         </DockPanel>
-                        <GroupBox Header="プロキシ設定" Visibility="{Binding ExplicitSetProxy, Converter={StaticResource BoolVisibleConveter}}">
+                        <GroupBox Header="プロキシ設定" Visibility="{Binding ExplicitSetProxy, Converter={StaticResource BoolVisibleConverter}}">
                             <StackPanel Margin="8" Orientation="Vertical">
                                 <DockPanel Margin="0,4">
                                     <TextBlock VerticalAlignment="Center" Text="ホスト: " />

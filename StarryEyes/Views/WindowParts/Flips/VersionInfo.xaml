@@ -22,7 +22,8 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.AnimatedTabControl.xaml" />
                 <ResourceDictionary Source="/Themes/FlipContent.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <utils:BooleanToVisibleConverter x:Key="BoolVisibleConveter" />
+            <utils:BooleanToVisibleConverter x:Key="BoolVisibleConverter" />
+            <utils:BooleanToInvisibleConverter x:Key="BoolInvisibleConverter" />
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid Background="White">
@@ -2508,7 +2509,7 @@
                     Padding="4,0"
                     ToolTip="アップデートを確認しています..."
                     Visibility="{Binding IsChecking,
-                                         Converter={StaticResource BoolVisibleConveter}}">
+                                         Converter={StaticResource BoolVisibleConverter}}">
                 <StackPanel Margin="0,2" Orientation="Horizontal">
                     <Path Width="10"
                           Height="12"
@@ -2529,7 +2530,7 @@
                     Padding="4,2"
                     ToolTip="アップデートはありません。クリックするともう一度チェックします。"
                     Visibility="{Binding IsUpdateIsNotExisted,
-                                         Converter={StaticResource BoolVisibleConveter}}">
+                                         Converter={StaticResource BoolVisibleConverter}}">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="MouseLeftButtonDown">
                         <ei:CallMethodAction MethodName="CheckUpdates" TargetObject="{Binding}" />
@@ -2555,7 +2556,7 @@
                     Padding="4,2"
                     ToolTip="アップデートがあります。クリックするとインストールします..."
                     Visibility="{Binding IsUpdateExisted,
-                                         Converter={StaticResource BoolVisibleConveter}}">
+                                         Converter={StaticResource BoolVisibleConverter}}">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="MouseLeftButtonDown">
                         <ei:CallMethodAction MethodName="StartUpdate" TargetObject="{Binding}" />
@@ -2593,52 +2594,103 @@
             </Hyperlink>
             <Run Text="." />
         </TextBlock>
-        <StackPanel Grid.Row="3"
-                    Margin="0,4,0,0"
-                    HorizontalAlignment="Left"
-                    VerticalAlignment="Top">
-            <TextBlock HorizontalAlignment="Left"
-                       VerticalAlignment="Center"
-                       TextWrapping="Wrap"><Run Language="ja-jp" Text="Krile Series 3rd Product, Project &quot;StarryEyes&quot;" />
-            </TextBlock>
-            <TextBlock Margin="0,4,0,0" TextWrapping="Wrap">
-                <Hyperlink>
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="Click">
-                            <ei:CallMethodAction MethodName="OpenOfficial" TargetObject="{Binding}" />
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                    <Run Language="ja-jp" Text="http://krile.starwing.net/" />
-                </Hyperlink>
-            </TextBlock>
-            <TextBlock HorizontalAlignment="Left"
-                       VerticalAlignment="Top"
+        <Grid Grid.Row="3">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Row="0"
+                        Margin="0,4,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top">
+                <TextBlock HorizontalAlignment="Left"
+                           VerticalAlignment="Center"
+                           TextWrapping="Wrap">
+                    <Run Language="ja-jp" Text="Krile Series 3rd Product, Project &quot;StarryEyes&quot;" />
+                </TextBlock>
+                <TextBlock Margin="0,4,0,0" TextWrapping="Wrap">
+                    <Hyperlink>
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <ei:CallMethodAction MethodName="OpenOfficial" TargetObject="{Binding}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                        <Run Language="ja-jp" Text="http://krile.starwing.net/" />
+                    </Hyperlink>
+                </TextBlock>
+                <TextBlock HorizontalAlignment="Left"
+                           VerticalAlignment="Top"
+                           TextWrapping="Wrap">
+                    <Hyperlink>
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <ei:CallMethodAction MethodName="OpenKarno" TargetObject="{Binding}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                        <Run Language="ja-jp" Text="@karno" />
+                    </Hyperlink>
+                    <Run Language="ja-jp" Text="/" />
+                    <Hyperlink>
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <ei:CallMethodAction MethodName="OpenKriletan" TargetObject="{Binding}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                        <Run Language="ja-jp" Text="@kriletan" />
+                    </Hyperlink>
+                </TextBlock>
+            </StackPanel>
+            <Grid Grid.Row="1" VerticalAlignment="Center">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <ItemsControl ItemsSource="{Binding Contributors}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Margin="0,4,6,4" Orientation="Horizontal">
+                                <TextBlock Text="{Binding Name}" Visibility="{Binding IsLinkOpenable, Converter={StaticResource BoolInvisibleConverter}}" />
+                                <TextBlock Visibility="{Binding IsLinkOpenable, Converter={StaticResource BoolVisibleConverter}}">
+                                    <Hyperlink>
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="Click">
+                                                <ei:CallMethodAction MethodName="OpenUserTwitter" TargetObject="{Binding}" />
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                        <Run Text="{Binding ScreenName, Mode=OneWay}" />
+                                    </Hyperlink>
+                                </TextBlock>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <TextBlock Grid.Row="1"
+                           Margin="0,4"
+                           VerticalAlignment="Top">
+                    <Hyperlink>
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <ei:CallMethodAction MethodName="OpenDonation" TargetObject="{Binding}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                        <Run Text="上記の方々を含む多くの方の寄付によってKrileの開発が継続されています。" />
+                    </Hyperlink>
+                </TextBlock>
+            </Grid>
+            <TextBlock Grid.Row="2"
+                       Margin="0,8"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Bottom"
                        TextWrapping="Wrap">
-                <Hyperlink>
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="Click">
-                            <ei:CallMethodAction MethodName="OpenKarno" TargetObject="{Binding}" />
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                    <Run Language="ja-jp" Text="@karno" />
-                </Hyperlink>
-                <Run Language="ja-jp" Text="/" />
-                <Hyperlink>
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="Click">
-                            <ei:CallMethodAction MethodName="OpenKriletan" TargetObject="{Binding}" />
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                    <Run Language="ja-jp" Text="@kriletan" />
-                </Hyperlink>
+                <Run Text="Built with: AsyncOAuth, AvalonEdit, Dapper, DynamicJson, Extended WPF Toolkit, Livet, MahApps.Metro, System.Data.SQLite, WPF Task Dialog, and any other Microsoft's libraries." />
             </TextBlock>
-        </StackPanel>
-        <TextBlock Grid.Row="3"
-                   Margin="0,8"
-                   HorizontalAlignment="Left"
-                   VerticalAlignment="Bottom"
-                   TextWrapping="Wrap">
-            <Run Text="Built with: AsyncOAuth, AvalonEdit, Dapper, DynamicJson, Extended WPF Toolkit, Livet, MahApps.Metro, System.Data.SQLite, WPF Task Dialog, and any other Microsoft's libraries." />
-        </TextBlock>
+        </Grid>
     </Grid>
 </UserControl>

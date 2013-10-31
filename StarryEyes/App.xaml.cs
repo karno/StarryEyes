@@ -589,6 +589,8 @@ namespace StarryEyes
 
         public static readonly string DonationUrl = "http://krile.starwing.net/donation.html";
 
+        public static readonly string ContributorsUrl = "http://krile.starwing.net/shared/contrib.xml";
+
         public static readonly string LicenseUrl = "https://raw.github.com/karno/StarryEyes/master/LICENSE.TXT";
 
         #endregion
