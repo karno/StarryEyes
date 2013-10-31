@@ -304,6 +304,10 @@ namespace StarryEyes.ViewModels.WindowParts
             }
             set
             {
+                if (value == null)
+                {
+                    throw new ArgumentNullException("value");
+                }
                 if (CanSaveToDraft)
                 {
                     InputAreaModel.Drafts.Add(InputInfo);
@@ -856,7 +860,8 @@ namespace StarryEyes.ViewModels.WindowParts
 
         public void AmendPreviousOne()
         {
-            if (InputInfo.PostedTweets != null) return; // amending now.
+            // if already amending or previous post is not existed, return.
+            if (InputInfo.PostedTweets != null || InputAreaModel.PreviousPosted == null) return;
             InputInfo = InputAreaModel.PreviousPosted;
         }
 
