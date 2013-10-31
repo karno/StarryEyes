@@ -365,7 +365,7 @@ namespace StarryEyes.Views.Controls
                 new CompletionData("id", "[Numeric] ユーザーID"),
                 new CompletionData("statuses", "[Numeric] ツイート数"),
                 new CompletionData("followings", "[Numeric] フォロー数"),
-                new CompletionData("followers", "[Numeric] フォロー数"),
+                new CompletionData("followers", "[Numeric] フォロワー数"),
                 new CompletionData("favs", "[Numeric] お気に入り登録数"),
                 new CompletionData("listed_count", "[Numeric] リスト被登録"),
                 new CompletionData("screen_name", "[String] スクリーン名(@ID)"),
