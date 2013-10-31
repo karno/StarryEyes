@@ -137,10 +137,8 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             try
             {
                 if (this._cursor == 0) return false;
-                var account =
-                    Setting.Accounts.Collection.FirstOrDefault(
-                        a => a.RelationData.IsFollowing(this._parent.User.User.Id)) ??
-                    Setting.Accounts.GetRandomOne();
+                var account = Setting.Accounts.GetRelatedOne(this._parent.User.User.Id);
+                if (account == null) return false;
                 var friends = await this.GetUsersApiImpl(account, _parent.User.User.Id, this._cursor);
                 friends.Result.ForEach(_userIds.Add);
                 this._cursor = friends.NextCursor;

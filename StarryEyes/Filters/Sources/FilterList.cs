@@ -67,6 +67,7 @@ namespace StarryEyes.Filters.Sources
                         return;
                     }
                     var account = this.GetAccount();
+                    if (account == null) return;
                     var memberList = new List<long>();
                     long cursor = -1;
                     do

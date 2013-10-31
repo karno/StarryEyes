@@ -56,11 +56,23 @@ namespace StarryEyes.Settings
         public TwitterAccount GetRandomOne()
         {
             var accounts = _accountObservableCollection.ToArray();
-            if (accounts.Length == 0)
+            return accounts.Length == 0
+                       ? null
+                       : accounts[this._random.Next(accounts.Length)];
+        }
+
+        public TwitterAccount GetRelatedOne(long id)
+        {
+            if (Setting.Accounts.Contains(id))
             {
-                return null;
+                return this.Get(id);
             }
-            return accounts[_random.Next(accounts.Length)];
+            var followings = Setting.Accounts.Collection
+                                    .Where(a => a.RelationData.IsFollowing(id))
+                                    .ToArray();
+            return followings.Length == 0
+                       ? this.GetRandomOne()
+                       : followings[this._random.Next(followings.Length)];
         }
 
         public void RemoveAccountFromId(long id)

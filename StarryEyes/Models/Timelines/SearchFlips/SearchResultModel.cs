@@ -126,11 +126,11 @@ namespace StarryEyes.Models.Timelines.SearchFlips
         {
             if (_option == SearchOption.Web)
             {
-                return Setting.Accounts
-                              .GetRandomOne()
-                              .SearchAsync(this._query, maxId: maxId, count: count)
-                              .ToObservable()
-                              .Do(StatusInbox.Queue);
+                var acc = Setting.Accounts.GetRandomOne();
+                if (acc == null) return Observable.Empty<TwitterStatus>();
+                return acc.SearchAsync(this._query, maxId: maxId, count: count)
+                          .ToObservable()
+                          .Do(StatusInbox.Queue);
             }
             return StatusProxy.FetchStatuses(this._filterSql, maxId, count);
         }

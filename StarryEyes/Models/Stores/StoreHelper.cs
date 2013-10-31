@@ -21,8 +21,14 @@ namespace StarryEyes.Models.Stores
                               .ToObservable()
                               .Where(_ => _ != null)
                               .ConcatIfEmpty(() =>
-                                             Setting.Accounts.GetRandomOne().ShowTweetAsync(id).ToObservable()
-                                                    .Do(StatusInbox.Queue));
+                              {
+                                  var acc = Setting.Accounts.GetRandomOne();
+                                  if (acc == null) return Observable.Empty<TwitterStatus>();
+                                  return acc.ShowTweetAsync(id)
+                                            .ToObservable()
+                                            .Do(StatusInbox.Queue);
+                                  ;
+                              });
         }
 
         public static IObservable<TwitterUser> GetUser(long id)
@@ -30,9 +36,16 @@ namespace StarryEyes.Models.Stores
             return UserProxy.GetUserAsync(id)
                             .ToObservable()
                             .Where(_ => _ != null)
-                            .ConcatIfEmpty(() =>
-                                           Setting.Accounts.GetRandomOne().ShowUserAsync(id).ToObservable()
-                                                  .Do(u => Task.Run(() => UserProxy.StoreUserAsync(u))));
+                            .ConcatIfEmpty(
+                            () =>
+                            {
+
+                                var acc = Setting.Accounts.GetRelatedOne(id);
+                                if (acc == null) return Observable.Empty<TwitterUser>();
+                                return acc.ShowUserAsync(id)
+                                          .ToObservable()
+                                          .Do(u => Task.Run(() => UserProxy.StoreUserAsync(u)));
+                            });
         }
 
         public static IObservable<TwitterUser> GetUser(string screenName)
@@ -41,8 +54,14 @@ namespace StarryEyes.Models.Stores
                             .ToObservable()
                             .Where(_ => _ != null)
                             .ConcatIfEmpty(
-                                () => Setting.Accounts.GetRandomOne().ShowUserAsync(screenName).ToObservable()
-                                             .Do(u => Task.Run(() => UserProxy.StoreUserAsync(u))));
+                                () =>
+                                {
+                                    var acc = Setting.Accounts.GetRandomOne();
+                                    if (acc == null) return Observable.Empty<TwitterUser>();
+                                    return acc.ShowUserAsync(screenName)
+                                              .ToObservable()
+                                              .Do(u => Task.Run(() => UserProxy.StoreUserAsync(u)));
+                                });
         }
     }
 }

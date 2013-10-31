@@ -2496,7 +2496,8 @@
                     Grid.ColumnSpan="2"
                     Margin="0,4"
                     Orientation="Horizontal">
-            <TextBlock HorizontalAlignment="Left"
+            <TextBlock Margin="0,0,4,0"
+                       HorizontalAlignment="Left"
                        VerticalAlignment="Center"
                        FontSize="16"
                        Text="{Binding Version,

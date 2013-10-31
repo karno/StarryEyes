@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Anomaly.Utils;
@@ -32,10 +31,7 @@ namespace StarryEyes.Models.Timelines.SearchFlips
 
         protected override IObservable<TwitterStatus> Fetch(long? maxId, int? count)
         {
-            var account =
-                Setting.Accounts.Collection.FirstOrDefault(
-                    a => a.RelationData.IsFollowing(this._userId)) ??
-                Setting.Accounts.GetRandomOne();
+            var account = Setting.Accounts.GetRelatedOne(this._userId);
             switch (this._type)
             {
                 case TimelineType.User:
