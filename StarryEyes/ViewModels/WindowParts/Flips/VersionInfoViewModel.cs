@@ -20,6 +20,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             AutoUpdateService.UpdateStateChanged += this.CheckUpdates;
             Observable.Timer(TimeSpan.FromSeconds(0), TimeSpan.FromHours(8))
                       .Subscribe(_ => UpdateContributors());
+            Task.Run(() => this.CheckUpdates());
         }
 
         #region Open links
@@ -62,7 +63,6 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         private async void UpdateContributors()
         {
-            this.Contributors.Clear();
             try
             {
                 var vms = await Task.Run(async () =>
@@ -85,6 +85,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 await DispatcherHelper.UIDispatcher.InvokeAsync(
                     () =>
                     {
+                        this.Contributors.Clear();
                         this.Contributors.Add(new ContributorsViewModel("thanks to:", null));
                         vms.OrderBy(v => v.ScreenName ?? "~" + v.Name)
                            .ForEach(this.Contributors.Add);
