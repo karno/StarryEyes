@@ -24,5 +24,11 @@ namespace StarryEyes.Views.WindowParts.Flips
         {
             InitializeComponent();
         }
+
+        protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
+        {
+            if(e.GetPosition(null).Y < 48)
+                Window.GetWindow(this).DragMove();
+        }
     }
 }
