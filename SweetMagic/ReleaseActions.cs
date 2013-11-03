@@ -1,7 +1,7 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
@@ -24,7 +24,7 @@ namespace SweetMagic
                 case "delete":
                     return new DeleteAction(element.Attribute("path").Value);
                 default:
-                    throw new ArgumentException("action is not matched:" + element.Name);
+                    throw new UpdateException("update action is not valid: " + element.Name);
             }
         }
     }
@@ -46,7 +46,20 @@ namespace SweetMagic
         public async override Task DoWork(UpdateTaskExecutor executor)
         {
             executor.NotifyProgress("downloading patch package...");
-            var file = await executor.DownloadBinary(Url);
+            byte[] file = null;
+            for (var i = 0; i < 3; i++)
+            {
+                file = await executor.DownloadBinary(this.Url);
+                if (file != null) break;
+                executor.NotifyProgress("<!> patch package download failed. awaiting server a few seconds...", false);
+                await Task.Run(() => Thread.Sleep(10000));
+                executor.NotifyProgress("retrying download patch package...");
+            }
+            if (file == null)
+            {
+                executor.NotifyProgress("***** FATAL: patch package download failed! *****");
+                throw new UpdateException("patch package download failed.");
+            }
             using (var ms = new MemoryStream(file))
             using (var ss = new MemoryStream())
             {
@@ -54,7 +67,7 @@ namespace SweetMagic
                 if (!Cryptography.Verify(ms, ss, executor.PublicKey))
                 {
                     executor.NotifyProgress("Invalid signature.");
-                    throw new Exception("Package signature is not matched.");
+                    throw new UpdateException("patch package signature is not valid.");
                 }
                 executor.NotifyProgress("verified.");
                 executor.NotifyProgress("applying patches.");
@@ -71,8 +84,13 @@ namespace SweetMagic
         private async Task Extract(ZipArchiveEntry entry, string basePath)
         {
             var fn = Path.Combine(basePath, entry.FullName);
+            var dir = Path.GetDirectoryName(fn);
+            if (dir == null)
+            {
+                throw new UpdateException("patch path is not valid.");
+            }
             // ensure create directory
-            Directory.CreateDirectory(Path.GetDirectoryName(fn));
+            Directory.CreateDirectory(dir);
             using (var fstream = File.Create(fn))
             {
                 await entry.Open().CopyToAsync(fstream);

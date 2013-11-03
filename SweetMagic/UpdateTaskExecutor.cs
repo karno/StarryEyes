@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace SweetMagic
 {
@@ -76,13 +77,29 @@ namespace SweetMagic
                 this.NotifyProgress("applying patch: v" + vs + " - " + patch.ReleaseTime.ToString("yyyy/MM/dd"));
                 foreach (var action in patch.Actions)
                 {
-                    await action.DoWork(this);
+                    try
+                    {
+                        await action.DoWork(this);
+                    }
+                    catch (UpdateException uex)
+                    {
+                        this.NotifyProgress("*** FATAL: UpdateException raised. ***");
+                        this.NotifyProgress(uex.Message);
+                        MessageBox.Show(uex.Message + Environment.NewLine +
+                                        "Please download and apply latest version from official website.",
+                                        "Auto Update Error",
+                                        MessageBoxButtons.OK,
+                                        MessageBoxIcon.Error);
+                        this.NotifyProgress("restarting krile...");
+                        Thread.Sleep(100);
+                        return;
+                    }
                 }
             }
             Thread.Sleep(10);
             this.NotifyProgress("update completed!");
             this.NotifyProgress("starting new binary, wait a moment...");
-            Thread.Sleep(10);
+            Thread.Sleep(100);
         }
 
         public async Task<string> DownloadString(string url, Encoding encoding)

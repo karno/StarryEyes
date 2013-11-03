@@ -68,6 +68,7 @@
     </Compile>
     <Compile Include="ReleaseActions.cs" />
     <Compile Include="ReleasePack.cs" />
+    <Compile Include="UpdateException.cs" />
     <Compile Include="UpdateTaskExecutor.cs" />
   </ItemGroup>
   <ItemGroup>
