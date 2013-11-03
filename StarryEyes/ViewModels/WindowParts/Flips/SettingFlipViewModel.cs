@@ -93,10 +93,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                     {
                         var data = e.Data.GetData(typeof(TwitterAccountConfigurationViewModel)) as
                             TwitterAccountConfigurationViewModel;
-                        if (data != null)
-                        {
-                            e.Effects = DragDropEffects.Move;
-                        }
+                        e.Effects = data != null ? DragDropEffects.Move : DragDropEffects.None;
                     };
                     _description.DragDrop += e =>
                     {

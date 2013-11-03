@@ -130,10 +130,7 @@ namespace StarryEyes.ViewModels.Timelines.Tabs
         private void AcceptTabViewModel(DragEventArgs e)
         {
             var data = e.Data.GetData(typeof(TabViewModel)) as TabViewModel;
-            if (data != null)
-            {
-                e.Effects = DragDropEffects.Copy;
-            }
+            e.Effects = data != null ? DragDropEffects.Copy : DragDropEffects.None;
         }
 
         private void DropCreateNewColumn(DragEventArgs e, bool createNext)
@@ -174,10 +171,7 @@ namespace StarryEyes.ViewModels.Timelines.Tabs
                     this._description.DragOver += e =>
                     {
                         var data = e.Data.GetData(typeof(TabViewModel)) as TabViewModel;
-                        if (data != null)
-                        {
-                            e.Effects = DragDropEffects.Move;
-                        }
+                        e.Effects = data != null ? DragDropEffects.Move : DragDropEffects.None;
                     };
                     this._description.DragDrop += e =>
                     {
