@@ -902,9 +902,16 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                 return;
             }
             if (IsDirectMessage) return;
-            var formatted = String.Format(txt, this.User.ScreenName, this.User.Name);
-            InputAreaModel.SetText(this.Model.GetSuitableReplyAccount(),
-                                   formatted, inReplyTo: this.Status);
+            try
+            {
+                var formatted = String.Format(txt, this.User.ScreenName, this.User.Name);
+                InputAreaModel.SetText(this.Model.GetSuitableReplyAccount(),
+                                       formatted, inReplyTo: this.Status);
+            }
+            catch (Exception ex)
+            {
+                BackstageModel.RegisterEvent(new OperationFailedEvent("フォーマット エラー: " + ex.Message));
+            }
         }
 
         public void Quote()

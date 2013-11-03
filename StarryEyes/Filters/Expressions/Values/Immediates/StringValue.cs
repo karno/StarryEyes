@@ -44,7 +44,7 @@ namespace StarryEyes.Filters.Expressions.Values.Immediates
 
         public override string ToQuery()
         {
-            return "\"" + this.Value + "\"";
+            return "\"" + this.Value.Replace("\"", "\\\"") + "\"";
         }
     }
 }

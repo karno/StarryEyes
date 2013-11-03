@@ -142,20 +142,25 @@ namespace StarryEyes.Models.Timelines.SearchFlips
                 case SearchOption.Local:
                 case SearchOption.CurrentTab:
                     var pan = FilterSearch.SplitPositiveNegativeQuery(_query);
-                    var query = pan.Item1.Select(s => "text contains \"" + s + "\"")
-                                   .Concat(pan.Item2.Select(s => "!(text contains \"" + s + "\")"))
+                    var query = pan.Item1.Select(s => "text contains \"" + s.Replace("\"", "\\\"") + "\"")
+                                   .Concat(pan.Item2.Select(s => "!(text contains \"" + s.Replace("\"", "\\\"") + "\")"))
                                    .JoinString("&&");
                     var ctab = TabManager.CurrentFocusTab;
                     var ctf = ctab != null ? ctab.FilterQuery : null;
                     if (_option == SearchOption.CurrentTab && ctf != null)
                     {
-                        return ctf.ToQuery() + " && " + query;
+                        var pq = ctf.ToQuery();
+                        if (!String.IsNullOrEmpty(pq))
+                        {
+                            pq = "(" + pq + ")";
+                        }
+                        return pq + " && " + query;
                     }
                     return "where " + query;
                 case SearchOption.Query:
-                    return this._query;
+                    return this._filterQuery == null ? "!()" : this._query;
                 case SearchOption.Web:
-                    return "from search:\"" + this._query + "\" where ()";
+                    return "from search:\"" + this._query.Replace("\"", "\\\"") + "\" where ()";
                 default:
                     throw new ArgumentOutOfRangeException();
             }
