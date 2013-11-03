@@ -47,10 +47,10 @@ namespace StarryEyes.Views.Triggers
             TextBox tbox;
             if ((tbox = FocusManager.GetFocusedElement(window) as TextBox) != null)
             {
-                // only allows modifiered keys
-                if (modifiers == ModifierKeys.None && key != Key.Escape &&
-                    !(key < Key.F1 && key > Key.F24))
+                if (Group == KeyAssignGroup.Input)
                 {
+                    // input area mode
+                    // allow any keys but cursor keys only accept when cursor is in boundary position.
                     var ci = tbox.CaretIndex;
                     var text = tbox.Text;
                     switch (key)
@@ -70,8 +70,16 @@ namespace StarryEyes.Views.Triggers
                         case Key.Right:
                             if (ci < text.Length) return false;
                             break;
-                        default:
-                            return false;
+                    }
+                }
+                else
+                {
+                    // normal area mode
+                    // only allows modifiered keys
+                    if (modifiers == ModifierKeys.None && key != Key.Escape &&
+                        !(key < Key.F1 && key > Key.F24))
+                    {
+                        return false;
                     }
                 }
 
@@ -91,11 +99,11 @@ namespace StarryEyes.Views.Triggers
                 }
             }
             return KeyAssignManager.CurrentProfile.GetAssigns(key, Group)
-                             .Where(b => b.Modifiers == modifiers)
-                             .SelectMany(b => b.Actions)
-                             .Select(KeyAssignManager.InvokeAction)
-                             .ToArray() // run all actions
-                             .Any(r => r);
+                                   .Where(b => b.Modifiers == modifiers)
+                                   .SelectMany(b => b.Actions)
+                                   .Where(KeyAssignManager.InvokeAction)
+                                   .ToArray() // run all actions
+                                   .Any();
         }
     }
 }
