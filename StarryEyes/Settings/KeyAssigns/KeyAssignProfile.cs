@@ -145,14 +145,6 @@ namespace StarryEyes.Settings.KeyAssigns
             {
                 iteration = iteration.Concat(bindings);
             }
-            if (group != KeyAssignGroup.Global)
-            {
-                IList<KeyAssign> globalBindings;
-                if (GlobalBindings.TryGetValue(key, out globalBindings))
-                {
-                    iteration = iteration.Concat(globalBindings);
-                }
-            }
             return iteration;
         }
 
