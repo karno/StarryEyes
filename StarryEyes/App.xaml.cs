@@ -361,7 +361,8 @@ namespace StarryEyes
         {
             try
             {
-                if (ex is SQLiteException)
+                var aex = ex as AggregateException;
+                if (ex is SQLiteException || (aex != null && aex.InnerExceptions.Any(ie => ie is SQLiteException)))
                 {
                     // database error
                     Setting.DatabaseErrorOccured.Value = true;
