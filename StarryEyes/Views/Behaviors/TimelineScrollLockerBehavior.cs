@@ -126,7 +126,6 @@ namespace StarryEyes.Views.Behaviors
             }
         }
 
-
         private double _currentOffset;
         private double _remainHeight;
         private volatile bool _isAnimationRunning;

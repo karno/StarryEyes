@@ -47,6 +47,8 @@ namespace StarryEyes.Models.Timelines.Tabs
         {
             this._tabs.Add(info);
             this.CurrentFocusTabIndex = this._tabs.Count - 1;
+            // commit changes
+            TabManager.Save();
         }
 
         public void RemoveTab(int index)
@@ -56,6 +58,8 @@ namespace StarryEyes.Models.Timelines.Tabs
                 this.CurrentFocusTabIndex = index >= this._tabs.Count - 1 ? index - 1 : index;
             }
             this._tabs.RemoveAt(index);
+            // commit changes
+            TabManager.Save();
         }
     }
 }

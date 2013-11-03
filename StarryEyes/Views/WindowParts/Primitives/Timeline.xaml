@@ -1631,7 +1631,7 @@
                                                                                           Mode=OneWayToSource}"
                                                                IsScrollOnTop="{Binding IsScrollInTop,
                                                                                        Mode=OneWayToSource}" />
-                            <behaviors:TimelineScrollLockerBehavior IsScrollLockEnabled="{Binding IsScrollLock}" ItemsSource="{Binding Timeline, Mode=OneWay}" />
+                            <behaviors:TimelineScrollLockerBehavior IsScrollLockEnabled="{Binding IsScrollLock, Mode=OneWay}" ItemsSource="{Binding Timeline, Mode=OneWay}" />
                             <behaviors:SquaredScrollBehavior />
                         </i:Interaction.Behaviors>
                         <ItemsPresenter />
