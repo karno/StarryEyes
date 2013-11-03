@@ -367,7 +367,8 @@ namespace StarryEyes.ViewModels.WindowParts
                     return null;
                 }
 
-                if (_inReplyToViewModelCache.Status.Id != InputInfo.InReplyTo.Status.Id)
+                if (_inReplyToViewModelCache != null &&
+                    _inReplyToViewModelCache.Status.Id != InputInfo.InReplyTo.Status.Id)
                 {
                     _inReplyToViewModelCache.Dispose();
                     _inReplyToViewModelCache = null;
