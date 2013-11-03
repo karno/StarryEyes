@@ -26,6 +26,11 @@
             <utils:BooleanToInvisibleConverter x:Key="BoolInvisibleConverter" />
         </ResourceDictionary>
     </UserControl.Resources>
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <ei:CallMethodAction MethodName="CheckUpdate" TargetObject="{Binding}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
     <Grid Background="White">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />

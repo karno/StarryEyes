@@ -7,6 +7,7 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Livet;
+using StarryEyes.Annotations;
 using StarryEyes.Models.Subsystems;
 
 namespace StarryEyes.ViewModels.WindowParts.Flips
@@ -21,6 +22,11 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             AutoUpdateService.UpdateStateChanged += () => _isUpdateAvailable = true;
             Observable.Timer(TimeSpan.FromSeconds(0), TimeSpan.FromHours(8))
                       .Subscribe(_ => UpdateContributors());
+        }
+
+        [UsedImplicitly]
+        public void CheckUpdate()
+        {
             Task.Run(() => this.CheckUpdates());
         }
 
