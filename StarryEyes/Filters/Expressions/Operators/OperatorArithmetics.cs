@@ -115,7 +115,7 @@ namespace StarryEyes.Filters.Expressions.Operators
 
         public override string GetSetSqlQuery()
         {
-            return LeftValue.GetSetSqlQuery() + " instersect " + RightValue.GetSetSqlQuery();
+            return LeftValue.GetSetSqlQuery() + " intersect " + RightValue.GetSetSqlQuery();
         }
 
         public override Func<TwitterStatus, long> GetNumericValueProvider()
