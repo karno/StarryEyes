@@ -96,7 +96,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
                 {"place_id", placeId},
                 {"display_coordinates", displayCoordinates}
             }.ParametalizeForPost();
-            var client = credential.CreateOAuthClient();
+            var client = credential.CreateOAuthClient(useGZip: false);
             var response = await client.PostAsync(new ApiAccess("statuses/update.json"), param);
             return await response.ReadAsStatusAsync();
         }
