@@ -142,19 +142,35 @@
                         </Grid.ColumnDefinitions>
                         <Border Grid.Column="0"
                                 AllowDrop="True"
-                                Background="#11111111"
+                                Background="#50111111"
                                 IsHitTestVisible="True">
                             <i:Interaction.Behaviors>
                                 <behaviors:DropAcceptBehavior Description="{Binding LeftAcceptDescription}" />
                             </i:Interaction.Behaviors>
+                            <Path Width="20"
+                                  Height="40"
+                                  HorizontalAlignment="Left"
+                                  VerticalAlignment="Center"
+                                  Data="F1 M 0,3.05176e-005L 30,3.05176e-005L 30,60L 90,60L 90,120L 30,120L 30,180L 0,180L 0,120L 0,60L 0,3.05176e-005 Z "
+                                  Fill="#99FFFFFF"
+                                  Stretch="Fill" />
                         </Border>
                         <Border Grid.Column="2"
                                 AllowDrop="True"
-                                Background="#11111111"
+                                Background="#50111111"
                                 IsHitTestVisible="True">
                             <i:Interaction.Behaviors>
                                 <behaviors:DropAcceptBehavior Description="{Binding RightAcceptDescription}" />
                             </i:Interaction.Behaviors>
+                            <Path Width="20"
+                                  Height="40"
+                                  HorizontalAlignment="Right"
+                                  VerticalAlignment="Center"
+                                  Data="F1 M 90,180L 60,180L 60,120L 0,120L 0,60.0001L 60,60.0001L 60,6.10352e-005L 90,6.10352e-005L 90,60.0001L 90,120L 90,180 Z "
+                                  Fill="#99FFFFFF"
+                                  Stretch="Fill" />
+
+
                         </Border>
                     </Grid>
                 </Grid>
