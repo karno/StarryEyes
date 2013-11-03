@@ -31,7 +31,7 @@ namespace StarryEyes.Feather.Scripting
                     var ext = file.Extension.TrimStart('.').ToLower();
                     IScriptExecutor executor;
                     if (_executors.TryGetValue(ext, out executor))
-                        executor.ExecuteScript(ext);
+                        executor.ExecuteScript(file.FullName);
                 });
         }
     }
