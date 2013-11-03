@@ -14,6 +14,7 @@ using StarryEyes.Filters.Expressions;
 using StarryEyes.Filters.Parsing;
 using StarryEyes.Models;
 using StarryEyes.Models.Accounting;
+using StarryEyes.Models.Receiving;
 using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
 using StarryEyes.Settings.KeyAssigns;
@@ -512,6 +513,8 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             {
                 Setting.Muteds.Value = _lastCommit;
             }
+            // update connection property
+            _accounts.ForEach(a => a.CommitChanges());
             this.IsConfigurationActive = false;
             _completeCallback.OnNext(Unit.Default);
             _completeCallback.OnCompleted();
@@ -521,6 +524,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
     public class TwitterAccountConfigurationViewModel : ViewModel
     {
+        private bool isConnectionPropertyHasChanged;
         private readonly SettingFlipViewModel _parent;
         private readonly TwitterAccount _account;
 
@@ -644,21 +648,35 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             get { return this.Account.IsUserStreamsEnabled; }
             set
             {
+                if (IsUserStreamsEnabled == value) return;
                 this.Account.IsUserStreamsEnabled = value;
                 this.RaisePropertyChanged();
+                isConnectionPropertyHasChanged = true;
             }
         }
 
         public bool ReceiveRepliesAll
         {
             get { return this.Account.ReceiveRepliesAll; }
-            set { this.Account.ReceiveRepliesAll = value; }
+            set
+            {
+                if (ReceiveRepliesAll == value) return;
+                this.Account.ReceiveRepliesAll = value;
+                this.RaisePropertyChanged();
+                isConnectionPropertyHasChanged = true;
+            }
         }
 
         public bool ReceiveFollowingsActivity
         {
             get { return this.Account.ReceiveFollowingsActivity; }
-            set { this.Account.ReceiveFollowingsActivity = value; }
+            set
+            {
+                if (ReceiveFollowingsActivity == value) return;
+                this.Account.ReceiveFollowingsActivity = value;
+                this.RaisePropertyChanged();
+                isConnectionPropertyHasChanged = true;
+            }
         }
 
         public bool IsMarkMediaAsPossiblySensitive
@@ -681,6 +699,19 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             if (resp.Response.Result == TaskDialogSimpleResult.Ok)
             {
                 Setting.Accounts.RemoveAccountFromId(Account.Id);
+            }
+        }
+
+        public void CommitChanges()
+        {
+            var flag = isConnectionPropertyHasChanged;
+            // down flags
+            isConnectionPropertyHasChanged = false;
+
+            // if property has changed, reconnect streams
+            if (flag)
+            {
+                Task.Run(() => ReceiveManager.ReconnectUserStreams(_account.Id));
             }
         }
     }
