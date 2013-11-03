@@ -1,4 +1,5 @@
-﻿using StarryEyes.Models.Accounting;
+﻿using System.Windows.Media;
+using StarryEyes.Models.Accounting;
 using StarryEyes.Views;
 
 namespace StarryEyes.Models.Backstages.NotificationEvents.PostEvents
@@ -16,7 +17,6 @@ namespace StarryEyes.Models.Backstages.NotificationEvents.PostEvents
         {
             get { return this._fallbackAccount; }
         }
-
 
         public FallbackedEvent(TwitterAccount account, TwitterAccount fallbackTo)
         {
@@ -40,7 +40,7 @@ namespace StarryEyes.Models.Backstages.NotificationEvents.PostEvents
             }
         }
 
-        public override System.Windows.Media.Color Background
+        public override Color Background
         {
             get { return MetroColors.Violet; }
         }
