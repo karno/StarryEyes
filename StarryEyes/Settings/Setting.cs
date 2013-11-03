@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Windows;
 using System.Xaml;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Filters;
@@ -205,11 +206,18 @@ namespace StarryEyes.Settings
 
         #region Krile internal state
 
+        public static readonly SettingItemStruct<Rect> LastWindowPosition =
+            new SettingItemStruct<Rect>("LastWindowPosition", Rect.Empty);
+
+        public static readonly SettingItemStruct<WindowState> LastWindowState =
+            new SettingItemStruct<WindowState>("LastWindowState", WindowState.Normal);
+
         public static readonly SettingItem<string> LastImageOpenDir =
             new SettingItem<string>("LastImageOpenDir", Environment.GetFolderPath(Environment.SpecialFolder.MyPictures));
 
         public static readonly SettingItemStruct<int> SettingVersion =
             new SettingItemStruct<int>("SettingVersion", 1);
+
 
         public static readonly SettingItemStruct<bool> DatabaseErrorOccured =
             new SettingItemStruct<bool>("DatabaseErrorOccured", false);
@@ -401,6 +409,8 @@ namespace StarryEyes.Settings
         /// </summary>
         public static bool IsFirstGenerated { get; private set; }
 
+        public static bool IsLoaded { get; private set; }
+
         public static bool LoadSettings()
         {
             IsFirstGenerated = false;
@@ -414,6 +424,7 @@ namespace StarryEyes.Settings
                             XamlServices.Load(fs) as IDictionary<string, object> ?? new Dictionary<string, object>());
                     }
                     _manager = new AccountManager(_accounts);
+                    IsLoaded = true;
                     return true;
                 }
                 catch (Exception ex)
@@ -462,12 +473,14 @@ namespace StarryEyes.Settings
                     File.Delete(App.ConfigurationFilePath);
                     _settingValueHolder = new ConcurrentDictionary<string, object>();
                     _manager = new AccountManager(_accounts);
+                    IsLoaded = true;
                     return true;
                 }
             }
             _settingValueHolder = new ConcurrentDictionary<string, object>();
             IsFirstGenerated = true;
             _manager = new AccountManager(_accounts);
+            IsLoaded = true;
             return true;
         }
 

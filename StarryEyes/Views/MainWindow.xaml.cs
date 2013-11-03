@@ -1,7 +1,6 @@
-﻿using System;
-using System.Reactive.Linq;
-using System.Windows.Input;
-using MahApps.Metro.Controls;
+﻿using MahApps.Metro.Controls;
+using StarryEyes.Nightmare.Windows;
+using StarryEyes.Settings;
 using StarryEyes.ViewModels;
 
 namespace StarryEyes.Views
@@ -14,14 +13,17 @@ namespace StarryEyes.Views
         public MainWindow()
         {
             InitializeComponent();
+            this.Loaded += MainWindow_Loaded;
+        }
 
-            Observable.Timer(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1))
-                      .ObserveOnDispatcher()
-                      .Subscribe(_ =>
-                      {
-                          var focusElement = Keyboard.FocusedElement;
-                          System.Diagnostics.Debug.WriteLine("focus: " + (focusElement == null ? "null" : focusElement.GetType().ToString()));
-                      });
+        void MainWindow_Loaded(object sender, System.Windows.RoutedEventArgs e)
+        {
+            if (!Setting.IsLoaded) return;
+            var rect = Setting.LastWindowPosition.Value;
+            var state = Setting.LastWindowState.Value;
+            if (rect.IsEmpty) return;
+            this.SetWindowPlacement(rect);
+            this.WindowState = state;
         }
 
         private void OnClosing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -30,6 +32,11 @@ namespace StarryEyes.Views
             if (viewModel != null && !viewModel.OnClosing())
             {
                 e.Cancel = true;
+            }
+            else
+            {
+                Setting.LastWindowPosition.Value = this.GetWindowPlacement();
+                Setting.LastWindowState.Value = this.WindowState;
             }
         }
     }
