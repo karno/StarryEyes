@@ -24,6 +24,10 @@ namespace StarryEyes.ViewModels.WindowParts.Backstages
             get { return _model.ConnectionState; }
         }
 
+        public bool IsFallbacked { get; set; }
+
+        public DateTime FallbackReleaseTime { get; set; }
+
         public int RemainUpdate { get; set; }
 
         public int MaxUpdate { get; set; }
@@ -37,14 +41,21 @@ namespace StarryEyes.ViewModels.WindowParts.Backstages
         {
             _parent = parent;
             _model = model;
-            this.CompositeDisposable.Add(Observable.FromEvent(
-                h => _model.ConnectionStateChanged += h,
-                h => _model.ConnectionStateChanged -= h)
-                .Subscribe(_ => ConnectionStateChanged()));
-            this.CompositeDisposable.Add(Observable.FromEvent(
-                h => _model.TwitterUserChanged += h,
-                h => _model.TwitterUserChanged -= h)
-                .Subscribe(_ => UserChanged()));
+            this.CompositeDisposable.Add(
+                Observable.FromEvent(
+                    h => _model.ConnectionStateChanged += h,
+                    h => _model.ConnectionStateChanged -= h)
+                          .Subscribe(_ => ConnectionStateChanged()));
+            this.CompositeDisposable.Add(
+                Observable.FromEvent(
+                    h => _model.TwitterUserChanged += h,
+                    h => _model.TwitterUserChanged -= h)
+                          .Subscribe(_ => UserChanged()));
+            this.CompositeDisposable.Add(
+                Observable.FromEvent(
+                    h => _model.FallbackStateUpdated += h,
+                    h => _model.FallbackStateUpdated -= h)
+                          .Subscribe(_ => this.FallbackStateUpdated()));
             this.CompositeDisposable.Add(
                 Observable.Interval(TimeSpan.FromSeconds(5))
                           .Subscribe(_ =>
@@ -66,6 +77,14 @@ namespace StarryEyes.ViewModels.WindowParts.Backstages
         private void ConnectionStateChanged()
         {
             this.RaisePropertyChanged(() => ConnectionState);
+        }
+
+        private void FallbackStateUpdated()
+        {
+            this.IsFallbacked = _model.IsFallbacked;
+            this.FallbackReleaseTime = _model.FallbackPredictedReleaseTime;
+            this.RaisePropertyChanged(() => IsFallbacked);
+            this.RaisePropertyChanged(() => FallbackReleaseTime);
         }
 
         public void ReconnectUserStreams()

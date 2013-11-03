@@ -40,7 +40,9 @@ namespace StarryEyes.Models.Requests
                 {
                     try
                     {
-                        return await acc.RetweetAsync(_id);
+                        var result = await acc.RetweetAsync(_id);
+                        BackstageModel.NotifyFallbackState(acc, false);
+                        return result;
                     }
                     catch (TwitterApiException tae)
                     {
@@ -52,6 +54,7 @@ namespace StarryEyes.Models.Requests
                             var prev = acc;
                             acc = Setting.Accounts.Get(acc.FallbackAccountId.Value);
                             BackstageModel.RegisterEvent(new FallbackedEvent(prev, acc));
+                            BackstageModel.NotifyFallbackState(prev, true);
                             continue;
                         }
                     }

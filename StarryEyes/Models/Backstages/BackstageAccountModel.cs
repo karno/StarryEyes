@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Linq;
+using System.Reactive.Linq;
+using System.Threading.Tasks;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;
@@ -6,6 +9,7 @@ using StarryEyes.Models.Receiving;
 using StarryEyes.Models.Receiving.Receivers;
 using StarryEyes.Models.Stores;
 using StarryEyes.Models.Subsystems;
+using StarryEyes.Settings;
 
 namespace StarryEyes.Models.Backstages
 {
@@ -82,6 +86,60 @@ namespace StarryEyes.Models.Backstages
         public void Reconnect()
         {
             ReceiveManager.ReconnectUserStreams(this.Account.Id);
+        }
+
+        public event Action FallbackStateUpdated;
+
+        public bool IsFallbacked { get; private set; }
+
+        public DateTime FallbackPredictedReleaseTime { get; private set; }
+
+        private IDisposable _prevScheduled;
+
+        public void NotifyFallbackState(bool isFallbacked)
+        {
+            if (!isFallbacked && !this.IsFallbacked) return;
+            Task.Run(() =>
+            {
+                this.IsFallbacked = isFallbacked;
+                if (isFallbacked)
+                {
+                    // calc prediction
+                    var threshold = DateTime.Now - TimeSpan.FromSeconds(Setting.PostWindowTimeSec.Value);
+                    var oldest = PostLimitPredictionService.GetStatuses(Account.Id)
+                                                           .Where(t => t.CreatedAt > threshold)
+                                                           .OrderBy(t => t.CreatedAt)
+                                                           .FirstOrDefault();
+                    if (oldest == null)
+                    {
+                        IsFallbacked = false;
+                        FallbackPredictedReleaseTime = DateTime.Now;
+                    }
+                    else
+                    {
+                        FallbackPredictedReleaseTime = oldest.CreatedAt +
+                                                       TimeSpan.FromSeconds(Setting.PostWindowTimeSec.Value);
+                        // create timer
+                        if (_prevScheduled != null)
+                        {
+                            _prevScheduled.Dispose();
+                        }
+                        _prevScheduled = Observable.Timer(FallbackPredictedReleaseTime)
+                                                   .Subscribe(_ => IsFallbacked = false);
+                    }
+                }
+                else
+                {
+                    FallbackPredictedReleaseTime = DateTime.Now;
+                    if (_prevScheduled != null)
+                    {
+                        _prevScheduled.Dispose();
+                        _prevScheduled = null;
+                    }
+                }
+                var handler = this.FallbackStateUpdated;
+                if (handler != null) handler();
+            });
         }
     }
 }

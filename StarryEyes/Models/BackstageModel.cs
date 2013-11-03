@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reactive.Linq;
 using Livet;
+using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages;
 using StarryEyes.Models.Backstages.TwitterEvents;
 using StarryEyes.Models.Receiving;
@@ -39,13 +40,22 @@ namespace StarryEyes.Models
             }
         }
 
-        #region Account connection state management
+        #region Account and connection state management
 
         private static readonly ObservableSynchronizedCollectionEx<BackstageAccountModel> _accounts =
             new ObservableSynchronizedCollectionEx<BackstageAccountModel>();
         public static ObservableSynchronizedCollectionEx<BackstageAccountModel> Accounts
         {
             get { return _accounts; }
+        }
+
+        public static void NotifyFallbackState(TwitterAccount account, bool isFallbacked)
+        {
+            var model = _accounts.FirstOrDefault(a => a.Account.Id == account.Id);
+            if (model != null)
+            {
+                model.NotifyFallbackState(isFallbacked);
+            }
         }
 
         #endregion

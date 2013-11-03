@@ -72,7 +72,7 @@
                                                 </i:EventTrigger>
                                             </i:Interaction.Triggers>
                                         </TextBlock>
-                                        <StackPanel Orientation="Horizontal">
+                                        <StackPanel Orientation="Horizontal" Visibility="{Binding IsFallbacked, Converter={StaticResource BooleanToInvisibleConverter}}">
                                             <TextBlock Text="POST: " />
                                             <TextBlock Text="{Binding RemainUpdate}">
                                                 <TextBlock.Style>
@@ -88,6 +88,13 @@
                                             </TextBlock>
                                             <TextBlock Text="/" />
                                             <TextBlock Text="{Binding MaxUpdate}" />
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Visibility="{Binding IsFallbacked, Converter={StaticResource BooleanToVisibleConverter}}">
+                                            <TextBlock FontWeight="Bold"
+                                                       Foreground="#FFE51400"
+                                                       Text="POST LIMITED" />
+                                            <TextBlock Text=" UNTIL: " />
+                                            <TextBlock Text="{Binding FallbackReleaseTime, StringFormat=HH:mm:ss}" />
                                         </StackPanel>
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Text="STREAM: " />

@@ -139,5 +139,16 @@ namespace StarryEyes.Models.Subsystems
                 return statuses.Count;
             }
         }
+
+        public static IEnumerable<TwitterStatus> GetStatuses(long id)
+        {
+            lock (_dictLock)
+            {
+                LinkedList<TwitterStatus> statuses;
+                return !_dictionary.TryGetValue(id, out statuses)
+                           ? Enumerable.Empty<TwitterStatus>()
+                           : statuses.ToArray();
+            }
+        }
     }
 }

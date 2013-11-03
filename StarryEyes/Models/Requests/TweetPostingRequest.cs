@@ -69,19 +69,25 @@ namespace StarryEyes.Models.Requests
             {
                 try
                 {
+                    TwitterStatus result;
                     if (_attachedImageBin != null)
                     {
-                        return await acc.UpdateWithMediaAsync(
-                            _status,
-                            new[] { _attachedImageBin },
+                        result = await acc.UpdateWithMediaAsync(
+                            this._status,
+                            new[] { this._attachedImageBin },
                             account.MarkMediaAsPossiblySensitive ? true : (bool?)null, // Inherit property
-                            _inReplyTo,
+                            this._inReplyTo,
                             latlong);
                     }
-                    return await acc.UpdateAsync(
-                        this._status,
-                        this._inReplyTo,
-                        latlong);
+                    else
+                    {
+                        result = await acc.UpdateAsync(
+                            this._status,
+                            this._inReplyTo,
+                            latlong);
+                    }
+                    BackstageModel.NotifyFallbackState(acc, false);
+                    return result;
                 }
                 catch (TwitterApiException tae)
                 {
@@ -93,6 +99,7 @@ namespace StarryEyes.Models.Requests
                         var prev = acc;
                         acc = Setting.Accounts.Get(acc.FallbackAccountId.Value);
                         BackstageModel.RegisterEvent(new FallbackedEvent(prev, acc));
+                        BackstageModel.NotifyFallbackState(prev, true);
                         continue;
                     }
                 }
