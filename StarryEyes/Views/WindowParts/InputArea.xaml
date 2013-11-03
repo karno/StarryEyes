@@ -37,6 +37,7 @@
                         VerticalAlignment="Top"
                         VerticalContentAlignment="Stretch"
                         Content="{Binding DisplayHashtag}"
+                        Focusable="False"
                         Style="{DynamicResource MetroSquareUnfocusableFlatButton}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="Click">
@@ -97,6 +98,7 @@
                 HorizontalAlignment="Left"
                 VerticalAlignment="Top"
                 BorderThickness="0"
+                Focusable="False"
                 Padding="0"
                 Style="{DynamicResource MetroSquareUnfocusableFlatButton}">
             <i:Interaction.Triggers>
@@ -360,6 +362,7 @@
                                   Stretch="Fill" />
                         </Button>
                         <Button DockPanel.Dock="Right"
+                                Focusable=" False"
                                 Style="{DynamicResource MetroSquareUnfocusableFlatButton}"
                                 ToolTip="直前のツイートを訂正"
                                 Visibility="{Binding CanAmend,
@@ -390,7 +393,8 @@
                         <StackPanel Height="26"
                                     VerticalAlignment="Top"
                                     Orientation="Horizontal">
-                            <controls:DropDownMenuButton Style="{DynamicResource MetroSquareUnfocusableFlatButton}"
+                            <controls:DropDownMenuButton Focusable="False"
+                                                         Style="{DynamicResource MetroSquareUnfocusableFlatButton}"
                                                          ToolTip="下書き"
                                                          Visibility="{Binding IsDraftsExisted,
                                                                               Converter={StaticResource BooleanToVisibleConverter}}">
@@ -421,6 +425,7 @@
                                 </StackPanel>
                             </controls:DropDownMenuButton>
                             <Button Width="28"
+                                    Focusable="False"
                                     Style="{DynamicResource MetroSquareUnfocusableFlatButton}"
                                     ToolTip="画像の添付"
                                     Visibility="{Binding IsImageAttached,
@@ -437,6 +442,7 @@
                                       Stretch="Fill" />
                             </Button>
                             <Button Width="28"
+                                    Focusable="False"
                                     Style="{DynamicResource MetroSquareUnfocusableFlatButton}"
                                     ToolTip="位置情報の追加・更新"
                                     Visibility="{Binding IsLocationEnabled,
@@ -453,6 +459,7 @@
                                       Stretch="Fill" />
                             </Button>
                             <Button Width="28"
+                                    Focusable="False"
                                     Style="{DynamicResource MetroSquareUnfocusableFlatButton}"
                                     ToolTip="位置情報の削除"
                                     Visibility="{Binding IsLocationAttached,
@@ -558,6 +565,7 @@
                                LastChildFill="False">
                         <Button Height="26"
                                 DockPanel.Dock="Top"
+                                Focusable="False"
                                 Style="{DynamicResource MetroSquareUnfocusableFlatButton}">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="Click">
