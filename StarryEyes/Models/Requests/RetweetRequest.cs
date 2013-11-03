@@ -4,6 +4,7 @@ using StarryEyes.Anomaly.TwitterApi;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Models.Accounting;
+using StarryEyes.Models.Backstages.NotificationEvents.PostEvents;
 using StarryEyes.Settings;
 
 namespace StarryEyes.Models.Requests
@@ -11,7 +12,7 @@ namespace StarryEyes.Models.Requests
     public sealed class RetweetRequest : RequestBase<TwitterStatus>
     {
         private const string LimitMessage =
-            "Wow, that's a lot of Twittering! You have reached your limit of updates for the day.";
+            "You have reached your limit of updates";
 
         private readonly long _id;
         private readonly bool _createRetweet;
@@ -48,7 +49,9 @@ namespace StarryEyes.Models.Requests
                             acc.FallbackAccountId != null)
                         {
                             // reached post limit, fallback
+                            var prev = acc;
                             acc = Setting.Accounts.Get(acc.FallbackAccountId.Value);
+                            BackstageModel.RegisterEvent(new FallbackedEvent(prev, acc));
                             continue;
                         }
                     }

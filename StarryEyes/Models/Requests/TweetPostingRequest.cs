@@ -6,6 +6,7 @@ using StarryEyes.Anomaly.TwitterApi;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Models.Accounting;
+using StarryEyes.Models.Backstages.NotificationEvents.PostEvents;
 using StarryEyes.Settings;
 
 namespace StarryEyes.Models.Requests
@@ -89,7 +90,9 @@ namespace StarryEyes.Models.Requests
                         acc.FallbackAccountId != null)
                     {
                         // reached post limit, fallback
+                        var prev = acc;
                         acc = Setting.Accounts.Get(acc.FallbackAccountId.Value);
+                        BackstageModel.RegisterEvent(new FallbackedEvent(prev, acc));
                         continue;
                     }
                 }
