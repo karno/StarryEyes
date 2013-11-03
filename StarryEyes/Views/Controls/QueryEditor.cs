@@ -113,7 +113,7 @@ namespace StarryEyes.Views.Controls
         private IEnumerable<CompletionData> QueryCompletionData(string beforeCursor, string inputted)
         {
             var tokens = Tokenizer.Tokenize(beforeCursor, true).ToArray();
-            if (IsSourceFilterEditable)
+            if (!IsSourceFilterEditable)
             {
                 return this.QueryOnRight(tokens, inputted);
             }
