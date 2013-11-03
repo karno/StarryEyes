@@ -30,6 +30,14 @@ namespace StarryEyes.Filters
 
         public static FilterOperatorBase And(this FilterOperatorBase left, FilterOperatorBase right)
         {
+            if (left is FilterOperatorOr)
+            {
+                left = new FilterBracket(left);
+            }
+            if (right is FilterOperatorOr)
+            {
+                right = new FilterBracket(right);
+            }
             return new FilterOperatorAnd
             {
                 LeftValue = left,

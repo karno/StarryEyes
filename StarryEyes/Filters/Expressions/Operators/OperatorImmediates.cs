@@ -108,7 +108,15 @@ namespace StarryEyes.Filters.Expressions.Operators
 
         public override string ToQuery()
         {
-            return this._inner == null ? "()" : "(" + this._inner.ToQuery() + ")";
+            if (this._inner == null)
+            {
+                return "()";
+            }
+            if (this._inner is FilterBracket)
+            {
+                return this._inner.ToQuery();
+            }
+            return "(" + this._inner.ToQuery() + ")";
         }
     }
 }
