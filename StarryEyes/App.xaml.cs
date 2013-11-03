@@ -401,7 +401,11 @@ namespace StarryEyes
                     UseShellExecute = true,
                     FileName = Path.Combine(apppath, App.FeedbackAppName)
                 };
-                Process.Start(psi);
+                try
+                {
+                    Process.Start(psi);
+                }
+                catch { }
 #endif
             }
             finally

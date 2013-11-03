@@ -16,7 +16,7 @@ namespace StarryEyes.Filters.Expressions.Values.Immediates
 
         protected override string OperatorString
         {
-            get { return "\"" + _value + "\""; }
+            get { return "\"" + this.Value + "\""; }
         }
 
         public override IEnumerable<FilterExpressionType> SupportedTypes
@@ -27,19 +27,24 @@ namespace StarryEyes.Filters.Expressions.Values.Immediates
             }
         }
 
+        public string Value
+        {
+            get { return this._value; }
+        }
+
         public override Func<TwitterStatus, string> GetStringValueProvider()
         {
-            return _ => _value;
+            return _ => this.Value;
         }
 
         public override string GetStringSqlQuery()
         {
-            return _value.Escape().Wrap();
+            return this.Value.Escape().Wrap();
         }
 
         public override string ToQuery()
         {
-            return "\"" + _value + "\"";
+            return "\"" + this.Value + "\"";
         }
     }
 }
