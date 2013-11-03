@@ -34,11 +34,8 @@ namespace StarryEyes.Models.Subsystems
             return File.Exists(ExecutablePath);
         }
 
-        private static int incl = 0;
-
         private static async Task<bool> CheckUpdate(Version version)
         {
-            incl++;
             if (IsUpdateBinaryExisted()) return true;
             try
             {
@@ -56,6 +53,7 @@ namespace StarryEyes.Models.Subsystems
                 _patcherSignUri = xdoc.Root.Attribute("sign").Value;
                 var releases = xdoc.Root.Descendants("release");
                 var latest = releases.Select(r => Version.Parse(r.Attribute("version").Value))
+                                     .Where(v => Setting.AcceptUnstableVersion.Value || v.Revision <= 0)
                                      .OrderByDescending(v => v)
                                      .FirstOrDefault();
                 if (version != null && latest > version)
