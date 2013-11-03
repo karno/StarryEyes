@@ -439,6 +439,12 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         #region High-level configuration
 
+        public bool ApplyUnstablePatch
+        {
+            get { return Setting.AcceptUnstableVersion.Value; }
+            set { Setting.AcceptUnstableVersion.Value = value; }
+        }
+
         public bool LoadUnsafePlugin
         {
             get { return Setting.LoadUnsafePlugins.Value; }

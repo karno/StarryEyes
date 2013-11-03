@@ -564,6 +564,9 @@
                     </Grid.Style>
                     <StackPanel Margin="16, 0" Orientation="Vertical">
                         <CheckBox Margin="0,0,0,8"
+                                  Content="開発途上版のパッチを適用する(_R) [不安定な更新が行われることがあります]"
+                                  IsChecked="{Binding ApplyUnstablePatch}" />
+                        <CheckBox Margin="0,8"
                                   Content="アンセーフ プラグインをロード(_U)"
                                   IsChecked="{Binding LoadUnsafePlugin}" />
                         <CheckBox Margin="0,8"
