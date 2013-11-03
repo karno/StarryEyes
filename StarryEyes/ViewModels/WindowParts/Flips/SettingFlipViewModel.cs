@@ -344,12 +344,14 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             }
             set
             {
+                if (value < 0) return; // ignore setting
                 var name = DefaultAssignProvider.DefaultAssignName;
-                if (value >= 0 && value <= this._keyAssignCandidateFiles.Count)
+                if (value < this._keyAssignCandidateFiles.Count)
                 {
                     name = this._keyAssignCandidateFiles[value];
                 }
                 Setting.KeyAssign.Value = name;
+                this.RaisePropertyChanged();
                 this.RaisePropertyChanged(() => KeyAssignFileContents);
             }
         }
