@@ -1131,6 +1131,7 @@ namespace StarryEyes.ViewModels.WindowParts
             var bitmap = new BitmapImage();
             bitmap.BeginInit();
             bitmap.CacheOption = BitmapCacheOption.OnLoad;
+            bitmap.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
             bitmap.UriSource = new Uri(filePath);
             bitmap.EndInit();
             Source = bitmap;
