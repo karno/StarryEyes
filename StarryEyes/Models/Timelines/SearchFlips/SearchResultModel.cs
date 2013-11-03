@@ -147,16 +147,21 @@ namespace StarryEyes.Models.Timelines.SearchFlips
                                    .JoinString("&&");
                     var ctab = TabManager.CurrentFocusTab;
                     var ctf = ctab != null ? ctab.FilterQuery : null;
-                    if (_option == SearchOption.CurrentTab && ctf != null)
+                    if (this._option != SearchOption.CurrentTab || ctf == null)
                     {
-                        var pq = ctf.ToQuery();
-                        if (!String.IsNullOrEmpty(pq))
-                        {
-                            pq = "(" + pq + ")";
-                        }
-                        query = pq + " && " + query;
+                        return "where " + query;
                     }
-                    return "where " + query;
+                    var cqf = QueryCompiler.CompileFilters(query);
+                    var filters = ctf.PredicateTreeRoot.Operator;
+                    var nfq = new FilterQuery
+                    {
+                        Sources = ctf.Sources.ToArray(),
+                        PredicateTreeRoot = new FilterExpressionRoot
+                        {
+                            Operator = filters.And(cqf.Operator)
+                        }
+                    };
+                    return nfq.ToQuery();
                 case SearchOption.Query:
                     return this._filterQuery == null ? "!()" : this._query;
                 case SearchOption.Web:
