@@ -154,7 +154,7 @@ namespace StarryEyes.Models.Timelines.SearchFlips
                         {
                             pq = "(" + pq + ")";
                         }
-                        return pq + " && " + query;
+                        query = pq + " && " + query;
                     }
                     return "where " + query;
                 case SearchOption.Query:
