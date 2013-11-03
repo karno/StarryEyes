@@ -200,21 +200,24 @@ namespace StarryEyes.ViewModels.WindowParts
 
             CompositeDisposable.Add(InitPostLimitPrediction());
 
-            _geoWatcher = new GeoCoordinateWatcher(GeoPositionAccuracy.Default);
-            _geoWatcher.StatusChanged += (_, e) =>
+            if (!Setting.DisableGeoLocationService.Value)
             {
-                if (e.Status != GeoPositionStatus.Ready)
+                _geoWatcher = new GeoCoordinateWatcher(GeoPositionAccuracy.Default);
+                _geoWatcher.StatusChanged += (_, e) =>
                 {
-                    IsLocationEnabled = true;
-                }
-                else
-                {
-                    IsLocationEnabled = false;
-                    AttachedLocation = null;
-                }
-            };
-            CompositeDisposable.Add(_geoWatcher);
-            _geoWatcher.Start();
+                    if (e.Status != GeoPositionStatus.Ready)
+                    {
+                        IsLocationEnabled = true;
+                    }
+                    else
+                    {
+                        IsLocationEnabled = false;
+                        AttachedLocation = null;
+                    }
+                };
+                CompositeDisposable.Add(_geoWatcher);
+                _geoWatcher.Start();
+            }
             this.RegisterEvents();
         }
 
@@ -673,7 +676,7 @@ namespace StarryEyes.ViewModels.WindowParts
                       .Where(_ => IsPostLimitPredictionEnabled)
                       .Subscribe(_ =>
                       {
-                          var account = InputAreaModel.BindingAccounts.FirstOrDefault();
+                          var account = InputAreaModel.BindingAccounts.ToArray().FirstOrDefault();
                           if (account == null) return;
                           var count = PostLimitPredictionService.GetCurrentWindowCount(account.Id);
                           MaxUpdate = Setting.PostLimitPerWindow.Value;
@@ -940,6 +943,7 @@ namespace StarryEyes.ViewModels.WindowParts
 
         public void AttachLocation()
         {
+            if (_geoWatcher == null || _geoWatcher.Status != GeoPositionStatus.Ready) return;
             AttachedLocation = new LocationDescriptionViewModel(
                 _geoWatcher.Position.Location);
         }

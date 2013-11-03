@@ -368,6 +368,13 @@ namespace StarryEyes
                     Setting.DatabaseErrorOccured.Value = true;
                 }
 
+                if (ex.Message.Contains("8007007e") &&
+                    ex.Message.Contains("CLSID {E5B8E079-EE6D-4E33-A438-C87F2E959254}"))
+                {
+                    Setting.DisableGeoLocationService.Value = false;
+                }
+
+
                 // TODO:ロギング処理など
                 Debug.WriteLine("##### SYSTEM CRASH! #####");
                 Debug.WriteLine(ex.ToString());

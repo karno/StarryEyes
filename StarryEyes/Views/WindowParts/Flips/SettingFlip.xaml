@@ -640,7 +640,21 @@
                                        Text="ウィンドウあたりの投稿上限 " />
                             <xctk:IntegerUpDown Width="80" Value="{Binding PostLimitPerWindow}" />
                         </DockPanel>
+                        <CheckBox Margin="0,8"
+                                  Content="位置情報サービスをロードしない(_G) [この設定は自動的に変更されることがあります]"
+                                  IsChecked="{Binding LoadPluginFromDevFolder}" />
                     </StackPanel>
+                    <Button Margin="12"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Bottom"
+                            Content="Krileをメンテナンスモードでリスタート"
+                            Style="{StaticResource MetroSquareButtonStyle}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <ei:CallMethodAction MethodName="RestartAsMaintenance" TargetObject="{Binding}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </Button>
                 </Grid>
                 <Grid Grid.Column="1" Margin="0,6,0,0">
                     <Grid.Style>

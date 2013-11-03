@@ -171,6 +171,9 @@ namespace StarryEyes.Settings
         public static readonly SettingItemStruct<bool> LoadPluginFromDevFolder =
             new SettingItemStruct<bool>("LoadPluginFromDevFolder", false);
 
+        public static readonly SettingItemStruct<bool> DisableGeoLocationService =
+            new SettingItemStruct<bool>("DisableGeoLocationService", false);
+
         public static readonly SettingItemStruct<int> EventDisplayMinimumMSec =
             new SettingItemStruct<int>("EventDisplayMinimumMSec", 200);
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
@@ -21,6 +22,7 @@ using StarryEyes.Settings.KeyAssigns;
 using StarryEyes.ViewModels.Dialogs;
 using StarryEyes.Views.Dialogs;
 using StarryEyes.Views.Messaging;
+using Application = System.Windows.Application;
 
 namespace StarryEyes.ViewModels.WindowParts.Flips
 {
@@ -513,6 +515,29 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             set { Setting.PostLimitPerWindow.Value = value; }
         }
 
+        public bool DisableGeoLocationService
+        {
+            get { return Setting.DisableGeoLocationService.Value; }
+            set { Setting.DisableGeoLocationService.Value = value; }
+        }
+
+        public void RestartAsMaintenance()
+        {
+            var psi = new ProcessStartInfo
+            {
+                FileName = App.ExeFilePath,
+                Arguments = "-maintenance",
+                UseShellExecute = true
+            };
+            try
+            {
+                MainWindowModel.SuppressCloseConfirmation = true;
+                Process.Start(psi);
+                Application.Current.Shutdown();
+            }
+            catch { }
+        }
+
         #endregion
 
         public void Close()
@@ -524,15 +549,18 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             // update connection property
             _accounts.ForEach(a => a.CommitChanges());
             this.IsConfigurationActive = false;
-            _completeCallback.OnNext(Unit.Default);
-            _completeCallback.OnCompleted();
-            _completeCallback = null;
+            if (_completeCallback != null)
+            {
+                _completeCallback.OnNext(Unit.Default);
+                _completeCallback.OnCompleted();
+                _completeCallback = null;
+            }
         }
     }
 
     public class TwitterAccountConfigurationViewModel : ViewModel
     {
-        private bool isConnectionPropertyHasChanged;
+        private bool _isConnectionPropertyHasChanged;
         private readonly SettingFlipViewModel _parent;
         private readonly TwitterAccount _account;
 
@@ -659,7 +687,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 if (IsUserStreamsEnabled == value) return;
                 this.Account.IsUserStreamsEnabled = value;
                 this.RaisePropertyChanged();
-                isConnectionPropertyHasChanged = true;
+                this._isConnectionPropertyHasChanged = true;
             }
         }
 
@@ -671,7 +699,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 if (ReceiveRepliesAll == value) return;
                 this.Account.ReceiveRepliesAll = value;
                 this.RaisePropertyChanged();
-                isConnectionPropertyHasChanged = true;
+                this._isConnectionPropertyHasChanged = true;
             }
         }
 
@@ -683,7 +711,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 if (ReceiveFollowingsActivity == value) return;
                 this.Account.ReceiveFollowingsActivity = value;
                 this.RaisePropertyChanged();
-                isConnectionPropertyHasChanged = true;
+                this._isConnectionPropertyHasChanged = true;
             }
         }
 
@@ -712,9 +740,9 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public void CommitChanges()
         {
-            var flag = isConnectionPropertyHasChanged;
+            var flag = this._isConnectionPropertyHasChanged;
             // down flags
-            isConnectionPropertyHasChanged = false;
+            this._isConnectionPropertyHasChanged = false;
 
             // if property has changed, reconnect streams
             if (flag)
