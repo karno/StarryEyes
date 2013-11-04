@@ -343,7 +343,6 @@ namespace StarryEyes
             if (shutdown)
             {
                 Debug.WriteLine("App Normal Exit");
-                // 正規の終了
                 RaiseApplicationExit();
             }
             Debug.WriteLine("App Finalize");
@@ -362,7 +361,8 @@ namespace StarryEyes
             try
             {
                 var aex = ex as AggregateException;
-                if (ex is SQLiteException || (aex != null && aex.InnerExceptions.Any(ie => ie is SQLiteException)))
+                if (ex is SQLiteException || (aex != null && aex.InnerExceptions.Any(ie => ie is SQLiteException)) ||
+                    ex.Message.Contains("database disk image is malformed"))
                 {
                     // database error
                     Setting.DatabaseErrorOccured.Value = true;
@@ -373,7 +373,6 @@ namespace StarryEyes
                 {
                     Setting.DisableGeoLocationService.Value = false;
                 }
-
 
                 // TODO:ロギング処理など
                 Debug.WriteLine("##### SYSTEM CRASH! #####");
