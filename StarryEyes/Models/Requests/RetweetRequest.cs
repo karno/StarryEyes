@@ -47,15 +47,17 @@ namespace StarryEyes.Models.Requests
                     catch (TwitterApiException tae)
                     {
                         thrown = tae;
-                        if (tae.Message.Contains(LimitMessage) &&
-                            acc.FallbackAccountId != null)
+                        if (tae.Message.Contains(LimitMessage))
                         {
-                            // reached post limit, fallback
-                            var prev = acc;
-                            acc = Setting.Accounts.Get(acc.FallbackAccountId.Value);
-                            BackstageModel.RegisterEvent(new FallbackedEvent(prev, acc));
-                            BackstageModel.NotifyFallbackState(prev, true);
-                            continue;
+                            BackstageModel.NotifyFallbackState(acc, true);
+                            if (acc.FallbackAccountId != null)
+                            {
+                                // reached post limit, fallback
+                                var prev = acc;
+                                acc = Setting.Accounts.Get(acc.FallbackAccountId.Value);
+                                BackstageModel.RegisterEvent(new FallbackedEvent(prev, acc));
+                                continue;
+                            }
                         }
                     }
                     var id = await acc.GetMyRetweetIdOfStatusAsync(_id);
