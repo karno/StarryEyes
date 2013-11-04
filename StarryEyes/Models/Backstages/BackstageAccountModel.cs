@@ -91,6 +91,12 @@ namespace StarryEyes.Models.Backstages
 
         public event Action FallbackStateUpdated;
 
+        protected virtual void RaiseFallbackStateUpdated()
+        {
+            var handler = this.FallbackStateUpdated;
+            if (handler != null) handler();
+        }
+
         public bool IsFallbacked { get; private set; }
 
         public DateTime FallbackPredictedReleaseTime { get; private set; }
@@ -109,8 +115,9 @@ namespace StarryEyes.Models.Backstages
                     var threshold = DateTime.Now - TimeSpan.FromSeconds(Setting.PostWindowTimeSec.Value);
                     var oldest = PostLimitPredictionService.GetStatuses(Account.Id)
                                                            .Where(t => t.CreatedAt > threshold)
-                                                           .OrderBy(t => t.CreatedAt)
-                                                           .FirstOrDefault();
+                                                           .OrderByDescending(t => t.CreatedAt)
+                                                           .Take(Setting.PostLimitPerWindow.Value) // limit count
+                                                           .LastOrDefault();
                     if (oldest == null)
                     {
                         IsFallbacked = false;
@@ -126,7 +133,11 @@ namespace StarryEyes.Models.Backstages
                             _prevScheduled.Dispose();
                         }
                         _prevScheduled = Observable.Timer(FallbackPredictedReleaseTime)
-                                                   .Subscribe(_ => IsFallbacked = false);
+                                                   .Subscribe(_ =>
+                                                   {
+                                                       IsFallbacked = false;
+                                                       this.RaiseFallbackStateUpdated();
+                                                   });
                     }
                 }
                 else
@@ -142,8 +153,7 @@ namespace StarryEyes.Models.Backstages
                 {
                     BackstageModel.RegisterEvent(new PostLimitedEvent(Account, FallbackPredictedReleaseTime));
                 }
-                var handler = this.FallbackStateUpdated;
-                if (handler != null) handler();
+                this.RaiseFallbackStateUpdated();
             });
         }
     }
