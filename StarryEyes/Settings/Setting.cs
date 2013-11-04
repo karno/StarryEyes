@@ -218,7 +218,6 @@ namespace StarryEyes.Settings
         public static readonly SettingItemStruct<int> SettingVersion =
             new SettingItemStruct<int>("SettingVersion", 1);
 
-
         public static readonly SettingItemStruct<bool> DatabaseErrorOccured =
             new SettingItemStruct<bool>("DatabaseErrorOccured", false);
 
