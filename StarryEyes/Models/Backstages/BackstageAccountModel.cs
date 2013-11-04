@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;
+using StarryEyes.Models.Backstages.NotificationEvents.PostEvents;
 using StarryEyes.Models.Receiving;
 using StarryEyes.Models.Receiving.Receivers;
 using StarryEyes.Models.Stores;
@@ -136,6 +137,10 @@ namespace StarryEyes.Models.Backstages
                         _prevScheduled.Dispose();
                         _prevScheduled = null;
                     }
+                }
+                if (IsFallbacked)
+                {
+                    BackstageModel.RegisterEvent(new PostLimitedEvent(Account, FallbackPredictedReleaseTime));
                 }
                 var handler = this.FallbackStateUpdated;
                 if (handler != null) handler();

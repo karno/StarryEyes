@@ -219,6 +219,7 @@
     <Compile Include="Hotfixes\ViewModelHelperRx.cs" />
     <Compile Include="Models\BackstageModel.cs" />
     <Compile Include="Models\Backstages\BackstageAccountModel.cs" />
+    <Compile Include="Models\Backstages\NotificationEvents\PostEvents\PostLimitedEvent.cs" />
     <Compile Include="Models\Backstages\SystemEvents\KeyAssignProfileNotFoundEvent.cs" />
     <Compile Include="Models\Backstages\SystemEvents\QueryCorruptionEvent.cs" />
     <Compile Include="Models\Backstages\SystemEvents\SystemEventBase.cs" />
