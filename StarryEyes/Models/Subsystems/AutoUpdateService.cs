@@ -165,6 +165,16 @@ namespace StarryEyes.Models.Subsystems
                 {
                     if (retryCount > 10)
                     {
+                        TaskDialog.Show(new TaskDialogOptions
+                        {
+                            Title = "アップデート完了エラー",
+                            MainIcon = VistaTaskDialogIcon.Error,
+                            MainInstruction = "更新バイナリを削除できません。",
+                            Content = "ユーザーデータディレクトリに存在するupdateフォルダを手動で削除してください。",
+                            ExpandedInfo = "ユーザーデータディレクトリの位置については、FAQを参照してください。" + Environment.NewLine +
+                                           "削除出来ない場合は、Windowsを再起動する必要があるかもしれません。",
+                            CommonButtons = TaskDialogCommonButtons.Close
+                        });
                         throw;
                     }
                     Thread.Sleep(1000);
