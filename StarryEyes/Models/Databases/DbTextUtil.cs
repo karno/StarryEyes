@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 namespace StarryEyes.Models.Databases
 {
@@ -22,7 +23,9 @@ namespace StarryEyes.Models.Databases
         /// <returns>(select (body))</returns>
         public static string EnumerationToSelectClause(this string str)
         {
-            return "(select (" + (string.IsNullOrEmpty(str) ? "-1" : str) + "))";
+            return String.IsNullOrEmpty(str)
+                       ? "(select (-1))"
+                       : "(" + str + ")";
         }
 
         /// <summary>

@@ -112,7 +112,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 
         public override string UsersSql
         {
-            get { return UserIdSql.EnumerationToSelectClause(); }
+            get { return "(select (" + UserIdSql + "))"; }
         }
 
         public override string FollowingsSql
