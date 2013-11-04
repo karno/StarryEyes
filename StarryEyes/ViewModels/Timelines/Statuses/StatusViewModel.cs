@@ -1153,7 +1153,11 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             {
                 LeftValue = new UserId(),
                 RightValue = new NumericValue(this.Status.User.Id)
-            });
+            }.Or(new FilterOperatorEquals
+            {
+                LeftValue = new RetweeterId(),
+                RightValue = new NumericValue(this.Status.User.Id)
+            }));
         }
 
         public void MuteClient()
