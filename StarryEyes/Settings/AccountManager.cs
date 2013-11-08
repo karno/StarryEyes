@@ -27,7 +27,7 @@ namespace StarryEyes.Settings
             this._settingItem = settingItem;
             _accountObservableCollection = new ObservableSynchronizedCollectionEx<TwitterAccount>(_settingItem.Value);
             _accountCache = new ConcurrentDictionary<long, TwitterAccount>(
-                _accountObservableCollection.ToDictionary(a => a.Id));
+                _accountObservableCollection.Distinct(a => a.Id).ToDictionary(a => a.Id));
             _accountObservableCollection.CollectionChanged += CollectionChanged;
             _random = new Random(Environment.TickCount);
         }
