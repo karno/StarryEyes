@@ -297,8 +297,8 @@ namespace StarryEyes
                         {
                             KeyAssignProfilesDirectory
                         };
-                        files.ForEach(File.Delete);
-                        dirs.ForEach(d => Directory.Delete(d, true));
+                        files.Where(File.Exists).ForEach(File.Delete);
+                        dirs.Where(Directory.Exists).ForEach(d => Directory.Delete(d, true));
                     }
                     else
                     {
@@ -318,6 +318,7 @@ namespace StarryEyes
             }
             return resp.CommandButtonResult.Value < 3;
         }
+
 
         private bool CheckDatabase()
         {
