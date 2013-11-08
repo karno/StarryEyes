@@ -30,7 +30,8 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
                 {
                     {"Version", "3"},
                     {"Cache Size", "8000"},
-                    {"Synchronous", "Off"},
+                    // This option would cause damage to database image.
+                    // {"Synchronous", "Off"}, 
                     {"Page Size", "2048"},
                     {"Pooling", "True"},
                     {"Max Pool Size", "200"}
