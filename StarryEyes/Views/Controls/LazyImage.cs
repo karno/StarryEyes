@@ -168,7 +168,6 @@ namespace StarryEyes.Views.Controls
                 _imageStreamer.TryRemove(source, out removal);
                 subject.OnNext(result);
                 subject.OnCompleted();
-                subject.Dispose();
             }
             catch (Exception ex)
             {

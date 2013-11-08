@@ -178,7 +178,9 @@ namespace StarryEyes.Models.Timelines.Statuses
                              lock (subj)
                              {
                                  subj.OnCompleted();
-                                 subj.Dispose();
+                                 // WE SHOULD NOT CALL Dispose METHOD !!!
+                                 // http://stackoverflow.com/questions/16540853/why-does-subjectt-dispose-does-not-dispose-current-suscriptions
+                                 // subj.Dispose();
                              }
                          })
                          .Subscribe(l => this.Images = l);

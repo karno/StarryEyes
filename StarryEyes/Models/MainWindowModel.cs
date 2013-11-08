@@ -166,6 +166,7 @@ namespace StarryEyes.Models
             else
             {
                 notifier.OnCompleted();
+                // WE SHOULD NOT CALL Dispose Method!
             }
             return notifier;
         }

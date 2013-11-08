@@ -360,7 +360,6 @@ namespace StarryEyes.Models
                                           });
                                // ReSharper restore AccessToDisposedClosure
                                subject.OnCompleted();
-                               subject.Dispose();
                            });
             return subject;
         }
