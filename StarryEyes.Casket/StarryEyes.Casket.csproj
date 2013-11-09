@@ -81,6 +81,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Cruds\AccountInfoCrud.cs" />
     <Compile Include="Cruds\ManagementCrud.cs" />
     <Compile Include="Cruds\Scaffolding\CrudBase.cs" />
     <Compile Include="Cruds\RelationCrudBase.cs" />
@@ -94,6 +95,7 @@
     <Compile Include="Cruds\RetweetsCrud.cs" />
     <Compile Include="Cruds\StatusCrud.cs" />
     <Compile Include="Cruds\UserCrud.cs" />
+    <Compile Include="DatabaseModels\DatabaseAccountInfo.cs" />
     <Compile Include="DatabaseModels\DatabaseActivity.cs" />
     <Compile Include="DatabaseModels\DatabaseEntity.cs" />
     <Compile Include="DatabaseModels\DatabaseManagement.cs" />

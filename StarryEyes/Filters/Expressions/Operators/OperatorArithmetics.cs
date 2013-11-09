@@ -16,10 +16,22 @@ namespace StarryEyes.Filters.Expressions.Operators
         {
             get
             {
-                return new[] { FilterExpressionType.Numeric, FilterExpressionType.Set }
+                return new[] { FilterExpressionType.Numeric, FilterExpressionType.Set, FilterExpressionType.String, }
                     .Intersect(LeftValue.SupportedTypes)
                     .Intersect(RightValue.SupportedTypes);
             }
+        }
+
+        public override Func<TwitterStatus, string> GetStringValueProvider()
+        {
+            var lsp = LeftValue.GetStringValueProvider();
+            var rsp = RightValue.GetStringValueProvider();
+            return _ => lsp(_) + rsp(_);
+        }
+
+        public override string GetStringSqlQuery()
+        {
+            return LeftValue.GetStringSqlQuery() + " || " + RightValue.GetStringSqlQuery();
         }
 
         public override Func<TwitterStatus, IReadOnlyCollection<long>> GetSetValueProvider()

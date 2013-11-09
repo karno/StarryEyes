@@ -112,22 +112,22 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 
         public override string UsersSql
         {
-            get { return "(select (" + UserIdSql + "))"; }
+            get { return "(select Id from Accounts where Id = " + UserId + ")"; }
         }
 
         public override string FollowingsSql
         {
-            get { return "(select Targetid from Followings where UserId = " + UserId + ")"; }
+            get { return "(select TargetId from Followings where UserId = " + UserId + ")"; }
         }
 
         public override string FollowersSql
         {
-            get { return "(select Targetid from Followers where UserId = " + UserId + ")"; }
+            get { return "(select TargetId from Followers where UserId = " + UserId + ")"; }
         }
 
         public override string BlockingsSql
         {
-            get { return "(select Targetid from Blockings where UserId = " + UserId + ")"; }
+            get { return "(select TargetId from Blockings where UserId = " + UserId + ")"; }
         }
 
         public override string ToQuery()

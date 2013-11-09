@@ -12,6 +12,7 @@ namespace StarryEyes.Casket
 {
     public static class Database
     {
+        private static readonly AccountInfoCrud _accountInfoCrud = new AccountInfoCrud();
         private static readonly StatusCrud _statusCrud = new StatusCrud();
         private static readonly StatusEntityCrud _statusEntityCrud = new StatusEntityCrud();
         private static readonly UserCrud _userCrud = new UserCrud();
@@ -26,6 +27,11 @@ namespace StarryEyes.Casket
         private static bool _isInitialized;
 
         public static string DbFilePath { get { return _dbFilePath; } }
+
+        public static AccountInfoCrud AccountInfoCrud
+        {
+            get { return _accountInfoCrud; }
+        }
 
         public static StatusCrud StatusCrud
         {
@@ -94,6 +100,7 @@ namespace StarryEyes.Casket
             {
                 tasks = new[]
                 {
+		    AccountInfoCrud.InitializeAsync(),
                     StatusCrud.InitializeAsync(),
                     StatusEntityCrud.InitializeAsync(),
                     UserCrud.InitializeAsync(),

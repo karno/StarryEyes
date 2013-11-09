@@ -68,7 +68,6 @@ namespace StarryEyes.Settings
             new SettingItem<List<TwitterAccount>>("Accounts", new List<TwitterAccount>());
 
         private static AccountManager _manager;
-
         public static AccountManager Accounts
         {
             get { return _manager; }

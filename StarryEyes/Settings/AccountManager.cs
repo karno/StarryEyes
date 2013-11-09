@@ -3,8 +3,10 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Threading.Tasks;
 using Livet;
 using StarryEyes.Models.Accounting;
+using StarryEyes.Models.Databases;
 
 namespace StarryEyes.Settings
 {
@@ -30,6 +32,20 @@ namespace StarryEyes.Settings
                 _accountObservableCollection.Distinct(a => a.Id).ToDictionary(a => a.Id));
             _accountObservableCollection.CollectionChanged += CollectionChanged;
             _random = new Random(Environment.TickCount);
+            // initialize DB after system is available.
+            App.SystemReady += this.SynchronizeDb;
+        }
+
+        private async void SynchronizeDb()
+        {
+            var accounts = (await AccountProxy.GetAccountsAsync()).ToArray();
+            var registered = _accountCache.Keys.ToArray();
+            var news = registered.Except(accounts).ToArray();
+            var olds = accounts.Except(registered).ToArray();
+            await Task.Run(() => Task.WaitAll(
+                olds.Select(AccountProxy.RemoveAccountAsync)
+                    .Concat(news.Select(AccountProxy.AddAccountAsync))
+                    .ToArray()));
         }
 
         public IEnumerable<long> Ids
@@ -90,11 +106,13 @@ namespace StarryEyes.Settings
                 case NotifyCollectionChangedAction.Add:
                     if (added == null) throw new ArgumentException("added item is null.");
                     _accountCache[added.Id] = added;
+                    Task.Run(() => AccountProxy.AddAccountAsync(added.Id));
                     break;
                 case NotifyCollectionChangedAction.Remove:
                     if (removed == null) throw new ArgumentException("removed item is null.");
                     TwitterAccount removal;
                     _accountCache.TryRemove(removed.Id, out removal);
+                    Task.Run(() => AccountProxy.RemoveAccountAsync(removed.Id));
                     break;
                 case NotifyCollectionChangedAction.Replace:
                     if (added == null) throw new ArgumentException("added item is null.");
@@ -102,10 +120,13 @@ namespace StarryEyes.Settings
                     _accountCache[added.Id] = added;
                     TwitterAccount replacee;
                     _accountCache.TryRemove(removed.Id, out replacee);
+                    Task.Run(() => AccountProxy.AddAccountAsync(added.Id));
+                    Task.Run(() => AccountProxy.RemoveAccountAsync(removed.Id));
                     break;
                 case NotifyCollectionChangedAction.Reset:
                     _accountCache.Clear();
                     _accountObservableCollection.ForEach(a => _accountCache[a.Id] = a);
+                    Task.Run(() => AccountProxy.RemoveAllAccountsAsync());
                     break;
             }
             _settingItem.Value = _accountObservableCollection.ToList();

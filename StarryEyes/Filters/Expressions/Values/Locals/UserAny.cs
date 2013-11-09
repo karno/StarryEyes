@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
 using StarryEyes.Albireo.Collections;
 using StarryEyes.Models.Accounting;
-using StarryEyes.Models.Databases;
 using StarryEyes.Settings;
 
 namespace StarryEyes.Filters.Expressions.Values.Locals
@@ -74,10 +72,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
         {
             get
             {
-                return Setting.Accounts.Ids
-                              .Select(i => "select (" + i.ToString(CultureInfo.InvariantCulture) + ")")
-                              .JoinString(" union ")
-                              .EnumerationToSelectClause();
+                return "(select Id from Accounts)";
             }
         }
 
