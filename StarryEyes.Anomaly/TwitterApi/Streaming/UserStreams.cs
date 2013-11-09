@@ -32,6 +32,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
                 {
                     // using GZip cause receiving elements delayed.
                     var client = credential.CreateOAuthClient(useGZip: false);
+                    // disable connection timeout due to streaming specification
                     client.Timeout = System.Threading.Timeout.InfiniteTimeSpan;
                     var endpoint = EndpointUserStreams;
                     if (!String.IsNullOrEmpty(param))
@@ -43,18 +44,38 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
                     {
                         while (!reader.EndOfStream && !cancel.IsCancellationRequested)
                         {
-                            var line = reader.ReadLine();
-                            observer.OnNext(line);
+                            var readLine = reader.ReadLineAsync();
+                            var delay = Task.Delay(TimeSpan.FromSeconds(ApiAccessProperties.StreamingTimeoutSec));
+                            if (await Task.WhenAny(readLine, delay) == readLine)
+                            {
+                                // successfully completed
+                                observer.OnNext(readLine.Result);
+                            }
+                            else
+                            {
+                                // timeout
+                                System.Diagnostics.Debug.WriteLine("#USERSTREAM# TIMEOUT.");
+                                break;
+                            }
                         }
-                    }
-                    if (!cancel.IsCancellationRequested)
-                    {
-                        observer.OnCompleted();
+                        if (reader.EndOfStream)
+                        {
+                            System.Diagnostics.Debug.WriteLine("#USERSTREAM# END OF STREAM.");
+                        }
                     }
                 }
                 catch (Exception ex)
                 {
+                    System.Diagnostics.Debug.WriteLine("#USERSTREAM# error detected: " + ex.Message);
                     observer.OnError(ex);
+                    return;
+                }
+
+                System.Diagnostics.Debug.WriteLine("#USERSTREAM# disconnection detected. (CANCELLATION REQUEST? " + cancel.IsCancellationRequested + ")");
+                if (!cancel.IsCancellationRequested)
+                {
+                    System.Diagnostics.Debug.WriteLine("#USERSTREAM# notify disconnection to upper layer.");
+                    observer.OnCompleted();
                 }
             }));
         }

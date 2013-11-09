@@ -27,5 +27,10 @@ namespace StarryEyes.Anomaly.TwitterApi
             get { return _userAgent ?? DefaultUserAgent; }
             set { _userAgent = !string.IsNullOrEmpty(value) ? value : null; }
         }
+
+        /// <summary>
+        /// Timeout seconds used in streaming connection.
+        /// </summary>
+        public static int StreamingTimeoutSec = 90;
     }
 }

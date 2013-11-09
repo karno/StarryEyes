@@ -20,8 +20,10 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
                 .Where(s => !String.IsNullOrWhiteSpace(s))
                 .ObserveOn(TaskPoolScheduler.Default)
                 .Select(s => DynamicJson.Parse(s))
-                .Subscribe(s => DispatchStreamingElements(s, handler),
-                           onError ?? (ex => { }), onCompleted ?? (() => { }));
+                .Subscribe(
+                    s => DispatchStreamingElements(s, handler),
+                    onError ?? (ex => { }),
+                    onCompleted ?? (() => { }));
         }
 
         private static void DispatchStreamingElements(dynamic element, IStreamHandler handler)

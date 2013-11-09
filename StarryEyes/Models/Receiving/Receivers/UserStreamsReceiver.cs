@@ -111,12 +111,13 @@ namespace StarryEyes.Models.Receiving.Receivers
 
         public void Reconnect()
         {
-            Debug.WriteLine("*** USER STREAMS RECONNECTING ***");
             if (!this.IsEnabled)
             {
+                Debug.WriteLine("*USERSTREAMS* disconnect.");
                 this.Disconnect();
                 return;
             }
+            Debug.WriteLine("*USERSTREAMS* Reconnecting " + _account.UnreliableScreenName + " ...");
             this.CleanupConnection();
             Task.Run(() => this._currentConnection.Add(this.ConnectCore()));
         }
@@ -137,6 +138,7 @@ namespace StarryEyes.Models.Receiving.Receivers
         {
             this.CheckDisposed();
             this.ConnectionState = UserStreamsConnectionState.Connecting;
+            Debug.WriteLine("*USERSTREAMS* " + _account.UnreliableScreenName + ": Starting connection...");
             var con = this.Account.ConnectUserStreams(this._trackKeywords, this.Account.ReceiveRepliesAll,
                                                       this.Account.ReceiveFollowingsActivity)
                           .Do(_ =>
@@ -157,6 +159,7 @@ namespace StarryEyes.Models.Receiving.Receivers
 
             public HandleStreams(UserStreamsReceiver parent)
             {
+                Debug.WriteLine("*USERSTREAMS* " + parent._account.UnreliableScreenName + ": Successufully subscribed.");
                 this._parent = parent;
             }
 
@@ -268,6 +271,8 @@ namespace StarryEyes.Models.Receiving.Receivers
 
         private void HandleException(Exception ex)
         {
+            Debug.WriteLine("*USERSTREAMS* catch exception: " + ex.Message);
+            Debug.WriteLine(ex.ToString());
             this.CleanupConnection();
             var tae = ex as TwitterApiException;
             if (tae != null)
@@ -315,11 +320,16 @@ namespace StarryEyes.Models.Receiving.Receivers
                 }
                 // else -> backoff
                 if (this._currentBackOffMode == BackOffMode.ProtocolError)
-                    this._currentBackOffWaitCount += this._currentBackOffWaitCount;
-                // wait count is raised exponentially.
+                {
+                    // wait count is raised exponentially.
+                    this._currentBackOffWaitCount *= 2;
+                }
                 else
+                {
                     this._currentBackOffWaitCount = 5000;
-                if (this._currentBackOffWaitCount >= 320000) // max wait is 320 sec.
+                }
+                // max wait is 320 sec.
+                if (this._currentBackOffWaitCount >= 320000)
                 {
                     this.RaiseDisconnectedByError(
                         "Twitterが不安定な状態になっています。",
@@ -332,10 +342,17 @@ namespace StarryEyes.Models.Receiving.Receivers
                 // network error
                 // -> backoff
                 if (this._currentBackOffMode == BackOffMode.NetworkError)
-                    this._currentBackOffMode += 250; // wait count is raised linearly.
+                {
+                    // wait count is raised linearly.
+                    this._currentBackOffMode += 250;
+                }
                 else
-                    this._currentBackOffWaitCount = 250; // wait starts 250ms
-                if (this._currentBackOffWaitCount >= 16000) // max wait is 16 sec.
+                {
+                    // wait starts 250ms
+                    this._currentBackOffWaitCount = 250;
+                }
+                // max wait is 16 sec.
+                if (this._currentBackOffWaitCount >= 16000)
                 {
                     this.RaiseDisconnectedByError(
                         "Twitterが不安定な状態になっています。",
