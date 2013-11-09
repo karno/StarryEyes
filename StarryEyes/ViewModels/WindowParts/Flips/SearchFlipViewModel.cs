@@ -271,6 +271,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 IsQueryMode = true;
                 IsSearchOptionAvailable = false;
                 IsSearchResultAvailable = false;
+                ErrorText = "コンパイルしています...";
                 try
                 {
                     if (value == "?")
