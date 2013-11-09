@@ -94,6 +94,12 @@ namespace StarryEyes.Settings
         public static readonly SettingItem<string> KeyAssign =
             new SettingItem<string>("KeyAssign", null);
 
+        public static readonly SettingItemStruct<bool> ShowThumbnails =
+            new SettingItemStruct<bool>("ShowThumbnails", true);
+
+        public static readonly SettingItemStruct<bool> OpenTwitterImageWithOriginalSize =
+            new SettingItemStruct<bool>("OpenTwitterImageWithOriginalSize", true);
+
         #endregion
 
         #region Input control
