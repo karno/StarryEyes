@@ -13,16 +13,12 @@ namespace StarryEyes.Feather.Scripting
 
         #endregion
 
-        public abstract bool RegisterExecutor(string ext, IScriptExecutor executor);
+        public abstract bool RegisterExecutor(IScriptExecutor executor);
 
-        public abstract IEnumerable<string> RegisteredExecutors { get; }
+        public abstract IEnumerable<IScriptExecutor> Executors { get; }
 
-        public abstract void Execute(string executorName, string script, params object[] parameters);
+        public abstract IScriptExecutor GetExecutor(string executorName);
 
-        public abstract T Evaluate<T>(string executorName, string script, params object[] parameters);
-
-        public abstract void ExecuteFile(string filePath);
-
-        public abstract void ExecuteFile(string executorName, string filePath);
+        public abstract bool ExecuteFile(string filePath);
     }
 }

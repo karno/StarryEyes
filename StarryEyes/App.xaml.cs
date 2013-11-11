@@ -20,6 +20,7 @@ using StarryEyes.Models.Receiving.Handling;
 using StarryEyes.Models.Stores;
 using StarryEyes.Models.Subsystems;
 using StarryEyes.Nightmare.Windows;
+using StarryEyes.Plugins;
 using StarryEyes.Settings;
 using StarryEyes.Views.Dialogs;
 
@@ -239,8 +240,7 @@ namespace StarryEyes
             PluginManager.LoadedPlugins.ForEach(p => p.Initialize());
 
             // activate scripts
-            // TODO: impl
-            // ScriptingManager.Instance.ExecuteFile(Path.Combine(ExeFileDir, ScriptDirectiory));
+            ScriptingManagerImpl.Initialize();
 
             ReceiveManager.Initialize();
             TwitterConfigurationService.Initialize();

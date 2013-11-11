@@ -1,50 +1,79 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
+using StarryEyes.Annotations;
 using StarryEyes.Feather.Scripting;
 
 namespace StarryEyes.Plugins
 {
     public class ScriptingManagerImpl : ScriptingManager
     {
-        public static void Initialize()
+        internal static void Initialize()
         {
-            var prop = typeof(ScriptingManager).GetProperty("Instance", BindingFlags.Static | BindingFlags.NonPublic);
-            prop.SetValue(null, new ScriptingManagerImpl());
+            // initialize from app core
+            var instance = new ScriptingManagerImpl();
+            var prop = typeof(ScriptingManager).GetProperty("Instance", BindingFlags.Static | BindingFlags.Public);
+            prop.SetValue(null, instance);
+            instance.ExecuteScripts();
         }
+
+        private readonly ConcurrentDictionary<string, IScriptExecutor> _executors =
+            new ConcurrentDictionary<string, IScriptExecutor>();
+        private readonly ConcurrentDictionary<string, IScriptExecutor> _executorExtResolver =
+            new ConcurrentDictionary<string, IScriptExecutor>();
 
         private ScriptingManagerImpl()
         {
-            // initialize from core module
         }
 
-        public override bool RegisterExecutor(string ext, IScriptExecutor executor)
+        private void ExecuteScripts()
         {
-            throw new System.NotImplementedException();
+            var targetPath = Path.Combine(App.ExeFileDir, App.ScriptDirectiory);
+            foreach (var file in Directory.GetFiles(targetPath, "*", SearchOption.TopDirectoryOnly))
+            {
+                this.ExecuteFile(file);
+            }
         }
 
-        public override IEnumerable<string> RegisteredExecutors
+        public override bool RegisterExecutor([NotNull] IScriptExecutor executor)
         {
-            get { throw new System.NotImplementedException(); }
+            if (executor == null) throw new ArgumentNullException("executor");
+            if (_executors.ContainsKey(executor.Name)) return false;
+            _executors[executor.Name] = executor;
+            executor.Extensions
+                    .Where(ext => !this._executorExtResolver.ContainsKey(ext))
+                    .ForEach(ext => this._executorExtResolver[ext] = executor);
+            return true;
         }
 
-        public override void Execute(string executorName, string script, params object[] parameters)
+        public override IEnumerable<IScriptExecutor> Executors
         {
-            throw new System.NotImplementedException();
+            get { return _executors.Values.ToArray(); }
         }
 
-        public override T Evaluate<T>(string executorName, string script, params object[] parameters)
+        public override IScriptExecutor GetExecutor(string executorName)
         {
-            throw new System.NotImplementedException();
+            IScriptExecutor executor;
+            return this._executors.TryGetValue(executorName, out executor)
+                       ? executor
+                       : null;
         }
 
-        public override void ExecuteFile(string filePath)
+        public override bool ExecuteFile([NotNull] string filePath)
         {
-            throw new System.NotImplementedException();
-        }
-
-        public override void ExecuteFile(string executorName, string filePath)
-        {
-            throw new System.NotImplementedException();
+            if (filePath == null) throw new ArgumentNullException("filePath");
+            var ext = (Path.GetExtension(filePath) ?? "").Trim(new[] { '.', ' ' });
+            IScriptExecutor executor;
+            if (_executorExtResolver.TryGetValue(ext, out executor))
+            {
+                Task.Run(() => executor.Execute(File.ReadAllText(filePath)));
+                return true;
+            }
+            return false;
         }
     }
 }
