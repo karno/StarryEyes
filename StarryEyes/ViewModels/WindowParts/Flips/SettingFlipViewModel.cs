@@ -191,8 +191,9 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         #region Mute filter editor property
 
-        private
-        FilterExpressionRoot _lastCommit;
+        private bool _isDirtyState;
+
+        private FilterExpressionRoot _lastCommit;
 
         private string _currentQueryString;
         public string QueryString
@@ -200,6 +201,8 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             get { return _currentQueryString; }
             set
             {
+                if (_currentQueryString == value) return;
+                _isDirtyState = true;
                 _currentQueryString = value;
                 RaisePropertyChanged();
                 Observable.Timer(TimeSpan.FromMilliseconds(100))
@@ -236,6 +239,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             {
                 var newFilter = await Task.Run(() => QueryCompiler.CompileFilters(source));
                 newFilter.GetEvaluator(); // validate types
+                newFilter.GetSqlQuery(); // validate types (phase 2)
                 _lastCommit = newFilter;
                 FoundError = false;
             }
@@ -244,6 +248,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 FoundError = true;
                 ExceptionMessage = ex.Message;
             }
+            _isDirtyState = false;
         }
 
         public void ResetFilter()
@@ -539,6 +544,16 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public void Close()
         {
+            if (_isDirtyState)
+            {
+                try
+                {
+                    var newFilter = QueryCompiler.CompileFilters(_currentQueryString);
+                    newFilter.GetEvaluator(); // validate types
+                    _lastCommit = newFilter;
+                }
+                catch { }
+            }
             if (_lastCommit != null)
             {
                 Setting.Muteds.Value = _lastCommit;
