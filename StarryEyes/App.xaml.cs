@@ -13,7 +13,6 @@ using System.Windows;
 using Livet;
 using StarryEyes.Annotations;
 using StarryEyes.Casket;
-using StarryEyes.Feather.Scripting;
 using StarryEyes.Models;
 using StarryEyes.Models.Plugins;
 using StarryEyes.Models.Receiving;
@@ -240,7 +239,8 @@ namespace StarryEyes
             PluginManager.LoadedPlugins.ForEach(p => p.Initialize());
 
             // activate scripts
-            IScriptingManager.ExecuteScripts(Path.Combine(ExeFileDir, ScriptDirectiory));
+            // TODO: impl
+            // ScriptingManager.Instance.ExecuteFile(Path.Combine(ExeFileDir, ScriptDirectiory));
 
             ReceiveManager.Initialize();
             TwitterConfigurationService.Initialize();
