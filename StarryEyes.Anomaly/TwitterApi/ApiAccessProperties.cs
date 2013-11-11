@@ -6,9 +6,11 @@ namespace StarryEyes.Anomaly.TwitterApi
     {
         private const string DefaultApiEndpoint = "https://api.twitter.com/1.1/";
         private const string DefaultUserAgent = "Krile/3.x (Windows;.NET Framework 4.5);SarryEyes.Anomaly;AsyncOAuth";
+        private const int DefaultStreamTimeoutSec = 90;
 
         private static string _apiEndpoint;
         private static string _userAgent;
+        private static int? _streamTimeoutSec;
 
         /// <summary>
         /// Api endpoint for accessing twitter.
@@ -31,6 +33,10 @@ namespace StarryEyes.Anomaly.TwitterApi
         /// <summary>
         /// Timeout seconds used in streaming connection.
         /// </summary>
-        public static int StreamingTimeoutSec = 90;
+        public static int StreamingTimeoutSec
+        {
+            get { return _streamTimeoutSec ?? DefaultStreamTimeoutSec; }
+            set { _streamTimeoutSec = value == 0 ? (int?)null : value; }
+        }
     }
 }

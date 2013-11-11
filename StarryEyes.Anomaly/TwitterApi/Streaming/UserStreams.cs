@@ -42,25 +42,29 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
                     using (var stream = await client.GetStreamAsync(endpoint))
                     using (var reader = new StreamReader(stream))
                     {
-                        while (!reader.EndOfStream && !cancel.IsCancellationRequested)
+                        // reader.EndOfStream 
+                        while (!cancel.IsCancellationRequested)
                         {
                             var readLine = reader.ReadLineAsync();
                             var delay = Task.Delay(TimeSpan.FromSeconds(ApiAccessProperties.StreamingTimeoutSec));
-                            if (await Task.WhenAny(readLine, delay) == readLine)
-                            {
-                                // successfully completed
-                                observer.OnNext(readLine.Result);
-                            }
-                            else
+                            if (await Task.WhenAny(readLine, delay) == delay)
                             {
                                 // timeout
                                 System.Diagnostics.Debug.WriteLine("#USERSTREAM# TIMEOUT.");
                                 break;
                             }
-                        }
-                        if (reader.EndOfStream)
-                        {
-                            System.Diagnostics.Debug.WriteLine("#USERSTREAM# END OF STREAM.");
+                            var line = readLine.Result;
+                            if (line == null)
+                            {
+                                // connection closed
+                                System.Diagnostics.Debug.WriteLine("#USERSTREAM# CONNECTION CLOSED.");
+                                break;
+                            }
+                            if (!String.IsNullOrEmpty(line))
+                            {
+                                // successfully completed
+                                observer.OnNext(line);
+                            }
                         }
                     }
                 }
