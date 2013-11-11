@@ -403,12 +403,12 @@
         <flips:AccountSelectionFlip Grid.RowSpan="2"
                                     Margin="0,-30,0,0"
                                     DataContext="{Binding InputAreaAccountSelectionFlipViewModel}" />
-        <flips:AccountSelectionFlip Grid.RowSpan="2"
-                                    Margin="0,-30,0,0"
-                                    DataContext="{Binding GlobalAccountSelectionFlipViewModel}" />
         <flips:SearchFlip Grid.RowSpan="2"
                           Margin="0,-30,0,0"
                           DataContext="{Binding SearchFlipViewModel}" />
+        <flips:AccountSelectionFlip Grid.RowSpan="2"
+                                    Margin="0,-30,0,0"
+                                    DataContext="{Binding GlobalAccountSelectionFlipViewModel}" />
         <flips:TabConfigurationFlip Grid.RowSpan="2"
                                     Margin="0,-30,0,0"
                                     DataContext="{Binding TabConfigurationFlipViewModel}" />
