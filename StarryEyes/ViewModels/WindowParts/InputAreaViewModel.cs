@@ -992,6 +992,12 @@ namespace StarryEyes.ViewModels.WindowParts
             }
             if (InputInfo.PostedTweets != null && Setting.WarnAmending.Value)
             {
+                var removal = InputInfo.PostedTweets.First().Item2.ToString();
+                var dual = InputInfo.PostedTweets.Count();
+                if (dual > 2)
+                {
+                    removal += " (" + dual + "件のツイートが同時に削除されます)";
+                }
                 // amend mode
                 var amend = Messenger.GetResponse(
                     new TaskDialogMessage(
@@ -1001,16 +1007,7 @@ namespace StarryEyes.ViewModels.WindowParts
                             MainIcon = VistaTaskDialogIcon.Information,
                             MainInstruction = "直前のツイートを削除し、再投稿します。",
                             Content = "削除に失敗した場合でも投稿は行われます。",
-                            ExpandedInfo = "削除されるツイート: " +
-                                           InputInfo.PostedTweets.First()
-                                                    .Item2 +
-                                           (InputInfo.PostedTweets.Count() >
-                                            1
-                                                ? Environment.NewLine + "(" +
-                                                  (InputInfo.PostedTweets
-                                                            .Count() - 1) +
-                                                  " 件のツイートも同時に削除されます)"
-                                                : ""),
+                            ExpandedInfo = "削除されるツイート: " + removal,
                             CommonButtons = TaskDialogCommonButtons.OKCancel,
                             VerificationText = "次回から表示しない",
                         }));
