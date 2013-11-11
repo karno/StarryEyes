@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -50,25 +51,18 @@ namespace StarryEyes.Views.Triggers
                 if (Group == KeyAssignGroup.Input)
                 {
                     // input area mode
-                    // allow any keys but cursor keys only accept when cursor is in boundary position.
-                    var ci = tbox.CaretIndex;
-                    var text = tbox.Text;
+                    // allow any keys but cursor keys only accept when text box is empty.
                     switch (key)
                     {
                         case Key.Up:
-                            // if cursor is in top of the box, accept key assign.
-                            if (text.Substring(0, ci).Any(c => c == '\n')) return false;
-                            break;
                         case Key.Down:
-                            // if cursor is in bottom of the box, accept key assign.
-                            if (text.Substring(ci).Any(c => c == '\n')) return false;
-                            break;
                         case Key.Left:
                         case Key.Back:
-                            if (ci > 0) return false;
-                            break;
                         case Key.Right:
-                            if (ci < text.Length) return false;
+                            if (!String.IsNullOrEmpty(tbox.Text))
+                            {
+                                return false;
+                            }
                             break;
                     }
                 }
