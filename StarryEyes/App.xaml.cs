@@ -240,7 +240,7 @@ namespace StarryEyes
             PluginManager.LoadedPlugins.ForEach(p => p.Initialize());
 
             // activate scripts
-            ScriptingManager.ExecuteScripts(Path.Combine(ExeFileDir, ScriptDirectiory));
+            IScriptingManager.ExecuteScripts(Path.Combine(ExeFileDir, ScriptDirectiory));
 
             ReceiveManager.Initialize();
             TwitterConfigurationService.Initialize();

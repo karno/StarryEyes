@@ -309,6 +309,7 @@
     <Compile Include="Models\Timelines\Tabs\TabModel.cs" />
     <Compile Include="Models\Timelines\TimelineModelBase.cs" />
     <Compile Include="Models\Timelines\Statuses\UserModel.cs" />
+    <Compile Include="Plugins\ScriptingManagerImpl.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Settings\AccountManager.cs" />
     <Compile Include="Settings\KeyAssignManager.cs" />

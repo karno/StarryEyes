@@ -1,5 +1,5 @@
 ﻿
-namespace StarryEyes.Feather.ConcreteInterfaces
+namespace StarryEyes.Feather.Scripting
 {
     public interface IScriptExecutor : IPlugin
     {

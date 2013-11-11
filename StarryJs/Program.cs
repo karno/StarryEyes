@@ -1,5 +1,5 @@
 ﻿using System;
-using StarryEyes.Feather.ConcreteInterfaces;
+using StarryEyes.Feather.Scripting;
 
 namespace StarryJs
 {
