@@ -148,6 +148,17 @@ namespace StarryEyes.Models.Subsystems
                     ExpandedInfo = ex.ToString(),
                     CommonButtons = TaskDialogCommonButtons.Close
                 });
+                // cleanup update binaries
+                try
+                {
+                    if (Directory.Exists(App.LocalUpdateStorePath))
+                    {
+                        Directory.Delete(App.LocalUpdateStorePath);
+                    }
+                }
+                catch
+                {
+                }
             }
         }
 
