@@ -12,14 +12,13 @@ namespace StarryEyes.Views.Messaging.Behaviors
         {
             var tdm = message as TaskDialogMessage;
             if (tdm == null) return;
-
             try
             {
                 var options = tdm.Options;
                 options.Owner = Window.GetWindow(this.AssociatedObject);
                 tdm.Response = TaskDialog.Show(options);
             }
-            catch (InvalidOperationException)
+            catch (Exception)
             {
                 var options = tdm.Options;
                 tdm.Response = TaskDialog.Show(options);
