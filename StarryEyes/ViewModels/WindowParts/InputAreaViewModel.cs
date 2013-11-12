@@ -56,7 +56,7 @@ namespace StarryEyes.ViewModels.WindowParts
         private TweetInputInfo _inputInfo;
         private bool _isLocationEnabled;
         private bool _isOpening;
-        private bool _isSuppressAccountChangeRelay;
+        private bool _suppressAccountChangeRelay;
 
         /// <summary>
         ///     Constructor
@@ -79,7 +79,7 @@ namespace StarryEyes.ViewModels.WindowParts
             var accountSelectReflecting = false;
             _accountSelectionFlip.SelectedAccountsChanged += () =>
             {
-                if (!_isSuppressAccountChangeRelay)
+                if (!this._suppressAccountChangeRelay)
                 {
                     // write-back
                     accountSelectReflecting = true;
@@ -721,19 +721,19 @@ namespace StarryEyes.ViewModels.WindowParts
         {
             // if null, not override default.
             if (infos == null) return;
-            _isSuppressAccountChangeRelay = true;
+            this._suppressAccountChangeRelay = true;
             var accounts = infos as TwitterAccount[] ?? infos.ToArray();
             AccountSelectionFlip.SelectedAccounts = accounts;
             InputAreaModel.BindingAccounts.Clear();
             accounts.ForEach(InputAreaModel.BindingAccounts.Add);
-            _isSuppressAccountChangeRelay = false;
+            this._suppressAccountChangeRelay = false;
         }
 
         public void ApplyBaseSelectedAccounts()
         {
-            _isSuppressAccountChangeRelay = true;
+            this._suppressAccountChangeRelay = true;
             _accountSelectionFlip.SetSelectedAccountIds(_baseSelectedAccounts);
-            _isSuppressAccountChangeRelay = false;
+            this._suppressAccountChangeRelay = false;
         }
 
         public void ClearInReplyTo()

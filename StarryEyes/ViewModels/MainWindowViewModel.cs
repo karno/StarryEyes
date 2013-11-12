@@ -377,7 +377,11 @@ namespace StarryEyes.ViewModels
 
         public Livet.Commands.ViewModelCommand ShowSettingCommand
         {
-            get { return _showSettingCommand ?? (_showSettingCommand = new Livet.Commands.ViewModelCommand(ShowSetting)); }
+            get
+            {
+                return _showSettingCommand ??
+                       (_showSettingCommand = new Livet.Commands.ViewModelCommand(ShowSetting));
+            }
         }
 
         public async void ShowSetting()
