@@ -110,6 +110,9 @@ namespace StarryEyes.Settings
         public static readonly SettingItemStruct<bool> WarnAmending =
             new SettingItemStruct<bool>("WarnAmending", true);
 
+        public static readonly SettingItemStruct<bool> SuppressTagBindingInReply =
+            new SettingItemStruct<bool>("SuppresTagBindingInReply", true);
+
         public static readonly SettingItemStruct<bool> WarnReplyFromThirdAccount =
             new SettingItemStruct<bool>("WarnReplyFromThirdAccount", true);
 

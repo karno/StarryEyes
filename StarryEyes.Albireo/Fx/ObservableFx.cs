@@ -250,6 +250,13 @@ namespace System.Reactive.Linq
             }
         }
 
+        public static IObservable<IEnumerable<T>> WaitForCompletion<T>(this IObservable<T> observable)
+        {
+            if (observable == null) throw new ArgumentNullException("observable");
+            return Observable.Defer(() => Observable.Start(() => observable.ToArray()))
+                             .SelectMany(o => o);
+        }
+
         public static IObservable<T> OrderBy<T, TKey>(this IObservable<T> observable,
             Func<T, TKey> keySelector)
         {

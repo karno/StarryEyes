@@ -248,6 +248,11 @@
     <Compile Include="Models\Databases\StatusProxy.cs" />
     <Compile Include="Models\Databases\Mapper.cs" />
     <Compile Include="Models\Databases\UserProxy.cs" />
+    <Compile Include="Models\Inputting\AccountSelectorModel.cs" />
+    <Compile Include="Models\Inputting\CursorPosition.cs" />
+    <Compile Include="Models\Inputting\InputCoreModel.cs" />
+    <Compile Include="Models\Inputting\InputData.cs" />
+    <Compile Include="Models\Inputting\InputModel.cs" />
     <Compile Include="Models\Subsystems\AutoUpdateService.cs" />
     <Compile Include="Networking.cs" />
     <Compile Include="Models\Plugins\PluginManager.cs" />
@@ -344,6 +349,7 @@
     <Compile Include="ViewModels\WindowParts\Flips\TabConfigurationFlipViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\VersionInfoViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\InputAreaViewModel.cs" />
+    <Compile Include="ViewModels\WindowParts\Inputting\InputViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\MainAreaViewModel.cs" />
     <Compile Include="ViewModels\Timelines\Tabs\ColumnViewModel.cs" />
     <Compile Include="ViewModels\Timelines\Statuses\StatusViewModel.cs" />

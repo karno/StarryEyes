@@ -178,7 +178,6 @@ namespace StarryEyes.Models
             if (focusToInputArea)
                 MainWindowModel.SetFocusTo(FocusRequest.Input);
         }
-
     }
 
     /// <summary>
