@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using Livet;
+using StarryEyes.Albireo;
 using StarryEyes.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Helpers;
@@ -42,8 +43,7 @@ namespace StarryEyes.Models
 
         private static void RaisePreviousPostUpdated()
         {
-            var handler = OnPreviousPostUpdated;
-            if (handler != null) handler();
+            OnPreviousPostUpdated.SafeInvoke();
         }
 
         static InputAreaModel()
@@ -146,7 +146,9 @@ namespace StarryEyes.Models
             }
             var handler = SetTextRequested;
             if (handler != null)
+            {
                 handler(infos, body, cursor, inReplyTo);
+            }
             if (focusToInputArea)
             {
                 MainWindowModel.SetFocusTo(FocusRequest.Input);

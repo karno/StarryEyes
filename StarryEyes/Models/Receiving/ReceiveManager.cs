@@ -1,4 +1,5 @@
 ﻿using System;
+using StarryEyes.Albireo;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Receivers;
 using StarryEyes.Models.Receiving.Managers;
@@ -13,13 +14,7 @@ namespace StarryEyes.Models.Receiving
         private static UserReceiveManager _userReceiveManager;
         private static StreamTrackReceiveManager _streamTrackReceiveManager;
 
-        public static event Action<long> UserStreamsConnectionStateChanged;
-
-        private static void OnUserStreamsConnectionStateChanged(long obj)
-        {
-            var handler = UserStreamsConnectionStateChanged;
-            if (handler != null) handler(obj);
-        }
+        public static event Action<TwitterAccount> UserStreamsConnectionStateChanged;
 
         public static void Initialize()
         {
@@ -27,7 +22,7 @@ namespace StarryEyes.Models.Receiving
             _searchReceiveManager = new SearchReceiveManager();
             _listReceiveManager = new ListReceiveManager();
             _streamTrackReceiveManager = new StreamTrackReceiveManager(_userReceiveManager);
-            _userReceiveManager.ConnectionStateChanged += OnUserStreamsConnectionStateChanged;
+            _userReceiveManager.ConnectionStateChanged += UserStreamsConnectionStateChanged.SafeInvoke;
         }
 
         public static void RegisterSearchQuery(string query)

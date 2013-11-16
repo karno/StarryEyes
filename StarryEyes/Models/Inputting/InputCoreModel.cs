@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Livet;
+using StarryEyes.Albireo;
 using StarryEyes.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models.Accounting;
@@ -134,11 +135,7 @@ namespace StarryEyes.Models.Inputting
 
         public void Close()
         {
-            var handler = CloseRequest;
-            if (handler != null)
-            {
-                handler();
-            }
+            CloseRequest.SafeInvoke();
         }
 
     }

@@ -7,6 +7,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using StarryEyes.Albireo;
 using StarryEyes.Anomaly.TwitterApi;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.DataModels.StreamModels;
@@ -96,11 +97,7 @@ namespace StarryEyes.Models.Receiving.Receivers
                     return;
                 }
                 this._state = value;
-                var handler = this.StateChanged;
-                if (handler != null)
-                {
-                    handler();
-                }
+                StateChanged.SafeInvoke();
             }
         }
 

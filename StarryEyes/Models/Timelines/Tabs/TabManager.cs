@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Livet;
+using StarryEyes.Albireo;
 using StarryEyes.Settings;
 
 namespace StarryEyes.Models.Timelines.Tabs
@@ -103,8 +104,7 @@ namespace StarryEyes.Models.Timelines.Tabs
             {
                 InputAreaModel.NotifyChangeFocusingTab(col.Tabs[col.CurrentFocusTabIndex]);
             }
-            var handler = CurrentFocusColumnChanged;
-            if (handler != null) handler();
+            CurrentFocusColumnChanged.SafeInvoke();
         }
 
         /// <summary>

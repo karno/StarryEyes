@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reactive.Linq;
 using Livet;
+using StarryEyes.Albireo;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages;
 using StarryEyes.Models.Backstages.TwitterEvents;
@@ -31,9 +32,9 @@ namespace StarryEyes.Models
             ReceiveManager.UserStreamsConnectionStateChanged += UpdateConnectionState;
         }
 
-        static void UpdateConnectionState(long id)
+        static void UpdateConnectionState(TwitterAccount account)
         {
-            var avm = _accounts.FirstOrDefault(vm => vm.Account.Id == id);
+            var avm = _accounts.FirstOrDefault(vm => vm.Account.Id == account.Id);
             if (avm != null)
             {
                 avm.UpdateConnectionState();
@@ -76,9 +77,7 @@ namespace StarryEyes.Models
         public static void RegisterEvent(BackstageEventBase ev)
         {
             System.Diagnostics.Debug.WriteLine("EVENT: " + ev.Title + " - " + ev.Detail);
-            var handler = EventRegistered;
-            if (handler != null)
-                EventRegistered(ev);
+            EventRegistered.SafeInvoke(ev);
             var tev = ev as TwitterEventBase;
             if (tev == null) return;
             lock (_twitterEvents.SyncRoot)
@@ -104,8 +103,7 @@ namespace StarryEyes.Models
         public static event Action CloseBackstage;
         public static void RaiseCloseBackstage()
         {
-            var handler = CloseBackstage;
-            if (handler != null) handler();
+            CloseBackstage.SafeInvoke();
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Text.RegularExpressions;
+using StarryEyes.Albireo;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models;
 using StarryEyes.Models.Accounting;
@@ -31,8 +32,7 @@ namespace StarryEyes.Filters.Sources
 
         protected virtual void RaiseInvalidateRequired()
         {
-            var handler = this.InvalidateRequired;
-            if (handler != null) handler();
+            this.InvalidateRequired.SafeInvoke();
         }
 
         /// <summary>

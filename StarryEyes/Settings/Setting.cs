@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Xaml;
+using StarryEyes.Albireo;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Filters;
 using StarryEyes.Filters.Expressions;
@@ -281,9 +282,7 @@ namespace StarryEyes.Settings
                     {
                         Save();
                     }
-                    var handler = this.ValueChanged;
-                    if (handler != null)
-                        this.ValueChanged(value);
+                    this.ValueChanged.SafeInvoke(value);
                 }
             }
 
@@ -351,9 +350,7 @@ namespace StarryEyes.Settings
                     {
                         Save();
                     }
-                    var handler = this.ValueChanged;
-                    if (handler != null)
-                        this.ValueChanged(value);
+                    this.ValueChanged.SafeInvoke(value);
                 }
             }
 
@@ -386,11 +383,9 @@ namespace StarryEyes.Settings
                 {
                     if (_valueCache != null) return _valueCache.Value;
                     object value;
-                    if (_settingValueHolder.TryGetValue(Name, out value))
-                    {
-                        return (_valueCache = (T)value).Value;
-                    }
-                    return (_valueCache = _defaultValue).Value;
+                    return _settingValueHolder.TryGetValue(this.Name, out value)
+                               ? (this._valueCache = (T)value).Value
+                               : (this._valueCache = this._defaultValue).Value;
                 }
                 set
                 {
@@ -400,9 +395,7 @@ namespace StarryEyes.Settings
                     {
                         Save();
                     }
-                    var handler = this.ValueChanged;
-                    if (handler != null)
-                        this.ValueChanged(value);
+                    this.ValueChanged.SafeInvoke(value);
                 }
             }
 
@@ -503,6 +496,10 @@ namespace StarryEyes.Settings
                         var sd = new SortedDictionary<string, object>(_settingValueHolder);
                         XamlServices.Save(fs, sd);
                     }
+                }
+                catch (IOException)
+                {
+                    // file error.
                 }
                 catch (UnauthorizedAccessException)
                 {

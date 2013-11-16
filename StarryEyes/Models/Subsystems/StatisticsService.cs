@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using StarryEyes.Albireo;
 using StarryEyes.Models.Databases;
 
 namespace StarryEyes.Models.Subsystems
@@ -97,9 +98,7 @@ namespace StarryEyes.Models.Subsystems
 
                 Interlocked.Exchange(ref _tweetsPerMinutes, _tweetsCountArray.Sum());
 
-                var handler = StatisticsParamsUpdated;
-                if (handler != null)
-                    handler();
+                StatisticsParamsUpdated.SafeInvoke();
             }
         }
 

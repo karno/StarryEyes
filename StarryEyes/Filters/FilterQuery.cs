@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using StarryEyes.Albireo;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Casket;
 using StarryEyes.Filters.Expressions;
@@ -12,9 +13,7 @@ namespace StarryEyes.Filters
         public event Action InvalidateRequired;
         private void RaiseInvalidateRequired()
         {
-            var handler = this.InvalidateRequired;
-            if (handler != null)
-                handler();
+            this.InvalidateRequired.SafeInvoke();
         }
 
         public FilterSourceBase[] Sources { get; set; }

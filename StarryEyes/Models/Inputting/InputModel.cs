@@ -1,5 +1,7 @@
-﻿using System.Reactive.Disposables;
+﻿using System;
+using System.Reactive.Disposables;
 using Livet.EventListeners;
+using StarryEyes.Albireo;
 
 namespace StarryEyes.Models.Inputting
 {
@@ -7,31 +9,41 @@ namespace StarryEyes.Models.Inputting
     {
         private static readonly CompositeDisposable _disposables;
 
-        private static readonly AccountSelectorModel _accountSelectorModel;
+        private static readonly AccountSelectorModel _accounts;
 
-        private static readonly InputCoreModel _inputCoreModel;
+        private static readonly InputCoreModel _core;
 
         static InputModel()
         {
             _disposables = new CompositeDisposable();
-            _inputCoreModel = new InputCoreModel();
-            _accountSelectorModel = new AccountSelectorModel(InputCoreModel.CurrentInputData);
+            _core = new InputCoreModel();
+            _accounts = new AccountSelectorModel(_core.CurrentInputData);
 
             // link property changing
-            var icmpc = new PropertyChangedEventListener(InputCoreModel);
-            icmpc.RegisterHandler(() => InputCoreModel.CurrentInputData,
-                                (o, e) => AccountSelectorModel.CurrentInputData = InputCoreModel.CurrentInputData);
+            var icmpc = new PropertyChangedEventListener(_core);
+            icmpc.RegisterHandler(() => _core.CurrentInputData,
+                                (o, e) => _accounts.CurrentInputData = _core.CurrentInputData);
             _disposables.Add(icmpc);
+            SetEventPropagation();
         }
 
-        public static AccountSelectorModel AccountSelectorModel
+        #region input events
+
+        private static void SetEventPropagation()
         {
-            get { return _accountSelectorModel; }
+            _core.SetCursorRequest += SetCursorRequest.SafeInvoke;
+            _core.FocusRequest += FocusRequest.SafeInvoke;
+            _core.CloseRequest += CloseRequest.SafeInvoke;
         }
 
-        public static InputCoreModel InputCoreModel
-        {
-            get { return _inputCoreModel; }
-        }
+        internal static event Action<CursorPosition> SetCursorRequest;
+
+        internal static event Action FocusRequest;
+
+        internal static event Action CloseRequest;
+
+
+        #endregion
+
     }
 }

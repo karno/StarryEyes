@@ -9,6 +9,7 @@ using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using StarryEyes.Albireo;
 using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Models.Backstages.SystemEvents;
 using StarryEyes.Nightmare.Windows;
@@ -93,8 +94,7 @@ namespace StarryEyes.Models.Subsystems
                     }
                     File.WriteAllBytes(ExecutablePath, patcher);
                 }
-                var handler = UpdateStateChanged;
-                if (handler != null) handler();
+                UpdateStateChanged.SafeInvoke();
                 return true;
             }
             catch (Exception ex)

@@ -1,4 +1,5 @@
 ﻿using System;
+using StarryEyes.Albireo;
 
 namespace StarryEyes.Models
 {
@@ -8,8 +9,7 @@ namespace StarryEyes.Models
 
         public static void RequestSearch(string query, SearchMode mode)
         {
-            var handler = SearchRequested;
-            if (handler != null) handler(query, mode);
+            SearchRequested.SafeInvoke(query, mode);
         }
     }
 

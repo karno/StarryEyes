@@ -7,6 +7,7 @@ using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
 using Livet;
+using StarryEyes.Albireo;
 using StarryEyes.Albireo.Collections;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models.Receiving.Handling;
@@ -30,10 +31,9 @@ namespace StarryEyes.Models.Timelines
 
         public event Action<bool> InvalidationStateChanged;
 
-        protected virtual void OnInvalidationStateChanged(bool obj)
+        protected virtual void OnInvalidationStateChanged(bool invalidationState)
         {
-            var handler = this.InvalidationStateChanged;
-            if (handler != null) handler(obj);
+            this.InvalidationStateChanged.SafeInvoke(invalidationState);
         }
 
         public ObservableSynchronizedCollectionEx<StatusModel> Statuses
@@ -267,8 +267,7 @@ namespace StarryEyes.Models.Timelines
 
         public void RequestFocus()
         {
-            var handler = FocusRequired;
-            if (handler != null) handler();
+            FocusRequired.SafeInvoke();
         }
 
         #endregion

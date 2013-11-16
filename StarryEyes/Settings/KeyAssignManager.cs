@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using StarryEyes.Albireo;
 using StarryEyes.Models;
 using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Models.Backstages.SystemEvents;
@@ -144,8 +145,7 @@ namespace StarryEyes.Settings
 
         private static void RaiseKeyAssignChanged()
         {
-            var handler = KeyAssignChanged;
-            if (handler != null) handler();
+            KeyAssignChanged.SafeInvoke();
         }
     }
 

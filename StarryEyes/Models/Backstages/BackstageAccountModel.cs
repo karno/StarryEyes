@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using StarryEyes.Albireo;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;
@@ -14,7 +15,7 @@ using StarryEyes.Settings;
 
 namespace StarryEyes.Models.Backstages
 {
-    public class BackstageAccountModel
+    public sealed class BackstageAccountModel
     {
         private readonly TwitterAccount _account;
         private UserStreamsConnectionState _connectionState;
@@ -22,18 +23,16 @@ namespace StarryEyes.Models.Backstages
 
         public event Action ConnectionStateChanged;
 
-        protected virtual void OnConnectionStateChanged()
+        private void RaiseConnectionStateChanged()
         {
-            var handler = this.ConnectionStateChanged;
-            if (handler != null) handler();
+            ConnectionStateChanged.SafeInvoke();
         }
 
         public event Action TwitterUserChanged;
 
-        protected virtual void OnTwitterUserChanged()
+        private void RaiseTwitterUserChanged()
         {
-            var handler = this.TwitterUserChanged;
-            if (handler != null) handler();
+            TwitterUserChanged.SafeInvoke();
         }
 
         public TwitterAccount Account
@@ -48,7 +47,7 @@ namespace StarryEyes.Models.Backstages
             {
                 if (this._connectionState == value) return;
                 this._connectionState = value;
-                this.OnConnectionStateChanged();
+                this.RaiseConnectionStateChanged();
             }
         }
 
@@ -71,7 +70,7 @@ namespace StarryEyes.Models.Backstages
                            u =>
                            {
                                _user = u;
-                               this.OnTwitterUserChanged();
+                               this.RaiseTwitterUserChanged();
                            },
                            ex => BackstageModel.RegisterEvent(
                                new OperationFailedEvent("Could not receive user account: " +
@@ -91,10 +90,9 @@ namespace StarryEyes.Models.Backstages
 
         public event Action FallbackStateUpdated;
 
-        protected virtual void RaiseFallbackStateUpdated()
+        private void RaiseFallbackStateUpdated()
         {
-            var handler = this.FallbackStateUpdated;
-            if (handler != null) handler();
+            FallbackStateUpdated.SafeInvoke();
         }
 
         public bool IsFallbacked { get; private set; }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using StarryEyes.Albireo;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Receiving.Receivers;
 using StarryEyes.Settings;
@@ -19,13 +20,7 @@ namespace StarryEyes.Models.Receiving.Managers
 
         public event Action TrackRearranged;
 
-        public event Action<long> ConnectionStateChanged;
-
-        private void OnConnectionStateChanged(long obj)
-        {
-            var handler = this.ConnectionStateChanged;
-            if (handler != null) handler(obj);
-        }
+        public event Action<TwitterAccount> ConnectionStateChanged;
 
         public UserStreamsConnectionState GetConnectionState(long id)
         {
@@ -91,7 +86,7 @@ namespace StarryEyes.Models.Receiving.Managers
                 // add new users
                 accounts.Where(s => !this._bundles.ContainsKey(s.Key))
                         .Select(s => new UserReceiveBundle(s.Value))
-                        .Do(s => s.StateChanged += this.OnConnectionStateChanged)
+                        .Do(s => s.StateChanged += this.ConnectionStateChanged.SafeInvoke)
                         .ForEach(b => this._bundles.Add(b.UserId, b));
 
                 // stop cancelled streamings
@@ -131,8 +126,7 @@ namespace StarryEyes.Models.Receiving.Managers
                 }
             }
             if (!rearranged) return;
-            var handler = this.TrackRearranged;
-            if (handler != null) handler();
+            TrackRearranged.SafeInvoke();
         }
         // ReSharper restore AccessToModifiedClosure
 
@@ -154,18 +148,11 @@ namespace StarryEyes.Models.Receiving.Managers
 
         private sealed class UserReceiveBundle : IDisposable, IKeywordTrackable
         {
-            private readonly TwitterAccount _authInfo;
+            private readonly TwitterAccount _account;
             private readonly CompositeDisposable _disposable;
             private readonly UserStreamsReceiver _userStreamsReceiver;
 
-            public event Action<long> StateChanged;
-
-            private void OnStateChanged(long obj)
-            {
-                System.Diagnostics.Debug.WriteLine("bundle state changed.");
-                var handler = this.StateChanged;
-                if (handler != null) handler(obj);
-            }
+            public event Action<TwitterAccount> StateChanged;
 
             public IEnumerable<string> TrackKeywords
             {
@@ -173,22 +160,22 @@ namespace StarryEyes.Models.Receiving.Managers
                 set { this._userStreamsReceiver.TrackKeywords = value; }
             }
 
-            public long UserId { get { return this._authInfo.Id; } }
+            public long UserId { get { return this._account.Id; } }
 
-            public UserReceiveBundle(TwitterAccount authInfo)
+            public UserReceiveBundle(TwitterAccount account)
             {
-                this._authInfo = authInfo;
+                this._account = account;
                 this._disposable = new CompositeDisposable
                 {
-                    (this._userStreamsReceiver = new UserStreamsReceiver(authInfo)),
-                    new HomeTimelineReceiver(authInfo),
-                    new MentionTimelineReceiver(authInfo),
-                    new DirectMessagesReceiver(authInfo),
-                    new UserInfoReceiver(authInfo),
-                    new UserTimelineReceiver(authInfo),
-                    new UserRelationReceiver(authInfo)
+                    (this._userStreamsReceiver = new UserStreamsReceiver(account)),
+                    new HomeTimelineReceiver(account),
+                    new MentionTimelineReceiver(account),
+                    new DirectMessagesReceiver(account),
+                    new UserInfoReceiver(account),
+                    new UserTimelineReceiver(account),
+                    new UserRelationReceiver(account)
                 };
-                this._userStreamsReceiver.StateChanged += () => this.OnStateChanged(this.UserId);
+                this._userStreamsReceiver.StateChanged += () => StateChanged.SafeInvoke(account);
             }
 
             public bool IsUserStreamsEnabled

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Subjects;
+using StarryEyes.Albireo;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Timelines.Tabs;
 using StarryEyes.Nightmare.Windows;
@@ -36,9 +37,7 @@ namespace StarryEyes.Models
         public static event Action<bool> WindowCommandsDisplayChanged;
         public static void SetShowMainWindowCommands(bool show)
         {
-            var handler = WindowCommandsDisplayChanged;
-            if (handler != null)
-                handler(show);
+            WindowCommandsDisplayChanged.SafeInvoke(show);
         }
 
         private static void RegisterKeyAssigns()
@@ -68,18 +67,14 @@ namespace StarryEyes.Models
 
         public static void SetFocusTo(FocusRequest req)
         {
-            var handler = FocusRequested;
-            if (handler != null)
-                handler(req);
+            FocusRequested.SafeInvoke(req);
         }
 
         public static event Action<TimelineFocusRequest> TimelineFocusRequested;
 
         public static void SetTimelineFocusTo(TimelineFocusRequest req)
         {
-            var handler = TimelineFocusRequested;
-            if (handler != null)
-                handler(req);
+            TimelineFocusRequested.SafeInvoke(req);
         }
 
         #endregion
@@ -100,8 +95,7 @@ namespace StarryEyes.Models
 
         public static void ExecuteAccountSelectAction(AccountSelectDescription desc)
         {
-            var handler = AccountSelectActionRequested;
-            if (handler != null) handler(desc);
+            AccountSelectActionRequested.SafeInvoke(desc);
         }
 
         private static readonly LinkedList<string> _stateStack = new LinkedList<string>();
@@ -133,8 +127,7 @@ namespace StarryEyes.Models
 
         private static void RaiseStateStringChanged()
         {
-            var handler = StateStringChanged;
-            if (handler != null) handler();
+            StateStringChanged.SafeInvoke();
         }
 
         public static event Action<Tuple<TabModel, ISubject<Unit>>> TabConfigureRequested;
@@ -166,7 +159,6 @@ namespace StarryEyes.Models
             else
             {
                 notifier.OnCompleted();
-                // WE SHOULD NOT CALL Dispose Method!
             }
             return notifier;
         }
@@ -175,8 +167,7 @@ namespace StarryEyes.Models
 
         public static void TransitionBackstage(bool open)
         {
-            var handler = BackstageTransitionRequested;
-            if (handler != null) handler(open);
+            BackstageTransitionRequested.SafeInvoke(open);
         }
 
         private static volatile bool _isUserInterfaceReady;
@@ -189,8 +180,7 @@ namespace StarryEyes.Models
             {
                 _taskDialogQueue.Enqueue(options);
             }
-            var handler = TaskDialogRequested;
-            if (handler != null) handler(options);
+            TaskDialogRequested.SafeInvoke(options);
         }
     }
 

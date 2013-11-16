@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using StarryEyes.Albireo;
 using StarryEyes.Albireo.Collections;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Filters;
@@ -116,8 +117,7 @@ namespace StarryEyes.Models.Timelines.Tabs
 
         private void OnUpdateBoundAccounts()
         {
-            var handler = this.BindingAccountsChanged;
-            if (handler != null) handler();
+            this.BindingAccountsChanged.SafeInvoke();
             TabManager.Save();
         }
 
@@ -163,8 +163,7 @@ namespace StarryEyes.Models.Timelines.Tabs
             var result = base.AddStatus(model, isNewArrival);
             if (result && isNewArrival)
             {
-                var handler = OnNewStatusArrival;
-                if (handler != null) handler(model.Status);
+                this.OnNewStatusArrival.SafeInvoke(model.Status);
                 if (this.NotifyNewArrivals)
                 {
                     NotificationService.NotifyNewArrival(model.Status, this);

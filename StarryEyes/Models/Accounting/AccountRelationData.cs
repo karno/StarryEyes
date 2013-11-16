@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using StarryEyes.Albireo;
 using StarryEyes.Albireo.Collections;
 using StarryEyes.Models.Databases;
 
@@ -34,11 +35,7 @@ namespace StarryEyes.Models.Accounting
                 TargetUserId = targetUser,
                 Change = change
             };
-            var handler = this.AccountDataUpdated;
-            if (handler != null)
-            {
-                handler(rdci);
-            }
+            this.AccountDataUpdated.SafeInvoke(rdci);
             OnAccountDataUpdatedStatic(rdci);
         }
 

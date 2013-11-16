@@ -105,7 +105,7 @@ namespace StarryEyes.Models.Inputting
             get { return _accounts; }
         }
 
-        public void SetOverride([NotNull] IEnumerable<TwitterAccount> accounts)
+        private void SetOverride([NotNull] IEnumerable<TwitterAccount> accounts)
         {
             if (accounts == null) throw new ArgumentNullException("accounts");
             _isSynchronizedWithTab = false;

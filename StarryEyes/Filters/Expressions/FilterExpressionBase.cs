@@ -1,4 +1,5 @@
 ﻿using System;
+using StarryEyes.Albireo;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Casket;
 using StarryEyes.Filters.Expressions.Operators;
@@ -29,8 +30,7 @@ namespace StarryEyes.Filters.Expressions
 
         protected void RaiseReapplyFilter()
         {
-            var handler = this.ReapplyRequested;
-            if (handler != null) handler();
+            this.ReapplyRequested.SafeInvoke();
         }
     }
 
