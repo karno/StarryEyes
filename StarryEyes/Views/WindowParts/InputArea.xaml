@@ -232,6 +232,7 @@
                               Stretch="Fill" />
                         <Button Width="32"
                                 DockPanel.Dock="Right"
+                                Focusable="False"
                                 Style="{DynamicResource MetroSquareTransparentButtonStyle}">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="Click">
@@ -269,6 +270,7 @@
                               Stretch="Fill" />
                         <Button Width="32"
                                 DockPanel.Dock="Right"
+                                Focusable="False"
                                 Style="{DynamicResource MetroSquareTransparentButtonStyle}">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="Click">
