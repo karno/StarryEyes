@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Net;
-using System.Net.Sockets;
 using System.Text.RegularExpressions;
 using StarryEyes.Views.Controls;
 
@@ -31,10 +30,7 @@ namespace StarryEyes.Models.Subsystems
                         }
                     }
                 }
-                catch (WebException)
-                {
-                }
-                catch (SocketException)
+                catch (Exception)
                 {
                 }
                 return new byte[0];
