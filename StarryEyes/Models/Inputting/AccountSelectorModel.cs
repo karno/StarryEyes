@@ -86,7 +86,7 @@ namespace StarryEyes.Models.Inputting
             {
                 if (value == null) throw new ArgumentNullException("value");
                 _currentInputData = value;
-                if (value.Accounts.Any())
+                if (value.Accounts != null)
                 {
                     // override with explicitly specified accounts
                     SetOverride(value.Accounts);

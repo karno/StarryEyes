@@ -71,11 +71,11 @@ namespace StarryEyes.Models.Inputting
 
         #region Accessing properties
 
-        [NotNull]
+        [CanBeNull]
         public IEnumerable<TwitterAccount> Accounts
         {
-            get { return _accounts ?? Enumerable.Empty<TwitterAccount>(); }
-            set { _accounts = value.Guard().ToArray(); }
+            get { return _accounts; }
+            set { _accounts = value == null ? null : value.ToArray(); }
         }
 
         [NotNull]
@@ -144,7 +144,9 @@ namespace StarryEyes.Models.Inputting
         public string Text
         {
             get { return _text; }
+            // ReSharper disable ConstantNullCoalescingCondition
             set { _text = value ?? String.Empty; }
+            // ReSharper restore ConstantNullCoalescingCondition
         }
 
         [NotNull]
@@ -198,7 +200,7 @@ namespace StarryEyes.Models.Inputting
         {
             return new InputData(_initText)
             {
-                _accounts = _accounts,
+                _accounts = _accounts == null ? null : _accounts.ToArray(),
                 _amendTweets = _amendTweets,
                 _attachedImage = _attachedImage,
                 _boundTags = _boundTags,
@@ -235,7 +237,7 @@ namespace StarryEyes.Models.Inputting
                     AttachedGeoLocation,
                     AttachedImage);
             }
-            return Observable.Defer(() => Observable.Start(() => _accounts.ToObservable()))
+            return Observable.Defer(() => Observable.Start(() => _accounts.Guard().ToObservable()))
                              .SelectMany(a => a)
                              .SelectMany(a => SendInternal(a, request))
                              .WaitForCompletion()
