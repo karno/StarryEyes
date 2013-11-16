@@ -52,6 +52,13 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SelfAnalyzedForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SelfAnalyzedForm.Designer.cs">
+      <DependentUpon>SelfAnalyzedForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SelfAnalyzer.cs" />
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -64,6 +71,9 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="SelfAnalyzedForm.resx">
+      <DependentUpon>SelfAnalyzedForm.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

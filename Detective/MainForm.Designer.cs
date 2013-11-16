@@ -46,16 +46,16 @@ namespace Detective
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Meiryo UI", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.label1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(27)))), ((int)(((byte)(161)))), ((int)(((byte)(226)))));
+            this.label1.ForeColor = System.Drawing.Color.White;
             this.label1.Location = new System.Drawing.Point(10, 13);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(326, 26);
+            this.label1.Size = new System.Drawing.Size(358, 26);
             this.label1.TabIndex = 0;
-            this.label1.Text = "Krileはエラーにより終了されました。";
+            this.label1.Text = "Krileの実行中にエラーが発生しました。";
             // 
             // mainPanel
             // 
-            this.mainPanel.BackColor = System.Drawing.Color.Black;
+            this.mainPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(162)))), ((int)(((byte)(0)))), ((int)(((byte)(37)))));
             this.mainPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.mainPanel.Controls.Add(this.isSendFeedback);
             this.mainPanel.Controls.Add(this.restartButton);

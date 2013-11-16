@@ -28,7 +28,14 @@ namespace Detective
                     {
                         ErrorLogData = File.ReadAllText(logFilePath);
                         ErrorLogData += Environment.NewLine + Environment.OSVersion.VersionString;
-                        Application.Run(new MainForm());
+                        if (SelfAnalyzer.Analyze(ErrorLogData))
+                        {
+                            Application.Run(new SelfAnalyzedForm());
+                        }
+                        else
+                        {
+                            Application.Run(new MainForm());
+                        }
                         return;
                     }
                     catch (Exception ex)
