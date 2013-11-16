@@ -17,6 +17,12 @@ namespace StarryEyes.Views.Controls
 {
     public class LazyImage : Image
     {
+        static LazyImage()
+        {
+            Observable.Timer(TimeSpan.FromMinutes(5), TimeSpan.FromMinutes(5))
+                      .Subscribe(_ => RemoveExpiredCaches());
+        }
+
         #region Constant variables
 
         private const int MaxRetryCount = 3;
@@ -56,6 +62,46 @@ namespace StarryEyes.Views.Controls
 
         #endregion
 
+        #region Image cache
+
+        private static readonly TimeSpan _cacheExpiration = TimeSpan.FromMinutes(30);
+
+        private static readonly ConcurrentDictionary<Uri, Tuple<byte[], DateTime>> _imageCache =
+            new ConcurrentDictionary<Uri, Tuple<byte[], DateTime>>();
+
+        private static byte[] GetCache([NotNull] Uri uri)
+        {
+            if (uri == null) throw new ArgumentNullException("uri");
+            Tuple<byte[], DateTime> tuple;
+            if (!_imageCache.TryGetValue(uri, out tuple) ||
+                DateTime.Now - tuple.Item2 > _cacheExpiration)
+            {
+                _imageCache.TryRemove(uri, out tuple);
+                return null;
+            }
+            return tuple.Item1;
+        }
+
+        private static void SetCache([NotNull] Uri uri, [NotNull]byte[] imageByte)
+        {
+            if (uri == null) throw new ArgumentNullException("uri");
+            if (imageByte == null) throw new ArgumentNullException("imageByte");
+            _imageCache[uri] = Tuple.Create(imageByte, DateTime.Now);
+        }
+
+        private static void RemoveExpiredCaches()
+        {
+            foreach (var tuple in _imageCache)
+            {
+                if (DateTime.Now - tuple.Value.Item2 <= _cacheExpiration) continue;
+                Tuple<byte[], DateTime> _;
+                _imageCache.TryRemove(tuple.Key, out _);
+            }
+            GC.Collect();
+        }
+
+        #endregion
+
         private static readonly ConcurrentDictionary<Uri, IObservable<byte[]>> _imageStreamer =
             new ConcurrentDictionary<Uri, IObservable<byte[]>>();
 
@@ -80,35 +126,20 @@ namespace StarryEyes.Views.Controls
                 }
                 else
                 {
+                    var cache = GetCache(uri);
+                    if (cache != null)
+                    {
+                        _taskFactory.StartNew(() =>
+                        {
+                            var b = CreateImage(cache, dpw, dph);
+                            DispatcherHolder.Enqueue(() => SetImage(img, b, uri), DispatcherPriority.Loaded);
+                        });
+                        return;
+                    }
                     img.Source = null;
                     Subject<byte[]> publisher = null;
                     _imageStreamer.GetOrAdd(uri, _ => publisher = new Subject<byte[]>())
-                                  .Select(b =>
-                                  {
-                                      try
-                                      {
-                                          using (var ms = new MemoryStream(b, false))
-                                          using (var ws = new WrappingStream(ms))
-                                          {
-                                              var bi = new BitmapImage();
-                                              bi.BeginInit();
-                                              bi.CacheOption = BitmapCacheOption.OnLoad;
-                                              bi.StreamSource = ws;
-                                              if (dpw > 0 || dph > 0)
-                                              {
-                                                  bi.DecodePixelWidth = dpw;
-                                                  bi.DecodePixelHeight = dph;
-                                              }
-                                              bi.EndInit();
-                                              bi.Freeze();
-                                              return bi;
-                                          }
-                                      }
-                                      catch
-                                      {
-                                          return null;
-                                      }
-                                  })
+                                  .Select(b => CreateImage(b, dpw, dph))
                                   .Subscribe(b => DispatcherHolder.Enqueue(
                                       () => SetImage(img, b, uri), DispatcherPriority.Loaded)
                                              , ex => { });
@@ -122,6 +153,33 @@ namespace StarryEyes.Views.Controls
             catch
             // ReSharper restore EmptyGeneralCatchClause
             {
+            }
+        }
+
+        private static BitmapImage CreateImage(byte[] b, int dpw, int dph)
+        {
+            try
+            {
+                using (var ms = new MemoryStream(b, false))
+                using (var ws = new WrappingStream(ms))
+                {
+                    var bi = new BitmapImage();
+                    bi.BeginInit();
+                    bi.CacheOption = BitmapCacheOption.OnLoad;
+                    bi.StreamSource = ws;
+                    if (dpw > 0 || dph > 0)
+                    {
+                        bi.DecodePixelWidth = dpw;
+                        bi.DecodePixelHeight = dph;
+                    }
+                    bi.EndInit();
+                    bi.Freeze();
+                    return bi;
+                }
+            }
+            catch
+            {
+                return null;
             }
         }
 
@@ -164,6 +222,7 @@ namespace StarryEyes.Views.Controls
                         break;
                     }
                 }
+                SetCache(source, result);
                 IObservable<byte[]> removal;
                 _imageStreamer.TryRemove(source, out removal);
                 subject.OnNext(result);
