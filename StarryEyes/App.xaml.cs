@@ -31,10 +31,13 @@ namespace StarryEyes
     /// </summary>
     public partial class App
     {
-        private static string DbVersion = "1.0";
+        private static readonly string DbVersion = "1.0";
         private static Mutex _appMutex;
+        private static DateTime _startupTime;
         private void AppStartup(object sender, StartupEventArgs e)
         {
+            _startupTime = DateTime.Now;
+
             #region initialize configuration directory
 
             // create data-store directory
@@ -386,8 +389,11 @@ namespace StarryEyes
                 builder.AppendLine("execution mode: " + ExecutionMode.ToString() + ", " +
                     "multicore JIT: " + IsMulticoreJitEnabled.ToString() + ", " +
                     "hardware rendering: " + IsHardwareRenderingEnabled.ToString());
+                var uptime = DateTime.Now - _startupTime;
+                builder.AppendLine("application uptime: " + ((int)uptime.TotalHours).ToString("00") +
+                                   uptime.ToString(":mm:ss"));
                 builder.AppendLine();
-                builder.AppendLine("thrown:");
+                builder.AppendLine("exception stack trace:");
                 builder.AppendLine(ex.ToString());
 #if DEBUG
                 var tpath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
