@@ -676,7 +676,7 @@ namespace StarryEyes.ViewModels.WindowParts
                       .Where(_ => IsPostLimitPredictionEnabled)
                       .Subscribe(_ =>
                       {
-                          var account = InputAreaModel.BindingAccounts.ToArray().FirstOrDefault();
+                          var account = InputAreaModel.BindingAccounts.FirstOrDefault();
                           if (account == null) return;
                           var count = PostLimitPredictionService.GetCurrentWindowCount(account.Id);
                           MaxUpdate = Setting.PostLimitPerWindow.Value;
