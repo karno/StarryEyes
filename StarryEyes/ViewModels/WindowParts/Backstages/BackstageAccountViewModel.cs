@@ -94,6 +94,7 @@ namespace StarryEyes.ViewModels.WindowParts.Backstages
 
         public void OpenProfile()
         {
+            if (this.User == null) return;
             _parent.Close();
             SearchFlipModel.RequestSearch(this.User.ScreenName, SearchMode.UserScreenName);
         }
