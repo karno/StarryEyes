@@ -130,7 +130,7 @@ namespace StarryEyes.ViewModels.WindowParts
                 KeyAssignAction.Create("OpenUserFavstar", () => ExecuteStatusAction(s => s.OpenUserFavstar())),
                 KeyAssignAction.Create("OpenUserTwilog", () => ExecuteStatusAction(s => s.OpenUserTwilog())),
                 KeyAssignAction.Create("OpenSource", () => ExecuteStatusAction(s => s.OpenSourceLink())),
-                KeyAssignAction.Create("OpenThumbnail", () => ExecuteStatusAction(s => s.OpenFirstImage())),
+                KeyAssignAction.Create("OpenThumbnail", () => ExecuteStatusAction(s => s.OpenThumbnailImage())),
                 KeyAssignAction.Create("OpenConversation", () => ExecuteStatusAction(s => s.ShowConversation())),
                 KeyAssignAction.Create("MuteUser", () => ExecuteStatusAction(s => s.MuteUser())),
                 KeyAssignAction.Create("MuteClient", () => ExecuteStatusAction(s => s.MuteClient())),

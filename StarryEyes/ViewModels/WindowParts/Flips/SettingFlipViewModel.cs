@@ -193,6 +193,18 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             set { Setting.ScrollLockStrategy.Value = (ScrollLockStrategy)value; }
         }
 
+        public bool ShowThumbnail
+        {
+            get { return Setting.ShowThumbnails.Value; }
+            set { Setting.ShowThumbnails.Value = value; }
+        }
+
+        public bool OpenTwitterImageWithOriginalSize
+        {
+            get { return Setting.OpenTwitterImageWithOriginalSize.Value; }
+            set { Setting.OpenTwitterImageWithOriginalSize.Value = value; }
+        }
+
         #endregion
 
         #region Mute filter editor property

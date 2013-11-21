@@ -308,10 +308,6 @@
                         </Style>
                     </Grid.Style>
                     <StackPanel Margin="16,0" Orientation="Vertical">
-                        <CheckBox Margin="0,0,0,8"
-                                  VerticalAlignment="Top"
-                                  Content="自分自身をお気に入り登録できるようにする(_F)"
-                                  IsChecked="{Binding IsAllowFavoriteMyself}" />
                         <StackPanel Margin="0,8" Orientation="Horizontal">
                             <TextBlock Margin="2,0,6,0"
                                        VerticalAlignment="Center"
@@ -324,6 +320,18 @@
                                 <clr:String>タイムライン上にマウスがあるときにロック</clr:String>
                             </ComboBox>
                         </StackPanel>
+                        <CheckBox Margin="0,0,0,8"
+                                  VerticalAlignment="Top"
+                                  Content="自分自身をお気に入り登録できるようにする(_F)"
+                                  IsChecked="{Binding IsAllowFavoriteMyself}" />
+                        <CheckBox Margin="0,0,0,8"
+                                  VerticalAlignment="Top"
+                                  Content="添付されている画像のサムネイルを表示する(_T)"
+                                  IsChecked="{Binding ShowThumbnail}" />
+                        <CheckBox Margin="20,0,0,8"
+                                  VerticalAlignment="Top"
+                                  Content="Twitterにアップロードされた画像のサムネイルをクリックした時に原寸で開く(_O)"
+                                  IsChecked="{Binding OpenTwitterImageWithOriginalSize}" />
                     </StackPanel>
                 </Grid>
                 <Grid Grid.Column="1" Margin="0,6,0,0">

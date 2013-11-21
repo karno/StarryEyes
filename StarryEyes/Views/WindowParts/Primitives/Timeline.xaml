@@ -887,17 +887,17 @@
                                                 BorderBrush="#FF979797"
                                                 BorderThickness="1"
                                                 Cursor="Hand"
-                                                Visibility="{Binding IsImageAvailable,
+                                                Visibility="{Binding IsThumbnailAvailable,
                                                                      Mode=OneWay,
                                                                      Converter={StaticResource BooleanToVisibleConverter}}">
                                             <controls:LazyImage Cursor="Hand"
                                                                 DecodePixelHeight="60"
                                                                 Stretch="UniformToFill"
-                                                                UriSource="{Binding FirstImage,
+                                                                UriSource="{Binding ThumbnailImage,
                                                                                     Mode=OneWay}">
                                                 <i:Interaction.Triggers>
                                                     <i:EventTrigger EventName="MouseLeftButtonDown">
-                                                        <ei:CallMethodAction MethodName="OpenFirstImage" TargetObject="{Binding Mode=OneTime}" />
+                                                        <ei:CallMethodAction MethodName="OpenThumbnailImage" TargetObject="{Binding Mode=OneTime}" />
                                                     </i:EventTrigger>
                                                 </i:Interaction.Triggers>
                                             </controls:LazyImage>

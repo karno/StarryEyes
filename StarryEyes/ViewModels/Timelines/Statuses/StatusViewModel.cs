@@ -105,6 +105,11 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                     h => Setting.AllowFavoriteMyself.ValueChanged += h,
                     h => Setting.AllowFavoriteMyself.ValueChanged -= h,
                     _ => this.RaisePropertyChanged(() => CanFavorite)));
+            this.CompositeDisposable.Add(
+                new EventListener<Action<bool>>(
+                    h => Setting.ShowThumbnails.ValueChanged += h,
+                    h => Setting.ShowThumbnails.ValueChanged -= h,
+                    _ => this.RaisePropertyChanged(() => IsThumbnailAvailable)));
             // when account is added/removed, all timelines are regenerated.
             // so, we don't have to listen any events which notify accounts addition/deletion.
 
@@ -118,7 +123,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                         .Finally(() =>
                         {
                             this.RaisePropertyChanged(() => this.Images);
-                            this.RaisePropertyChanged(() => this.FirstImage);
+                            this.RaisePropertyChanged(() => this.ThumbnailImage);
                             this.RaisePropertyChanged(() => this.IsImageAvailable);
                         })
                         .Subscribe();
@@ -368,7 +373,12 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             get { return this.Model.Images.Select(i => i.Item2); }
         }
 
-        public Uri FirstImage
+        public bool IsThumbnailAvailable
+        {
+            get { return this.IsImageAvailable && Setting.ShowThumbnails.Value; }
+        }
+
+        public Uri ThumbnailImage
         {
             get { return this.Model.Images != null ? this.Model.Images.Select(i => i.Item2).FirstOrDefault() : null; }
         }
@@ -432,12 +442,20 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             BrowserHelper.Open(url);
         }
 
-        public void OpenFirstImage()
+        private const string TwitterImageHost = "pbs.twimg.com";
+        public void OpenThumbnailImage()
         {
             if (this.Model.Images == null) return;
             var tuple = this.Model.Images.FirstOrDefault();
             if (tuple == null) return;
-            BrowserHelper.Open(tuple.Item1);
+            if (tuple.Item1.Host == TwitterImageHost && Setting.OpenTwitterImageWithOriginalSize.Value)
+            {
+                BrowserHelper.Open(new Uri(tuple.Item1 + ":orig"));
+            }
+            else
+            {
+                BrowserHelper.Open(tuple.Item1);
+            }
         }
 
         #region Reply Control
