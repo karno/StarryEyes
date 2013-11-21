@@ -713,8 +713,16 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             if (!this.AssertQuickActionEnabled()) return;
             if (!this.CanRetweetImmediate)
             {
-                this.NotifyQuickActionFailed("このツイートは現在のアカウントからリツイートできません。",
-                    "自分自身のツイートはリツイートできません。");
+                if (this.IsMyselfStrict)
+                {
+                    this.NotifyQuickActionFailed("このツイートは現在のアカウントからリツイートできません。",
+                                                 "自分自身のツイートはリツイートできません。");
+                }
+                else
+                {
+                    this.NotifyQuickActionFailed("このツイートはリツイートできません。",
+                                                 "非公開アカウントのツイートやダイレクトメッセージはリツイートできません。");
+                }
                 return;
             }
             this.Retweet(this.GetImmediateAccounts(), !this.IsRetweeted);
