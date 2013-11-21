@@ -1,5 +1,6 @@
 ﻿using System;
 using Livet;
+using StarryEyes.Albireo;
 using StarryEyes.Models;
 using StarryEyes.Views.Messaging;
 
@@ -43,9 +44,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             {
                 MainWindowModel.SetShowMainWindowCommands(true);
             }
-            var handler = this.Closed;
-            if (handler != null)
-                handler();
+            this.Closed.SafeInvoke();
         }
     }
 }

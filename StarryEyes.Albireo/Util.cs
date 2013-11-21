@@ -2,19 +2,6 @@
 
 namespace StarryEyes.Albireo
 {
-    public static class StringUtil
-    {
-        public static bool IsNullOrEmpty(this string text)
-        {
-            return String.IsNullOrEmpty(text);
-        }
-
-        public static bool IsNullOrWhiteSpace(this string text)
-        {
-            return String.IsNullOrWhiteSpace(text);
-        }
-    }
-
     public static class EventUtil
     {
         public static void SafeInvoke(this Action action)

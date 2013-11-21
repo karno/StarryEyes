@@ -4,7 +4,6 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Reactive.Linq;
-using StarryEyes.Albireo;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models.Receivers;
 using StarryEyes.Models.Receiving.Handling;
@@ -74,7 +73,7 @@ namespace StarryEyes.Models.Stores
 
         private static void SaveHashtagCache(IEnumerable<string> cache)
         {
-            var items = cache.Where(s => !s.IsNullOrEmpty()).ToArray();
+            var items = cache.Where(s => !String.IsNullOrEmpty(s)).ToArray();
             using (var fs = File.OpenWrite(App.HashtagTempFilePath))
             using (var ds = new DeflateStream(fs, CompressionMode.Compress))
             using (var bw = new BinaryWriter(ds))

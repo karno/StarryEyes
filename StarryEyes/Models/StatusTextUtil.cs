@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using StarryEyes.Albireo;
 using StarryEyes.Anomaly.Utils;
 using StarryEyes.Helpers;
 using StarryEyes.Models.Subsystems;
@@ -37,12 +36,15 @@ namespace StarryEyes.Models
         {
             return TwitterRegexPatterns.ValidUrl.Replace(text, match =>
             {
-                if (match.Groups[TwitterRegexPatterns.ValidUrlGroupProtocol].Value.IsNullOrEmpty())
+                if (String.IsNullOrEmpty(match.Groups[TwitterRegexPatterns.ValidUrlGroupProtocol].Value))
+                {
+                    // if protocol scheme is not declared, escape url and protect unintended linking.
                     return match.Groups[TwitterRegexPatterns.ValidUrlGroupBefore].Value +
                            EscapeCore(match.Groups[TwitterRegexPatterns.ValidUrlGroupDomain].Value) +
                            match.Groups[TwitterRegexPatterns.ValidUrlGroupPort] +
                            match.Groups[TwitterRegexPatterns.ValidUrlGroupPath] +
                            match.Groups[TwitterRegexPatterns.ValidUrlGroupQueryString];
+                }
                 return match.Value;
             });
         }

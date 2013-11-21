@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Livet;
+using StarryEyes.Albireo;
 using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Anomaly.Utils;
 using StarryEyes.Models.Accounting;
@@ -66,9 +67,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         public event Action SelectedAccountsChanged;
         private void RaiseSelectedAccountsChanged()
         {
-            var handler = this.SelectedAccountsChanged;
-            if (handler != null)
-                handler();
+            this.SelectedAccountsChanged.SafeInvoke();
         }
     }
 

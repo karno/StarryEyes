@@ -16,7 +16,6 @@ using Livet.Commands;
 using Livet.EventListeners;
 using Livet.Messaging;
 using Livet.Messaging.IO;
-using StarryEyes.Albireo;
 using StarryEyes.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
@@ -1322,7 +1321,7 @@ namespace StarryEyes.ViewModels.WindowParts
 
         public override void UpdateCandidateList(string token, int offset)
         {
-            if (token.IsNullOrEmpty() || (token[0] != '@' && token[0] != '#'))
+            if (String.IsNullOrEmpty(token) || (token[0] != '@' && token[0] != '#'))
             {
                 _items.Clear();
             }
@@ -1405,7 +1404,7 @@ namespace StarryEyes.ViewModels.WindowParts
         private void AddHashItems(string key)
         {
             CacheStore.HashtagCache
-                      .Where(s => key.IsNullOrEmpty() ||
+                      .Where(s => String.IsNullOrEmpty(key) ||
                           s.IndexOf(key, StringComparison.CurrentCultureIgnoreCase) >= 0)
                       .OrderBy(_ => _)
                       .Select(s => new SuggestItemViewModel("#" + s))

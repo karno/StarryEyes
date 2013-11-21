@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -8,7 +9,6 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
-using StarryEyes.Albireo;
 using StarryEyes.Annotations;
 
 namespace StarryEyes.Views.Controls
@@ -185,7 +185,7 @@ namespace StarryEyes.Views.Controls
             int tokenStart, __;
             var token = _provider.FindNearestToken(this.Text, this.CaretIndex, out tokenStart, out __);
             var caretIndexInToken = this.CaretIndex - tokenStart;
-            if (token.IsNullOrEmpty())
+            if (String.IsNullOrEmpty(token))
             {
                 CloseCandidates();
                 return;
