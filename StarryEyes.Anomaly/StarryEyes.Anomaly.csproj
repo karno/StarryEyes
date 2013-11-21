@@ -115,6 +115,7 @@
     <Compile Include="Utils\HttpUtility.cs" />
     <Compile Include="Utils\ParsingExtension.cs" />
     <Compile Include="Utils\ReactiveUtility.cs" />
+    <Compile Include="Utils\TextEntityResolver.cs" />
     <Compile Include="Utils\UnixEpoch.cs" />
   </ItemGroup>
   <ItemGroup>

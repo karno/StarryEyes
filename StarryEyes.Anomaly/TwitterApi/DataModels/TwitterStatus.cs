@@ -68,7 +68,6 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
 
         public bool GenerateFromJson { get; private set; }
 
-
         /// <summary>
         /// Numerical ID of this tweet/message.
         /// </summary>
@@ -190,48 +189,39 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
                 var builder = new StringBuilder();
                 var status = this;
                 if (status.RetweetedOriginal != null)
-                    status = status.RetweetedOriginal; // change target
-                var escaped = ParsingExtension.EscapeEntity(status.Text);
-                TwitterEntity prevEntity = null;
-                foreach (var entity in status.Entities.Guard().OrderBy(e => e.StartIndex))
                 {
-                    int pidx = 0;
-                    if (prevEntity != null)
-                        pidx = prevEntity.EndIndex;
-                    if (pidx < entity.StartIndex)
-                    {
-                        // output raw
-                        builder.Append(ParsingExtension.ResolveEntity(escaped.Substring(pidx, entity.StartIndex - pidx)));
-                    }
-                    switch (entity.EntityType)
-                    {
-                        case EntityType.Hashtags:
-                            builder.Append("#" + entity.DisplayText);
-                            break;
-                        case EntityType.Urls:
-                            builder.Append(showFullUrl
-                                               ? ParsingExtension.ResolveEntity(entity.OriginalUrl)
-                                               : ParsingExtension.ResolveEntity(entity.DisplayText));
-                            break;
-                        case EntityType.Media:
-                            builder.Append(showFullUrl
-                                               ? ParsingExtension.ResolveEntity(entity.MediaUrl)
-                                               : ParsingExtension.ResolveEntity(entity.DisplayText));
-                            break;
-                        case EntityType.UserMentions:
-                            builder.Append("@" + entity.DisplayText);
-                            break;
-                    }
-                    prevEntity = entity;
+                    // change target
+                    status = status.RetweetedOriginal;
                 }
-                if (prevEntity == null)
+                foreach (var description in TextEntityResolver.ParseText(status))
                 {
-                    builder.Append(ParsingExtension.ResolveEntity(escaped));
-                }
-                else if (prevEntity.EndIndex < escaped.Length)
-                {
-                    builder.Append(ParsingExtension.ResolveEntity(
-                        escaped.Substring(prevEntity.EndIndex, escaped.Length - prevEntity.EndIndex)));
+                    if (!description.IsEntityAvailable)
+                    {
+                        builder.Append(description.Text);
+                    }
+                    else
+                    {
+                        var entity = description.Entity;
+                        switch (entity.EntityType)
+                        {
+                            case EntityType.Hashtags:
+                                builder.Append("#" + entity.DisplayText);
+                                break;
+                            case EntityType.Urls:
+                                builder.Append(showFullUrl
+                                                   ? ParsingExtension.ResolveEntity(entity.OriginalUrl)
+                                                   : ParsingExtension.ResolveEntity(entity.DisplayText));
+                                break;
+                            case EntityType.Media:
+                                builder.Append(showFullUrl
+                                                   ? ParsingExtension.ResolveEntity(entity.MediaUrl)
+                                                   : ParsingExtension.ResolveEntity(entity.DisplayText));
+                                break;
+                            case EntityType.UserMentions:
+                                builder.Append("@" + entity.DisplayText);
+                                break;
+                        }
+                    }
                 }
                 return builder.ToString();
             }

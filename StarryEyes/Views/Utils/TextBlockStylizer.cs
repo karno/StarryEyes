@@ -130,46 +130,34 @@ namespace StarryEyes.Views.Utils
                 }
                 yield break;
             }
-            var escaped = ParsingExtension.EscapeEntity(text);
-            TwitterEntity prevEntity = null;
-            foreach (var entity in entities.OrderBy(e => e.StartIndex))
+            foreach (var description in TextEntityResolver.ParseText(text, entities))
             {
-                var pidx = 0;
-                if (prevEntity != null)
-                    pidx = prevEntity.EndIndex;
-                if (pidx < entity.StartIndex)
+                if (!description.IsEntityAvailable)
                 {
-                    // output raw
-                    yield return GenerateText(ParsingExtension.ResolveEntity(escaped.Substring(pidx, entity.StartIndex - pidx)));
+                    yield return GenerateText(description.Text);
                 }
-                var display = entity.DisplayText;
-                if (String.IsNullOrWhiteSpace(display))
+                else
                 {
-                    display = entity.OriginalUrl;
+                    var entity = description.Entity;
+                    var display = entity.DisplayText;
+                    if (String.IsNullOrEmpty(display))
+                    {
+                        display = entity.OriginalUrl;
+                    }
+                    switch (entity.EntityType)
+                    {
+                        case EntityType.Hashtags:
+                            yield return GenerateHashtagLink(obj, display);
+                            break;
+                        case EntityType.Media:
+                        case EntityType.Urls:
+                            yield return GenerateLink(obj, display, ParsingExtension.ResolveEntity(entity.OriginalUrl));
+                            break;
+                        case EntityType.UserMentions:
+                            yield return GenerateUserLink(obj, display, ParsingExtension.ResolveEntity(entity.DisplayText));
+                            break;
+                    }
                 }
-                switch (entity.EntityType)
-                {
-                    case EntityType.Hashtags:
-                        yield return GenerateHashtagLink(obj, display);
-                        break;
-                    case EntityType.Media:
-                    case EntityType.Urls:
-                        yield return GenerateLink(obj, display, ParsingExtension.ResolveEntity(entity.OriginalUrl));
-                        break;
-                    case EntityType.UserMentions:
-                        yield return GenerateUserLink(obj, display, ParsingExtension.ResolveEntity(entity.DisplayText));
-                        break;
-                }
-                prevEntity = entity;
-            }
-            if (prevEntity == null)
-            {
-                yield return GenerateText(text);
-            }
-            else if (prevEntity.EndIndex < escaped.Length)
-            {
-                yield return GenerateText(
-                    ParsingExtension.ResolveEntity(escaped.Substring(prevEntity.EndIndex, escaped.Length - prevEntity.EndIndex)));
             }
         }
 
