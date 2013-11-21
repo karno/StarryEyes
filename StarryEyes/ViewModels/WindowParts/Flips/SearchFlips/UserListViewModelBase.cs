@@ -95,6 +95,8 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 var ids = _userIds.Skip(page * 100).Take(100).ToArray();
                 if (ids.Length == 0)
                 {
+                    // backward page count
+                    Interlocked.Decrement(ref _currentPageCount);
                     var result = await this.ReadMoreIds();
                     IsLoading = false;
                     if (result)
