@@ -27,6 +27,10 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 MainWindowModel.SuppressKeyAssigns = value;
                 MainWindowModel.SetShowMainWindowCommands(!value);
                 RaisePropertyChanged();
+                if (!value)
+                {
+                    Close();
+                }
             }
         }
 
@@ -41,6 +45,9 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         private void StartTabConfigure(Tuple<TabModel, ISubject<Unit>> args)
         {
+            // ensure close before starting configuration
+            this.IsConfigurationActive = false;
+
             var model = args.Item1;
             var callback = args.Item2;
             this._completeCallback = callback;
@@ -170,6 +177,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public void Close()
         {
+            if (!IsConfigurationActive) return;
             this.IsConfigurationActive = false;
             if (_currentConfigurationTarget != null)
             {

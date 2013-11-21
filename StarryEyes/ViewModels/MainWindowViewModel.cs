@@ -195,6 +195,9 @@ namespace StarryEyes.ViewModels
                           .Subscribe(
                               desc =>
                               {
+                                  // ensure close before opening.
+                                  _globalAccountSelectionFlipViewModel.Close();
+
                                   _globalAccountSelectionFlipViewModel.SelectedAccounts =
                                       desc.SelectionAccounts;
                                   _globalAccountSelectionFlipViewModel.SelectionReason = "";
@@ -219,8 +222,7 @@ namespace StarryEyes.ViewModels
                                                              disposable.Dispose();
                                                              disposable = null;
                                                              desc.Callback(
-                                                                 this
-                                                                     ._globalAccountSelectionFlipViewModel
+                                                                 this._globalAccountSelectionFlipViewModel
                                                                      .SelectedAccounts);
                                                          });
                                   _globalAccountSelectionFlipViewModel.Open();

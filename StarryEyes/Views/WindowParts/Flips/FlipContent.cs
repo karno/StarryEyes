@@ -25,14 +25,21 @@ namespace StarryEyes.Views.WindowParts.Flips
             if ((bool)e.NewValue)
             {
                 fc.OwnerVisibility = Visibility.Visible;
-                VisualStateManager.GoToState(fc, "Open", true);
+                if (!VisualStateManager.GoToState(fc, "Open", true))
+                {
+                    fc.IsOpen = false;
+                }
             }
             else
             {
                 VisualStateManager.GoToState(fc, "Close", true);
                 var timer = new DispatcherTimer(DispatcherPriority.Loaded, DispatcherHelper.UIDispatcher);
                 timer.Interval = TimeSpan.FromSeconds(0.2);
-                timer.Tick += (o, args) => { timer.Stop(); fc.OwnerVisibility = Visibility.Collapsed; };
+                timer.Tick += (o, args) =>
+                {
+                    timer.Stop();
+                    fc.OwnerVisibility = Visibility.Collapsed;
+                };
                 timer.Start();
             }
         }

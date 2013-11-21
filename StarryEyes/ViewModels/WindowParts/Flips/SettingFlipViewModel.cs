@@ -42,6 +42,10 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 MainWindowModel.SuppressKeyAssigns = value;
                 MainWindowModel.SetShowMainWindowCommands(!value);
                 RaisePropertyChanged();
+                if (!value)
+                {
+                    Close();
+                }
             }
         }
 
@@ -61,8 +65,10 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         private void StartSetting(ISubject<Unit> subject)
         {
-            this.RefreshKeyAssignCandidates();
+            // ensure close before starting setting
+            this.IsConfigurationActive = false;
 
+            this.RefreshKeyAssignCandidates();
             this.ResetFilter();
             this._completeCallback = subject;
             this.RaisePropertyChanged();
@@ -544,6 +550,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public void Close()
         {
+            if (!IsConfigurationActive) return;
             if (_isDirtyState)
             {
                 try

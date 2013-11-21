@@ -80,7 +80,6 @@ namespace StarryEyes.Models
         #endregion
 
         public static event Action<AccountSelectDescription> AccountSelectActionRequested;
-
         public static void ExecuteAccountSelectAction(
             AccountSelectionAction action, IEnumerable<TwitterAccount> defaultSelected,
             Action<IEnumerable<TwitterAccount>> after)
@@ -131,7 +130,6 @@ namespace StarryEyes.Models
         }
 
         public static event Action<Tuple<TabModel, ISubject<Unit>>> TabConfigureRequested;
-
         public static IObservable<Unit> ShowTabConfigure(TabModel model)
         {
             var notifier = new Subject<Unit>();

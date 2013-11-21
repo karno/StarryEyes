@@ -28,6 +28,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public virtual void Open()
         {
+            if (IsVisible) return;
             if (IsWindowCommandsRelated)
             {
                 MainWindowModel.SetShowMainWindowCommands(false);
@@ -38,6 +39,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public virtual void Close()
         {
+            if (!IsVisible) return;
             IsVisible = false;
             this.Messenger.Raise(new GoToStateMessage("Close"));
             if (IsWindowCommandsRelated)
