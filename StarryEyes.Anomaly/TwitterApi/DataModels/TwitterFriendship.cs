@@ -18,6 +18,7 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
             IsSourceFollowingTarget = src.following;
             IsTargetFollowingSource = src.followed_by;
             IsBlocking = src.blocking;
+            IsWantRetweets = ((bool?)src.want_retweets).GetValueOrDefault();
         }
 
         public long SourceId { get; set; }
@@ -33,5 +34,7 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
         public bool IsTargetFollowingSource { get; set; }
 
         public bool IsBlocking { get; set; }
+
+        public bool IsWantRetweets { get; set; }
     }
 }

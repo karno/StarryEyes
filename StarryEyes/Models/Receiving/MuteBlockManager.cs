@@ -16,8 +16,11 @@ namespace StarryEyes.Models.Receiving
     {
         private static volatile bool _isMuteInvalidated = true;
         private static volatile bool _isBlockInvalidated = true;
+        private static volatile bool _isNoRetweetsInvalidated = true;
 
-        private static IDisposable _blockingDisposable = null;
+        private static IDisposable _blockingDisposable;
+        private static IDisposable _noRetweetDisposable;
+        private static AVLTree<long> _noRetweetUserIds = new AVLTree<long>();
         private static AVLTree<long> _blockingUserIds = new AVLTree<long>();
         private static Func<TwitterStatus, bool> _muteFilter = _ => false;
         private static string _muteSqlQuery = string.Empty;
@@ -31,6 +34,7 @@ namespace StarryEyes.Models.Receiving
             {
                 InvalidateBlocks();
                 InvalidateMute();
+                InvalidateNoRetweets();
             });
             Setting.Muteds.ValueChanged += _ => InvalidateMute();
         }
@@ -40,16 +44,18 @@ namespace StarryEyes.Models.Receiving
             get
             {
                 const string blocksql = "UserId NOT IN (select TargetId from Blockings)";
+                const string noRetweetSql =
+                    "(RetweetOriginalId IS NULL OR UserId NOT IN (select TargetId from NoRetweets))";
                 CheckUpdateMutes();
-                CheckUpdateBlocks();
-                return _muteSqlQuery.SqlConcatAnd(blocksql);
+                return _muteSqlQuery.SqlConcatAnd(blocksql).SqlConcatAnd(noRetweetSql);
             }
         }
 
-        public static bool IsBlockedOrMuted([NotNull] TwitterStatus status)
+        public static bool CheckExcepted([NotNull] TwitterStatus status)
         {
             if (status == null) throw new ArgumentNullException("status");
             if (IsBlocked(status.User)) return true;
+            if (status.RetweetedOriginal != null && IsNoRetweet(status.User)) return true;
             CheckUpdateMutes();
             return _muteFilter(status);
         }
@@ -76,6 +82,21 @@ namespace StarryEyes.Models.Receiving
             }
         }
 
+        public static bool IsNoRetweet([NotNull] TwitterUser user)
+        {
+            if (user == null) throw new ArgumentNullException("user");
+            return IsNoRetweet(user.Id);
+        }
+
+        public static bool IsNoRetweet(long userId)
+        {
+            CheckUpdateNoRetweets();
+            lock (_noRetweetUserIds)
+            {
+                return _noRetweetUserIds.Contains(userId);
+            }
+        }
+
         private static void CheckUpdateMutes()
         {
             lock (_muteFilter)
@@ -96,6 +117,16 @@ namespace StarryEyes.Models.Receiving
             }
         }
 
+        private static void CheckUpdateNoRetweets()
+        {
+            lock (_noRetweetUserIds)
+            {
+                if (!_isNoRetweetsInvalidated) return;
+                _isNoRetweetsInvalidated = false;
+                UpdateNoRetweets();
+            }
+        }
+
         private static void UpdateMutes()
         {
             var eval = Setting.Muteds.Evaluator;
@@ -112,7 +143,7 @@ namespace StarryEyes.Models.Receiving
         private static void UpdateBlocks()
         {
             var disposables = new CompositeDisposable();
-            var nbs = new AVLTree<long>();
+            var repl = new AVLTree<long>();
             Setting.Accounts
                    .Collection
                    .Select(a => a.RelationData)
@@ -125,11 +156,38 @@ namespace StarryEyes.Models.Receiving
                                  .Subscribe(_ => InvalidateBlocks())))
                 // select blocked users
                    .SelectMany(r => r.Blockings)
-                   .ForEach(nbs.Add);
-            _blockingUserIds = nbs;
+                   .ForEach(repl.Add);
+            _blockingUserIds = repl;
 
             var prev = _blockingDisposable;
             _blockingDisposable = disposables;
+            if (prev != null)
+            {
+                prev.Dispose();
+            }
+        }
+
+        private static void UpdateNoRetweets()
+        {
+            var disposables = new CompositeDisposable();
+            var repl = new AVLTree<long>();
+            Setting.Accounts
+                   .Collection
+                   .Select(a => a.RelationData)
+                // listen no retweet change info
+                   .Do(r => disposables.Add(
+                       Observable.FromEvent<RelationDataChangedInfo>(
+                           h => r.AccountDataUpdated += h,
+                           h => r.AccountDataUpdated -= h)
+                                 .Where(info => info.Change == RelationDataChange.NoRetweets)
+                                 .Subscribe(_ => InvalidateNoRetweets())))
+                // select blocked users
+                   .SelectMany(r => r.NoRetweets)
+                   .ForEach(repl.Add);
+            _noRetweetUserIds = repl;
+
+            var prev = _noRetweetDisposable;
+            _noRetweetDisposable = disposables;
             if (prev != null)
             {
                 prev.Dispose();
@@ -144,6 +202,11 @@ namespace StarryEyes.Models.Receiving
         private static void InvalidateBlocks()
         {
             _isBlockInvalidated = true;
+        }
+
+        private static void InvalidateNoRetweets()
+        {
+            _isNoRetweetsInvalidated = true;
         }
     }
 }

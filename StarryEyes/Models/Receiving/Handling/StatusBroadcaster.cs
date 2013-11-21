@@ -71,7 +71,7 @@ namespace StarryEyes.Models.Receiving.Handling
                 {
                     var status = notification.StatusModel == null ? null : notification.StatusModel.Status;
                     var added = notification.IsAdded && status != null;
-                    if (added && MuteBlockManager.IsBlockedOrMuted(status))
+                    if (added && MuteBlockManager.CheckExcepted(status))
                     {
                         // MUTE CAPTURE
                         System.Diagnostics.Debug.WriteLine("*** Mute or Block Capture: " + status);

@@ -65,6 +65,9 @@ namespace StarryEyes.Models.Accounting
             InitializeCollection(() => UserProxy.GetBlockingsAsync(accountId),
                                  _blockingsLocker, _blockings.Add,
                                  id => this.OnAccountDataUpdated(id, true, RelationDataChange.Blocking));
+            InitializeCollection(() => UserProxy.GetNoRetweetsAsync(accountId),
+                                 _noRetweetsLocker, _noRetweets.Add,
+                                 id => this.OnAccountDataUpdated(id, true, RelationDataChange.NoRetweets));
         }
 
         private void InitializeCollection(Func<Task<IEnumerable<long>>> reader,
@@ -255,7 +258,7 @@ namespace StarryEyes.Models.Accounting
         {
             get
             {
-                lock (this._blockingsLocker)
+                lock (_blockingsLocker)
                 {
                     return this._blockings.ToArray();
                 }
@@ -326,6 +329,88 @@ namespace StarryEyes.Models.Accounting
             await UserProxy.RemoveBlockingsAsync(_accountId, m);
             m.ForEach(id => this.OnAccountDataUpdated(id, false, RelationDataChange.Blocking));
         }
+
+        private readonly object _noRetweetsLocker = new object();
+        private readonly AVLTree<long> _noRetweets = new AVLTree<long>();
+
+        /// <summary>
+        /// Get all users whose retweet is suppressed.
+        /// </summary>
+        public IEnumerable<long> NoRetweets
+        {
+            get
+            {
+                lock (_noRetweetsLocker)
+                {
+                    return this._noRetweets.ToArray();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Check someone is blocked me
+        /// </summary>
+        /// <param name="id">his/her id</param>
+        /// <returns>if true, he/she has been blocked me.</returns>
+        public bool IsNoRetweets(long id)
+        {
+            lock (this._noRetweetsLocker)
+            {
+                return this._noRetweets.Contains(id);
+            }
+        }
+
+        /// <summary>
+        /// Add/remove blocking user
+        /// </summary>
+        /// <param name="id">target user's id</param>
+        /// <param name="isAdded">flag of blocked/unblocked</param>
+        public async Task SetNoRetweetsAsync(long id, bool isAdded)
+        {
+            lock (this._noRetweetsLocker)
+            {
+                if (isAdded)
+                {
+                    this._noRetweets.Add(id);
+                }
+                else
+                {
+                    this._noRetweets.Remove(id);
+                }
+            }
+            await UserProxy.SetNoRetweetsAsync(_accountId, id, isAdded);
+            this.OnAccountDataUpdated(id, isAdded, RelationDataChange.NoRetweets);
+        }
+
+        /// <summary>
+        /// Add blocking users
+        /// </summary>
+        /// <param name="ids">target users' ids</param>
+        public async Task AddNoRetweetsAsync(IEnumerable<long> ids)
+        {
+            var m = ids.Memoize();
+            lock (this._noRetweetsLocker)
+            {
+                m.ForEach(this._noRetweets.Add);
+            }
+            await UserProxy.AddNoRetweetssAsync(_accountId, m);
+            m.ForEach(id => this.OnAccountDataUpdated(id, true, RelationDataChange.NoRetweets));
+        }
+
+        /// <summary>
+        /// Remove blocking users
+        /// </summary>
+        /// <param name="ids">target users' ids</param>
+        public async Task RemoveNoRetweetsAsync(IEnumerable<long> ids)
+        {
+            var m = ids.Memoize();
+            lock (this._noRetweetsLocker)
+            {
+                m.ForEach(i => this._noRetweets.Remove(i));
+            }
+            await UserProxy.RemoveNoRetweetssAsync(_accountId, m);
+            m.ForEach(id => this.OnAccountDataUpdated(id, false, RelationDataChange.NoRetweets));
+        }
     }
 
     /// <summary>
@@ -376,5 +461,9 @@ namespace StarryEyes.Models.Accounting
         /// Blocking users is updated
         /// </summary>
         Blocking,
+        /// <summary>
+        /// Retweet suppression user is updated
+        /// </summary>
+        NoRetweets,
     }
 }

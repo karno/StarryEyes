@@ -81,6 +81,11 @@ namespace StarryEyes.Models.Databases
             return await Database.RelationCrud.IsBlockingAsync(userId, targetId);
         }
 
+        public static async Task<bool> IsNoRetweetsAsync(long userId, long targetId)
+        {
+            return await Database.RelationCrud.IsNoRetweetsAsync(userId, targetId);
+        }
+
         public static async Task SetFollowingAsync(long userId, long targetId, bool following)
         {
             await Database.RelationCrud.SetFollowingAsync(userId, targetId, following);
@@ -94,6 +99,11 @@ namespace StarryEyes.Models.Databases
         public static async Task SetBlockingAsync(long userId, long targetId, bool blocking)
         {
             await Database.RelationCrud.SetBlockingAsync(userId, targetId, blocking);
+        }
+
+        public static async Task SetNoRetweetsAsync(long userId, long targetId, bool suppressing)
+        {
+            await Database.RelationCrud.SetNoRetweetsAsync(userId, targetId, suppressing);
         }
 
         public static async Task AddFollowingsAsync(long userId, IEnumerable<long> targetIds)
@@ -126,6 +136,16 @@ namespace StarryEyes.Models.Databases
             await Database.RelationCrud.RemoveBlockingsAsync(userId, removals);
         }
 
+        public static async Task AddNoRetweetssAsync(long userId, IEnumerable<long> targetIds)
+        {
+            await Database.RelationCrud.AddNoRetweetsAsync(userId, targetIds);
+        }
+
+        public static async Task RemoveNoRetweetssAsync(long userId, IEnumerable<long> removals)
+        {
+            await Database.RelationCrud.RemoveNoRetweetsAsync(userId, removals);
+        }
+
         public static async Task<IEnumerable<long>> GetFollowingsAsync(long userId)
         {
             return await Database.RelationCrud.GetFollowingsAsync(userId);
@@ -141,6 +161,11 @@ namespace StarryEyes.Models.Databases
             return await Database.RelationCrud.GetBlockingsAsync(userId);
         }
 
+        public static async Task<IEnumerable<long>> GetNoRetweetsAsync(long userId)
+        {
+            return await Database.RelationCrud.GetNoRetweetsAsync(userId);
+        }
+
         public static async Task<IEnumerable<long>> GetFollowingsAllAsync()
         {
             return await Database.RelationCrud.GetFollowingsAllAsync();
@@ -154,6 +179,11 @@ namespace StarryEyes.Models.Databases
         public static async Task<IEnumerable<long>> GetBlockingsAllAsync()
         {
             return await Database.RelationCrud.GetBlockingsAllAsync();
+        }
+
+        public static async Task<IEnumerable<long>> GetNoRetweetsAllAsync()
+        {
+            return await Database.RelationCrud.GetNoRetweetsAllAsync();
         }
     }
 }

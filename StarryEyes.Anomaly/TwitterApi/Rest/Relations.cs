@@ -16,7 +16,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             if (credential == null) throw new ArgumentNullException("credential");
             var client = credential.CreateOAuthClient();
             var respStr = await client.GetStringAsync(new ApiAccess("friendships/no_retweets/ids.json"));
-            return await Task.Run(() => ((dynamic[])DynamicJson.Parse(respStr)).OfType<long>());
+            return await Task.Run(() => ((dynamic[])DynamicJson.Parse(respStr)).Select(d => (long)d));
         }
 
         #region FriendsIds

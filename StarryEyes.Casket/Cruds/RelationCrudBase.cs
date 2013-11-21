@@ -84,12 +84,14 @@ namespace StarryEyes.Casket.Cruds
         private readonly RelationCrudBase _followings;
         private readonly RelationCrudBase _followers;
         private readonly RelationCrudBase _blockings;
+        private readonly RelationCrudBase _noRetweets;
 
         public RelationCrud()
         {
             _followings = new RelationCrudBase("Followings");
             _followers = new RelationCrudBase("Followers");
             _blockings = new RelationCrudBase("Blockings");
+            _noRetweets = new RelationCrudBase("NoRetweets");
         }
 
         public async Task InitializeAsync()
@@ -97,9 +99,11 @@ namespace StarryEyes.Casket.Cruds
             var a = this._followings.InitializeAsync();
             var b = this._followers.InitializeAsync();
             var c = this._blockings.InitializeAsync();
+            var d = this._noRetweets.InitializeAsync();
             await a;
             await b;
             await c;
+            await d;
         }
 
         public async Task<bool> IsFollowingAsync(long userId, long targetId)
@@ -115,6 +119,11 @@ namespace StarryEyes.Casket.Cruds
         public async Task<bool> IsBlockingAsync(long userId, long targetId)
         {
             return await _blockings.ContainsAsync(userId, targetId);
+        }
+
+        public async Task<bool> IsNoRetweetsAsync(long userId, long targetId)
+        {
+            return await _noRetweets.ContainsAsync(userId, targetId);
         }
 
         public async Task SetFollowingAsync(long userId, long targetId, bool following)
@@ -153,6 +162,18 @@ namespace StarryEyes.Casket.Cruds
             }
         }
 
+        public async Task SetNoRetweetsAsync(long userId, long targetId, bool isSuppressed)
+        {
+            if (isSuppressed)
+            {
+                await _noRetweets.AddOrUpdateAsync(userId, targetId);
+            }
+            else
+            {
+                await _noRetweets.DeleteAsync(userId, targetId);
+            }
+        }
+
         public async Task AddFollowingsAsync(long userId, IEnumerable<long> targetIds)
         {
             await _followings.AddOrUpdateAllAsync(userId, targetIds);
@@ -183,6 +204,16 @@ namespace StarryEyes.Casket.Cruds
             await _blockings.DeleteAllAsync(userId, removals);
         }
 
+        public async Task AddNoRetweetsAsync(long userId, IEnumerable<long> targetIds)
+        {
+            await _noRetweets.AddOrUpdateAllAsync(userId, targetIds);
+        }
+
+        public async Task RemoveNoRetweetsAsync(long userId, IEnumerable<long> removals)
+        {
+            await _noRetweets.DeleteAllAsync(userId, removals);
+        }
+
         public async Task<IEnumerable<long>> GetFollowingsAsync(long userId)
         {
             return await this._followings.GetUsersAsync(userId);
@@ -198,6 +229,11 @@ namespace StarryEyes.Casket.Cruds
             return await this._blockings.GetUsersAsync(userId);
         }
 
+        public async Task<IEnumerable<long>> GetNoRetweetsAsync(long userId)
+        {
+            return await _noRetweets.GetUsersAsync(userId);
+        }
+
         public async Task<IEnumerable<long>> GetFollowingsAllAsync()
         {
             return await this._followings.GetUsersAllAsync();
@@ -211,6 +247,11 @@ namespace StarryEyes.Casket.Cruds
         public async Task<IEnumerable<long>> GetBlockingsAllAsync()
         {
             return await this._blockings.GetUsersAllAsync();
+        }
+
+        public async Task<IEnumerable<long>> GetNoRetweetsAllAsync()
+        {
+            return await _noRetweets.GetUsersAllAsync();
         }
     }
 }

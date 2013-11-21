@@ -21,6 +21,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
         private bool _isFollowing;
         private bool _isFollowedBack;
         private bool _isBlocking;
+        private bool _isNoRetweets;
 
         public string SourceUserScreenName
         {
@@ -82,6 +83,16 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             }
         }
 
+        public bool IsNoRetweets
+        {
+            get { return this._isNoRetweets; }
+            set
+            {
+                this._isNoRetweets = value;
+                RaisePropertyChanged();
+            }
+        }
+
         public RelationControlViewModel(UserInfoViewModel parent, TwitterAccount source, TwitterUser target)
         {
             this._parent = parent;
@@ -91,6 +102,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             this.IsFollowing = rds.IsFollowing(target.Id);
             this.IsFollowedBack = rds.IsFollowedBy(target.Id);
             this.IsBlocking = rds.IsBlocking(target.Id);
+            this.IsNoRetweets = rds.IsNoRetweets(target.Id);
             Task.Run(() => this.GetFriendship(rds));
         }
 
@@ -115,6 +127,11 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                     this.IsBlocking = fs.IsBlocking;
                     await rds.SetBlockingAsync(_target.Id, fs.IsBlocking);
                 }
+                if (this.IsNoRetweets == fs.IsWantRetweets)
+                {
+                    this.IsNoRetweets = !fs.IsWantRetweets;
+                    await rds.SetNoRetweetsAsync(_target.Id, !fs.IsWantRetweets);
+                }
                 // ReSharper restore InvertIf
             }
             catch (Exception)
@@ -127,7 +144,11 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
         {
             this.DispatchAction(
                 RelationKind.Follow,
-                () => this.IsFollowing = true,
+                () =>
+                {
+                    this.IsFollowing = true;
+                    Task.Run(() => _source.RelationData.SetFollowingAsync(_target.Id, true));
+                },
                 ex => this._parent.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
                 {
                     Title = "フォロー エラー",
@@ -142,7 +163,11 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
         {
             this.DispatchAction(
                 RelationKind.Unfollow,
-                () => this.IsFollowing = false,
+                () =>
+                {
+                    this.IsFollowing = false;
+                    Task.Run(() => _source.RelationData.SetFollowingAsync(_target.Id, false));
+                },
                 ex => this._parent.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
                 {
                     Title = "アンフォロー エラー",
@@ -161,6 +186,8 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 {
                     this.IsFollowing = false;
                     this.IsBlocking = true;
+                    Task.Run(() => _source.RelationData.SetFollowingAsync(_target.Id, false));
+                    Task.Run(() => _source.RelationData.SetBlockingAsync(_target.Id, true));
                 },
                 ex => this._parent.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
                 {
@@ -176,12 +203,54 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
         {
             this.DispatchAction(
                 RelationKind.Unblock,
-                () => this.IsBlocking = false,
+                () =>
+                {
+                    this.IsBlocking = false;
+                    Task.Run(() => _source.RelationData.SetBlockingAsync(_target.Id, false));
+                },
                 ex => this._parent.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
                 {
                     Title = "アンブロック エラー",
                     MainIcon = VistaTaskDialogIcon.Error,
                     MainInstruction = "ブロックを解除できませんでした。",
+                    Content = ex.Message,
+                    CommonButtons = TaskDialogCommonButtons.Close,
+                })));
+        }
+
+        public void SuppressRetweets()
+        {
+            this.DispatchRetweetSuppression(
+                true,
+                () =>
+                {
+                    this.IsNoRetweets = true;
+                    Task.Run(() => _source.RelationData.SetNoRetweetsAsync(_target.Id, true));
+                },
+                ex => this._parent.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
+                {
+                    Title = "リツイート非表示 エラー",
+                    MainIcon = VistaTaskDialogIcon.Error,
+                    MainInstruction = "このユーザのリツイートを非表示にできませんでした。",
+                    Content = ex.Message,
+                    CommonButtons = TaskDialogCommonButtons.Close,
+                })));
+        }
+
+        public void UnsuppressRetweets()
+        {
+            this.DispatchRetweetSuppression(
+                false,
+                () =>
+                {
+                    this.IsNoRetweets = false;
+                    Task.Run(() => _source.RelationData.SetNoRetweetsAsync(_target.Id, false));
+                },
+                ex => this._parent.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
+                {
+                    Title = "リツイート非表示解除 エラー",
+                    MainIcon = VistaTaskDialogIcon.Error,
+                    MainInstruction = "このユーザリツイート非表示を解除できませんでした。",
                     Content = ex.Message,
                     CommonButtons = TaskDialogCommonButtons.Close,
                 })));
@@ -204,6 +273,16 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                     Content = ex.Message,
                     CommonButtons = TaskDialogCommonButtons.Close,
                 })));
+        }
+
+        private void DispatchRetweetSuppression(bool suppress, Action succeeded, Action<Exception> failed)
+        {
+            this.IsCommunicating = true;
+            RequestQueue.Enqueue(_source, new UpdateFriendshipsRequest(_target, suppress))
+                        .Finally(() => this.IsCommunicating = false)
+                        .Subscribe(_ => { },
+                                   failed,
+                                   succeeded);
         }
 
         private void DispatchAction(RelationKind work, Action succeeded, Action<Exception> failed)
