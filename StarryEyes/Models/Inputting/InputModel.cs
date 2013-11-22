@@ -31,9 +31,9 @@ namespace StarryEyes.Models.Inputting
 
         private static void SetEventPropagation()
         {
-            _core.SetCursorRequest += SetCursorRequest.SafeInvoke;
-            _core.FocusRequest += FocusRequest.SafeInvoke;
-            _core.CloseRequest += CloseRequest.SafeInvoke;
+            _core.SetCursorRequest += arg => SetCursorRequest.SafeInvoke(arg);
+            _core.FocusRequest += () => FocusRequest.SafeInvoke();
+            _core.CloseRequest += () => CloseRequest.SafeInvoke();
         }
 
         internal static event Action<CursorPosition> SetCursorRequest;

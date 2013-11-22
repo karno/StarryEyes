@@ -86,7 +86,7 @@ namespace StarryEyes.Models.Receiving.Managers
                 // add new users
                 accounts.Where(s => !this._bundles.ContainsKey(s.Key))
                         .Select(s => new UserReceiveBundle(s.Value))
-                        .Do(s => s.StateChanged += this.ConnectionStateChanged.SafeInvoke)
+                        .Do(s => s.StateChanged += arg => this.ConnectionStateChanged.SafeInvoke(arg))
                         .ForEach(b => this._bundles.Add(b.UserId, b));
 
                 // stop cancelled streamings
@@ -132,9 +132,14 @@ namespace StarryEyes.Models.Receiving.Managers
 
         public void ReconnectStream(long id)
         {
+            UserReceiveBundle bundle;
             lock (this._bundlesLocker)
             {
-                this._bundles.Values.Where(b => b.UserId == id).ForEach(c => c.ReconnectUserStreams());
+                this._bundles.TryGetValue(id, out bundle);
+            }
+            if (bundle != null)
+            {
+                bundle.ReconnectUserStreams();
             }
         }
 
