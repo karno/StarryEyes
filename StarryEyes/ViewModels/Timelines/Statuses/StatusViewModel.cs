@@ -125,6 +125,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                             this.RaisePropertyChanged(() => this.Images);
                             this.RaisePropertyChanged(() => this.ThumbnailImage);
                             this.RaisePropertyChanged(() => this.IsImageAvailable);
+                            this.RaisePropertyChanged(() => this.IsThumbnailAvailable);
                         })
                         .Subscribe();
                     this.CompositeDisposable.Add(subscribe);
