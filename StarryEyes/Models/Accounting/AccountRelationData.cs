@@ -137,6 +137,26 @@ namespace StarryEyes.Models.Accounting
         }
 
         /// <summary>
+        /// Set following ids
+        /// </summary>
+        /// <param name="ids">following ids</param>
+        /// <returns>asynchronous operation</returns>
+        public async Task SetFollowingsAsync(IEnumerable<long> ids)
+        {
+            var arg = ids.ToArray();
+            long[] followings;
+            lock (this._followingLocker)
+            {
+                followings = _followings.ToArray();
+            }
+            var news = arg.Except(followings).ToArray();
+            var olds = followings.Except(arg).ToArray();
+            await Task.WhenAll(
+                RemoveFollowingsAsync(olds),
+                AddFollowingsAsync(news));
+        }
+
+        /// <summary>
         /// Add following users
         /// </summary>
         /// <param name="ids">target users' ids</param>
@@ -216,6 +236,26 @@ namespace StarryEyes.Models.Accounting
             }
             await UserProxy.SetFollowerAsync(_accountId, id, isAdded);
             this.OnAccountDataUpdated(id, isAdded, RelationDataChange.Follower);
+        }
+
+        /// <summary>
+        /// Set follower ids
+        /// </summary>
+        /// <param name="ids">follower ids</param>
+        /// <returns>asynchronous operation</returns>
+        public async Task SetFollowersAsync(IEnumerable<long> ids)
+        {
+            var arg = ids.ToArray();
+            long[] followers;
+            lock (this._followersLocker)
+            {
+                followers = _followers.ToArray();
+            }
+            var news = arg.Except(followers).ToArray();
+            var olds = followers.Except(arg).ToArray();
+            await Task.WhenAll(
+                RemoveFollowersAsync(olds),
+                AddFollowersAsync(news));
         }
 
         /// <summary>
@@ -301,6 +341,26 @@ namespace StarryEyes.Models.Accounting
         }
 
         /// <summary>
+        /// Set blocking ids
+        /// </summary>
+        /// <param name="ids">blocking ids</param>
+        /// <returns>asynchronous operation</returns>
+        public async Task SetBlockingsAsync(IEnumerable<long> ids)
+        {
+            var arg = ids.ToArray();
+            long[] blockings;
+            lock (this._blockingsLocker)
+            {
+                blockings = _blockings.ToArray();
+            }
+            var news = arg.Except(blockings).ToArray();
+            var olds = blockings.Except(arg).ToArray();
+            await Task.WhenAll(
+                RemoveBlockingsAsync(olds),
+                AddBlockingsAsync(news));
+        }
+
+        /// <summary>
         /// Add blocking users
         /// </summary>
         /// <param name="ids">target users' ids</param>
@@ -380,6 +440,26 @@ namespace StarryEyes.Models.Accounting
             }
             await UserProxy.SetNoRetweetsAsync(_accountId, id, isAdded);
             this.OnAccountDataUpdated(id, isAdded, RelationDataChange.NoRetweets);
+        }
+
+        /// <summary>
+        /// Set no retweet ids
+        /// </summary>
+        /// <param name="ids">no retweet ids</param>
+        /// <returns>asynchronous operation</returns>
+        public async Task SetNoRetweetsAsync(IEnumerable<long> ids)
+        {
+            var arg = ids.ToArray();
+            long[] noRetweets;
+            lock (this._noRetweetsLocker)
+            {
+                noRetweets = _noRetweets.ToArray();
+            }
+            var news = arg.Except(noRetweets).ToArray();
+            var olds = noRetweets.Except(arg).ToArray();
+            await Task.WhenAll(
+                RemoveNoRetweetsAsync(olds),
+                AddNoRetweetsAsync(news));
         }
 
         /// <summary>

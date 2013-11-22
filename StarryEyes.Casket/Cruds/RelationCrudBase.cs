@@ -96,14 +96,11 @@ namespace StarryEyes.Casket.Cruds
 
         public async Task InitializeAsync()
         {
-            var a = this._followings.InitializeAsync();
-            var b = this._followers.InitializeAsync();
-            var c = this._blockings.InitializeAsync();
-            var d = this._noRetweets.InitializeAsync();
-            await a;
-            await b;
-            await c;
-            await d;
+            await Task.WhenAll(
+                this._followings.InitializeAsync(),
+                this._followers.InitializeAsync(),
+                this._blockings.InitializeAsync(),
+                this._noRetweets.InitializeAsync());
         }
 
         public async Task<bool> IsFollowingAsync(long userId, long targetId)
