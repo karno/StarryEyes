@@ -13,7 +13,7 @@ namespace StarryEyes.Filters.Expressions.Values.Statuses
 
         public override Func<TwitterStatus, string> GetStringValueProvider()
         {
-            return _ => _.GetOriginal().Text;
+            return _ => _.GetOriginal().GetEntityAidedText();
         }
 
         public override string GetStringSqlQuery()
