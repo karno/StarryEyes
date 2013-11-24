@@ -18,8 +18,6 @@ using Livet.Messaging;
 using Livet.Messaging.IO;
 using StarryEyes.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
-using StarryEyes.Anomaly.TwitterApi.Rest;
-using StarryEyes.Anomaly.Utils;
 using StarryEyes.Helpers;
 using StarryEyes.Models;
 using StarryEyes.Models.Accounting;
@@ -31,6 +29,7 @@ using StarryEyes.Models.Subsystems;
 using StarryEyes.Models.Timelines.Statuses;
 using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
+using StarryEyes.ViewModels.Common;
 using StarryEyes.ViewModels.Timelines.Statuses;
 using StarryEyes.ViewModels.WindowParts.Flips;
 using StarryEyes.Views.Controls;
@@ -665,7 +664,6 @@ namespace StarryEyes.ViewModels.WindowParts
             get { return (double)MaxControlWidth * RemainUpdate / MaxUpdate; }
         }
 
-
         /// <summary>
         ///     Start ALPS.
         /// </summary>
@@ -1222,54 +1220,6 @@ namespace StarryEyes.ViewModels.WindowParts
         {
             _removeHandler(Model);
             InputAreaViewModel.Send(Model);
-        }
-    }
-
-    public class TwitterAccountViewModel : ViewModel
-    {
-        private readonly TwitterAccount _account;
-
-        public TwitterAccountViewModel(TwitterAccount account)
-        {
-            this._account = account;
-        }
-
-        public long Id
-        {
-            get { return this._account.Id; }
-        }
-
-        public TwitterAccount Account
-        {
-            get { return this._account; }
-        }
-
-        public Uri ProfileImageUri
-        {
-            get
-            {
-                if (this._account.UnreliableProfileImage == null)
-                {
-                    Task.Run(async () =>
-                    {
-                        try
-                        {
-                            var user = await this._account.ShowUserAsync(this._account.Id);
-                            this._account.UnreliableProfileImage = user.ProfileImageUri.ChangeImageSize(ImageSize.Original);
-                            this.RaisePropertyChanged(() => ProfileImageUri);
-                        }
-                        // ReSharper disable EmptyGeneralCatchClause
-                        catch { }
-                        // ReSharper restore EmptyGeneralCatchClause
-                    });
-                }
-                return this._account.UnreliableProfileImage;
-            }
-        }
-
-        public string ScreenName
-        {
-            get { return this._account.UnreliableScreenName; }
         }
     }
 

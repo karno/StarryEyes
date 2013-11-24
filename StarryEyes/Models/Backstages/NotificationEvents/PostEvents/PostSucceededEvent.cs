@@ -1,14 +1,20 @@
-﻿using StarryEyes.Views;
+﻿using StarryEyes.Models.Inputting;
+using StarryEyes.Views;
 
 namespace StarryEyes.Models.Backstages.NotificationEvents.PostEvents
 {
     public sealed class PostSucceededEvent : BackstageEventBase
     {
-        private readonly TweetInputInfo _tweetInputInfo;
+        private readonly string _body;
 
         public PostSucceededEvent(TweetInputInfo info)
         {
-            this._tweetInputInfo = info;
+            this._body = info.Text;
+        }
+
+        public PostSucceededEvent(InputData data)
+        {
+            this._body = data.Text;
         }
 
         public override string Title
@@ -18,7 +24,7 @@ namespace StarryEyes.Models.Backstages.NotificationEvents.PostEvents
 
         public override string Detail
         {
-            get { return _tweetInputInfo.Text; }
+            get { return _body; }
         }
 
         public override System.Windows.Media.Color Background

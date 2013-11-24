@@ -1,23 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Livet;
+﻿using Livet;
 using StarryEyes.Filters;
+using StarryEyes.ViewModels.Common.FilterEditor;
 
-namespace StarryEyes.ViewModels.WindowParts.Common
+namespace StarryEyes.ViewModels.Common
 {
     public class FilterEditControlViewModel : ViewModel
     {
         private FilterQuery _filter;
         public FilterQuery Filter
         {
-            get { return _filter; }
+            get { return this._filter; }
             set
             {
-                _filter = value;
-                RaisePropertyChanged();
+                this._filter = value;
+                this.RaisePropertyChanged();
             }
         }
 
@@ -26,7 +22,7 @@ namespace StarryEyes.ViewModels.WindowParts.Common
 
         public DispatcherCollection<FilterSourceViewModel> Sources
         {
-            get { return _sources; }
+            get { return this._sources; }
         }
 
         public FilterEditControlViewModel()

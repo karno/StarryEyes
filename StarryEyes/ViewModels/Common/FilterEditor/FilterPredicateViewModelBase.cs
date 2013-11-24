@@ -1,15 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Livet;
-using StarryEyes.Filters;
 using StarryEyes.Filters.Expressions;
-using StarryEyes.Filters.Expressions.Operators;
 
-namespace StarryEyes.ViewModels.WindowParts.Common.FilterEditor
+namespace StarryEyes.ViewModels.Common.FilterEditor
 {
     public abstract class FilterPredicateViewModelBase : ViewModel
     {
@@ -23,7 +17,7 @@ namespace StarryEyes.ViewModels.WindowParts.Common.FilterEditor
 
         public ObservableCollection<FilterPredicateViewModelBase> Children
         {
-            get { return _children; }
+            get { return this._children; }
         }
     }
 

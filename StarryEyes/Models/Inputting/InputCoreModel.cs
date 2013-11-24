@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Livet;
 using StarryEyes.Albireo;
 using StarryEyes.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models.Accounting;
-using StarryEyes.Settings;
 
 namespace StarryEyes.Models.Inputting
 {
@@ -20,9 +18,21 @@ namespace StarryEyes.Models.Inputting
 
         private InputData _inputData;
 
-        private InputData _amendingTarget;
+        private InputData _lastPostedData;
 
         #region properties
+
+        [NotNull]
+        public ObservableSynchronizedCollection<string> BindingHashtags
+        {
+            get { return _bindingHashtags; }
+        }
+
+        [NotNull]
+        public ObservableSynchronizedCollection<InputData> Drafts
+        {
+            get { return _drafts; }
+        }
 
         [NotNull]
         internal InputData CurrentInputData
@@ -30,21 +40,37 @@ namespace StarryEyes.Models.Inputting
             get { return _inputData; }
             set
             {
+                if (value == _inputData) return;
                 if (value == null) throw new ArgumentNullException("value");
+                if (_inputData != null && _inputData.IsChanged)
+                {
+                    _drafts.Add(_inputData);
+                }
                 _inputData = value;
                 RaisePropertyChanged(() => CurrentInputData);
             }
         }
 
         [CanBeNull]
-        public InputData AmendingTarget
+        public InputData LastPostedData
         {
-            get { return _amendingTarget; }
-            set
+            get { return this._lastPostedData; }
+            internal set
             {
-                _amendingTarget = value;
-                RaisePropertyChanged(() => AmendingTarget);
+                this._lastPostedData = value;
+                RaisePropertyChanged(() => LastPostedData);
+                this.RaisePropertyChanged(() => CanAmend);
             }
+        }
+
+        public bool IsAmending
+        {
+            get { return CurrentInputData.IsAmend; }
+        }
+
+        public bool CanAmend
+        {
+            get { return LastPostedData != null && CurrentInputData != LastPostedData; }
         }
 
         #endregion
@@ -64,11 +90,28 @@ namespace StarryEyes.Models.Inputting
             CurrentInputData = new InputData(String.Empty);
         }
 
-        public void SetText(string body = null,
-                            CursorPosition cursor = null,
-                            TwitterStatus inReplyTo = null,
-                            IEnumerable<TwitterAccount> infos = null,
-                            bool focusToInputArea = true)
+        public void SetText([NotNull] InputSetting setting)
+        {
+            if (setting == null) throw new ArgumentNullException("setting");
+            if (setting.Recipient != null)
+            {
+                this.SetDirectMessage(setting.Accounts, setting.Recipient, setting.FocusToInputArea);
+            }
+            else
+            {
+                this.SetText(setting.Accounts,
+                              setting.Body,
+                              setting.InReplyTo,
+                              setting.CursorPosition,
+                              setting.FocusToInputArea);
+            }
+        }
+
+        private void SetText(IEnumerable<TwitterAccount> infos,
+                             string body,
+                             TwitterStatus inReplyTo,
+                             CursorPosition cursor,
+                             bool focusToInputArea)
         {
 
             CurrentInputData = new InputData(body)
@@ -76,37 +119,16 @@ namespace StarryEyes.Models.Inputting
                 Accounts = infos,
                 InReplyTo = inReplyTo,
             };
-            var ch = SetCursorRequest;
-            if (ch != null)
+            SetCursorRequest.SafeInvoke(cursor ?? CursorPosition.End);
+            if (focusToInputArea)
             {
-                ch(cursor ?? CursorPosition.End);
-            }
-            var fh = FocusRequest;
-            if (focusToInputArea && fh != null)
-            {
-                fh();
+                FocusRequest.SafeInvoke();
             }
         }
 
-        public void SetText(string body = null,
-                            CursorPosition cursor = null,
-                            TwitterStatus inReplyTo = null,
-                            IEnumerable<long> infos = null,
-                            bool focusToInputArea = true)
-        {
-            var accounts = infos == null
-                               ? null
-                               : infos.Select(Setting.Accounts.Get).Where(s => s != null);
-            SetText(body,
-                    cursor,
-                    inReplyTo,
-                    accounts,
-                    focusToInputArea);
-        }
-
-        public void SetDirectMessage([NotNull] TwitterUser recipient,
-                                     IEnumerable<TwitterAccount> infos = null,
-                                     bool focusToInputArea = true)
+        private void SetDirectMessage(IEnumerable<TwitterAccount> infos,
+                                      [NotNull] TwitterUser recipient,
+                                      bool focusToInputArea)
         {
             if (recipient == null) throw new ArgumentNullException("recipient");
             CurrentInputData = new InputData(String.Empty)
@@ -115,10 +137,17 @@ namespace StarryEyes.Models.Inputting
                 MessageRecipient = recipient
             };
             // because text is always empty, setting cursor position can be skipped.
-            var fh = FocusRequest;
-            if (focusToInputArea && fh != null)
+            if (focusToInputArea)
             {
-                fh();
+                FocusRequest.SafeInvoke();
+            }
+        }
+
+        public void AmendLastPosted()
+        {
+            if (LastPostedData != null)
+            {
+                this.CurrentInputData = _lastPostedData;
             }
         }
 

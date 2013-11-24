@@ -1,6 +1,6 @@
 ﻿using Livet;
 
-namespace StarryEyes.ViewModels.WindowParts.Common
+namespace StarryEyes.ViewModels.Common.FilterEditor
 {
     public class FilterSourceViewModel : ViewModel
     {

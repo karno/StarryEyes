@@ -67,6 +67,11 @@ namespace StarryEyes.Models.Inputting
             }
         }
 
+        public bool IsAmend
+        {
+            get { return _amendTweets.Count > 0; }
+        }
+
         #endregion
 
         #region Accessing properties
@@ -216,14 +221,14 @@ namespace StarryEyes.Models.Inputting
         public IObservable<PostResult> Send()
         {
             var existedTags = TwitterRegexPatterns.ValidHashtag.Matches(Text)
-                                               .OfType<Match>()
-                                               .Select(_ => _.Groups[1].Value)
-                                               .Distinct()
-                                               .ToArray();
+                                                  .OfType<Match>()
+                                                  .Select(_ => _.Groups[1].Value)
+                                                  .Distinct()
+                                                  .ToArray();
             var binds = _boundTags.Guard().Except(existedTags)
-                                 .Distinct()
-                                 .Select(t => " #" + t)
-                                 .JoinString("");
+                                  .Distinct()
+                                  .Select(t => " #" + t)
+                                  .JoinString("");
             RequestBase<TwitterStatus> request;
             if (IsDirectMessage)
             {
@@ -237,34 +242,44 @@ namespace StarryEyes.Models.Inputting
                     AttachedGeoLocation,
                     AttachedImage);
             }
-            return Observable.Defer(() => Observable.Start(() => _accounts.Guard().ToObservable()))
-                             .SelectMany(a => a)
-                             .SelectMany(a => SendInternal(a, request))
-                             .WaitForCompletion()
-                             .Select(r => r.ToLookup(t => t.Item3 == null))
-                             .Select(g =>
-                             {
-                                 InputData succ = null;
-                                 InputData fail = null;
-                                 Exception[] exs = null;
-                                 if (g.Contains(true))
-                                 {
-                                     succ = this.Clone();
-                                     // succeeded results
-                                     var succeeds = g[true].ToArray();
-                                     succ.AmendTargetTweets = succeeds.ToDictionary(t => t.Item1, t => t.Item2);
-                                     succ.Accounts = succeeds.Select(t => t.Item1);
-                                 }
-                                 if (g.Contains(false))
-                                 {
-                                     fail = this.Clone();
-                                     // failed results
-                                     var faileds = g[false].ToArray();
-                                     fail.Accounts = faileds.Select(t => t.Item1);
-                                     exs = faileds.Select(t => t.Item3).ToArray();
-                                 }
-                                 return new PostResult(succ, fail, exs);
-                             });
+            var s = Observable.Defer(() => Observable.Start(() => _accounts.Guard().ToObservable()))
+                              .SelectMany(a => a)
+                              .SelectMany(a => SendInternal(a, request))
+                              .WaitForCompletion()
+                              .Select(r => r.ToLookup(t => t.Item3 == null))
+                              .Select(g =>
+                              {
+                                  InputData succ = null;
+                                  InputData fail = null;
+                                  Exception[] exs = null;
+                                  if (g.Contains(true))
+                                  {
+                                      succ = this.Clone();
+                                      // succeeded results
+                                      var succeeds = g[true].ToArray();
+                                      succ.AmendTargetTweets = succeeds.ToDictionary(t => t.Item1, t => t.Item2);
+                                      succ.Accounts = succeeds.Select(t => t.Item1);
+                                  }
+                                  if (g.Contains(false))
+                                  {
+                                      fail = this.Clone();
+                                      // failed results
+                                      var faileds = g[false].ToArray();
+                                      fail.Accounts = faileds.Select(t => t.Item1);
+                                      exs = faileds.Select(t => t.Item3).ToArray();
+                                  }
+                                  return new PostResult(succ, fail, exs);
+                              });
+            if (IsAmend)
+            {
+                return AmendTargetTweets
+                    .ToObservable()
+                    .SelectMany(t => RequestQueue.Enqueue(t.Key, new DeletionRequest(t.Value)))
+                    .Select(_ => (PostResult)null)
+                    .Concat(s)
+                    .Where(r => r != null);
+            }
+            return s;
         }
 
         [NotNull]

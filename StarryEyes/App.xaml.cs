@@ -322,7 +322,6 @@ namespace StarryEyes
             return resp.CommandButtonResult.Value < 3;
         }
 
-
         private bool CheckDatabase()
         {
             var ver = Database.ManagementCrud.DatabaseVersion;

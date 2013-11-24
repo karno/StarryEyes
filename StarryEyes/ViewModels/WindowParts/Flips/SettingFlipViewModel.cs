@@ -19,6 +19,7 @@ using StarryEyes.Models.Receiving;
 using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
 using StarryEyes.Settings.KeyAssigns;
+using StarryEyes.ViewModels.Common;
 using StarryEyes.ViewModels.Dialogs;
 using StarryEyes.Views.Dialogs;
 using StarryEyes.Views.Messaging;

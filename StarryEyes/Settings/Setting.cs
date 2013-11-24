@@ -126,6 +126,9 @@ namespace StarryEyes.Settings
         public static readonly SettingItemStruct<bool> RestorePreviousStashed =
             new SettingItemStruct<bool>("RestorePreviousStashed", false);
 
+        public static readonly SettingItemStruct<bool> ShowMessageOnTweetFailed =
+            new SettingItemStruct<bool>("ShowMessageOnTweetFailed", true);
+
         #endregion
 
         #region Outer and Third Party services

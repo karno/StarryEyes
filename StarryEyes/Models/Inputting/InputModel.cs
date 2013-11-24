@@ -1,7 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reactive.Disposables;
 using Livet.EventListeners;
 using StarryEyes.Albireo;
+using StarryEyes.Annotations;
+using StarryEyes.Models.Accounting;
+using StarryEyes.Settings;
 
 namespace StarryEyes.Models.Inputting
 {
@@ -27,7 +32,7 @@ namespace StarryEyes.Models.Inputting
             SetEventPropagation();
         }
 
-        #region input events
+        #region composite events
 
         private static void SetEventPropagation()
         {
@@ -42,8 +47,64 @@ namespace StarryEyes.Models.Inputting
 
         internal static event Action CloseRequest;
 
+        #endregion
+
+        #region Internal Models
+
+        internal static AccountSelectorModel AccountSelector
+        {
+            get { return _accounts; }
+        }
+
+        internal static InputCoreModel InputCore
+        {
+            get { return _core; }
+        }
 
         #endregion
 
+        #region Proxy methods for plugins
+
+        public static void SelectAccount([NotNull] IEnumerable<TwitterAccount> accounts)
+        {
+            if (accounts == null) throw new ArgumentNullException("accounts");
+            _accounts.Accounts.Clear();
+            Setting.Accounts.Collection
+                   .Where(accounts.Contains)
+                   .ForEach(a => _accounts.Accounts.Add(a));
+        }
+
+        public static void SetText([NotNull] InputSetting setting)
+        {
+            _core.SetText(setting);
+        }
+
+        public static void AmendLastPosted()
+        {
+            _core.AmendLastPosted();
+        }
+
+        public static void Close()
+        {
+            _core.Close();
+        }
+
+        public static void ClearInput()
+        {
+            _core.ClearInput(true);
+        }
+
+        public static void ClearBindingHashtags()
+        {
+            _core.BindingHashtags.Clear();
+        }
+
+        public static void BindHashtag(string hashtag)
+        {
+            if (_core.BindingHashtags.Contains(hashtag)) return;
+            _core.BindingHashtags.Add(hashtag);
+        }
+
+        #endregion
     }
 }
