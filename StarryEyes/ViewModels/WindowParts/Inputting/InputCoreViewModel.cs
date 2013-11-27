@@ -33,7 +33,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
         private readonly ReadOnlyDispatcherCollectionRx<InputDataViewModel> _draftedInputs;
         private readonly InputAreaSuggestItemProvider _provider;
 
-        private readonly GeoCoordinateWatcher _geoWatcher;
+        private GeoCoordinateWatcher _geoWatcher;
         private UserViewModel _recipientViewModel;
         private InReplyToStatusViewModel _inReplyToViewModelCache;
         private bool _isLocationEnabled;
@@ -75,8 +75,41 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                                             RaisePropertyChanged(() => DraftCount);
                                             RaisePropertyChanged(() => IsDraftsExisted);
                                         }));
+            Setting.DisableGeoLocationService.ValueChanged += this.UpdateGeoLocationService;
+            this.UpdateGeoLocationService(Setting.DisableGeoLocationService.Value);
+        }
 
-
+        private void UpdateGeoLocationService(bool isEnabled)
+        {
+            if (!isEnabled && _geoWatcher != null)
+            {
+                var watcher = _geoWatcher;
+                _geoWatcher = null;
+                CompositeDisposable.Remove(watcher);
+                watcher.Stop();
+                watcher.Dispose();
+                IsLocationEnabled = false;
+                AttachedLocation = null;
+                return;
+            }
+            if (isEnabled && this._geoWatcher == null)
+            {
+                _geoWatcher = new GeoCoordinateWatcher();
+                _geoWatcher.StatusChanged += (_, e) =>
+                {
+                    if (e.Status != GeoPositionStatus.Ready)
+                    {
+                        IsLocationEnabled = true;
+                    }
+                    else
+                    {
+                        IsLocationEnabled = false;
+                        AttachedLocation = null;
+                    }
+                    _geoWatcher.Start();
+                };
+                CompositeDisposable.Add(_geoWatcher);
+            }
         }
 
         [NotNull]
@@ -298,6 +331,11 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             get { return InputData.InReplyTo != null; }
         }
 
+        public void ClearInReplyTo()
+        {
+            InReplyTo = null;
+        }
+
         public UserViewModel DirectMessageTo
         {
             get
@@ -334,6 +372,11 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
         public bool IsDirectMessageEnabled
         {
             get { return InputData.MessageRecipient != null; }
+        }
+
+        public void ClearDirectMessage()
+        {
+            DirectMessageTo = null;
         }
 
         #endregion

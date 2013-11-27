@@ -22,6 +22,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             this.CompositeDisposable.Add(_inputCoreViewModel = new InputCoreViewModel(this));
             this.CompositeDisposable.Add(_accountSelectorViewModel = new AccountSelectorViewModel(this));
             this.CompositeDisposable.Add(_postLimitPredictionViewModel = new PostLimitPredictionViewModel());
+            this.RegisterKeyAssigns();
         }
 
         public InputCoreViewModel InputCoreViewModel
@@ -37,6 +38,36 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
         public PostLimitPredictionViewModel PostLimitPredictionViewModel
         {
             get { return this._postLimitPredictionViewModel; }
+        }
+
+        private void RegisterKeyAssigns()
+        {
+            KeyAssignManager.RegisterActions(
+                KeyAssignAction.Create("CloseInput", this.CloseInput),
+                KeyAssignAction.Create("Post", this.InputCoreViewModel.Send),
+                KeyAssignAction.Create("LoadStash", () =>
+                {
+                    if (this.InputCoreViewModel.IsDraftsExisted)
+                    {
+                        this.InputCoreViewModel.DraftedInputs[0].Writeback();
+                    }
+                }),
+                KeyAssignAction.Create("Amend", this.InputCoreViewModel.AmendLastPosted),
+                KeyAssignAction.Create("AttachImage", () =>
+                {
+                    if (this.InputCoreViewModel.IsLocationAttached)
+                    {
+                        this.InputCoreViewModel.DetachImage();
+                    }
+                    else
+                    {
+                        this.InputCoreViewModel.AttachImage();
+                    }
+                }),
+                KeyAssignAction.Create("ToggleEscape", () =>
+                {
+                    this.InputCoreViewModel.IsUrlAutoEsacpeEnabled = !this.InputCoreViewModel.IsUrlAutoEsacpeEnabled;
+                }));
         }
 
         public bool IsOpening
@@ -92,7 +123,5 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
         {
             Messenger.Raise(new InteractionMessage("FocusToTextBox"));
         }
-
-
     }
 }
