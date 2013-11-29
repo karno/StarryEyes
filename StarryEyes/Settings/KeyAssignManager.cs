@@ -134,7 +134,14 @@ namespace StarryEyes.Settings
             if (Actions.TryGetValue(desc.ActionName, out callback))
             {
                 System.Diagnostics.Debug.WriteLine("$ Key assign invoke: " + desc.ActionName);
-                callback.Invoke(desc.Argument);
+                try
+                {
+                    callback.Invoke(desc.Argument);
+                }
+                catch (Exception ex)
+                {
+                    BackstageModel.RegisterEvent(new OperationFailedEvent("Key assign error: " + ex.Message));
+                }
                 return true;
             }
             System.Diagnostics.Debug.WriteLine("$ Key assign not matched: " + desc.ActionName);
