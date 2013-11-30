@@ -8,6 +8,7 @@
                       xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                       xmlns:StarryEyes_Mystique_Views_Messaging_Behaviors="clr-namespace:StarryEyes.Views.Messaging.Behaviors"
+                      xmlns:triggers="clr-namespace:StarryEyes.Views.Triggers" 
                       xmlns:v="clr-namespace:StarryEyes.Views.Dialogs"
                       xmlns:vm="clr-namespace:StarryEyes.ViewModels.Dialogs"
                       Title="Twitterへ認証"
@@ -69,7 +70,13 @@
                  Text="{Binding Pin,
                                 Mode=TwoWay,
                                 UpdateSourceTrigger=PropertyChanged}"
-                 TextWrapping="Wrap" />
+                 TextWrapping="Wrap">
+            <i:Interaction.Triggers>
+                <triggers:EnterKeyTrigger>
+                    <ei:CallMethodAction MethodName="OnEnterKeyDown" TargetObject="{Binding}" />
+                </triggers:EnterKeyTrigger>
+            </i:Interaction.Triggers>
+        </TextBox>
         <Button Width="100"
                 Height="32"
                 Margin="0,0,10,7"
