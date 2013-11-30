@@ -135,6 +135,18 @@ namespace StarryEyes.ViewModels.Dialogs
                 });
         }
         #endregion
+
+        #region Text box control
+
+        public void OnEnterKeyDown()
+        {
+            if (CanVerifyPin())
+            {
+                VerifyPin();
+            }
+        }
+
+        #endregion
     }
 
     public enum AuthenticationStep
