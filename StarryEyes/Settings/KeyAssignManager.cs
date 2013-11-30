@@ -32,6 +32,8 @@ namespace StarryEyes.Settings
             get { return Path.Combine(App.ConfigurationDirectoryPath, App.KeyAssignProfilesDirectory); }
         }
 
+        public static event Action KeyAssignChanged;
+
         internal static void Initialize()
         {
             // make sure existing directories.
@@ -40,7 +42,7 @@ namespace StarryEyes.Settings
             ReloadCandidates();
 
             // listen setting changed
-            Setting.KeyAssign.ValueChanged += _ => RaiseKeyAssignChanged();
+            Setting.KeyAssign.ValueChanged += _ => KeyAssignChanged.SafeInvoke();
         }
 
         public static void ReloadCandidates()
@@ -146,13 +148,6 @@ namespace StarryEyes.Settings
             }
             System.Diagnostics.Debug.WriteLine("$ Key assign not matched: " + desc.ActionName);
             return false;
-        }
-
-        public static event Action KeyAssignChanged;
-
-        private static void RaiseKeyAssignChanged()
-        {
-            KeyAssignChanged.SafeInvoke();
         }
     }
 

@@ -8,7 +8,7 @@ namespace StarryEyes.Settings.KeyAssigns
 {
     public class KeyAssignProfile
     {
-        public string Name { get; set; }
+        public string Name { get; private set; }
 
         public IDictionary<Key, IList<KeyAssign>> GlobalBindings { get; private set; }
         public IDictionary<Key, IList<KeyAssign>> TimelineBindings { get; private set; }
@@ -34,7 +34,7 @@ namespace StarryEyes.Settings.KeyAssigns
         public void Save(string directory)
         {
             var path = Path.Combine(directory, Name + ".txt");
-            using (var stream = File.OpenWrite(path))
+            using (var stream = File.Create(path))
             using (var writer = new StreamWriter(stream))
             {
                 this.DumpText(writer);
