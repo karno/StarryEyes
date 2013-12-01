@@ -393,7 +393,7 @@ namespace StarryEyes
                     "hardware rendering: " + IsHardwareRenderingEnabled.ToString());
                 var uptime = DateTime.Now - _startupTime;
                 builder.AppendLine("application uptime: " + ((int)uptime.TotalHours).ToString("00") +
-                                   uptime.ToString(":mm:ss"));
+                                   uptime.ToString("\\:mm\\:ss"));
                 builder.AppendLine();
                 builder.AppendLine("exception stack trace:");
                 builder.AppendLine(ex.ToString());
