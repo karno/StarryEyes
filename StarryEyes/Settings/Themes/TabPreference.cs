@@ -39,12 +39,12 @@ namespace StarryEyes.Settings.Themes
 
         #endregion
 
-        private FontPreference _tabFont;
+        private ThemeFont _tabFont;
 
         [DataMember, NotNull]
-        public FontPreference TabFont
+        public ThemeFont TabFont
         {
-            get { return _tabFont ?? (_tabFont = FontPreference.Default); }
+            get { return _tabFont ?? (_tabFont = ThemeFont.Default); }
             set { _tabFont = value; }
         }
 

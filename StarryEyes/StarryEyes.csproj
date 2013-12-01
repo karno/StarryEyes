@@ -327,13 +327,13 @@
     <Compile Include="Settings\KeyAssigns\KeyAssignProfile.cs" />
     <Compile Include="Settings\TabDescription.cs" />
     <Compile Include="Settings\ThemeManager.cs" />
-    <Compile Include="Settings\Themes\ColorPreference.cs" />
+    <Compile Include="Settings\Themes\ColorTheme.cs" />
     <Compile Include="Settings\Themes\DefaultThemeProvider.cs" />
-    <Compile Include="Settings\Themes\FontPreference.cs" />
+    <Compile Include="Settings\Themes\ThemeFont.cs" />
     <Compile Include="Settings\Themes\TabPreference.cs" />
     <Compile Include="Settings\Themes\ThemeProfile.cs" />
-    <Compile Include="Settings\Themes\TweetColorPreference.cs" />
-    <Compile Include="Settings\Themes\UserFlipColorPreference.cs" />
+    <Compile Include="Settings\Themes\TweetTheme.cs" />
+    <Compile Include="Settings\Themes\UserFlipTheme.cs" />
     <Compile Include="ViewModels\Dialogs\KeyOverrideViewModel.cs" />
     <Compile Include="ViewModels\DropAcceptDescription.cs" />
     <Compile Include="ViewModels\Timelines\SearchFlips\SearchResultViewModel.cs" />

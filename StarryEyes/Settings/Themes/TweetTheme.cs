@@ -4,7 +4,7 @@ using System.Windows.Media;
 namespace StarryEyes.Settings.Themes
 {
     [DataContract]
-    public struct TweetColorPreference
+    public struct TweetTheme
     {
         #region Serialization properties
 
@@ -25,7 +25,7 @@ namespace StarryEyes.Settings.Themes
         #endregion
 
         [DataMember]
-        public HighlightableColorPreference Colors { get; set; }
+        public HighlightableColorTheme Colors { get; set; }
 
         [IgnoreDataMember]
         public Color ForegroundKey { get; set; }
@@ -34,21 +34,24 @@ namespace StarryEyes.Settings.Themes
         public Color ForegroundSub { get; set; }
 
         [DataMember]
-        public HighlightableColorPreference FavAndRetweet { get; set; }
+        public HighlightableColorTheme FavoriteAndRetweetButton { get; set; }
 
         [DataMember]
-        public HighlightableColorPreference Favorite { get; set; }
+        public HighlightableColorTheme FavoriteButton { get; set; }
 
         [DataMember]
-        public HighlightableColorPreference FavoriteHighlight { get; set; }
+        public HighlightableColorTheme ColoredFavoriteButton { get; set; }
 
         [DataMember]
-        public HighlightableColorPreference Retweet { get; set; }
+        public HighlightableColorTheme RetweetButton { get; set; }
 
         [DataMember]
-        public HighlightableColorPreference RetweetHighlight { get; set; }
+        public HighlightableColorTheme ColoredRetweetButton { get; set; }
 
         [DataMember]
-        public HighlightableColorPreference Mention { get; set; }
+        public HighlightableColorTheme MentionButton { get; set; }
+
+        [DataMember]
+        public HighlightableColorTheme DeleteButton { get; set; }
     }
 }

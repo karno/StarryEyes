@@ -19,7 +19,7 @@ namespace StarryEyes.Settings.Themes
 
 
     [DataContract]
-    public struct ColorPreference
+    public struct ColorTheme
     {
         [DataMember]
         private string BackgroundColor
@@ -43,12 +43,12 @@ namespace StarryEyes.Settings.Themes
     }
 
     [DataContract]
-    public struct HighlightableColorPreference
+    public struct HighlightableColorTheme
     {
         [DataMember]
-        public ColorPreference Default { get; set; }
+        public ColorTheme Default { get; set; }
 
         [DataMember]
-        public ColorPreference Highlight { get; set; }
+        public ColorTheme Highlight { get; set; }
     }
 }

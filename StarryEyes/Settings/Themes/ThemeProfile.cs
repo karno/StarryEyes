@@ -8,8 +8,8 @@ namespace StarryEyes.Settings.Themes
     [DataContract]
     public class ThemeProfile
     {
-        private FontPreference _globalFont;
-        private UserFlipColorPreference _userFlipColor;
+        private ThemeFont _globalFont;
+        private UserFlipTheme _userFlipColor;
         private TabPreference _tabColor;
 
         private ThemeProfile() { }
@@ -49,28 +49,28 @@ namespace StarryEyes.Settings.Themes
         public string Name { get; private set; }
 
         [DataMember, NotNull]
-        public FontPreference GlobalFont
+        public ThemeFont GlobalFont
         {
-            get { return _globalFont ?? (_globalFont = FontPreference.Default); }
+            get { return _globalFont ?? (_globalFont = ThemeFont.Default); }
             set { _globalFont = value; }
         }
 
         [DataMember]
-        public HighlightableColorPreference GlobalColor { get; set; }
+        public HighlightableColorTheme GlobalColor { get; set; }
 
         [DataMember]
-        public HighlightableColorPreference BackstageColor { get; set; }
+        public HighlightableColorTheme BackstageColor { get; set; }
 
         [DataMember]
-        public ColorPreference AccountSelectionFlipColor { get; set; }
+        public ColorTheme AccountSelectionFlipColor { get; set; }
 
         [DataMember]
-        public HighlightableColorPreference SearchFlipColor { get; set; }
+        public HighlightableColorTheme SearchFlipColor { get; set; }
 
         [DataMember, NotNull]
-        public UserFlipColorPreference UserFlipColor
+        public UserFlipTheme UserFlipColor
         {
-            get { return _userFlipColor ?? (_userFlipColor = new UserFlipColorPreference()); }
+            get { return _userFlipColor ?? (_userFlipColor = new UserFlipTheme()); }
             set { _userFlipColor = value; }
         }
 
@@ -82,18 +82,18 @@ namespace StarryEyes.Settings.Themes
         }
 
         [DataMember]
-        public TweetColorPreference TweetDefault { get; set; }
+        public TweetTheme TweetDefault { get; set; }
 
         [DataMember]
-        public TweetColorPreference TweetMyself { get; set; }
+        public TweetTheme TweetMyself { get; set; }
 
         [DataMember]
-        public TweetColorPreference TweetMention { get; set; }
+        public TweetTheme TweetMention { get; set; }
 
         [DataMember]
-        public TweetColorPreference TweetRetweet { get; set; }
+        public TweetTheme TweetRetweet { get; set; }
 
         [DataMember]
-        public TweetColorPreference TweetDirectMessage { get; set; }
+        public TweetTheme TweetDirectMessage { get; set; }
     }
 }

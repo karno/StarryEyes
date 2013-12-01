@@ -10,15 +10,15 @@ using StarryEyes.Annotations;
 namespace StarryEyes.Settings.Themes
 {
     [DataContract, KnownType(typeof(FontFamily))]
-    public class FontPreference
+    public class ThemeFont
     {
-        public FontPreference()
+        public ThemeFont()
             : this(SystemFonts.MessageFontFamily)
         {
 
         }
 
-        public FontPreference(FontFamily fontFamily)
+        public ThemeFont(FontFamily fontFamily)
         {
             this._fontFamily = fontFamily;
         }
@@ -26,11 +26,11 @@ namespace StarryEyes.Settings.Themes
         private FontFamily _fontFamily;
 
         [IgnoreDataMember]
-        public static FontPreference Default
+        public static ThemeFont Default
         {
             get
             {
-                return new FontPreference
+                return new ThemeFont
                 {
                     FontFamily = SystemFonts.MessageFontFamily,
                     FontSize = SystemFonts.MessageFontSize,

@@ -4,7 +4,7 @@ using System.Windows.Media;
 namespace StarryEyes.Settings.Themes
 {
     [DataContract]
-    public class UserFlipColorPreference
+    public class UserFlipTheme
     {
         #region Serialization properties
 
@@ -53,10 +53,10 @@ namespace StarryEyes.Settings.Themes
         #endregion
 
         [DataMember]
-        public ColorPreference Default { get; set; }
+        public ColorTheme Default { get; set; }
 
         [DataMember]
-        public ColorPreference Highlight { get; set; }
+        public ColorTheme Highlight { get; set; }
 
         [IgnoreDataMember]
         public Color Key { get; set; }
