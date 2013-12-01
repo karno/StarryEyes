@@ -330,7 +330,7 @@
     <Compile Include="Settings\Themes\ColorTheme.cs" />
     <Compile Include="Settings\Themes\DefaultThemeProvider.cs" />
     <Compile Include="Settings\Themes\ThemeFont.cs" />
-    <Compile Include="Settings\Themes\TabPreference.cs" />
+    <Compile Include="Settings\Themes\TabTheme.cs" />
     <Compile Include="Settings\Themes\ThemeProfile.cs" />
     <Compile Include="Settings\Themes\TweetTheme.cs" />
     <Compile Include="Settings\Themes\UserFlipTheme.cs" />

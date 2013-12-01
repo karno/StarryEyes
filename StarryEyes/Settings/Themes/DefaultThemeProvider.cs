@@ -90,7 +90,7 @@ namespace StarryEyes.Settings.Themes
                 Blocking = MetroColors.Red
             };
 
-            profile.Tab = new TabPreference
+            profile.Tab = new TabTheme
             {
                 TabFont = new ThemeFont() { FontSize = 16.0 },
                 Default = Color.FromRgb(0x99, 0x99, 0x99),

@@ -5,7 +5,7 @@ using StarryEyes.Annotations;
 namespace StarryEyes.Settings.Themes
 {
     [DataContract]
-    public class TabPreference
+    public class TabTheme
     {
         #region Serialization properties
 

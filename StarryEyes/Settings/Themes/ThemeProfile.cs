@@ -10,7 +10,7 @@ namespace StarryEyes.Settings.Themes
     {
         private ThemeFont _globalFont;
         private UserFlipTheme _userFlipColor;
-        private TabPreference _tabColor;
+        private TabTheme _tabColor;
 
         private ThemeProfile() { }
 
@@ -75,9 +75,9 @@ namespace StarryEyes.Settings.Themes
         }
 
         [DataMember, NotNull]
-        public TabPreference Tab
+        public TabTheme Tab
         {
-            get { return _tabColor ?? (_tabColor = new TabPreference()); }
+            get { return _tabColor ?? (_tabColor = new TabTheme()); }
             set { _tabColor = value; }
         }
 
