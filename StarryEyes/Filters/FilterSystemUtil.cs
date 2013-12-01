@@ -32,11 +32,11 @@ namespace StarryEyes.Filters
         {
             if (left is FilterOperatorOr)
             {
-                left = new FilterBracket(left);
+                left = new FilterBracket { Value = left };
             }
             if (right is FilterOperatorOr)
             {
-                right = new FilterBracket(right);
+                right = new FilterBracket { Value = right };
             }
             return new FilterOperatorAnd
             {

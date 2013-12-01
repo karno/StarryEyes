@@ -46,7 +46,7 @@ namespace StarryEyes.Filters.Expressions
             {
                 Operator = new FilterNegate
                 {
-                    Value = new FilterBracket(null)
+                    Value = new FilterBracket()
                 }
             };
         }

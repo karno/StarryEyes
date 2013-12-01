@@ -38,12 +38,6 @@ namespace StarryEyes.Filters.Expressions.Operators
     /// </summary>
     public class FilterBracket : FilterSingleValueOperator
     {
-        private readonly FilterOperatorBase _inner;
-        public FilterBracket(FilterOperatorBase inner)
-        {
-            this._inner = inner;
-        }
-
         protected override string OperatorString
         {
             get { return "()"; }
@@ -53,70 +47,70 @@ namespace StarryEyes.Filters.Expressions.Operators
         {
             get
             {
-                return _inner == null ? new[] { FilterExpressionType.Boolean, FilterExpressionType.Set } :
-                    _inner.SupportedTypes;
+                return Value == null ? new[] { FilterExpressionType.Boolean, FilterExpressionType.Set } :
+                    Value.SupportedTypes;
             }
         }
 
         public override Func<TwitterStatus, bool> GetBooleanValueProvider()
         {
-            return _inner == null ? Tautology : _inner.GetBooleanValueProvider();
+            return Value == null ? Tautology : Value.GetBooleanValueProvider();
         }
 
         public override Func<TwitterStatus, long> GetNumericValueProvider()
         {
-            if (_inner == null)
+            if (Value == null)
             {
                 return _ => 0;
             }
-            return _inner.GetNumericValueProvider();
+            return Value.GetNumericValueProvider();
         }
 
         public override Func<TwitterStatus, IReadOnlyCollection<long>> GetSetValueProvider()
         {
-            return _inner == null ? (_ => new List<long>()) : _inner.GetSetValueProvider();
+            return Value == null ? (_ => new List<long>()) : Value.GetSetValueProvider();
         }
 
         public override Func<TwitterStatus, string> GetStringValueProvider()
         {
-            if (_inner == null)
+            if (Value == null)
             {
                 return _ => String.Empty;
             }
-            return _inner.GetStringValueProvider();
+            return Value.GetStringValueProvider();
         }
 
         public override string GetBooleanSqlQuery()
         {
-            return this._inner == null ? "1" : "(" + this._inner.GetBooleanSqlQuery() + ")";
+            return this.Value == null ? "1" : "(" + this.Value.GetBooleanSqlQuery() + ")";
         }
 
         public override string GetNumericSqlQuery()
         {
-            return this._inner == null ? "1" : "(" + this._inner.GetNumericSqlQuery() + ")";
+            return this.Value == null ? "1" : "(" + this.Value.GetNumericSqlQuery() + ")";
         }
 
         public override string GetSetSqlQuery()
         {
-            return this._inner == null ? "1" : this._inner.GetSetSqlQuery();
+            return this.Value == null ? "1" : this.Value.GetSetSqlQuery();
         }
 
         public override string GetStringSqlQuery()
         {
-            return this._inner == null ? "1" : this._inner.GetStringSqlQuery();
+            return this.Value == null ? "1" : this.Value.GetStringSqlQuery();
         }
 
         public override string ToQuery()
         {
-            if (this._inner == null)
+            if (this.Value == null)
             {
                 return "()";
             }
-            if (this._inner is FilterBracket)
+            if (this.Value is FilterBracket)
             {
-                return this._inner.ToQuery();
+                return this.Value.ToQuery();
             }
-            return "(" + this._inner.ToQuery() + ")";
+            return "(" + this.Value.ToQuery() + ")";
         }
     }
 }

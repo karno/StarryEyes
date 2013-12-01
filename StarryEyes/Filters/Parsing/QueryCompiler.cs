@@ -357,11 +357,11 @@ namespace StarryEyes.Filters.Parsing
                 {
                     // empty bracket
                     reader.AssertGet(TokenType.CloseBracket);
-                    return new FilterBracket(null);
+                    return new FilterBracket();
                 }
                 var ret = CompileL0(reader);
                 reader.AssertGet(TokenType.CloseBracket);
-                return new FilterBracket(ret);
+                return new FilterBracket { Value = ret };
             }
             return GetValue(reader);
         }
