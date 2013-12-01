@@ -216,6 +216,9 @@ namespace StarryEyes
             // set parameters for accessing twitter.
             Networking.Initialize();
 
+            // load themes
+            ThemeManager.Initialize();
+
             // load key assigns
             KeyAssignManager.Initialize();
 
@@ -591,6 +594,8 @@ namespace StarryEyes
         public static readonly string DatabaseFileName = "krile.db";
 
         public static readonly string KeyAssignProfilesDirectory = "assigns";
+
+        public static readonly string ThemeProfilesDirectory = "themes";
 
         public static readonly string MediaDirectory = "media";
 
