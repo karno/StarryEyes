@@ -13,7 +13,7 @@ StarryEyes.Anomaly
 StarryEyes.Casket
 	SQLite データベースへのデータの読み書きやデータキャッシュの実装が含まれます．
 StarryEyes.Feather
-    プラグイン インタフェースの最小セットを提供します．
+    プラグイン インタフェースの最小セットとモデルプロキシを提供します．
     プラグインは必要に応じて他のライブラリを参照する必要があります．
 StarryEyes.Nightmare
 	Windows Formsとの相互運用やWin32 APIとの相互運用が必要な項目についての
@@ -23,8 +23,9 @@ StarryEyes.Nightmare
 StarryJs: Javascript スクリプティングエンジンをStarryEyesに対して提供するプラグインです．
 
 * Subsystems フォルダ 以下:
-Detective: エラーレポータ(rescue.exe)です．
+Detective: エラーレポータ(report.exe)です．
 SweetMagic: 自動アップデータ(kup.exe)です．
+Wonder: 自動アップデータ用 パッチパッケージ・署名作成アプリケーションです．
 
 * Tests フォルダ 以下:
 テストの実装が含まれます．
