@@ -90,7 +90,7 @@ namespace StarryEyes.Filters.Sources
                 }
                 catch (Exception ex)
                 {
-                    BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message));
+                    BackstageModel.RegisterEvent(new OperationFailedEvent("リスト情報を読み込めません(" + this.FilterValue + ")", ex));
                 }
                 finally
                 {

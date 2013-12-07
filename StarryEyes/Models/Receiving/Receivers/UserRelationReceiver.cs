@@ -19,6 +19,11 @@ namespace StarryEyes.Models.Receiving.Receivers
             this._account = account;
         }
 
+        protected override string ReceiverName
+        {
+            get { return "ユーザー関係(@" + _account.UnreliableScreenName + ")"; }
+        }
+
         protected override int IntervalSec
         {
             get { return Setting.UserRelationReceivePeriod.Value; }
@@ -45,10 +50,8 @@ namespace StarryEyes.Models.Receiving.Receivers
                 ).Subscribe(_ => { },
                             ex =>
                             {
-                                BackstageModel.RegisterEvent(
-                                    new OperationFailedEvent("relation receive error: " +
-                                                             this._account.UnreliableScreenName + " - " +
-                                                             ex.Message));
+                                BackstageModel.RegisterEvent(new OperationFailedEvent(
+                                    "関係情報の受信に失敗しました(@" + this._account.UnreliableScreenName + ")", ex));
                                 System.Diagnostics.Debug.WriteLine(ex);
                             },
                             () => Task.Run(async () =>

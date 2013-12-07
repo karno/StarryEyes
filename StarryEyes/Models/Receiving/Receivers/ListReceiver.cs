@@ -28,6 +28,16 @@ namespace StarryEyes.Models.Receiving.Receivers
             this._listInfo = listInfo;
         }
 
+        protected override string ReceiverName
+        {
+            get
+            {
+                return "リストタイムライン(" +
+                    (_auth == null ? "アカウント未指定" : "@" + _auth.UnreliableScreenName) + " - " +
+                       this._listInfo;
+            }
+        }
+
         protected override int IntervalSec
         {
             get { return Setting.ListReceivePeriod.Value; }
@@ -40,7 +50,8 @@ namespace StarryEyes.Models.Receiving.Receivers
                 var authInfo = this._auth ?? Setting.Accounts.GetRandomOne();
                 if (authInfo == null)
                 {
-                    BackstageModel.RegisterEvent(new OperationFailedEvent("アカウントが登録されていないため、検索タイムラインを受信できませんでした。"));
+                    BackstageModel.RegisterEvent(new OperationFailedEvent(
+                        "アカウントが登録されていないため、検索タイムラインを受信できませんでした。", null));
                     return;
                 }
 
@@ -52,11 +63,8 @@ namespace StarryEyes.Models.Receiving.Receivers
                 }
                 catch (Exception ex)
                 {
-                    BackstageModel.RegisterEvent(
-                        new OperationFailedEvent("list receive error: \"" +
-                                                 this._listInfo + "\", " +
-                                                 authInfo.UnreliableScreenName + " - " +
-                                                 ex.Message));
+                    BackstageModel.RegisterEvent(new OperationFailedEvent(
+                        "リストを受信できません: (@" + authInfo.UnreliableScreenName + " - \"" + this._listInfo + "\")", ex));
                 }
             });
         }

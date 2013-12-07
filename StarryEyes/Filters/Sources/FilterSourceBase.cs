@@ -56,8 +56,8 @@ namespace StarryEyes.Filters.Sources
                 .Do(StatusInbox.Queue)
                 .Catch((Exception ex) =>
                 {
-                    BackstageModel.RegisterEvent(
-                        new OperationFailedEvent("source: " + FilterKey + ": " + FilterValue + " => " + ex.Message));
+                    BackstageModel.RegisterEvent(new OperationFailedEvent(
+                        "フィルタソースからの受信に失敗しました: " + FilterKey + ": " + FilterValue, ex));
                     return Observable.Empty<TwitterStatus>();
                 });
         }

@@ -95,7 +95,8 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             }
             catch (Exception ex)
             {
-                BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message));
+                BackstageModel.RegisterEvent(new OperationFailedEvent(
+                    "保存済み検索クエリを受信できませんでした(@" + aid.UnreliableScreenName + ")", ex));
             }
         }
     }
@@ -155,7 +156,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             }
             catch (Exception ex)
             {
-                BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message));
+                BackstageModel.RegisterEvent(new OperationFailedEvent("検索クエリの削除に失敗しました", ex));
             }
         }
         #endregion

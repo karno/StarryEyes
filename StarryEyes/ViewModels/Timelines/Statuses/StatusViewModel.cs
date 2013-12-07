@@ -38,13 +38,13 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         private readonly ReadOnlyDispatcherCollectionRx<UserViewModel> _favoritedUsers;
         private readonly TimelineViewModelBase _parent;
         private readonly ReadOnlyDispatcherCollectionRx<UserViewModel> _retweetedUsers;
+        private readonly bool _isInReplyToExists;
         private long[] _bindingAccounts;
         private TwitterStatus _inReplyTo;
         private bool _isSelected;
         private UserViewModel _recipient;
         private UserViewModel _retweeter;
         private UserViewModel _user;
-        private bool _isInReplyToExists;
         private bool _isInReplyToLoading;
         private bool _isInReplyToLoaded;
 
@@ -346,14 +346,12 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         {
             get
             {
-                if (this.IsSourceIsLink)
+                if (!this.IsSourceIsLink) return this.Status.Source;
+                var start = this.Status.Source.IndexOf(">", StringComparison.Ordinal);
+                var end = this.Status.Source.IndexOf("<", start + 1, StringComparison.Ordinal);
+                if (start >= 0 && end >= 0)
                 {
-                    var start = this.Status.Source.IndexOf(">", StringComparison.Ordinal);
-                    var end = this.Status.Source.IndexOf("<", start + 1, StringComparison.Ordinal);
-                    if (start >= 0 && end >= 0)
-                    {
-                        return this.Status.Source.Substring(start + 1, end - start - 1);
-                    }
+                    return this.Status.Source.Substring(start + 1, end - start - 1);
                 }
                 return this.Status.Source;
             }
@@ -665,11 +663,12 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                                               .Catch((Exception ex) =>
                                               {
                                                   onFail(a);
-                                                  BackstageModel.RegisterEvent(
-                                                      new OperationFailedEvent((add ? "" : "un") + "favorite failed: " +
-                                                                               a.UnreliableScreenName + " -> " +
-                                                                               this.Status.User.ScreenName + " :" +
-                                                                               ex.Message));
+                                                  var desc = add
+                                                      ? "お気に入り登録に失敗"
+                                                      : "お気に入り登録解除に失敗";
+                                                  BackstageModel.RegisterEvent(new OperationFailedEvent(
+                                                          desc + "(" + a.UnreliableScreenName + " -> " +
+                                                          this.Status.User.ScreenName + ")", ex));
                                                   return Observable.Empty<TwitterStatus>();
                                               }))
                  .Do(_ => this.RaisePropertyChanged(() => this.IsFavorited))
@@ -698,11 +697,12 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                                               .Catch((Exception ex) =>
                                               {
                                                   onFail(a);
-                                                  BackstageModel.RegisterEvent(
-                                                      new OperationFailedEvent((add ? "" : "un") + "retweet failed: " +
-                                                                               a.UnreliableScreenName + " -> " +
-                                                                               this.Status.User.ScreenName + " :" +
-                                                                               ex.Message));
+                                                  var desc = add
+                                                      ? "リツイートに失敗"
+                                                      : "リツイート解除に失敗";
+                                                  BackstageModel.RegisterEvent(new OperationFailedEvent(
+                                                      desc + "(" + a.UnreliableScreenName + " -> " +
+                                                      this.Status.User.ScreenName + ")", ex));
                                                   return Observable.Empty<TwitterStatus>();
                                               }))
                  .Do(_ => this.RaisePropertyChanged(() => this.IsRetweeted))
@@ -749,14 +749,11 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
 
         private bool AssertQuickActionEnabled()
         {
-            if (!this.BindingAccounts.Any())
-            {
-                this.NotifyQuickActionFailed("アカウントが選択されていません。",
-                                        "クイックアクションを利用するには、投稿欄横のエリアからアカウントを選択する必要があります。" + Environment.NewLine +
-                                        "選択されているアカウントはタブごとに保持されます。");
-                return false;
-            }
-            return true;
+            if (this.BindingAccounts.Any()) return true;
+            this.NotifyQuickActionFailed("アカウントが選択されていません。",
+                "クイックアクションを利用するには、投稿欄横のエリアからアカウントを選択する必要があります。" + Environment.NewLine +
+                "選択されているアカウントはタブごとに保持されます。");
+            return false;
         }
 
         private void NotifyQuickActionFailed(string main, string body)
@@ -937,7 +934,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             }
             catch (Exception ex)
             {
-                BackstageModel.RegisterEvent(new OperationFailedEvent("フォーマット エラー: " + ex.Message));
+                BackstageModel.RegisterEvent(new OperationFailedEvent("返信フォーマット エラー(フォーマット: " + txt + ")", ex));
             }
         }
 
@@ -1001,9 +998,8 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             if (info == null) return;
             var dreq = new DeletionRequest(this.OriginalStatus);
             RequestQueue.Enqueue(info, dreq)
-                        .Subscribe(_ => StatusInbox.QueueRemoval(_.Id),
-                                   ex => BackstageModel.RegisterEvent(
-                                       new OperationFailedEvent("ツイートを削除できませんでした: " + ex.Message)));
+                .Subscribe(_ => StatusInbox.QueueRemoval(_.Id),
+                    ex => BackstageModel.RegisterEvent(new OperationFailedEvent("ツイートを削除できませんでした", ex)));
         }
 
         private bool _lastSelectState;

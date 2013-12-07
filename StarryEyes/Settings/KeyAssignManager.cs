@@ -142,7 +142,7 @@ namespace StarryEyes.Settings
                 }
                 catch (Exception ex)
                 {
-                    BackstageModel.RegisterEvent(new OperationFailedEvent("Key assign error: " + ex.Message));
+                    BackstageModel.RegisterEvent(new OperationFailedEvent("キーアサイン エラー", ex));
                 }
                 return true;
             }
@@ -189,11 +189,11 @@ namespace StarryEyes.Settings
         {
             if (_hasArgument != null && _hasArgument.Value == String.IsNullOrEmpty(argument))
             {
-                BackstageModel.RegisterEvent(
-                    new OperationFailedEvent(
-                        String.Format(_hasArgument.Value
-                                          ? "キーバインド {0} には引数の指定が必要です。"
-                                          : "キーバインド {0} に引数を指定することはできません。", Name)));
+                BackstageModel.RegisterEvent(new OperationFailedEvent(
+                    String.Format(_hasArgument.Value
+                        ? "キーアサイン {0} には引数の指定が必要です。"
+                        : "キーアサイン {0} に引数を指定することはできません。", Name),
+                    null));
             }
             else
             {

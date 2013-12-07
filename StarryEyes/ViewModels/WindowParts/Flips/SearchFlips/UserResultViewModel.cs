@@ -94,7 +94,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                         Content = "アカウントが登録されていません。",
                         CommonButtons = TaskDialogCommonButtons.Close,
                     }));
-                    BackstageModel.RegisterEvent(new OperationFailedEvent("アカウントが登録されていません。"));
+                    BackstageModel.RegisterEvent(new OperationFailedEvent("アカウントが登録されていません。", null));
                 }
                 var page = Interlocked.Increment(ref _currentPageCount);
                 try
@@ -122,7 +122,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                         Content = ex.Message,
                         CommonButtons = TaskDialogCommonButtons.Close,
                     }));
-                    BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message));
+                    BackstageModel.RegisterEvent(new OperationFailedEvent("ユーザーの読み込みに失敗しました", ex));
                 }
                 finally
                 {

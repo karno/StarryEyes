@@ -48,7 +48,7 @@ namespace StarryEyes
                     catch (Exception ex)
                     {
                         Anomaly.Core.ProxyProvider = null;
-                        BackstageModel.RegisterEvent(new OperationFailedEvent("PROXY ERROR: " + ex.Message));
+                        BackstageModel.RegisterEvent(new OperationFailedEvent("プロキシ エラー", ex));
                     }
                     break;
                 default:

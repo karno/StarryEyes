@@ -17,6 +17,11 @@ namespace StarryEyes.Models.Receiving.Receivers
             this._account = account;
         }
 
+        protected override string ReceiverName
+        {
+            get { return "ダイレクトメッセージ(@" + _account.UnreliableScreenName + ")"; }
+        }
+
         protected override int IntervalSec
         {
             get { return Setting.RESTReceivePeriod.Value; }
@@ -26,16 +31,14 @@ namespace StarryEyes.Models.Receiving.Receivers
         {
             this._account.GetDirectMessagesAsync(count: 50).ToObservable()
                 .Subscribe(StatusInbox.Queue,
-                           ex => BackstageModel.RegisterEvent(
-                               new OperationFailedEvent("messages receive error: " +
-                                                        this._account.UnreliableScreenName + " - " +
-                                                        ex.Message)));
+                    ex => BackstageModel.RegisterEvent(
+                        new OperationFailedEvent("messages receive error: " +
+                                                 this._account.UnreliableScreenName, ex)));
             this._account.GetSentDirectMessagesAsync(count: 50).ToObservable()
                 .Subscribe(StatusInbox.Queue,
-                           ex => BackstageModel.RegisterEvent(
-                               new OperationFailedEvent("sent messages receive error: " +
-                                                        this._account.UnreliableScreenName + " - " +
-                                                        ex.Message)));
+                    ex => BackstageModel.RegisterEvent(
+                        new OperationFailedEvent("sent messages receive error: " +
+                                                 this._account.UnreliableScreenName, ex)));
         }
     }
 }

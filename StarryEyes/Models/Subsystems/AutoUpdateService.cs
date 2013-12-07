@@ -20,8 +20,8 @@ namespace StarryEyes.Models.Subsystems
 {
     public static class AutoUpdateService
     {
-        private static string _patcherUri = null;
-        private static string _patcherSignUri = null;
+        private static string _patcherUri;
+        private static string _patcherSignUri;
 
         public static event Action UpdateStateChanged;
 
@@ -65,7 +65,7 @@ namespace StarryEyes.Models.Subsystems
             catch (Exception ex)
             {
                 BackstageModel.RegisterEvent(
-                    new OperationFailedEvent("Update check failed: " + ex.Message));
+                    new OperationFailedEvent("更新の確認に失敗しました", ex));
             }
             return false;
         }
@@ -99,7 +99,7 @@ namespace StarryEyes.Models.Subsystems
             }
             catch (Exception ex)
             {
-                BackstageModel.RegisterEvent(new OperationFailedEvent("Auto update preparation failed: " + ex.Message));
+                BackstageModel.RegisterEvent(new OperationFailedEvent("自動更新の準備に失敗しました", ex));
                 return false;
             }
         }

@@ -66,16 +66,14 @@ namespace StarryEyes.Models.Backstages
             this._account = account;
             this.UpdateConnectionState();
             StoreHelper.GetUser(this._account.Id)
-                       .Subscribe(
-                           u =>
-                           {
-                               _user = u;
-                               this.RaiseTwitterUserChanged();
-                           },
-                           ex => BackstageModel.RegisterEvent(
-                               new OperationFailedEvent("Could not receive user account: " +
-                                                        this._account.UnreliableScreenName +
-                                                        " - " + ex.Message)));
+                .Subscribe(
+                    u =>
+                    {
+                        _user = u;
+                        this.RaiseTwitterUserChanged();
+                    },
+                    ex => BackstageModel.RegisterEvent(
+                        new OperationFailedEvent("アカウント情報を取得できません(@" + _account.UnreliableScreenName + ")", ex)));
         }
 
         internal void UpdateConnectionState()

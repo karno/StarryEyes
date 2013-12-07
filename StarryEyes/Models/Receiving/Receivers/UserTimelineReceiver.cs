@@ -17,6 +17,11 @@ namespace StarryEyes.Models.Receiving.Receivers
             this._account = account;
         }
 
+        protected override string ReceiverName
+        {
+            get { return "ユーザータイムライン(@" + _account.UnreliableScreenName + ")"; }
+        }
+
         protected override int IntervalSec
         {
             get { return Setting.RESTReceivePeriod.Value; }
@@ -32,8 +37,7 @@ namespace StarryEyes.Models.Receiving.Receivers
             catch (Exception ex)
             {
                 BackstageModel.RegisterEvent(
-                    new OperationFailedEvent("user status receive error: " +
-                                             this._account.UnreliableScreenName + " - " + ex.Message));
+                    new OperationFailedEvent("ツイートを受信できませんでした(@" + this._account.UnreliableScreenName + ")", ex));
             }
         }
     }

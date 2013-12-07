@@ -64,7 +64,7 @@ namespace StarryEyes.Models.Subsystems
             }
             catch (Exception ex)
             {
-                BackstageModel.RegisterEvent(new OperationFailedEvent("Configuration receive failed: " + ex.Message));
+                BackstageModel.RegisterEvent(new OperationFailedEvent("TwitterAPI構成情報の受信に失敗しました", ex));
                 // execute later
                 Observable.Timer(TimeSpan.FromMinutes(5))
                           .ObserveOn(TaskPoolScheduler.Default)

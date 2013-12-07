@@ -17,6 +17,11 @@ namespace StarryEyes.Models.Receiving.Receivers
             this._account = account;
         }
 
+        protected override string ReceiverName
+        {
+            get { return "ユーザー情報(@" + _account.UnreliableScreenName + ")"; }
+        }
+
         protected override int IntervalSec
         {
             get { return Setting.UserInfoReceivePeriod.Value; }
@@ -33,7 +38,8 @@ namespace StarryEyes.Models.Receiving.Receivers
             }
             catch (Exception ex)
             {
-                BackstageModel.RegisterEvent(new OperationFailedEvent("ユーザ情報を取得できません(@" + this._account.UnreliableScreenName + "): " + ex.Message));
+                BackstageModel.RegisterEvent(new OperationFailedEvent(
+                    "ユーザ情報を取得できません(@" + this._account.UnreliableScreenName + ")", ex));
             }
         }
     }

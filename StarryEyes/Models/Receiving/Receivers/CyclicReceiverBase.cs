@@ -9,21 +9,21 @@ namespace StarryEyes.Models.Receiving.Receivers
 {
     public abstract class CyclicReceiverBase : IDisposable
     {
-        private readonly CompositeDisposable _disposable = new CompositeDisposable();
+        private int _remainCountDown;
 
+        private readonly CompositeDisposable _disposable = new CompositeDisposable();
         protected CompositeDisposable CompositeDisposable
         {
             get { return this._disposable; }
         }
 
-        private int _remainCountDown;
-
         private bool _isDisposed;
-
         public bool IsDisposed
         {
             get { return this._isDisposed; }
         }
+
+        protected abstract string ReceiverName { get; }
 
         protected abstract int IntervalSec { get; }
 
@@ -50,13 +50,13 @@ namespace StarryEyes.Models.Receiving.Receivers
             }
             catch (Exception ex)
             {
-                BackstageModel.RegisterEvent(new OperationFailedEvent(ex.Message));
+                BackstageModel.RegisterEvent(new OperationFailedEvent("受信に失敗しました:" + ReceiverName, ex));
             }
         }
 
         protected abstract void DoReceive();
 
-        protected void CheckDisposed()
+        protected void AssertDisposed()
         {
             if (this._isDisposed)
             {

@@ -18,6 +18,11 @@ namespace StarryEyes.Models.Receiving.Receivers
             this._account = account;
         }
 
+        protected override string ReceiverName
+        {
+            get { return "ホームタイムライン(@" + _account.UnreliableScreenName + ")"; }
+        }
+
         protected override int IntervalSec
         {
             get { return Setting.RESTReceivePeriod.Value; }
@@ -34,10 +39,8 @@ namespace StarryEyes.Models.Receiving.Receivers
                 }
                 catch (Exception ex)
                 {
-                    BackstageModel.RegisterEvent(
-                        new OperationFailedEvent("タイムラインを受信できません(@" +
-                                                 this._account.UnreliableScreenName + "): " +
-                                                 ex.Message));
+                    BackstageModel.RegisterEvent(new OperationFailedEvent(
+                        "タイムラインを受信できません(@" + this._account.UnreliableScreenName + ")", ex));
                 }
             });
         }

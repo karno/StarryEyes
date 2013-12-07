@@ -17,6 +17,11 @@ namespace StarryEyes.Models.Receiving.Receivers
             this._query = query;
         }
 
+        protected override string ReceiverName
+        {
+            get { return "検索タイムライン(" + _query + ")"; }
+        }
+
         protected override int IntervalSec
         {
             get { return Setting.RESTSearchReceivePeriod.Value; }
@@ -31,7 +36,7 @@ namespace StarryEyes.Models.Receiving.Receivers
                     var account = Setting.Accounts.GetRandomOne();
                     if (account == null)
                     {
-                        BackstageModel.RegisterEvent(new OperationFailedEvent("アカウントが登録されていないため、検索タイムラインを受信できませんでした。"));
+                        BackstageModel.RegisterEvent(new OperationFailedEvent("アカウントが登録されていないため、検索タイムラインを受信できませんでした。", null));
                         return;
                     }
                     var resp = await account.SearchAsync(this._query);
@@ -39,7 +44,7 @@ namespace StarryEyes.Models.Receiving.Receivers
                 }
                 catch (Exception ex)
                 {
-                    BackstageModel.RegisterEvent(new OperationFailedEvent("検索タイムラインを受信できません: " + ex.Message));
+                    BackstageModel.RegisterEvent(new OperationFailedEvent("検索タイムラインを受信できません", ex));
                 }
             });
         }
