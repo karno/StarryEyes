@@ -13,7 +13,7 @@ namespace StarryEyes.Models.Receiving.Handling
     /// </summary>
     public static class StatusInbox
     {
-        private static readonly ManualResetEvent _signal = new ManualResetEvent(false);
+        private static readonly ManualResetEventSlim _signal = new ManualResetEventSlim(false);
 
         private static readonly ConcurrentQueue<StatusNotification> _queue = new ConcurrentQueue<StatusNotification>();
 
@@ -86,7 +86,7 @@ namespace StarryEyes.Models.Receiving.Handling
                 {
                     break;
                 }
-                _signal.WaitOne();
+                _signal.Wait();
             }
         }
     }
