@@ -22,7 +22,8 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.AnimatedTabControl.xaml" />
+                <ResourceDictionary
+                    Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.AnimatedTabControl.xaml" />
                 <ResourceDictionary Source="/Themes/FlipContent.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <utils:BooleanToVisibleConverter x:Key="BoolVisibleConverter" />
@@ -37,6 +38,9 @@
         <i:Interaction.Triggers>
             <l:InteractionMessageTrigger Messenger="{Binding Messenger}">
                 <smb:TaskDialogInteractionMessageAction />
+            </l:InteractionMessageTrigger>
+            <l:InteractionMessageTrigger Messenger="{Binding Messenger}">
+                <l:OpenFileDialogInteractionMessageAction />
             </l:InteractionMessageTrigger>
         </i:Interaction.Triggers>
         <Grid Background="White">
@@ -76,7 +80,7 @@
                 <ListBox x:Name="SettingCategories"
                          Width="180"
                          HorizontalContentAlignment="Stretch"
-                         SelectedIndex="0">
+                         SelectedIndex="5">
                     <ListBox.Resources>
                         <Style TargetType="{x:Type ListBoxItem}">
                             <Setter Property="Margin" Value="0" />
@@ -118,7 +122,9 @@
                                            Text="{Binding}" />
                             </Grid>
                             <DataTemplate.Triggers>
-                                <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBoxItem}}}" Value="True">
+                                <DataTrigger
+                                    Binding="{Binding IsSelected, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBoxItem}}}"
+                                    Value="True">
                                     <Setter TargetName="Indicator" Property="Visibility" Value="Visible" />
                                     <Setter TargetName="Indicator" Property="Fill" Value="#1BA1E2" />
                                     <Setter TargetName="DisplayText" Property="Foreground" Value="#1BA1E2" />
@@ -132,6 +138,7 @@
                     <clr:String>ミュート</clr:String>
                     <clr:String>入力</clr:String>
                     <clr:String>通知と確認</clr:String>
+                    <clr:String>テーマ</clr:String>
                     <clr:String>キーアサイン</clr:String>
                     <clr:String>外部サービス</clr:String>
                     <clr:String>プロキシー</clr:String>
@@ -143,7 +150,8 @@
                         <Style TargetType="Grid">
                             <Setter Property="Visibility" Value="Collapsed" />
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding ElementName=SettingCategories, Path=SelectedIndex}" Value="0">
+                                <DataTrigger Binding="{Binding ElementName=SettingCategories, Path=SelectedIndex}"
+                                             Value="0">
                                     <Setter Property="Visibility" Value="Visible" />
                                 </DataTrigger>
                             </Style.Triggers>
@@ -180,7 +188,8 @@
                                                                     RenderOptions.BitmapScalingMode="HighQuality"
                                                                     UriSource="{Binding ProfileImage}">
                                                     <i:Interaction.Behaviors>
-                                                        <behaviors:DragStartBehavior AllowedEffects="Move" DragDropData="{Binding}" />
+                                                        <behaviors:DragStartBehavior AllowedEffects="Move"
+                                                                                     DragDropData="{Binding}" />
                                                     </i:Interaction.Behaviors>
                                                 </controls:LazyImage>
                                                 <TextBlock Grid.Column="1"
@@ -202,7 +211,8 @@
                                                         Style="{StaticResource MetroSquareButtonStyle}">
                                                     <i:Interaction.Triggers>
                                                         <i:EventTrigger EventName="Click">
-                                                            <ei:CallMethodAction MethodName="Deauthorize" TargetObject="{Binding Mode=OneWay}" />
+                                                            <ei:CallMethodAction MethodName="Deauthorize"
+                                                                                 TargetObject="{Binding Mode=OneWay}" />
                                                         </i:EventTrigger>
                                                     </i:Interaction.Triggers>
                                                 </Button>
@@ -279,7 +289,8 @@
                         <Button DockPanel.Dock="Right" Style="{StaticResource MetroSquareDefaultButtonStyle}">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="Click">
-                                    <ei:CallMethodAction MethodName="AddNewAccount" TargetObject="{Binding Mode=OneWay}" />
+                                    <ei:CallMethodAction MethodName="AddNewAccount"
+                                                         TargetObject="{Binding Mode=OneWay}" />
                                 </i:EventTrigger>
                             </i:Interaction.Triggers>
                             <TextBlock Margin="8,0"
@@ -301,7 +312,8 @@
                         <Style TargetType="Grid">
                             <Setter Property="Visibility" Value="Collapsed" />
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding ElementName=SettingCategories, Path=SelectedIndex}" Value="1">
+                                <DataTrigger Binding="{Binding ElementName=SettingCategories, Path=SelectedIndex}"
+                                             Value="1">
                                     <Setter Property="Visibility" Value="Visible" />
                                 </DataTrigger>
                             </Style.Triggers>
@@ -339,7 +351,8 @@
                         <Style TargetType="Grid">
                             <Setter Property="Visibility" Value="Collapsed" />
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding ElementName=SettingCategories, Path=SelectedIndex}" Value="2">
+                                <DataTrigger Binding="{Binding ElementName=SettingCategories, Path=SelectedIndex}"
+                                             Value="2">
                                     <Setter Property="Visibility" Value="Visible" />
                                 </DataTrigger>
                             </Style.Triggers>
@@ -412,7 +425,8 @@
                         <Style TargetType="Grid">
                             <Setter Property="Visibility" Value="Collapsed" />
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding ElementName=SettingCategories, Path=SelectedIndex}" Value="3">
+                                <DataTrigger Binding="{Binding ElementName=SettingCategories, Path=SelectedIndex}"
+                                             Value="3">
                                     <Setter Property="Visibility" Value="Visible" />
                                 </DataTrigger>
                             </Style.Triggers>
@@ -445,7 +459,8 @@
                         <Style TargetType="Grid">
                             <Setter Property="Visibility" Value="Collapsed" />
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding ElementName=SettingCategories, Path=SelectedIndex}" Value="4">
+                                <DataTrigger Binding="{Binding ElementName=SettingCategories, Path=SelectedIndex}"
+                                             Value="4">
                                     <Setter Property="Visibility" Value="Visible" />
                                 </DataTrigger>
                             </Style.Triggers>
@@ -468,7 +483,27 @@
                         <Style TargetType="Grid">
                             <Setter Property="Visibility" Value="Collapsed" />
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding ElementName=SettingCategories, Path=SelectedIndex}" Value="5">
+                                <DataTrigger Binding="{Binding ElementName=SettingCategories, Path=SelectedIndex}"
+                                             Value="5">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+
+                </Grid>
+                <Grid Grid.Column="1" Margin="0,6,0,0">
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ElementName=SettingCategories, Path=SelectedIndex}"
+                                             Value="6">
                                     <Setter Property="Visibility" Value="Visible" />
                                 </DataTrigger>
                             </Style.Triggers>
@@ -482,7 +517,8 @@
                         <TextBlock Margin="0,0,8,0"
                                    VerticalAlignment="Center"
                                    Text="使用するキーアサイン:" />
-                        <ComboBox ItemsSource="{Binding KeyAssignCandidateFiles}" SelectedIndex="{Binding KeyAssignFile, Mode=TwoWay}" />
+                        <ComboBox ItemsSource="{Binding KeyAssignCandidateFiles}"
+                                  SelectedIndex="{Binding KeyAssignFile, Mode=TwoWay}" />
                     </StackPanel>
                     <TextBox Grid.Row="1"
                              Margin="16,0,16,16"
@@ -496,7 +532,8 @@
                         <Style TargetType="Grid">
                             <Setter Property="Visibility" Value="Collapsed" />
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding ElementName=SettingCategories, Path=SelectedIndex}" Value="6">
+                                <DataTrigger Binding="{Binding ElementName=SettingCategories, Path=SelectedIndex}"
+                                             Value="7">
                                     <Setter Property="Visibility" Value="Visible" />
                                 </DataTrigger>
                             </Style.Triggers>
@@ -514,7 +551,8 @@
                         <Style TargetType="Grid">
                             <Setter Property="Visibility" Value="Collapsed" />
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding ElementName=SettingCategories, Path=SelectedIndex}" Value="7">
+                                <DataTrigger Binding="{Binding ElementName=SettingCategories, Path=SelectedIndex}"
+                                             Value="8">
                                     <Setter Property="Visibility" Value="Visible" />
                                 </DataTrigger>
                             </Style.Triggers>
@@ -533,7 +571,8 @@
                                 <clr:String>利用するプロキシを指定する</clr:String>
                             </ComboBox>
                         </DockPanel>
-                        <GroupBox Header="プロキシ設定" Visibility="{Binding ExplicitSetProxy, Converter={StaticResource BoolVisibleConverter}}">
+                        <GroupBox Header="プロキシ設定"
+                                  Visibility="{Binding ExplicitSetProxy, Converter={StaticResource BoolVisibleConverter}}">
                             <StackPanel Margin="8" Orientation="Vertical">
                                 <DockPanel Margin="0,4">
                                     <TextBlock VerticalAlignment="Center" Text="ホスト: " />
@@ -564,7 +603,8 @@
                         <Style TargetType="Grid">
                             <Setter Property="Visibility" Value="Collapsed" />
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding ElementName=SettingCategories, Path=SelectedIndex}" Value="8">
+                                <DataTrigger Binding="{Binding ElementName=SettingCategories, Path=SelectedIndex}"
+                                             Value="9">
                                     <Setter Property="Visibility" Value="Visible" />
                                 </DataTrigger>
                             </Style.Triggers>
@@ -669,7 +709,8 @@
                         <Style TargetType="Grid">
                             <Setter Property="Visibility" Value="Collapsed" />
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding ElementName=SettingCategories, Path=SelectedIndex}" Value="9">
+                                <DataTrigger Binding="{Binding ElementName=SettingCategories, Path=SelectedIndex}"
+                                             Value="10">
                                     <Setter Property="Visibility" Value="Visible" />
                                 </DataTrigger>
                             </Style.Triggers>

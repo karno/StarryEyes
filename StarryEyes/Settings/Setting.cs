@@ -95,6 +95,9 @@ namespace StarryEyes.Settings
         public static readonly SettingItem<string> Theme =
             new SettingItem<string>("Theme", null);
 
+        public static readonly SettingItem<string> BackgroundImagePath =
+            new SettingItem<string>("BackgroundImagePath", null);
+
         public static readonly SettingItem<string> KeyAssign =
             new SettingItem<string>("KeyAssign", null);
 
@@ -513,8 +516,6 @@ namespace StarryEyes.Settings
                 }
             }
         }
-
-
     }
 
     public enum ScrollLockStrategy

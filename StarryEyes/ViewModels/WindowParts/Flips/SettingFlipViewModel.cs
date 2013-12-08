@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using Livet;
 using Livet.Messaging;
+using Livet.Messaging.IO;
 using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Anomaly.Utils;
 using StarryEyes.Filters.Expressions;
@@ -19,6 +20,7 @@ using StarryEyes.Models.Receiving;
 using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
 using StarryEyes.Settings.KeyAssigns;
+using StarryEyes.Settings.Themes;
 using StarryEyes.ViewModels.Common;
 using StarryEyes.ViewModels.Dialogs;
 using StarryEyes.Views.Dialogs;
@@ -346,6 +348,72 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         {
             get { return Setting.WarnReplyFromThirdAccount.Value; }
             set { Setting.WarnReplyFromThirdAccount.Value = value; }
+        }
+
+        #endregion
+
+        #region Theme property
+
+        public string BackgroundImagePath
+        {
+            get { return Setting.BackgroundImagePath.Value ?? String.Empty; }
+            set
+            {
+                Setting.BackgroundImagePath.Value = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public void SelectBackgroundImage()
+        {
+            var msg = new OpeningFileSelectionMessage
+            {
+                Filter = "画像ファイル|*.png;*.jpg;*.jpeg;*.gif;*.bmp",
+                Title = "背景画像を選択"
+            };
+            var resp = this.Messenger.GetResponse(msg);
+            if (resp.Response != null && resp.Response.Length > 0)
+            {
+                BackgroundImagePath = resp.Response[0];
+            }
+        }
+
+        private readonly ObservableCollection<string> _themeCandidateFiles = new ObservableCollection<string>();
+        public ObservableCollection<string> ThemeCandidateFiles
+        {
+            get { return _keyAssignCandidateFiles; }
+        }
+
+        public int ThemeFile
+        {
+            get
+            {
+                var fn = Setting.Theme.Value ?? DefaultThemeProvider.DefaultThemeName;
+                return this._themeCandidateFiles.IndexOf(fn);
+            }
+            set
+            {
+                if (value < 0) return;
+                var name = DefaultThemeProvider.DefaultThemeName;
+                if (value < this._themeCandidateFiles.Count)
+                {
+                    name = this._themeCandidateFiles[value];
+                }
+                Setting.Theme.Value = name;
+                this.RaisePropertyChanged();
+            }
+        }
+
+        public void RefreshThemeCandidates()
+        {
+            _themeCandidateFiles.Clear();
+            ThemeManager.Themes.ForEach(f => _themeCandidateFiles.Add(f));
+            this.RaisePropertyChanged(() => ThemeFile);
+        }
+
+        public void ShowThemeEditor()
+        {
+            // todo: impl this.
         }
 
         #endregion

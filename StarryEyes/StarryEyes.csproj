@@ -356,6 +356,7 @@
     <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\SearchCandidateViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\UserResultViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\SearchFlips\UserInfoViewModel.cs" />
+    <Compile Include="ViewModels\WindowParts\Flips\SettingFlips\ThemeEditorViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\SettingFlipViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\TabConfigurationFlipViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\VersionInfoViewModel.cs" />

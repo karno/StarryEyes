@@ -11,8 +11,13 @@ namespace StarryEyes.Settings
 {
     public static class ThemeManager
     {
-        private static readonly IDictionary<string, ThemeProfile> Profiles =
+        private static readonly IDictionary<string, ThemeProfile> ThemeProfiles =
             new Dictionary<string, ThemeProfile>();
+
+        public static IEnumerable<string> Themes
+        {
+            get { return ThemeProfiles.Keys; }
+        }
 
         public static string ThemeProfileDirectoryPath
         {
@@ -36,7 +41,7 @@ namespace StarryEyes.Settings
             try
             {
                 var profile = ThemeProfile.Load(file);
-                Profiles[profile.Name] = profile;
+                ThemeProfiles[profile.Name] = profile;
             }
             catch (Exception ex)
             {
@@ -66,15 +71,15 @@ namespace StarryEyes.Settings
         {
             // check assign is existed
             var group = Setting.Theme.Value ?? DefaultThemeProvider.DefaultThemeName;
-            if (Profiles.ContainsKey(group)) return;
+            if (ThemeProfiles.ContainsKey(group)) return;
             // load default
             Setting.KeyAssign.Value = DefaultThemeProvider.DefaultThemeName;
-            if (Profiles.ContainsKey(DefaultThemeProvider.DefaultThemeName)) return;
+            if (ThemeProfiles.ContainsKey(DefaultThemeProvider.DefaultThemeName)) return;
             // default binding is not found
             // make default
             var deftheme = DefaultThemeProvider.GetDefault();
             deftheme.Save(ThemeProfileDirectoryPath);
-            Profiles.Add(deftheme.Name, deftheme);
+            ThemeProfiles.Add(deftheme.Name, deftheme);
         }
 
         public static void ReloadCandidates()
@@ -93,10 +98,10 @@ namespace StarryEyes.Settings
         {
             get
             {
-                var profileId = Setting.KeyAssign.Value ?? DefaultThemeProvider.DefaultThemeName;
-                if (Profiles.ContainsKey(profileId))
+                var profileId = Setting.Theme.Value ?? DefaultThemeProvider.DefaultThemeName;
+                if (ThemeProfiles.ContainsKey(profileId))
                 {
-                    return Profiles[profileId];
+                    return ThemeProfiles[profileId];
                 }
 
                 // not found
