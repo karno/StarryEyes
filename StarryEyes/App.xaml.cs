@@ -217,7 +217,7 @@ namespace StarryEyes
             Networking.Initialize();
 
             // load themes
-            ThemeManager.Initialize();
+            // ThemeManager.Initialize();
 
             // load key assigns
             KeyAssignManager.Initialize();
