@@ -95,7 +95,7 @@ namespace StarryEyes.Models.Inputting
             if (setting == null) throw new ArgumentNullException("setting");
             if (setting.Recipient != null)
             {
-                this.SetDirectMessage(setting.Accounts, setting.Recipient, setting.FocusToInputArea);
+                this.SetDirectMessage(setting.Accounts, setting.Recipient, setting.SetFocusToInputArea);
             }
             else
             {
@@ -103,7 +103,7 @@ namespace StarryEyes.Models.Inputting
                               setting.Body,
                               setting.InReplyTo,
                               setting.CursorPosition,
-                              setting.FocusToInputArea);
+                              setting.SetFocusToInputArea);
             }
         }
 

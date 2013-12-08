@@ -112,7 +112,6 @@ namespace StarryEyes.Models.Inputting
             }
         }
 
-        private bool _isDirectMessage;
         private IEnumerable<TwitterAccount> _accounts;
         private TwitterUser _recipient;
         private TwitterStatus _inReplyTo;
@@ -158,11 +157,11 @@ namespace StarryEyes.Models.Inputting
         [NotNull]
         public CursorPosition CursorPosition { get; set; }
 
-        public bool FocusToInputArea { get; set; }
+        public bool SetFocusToInputArea { get; set; }
 
         private InputSetting()
         {
-            FocusToInputArea = true;
+            this.SetFocusToInputArea = true;
             CursorPosition = CursorPosition.End;
         }
     }
