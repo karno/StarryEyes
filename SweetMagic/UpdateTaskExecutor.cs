@@ -111,15 +111,37 @@ namespace SweetMagic
         {
             try
             {
-                var client = new HttpClient { Timeout = TimeSpan.FromSeconds(5) };
+                var client = new HttpClient { Timeout = TimeSpan.FromSeconds(90) };
                 var result = await client.GetByteArrayAsync(url);
                 this.NotifyProgress("download complete.");
                 return result;
             }
             catch (Exception ex)
             {
-                this.NotifyProgress(ex.Message);
+                PrintExceptionSub(String.Empty, ex);
                 return null;
+            }
+        }
+
+        private void PrintExceptionSub(string prefix, Exception ex)
+        {
+            var pp = String.IsNullOrEmpty(prefix) ? "" : prefix + " ";
+            var aex = ex as AggregateException;
+            if (aex != null)
+            {
+                this.NotifyProgress(pp + "[Aggregated Exception]");
+                foreach (var iex in aex.InnerExceptions)
+                {
+                    PrintExceptionSub(prefix + " |", iex);
+                }
+            }
+            else
+            {
+                this.NotifyProgress(pp + ex.Message);
+                if (ex.InnerException != null)
+                {
+                    PrintExceptionSub(prefix + ">", ex.InnerException);
+                }
             }
         }
     }
