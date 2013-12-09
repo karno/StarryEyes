@@ -73,6 +73,32 @@ namespace StarryEyes.ViewModels.Dialogs
                     }));
                 return;
             }
+            if (!(System.Text.RegularExpressions.Regex.Match(OverrideConsumerKey, "^[a-zA-Z0-9]+$")).Success)
+            {
+                this.Messenger.Raise(new TaskDialogMessage(
+                    new TaskDialogOptions
+                    {
+                        Title = "キー設定エラー",
+                        MainIcon = VistaTaskDialogIcon.Error,
+                        MainInstruction = "Consumer Keyが間違っています。",
+                        Content = "入力されたConsumer Keyに使用できない文字が含まれています。入力したキーを確認してください。",
+                        CommonButtons = TaskDialogCommonButtons.Close
+                    }));
+                return;
+            }
+            if (!(System.Text.RegularExpressions.Regex.Match(OverrideConsumerSecret, "^[a-zA-Z0-9]+$")).Success)
+            {
+                this.Messenger.Raise(new TaskDialogMessage(
+                    new TaskDialogOptions
+                    {
+                        Title = "キー設定エラー",
+                        MainIcon = VistaTaskDialogIcon.Error,
+                        MainInstruction = "Consumer Secretが間違っています。",
+                        Content = "入力されたConsumer Secretに使用できない文字が含まれています。入力したキーを確認してください。",
+                        CommonButtons = TaskDialogCommonButtons.Close
+                    }));
+                return;
+            }
             if (IsKeyChecking) return;
             IsKeyChecking = true;
             var authorizer = new OAuthAuthorizer(OverrideConsumerKey, OverrideConsumerSecret);
