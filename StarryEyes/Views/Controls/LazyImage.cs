@@ -69,17 +69,22 @@ namespace StarryEyes.Views.Controls
         private static readonly ConcurrentDictionary<Uri, Tuple<byte[], DateTime>> _imageCache =
             new ConcurrentDictionary<Uri, Tuple<byte[], DateTime>>();
 
-        private static byte[] GetCache([NotNull] Uri uri)
+        private static bool GetCache([NotNull] Uri uri, out byte[] cache)
         {
+            cache = null;
             if (uri == null) throw new ArgumentNullException("uri");
             Tuple<byte[], DateTime> tuple;
-            if (!_imageCache.TryGetValue(uri, out tuple) ||
-                DateTime.Now - tuple.Item2 > _cacheExpiration)
+            if (!_imageCache.TryGetValue(uri, out tuple))
+            {
+                return false;
+            }
+            if (DateTime.Now - tuple.Item2 > _cacheExpiration)
             {
                 _imageCache.TryRemove(uri, out tuple);
-                return null;
+                return false;
             }
-            return tuple.Item1;
+            cache = tuple.Item1;
+            return true;
         }
 
         private static void SetCache([NotNull] Uri uri, [NotNull]byte[] imageByte)
@@ -126,8 +131,8 @@ namespace StarryEyes.Views.Controls
                 }
                 else
                 {
-                    var cache = GetCache(uri);
-                    if (cache != null)
+                    byte[] cache;
+                    if (GetCache(uri, out cache))
                     {
                         _taskFactory.StartNew(() =>
                         {
@@ -243,7 +248,13 @@ namespace StarryEyes.Views.Controls
         {
             try
             {
-                if (source == null || image.UriSource != sourceFrom) return;
+                if (image.UriSource != sourceFrom) return;
+                if (source == null)
+                {
+                    // unset value
+                    image.Source = null;
+                    return;
+                }
                 if (!source.IsFrozen)
                 {
                     throw new ArgumentException("Image is not frozen.");
