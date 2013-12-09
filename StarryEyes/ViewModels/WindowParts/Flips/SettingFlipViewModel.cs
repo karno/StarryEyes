@@ -384,12 +384,17 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             get { return _keyAssignCandidateFiles; }
         }
 
+        private string _themeCache = null;
+
         public int ThemeFile
         {
             get
             {
-                var fn = Setting.Theme.Value ?? DefaultThemeProvider.DefaultThemeName;
-                return this._themeCandidateFiles.IndexOf(fn);
+                if (_themeCache == null)
+                {
+                    _themeCache = Setting.Theme.Value ?? DefaultThemeProvider.DefaultThemeName;
+                }
+                return this._themeCandidateFiles.IndexOf(_themeCache);
             }
             set
             {
@@ -399,7 +404,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 {
                     name = this._themeCandidateFiles[value];
                 }
-                Setting.Theme.Value = name;
+                _themeCache = name;
                 this.RaisePropertyChanged();
             }
         }
@@ -414,6 +419,14 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         public void ShowThemeEditor()
         {
             // todo: impl this.
+        }
+
+        private void ApplyTheme()
+        {
+            if (_themeCache != null)
+            {
+                Setting.Theme.Value = _themeCache;
+            }
         }
 
         #endregion
@@ -632,6 +645,9 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         public void Close()
         {
             if (!IsConfigurationActive) return;
+            this.IsConfigurationActive = false;
+
+            // refresh mute filter
             if (_isDirtyState)
             {
                 try
@@ -646,9 +662,14 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             {
                 Setting.Muteds.Value = _lastCommit;
             }
+
             // update connection property
             _accounts.ForEach(a => a.CommitChanges());
-            this.IsConfigurationActive = false;
+
+            // update theme
+            ApplyTheme();
+
+            // callback completion handler
             if (_completeCallback != null)
             {
                 _completeCallback.OnNext(Unit.Default);

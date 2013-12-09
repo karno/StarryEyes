@@ -394,6 +394,9 @@
     <Compile Include="Views\Dialogs\KeyOverrideWindow.xaml.cs">
       <DependentUpon>KeyOverrideWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Dialogs\ThemeEditorWindow.xaml.cs">
+      <DependentUpon>ThemeEditorWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Messaging\Behaviors\ScrollIntoViewInteractionMessageAction.cs" />
     <Compile Include="Views\Messaging\ScrollIntoViewMessage.cs" />
     <Compile Include="Views\Triggers\EnterKeyTrigger.cs" />
@@ -488,6 +491,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Dialogs\KeyOverrideWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Dialogs\ThemeEditorWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -94,7 +94,7 @@ namespace StarryEyes.Settings
             CheckSetting();
         }
 
-        public static ThemeProfile CurrentProfile
+        public static ThemeProfile CurrentTheme
         {
             get
             {
