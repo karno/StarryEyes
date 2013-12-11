@@ -65,7 +65,7 @@ namespace StarryEyes.Views.Utils
                 {
                     status = status.RetweetedOriginal;
                 }
-                GenerateInlines(o, status.Text, status.Entities)
+                GenerateInlines(o, status.Text, status.Entities, status.StatusType == StatusType.DirectMessage)
                     .ForEach(textBlock.Inlines.Add);
             }));
 
@@ -102,7 +102,7 @@ namespace StarryEyes.Views.Utils
                 }
 
                 // generate contents
-                GenerateInlines(o, user.Description, user.DescriptionEntities)
+                GenerateInlines(o, user.Description, user.DescriptionEntities, false)
                     .Select(inline =>
                     {
                         var run = inline as Run;
@@ -119,7 +119,7 @@ namespace StarryEyes.Views.Utils
 
         #region Common Entitied Text Utility
 
-        private static IEnumerable<Inline> GenerateInlines(DependencyObject obj, string text, IEnumerable<TwitterEntity> entities)
+        private static IEnumerable<Inline> GenerateInlines(DependencyObject obj, string text, IEnumerable<TwitterEntity> entities, bool isDirectMessage)
         {
             text = text ?? String.Empty;
             if (entities == null)
@@ -150,6 +150,11 @@ namespace StarryEyes.Views.Utils
                             yield return GenerateHashtagLink(obj, display);
                             break;
                         case EntityType.Media:
+                            if (!isDirectMessage)
+                            {
+                                yield return GenerateLink(obj, display, ParsingExtension.ResolveEntity(entity.OriginalUrl));
+                            }
+                            break;
                         case EntityType.Urls:
                             yield return GenerateLink(obj, display, ParsingExtension.ResolveEntity(entity.OriginalUrl));
                             break;

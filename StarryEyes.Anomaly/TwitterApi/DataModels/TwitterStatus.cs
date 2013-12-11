@@ -213,9 +213,12 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
                                                    : ParsingExtension.ResolveEntity(entity.DisplayText));
                                 break;
                             case EntityType.Media:
-                                builder.Append(showFullUrl
-                                                   ? ParsingExtension.ResolveEntity(entity.MediaUrl)
-                                                   : ParsingExtension.ResolveEntity(entity.DisplayText));
+                                if (StatusType == DataModels.StatusType.Tweet)
+                                {
+                                    builder.Append(showFullUrl
+                                                       ? ParsingExtension.ResolveEntity(entity.MediaUrl)
+                                                       : ParsingExtension.ResolveEntity(entity.DisplayText));
+                                }
                                 break;
                             case EntityType.UserMentions:
                                 builder.Append("@" + entity.DisplayText);
