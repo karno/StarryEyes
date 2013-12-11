@@ -165,32 +165,48 @@ namespace StarryEyes.Models.Subsystems
         internal static void PostUpdate()
         {
             var retryCount = 0;
-            while (Directory.Exists(App.LocalUpdateStorePath))
+            try
             {
-                try
+                var directory = new DirectoryInfo(App.LocalUpdateStorePath);
+                while (directory.Exists)
                 {
-                    Directory.Delete(App.LocalUpdateStorePath, true);
-                    break;
-                }
-                catch (Exception)
-                {
-                    if (retryCount > 10)
+                    try
                     {
-                        TaskDialog.Show(new TaskDialogOptions
-                        {
-                            Title = "アップデート完了エラー",
-                            MainIcon = VistaTaskDialogIcon.Error,
-                            MainInstruction = "更新バイナリを削除できません。",
-                            Content = "ユーザーデータディレクトリに存在するupdateフォルダを手動で削除してください。",
-                            ExpandedInfo = "ユーザーデータディレクトリの位置については、FAQを参照してください。" + Environment.NewLine +
-                                           "削除出来ない場合は、Windowsを再起動する必要があるかもしれません。",
-                            CommonButtons = TaskDialogCommonButtons.Close
-                        });
-                        throw;
+                        // remove "read-only" attribute
+                        directory.GetFiles("*", SearchOption.AllDirectories)
+                            .Where(file => file.Attributes.HasFlag(FileAttributes.ReadOnly))
+                            .ForEach(f => f.Attributes ^= FileAttributes.ReadOnly);
+
+                        // delete directory
+                        directory.Delete(true);
+                        break;
                     }
-                    Thread.Sleep(1000);
-                    retryCount++;
+                    catch (Exception)
+                    {
+                        if (retryCount > 10)
+                        {
+                            // exit loop
+                            throw;
+                        }
+                        Thread.Sleep(1000);
+                        // refresh directory state
+                        directory.Refresh();
+                        retryCount++;
+                    }
                 }
+            }
+            catch (Exception)
+            {
+                TaskDialog.Show(new TaskDialogOptions
+                {
+                    Title = "アップデート完了エラー",
+                    MainIcon = VistaTaskDialogIcon.Error,
+                    MainInstruction = "更新バイナリを削除できません。",
+                    Content = "ユーザーデータディレクトリに存在するupdateフォルダを手動で削除してください。",
+                    ExpandedInfo = "ユーザーデータディレクトリの位置については、FAQを参照してください。" + Environment.NewLine +
+                                   "削除出来ない場合は、Windowsを再起動する必要があるかもしれません。",
+                    CommonButtons = TaskDialogCommonButtons.Close
+                });
             }
         }
 
