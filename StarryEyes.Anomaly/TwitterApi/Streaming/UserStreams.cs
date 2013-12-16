@@ -46,7 +46,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
                         while (!cancel.IsCancellationRequested)
                         {
                             var readLine = reader.ReadLineAsync();
-                            var delay = Task.Delay(TimeSpan.FromSeconds(ApiAccessProperties.StreamingTimeoutSec));
+                            var delay = Task.Delay(TimeSpan.FromSeconds(ApiAccessProperties.StreamingTimeoutSec), cancel);
                             if (await Task.WhenAny(readLine, delay) == delay)
                             {
                                 // timeout
@@ -81,7 +81,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
                     System.Diagnostics.Debug.WriteLine("#USERSTREAM# notify disconnection to upper layer.");
                     observer.OnCompleted();
                 }
-            }));
+            }, cancel));
         }
     }
 }
