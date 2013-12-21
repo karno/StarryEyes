@@ -63,6 +63,7 @@
     <Compile Include="Windows\Forms\WinFormsIcon.cs" />
     <Compile Include="Windows\Forms\WinFormsMouseEventArgs.cs" />
     <Compile Include="Windows\Application.cs" />
+    <Compile Include="Windows\WinApi.cs" />
     <Compile Include="Windows\SystemInformation.cs" />
     <Compile Include="Windows\TaskDialog.cs" />
     <Compile Include="Windows\TaskDialogOptions.cs" />

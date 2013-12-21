@@ -135,6 +135,9 @@ namespace StarryEyes.Settings
         public static readonly SettingItemStruct<bool> ShowMessageOnTweetFailed =
             new SettingItemStruct<bool>("ShowMessageOnTweetFailed", true);
 
+        public static readonly SettingItemStruct<bool> CheckDesktopHeap =
+            new SettingItemStruct<bool>("CheckDesktopHeap", true);
+
         #endregion
 
         #region Outer and Third Party services

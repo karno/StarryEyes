@@ -591,6 +591,8 @@ namespace StarryEyes
             get { return Version.Revision != 0; }
         }
 
+        public static readonly uint LeastDesktopHeapSize = 12 * 1024;
+
         public static readonly string DatabaseFileName = "krile.db";
 
         public static readonly string KeyAssignProfilesDirectory = "assigns";

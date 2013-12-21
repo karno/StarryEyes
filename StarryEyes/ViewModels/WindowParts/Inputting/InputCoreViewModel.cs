@@ -784,7 +784,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                                 MainInstruction = "ツイートに失敗しました。再試行しますか？" + Environment.NewLine +
                                                   "(再試行しない場合は、ツイートしようとした内容は下書きとして保存されます。)",
                                 Content = r.Exceptions == null ? "利用可能な情報はありません。" : r.Exceptions.First().Message,
-                                VerificationText = "このメッセージを表示しない",
+                                VerificationText = "次回から表示しない",
                                 CommonButtons = TaskDialogCommonButtons.RetryCancel
                             }));
                             Setting.ShowMessageOnTweetFailed.Value =

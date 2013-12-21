@@ -9,6 +9,7 @@ using Livet;
 using Livet.Messaging;
 using StarryEyes.Annotations;
 using StarryEyes.Models;
+using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Models.Subsystems;
 using StarryEyes.Models.Timelines.Tabs;
 using StarryEyes.Nightmare.Windows;
@@ -264,6 +265,44 @@ namespace StarryEyes.ViewModels
 
             // initially focus to timeline
             MainWindowModel.SetFocusTo(FocusRequest.Timeline);
+
+            PostInitialize();
+        }
+
+        private void PostInitialize()
+        {
+            if (Setting.CheckDesktopHeap.Value)
+            {
+                try
+                {
+                    var dh = SystemInformation.DesktopHeapSize;
+                    var rh = App.LeastDesktopHeapSize;
+                    if (dh < rh)
+                    {
+                        var msg = this.Messenger.GetResponse(new TaskDialogMessage(new TaskDialogOptions
+                        {
+                            Title = "Krile StarryEyes",
+                            MainIcon = VistaTaskDialogIcon.Warning,
+                            MainInstruction = "メモリ不足に陥る可能性があります。",
+                            Content = "Krileのクラッシュやシステムの停止を引き起こす可能性があります。" + Environment.NewLine +
+                                      "Windowsの設定を変更することで、この問題を回避できる可能性があります。",
+                            ExpandedInfo = "デスクトップ ヒープの設定が少なすぎます。" + Environment.NewLine +
+                                           "現在の設定値: " + dh + " / 推奨下限設定値: " + rh,
+                            CommandButtons = new[] { "Microsoft KBを参照", "キャンセル" },
+                            VerificationText = "次回から表示しない"
+                        }));
+                        Setting.CheckDesktopHeap.Value = !msg.Response.VerificationChecked.GetValueOrDefault();
+                        if (msg.Response.CommandButtonResult == 0)
+                        {
+                            BrowserHelper.Open("http://support.microsoft.com/kb/947246");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    BackstageModel.RegisterEvent(new OperationFailedEvent("sysinfo failed", ex));
+                }
+            }
         }
 
         private void ReInitTabs()

@@ -1,0 +1,72 @@
+﻿using System;
+using System.Runtime.InteropServices;
+
+namespace StarryEyes.Nightmare.Windows
+{
+    // ReSharper disable InconsistentNaming
+    internal static class WinApi
+    {
+        // constants
+        internal const uint GENERIC_READ = 0x80000000;
+        internal const int UOI_HEAPSIZE = 5;
+
+        [DllImport("user32.dll", SetLastError = true)]
+        internal static extern IntPtr OpenInputDesktop(uint dwFlags, bool fInherit,
+          uint dwDesiredAccess);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        internal static extern bool CloseDesktop(IntPtr hDesktop);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        internal static extern bool GetUserObjectInformation(IntPtr hObj, int nIndex,
+          [Out] byte[] pvInfo, uint nLength, out uint lpnLengthNeeded);
+
+        [DllImport("user32.dll")]
+        internal extern static bool GetWindowPlacement(int hWnd, ref WINDOWPLACEMENT lpwndpl);
+
+        [DllImport("user32.dll")]
+        internal extern static bool SetWindowPlacement(int hWnd, ref WINDOWPLACEMENT lpwndpl);
+    }
+
+    #region Data structures
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct POINT
+    {
+        public int x;
+        public int y;
+        public POINT(int x, int y)
+        {
+            this.x = x;
+            this.y = y;
+        }
+    }
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct RECT
+    {
+        public int left;
+        public int top;
+        public int right;
+        public int bottom;
+        public RECT(int left, int top, int right, int bottom)
+        {
+            this.left = left;
+            this.top = top;
+            this.right = right;
+            this.bottom = bottom;
+        }
+    }
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct WINDOWPLACEMENT
+    {
+        public int length;
+        public int flags;
+        public int showCmd;
+        public POINT ptMinPosition;
+        public POINT ptMaxPosition;
+        public RECT rcNormalPosition;
+    }
+
+    #endregion
+    // ReSharper restore InconsistentNaming
+}
