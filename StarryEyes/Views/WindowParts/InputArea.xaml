@@ -124,7 +124,7 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <controls:LazyImage RenderOptions.BitmapScalingMode="HighQuality" UriSource="{Binding ProfileImageUri}" />
+                        <controls:LazyImage RenderOptions.BitmapScalingMode="Fant" UriSource="{Binding ProfileImageUri}" />
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>

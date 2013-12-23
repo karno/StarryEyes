@@ -61,7 +61,9 @@
                         <Border.BorderBrush>
                             <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ActiveBorderColorKey}}" />
                         </Border.BorderBrush>
-                        <Controls:LazyImage UriSource="{Binding ProfileImageUri}" />
+                        <Controls:LazyImage DecodePixelWidth="40"
+                                            RenderOptions.BitmapScalingMode="HighQuality"
+                                            UriSource="{Binding ProfileImageUri}" />
                     </Border>
                     <TextBlock Grid.Column="2"
                                Margin="2,0,4,0"
@@ -93,12 +95,12 @@
                         <DoubleAnimationUsingKeyFrames Storyboard.TargetName="innerGrid" Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.X)">
                             <EasingDoubleKeyFrame KeyTime="0" Value="0">
                                 <EasingDoubleKeyFrame.EasingFunction>
-                                    <ExponentialEase Exponent="10" EasingMode="EaseOut" />
+                                    <ExponentialEase EasingMode="EaseOut" Exponent="10" />
                                 </EasingDoubleKeyFrame.EasingFunction>
                             </EasingDoubleKeyFrame>
                             <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="-100">
                                 <EasingDoubleKeyFrame.EasingFunction>
-                                    <ExponentialEase Exponent="10" EasingMode="EaseOut" />
+                                    <ExponentialEase EasingMode="EaseOut" Exponent="10" />
                                 </EasingDoubleKeyFrame.EasingFunction>
                             </EasingDoubleKeyFrame>
                         </DoubleAnimationUsingKeyFrames>
@@ -106,7 +108,7 @@
                             <EasingDoubleKeyFrame KeyTime="0" Value="1" />
                             <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="0">
                                 <EasingDoubleKeyFrame.EasingFunction>
-                                    <ExponentialEase Exponent="10" EasingMode="EaseOut" />
+                                    <ExponentialEase EasingMode="EaseOut" Exponent="10" />
                                 </EasingDoubleKeyFrame.EasingFunction>
                             </EasingDoubleKeyFrame>
                         </DoubleAnimationUsingKeyFrames>
@@ -120,24 +122,24 @@
                         <DoubleAnimationUsingKeyFrames Storyboard.TargetName="innerGrid" Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.X)">
                             <EasingDoubleKeyFrame KeyTime="0" Value="-100">
                                 <EasingDoubleKeyFrame.EasingFunction>
-                                    <ExponentialEase Exponent="10" EasingMode="EaseOut" />
+                                    <ExponentialEase EasingMode="EaseOut" Exponent="10" />
                                 </EasingDoubleKeyFrame.EasingFunction>
                             </EasingDoubleKeyFrame>
                             <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="0">
                                 <EasingDoubleKeyFrame.EasingFunction>
-                                    <ExponentialEase Exponent="10" EasingMode="EaseOut" />
+                                    <ExponentialEase EasingMode="EaseOut" Exponent="10" />
                                 </EasingDoubleKeyFrame.EasingFunction>
                             </EasingDoubleKeyFrame>
                         </DoubleAnimationUsingKeyFrames>
                         <DoubleAnimationUsingKeyFrames Storyboard.TargetName="outerGrid" Storyboard.TargetProperty="(UIElement.Opacity)">
                             <EasingDoubleKeyFrame KeyTime="0" Value="0">
                                 <EasingDoubleKeyFrame.EasingFunction>
-                                    <ExponentialEase Exponent="10" EasingMode="EaseIn" />
+                                    <ExponentialEase EasingMode="EaseIn" Exponent="10" />
                                 </EasingDoubleKeyFrame.EasingFunction>
                             </EasingDoubleKeyFrame>
                             <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="1">
                                 <EasingDoubleKeyFrame.EasingFunction>
-                                    <ExponentialEase Exponent="10" EasingMode="EaseIn" />
+                                    <ExponentialEase EasingMode="EaseIn" Exponent="10" />
                                 </EasingDoubleKeyFrame.EasingFunction>
                             </EasingDoubleKeyFrame>
                         </DoubleAnimationUsingKeyFrames>

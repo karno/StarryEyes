@@ -43,6 +43,8 @@
                                                         Margin="2,2,0,0"
                                                         VerticalAlignment="Top"
                                                         Cursor="Hand"
+                                                        DecodePixelWidth="36"
+                                                        RenderOptions.BitmapScalingMode="HighQuality"
                                                         UriSource="{Binding User.ProfileImageUri}">
                                         <i:Interaction.Triggers>
                                             <i:EventTrigger EventName="MouseLeftButtonDown">

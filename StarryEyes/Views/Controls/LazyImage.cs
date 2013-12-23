@@ -34,7 +34,7 @@ namespace StarryEyes.Views.Controls
 
         public static readonly DependencyProperty UriSourceProperty =
             DependencyProperty.Register("UriSource", typeof(Uri), typeof(LazyImage),
-                                        new PropertyMetadata(null, UriSourcePropertyChanged));
+                new PropertyMetadata(null, ImagePropertyChanged));
 
         public Uri UriSource
         {
@@ -43,7 +43,8 @@ namespace StarryEyes.Views.Controls
         }
 
         public static readonly DependencyProperty DecodePixelWidthProperty =
-            DependencyProperty.Register("DecodePixelWidth", typeof(int), typeof(LazyImage), new PropertyMetadata(0));
+            DependencyProperty.Register("DecodePixelWidth", typeof(int), typeof(LazyImage),
+                new PropertyMetadata(0, ImagePropertyChanged));
 
         public int DecodePixelWidth
         {
@@ -52,7 +53,8 @@ namespace StarryEyes.Views.Controls
         }
 
         public static readonly DependencyProperty DecodePixelHeightProperty =
-            DependencyProperty.Register("DecodePixelHeight", typeof(int), typeof(LazyImage), new PropertyMetadata(0));
+            DependencyProperty.Register("DecodePixelHeight", typeof(int), typeof(LazyImage),
+                new PropertyMetadata(0, ImagePropertyChanged));
 
         public int DecodePixelHeight
         {
@@ -112,14 +114,28 @@ namespace StarryEyes.Views.Controls
 
         private static readonly TaskFactory _taskFactory = LimitedTaskScheduler.GetTaskFactory(MaxParallelism);
 
-        private static void UriSourcePropertyChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        private static void ImagePropertyChanged(DependencyObject sender,
+            DependencyPropertyChangedEventArgs e)
         {
+            if (e.NewValue == e.OldValue) return;
             var img = sender as LazyImage;
             if (img == null) return;
+            var uri = img.UriSource;
             var dpw = img.DecodePixelWidth;
             var dph = img.DecodePixelHeight;
-            var uri = e.NewValue as Uri;
-            if (e.NewValue == e.OldValue || uri == null) return;
+            System.Diagnostics.Debug.WriteLine("IMAGE DECODE:: URI:" + uri + " / DPW:" + dpw + " / DPH:" + dph + " / NVAL:" + e.NewValue);
+            if (uri == null)
+            {
+                SetImage(img, null, null);
+            }
+            else
+            {
+                ReloadImage(img, uri, dpw, dph);
+            }
+        }
+
+        private static void ReloadImage(LazyImage img, Uri uri, int dpw, int dph)
+        {
             try
             {
                 if (uri.Scheme == "pack")

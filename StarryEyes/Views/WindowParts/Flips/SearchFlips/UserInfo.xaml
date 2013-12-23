@@ -74,11 +74,13 @@
                                     Height="143"
                                     Margin="0"
                                     VerticalAlignment="Top"
+                                    RenderOptions.BitmapScalingMode="Fant"
                                     Stretch="UniformToFill"
                                     UriSource="{Binding User.UserSubImageUri}" />
                 <controls:LazyImage Width="127"
                                     Height="127"
                                     Margin="8"
+                                    RenderOptions.BitmapScalingMode="Fant"
                                     UriSource="{Binding User.ProfileImageUri}" />
             </Grid>
             <ScrollViewer HorizontalScrollBarVisibility="Disabled"
@@ -340,6 +342,7 @@
                                                             Margin="0"
                                                             HorizontalAlignment="Left"
                                                             VerticalAlignment="Stretch"
+                                                            RenderOptions.BitmapScalingMode="HighQuality"
                                                             UriSource="{Binding SourceUserProfileImage}" />
                                     </Border>
                                     <StackPanel Grid.Column="1"
