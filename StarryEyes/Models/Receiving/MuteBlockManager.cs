@@ -43,19 +43,25 @@ namespace StarryEyes.Models.Receiving
         {
             get
             {
-                const string blocksql = "UserId NOT IN (select TargetId from Blockings)";
-                const string noRetweetSql =
-                    "(RetweetOriginalId IS NULL OR UserId NOT IN (select TargetId from NoRetweets))";
+                const string exceptSql =
+                    "BaseUserId NOT IN (select TargetId from Blockings) AND " +
+                    "(RetweeterId IS NULL OR " +
+                    "(RetweeterId NOT IN (select TargetId from NoRetweets) AND " +
+                    "RetweeterId NOT IN (select TargetId from Blockings)))";
                 CheckUpdateMutes();
-                return _muteSqlQuery.SqlConcatAnd(blocksql).SqlConcatAnd(noRetweetSql);
+                return _muteSqlQuery.SqlConcatAnd(exceptSql);
             }
         }
 
         public static bool CheckExcepted([NotNull] TwitterStatus status)
         {
             if (status == null) throw new ArgumentNullException("status");
-            if (IsBlocked(status.User)) return true;
-            if (status.RetweetedOriginal != null && IsNoRetweet(status.User)) return true;
+            if (IsBlocked(status.User) ||
+                (status.RetweetedOriginal != null &&
+                 (IsNoRetweet(status.User) || IsBlocked(status.RetweetedOriginal.User))))
+            {
+                return true;
+            }
             CheckUpdateMutes();
             return _muteFilter(status);
         }
