@@ -7,6 +7,7 @@ using AsyncOAuth;
 using Livet;
 using Livet.Commands;
 using Livet.Messaging.Windows;
+using StarryEyes.Annotations;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
@@ -40,24 +41,23 @@ namespace StarryEyes.ViewModels.Dialogs
              Setting.GlobalConsumerSecret.Value ?? App.ConsumerSecret);
             CurrentAuthenticationStep = AuthenticationStep.RequestingToken;
             Observable.Defer(() => _authorizer.GetRequestToken(RequestTokenEndpoint).ToObservable())
-                .Retry(3, TimeSpan.FromSeconds(3)) // twitter sometimes returns an error without any troubles.
-                .Subscribe(t =>
-                {
-                    _currentRequestToken = t.Token;
-                    CurrentAuthenticationStep = AuthenticationStep.WaitingPinInput;
-                    BrowserHelper.Open(_authorizer.BuildAuthorizeUrl(AuthorizationEndpoint, t.Token));
-                },
-                ex => this.Messenger.Raise(new TaskDialogMessage(
-                                               new TaskDialogOptions
-                                               {
-                                                   Title = "OAuth認証エラー",
-                                                   MainIcon = VistaTaskDialogIcon.Error,
-                                                   MainInstruction = "Twitterと正しく通信できませんでした。",
-                                                   Content = "何度も繰り返し発生する場合は、しばらく時間を置いて試してみてください。",
-                                                   CommonButtons = TaskDialogCommonButtons.Close,
-                                                   FooterIcon = VistaTaskDialogIcon.Information,
-                                                   FooterText = "コンピュータの時計が大幅にずれている場合も認証が行えないことがあります。"
-                                               })));
+                      .Retry(3, TimeSpan.FromSeconds(3)) // twitter sometimes returns an error without any troubles.
+                      .Subscribe(t =>
+                      {
+                          _currentRequestToken = t.Token;
+                          CurrentAuthenticationStep = AuthenticationStep.WaitingPinInput;
+                          BrowserHelper.Open(_authorizer.BuildAuthorizeUrl(AuthorizationEndpoint, t.Token));
+                      },
+                          ex => this.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
+                          {
+                              Title = "OAuth認証エラー",
+                              MainIcon = VistaTaskDialogIcon.Error,
+                              MainInstruction = "Twitterと正しく通信できませんでした。",
+                              Content = "何度も繰り返し発生する場合は、しばらく時間を置いて試してみてください。",
+                              CommonButtons = TaskDialogCommonButtons.Close,
+                              FooterIcon = VistaTaskDialogIcon.Information,
+                              FooterText = "コンピュータの時計が大幅にずれている場合も認証が行えないことがあります。"
+                          })));
         }
 
         private AuthenticationStep _currentAuthenticationStep = AuthenticationStep.RequestingToken;
@@ -144,6 +144,16 @@ namespace StarryEyes.ViewModels.Dialogs
             {
                 VerifyPin();
             }
+        }
+
+        #endregion
+
+        #region Help control
+
+        [UsedImplicitly]
+        public void ShowHelp()
+        {
+            BrowserHelper.Open(App.AuthorizeHelpUrl);
         }
 
         #endregion

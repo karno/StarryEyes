@@ -639,6 +639,8 @@ namespace StarryEyes
 
         public static readonly string QueryReferenceUrl = "https://github.com/karno/StarryEyes/wiki";
 
+        public static readonly string AuthorizeHelpUrl = "https://github.com/karno/StarryEyes/wiki/Help_Authorize";
+
         public static readonly string ReleaseNoteUrl = "https://github.com/karno/StarryEyes/wiki/ReleaseNote";
 
         public static readonly string DonationUrl = "http://krile.starwing.net/donation.html";
