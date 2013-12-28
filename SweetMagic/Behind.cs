@@ -28,7 +28,8 @@ namespace SweetMagic
             // [File], [Version], [Key File], [Update Base Path], [Process ID]
             if (cmd.Length < 5)
             {
-                MessageBox.Show("Information losted.", "Updater", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show("Update start failed: invalid parameter [CODE: 1]", "Krile Updater Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Hand);
                 Application.Exit();
                 return null;
             }
@@ -60,7 +61,8 @@ namespace SweetMagic
             var cmd = Environment.GetCommandLineArgs();
             if (cmd.Length < 2)
             {
-                MessageBox.Show("Information losted.", "Updater", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show("Update start failed: invalid parameter [CODE: 2]", "Krile Updater Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Hand);
                 Application.Exit();
                 return;
             }
