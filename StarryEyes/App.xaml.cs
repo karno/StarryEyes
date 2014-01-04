@@ -10,6 +10,7 @@ using System.Runtime;
 using System.Text;
 using System.Threading;
 using System.Windows;
+using System.Windows.Threading;
 using Livet;
 using StarryEyes.Annotations;
 using StarryEyes.Casket;
@@ -34,6 +35,10 @@ namespace StarryEyes
         private static readonly string DbVersion = "1.0";
         private static Mutex _appMutex;
         private static DateTime _startupTime;
+
+        /// <summary>
+        /// Application entry point
+        /// </summary>
         private void AppStartup(object sender, StartupEventArgs e)
         {
             _startupTime = DateTime.Now;
@@ -254,6 +259,10 @@ namespace StarryEyes
             RaiseSystemReady();
         }
 
+        /// <summary>
+        /// Show pre-execute option dialog (TaskDialog)
+        /// </summary>
+        /// <returns>when returning false, should abort execution</returns>
         private bool ShowPreExecuteDialog()
         {
             var resp = TaskDialog.Show(new TaskDialogOptions
@@ -325,6 +334,10 @@ namespace StarryEyes
             return resp.CommandButtonResult.Value < 3;
         }
 
+        /// <summary>
+        /// Check sqlite database
+        /// </summary>
+        /// <returns>when database is compatible, return true</returns>
         private bool CheckDatabase()
         {
             var ver = Database.ManagementCrud.DatabaseVersion;
@@ -341,9 +354,9 @@ namespace StarryEyes
         }
 
         /// <summary>
-        /// アプリケーションのファイナライズ
+        /// Finalize application
         /// </summary>
-        /// <param name="shutdown">アプリケーションが正しく終了している状態か</param>
+        /// <param name="shutdown">If true, application has shutdowned collectly.</param>
         void AppFinalize(bool shutdown)
         {
             if (shutdown)
@@ -362,6 +375,10 @@ namespace StarryEyes
             { }
         }
 
+        /// <summary>
+        /// Global unhandled exception handler method
+        /// </summary>
+        /// <param name="ex">thrown exception</param>
         private void HandleException(Exception ex)
         {
             try
@@ -488,6 +505,44 @@ namespace StarryEyes
             }
         }
 
+        public static string DatabaseDirectoryPath
+        {
+            get
+            {
+                try
+                {
+                    var path = ConfigurationManager.AppSettings["DatabaseDirectoryPath"];
+                    if (String.IsNullOrEmpty(path))
+                    {
+                        // locate into configuration directory
+                        return ConfigurationDirectoryPath;
+                    }
+                    // make sure to exist database directory
+                    if (!Directory.Exists(path))
+                    {
+                        Directory.CreateDirectory(path);
+                    }
+                    return path;
+                }
+                catch (Exception ex)
+                {
+                    TaskDialog.Show(new TaskDialogOptions
+                    {
+                        Title = "Krile スタートアップ エラー",
+                        MainIcon = VistaTaskDialogIcon.Error,
+                        MainInstruction = "Krileの起動に失敗しました。",
+                        Content = "データベース パスの指定が不正かもしれません。" + Environment.NewLine +
+                                  "Krile.exe.configの設定を確認してください。",
+                        ExpandedInfo = ex.ToString(),
+                        CommonButtons = TaskDialogCommonButtons.Close,
+                        FooterIcon = VistaTaskDialogIcon.Information,
+                        FooterText = "改善しないときは、Krileの再インストールを試してください。"
+                    });
+                    throw;
+                }
+            }
+        }
+
         public static bool IsMulticoreJitEnabled
         {
             get
@@ -542,7 +597,7 @@ namespace StarryEyes
         [NotNull]
         public static string DatabaseFilePath
         {
-            get { return Path.Combine(ConfigurationDirectoryPath, DatabaseFileName); }
+            get { return Path.Combine(DatabaseDirectoryPath, DatabaseFileName); }
         }
 
         public static string LocalUpdateStorePath
@@ -715,8 +770,17 @@ namespace StarryEyes
 
     public enum ExecutionMode
     {
+        /// <summary>
+        /// Use Local folder for storing setting file
+        /// </summary>
         Default,
+        /// <summary>
+        /// Use Roaming folder for storing setting file
+        /// </summary>
         Roaming,
+        /// <summary>
+        /// Use application local folder for storing setting file
+        /// </summary>
         Standalone,
     }
 }
