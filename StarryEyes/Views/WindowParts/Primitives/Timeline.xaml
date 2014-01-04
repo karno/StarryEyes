@@ -46,7 +46,7 @@
             <DataTemplate x:Key="StatusItemTemplate">
                 <Border x:Name="MainBorder"
                         Margin="0"
-                        Background="White"
+                        Background="#00FFFFFF"
                         Padding="0"
                         RenderTransformOrigin="0.5,1"
                         SnapsToDevicePixels="True">
@@ -1511,7 +1511,7 @@
         <Border x:Name="multiOperationBlock"
                 Height="40"
                 VerticalAlignment="Top"
-                Background="White"
+                Background="#00FFFFFF"
                 DockPanel.Dock="Bottom"
                 Visibility="Collapsed">
             <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">

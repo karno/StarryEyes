@@ -426,6 +426,7 @@
     <Compile Include="Views\Utils\DesignTimeUtil.cs" />
     <Compile Include="Views\Utils\StringRemoveLineConverter.cs" />
     <Compile Include="Views\Utils\StringToVisibleConverter.cs" />
+    <Compile Include="Views\Utils\ThicknessConverter.cs" />
     <Compile Include="Views\Utils\UriImageConverter.cs" />
     <Compile Include="Views\Utils\WindowStateVisibilityConverter.cs" />
     <Compile Include="Views\WindowParts\Flips\AccountSelectionFlip.xaml.cs">

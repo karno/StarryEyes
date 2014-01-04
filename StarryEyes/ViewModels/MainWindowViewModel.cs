@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
@@ -133,6 +134,10 @@ namespace StarryEyes.ViewModels
                 h => MainWindowModel.BackstageTransitionRequested += h,
                 h => MainWindowModel.BackstageTransitionRequested -= h)
                                               .Subscribe(this.TransitionBackstage));
+            CompositeDisposable.Add(Observable.FromEvent<string>(
+                h => Setting.BackgroundImagePath.ValueChanged += h,
+                h => Setting.BackgroundImagePath.ValueChanged -= h)
+                                              .Subscribe(_ => RaisePropertyChanged(() => this.BackgroundImageUri)));
             this._backstageViewModel.Initialize();
         }
 
@@ -382,6 +387,31 @@ namespace StarryEyes.ViewModels
             RaisePropertyChanged(() => TweetsPerMinutes);
             RaisePropertyChanged(() => GrossTweetCount);
             RaisePropertyChanged(() => StartupTime);
+        }
+
+        #endregion
+
+        #region Theme control
+
+        public Uri BackgroundImageUri
+        {
+            get
+            {
+                var path = Setting.BackgroundImagePath.Value;
+                if (String.IsNullOrEmpty(path))
+                {
+                    return null;
+                }
+                if (!Path.IsPathRooted(path))
+                {
+                    path = Path.GetFullPath(path);
+                }
+                if (File.Exists(path))
+                {
+                    return new Uri(path, UriKind.Absolute);
+                }
+                return null;
+            }
         }
 
         #endregion

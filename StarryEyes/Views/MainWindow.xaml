@@ -54,6 +54,7 @@
             <utils:BooleanToInvisibleConverter x:Key="BooleanToInvisibleConverter" />
             <utils:BooleanToVisibleConverter x:Key="BooleanToVisibleConverter" />
             <utils:WindowMaximizeToInvisibleConverter x:Key="MaximizeToInvisibleConverter" />
+            <utils:BottomInvertedThicknessConverter x:Key="BottomThicknessConverter" />
         </ResourceDictionary>
     </controls:MetroWindow.Resources>
     <controls:MetroWindow.DataContext>
@@ -249,7 +250,8 @@
             <RowDefinition />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <Grid>
+
+        <Grid Grid.Row="0">
             <i:Interaction.Triggers>
                 <ei:DataTrigger Binding="{Binding IsBackstageVisible, Mode=OneWay}" Value="True">
                     <ei:GoToStateAction StateName="HideForePanel" />
@@ -274,13 +276,26 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="13*" />
                 </Grid.RowDefinitions>
-                <windowParts:InputArea Margin="3,4,3,0" DataContext="{Binding InputAreaViewModel}" />
+                <Image Grid.RowSpan="2"
+                       Margin="{Binding ElementName=StatusGrid,
+                                        Path=ActualHeight,
+                                        Converter={StaticResource BottomThicknessConverter}}"
+                       Stretch="UniformToFill">
+                    <Image.Source>
+                        <BitmapImage UriSource="{Binding BackgroundImageUri}" />
+                    </Image.Source>
+                </Image>
+                <windowParts:InputArea Grid.Row="0"
+                                       Margin="3,4,3,0"
+                                       DataContext="{Binding InputAreaViewModel}" />
                 <windowParts:MainArea Grid.Row="1"
                                       Margin="-8,0,0,0"
                                       DataContext="{Binding MainAreaViewModel}" />
             </Grid>
         </Grid>
-        <Grid Grid.Row="1" Background="White">
+        <Grid Name="StatusGrid"
+              Grid.Row="1"
+              Background="#00FFFFFF">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="MouseLeftButtonDown">
                     <ei:CallMethodAction MethodName="ToggleShowBackstage" TargetObject="{Binding}" />

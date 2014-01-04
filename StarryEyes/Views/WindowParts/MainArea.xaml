@@ -23,7 +23,7 @@
             </ResourceDictionary.MergedDictionaries>
             <utils:BooleanToVisibleConverter x:Key="BooleanToVisibleConverter" />
             <DataTemplate x:Key="TabHeaderTemplate" DataType="tabs:TabViewModel">
-                <Border Margin="0,4,0,4" Background="White">
+                <Border Margin="0,4,0,4" Background="#00FFFFFF">
                     <StackPanel Margin="0,0,8,0" Orientation="Horizontal">
                         <i:Interaction.Behaviors>
                             <behaviors:DragStartBehavior AfterDragDropCommand="{Binding Parent.DragDropFinishCommand}"
@@ -87,7 +87,7 @@
                     <ItemsControl MinHeight="16"
                                   Margin="8,0"
                                   AllowDrop="True"
-                                  Background="White"
+                                  Background="#00FFFFFF"
                                   FocusVisualStyle="{x:Null}"
                                   InputMethod.IsInputMethodEnabled="False"
                                   ItemTemplate="{StaticResource TabHeaderTemplate}"
@@ -109,7 +109,7 @@
                     </ItemsControl>
                     <ItemsControl Grid.Row="1"
                                   Margin="0,4,0,0"
-                                  Background="White"
+                                  Background="#00FFFFFF"
                                   FocusVisualStyle="{x:Null}"
                                   InputMethod.IsInputMethodEnabled="False"
                                   ItemsSource="{Binding Tabs}">
