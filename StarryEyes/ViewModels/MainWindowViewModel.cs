@@ -126,18 +126,26 @@ namespace StarryEyes.ViewModels
             CompositeDisposable.Add(_settingFlipViewModel = new SettingFlipViewModel(this));
             CompositeDisposable.Add(_tabConfigurationFlipViewModel = new TabConfigurationFlipViewModel());
             CompositeDisposable.Add(_searchFlipViewModel = new SearchFlipViewModel());
-            CompositeDisposable.Add(Observable.FromEvent<FocusRequest>(
-                h => MainWindowModel.FocusRequested += h,
-                h => MainWindowModel.FocusRequested -= h)
-                                              .Subscribe(SetFocus));
-            CompositeDisposable.Add(Observable.FromEvent<bool>(
-                h => MainWindowModel.BackstageTransitionRequested += h,
-                h => MainWindowModel.BackstageTransitionRequested -= h)
-                                              .Subscribe(this.TransitionBackstage));
-            CompositeDisposable.Add(Observable.FromEvent<string>(
-                h => Setting.BackgroundImagePath.ValueChanged += h,
-                h => Setting.BackgroundImagePath.ValueChanged -= h)
-                                              .Subscribe(_ => RaisePropertyChanged(() => this.BackgroundImageUri)));
+            CompositeDisposable.Add(Observable
+                .FromEvent<FocusRequest>(
+                    h => MainWindowModel.FocusRequested += h,
+                    h => MainWindowModel.FocusRequested -= h)
+                .Subscribe(SetFocus));
+            CompositeDisposable.Add(Observable
+                .FromEvent<bool>(
+                    h => MainWindowModel.BackstageTransitionRequested += h,
+                    h => MainWindowModel.BackstageTransitionRequested -= h)
+                .Subscribe(this.TransitionBackstage));
+            CompositeDisposable.Add(Observable
+                .FromEvent<string>(
+                    h => Setting.BackgroundImagePath.ValueChanged += h,
+                    h => Setting.BackgroundImagePath.ValueChanged -= h)
+                .Subscribe(_ => RaisePropertyChanged(() => this.BackgroundImageUri)));
+            CompositeDisposable.Add(Observable
+                .FromEvent<int>(
+                    h => Setting.BackgroundImageTransparency.ValueChanged += h,
+                    h => Setting.BackgroundImageTransparency.ValueChanged -= h)
+                .Subscribe(_ => RaisePropertyChanged(() => this.BackgroundImageOpacity)));
             this._backstageViewModel.Initialize();
         }
 
@@ -412,6 +420,11 @@ namespace StarryEyes.ViewModels
                 }
                 return null;
             }
+        }
+
+        public double BackgroundImageOpacity
+        {
+            get { return (100 - Setting.BackgroundImageTransparency.Value) / 100.0; }
         }
 
         #endregion

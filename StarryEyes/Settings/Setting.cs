@@ -98,6 +98,9 @@ namespace StarryEyes.Settings
         public static readonly SettingItem<string> BackgroundImagePath =
             new SettingItem<string>("BackgroundImagePath", null);
 
+        public static readonly SettingItemStruct<int> BackgroundImageTransparency =
+            new SettingItemStruct<int>("BackgroundImageTransparency", 0);
+
         public static readonly SettingItem<string> KeyAssign =
             new SettingItem<string>("KeyAssign", null);
 

@@ -280,6 +280,7 @@
                        Margin="{Binding ElementName=StatusGrid,
                                         Path=ActualHeight,
                                         Converter={StaticResource BottomThicknessConverter}}"
+                       Opacity="{Binding BackgroundImageOpacity}"
                        Stretch="UniformToFill">
                     <Image.Source>
                         <BitmapImage UriSource="{Binding BackgroundImageUri}" />
