@@ -5,13 +5,11 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Reactive.Linq;
 using System.Reflection;
 using System.Runtime;
 using System.Text;
 using System.Threading;
 using System.Windows;
-using System.Windows.Media;
 using System.Windows.Threading;
 using Livet;
 using StarryEyes.Annotations;
@@ -25,8 +23,6 @@ using StarryEyes.Models.Subsystems;
 using StarryEyes.Nightmare.Windows;
 using StarryEyes.Plugins;
 using StarryEyes.Settings;
-using StarryEyes.Settings.Themes;
-using StarryEyes.Views;
 using StarryEyes.Views.Dialogs;
 using ThemeManager = StarryEyes.Settings.ThemeManager;
 
@@ -787,21 +783,29 @@ namespace StarryEyes
 
             // initialization call
             OnThemeChanged();
-            Observable.Timer(TimeSpan.FromSeconds(10))
-                      .ObserveOnDispatcher()
-                      .Subscribe(s =>
-                      {
-                          // apply new one
-                          var currentTheme = ThemeManager.CurrentTheme;
-                          currentTheme.GlobalKeyColor = new ThemeColors
+            // TODO: below codes are reserved for debugging
+            /*
+                Observable.Timer(TimeSpan.FromSeconds(10))
+                          .ObserveOnDispatcher()
+                          .Subscribe(s =>
                           {
-                              Foreground = Colors.White,
-                              Background = MetroColors.Emerald
-                          };
-                          this.ApplyThemeResource(currentTheme == null
-                              ? null
-                              : currentTheme.CreateResourceDictionary());
-                      });
+                              // apply new one
+                              var currentTheme = ThemeManager.CurrentTheme;
+                              currentTheme.GlobalKeyColor = new ThemeColors
+                              {
+                                  Foreground = Colors.White,
+                                  Background = MetroColors.Emerald
+                              };
+                              currentTheme.BaseColor = new ThemeColors
+                              {
+                                  Foreground = Colors.White,
+                                  Background = Colors.Black
+                              };
+                              this.ApplyThemeResource(currentTheme == null
+                                  ? null
+                                  : currentTheme.CreateResourceDictionary());
+                          });
+            */
         }
 
         /// <summary>
@@ -811,11 +815,6 @@ namespace StarryEyes
         {
             // apply new one
             var currentTheme = ThemeManager.CurrentTheme;
-            currentTheme.GlobalKeyColor = new ThemeColors
-            {
-                Foreground = Colors.White,
-                Background = MetroColors.Crimson
-            };
             this.ApplyThemeResource(currentTheme == null
                 ? null
                 : currentTheme.CreateResourceDictionary());

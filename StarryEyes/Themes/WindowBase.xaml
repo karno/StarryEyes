@@ -1,28 +1,43 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <!--  for general text  -->
-    <!--  re-set brushes too  -->
-    <SolidColorBrush x:Key="BlackBrush" Color="{StaticResource BaseColorForeground}" />
-    <SolidColorBrush x:Key="TextBrush" Color="{StaticResource BaseColorForeground}" />
-    <SolidColorBrush x:Key="LabelTextBrush" Color="{StaticResource BaseColorForeground}" />
-    <SolidColorBrush x:Key="BaseColorForegroundBrush" Color="{StaticResource BaseColorForeground}" />
-    <SolidColorBrush x:Key="TextBoxMouseOverInnerBorderBrush" Color="{StaticResource BaseColorForeground}" />
-    <SolidColorBrush x:Key="TextBoxFocusBorderBrush" Color="{StaticResource BaseColorForeground}" />
-    <SolidColorBrush x:Key="ButtonMouseOverBorderBrush" Color="{StaticResource BaseColorForeground}" />
-    <SolidColorBrush x:Key="ButtonMouseOverInnerBorderBrush" Color="{StaticResource BaseColorForeground}" />
-    <SolidColorBrush x:Key="ComboBoxMouseOverBorderBrush" Color="{StaticResource BaseColorForeground}" />
-    <SolidColorBrush x:Key="ComboBoxMouseOverInnerBorderBrush" Color="{StaticResource BaseColorForeground}" />
+    <!--
+        <SolidColorBrush x:Key="BlackBrush" Color="{DynamicResource BaseColorForeground}" />
+        <SolidColorBrush x:Key="BlackColorBrush" Color="{DynamicResource BaseColorForeground}" />
+        <SolidColorBrush x:Key="TextBrush" Color="{DynamicResource BaseColorForeground}" />
+        <SolidColorBrush x:Key="LabelTextBrush" Color="{DynamicResource BaseColorForeground}" />
+        <SolidColorBrush x:Key="BaseColorForegroundBrush" Color="{DynamicResource BaseColorForeground}" />
+        <SolidColorBrush x:Key="TextBoxMouseOverInnerBorderBrush" Color="{DynamicResource BaseColorForeground}" />
+        <SolidColorBrush x:Key="TextBoxFocusBorderBrush" Color="{DynamicResource BaseColorForeground}" />
+        <SolidColorBrush x:Key="ButtonMouseOverBorderBrush" Color="{DynamicResource BaseColorForeground}" />
+        <SolidColorBrush x:Key="ButtonMouseOverInnerBorderBrush" Color="{DynamicResource BaseColorForeground}" />
+        <SolidColorBrush x:Key="ComboBoxMouseOverBorderBrush" Color="{DynamicResource BaseColorForeground}" />
+        <SolidColorBrush x:Key="ComboBoxMouseOverInnerBorderBrush" Color="{DynamicResource BaseColorForeground}" />
+        
+        
+        <SolidColorBrush x:Key="CheckBoxBackgroundBrush" Color="{DynamicResource BaseColorBackground}" />
+        <SolidColorBrush x:Key="CheckBoxMouseOverBrush" Color="{DynamicResource BaseColorBackground}" />
+        
+        <SolidColorBrush x:Key="FlatButtonPressedBackgroundBrush" Color="#222222" />
+    -->
+    <!--  Window Backgrounds  -->
+    <SolidColorBrush x:Key="ControlBackgroundBrush" Color="{DynamicResource BaseColorBackground}" />
+    <SolidColorBrush x:Key="WhiteBrush" Color="{DynamicResource BaseColorBackground}" />
+    <SolidColorBrush x:Key="WhiteColorBrush" Color="{DynamicResource BaseColorBackground}" />
+    <SolidColorBrush x:Key="BaseColorBackgroundBrush" Color="{DynamicResource BaseColorBackground}" />
+    <SolidColorBrush x:Key="DisabledWhiteBrush" Color="{DynamicResource BaseColorBackground}" />
+    <SolidColorBrush x:Key="WindowBackgroundBrush" Color="{DynamicResource BaseColorBackground}" />
 
-    <SolidColorBrush x:Key="ControlBackgroundBrush" Color="{StaticResource BaseColorBackground}" />
-    <SolidColorBrush x:Key="WhiteBrush" Color="{StaticResource BaseColorBackground}" />
-    <SolidColorBrush x:Key="BaseColorBackgroundBrush" Color="{StaticResource BaseColorBackground}" />
-    <SolidColorBrush x:Key="DisabledWhiteBrush" Color="{StaticResource BaseColorBackground}" />
-    <SolidColorBrush x:Key="WindowBackgroundBrush" Color="{StaticResource BaseColorBackground}" />
+    <!--  Common control foregrounds  -->
+    <SolidColorBrush x:Key="BlackBrush" Color="{DynamicResource BaseColorForeground}" />
+    <SolidColorBrush x:Key="BlackColorBrush" Color="{DynamicResource BaseColorForeground}" />
+    <SolidColorBrush x:Key="TextBrush" Color="{DynamicResource BaseColorForeground}" />
+    <SolidColorBrush x:Key="LabelTextBrush" Color="{DynamicResource BaseColorForeground}" />
 
-    <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="{StaticResource BaseColorBackground}" />
-    <SolidColorBrush x:Key="{x:Static SystemColors.ControlTextBrushKey}" Color="{StaticResource BaseColorForeground}" />
+    <!--  Window highlights  -->
+    <SolidColorBrush x:Key="AccentColorBrush" Color="{DynamicResource GlobalKeyBackground}" />
+    <SolidColorBrush x:Key="WindowTitleColorBrush" Color="{DynamicResource GlobalKeyBackground}" />
+    <SolidColorBrush x:Key="HighlightBrush" Color="{DynamicResource GlobalKeyBackground}" />
 
-    <SolidColorBrush x:Key="CheckBoxBackgroundBrush" Color="{StaticResource BaseColorBackground}" />
-    <SolidColorBrush x:Key="CheckBoxMouseOverBrush" Color="{StaticResource BaseColorBackground}" />
-
-    <SolidColorBrush x:Key="FlatButtonPressedBackgroundBrush" Color="#222222" />
+    <!--  override WPF default values  -->
+    <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="{DynamicResource BaseColorBackground}" />
+    <SolidColorBrush x:Key="{x:Static SystemColors.ControlTextBrushKey}" Color="{DynamicResource BaseColorForeground}" />
 </ResourceDictionary>
