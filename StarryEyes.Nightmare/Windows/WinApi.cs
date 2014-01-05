@@ -22,10 +22,10 @@ namespace StarryEyes.Nightmare.Windows
           [Out] byte[] pvInfo, uint nLength, out uint lpnLengthNeeded);
 
         [DllImport("user32.dll")]
-        internal extern static bool GetWindowPlacement(int hWnd, ref WINDOWPLACEMENT lpwndpl);
+        internal extern static bool GetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpWndPl);
 
         [DllImport("user32.dll")]
-        internal extern static bool SetWindowPlacement(int hWnd, ref WINDOWPLACEMENT lpwndpl);
+        internal extern static bool SetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpWndPl);
     }
 
     #region Data structures
