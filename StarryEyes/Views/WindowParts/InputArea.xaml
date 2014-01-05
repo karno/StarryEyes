@@ -426,23 +426,75 @@
                                                TextWrapping="Wrap" />
                                 </StackPanel>
                             </controls:DropDownMenuButton>
-                            <Button Width="28"
-                                    Focusable="False"
-                                    Style="{DynamicResource MetroSquareUnfocusableFlatButton}"
-                                    ToolTip="画像の添付"
-                                    Visibility="{Binding IsImageAttached,
-                                                         Converter={StaticResource BooleanToInvisibleConverter}}">
-                                <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="Click">
-                                        <ei:CallMethodAction MethodName="AttachImage" TargetObject="{Binding Mode=OneWay}" />
-                                    </i:EventTrigger>
-                                </i:Interaction.Triggers>
-                                <Path Width="16.546"
-                                      Height="14"
-                                      Data="F1 M 15.7273,17L 32.2727,17L 32.2727,31L 15.7273,31L 15.7273,17 Z M 17,18.2727L 17,29.7273L 31,29.7273L 31,18.2727L 17,18.2727 Z M 18.2727,29.0909L 20.8182,26.5455L 22.0909,27.8182L 27.1818,22.7273L 29.0909,24.6364L 30.3636,23.3636L 30.3636,29.0909L 18.2727,29.0909 Z M 20.8182,19.5455C 20.8182,20.9513 19.6785,22.0909 18.2727,22.0909C 18.053,22.0909 17.8398,22.0631 17.6364,22.0107L 17.6364,18.9091L 20.738,18.9091C 20.7903,19.1125 20.8182,19.3257 20.8182,19.5455 Z "
-                                      Fill="#FF000000"
-                                      Stretch="Fill" />
-                            </Button>
+                            <Grid Visibility="{Binding IsImageAttached, Converter={StaticResource BooleanToInvisibleConverter}}">
+                                <Button Name="ImageAttachOptionButton"
+                                        Width="40"
+                                        Height="22"
+                                        Style="{StaticResource MetroSquareUnfocusableFlatButton}"
+                                        ToolTip="画像添付オプション">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="Click">
+                                            <ei:ChangePropertyAction PropertyName="IsOpen"
+                                                                     TargetObject="{Binding ElementName=ImageAttachOptionButton,
+                                                                                            Path=ContextMenu}"
+                                                                     Value="True" />
+                                            <ei:ChangePropertyAction PropertyName="PlacementTarget"
+                                                                     TargetObject="{Binding ElementName=ImageAttachOptionButton,
+                                                                                            Path=ContextMenu}"
+                                                                     Value="{Binding ElementName=ImageAttachOptionButton,
+                                                                                     Mode=OneWay}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                    <Path Width="5"
+                                          Height="4"
+                                          Margin="14,1,-13,0"
+                                          Data="F1 M 806.479,594.43L 808.229,591.399L 804.729,591.399L 806.479,594.43 Z "
+                                          Fill="Black"
+                                          Stretch="Fill" />
+                                    <Button.ContextMenu>
+                                        <ContextMenu DataContext="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                                            <MenuItem Header="添付するファイルを選択...">
+                                                <i:Interaction.Triggers>
+                                                    <i:EventTrigger EventName="Click">
+                                                        <ei:CallMethodAction MethodName="AttachImage" TargetObject="{Binding Mode=OneWay}" />
+                                                    </i:EventTrigger>
+                                                </i:Interaction.Triggers>
+                                            </MenuItem>
+                                            <MenuItem Header="クリップボードの画像を使用" IsEnabled="{Binding IsClipboardContentImage, Mode=OneWay}">
+                                                <i:Interaction.Triggers>
+                                                    <i:EventTrigger EventName="Click">
+                                                        <ei:CallMethodAction MethodName="AttachClipboardImage" TargetObject="{Binding Mode=OneWay}" />
+                                                    </i:EventTrigger>
+                                                </i:Interaction.Triggers>
+                                            </MenuItem>
+                                            <Separator />
+                                            <MenuItem Header="Snipping Toolを起動">
+                                                <i:Interaction.Triggers>
+                                                    <i:EventTrigger EventName="Click">
+                                                        <ei:CallMethodAction MethodName="StartSnippingTool" TargetObject="{Binding Mode=OneWay}" />
+                                                    </i:EventTrigger>
+                                                </i:Interaction.Triggers>
+                                            </MenuItem>
+                                        </ContextMenu>
+                                    </Button.ContextMenu>
+                                </Button>
+                                <Button Width="28"
+                                        HorizontalAlignment="Left"
+                                        Focusable="False"
+                                        Style="{DynamicResource MetroSquareUnfocusableFlatButton}"
+                                        ToolTip="画像の添付">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="Click">
+                                            <ei:CallMethodAction MethodName="AttachImage" TargetObject="{Binding Mode=OneWay}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                    <Path Width="16.546"
+                                          Height="14"
+                                          Data="F1 M 15.7273,17L 32.2727,17L 32.2727,31L 15.7273,31L 15.7273,17 Z M 17,18.2727L 17,29.7273L 31,29.7273L 31,18.2727L 17,18.2727 Z M 18.2727,29.0909L 20.8182,26.5455L 22.0909,27.8182L 27.1818,22.7273L 29.0909,24.6364L 30.3636,23.3636L 30.3636,29.0909L 18.2727,29.0909 Z M 20.8182,19.5455C 20.8182,20.9513 19.6785,22.0909 18.2727,22.0909C 18.053,22.0909 17.8398,22.0631 17.6364,22.0107L 17.6364,18.9091L 20.738,18.9091C 20.7903,19.1125 20.8182,19.3257 20.8182,19.5455 Z "
+                                          Fill="#FF000000"
+                                          Stretch="Fill" />
+                                </Button>
+                            </Grid>
                             <Button Width="28"
                                     Focusable="False"
                                     Style="{DynamicResource MetroSquareUnfocusableFlatButton}"

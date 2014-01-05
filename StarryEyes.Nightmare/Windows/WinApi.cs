@@ -9,6 +9,8 @@ namespace StarryEyes.Nightmare.Windows
         // constants
         internal const uint GENERIC_READ = 0x80000000;
         internal const int UOI_HEAPSIZE = 5;
+        internal const int WM_DRAWCLIPBOARD = 0x0308;
+        internal const int WM_CHANGECBCHAIN = 0x030D;
 
         [DllImport("user32.dll", SetLastError = true)]
         internal static extern IntPtr OpenInputDesktop(uint dwFlags, bool fInherit,
@@ -26,6 +28,15 @@ namespace StarryEyes.Nightmare.Windows
 
         [DllImport("user32.dll")]
         internal extern static bool SetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpWndPl);
+
+        [DllImport("user32.dll")]
+        internal static extern int SendMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
+
+        [DllImport("user32.dll")]
+        internal static extern IntPtr SetClipboardViewer(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
+        internal static extern bool ChangeClipboardChain(IntPtr hWnd, IntPtr hWndNext);
     }
 
     #region Data structures
