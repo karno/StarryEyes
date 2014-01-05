@@ -460,7 +460,7 @@
                                                     </i:EventTrigger>
                                                 </i:Interaction.Triggers>
                                             </MenuItem>
-                                            <MenuItem Header="クリップボードの画像を使用" IsEnabled="{Binding IsClipboardContentImage, Mode=OneWay}">
+                                            <MenuItem Header="クリップボードの画像を添付" IsEnabled="{Binding IsClipboardContentImage, Mode=OneWay}">
                                                 <i:Interaction.Triggers>
                                                     <i:EventTrigger EventName="Click">
                                                         <ei:CallMethodAction MethodName="AttachClipboardImage" TargetObject="{Binding Mode=OneWay}" />
