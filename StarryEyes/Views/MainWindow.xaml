@@ -25,6 +25,7 @@
                       ShowIconOnTitleBar="True"
                       SnapsToDevicePixels="True"
                       TitleCaps="False"
+                      TitleForeground="{StaticResource GlobalKeyForegroundBrush}"
                       UseLayoutRounding="False"
                       mc:Ignorable="d">
     <controls:MetroWindow.Icon>
@@ -45,12 +46,9 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colours.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
+                <!--  <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseDark.xaml" />  -->
+                <ResourceDictionary Source="../Themes/WindowBase.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <Color x:Key="AccentColor">#FF1BA1E2</Color>
-            <!--  ReSharper disable Xaml.RedundantResource  -->
-            <SolidColorBrush x:Key="AccentColorBrush" Color="{StaticResource AccentColor}" />
-            <!--  ReSharper restore Xaml.RedundantResource  -->
             <utils:BooleanToInvisibleConverter x:Key="BooleanToInvisibleConverter" />
             <utils:BooleanToVisibleConverter x:Key="BooleanToVisibleConverter" />
             <utils:WindowMaximizeToInvisibleConverter x:Key="MaximizeToInvisibleConverter" />

@@ -1,0 +1,28 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!--  for general text  -->
+    <!--  re-set brushes too  -->
+    <SolidColorBrush x:Key="BlackBrush" Color="{StaticResource BaseColorForeground}" />
+    <SolidColorBrush x:Key="TextBrush" Color="{StaticResource BaseColorForeground}" />
+    <SolidColorBrush x:Key="LabelTextBrush" Color="{StaticResource BaseColorForeground}" />
+    <SolidColorBrush x:Key="BaseColorForegroundBrush" Color="{StaticResource BaseColorForeground}" />
+    <SolidColorBrush x:Key="TextBoxMouseOverInnerBorderBrush" Color="{StaticResource BaseColorForeground}" />
+    <SolidColorBrush x:Key="TextBoxFocusBorderBrush" Color="{StaticResource BaseColorForeground}" />
+    <SolidColorBrush x:Key="ButtonMouseOverBorderBrush" Color="{StaticResource BaseColorForeground}" />
+    <SolidColorBrush x:Key="ButtonMouseOverInnerBorderBrush" Color="{StaticResource BaseColorForeground}" />
+    <SolidColorBrush x:Key="ComboBoxMouseOverBorderBrush" Color="{StaticResource BaseColorForeground}" />
+    <SolidColorBrush x:Key="ComboBoxMouseOverInnerBorderBrush" Color="{StaticResource BaseColorForeground}" />
+
+    <SolidColorBrush x:Key="ControlBackgroundBrush" Color="{StaticResource BaseColorBackground}" />
+    <SolidColorBrush x:Key="WhiteBrush" Color="{StaticResource BaseColorBackground}" />
+    <SolidColorBrush x:Key="BaseColorBackgroundBrush" Color="{StaticResource BaseColorBackground}" />
+    <SolidColorBrush x:Key="DisabledWhiteBrush" Color="{StaticResource BaseColorBackground}" />
+    <SolidColorBrush x:Key="WindowBackgroundBrush" Color="{StaticResource BaseColorBackground}" />
+
+    <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="{StaticResource BaseColorBackground}" />
+    <SolidColorBrush x:Key="{x:Static SystemColors.ControlTextBrushKey}" Color="{StaticResource BaseColorForeground}" />
+
+    <SolidColorBrush x:Key="CheckBoxBackgroundBrush" Color="{StaticResource BaseColorBackground}" />
+    <SolidColorBrush x:Key="CheckBoxMouseOverBrush" Color="{StaticResource BaseColorBackground}" />
+
+    <SolidColorBrush x:Key="FlatButtonPressedBackgroundBrush" Color="#222222" />
+</ResourceDictionary>

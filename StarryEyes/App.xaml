@@ -10,6 +10,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Simple Styles.xaml" />
+                <ResourceDictionary Source="Themes\DesignTimeDefault.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <Style x:Key="TouchScrollItemsControlStyle" TargetType="{x:Type ItemsControl}">
                 <Setter Property="ScrollViewer.PanningMode" Value="VerticalOnly" />

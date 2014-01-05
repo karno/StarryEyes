@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Windows.Media;
 using StarryEyes.Views;
 
@@ -22,77 +21,94 @@ namespace StarryEyes.Settings.Themes
 
             #region base color setting
 
-            profile.GlobalColor = new HighlightableColorTheme
+            profile.GlobalFont = FontTheme.Default;
+
+            profile.BaseColor = new ThemeColors
             {
-                Default = new ColorTheme
-                {
-                    Background = Colors.White,
-                    Foreground = Colors.Black
-                },
-                Highlight = new ColorTheme
-                {
-                    Background = MetroColors.Cyan,
-                    Foreground = Colors.White
-                }
+                Background = Colors.White,
+                Foreground = Colors.Black
             };
 
-            profile.BackstageColor = new HighlightableColorTheme
+            profile.GlobalKeyColor = new ThemeColors
             {
-                Default = new ColorTheme
-                {
-                    Background = Colors.WhiteSmoke,
-                    Foreground = Colors.Black
-                },
-                Highlight = new ColorTheme
-                {
-                    Background = Colors.WhiteSmoke,
-                    Foreground = MetroColors.Cyan
-                }
+                Background = MetroColors.Cyan,
+                Foreground = Colors.White,
             };
 
-            profile.AccountSelectionFlipColor = new ColorTheme
+            profile.BackstageColor = new ThemeColors
+            {
+                Background = Colors.WhiteSmoke,
+                Foreground = Colors.Black
+            };
+
+            profile.AccountSelectionFlipColor = new ThemeColors
             {
                 Background = Color.FromRgb(0x11, 0x11, 0x11),
                 Foreground = Colors.White
             };
 
-            profile.SearchFlipColor = new HighlightableColorTheme
+            profile.SearchFlipColor = new SearchFlipTheme
             {
-                Default = new ColorTheme
+                Default = new ThemeColors
+                {
+                    Background = Color.FromRgb(0x1b, 0x58, 0xb8),
+                    Foreground = Colors.White
+                },
+                Pressed = new ThemeColors
                 {
                     Background = Color.FromRgb(0x16, 0x49, 0x9a),
                     Foreground = Colors.White
                 },
-                Highlight = new ColorTheme
+                Selected = new ThemeColors
                 {
                     Background = Color.FromRgb(0x5c, 0x83, 0xc2),
+                    Foreground = Colors.White
+                },
+                Hovering = new ThemeColors
+                {
+                    Background = Color.FromRgb(0x5c, 0x83, 0xc2),
+                    Foreground = Colors.White
+                },
+                QueryInvalid = new ThemeColors
+                {
+                    Background = MetroColors.Crimson,
                     Foreground = Colors.White
                 }
             };
 
             profile.UserFlipColor = new UserFlipTheme
             {
-                Default = new ColorTheme
+                Default = new ThemeColors
                 {
                     Background = Color.FromRgb(0x11, 0x11, 0x11),
                     Foreground = Colors.White
                 },
-                Highlight = new ColorTheme
+                Selected = new ThemeColors
                 {
                     Background = Color.FromRgb(0x33, 0x33, 0x33),
                     Foreground = Colors.White
                 },
-                Key = MetroColors.Cyan,
-                NotFollowed = Color.FromRgb(0x33, 0x33, 0x33),
-                NotFollowbacked = Color.FromRgb(0x80, 0x80, 0x80),
-                Following = MetroColors.Cyan,
+                Hovering = new ThemeColors
+                {
+                    Background = Color.FromRgb(0x22, 0x22, 0x22),
+                    Foreground = Colors.White
+                },
+                Pressed = new ThemeColors
+                {
+
+                    Background = Color.FromRgb(0x44, 0x44, 0x44),
+                    Foreground = Colors.White
+                },
+                NotFollowbacked = Colors.DimGray,
                 Followbacked = MetroColors.Cyan,
+                NotFollowed = Color.FromRgb(0x33, 0x33, 0x33),
+                Following = MetroColors.Cyan,
                 Blocking = MetroColors.Red
             };
 
-            profile.Tab = new TabTheme
+            profile.TabColor = new TabTheme
             {
-                TabFont = new ThemeFont() { FontSize = 16.0 },
+                TabFont = FontTheme.CreateDefaultWithSize(16.0),
                 Default = Color.FromRgb(0x99, 0x99, 0x99),
                 Selected = MetroColors.Cyan,
                 Focused = Colors.Black,
@@ -109,22 +125,22 @@ namespace StarryEyes.Settings.Themes
                 return c;
             });
 
-            profile.TweetDefault = CreateDefault(MetroColors.Cyan, Colors.Transparent,
+            profile.TweetDefaultColor = CreateDefault(MetroColors.Cyan, Colors.Transparent,
                                                  alpha(Colors.Black, 0x10));
 
-            profile.TweetMyself = CreateDefault(MetroColors.Cyan,
+            profile.TweetMyselfColor = CreateDefault(MetroColors.Cyan,
                                                 alpha(MetroColors.Cyan, 0x16),
                                                 alpha(MetroColors.Cyan, 0x20));
 
-            profile.TweetMention = CreateDefault(MetroColors.Orange,
+            profile.TweetMentionColor = CreateDefault(MetroColors.Orange,
                                                 alpha(MetroColors.Orange, 0x16),
                                                 alpha(MetroColors.Orange, 0x20));
 
-            profile.TweetRetweet = CreateDefault(MetroColors.Emerald,
+            profile.TweetRetweetColor = CreateDefault(MetroColors.Emerald,
                                                 alpha(MetroColors.Emerald, 0x16),
                                                 alpha(MetroColors.Emerald, 0x20));
 
-            profile.TweetDirectMessage = CreateDefault(MetroColors.Crimson,
+            profile.TweetDirectMessageColor = CreateDefault(MetroColors.Crimson,
                                                 alpha(MetroColors.Crimson, 0x16),
                                                 alpha(MetroColors.Crimson, 0x20));
 
@@ -135,55 +151,51 @@ namespace StarryEyes.Settings.Themes
 
         private static TweetTheme CreateDefault(Color key, Color background, Color highlight)
         {
-            var dc = new HighlightableColorTheme
+            var dcf = (Func<Color, ControlColors>)(c => new ControlColors
             {
-                Default = new ColorTheme
-                {
-                    Background = Colors.Transparent,
-                    Foreground = Color.FromRgb(0x80, 0x80, 0x80),
-                },
-                Highlight = new ColorTheme
-                {
-                    Background = Color.FromRgb(0xdc, 0xdc, 0xdc),
-                    Foreground = Color.FromRgb(0x80, 0x80, 0x80),
-                }
-            };
-            var dcf = (Func<Color, HighlightableColorTheme>)(c => new HighlightableColorTheme
-            {
-                Default = new ColorTheme
+                Default = new ThemeColors
                 {
                     Background = Colors.Transparent,
                     Foreground = c,
                 },
-                Highlight = new ColorTheme
+                Hovering = new ThemeColors
                 {
                     Background = Color.FromRgb(0xdc, 0xdc, 0xdc),
+                    Foreground = c,
+                },
+                Pressed = new ThemeColors
+                {
+                    Background = Color.FromRgb(0x90, 0x90, 0x90),
                     Foreground = c,
                 }
             });
+            var dc = dcf(Color.FromRgb(0x80, 0x80, 0x80));
+
             return new TweetTheme
             {
-                Colors = new HighlightableColorTheme
+                Default = new ThemeColors
                 {
-                    Default = new ColorTheme
-                    {
-                        Background = background,
-                        Foreground = Colors.Black,
-                    },
-                    Highlight = new ColorTheme
-                    {
-                        Background = highlight,
-                        Foreground = Colors.Black,
-                    }
+                    Background = background,
+                    Foreground = Colors.Black,
                 },
-                ForegroundKey = key,
-                ForegroundSub = Color.FromRgb(0x80, 0x80, 0x80),
+                Highlight = new ThemeColors
+                {
+                    Background = highlight,
+                    Foreground = Colors.Black,
+                },
+                KeyText = key,
+                SubText = Color.FromRgb(0x80, 0x80, 0x80),
+                FavoriteCounter = MetroColors.Amber,
+                RetweetCounter = MetroColors.Emerald,
+                RetweetMarker = MetroColors.Emerald,
+
                 FavoriteAndRetweetButton = dc,
                 FavoriteButton = dc,
                 ColoredFavoriteButton = dcf(MetroColors.Amber),
                 ColoredRetweetButton = dc,
                 RetweetButton = dcf(MetroColors.Emerald),
-                MentionButton = dc
+                MentionButton = dc,
+                DeleteButton = dc
             };
         }
     }

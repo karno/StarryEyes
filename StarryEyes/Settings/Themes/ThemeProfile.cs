@@ -1,24 +1,41 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Runtime.Serialization;
+using System.Windows;
 using System.Xml;
 using StarryEyes.Annotations;
 
 namespace StarryEyes.Settings.Themes
 {
+    /// <summary>
+    /// Describes Theme Profile
+    /// </summary>
     [DataContract]
-    public class ThemeProfile
+    public class ThemeProfile : ICloneable
     {
-        private ThemeFont _globalFont;
+        private FontTheme _globalFont;
         private UserFlipTheme _userFlipColor;
         private TabTheme _tabColor;
 
+        /// <summary>
+        /// Internal constructor
+        /// </summary>
         private ThemeProfile() { }
 
+        /// <summary>
+        /// Construct class with name
+        /// </summary>
+        /// <param name="name"></param>
         public ThemeProfile(string name)
         {
             this.Name = name;
         }
 
+        /// <summary>
+        /// Load from xml file.
+        /// </summary>
+        /// <param name="path">load path</param>
+        /// <returns>loaded profile</returns>
         public static ThemeProfile Load(string path)
         {
             var name = Path.GetFileNameWithoutExtension(path);
@@ -35,6 +52,10 @@ namespace StarryEyes.Settings.Themes
             }
         }
 
+        /// <summary>
+        /// Save theme to xml file.
+        /// </summary>
+        /// <param name="directory">target directory.(must exist)</param>
         public void Save(string directory)
         {
             var path = Path.Combine(directory, Name + ".xml");
@@ -46,27 +67,55 @@ namespace StarryEyes.Settings.Themes
             }
         }
 
+        /// <summary>
+        /// Theme Name
+        /// </summary>
         public string Name { get; private set; }
 
+        /// <summary>
+        /// Krile Global Font
+        /// </summary>
         [DataMember, NotNull]
-        public ThemeFont GlobalFont
+        public FontTheme GlobalFont
         {
-            get { return _globalFont ?? (_globalFont = ThemeFont.Default); }
+            get { return _globalFont ?? (_globalFont = FontTheme.Default); }
             set { _globalFont = value; }
         }
 
+        /// <summary>
+        /// Global base background/foreground color
+        /// </summary>
         [DataMember]
-        public HighlightableColorTheme GlobalColor { get; set; }
+        public ThemeColors BaseColor { get; set; }
 
+        /// <summary>
+        /// Global key color(one-point color)<para />
+        /// Sometimes use this colors conversely. (e.g. Window title bar)
+        /// </summary>
         [DataMember]
-        public HighlightableColorTheme BackstageColor { get; set; }
+        public ThemeColors GlobalKeyColor { get; set; }
 
+        /// <summary>
+        /// Backstage background/foreground color
+        /// </summary>
         [DataMember]
-        public ColorTheme AccountSelectionFlipColor { get; set; }
+        public ThemeColors BackstageColor { get; set; }
 
+        /// <summary>
+        /// Account selection flip background/foreground color
+        /// </summary>
         [DataMember]
-        public HighlightableColorTheme SearchFlipColor { get; set; }
+        public ThemeColors AccountSelectionFlipColor { get; set; }
 
+        /// <summary>
+        /// Theme description for search-flip
+        /// </summary>
+        [DataMember]
+        public SearchFlipTheme SearchFlipColor { get; set; }
+
+        /// <summary>
+        /// Theme description for user-flip
+        /// </summary>
         [DataMember, NotNull]
         public UserFlipTheme UserFlipColor
         {
@@ -74,26 +123,99 @@ namespace StarryEyes.Settings.Themes
             set { _userFlipColor = value; }
         }
 
+        /// <summary>
+        /// Theme description for tabs
+        /// </summary>
         [DataMember, NotNull]
-        public TabTheme Tab
+        public TabTheme TabColor
         {
             get { return _tabColor ?? (_tabColor = new TabTheme()); }
             set { _tabColor = value; }
         }
 
+        /// <summary>
+        /// Theme description for tweets
+        /// </summary>
         [DataMember]
-        public TweetTheme TweetDefault { get; set; }
+        public TweetTheme TweetDefaultColor { get; set; }
 
+        /// <summary>
+        /// Theme description for your tweets
+        /// </summary>
         [DataMember]
-        public TweetTheme TweetMyself { get; set; }
+        public TweetTheme TweetMyselfColor { get; set; }
 
+        /// <summary>
+        /// Theme description for mentioned tweets
+        /// </summary>
         [DataMember]
-        public TweetTheme TweetMention { get; set; }
+        public TweetTheme TweetMentionColor { get; set; }
 
+        /// <summary>
+        /// Theme description for retweeted tweets
+        /// </summary>
         [DataMember]
-        public TweetTheme TweetRetweet { get; set; }
+        public TweetTheme TweetRetweetColor { get; set; }
 
+        /// <summary>
+        /// Theme description for direct messages
+        /// </summary>
         [DataMember]
-        public TweetTheme TweetDirectMessage { get; set; }
+        public TweetTheme TweetDirectMessageColor { get; set; }
+
+        /// <summary>
+        /// Create theme resource dictionary for adding WPF Theme System
+        /// </summary>
+        /// <returns>configured resource dictionary</returns>
+        public ResourceDictionary CreateResourceDictionary()
+        {
+            var dict = new ResourceDictionary();
+            // Font resource
+            GlobalFont.ConfigureResourceDictionary(dict, "Font");
+            BaseColor.ConfigureResourceDictionary(dict, "BaseColor");
+            GlobalKeyColor.ConfigureResourceDictionary(dict, "GlobalKey");
+            BackstageColor.ConfigureResourceDictionary(dict, "Backstage");
+            AccountSelectionFlipColor.ConfigureResourceDictionary(dict, "AccountSelectionFlip");
+            SearchFlipColor.ConfigureResourceDictionary(dict, "SearchFlip");
+            UserFlipColor.ConfigureResourceDictionary(dict, "UserFlip");
+            TabColor.ConfigureResourceDictionary(dict, "Tab");
+            TweetDefaultColor.ConfigureResourceDictionary(dict, "TweetDefault");
+            TweetMyselfColor.ConfigureResourceDictionary(dict, "TweetMyself");
+            TweetMentionColor.ConfigureResourceDictionary(dict, "TweetMention");
+            TweetRetweetColor.ConfigureResourceDictionary(dict, "TweetRetweet");
+            TweetDirectMessageColor.ConfigureResourceDictionary(dict, "TweetMessage");
+
+            return dict;
+        }
+
+        /// <summary>
+        /// Create clone of me.
+        /// </summary>
+        /// <returns></returns>
+        public ThemeProfile Clone()
+        {
+            return new ThemeProfile
+            {
+                Name = Name,
+                GlobalFont = this.GlobalFont.Clone(),
+                BaseColor = BaseColor,
+                GlobalKeyColor = GlobalKeyColor,
+                BackstageColor = BackstageColor,
+                AccountSelectionFlipColor = AccountSelectionFlipColor,
+                SearchFlipColor = SearchFlipColor.Clone(),
+                UserFlipColor = UserFlipColor.Clone(),
+                TabColor = this.TabColor.Clone(),
+                TweetDefaultColor = this.TweetDefaultColor.Clone(),
+                TweetMyselfColor = this.TweetMyselfColor.Clone(),
+                TweetMentionColor = this.TweetMentionColor.Clone(),
+                TweetRetweetColor = this.TweetRetweetColor.Clone(),
+                TweetDirectMessageColor = this.TweetDirectMessageColor.Clone()
+            };
+        }
+
+        object ICloneable.Clone()
+        {
+            return Clone();
+        }
     }
 }

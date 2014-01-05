@@ -332,9 +332,11 @@
     <Compile Include="Settings\KeyAssigns\KeyAssignProfile.cs" />
     <Compile Include="Settings\TabDescription.cs" />
     <Compile Include="Settings\ThemeManager.cs" />
-    <Compile Include="Settings\Themes\ColorTheme.cs" />
+    <Compile Include="Settings\Themes\ThemeColors.cs" />
     <Compile Include="Settings\Themes\DefaultThemeProvider.cs" />
-    <Compile Include="Settings\Themes\ThemeFont.cs" />
+    <Compile Include="Settings\Themes\IResourceConfigurator.cs" />
+    <Compile Include="Settings\Themes\SearchFlipTheme.cs" />
+    <Compile Include="Settings\Themes\FontTheme.cs" />
     <Compile Include="Settings\Themes\TabTheme.cs" />
     <Compile Include="Settings\Themes\ThemeProfile.cs" />
     <Compile Include="Settings\Themes\TweetTheme.cs" />
@@ -480,11 +482,19 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Themes\DesignTimeDefault.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Themes\FlipContent.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\WindowBase.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

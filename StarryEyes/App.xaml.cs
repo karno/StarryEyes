@@ -5,11 +5,13 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Reactive.Linq;
 using System.Reflection;
 using System.Runtime;
 using System.Text;
 using System.Threading;
 using System.Windows;
+using System.Windows.Media;
 using System.Windows.Threading;
 using Livet;
 using StarryEyes.Annotations;
@@ -23,7 +25,10 @@ using StarryEyes.Models.Subsystems;
 using StarryEyes.Nightmare.Windows;
 using StarryEyes.Plugins;
 using StarryEyes.Settings;
+using StarryEyes.Settings.Themes;
+using StarryEyes.Views;
 using StarryEyes.Views.Dialogs;
+using ThemeManager = StarryEyes.Settings.ThemeManager;
 
 namespace StarryEyes
 {
@@ -252,6 +257,9 @@ namespace StarryEyes
 
             // activate scripts
             ScriptingManagerImpl.Initialize();
+
+            // apply theme
+            InitializeTheme();
 
             ReceiveManager.Initialize();
             TwitterConfigurationService.Initialize();
@@ -765,7 +773,83 @@ namespace StarryEyes
 
         #endregion
 
+        #region Themes
+
+        private ResourceDictionary _prevThemeDict;
+
+        private void InitializeTheme()
+        {
+            ThemeManager.ThemeChanged += this.OnThemeChanged;
+            ThemeManager.Initialize();
+
+            // unload design-time default theme
+            _prevThemeDict = Current.Resources.MergedDictionaries.FirstOrDefault(r => r.Source.ToString().EndsWith("DesignTimeDefault.xaml"));
+
+            // initialization call
+            OnThemeChanged();
+            Observable.Timer(TimeSpan.FromSeconds(10))
+                      .ObserveOnDispatcher()
+                      .Subscribe(s =>
+                      {
+                          // apply new one
+                          var currentTheme = ThemeManager.CurrentTheme;
+                          currentTheme.GlobalKeyColor = new ThemeColors
+                          {
+                              Foreground = Colors.White,
+                              Background = MetroColors.Emerald
+                          };
+                          this.ApplyThemeResource(currentTheme == null
+                              ? null
+                              : currentTheme.CreateResourceDictionary());
+                      });
+        }
+
+        /// <summary>
+        /// This method is called when theme has changed.
+        /// </summary>
+        void OnThemeChanged()
+        {
+            // apply new one
+            var currentTheme = ThemeManager.CurrentTheme;
+            currentTheme.GlobalKeyColor = new ThemeColors
+            {
+                Foreground = Colors.White,
+                Background = MetroColors.Crimson
+            };
+            this.ApplyThemeResource(currentTheme == null
+                ? null
+                : currentTheme.CreateResourceDictionary());
+        }
+
+        /// <summary>
+        /// Apply theme resource dictionary
+        /// </summary>
+        /// <param name="dictionary">theme resource dictionary</param>
+        void ApplyThemeResource(ResourceDictionary dictionary)
+        {
+            if (dictionary == null || dictionary == _prevThemeDict) return;
+
+            // apply new dictionary
+            Current.Resources.MergedDictionaries.Add(dictionary);
+
+            // remove previous 
+            Current.Resources.MergedDictionaries.Remove(_prevThemeDict);
+
+            _prevThemeDict = dictionary;
+        }
+
+        #endregion
+
+        #region Static helper constants/methods
+
         public static readonly DateTime StartupDateTime = DateTime.Now;
+
+        public static T FindResource<T>(string name) where T : DispatcherObject
+        {
+            return App.Current.TryFindResource(name) as T;
+        }
+
+        #endregion
     }
 
     public enum ExecutionMode
