@@ -31,6 +31,7 @@
     <SolidColorBrush x:Key="BlackColorBrush" Color="{DynamicResource BaseColorForeground}" />
     <SolidColorBrush x:Key="TextBrush" Color="{DynamicResource BaseColorForeground}" />
     <SolidColorBrush x:Key="LabelTextBrush" Color="{DynamicResource BaseColorForeground}" />
+    <SolidColorBrush x:Key="CheckBoxBrush" Color="{DynamicResource BaseColorForeground}" />
 
     <!--  Window highlights  -->
     <SolidColorBrush x:Key="AccentColorBrush" Color="{DynamicResource GlobalKeyBackground}" />
