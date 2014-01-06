@@ -394,6 +394,9 @@
     <Compile Include="Views\Dialogs\AwaitDownloadingUpdateWindow.xaml.cs">
       <DependentUpon>AwaitDownloadingUpdateWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Dialogs\DatabaseOptimizingWindow.xaml.cs">
+      <DependentUpon>DatabaseOptimizingWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Dialogs\KeyOverrideWindow.xaml.cs">
       <DependentUpon>KeyOverrideWindow.xaml</DependentUpon>
     </Compile>
@@ -499,6 +502,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Dialogs\AwaitDownloadingUpdateWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Dialogs\DatabaseOptimizingWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

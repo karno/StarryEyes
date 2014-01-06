@@ -79,7 +79,7 @@
                 <ListBox x:Name="SettingCategories"
                          Width="180"
                          HorizontalContentAlignment="Stretch"
-                         SelectedIndex="5">
+                         SelectedIndex="9">
                     <ListBox.Resources>
                         <Style TargetType="{x:Type ListBoxItem}">
                             <Setter Property="Margin" Value="0" />
@@ -676,17 +676,19 @@
                                   Content="位置情報サービスをロードしない(_G) [この設定は自動的に変更されることがあります]"
                                   IsChecked="{Binding LoadPluginFromDevFolder}" />
                     </StackPanel>
-                    <Button Margin="12"
-                            HorizontalAlignment="Left"
-                            VerticalAlignment="Bottom"
-                            Content="Krileをメンテナンスモードでリスタート"
-                            Style="{StaticResource MetroSquareButtonStyle}">
-                        <i:Interaction.Triggers>
-                            <i:EventTrigger EventName="Click">
-                                <ei:CallMethodAction MethodName="RestartAsMaintenance" TargetObject="{Binding}" />
-                            </i:EventTrigger>
-                        </i:Interaction.Triggers>
-                    </Button>
+                    <StackPanel VerticalAlignment="Bottom" Orientation="Horizontal">
+                        <Button Margin="12"
+                                HorizontalAlignment="Left"
+                                Content="Krileをメンテナンスモードでリスタート"
+                                Style="{StaticResource MetroSquareButtonStyle}">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="Click">
+                                    <ei:CallMethodAction MethodName="RestartAsMaintenance" TargetObject="{Binding}" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </Button>
+                        <TextBlock VerticalAlignment="Center" Text="設定とデータベースの削除やデータベースの最適化などが行えます。" />
+                    </StackPanel>
                 </Grid>
                 <Grid Grid.Column="1" Margin="0,6,0,0">
                     <Grid.Style>

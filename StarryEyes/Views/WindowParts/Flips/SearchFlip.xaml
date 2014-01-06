@@ -20,18 +20,12 @@
              mc:Ignorable="d">
     <UserControl.Resources>
         <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/Krile;component/DefaultContextMenus.xaml" />
-            </ResourceDictionary.MergedDictionaries>
             <utils:BooleanToInvisibleConverter x:Key="BooleanToInvisibleConverter" />
             <utils:BooleanToVisibleConverter x:Key="BooleanToVisibleConverter" />
             <utils:NotNullToVisibleConverter x:Key="NotNullToVisibleConverter" />
             <Style x:Key="FloatTextBlockStyle" TargetType="TextBlock">
                 <Style.Resources>
                     <ResourceDictionary>
-                        <ResourceDictionary.MergedDictionaries>
-                            <ResourceDictionary Source="pack://application:,,,/Krile;component/DefaultContextMenus.xaml" />
-                        </ResourceDictionary.MergedDictionaries>
                         <Storyboard x:Key="DefaultStoryBoard">
                             <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(TextBlock.Background).(SolidColorBrush.Color)">
                                 <SplineColorKeyFrame KeyTime="0:0:0" Value="#00000000" />

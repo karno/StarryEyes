@@ -56,7 +56,22 @@ namespace StarryEyes.Casket.Cruds
 
         internal async Task VacuumAsync()
         {
-            await this.ExecuteAsync("vacuum;");
+            // should execute WITHOUT transaction.
+            await Task.Run(() =>
+            {
+                try
+                {
+                    ReaderWriterLock.EnterWriteLock();
+                    using (var con = OpenConnection())
+                    {
+                        con.Execute("VACUUM;");
+                    }
+                }
+                finally
+                {
+                    ReaderWriterLock.ExitWriteLock();
+                }
+            });
         }
     }
 }

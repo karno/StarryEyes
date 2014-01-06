@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Runtime;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using Livet;
@@ -33,6 +34,8 @@ namespace StarryEyes
     /// </summary>
     public partial class App
     {
+        private static bool _requireOptimizeDb = false;
+
         private static readonly string DbVersion = "1.0";
         private static Mutex _appMutex;
         private static DateTime _startupTime;
@@ -90,32 +93,37 @@ namespace StarryEyes
             #region detect run duplication
 
             // Check run duplication
-            string mutexStr = null;
-            switch (ExecutionMode)
-            {
-                case ExecutionMode.Default:
-                case ExecutionMode.Roaming:
-                    mutexStr = ExecutionMode.ToString();
-                    break;
-                case ExecutionMode.Standalone:
-                    mutexStr = "Standalone_" + ExeFilePath.Replace('\\', '*');
-                    break;
-            }
-            _appMutex = new Mutex(true, "Krile_StarryEyes_" + mutexStr);
 
-            if (_appMutex.WaitOne(0, false) == false)
+            // if Krile started as maintenance mode, skip this check.
+            if (!e.Args.Select(a => a.ToLower()).Contains("-maintenance"))
             {
-                TaskDialog.Show(new TaskDialogOptions
+                string mutexStr = null;
+                switch (ExecutionMode)
                 {
-                    Title = "Krile StarryEyes",
-                    MainIcon = VistaTaskDialogIcon.Error,
-                    MainInstruction = "Krileはすでに起動しています。",
-                    Content = "同じ設定を共有するKrileを多重起動することはできません。",
-                    ExpandedInfo = "Krileを多重起動するためには、krile.exe.configを編集する必要があります。" + Environment.NewLine +
-                    "詳しくは公式ウェブサイト上のFAQを参照してください。",
-                    CommonButtons = TaskDialogCommonButtons.Close
-                });
-                Environment.Exit(0);
+                    case ExecutionMode.Default:
+                    case ExecutionMode.Roaming:
+                        mutexStr = ExecutionMode.ToString();
+                        break;
+                    case ExecutionMode.Standalone:
+                        mutexStr = "Standalone_" + ExeFilePath.Replace('\\', '*');
+                        break;
+                }
+                _appMutex = new Mutex(true, "Krile_StarryEyes_" + mutexStr);
+
+                if (_appMutex.WaitOne(0, false) == false)
+                {
+                    TaskDialog.Show(new TaskDialogOptions
+                    {
+                        Title = "Krile StarryEyes",
+                        MainIcon = VistaTaskDialogIcon.Error,
+                        MainInstruction = "Krileはすでに起動しています。",
+                        Content = "同じ設定を共有するKrileを多重起動することはできません。",
+                        ExpandedInfo = "Krileを多重起動するためには、krile.exe.configを編集する必要があります。" + Environment.NewLine +
+                        "詳しくは公式ウェブサイト上のFAQを参照してください。",
+                        CommonButtons = TaskDialogCommonButtons.Close
+                    });
+                    Environment.Exit(0);
+                }
             }
 
             #endregion
@@ -240,6 +248,16 @@ namespace StarryEyes
                 Environment.Exit(0);
             }
 
+            if (_requireOptimizeDb)
+            {
+                ShutdownMode = ShutdownMode.OnExplicitShutdown;
+                var dboptwindow = new DatabaseOptimizingWindow();
+                dboptwindow.Show();
+                Task.Run(async () => await Database.VacuumTables()).Wait();
+                dboptwindow.Close();
+                ShutdownMode = ShutdownMode.OnLastWindowClose;
+            }
+
             // initialize subsystems
             StatisticsService.Initialize();
             PostLimitPredictionService.Initialize();
@@ -278,11 +296,12 @@ namespace StarryEyes
                 CommandButtons = new[]
                 {
                     /* 0 */ "このまま起動(&C)",
-                    /* 1 */ "データベースを消去して起動(&D)",
-                    /* 2 */ "すべての設定・データベースを消去して起動(&R)",
-                    /* 3 */ "すべての設定・データベースを消去して終了(&E)",
-                    /* 4 */ "最新版をクリーンインストール(&U)",
-                    /* 5 */ "キャンセル(&X)"
+                    /* 1 */ "データベースを最適化して起動(&O)",
+                    /* 2 */ "データベースを消去して起動(&D)",
+                    /* 3 */ "すべての設定・データベースを消去して起動(&R)",
+                    /* 4 */ "すべての設定・データベースを消去して終了(&E)",
+                    /* 5 */ "最新版をクリーンインストール(&U)",
+                    /* 6 */ "キャンセル(&X)"
                 },
                 FooterIcon = VistaTaskDialogIcon.Information,
                 FooterText = "クリーンインストールを行うと、全ての設定・データベースが消去されます。"
@@ -294,15 +313,19 @@ namespace StarryEyes
             switch (resp.CommandButtonResult.Value)
             {
                 case 1:
+                    // optimize database
+                    _requireOptimizeDb = true;
+                    break;
+                case 2:
                     // remove database
                     if (File.Exists(DatabaseFilePath))
                     {
                         File.Delete(DatabaseFilePath);
                     }
                     break;
-                case 2:
                 case 3:
                 case 4:
+                case 5:
                     // remove all
                     if (ExecutionMode == ExecutionMode.Standalone)
                     {
@@ -329,13 +352,13 @@ namespace StarryEyes
                     }
                     break;
             }
-            if (resp.CommandButtonResult.Value == 4)
+            if (resp.CommandButtonResult.Value == 5)
             {
                 // force update
                 var w = new AwaitDownloadingUpdateWindow();
                 w.ShowDialog();
             }
-            return resp.CommandButtonResult.Value < 3;
+            return resp.CommandButtonResult.Value < 4;
         }
 
         /// <summary>
@@ -794,12 +817,12 @@ namespace StarryEyes
                               currentTheme.GlobalKeyColor = new ThemeColors
                               {
                                   Foreground = Colors.White,
-                                  Background = MetroColors.Emerald
+                                  Background = Color.FromRgb(0x11, 0x11, 0x11),
                               };
                               currentTheme.BaseColor = new ThemeColors
                               {
                                   Foreground = Colors.White,
-                                  Background = Colors.Black
+                                  Background = Color.FromRgb(0x11, 0x11, 0x11),
                               };
                               this.ApplyThemeResource(currentTheme == null
                                   ? null

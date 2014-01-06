@@ -424,7 +424,7 @@ namespace StarryEyes.ViewModels
 
         public double BackgroundImageOpacity
         {
-            get { return (255 - Setting.BackgroundImageTransparency.Value) / 255.0; }
+            get { return (255 - Math.Min(255, Setting.BackgroundImageTransparency.Value)) / 255.0; }
         }
 
         #endregion

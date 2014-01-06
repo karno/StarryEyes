@@ -30,7 +30,7 @@
                       UseLayoutRounding="False"
                       mc:Ignorable="d">
     <controls:MetroWindow.Icon>
-        <DrawingImage RenderOptions.BitmapScalingMode="Fant">
+        <DrawingImage>
             <DrawingImage.Drawing>
                 <DrawingGroup>
                     <DrawingGroup.Children>

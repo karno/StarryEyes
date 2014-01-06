@@ -16,9 +16,6 @@
              mc:Ignorable="d">
     <UserControl.Resources>
         <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/Krile;component/DefaultContextMenus.xaml" />
-            </ResourceDictionary.MergedDictionaries>
             <utils:BooleanToVisibleConverter x:Key="BooleanToVisibleConverter" />
             <utils:BooleanToInvisibleConverter x:Key="BooleanToInvisibleConverter" />
             <utils:NotNullOrEmptyToVisibleConverter x:Key="NotNullOrEmptyToVisibleConverter" />
