@@ -35,12 +35,10 @@ namespace StarryEyes.Models.Receiving.Receivers
         private bool _isEnabled;
         private string[] _trackKeywords = new string[0];
         private UserStreamsConnectionState _state = UserStreamsConnectionState.Disconnected;
+        private readonly StateUpdater _stateUpdater;
 
         private readonly TwitterAccount _account;
         private CompositeDisposable _currentConnection = new CompositeDisposable();
-        private BackOffMode _currentBackOffMode = BackOffMode.None;
-        private long _currentBackOffWaitCount;
-        private int _hardErrorRetryCount;
 
         public event Action StateChanged;
 
@@ -103,6 +101,7 @@ namespace StarryEyes.Models.Receiving.Receivers
 
         public UserStreamsReceiver(TwitterAccount account)
         {
+            this._stateUpdater = new StateUpdater();
             this._account = account;
         }
 
@@ -114,6 +113,7 @@ namespace StarryEyes.Models.Receiving.Receivers
                 this.Disconnect();
                 return;
             }
+            this._stateUpdater.UpdateState(_account.UnreliableScreenName + ": User Streamsを再接続しています...");
             Debug.WriteLine("*USERSTREAMS* Reconnecting " + _account.UnreliableScreenName + " ...");
             this.CleanupConnection();
             Task.Run(() => this._currentConnection.Add(this.ConnectCore()));
@@ -128,7 +128,7 @@ namespace StarryEyes.Models.Receiving.Receivers
         private void CleanupConnection()
         {
             Interlocked.Exchange(ref this._currentConnection, new CompositeDisposable())
-                .Dispose();
+                       .Dispose();
         }
 
         private IDisposable ConnectCore()
@@ -142,11 +142,12 @@ namespace StarryEyes.Models.Receiving.Receivers
                           {
                               if (this.ConnectionState != UserStreamsConnectionState.Connecting) return;
                               this.ConnectionState = UserStreamsConnectionState.Connected;
-                              this._currentBackOffMode = BackOffMode.None;
+                              this.ResetErrorParams();
                           })
                           .SubscribeWithHandler(new HandleStreams(this),
                                                 this.HandleException,
                                                 this.Reconnect);
+            _stateUpdater.UpdateState();
             return con;
         }
 
@@ -266,6 +267,17 @@ namespace StarryEyes.Models.Receiving.Receivers
 
         #region Error handlers
 
+        private BackOffMode _currentBackOffMode = BackOffMode.None;
+        private long _currentBackOffWaitCount;
+        private int _hardErrorRetryCount;
+
+        private void ResetErrorParams()
+        {
+            this._currentBackOffMode = BackOffMode.None;
+            this._currentBackOffWaitCount = 0;
+            this._hardErrorRetryCount = 0;
+        }
+
         private void HandleException(Exception ex)
         {
             Debug.WriteLine("*USERSTREAMS* catch exception: " + ex.Message);
@@ -274,6 +286,7 @@ namespace StarryEyes.Models.Receiving.Receivers
             var tae = ex as TwitterApiException;
             if (tae != null)
             {
+                _stateUpdater.UpdateState(_account.UnreliableScreenName + ": User Streamsが切断されました(コード: " + (int)tae.StatusCode + ")");
                 switch (tae.StatusCode)
                 {
                     case HttpStatusCode.Unauthorized:
@@ -324,6 +337,7 @@ namespace StarryEyes.Models.Receiving.Receivers
                 else
                 {
                     this._currentBackOffWaitCount = 5000;
+                    this._currentBackOffMode = BackOffMode.ProtocolError;
                 }
                 // max wait is 320 sec.
                 if (this._currentBackOffWaitCount >= 320000)
@@ -331,6 +345,7 @@ namespace StarryEyes.Models.Receiving.Receivers
                     this.RaiseDisconnectedByError(
                         "Twitterが不安定な状態になっています。",
                         "プロトコル エラーにより、ユーザーストリームに既定のリトライ回数内で接続できませんでした。");
+                    _stateUpdater.UpdateState(_account.UnreliableScreenName + ": User Streamsへ接続できませんでした(プロトコル エラー)");
                     return;
                 }
             }
@@ -347,6 +362,7 @@ namespace StarryEyes.Models.Receiving.Receivers
                 {
                     // wait starts 250ms
                     this._currentBackOffWaitCount = 250;
+                    this._currentBackOffMode = BackOffMode.NetworkError;
                 }
                 // max wait is 16 sec.
                 if (this._currentBackOffWaitCount >= 16000)
@@ -354,12 +370,14 @@ namespace StarryEyes.Models.Receiving.Receivers
                     this.RaiseDisconnectedByError(
                         "Twitterが不安定な状態になっています。",
                         "ネットワーク エラーにより、ユーザーストリームに規定のリトライ回数内で接続できませんでした。");
+                    _stateUpdater.UpdateState(_account.UnreliableScreenName + ": User Streamsへ接続できませんでした(ネットワーク エラー)");
                     return;
                 }
             }
             Debug.WriteLine("*** USER STREAMS error ***" + Environment.NewLine + ex);
             Debug.WriteLine(" -> reconnect.");
             // parsing error, auto-reconnect
+            _stateUpdater.UpdateState(_account.UnreliableScreenName + ": User Streamsへの再接続を試みています...(" + _currentBackOffWaitCount + " msec 待機しています)");
             this._currentConnection.Add(
                 Observable.Timer(TimeSpan.FromMilliseconds(this._currentBackOffWaitCount))
                           .Subscribe(_ => this.Reconnect()));

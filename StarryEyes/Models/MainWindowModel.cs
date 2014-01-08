@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Subjects;
+using System.Threading;
 using StarryEyes.Albireo;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Timelines.Tabs;
@@ -182,6 +183,25 @@ namespace StarryEyes.Models
         }
     }
 
+    public class StateUpdater
+    {
+        private IDisposable _disposable;
+
+        public void UpdateState(string status = null)
+        {
+            IDisposable nd = null;
+            if (!String.IsNullOrEmpty(status))
+            {
+                nd = MainWindowModel.SetState(status);
+            }
+            var pd = Interlocked.Exchange(ref _disposable, nd);
+            if (pd != null)
+            {
+                pd.Dispose();
+            }
+        }
+    }
+
     public class AccountSelectDescription
     {
         public AccountSelectionAction AccountSelectionAction { get; set; }
@@ -190,7 +210,6 @@ namespace StarryEyes.Models
 
         public Action<IEnumerable<TwitterAccount>> Callback { get; set; }
     }
-
 
     public enum AccountSelectionAction
     {
