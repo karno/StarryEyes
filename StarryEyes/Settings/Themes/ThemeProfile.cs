@@ -2,6 +2,7 @@
 using System.IO;
 using System.Runtime.Serialization;
 using System.Windows;
+using System.Windows.Media;
 using System.Xml;
 using StarryEyes.Annotations;
 
@@ -13,6 +14,17 @@ namespace StarryEyes.Settings.Themes
     [DataContract]
     public class ThemeProfile : ICloneable
     {
+        #region Serialization properties
+
+        [DataMember(Name = "GlobalKeyColor")]
+        private string GlobalKeyColorString
+        {
+            get { return this.GlobalKeyColor.ToColorString(); }
+            set { this.GlobalKeyColor = value.ToColor(); }
+        }
+
+        #endregion
+
         private FontTheme _globalFont;
         private UserFlipTheme _userFlipColor;
         private TabTheme _tabColor;
@@ -89,11 +101,16 @@ namespace StarryEyes.Settings.Themes
         public ThemeColors BaseColor { get; set; }
 
         /// <summary>
-        /// Global key color(one-point color)<para />
-        /// Sometimes use this colors conversely. (e.g. Window title bar)
+        /// Global key colors (one-point color)
+        /// </summary>
+        [IgnoreDataMember]
+        public Color GlobalKeyColor { get; set; }
+
+        /// <summary>
+        /// Colors for title bar.
         /// </summary>
         [DataMember]
-        public ThemeColors GlobalKeyColor { get; set; }
+        public ThemeColors TitleBarColor { get; set; }
 
         /// <summary>
         /// Backstage background/foreground color
@@ -174,6 +191,7 @@ namespace StarryEyes.Settings.Themes
             GlobalFont.ConfigureResourceDictionary(dict, "Font");
             BaseColor.ConfigureResourceDictionary(dict, "BaseColor");
             GlobalKeyColor.ConfigureResourceDictionary(dict, "GlobalKey");
+            TitleBarColor.ConfigureResourceDictionary(dict, "TitleBar");
             BackstageColor.ConfigureResourceDictionary(dict, "Backstage");
             AccountSelectionFlipColor.ConfigureResourceDictionary(dict, "AccountSelectionFlip");
             SearchFlipColor.ConfigureResourceDictionary(dict, "SearchFlip");
@@ -200,6 +218,7 @@ namespace StarryEyes.Settings.Themes
                 GlobalFont = this.GlobalFont.Clone(),
                 BaseColor = BaseColor,
                 GlobalKeyColor = GlobalKeyColor,
+                TitleBarColor = TitleBarColor,
                 BackstageColor = BackstageColor,
                 AccountSelectionFlipColor = AccountSelectionFlipColor,
                 SearchFlipColor = SearchFlipColor.Clone(),

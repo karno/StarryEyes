@@ -796,6 +796,8 @@ namespace StarryEyes
 
         private ResourceDictionary _prevThemeDict;
 
+        //#define THEME_TEST
+
         private void InitializeTheme()
         {
             ThemeManager.ThemeChanged += this.OnThemeChanged;
@@ -807,14 +809,14 @@ namespace StarryEyes
             // initialization call
             OnThemeChanged();
             // TODO: below codes are reserved for debugging
-            /*
+#if THEME_TEST
                 Observable.Timer(TimeSpan.FromSeconds(10))
                           .ObserveOnDispatcher()
                           .Subscribe(s =>
                           {
                               // apply new one
                               var currentTheme = ThemeManager.CurrentTheme;
-                              currentTheme.GlobalKeyColor = new ThemeColors
+                              currentTheme.TitleBarColor = new ThemeColors
                               {
                                   Foreground = Colors.White,
                                   Background = Color.FromRgb(0x11, 0x11, 0x11),
@@ -828,7 +830,8 @@ namespace StarryEyes
                                   ? null
                                   : currentTheme.CreateResourceDictionary());
                           });
-            */
+#endif
+
         }
 
         /// <summary>

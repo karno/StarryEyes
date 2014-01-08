@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Windows.Media;
 using StarryEyes.Views;
 
@@ -29,7 +30,9 @@ namespace StarryEyes.Settings.Themes
                 Foreground = Colors.Black
             };
 
-            profile.GlobalKeyColor = new ThemeColors
+            profile.GlobalKeyColor = MetroColors.Cyan;
+
+            profile.TitleBarColor = new ThemeColors
             {
                 Background = MetroColors.Cyan,
                 Foreground = Colors.White,
@@ -197,6 +200,42 @@ namespace StarryEyes.Settings.Themes
                 MentionButton = dc,
                 DeleteButton = dc
             };
+        }
+
+        private const string ResourceDictionaryStart =
+            "<ResourceDictionary xmlns=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\" xmlns:x=\"http://schemas.microsoft.com/winfx/2006/xaml\">";
+
+        private const string ResourceDictionaryEnd = "</ResourceDictionary>";
+
+        public static string GetDefaultAsXaml()
+        {
+            var dp = GetDefault();
+            var rd = dp.CreateResourceDictionary();
+            // create resource dictionary
+            var content = rd.Keys.OfType<string>()
+                            .OrderBy(s => s)
+                            .Select(s =>
+                            {
+                                var res = rd[s];
+                                if (res is SolidColorBrush)
+                                {
+                                    return "<SolidColorBrush x:Key=\"" + s + "\">" +
+                                           ((SolidColorBrush)res).Color.ToColorString() +
+                                           "</SolidColorBrush>";
+                                }
+                                if (res is Color)
+                                {
+                                    return "<Color x:Key=\"" + s + "\">" +
+                                           ((Color)res).ToColorString() +
+                                           "</Color>";
+                                }
+                                return String.Empty;
+                            })
+                            .Where(s => !String.IsNullOrEmpty(s))
+                            .JoinString(Environment.NewLine);
+            return ResourceDictionaryStart + Environment.NewLine +
+                   content + Environment.NewLine +
+                   ResourceDictionaryEnd;
         }
     }
 }

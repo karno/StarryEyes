@@ -34,9 +34,9 @@
     <SolidColorBrush x:Key="CheckBoxBrush" Color="{DynamicResource BaseColorForeground}" />
 
     <!--  Window highlights  -->
-    <SolidColorBrush x:Key="AccentColorBrush" Color="{DynamicResource GlobalKeyBackground}" />
-    <SolidColorBrush x:Key="WindowTitleColorBrush" Color="{DynamicResource GlobalKeyBackground}" />
-    <SolidColorBrush x:Key="HighlightBrush" Color="{DynamicResource GlobalKeyBackground}" />
+    <SolidColorBrush x:Key="AccentColorBrush" Color="{DynamicResource GlobalKey}" />
+    <SolidColorBrush x:Key="HighlightBrush" Color="{DynamicResource GlobalKey}" />
+    <SolidColorBrush x:Key="WindowTitleColorBrush" Color="{DynamicResource TitleBarBackground}" />
 
     <!--  override WPF default values  -->
     <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="{DynamicResource BaseColorBackground}" />
