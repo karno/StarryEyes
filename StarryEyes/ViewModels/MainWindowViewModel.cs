@@ -136,16 +136,12 @@ namespace StarryEyes.ViewModels
                     h => MainWindowModel.BackstageTransitionRequested += h,
                     h => MainWindowModel.BackstageTransitionRequested -= h)
                 .Subscribe(this.TransitionBackstage));
-            CompositeDisposable.Add(Observable
-                .FromEvent<string>(
-                    h => Setting.BackgroundImagePath.ValueChanged += h,
-                    h => Setting.BackgroundImagePath.ValueChanged -= h)
-                .Subscribe(_ => RaisePropertyChanged(() => this.BackgroundImageUri)));
-            CompositeDisposable.Add(Observable
-                .FromEvent<int>(
-                    h => Setting.BackgroundImageTransparency.ValueChanged += h,
-                    h => Setting.BackgroundImageTransparency.ValueChanged -= h)
-                .Subscribe(_ => RaisePropertyChanged(() => this.BackgroundImageOpacity)));
+            CompositeDisposable.Add(Setting.BackgroundImagePath.ListenValueChanged(
+                _ => RaisePropertyChanged(() => BackgroundImageUri)));
+            CompositeDisposable.Add(Setting.BackgroundImageTransparency.ListenValueChanged(
+                _ => RaisePropertyChanged(() => BackgroundImageOpacity)));
+            CompositeDisposable.Add(Setting.RotateWindowContent.ListenValueChanged(
+                _ => RaisePropertyChanged(() => RotateWindowContent)));
             this._backstageViewModel.Initialize();
         }
 
@@ -425,6 +421,11 @@ namespace StarryEyes.ViewModels
         public double BackgroundImageOpacity
         {
             get { return (255 - Math.Min(255, Setting.BackgroundImageTransparency.Value)) / 255.0; }
+        }
+
+        public bool RotateWindowContent
+        {
+            get { return Setting.RotateWindowContent.Value; }
         }
 
         #endregion

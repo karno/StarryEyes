@@ -604,6 +604,9 @@
                         <CheckBox Margin="0,8"
                                   Content="開発用フォルダからプラグインをロード(_D)"
                                   IsChecked="{Binding LoadPluginFromDevFolder}" />
+                        <CheckBox Margin="0,8"
+                                  Content="タイムラインを反転し、投稿欄を下に移動する"
+                                  IsChecked="{Binding RotateWindowContent}" />
                         <DockPanel Margin="0,8" LastChildFill="False">
                             <TextBlock VerticalAlignment="Center" Text="イベント表示時間: " />
                             <TextBlock Margin="4,0"

@@ -563,6 +563,12 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             set { Setting.LoadPluginFromDevFolder.Value = value; }
         }
 
+        public bool RotateWindowContent
+        {
+            get { return Setting.RotateWindowContent.Value; }
+            set { Setting.RotateWindowContent.Value = value; }
+        }
+
         public int EventDisplayMinimumMillisec
         {
             get { return Setting.EventDisplayMinimumMSec.Value; }
