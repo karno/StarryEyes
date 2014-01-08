@@ -52,7 +52,7 @@
                             <MenuItem Header="返信(_M)" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToInvisibleConverter}}">
                                 <i:Interaction.Triggers>
                                     <i:EventTrigger EventName="Click">
-                                        <ei:CallMethodAction MethodName="Reply" TargetObject="{Binding}" />
+                                        <ei:CallMethodAction MethodName="SendReplyOrDirectMessage" TargetObject="{Binding}" />
                                     </i:EventTrigger>
                                 </i:Interaction.Triggers>
                             </MenuItem>
@@ -1080,7 +1080,7 @@
                                                     ToolTip="このツイートに返信">
                                                 <i:Interaction.Triggers>
                                                     <i:EventTrigger EventName="Click">
-                                                        <ei:CallMethodAction MethodName="SendReply" TargetObject="{Binding Mode=OneTime}" />
+                                                        <ei:CallMethodAction MethodName="SendReplyOrDirectMessage" TargetObject="{Binding Mode=OneTime}" />
                                                     </i:EventTrigger>
                                                 </i:Interaction.Triggers>
                                                 <Path Width="12"

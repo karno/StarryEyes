@@ -136,7 +136,7 @@ namespace StarryEyes.ViewModels.WindowParts
                 KeyAssignAction.Create("MuteClient", () => ExecuteStatusAction(s => s.MuteClient())),
                 KeyAssignAction.Create("ReportAsSpam", () => ExecuteStatusAction(s => s.ReportAsSpam())),
                 KeyAssignAction.Create("GiveTrophy", () => ExecuteStatusAction(s => s.GiveFavstarTrophy())),
-                KeyAssignAction.CreateWithArgumentOptional("Reply", a => this.ExecuteStatusAction(s => s.Reply(a))),
+                KeyAssignAction.CreateWithArgumentOptional("Reply", a => this.ExecuteStatusAction(s => s.SendReplyOrDirectMessage(a))),
                 KeyAssignAction.CreateWithArgumentRequired("OpenUrl",
                                                            a => this.ExecuteStatusAction(s => s.OpenNthLink(a)))
                 );

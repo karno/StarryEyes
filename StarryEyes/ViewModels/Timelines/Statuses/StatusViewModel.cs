@@ -870,7 +870,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                 });
         }
 
-        public void SendReply()
+        public void SendReplyOrDirectMessage()
         {
             if (this.Status.StatusType == StatusType.DirectMessage)
             {
@@ -882,59 +882,71 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             }
         }
 
-        public void Reply()
+        public void SendReplyOrDirectMessage(string body)
         {
-            if (this.IsSelected)
+            if (this.Status.StatusType == StatusType.DirectMessage)
             {
-                this.Parent.ReplySelecteds();
+                this.DirectMessage(body);
             }
             else
             {
-                // except my names and the user name of main target
-                var excepts = this.Model.GetSuitableReplyAccount()
-                                  .Guard()
-                                  .Select(a => a.UnreliableScreenName)
-                                  .Append(this.User.ScreenName);
-                // reply to all users
-                var users = this.Status.Entities
-                                .Where(e => e.EntityType == EntityType.UserMentions)
-                                .Select(e => e.DisplayText)
-                                .Except(excepts)
-                                .Distinct()
-                                .Select(s => "@" + s + " ")
-                                .JoinString("");
-                InputAreaModel.SetText(this.Model.GetSuitableReplyAccount(),
-                                       "@" + this.User.ScreenName + " " + users,
-                                       new CursorPosition(this.User.ScreenName.Length + 2, users.Length),
-                                       this.Status);
+                this.Reply(body);
             }
         }
 
-        public void Reply(string txt)
+        private void Reply()
         {
-            // from key assign
-            if (String.IsNullOrEmpty(txt))
+            if (IsDirectMessage)
             {
-                if (IsDirectMessage)
-                {
-                    this.DirectMessage();
-                }
-                else
-                {
-                    this.Reply();
-                }
+                this.DirectMessage();
                 return;
             }
-            if (IsDirectMessage) return;
+            if (this.IsSelected)
+            {
+                this.Parent.ReplySelecteds();
+                return;
+            }
+            // except my names and the user name of main target
+            var excepts = this.Model.GetSuitableReplyAccount()
+                              .Guard()
+                              .Select(a => a.UnreliableScreenName)
+                              .Append(this.User.ScreenName);
+            // reply to all users
+            var users = this.Status.Entities
+                            .Where(e => e.EntityType == EntityType.UserMentions)
+                            .Select(e => e.DisplayText)
+                            .Except(excepts)
+                            .Distinct()
+                            .Select(s => "@" + s + " ")
+                            .JoinString("");
+            InputAreaModel.SetText(this.Model.GetSuitableReplyAccount(),
+                "@" + this.User.ScreenName + " " + users,
+                new CursorPosition(this.User.ScreenName.Length + 2, users.Length),
+                this.Status);
+        }
+
+        private void Reply(string body)
+        {
+            if (IsDirectMessage)
+            {
+                this.DirectMessage(body);
+                return;
+            }
+            // from key assign
+            if (String.IsNullOrEmpty(body))
+            {
+                this.Reply();
+                return;
+            }
             try
             {
-                var formatted = String.Format(txt, this.User.ScreenName, this.User.Name);
+                var formatted = String.Format(body, this.User.ScreenName, this.User.Name);
                 InputAreaModel.SetText(this.Model.GetSuitableReplyAccount(),
                                        formatted, inReplyTo: this.Status);
             }
             catch (Exception ex)
             {
-                BackstageModel.RegisterEvent(new OperationFailedEvent("返信フォーマット エラー(フォーマット: " + txt + ")", ex));
+                BackstageModel.RegisterEvent(new OperationFailedEvent("返信フォーマット エラー(フォーマット: " + body + ")", ex));
             }
         }
 
@@ -952,6 +964,12 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         public void DirectMessage()
         {
             InputAreaModel.SetDirectMessage(this.Model.GetSuitableReplyAccount(), this.Status.User);
+        }
+
+        public void DirectMessage(string body)
+        {
+            var formatted = String.Format(body, this.User.ScreenName, this.User.Name);
+            InputAreaModel.SetDirectMessage(this.Model.GetSuitableReplyAccount(), this.Status.User, formatted);
         }
 
         public void ConfirmDelete()

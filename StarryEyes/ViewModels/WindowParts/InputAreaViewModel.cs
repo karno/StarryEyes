@@ -182,13 +182,13 @@ namespace StarryEyes.ViewModels.WindowParts
                     }));
 
             CompositeDisposable.Add(
-                new EventListener<Action<IEnumerable<TwitterAccount>, TwitterUser>>(
+                new EventListener<Action<IEnumerable<TwitterAccount>, TwitterUser, string>>(
                     _ => InputAreaModel.SendDirectMessageRequested += _,
                     _ => InputAreaModel.SendDirectMessageRequested -= _,
-                    (infos, user) =>
+                    (infos, user, body) =>
                     {
                         OpenInput(false);
-                        CheckClearInput();
+                        if (!CheckClearInput(body)) return;
                         OverrideSelectedAccounts(infos);
                         DirectMessageTo = new UserViewModel(user);
                     }));
