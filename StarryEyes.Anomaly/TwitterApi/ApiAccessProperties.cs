@@ -5,7 +5,7 @@ namespace StarryEyes.Anomaly.TwitterApi
     public static class ApiAccessProperties
     {
         private const string DefaultApiEndpoint = "https://api.twitter.com/1.1/";
-        private const string DefaultUserAgent = "Krile/3.x (Windows;.NET Framework 4.5);SarryEyes.Anomaly;AsyncOAuth";
+        private const string DefaultUserAgent = "Krile/StarryEyes (Windows;.NET Framework 4.5) - SarryEyes.Anomaly with AsyncOAuth";
         private const int DefaultStreamTimeoutSec = 90;
 
         private static string _apiEndpoint;

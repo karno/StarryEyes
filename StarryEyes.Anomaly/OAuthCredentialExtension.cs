@@ -12,6 +12,8 @@ namespace StarryEyes.Anomaly
 {
     public static class OAuthCredentialExtension
     {
+        private const string UserAgentHeader = "User-Agent";
+
         public static HttpClient CreateOAuthClient(
             this IOAuthCredential credential,
             IEnumerable<KeyValuePair<string, string>> optionalHeaders = null,
@@ -22,7 +24,8 @@ namespace StarryEyes.Anomaly
                     GetInnerHandler(useGZip),
                     credential.OAuthConsumerKey, credential.OAuthConsumerSecret,
                     new AccessToken(credential.OAuthAccessToken, credential.OAuthAccessTokenSecret),
-                    optionalHeaders));
+                    optionalHeaders))
+                .SetUserAgent(ApiAccessProperties.UserAgent);
         }
 
         public static HttpClient CreateOAuthEchoClient(
@@ -36,7 +39,16 @@ namespace StarryEyes.Anomaly
                     GetInnerHandler(useGZip),
                     serviceProvider, realm, credential.OAuthConsumerKey, credential.OAuthConsumerSecret,
                     new AccessToken(credential.OAuthAccessToken, credential.OAuthAccessTokenSecret),
-                    optionalHeaders));
+                    optionalHeaders))
+                    .SetUserAgent(ApiAccessProperties.UserAgent);
+        }
+
+        public static HttpClient SetUserAgent(this HttpClient client, string userAgent)
+        {
+            // remove before add user agent
+            client.DefaultRequestHeaders.Remove(UserAgentHeader);
+            client.DefaultRequestHeaders.Add(UserAgentHeader, userAgent);
+            return client;
         }
 
         private static HttpMessageHandler GetInnerHandler(bool useGZip)

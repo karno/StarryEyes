@@ -167,7 +167,7 @@ namespace StarryEyes.Settings
                     new SettingItemStruct<bool>("AcceptUnstableVersion", App.IsUnstableVersion);
 
         public static readonly SettingItem<string> UserAgent =
-            new SettingItem<string>("UserAgent", "Krile StarryEyes/Breezy TL with ReactiveOAuth");
+            new SettingItem<string>("UserAgent", null);
 
         #region Web proxy configuration
 
