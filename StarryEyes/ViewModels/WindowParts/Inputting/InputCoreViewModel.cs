@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Device.Location;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
@@ -34,6 +35,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
         private readonly InputAreaSuggestItemProvider _provider;
 
         private GeoCoordinateWatcher _geoWatcher;
+        private ClipboardWatcher _watcher;
         private UserViewModel _recipientViewModel;
         private InReplyToStatusViewModel _inReplyToViewModelCache;
         private bool _isLocationEnabled;
@@ -75,6 +77,9 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                                             RaisePropertyChanged(() => DraftCount);
                                             RaisePropertyChanged(() => IsDraftsExisted);
                                         }));
+            CompositeDisposable.Add(_watcher = new ClipboardWatcher());
+            _watcher.ClipboardChanged += (o, e) => RaisePropertyChanged(() => IsClipboardContentImage);
+            _watcher.StartWatching();
             Setting.DisableGeoLocationService.ValueChanged += this.UpdateGeoLocationService;
             this.UpdateGeoLocationService(Setting.DisableGeoLocationService.Value);
         }
@@ -506,13 +511,42 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                 MultiSelect = false,
                 Title = "添付する画像ファイルを指定"
             };
-            var m = _parent.Messenger.GetResponse(msg);
-            if (m.Response == null || m.Response.Length <= 0 || String.IsNullOrEmpty(m.Response[0]) ||
-                !File.Exists(m.Response[0])) return;
+            var m = Messenger.GetResponse(msg);
+            if (m.Response == null || m.Response.Length <= 0 ||
+                String.IsNullOrEmpty(m.Response[0]) || !File.Exists(m.Response[0]))
+            {
+                return;
+            }
+
+            Setting.LastImageOpenDir.Value = Path.GetDirectoryName(m.Response[0]);
+            AttachImageFromPath(m.Response[0]);
+        }
+
+        public void DetachImage()
+        {
+            AttachedImage = null;
+        }
+
+        public void AttachClipboardImage()
+        {
+            BitmapSource image;
+            if (!Clipboard.ContainsImage() || (image = Clipboard.GetImage()) == null) return;
+            var tempPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName() + ".png");
+            using (var fs = new FileStream(tempPath, FileMode.Create))
+            {
+                var encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(image));
+                encoder.Save(fs);
+            }
+            AttachImageFromPath(tempPath);
+        }
+
+        private bool AttachImageFromPath(string file)
+        {
             try
             {
-                AttachedImage = new ImageDescriptionViewModel(m.Response[0]);
-                Setting.LastImageOpenDir.Value = Path.GetDirectoryName(m.Response[0]);
+                AttachedImage = new ImageDescriptionViewModel(file);
+                return true;
             }
             catch (Exception ex)
             {
@@ -527,12 +561,33 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                     CommonButtons = TaskDialogCommonButtons.Close,
                 }));
                 AttachedImage = null;
+                return false;
             }
         }
 
-        public void DetachImage()
+        public void StartSnippingTool()
         {
-            AttachedImage = null;
+            try
+            {
+                Process.Start("SnippingTool.exe");
+            }
+            catch (Exception ex)
+            {
+                this.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
+                {
+                    Title = "エラー",
+                    MainIcon = VistaTaskDialogIcon.Error,
+                    MainInstruction = "Snipping Toolの起動に失敗しました。",
+                    Content = "スタートメニューからの起動を試してみてください。",
+                    ExpandedInfo = ex.ToString(),
+                    CommonButtons = TaskDialogCommonButtons.Close
+                }));
+            }
+        }
+
+        public bool IsClipboardContentImage
+        {
+            get { return Clipboard.ContainsImage(); }
         }
 
         private DropAcceptDescription _description;
