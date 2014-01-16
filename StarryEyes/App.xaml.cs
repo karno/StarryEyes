@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Configuration;
-using System.Data.SQLite;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -132,6 +131,20 @@ namespace StarryEyes
             Current.DispatcherUnhandledException += (sender2, e2) => HandleException(e2.Exception);
             AppDomain.CurrentDomain.UnhandledException += (sender2, e2) => HandleException(e2.ExceptionObject as Exception);
 
+            #region crash handler
+
+            if (File.Exists(LockFilePath))
+            {
+                if (!ShowRescueDialog())
+                {
+                    Environment.Exit(0);
+                }
+            }
+
+            File.WriteAllText(LockFilePath, DateTime.Now.ToLongTimeString());
+
+            #endregion
+
             #region clean up update binary
             if (e.Args.Select(a => a.ToLower()).Contains("-postupdate"))
             {
@@ -145,7 +158,7 @@ namespace StarryEyes
 
             if (e.Args.Select(a => a.ToLower()).Contains("-maintenance"))
             {
-                if (!this.ShowPreExecuteDialog())
+                if (!ShowMaintenanceDialog())
                 {
                     Environment.Exit(0);
                 }
@@ -190,29 +203,6 @@ namespace StarryEyes
                 // fail loading settings
                 Current.Shutdown();
                 Environment.Exit(0);
-            }
-
-            if (Setting.DatabaseErrorOccured.Value)
-            {
-                var result = TaskDialog.Show(new TaskDialogOptions
-                {
-                    Title = "データベース エラーの検出",
-                    MainIcon = VistaTaskDialogIcon.Warning,
-                    MainInstruction = "データベースでエラーが検出されています。",
-                    Content = "データベースを初期化するまでエラーが継続することがあります。" + Environment.NewLine +
-                              "何度起動しても落ちてしまう場合、データベースを削除すると改善することがあります。。" + Environment.NewLine +
-                              "データベースを初期化しますか？",
-                    CommonButtons = TaskDialogCommonButtons.YesNo,
-                    DefaultButtonIndex = 1
-                });
-                if (result.Result == TaskDialogSimpleResult.Yes)
-                {
-                    if (File.Exists(DatabaseFilePath))
-                    {
-                        File.Delete(DatabaseFilePath);
-                    }
-                }
-                Setting.DatabaseErrorOccured.Value = false;
             }
 
             #region Execute update
@@ -282,10 +272,43 @@ namespace StarryEyes
         }
 
         /// <summary>
-        /// Show pre-execute option dialog (TaskDialog)
+        /// Show rescue option dialog (TaskDialog)
         /// </summary>
         /// <returns>when returning false, should abort execution</returns>
-        private bool ShowPreExecuteDialog()
+        private bool ShowRescueDialog()
+        {
+            var resp = TaskDialog.Show(new TaskDialogOptions
+            {
+                Title = "Krileの回復",
+                MainIcon = VistaTaskDialogIcon.Error,
+                MainInstruction = "Krileは正しく終了しませんでした。",
+                Content = "一時的な問題である場合は、このまま起動を継続できます。" + Environment.NewLine +
+                "問題が継続して発生する場合は、データベースファイルの削除などを行うと回復することがあります。" + Environment.NewLine +
+                "データベースや設定の削除、クリーンインストールなどを行うには「メンテナンスダイアログを表示」を選択してください。" + Environment.NewLine +
+                "バックアップなどを取得するためにこのままKrileを終了する場合は「起動せずにKrileを終了」を選択してください。",
+                CommandButtons = new[]
+                {
+                    /* 0 */ "このまま起動(&C)",
+                    /* 1 */ "メンテナンスダイアログを表示(&M)",
+                    /* 2 */ "起動せずにKrileを終了(&X)"
+                },
+            });
+            if (!resp.CommandButtonResult.HasValue || resp.CommandButtonResult.Value == 2)
+            {
+                return false;
+            }
+            if (resp.CommandButtonResult.Value == 0)
+            {
+                return true;
+            }
+            return ShowMaintenanceDialog();
+        }
+
+        /// <summary>
+        /// Show maintenance option dialog (TaskDialog)
+        /// </summary>
+        /// <returns>when returning false, should abort execution</returns>
+        private bool ShowMaintenanceDialog()
         {
             var resp = TaskDialog.Show(new TaskDialogOptions
             {
@@ -411,13 +434,6 @@ namespace StarryEyes
             try
             {
                 var aex = ex as AggregateException;
-                if (ex is SQLiteException || (aex != null && aex.InnerExceptions.Any(ie => ie is SQLiteException)) ||
-                    ex.Message.Contains("database disk image is malformed"))
-                {
-                    // database error
-                    Setting.DatabaseErrorOccured.Value = true;
-                }
-
                 if (ex.Message.Contains("8007007e") &&
                     ex.Message.Contains("CLSID {E5B8E079-EE6D-4E33-A438-C87F2E959254}"))
                 {
@@ -627,6 +643,12 @@ namespace StarryEyes
             get { return Path.Combine(DatabaseDirectoryPath, DatabaseFileName); }
         }
 
+        [NotNull]
+        public static string LockFilePath
+        {
+            get { return Path.Combine(ConfigurationDirectoryPath, LockFileName); }
+        }
+
         public static string LocalUpdateStorePath
         {
             get { return Path.Combine(ConfigurationDirectoryPath, LocalUpdateStoreDirName); }
@@ -676,6 +698,8 @@ namespace StarryEyes
         public static readonly uint LeastDesktopHeapSize = 12 * 1024;
 
         public static readonly string DatabaseFileName = "krile.db";
+
+        public static readonly string LockFileName = "krile.lock";
 
         public static readonly string KeyAssignProfilesDirectory = "assigns";
 
@@ -771,6 +795,8 @@ namespace StarryEyes
         internal static void RaiseApplicationExit()
         {
             Debug.WriteLine("# App exit.");
+            // reset continual crash counter
+            File.Delete(LockFilePath);
             var apx = ApplicationExit;
             ApplicationExit = null;
             if (apx != null)
