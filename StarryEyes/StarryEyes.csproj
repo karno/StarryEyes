@@ -177,6 +177,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AppInitializer.cs" />
     <Compile Include="Filters\Expressions\Operators\OperatorStrings.cs" />
     <Compile Include="Filters\Expressions\Values\Users\Booleans.cs" />
     <Compile Include="Filters\Expressions\Values\Users\Complexes.cs" />

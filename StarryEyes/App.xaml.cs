@@ -3,25 +3,14 @@ using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Reflection;
-using System.Runtime;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
-using Livet;
 using StarryEyes.Annotations;
 using StarryEyes.Casket;
-using StarryEyes.Models;
-using StarryEyes.Models.Plugins;
-using StarryEyes.Models.Receiving;
-using StarryEyes.Models.Receiving.Handling;
-using StarryEyes.Models.Stores;
-using StarryEyes.Models.Subsystems;
 using StarryEyes.Nightmare.Windows;
-using StarryEyes.Plugins;
 using StarryEyes.Settings;
 using StarryEyes.Views.Dialogs;
 using ThemeManager = StarryEyes.Settings.ThemeManager;
@@ -46,127 +35,12 @@ namespace StarryEyes
         {
             _startupTime = DateTime.Now;
 
-            #region initialize configuration directory
+            // create default theme xaml
+            // File.WriteAllText("default.xaml", DefaultThemeProvider.GetDefaultAsXaml());
+            // Environment.Exit(0);
 
-            // create data-store directory
-            try
-            {
-                Directory.CreateDirectory(ConfigurationDirectoryPath);
-            }
-            catch (Exception ex)
-            {
-                TaskDialog.Show(new TaskDialogOptions
-                {
-                    Title = "Krile StarryEyes",
-                    MainIcon = VistaTaskDialogIcon.Error,
-                    MainInstruction = "Krileの起動に失敗しました。",
-                    Content = "設定を保持するディレクトリを作成できません。",
-                    ExpandedInfo = ex.ToString(),
-                    CommonButtons = TaskDialogCommonButtons.Close,
-                    FooterIcon = VistaTaskDialogIcon.Information,
-                    FooterText = "別の場所への配置を試みてください。"
-                });
-                Environment.Exit(-1);
-            }
-
-            // enable multi-core JIT.
-            // see reference: http://msdn.microsoft.com/en-us/library/system.runtime.profileoptimization.aspx
-            if (IsMulticoreJitEnabled && !(e.Args.Select(a => a.ToLower()).Contains("-maintenance")))
-            {
-                ProfileOptimization.SetProfileRoot(ConfigurationDirectoryPath);
-                ProfileOptimization.StartProfile(ProfileFileName);
-            }
-
-            // initialize dispatcher helper
-            DispatcherHelper.UIDispatcher = Dispatcher;
-            DispatcherHolder.Initialize(Dispatcher);
-
-            // set rendering mode
-            if (!IsHardwareRenderingEnabled)
-            {
-                System.Windows.Media.RenderOptions.ProcessRenderMode = System.Windows.Interop.RenderMode.SoftwareOnly;
-            }
-
-            #endregion
-
-            #region detect run duplication
-
-            // Check run duplication
-
-            // if Krile started as maintenance mode, skip this check.
-            if (!e.Args.Select(a => a.ToLower()).Contains("-maintenance"))
-            {
-                string mutexStr = null;
-                switch (ExecutionMode)
-                {
-                    case ExecutionMode.Default:
-                    case ExecutionMode.Roaming:
-                        mutexStr = ExecutionMode.ToString();
-                        break;
-                    case ExecutionMode.Standalone:
-                        mutexStr = "Standalone_" + ExeFilePath.Replace('\\', '*');
-                        break;
-                }
-                _appMutex = new Mutex(true, "Krile_StarryEyes_" + mutexStr);
-
-                if (_appMutex.WaitOne(0, false) == false)
-                {
-                    TaskDialog.Show(new TaskDialogOptions
-                    {
-                        Title = "Krile StarryEyes",
-                        MainIcon = VistaTaskDialogIcon.Error,
-                        MainInstruction = "Krileはすでに起動しています。",
-                        Content = "同じ設定を共有するKrileを多重起動することはできません。",
-                        ExpandedInfo = "Krileを多重起動するためには、krile.exe.configを編集する必要があります。" + Environment.NewLine +
-                        "詳しくは公式ウェブサイト上のFAQを参照してください。",
-                        CommonButtons = TaskDialogCommonButtons.Close
-                    });
-                    Environment.Exit(0);
-                }
-            }
-
-            #endregion
-
-            // set exception handlers
-            Current.DispatcherUnhandledException += (sender2, e2) => HandleException(e2.Exception);
-            AppDomain.CurrentDomain.UnhandledException += (sender2, e2) => HandleException(e2.ExceptionObject as Exception);
-
-            #region crash handler
-
-            if (File.Exists(LockFilePath))
-            {
-                if (!ShowRescueDialog())
-                {
-                    Environment.Exit(0);
-                }
-            }
-
-            File.WriteAllText(LockFilePath, DateTime.Now.ToLongTimeString());
-
-            #endregion
-
-            #region clean up update binary
-            if (e.Args.Select(a => a.ToLower()).Contains("-postupdate"))
-            {
-                // remove kup.exe
-                AutoUpdateService.PostUpdate();
-            }
-
-            #endregion
-
-            #region check and show pre-execute dialog
-
-            if (e.Args.Select(a => a.ToLower()).Contains("-maintenance"))
-            {
-                if (!ShowMaintenanceDialog())
-                {
-                    Environment.Exit(0);
-                }
-            }
-
-            #endregion
-
-            #region register core handlers
+            // call pre-initializer
+            AppInitializer.PreInitialize(e);
 
             // set exception handlers
             Current.DispatcherUnhandledException += (sender2, e2) => HandleException(e2.Exception);
@@ -175,61 +49,10 @@ namespace StarryEyes
             // set exit handler
             Current.Exit += (_, __) => AppFinalize(true);
 
-            #endregion
+            // call main initializer
+            AppInitializer.Initialize(e);
 
-            #region initialize web connection parameters
-
-            // initialize service points
-            ServicePointManager.Expect100Continue = false; // disable expect 100 continue for User Streams connection.
-            ServicePointManager.DefaultConnectionLimit = Int32.MaxValue; // Limit Break!
-
-            // declare security protocol explicitly
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3;
-
-            // initialize anomaly core system
-            Anomaly.Core.Initialize();
-
-            #endregion
-
-            // initialize special image handlers
-            SpecialImageResolvers.Initialize();
-
-            // load plugins
-            PluginManager.Load(Path.Combine(ExeFileDir, PluginDirectory));
-
-            // load settings
-            if (!Setting.LoadSettings())
-            {
-                // fail loading settings
-                Current.Shutdown();
-                Environment.Exit(0);
-            }
-
-            #region Execute update
-
-            // requires settings
-            if (AutoUpdateService.IsUpdateBinaryExisted())
-            {
-                // execute update
-                AutoUpdateService.StartUpdate(App.Version);
-                Environment.Exit(0);
-            }
-
-            #endregion
-
-            // set parameters for accessing twitter.
-            Networking.Initialize();
-
-            // load themes
-            ThemeManager.Initialize();
-
-            // load key assigns
-            KeyAssignManager.Initialize();
-
-            // load cache manager
-            CacheStore.Initialize();
-
-            // initialize stores
+            // initialize database
             Database.Initialize(DatabaseFilePath);
             if (!this.CheckDatabase())
             {
@@ -241,148 +64,27 @@ namespace StarryEyes
             if (_requireOptimizeDb)
             {
                 ShutdownMode = ShutdownMode.OnExplicitShutdown;
-                var dboptwindow = new DatabaseOptimizingWindow();
-                dboptwindow.Show();
-                Task.Run(async () => await Database.VacuumTables()).Wait();
-                dboptwindow.Close();
-                ShutdownMode = ShutdownMode.OnLastWindowClose;
+                try
+                {
+                    var dboptwindow = new DatabaseOptimizingWindow();
+                    dboptwindow.ShowDialog();
+                }
+                finally
+                {
+                    ShutdownMode = ShutdownMode.OnLastWindowClose;
+                }
             }
 
-            // initialize subsystems
-            StatisticsService.Initialize();
-            PostLimitPredictionService.Initialize();
-            MuteBlockManager.Initialize();
-            StatusBroadcaster.Initialize();
-            StatusInbox.Initialize();
-            AutoUpdateService.StartSchedule();
-
-            // activate plugins
-            PluginManager.LoadedPlugins.ForEach(p => p.Initialize());
-
-            // activate scripts
-            ScriptingManagerImpl.Initialize();
-
-            // apply theme
+            // Apply theme
             InitializeTheme();
 
-            ReceiveManager.Initialize();
-            TwitterConfigurationService.Initialize();
-            BackstageModel.Initialize();
+            AppInitializer.PostInitialize();
+
+            // initialization completed
             RaiseSystemReady();
         }
 
-        /// <summary>
-        /// Show rescue option dialog (TaskDialog)
-        /// </summary>
-        /// <returns>when returning false, should abort execution</returns>
-        private bool ShowRescueDialog()
-        {
-            var resp = TaskDialog.Show(new TaskDialogOptions
-            {
-                Title = "Krileの回復",
-                MainIcon = VistaTaskDialogIcon.Error,
-                MainInstruction = "Krileは正しく終了しませんでした。",
-                Content = "一時的な問題である場合は、このまま起動を継続できます。" + Environment.NewLine +
-                "問題が継続して発生する場合は、データベースファイルの削除などを行うと回復することがあります。" + Environment.NewLine +
-                "データベースや設定の削除、クリーンインストールなどを行うには「メンテナンスダイアログを表示」を選択してください。" + Environment.NewLine +
-                "バックアップなどを取得するためにこのままKrileを終了する場合は「起動せずにKrileを終了」を選択してください。",
-                CommandButtons = new[]
-                {
-                    /* 0 */ "このまま起動(&C)",
-                    /* 1 */ "メンテナンスダイアログを表示(&M)",
-                    /* 2 */ "起動せずにKrileを終了(&X)"
-                },
-            });
-            if (!resp.CommandButtonResult.HasValue || resp.CommandButtonResult.Value == 2)
-            {
-                return false;
-            }
-            if (resp.CommandButtonResult.Value == 0)
-            {
-                return true;
-            }
-            return ShowMaintenanceDialog();
-        }
-
-        /// <summary>
-        /// Show maintenance option dialog (TaskDialog)
-        /// </summary>
-        /// <returns>when returning false, should abort execution</returns>
-        private bool ShowMaintenanceDialog()
-        {
-            var resp = TaskDialog.Show(new TaskDialogOptions
-            {
-                Title = "Krileのメンテナンス",
-                MainIcon = VistaTaskDialogIcon.Warning,
-                MainInstruction = "Krileが保持するデータを管理できます。",
-                Content = "消去したデータはもとに戻せません。必要なデータは予めバックアップしてください。",
-                CommandButtons = new[]
-                {
-                    /* 0 */ "このまま起動(&C)",
-                    /* 1 */ "データベースを最適化して起動(&O)",
-                    /* 2 */ "データベースを消去して起動(&D)",
-                    /* 3 */ "すべての設定・データベースを消去して起動(&R)",
-                    /* 4 */ "すべての設定・データベースを消去して終了(&E)",
-                    /* 5 */ "最新版をクリーンインストール(&U)",
-                    /* 6 */ "キャンセル(&X)"
-                },
-                FooterIcon = VistaTaskDialogIcon.Information,
-                FooterText = "クリーンインストールを行うと、全ての設定・データベースが消去されます。"
-            });
-            if (!resp.CommandButtonResult.HasValue || resp.CommandButtonResult.Value == 5)
-            {
-                return false;
-            }
-            switch (resp.CommandButtonResult.Value)
-            {
-                case 1:
-                    // optimize database
-                    _requireOptimizeDb = true;
-                    break;
-                case 2:
-                    // remove database
-                    if (File.Exists(DatabaseFilePath))
-                    {
-                        File.Delete(DatabaseFilePath);
-                    }
-                    break;
-                case 3:
-                case 4:
-                case 5:
-                    // remove all
-                    if (ExecutionMode == ExecutionMode.Standalone)
-                    {
-                        // remove each
-                        var files = new[]
-                        {
-                            DatabaseFilePath, DatabaseFilePath, HashtagTempFilePath, ListUserTempFilePath,
-                            Path.Combine(ConfigurationDirectoryPath, ProfileFileName)
-                        };
-                        var dirs = new[]
-                        {
-                            KeyAssignProfilesDirectory
-                        };
-                        files.Where(File.Exists).ForEach(File.Delete);
-                        dirs.Where(Directory.Exists).ForEach(d => Directory.Delete(d, true));
-                    }
-                    else
-                    {
-                        // remove whole directory
-                        if (Directory.Exists(ConfigurationDirectoryPath))
-                        {
-                            Directory.Delete(ConfigurationDirectoryPath, true);
-                        }
-                    }
-                    break;
-            }
-            if (resp.CommandButtonResult.Value == 5)
-            {
-                // force update
-                var w = new AwaitDownloadingUpdateWindow();
-                w.ShowDialog();
-            }
-            return resp.CommandButtonResult.Value < 4;
-        }
+        #region Startup Subprocesses
 
         /// <summary>
         /// Check sqlite database
@@ -403,6 +105,10 @@ namespace StarryEyes
             return true;
         }
 
+        #endregion
+
+        #region Finalize/Error handling
+
         /// <summary>
         /// Finalize application
         /// </summary>
@@ -416,13 +122,7 @@ namespace StarryEyes
             }
             Debug.WriteLine("App Finalize");
             RaiseApplicationFinalize();
-            try
-            {
-                _appMutex.ReleaseMutex();
-                _appMutex.Dispose();
-            }
-            catch (ObjectDisposedException)
-            { }
+            AppInitializer.ReleaseMutex();
         }
 
         /// <summary>
@@ -492,6 +192,8 @@ namespace StarryEyes
 
             Environment.Exit(-1);
         }
+
+        #endregion
 
         #region Definitions
 
