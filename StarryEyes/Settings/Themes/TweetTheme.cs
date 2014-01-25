@@ -28,6 +28,13 @@ namespace StarryEyes.Settings.Themes
         }
 
         [DataMember]
+        private string ForegroundLinkColor
+        {
+            get { return HyperlinkText.ToColorString(); }
+            set { HyperlinkText = value.ToColor(); }
+        }
+
+        [DataMember]
         private string FavoriteCounterColor
         {
             get { return FavoriteCounter.ToColorString(); }
@@ -73,6 +80,12 @@ namespace StarryEyes.Settings.Themes
         /// </summary>
         [IgnoreDataMember]
         public Color SubText { get; set; }
+
+        /// <summary>
+        /// Link text color
+        /// </summary>
+        [IgnoreDataMember]
+        public Color HyperlinkText { get; set; }
 
         /// <summary>
         /// Foreground color for favorite counter
@@ -140,6 +153,10 @@ namespace StarryEyes.Settings.Themes
             Highlight.ConfigureResourceDictionary(dictionary, prefix + "Highlight");
             KeyText.ConfigureResourceDictionary(dictionary, prefix + "KeyText");
             SubText.ConfigureResourceDictionary(dictionary, prefix + "SubText");
+            HyperlinkText.ConfigureResourceDictionary(dictionary, prefix + "HyperlinkText");
+            FavoriteCounter.ConfigureResourceDictionary(dictionary, prefix + "FavoriteCounter");
+            RetweetCounter.ConfigureResourceDictionary(dictionary, prefix + "RetweetCounter");
+            RetweetMarker.ConfigureResourceDictionary(dictionary, prefix + "RetweetMarker");
             FavoriteAndRetweetButton.ConfigureResourceDictionary(dictionary, prefix + "FavAndRtButton");
             FavoriteButton.ConfigureResourceDictionary(dictionary, prefix + "FavoriteButton");
             ColoredFavoriteButton.ConfigureResourceDictionary(dictionary, prefix + "ColoredFavoriteButton");
@@ -157,6 +174,10 @@ namespace StarryEyes.Settings.Themes
                 Highlight = Highlight,
                 KeyText = KeyText,
                 SubText = SubText,
+                HyperlinkText = HyperlinkText,
+                FavoriteCounter = FavoriteCounter,
+                RetweetCounter = RetweetCounter,
+                RetweetMarker = RetweetMarker,
                 FavoriteAndRetweetButton = FavoriteAndRetweetButton,
                 FavoriteButton = FavoriteButton,
                 ColoredFavoriteButton = ColoredFavoriteButton,

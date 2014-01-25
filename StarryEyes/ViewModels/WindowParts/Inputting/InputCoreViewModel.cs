@@ -35,7 +35,6 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
         private readonly InputAreaSuggestItemProvider _provider;
 
         private GeoCoordinateWatcher _geoWatcher;
-        private ClipboardWatcher _watcher;
         private UserViewModel _recipientViewModel;
         private InReplyToStatusViewModel _inReplyToViewModelCache;
         private bool _isLocationEnabled;
@@ -77,9 +76,11 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                                             RaisePropertyChanged(() => DraftCount);
                                             RaisePropertyChanged(() => IsDraftsExisted);
                                         }));
-            CompositeDisposable.Add(_watcher = new ClipboardWatcher());
-            _watcher.ClipboardChanged += (o, e) => RaisePropertyChanged(() => IsClipboardContentImage);
-            _watcher.StartWatching();
+            // initialize clipboard watcher.
+            ClipboardWatcher watcher;
+            CompositeDisposable.Add(watcher = new ClipboardWatcher());
+            watcher.ClipboardChanged += (o, e) => RaisePropertyChanged(() => IsClipboardContentImage);
+            watcher.StartWatching();
             Setting.DisableGeoLocationService.ValueChanged += this.UpdateGeoLocationService;
             this.UpdateGeoLocationService(Setting.DisableGeoLocationService.Value);
         }

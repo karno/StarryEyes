@@ -41,9 +41,27 @@
                 </controls:LazyImage>
             </DataTemplate>
             <DataTemplate x:Key="StatusItemTemplate">
+                <DataTemplate.Resources>
+                    <SolidColorBrush x:Key="TweetBackgroundBrush" Color="{DynamicResource TweetDefaultBackground}" />
+                    <SolidColorBrush x:Key="TweetForegroundBrush" Color="{DynamicResource TweetDefaultForeground}" />
+                    <SolidColorBrush x:Key="TweetHighlightBackgroundBrush" Color="{DynamicResource TweetDefaultHighlightBackground}" />
+                    <SolidColorBrush x:Key="TweetHighlightForegroundBrush" Color="{DynamicResource TweetDefaultHighlightForeground}" />
+                    <SolidColorBrush x:Key="KeyTextBrush" Color="{DynamicResource TweetDefaultKeyText}" />
+                    <SolidColorBrush x:Key="SubTextBrush" Color="{DynamicResource TweetDefaultSubText}" />
+                    <SolidColorBrush x:Key="HyperlinkTextBrush" Color="{DynamicResource TweetDefaultHyperlinkText}" />
+                    <SolidColorBrush x:Key="FavoriteCounter" Color="{DynamicResource TweetDefaultFavoriteCounter}" />
+                    <SolidColorBrush x:Key="RetweetCounter" Color="{DynamicResource TweetDefaultFavoriteCounter}" />
+                    <SolidColorBrush x:Key="RetweetMarker" Color="{DynamicResource TweetDefaultRetweetMarker}" />
+                    <SolidColorBrush x:Key="FavAndRtBackground" Color="{DynamicResource TweetDefaultFavAndRtButtonBackground}" />
+                    <SolidColorBrush x:Key="FavAndRtForeground" Color="{DynamicResource TweetDefaultFavAndRtButtonForeground}" />
+                    <SolidColorBrush x:Key="FavAndRtHoveringBackground" Color="{DynamicResource TweetDefaultFavAndRtButtonHoveringBackground}" />
+                    <SolidColorBrush x:Key="FavAndRtHoveringForeground" Color="{DynamicResource TweetDefaultFavAndRtButtonHoveringForeground}" />
+                    <SolidColorBrush x:Key="FavAndRtPressedBackground" Color="{DynamicResource TweetDefaultFavAndRtButtonPressedBackground}" />
+                    <SolidColorBrush x:Key="FavAndRtPressedForeground" Color="{DynamicResource TweetDefaultFavAndRtButtonPressedForeground}" />
+                </DataTemplate.Resources>
                 <Border x:Name="MainBorder"
                         Margin="0"
-                        Background="#00FFFFFF"
+                        Background="{DynamicResource TweetDefaultBackgroundBrush}"
                         Padding="0"
                         RenderTransformOrigin="0.5,1"
                         SnapsToDevicePixels="True">
@@ -535,7 +553,6 @@
                                         Margin="-8,-10,0,10"
                                         HorizontalAlignment="Stretch"
                                         VerticalAlignment="Top"
-                                        Background="#0F808080"
                                         Cursor="Hand"
                                         Visibility="Collapsed">
                                     <Border.LayoutTransform>
@@ -603,10 +620,10 @@
                                                                    VerticalAlignment="Bottom"
                                                                    FontFamily="Segoe UI Semibold"
                                                                    FontSize="13.333"
-                                                                   Foreground="Gray"
+                                                                   Foreground="{DynamicResource TweetDefaultSubTextBrush}"
                                                                    RenderTransformOrigin="0.5,0.5"
                                                                    Text="{Binding InReplyToUserScreenName,
-                                                                                  FallbackValue=uSeR,
+                                                                                  FallbackValue=user,
                                                                                   Mode=OneWay}"
                                                                    TextWrapping="NoWrap" />
                                                         <TextBlock Height="Auto"
@@ -614,21 +631,21 @@
                                                                    VerticalAlignment="Bottom"
                                                                    FontFamily="Segoe UI Semilight"
                                                                    FontSize="12.667"
-                                                                   Foreground="Gray"
+                                                                   Foreground="{DynamicResource TweetDefaultSubTextBrush}"
                                                                    Text="{Binding InReplyToUserName,
                                                                                   FallbackValue=name,
                                                                                   Mode=OneWay}"
                                                                    TextWrapping="NoWrap" />
                                                     </DockPanel>
                                                     <TextBlock Margin="10,0"
-                                                               Foreground="Gray"
+                                                               Foreground="{DynamicResource TweetDefaultSubTextBrush}"
                                                                Text="{Binding InReplyToBody,
                                                                               Mode=OneWay}"
                                                                TextWrapping="Wrap" />
                                                 </StackPanel>
                                             </Grid>
                                             <Grid Margin="7" Visibility="{Binding IsInReplyToAvailable, Converter={StaticResource BooleanToInvisibleConverter}}">
-                                                <TextBlock Foreground="DimGray" Text="返信先を受信できませんでした。ここをクリックすると個別に抽出できます。" />
+                                                <TextBlock Foreground="{DynamicResource TweetDefaultSubTextBrush}" Text="返信先を受信できませんでした。ここをクリックすると個別に抽出できます。" />
                                             </Grid>
                                         </StackPanel>
                                         <Grid Margin="7" Visibility="{Binding IsInReplyToLoading, Converter={StaticResource BooleanToVisibleConverter}}">
@@ -731,7 +748,7 @@
                                                    Cursor="Hand"
                                                    FontFamily="Segoe UI Semibold"
                                                    FontSize="13.333"
-                                                   Foreground="#FF1BA1E2"
+                                                   Foreground="{DynamicResource TweetDefaultKeyTextBrush}"
                                                    RenderTransformOrigin="0.5,0.5"
                                                    Text="{Binding User.ScreenName,
                                                                   FallbackValue=uSeR,
@@ -748,7 +765,7 @@
                                                    VerticalAlignment="Bottom"
                                                    FontFamily="Segoe UI Semilight"
                                                    FontSize="12.667"
-                                                   Foreground="Gray"
+                                                   Foreground="{DynamicResource TweetDefaultSubTextBrush}"
                                                    IsHitTestVisible="False"
                                                    Text="{Binding User.Name,
                                                                   FallbackValue=name,
@@ -770,7 +787,7 @@
                                                        VerticalAlignment="Center"
                                                        FontFamily="Segoe UI Semilight"
                                                        FontSize="12"
-                                                       Foreground="Gray"
+                                                       Foreground="{DynamicResource TweetDefaultSubTextBrush}"
                                                        IsHitTestVisible="False"
                                                        Text="via "
                                                        TextWrapping="NoWrap" />
@@ -779,7 +796,7 @@
                                                        VerticalAlignment="Center"
                                                        FontFamily="Segoe UI Semilight"
                                                        FontSize="12"
-                                                       Foreground="Gray"
+                                                       Foreground="{DynamicResource TweetDefaultSubTextBrush}"
                                                        IsHitTestVisible="False"
                                                        Text="{Binding SourceText,
                                                                       Mode=OneTime}"
@@ -793,7 +810,7 @@
                                                        Cursor="Hand"
                                                        FontFamily="Segoe UI Semilight"
                                                        FontSize="12"
-                                                       Foreground="Gray"
+                                                       Foreground="{DynamicResource TweetDefaultSubTextBrush}"
                                                        Text="{Binding SourceText,
                                                                       Mode=OneTime}"
                                                        TextWrapping="NoWrap"
@@ -814,8 +831,11 @@
                                             <ColumnDefinition />
                                             <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
-                                        <TextBlock VerticalAlignment="Top"
+                                        <TextBlock Name="BodyText"
+                                                   VerticalAlignment="Top"
                                                    TextWrapping="Wrap"
+                                                   helpers:TextBlockStylizer.ForegroundBrush="{DynamicResource TweetDefaultForegroundBrush}"
+                                                   helpers:TextBlockStylizer.HyperlinkBrush="{DynamicResource TweetDefaultHyperlinkTextBrush}"
                                                    helpers:TextBlockStylizer.LinkNavigationCommand="{Binding OpenLinkCommand,
                                                                                                              Mode=OneTime}"
                                                    helpers:TextBlockStylizer.TwitterStatus="{Binding Status,
@@ -875,31 +895,29 @@
                                             </i:Interaction.Behaviors>
                                         </TextBlock>
                                         <Border Grid.Column="1"
-                                                Grid.ColumnSpan="1"
                                                 Width="60"
                                                 Height="60"
                                                 Margin="8,0"
                                                 HorizontalAlignment="Left"
                                                 VerticalAlignment="Top"
-                                                Background="#FFF0F0F0"
-                                                BorderBrush="#FF979797"
+                                                Background="#80808080"
+                                                BorderBrush="{DynamicResource TweetDefaultSubTextBrush}"
                                                 BorderThickness="1"
                                                 Cursor="Hand"
                                                 Visibility="{Binding IsThumbnailAvailable,
                                                                      Mode=OneWay,
                                                                      Converter={StaticResource BooleanToVisibleConverter}}">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="MouseLeftButtonDown">
+                                                    <ei:CallMethodAction MethodName="OpenThumbnailImage" TargetObject="{Binding Mode=OneTime}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
                                             <controls:LazyImage Cursor="Hand"
                                                                 DecodePixelHeight="60"
                                                                 RenderOptions.BitmapScalingMode="HighQuality"
                                                                 Stretch="UniformToFill"
                                                                 UriSource="{Binding ThumbnailImage,
-                                                                                    Mode=OneWay}">
-                                                <i:Interaction.Triggers>
-                                                    <i:EventTrigger EventName="MouseLeftButtonDown">
-                                                        <ei:CallMethodAction MethodName="OpenThumbnailImage" TargetObject="{Binding Mode=OneTime}" />
-                                                    </i:EventTrigger>
-                                                </i:Interaction.Triggers>
-                                            </controls:LazyImage>
+                                                                                    Mode=OneWay}" />
                                         </Border>
                                     </Grid>
                                     <Grid Grid.Row="3"
@@ -916,7 +934,7 @@
                                                    VerticalAlignment="Center"
                                                    FontFamily="Segoe UI Semilight"
                                                    FontSize="10.667"
-                                                   Foreground="Gray"
+                                                   Foreground="{DynamicResource TweetDefaultSubTextBrush}"
                                                    IsHitTestVisible="False"
                                                    Text="{Binding CreatedAt,
                                                                   FallbackValue=0:00,
@@ -931,7 +949,7 @@
                                                    Cursor="Hand"
                                                    FontFamily="Segoe UI Semilight"
                                                    FontSize="10.667"
-                                                   Foreground="Gray"
+                                                   Foreground="{DynamicResource TweetDefaultSubTextBrush}"
                                                    Opacity="0"
                                                    Text="{Binding CreatedAt,
                                                                   Mode=OneTime,

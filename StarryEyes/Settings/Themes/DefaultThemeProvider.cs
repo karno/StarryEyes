@@ -188,6 +188,7 @@ namespace StarryEyes.Settings.Themes
                 },
                 KeyText = key,
                 SubText = Color.FromRgb(0x80, 0x80, 0x80),
+                HyperlinkText = Colors.DimGray,
                 FavoriteCounter = MetroColors.Amber,
                 RetweetCounter = MetroColors.Emerald,
                 RetweetMarker = MetroColors.Emerald,

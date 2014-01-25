@@ -80,6 +80,12 @@ namespace StarryEyes.Settings.Themes
         }
 
         /// <summary>
+        /// Version of the theme profile.
+        /// </summary>
+        [DataMember]
+        public int ProfileVersion { get; set; }
+
+        /// <summary>
         /// Theme Name
         /// </summary>
         public string Name { get; private set; }

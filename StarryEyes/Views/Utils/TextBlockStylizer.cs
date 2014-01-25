@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -114,6 +115,44 @@ namespace StarryEyes.Views.Utils
                     })
                     .ForEach(textBlock.Inlines.Add);
             }));
+
+        #endregion
+
+        #region Colors
+
+        public static Brush GetForegroundBrush(DependencyObject obj)
+        {
+            return (Brush)obj.GetValue(ForegroundBrushProperty);
+        }
+
+        public static void SetForegroundBrush(DependencyObject obj, Brush brush)
+        {
+            obj.SetValue(ForegroundBrushProperty, brush);
+        }
+
+        public static readonly DependencyProperty ForegroundBrushProperty =
+            DependencyProperty.RegisterAttached(
+                "ForegroundBrush",
+                typeof(Brush),
+                typeof(TextBlockStylizer),
+                new PropertyMetadata(Brushes.Black));
+
+        public static Brush GetHyperlinkBrush(DependencyObject obj)
+        {
+            return (Brush)obj.GetValue(HyperlinkBrushProperty);
+        }
+
+        public static void SetHyperlinkBrush(DependencyObject obj, Brush brush)
+        {
+            obj.SetValue(HyperlinkBrushProperty, brush);
+        }
+
+        public static readonly DependencyProperty HyperlinkBrushProperty =
+            DependencyProperty.RegisterAttached(
+                "HyperlinkBrush",
+                typeof(Brush),
+                typeof(TextBlockStylizer),
+                new PropertyMetadata(Brushes.Black));
 
         #endregion
 
@@ -236,14 +275,26 @@ namespace StarryEyes.Views.Utils
 
         #endregion
 
+        private static void SetForeBrushBinding(TextElement inline, object property)
+        {
+            var binding = new Binding
+            {
+                RelativeSource = new RelativeSource(RelativeSourceMode.FindAncestor, typeof(TextBlock), 1),
+                Path = new PropertyPath(property)
+            };
+            inline.SetBinding(TextElement.ForegroundProperty, binding);
+        }
+
         private static Inline GenerateText(string surface)
         {
-            return new Run { Text = surface, Focusable = false };
+            var run = new Run { Text = surface, Focusable = false };
+            SetForeBrushBinding(run, ForegroundBrushProperty);
+            return run;
         }
 
         private static Inline GenerateLink(DependencyObject obj, string surface, string linkUrl)
         {
-            var hl = new Hyperlink { Foreground = Brushes.Gray, Focusable = false };
+            var hl = new Hyperlink { Focusable = false };
             hl.Inlines.Add(surface);
             hl.Command = new ProxyCommand(link =>
             {
@@ -252,6 +303,7 @@ namespace StarryEyes.Views.Utils
                     command.Execute(link as string);
             });
             hl.CommandParameter = linkUrl;
+            SetForeBrushBinding(hl, HyperlinkBrushProperty);
             return hl;
         }
 
