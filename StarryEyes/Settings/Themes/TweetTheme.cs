@@ -9,46 +9,46 @@ namespace StarryEyes.Settings.Themes
     /// Describes tweet theme
     /// </summary>
     [DataContract]
-    public struct TweetTheme : IResourceConfigurator, ICloneable
+    public class TweetTheme : IResourceConfigurator, ICloneable
     {
         #region Serialization properties
 
-        [DataMember]
+        [DataMember(Order = 2)]
         private string ForegroundKeyColor
         {
             get { return this.KeyText.ToColorString(); }
             set { this.KeyText = value.ToColor(); }
         }
 
-        [DataMember]
+        [DataMember(Order = 3)]
         private string ForegroundSubColor
         {
             get { return this.SubText.ToColorString(); }
             set { this.SubText = value.ToColor(); }
         }
 
-        [DataMember]
+        [DataMember(Order = 4)]
         private string ForegroundLinkColor
         {
             get { return HyperlinkText.ToColorString(); }
             set { HyperlinkText = value.ToColor(); }
         }
 
-        [DataMember]
+        [DataMember(Order = 5)]
         private string FavoriteCounterColor
         {
             get { return FavoriteCounter.ToColorString(); }
             set { FavoriteCounter = value.ToColor(); }
         }
 
-        [DataMember]
+        [DataMember(Order = 6)]
         private string RetweetCounterColor
         {
             get { return RetweetCounter.ToColorString(); }
             set { RetweetCounter = value.ToColor(); }
         }
 
-        [DataMember]
+        [DataMember(Order = 7)]
         private string RetweetMarkerColor
         {
             get { return RetweetMarker.ToColorString(); }
@@ -60,13 +60,13 @@ namespace StarryEyes.Settings.Themes
         /// <summary>
         /// Colors for default tweet
         /// </summary>
-        [DataMember]
+        [DataMember(Order = 0)]
         public ThemeColors Default { get; set; }
 
         /// <summary>
         /// Colors for highlighted tweet
         /// </summary>
-        [DataMember]
+        [DataMember(Order = 1)]
         public ThemeColors Highlight { get; set; }
 
         /// <summary>
@@ -108,43 +108,43 @@ namespace StarryEyes.Settings.Themes
         /// <summary>
         /// Colors for favorite and retweet button
         /// </summary>
-        [DataMember]
+        [DataMember(Order = 8)]
         public ControlColors FavoriteAndRetweetButton { get; set; }
 
         /// <summary>
         /// Colors for favorite button
         /// </summary>
-        [DataMember]
+        [DataMember(Order = 9)]
         public ControlColors FavoriteButton { get; set; }
 
         /// <summary>
         /// Colors for favorited favorite button
         /// </summary>
-        [DataMember]
+        [DataMember(Order = 10)]
         public ControlColors ColoredFavoriteButton { get; set; }
 
         /// <summary>
         /// Colors for retweet button
         /// </summary>
-        [DataMember]
+        [DataMember(Order = 11)]
         public ControlColors RetweetButton { get; set; }
 
         /// <summary>
         /// Colors for retweeted retweet button
         /// </summary>
-        [DataMember]
+        [DataMember(Order = 12)]
         public ControlColors ColoredRetweetButton { get; set; }
 
         /// <summary>
         /// Colors for mention button
         /// </summary>
-        [DataMember]
+        [DataMember(Order = 13)]
         public ControlColors MentionButton { get; set; }
 
         /// <summary>
         /// Colors for delete button
         /// </summary>
-        [DataMember]
+        [DataMember(Order = 14)]
         public ControlColors DeleteButton { get; set; }
 
         public void ConfigureResourceDictionary(ResourceDictionary dictionary, string prefix)
@@ -170,21 +170,21 @@ namespace StarryEyes.Settings.Themes
         {
             return new TweetTheme
             {
-                Default = Default,
-                Highlight = Highlight,
+                Default = Default.Clone(),
+                Highlight = Highlight.Clone(),
                 KeyText = KeyText,
                 SubText = SubText,
                 HyperlinkText = HyperlinkText,
                 FavoriteCounter = FavoriteCounter,
                 RetweetCounter = RetweetCounter,
                 RetweetMarker = RetweetMarker,
-                FavoriteAndRetweetButton = FavoriteAndRetweetButton,
-                FavoriteButton = FavoriteButton,
-                ColoredFavoriteButton = ColoredFavoriteButton,
-                RetweetButton = RetweetButton,
-                ColoredRetweetButton = ColoredRetweetButton,
-                MentionButton = MentionButton,
-                DeleteButton = DeleteButton
+                FavoriteAndRetweetButton = FavoriteAndRetweetButton.Clone(),
+                FavoriteButton = FavoriteButton.Clone(),
+                ColoredFavoriteButton = ColoredFavoriteButton.Clone(),
+                RetweetButton = RetweetButton.Clone(),
+                ColoredRetweetButton = ColoredRetweetButton.Clone(),
+                MentionButton = MentionButton.Clone(),
+                DeleteButton = DeleteButton.Clone()
             };
         }
 

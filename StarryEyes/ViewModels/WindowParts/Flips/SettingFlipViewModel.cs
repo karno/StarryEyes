@@ -7,6 +7,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
 using Livet;
 using Livet.Messaging;
 using Livet.Messaging.IO;
@@ -72,6 +73,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             this.IsConfigurationActive = false;
 
             this.RefreshKeyAssignCandidates();
+            this.RefreshThemeCandidates();
             this.ResetFilter();
             this._completeCallback = subject;
             this.RaisePropertyChanged();
@@ -381,12 +383,12 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         private readonly ObservableCollection<string> _themeCandidateFiles = new ObservableCollection<string>();
         public ObservableCollection<string> ThemeCandidateFiles
         {
-            get { return _keyAssignCandidateFiles; }
+            get { return _themeCandidateFiles; }
         }
 
-        private string _themeCache = null;
+        private string _themeCache;
 
-        public int ThemeFile
+        public int ThemeFileIndex
         {
             get
             {
@@ -405,6 +407,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                     name = this._themeCandidateFiles[value];
                 }
                 _themeCache = name;
+                CurrentThemeChanged();
                 this.RaisePropertyChanged();
             }
         }
@@ -413,7 +416,8 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         {
             _themeCandidateFiles.Clear();
             ThemeManager.Themes.ForEach(f => _themeCandidateFiles.Add(f));
-            this.RaisePropertyChanged(() => ThemeFile);
+            this.RaisePropertyChanged(() => this.ThemeFileIndex);
+            CurrentThemeChanged();
         }
 
         public void ShowThemeEditor()
@@ -428,6 +432,55 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 Setting.Theme.Value = _themeCache;
             }
         }
+
+        #region for theme preview
+
+        private ThemeProfile CurrentConfiguringTheme
+        {
+            get
+            {
+                return (ThemeFileIndex >= 0 && ThemeFileIndex < _themeCandidateFiles.Count
+                    ? ThemeManager.GetTheme(_themeCandidateFiles[ThemeFileIndex])
+                    : null) ?? DefaultThemeProvider.GetDefault();
+            }
+        }
+
+        private void CurrentThemeChanged()
+        {
+            RaisePropertyChanged(() => GlobalForeground);
+            RaisePropertyChanged(() => GlobalBackground);
+            RaisePropertyChanged(() => CurrentThemeBorder);
+            RaisePropertyChanged(() => CurrentThemeBorder);
+            RaisePropertyChanged(() => TitleBackground);
+            RaisePropertyChanged(() => TitleForeground);
+        }
+
+        public Brush GlobalForeground
+        {
+            get { return new SolidColorBrush(this.CurrentConfiguringTheme.BaseColor.Foreground); }
+        }
+
+        public Brush GlobalBackground
+        {
+            get { return new SolidColorBrush(this.CurrentConfiguringTheme.BaseColor.Background); }
+        }
+
+        public Brush CurrentThemeBorder
+        {
+            get { return new SolidColorBrush(this.CurrentConfiguringTheme.GlobalKeyColor); }
+        }
+
+        public Brush TitleBackground
+        {
+            get { return new SolidColorBrush(this.CurrentConfiguringTheme.TitleBarColor.Background); }
+        }
+
+        public Brush TitleForeground
+        {
+            get { return new SolidColorBrush(this.CurrentConfiguringTheme.TitleBarColor.Foreground); }
+        }
+
+        #endregion
 
         #endregion
 

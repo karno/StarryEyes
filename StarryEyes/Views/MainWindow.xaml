@@ -11,8 +11,8 @@
                       xmlns:sebehaviors="clr-namespace:StarryEyes.Views.Messaging.Behaviors"
                       xmlns:triggers="clr-namespace:StarryEyes.Views.Triggers"
                       xmlns:utils="clr-namespace:StarryEyes.Views.Utils"
+                      xmlns:vc="clr-namespace:StarryEyes.Views.Controls"
                       xmlns:views="clr-namespace:StarryEyes.Views"
-              xmlns:vc="clr-namespace:StarryEyes.Views.Controls"
                       xmlns:vm="clr-namespace:StarryEyes.ViewModels"
                       xmlns:windowParts="clr-namespace:StarryEyes.Views.WindowParts"
                       Title="{Binding WindowTitle}"
@@ -289,15 +289,13 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="13*" />
                 </Grid.RowDefinitions>
-        <vc:LazyImage
-                    Grid.RowSpan="2"
-                       Margin="{Binding ElementName=StatusGrid,
-                                        Path=ActualHeight,
-                                        Converter={StaticResource BottomThicknessConverter}}"
-                       Opacity="{Binding BackgroundImageOpacity}"
-               UriSource="{Binding BackgroundImageUri}"
-                       Stretch="UniformToFill">
-            </vc:LazyImage>
+                <vc:LazyImage Grid.RowSpan="2"
+                              Margin="{Binding ElementName=StatusGrid,
+                                               Path=ActualHeight,
+                                               Converter={StaticResource BottomThicknessConverter}}"
+                              Opacity="{Binding BackgroundImageOpacity}"
+                              Stretch="UniformToFill"
+                              UriSource="{Binding BackgroundImageUri}" />
                 <windowParts:InputArea Grid.Row="0"
                                        Margin="3,4,3,0"
                                        DataContext="{Binding InputAreaViewModel}" />

@@ -243,9 +243,6 @@ namespace StarryEyes
             // set parameters for accessing twitter.
             Networking.Initialize();
 
-            // load themes
-            ThemeManager.Initialize();
-
             // load key assigns
             KeyAssignManager.Initialize();
 

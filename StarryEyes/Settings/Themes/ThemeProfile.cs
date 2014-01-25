@@ -16,7 +16,7 @@ namespace StarryEyes.Settings.Themes
     {
         #region Serialization properties
 
-        [DataMember(Name = "GlobalKeyColor")]
+        [DataMember(Name = "GlobalKeyColor", Order = 3)]
         private string GlobalKeyColorString
         {
             get { return this.GlobalKeyColor.ToColorString(); }
@@ -82,7 +82,7 @@ namespace StarryEyes.Settings.Themes
         /// <summary>
         /// Version of the theme profile.
         /// </summary>
-        [DataMember]
+        [DataMember(Order = 0)]
         public int ProfileVersion { get; set; }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace StarryEyes.Settings.Themes
         /// <summary>
         /// Krile Global Font
         /// </summary>
-        [DataMember, NotNull]
+        [DataMember(Order = 1), NotNull]
         public FontTheme GlobalFont
         {
             get { return _globalFont ?? (_globalFont = FontTheme.Default); }
@@ -103,7 +103,7 @@ namespace StarryEyes.Settings.Themes
         /// <summary>
         /// Global base background/foreground color
         /// </summary>
-        [DataMember]
+        [DataMember(Order = 2)]
         public ThemeColors BaseColor { get; set; }
 
         /// <summary>
@@ -115,31 +115,31 @@ namespace StarryEyes.Settings.Themes
         /// <summary>
         /// Colors for title bar.
         /// </summary>
-        [DataMember]
+        [DataMember(Order = 4)]
         public ThemeColors TitleBarColor { get; set; }
 
         /// <summary>
         /// Backstage background/foreground color
         /// </summary>
-        [DataMember]
+        [DataMember(Order = 5)]
         public ThemeColors BackstageColor { get; set; }
 
         /// <summary>
         /// Account selection flip background/foreground color
         /// </summary>
-        [DataMember]
+        [DataMember(Order = 6)]
         public ThemeColors AccountSelectionFlipColor { get; set; }
 
         /// <summary>
         /// Theme description for search-flip
         /// </summary>
-        [DataMember]
+        [DataMember(Order = 7)]
         public SearchFlipTheme SearchFlipColor { get; set; }
 
         /// <summary>
         /// Theme description for user-flip
         /// </summary>
-        [DataMember, NotNull]
+        [DataMember(Order = 8), NotNull]
         public UserFlipTheme UserFlipColor
         {
             get { return _userFlipColor ?? (_userFlipColor = new UserFlipTheme()); }
@@ -149,7 +149,7 @@ namespace StarryEyes.Settings.Themes
         /// <summary>
         /// Theme description for tabs
         /// </summary>
-        [DataMember, NotNull]
+        [DataMember(Order = 9), NotNull]
         public TabTheme TabColor
         {
             get { return _tabColor ?? (_tabColor = new TabTheme()); }
@@ -159,31 +159,31 @@ namespace StarryEyes.Settings.Themes
         /// <summary>
         /// Theme description for tweets
         /// </summary>
-        [DataMember]
+        [DataMember(Order = 10)]
         public TweetTheme TweetDefaultColor { get; set; }
 
         /// <summary>
         /// Theme description for your tweets
         /// </summary>
-        [DataMember]
+        [DataMember(Order = 11)]
         public TweetTheme TweetMyselfColor { get; set; }
 
         /// <summary>
         /// Theme description for mentioned tweets
         /// </summary>
-        [DataMember]
+        [DataMember(Order = 12)]
         public TweetTheme TweetMentionColor { get; set; }
 
         /// <summary>
         /// Theme description for retweeted tweets
         /// </summary>
-        [DataMember]
+        [DataMember(Order = 13)]
         public TweetTheme TweetRetweetColor { get; set; }
 
         /// <summary>
         /// Theme description for direct messages
         /// </summary>
-        [DataMember]
+        [DataMember(Order = 14)]
         public TweetTheme TweetDirectMessageColor { get; set; }
 
         /// <summary>
@@ -222,11 +222,11 @@ namespace StarryEyes.Settings.Themes
             {
                 Name = Name,
                 GlobalFont = this.GlobalFont.Clone(),
-                BaseColor = BaseColor,
+                BaseColor = BaseColor.Clone(),
                 GlobalKeyColor = GlobalKeyColor,
-                TitleBarColor = TitleBarColor,
-                BackstageColor = BackstageColor,
-                AccountSelectionFlipColor = AccountSelectionFlipColor,
+                TitleBarColor = TitleBarColor.Clone(),
+                BackstageColor = BackstageColor.Clone(),
+                AccountSelectionFlipColor = AccountSelectionFlipColor.Clone(),
                 SearchFlipColor = SearchFlipColor.Clone(),
                 UserFlipColor = UserFlipColor.Clone(),
                 TabColor = this.TabColor.Clone(),

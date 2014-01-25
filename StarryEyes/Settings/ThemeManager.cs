@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using StarryEyes.Albireo;
+using StarryEyes.Annotations;
 using StarryEyes.Models;
 using StarryEyes.Models.Backstages.SystemEvents;
 using StarryEyes.Nightmare.Windows;
@@ -108,6 +109,13 @@ namespace StarryEyes.Settings
                 BackstageModel.RegisterEvent(new ThemeProfileNotFoundEvent(profileId));
                 return DefaultThemeProvider.GetDefault();
             }
+        }
+
+        [CanBeNull]
+        public static ThemeProfile GetTheme(string themeName)
+        {
+            ThemeProfile result;
+            return ThemeProfiles.TryGetValue(themeName, out result) ? result : null;
         }
     }
 }

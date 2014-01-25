@@ -79,7 +79,7 @@
                 <ListBox x:Name="SettingCategories"
                          Width="180"
                          HorizontalContentAlignment="Stretch"
-                         SelectedIndex="9">
+                         SelectedIndex="5">
                     <ListBox.Resources>
                         <Style TargetType="{x:Type ListBoxItem}">
                             <Setter Property="Margin" Value="0" />
@@ -485,7 +485,54 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition />
                     </Grid.RowDefinitions>
-
+                    <Grid Margin="16,0,16,4">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <DockPanel>
+                            <TextBlock VerticalAlignment="Center"
+                                       DockPanel.Dock="Left"
+                                       Text="使用するテーマ: " />
+                            <ComboBox ItemsSource="{Binding ThemeCandidateFiles}" SelectedIndex="{Binding ThemeFileIndex}" />
+                        </DockPanel>
+                        <Grid Height="300"
+                              Margin="20"
+                              Row="1">
+                            <Border BorderBrush="{Binding CurrentThemeBorder}" BorderThickness="1">
+                                <Border.Effect>
+                                    <BlurEffect KernelType="Gaussian" Radius="10" />
+                                </Border.Effect>
+                            </Border>
+                            <Border Background="{Binding GlobalBackground}"
+                                    BorderBrush="{Binding CurrentThemeBorder}"
+                                    BorderThickness="1">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <Border Background="{Binding TitleBackground}">
+                                        <TextBlock Margin="2"
+                                                   Foreground="{Binding TitleForeground}"
+                                                   Text="Krile STARRYEYES" />
+                                    </Border>
+                                    <Border Grid.Row="1" Background="{Binding GlobalBackground}" />
+                                </Grid>
+                            </Border>
+                        </Grid>
+                    </Grid>
+                    <DockPanel Grid.Row="1" Margin="16,16,16,4">
+                        <TextBlock VerticalAlignment="Center" Text="タイムラインの壁紙: " />
+                        <Button Content="..." DockPanel.Dock="Right">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="Click">
+                                    <ei:CallMethodAction MethodName="SelectBackgroundImage" TargetObject="{Binding}" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </Button>
+                        <TextBox Text="{Binding BackgroundImagePath}" />
+                    </DockPanel>
                 </Grid>
                 <Grid Grid.Column="1" Margin="0,6,0,0">
                     <Grid.Style>

@@ -32,17 +32,17 @@ namespace StarryEyes.Settings.Themes
     /// Describe background/foreground color
     /// </summary>
     [DataContract]
-    public struct ThemeColors : IResourceConfigurator
+    public class ThemeColors : IResourceConfigurator, ICloneable
     {
         #region serialization properties
-        [DataMember]
+        [DataMember(Order = 0)]
         private string BackgroundColor
         {
             get { return Background.ToColorString(); }
             set { Background = value.ToColor(); }
         }
 
-        [DataMember]
+        [DataMember(Order = 1)]
         private string ForegroundColor
         {
             get { return Foreground.ToColorString(); }
@@ -67,30 +67,44 @@ namespace StarryEyes.Settings.Themes
             Background.ConfigureResourceDictionary(dictionary, prefix + "Background");
             Foreground.ConfigureResourceDictionary(dictionary, prefix + "Foreground");
         }
+
+        public ThemeColors Clone()
+        {
+            return new ThemeColors
+            {
+                Background = Background,
+                Foreground = Foreground,
+            };
+        }
+
+        object ICloneable.Clone()
+        {
+            return Clone();
+        }
     }
 
     /// <summary>
     /// Describe colors for mouse controllable controls
     /// </summary>
     [DataContract]
-    public struct ControlColors : IResourceConfigurator
+    public class ControlColors : IResourceConfigurator, ICloneable
     {
         /// <summary>
         /// Default colors
         /// </summary>
-        [DataMember]
+        [DataMember(Order = 0)]
         public ThemeColors Default { get; set; }
 
         /// <summary>
         /// Mouse hovered colors
         /// </summary>
-        [DataMember]
+        [DataMember(Order = 1)]
         public ThemeColors Hovering { get; set; }
 
         /// <summary>
         /// Pressed colors
         /// </summary>
-        [DataMember]
+        [DataMember(Order = 2)]
         public ThemeColors Pressed { get; set; }
 
         public void ConfigureResourceDictionary(ResourceDictionary dictionary, string prefix)
@@ -98,6 +112,21 @@ namespace StarryEyes.Settings.Themes
             Default.ConfigureResourceDictionary(dictionary, prefix);
             Hovering.ConfigureResourceDictionary(dictionary, prefix + "Hovering");
             Pressed.ConfigureResourceDictionary(dictionary, prefix + "Pressed");
+        }
+
+        public ControlColors Clone()
+        {
+            return new ControlColors
+            {
+                Default = Default.Clone(),
+                Hovering = Hovering.Clone(),
+                Pressed = Pressed.Clone(),
+            };
+        }
+
+        object ICloneable.Clone()
+        {
+            return Clone();
         }
     }
 }

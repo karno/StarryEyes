@@ -60,7 +60,7 @@ namespace StarryEyes.Settings.Themes
         /// <summary>
         /// Name of font family, for serialization
         /// </summary>
-        [DataMember]
+        [DataMember(Order = 0)]
         private string FontFamilyName
         {
             get
@@ -93,7 +93,7 @@ namespace StarryEyes.Settings.Themes
         /// <summary>
         /// Font size
         /// </summary>
-        [DataMember]
+        [DataMember(Order = 1)]
         public double FontSize { get; set; }
 
         public void ConfigureResourceDictionary(ResourceDictionary dictionary, string prefix)

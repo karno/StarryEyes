@@ -13,35 +13,35 @@ namespace StarryEyes.Settings.Themes
     {
         #region Serialization properties
 
-        [DataMember]
+        [DataMember(Order = 4)]
         private string NotFollowedColor
         {
             get { return NotFollowed.ToColorString(); }
             set { NotFollowed = value.ToColor(); }
         }
 
-        [DataMember]
+        [DataMember(Order = 5)]
         private string NotFollowbackedColor
         {
             get { return NotFollowbacked.ToColorString(); }
             set { NotFollowbacked = value.ToColor(); }
         }
 
-        [DataMember]
+        [DataMember(Order = 6)]
         private string FollowingColor
         {
             get { return Following.ToColorString(); }
             set { Following = value.ToColor(); }
         }
 
-        [DataMember]
+        [DataMember(Order = 7)]
         private string FollowbackedColor
         {
             get { return Followbacked.ToColorString(); }
             set { Followbacked = value.ToColor(); }
         }
 
-        [DataMember]
+        [DataMember(Order = 8)]
         private string BlockingColor
         {
             get { return Blocking.ToColorString(); }
@@ -53,25 +53,25 @@ namespace StarryEyes.Settings.Themes
         /// <summary>
         /// Default foreground/background color
         /// </summary>
-        [DataMember]
+        [DataMember(Order = 0)]
         public ThemeColors Default { get; set; }
 
         /// <summary>
         /// Colors for selected item
         /// </summary>
-        [DataMember]
+        [DataMember(Order = 1)]
         public ThemeColors Selected { get; set; }
 
         /// <summary>
         /// Colors for mouse hovered item
         /// </summary>
-        [DataMember]
+        [DataMember(Order = 2)]
         public ThemeColors Hovering { get; set; }
 
         /// <summary>
         /// Colors for pressed item
         /// </summary>
-        [DataMember]
+        [DataMember(Order = 3)]
         public ThemeColors Pressed { get; set; }
 
         /// <summary>

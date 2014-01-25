@@ -12,31 +12,31 @@ namespace StarryEyes.Settings.Themes
         /// <summary>
         /// Default background/foreground colors
         /// </summary>
-        [DataMember]
+        [DataMember(Order = 0)]
         public ThemeColors Default { get; set; }
 
         /// <summary>
         /// Colors for foreground/background when query is invalid
         /// </summary>
-        [DataMember]
+        [DataMember(Order = 1)]
         public ThemeColors QueryInvalid { get; set; }
 
         /// <summary>
         /// Colors for selected item
         /// </summary>
-        [DataMember]
+        [DataMember(Order = 2)]
         public ThemeColors Selected { get; set; }
 
         /// <summary>
         /// Colors for mouse hovered item
         /// </summary>
-        [DataMember]
+        [DataMember(Order = 3)]
         public ThemeColors Hovering { get; set; }
 
         /// <summary>
         /// Colors for mouse pressed item
         /// </summary>
-        [DataMember]
+        [DataMember(Order = 4)]
         public ThemeColors Pressed { get; set; }
 
         public void ConfigureResourceDictionary(ResourceDictionary dictionary, string prefix)

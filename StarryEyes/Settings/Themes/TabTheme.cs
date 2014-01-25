@@ -11,28 +11,28 @@ namespace StarryEyes.Settings.Themes
     {
         #region Serialization properties
 
-        [DataMember]
+        [DataMember(Order = 1)]
         private string DefaultColor
         {
             get { return Default.ToColorString(); }
             set { Default = value.ToColor(); }
         }
 
-        [DataMember]
+        [DataMember(Order = 2)]
         private string SelectedColor
         {
             get { return Selected.ToColorString(); }
             set { Selected = value.ToColor(); }
         }
 
-        [DataMember]
+        [DataMember(Order = 3)]
         private string FocusedColor
         {
             get { return Focused.ToColorString(); }
             set { Focused = value.ToColor(); }
         }
 
-        [DataMember]
+        [DataMember(Order = 4)]
         private string UnreadCountColor
         {
             get { return UnreadCount.ToColorString(); }
@@ -46,7 +46,7 @@ namespace StarryEyes.Settings.Themes
         /// <summary>
         /// Tab font
         /// </summary>
-        [DataMember, NotNull]
+        [DataMember(Order = 0), NotNull]
         public FontTheme TabFont
         {
             get { return _tabFont ?? (_tabFont = FontTheme.Default); }
