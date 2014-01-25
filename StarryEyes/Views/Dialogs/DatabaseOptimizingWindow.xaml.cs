@@ -1,16 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+using StarryEyes.Casket;
 
 namespace StarryEyes.Views.Dialogs
 {
@@ -22,6 +12,13 @@ namespace StarryEyes.Views.Dialogs
         public DatabaseOptimizingWindow()
         {
             InitializeComponent();
+            this.Loaded += DatabaseOptimizingWindow_Loaded;
+        }
+
+        async void DatabaseOptimizingWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            await Task.Run(async () => await Database.VacuumTables());
+            this.Close();
         }
     }
 }

@@ -1,7 +1,8 @@
 ﻿<Window x:Class="StarryEyes.Views.Dialogs.DatabaseOptimizingWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="DatabaseOptimizingWindow"
+        xmlns:my="http://metro.mahapps.com/winfx/xaml/controls"
+        Title="Krile StarryEyes - Database Optimizer"
         Width="300"
         Height="100"
         Background="#222222"
@@ -10,13 +11,25 @@
         WindowStartupLocation="CenterScreen"
         WindowStyle="None">
     <Border BorderBrush="White" BorderThickness="1">
-        <TextBlock HorizontalAlignment="Center"
-                   VerticalAlignment="Center"
-                   FontSize="14"
-                   Foreground="White">
-            <Run Text="OPTIMIZING KRILE DATABASE" />
-            <LineBreak />
-            <Run Text="PLEASE WAIT FOR A WHILE..." />
-        </TextBlock>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="1*" />
+            </Grid.ColumnDefinitions>
+            <my:ProgressRing Width="32"
+                             Height="32"
+                             Foreground="White"
+                             IsActive="True" />
+            <TextBlock Grid.Column="1"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       FontSize="16"
+                       Foreground="White">
+                <Run Text="optimizing database" />
+                <LineBreak />
+                <Run FontSize="10" Text="please wait for a while..." />
+            </TextBlock>
+        </Grid>
     </Border>
 </Window>
