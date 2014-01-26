@@ -1,4 +1,5 @@
-﻿using StarryEyes.Anomaly.TwitterApi.DataModels;
+﻿using System;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.DataModels.StreamModels;
 
 namespace StarryEyes.Anomaly.TwitterApi.Streaming
@@ -20,5 +21,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
         void OnTrackLimit(StreamTrackLimit item);
 
         void OnUserActivity(StreamUserActivity item);
+
+        void OnExceptionThrownDuringParsing(Exception ex);
     }
 }
