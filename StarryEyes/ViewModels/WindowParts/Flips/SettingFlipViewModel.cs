@@ -26,6 +26,7 @@ using StarryEyes.ViewModels.Common;
 using StarryEyes.ViewModels.Dialogs;
 using StarryEyes.Views.Dialogs;
 using StarryEyes.Views.Messaging;
+using StarryEyes.Views.WindowParts.Primitives;
 using Application = System.Windows.Application;
 
 namespace StarryEyes.ViewModels.WindowParts.Flips
@@ -366,6 +367,16 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             }
         }
 
+        public int BackgroundImageTransparency
+        {
+            get { return Setting.BackgroundImageTransparency.Value; }
+            set
+            {
+                Setting.BackgroundImageTransparency.Value = value;
+                RaisePropertyChanged();
+            }
+        }
+
         public void SelectBackgroundImage()
         {
             var msg = new OpeningFileSelectionMessage
@@ -373,6 +384,10 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 Filter = "画像ファイル|*.png;*.jpg;*.jpeg;*.gif;*.bmp",
                 Title = "背景画像を選択"
             };
+            if (!String.IsNullOrEmpty(BackgroundImagePath))
+            {
+                msg.FileName = BackgroundImagePath;
+            }
             var resp = this.Messenger.GetResponse(msg);
             if (resp.Response != null && resp.Response.Length > 0)
             {
@@ -430,6 +445,8 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             if (_themeCache != null)
             {
                 Setting.Theme.Value = _themeCache;
+                // refresh colors in timeline
+                TimelineSwapResourcesBehavior.RefreshResources();
             }
         }
 

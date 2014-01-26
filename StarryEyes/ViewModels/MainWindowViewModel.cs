@@ -6,6 +6,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Media.Imaging;
 using Livet;
 using Livet.Messaging;
 using StarryEyes.Annotations;
@@ -137,7 +138,11 @@ namespace StarryEyes.ViewModels
                     h => MainWindowModel.BackstageTransitionRequested -= h)
                 .Subscribe(this.TransitionBackstage));
             CompositeDisposable.Add(Setting.BackgroundImagePath.ListenValueChanged(
-                _ => RaisePropertyChanged(() => BackgroundImageUri)));
+                _ =>
+                {
+                    RaisePropertyChanged(() => BackgroundImageUri);
+                    RaisePropertyChanged(() => BackgroundImage);
+                }));
             CompositeDisposable.Add(Setting.BackgroundImageTransparency.ListenValueChanged(
                 _ => RaisePropertyChanged(() => BackgroundImageOpacity)));
             CompositeDisposable.Add(Setting.RotateWindowContent.ListenValueChanged(
@@ -418,10 +423,31 @@ namespace StarryEyes.ViewModels
             }
         }
 
+        public BitmapImage BackgroundImage
+        {
+            get
+            {
+                var uri = BackgroundImageUri;
+                if (uri == null)
+                {
+                    return null;
+                }
+                try
+                {
+                    return new BitmapImage(uri);
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
+            }
+        }
+
         public double BackgroundImageOpacity
         {
             get { return (255 - Math.Min(255, Setting.BackgroundImageTransparency.Value)) / 255.0; }
         }
+
 
         public bool RotateWindowContent
         {

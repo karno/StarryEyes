@@ -289,13 +289,13 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="13*" />
                 </Grid.RowDefinitions>
-                <vc:LazyImage Grid.RowSpan="2"
-                              Margin="{Binding ElementName=StatusGrid,
-                                               Path=ActualHeight,
-                                               Converter={StaticResource BottomThicknessConverter}}"
-                              Opacity="{Binding BackgroundImageOpacity}"
-                              Stretch="UniformToFill"
-                              UriSource="{Binding BackgroundImageUri}" />
+                <Image Grid.RowSpan="2"
+                       Margin="{Binding ElementName=StatusGrid,
+                                        Path=ActualHeight,
+                                        Converter={StaticResource BottomThicknessConverter}}"
+                       Opacity="{Binding BackgroundImageOpacity}"
+                       Source="{Binding BackgroundImage}"
+                       Stretch="UniformToFill" />
                 <windowParts:InputArea Grid.Row="0"
                                        Margin="3,4,3,0"
                                        DataContext="{Binding InputAreaViewModel}" />

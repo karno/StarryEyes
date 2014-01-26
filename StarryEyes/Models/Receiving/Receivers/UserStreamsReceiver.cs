@@ -13,6 +13,7 @@ using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.DataModels.StreamModels;
 using StarryEyes.Anomaly.TwitterApi.Streaming;
 using StarryEyes.Models.Accounting;
+using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Models.Backstages.SystemEvents;
 using StarryEyes.Models.Backstages.TwitterEvents;
 using StarryEyes.Models.Receiving.Handling;
@@ -262,6 +263,12 @@ namespace StarryEyes.Models.Receiving.Receivers
                         NotificationService.NotifyUserUpdated(item.Source);
                         break;
                 }
+            }
+
+            public void OnExceptionThrownDuringParsing(Exception ex)
+            {
+                BackstageModel.RegisterEvent(new OperationFailedEvent(
+                    "異常なストリーム データを受信しました(" + _parent.Account.UnreliableScreenName + ": ", ex));
             }
         }
 

@@ -25,7 +25,7 @@
             <ColumnDefinition Width="316" />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
-        <Border Background="WhiteSmoke">
+        <Border Background="{DynamicResource BackstageBackgroundBrush}">
             <ScrollViewer HorizontalScrollBarVisibility="Disabled"
                           Style="{StaticResource TouchScrollViewerStyle}"
                           VerticalScrollBarVisibility="Auto">
@@ -126,7 +126,7 @@
                 </ItemsControl>
             </ScrollViewer>
         </Border>
-        <Border Grid.Column="1" Background="White">
+        <Border Grid.Column="1" Background="{DynamicResource BaseColorBackgroundBrush}">
             <!--  Main area  -->
             <ScrollViewer Grid.Row="1"
                           HorizontalAlignment="Stretch"

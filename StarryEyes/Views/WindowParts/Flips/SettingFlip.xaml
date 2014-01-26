@@ -42,7 +42,7 @@
                 <l:OpenFileDialogInteractionMessageAction />
             </l:InteractionMessageTrigger>
         </i:Interaction.Triggers>
-        <Grid Background="White">
+        <Grid Background="{DynamicResource BaseColorBackgroundBrush}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition />
@@ -66,7 +66,7 @@
                     <Path Width="25"
                           Height="18"
                           Data="F1 M 36,22L 36,26L 19.75,26L 27,33L 20.5,33L 11,24L 20.5,15L 27,15L 19.75,22L 36,22 Z "
-                          Fill="Black"
+                          Fill="{DynamicResource BaseColorForegroundBrush}"
                           Stretch="Fill" />
                 </Button>
 
@@ -90,7 +90,7 @@
                     </ListBox.Resources>
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <Grid Background="White">
+                            <Grid Background="#00FFFFFF">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition />
@@ -171,7 +171,7 @@
                                                 <RowDefinition Height="Auto" />
                                                 <RowDefinition />
                                             </Grid.RowDefinitions>
-                                            <Grid Background="#FF1BA1E2">
+                                            <Grid Background="{DynamicResource TitleBarBackgroundBrush}">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="Auto" />
                                                     <ColumnDefinition />
@@ -192,7 +192,7 @@
                                                            HorizontalAlignment="Left"
                                                            VerticalAlignment="Center"
                                                            FontSize="18"
-                                                           Foreground="White"
+                                                           Foreground="{DynamicResource TitleBarForegroundBrush}"
                                                            Text="{Binding ScreenName,
                                                                           FallbackValue=USER NAME}"
                                                            TextWrapping="Wrap" />
@@ -218,7 +218,7 @@
                                                     Height="Auto"
                                                     HorizontalAlignment="Stretch"
                                                     VerticalAlignment="Stretch"
-                                                    BorderBrush="#FF1BA1E2"
+                                                    BorderBrush="{DynamicResource TitleBarBackgroundBrush}"
                                                     BorderThickness="1,0,1,1">
                                                 <StackPanel Background="{x:Null}" Orientation="Vertical">
                                                     <DockPanel Margin="8,8,8,4" Visibility="{Binding CanFallback}">
@@ -522,17 +522,43 @@
                             </Border>
                         </Grid>
                     </Grid>
-                    <DockPanel Grid.Row="1" Margin="16,16,16,4">
-                        <TextBlock VerticalAlignment="Center" Text="タイムラインの壁紙: " />
-                        <Button Content="..." DockPanel.Dock="Right">
+                    <Grid Grid.Row="1" Margin="16,16,16,4">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="1*" />
+                            <RowDefinition Height="1*" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Margin="4"
+                                   VerticalAlignment="Center"
+                                   Text="タイムラインの壁紙: " />
+                        <TextBox Grid.Column="1" Text="{Binding BackgroundImagePath}" />
+                        <Button Grid.Column="2" Content="...">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="Click">
                                     <ei:CallMethodAction MethodName="SelectBackgroundImage" TargetObject="{Binding}" />
                                 </i:EventTrigger>
                             </i:Interaction.Triggers>
                         </Button>
-                        <TextBox Text="{Binding BackgroundImagePath}" />
-                    </DockPanel>
+                        <TextBlock Grid.Row="1"
+                                   Margin="4"
+                                   Text="壁紙の透過度" />
+                        <Slider Grid.Row="1"
+                                Grid.Column="1"
+                                Maximum="255"
+                                Minimum="0"
+                                Value="{Binding BackgroundImageTransparency,
+                                                Mode=TwoWay}" />
+                        <TextBlock Grid.Row="1"
+                                   Grid.Column="2"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   Text="{Binding BackgroundImageTransparency,
+                                                  Mode=OneWay}" />
+                    </Grid>
                 </Grid>
                 <Grid Grid.Column="1" Margin="0,6,0,0">
                     <Grid.Style>

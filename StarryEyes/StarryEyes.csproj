@@ -178,6 +178,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AppInitializer.cs" />
+    <Compile Include="CustomColorButtonHelper.cs" />
     <Compile Include="Filters\Expressions\Operators\OperatorStrings.cs" />
     <Compile Include="Filters\Expressions\Values\Users\Booleans.cs" />
     <Compile Include="Filters\Expressions\Values\Users\Complexes.cs" />
@@ -453,6 +454,7 @@
     <Compile Include="Views\WindowParts\Flips\VersionInfo.xaml.cs">
       <DependentUpon>VersionInfo.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\WindowParts\Primitives\TimelineSwapResourcesBehavior.cs" />
     <Compile Include="Views\WindowParts\Primitives\UsersList.xaml.cs">
       <DependentUpon>UsersList.xaml</DependentUpon>
     </Compile>

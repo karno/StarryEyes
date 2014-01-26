@@ -138,6 +138,9 @@ namespace StarryEyes
         /// <returns>when returning false, should abort execution</returns>
         private static bool ShowRescueDialog()
         {
+#if DEBUG
+            return true;
+#endif
             var resp = ConfirmationMassages.ConfirmRescue();
             if (!resp.CommandButtonResult.HasValue || resp.CommandButtonResult.Value == 2)
             {

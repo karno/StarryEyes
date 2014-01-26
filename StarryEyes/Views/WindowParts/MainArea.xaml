@@ -48,11 +48,11 @@
                                    VerticalAlignment="Center"
                                    FontFamily="Segoe UI"
                                    FontSize="16"
-                                   Foreground="#FF999999"
+                                   Foreground="{DynamicResource TabBrush}"
                                    Text="{Binding Name}" />
                         <TextBlock VerticalAlignment="Top"
                                    FontFamily="Segoe UI"
-                                   Foreground="#FF1BA1E2"
+                                   Foreground="{DynamicResource TabUnreadCountBrush}"
                                    Text="{Binding UnreadCount}"
                                    Visibility="{Binding IsUnreadExisted,
                                                         Converter={StaticResource BooleanToVisibleConverter}}" />
@@ -64,14 +64,14 @@
                             <Condition Binding="{Binding IsFocused}" Value="True" />
                             <Condition Binding="{Binding Parent.IsFocused}" Value="True" />
                         </MultiDataTrigger.Conditions>
-                        <Setter TargetName="TabName" Property="Foreground" Value="Black" />
+                        <Setter TargetName="TabName" Property="Foreground" Value="{DynamicResource TabFocusedBrush}" />
                     </MultiDataTrigger>
                     <MultiDataTrigger>
                         <MultiDataTrigger.Conditions>
                             <Condition Binding="{Binding IsFocused}" Value="True" />
                             <Condition Binding="{Binding Parent.IsFocused}" Value="False" />
                         </MultiDataTrigger.Conditions>
-                        <Setter TargetName="TabName" Property="Foreground" Value="#FF1BA1E2" />
+                        <Setter TargetName="TabName" Property="Foreground" Value="{DynamicResource TabSelectedBrush}" />
                     </MultiDataTrigger>
                 </DataTemplate.Triggers>
             </DataTemplate>
