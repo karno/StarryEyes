@@ -163,12 +163,12 @@ namespace StarryEyes.Settings.Themes
                 },
                 Hovering = new ThemeColors
                 {
-                    Background = Color.FromRgb(0xdc, 0xdc, 0xdc),
+                    Background = Color.FromArgb(0x90, 0xdc, 0xdc, 0xdc),
                     Foreground = c,
                 },
                 Pressed = new ThemeColors
                 {
-                    Background = Color.FromRgb(0x90, 0x90, 0x90),
+                    Background = Color.FromArgb(0x90, 0x90, 0x90, 0x90),
                     Foreground = c,
                 }
             });

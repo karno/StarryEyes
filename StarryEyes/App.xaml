@@ -181,7 +181,6 @@
                 <Setter Property="FontSize" Value="10" />
                 <Setter Property="Background" Value="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(starryEyes:CustomColorButtonHelper.DefaultBrush)}" />
                 <Setter Property="BorderBrush" Value="Transparent" />
-                <Setter Property="Foreground" Value="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(starryEyes:CustomColorButtonHelper.DefaultForegroundBrush)}" />
                 <Setter Property="Padding" Value="5,6" />
                 <Setter Property="BorderThickness" Value="1" />
                 <Setter Property="Template">

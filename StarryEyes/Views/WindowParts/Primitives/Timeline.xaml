@@ -52,7 +52,7 @@
                     <SolidColorBrush x:Key="SubTextBrush" Color="{DynamicResource TweetDefaultSubText}" />
                     <SolidColorBrush x:Key="HyperlinkTextBrush" Color="{DynamicResource TweetDefaultHyperlinkText}" />
                     <SolidColorBrush x:Key="FavoriteCounter" Color="{DynamicResource TweetDefaultFavoriteCounter}" />
-                    <SolidColorBrush x:Key="RetweetCounter" Color="{DynamicResource TweetDefaultFavoriteCounter}" />
+                    <SolidColorBrush x:Key="RetweetCounter" Color="{DynamicResource TweetDefaultRetweetCounter}" />
                     <SolidColorBrush x:Key="RetweetMarker" Color="{DynamicResource TweetDefaultRetweetMarker}" />
                     <SolidColorBrush x:Key="FavAndRtBackground" Color="{DynamicResource TweetDefaultFavAndRtButtonBackground}" />
                     <SolidColorBrush x:Key="FavAndRtForeground" Color="{DynamicResource TweetDefaultFavAndRtButtonForeground}" />
@@ -1030,7 +1030,7 @@
                                                       Data="F1 M 753.421,588.661L 755.996,588.661L 756.841,586.293L 757.687,588.661L 757.768,588.661C 758.324,588.451 758.927,588.337 759.556,588.337C 761.011,588.337 762.323,588.949 763.248,589.929L 763.248,587.414L 764.633,588.799L 764.633,592.491L 760.94,592.491L 759.556,591.106L 762.136,591.106C 761.502,590.398 760.581,589.952 759.556,589.952C 759.052,589.952 758.573,590.06 758.14,590.254L 759.078,592.608L 756.841,591.292L 756.799,591.32C 756.445,591.786 756.206,592.344 756.125,592.952L 754.5,592.952C 754.592,591.925 754.991,590.986 755.603,590.227L 753.421,588.661 Z M 759.556,596.875C 761.311,596.875 762.761,595.569 762.987,593.875L 764.612,593.875C 764.379,596.463 762.204,598.491 759.556,598.491C 758.101,598.491 756.789,597.879 755.864,596.898L 755.864,599.414L 754.479,598.029L 754.479,594.337L 758.171,594.337L 759.556,595.722L 756.976,595.722C 757.61,596.43 758.531,596.875 759.556,596.875 Z "
                                                       Stretch="Fill">
                                                     <Path.Style>
-                                                        <Style TargetType="Path">
+                                                        <Style TargetType="{x:Type Path}">
                                                             <Setter Property="Fill" Value="{DynamicResource FavAndRtForeground}" />
                                                             <Style.Triggers>
                                                                 <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Button}, Path=IsMouseOver}" Value="True">
@@ -1047,11 +1047,14 @@
                                             <Button Width="46"
                                                     Height="22"
                                                     Margin="0,-2"
-                                                    Style="{StaticResource MetroSquareUnfocusableFlatButton}"
+                                                    Style="{StaticResource MetroCustomColorFlatButton}"
                                                     ToolTip="アカウントを選択してお気に入り登録"
                                                     Visibility="{Binding CanFavorite,
                                                                          Mode=OneTime,
-                                                                         Converter={StaticResource BooleanToVisibleConverter}}">
+                                                                         Converter={StaticResource BooleanToVisibleConverter}}"
+                                                    starryEyes:CustomColorButtonHelper.DefaultBrush="{DynamicResource FavoriteBackground}"
+                                                    starryEyes:CustomColorButtonHelper.HoverBrush="{DynamicResource FavoriteHoveringBackground}"
+                                                    starryEyes:CustomColorButtonHelper.PressedBrush="{DynamicResource FavoritePressedBackground}">
                                                 <i:Interaction.Triggers>
                                                     <i:EventTrigger EventName="Click">
                                                         <ei:CallMethodAction MethodName="ToggleFavorite" TargetObject="{Binding Mode=OneTime}" />
@@ -1062,47 +1065,114 @@
                                                       Margin="19,1,-13,0"
                                                       Data="F1 M 806.479,594.43L 808.229,591.399L 804.729,591.399L 806.479,594.43 Z "
                                                       Fill="Gray"
-                                                      Stretch="Fill" />
-                                            </Button>
-                                            <Button Width="32"
-                                                    Height="22"
-                                                    Margin="-60,-2,0,-2"
-                                                    Style="{StaticResource MetroSquareUnfocusableFlatButton}"
-                                                    ToolTip="お気に入り登録"
-                                                    Visibility="{Binding CanFavorite,
-                                                                         Mode=OneTime,
-                                                                         Converter={StaticResource BooleanToVisibleConverter}}">
-                                                <i:Interaction.Triggers>
-                                                    <i:EventTrigger EventName="Click">
-                                                        <ei:CallMethodAction MethodName="ToggleFavoriteImmediate" TargetObject="{Binding Mode=OneTime}" />
-                                                    </i:EventTrigger>
-                                                </i:Interaction.Triggers>
-                                                <Path x:Name="FavoriteStar"
-                                                      Width="16"
-                                                      Height="14.77"
-                                                      Margin="-2"
-                                                      Data="F1 M 771.886,590.845L 776.402,590.845L 777.886,586.691L 779.369,590.845L 783.886,590.845L 780.124,593.539L 781.809,597.768L 777.886,595.46L 774.424,597.768L 775.728,593.602L 771.886,590.845 Z "
                                                       Stretch="Fill">
                                                     <Path.Style>
                                                         <Style TargetType="{x:Type Path}">
-                                                            <Setter Property="Fill" Value="Gray" />
+                                                            <Setter Property="Fill" Value="{DynamicResource FavoriteForeground}" />
                                                             <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding IsFavorited, Mode=OneWay}" Value="True">
-                                                                    <Setter Property="Fill" Value="#EF9608" />
+                                                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Button}, Path=IsMouseOver}" Value="True">
+                                                                    <Setter Property="Fill" Value="{DynamicResource FavoriteHoveringForeground}" />
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Button}, Path=IsPressed}" Value="True">
+                                                                    <Setter Property="Fill" Value="{DynamicResource FavoritePressedForeground}" />
                                                                 </DataTrigger>
                                                             </Style.Triggers>
                                                         </Style>
                                                     </Path.Style>
                                                 </Path>
                                             </Button>
+                                            <Grid Width="32"
+                                                  Height="22"
+                                                  Margin="-60,-2,0,-2"
+                                                  Visibility="{Binding CanFavorite,
+                                                                       Mode=OneTime,
+                                                                       Converter={StaticResource BooleanToVisibleConverter}}">
+                                                <Button Width="32"
+                                                        Height="22"
+                                                        Margin="0,-2,0,-2"
+                                                        Style="{StaticResource MetroCustomColorFlatButton}"
+                                                        ToolTip="お気に入り登録"
+                                                        Visibility="{Binding IsFavorited,
+                                                                             Mode=OneWay,
+                                                                             Converter={StaticResource BooleanToInvisibleConverter}}"
+                                                        starryEyes:CustomColorButtonHelper.DefaultBrush="{DynamicResource FavoriteBackground}"
+                                                        starryEyes:CustomColorButtonHelper.HoverBrush="{DynamicResource FavoriteHoveringBackground}"
+                                                        starryEyes:CustomColorButtonHelper.PressedBrush="{DynamicResource FavoritePressedBackground}">
+                                                    <i:Interaction.Triggers>
+                                                        <i:EventTrigger EventName="Click">
+                                                            <ei:CallMethodAction MethodName="ToggleFavoriteImmediate" TargetObject="{Binding Mode=OneTime}" />
+                                                        </i:EventTrigger>
+                                                    </i:Interaction.Triggers>
+                                                    <Path x:Name="FavoriteStar"
+                                                          Width="16"
+                                                          Height="14.77"
+                                                          Margin="-2"
+                                                          Data="F1 M 771.886,590.845L 776.402,590.845L 777.886,586.691L 779.369,590.845L 783.886,590.845L 780.124,593.539L 781.809,597.768L 777.886,595.46L 774.424,597.768L 775.728,593.602L 771.886,590.845 Z "
+                                                          Stretch="Fill">
+                                                        <Path.Style>
+                                                            <Style TargetType="{x:Type Path}">
+                                                                <Setter Property="Fill" Value="{DynamicResource FavoriteForeground}" />
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Button}, Path=IsMouseOver}" Value="True">
+                                                                        <Setter Property="Fill" Value="{DynamicResource FavoriteHoveringForeground}" />
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Button}, Path=IsPressed}" Value="True">
+                                                                        <Setter Property="Fill" Value="{DynamicResource FavoritePressedForeground}" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Path.Style>
+                                                    </Path>
+                                                </Button>
+                                                <Button Width="32"
+                                                        Height="22"
+                                                        Margin="0,-2,0,-2"
+                                                        Style="{StaticResource MetroCustomColorFlatButton}"
+                                                        ToolTip="お気に入りを削除"
+                                                        Visibility="{Binding IsFavorited,
+                                                                             Mode=OneWay,
+                                                                             Converter={StaticResource BooleanToVisibleConverter}}"
+                                                        starryEyes:CustomColorButtonHelper.DefaultBrush="{DynamicResource ColoredFavoriteBackground}"
+                                                        starryEyes:CustomColorButtonHelper.HoverBrush="{DynamicResource ColoredFavoriteHoveringBackground}"
+                                                        starryEyes:CustomColorButtonHelper.PressedBrush="{DynamicResource ColoredFavoritePressedBackground}">
+                                                    <i:Interaction.Triggers>
+                                                        <i:EventTrigger EventName="Click">
+                                                            <ei:CallMethodAction MethodName="ToggleFavoriteImmediate" TargetObject="{Binding Mode=OneTime}" />
+                                                        </i:EventTrigger>
+                                                    </i:Interaction.Triggers>
+                                                    <Path x:Name="UnfavoriteStar"
+                                                          Width="16"
+                                                          Height="14.77"
+                                                          Margin="-2"
+                                                          Data="F1 M 771.886,590.845L 776.402,590.845L 777.886,586.691L 779.369,590.845L 783.886,590.845L 780.124,593.539L 781.809,597.768L 777.886,595.46L 774.424,597.768L 775.728,593.602L 771.886,590.845 Z "
+                                                          Stretch="Fill">
+                                                        <Path.Style>
+                                                            <Style TargetType="{x:Type Path}">
+                                                                <Setter Property="Fill" Value="{DynamicResource ColoredFavoriteForeground}" />
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Button}, Path=IsMouseOver}" Value="True">
+                                                                        <Setter Property="Fill" Value="{DynamicResource ColoredFavoriteHoveringForeground}" />
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Button}, Path=IsPressed}" Value="True">
+                                                                        <Setter Property="Fill" Value="{DynamicResource ColoredFavoritePressedForeground}" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Path.Style>
+                                                    </Path>
+                                                </Button>
+                                            </Grid>
                                             <Button Width="46"
                                                     Height="22"
                                                     Margin="0,-2"
-                                                    Style="{StaticResource MetroSquareUnfocusableFlatButton}"
+                                                    Style="{StaticResource MetroCustomColorFlatButton}"
                                                     ToolTip="アカウントを選択してリツイート"
                                                     Visibility="{Binding CanRetweet,
                                                                          Mode=OneTime,
-                                                                         Converter={StaticResource BooleanToVisibleConverter}}">
+                                                                         Converter={StaticResource BooleanToVisibleConverter}}"
+                                                    starryEyes:CustomColorButtonHelper.DefaultBrush="{DynamicResource RetweetBackground}"
+                                                    starryEyes:CustomColorButtonHelper.HoverBrush="{DynamicResource RetweetHoveringBackground}"
+                                                    starryEyes:CustomColorButtonHelper.PressedBrush="{DynamicResource RetweetPressedBackground}">
                                                 <i:Interaction.Triggers>
                                                     <i:EventTrigger EventName="Click">
                                                         <ei:CallMethodAction MethodName="ToggleRetweet" TargetObject="{Binding Mode=OneTime}" />
@@ -1113,44 +1183,111 @@
                                                       Margin="19,1,-13,0"
                                                       Data="F1 M 806.479,594.43L 808.229,591.399L 804.729,591.399L 806.479,594.43 Z "
                                                       Fill="Gray"
-                                                      Stretch="Fill" />
-                                            </Button>
-                                            <Button Width="32"
-                                                    Height="22"
-                                                    Margin="-60,-2,0,-2"
-                                                    Style="{StaticResource MetroSquareUnfocusableFlatButton}"
-                                                    ToolTip="リツイート"
-                                                    Visibility="{Binding CanRetweet,
-                                                                         Mode=OneTime,
-                                                                         Converter={StaticResource BooleanToVisibleConverter}}">
-                                                <i:Interaction.Triggers>
-                                                    <i:EventTrigger EventName="Click">
-                                                        <ei:CallMethodAction MethodName="ToggleRetweetImmediate" TargetObject="{Binding Mode=OneTime}" />
-                                                    </i:EventTrigger>
-                                                </i:Interaction.Triggers>
-                                                <Path x:Name="RetweetCircle"
-                                                      Width="13.54"
-                                                      Height="16"
-                                                      Margin="-2"
-                                                      Data="F1 M 797.334,587.09C 798.788,587.09 800.1,587.702 801.026,588.682L 801.026,586.167L 802.41,587.551L 802.41,591.244L 798.718,591.244L 797.334,589.859L 799.914,589.859C 799.28,589.151 798.359,588.705 797.334,588.705C 795.578,588.705 794.128,590.012 793.903,591.705L 792.277,591.705C 792.511,589.117 794.685,587.09 797.334,587.09 Z M 797.334,595.628C 799.089,595.628 800.539,594.322 800.765,592.628L 802.39,592.628C 802.157,595.216 799.982,597.244 797.334,597.244C 795.879,597.244 794.567,596.632 793.641,595.651L 793.641,598.167L 792.257,596.782L 792.257,593.09L 795.949,593.09L 797.334,594.474L 794.753,594.474C 795.387,595.182 796.308,595.628 797.334,595.628 Z "
                                                       Stretch="Fill">
                                                     <Path.Style>
                                                         <Style TargetType="{x:Type Path}">
-                                                            <Setter Property="Fill" Value="Gray" />
+                                                            <Setter Property="Fill" Value="{DynamicResource RetweetForeground}" />
                                                             <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding IsRetweeted, Mode=OneWay}" Value="True">
-                                                                    <Setter Property="Fill" Value="#339933" />
+                                                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Button}, Path=IsMouseOver}" Value="True">
+                                                                    <Setter Property="Fill" Value="{DynamicResource RetweetHoveringForeground}" />
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Button}, Path=IsPressed}" Value="True">
+                                                                    <Setter Property="Fill" Value="{DynamicResource RetweetPressedForeground}" />
                                                                 </DataTrigger>
                                                             </Style.Triggers>
                                                         </Style>
                                                     </Path.Style>
                                                 </Path>
                                             </Button>
+                                            <Grid Width="32"
+                                                  Height="22"
+                                                  Margin="-60,-2,0,-2"
+                                                  Visibility="{Binding CanRetweet,
+                                                                       Mode=OneTime,
+                                                                       Converter={StaticResource BooleanToVisibleConverter}}">
+                                                <Button Width="32"
+                                                        Height="22"
+                                                        Margin="0,-2,0,-2"
+                                                        Style="{StaticResource MetroCustomColorFlatButton}"
+                                                        ToolTip="リツイート"
+                                                        Visibility="{Binding IsRetweeted,
+                                                                             Mode=OneWay,
+                                                                             Converter={StaticResource BooleanToInvisibleConverter}}"
+                                                        starryEyes:CustomColorButtonHelper.DefaultBrush="{DynamicResource RetweetBackground}"
+                                                        starryEyes:CustomColorButtonHelper.HoverBrush="{DynamicResource RetweetHoveringBackground}"
+                                                        starryEyes:CustomColorButtonHelper.PressedBrush="{DynamicResource RetweetPressedBackground}">
+                                                    <i:Interaction.Triggers>
+                                                        <i:EventTrigger EventName="Click">
+                                                            <ei:CallMethodAction MethodName="ToggleRetweetImmediate" TargetObject="{Binding Mode=OneTime}" />
+                                                        </i:EventTrigger>
+                                                    </i:Interaction.Triggers>
+                                                    <Path x:Name="RetweetCircle"
+                                                          Width="13.54"
+                                                          Height="16"
+                                                          Margin="-2"
+                                                          Data="F1 M 797.334,587.09C 798.788,587.09 800.1,587.702 801.026,588.682L 801.026,586.167L 802.41,587.551L 802.41,591.244L 798.718,591.244L 797.334,589.859L 799.914,589.859C 799.28,589.151 798.359,588.705 797.334,588.705C 795.578,588.705 794.128,590.012 793.903,591.705L 792.277,591.705C 792.511,589.117 794.685,587.09 797.334,587.09 Z M 797.334,595.628C 799.089,595.628 800.539,594.322 800.765,592.628L 802.39,592.628C 802.157,595.216 799.982,597.244 797.334,597.244C 795.879,597.244 794.567,596.632 793.641,595.651L 793.641,598.167L 792.257,596.782L 792.257,593.09L 795.949,593.09L 797.334,594.474L 794.753,594.474C 795.387,595.182 796.308,595.628 797.334,595.628 Z "
+                                                          Stretch="Fill">
+                                                        <Path.Style>
+                                                            <Style TargetType="{x:Type Path}">
+                                                                <Setter Property="Fill" Value="{DynamicResource RetweetForeground}" />
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Button}, Path=IsMouseOver}" Value="True">
+                                                                        <Setter Property="Fill" Value="{DynamicResource RetweetHoveringForeground}" />
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Button}, Path=IsPressed}" Value="True">
+                                                                        <Setter Property="Fill" Value="{DynamicResource RetweetPressedForeground}" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Path.Style>
+                                                    </Path>
+                                                </Button>
+                                                <Button Width="32"
+                                                        Height="22"
+                                                        Margin="0,-2,0,-2"
+                                                        Style="{StaticResource MetroCustomColorFlatButton}"
+                                                        ToolTip="リツイートを取り消す"
+                                                        Visibility="{Binding IsRetweeted,
+                                                                             Mode=OneWay,
+                                                                             Converter={StaticResource BooleanToVisibleConverter}}"
+                                                        starryEyes:CustomColorButtonHelper.DefaultBrush="{DynamicResource ColoredRetweetBackground}"
+                                                        starryEyes:CustomColorButtonHelper.HoverBrush="{DynamicResource ColoredRetweetHoveringBackground}"
+                                                        starryEyes:CustomColorButtonHelper.PressedBrush="{DynamicResource ColoredRetweetPressedBackground}">
+                                                    <i:Interaction.Triggers>
+                                                        <i:EventTrigger EventName="Click">
+                                                            <ei:CallMethodAction MethodName="ToggleRetweetImmediate" TargetObject="{Binding Mode=OneTime}" />
+                                                        </i:EventTrigger>
+                                                    </i:Interaction.Triggers>
+                                                    <Path x:Name="UnretweetCircle"
+                                                          Width="13.54"
+                                                          Height="16"
+                                                          Margin="-2"
+                                                          Data="F1 M 797.334,587.09C 798.788,587.09 800.1,587.702 801.026,588.682L 801.026,586.167L 802.41,587.551L 802.41,591.244L 798.718,591.244L 797.334,589.859L 799.914,589.859C 799.28,589.151 798.359,588.705 797.334,588.705C 795.578,588.705 794.128,590.012 793.903,591.705L 792.277,591.705C 792.511,589.117 794.685,587.09 797.334,587.09 Z M 797.334,595.628C 799.089,595.628 800.539,594.322 800.765,592.628L 802.39,592.628C 802.157,595.216 799.982,597.244 797.334,597.244C 795.879,597.244 794.567,596.632 793.641,595.651L 793.641,598.167L 792.257,596.782L 792.257,593.09L 795.949,593.09L 797.334,594.474L 794.753,594.474C 795.387,595.182 796.308,595.628 797.334,595.628 Z "
+                                                          Stretch="Fill">
+                                                        <Path.Style>
+                                                            <Style TargetType="{x:Type Path}">
+                                                                <Setter Property="Fill" Value="{DynamicResource ColoredRetweetForeground}" />
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Button}, Path=IsMouseOver}" Value="True">
+                                                                        <Setter Property="Fill" Value="{DynamicResource ColoredRetweetHoveringForeground}" />
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Button}, Path=IsPressed}" Value="True">
+                                                                        <Setter Property="Fill" Value="{DynamicResource ColoredRetweetPressedForeground}" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Path.Style>
+                                                    </Path>
+                                                </Button>
+                                            </Grid>
                                             <Button Width="32"
                                                     Height="22"
                                                     Margin="0,-2"
-                                                    Style="{StaticResource MetroSquareUnfocusableFlatButton}"
-                                                    ToolTip="このツイートに返信">
+                                                    Style="{StaticResource MetroCustomColorFlatButton}"
+                                                    ToolTip="このツイートに返信"
+                                                    starryEyes:CustomColorButtonHelper.DefaultBrush="{DynamicResource MentionBackground}"
+                                                    starryEyes:CustomColorButtonHelper.HoverBrush="{DynamicResource MentionHoveringBackground}"
+                                                    starryEyes:CustomColorButtonHelper.PressedBrush="{DynamicResource MentionPressedBackground}">
                                                 <i:Interaction.Triggers>
                                                     <i:EventTrigger EventName="Click">
                                                         <ei:CallMethodAction MethodName="SendReplyOrDirectMessage" TargetObject="{Binding Mode=OneTime}" />
@@ -1161,16 +1298,33 @@
                                                       Margin="-2"
                                                       Data="F1 M 825.467,595.138L 826.267,597.937L 823.067,595.138L 821.867,595.138L 821.867,587.937L 831.467,587.937L 831.467,595.138L 825.467,595.138 Z "
                                                       Fill="Gray"
-                                                      Stretch="Fill" />
+                                                      Stretch="Fill">
+                                                    <Path.Style>
+                                                        <Style TargetType="{x:Type Path}">
+                                                            <Setter Property="Fill" Value="{DynamicResource MentionForeground}" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Button}, Path=IsMouseOver}" Value="True">
+                                                                    <Setter Property="Fill" Value="{DynamicResource MentionHoveringForeground}" />
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Button}, Path=IsPressed}" Value="True">
+                                                                    <Setter Property="Fill" Value="{DynamicResource MentionPressedForeground}" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Path.Style>
+                                                </Path>
                                             </Button>
                                             <Button Width="32"
                                                     Height="22"
                                                     Margin="0,-2"
-                                                    Style="{StaticResource MetroSquareUnfocusableFlatButton}"
+                                                    Style="{StaticResource MetroCustomColorFlatButton}"
                                                     ToolTip="このツイートを削除"
                                                     Visibility="{Binding CanDelete,
                                                                          Mode=OneWay,
-                                                                         Converter={StaticResource BooleanToVisibleConverter}}">
+                                                                         Converter={StaticResource BooleanToVisibleConverter}}"
+                                                    starryEyes:CustomColorButtonHelper.DefaultBrush="{DynamicResource DeleteBackground}"
+                                                    starryEyes:CustomColorButtonHelper.HoverBrush="{DynamicResource DeleteHoveringBackground}"
+                                                    starryEyes:CustomColorButtonHelper.PressedBrush="{DynamicResource DeletePressedBackground}">
                                                 <i:Interaction.Triggers>
                                                     <i:EventTrigger EventName="Click">
                                                         <ei:CallMethodAction MethodName="ConfirmDelete" TargetObject="{Binding Mode=OneTime}" />
@@ -1181,7 +1335,21 @@
                                                       Margin="-2"
                                                       Data="F1 M 834.964,587.472L 842.787,587.472C 843.057,587.472 843.153,588.572 843.153,588.572L 834.598,588.572C 834.598,588.572 834.694,587.472 834.964,587.472 Z M 838.142,586.25L 839.609,586.25C 839.744,586.25 840.098,586.604 840.098,586.739C 840.098,586.874 839.744,587.228 839.609,587.228L 838.142,587.228C 838.007,587.228 837.653,586.874 837.653,586.739C 837.653,586.604 838.007,586.25 838.142,586.25 Z M 835.698,588.939L 842.053,588.939C 842.323,588.939 842.542,589.158 842.542,589.428L 842.053,596.761C 842.053,597.031 841.834,597.25 841.564,597.25L 836.187,597.25C 835.917,597.25 835.698,597.031 835.698,596.761L 835.209,589.428C 835.209,589.158 835.428,588.939 835.698,588.939 Z M 836.431,589.917L 836.553,596.272L 837.409,596.272L 837.287,589.917L 836.431,589.917 Z M 838.387,589.917L 838.387,596.272L 839.364,596.272L 839.364,589.917L 838.387,589.917 Z M 840.464,589.917L 840.342,596.272L 841.198,596.272L 841.32,589.917L 840.464,589.917 Z "
                                                       Fill="Gray"
-                                                      Stretch="Fill" />
+                                                      Stretch="Fill">
+                                                    <Path.Style>
+                                                        <Style TargetType="{x:Type Path}">
+                                                            <Setter Property="Fill" Value="{DynamicResource DeleteForeground}" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Button}, Path=IsMouseOver}" Value="True">
+                                                                    <Setter Property="Fill" Value="{DynamicResource DeleteHoveringForeground}" />
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Button}, Path=IsPressed}" Value="True">
+                                                                    <Setter Property="Fill" Value="{DynamicResource DeletePressedForeground}" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Path.Style>
+                                                </Path>
                                             </Button>
                                         </StackPanel>
                                     </Grid>
@@ -1208,12 +1376,12 @@
                                                   Margin="2,0"
                                                   VerticalAlignment="Center"
                                                   Data="F1 M 17.5,22.5L 22.3928,22.5L 24,18L 25.6071,22.5L 30.5,22.5L 26.4252,25.4193L 28.25,30L 24,27.5L 20.25,30L 21.6625,25.4875L 17.5,22.5 Z "
-                                                  Fill="#FFF0A30A"
+                                                  Fill="{DynamicResource FavoriteCounter}"
                                                   Stretch="Fill" />
                                             <TextBlock Margin="1,-1,5,0"
                                                        VerticalAlignment="Center"
                                                        FontFamily="Segoe UI Semilight"
-                                                       Foreground="#FFF0A30A"
+                                                       Foreground="{DynamicResource FavoriteCounter}"
                                                        IsHitTestVisible="False"
                                                        Text="{Binding FavoriteCount,
                                                                       Mode=OneWay,
@@ -1231,12 +1399,12 @@
                                                   Margin="2,0"
                                                   VerticalAlignment="Center"
                                                   Data="F1 M 24,18.9231C 25.4548,18.9231 26.7667,19.535 27.6923,20.5154L 27.6923,18L 29.0769,19.3846L 29.0769,23.0769L 25.3846,23.0769L 24,21.6923L 26.5801,21.6923C 25.9463,20.9841 25.0252,20.5385 24,20.5385C 22.2447,20.5385 20.7946,21.8449 20.569,23.5385L 18.9438,23.5385C 19.177,20.9508 21.3517,18.9231 24,18.9231 Z M 24,27.4615C 25.7553,27.4615 27.2054,26.1551 27.431,24.4615L 29.0562,24.4615C 28.823,27.0492 26.6483,29.0769 24,29.0769C 22.5452,29.0769 21.2333,28.465 20.3077,27.4846L 20.3077,30L 18.9231,28.6154L 18.9231,24.9231L 22.6154,24.9231L 24,26.3077L 21.4199,26.3077C 22.0537,27.0159 22.9748,27.4615 24,27.4615 Z "
-                                                  Fill="#FF008A00"
+                                                  Fill="{DynamicResource RetweetCounter}"
                                                   Stretch="Fill" />
                                             <TextBlock Margin="1,-1,0,0"
                                                        VerticalAlignment="Center"
                                                        FontFamily="Segoe UI Semilight"
-                                                       Foreground="#FF008A00"
+                                                       Foreground="{DynamicResource RetweetCounter}"
                                                        IsHitTestVisible="False"
                                                        Text="{Binding RetweetCount,
                                                                       Mode=OneWay,
@@ -1267,12 +1435,12 @@
                                                   Margin="2,0"
                                                   VerticalAlignment="Center"
                                                   Data="F1 M 17.5,22.5L 22.3928,22.5L 24,18L 25.6071,22.5L 30.5,22.5L 26.4252,25.4193L 28.25,30L 24,27.5L 20.25,30L 21.6625,25.4875L 17.5,22.5 Z "
-                                                  Fill="#FFF0A30A"
+                                                  Fill="{DynamicResource FavoriteCounter}"
                                                   Stretch="Fill" />
                                             <TextBlock Margin="1,-1,5,0"
                                                        VerticalAlignment="Center"
                                                        FontFamily="Segoe UI Semilight"
-                                                       Foreground="#FFF0A30A"
+                                                       Foreground="{DynamicResource FavoriteCounter}"
                                                        IsHitTestVisible="False"
                                                        Text="{Binding FavoriteCount,
                                                                       Mode=OneWay,
@@ -1302,12 +1470,12 @@
                                                   Margin="3,1"
                                                   VerticalAlignment="Center"
                                                   Data="F1 M 24,18.9231C 25.4548,18.9231 26.7667,19.535 27.6923,20.5154L 27.6923,18L 29.0769,19.3846L 29.0769,23.0769L 25.3846,23.0769L 24,21.6923L 26.5801,21.6923C 25.9463,20.9841 25.0252,20.5385 24,20.5385C 22.2447,20.5385 20.7946,21.8449 20.569,23.5385L 18.9438,23.5385C 19.177,20.9508 21.3517,18.9231 24,18.9231 Z M 24,27.4615C 25.7553,27.4615 27.2054,26.1551 27.431,24.4615L 29.0562,24.4615C 28.823,27.0492 26.6483,29.0769 24,29.0769C 22.5452,29.0769 21.2333,28.465 20.3077,27.4846L 20.3077,30L 18.9231,28.6154L 18.9231,24.9231L 22.6154,24.9231L 24,26.3077L 21.4199,26.3077C 22.0537,27.0159 22.9748,27.4615 24,27.4615 Z "
-                                                  Fill="#FF008A00"
+                                                  Fill="{DynamicResource RetweetCounter}"
                                                   Stretch="Fill" />
                                             <TextBlock Margin="1,-2,5,0"
                                                        VerticalAlignment="Center"
                                                        FontFamily="Segoe UI Semilight"
-                                                       Foreground="#FF008A00"
+                                                       Foreground="{DynamicResource RetweetCounter}"
                                                        IsHitTestVisible="False"
                                                        Text="{Binding RetweetCount,
                                                                       Mode=OneWay,
@@ -1336,7 +1504,7 @@
                                               Height="12"
                                               Margin="3,1"
                                               Data="F1 M 24,18.9231C 25.4548,18.9231 26.7667,19.535 27.6923,20.5154L 27.6923,18L 29.0769,19.3846L 29.0769,23.0769L 25.3846,23.0769L 24,21.6923L 26.5801,21.6923C 25.9463,20.9841 25.0252,20.5385 24,20.5385C 22.2447,20.5385 20.7946,21.8449 20.569,23.5385L 18.9438,23.5385C 19.177,20.9508 21.3517,18.9231 24,18.9231 Z M 24,27.4615C 25.7553,27.4615 27.2054,26.1551 27.431,24.4615L 29.0562,24.4615C 28.823,27.0492 26.6483,29.0769 24,29.0769C 22.5452,29.0769 21.2333,28.465 20.3077,27.4846L 20.3077,30L 18.9231,28.6154L 18.9231,24.9231L 22.6154,24.9231L 24,26.3077L 21.4199,26.3077C 22.0537,27.0159 22.9748,27.4615 24,27.4615 Z "
-                                              Fill="#FF008A00"
+                                              Fill="{DynamicResource RetweetMarker}"
                                               Stretch="Fill" />
                                         <TextBlock Margin="1,-2,0,0"
                                                    HorizontalAlignment="Left"
@@ -1344,7 +1512,7 @@
                                                    Cursor="Hand"
                                                    FontFamily="Segoe UI Semilight"
                                                    FontSize="12"
-                                                   Foreground="#FF008A00"
+                                                   Foreground="{DynamicResource RetweetMarker}"
                                                    Text="{Binding Retweeter.ScreenName,
                                                                   Mode=OneTime,
                                                                   FallbackValue=user}"
@@ -1669,9 +1837,8 @@
                       ItemsSource="{Binding Timeline,
                                             Mode=OneWay}"
                       VirtualizingPanel.IsVirtualizing="True"
-                      VirtualizingPanel.ScrollUnit="Pixel">
-            <!--  Disable panel recycling  -->
-            <!--  VirtualizingPanel.VirtualizationMode="Recycling"  -->
+                      VirtualizingPanel.ScrollUnit="Pixel"
+                      VirtualizingPanel.VirtualizationMode="Recycling">
             <i:Interaction.Triggers>
                 <l:InteractionMessageTrigger Messenger="{Binding Messenger, Mode=OneTime}">
                     <mbehaviors:ScrollIntoViewInteractionMessageAction />

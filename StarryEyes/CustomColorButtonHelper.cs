@@ -43,45 +43,5 @@ namespace StarryEyes
         {
             return (Brush)element.GetValue(PressedBrushProperty);
         }
-
-        public static readonly DependencyProperty DefaultForegroundBrushProperty = DependencyProperty.RegisterAttached(
-            "DefaultForegroundBrush", typeof(Brush), typeof(CustomColorButtonHelper), new PropertyMetadata(Brushes.Yellow));
-
-        public static void SetDefaultForegroundBrush(DependencyObject element, Brush value)
-        {
-            element.SetValue(DefaultForegroundBrushProperty, value);
-        }
-
-        public static Brush GetDefaultForegroundBrush(DependencyObject element)
-        {
-            return (Brush)element.GetValue(DefaultForegroundBrushProperty);
-        }
-
-        public static readonly DependencyProperty HoverForegroundBrushProperty = DependencyProperty.RegisterAttached(
-            "HoverForegroundBrush", typeof(Brush), typeof(CustomColorButtonHelper), new PropertyMetadata(default(Brush)));
-
-        public static void SetHoverForegroundBrush(DependencyObject element, Brush value)
-        {
-            element.SetValue(HoverForegroundBrushProperty, value);
-        }
-
-        public static Brush GetHoverForegroundBrush(DependencyObject element)
-        {
-            return (Brush)element.GetValue(HoverForegroundBrushProperty);
-        }
-
-        public static readonly DependencyProperty PressedForegroundBrushProperty = DependencyProperty.RegisterAttached(
-            "PressedForegroundBrush", typeof(Brush), typeof(CustomColorButtonHelper), new PropertyMetadata(default(Brush)));
-
-        public static void SetPressedForegroundBrush(DependencyObject element, Brush value)
-        {
-            element.SetValue(PressedForegroundBrushProperty, value);
-        }
-
-        public static Brush GetPressedForegroundBrush(DependencyObject element)
-        {
-            return (Brush)element.GetValue(PressedForegroundBrushProperty);
-        }
-
     }
 }

@@ -115,7 +115,7 @@ namespace StarryEyes.Views.WindowParts.Primitives
                 "Tweet{0}SubText",
                 "Tweet{0}HyperlinkText",
                 "Tweet{0}FavoriteCounter",
-                "Tweet{0}FavoriteCounter",
+                "Tweet{0}RetweetCounter",
                 "Tweet{0}RetweetMarker",
                 "Tweet{0}FavAndRtButtonBackground",
                 "Tweet{0}FavAndRtButtonForeground",
