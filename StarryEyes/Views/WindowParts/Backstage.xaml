@@ -79,7 +79,7 @@
                                             <TextBlock Text="{Binding RemainUpdate}">
                                                 <TextBlock.Style>
                                                     <Style TargetType="{x:Type TextBlock}">
-                                                        <Setter Property="Foreground" Value="Black" />
+                                                        <Setter Property="Foreground" Value="{DynamicResource BaseColorForegroundBrush}" />
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding IsWarningPostLimit}" Value="True">
                                                                 <Setter Property="Foreground" Value="#FFE51400" />
@@ -168,7 +168,7 @@
                                     <TextBlock Margin="8,8,4,8"
                                                VerticalAlignment="Center"
                                                FontWeight="Bold"
-                                               Foreground="Black"
+                                               Foreground="{DynamicResource BaseColorForegroundBrush}"
                                                Text="{Binding Title,
                                                               Mode=OneWay}"
                                                Visibility="{Binding IsImageAvailable,
@@ -176,7 +176,7 @@
                                                                     Mode=OneWay}" />
                                     <TextBlock Margin="4,8,8,8"
                                                VerticalAlignment="Center"
-                                               Foreground="Black"
+                                               Foreground="{DynamicResource BaseColorForegroundBrush}"
                                                Text="{Binding Detail,
                                                               Mode=OneWay}" />
                                 </StackPanel>
