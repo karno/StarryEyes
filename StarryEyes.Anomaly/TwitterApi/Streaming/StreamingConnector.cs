@@ -28,16 +28,19 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
 
         private static void DispatchStreamingElements(dynamic element, IStreamHandler handler)
         {
+            var type = "initial";
             try
             {
+                // element.foo() -> element.IsDefined("foo")
                 if (element.text())
                 {
                     // standard status receiving
+                    type = "status";
                     handler.OnStatus(new TwitterStatus(element));
                 }
-                // element.foo() -> element.IsDefined("foo")
                 if (element.delete())
                 {
+                    type = "delete";
                     // delete handler
                     handler.OnDeleted(new StreamDelete
                     {
@@ -48,11 +51,13 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
                 }
                 if (element.scrub_geo())
                 {
+                    type = "geolocation";
                     // TODO: Not implemented.(Location deletion notices)
                     return;
                 }
                 if (element.limit())
                 {
+                    type = "tracklimit";
                     handler.OnTrackLimit(new StreamTrackLimit
                     {
                         UndeliveredCount = (long)element.limit.track
@@ -61,11 +66,13 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
                 }
                 if (element.status_withheld() || element.user_withheld())
                 {
+                    type = "withheld";
                     // TODO: Not implemented.(???)
                     return;
                 }
                 if (element.disconnect())
                 {
+                    type = "discon";
                     handler.OnDisconnect(new StreamDisconnect
                     {
                         Code = (DisconnectCode)element.disconnect.code,
@@ -75,11 +82,13 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
                 }
                 if (element.warning())
                 {
+                    type = "warning";
                     // TODO: Not implemented.(stall warning)
                     return;
                 }
                 if (element.friends())
                 {
+                    type = "friends";
                     handler.OnEnumerationReceived(new StreamEnumeration
                     {
                         Friends = (long[])element.friends
@@ -87,7 +96,9 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
                 }
                 if (element.IsDefined("event"))
                 {
+                    type = "event";
                     string ev = ((string)element["event"]).ToLower();
+                    type = "event:" + ev;
                     switch (ev)
                     {
                         case "favorite":
@@ -141,7 +152,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
             }
             catch (Exception ex)
             {
-                handler.OnExceptionThrownDuringParsing(ex);
+                handler.OnExceptionThrownDuringParsing(new Exception("type:" + type, ex));
             }
         }
     }

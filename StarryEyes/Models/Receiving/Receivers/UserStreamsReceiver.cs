@@ -268,7 +268,7 @@ namespace StarryEyes.Models.Receiving.Receivers
             public void OnExceptionThrownDuringParsing(Exception ex)
             {
                 BackstageModel.RegisterEvent(new OperationFailedEvent(
-                    "異常なストリーム データを受信しました(" + _parent.Account.UnreliableScreenName + ": ", ex));
+                    "解析できないデータを受信しました(" + _parent.Account.UnreliableScreenName + "): ", ex));
             }
         }
 

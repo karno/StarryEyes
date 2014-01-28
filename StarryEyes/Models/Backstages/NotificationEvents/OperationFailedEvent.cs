@@ -26,8 +26,18 @@ namespace StarryEyes.Models.Backstages.NotificationEvents
                 return this._description +
                        (this._exception == null
                            ? String.Empty
-                           : " - " + this.GetCoreException(this._exception).Message);
+                           : " - " + BuildMessage(this.GetCoreException(this._exception)));
             }
+        }
+
+        private string BuildMessage(Exception ex)
+        {
+            var msg = ex.Message;
+            if (ex.InnerException != null)
+            {
+                msg += " - " + BuildMessage(ex.InnerException);
+            }
+            return msg;
         }
 
         private Exception GetCoreException(Exception ex)
