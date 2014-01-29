@@ -31,7 +31,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
             Directory.CreateDirectory(dir);
             var logFile = Path.Combine(dir, credential.OAuthAccessToken + ".log");
 
-            var fstream = File.Open(logFile, FileMode.OpenOrCreate, FileAccess.Write);
+            var fstream = File.Open(logFile, FileMode.Append, FileAccess.Write);
             var writer = new StreamWriter(fstream);
 
             writer.WriteLine(DateTime.Now.ToString() + ": #CONOPEN");

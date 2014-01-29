@@ -136,6 +136,7 @@ namespace StarryEyes.Models.Receiving.Receivers
             this.CheckDisposed();
             this.ConnectionState = UserStreamsConnectionState.Connecting;
             Debug.WriteLine("*USERSTREAMS* " + _account.UnreliableScreenName + ": Starting connection...");
+            _stateUpdater.UpdateState();
             var con = this.Account.ConnectUserStreams(this._trackKeywords, this.Account.ReceiveRepliesAll,
                                                       this.Account.ReceiveFollowingsActivity)
                           .Do(_ =>
