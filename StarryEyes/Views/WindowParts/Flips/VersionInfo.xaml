@@ -31,7 +31,7 @@
             <ei:CallMethodAction MethodName="CheckUpdate" TargetObject="{Binding}" />
         </i:EventTrigger>
     </i:Interaction.Triggers>
-    <Grid Background="White">
+    <Grid Background="{DynamicResource BaseColorBackgroundBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -2577,7 +2577,7 @@
                                VerticalAlignment="Center"
                                FontSize="11"
                                Foreground="White"
-                               Text="update available! (click to install)"
+                               Text="update is available! (click to install)"
                                TextWrapping="Wrap" />
                 </StackPanel>
             </Border>

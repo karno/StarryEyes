@@ -26,18 +26,22 @@
                                                  RelativeSource={RelativeSource AncestorType={x:Type UserControl},
                                                                                 Mode=FindAncestor}}"
                        Visibility="Visible">
-        <Grid Background="White">
+        <Grid Background="{DynamicResource BaseColorBackgroundBrush}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition />
             </Grid.RowDefinitions>
-            <Grid Background="#FFF0F0F0">
+            <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
-                <Button Width="48"
+                <Border Grid.ColumnSpan="2"
+                        Background="{DynamicResource BaseColorForegroundBrush}"
+                        Opacity="0.05" />
+                <Button Grid.Column="0"
+                        Width="48"
                         Height="48"
                         Margin="-6,-6,12,12"
                         HorizontalAlignment="Left"
@@ -56,10 +60,11 @@
                 </Button>
                 <TextBox Grid.Column="1"
                          VerticalAlignment="Top"
-                         Background="#FFF0F0F0"
+                         Background="Transparent"
                          BorderBrush="{x:Null}"
                          BorderThickness="0"
                          FontSize="32"
+                         Foreground="{DynamicResource BaseColorForegroundBrush}"
                          Padding="4,8,4,1"
                          Text="{Binding TabName}"
                          TextWrapping="Wrap" />
@@ -81,14 +86,19 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <Grid>
+                <Border Grid.RowSpan="4"
+                        Background="{DynamicResource BaseColorForegroundBrush}"
+                        Opacity="0.05" />
+                <Grid Grid.Row="0">
                     <TextBlock Margin="8,8,8,4" Text="このタブのクエリ" />
                     <TextBlock Margin="8,8,8,4" HorizontalAlignment="Right">
                         <Hyperlink Command="{Binding OpenQueryReferenceCommand}">Krile Queryのヘルプ...</Hyperlink>
                     </TextBlock>
                 </Grid>
+
                 <controls:QueryEditor Grid.Row="1"
-                                      Background="#FFF0F0F0"
+                                      Background="Transparent"
+                                      Foreground="{DynamicResource BaseColorForegroundBrush}"
                                       IsSourceFilterEditable="True"
                                       QueryText="{Binding QueryString,
                                                           Mode=TwoWay}" />

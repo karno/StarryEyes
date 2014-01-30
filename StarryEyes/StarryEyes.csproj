@@ -413,6 +413,7 @@
     <Compile Include="Views\Triggers\KeyTriggerBase.cs" />
     <Compile Include="Views\Utils\DependencyObjectExtension.cs" />
     <Compile Include="Views\Utils\NotNullToVisibleConverter.cs" />
+    <Compile Include="Views\Utils\StringFormatConverter.cs" />
     <Compile Include="Views\Utils\TextBlockStylizer.cs" />
     <Compile Include="Views\Messaging\Behaviors\BringIntoViewInteractionMessageAction.cs" />
     <Compile Include="Views\Messaging\Behaviors\GoToStateInteractionMessageAction.cs" />

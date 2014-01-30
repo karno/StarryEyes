@@ -1683,7 +1683,7 @@
             <ei:GoToStateAction StateName="Close" TargetObject="{Binding ElementName=userControl}" />
         </ei:DataTrigger>
     </i:Interaction.Triggers>
-    <DockPanel>
+    <DockPanel Background="{DynamicResource BaseColorBackgroundBrush}">
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="StatusesActionBar">
                 <VisualState x:Name="Close">

@@ -79,7 +79,7 @@
                 <ListBox x:Name="SettingCategories"
                          Width="180"
                          HorizontalContentAlignment="Stretch"
-                         SelectedIndex="5">
+                         SelectedIndex="2">
                     <ListBox.Resources>
                         <Style TargetType="{x:Type ListBoxItem}">
                             <Setter Property="Margin" Value="0" />
@@ -357,11 +357,14 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                    <Grid Margin="16,0" Background="#FFF0F0F0">
+                    <Grid Margin="16,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
+                        <Border Grid.ColumnSpan="2"
+                                Background="{DynamicResource BaseColorForegroundBrush}"
+                                Opacity="0.05" />
                         <TextBlock Margin="24,0"
                                    HorizontalAlignment="Left"
                                    VerticalAlignment="Center"
@@ -380,9 +383,14 @@
                             </i:Interaction.Triggers>
                         </Button>
                     </Grid>
+                    <Border Grid.Row="1"
+                            Margin="16,0"
+                            Background="{DynamicResource BaseColorForegroundBrush}"
+                            Opacity="0.05" />
                     <controls:QueryEditor Grid.Row="1"
                                           Margin="16,0"
-                                          Background="#FFF0F0F0"
+                                          Background="Transparent"
+                                          Foreground="{DynamicResource BaseColorForegroundBrush}"
                                           IsSourceFilterEditable="False"
                                           QueryText="{Binding QueryString,
                                                               Mode=TwoWay}" />

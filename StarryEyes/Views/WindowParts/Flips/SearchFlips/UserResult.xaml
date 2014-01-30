@@ -32,7 +32,7 @@
                 <Path Width="25"
                       Height="18"
                       Data="F1 M 36,22L 36,26L 19.75,26L 27,33L 20.5,33L 11,24L 20.5,15L 27,15L 19.75,22L 36,22 Z "
-                      Fill="Black"
+                      Fill="{DynamicResource BaseColorForegroundBrush}"
                       Stretch="Fill" />
             </Button>
             <TextBlock Margin="8"

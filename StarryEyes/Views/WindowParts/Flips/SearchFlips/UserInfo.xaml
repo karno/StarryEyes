@@ -16,54 +16,139 @@
              mc:Ignorable="d">
     <UserControl.Resources>
         <ResourceDictionary>
+            <utils:StringFormatConverter x:Key="StringFormatConverter" />
             <utils:BooleanToVisibleConverter x:Key="BooleanToVisibleConverter" />
             <utils:BooleanToInvisibleConverter x:Key="BooleanToInvisibleConverter" />
             <utils:NotNullOrEmptyToVisibleConverter x:Key="NotNullOrEmptyToVisibleConverter" />
-            <Style x:Key="FloatTextBlockStyle" TargetType="TextBlock">
-                <Style.Resources>
-                    <ResourceDictionary>
-                        <Storyboard x:Key="DefaultStoryBoard">
-                            <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(TextBlock.Background).(SolidColorBrush.Color)">
-                                <SplineColorKeyFrame KeyTime="0:0:0" Value="#00000000" />
-                            </ColorAnimationUsingKeyFrames>
-                        </Storyboard>
-                        <Storyboard x:Key="HighlightStoryBoard">
-                            <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(TextBlock.Background).(SolidColorBrush.Color)">
-                                <SplineColorKeyFrame KeyTime="0:0:0" Value="#FF333333" />
-                            </ColorAnimationUsingKeyFrames>
-                        </Storyboard>
-                        <Storyboard x:Key="PressStoryBoard">
-                            <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(TextBlock.Background).(SolidColorBrush.Color)">
-                                <SplineColorKeyFrame KeyTime="0:0:0" Value="#FF444444" />
-                            </ColorAnimationUsingKeyFrames>
-                        </Storyboard>
-                    </ResourceDictionary>
-                </Style.Resources>
-                <Setter Property="Background" Value="#001BA1E2" />
-                <Setter Property="Foreground" Value="White" />
-                <Style.Triggers>
-                    <EventTrigger RoutedEvent="MouseEnter">
-                        <BeginStoryboard Storyboard="{StaticResource HighlightStoryBoard}" />
-                    </EventTrigger>
-                    <EventTrigger RoutedEvent="MouseLeave">
-                        <BeginStoryboard Storyboard="{StaticResource DefaultStoryBoard}" />
-                    </EventTrigger>
-                    <EventTrigger RoutedEvent="MouseLeftButtonDown">
-                        <BeginStoryboard Storyboard="{StaticResource PressStoryBoard}" />
-                    </EventTrigger>
-                    <EventTrigger RoutedEvent="MouseLeftButtonUp">
-                        <BeginStoryboard Storyboard="{StaticResource HighlightStoryBoard}" />
-                    </EventTrigger>
-                </Style.Triggers>
+            <Style x:Key="FlatFloatButtonStyle" TargetType="{x:Type Button}">
+                <Setter Property="FontFamily" Value="{x:Static SystemFonts.MessageFontFamily}" />
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="Foreground" Value="Black" />
+                <Setter Property="FontWeight" Value="Normal" />
+                <Setter Property="Padding" Value="0" />
+                <Setter Property="Margin" Value="0" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="Opacity" Value="1" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Button}">
+                            <Border x:Name="OuterBorder" Background="Black">
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroup x:Name="CommonStates">
+                                        <VisualState x:Name="MouseOver">
+                                            <Storyboard>
+                                                <ColorAnimationUsingKeyFrames Storyboard.TargetName="OuterBorder" Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)">
+                                                    <SplineColorKeyFrame KeyTime="0:0:0" Value="{DynamicResource UserFlipHoveringBackground}" />
+                                                </ColorAnimationUsingKeyFrames>
+                                                <ColorAnimationUsingKeyFrames Storyboard.TargetName="Presenter" Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)">
+                                                    <SplineColorKeyFrame KeyTime="0:0:0" Value="{DynamicResource UserFlipHoveringForeground}" />
+                                                </ColorAnimationUsingKeyFrames>
+                                            </Storyboard>
+                                        </VisualState>
+                                        <VisualState x:Name="Pressed">
+                                            <Storyboard>
+                                                <ColorAnimationUsingKeyFrames Storyboard.TargetName="OuterBorder" Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)">
+                                                    <SplineColorKeyFrame KeyTime="0:0:0" Value="{DynamicResource UserFlipPressedBackground}" />
+                                                </ColorAnimationUsingKeyFrames>
+                                                <ColorAnimationUsingKeyFrames Storyboard.TargetName="Presenter" Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)">
+                                                    <SplineColorKeyFrame KeyTime="0:0:0" Value="{DynamicResource UserFlipPressedForeground}" />
+                                                </ColorAnimationUsingKeyFrames>
+                                            </Storyboard>
+                                        </VisualState>
+                                        <VisualState x:Name="Disabled" />
+                                        <VisualState x:Name="Normal">
+                                            <Storyboard>
+                                                <ColorAnimationUsingKeyFrames Storyboard.TargetName="OuterBorder" Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)">
+                                                    <SplineColorKeyFrame KeyTime="0:0:0" Value="#00000000" />
+                                                </ColorAnimationUsingKeyFrames>
+                                                <ColorAnimationUsingKeyFrames Storyboard.TargetName="Presenter" Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)">
+                                                    <SplineColorKeyFrame KeyTime="0:0:0" Value="White" />
+                                                </ColorAnimationUsingKeyFrames>
+                                            </Storyboard>
+                                        </VisualState>
+                                    </VisualStateGroup>
+                                    <VisualStateGroup x:Name="FocusStates">
+                                        <VisualState x:Name="Focused" />
+                                    </VisualStateGroup>
+                                    <VisualStateGroup x:Name="ValidationStates">
+                                        <VisualState x:Name="InvalidFocused" />
+                                        <VisualState x:Name="InvalidUnfocused" />
+                                    </VisualStateGroup>
+                                </VisualStateManager.VisualStateGroups>
+                                <ContentPresenter x:Name="Presenter"
+                                                  Width="Auto"
+                                                  Height="Auto"
+                                                  Margin="8"
+                                                  HorizontalAlignment="Stretch"
+                                                  VerticalAlignment="Stretch"
+                                                  TextBlock.FontSize="12"
+                                                  TextBlock.Foreground="Black" />
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
             </Style>
+            <ControlTemplate x:Key="MetroCircleButtonTemplate" TargetType="{x:Type Button}">
+                <Grid x:Name="grid" Opacity="0.8">
+                    <VisualStateManager.VisualStateGroups>
+                        <VisualStateGroup x:Name="CommonStates">
+                            <VisualState x:Name="MouseOver">
+                                <Storyboard>
+                                    <ColorAnimationUsingKeyFrames Storyboard.TargetName="circle" Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)">
+                                        <EasingColorKeyFrame KeyTime="0" Value="#0CFFFFFF" />
+                                    </ColorAnimationUsingKeyFrames>
+                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetName="grid" Storyboard.TargetProperty="(UIElement.Opacity)">
+                                        <EasingDoubleKeyFrame KeyTime="0" Value="1" />
+                                    </DoubleAnimationUsingKeyFrames>
+                                </Storyboard>
+                            </VisualState>
+                            <VisualState x:Name="Pressed">
+                                <Storyboard>
+                                    <ColorAnimationUsingKeyFrames Storyboard.TargetName="circle" Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)">
+                                        <EasingColorKeyFrame KeyTime="0" Value="#19FFFFFF" />
+                                    </ColorAnimationUsingKeyFrames>
+                                </Storyboard>
+                            </VisualState>
+                            <VisualState x:Name="Disabled" />
+                            <VisualState x:Name="Normal">
+                                <Storyboard>
+                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetName="grid" Storyboard.TargetProperty="(UIElement.Opacity)">
+                                        <EasingDoubleKeyFrame KeyTime="0" Value="1" />
+                                    </DoubleAnimationUsingKeyFrames>
+                                </Storyboard>
+                            </VisualState>
+                        </VisualStateGroup>
+                        <VisualStateGroup x:Name="FocusStates">
+                            <VisualState x:Name="Focused" />
+                        </VisualStateGroup>
+                        <VisualStateGroup x:Name="ValidationStates">
+                            <VisualState x:Name="InvalidFocused" />
+                            <VisualState x:Name="InvalidUnfocused" />
+                        </VisualStateGroup>
+                    </VisualStateManager.VisualStateGroups>
+                    <Ellipse x:Name="circle"
+                             Width="Auto"
+                             Height="Auto"
+                             HorizontalAlignment="Stretch"
+                             VerticalAlignment="Stretch"
+                             Fill="#00000000"
+                             Stroke="{DynamicResource UserFlipForegroundBrush}"
+                             StrokeThickness="1.5" />
+                    <ContentPresenter Width="Auto"
+                                      Height="Auto"
+                                      Margin="2"
+                                      HorizontalAlignment="Stretch"
+                                      VerticalAlignment="Stretch" />
+                </Grid>
+            </ControlTemplate>
         </ResourceDictionary>
     </UserControl.Resources>
-    <Grid>
+    <Grid Background="{DynamicResource BaseColorBackgroundBrush}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="286" />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
-        <DockPanel Background="#111111">
+        <DockPanel Background="{DynamicResource UserFlipBackgroundBrush}">
             <Grid Height="143"
                   Background="Black"
                   DockPanel.Dock="Top">
@@ -91,7 +176,7 @@
                                    Cursor="Hand"
                                    FontSize="24"
                                    FontWeight="Bold"
-                                   Foreground="#FF1BA1E2"
+                                   Foreground="{DynamicResource GlobalKeyBrush}"
                                    Text="{Binding ScreenName,
                                                   Mode=OneTime}">
                             <i:Interaction.Triggers>
@@ -105,7 +190,7 @@
                               Margin="0,8,8,8"
                               Data="F1 M 14.0021,23.0031L 16.0022,23.0031L 16.0022,20.0028C 16.0022,15.5839 19.5845,12.0017 24.0033,12.0017C 28.4222,12.0017 32.0045,15.5839 32.0045,20.0028L 32.0045,23.0031L 34.0049,23.0031L 34.0049,36.005L 14.0021,36.005L 14.0021,23.0031 Z M 29.004,20.0028C 29.004,17.241 26.7652,15.0021 24.0033,15.0021C 21.2415,15.0021 19.0026,17.241 19.0026,20.0028L 19.0026,23.0031L 29.004,23.0031L 29.004,20.0028 Z "
                               DockPanel.Dock="Right"
-                              Fill="#FFFFFFFF"
+                              Fill="{DynamicResource UserFlipForegroundBrush}"
                               Stretch="Fill"
                               Visibility="{Binding User.IsProtected,
                                                    Converter={StaticResource BooleanToVisibleConverter}}" />
@@ -113,26 +198,28 @@
                               Height="13"
                               Margin="0,8,8,8"
                               Data="F1 M 18,22L 22.6667,26.6667L 30,17.3334L 32,19.3334L 22.6667,30.6667L 16,24L 18,22 Z "
-                              Fill="#FFFFFFFF"
+                              Fill="{DynamicResource UserFlipForegroundBrush}"
                               Stretch="Fill"
                               Visibility="{Binding User.IsVerified,
                                                    Converter={StaticResource BooleanToVisibleConverter}}" />
                     </StackPanel>
                     <TextBlock Margin="8,6"
-                               Foreground="White"
+                               Foreground="{DynamicResource UserFlipForegroundBrush}"
                                Text="{Binding User.Name,
                                               Mode=OneWay}" />
                     <TextBlock Margin="8,6"
                                VerticalAlignment="Top"
-                               Foreground="White"
+                               Foreground="{DynamicResource UserFlipForegroundBrush}"
                                TextWrapping="Wrap"
                                Visibility="{Binding User.Bio,
                                                     Converter={StaticResource NotNullOrEmptyToVisibleConverter}}"
+                               utils:TextBlockStylizer.ForegroundBrush="{DynamicResource UserFlipForegroundBrush}"
+                               utils:TextBlockStylizer.HyperlinkBrush="{DynamicResource UserFlipForegroundBrush}"
                                utils:TextBlockStylizer.LinkNavigationCommand="{Binding OpenLinkCommand,
                                                                                        Mode=OneTime}"
                                utils:TextBlockStylizer.TwitterUser="{Binding User.User}">
                         <i:Interaction.Behaviors>
-                            <behaviors:TextBlockDragSelectBehavior ForegroundBrush="White" SelectedText="{Binding SelectedText, Mode=OneWayToSource}">
+                            <behaviors:TextBlockDragSelectBehavior ForegroundBrush="{DynamicResource BaseColorBackgroundBrush}" SelectedText="{Binding SelectedText, Mode=OneWayToSource}">
                                 <behaviors:TextBlockDragSelectBehavior.SelectContextMenu>
                                     <ContextMenu DataContext="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
                                         <MenuItem Header="クリップボードにコピー(_C)">
@@ -178,13 +265,13 @@
                         </i:Interaction.Behaviors>
                     </TextBlock>
                     <TextBlock Margin="8,6"
-                               Foreground="White"
+                               Foreground="{DynamicResource UserFlipForegroundBrush}"
                                Text="{Binding User.Location}"
                                Visibility="{Binding User.Location,
                                                     Converter={StaticResource NotNullOrEmptyToVisibleConverter}}" />
                     <TextBlock Margin="8,6"
                                Cursor="Hand"
-                               Foreground="White"
+                               Foreground="{DynamicResource UserFlipForegroundBrush}"
                                Text="{Binding User.Web}"
                                TextDecorations="Underline"
                                TextTrimming="CharacterEllipsis"
@@ -197,24 +284,20 @@
                         </i:Interaction.Triggers>
                     </TextBlock>
                     <UniformGrid Rows="1">
-                        <TextBlock Padding="8"
-                                   Style="{StaticResource FloatTextBlockStyle}"
-                                   Text="favstar">
+                        <Button Content="favstar" Style="{StaticResource FlatFloatButtonStyle}">
                             <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="MouseLeftButtonDown">
+                                <i:EventTrigger EventName="Click">
                                     <ei:CallMethodAction MethodName="OpenUserFavstar" TargetObject="{Binding User}" />
                                 </i:EventTrigger>
                             </i:Interaction.Triggers>
-                        </TextBlock>
-                        <TextBlock Padding="8"
-                                   Style="{StaticResource FloatTextBlockStyle}"
-                                   Text="twilog">
+                        </Button>
+                        <Button Content="twilog" Style="{StaticResource FlatFloatButtonStyle}">
                             <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="MouseLeftButtonDown">
+                                <i:EventTrigger EventName="Click">
                                     <ei:CallMethodAction MethodName="OpenUserTwilog" TargetObject="{Binding User}" />
                                 </i:EventTrigger>
                             </i:Interaction.Triggers>
-                        </TextBlock>
+                        </Button>
                     </UniformGrid>
                     <Grid>
                         <Grid.Style>
@@ -222,21 +305,22 @@
                                 <Setter Property="Background" Value="Transparent" />
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding DisplayKind}" Value="Statuses">
-                                        <Setter Property="Background" Value="#FF222222" />
+                                        <Setter Property="Background" Value="{DynamicResource UserFlipHoveringBackgroundBrush}" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </Grid.Style>
-                        <TextBlock Padding="8"
-                                   Style="{StaticResource FloatTextBlockStyle}"
-                                   Text="{Binding User.StatusesCount,
-                                                  StringFormat={}{0} tweets}">
+                        <Button x:Name="StatusesButton"
+                                Content="{Binding User.StatusesCount,
+                                                  Converter={StaticResource StringFormatConverter},
+                                                  ConverterParameter={}{0} tweets}"
+                                Style="{StaticResource FlatFloatButtonStyle}">
                             <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="MouseLeftButtonDown">
+                                <i:EventTrigger EventName="Click">
                                     <ei:CallMethodAction MethodName="ShowStatuses" TargetObject="{Binding}" />
                                 </i:EventTrigger>
                             </i:Interaction.Triggers>
-                        </TextBlock>
+                        </Button>
                     </Grid>
                     <Grid>
                         <Grid.Style>
@@ -244,21 +328,22 @@
                                 <Setter Property="Background" Value="Transparent" />
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding DisplayKind}" Value="Following">
-                                        <Setter Property="Background" Value="#FF222222" />
+                                        <Setter Property="Background" Value="{DynamicResource UserFlipHoveringBackgroundBrush}" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </Grid.Style>
-                        <TextBlock Padding="8"
-                                   Style="{StaticResource FloatTextBlockStyle}"
-                                   Text="{Binding User.FollowingsCount,
-                                                  StringFormat={}{0} following}">
+                        <Button x:Name="FollowingsButton"
+                                Content="{Binding User.FollowingsCount,
+                                                  Converter={StaticResource StringFormatConverter},
+                                                  ConverterParameter={}{0} following}"
+                                Style="{StaticResource FlatFloatButtonStyle}">
                             <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="MouseLeftButtonDown">
+                                <i:EventTrigger EventName="Click">
                                     <ei:CallMethodAction MethodName="ShowFollowing" TargetObject="{Binding}" />
                                 </i:EventTrigger>
                             </i:Interaction.Triggers>
-                        </TextBlock>
+                        </Button>
                     </Grid>
                     <Grid>
                         <Grid.Style>
@@ -266,21 +351,22 @@
                                 <Setter Property="Background" Value="Transparent" />
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding DisplayKind}" Value="Followers">
-                                        <Setter Property="Background" Value="#FF222222" />
+                                        <Setter Property="Background" Value="{DynamicResource UserFlipHoveringBackgroundBrush}" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </Grid.Style>
-                        <TextBlock Padding="8"
-                                   Style="{StaticResource FloatTextBlockStyle}"
-                                   Text="{Binding User.FollowersCount,
-                                                  StringFormat={}{0} followers}">
+                        <Button x:Name="FollowersButton"
+                                Content="{Binding User.FollowersCount,
+                                                  Converter={StaticResource StringFormatConverter},
+                                                  ConverterParameter={}{0} followers}"
+                                Style="{StaticResource FlatFloatButtonStyle}">
                             <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="MouseLeftButtonDown">
+                                <i:EventTrigger EventName="Click">
                                     <ei:CallMethodAction MethodName="ShowFollowers" TargetObject="{Binding}" />
                                 </i:EventTrigger>
                             </i:Interaction.Triggers>
-                        </TextBlock>
+                        </Button>
                     </Grid>
                     <Grid>
                         <Grid.Style>
@@ -288,21 +374,22 @@
                                 <Setter Property="Background" Value="Transparent" />
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding DisplayKind}" Value="Favorites">
-                                        <Setter Property="Background" Value="#FF222222" />
+                                        <Setter Property="Background" Value="{DynamicResource UserFlipHoveringBackgroundBrush}" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </Grid.Style>
-                        <TextBlock Padding="8"
-                                   Style="{StaticResource FloatTextBlockStyle}"
-                                   Text="{Binding User.FavoritesCount,
-                                                  StringFormat={}{0} favorites}">
+                        <Button x:Name="FavoritesButton"
+                                Content="{Binding User.FavoritesCount,
+                                                  Converter={StaticResource StringFormatConverter},
+                                                  ConverterParameter={}{0} favorites}"
+                                Style="{StaticResource FlatFloatButtonStyle}">
                             <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="MouseLeftButtonDown">
+                                <i:EventTrigger EventName="Click">
                                     <ei:CallMethodAction MethodName="ShowFavorites" TargetObject="{Binding}" />
                                 </i:EventTrigger>
                             </i:Interaction.Triggers>
-                        </TextBlock>
+                        </Button>
                     </Grid>
                     <ItemsControl FocusVisualStyle="{x:Null}" ItemsSource="{Binding RelationControls}">
                         <ItemsControl.ItemTemplate>
@@ -347,23 +434,23 @@
                                                 VerticalAlignment="Center"
                                                 Orientation="Vertical">
                                         <TextBlock FontSize="16"
-                                                   Foreground="White"
+                                                   Foreground="{DynamicResource UserFlipForegroundBrush}"
                                                    Text="{Binding SourceUserScreenName,
                                                                   FallbackValue=user}" />
                                         <TextBlock FontSize="9"
-                                                   Foreground="White"
+                                                   Foreground="{DynamicResource UserFlipForegroundBrush}"
                                                    Text="PLEASE WAIT A MOMENT..."
                                                    Visibility="{Binding IsCommunicating,
                                                                         Converter={StaticResource BooleanToVisibleConverter}}" />
 
                                         <Grid Visibility="{Binding IsCommunicating, Converter={StaticResource BooleanToInvisibleConverter}}">
                                             <TextBlock FontSize="9"
-                                                       Foreground="#FF1BA1E2"
+                                                       Foreground="{DynamicResource UserFlipFollowbackedBrush}"
                                                        Text="FOLLOWBACKED"
                                                        Visibility="{Binding IsFollowedBack,
                                                                             Converter={StaticResource BooleanToVisibleConverter}}" />
                                             <TextBlock FontSize="9"
-                                                       Foreground="Gray"
+                                                       Foreground="{DynamicResource UserFlipNotFollowbackedBrush}"
                                                        Text="NOT FOLLOWBACKED"
                                                        Visibility="{Binding IsFollowedBack,
                                                                             Converter={StaticResource BooleanToInvisibleConverter}}" />
@@ -373,10 +460,9 @@
                                         <Border Width="88"
                                                 Height="24"
                                                 Margin="8,0"
-                                                Background="#FF333333">
+                                                Background="{DynamicResource UserFlipNotFollowedBrush}">
                                             <Button Content="FOLLOW"
                                                     ContextMenu="{StaticResource BlockMenu}"
-                                                    FontSize="10"
                                                     FontWeight="Normal"
                                                     Foreground="White"
                                                     Style="{DynamicResource MetroSquareUnfocusableFlatButton}">
@@ -391,12 +477,11 @@
                                                 Height="24"
                                                 Margin="8,0"
                                                 VerticalAlignment="Center"
-                                                Background="#FF1BA1E2"
+                                                Background="{DynamicResource UserFlipFollowingBrush}"
                                                 Visibility="{Binding IsFollowing,
                                                                      Converter={StaticResource BooleanToVisibleConverter}}">
                                             <Button Content="FOLLOWING"
                                                     ContextMenu="{StaticResource BlockMenu}"
-                                                    FontSize="10"
                                                     FontWeight="Normal"
                                                     Foreground="White"
                                                     Style="{DynamicResource MetroSquareUnfocusableFlatButton}">
@@ -410,11 +495,10 @@
                                         <Border Width="88"
                                                 Height="24"
                                                 Margin="8,0"
-                                                Background="#FFE51400"
+                                                Background="{DynamicResource UserFlipBlockingBrush}"
                                                 Visibility="{Binding IsBlocking,
                                                                      Converter={StaticResource BooleanToVisibleConverter}}">
                                             <Button Content="BLOCKED"
-                                                    FontSize="10"
                                                     FontWeight="Normal"
                                                     Foreground="White"
                                                     Style="{DynamicResource MetroSquareUnfocusableFlatButton}">
@@ -433,18 +517,20 @@
                     <TextBlock Margin="8,4"
                                HorizontalAlignment="Right"
                                FontSize="9"
-                               Foreground="White"
+                               Foreground="{DynamicResource UserFlipForegroundBrush}"
                                Text="RIGHT CLICK TO BLOCK USER" />
                 </StackPanel>
             </ScrollViewer>
         </DockPanel>
-        <Ellipse Width="52"
+        <Ellipse Grid.Column="0"
+                 Width="52"
                  Height="52"
                  Margin="-8,-8,0,0"
                  HorizontalAlignment="Left"
                  VerticalAlignment="Top"
                  Fill="#99000000" />
-        <Button Grid.ColumnSpan="2"
+        <Button Grid.Column="0"
+                Grid.ColumnSpan="2"
                 Width="48"
                 Height="48"
                 Margin="-6,-6,12,12"
@@ -459,7 +545,7 @@
             <Path Width="25"
                   Height="18"
                   Data="F1 M 36,22L 36,26L 19.75,26L 27,33L 20.5,33L 11,24L 20.5,15L 27,15L 19.75,22L 36,22 Z "
-                  Fill="White"
+                  Fill="{DynamicResource UserFlipForegroundBrush}"
                   Stretch="Fill" />
         </Button>
         <DockPanel x:Name="RightStatusPanel"

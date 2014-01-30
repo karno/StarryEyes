@@ -19,7 +19,7 @@
     <UserControl.Resources>
         <utils:BooleanToVisibleConverter x:Key="BooleanToVisibleConverter" />
         <DataTemplate x:Key="UserItemTemplate" DataType="searchFlips:UserResultItemViewModel">
-            <Grid Background="White">
+            <Grid Background="{DynamicResource BaseColorBackgroundBrush}">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="MouseLeftButtonDown">
                         <ei:CallMethodAction MethodName="Select" TargetObject="{Binding}" />
@@ -46,7 +46,7 @@
                     <TextBlock Margin="2,8,0,2"
                                VerticalAlignment="Center"
                                FontWeight="Bold"
-                               Foreground="#FF1BA1E2"
+                               Foreground="{DynamicResource GlobalKeyBrush}"
                                Text="{Binding ScreenName,
                                               Mode=OneTime}" />
                     <TextBlock Margin="2,8,0,2"
@@ -64,7 +64,7 @@
             </Grid>
         </DataTemplate>
     </UserControl.Resources>
-    <DockPanel>
+    <DockPanel Background="{DynamicResource BaseColorBackgroundBrush}">
         <Border x:Name="LoadingBlock"
                 VerticalAlignment="Top"
                 DockPanel.Dock="Top"

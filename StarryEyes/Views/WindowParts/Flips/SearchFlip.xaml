@@ -23,42 +23,73 @@
             <utils:BooleanToInvisibleConverter x:Key="BooleanToInvisibleConverter" />
             <utils:BooleanToVisibleConverter x:Key="BooleanToVisibleConverter" />
             <utils:NotNullToVisibleConverter x:Key="NotNullToVisibleConverter" />
-            <Style x:Key="FloatTextBlockStyle" TargetType="TextBlock">
-                <Style.Resources>
-                    <ResourceDictionary>
-                        <Storyboard x:Key="DefaultStoryBoard">
-                            <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(TextBlock.Background).(SolidColorBrush.Color)">
-                                <SplineColorKeyFrame KeyTime="0:0:0" Value="#00000000" />
-                            </ColorAnimationUsingKeyFrames>
-                        </Storyboard>
-                        <Storyboard x:Key="HighlightStoryBoard">
-                            <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(TextBlock.Background).(SolidColorBrush.Color)">
-                                <SplineColorKeyFrame KeyTime="0:0:0" Value="#FF5C83C2" />
-                            </ColorAnimationUsingKeyFrames>
-                        </Storyboard>
-                        <Storyboard x:Key="PressStoryBoard">
-                            <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(TextBlock.Background).(SolidColorBrush.Color)">
-                                <SplineColorKeyFrame KeyTime="0:0:0" Value="#FF16499A" />
-                            </ColorAnimationUsingKeyFrames>
-                        </Storyboard>
-                    </ResourceDictionary>
-                </Style.Resources>
-                <Setter Property="Background" Value="#001BA1E2" />
-                <Setter Property="Foreground" Value="White" />
-                <Style.Triggers>
-                    <EventTrigger RoutedEvent="MouseEnter">
-                        <BeginStoryboard Storyboard="{StaticResource HighlightStoryBoard}" />
-                    </EventTrigger>
-                    <EventTrigger RoutedEvent="MouseLeave">
-                        <BeginStoryboard Storyboard="{StaticResource DefaultStoryBoard}" />
-                    </EventTrigger>
-                    <EventTrigger RoutedEvent="MouseLeftButtonDown">
-                        <BeginStoryboard Storyboard="{StaticResource PressStoryBoard}" />
-                    </EventTrigger>
-                    <EventTrigger RoutedEvent="MouseLeftButtonUp">
-                        <BeginStoryboard Storyboard="{StaticResource HighlightStoryBoard}" />
-                    </EventTrigger>
-                </Style.Triggers>
+            <Style x:Key="FlatFloatButtonStyle" TargetType="{x:Type Button}">
+                <Setter Property="FontFamily" Value="{x:Static SystemFonts.MessageFontFamily}" />
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="Foreground" Value="Black" />
+                <Setter Property="FontWeight" Value="Normal" />
+                <Setter Property="Padding" Value="0" />
+                <Setter Property="Margin" Value="0" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="Opacity" Value="1" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Button}">
+                            <Border x:Name="OuterBorder" Background="Black">
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroup x:Name="CommonStates">
+                                        <VisualState x:Name="MouseOver">
+                                            <Storyboard>
+                                                <ColorAnimationUsingKeyFrames Storyboard.TargetName="OuterBorder" Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)">
+                                                    <SplineColorKeyFrame KeyTime="0:0:0" Value="{DynamicResource SearchFlipHoveringBackground}" />
+                                                </ColorAnimationUsingKeyFrames>
+                                                <ColorAnimationUsingKeyFrames Storyboard.TargetName="Presenter" Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)">
+                                                    <SplineColorKeyFrame KeyTime="0:0:0" Value="{DynamicResource SearchFlipHoveringForeground}" />
+                                                </ColorAnimationUsingKeyFrames>
+                                            </Storyboard>
+                                        </VisualState>
+                                        <VisualState x:Name="Pressed">
+                                            <Storyboard>
+                                                <ColorAnimationUsingKeyFrames Storyboard.TargetName="OuterBorder" Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)">
+                                                    <SplineColorKeyFrame KeyTime="0:0:0" Value="{DynamicResource SearchFlipPressedBackground}" />
+                                                </ColorAnimationUsingKeyFrames>
+                                                <ColorAnimationUsingKeyFrames Storyboard.TargetName="Presenter" Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)">
+                                                    <SplineColorKeyFrame KeyTime="0:0:0" Value="{DynamicResource SearchFlipPressedForeground}" />
+                                                </ColorAnimationUsingKeyFrames>
+                                            </Storyboard>
+                                        </VisualState>
+                                        <VisualState x:Name="Disabled" />
+                                        <VisualState x:Name="Normal">
+                                            <Storyboard>
+                                                <ColorAnimationUsingKeyFrames Storyboard.TargetName="OuterBorder" Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)">
+                                                    <SplineColorKeyFrame KeyTime="0:0:0" Value="#00000000" />
+                                                </ColorAnimationUsingKeyFrames>
+                                                <ColorAnimationUsingKeyFrames Storyboard.TargetName="Presenter" Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)">
+                                                    <SplineColorKeyFrame KeyTime="0:0:0" Value="White" />
+                                                </ColorAnimationUsingKeyFrames>
+                                            </Storyboard>
+                                        </VisualState>
+                                    </VisualStateGroup>
+                                    <VisualStateGroup x:Name="FocusStates">
+                                        <VisualState x:Name="Focused" />
+                                    </VisualStateGroup>
+                                    <VisualStateGroup x:Name="ValidationStates">
+                                        <VisualState x:Name="InvalidFocused" />
+                                        <VisualState x:Name="InvalidUnfocused" />
+                                    </VisualStateGroup>
+                                </VisualStateManager.VisualStateGroups>
+                                <ContentPresenter x:Name="Presenter"
+                                                  Width="Auto"
+                                                  Height="Auto"
+                                                  Margin="8"
+                                                  HorizontalAlignment="Stretch"
+                                                  VerticalAlignment="Stretch"
+                                                  TextBlock.FontSize="12"
+                                                  TextBlock.Foreground="Black" />
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
             </Style>
         </ResourceDictionary>
     </UserControl.Resources>
@@ -240,7 +271,8 @@
 
         <!--  Search results  -->
         <Grid x:Name="ResultGrid"
-              Background="White"
+              Grid.Column="0"
+              Background="{DynamicResource BaseColorBackgroundBrush}"
               Visibility="Collapsed">
             <Grid.RenderTransform>
                 <TransformGroup>
@@ -274,7 +306,7 @@
               Grid.Column="1"
               Width="286"
               HorizontalAlignment="Right"
-              Background="#FF1B58B8"
+              Background="{DynamicResource SearchFlipBackgroundBrush}"
               RenderTransformOrigin="0.5,0.5">
             <Grid.RenderTransform>
                 <TransformGroup>
@@ -294,14 +326,14 @@
             <Border Grid.RowSpan="2" VerticalAlignment="Stretch">
                 <Border.Style>
                     <Style TargetType="Border">
-                        <Setter Property="Background" Value="#1B58B8" />
+                        <Setter Property="Background" Value="{DynamicResource SearchFlipBackgroundBrush}" />
                         <Style.Triggers>
                             <MultiDataTrigger>
                                 <MultiDataTrigger.Conditions>
                                     <Condition Binding="{Binding IsQueryMode}" Value="True" />
                                     <Condition Binding="{Binding HasError}" Value="True" />
                                 </MultiDataTrigger.Conditions>
-                                <Setter Property="Background" Value="#FFE51400" />
+                                <Setter Property="Background" Value="{DynamicResource SearchFlipQueryInvalidBackgroundBrush}" />
                             </MultiDataTrigger>
                         </Style.Triggers>
                     </Style>
@@ -309,20 +341,20 @@
             </Border>
             <TextBlock Grid.Row="1"
                        Margin="8"
-                       Foreground="White"
+                       Foreground="{DynamicResource SearchFlipForegroundBrush}"
                        Text="先頭に?を入力することでクエリを用いて検索できます。"
                        TextWrapping="Wrap"
                        Visibility="{Binding IsQueryMode,
                                             Converter={StaticResource BooleanToInvisibleConverter}}" />
             <Grid Grid.Row="1" Visibility="{Binding IsQueryMode, Converter={StaticResource BooleanToVisibleConverter}}">
                 <TextBlock Margin="8"
-                           Foreground="White"
+                           Foreground="{DynamicResource SearchFlipForegroundBrush}"
                            Text="クエリは正しく解釈されました。Enterキーを入力すると検索が開始されます。"
                            TextWrapping="Wrap"
                            Visibility="{Binding HasError,
                                                 Converter={StaticResource BooleanToInvisibleConverter}}" />
                 <TextBlock Margin="8"
-                           Foreground="White"
+                           Foreground="{DynamicResource SearchFlipQueryInvalidForegroundBrush}"
                            TextWrapping="Wrap"
                            Visibility="{Binding HasError,
                                                 Converter={StaticResource BooleanToVisibleConverter}}">
@@ -356,52 +388,47 @@
                             <Setter Property="Background" Value="Transparent" />
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding SearchMode}" Value="CurrentTab">
-                                    <Setter Property="Background" Value="#FF5C83C2" />
+                                    <Setter Property="Background" Value="{DynamicResource SearchFlipHoveringBackgroundBrush}" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </Grid.Style>
-                    <TextBlock Padding="8"
-                               Style="{StaticResource FloatTextBlockStyle}"
-                               Text="タブ内のツイート">
-                        <TextBlock.ToolTip>
-                            <TextBlock Margin="4"
-                                       Foreground="White"
-                                       Text="現在選択されているタブに表示されているツイートを検索します。" />
-                        </TextBlock.ToolTip>
+                    <Button Content="タブ内のツイート"
+                            Focusable="False"
+                            Style="{StaticResource FlatFloatButtonStyle}">
                         <i:Interaction.Triggers>
-                            <i:EventTrigger EventName="MouseLeftButtonDown">
+                            <i:EventTrigger EventName="Click">
                                 <ei:CallMethodAction MethodName="SetLocalTabSearch" TargetObject="{Binding}" />
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
-                    </TextBlock>
+                        <Button.ToolTip>
+                            <TextBlock Margin="4" Text="現在選択されているタブに表示されているツイートを検索します。" />
+                        </Button.ToolTip>
+                    </Button>
                 </Grid>
-
                 <Grid>
                     <Grid.Style>
                         <Style TargetType="Grid">
                             <Setter Property="Background" Value="Transparent" />
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding SearchMode}" Value="Local">
-                                    <Setter Property="Background" Value="#FF5C83C2" />
+                                    <Setter Property="Background" Value="{DynamicResource SearchFlipHoveringBackgroundBrush}" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </Grid.Style>
-                    <TextBlock Padding="8"
-                               Style="{StaticResource FloatTextBlockStyle}"
-                               Text="ローカルデータ">
-                        <TextBlock.ToolTip>
-                            <TextBlock Margin="4"
-                                       Foreground="White"
-                                       Text="Krileに蓄積されているすべてのツイートから検索します。" />
-                        </TextBlock.ToolTip>
+                    <Button Content="すべてのローカルデータ"
+                            Focusable="False"
+                            Style="{StaticResource FlatFloatButtonStyle}">
                         <i:Interaction.Triggers>
-                            <i:EventTrigger EventName="MouseLeftButtonDown">
+                            <i:EventTrigger EventName="Click">
                                 <ei:CallMethodAction MethodName="SetLocalSearch" TargetObject="{Binding}" />
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
-                    </TextBlock>
+                        <Button.ToolTip>
+                            <TextBlock Margin="4" Text="Krileに蓄積されているすべてのツイートから検索します。" />
+                        </Button.ToolTip>
+                    </Button>
                 </Grid>
 
                 <Grid>
@@ -410,25 +437,23 @@
                             <Setter Property="Background" Value="Transparent" />
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding SearchMode}" Value="Web">
-                                    <Setter Property="Background" Value="#FF5C83C2" />
+                                    <Setter Property="Background" Value="{DynamicResource SearchFlipHoveringBackgroundBrush}" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </Grid.Style>
-                    <TextBlock Padding="8"
-                               Style="{StaticResource FloatTextBlockStyle}"
-                               Text="Twitter上のツイート">
-                        <TextBlock.ToolTip>
-                            <TextBlock Margin="4"
-                                       Foreground="White"
-                                       Text="Twitterからツイートを検索します。" />
-                        </TextBlock.ToolTip>
+                    <Button Content="Twitter上のツイート"
+                            Focusable="False"
+                            Style="{StaticResource FlatFloatButtonStyle}">
                         <i:Interaction.Triggers>
-                            <i:EventTrigger EventName="MouseLeftButtonDown">
+                            <i:EventTrigger EventName="Click">
                                 <ei:CallMethodAction MethodName="SetWebSearch" TargetObject="{Binding}" />
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
-                    </TextBlock>
+                        <Button.ToolTip>
+                            <TextBlock Margin="4" Text="Twitterに問い合わせてツイートを検索します。" />
+                        </Button.ToolTip>
+                    </Button>
                 </Grid>
 
                 <Grid>
@@ -437,25 +462,23 @@
                             <Setter Property="Background" Value="Transparent" />
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding SearchMode}" Value="UserWeb">
-                                    <Setter Property="Background" Value="#FF5C83C2" />
+                                    <Setter Property="Background" Value="{DynamicResource SearchFlipHoveringBackgroundBrush}" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </Grid.Style>
-                    <TextBlock Padding="8"
-                               Style="{StaticResource FloatTextBlockStyle}"
-                               Text="ユーザー名">
-                        <TextBlock.ToolTip>
-                            <TextBlock Margin="4"
-                                       Foreground="White"
-                                       Text="Twitterでユーザーを検索します。" />
-                        </TextBlock.ToolTip>
+                    <Button Content="ユーザー名"
+                            Focusable="False"
+                            Style="{StaticResource FlatFloatButtonStyle}">
                         <i:Interaction.Triggers>
-                            <i:EventTrigger EventName="MouseLeftButtonDown">
+                            <i:EventTrigger EventName="Click">
                                 <ei:CallMethodAction MethodName="SetUserWebSearch" TargetObject="{Binding}" />
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
-                    </TextBlock>
+                        <Button.ToolTip>
+                            <TextBlock Margin="4" Text="Twitterに問い合わせてユーザーを検索します。" />
+                        </Button.ToolTip>
+                    </Button>
                 </Grid>
 
                 <Grid Visibility="{Binding CanBeUserScreenName, Converter={StaticResource BooleanToVisibleConverter}}">
@@ -464,32 +487,30 @@
                             <Setter Property="Background" Value="Transparent" />
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding SearchMode}" Value="UserScreenName">
-                                    <Setter Property="Background" Value="#FF5C83C2" />
+                                    <Setter Property="Background" Value="{DynamicResource SearchFlipHoveringBackgroundBrush}" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </Grid.Style>
-                    <TextBlock Padding="8"
-                               Style="{StaticResource FloatTextBlockStyle}"
-                               Text="ユーザー@ID">
-                        <TextBlock.ToolTip>
-                            <TextBlock Margin="4"
-                                       Foreground="White"
-                                       Text="この@IDを持つユーザーを表示します。" />
-                        </TextBlock.ToolTip>
+                    <Button Content="ユーザー@ID"
+                            Focusable="False"
+                            Style="{StaticResource FlatFloatButtonStyle}">
                         <i:Interaction.Triggers>
-                            <i:EventTrigger EventName="MouseLeftButtonDown">
+                            <i:EventTrigger EventName="Click">
                                 <ei:CallMethodAction MethodName="SetUserIdSearch" TargetObject="{Binding}" />
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
-                    </TextBlock>
+                        <Button.ToolTip>
+                            <TextBlock Margin="4" Text="この@IDを持つユーザーを表示します。" />
+                        </Button.ToolTip>
+                    </Button>
                 </Grid>
 
             </StackPanel>
             <TextBlock Grid.Row="3"
                        Margin="8"
                        VerticalAlignment="Bottom"
-                       Foreground="White"
+                       Foreground="{DynamicResource SearchFlipForegroundBrush}"
                        Text="アクティブアカウントが一つだけの場合、保存されている検索キーワードを表示します。"
                        TextWrapping="Wrap"
                        Visibility="{Binding SearchCandidate.IsSearchCandidateAvailable,
@@ -507,7 +528,7 @@
                                         UriSource="{Binding SearchCandidate.CurrentUserProfileImage}" />
                     <TextBlock Margin="4,8,8,8"
                                VerticalAlignment="Center"
-                               Foreground="White">
+                               Foreground="{DynamicResource SearchFlipForegroundBrush}">
                         <Run Text="{Binding SearchCandidate.CurrentUserScreenName, Mode=OneWay}" />
                         <Run Text="が保存している検索キーワード:" />
                     </TextBlock>
@@ -525,60 +546,27 @@
                     </ItemsControl.Template>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <DataTemplate.Resources>
-                                <Storyboard x:Key="HighlightStoryBoard">
-                                    <ColorAnimationUsingKeyFrames Storyboard.TargetName="grid" Storyboard.TargetProperty="(Panel.Background).(SolidColorBrush.Color)">
-                                        <EasingColorKeyFrame KeyTime="0:0:0" Value="#FF5C83C2" />
-                                    </ColorAnimationUsingKeyFrames>
-                                </Storyboard>
-                                <Storyboard x:Key="LowlightStoryBoard">
-                                    <ColorAnimationUsingKeyFrames Storyboard.TargetName="grid" Storyboard.TargetProperty="(Panel.Background).(SolidColorBrush.Color)">
-                                        <EasingColorKeyFrame KeyTime="0:0:0" Value="#00000000" />
-                                    </ColorAnimationUsingKeyFrames>
-                                </Storyboard>
-                                <Storyboard x:Key="PressStoryBoard">
-                                    <ColorAnimationUsingKeyFrames Storyboard.TargetName="grid" Storyboard.TargetProperty="(Panel.Background).(SolidColorBrush.Color)">
-                                        <EasingColorKeyFrame KeyTime="0:0:0" Value="#FF16499A" />
-                                    </ColorAnimationUsingKeyFrames>
-                                </Storyboard>
-                            </DataTemplate.Resources>
-                            <Grid x:Name="grid">
+                            <Button Content="{Binding Query}"
+                                    Focusable="False"
+                                    Style="{StaticResource FlatFloatButtonStyle}">
                                 <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="MouseLeftButtonDown">
+                                    <i:EventTrigger EventName="Click">
                                         <ei:CallMethodAction MethodName="SelectThis" TargetObject="{Binding}" />
                                     </i:EventTrigger>
                                 </i:Interaction.Triggers>
-                                <Grid.ContextMenu>
+                                <Button.ContextMenu>
                                     <ContextMenu DataContext="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
                                         <MenuItem Command="{Binding RemoveCommand}" Header="このアイテムを削除(_D)" />
                                     </ContextMenu>
-                                </Grid.ContextMenu>
-                                <TextBlock Margin="8"
-                                           Foreground="White"
-                                           Text="{Binding Query}" />
-                                <Grid.Style>
-                                    <Style TargetType="Grid">
-                                        <Setter Property="Background" Value="#00000000" />
-                                        <Style.Triggers>
-                                            <EventTrigger RoutedEvent="MouseEnter" />
-                                        </Style.Triggers>
-                                    </Style>
-                                </Grid.Style>
-                            </Grid>
-                            <DataTemplate.Triggers>
-                                <EventTrigger RoutedEvent="Mouse.MouseEnter" SourceName="grid">
-                                    <BeginStoryboard Storyboard="{StaticResource HighlightStoryBoard}" />
-                                </EventTrigger>
-                                <EventTrigger RoutedEvent="UIElement.MouseLeftButtonDown" SourceName="grid">
-                                    <BeginStoryboard Storyboard="{StaticResource PressStoryBoard}" />
-                                </EventTrigger>
-                                <EventTrigger RoutedEvent="Mouse.MouseLeave" SourceName="grid">
-                                    <BeginStoryboard Storyboard="{StaticResource LowlightStoryBoard}" />
-                                </EventTrigger>
-                                <EventTrigger RoutedEvent="UIElement.MouseLeftButtonUp" SourceName="grid">
-                                    <BeginStoryboard Storyboard="{StaticResource LowlightStoryBoard}" />
-                                </EventTrigger>
-                            </DataTemplate.Triggers>
+                                </Button.ContextMenu>
+                                <Button.ToolTip>
+                                    <TextBlock Margin="4">
+                                        <Run Text="Twitterから" />
+                                        <Run Text="{Binding Query, Mode=OneWay}" />
+                                        <Run Text="を検索します。" />
+                                    </TextBlock>
+                                </Button.ToolTip>
+                            </Button>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
