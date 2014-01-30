@@ -42,6 +42,22 @@ namespace StarryEyes.Settings
             try
             {
                 var profile = ThemeProfile.Load(file);
+                if (profile.ProfileVersion < ThemeProfile.CurrentProfileVersion)
+                {
+                    MainWindowModel.ShowTaskDialog(
+                        new TaskDialogOptions
+                        {
+                            Title = "テーマの互換性",
+                            MainIcon = VistaTaskDialogIcon.Warning,
+                            MainInstruction = "テーマ ファイルを読み込めませんでした。",
+                            Content = "テーマ バージョンが古いため、互換性がありません。" + Environment.NewLine +
+                                      file,
+                            ExpandedInfo = "新しいバージョンのテーマを入手するか、最新のフォーマットに則った記述へ変更してください。" + Environment.NewLine +
+                                           "(default.xmlについてこのエラーが表示された場合は、自動的に最新のフォーマットに更新されます。)",
+                            CommonButtons = TaskDialogCommonButtons.Close
+                        });
+                    return;
+                }
                 ThemeProfiles[profile.Name] = profile;
             }
             catch (Exception ex)
@@ -55,15 +71,7 @@ namespace StarryEyes.Settings
                         Content = "XMLの記述に誤りがあります:" + Environment.NewLine +
                                   file,
                         ExpandedInfo = ex.Message,
-                        CustomButtons = new[] { "再読込", "無視" },
-                        Callback = (dlg, args, _) =>
-                        {
-                            if (args.ButtonId == 0)
-                            {
-                                Load(file);
-                            }
-                            return true;
-                        },
+                        CommonButtons = TaskDialogCommonButtons.Close
                     });
             }
         }
@@ -74,13 +82,13 @@ namespace StarryEyes.Settings
             var group = Setting.Theme.Value ?? DefaultThemeProvider.DefaultThemeName;
             if (ThemeProfiles.ContainsKey(group)) return;
             // load default
-            Setting.KeyAssign.Value = DefaultThemeProvider.DefaultThemeName;
+            Setting.Theme.Value = DefaultThemeProvider.DefaultThemeName;
             if (ThemeProfiles.ContainsKey(DefaultThemeProvider.DefaultThemeName)) return;
             // default binding is not found
             // make default
-            var deftheme = DefaultThemeProvider.GetDefault();
-            deftheme.Save(ThemeProfileDirectoryPath);
-            ThemeProfiles.Add(deftheme.Name, deftheme);
+            var dtheme = DefaultThemeProvider.GetDefault();
+            dtheme.Save(ThemeProfileDirectoryPath);
+            ThemeProfiles.Add(dtheme.Name, dtheme);
         }
 
         public static void ReloadCandidates()

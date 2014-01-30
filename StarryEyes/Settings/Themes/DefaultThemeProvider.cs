@@ -17,6 +17,7 @@ namespace StarryEyes.Settings.Themes
         public static ThemeProfile GetDefault()
         {
             var profile = new ThemeProfile(DefaultThemeName);
+            profile.ProfileVersion = ThemeProfile.CurrentProfileVersion;
 
             // global font is default
 

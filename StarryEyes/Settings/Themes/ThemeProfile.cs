@@ -14,6 +14,8 @@ namespace StarryEyes.Settings.Themes
     [DataContract]
     public class ThemeProfile : ICloneable
     {
+        public static readonly int CurrentProfileVersion = 1;
+
         #region Serialization properties
 
         [DataMember(Name = "GlobalKeyColor", Order = 3)]

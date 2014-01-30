@@ -76,15 +76,7 @@ namespace StarryEyes.Settings
                         Content = "キーアサインファイルの記述に誤りがあります:" + Environment.NewLine +
                                   file,
                         ExpandedInfo = ex.Message,
-                        CustomButtons = new[] { "再読込", "無視" },
-                        Callback = (dlg, args, _) =>
-                        {
-                            if (args.ButtonId == 0)
-                            {
-                                Load(file);
-                            }
-                            return true;
-                        },
+                        CommonButtons = TaskDialogCommonButtons.Close
                     });
             }
         }
