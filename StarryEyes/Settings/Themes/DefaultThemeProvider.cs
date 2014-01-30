@@ -196,8 +196,8 @@ namespace StarryEyes.Settings.Themes
                 FavoriteAndRetweetButton = dc,
                 FavoriteButton = dc,
                 ColoredFavoriteButton = dcf(MetroColors.Amber),
-                ColoredRetweetButton = dc,
-                RetweetButton = dcf(MetroColors.Emerald),
+                RetweetButton = dc,
+                ColoredRetweetButton = dcf(MetroColors.Emerald),
                 MentionButton = dc,
                 DeleteButton = dc
             };
