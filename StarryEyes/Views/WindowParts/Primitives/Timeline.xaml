@@ -99,7 +99,6 @@
                 </DataTemplate.Resources>
                 <Border x:Name="MainBorder"
                         Margin="0"
-                        Background="{DynamicResource TweetDefaultBackgroundBrush}"
                         Padding="0"
                         RenderTransformOrigin="0.5,1"
                         SnapsToDevicePixels="True"
@@ -1683,7 +1682,7 @@
             <ei:GoToStateAction StateName="Close" TargetObject="{Binding ElementName=userControl}" />
         </ei:DataTrigger>
     </i:Interaction.Triggers>
-    <DockPanel Background="{DynamicResource BaseColorBackgroundBrush}">
+    <DockPanel>
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="StatusesActionBar">
                 <VisualState x:Name="Close">
@@ -1770,7 +1769,7 @@
                           HorizontalAlignment="Center"
                           VerticalAlignment="Center"
                           Data="F1 M 21,32L 23,39L 15,32L 12,32L 12,14L 36,14L 36,32L 21,32 Z "
-                          Fill="#FF000000"
+                          Fill="{DynamicResource BaseColorForegroundBrush}"
                           Stretch="Fill" />
                 </Button>
                 <Button Width="32"
@@ -1788,7 +1787,7 @@
                           HorizontalAlignment="Center"
                           VerticalAlignment="Center"
                           Data="F1 M 19.1538,24.1539L 21.2308,24.1539L 21.2308,27.6154L 24.6923,27.6154L 24.6923,29.6923L 21.2308,29.6923L 21.2308,33.1539L 19.1538,33.1539L 19.1538,29.6923L 15.6923,29.6923L 15.6923,27.6154L 19.1538,27.6154L 19.1538,24.1539 Z M 15,22.0769L 21.7747,22.0769L 24,15.8462L 26.2253,22.0769L 33,22.0769L 27.358,26.119L 29.8846,32.4615L 25.3846,29.8145L 25.3846,26.9231L 21.9231,26.9231L 21.9231,23.4615L 18.4615,23.4616L 18.4615,24.5613L 15,22.0769 Z "
-                          Fill="#FF000000"
+                          Fill="{DynamicResource BaseColorForegroundBrush}"
                           Stretch="Fill" />
                 </Button>
                 <Button Width="32"
@@ -1807,7 +1806,7 @@
                           HorizontalAlignment="Center"
                           VerticalAlignment="Center"
                           Data="F1 M 27,15L 33,15L 33,21L 30.75,23.25L 30.75,19.125L 22.5,27.375L 20.625,25.5L 28.875,17.25L 24.75,17.25L 27,15 Z M 15,18L 26.25,18L 24,20.25L 17.25,20.25L 17.25,30.75L 27.75,30.75L 27.75,24L 30,21.75L 30,33L 15,33L 15,18 Z "
-                          Fill="#FF000000"
+                          Fill="{DynamicResource BaseColorForegroundBrush}"
                           Stretch="Fill" />
                 </Button>
                 <Button Width="32"
@@ -1825,7 +1824,7 @@
                           HorizontalAlignment="Center"
                           VerticalAlignment="Center"
                           Data="F1 M 18.4,16L 24,21.6L 29.5999,16.0001L 31.9999,18.4001L 26.4,24L 32,29.6001L 29.6,32L 24,26.4L 18.3999,32L 16,29.6L 21.6,24L 16,18.4L 18.4,16 Z "
-                          Fill="#FF000000"
+                          Fill="{DynamicResource BaseColorForegroundBrush}"
                           Stretch="Fill" />
                 </Button>
             </StackPanel>

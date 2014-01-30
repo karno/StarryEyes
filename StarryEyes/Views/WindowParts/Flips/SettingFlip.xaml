@@ -79,7 +79,7 @@
                 <ListBox x:Name="SettingCategories"
                          Width="180"
                          HorizontalContentAlignment="Stretch"
-                         SelectedIndex="2">
+                         SelectedIndex="0">
                     <ListBox.Resources>
                         <Style TargetType="{x:Type ListBoxItem}">
                             <Setter Property="Margin" Value="0" />
@@ -502,9 +502,19 @@
                             <TextBlock VerticalAlignment="Center"
                                        DockPanel.Dock="Left"
                                        Text="使用するテーマ: " />
+                            <Button DockPanel.Dock="Right" Style="{StaticResource MetroSquareButtonStyle}">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="Click">
+                                        <ei:CallMethodAction MethodName="OpenThemeFolder" TargetObject="{Binding}" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                                <TextBlock Margin="2,-4"
+                                           FontSize="12"
+                                           Text="テーマフォルダを開く" />
+                            </Button>
                             <ComboBox ItemsSource="{Binding ThemeCandidateFiles}" SelectedIndex="{Binding ThemeFileIndex}" />
                         </DockPanel>
-                        <Grid Height="300"
+                        <Grid Height="350"
                               Margin="20"
                               Row="1">
                             <Border BorderBrush="{Binding CurrentThemeBorder}" BorderThickness="1">
@@ -518,14 +528,87 @@
                                 <Grid>
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
                                         <RowDefinition />
                                     </Grid.RowDefinitions>
                                     <Border Background="{Binding TitleBackground}">
-                                        <TextBlock Margin="2"
+                                        <TextBlock Margin="8,4"
                                                    Foreground="{Binding TitleForeground}"
                                                    Text="Krile STARRYEYES" />
                                     </Border>
                                     <Border Grid.Row="1" Background="{Binding GlobalBackground}" />
+                                    <Image Grid.Row="1"
+                                           Grid.RowSpan="2"
+                                           Opacity="{Binding WallpaperOpacity}"
+                                           Source="{Binding WallpaperImage}"
+                                           Stretch="UniformToFill" />
+                                    <StackPanel Grid.Row="1"
+                                                Margin="0,2"
+                                                Orientation="Horizontal">
+                                        <TextBlock Margin="8,2,8,2"
+                                                   Foreground="{Binding ActiveTabForeground}"
+                                                   Text="home" />
+                                        <TextBlock Margin="2,2,1,2"
+                                                   Foreground="{Binding InactiveTabForeground}"
+                                                   Text="mention" />
+                                        <TextBlock Margin="0,-2,4,0"
+                                                   FontSize="10"
+                                                   Foreground="{Binding TabUnreadCountForeground}"
+                                                   Text="2" />
+                                        <TextBlock Margin="2,2,8,2"
+                                                   Foreground="{Binding InactiveTabForeground}"
+                                                   Text="messages" />
+                                    </StackPanel>
+                                    <ItemsControl Grid.Row="2">
+                                        <clr:Int32>0</clr:Int32>
+                                        <clr:Int32>0</clr:Int32>
+                                        <clr:Int32>0</clr:Int32>
+                                        <clr:Int32>0</clr:Int32>
+                                        <clr:Int32>0</clr:Int32>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate DataType="{x:Type clr:Int32}">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition />
+                                                    </Grid.ColumnDefinitions>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto" />
+                                                        <RowDefinition />
+                                                    </Grid.RowDefinitions>
+                                                    <Border Grid.RowSpan="2"
+                                                            Grid.Column="0"
+                                                            Width="48"
+                                                            Height="48"
+                                                            Margin="8"
+                                                            VerticalAlignment="Top"
+                                                            Background="DimGray" />
+                                                    <StackPanel Grid.Row="0"
+                                                                Grid.Column="1"
+                                                                Margin="4"
+                                                                Orientation="Horizontal">
+                                                        <TextBlock Margin="0,0,6,0"
+                                                                   FontWeight="Bold"
+                                                                   Foreground="{Binding DataContext.GlobalKeyBrush,
+                                                                                        RelativeSource={RelativeSource FindAncestor,
+                                                                                                                       AncestorType=UserControl}}"
+                                                                   Text="USER" />
+                                                        <TextBlock Foreground="{Binding DataContext.GlobalForeground, RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}" Text="name" />
+                                                    </StackPanel>
+                                                    <TextBlock Grid.Row="1"
+                                                               Grid.Column="1"
+                                                               Margin="4"
+                                                               VerticalAlignment="Top"
+                                                               Foreground="{Binding DataContext.GlobalForeground,
+                                                                                    RelativeSource={RelativeSource FindAncestor,
+                                                                                                                   AncestorType=UserControl}}"
+                                                               TextWrapping="Wrap">
+                                                        <Run Text="The quick brown fox jumps over the lazy dog." />
+                                                    </TextBlock>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
                                 </Grid>
                             </Border>
                         </Grid>
@@ -543,7 +626,7 @@
                         <TextBlock Margin="4"
                                    VerticalAlignment="Center"
                                    Text="タイムラインの壁紙: " />
-                        <TextBox Grid.Column="1" Text="{Binding BackgroundImagePath}" />
+                        <TextBox Grid.Column="1" Text="{Binding BackgroundImagePath, UpdateSourceTrigger=PropertyChanged}" />
                         <Button Grid.Column="2" Content="...">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="Click">
@@ -556,6 +639,7 @@
                                    Text="壁紙の透過度" />
                         <Slider Grid.Row="1"
                                 Grid.Column="1"
+                                Grid.ColumnSpan="2"
                                 Maximum="255"
                                 Minimum="0"
                                 Value="{Binding BackgroundImageTransparency,

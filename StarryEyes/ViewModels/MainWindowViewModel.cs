@@ -434,7 +434,12 @@ namespace StarryEyes.ViewModels
                 }
                 try
                 {
-                    return new BitmapImage(uri);
+                    var bi = new BitmapImage();
+                    bi.BeginInit();
+                    bi.CacheOption = BitmapCacheOption.OnLoad;
+                    bi.UriSource = uri;
+                    bi.EndInit();
+                    return bi;
                 }
                 catch (Exception)
                 {
@@ -447,7 +452,6 @@ namespace StarryEyes.ViewModels
         {
             get { return (255 - Math.Min(255, Setting.BackgroundImageTransparency.Value)) / 255.0; }
         }
-
 
         public bool RotateWindowContent
         {

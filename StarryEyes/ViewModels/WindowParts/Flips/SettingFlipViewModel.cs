@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
@@ -8,6 +9,7 @@ using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using Livet;
 using Livet.Messaging;
 using Livet.Messaging.IO;
@@ -35,8 +37,10 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
     {
         private readonly MainWindowViewModel _parent;
         private ISubject<Unit> _completeCallback;
+        private FileSystemWatcher _fsWatcher;
 
         private bool _isConfigurationActive;
+
         public bool IsConfigurationActive
         {
             get { return _isConfigurationActive; }
@@ -77,6 +81,14 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             this.RefreshThemeCandidates();
             this.ResetFilter();
             this._completeCallback = subject;
+            this._fsWatcher = new FileSystemWatcher(ThemeManager.ThemeProfileDirectoryPath, "*.xml");
+            this._fsWatcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName |
+                                           NotifyFilters.DirectoryName | NotifyFilters.Size;
+            this._fsWatcher.Changed += (_, e) => DispatcherHolder.Enqueue(this.RefreshThemeCandidates);
+            this._fsWatcher.Created += (_, e) => DispatcherHolder.Enqueue(this.RefreshThemeCandidates);
+            this._fsWatcher.Deleted += (_, e) => DispatcherHolder.Enqueue(this.RefreshThemeCandidates);
+            this._fsWatcher.Renamed += (_, e) => DispatcherHolder.Enqueue(this.RefreshThemeCandidates);
+            this._fsWatcher.EnableRaisingEvents = true;
             this.RaisePropertyChanged();
             this.IsConfigurationActive = true;
         }
@@ -94,6 +106,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         #region Account control
 
         private DropAcceptDescription _description;
+
         public DropAcceptDescription DropDescription
         {
             get
@@ -128,6 +141,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         }
 
         private readonly ReadOnlyDispatcherCollectionRx<TwitterAccountConfigurationViewModel> _accounts;
+
         public ReadOnlyDispatcherCollectionRx<TwitterAccountConfigurationViewModel> Accounts
         {
             get { return this._accounts; }
@@ -220,6 +234,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         private FilterExpressionRoot _lastCommit;
 
         private string _currentQueryString;
+
         public string QueryString
         {
             get { return _currentQueryString; }
@@ -236,6 +251,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         }
 
         private bool _foundError;
+
         public bool FoundError
         {
             get { return _foundError; }
@@ -247,6 +263,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         }
 
         private string _exceptionMessage;
+
         public string ExceptionMessage
         {
             get { return _exceptionMessage; }
@@ -284,6 +301,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         }
 
         #region OpenQueryReferenceCommand
+
         private Livet.Commands.ViewModelCommand _openQueryReferenceCommand;
 
         public Livet.Commands.ViewModelCommand OpenQueryReferenceCommand
@@ -302,7 +320,9 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         {
             BrowserHelper.Open(App.QueryReferenceUrl);
         }
+
         #endregion
+
         #endregion
 
         #region Input property
@@ -364,6 +384,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             {
                 Setting.BackgroundImagePath.Value = value;
                 RaisePropertyChanged();
+                RaisePropertyChanged(() => WallpaperImage);
             }
         }
 
@@ -374,6 +395,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             {
                 Setting.BackgroundImageTransparency.Value = value;
                 RaisePropertyChanged();
+                RaisePropertyChanged(() => WallpaperOpacity);
             }
         }
 
@@ -396,6 +418,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         }
 
         private readonly ObservableCollection<string> _themeCandidateFiles = new ObservableCollection<string>();
+
         public ObservableCollection<string> ThemeCandidateFiles
         {
             get { return _themeCandidateFiles; }
@@ -435,6 +458,19 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             CurrentThemeChanged();
         }
 
+        public void OpenThemeFolder()
+        {
+            try
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = "EXPLORER.EXE",
+                    Arguments = "/n, " + ThemeManager.ThemeProfileDirectoryPath,
+                });
+            }
+            catch { }
+        }
+
         public void ShowThemeEditor()
         {
             // todo: impl this.
@@ -466,10 +502,14 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         {
             RaisePropertyChanged(() => GlobalForeground);
             RaisePropertyChanged(() => GlobalBackground);
+            RaisePropertyChanged(() => GlobalKeyBrush);
             RaisePropertyChanged(() => CurrentThemeBorder);
             RaisePropertyChanged(() => CurrentThemeBorder);
             RaisePropertyChanged(() => TitleBackground);
             RaisePropertyChanged(() => TitleForeground);
+            RaisePropertyChanged(() => ActiveTabForeground);
+            RaisePropertyChanged(() => InactiveTabForeground);
+            RaisePropertyChanged(() => TabUnreadCountForeground);
         }
 
         public Brush GlobalForeground
@@ -480,6 +520,11 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         public Brush GlobalBackground
         {
             get { return new SolidColorBrush(this.CurrentConfiguringTheme.BaseColor.Background); }
+        }
+
+        public Brush GlobalKeyBrush
+        {
+            get { return new SolidColorBrush(this.CurrentConfiguringTheme.GlobalKeyColor); }
         }
 
         public Brush CurrentThemeBorder
@@ -495,6 +540,51 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         public Brush TitleForeground
         {
             get { return new SolidColorBrush(this.CurrentConfiguringTheme.TitleBarColor.Foreground); }
+        }
+
+        public Brush ActiveTabForeground
+        {
+            get { return new SolidColorBrush(this.CurrentConfiguringTheme.TabColor.Focused); }
+        }
+
+        public Brush InactiveTabForeground
+        {
+            get { return new SolidColorBrush(this.CurrentConfiguringTheme.TabColor.Default); }
+        }
+
+        public Brush TabUnreadCountForeground
+        {
+            get { return new SolidColorBrush(this.CurrentConfiguringTheme.TabColor.UnreadCount); }
+        }
+
+        public BitmapImage WallpaperImage
+        {
+            get
+            {
+                var uri = BackgroundImagePath;
+                if (uri == null)
+                {
+                    return null;
+                }
+                try
+                {
+                    var bi = new BitmapImage();
+                    bi.BeginInit();
+                    bi.CacheOption = BitmapCacheOption.OnLoad;
+                    bi.UriSource = new Uri(uri);
+                    bi.EndInit();
+                    return bi;
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
+            }
+        }
+
+        public double WallpaperOpacity
+        {
+            get { return (255 - Math.Min(255, Setting.BackgroundImageTransparency.Value)) / 255.0; }
         }
 
         #endregion
@@ -741,6 +831,9 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
             // update connection property
             _accounts.ForEach(a => a.CommitChanges());
+
+            // dispose fswatcher
+            this._fsWatcher.Dispose();
 
             // update theme
             ApplyTheme();
