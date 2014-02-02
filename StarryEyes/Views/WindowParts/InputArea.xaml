@@ -338,7 +338,7 @@
                         </i:Interaction.Behaviors>
                         <controls:SuggestableTextBox.ListItemTemplate>
                             <DataTemplate>
-                                <TextBlock Foreground="White" Text="{Binding Body}" />
+                                <TextBlock Foreground="Black" Text="{Binding Body}" />
                             </DataTemplate>
                         </controls:SuggestableTextBox.ListItemTemplate>
                     </controls:SuggestableTextBox>
