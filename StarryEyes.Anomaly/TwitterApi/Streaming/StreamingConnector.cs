@@ -28,7 +28,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
 
         private static void DispatchStreamingElements(dynamic element, IStreamHandler handler)
         {
-            var type = "initial";
+            var type = "initialize";
             try
             {
                 // element.foo() -> element.IsDefined("foo")
@@ -37,6 +37,14 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
                     // standard status receiving
                     type = "status";
                     handler.OnStatus(new TwitterStatus(element));
+                    return;
+                }
+                if (element.direct_message())
+                {
+                    // direct message
+                    type = "message";
+                    handler.OnStatus(new TwitterStatus(element.direct_message));
+                    return;
                 }
                 if (element.delete())
                 {
@@ -79,6 +87,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
                         Reason = element.disconnect.reason,
                         StreamName = element.disconnect.stream_name
                     });
+                    return;
                 }
                 if (element.warning())
                 {
@@ -93,6 +102,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
                     {
                         Friends = (long[])element.friends
                     });
+                    return;
                 }
                 if (element.IsDefined("event"))
                 {
@@ -146,9 +156,13 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
                                 CreatedAt =
                                     ((string)element.created_at).ParseDateTime(ParsingExtension.TwitterDateTimeFormat),
                             });
-                            break;
+                            return;
+                        default:
+                            handler.OnExceptionThrownDuringParsing(new Exception("Unknown event: " + ev + " / " + element.ToString()));
+                            return;
                     }
                 }
+                handler.OnExceptionThrownDuringParsing(new Exception("Unknown data: " + element.ToString()));
             }
             catch (Exception ex)
             {
