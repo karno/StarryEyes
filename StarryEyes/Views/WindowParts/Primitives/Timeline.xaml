@@ -591,6 +591,7 @@
                                         Margin="-8,-10,0,10"
                                         HorizontalAlignment="Stretch"
                                         VerticalAlignment="Top"
+                                        Background="#00000000"
                                         Cursor="Hand"
                                         Visibility="Collapsed">
                                     <Border.LayoutTransform>
