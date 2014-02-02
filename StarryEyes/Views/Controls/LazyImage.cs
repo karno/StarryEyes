@@ -124,11 +124,8 @@ namespace StarryEyes.Views.Controls
             var dpw = img.DecodePixelWidth;
             var dph = img.DecodePixelHeight;
             System.Diagnostics.Debug.WriteLine("IMAGE DECODE:: URI:" + uri + " / DPW:" + dpw + " / DPH:" + dph + " / NVAL:" + e.NewValue);
-            if (uri == null)
-            {
-                SetImage(img, null, null);
-            }
-            else
+            SetImage(img, null, null);
+            if (uri != null)
             {
                 ReloadImage(img, uri, dpw, dph);
             }
