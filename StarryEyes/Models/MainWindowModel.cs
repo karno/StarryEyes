@@ -6,6 +6,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Subjects;
 using System.Threading;
 using StarryEyes.Albireo;
+using StarryEyes.Annotations;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Timelines.Tabs;
 using StarryEyes.Nightmare.Windows;
@@ -114,8 +115,9 @@ namespace StarryEyes.Models
             }
         }
 
-        public static IDisposable SetState(string state)
+        public static IDisposable SetState([NotNull] string state)
         {
+            if (state == null) throw new ArgumentNullException("state");
             var node = _stateStack.AddFirst(state);
             RaiseStateStringChanged();
             return Disposable.Create(() =>

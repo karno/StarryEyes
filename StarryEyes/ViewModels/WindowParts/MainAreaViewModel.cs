@@ -126,19 +126,20 @@ namespace StarryEyes.ViewModels.WindowParts
                 KeyAssignAction.Create("OpenWeb", () => ExecuteStatusAction(s => s.OpenWeb())),
                 KeyAssignAction.Create("OpenFavstar", () => ExecuteStatusAction(s => s.OpenFavstar())),
                 KeyAssignAction.Create("OpenUserDetailOnTwitter",
-                                       () => ExecuteStatusAction(s => s.OpenUserDetailOnTwitter())),
+                    () => ExecuteStatusAction(s => s.OpenUserDetailOnTwitter())),
                 KeyAssignAction.Create("OpenUserFavstar", () => ExecuteStatusAction(s => s.OpenUserFavstar())),
                 KeyAssignAction.Create("OpenUserTwilog", () => ExecuteStatusAction(s => s.OpenUserTwilog())),
                 KeyAssignAction.Create("OpenSource", () => ExecuteStatusAction(s => s.OpenSourceLink())),
                 KeyAssignAction.Create("OpenThumbnail", () => ExecuteStatusAction(s => s.OpenThumbnailImage())),
-                KeyAssignAction.Create("OpenConversation", () => ExecuteStatusAction(s => s.ShowConversation())),
+                KeyAssignAction.Create("ShowConversation", () => ExecuteStatusAction(s => s.ShowConversation())),
                 KeyAssignAction.Create("MuteUser", () => ExecuteStatusAction(s => s.MuteUser())),
                 KeyAssignAction.Create("MuteClient", () => ExecuteStatusAction(s => s.MuteClient())),
                 KeyAssignAction.Create("ReportAsSpam", () => ExecuteStatusAction(s => s.ReportAsSpam())),
                 KeyAssignAction.Create("GiveTrophy", () => ExecuteStatusAction(s => s.GiveFavstarTrophy())),
-                KeyAssignAction.CreateWithArgumentOptional("Reply", a => this.ExecuteStatusAction(s => s.SendReplyOrDirectMessage(a))),
+                KeyAssignAction.CreateWithArgumentOptional("Reply",
+                    a => this.ExecuteStatusAction(s => s.SendReplyOrDirectMessage(a))),
                 KeyAssignAction.CreateWithArgumentRequired("OpenUrl",
-                                                           a => this.ExecuteStatusAction(s => s.OpenNthLink(a)))
+                    a => this.ExecuteStatusAction(s => s.OpenNthLink(a)))
                 );
 
             // Timeline argumentable actions

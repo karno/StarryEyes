@@ -309,8 +309,10 @@ namespace StarryEyes
         {
             try
             {
+                if (_appMutex == null) return;
                 _appMutex.ReleaseMutex();
                 _appMutex.Dispose();
+                _appMutex = null;
             }
             catch (ObjectDisposedException) { }
         }
