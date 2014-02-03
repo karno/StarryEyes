@@ -257,6 +257,7 @@
     <Compile Include="Models\Inputting\InputCoreModel.cs" />
     <Compile Include="Models\Inputting\InputData.cs" />
     <Compile Include="Models\Inputting\InputModel.cs" />
+    <Compile Include="Models\Plugins\Injections\InjectionInlet.cs" />
     <Compile Include="Models\Requests\UpdateFriendshipsRequest.cs" />
     <Compile Include="Models\Inputting\InputSetting.cs" />
     <Compile Include="Models\Subsystems\AutoUpdateService.cs" />
@@ -320,7 +321,7 @@
     <Compile Include="Models\Timelines\Tabs\TabModel.cs" />
     <Compile Include="Models\Timelines\TimelineModelBase.cs" />
     <Compile Include="Models\Timelines\Statuses\UserModel.cs" />
-    <Compile Include="Plugins\ScriptingManagerImpl.cs" />
+    <Compile Include="Models\Plugins\ScriptingManagerImpl.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Settings\AccountManager.cs" />
     <Compile Include="Settings\KeyAssignManager.cs" />
@@ -639,7 +640,6 @@
     <EmbeddedResource Include="Views\Controls\QueryEditorResources\KrileQuery.xshd" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Injections\" />
     <Folder Include="ViewModels\Notifications\" />
     <Folder Include="Views\Notifications\" />
   </ItemGroup>

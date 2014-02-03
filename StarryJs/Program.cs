@@ -5,9 +5,9 @@ namespace StarryJs
 {
     public class Program : IScriptExecutor
     {
-        public string Id
+        public Guid Id
         {
-            get { return "Jurassic"; }
+            get { return new Guid("b83ca033-5d65-4d2b-ba12-f745950337d1"); }
         }
 
         public string Name

@@ -33,7 +33,8 @@ namespace StarryEyes.Plugins
         private void ExecuteScripts()
         {
             var targetPath = Path.Combine(App.ExeFileDir, App.ScriptDirectiory);
-            if (Directory.Exists(targetPath)) {
+            if (Directory.Exists(targetPath))
+            {
                 foreach (var file in Directory.GetFiles(targetPath, "*", SearchOption.TopDirectoryOnly))
                 {
                     this.ExecuteFile(file);

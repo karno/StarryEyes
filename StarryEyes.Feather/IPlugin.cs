@@ -8,7 +8,7 @@ namespace StarryEyes.Feather
     /// </summary>
     public interface IPlugin
     {
-        string Id { get; }
+        Guid Id { get; }
 
         string Name { get; }
 
