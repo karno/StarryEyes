@@ -112,7 +112,7 @@ namespace StarryEyes.Models.Subsystems
                 if (version != null)
                 {
                     ver = version.ToString(3);
-                    if (Setting.AcceptUnstableVersion.Value)
+                    if (Setting.IsLoaded && Setting.AcceptUnstableVersion.Value)
                     {
                         ver = App.Version.ToString(4);
                     }
