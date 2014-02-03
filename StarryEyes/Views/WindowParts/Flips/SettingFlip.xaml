@@ -90,7 +90,7 @@
                     </ListBox.Resources>
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <Grid Background="#00FFFFFF">
+                            <Grid Background="{DynamicResource BaseColorBackgroundBrush}">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition />
