@@ -30,9 +30,19 @@ namespace StarryEyes.Models.Subsystems
             get { return Path.Combine(App.LocalUpdateStorePath, App.UpdaterFileName); }
         }
 
+        private static string PostUpdateFilePath
+        {
+            get { return Path.Combine(App.LocalUpdateStorePath, App.PostUpdateFileName); }
+        }
+
         public static bool IsUpdateBinaryExisted()
         {
             return File.Exists(ExecutablePath);
+        }
+
+        public static bool IsPostUpdateFileExisted()
+        {
+            return File.Exists(PostUpdateFilePath);
         }
 
         private static async Task<bool> CheckUpdate(Version version)

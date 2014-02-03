@@ -99,6 +99,8 @@ namespace SweetMagic
         {
             try
             {
+                // create "complete" file
+                File.Create(Path.Combine(Application.StartupPath, "kup.completed"));
                 var psi = new ProcessStartInfo(Path.Combine(this._callbackPoint, Program.CallbackFile))
                 {
                     UseShellExecute = true,
@@ -112,6 +114,5 @@ namespace SweetMagic
                 Application.Exit();
             }
         }
-
     }
 }

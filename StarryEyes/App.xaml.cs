@@ -427,6 +427,8 @@ namespace StarryEyes
 
         public static readonly string UpdaterFileName = "kup.exe";
 
+        public static readonly string PostUpdateFileName = "kup.completed";
+
         public static readonly string DefaultStatusMessage = "完了";
 
         public static readonly string RemoteVersionXml = "http://krile.starwing.net/shared/update.xml";

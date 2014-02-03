@@ -92,7 +92,7 @@ namespace StarryEyes
                 Environment.Exit(-1);
             }
 
-            if (postUpdate)
+            if (postUpdate || AutoUpdateService.IsPostUpdateFileExisted())
             {
                 // remove update binary
                 AutoUpdateService.PostUpdate();
