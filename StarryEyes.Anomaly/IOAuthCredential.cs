@@ -1,11 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Net.Http;
-using AsyncOAuth;
-using StarryEyes.Anomaly.Ext;
-namespace StarryEyes.Anomaly
+﻿namespace StarryEyes.Anomaly
 {
     public interface IOAuthCredential
     {
+        long Id { get; }
+
         string OAuthConsumerKey { get; }
 
         string OAuthConsumerSecret { get; }

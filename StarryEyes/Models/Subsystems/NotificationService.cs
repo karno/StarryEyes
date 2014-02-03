@@ -5,9 +5,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using StarryEyes.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Feather.Proxies;
 using StarryEyes.Filters;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Databases;
+using StarryEyes.Models.Plugins.Injections;
 using StarryEyes.Models.Receiving.Handling;
 using StarryEyes.Models.Subsystems.Notifications;
 using StarryEyes.Models.Timelines.Statuses;
@@ -23,25 +25,34 @@ namespace StarryEyes.Models.Subsystems
     public static class NotificationService
     {
         private static INotificationSink _head;
-        private static NotificationProxy _tail;
+        private static NotificationProxyWrapper _tail;
         private static readonly INotificationSink _sink = new NotificationSink();
 
         private static INotificationSink Head { get { return _head ?? _sink; } }
 
-        public static void RegisterProxy([NotNull] NotificationProxy proxy)
+        public static void Initialize()
         {
-            if (proxy == null) throw new ArgumentNullException("proxy");
+            // register binder
+            BridgeSocketBinder.Bind(NotificationProxy.Socket,
+                p => RegisterProxy(new NotificationProxyWrapper(p)));
+        }
+
+        public static void RegisterProxy([NotNull] NotificationProxyWrapper proxyWrapper)
+        {
+            if (proxyWrapper == null) throw new ArgumentNullException("proxyWrapper");
             if (_head == null)
             {
-                _head = proxy;
+                _head = proxyWrapper;
             }
             else
             {
-                _tail.Next = proxy;
+                _tail.Next = proxyWrapper;
             }
-            proxy.Next = _sink;
-            _tail = proxy;
+            proxyWrapper.Next = _sink;
+            _tail = proxyWrapper;
         }
+
+        #region Notification methods
 
         internal static void NotifyReceived(TwitterStatus status)
         {
@@ -193,5 +204,7 @@ namespace StarryEyes.Models.Subsystems
         {
             Head.NotifyUserUpdated(source);
         }
+
+        #endregion
     }
 }

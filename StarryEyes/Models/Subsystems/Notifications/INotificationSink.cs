@@ -1,5 +1,6 @@
-﻿using StarryEyes.Anomaly.TwitterApi.DataModels;
-using StarryEyes.Models.Accounting;
+﻿using StarryEyes.Anomaly;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Feather.Proxies;
 
 namespace StarryEyes.Models.Subsystems.Notifications
 {
@@ -25,15 +26,9 @@ namespace StarryEyes.Models.Subsystems.Notifications
 
         void NotifyDeleted(long statusId, TwitterStatus deleted);
 
-        void NotifyLimitationInfoGot(TwitterAccount account, int trackLimit);
+        void NotifyLimitationInfoGot(IOAuthCredential account, int trackLimit);
 
         void NotifyUserUpdated(TwitterUser source);
     }
 
-    public enum NotificationType
-    {
-        Normal,
-        Mention,
-        DirectMessage,
-    }
 }

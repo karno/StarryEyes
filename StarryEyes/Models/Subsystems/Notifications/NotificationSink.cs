@@ -1,4 +1,6 @@
-﻿using StarryEyes.Anomaly.TwitterApi.DataModels;
+﻿using StarryEyes.Anomaly;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Feather.Proxies;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Models.Backstages.TwitterEvents;
@@ -62,9 +64,11 @@ namespace StarryEyes.Models.Subsystems.Notifications
             // do nothing, currently.
         }
 
-        public void NotifyLimitationInfoGot(TwitterAccount account, int trackLimit)
+        public void NotifyLimitationInfoGot(IOAuthCredential account, int trackLimit)
         {
-            BackstageModel.RegisterEvent(new TrackLimitEvent(account, trackLimit));
+            var acc = account as TwitterAccount;
+            if (acc == null) return;
+            BackstageModel.RegisterEvent(new TrackLimitEvent(acc, trackLimit));
         }
 
         public void NotifyUserUpdated(TwitterUser source)

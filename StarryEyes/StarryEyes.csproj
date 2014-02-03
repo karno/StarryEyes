@@ -257,10 +257,14 @@
     <Compile Include="Models\Inputting\InputCoreModel.cs" />
     <Compile Include="Models\Inputting\InputData.cs" />
     <Compile Include="Models\Inputting\InputModel.cs" />
+    <Compile Include="Models\Plugins\Injections\BridgeSocketBinder.cs" />
     <Compile Include="Models\Plugins\Injections\InjectionInlet.cs" />
     <Compile Include="Models\Requests\UpdateFriendshipsRequest.cs" />
     <Compile Include="Models\Inputting\InputSetting.cs" />
     <Compile Include="Models\Subsystems\AutoUpdateService.cs" />
+    <Compile Include="Models\Subsystems\Notifications\INotificationSink.cs" />
+    <Compile Include="Models\Subsystems\Notifications\NotificationProxyWrapper.cs" />
+    <Compile Include="Models\Subsystems\Notifications\NotificationSink.cs" />
     <Compile Include="Networking.cs" />
     <Compile Include="Models\Plugins\PluginManager.cs" />
     <Compile Include="Models\Receiving\ListInfo.cs" />
@@ -268,9 +272,6 @@
     <Compile Include="Models\Receiving\MuteBlockManager.cs" />
     <Compile Include="Models\Receiving\Handling\StatusBroadcaster.cs" />
     <Compile Include="Models\Receiving\Handling\StatusNotification.cs" />
-    <Compile Include="Models\Subsystems\Notifications\INotificationSink.cs" />
-    <Compile Include="Models\Subsystems\Notifications\NotificationProxy.cs" />
-    <Compile Include="Models\Subsystems\Notifications\NotificationSink.cs" />
     <Compile Include="Models\Receiving\Managers\ListReceiveManager.cs" />
     <Compile Include="Models\Receiving\Managers\StreamTrackReceiveManager.cs" />
     <Compile Include="Models\Receiving\Receivers\ListReceiver.cs" />

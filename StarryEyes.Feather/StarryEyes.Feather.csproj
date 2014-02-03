@@ -51,8 +51,10 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Injections\BridgeSocket.cs" />
     <Compile Include="Injections\IInjectable.cs" />
     <Compile Include="Injections\InjectionResult.cs" />
+    <Compile Include="Proxies\INotificationProxy.cs" />
     <Compile Include="Scripting\IScriptExecutor.cs" />
     <Compile Include="IPlugin.cs" />
     <Compile Include="Packaging\PackageDescription.cs" />
@@ -63,6 +65,12 @@
   <ItemGroup />
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\StarryEyes.Anomaly\StarryEyes.Anomaly.csproj">
+      <Project>{564E23DE-AB35-45B6-B331-395C3943BC23}</Project>
+      <Name>StarryEyes.Anomaly</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

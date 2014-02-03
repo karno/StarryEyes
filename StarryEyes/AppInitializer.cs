@@ -266,6 +266,7 @@ namespace StarryEyes
             StatusBroadcaster.Initialize();
             StatusInbox.Initialize();
             AutoUpdateService.StartSchedule();
+            NotificationService.Initialize();
 
             // activate plugins
             PluginManager.LoadedPlugins.ForEach(p => p.Initialize());
