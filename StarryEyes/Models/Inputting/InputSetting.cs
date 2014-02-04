@@ -48,7 +48,8 @@ namespace StarryEyes.Models.Inputting
             {
                 Accounts = reply == null ? null : new[] { reply },
                 Body = "@" + inReplyTo.User.ScreenName + " " + users + body,
-                InReplyTo = inReplyTo
+                InReplyTo = inReplyTo,
+                CursorPosition = new CursorPosition(inReplyTo.User.ScreenName.Length + 2, (users + body).Length)
             };
         }
 
