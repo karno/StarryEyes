@@ -440,6 +440,9 @@
                                    Text="他のアカウントからのフォールバックになっているアカウントへの返信に対して返信する際に、フォールバック元アカウントを自動指定するようにします。"
                                    TextWrapping="Wrap" />
                         <CheckBox Margin="0,8"
+                                  Content="誰かに返信する時はバインドされているタグを無視する(_T)"
+                                  IsChecked="{Binding SuppressTagBindInReply}" />
+                        <CheckBox Margin="0,8"
                                   Content="ツイートボックスを開くときに下書きが存在していたら下書きを開く(_R)"
                                   IsChecked="{Binding RestorePreviousStashed}" />
                         <StackPanel Margin="0,8" Orientation="Horizontal">
@@ -470,11 +473,14 @@
                                   Content="アプリケーションを閉じるときに確認する(_X)"
                                   IsChecked="{Binding ConfirmOnExitApp}" />
                         <CheckBox Margin="0,8"
+                                  Content="別のアカウントで行われている会話に割り込む場合に警告する(_T)"
+                                  IsChecked="{Binding WarnReplyFromThirdAccount}" />
+                        <CheckBox Margin="0,8"
                                   Content="ツイートの訂正を行うときに警告する(_A)"
                                   IsChecked="{Binding WarnAmendTweet}" />
                         <CheckBox Margin="0,8"
-                                  Content="別のアカウントで行われている会話に割り込む場合に警告する(_T)"
-                                  IsChecked="{Binding WarnReplyFromThirdAccount}" />
+                                  Content="ツイート失敗時にメッセージを表示する(_T)"
+                                  IsChecked="{Binding ShowMessageOnTweetFailed}" />
                     </StackPanel>
                 </Grid>
                 <Grid Grid.Column="1" Margin="0,6,0,0">

@@ -226,10 +226,12 @@ namespace StarryEyes.Models.Inputting
                                                   .Select(_ => _.Groups[1].Value)
                                                   .Distinct()
                                                   .ToArray();
-            var binds = _boundTags.Guard().Except(existedTags)
-                                  .Distinct()
-                                  .Select(t => " #" + t)
-                                  .JoinString("");
+            var binds = !IsTagBindEnabled
+                ? String.Empty
+                : _boundTags.Guard().Except(existedTags)
+                            .Distinct()
+                            .Select(t => " #" + t)
+                            .JoinString(String.Empty);
             RequestBase<TwitterStatus> request;
             if (IsDirectMessage)
             {

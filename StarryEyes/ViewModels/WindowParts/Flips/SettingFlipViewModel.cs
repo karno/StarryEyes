@@ -327,12 +327,6 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         #region Input property
 
-        public bool IsUrlAutoEscapeEnabled
-        {
-            get { return Setting.IsUrlAutoEscapeEnabled.Value; }
-            set { Setting.IsUrlAutoEscapeEnabled.Value = value; }
-        }
-
         public int TweetBoxClosingAction
         {
             get { return (int)Setting.TweetBoxClosingAction.Value; }
@@ -349,6 +343,12 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         {
             get { return Setting.RestorePreviousStashed.Value; }
             set { Setting.RestorePreviousStashed.Value = value; }
+        }
+
+        public bool SuppressTagBindInReply
+        {
+            get { return Setting.SuppressTagBindingInReply.Value; }
+            set { Setting.SuppressTagBindingInReply.Value = value; }
         }
 
         #endregion
@@ -371,6 +371,12 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         {
             get { return Setting.WarnReplyFromThirdAccount.Value; }
             set { Setting.WarnReplyFromThirdAccount.Value = value; }
+        }
+
+        public bool ShowMessageOnTweetFailed
+        {
+            get { return Setting.ShowMessageOnTweetFailed.Value; }
+            set { Setting.ShowMessageOnTweetFailed.Value = value; }
         }
 
         #endregion
