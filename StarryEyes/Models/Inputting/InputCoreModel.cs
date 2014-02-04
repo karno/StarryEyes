@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Livet;
 using StarryEyes.Albireo;
 using StarryEyes.Annotations;
@@ -47,6 +48,7 @@ namespace StarryEyes.Models.Inputting
                     _drafts.Add(_inputData);
                 }
                 _inputData = value;
+                _inputData.BoundTags = BindingHashtags.ToArray();
                 RaisePropertyChanged(() => CurrentInputData);
             }
         }
@@ -159,6 +161,7 @@ namespace StarryEyes.Models.Inputting
                 // if text is not changed, send to draft
                 _drafts.Add(current);
             }
+            _inputData.BoundTags = BindingHashtags.ToArray();
             RaisePropertyChanged(() => CurrentInputData);
         }
 

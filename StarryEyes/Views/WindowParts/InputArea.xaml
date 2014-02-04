@@ -39,6 +39,7 @@
                         VerticalContentAlignment="Stretch"
                         Content="{Binding DisplayHashtag}"
                         Focusable="False"
+                        Foreground="{DynamicResource BaseColorForegroundBrush}"
                         Style="{DynamicResource MetroSquareUnfocusableFlatButton}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="Click">
@@ -613,7 +614,7 @@
                                 </Viewbox>
                             </Grid>
                         </StackPanel>
-                        <DockPanel LastChildFill="False" Visibility="{Binding IsDirectMessageEnabled, Converter={StaticResource BooleanToInvisibleConverter}}">
+                        <DockPanel LastChildFill="False" Visibility="{Binding IsBindHashtagEnabled, Converter={StaticResource BooleanToVisibleConverter}}">
                             <Border Width="14"
                                     Height="14"
                                     Margin="7,0"

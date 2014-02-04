@@ -78,6 +78,11 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                                             RaisePropertyChanged(() => IsDraftsExisted);
                                         }));
 
+            // listen setting changed
+            CompositeDisposable.Add(
+                Setting.SuppressTagBindingInReply.ListenValueChanged(
+                    _ => RaisePropertyChanged(() => IsBindHashtagEnabled)));
+
             // listen text control
             CompositeDisposable.Add(new EventListener<Action<CursorPosition>>(
                 h => InputModel.SetCursorRequest += h,
@@ -148,6 +153,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             RaisePropertyChanged(() => IsInReplyToEnabled);
             RaisePropertyChanged(() => DirectMessageTo);
             RaisePropertyChanged(() => IsDirectMessageEnabled);
+            RaisePropertyChanged(() => IsBindHashtagEnabled);
             RaisePropertyChanged(() => AttachedImage);
             RaisePropertyChanged(() => IsImageAttached);
             RaisePropertyChanged(() => AttachedLocation);
@@ -340,6 +346,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                 }
                 RaisePropertyChanged(() => InReplyTo);
                 RaisePropertyChanged(() => IsInReplyToEnabled);
+                RaisePropertyChanged(() => IsBindHashtagEnabled);
             }
         }
 
@@ -383,6 +390,16 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                 }
                 RaisePropertyChanged(() => DirectMessageTo);
                 RaisePropertyChanged(() => IsDirectMessageEnabled);
+                RaisePropertyChanged(() => IsBindHashtagEnabled);
+            }
+        }
+
+        public bool IsBindHashtagEnabled
+        {
+            get
+            {
+                return InputData.MessageRecipient == null ||
+                       (InputData.InReplyTo == null || !Setting.SuppressTagBindingInReply.Value);
             }
         }
 
@@ -836,16 +853,18 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                     }
                     if (r.Faileds != null)
                     {
-                        var message = this.AnalyzeFailedReason(r.Exceptions) ?? "利用可能な情報はありません。";
+                        var message = this.AnalyzeFailedReason(r.Exceptions) ?? "原因を特定できませんでした。";
                         if (Setting.ShowMessageOnTweetFailed.Value)
                         {
                             var resp = _parent.Messenger.GetResponse(new TaskDialogMessage(new TaskDialogOptions
                             {
                                 Title = "ツイートの失敗",
                                 MainIcon = VistaTaskDialogIcon.Error,
-                                MainInstruction = "ツイートに失敗しました。再試行しますか？" + Environment.NewLine +
-                                                  "(再試行しない場合は、ツイートしようとした内容は下書きとして保存されます。)",
-                                Content = message,
+                                MainInstruction = "ツイートに失敗しました。",
+                                Content = "エラー: " + message + Environment.NewLine +
+                                          "もう一度投稿しますか？",
+                                FooterText = "再試行しない場合は、ツイートしようとした内容は下書きとして保存されます。",
+                                FooterIcon = VistaTaskDialogIcon.Information,
                                 VerificationText = "次回から表示しない",
                                 CommonButtons = TaskDialogCommonButtons.RetryCancel
                             }));
