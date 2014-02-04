@@ -22,7 +22,8 @@ namespace StarryEyes.Models.Inputting
         private BitmapImage _attachedImage;
         private GeoLocationInfo _geoInfo;
         private string[] _boundTags;
-        private Dictionary<TwitterAccount, TwitterStatus> _amendTweets = new Dictionary<TwitterAccount, TwitterStatus>();
+        private Dictionary<TwitterAccount, TwitterStatus> _amendTweets =
+            new Dictionary<TwitterAccount, TwitterStatus>();
         private TwitterStatus _inReplyTo;
         private TwitterUser _messageRecipient;
 
@@ -291,7 +292,8 @@ namespace StarryEyes.Models.Inputting
             return RequestQueue.Enqueue(account, request)
                                .Do(StatusInbox.Queue)
                                .Select(s => Tuple.Create(account, s, (Exception)null))
-                               .Catch((Exception ex) => Observable.Return(Tuple.Create(account, (TwitterStatus)null, ex)));
+                               .Catch((Exception ex) =>
+                                   Observable.Return(Tuple.Create(account, (TwitterStatus)null, ex)));
         }
     }
 

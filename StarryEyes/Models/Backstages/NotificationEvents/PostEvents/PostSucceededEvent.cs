@@ -7,11 +7,6 @@ namespace StarryEyes.Models.Backstages.NotificationEvents.PostEvents
     {
         private readonly string _body;
 
-        public PostSucceededEvent(TweetInputInfo info)
-        {
-            this._body = info.Text;
-        }
-
         public PostSucceededEvent(InputData data)
         {
             this._body = data.Text;

@@ -304,7 +304,6 @@
     <Compile Include="Models\Accounting\AccountRelationData.cs" />
     <Compile Include="Models\Stores\CacheStore.cs" />
     <Compile Include="Models\Stores\StoreHelper.cs" />
-    <Compile Include="Models\InputAreaModel.cs" />
     <Compile Include="Models\MainWindowModel.cs" />
     <Compile Include="Models\Subsystems\NotificationService.cs" />
     <Compile Include="Hotfixes\ObservableSynchronizedCollectionEx.cs" />
@@ -352,6 +351,7 @@
     <Compile Include="ViewModels\Common\FilterEditControlViewModel.cs" />
     <Compile Include="ViewModels\Common\FilterEditor\FilterPredicateViewModelBase.cs" />
     <Compile Include="ViewModels\Common\FilterEditor\FilterSourceViewModel.cs" />
+    <Compile Include="ViewModels\WindowParts\Inputting\BindHashtagViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\AccountSelectionFlipViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\BackstageViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\PartialFlipViewModelBase.cs" />
@@ -367,7 +367,6 @@
     <Compile Include="ViewModels\WindowParts\Flips\SettingFlipViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\TabConfigurationFlipViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\VersionInfoViewModel.cs" />
-    <Compile Include="ViewModels\WindowParts\InputAreaViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Inputting\AccountSelectorViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Inputting\InputAreaSuggestItemProvider.cs" />
     <Compile Include="ViewModels\WindowParts\Inputting\InputCoreViewModel.cs" />

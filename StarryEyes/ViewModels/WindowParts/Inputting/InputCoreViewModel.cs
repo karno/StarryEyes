@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using Livet;
+using Livet.EventListeners;
 using Livet.Messaging.IO;
 using StarryEyes.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
@@ -41,7 +42,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
 
         public InputCoreViewModel(InputViewModel parent)
         {
-            _parent = parent;
+            this._parent = parent;
             this._provider = new InputAreaSuggestItemProvider();
 
             CompositeDisposable.Add(
@@ -76,6 +77,16 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                                             RaisePropertyChanged(() => DraftCount);
                                             RaisePropertyChanged(() => IsDraftsExisted);
                                         }));
+
+            // listen text control
+            CompositeDisposable.Add(new EventListener<Action<CursorPosition>>(
+                h => InputModel.SetCursorRequest += h,
+                h => InputModel.SetCursorRequest -= h,
+                SetCursor));
+            var plistener = new PropertyChangedEventListener(InputModel.InputCore);
+            plistener.Add(() => InputModel.InputCore.CurrentInputData, (_, e) => InputDataChanged());
+            CompositeDisposable.Add(plistener);
+
             // initialize clipboard watcher.
             ClipboardWatcher watcher;
             CompositeDisposable.Add(watcher = new ClipboardWatcher());
@@ -122,7 +133,29 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
         public InputData InputData
         {
             get { return InputModel.InputCore.CurrentInputData; }
-            set { InputModel.InputCore.CurrentInputData = value; }
+            set
+            {
+                InputModel.InputCore.CurrentInputData = value;
+                InputDataChanged();
+            }
+        }
+
+        private void InputDataChanged()
+        {
+            this.RaisePropertyChanged(() => InputData);
+            RaisePropertyChanged(() => InputText);
+            RaisePropertyChanged(() => InReplyTo);
+            RaisePropertyChanged(() => IsInReplyToEnabled);
+            RaisePropertyChanged(() => DirectMessageTo);
+            RaisePropertyChanged(() => IsDirectMessageEnabled);
+            RaisePropertyChanged(() => AttachedImage);
+            RaisePropertyChanged(() => IsImageAttached);
+            RaisePropertyChanged(() => AttachedLocation);
+            RaisePropertyChanged(() => IsLocationAttached);
+            RaisePropertyChanged(() => IsAmending);
+            RaisePropertyChanged(() => CanAmend);
+            UpdateHashtagCandidates();
+            UpdateTextCount();
         }
 
         public InputAreaSuggestItemProvider Provider
@@ -170,12 +203,12 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                                            .OfType<Match>()
                                            .Select(_ => _.Groups[1].Value)
                                            .ToArray();
-                if (InputAreaModel.BindingHashtags.Count > 0)
+                if (InputModel.InputCore.BindingHashtags.Count > 0)
                 {
-                    currentTextLength += InputAreaModel.BindingHashtags
-                                                       .Except(tags)
-                                                       .Select(_ => _.Length + 1)
-                                                       .Sum();
+                    currentTextLength += InputModel.InputCore.BindingHashtags
+                                                   .Except(tags)
+                                                   .Select(_ => _.Length + 1)
+                                                   .Sum();
                 }
                 return currentTextLength;
             }
@@ -220,7 +253,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                 var action = Setting.TweetBoxClosingAction.Value;
                 if (action == TweetBoxClosingAction.Confirm)
                 {
-                    var msg = Messenger.GetResponse(
+                    var msg = _parent.Messenger.GetResponse(
                         new TaskDialogMessage(
                             new TaskDialogOptions
                             {
@@ -262,31 +295,9 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             return true;
         }
 
-        public void ClearInput(string clearTo = "", bool stash = false)
+        public void ClearInput(string clearTo = "", bool sendDraftIfChanged = false)
         {
-            if (stash && CanSaveToDraft)
-            {
-                InputModel.InputCore.Drafts.Add(InputData);
-            }
-            InputData = new InputData(clearTo)
-            {
-                Accounts = _parent.AccountSelectorViewModel.AccountSelectionFlip.SelectedAccounts,
-                BoundTags = _bindingHashtags.Select(t => t.Hashtag).ToArray()
-            };
-            this.RaisePropertyChanged(() => InputData);
-            RaisePropertyChanged(() => InputText);
-            RaisePropertyChanged(() => InReplyTo);
-            RaisePropertyChanged(() => IsInReplyToEnabled);
-            RaisePropertyChanged(() => DirectMessageTo);
-            RaisePropertyChanged(() => IsDirectMessageEnabled);
-            RaisePropertyChanged(() => AttachedImage);
-            RaisePropertyChanged(() => IsImageAttached);
-            RaisePropertyChanged(() => AttachedLocation);
-            RaisePropertyChanged(() => IsLocationAttached);
-            RaisePropertyChanged(() => IsAmending);
-            RaisePropertyChanged(() => CanAmend);
-            UpdateHashtagCandidates();
-            UpdateTextCount();
+            InputModel.InputCore.ClearInput(clearTo, sendDraftIfChanged);
         }
 
         #endregion
@@ -423,6 +434,11 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             }
         }
 
+        private void SetCursor(CursorPosition position)
+        {
+            this._parent.Messenger.Raise(new TextBoxSetCaretMessage(
+                position.Index < 0 ? InputText.Length : position.Index, position.SelectionLength));
+        }
 
         #endregion
 
@@ -512,7 +528,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                 MultiSelect = false,
                 Title = "添付する画像ファイルを指定"
             };
-            var m = Messenger.GetResponse(msg);
+            var m = _parent.Messenger.GetResponse(msg);
             if (m.Response == null || m.Response.Length <= 0 ||
                 String.IsNullOrEmpty(m.Response[0]) || !File.Exists(m.Response[0]))
             {
@@ -551,7 +567,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             }
             catch (Exception ex)
             {
-                this.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
+                _parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
                 {
                     Title = "画像読み込みエラー",
                     MainIcon = VistaTaskDialogIcon.Error,
@@ -574,15 +590,15 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             }
             catch (Exception ex)
             {
-                this.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
-                {
-                    Title = "エラー",
-                    MainIcon = VistaTaskDialogIcon.Error,
-                    MainInstruction = "Snipping Toolの起動に失敗しました。",
-                    Content = "スタートメニューからの起動を試してみてください。",
-                    ExpandedInfo = ex.ToString(),
-                    CommonButtons = TaskDialogCommonButtons.Close
-                }));
+                _parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
+                 {
+                     Title = "エラー",
+                     MainIcon = VistaTaskDialogIcon.Error,
+                     MainInstruction = "Snipping Toolの起動に失敗しました。",
+                     Content = "スタートメニューからの起動を試してみてください。",
+                     ExpandedInfo = ex.ToString(),
+                     CommonButtons = TaskDialogCommonButtons.Close
+                 }));
             }
         }
 
@@ -666,7 +682,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
 
         public bool CanAmend
         {
-            get { return InputAreaModel.PreviousPosted != null && !IsAmending; }
+            get { return InputModel.InputCore.LastPostedData != null && !IsAmending; }
         }
 
         public void AmendLastPosted()
@@ -692,7 +708,6 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
         {
             get { return _draftedInputs.Count; }
         }
-
 
         public bool CanSaveToDraft
         {
@@ -727,7 +742,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             {
                 // could not send.
                 this.RaisePropertyChanged(() => CanSend);
-                _parent.FocusToTextBox();
+                this._parent.FocusToTextBox();
                 return;
             }
             if (!this.CheckInput())
@@ -736,7 +751,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             }
             SendCore(InputData);
             ClearInput();
-            _parent.FocusToTextBox();
+            this._parent.FocusToTextBox();
         }
 
         private bool CheckInput()
@@ -750,7 +765,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                     removal += " (" + dual + "件のツイートが同時に削除されます)";
                 }
                 // amend mode
-                var amend = Messenger.GetResponse(
+                var amend = _parent.Messenger.GetResponse(
                     new TaskDialogMessage(
                         new TaskDialogOptions
                         {
@@ -790,7 +805,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                              .Select(_ => _.UnreliableScreenName)
                              .Any(replies.Contains))
                 {
-                    var thirdreply = Messenger.GetResponse(
+                    var thirdreply = _parent.Messenger.GetResponse(
                         new TaskDialogMessage(new TaskDialogOptions
                         {
                             Title = "割込みリプライ警告",

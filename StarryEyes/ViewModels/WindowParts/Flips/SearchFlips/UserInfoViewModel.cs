@@ -8,6 +8,7 @@ using Livet;
 using Livet.Commands;
 using StarryEyes.Anomaly.Utils;
 using StarryEyes.Models;
+using StarryEyes.Models.Inputting;
 using StarryEyes.Models.Stores;
 using StarryEyes.Models.Timelines.SearchFlips;
 using StarryEyes.Nightmare.Windows;
@@ -251,7 +252,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
 
         public void SetTextToInputBox()
         {
-            InputAreaModel.SetText(body: SelectedText);
+            InputModel.InputCore.SetText(InputSetting.Create(SelectedText));
         }
 
         public void FindOnKrile()

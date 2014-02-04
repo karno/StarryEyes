@@ -9,12 +9,6 @@ namespace StarryEyes.Models.Backstages.NotificationEvents.PostEvents
 
         private readonly string _reason;
 
-        public PostFailedEvent(TweetInputInfo info, string reason)
-        {
-            this._post = info.Text;
-            this._reason = reason;
-        }
-
         public PostFailedEvent(InputData data, string reason)
         {
             this._post = data.Text;

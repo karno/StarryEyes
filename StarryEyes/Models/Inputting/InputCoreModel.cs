@@ -16,7 +16,7 @@ namespace StarryEyes.Models.Inputting
         private readonly ObservableSynchronizedCollection<InputData> _drafts =
             new ObservableSynchronizedCollection<InputData>();
 
-        private InputData _inputData;
+        private InputData _inputData = new InputData(String.Empty);
 
         private InputData _lastPostedData;
 
@@ -113,7 +113,6 @@ namespace StarryEyes.Models.Inputting
                              CursorPosition cursor,
                              bool focusToInputArea)
         {
-
             CurrentInputData = new InputData(body)
             {
                 Accounts = infos,
@@ -151,15 +150,16 @@ namespace StarryEyes.Models.Inputting
             }
         }
 
-        public void ClearInput(bool sendDraftIfChanged)
+        public void ClearInput(string text, bool sendDraftIfChanged)
         {
             var current = _inputData;
-            _inputData = new InputData(String.Empty);
+            _inputData = new InputData(text);
             if (current.IsChanged && sendDraftIfChanged)
             {
                 // if text is not changed, send to draft
                 _drafts.Add(current);
             }
+            RaisePropertyChanged(() => CurrentInputData);
         }
 
         public void Close()

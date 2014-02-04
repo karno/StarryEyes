@@ -1,4 +1,6 @@
-﻿using Livet;
+﻿using System;
+using Livet;
+using Livet.EventListeners;
 using Livet.Messaging;
 using StarryEyes.Models;
 using StarryEyes.Models.Inputting;
@@ -22,6 +24,21 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             this.CompositeDisposable.Add(_inputCoreViewModel = new InputCoreViewModel(this));
             this.CompositeDisposable.Add(_accountSelectorViewModel = new AccountSelectorViewModel(this));
             this.CompositeDisposable.Add(_postLimitPredictionViewModel = new PostLimitPredictionViewModel());
+
+            this.CompositeDisposable.Add(
+                new EventListener<Action>(
+                    h => InputModel.FocusRequest += h,
+                    h => InputModel.FocusRequest -= h,
+                    () =>
+                    {
+                        OpenInput();
+                        FocusToTextBox();
+                    }));
+            this.CompositeDisposable.Add(
+                new EventListener<Action>(
+                    h => InputModel.CloseRequest += h,
+                    h => InputModel.CloseRequest -= h,
+                    CloseInput));
             this.RegisterKeyAssigns();
         }
 
@@ -113,6 +130,9 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             if (!IsOpening) return;
             if (InputCoreViewModel.CheckClearInput())
             {
+                // reset tab-account synchronization
+                AccountSelectorViewModel.SynchronizeWithTab();
+                // close
                 IsOpening = false;
             }
             // move focus to timeline
@@ -121,7 +141,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
 
         public void FocusToTextBox()
         {
-            Messenger.Raise(new InteractionMessage("FocusToTextBox"));
+            this.Messenger.Raise(new InteractionMessage("FocusToTextBox"));
         }
     }
 }

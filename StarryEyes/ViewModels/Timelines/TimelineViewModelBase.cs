@@ -9,7 +9,7 @@ using System.Windows.Threading;
 using Livet;
 using Livet.EventListeners;
 using StarryEyes.Annotations;
-using StarryEyes.Models;
+using StarryEyes.Models.Inputting;
 using StarryEyes.Models.Timelines;
 using StarryEyes.Models.Timelines.Statuses;
 using StarryEyes.Models.Timelines.Tabs;
@@ -202,7 +202,10 @@ namespace StarryEyes.ViewModels.Timelines
                 .Select(s => "@" + s.User.ScreenName)
                 .Distinct()
                 .JoinString(" ");
-            InputAreaModel.SetText(CurrentAccounts.ToArray(), users + " ");
+            var accs = CurrentAccounts.Select(id => Setting.Accounts.Get(id))
+                                      .Where(a => a != null)
+                                      .ToArray();
+            InputModel.InputCore.SetText(InputSetting.Create(accs, users + " "));
             DeselectAll();
         }
 

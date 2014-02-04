@@ -21,6 +21,7 @@ using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Models.Backstages.TwitterEvents;
 using StarryEyes.Models.Databases;
+using StarryEyes.Models.Inputting;
 using StarryEyes.Models.Receiving.Handling;
 using StarryEyes.Models.Requests;
 using StarryEyes.Models.Stores;
@@ -580,7 +581,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
 
         public void SetTextToInputBox()
         {
-            InputAreaModel.SetText(body: this.SelectedText);
+            InputModel.InputCore.SetText(InputSetting.Create(this.SelectedText));
         }
 
         public void FindOnKrile()
@@ -906,23 +907,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                 this.Parent.ReplySelecteds();
                 return;
             }
-            // except my names and the user name of main target
-            var excepts = this.Model.GetSuitableReplyAccount()
-                              .Guard()
-                              .Select(a => a.UnreliableScreenName)
-                              .Append(this.User.ScreenName);
-            // reply to all users
-            var users = this.Status.Entities
-                            .Where(e => e.EntityType == EntityType.UserMentions)
-                            .Select(e => e.DisplayText)
-                            .Except(excepts)
-                            .Distinct()
-                            .Select(s => "@" + s + " ")
-                            .JoinString("");
-            InputAreaModel.SetText(this.Model.GetSuitableReplyAccount(),
-                "@" + this.User.ScreenName + " " + users,
-                new CursorPosition(this.User.ScreenName.Length + 2, users.Length),
-                this.Status);
+            InputModel.InputCore.SetText(InputSetting.CreateReply(this.Status));
         }
 
         private void Reply(string body)
@@ -941,8 +926,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             try
             {
                 var formatted = String.Format(body, this.User.ScreenName, this.User.Name);
-                InputAreaModel.SetText(this.Model.GetSuitableReplyAccount(),
-                                       formatted, inReplyTo: this.Status);
+                InputModel.InputCore.SetText(InputSetting.CreateReply(this.Status, formatted, false));
             }
             catch (Exception ex)
             {
@@ -952,24 +936,33 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
 
         public void Quote()
         {
-            InputAreaModel.SetText(this.Model.GetSuitableReplyAccount(),
-                " RT @" + this.User.ScreenName + " " + this.Status.GetEntityAidedText(true), CursorPosition.Begin);
+            var setting = InputSetting.CreateReply(this.Status,
+                " RT @" + this.User.ScreenName + " " + this.Status.GetEntityAidedText(true),
+                false);
+            setting.CursorPosition = CursorPosition.Begin;
+            InputModel.InputCore.SetText(setting);
         }
 
         public void QuotePermalink()
         {
-            InputAreaModel.SetText(this.Model.GetSuitableReplyAccount(), " " + this.Status.Permalink, CursorPosition.Begin);
+            var setting = InputSetting.Create(this.Model.GetSuitableReplyAccount(),
+                " " + this.Status.Permalink);
+            setting.CursorPosition = CursorPosition.Begin;
+            InputModel.InputCore.SetText(setting);
         }
 
         public void DirectMessage()
         {
-            InputAreaModel.SetDirectMessage(this.Model.GetSuitableReplyAccount(), this.Status.User);
+            InputModel.InputCore.SetText(
+                InputSetting.CreateDirectMessage(this.Model.GetSuitableReplyAccount(),
+                    this.Status.User));
         }
 
         public void DirectMessage(string body)
         {
             var formatted = String.Format(body, this.User.ScreenName, this.User.Name);
-            InputAreaModel.SetDirectMessage(this.Model.GetSuitableReplyAccount(), this.Status.User, formatted);
+            InputModel.InputCore.SetText(InputSetting.CreateDirectMessage(
+                this.Model.GetSuitableReplyAccount(), this.Status.User, formatted));
         }
 
         public void ConfirmDelete()

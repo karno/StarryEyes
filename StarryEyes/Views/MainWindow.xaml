@@ -298,7 +298,7 @@
                        Stretch="UniformToFill" />
                 <windowParts:InputArea Grid.Row="0"
                                        Margin="3,4,3,0"
-                                       DataContext="{Binding InputAreaViewModel}" />
+                                       DataContext="{Binding InputViewModel}" />
                 <windowParts:MainArea Grid.Row="1"
                                       Margin="-8,0,0,0"
                                       DataContext="{Binding MainAreaViewModel}" />

@@ -12,26 +12,30 @@ namespace StarryEyes.Models.Inputting
 {
     public class AccountSelectorModel : NotificationObject
     {
+        private readonly InputCoreModel _coreModel;
+
         private readonly ObservableSynchronizedCollection<TwitterAccount> _accounts =
             new ObservableSynchronizedCollection<TwitterAccount>();
 
         private TabModel _currentFocusTab;
-        private InputData _currentInputData;
         private bool _isSynchronizedWithTab;
 
-        internal AccountSelectorModel([NotNull] InputData initialInputData)
+        internal AccountSelectorModel([NotNull] InputCoreModel coreModel)
         {
-            if (initialInputData == null) throw new ArgumentNullException("initialInputData");
+            this._coreModel = coreModel;
             _isSynchronizedWithTab = true;
-            _currentInputData = initialInputData;
             Accounts.CollectionChanged += HandleCollectionChanged;
         }
 
         private void HandleCollectionChanged(object o, NotifyCollectionChangedEventArgs e)
         {
             if (_currentFocusTab == null || !_isSynchronizedWithTab) return;
-            var newItems = e.NewItems.OfType<TwitterAccount>().Select(i => i.Id);
-            var oldItems = e.OldItems.OfType<TwitterAccount>().Select(i => i.Id);
+            var newItems = e.NewItems != null
+                ? e.NewItems.OfType<TwitterAccount>().Select(i => i.Id)
+                : Enumerable.Empty<long>();
+            var oldItems = e.OldItems != null
+                ? e.OldItems.OfType<TwitterAccount>().Select(i => i.Id)
+                : Enumerable.Empty<long>();
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
@@ -55,6 +59,7 @@ namespace StarryEyes.Models.Inputting
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+            _coreModel.CurrentInputData.Accounts = Accounts.ToArray();
         }
 
         public bool IsSynchronizedWithTab
@@ -78,24 +83,17 @@ namespace StarryEyes.Models.Inputting
             }
         }
 
-        [NotNull]
-        public InputData CurrentInputData
+        public void CurrentInputDataChanged()
         {
-            get { return _currentInputData; }
-            set
+            if (_coreModel.CurrentInputData.Accounts != null)
             {
-                if (value == null) throw new ArgumentNullException("value");
-                _currentInputData = value;
-                if (value.Accounts != null)
-                {
-                    // override with explicitly specified accounts
-                    SetOverride(value.Accounts);
-                }
-                else
-                {
-                    // enforced synchronizing
-                    SynchronizeWithTab();
-                }
+                // override with explicitly specified accounts
+                SetOverride(_coreModel.CurrentInputData.Accounts);
+            }
+            else
+            {
+                // enforced synchronizing
+                SynchronizeWithTab();
             }
         }
 
@@ -136,9 +134,9 @@ namespace StarryEyes.Models.Inputting
                            .Where(a => _currentFocusTab.BindingAccounts.Contains(a.Id))
                            .ForEach(Accounts.Add);
                 }
+                _coreModel.CurrentInputData.Accounts = Accounts.ToArray();
             }
             _isSynchronizedWithTab = true;
-            CurrentInputData.Accounts = Accounts.ToArray();
             RaisePropertyChanged(() => IsSynchronizedWithTab);
         }
     }

@@ -19,6 +19,7 @@ using StarryEyes.Settings;
 using StarryEyes.ViewModels.Dialogs;
 using StarryEyes.ViewModels.WindowParts;
 using StarryEyes.ViewModels.WindowParts.Flips;
+using StarryEyes.ViewModels.WindowParts.Inputting;
 using StarryEyes.Views.Dialogs;
 using StarryEyes.Views.Messaging;
 
@@ -32,7 +33,7 @@ namespace StarryEyes.ViewModels
 
         private readonly AccountSelectionFlipViewModel _globalAccountSelectionFlipViewModel;
 
-        private readonly InputAreaViewModel _inputAreaViewModel;
+        private readonly InputViewModel _inputViewModel;
 
         private readonly MainAreaViewModel _mainAreaViewModel;
 
@@ -47,9 +48,9 @@ namespace StarryEyes.ViewModels
             get { return this._backstageViewModel; }
         }
 
-        public InputAreaViewModel InputAreaViewModel
+        public InputViewModel InputViewModel
         {
-            get { return _inputAreaViewModel; }
+            get { return this._inputViewModel; }
         }
 
         public MainAreaViewModel MainAreaViewModel
@@ -59,7 +60,7 @@ namespace StarryEyes.ViewModels
 
         public AccountSelectionFlipViewModel InputAreaAccountSelectionFlipViewModel
         {
-            get { return _inputAreaViewModel.AccountSelectionFlip; }
+            get { return this._inputViewModel.AccountSelectorViewModel.AccountSelectionFlip; }
         }
 
         public AccountSelectionFlipViewModel GlobalAccountSelectionFlipViewModel
@@ -121,7 +122,7 @@ namespace StarryEyes.ViewModels
         public MainWindowViewModel()
         {
             CompositeDisposable.Add(_backstageViewModel = new BackstageViewModel());
-            CompositeDisposable.Add(_inputAreaViewModel = new InputAreaViewModel());
+            CompositeDisposable.Add(this._inputViewModel = new InputViewModel());
             CompositeDisposable.Add(_mainAreaViewModel = new MainAreaViewModel());
             CompositeDisposable.Add(_globalAccountSelectionFlipViewModel = new AccountSelectionFlipViewModel());
             CompositeDisposable.Add(_settingFlipViewModel = new SettingFlipViewModel(this));
@@ -167,8 +168,8 @@ namespace StarryEyes.ViewModels
                     break;
                 case FocusRequest.Input:
                     SearchFlipViewModel.Close();
-                    InputAreaViewModel.OpenInput();
-                    InputAreaViewModel.FocusToTextBox();
+                    this.InputViewModel.OpenInput();
+                    this.InputViewModel.FocusToTextBox();
                     break;
             }
         }

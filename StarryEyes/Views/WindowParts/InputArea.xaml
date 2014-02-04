@@ -8,16 +8,16 @@
              xmlns:ed="http://schemas.microsoft.com/expression/2010/drawing"
              xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:inputting="clr-namespace:StarryEyes.ViewModels.WindowParts.Inputting"
              xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:seb="clr-namespace:StarryEyes.Views.Behaviors"
              xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:triggers="clr-namespace:StarryEyes.Views.Triggers"
              xmlns:utils="clr-namespace:StarryEyes.Views.Utils"
-             xmlns:windowParts="clr-namespace:StarryEyes.ViewModels.WindowParts"
              x:Name="UserControl"
              MaxHeight="200"
-             d:DataContext="{d:DesignInstance Type={x:Type windowParts:InputAreaViewModel}}"
+             d:DataContext="{d:DesignInstance Type={x:Type inputting:InputViewModel}}"
              d:DesignHeight="150"
              d:DesignWidth="900"
              mc:Ignorable="d">
@@ -95,41 +95,62 @@
                 <VisualState x:Name="MouseOutState" />
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
-        <Button Margin="4,0,0,0"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Top"
-                BorderThickness="0"
-                Focusable="False"
-                Padding="0"
-                Style="{DynamicResource MetroSquareUnfocusableFlatButton}">
-            <i:Interaction.Triggers>
-                <i:EventTrigger EventName="Click">
-                    <ei:CallMethodAction MethodName="SelectAccounts" TargetObject="{Binding Mode=OneWay}" />
-                </i:EventTrigger>
-            </i:Interaction.Triggers>
-            <Button.ToolTip>
-                <TextBlock Foreground="White"><Run Text="{Binding AuthInfoScreenNames, Mode=OneWay}" />
-                    <LineBreak /><Run Text="クリックすると変更することができます。" />
-                </TextBlock>
-            </Button.ToolTip>
-            <ItemsControl x:Name="ItemsControl"
-                          Width="24"
-                          Height="24"
-                          FocusVisualStyle="{x:Null}"
-                          ItemsSource="{Binding BindingAuthInfos}"
-                          d:IsHidden="True">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <UniformGrid Columns="{Binding AuthInfoGridRowColumn}" Rows="{Binding AuthInfoGridRowColumn}" />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <controls:LazyImage RenderOptions.BitmapScalingMode="Fant" UriSource="{Binding ProfileImageUri}" />
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </Button>
+        <Grid Margin="4,0,0,0"
+              HorizontalAlignment="Left"
+              VerticalAlignment="Top"
+              DataContext="{Binding AccountSelectorViewModel}">
+            <Button HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    BorderThickness="0"
+                    Focusable="False"
+                    Padding="0"
+                    Style="{DynamicResource MetroSquareUnfocusableFlatButton}">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="Click">
+                        <ei:CallMethodAction MethodName="SelectAccounts" TargetObject="{Binding Mode=OneWay}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+                <Button.ToolTip>
+                    <TextBlock Foreground="White"><Run Text="{Binding AuthInfoScreenNames, Mode=OneWay}" />
+                        <LineBreak /><Run Text="クリックすると変更することができます。" />
+                    </TextBlock>
+                </Button.ToolTip>
+                <ItemsControl x:Name="ItemsControl"
+                              Width="24"
+                              Height="24"
+                              FocusVisualStyle="{x:Null}"
+                              ItemsSource="{Binding Accounts}"
+                              d:IsHidden="True">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Columns="{Binding AuthInfoGridRowColumn}" Rows="{Binding AuthInfoGridRowColumn}" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <controls:LazyImage RenderOptions.BitmapScalingMode="Fant" UriSource="{Binding ProfileImageUri}" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Button>
+            <Border Grid.Column="0"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    Background="#00000000"
+                    BorderBrush="#A0E51400"
+                    BorderThickness="4"
+                    Visibility="{Binding IsSynchronizedWithTab,
+                                         Converter={StaticResource BooleanToInvisibleConverter}}">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseLeftButtonDown">
+                        <ei:CallMethodAction MethodName="SynchronizeWithTab" TargetObject="{Binding}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+                <Border.ToolTip>
+                    <TextBlock Text="アカウントが自動選択されています。クリックすると解除します。" />
+                </Border.ToolTip>
+            </Border>
+        </Grid>
         <Grid x:Name="Default"
               Grid.Column="1"
               Grid.ColumnSpan="2"
@@ -160,14 +181,17 @@
                     </TextBlock>
                     <TextBlock Grid.Column="1"
                                Margin="4,0,4,0"
+                               DataContext="{Binding InputCoreViewModel}"
                                Foreground="Green"
                                Visibility="{Binding IsDraftsExisted,
-                                                    Converter={StaticResource BooleanToVisibleConverter}}"><Run Text="{Binding DraftCount, Mode=OneWay}" /><Run Text="件の下書きがあります" />
+                                                    Converter={StaticResource BooleanToVisibleConverter}}">
+                        <Run Text="{Binding DraftCount, Mode=OneWay}" /><Run Text="件の下書きがあります" />
                     </TextBlock>
                     <Grid Grid.Column="2"
                           Width="{Binding MaxControlWidth}"
                           Height="12"
                           Background="Gainsboro"
+                          DataContext="{Binding PostLimitPredictionViewModel}"
                           SnapsToDevicePixels="True"
                           Visibility="{Binding IsPostLimitPredictionEnabled,
                                                Converter={StaticResource BooleanToVisibleConverter}}">
@@ -184,7 +208,7 @@
                               SnapsToDevicePixels="True">
                             <Grid.Style>
                                 <Style TargetType="{x:Type Grid}">
-                                    <Setter Property="Background" Value="#FF1BA1E2" />
+                                    <Setter Property="Background" Value="{DynamicResource GlobalKeyBrush}" />
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding IsWarningPostLimit}" Value="True">
                                             <Setter Property="Background" Value="#FFE51400" />
@@ -221,6 +245,7 @@
                     <DockPanel Grid.ColumnSpan="3"
                                Height="26"
                                Background="#FFF09609"
+                               DataContext="{Binding InputCoreViewModel}"
                                LastChildFill="True"
                                Visibility="{Binding IsInReplyToEnabled,
                                                     Converter={StaticResource BooleanToVisibleConverter}}">
@@ -249,15 +274,18 @@
                         <TextBlock VerticalAlignment="Center" Foreground="White">
                             <TextBlock.Text>
                                 <MultiBinding StringFormat="@{0}: {1}">
-                                    <Binding Path="InReplyTo.User.ScreenName" />
+                                    <Binding Path="InReplyTo.ScreenName" />
                                     <Binding Converter="{StaticResource StringRemoveLineConverter}" Path="InReplyTo.Status.Text" />
                                 </MultiBinding>
                             </TextBlock.Text>
                         </TextBlock>
                     </DockPanel>
-                    <DockPanel Grid.ColumnSpan="3"
+                    <DockPanel Grid.Row="0"
+                               Grid.Column="0"
+                               Grid.ColumnSpan="3"
                                Height="26"
                                Background="#FFA05000"
+                               DataContext="{Binding InputCoreViewModel}"
                                LastChildFill="True"
                                Visibility="{Binding IsDirectMessageEnabled,
                                                     Converter={StaticResource BooleanToVisibleConverter}}">
@@ -289,9 +317,12 @@
                                    Text="{Binding DirectMessageTo.User.ScreenName,
                                                   StringFormat=@\{0\}}" />
                     </DockPanel>
-                    <DockPanel Grid.ColumnSpan="3"
+                    <DockPanel Grid.Row="0"
+                               Grid.Column="0"
+                               Grid.ColumnSpan="3"
                                Height="26"
                                Background="#FFD80073"
+                               DataContext="{Binding AccountSelectorViewModel}"
                                LastChildFill="True"
                                Visibility="{Binding IsBindingAuthInfoExisted,
                                                     Converter={StaticResource BooleanToInvisibleConverter}}">
@@ -308,6 +339,7 @@
                                    Text="アカウントが選択されていません。左側のエリアをクリックして、投稿するアカウントを選択してください。" />
                     </DockPanel>
                     <controls:SuggestableTextBox Grid.Row="1"
+                                                 Grid.Column="0"
                                                  AcceptsReturn="True"
                                                  AllowDrop="True"
                                                  Background="Transparent"
@@ -316,8 +348,8 @@
                                                  CaretBrush="{DynamicResource BaseColorForegroundBrush}"
                                                  Foreground="{DynamicResource BaseColorForegroundBrush}"
                                                  Padding="2,4"
-                                                 SuggestItemProvider="{Binding Provider}"
-                                                 Text="{Binding InputText,
+                                                 SuggestItemProvider="{Binding InputCoreViewModel.Provider}"
+                                                 Text="{Binding InputCoreViewModel.InputText,
                                                                 UpdateSourceTrigger=PropertyChanged}"
                                                  TextAlignment="Justify"
                                                  TextWrapping="Wrap"
@@ -331,10 +363,10 @@
                             </l:InteractionMessageTrigger>
                         </i:Interaction.Triggers>
                         <i:Interaction.Behaviors>
-                            <l:TextBoxBindingSupportBehavior SelectedText="{Binding SelectedText}"
-                                                             SelectionLength="{Binding SelectionLength}"
-                                                             SelectionStart="{Binding SelectionStart}" />
-                            <seb:DropAcceptBehavior Description="{Binding DropAcceptDescription}" />
+                            <l:TextBoxBindingSupportBehavior SelectedText="{Binding InputCoreViewModel.SelectedText}"
+                                                             SelectionLength="{Binding InputCoreViewModel. SelectionLength}"
+                                                             SelectionStart="{Binding InputCoreViewModel. SelectionStart}" />
+                            <seb:DropAcceptBehavior Description="{Binding InputCoreViewModel. DropAcceptDescription}" />
                         </i:Interaction.Behaviors>
                         <controls:SuggestableTextBox.ListItemTemplate>
                             <DataTemplate>
@@ -343,9 +375,11 @@
                         </controls:SuggestableTextBox.ListItemTemplate>
                     </controls:SuggestableTextBox>
                     <DockPanel Grid.Row="2"
+                               Grid.Column="0"
                                Grid.ColumnSpan="3"
                                Height="26"
-                               VerticalAlignment="Top">
+                               VerticalAlignment="Top"
+                               DataContext="{Binding InputCoreViewModel}">
                         <DockPanel.Background>
                             <SolidColorBrush Opacity="0.4" Color="{DynamicResource BaseColorBackground}" />
                         </DockPanel.Background>
@@ -552,7 +586,8 @@
                                           Fill="{DynamicResource BaseColorForegroundBrush}"
                                           Stretch="Fill" />
                                 </Border>
-                                <Border VerticalAlignment="Center"
+                                <Border Grid.Column="0"
+                                        VerticalAlignment="Center"
                                         ToolTip="URLリンク化自動回避を行います(スキームのないURLのTLDの前にゼロ幅スペースが自動挿入されます)。"
                                         Visibility="{Binding IsChecked,
                                                              Converter={StaticResource BooleanToVisibleConverter},
@@ -642,7 +677,7 @@
                         <TextBlock Margin="4"
                                    DockPanel.Dock="Bottom"
                                    Foreground="DimGray"
-                                   Text="{Binding RemainTextCount}"
+                                   Text="{Binding InputCoreViewModel.RemainTextCount}"
                                    TextAlignment="Right"
                                    TextWrapping="Wrap" />
                     </DockPanel>
@@ -656,6 +691,7 @@
                             HorizontalAlignment="Left"
                             VerticalAlignment="Center"
                             BorderThickness="1"
+                            DataContext="{Binding InputCoreViewModel}"
                             ToolTip="クリックで画像の添付を解除します。"
                             Visibility="{Binding IsImageAttached,
                                                  Converter={StaticResource BooleanToVisibleConverter}}">
@@ -677,7 +713,7 @@
                             <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ActiveBorderColorKey}}" />
                         </Border.BorderBrush>
                         <Grid>
-                            <Image Source="{Binding AttachedImage.Source}" Stretch="Uniform" />
+                            <Image Source="{Binding Path=AttachedImage.Source}" Stretch="Uniform" />
                             <Border x:Name="Border"
                                     Background="#FFE51400"
                                     Opacity="0">

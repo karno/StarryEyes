@@ -30,18 +30,20 @@ namespace StarryEyes.Models.Inputting
             };
         }
 
-        public static InputSetting CreateReply([NotNull] TwitterStatus inReplyTo, string body = null)
+        public static InputSetting CreateReply([NotNull] TwitterStatus inReplyTo, string body = null, bool addMentions = true)
         {
             if (inReplyTo == null) throw new ArgumentNullException("inReplyTo");
             var reply = GetSuitableReplyAccount(inReplyTo);
             var except = reply == null ? new[] { inReplyTo.User.Id } : new[] { reply.Id, inReplyTo.User.Id };
-            var users = inReplyTo.Entities
-                                 .Where(e => e.EntityType == EntityType.UserMentions)
-                                 .Where(e => !except.Contains(e.UserId.GetValueOrDefault()))
-                                 .Select(e => e.DisplayText)
-                                 .Distinct()
-                                 .Select(s => "@" + s + " ")
-                                 .JoinString("");
+            var users = !addMentions
+                ? ""
+                : inReplyTo.Entities
+                           .Where(e => e.EntityType == EntityType.UserMentions)
+                           .Where(e => !except.Contains(e.UserId.GetValueOrDefault()))
+                           .Select(e => e.DisplayText)
+                           .Distinct()
+                           .Select(s => "@" + s + " ")
+                           .JoinString("");
             return new InputSetting
             {
                 Accounts = reply == null ? null : new[] { reply },
@@ -61,7 +63,7 @@ namespace StarryEyes.Models.Inputting
         }
 
         public static InputSetting CreateDirectMessage(
-            IEnumerable<TwitterAccount> accounts, [NotNull] TwitterUser recipient, string body)
+            IEnumerable<TwitterAccount> accounts, [NotNull] TwitterUser recipient, string body = null)
         {
             if (recipient == null) throw new ArgumentNullException("recipient");
             return new InputSetting

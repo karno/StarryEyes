@@ -22,12 +22,12 @@ namespace StarryEyes.Models.Inputting
         {
             _disposables = new CompositeDisposable();
             _core = new InputCoreModel();
-            _accounts = new AccountSelectorModel(_core.CurrentInputData);
+            _accounts = new AccountSelectorModel(_core);
 
             // link property changing
             var icmpc = new PropertyChangedEventListener(_core);
             icmpc.RegisterHandler(() => _core.CurrentInputData,
-                                (o, e) => _accounts.CurrentInputData = _core.CurrentInputData);
+                                (o, e) => _accounts.CurrentInputDataChanged());
             _disposables.Add(icmpc);
             SetEventPropagation();
         }
@@ -91,7 +91,7 @@ namespace StarryEyes.Models.Inputting
 
         public static void ClearInput()
         {
-            _core.ClearInput(true);
+            _core.ClearInput(String.Empty, true);
         }
 
         public static void ClearBindingHashtags()
