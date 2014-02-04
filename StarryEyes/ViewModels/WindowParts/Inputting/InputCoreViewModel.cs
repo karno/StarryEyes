@@ -836,16 +836,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                     }
                     if (r.Faileds != null)
                     {
-                        if (r.Exceptions != null)
-                        {
-                            var msg = this.AnalyzeFailedReason(r.Exceptions);
-                            if (msg != null)
-                            {
-                                BackstageModel.RegisterEvent(new PostFailedEvent(r.Faileds, msg));
-                                InputModel.InputCore.Drafts.Add(r.Faileds);
-                                return;
-                            }
-                        }
+                        var message = this.AnalyzeFailedReason(r.Exceptions) ?? "利用可能な情報はありません。";
                         if (Setting.ShowMessageOnTweetFailed.Value)
                         {
                             var resp = _parent.Messenger.GetResponse(new TaskDialogMessage(new TaskDialogOptions
@@ -854,7 +845,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                                 MainIcon = VistaTaskDialogIcon.Error,
                                 MainInstruction = "ツイートに失敗しました。再試行しますか？" + Environment.NewLine +
                                                   "(再試行しない場合は、ツイートしようとした内容は下書きとして保存されます。)",
-                                Content = r.Exceptions == null ? "利用可能な情報はありません。" : r.Exceptions.First().Message,
+                                Content = message,
                                 VerificationText = "次回から表示しない",
                                 CommonButtons = TaskDialogCommonButtons.RetryCancel
                             }));
@@ -868,12 +859,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                         }
                         else
                         {
-                            BackstageModel.RegisterEvent(
-                                new PostFailedEvent(
-                                    r.Faileds,
-                                    r.Exceptions == null
-                                        ? "利用可能な情報はありません。"
-                                        : r.Exceptions.First().Message));
+                            BackstageModel.RegisterEvent(new PostFailedEvent(r.Faileds, message));
                         }
                         // Send to draft
                         InputModel.InputCore.Drafts.Add(r.Faileds);
@@ -883,9 +869,16 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
 
         private string AnalyzeFailedReason(IEnumerable<Exception> exceptions)
         {
+            if (exceptions == null) return null;
+            string fmsg = null;
             foreach (var exception in exceptions)
             {
                 var msg = exception.Message;
+                if (fmsg == null)
+                {
+                    // stash first message
+                    fmsg = msg;
+                }
                 if (msg.Contains("duplicate"))
                 {
                     return "直近のツイートと重複しています。";
@@ -896,7 +889,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                 }
                 // TODO: Implement more cases.
             }
-            return null;
+            return fmsg;
         }
 
         #endregion
