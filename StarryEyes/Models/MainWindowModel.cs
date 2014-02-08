@@ -106,7 +106,11 @@ namespace StarryEyes.Models
         {
             get
             {
-                var item = _stateStack.First;
+                LinkedListNode<string> item;
+                lock (_stateStack)
+                {
+                    item = _stateStack.First;
+                }
                 if (item != null)
                 {
                     return item.Value;
@@ -118,11 +122,18 @@ namespace StarryEyes.Models
         public static IDisposable SetState([NotNull] string state)
         {
             if (state == null) throw new ArgumentNullException("state");
-            var node = _stateStack.AddFirst(state);
+            LinkedListNode<string> node;
+            lock (_stateStack)
+            {
+                node = _stateStack.AddFirst(state);
+            }
             RaiseStateStringChanged();
             return Disposable.Create(() =>
             {
-                _stateStack.Remove(node);
+                lock (_stateStack)
+                {
+                    _stateStack.Remove(node);
+                }
                 RaiseStateStringChanged();
             });
         }
