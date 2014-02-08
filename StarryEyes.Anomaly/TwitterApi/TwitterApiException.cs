@@ -16,7 +16,7 @@ namespace StarryEyes.Anomaly.TwitterApi
         }
 
         public TwitterApiException(HttpStatusCode statusCode, string message)
-            : base()
+            : base(message)
         {
             this.StatusCode = statusCode;
         }

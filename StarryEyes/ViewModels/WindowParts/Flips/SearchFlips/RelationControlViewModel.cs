@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Net;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Livet;
+using StarryEyes.Anomaly.TwitterApi;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Models.Accounting;
@@ -154,7 +156,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                     Title = "フォロー エラー",
                     MainIcon = VistaTaskDialogIcon.Error,
                     MainInstruction = "フォローできませんでした。",
-                    Content = ex.Message,
+                    Content = GetExceptionDescription(ex),
                     CommonButtons = TaskDialogCommonButtons.Close,
                 })));
         }
@@ -173,7 +175,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                     Title = "アンフォロー エラー",
                     MainIcon = VistaTaskDialogIcon.Error,
                     MainInstruction = "フォロー解除できませんでした。",
-                    Content = ex.Message,
+                    Content = GetExceptionDescription(ex),
                     CommonButtons = TaskDialogCommonButtons.Close,
                 })));
         }
@@ -194,7 +196,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                     Title = "ブロック エラー",
                     MainIcon = VistaTaskDialogIcon.Error,
                     MainInstruction = "ブロックできませんでした。",
-                    Content = ex.Message,
+                    Content = GetExceptionDescription(ex),
                     CommonButtons = TaskDialogCommonButtons.Close,
                 })));
         }
@@ -213,7 +215,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                     Title = "アンブロック エラー",
                     MainIcon = VistaTaskDialogIcon.Error,
                     MainInstruction = "ブロックを解除できませんでした。",
-                    Content = ex.Message,
+                    Content = GetExceptionDescription(ex),
                     CommonButtons = TaskDialogCommonButtons.Close,
                 })));
         }
@@ -232,7 +234,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                     Title = "リツイート非表示 エラー",
                     MainIcon = VistaTaskDialogIcon.Error,
                     MainInstruction = "このユーザのリツイートを非表示にできませんでした。",
-                    Content = ex.Message,
+                    Content = GetExceptionDescription(ex),
                     CommonButtons = TaskDialogCommonButtons.Close,
                 })));
         }
@@ -250,8 +252,8 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 {
                     Title = "リツイート非表示解除 エラー",
                     MainIcon = VistaTaskDialogIcon.Error,
-                    MainInstruction = "このユーザリツイート非表示を解除できませんでした。",
-                    Content = ex.Message,
+                    MainInstruction = "このユーザのリツイート非表示を解除できませんでした。",
+                    Content = GetExceptionDescription(ex),
                     CommonButtons = TaskDialogCommonButtons.Close,
                 })));
         }
@@ -270,9 +272,29 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                     Title = "スパム報告 エラー",
                     MainIcon = VistaTaskDialogIcon.Error,
                     MainInstruction = "スパム報告できませんでした。",
-                    Content = ex.Message,
+                    Content = GetExceptionDescription(ex),
                     CommonButtons = TaskDialogCommonButtons.Close,
                 })));
+        }
+
+        private string GetExceptionDescription(Exception ex)
+        {
+            var tex = ex as TwitterApiException;
+            if (tex != null)
+            {
+                return "Twitter API エラー: " + tex.Message + Environment.NewLine +
+                       "ステータスコード: " + tex.StatusCode + Environment.NewLine +
+                       "Twitter エラーコード: " + (tex.TwitterErrorCode.HasValue
+                           ? tex.TwitterErrorCode.Value.ToString()
+                           : "なし");
+            }
+            var wex = ex as WebException;
+            if (wex != null)
+            {
+                return "Web エラー: " + wex.Message + Environment.NewLine +
+                       "ステータスコード: " + wex.Status;
+            }
+            return ex.Message;
         }
 
         private void DispatchRetweetSuppression(bool suppress, Action succeeded, Action<Exception> failed)
