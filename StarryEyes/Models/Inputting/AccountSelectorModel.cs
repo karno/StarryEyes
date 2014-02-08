@@ -74,7 +74,11 @@ namespace StarryEyes.Models.Inputting
             set
             {
                 if (_currentFocusTab == value) return;
+                // notify to coremodel
+                _coreModel.ChangeFocusingTab(_currentFocusTab, value);
                 _currentFocusTab = value;
+
+                // synchronize accounts
                 if (_isSynchronizedWithTab)
                 {
                     // propagate accounts bound with tab as selected account.

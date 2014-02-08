@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
 using Livet;
 using StarryEyes.Albireo;
 using StarryEyes.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models.Accounting;
+using StarryEyes.Models.Timelines.Tabs;
 
 namespace StarryEyes.Models.Inputting
 {
@@ -20,6 +22,8 @@ namespace StarryEyes.Models.Inputting
         private InputData _inputData = new InputData(String.Empty);
 
         private InputData _lastPostedData;
+
+        private TabModel _currentFocusTabModel;
 
         #region properties
 
@@ -90,6 +94,31 @@ namespace StarryEyes.Models.Inputting
         internal InputCoreModel()
         {
             CurrentInputData = new InputData(String.Empty);
+            _bindingHashtags.ListenCollectionChanged()
+                            .Subscribe(_ =>
+                            {
+                                if (_currentFocusTabModel != null)
+                                {
+                                    _currentFocusTabModel.BindingHashtags = _bindingHashtags.ToArray();
+                                }
+                            });
+        }
+
+        internal void ChangeFocusingTab(TabModel previous, TabModel replace)
+        {
+            if (previous != null)
+            {
+                previous.BindingHashtags = _bindingHashtags.ToArray();
+            }
+            _bindingHashtags.Clear();
+            if (replace != null)
+            {
+                replace.BindingHashtags
+                       .Guard()
+                       .ToArray()
+                       .ForEach(_bindingHashtags.Add);
+            }
+            _currentFocusTabModel = replace;
         }
 
         public void SetText([NotNull] InputSetting setting)
