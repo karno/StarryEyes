@@ -848,7 +848,7 @@
                         </DockPanel>
                         <CheckBox Margin="0,8"
                                   Content="位置情報サービスをロードしない(_G) [この設定は自動的に変更されることがあります]"
-                                  IsChecked="{Binding LoadPluginFromDevFolder}" />
+                                  IsChecked="{Binding DisableGeoLocationService}" />
                     </StackPanel>
                     <StackPanel VerticalAlignment="Bottom" Orientation="Horizontal">
                         <Button Margin="12"
