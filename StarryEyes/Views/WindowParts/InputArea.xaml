@@ -410,7 +410,7 @@
                                                      Converter={StaticResource BooleanToVisibleConverter}}">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="Click">
-                                    <ei:CallMethodAction MethodName="AmendPreviousOne" TargetObject="{Binding Mode=OneWay}" />
+                                    <ei:CallMethodAction MethodName="AmendLastPosted" TargetObject="{Binding Mode=OneWay}" />
                                 </i:EventTrigger>
                             </i:Interaction.Triggers>
                             <Path Width="12"
