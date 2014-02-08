@@ -201,15 +201,24 @@ namespace StarryEyes.Models.Databases
             var se = Database.StatusEntityCrud.GetEntitiesAsync(id);
             var favorers = Database.FavoritesCrud.GetUsersAsync(id);
             var retweeters = Database.RetweetsCrud.GetUsersAsync(id);
-            if (dbstatus.RetweetOriginalId != null)
+            try
             {
-                var orig = await GetStatusAsync(dbstatus.RetweetOriginalId.Value);
-                if (orig != null)
+                if (dbstatus.RetweetOriginalId != null)
                 {
-                    return Mapper.Map(dbstatus, await se, await favorers, await retweeters, orig, await user);
+                    var orig = await GetStatusAsync(dbstatus.RetweetOriginalId.Value);
+                    if (orig != null)
+                    {
+                        return Mapper.Map(dbstatus, await se, await favorers, await retweeters, orig, await user);
+                    }
                 }
+                return Mapper.Map(dbstatus, await se, await favorers, await retweeters, await user);
             }
-            return Mapper.Map(dbstatus, await se, await favorers, await retweeters, await user);
+            catch (ArgumentNullException anex)
+            {
+                throw new DatabaseConsistencyException(
+                    "データベースから必要なデータを読み出せませんでした。(ステータスID " + dbstatus.Id + ", ユーザID " + dbstatus.UserId + ")",
+                    anex);
+            }
         }
 
         private static async Task<TwitterStatus> LoadDirectMessageAsync([NotNull] DatabaseStatus dbstatus)
