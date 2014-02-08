@@ -105,7 +105,7 @@ namespace StarryEyes
             }
 
             // create lock file
-            File.WriteAllText(App.LockFilePath, DateTime.Now.ToLongTimeString());
+            File.Create(App.LockFilePath);
 
             // initialze web parameters
             InitializeWebConnectionParameters();
