@@ -100,6 +100,7 @@ namespace StarryEyes.Models.Receiving.Managers
                         this._trackReferenceCount[track]++;
                         return;
                     }
+                    BehaviorLogger.Log("TRACK", "add query: " + track);
                     System.Diagnostics.Debug.WriteLine("◎ track add: " + track);
                     this._trackReferenceCount[track] = 1;
                 }
@@ -138,6 +139,7 @@ namespace StarryEyes.Models.Receiving.Managers
                 this._trackReferenceCount.Remove(track);
                 if (this._trackResolver.ContainsKey(track))
                 {
+                    BehaviorLogger.Log("TRACK", "remove query: " + track);
                     var id = this._trackResolver[track];
                     this._trackResolver.Remove(track);
                     var tracker = this._receiveManager.GetKeywordTrackerFromId(id);

@@ -243,6 +243,9 @@ namespace StarryEyes
 
         private static void InitializeSubsystemsAfterSettingsLoaded()
         {
+            // Logger subsystem initialize
+            BehaviorLogger.Initialize();
+
             // set parameters for accessing twitter.
             Networking.Initialize();
 

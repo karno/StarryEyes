@@ -260,6 +260,7 @@
     <Compile Include="Models\Inputting\InputModel.cs" />
     <Compile Include="Models\Plugins\Injections\BridgeSocketBinder.cs" />
     <Compile Include="Models\Plugins\Injections\InjectionInlet.cs" />
+    <Compile Include="Models\BehaviorLogger.cs" />
     <Compile Include="Models\Requests\UpdateFriendshipsRequest.cs" />
     <Compile Include="Models\Inputting\InputSetting.cs" />
     <Compile Include="Models\Subsystems\AutoUpdateService.cs" />

@@ -18,11 +18,13 @@ namespace StarryEyes.Models.Receiving
 
         public static void Initialize()
         {
+            BehaviorLogger.Log("RM", "initializing...");
             _userReceiveManager = new UserReceiveManager();
             _searchReceiveManager = new SearchReceiveManager();
             _listReceiveManager = new ListReceiveManager();
             _streamTrackReceiveManager = new StreamTrackReceiveManager(_userReceiveManager);
             _userReceiveManager.ConnectionStateChanged += arg => UserStreamsConnectionStateChanged.SafeInvoke(arg);
+            BehaviorLogger.Log("RM", "init.");
         }
 
         public static void RegisterSearchQuery(string query)

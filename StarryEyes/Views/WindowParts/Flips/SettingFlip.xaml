@@ -849,6 +849,9 @@
                         <CheckBox Margin="0,8"
                                   Content="位置情報サービスをロードしない(_G) [この設定は自動的に変更されることがあります]"
                                   IsChecked="{Binding DisableGeoLocationService}" />
+                        <CheckBox Margin="0,8"
+                                  Content="Krileの動作を記録する(_L) [処理速度が低下します][再起動後に反映されます]"
+                                  IsChecked="{Binding IsBehaviorLogEnabled}" />
                     </StackPanel>
                     <StackPanel VerticalAlignment="Bottom" Orientation="Horizontal">
                         <Button Margin="12"

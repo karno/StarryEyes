@@ -795,6 +795,12 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             set { Setting.DisableGeoLocationService.Value = value; }
         }
 
+        public bool IsBehaviorLogEnabled
+        {
+            get { return Setting.IsBehaviorLogEnabled.Value; }
+            set { Setting.IsBehaviorLogEnabled.Value = value; }
+        }
+
         public void RestartAsMaintenance()
         {
             var psi = new ProcessStartInfo
