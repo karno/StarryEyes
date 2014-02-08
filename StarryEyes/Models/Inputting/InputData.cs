@@ -43,9 +43,8 @@ namespace StarryEyes.Models.Inputting
                 // when amending tweet,
                 // sending direct message, or
                 // replying someone (if configured so that).
-                return _amendTweets != null ||
-                       IsDirectMessage ||
-                       Setting.SuppressTagBindingInReply.Value && _inReplyTo != null;
+                return !this.IsAmend && !this.IsDirectMessage &&
+                       (!Setting.SuppressTagBindingInReply.Value || this._inReplyTo == null);
             }
         }
 
@@ -207,7 +206,7 @@ namespace StarryEyes.Models.Inputting
             return new InputData(_initText)
             {
                 _accounts = _accounts == null ? null : _accounts.ToArray(),
-                _amendTweets = _amendTweets,
+                _amendTweets = _amendTweets.ToDictionary(p => p.Key, p => p.Value),
                 _attachedImage = _attachedImage,
                 _boundTags = _boundTags,
                 _geoInfo = _geoInfo,
