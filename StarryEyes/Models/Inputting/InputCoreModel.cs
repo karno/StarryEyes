@@ -106,6 +106,7 @@ namespace StarryEyes.Models.Inputting
 
         internal void ChangeFocusingTab(TabModel previous, TabModel replace)
         {
+            _currentFocusTabModel = null;
             if (previous != null)
             {
                 previous.BindingHashtags = _bindingHashtags.ToArray();
