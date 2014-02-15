@@ -280,8 +280,8 @@ namespace StarryEyes.Models.Receiving.Receivers
                   .Split(new[] { "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries)
                   .Select(s => "> " + s)
                   .ForEach(_parent.Log);
-                BackstageModel.RegisterEvent(new OperationFailedEvent(
-                    "解析できないデータを受信しました(" + _parent.Account.UnreliableScreenName + "): ", ex));
+                BackstageModel.RegisterEvent(new StreamDecodeFailedEvent(
+            _parent.Account.UnreliableScreenName, ex));
             }
         }
 

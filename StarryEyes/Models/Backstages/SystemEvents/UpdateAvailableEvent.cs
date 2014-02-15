@@ -5,7 +5,7 @@ namespace StarryEyes.Models.Backstages.SystemEvents
     {
         public override string Detail
         {
-            get { return "updated version of Krile is now available. Please restart."; }
+            get { return "新しいバージョンのKrileが利用可能です。次回起動時に更新されます。"; }
         }
 
         public override SystemEventKind Kind
