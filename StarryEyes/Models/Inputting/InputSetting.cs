@@ -35,21 +35,24 @@ namespace StarryEyes.Models.Inputting
             if (inReplyTo == null) throw new ArgumentNullException("inReplyTo");
             var reply = GetSuitableReplyAccount(inReplyTo);
             var except = reply == null ? new[] { inReplyTo.User.Id } : new[] { reply.Id, inReplyTo.User.Id };
-            var users = !addMentions
-                ? ""
-                : inReplyTo.Entities
-                           .Where(e => e.EntityType == EntityType.UserMentions)
-                           .Where(e => !except.Contains(e.UserId.GetValueOrDefault()))
-                           .Select(e => e.DisplayText)
-                           .Distinct()
-                           .Select(s => "@" + s + " ")
-                           .JoinString("");
+            var mention = String.Empty;
+            if (addMentions)
+            {
+                mention = "@" + inReplyTo.User.ScreenName + " " +
+                          inReplyTo.Entities
+                                   .Where(e => e.EntityType == EntityType.UserMentions)
+                                   .Where(e => !except.Contains(e.UserId.GetValueOrDefault()))
+                                   .Select(e => e.DisplayText)
+                                   .Distinct()
+                                   .Select(s => "@" + s + " ")
+                                   .JoinString("");
+            }
             return new InputSetting
             {
                 Accounts = reply == null ? null : new[] { reply },
-                Body = "@" + inReplyTo.User.ScreenName + " " + users + body,
+                Body = mention + body,
                 InReplyTo = inReplyTo,
-                CursorPosition = new CursorPosition(inReplyTo.User.ScreenName.Length + 2, (users + body).Length)
+                CursorPosition = new CursorPosition(inReplyTo.User.ScreenName.Length + 2, (mention + body).Length)
             };
         }
 
