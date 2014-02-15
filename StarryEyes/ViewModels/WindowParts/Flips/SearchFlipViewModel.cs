@@ -5,10 +5,12 @@ using System.Reactive.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Livet.EventListeners;
 using Livet.Messaging;
 using StarryEyes.Filters;
 using StarryEyes.Filters.Parsing;
 using StarryEyes.Models;
+using StarryEyes.Models.Inputting;
 using StarryEyes.Models.Timelines.SearchFlips;
 using StarryEyes.Settings;
 using StarryEyes.ViewModels.Timelines.SearchFlips;
@@ -39,7 +41,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                     h => KeyAssignManager.KeyAssignChanged -= h)
                           .Subscribe(_ => RaisePropertyChanged(() => SearchHintLabel)));
             this.CompositeDisposable.Add(
-                new Livet.EventListeners.EventListener<Action<string, SearchMode>>(
+                new EventListener<Action<string, SearchMode>>(
                     h => SearchFlipModel.SearchRequested += h,
                     h => SearchFlipModel.SearchRequested -= h,
                     (query, mode) =>
@@ -57,6 +59,11 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                             SearchMode = mode;
                         }
                     }));
+            this.CompositeDisposable.Add(
+                new EventListener<Action>(
+                    h => InputModel.FocusRequest += h,
+                    h => InputModel.FocusRequest -= h,
+                    this.CloseResults));
         }
 
         private bool _isSearchResultAvailable;
