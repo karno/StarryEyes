@@ -104,8 +104,16 @@ namespace StarryEyes
                 Environment.Exit(0);
             }
 
-            // create lock file
-            File.Create(App.LockFilePath);
+            try
+            {
+                // create lock file
+                File.Create(App.LockFilePath);
+            }
+            catch (Exception ex)
+            {
+                FailMessages.InitLockFileFailed(ex);
+                Environment.Exit(-1);
+            }
 
             // initialze web parameters
             InitializeWebConnectionParameters();
@@ -164,48 +172,55 @@ namespace StarryEyes
             {
                 return false;
             }
-            switch (resp.CommandButtonResult.Value)
+            try
             {
-                case 1:
-                    // optimize database
-                    _requireOptimizeDb = true;
-                    break;
-                case 2:
-                    // remove database
-                    if (File.Exists(App.DatabaseFilePath))
-                    {
-                        File.Delete(App.DatabaseFilePath);
-                    }
-                    break;
-                case 3:
-                case 4:
-                case 5:
-                    // remove all
-                    if (App.ExecutionMode == ExecutionMode.Standalone)
-                    {
-                        // remove each
-                        var files = new[]
+                switch (resp.CommandButtonResult.Value)
+                {
+                    case 1:
+                        // optimize database
+                        _requireOptimizeDb = true;
+                        break;
+                    case 2:
+                        // remove database
+                        if (File.Exists(App.DatabaseFilePath))
                         {
-                            App.DatabaseFilePath, App.DatabaseFilePath,
-                            App.HashtagTempFilePath, App.ListUserTempFilePath,
-                            Path.Combine(App.ConfigurationDirectoryPath, App.ProfileFileName)
-                        };
-                        var dirs = new[]
-                        {
-                            App.KeyAssignProfilesDirectory
-                        };
-                        files.Where(File.Exists).ForEach(File.Delete);
-                        dirs.Where(Directory.Exists).ForEach(d => Directory.Delete(d, true));
-                    }
-                    else
-                    {
-                        // remove whole directory
-                        if (Directory.Exists(App.ConfigurationDirectoryPath))
-                        {
-                            Directory.Delete(App.ConfigurationDirectoryPath, true);
+                            File.Delete(App.DatabaseFilePath);
                         }
-                    }
-                    break;
+                        break;
+                    case 3:
+                    case 4:
+                    case 5:
+                        // remove all
+                        if (App.ExecutionMode == ExecutionMode.Standalone)
+                        {
+                            // remove each
+                            var files = new[]
+                            {
+                                App.DatabaseFilePath, App.DatabaseFilePath,
+                                App.HashtagTempFilePath, App.ListUserTempFilePath,
+                                Path.Combine(App.ConfigurationDirectoryPath, App.ProfileFileName)
+                            };
+                            var dirs = new[]
+                            {
+                                App.KeyAssignProfilesDirectory
+                            };
+                            files.Where(File.Exists).ForEach(File.Delete);
+                            dirs.Where(Directory.Exists).ForEach(d => Directory.Delete(d, true));
+                        }
+                        else
+                        {
+                            // remove whole directory
+                            if (Directory.Exists(App.ConfigurationDirectoryPath))
+                            {
+                                Directory.Delete(App.ConfigurationDirectoryPath, true);
+                            }
+                        }
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                FailMessages.GeneralProcessFailed(ex);
             }
             if (resp.CommandButtonResult.Value == 5)
             {
@@ -381,6 +396,7 @@ namespace StarryEyes
         /// </summary>
         private static class FailMessages
         {
+
             public static void LaunchDuplicated()
             {
                 ShowMessage(new TaskDialogOptions
@@ -407,6 +423,34 @@ namespace StarryEyes
                     CommonButtons = TaskDialogCommonButtons.Close,
                     FooterIcon = VistaTaskDialogIcon.Information,
                     FooterText = "別の場所への配置を試みてください。"
+                });
+            }
+
+            public static void InitLockFileFailed(Exception ex)
+            {
+                ShowMessage(new TaskDialogOptions
+                {
+                    Title = "Krile StarryEyes",
+                    MainIcon = VistaTaskDialogIcon.Error,
+                    MainInstruction = "Krileの起動に失敗しました。",
+                    Content = "起動状態ファイルを作成できません。",
+                    ExpandedInfo = ex.ToString(),
+                    CommonButtons = TaskDialogCommonButtons.Close,
+                    FooterIcon = VistaTaskDialogIcon.Information,
+                    FooterText = "症状が改善しない場合は、Windowsを再起動してみてください。"
+                });
+            }
+
+            public static void GeneralProcessFailed(Exception ex)
+            {
+                ShowMessage(new TaskDialogOptions
+                {
+                    Title = "Krile StarryEyes",
+                    MainIcon = VistaTaskDialogIcon.Error,
+                    MainInstruction = "処理が正常に完了しませんでした。",
+                    Content = "Krileを再起動してもう一度試すか、コンピュータを再起動してみてください。",
+                    ExpandedInfo = ex.ToString(),
+                    CommonButtons = TaskDialogCommonButtons.Close,
                 });
             }
         }

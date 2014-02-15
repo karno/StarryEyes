@@ -63,7 +63,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 new EventListener<Action>(
                     h => InputModel.FocusRequest += h,
                     h => InputModel.FocusRequest -= h,
-                    this.CloseResults));
+                    this.CloseCore));
         }
 
         private bool _isSearchResultAvailable;
@@ -332,11 +332,16 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         public override void Close()
         {
             if (!this.IsVisible) return;
+            CloseCore();
+            MainWindowModel.SetFocusTo(FocusRequest.Timeline);
+        }
+
+        private void CloseCore()
+        {
             Text = String.Empty;
             this.CloseResults();
             base.Close();
             _backStack.Clear();
-            MainWindowModel.SetFocusTo(FocusRequest.Timeline);
         }
 
         #region Text box control

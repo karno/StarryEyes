@@ -39,6 +39,7 @@ namespace Detective
                 result.AppendLine("メンテナンスモードでの起動方法やデータベースファイルの場所については、公式サイトのFAQを参照してください。");
                 result.AppendLine("----------");
             }
+
             AnalyzeResult = result.ToString();
             return AnalyzeResult.Length > 0;
         }
