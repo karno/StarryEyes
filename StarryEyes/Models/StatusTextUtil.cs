@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using StarryEyes.Anomaly.Utils;
 using StarryEyes.Helpers;
@@ -24,10 +25,12 @@ namespace StarryEyes.Models
                                {
                                    return s.Text.Substring(1)
                                            .StartsWith("https", StringComparison.CurrentCultureIgnoreCase)
-                                              ? TwitterConfigurationService.HttpsUrlLength
-                                              : TwitterConfigurationService.HttpUrlLength;
+                                       ? TwitterConfigurationService.HttpsUrlLength
+                                       : TwitterConfigurationService.HttpUrlLength;
                                }
-                               return ParsingExtension.ResolveEntity(s.Text).Length;
+                               var resolved = ParsingExtension.ResolveEntity(s.Text);
+                               // count with cosidering surrogate pairs
+                               return new StringInfo(resolved).LengthInTextElements;
                            })
                            .Sum();
         }
