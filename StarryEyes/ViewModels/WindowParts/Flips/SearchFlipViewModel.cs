@@ -339,7 +339,10 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         private void CloseCore()
         {
             Text = String.Empty;
-            this.CloseResults();
+            IsSearchResultAvailable = false;
+            this.SearchResult = null;
+            this.UserResult = null;
+            this.UserInfo = null;
             base.Close();
             _backStack.Clear();
         }
