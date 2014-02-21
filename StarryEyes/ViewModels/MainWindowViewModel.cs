@@ -364,6 +364,17 @@ namespace StarryEyes.ViewModels
 
         #region Status control
 
+        public bool IsMuted
+        {
+            get { return !Setting.PlaySounds.Value; }
+        }
+
+        public void ToggleMute()
+        {
+            Setting.PlaySounds.Value = !Setting.PlaySounds.Value;
+            RaisePropertyChanged(() => IsMuted);
+        }
+
         public string StateString
         {
             get { return MainWindowModel.StateString; }

@@ -101,6 +101,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\LivetExtensions.1.1.0.0\lib\net45\Microsoft.WindowsAPICodePack.dll</HintPath>
     </Reference>
+    <Reference Include="NAudio">
+      <HintPath>..\packages\NAudio.1.7\lib\net35\NAudio.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationFramework.Aero" />
     <Reference Include="System" />
     <Reference Include="System.configuration" />
@@ -411,6 +414,9 @@
     </Compile>
     <Compile Include="Views\Messaging\Behaviors\ScrollIntoViewInteractionMessageAction.cs" />
     <Compile Include="Views\Messaging\ScrollIntoViewMessage.cs" />
+    <Compile Include="Views\Notifications\INotificator.cs" />
+    <Compile Include="Views\Notifications\NotificationViewRouter.cs" />
+    <Compile Include="Views\Notifications\NullNotificator.cs" />
     <Compile Include="Views\Triggers\EnterKeyTrigger.cs" />
     <Compile Include="Views\Triggers\EscapeKeyTrigger.cs" />
     <Compile Include="Views\Triggers\KeyAssignTrigger.cs" />
@@ -644,7 +650,8 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ViewModels\Notifications\" />
-    <Folder Include="Views\Notifications\" />
+    <Folder Include="Views\Notifications\Normal\" />
+    <Folder Include="Views\Notifications\Slim\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MahApps.Metro\MahApps.Metro.Resources\MahApps.Metro.Resources.csproj">
@@ -683,6 +690,18 @@
     <SplashScreen Include="splash.png" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="media\event.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="media\mention.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="media\message.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="media\new.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="x64\SQLite.Interop.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

@@ -1,23 +1,26 @@
-﻿using StarryEyes.Anomaly;
+﻿using System;
+using StarryEyes.Annotations;
+using StarryEyes.Anomaly;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Feather.Proxies;
 
 namespace StarryEyes.Models.Subsystems.Notifications
 {
-    public class NotificationProxyWrapper : INotificationSink
+    public sealed class NotificationProxyWrapper : INotificationSink
     {
         private readonly INotificationProxy _proxy;
 
         internal INotificationSink Next { get; set; }
 
-        public NotificationProxyWrapper(INotificationProxy proxy)
+        public NotificationProxyWrapper([NotNull] INotificationProxy proxy)
         {
+            if (proxy == null) throw new ArgumentNullException("proxy");
             this._proxy = proxy;
         }
 
-        public virtual void NotifyReceived(TwitterStatus status)
+        public void NotifyReceived(TwitterStatus status)
         {
-            if (_proxy.NotifyReceived(status) && this.Next != null)
+            if (!_proxy.NotifyReceived(status) && this.Next != null)
             {
                 this.Next.NotifyReceived(status);
             }
@@ -25,7 +28,7 @@ namespace StarryEyes.Models.Subsystems.Notifications
 
         public void NotifyNewArrival(TwitterStatus status, NotificationType type, string explicitSoundSource)
         {
-            if (_proxy.NotifyNewArrival(status, type, explicitSoundSource) && this.Next != null)
+            if (!_proxy.NotifyNewArrival(status, type, explicitSoundSource) && this.Next != null)
             {
                 this.Next.NotifyNewArrival(status, type, explicitSoundSource);
             }
@@ -33,7 +36,7 @@ namespace StarryEyes.Models.Subsystems.Notifications
 
         public void NotifyFollowed(TwitterUser source, TwitterUser target)
         {
-            if (_proxy.NotifyFollowed(source, target) && this.Next != null)
+            if (!_proxy.NotifyFollowed(source, target) && this.Next != null)
             {
                 this.Next.NotifyFollowed(source, target);
             }
@@ -41,7 +44,7 @@ namespace StarryEyes.Models.Subsystems.Notifications
 
         public void NotifyUnfollowed(TwitterUser source, TwitterUser target)
         {
-            if (_proxy.NotifyUnfollowed(source, target) && this.Next != null)
+            if (!_proxy.NotifyUnfollowed(source, target) && this.Next != null)
             {
                 this.Next.NotifyUnfollowed(source, target);
             }
@@ -49,7 +52,7 @@ namespace StarryEyes.Models.Subsystems.Notifications
 
         public void NotifyBlocked(TwitterUser source, TwitterUser target)
         {
-            if (_proxy.NotifyBlocked(source, target) && this.Next != null)
+            if (!_proxy.NotifyBlocked(source, target) && this.Next != null)
             {
                 this.Next.NotifyBlocked(source, target);
             }
@@ -57,7 +60,7 @@ namespace StarryEyes.Models.Subsystems.Notifications
 
         public void NotifyUnblocked(TwitterUser source, TwitterUser target)
         {
-            if (_proxy.NotifyUnblocked(source, target) && this.Next != null)
+            if (!_proxy.NotifyUnblocked(source, target) && this.Next != null)
             {
                 this.Next.NotifyUnblocked(source, target);
             }
@@ -65,7 +68,7 @@ namespace StarryEyes.Models.Subsystems.Notifications
 
         public void NotifyFavorited(TwitterUser source, TwitterStatus status)
         {
-            if (_proxy.NotifyFavorited(source, status) && this.Next != null)
+            if (!_proxy.NotifyFavorited(source, status) && this.Next != null)
             {
                 this.Next.NotifyFavorited(source, status);
             }
@@ -73,7 +76,7 @@ namespace StarryEyes.Models.Subsystems.Notifications
 
         public void NotifyUnfavorited(TwitterUser source, TwitterStatus status)
         {
-            if (_proxy.NotifyUnfavorited(source, status) && this.Next != null)
+            if (!_proxy.NotifyUnfavorited(source, status) && this.Next != null)
             {
                 this.Next.NotifyUnfavorited(source, status);
             }
@@ -81,7 +84,7 @@ namespace StarryEyes.Models.Subsystems.Notifications
 
         public void NotifyRetweeted(TwitterUser source, TwitterStatus status)
         {
-            if (_proxy.NotifyRetweeted(source, status) && this.Next != null)
+            if (!_proxy.NotifyRetweeted(source, status) && this.Next != null)
             {
                 this.Next.NotifyRetweeted(source, status);
             }
@@ -89,7 +92,7 @@ namespace StarryEyes.Models.Subsystems.Notifications
 
         public void NotifyDeleted(long statusId, TwitterStatus deleted)
         {
-            if (_proxy.NotifyDeleted(statusId, deleted) && this.Next != null)
+            if (!_proxy.NotifyDeleted(statusId, deleted) && this.Next != null)
             {
                 this.Next.NotifyDeleted(statusId, deleted);
             }
@@ -97,7 +100,7 @@ namespace StarryEyes.Models.Subsystems.Notifications
 
         public void NotifyLimitationInfoGot(IOAuthCredential account, int trackLimit)
         {
-            if (_proxy.NotifyLimitationInfoGot(account, trackLimit) && this.Next != null)
+            if (!_proxy.NotifyLimitationInfoGot(account, trackLimit) && this.Next != null)
             {
                 this.Next.NotifyLimitationInfoGot(account, trackLimit);
             }
@@ -105,7 +108,7 @@ namespace StarryEyes.Models.Subsystems.Notifications
 
         public void NotifyUserUpdated(TwitterUser source)
         {
-            if (_proxy.NotifyUserUpdated(source) && this.Next != null)
+            if (!_proxy.NotifyUserUpdated(source) && this.Next != null)
             {
                 this.Next.NotifyUserUpdated(source);
             }

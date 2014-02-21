@@ -16,6 +16,7 @@ using StarryEyes.Nightmare.Windows;
 using StarryEyes.Plugins;
 using StarryEyes.Settings;
 using StarryEyes.Views.Dialogs;
+using StarryEyes.Views.Notifications;
 using Application = System.Windows.Application;
 
 namespace StarryEyes
@@ -285,6 +286,7 @@ namespace StarryEyes
             StatusInbox.Initialize();
             AutoUpdateService.StartSchedule();
             NotificationService.Initialize();
+            NotificationViewRouter.Initialize();
 
             // activate plugins
             PluginManager.LoadedPlugins.ForEach(p => p.Initialize());

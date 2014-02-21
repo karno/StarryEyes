@@ -443,7 +443,7 @@ namespace StarryEyes
 
         public static readonly string NewReceiveWavFile = "new.wav";
 
-        public static readonly string DirectMessageWavFile = "directmessage.wav";
+        public static readonly string DirectMessageWavFile = "message.wav";
 
         public static readonly string EventWavFile = "event.wav";
 

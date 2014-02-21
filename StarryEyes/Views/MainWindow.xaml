@@ -314,16 +314,45 @@
             </i:Interaction.Triggers>
             <Grid Margin="0">
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <TextBlock Margin="8"
+                <Button Name="MuteToggleButton"
+                        Style="{StaticResource MetroSquareTransparentButtonStyle}"
+                        ToolTip="通知音を再生するかどうかを切り替えます。">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <ei:CallMethodAction MethodName="ToggleMute" TargetObject="{Binding}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                    <Grid>
+                        <Path Width="16"
+                              Height="11"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center"
+                              Data="F1 M 13.0018,21.0029L 17.0024,21.0029L 23.0032,16.0022L 23.0032,33.0046L 17.0024,27.0038L 13.0018,27.0038C 11.8971,27.0038 11.0015,26.1082 11.0015,25.0035L 11.0015,23.0032C 11.0015,21.8985 11.8971,21.0029 13.0018,21.0029 Z M 36.005,24.0034C 36.005,27.0413 34.7736,29.7917 32.7827,31.7826L 31.3683,30.3682C 32.9972,28.7393 34.0047,26.489 34.0047,24.0034C 34.0047,21.4913 32.9757,19.2196 31.3161,17.5868L 32.5252,15.9747C 34.6669,17.982 36.005,20.8364 36.005,24.0034 Z M 32.0045,24.0034C 32.0045,26.1913 31.0008,28.1449 29.4287,29.4287L 28.0041,28.0041C 29.2186,27.0918 30.0042,25.6393 30.0042,24.0034C 30.0042,22.3674 29.2186,20.9149 28.0041,20.0026L 29.4287,18.578C 31.0008,19.8618 32.0045,21.8154 32.0045,24.0034 Z M 28.0039,24.0034C 28.0039,25.3369 27.134,26.4672 25.9306,26.8578L 25.0035,25.0035C 25.5558,25.0035 26.0036,24.5557 26.0036,24.0034C 26.0036,23.451 25.5558,23.0032 25.0035,23.0032L 25.9306,21.1489C 27.134,21.5395 28.0039,22.6698 28.0039,24.0034 Z "
+                              Fill="{DynamicResource BaseColorForegroundBrush}"
+                              Stretch="Fill"
+                              Visibility="{Binding IsMuted,
+                                                   Converter={StaticResource BooleanToInvisibleConverter}}" />
+                        <Path Width="16"
+                              Height="10.4"
+                              Data="F1 M 13.0018,21.0029L 17.0024,21.0029L 23.0032,16.0022L 23.0032,33.0046L 17.0024,27.0038L 13.0018,27.0038C 11.8971,27.0038 11.0015,26.1082 11.0015,25.0035L 11.0015,23.0032C 11.0015,21.8985 11.8971,21.0029 13.0018,21.0029 Z M 25.8469,28.0394L 29.3829,24.5034L 25.8469,20.9673L 27.9685,18.8457L 31.5045,22.3818L 35.0404,18.8458L 37.1621,20.9675L 33.6261,24.5034L 37.1621,28.0394L 35.0405,30.161L 31.5045,26.625L 27.9685,30.161L 25.8469,28.0394 Z "
+                              Fill="{DynamicResource BaseColorForegroundBrush}"
+                              Stretch="Fill"
+                              Visibility="{Binding IsMuted,
+                                                   Converter={StaticResource BooleanToVisibleConverter}}" />
+                    </Grid>
+                </Button>
+                <TextBlock Grid.Column="1"
+                           Margin="8"
                            Text="{Binding StateString}"
                            ToolTip="ここをクリックすると、バックステージを開くことができます。" />
-                <StackPanel Grid.Column="1"
+                <StackPanel Grid.Column="2"
                             Margin="8"
                             Orientation="Horizontal"
                             ToolTip="現在保持している総ツイート数です。">
@@ -339,7 +368,7 @@
                                FontFamily="Segoe UI"
                                Text="{Binding GrossTweetCount}" />
                 </StackPanel>
-                <StackPanel Grid.Column="2"
+                <StackPanel Grid.Column="3"
                             Margin="8"
                             Orientation="Horizontal"
                             ToolTip="一分間あたりのツイート受信数の目安です。">
@@ -355,7 +384,7 @@
                                Text="{Binding TweetsPerMinutes,
                                               Mode=OneWay}" />
                 </StackPanel>
-                <StackPanel Grid.Column="3"
+                <StackPanel Grid.Column="4"
                             Margin="8"
                             Orientation="Horizontal"
                             ToolTip="Krileの起動時間です。">
@@ -371,7 +400,7 @@
                                FontFamily="Segoe UI"
                                Text="{Binding StartupTime}" />
                 </StackPanel>
-                <Canvas Grid.Column="4"
+                <Canvas Grid.Column="5"
                         Width="12"
                         Visibility="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
                                                                             AncestorType={x:Type Window}},

@@ -156,6 +156,9 @@ namespace StarryEyes.Settings
 
         #region Notification and Confirmations
 
+        public static readonly SettingItemStruct<bool> PlaySounds =
+            new SettingItemStruct<bool>("PlaySounds", true);
+
         public static readonly SettingItemStruct<bool> ConfirmOnExitApp =
             new SettingItemStruct<bool>("ConfirmOnExitApp", true);
 
