@@ -161,7 +161,7 @@ namespace StarryEyes.Settings
             new SettingItemStruct<bool>("PlaySounds", true);
 
         public static readonly SettingItemStruct<NotificationUIType> NotificationType =
-            new SettingItemStruct<NotificationUIType>("NotificationType", NotificationUIType.Normal);
+            new SettingItemStruct<NotificationUIType>("NotificationType", NotificationUIType.Slim);
 
         public static readonly SettingItemStruct<bool> ConfirmOnExitApp =
             new SettingItemStruct<bool>("ConfirmOnExitApp", true);

@@ -4,6 +4,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using Livet;
+using Livet.Messaging.IO;
 using StarryEyes.Filters;
 using StarryEyes.Filters.Parsing;
 using StarryEyes.Models;
@@ -60,6 +61,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             RaisePropertyChanged(() => TabName);
             RaisePropertyChanged(() => IsShowUnreadCounts);
             RaisePropertyChanged(() => IsNotifyNewArrivals);
+            RaisePropertyChanged(() => NotifySoundSourcePath);
             RaisePropertyChanged(() => QueryString);
             RaisePropertyChanged(() => FoundError);
         }
@@ -94,6 +96,31 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 _currentConfigurationTarget.NotifyNewArrivals = value;
                 RaisePropertyChanged();
                 TabManager.Save();
+            }
+        }
+
+        public string NotifySoundSourcePath
+        {
+            get { return _currentConfigurationTarget != null ? _currentConfigurationTarget.NotifySoundSource : String.Empty; }
+            set
+            {
+                if (_currentConfigurationTarget == null) return;
+                _currentConfigurationTarget.NotifySoundSource = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public void SelectSoundSource()
+        {
+            var msg = this.Messenger.GetResponse(new OpeningFileSelectionMessage
+            {
+                Title = "タブの通知音を選択",
+                Filter = "Wave ファイル|*.wav",
+                FileName = NotifySoundSourcePath,
+            });
+            if (msg.Response != null && msg.Response.Length > 0)
+            {
+                NotifySoundSourcePath = msg.Response[0];
             }
         }
 
@@ -173,7 +200,6 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             BrowserHelper.Open(App.QueryReferenceUrl);
         }
         #endregion
-
 
         public void Close()
         {

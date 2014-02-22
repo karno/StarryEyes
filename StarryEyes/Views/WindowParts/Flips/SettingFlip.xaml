@@ -485,8 +485,8 @@
                             <TextBlock Margin="0,0,8,0" Text="新着ツイートやイベントの通知:" />
                             <ComboBox SelectedIndex="{Binding NotificationTypeIndex}">
                                 <clr:String>なし</clr:String>
-                                <clr:String>ポップアップ</clr:String>
                                 <clr:String>スリム</clr:String>
+                                <clr:String>ポップアップ</clr:String>
                             </ComboBox>
                         </StackPanel>
                     </StackPanel>

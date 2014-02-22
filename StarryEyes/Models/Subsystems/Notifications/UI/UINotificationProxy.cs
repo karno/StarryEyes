@@ -25,7 +25,7 @@ namespace StarryEyes.Models.Subsystems.Notifications.UI
         {
             switch (Setting.NotificationType.Value)
             {
-                case NotificationUIType.Normal:
+                case NotificationUIType.Popup:
                     return NormalNotificator.Instance;
                 case NotificationUIType.Slim:
                     return SlimNotificator.Instance;
@@ -212,7 +212,7 @@ namespace StarryEyes.Models.Subsystems.Notifications.UI
     public enum NotificationUIType
     {
         None,
-        Normal,
-        Slim
+        Slim,
+        Popup
     }
 }

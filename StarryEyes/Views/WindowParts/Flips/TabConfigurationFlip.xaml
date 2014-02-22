@@ -6,8 +6,11 @@
              xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
              xmlns:flips="clr-namespace:StarryEyes.Views.WindowParts.Flips"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:utils="clr-namespace:StarryEyes.Views.Utils"
+             xmlns:vmflips="clr-namespace:StarryEyes.ViewModels.WindowParts.Flips"
+             d:DataContext="{d:DesignInstance vmflips:TabConfigurationFlipViewModel}"
              d:DesignHeight="600"
              d:DesignWidth="800"
              mc:Ignorable="d">
@@ -20,6 +23,11 @@
             <utils:BooleanToVisibleConverter x:Key="BoolVisibleConverter" />
         </ResourceDictionary>
     </UserControl.Resources>
+    <i:Interaction.Triggers>
+        <l:InteractionMessageTrigger Messenger="{Binding Messenger}">
+            <l:OpenFileDialogInteractionMessageAction />
+        </l:InteractionMessageTrigger>
+    </i:Interaction.Triggers>
     <flips:FlipContent IsOpen="{Binding IsConfigurationActive}"
                        OwnerVisibility="{Binding Visibility,
                                                  Mode=TwoWay,
@@ -69,16 +77,48 @@
                          Text="{Binding TabName}"
                          TextWrapping="Wrap" />
             </Grid>
-            <StackPanel Grid.Row="1" Orientation="Horizontal">
-                <CheckBox Margin="8"
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <CheckBox Grid.Column="0"
+                          Margin="8"
                           HorizontalAlignment="Left"
+                          VerticalAlignment="Center"
                           Content="新着を通知"
                           IsChecked="{Binding IsNotifyNewArrivals}" />
-                <CheckBox Margin="8,8,0,8"
+                <CheckBox Grid.Column="1"
+                          Margin="8,8,0,8"
                           HorizontalAlignment="Left"
+                          VerticalAlignment="Center"
                           Content="非選択時の新着ツイート数を表示"
                           IsChecked="{Binding IsShowUnreadCounts}" />
-            </StackPanel>
+                <Path Grid.Column="2"
+                      Width="10.5"
+                      Height="12"
+                      Margin="8,8,0,8"
+                      Data="F1 M 17,30L 18,30.0945L 18,18L 18,17L 18,15L 34,12L 34,14L 34,15L 34,30C 34,31.6569 32.2091,33 30,33C 27.7909,33 26,31.6569 26,30C 26,28.3431 27.7908,27 30,27C 30.3453,27 30.6804,27.0328 31,27.0945L 31,15.5625L 21,17.4375L 21,33C 21,34.6569 19.2091,36 17,36C 14.7909,36 13,34.6569 13,33C 13,31.3431 14.7909,30 17,30 Z "
+                      Fill="{DynamicResource BaseColorForegroundBrush}"
+                      Stretch="Fill" />
+                <TextBox Grid.Column="3"
+                         Margin="6,8,0,8"
+                         VerticalAlignment="Center"
+                         Text="{Binding NotifySoundSourcePath,
+                                        UpdateSourceTrigger=PropertyChanged}" />
+                <Button Grid.Column="4"
+                        Margin="0,8,8,8"
+                        Content="...">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <ei:CallMethodAction MethodName="SelectSoundSource" TargetObject="{Binding}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </Button>
+            </Grid>
             <Grid Grid.Row="2">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
