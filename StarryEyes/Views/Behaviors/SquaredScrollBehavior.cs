@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Interactivity;
 using StarryEyes.Nightmare.Windows;
 
@@ -28,7 +27,7 @@ namespace StarryEyes.Views.Behaviors
             // delta ^ 2
             // integrate mouse whell delta
             _integrate += e.Delta;
-            int dp = _integrate / SystemInformation.MouseWheelScrollDelta;
+            var dp = _integrate / SystemInformation.MouseWheelScrollDelta;
             _integrate %= SystemInformation.MouseWheelScrollDelta;
             if (dp != 0)
             {

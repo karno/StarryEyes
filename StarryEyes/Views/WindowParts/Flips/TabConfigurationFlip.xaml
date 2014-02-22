@@ -103,7 +103,8 @@
                       Margin="8,8,0,8"
                       Data="F1 M 17,30L 18,30.0945L 18,18L 18,17L 18,15L 34,12L 34,14L 34,15L 34,30C 34,31.6569 32.2091,33 30,33C 27.7909,33 26,31.6569 26,30C 26,28.3431 27.7908,27 30,27C 30.3453,27 30.6804,27.0328 31,27.0945L 31,15.5625L 21,17.4375L 21,33C 21,34.6569 19.2091,36 17,36C 14.7909,36 13,34.6569 13,33C 13,31.3431 14.7909,30 17,30 Z "
                       Fill="{DynamicResource BaseColorForegroundBrush}"
-                      Stretch="Fill" />
+                      Stretch="Fill"
+                      ToolTip="このタブの通知音" />
                 <TextBox Grid.Column="3"
                          Margin="6,8,0,8"
                          VerticalAlignment="Center"
