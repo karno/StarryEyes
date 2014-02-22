@@ -111,12 +111,13 @@
                                         UpdateSourceTrigger=PropertyChanged}" />
                 <Button Grid.Column="4"
                         Margin="0,8,8,8"
-                        Content="...">
+                        Style="{StaticResource MetroSquareUnfocusableFlatButton}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="Click">
                             <ei:CallMethodAction MethodName="SelectSoundSource" TargetObject="{Binding}" />
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
+                    <TextBlock Foreground="{StaticResource BaseColorForegroundBrush}" Text="..." />
                 </Button>
             </Grid>
             <Grid Grid.Row="2">

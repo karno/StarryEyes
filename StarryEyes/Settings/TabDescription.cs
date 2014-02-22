@@ -27,6 +27,9 @@ namespace StarryEyes.Settings
         public bool NotifyNewArrivals { get; set; }
 
         [DataMember]
+        public string NotifySoundSource { get; set; }
+
+        [DataMember]
         public string Query { get; set; }
 
         public TabDescription()
@@ -40,6 +43,7 @@ namespace StarryEyes.Settings
             this.NotifyNewArrivals = model.NotifyNewArrivals;
             this.BindingAccountIds = model.BindingAccounts.ToArray();
             this.BindingHashtags = model.BindingHashtags.ToArray();
+            this.NotifySoundSource = model.NotifySoundSource;
             this.Query = model.FilterQuery != null ? model.FilterQuery.ToQuery() : null;
         }
 
@@ -61,6 +65,7 @@ namespace StarryEyes.Settings
                  FilterQuery = filter,
                  BindingHashtags = this.BindingHashtags,
                  NotifyNewArrivals = this.NotifyNewArrivals,
+                 NotifySoundSource = this.NotifySoundSource,
                  ShowUnreadCounts = this.ShowUnreadCounts
              };
             this.BindingAccountIds.ForEach(model.BindingAccounts.Add);

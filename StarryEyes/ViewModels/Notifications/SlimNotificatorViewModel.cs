@@ -52,7 +52,7 @@ namespace StarryEyes.ViewModels.Notifications
             DispatcherHolder.Enqueue(() =>
             {
                 var mwnd = Application.Current.MainWindow;
-                if (mwnd != null && mwnd.IsActive)
+                if (mwnd != null && !mwnd.IsActive)
                 {
                     new SlimNotificatorView
                     {
