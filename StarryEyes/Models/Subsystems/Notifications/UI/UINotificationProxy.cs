@@ -1,20 +1,16 @@
 ﻿using System;
 using System.IO;
-using System.Reactive.Disposables;
 using System.Threading.Tasks;
-using NAudio.Wave;
 using StarryEyes.Anomaly;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Feather.Proxies;
-using StarryEyes.Models;
 using StarryEyes.Models.Backstages.NotificationEvents;
-using StarryEyes.Models.Subsystems;
-using StarryEyes.Models.Subsystems.Notifications;
+using StarryEyes.Models.Subsystems.Notifications.Audio;
 using StarryEyes.Settings;
 
-namespace StarryEyes.Views.Notifications
+namespace StarryEyes.Models.Subsystems.Notifications.UI
 {
-    public static class NotificationViewRouter
+    public static class UINotificationProxy
     {
         /// <summary>
         /// Initialize notification router
@@ -25,14 +21,22 @@ namespace StarryEyes.Views.Notifications
                 new NotificationProxyWrapper(new ΝotificationViewRouter()));
         }
 
-        private static INotificator GetNotificator()
+        private static IUINotificator GetNotificator()
         {
-            return NullNotificator.Instance;
+            switch (Setting.NotificationType.Value)
+            {
+                case NotificationUIType.Normal:
+                    return NormalNotificator.Instance;
+                case NotificationUIType.Slim:
+                    return SlimNotificator.Instance;
+                default:
+                    return NullNotificator.Instance;
+            }
         }
 
         private static string GetSoundFilePath(NotifySoundType type)
         {
-            var file = String.Empty;
+            string file;
             switch (type)
             {
                 case NotifySoundType.New:
@@ -63,29 +67,13 @@ namespace StarryEyes.Views.Notifications
 
             Task.Run(() =>
             {
-                var disposables = new CompositeDisposable();
                 try
                 {
-                    // initialize classes
-                    var reader = new WaveFileReader(filePath);
-                    disposables.Add(reader);
-
-                    var waveChannel = new WaveChannel32(reader);
-                    disposables.Add(waveChannel);
-                    waveChannel.PadWithZeroes = false;
-
-                    var player = new DirectSoundOut();
-                    disposables.Add(player);
-                    player.Init(waveChannel);
-                    player.PlaybackStopped += (o, e) => disposables.Dispose();
-
-                    player.Play();
+                    AudioPlayer.PlaySound(filePath);
                 }
                 catch (Exception ex)
                 {
                     BackstageModel.RegisterEvent(new OperationFailedEvent("SOUND ERROR", ex));
-                    // cleanup resources
-                    disposables.Dispose();
                 }
             });
         }
@@ -112,6 +100,12 @@ namespace StarryEyes.Views.Notifications
             {
                 if (CheckMyself(status))
                 {
+                    return false;
+                }
+                if (status.RetweetedOriginal != null && CheckMyself(status.RetweetedOriginal))
+                {
+                    // suppress status which retweets our tweet
+                    // -> notify as "our status is retweeted"
                     return false;
                 }
                 System.Diagnostics.Debug.WriteLine("New Arrival: " + type + " - " + status);
@@ -213,5 +207,12 @@ namespace StarryEyes.Views.Notifications
             Message,
             Event
         }
+    }
+
+    public enum NotificationUIType
+    {
+        None,
+        Normal,
+        Slim
     }
 }

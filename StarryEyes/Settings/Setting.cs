@@ -12,6 +12,7 @@ using StarryEyes.Filters;
 using StarryEyes.Filters.Expressions;
 using StarryEyes.Filters.Parsing;
 using StarryEyes.Models.Accounting;
+using StarryEyes.Models.Subsystems.Notifications.UI;
 using StarryEyes.Models.Timelines.Tabs;
 using StarryEyes.Nightmare.Windows;
 
@@ -158,6 +159,9 @@ namespace StarryEyes.Settings
 
         public static readonly SettingItemStruct<bool> PlaySounds =
             new SettingItemStruct<bool>("PlaySounds", true);
+
+        public static readonly SettingItemStruct<NotificationUIType> NotificationType =
+            new SettingItemStruct<NotificationUIType>("NotificationType", NotificationUIType.Normal);
 
         public static readonly SettingItemStruct<bool> ConfirmOnExitApp =
             new SettingItemStruct<bool>("ConfirmOnExitApp", true);

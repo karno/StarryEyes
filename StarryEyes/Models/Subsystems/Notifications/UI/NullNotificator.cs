@@ -1,8 +1,8 @@
 ﻿using StarryEyes.Anomaly.TwitterApi.DataModels;
 
-namespace StarryEyes.Views.Notifications
+namespace StarryEyes.Models.Subsystems.Notifications.UI
 {
-    public sealed class NullNotificator : INotificator
+    public sealed class NullNotificator : IUINotificator
     {
         private static readonly NullNotificator _nullNotificator = new NullNotificator();
 
@@ -20,8 +20,6 @@ namespace StarryEyes.Views.Notifications
         public void MessageReceived(TwitterStatus status) { }
 
         public void Followed(TwitterUser source, TwitterUser target) { }
-
-        public void Unfollowed(TwitterUser source, TwitterUser target) { }
 
         public void Favorited(TwitterUser source, TwitterStatus target) { }
 

@@ -1,8 +1,8 @@
 ﻿using StarryEyes.Anomaly.TwitterApi.DataModels;
 
-namespace StarryEyes.Views.Notifications
+namespace StarryEyes.Models.Subsystems.Notifications.UI
 {
-    public interface INotificator
+    public interface IUINotificator
     {
         void StatusReceived(TwitterStatus status);
 
