@@ -538,10 +538,15 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
 
         public void AttachImage()
         {
+            var dir = Setting.LastImageOpenDir.Value;
+            if (!Directory.Exists(dir))
+            {
+                dir = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
+            }
             var msg = new OpeningFileSelectionMessage
             {
                 Filter = "画像ファイル|*.jpg;*.jpeg;*.jpe;*.png;*.gif;*.bmp;*.dib|全てのファイル|*.*",
-                InitialDirectory = Setting.LastImageOpenDir.Value,
+                InitialDirectory = dir,
                 MultiSelect = false,
                 Title = "添付する画像ファイルを指定"
             };

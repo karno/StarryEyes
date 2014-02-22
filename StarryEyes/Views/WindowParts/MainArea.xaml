@@ -35,9 +35,12 @@
                         <StackPanel.ContextMenu>
                             <ContextMenu DataContext="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
                                 <MenuItem Command="{Binding EditTabCommand}" Header="編集..." />
-                                <MenuItem Command="{Binding CopyTabCommand}" Header="このタブをコピーして追加" />
+                                <MenuItem Header="このタブの新着ツイートをポップアップ通知"
+                                          IsCheckable="True"
+                                          IsChecked="{Binding IsNotifyNewArrivals}" />
                                 <Separator />
                                 <MenuItem Command="{Binding Parent.CreateNewTabCommand}" Header="新しいタブの追加..." />
+                                <MenuItem Command="{Binding CopyTabCommand}" Header="このタブをコピーして追加" />
                                 <MenuItem Command="{Binding Parent.RestoreLastClosedTabCommand}" Header="最後に閉じたタブを元に戻す" />
                                 <Separator />
                                 <MenuItem Command="{Binding CloseTabCommand}" Header="タブを閉じる" />

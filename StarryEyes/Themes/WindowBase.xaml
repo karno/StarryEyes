@@ -27,7 +27,8 @@
     <SolidColorBrush x:Key="WindowBackgroundBrush" Color="{DynamicResource BaseColorBackground}" />
 
     <!--  Context Menus  -->
-    <SolidColorBrush x:Key="RightArrowFill" Color="#111111" />
+    <SolidColorBrush x:Key="RightArrowFill" Color="#FF222222" />
+    <SolidColorBrush x:Key="CheckmarkFill" Color="#FF222222" />
 
     <!--  Common control foregrounds  -->
     <SolidColorBrush x:Key="BlackBrush" Color="{DynamicResource BaseColorForeground}" />

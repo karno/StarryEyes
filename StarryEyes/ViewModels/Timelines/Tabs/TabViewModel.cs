@@ -15,9 +15,70 @@ namespace StarryEyes.ViewModels.Timelines.Tabs
     public class TabViewModel : TimelineViewModelBase
     {
         private readonly ColumnViewModel _parent;
+
         private readonly TabModel _model;
 
         private int _unreadCount;
+
+        public TabModel Model
+        {
+            get { return this._model; }
+        }
+
+        public string Name
+        {
+            get { return this._model.Name; }
+            set
+            {
+                this._model.Name = value;
+                this.RaisePropertyChanged();
+            }
+        }
+
+        public ColumnViewModel Parent
+        {
+            get { return this._parent; }
+        }
+
+        public bool IsFocused
+        {
+            get { return this._parent.FocusedTab == this; }
+        }
+
+        protected override IEnumerable<long> CurrentAccounts
+        {
+            get { return this._model.BindingAccounts; }
+        }
+
+        public int UnreadCount
+        {
+            get { return this._unreadCount; }
+            set
+            {
+                var newValue = this.IsFocused || !this.Model.ShowUnreadCounts ? 0 : value;
+                if (this._unreadCount == newValue) return;
+                this._unreadCount = newValue;
+                this.RaisePropertyChanged();
+                this.RaisePropertyChanged(() => this.IsUnreadExisted);
+            }
+        }
+
+        public bool IsUnreadExisted
+        {
+            get { return this.UnreadCount > 0; }
+        }
+
+        public bool IsNotifyNewArrivals
+        {
+            get { return _model.NotifyNewArrivals; }
+            set
+            {
+                if (_model.NotifyNewArrivals == value) return;
+                _model.NotifyNewArrivals = value;
+                RaisePropertyChanged(() => IsNotifyNewArrivals);
+                TabManager.Save();
+            }
+        }
 
         /// <summary>
         /// design time support method.
@@ -51,31 +112,6 @@ namespace StarryEyes.ViewModels.Timelines.Tabs
             model.IsActivated = true;
         }
 
-        public TabModel Model
-        {
-            get { return this._model; }
-        }
-
-        public string Name
-        {
-            get { return this._model.Name; }
-            set
-            {
-                this._model.Name = value;
-                this.RaisePropertyChanged();
-            }
-        }
-
-        public ColumnViewModel Parent
-        {
-            get { return this._parent; }
-        }
-
-        public bool IsFocused
-        {
-            get { return this._parent.FocusedTab == this; }
-        }
-
         public void SetFocus()
         {
             this._parent.FocusedTab = this;
@@ -90,29 +126,6 @@ namespace StarryEyes.ViewModels.Timelines.Tabs
                 this.UnreadCount = 0;
             }
             this.RaisePropertyChanged(() => this.IsFocused);
-        }
-
-        protected override IEnumerable<long> CurrentAccounts
-        {
-            get { return this._model.BindingAccounts; }
-        }
-
-        public int UnreadCount
-        {
-            get { return this._unreadCount; }
-            set
-            {
-                var newValue = this.IsFocused || !this.Model.ShowUnreadCounts ? 0 : value;
-                if (this._unreadCount == newValue) return;
-                this._unreadCount = newValue;
-                this.RaisePropertyChanged();
-                this.RaisePropertyChanged(() => this.IsUnreadExisted);
-            }
-        }
-
-        public bool IsUnreadExisted
-        {
-            get { return this.UnreadCount > 0; }
         }
 
         protected override void ReadMore(long id)
@@ -153,7 +166,11 @@ namespace StarryEyes.ViewModels.Timelines.Tabs
         public void EditTab()
         {
             MainWindowModel.ShowTabConfigure(this.Model)
-                           .Subscribe(_ => this.RaisePropertyChanged(() => this.Name));
+                           .Subscribe(_ =>
+                           {
+                               this.RaisePropertyChanged(() => Name);
+                               this.RaisePropertyChanged(() => IsNotifyNewArrivals);
+                           });
         }
         #endregion
 

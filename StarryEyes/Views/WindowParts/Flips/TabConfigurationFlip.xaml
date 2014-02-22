@@ -86,17 +86,17 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <CheckBox Grid.Column="0"
-                          Margin="8"
-                          HorizontalAlignment="Left"
-                          VerticalAlignment="Center"
-                          Content="新着を通知"
-                          IsChecked="{Binding IsNotifyNewArrivals}" />
-                <CheckBox Grid.Column="1"
                           Margin="8,8,0,8"
                           HorizontalAlignment="Left"
                           VerticalAlignment="Center"
-                          Content="非選択時の新着ツイート数を表示"
+                          Content="新着ツイート数を表示"
                           IsChecked="{Binding IsShowUnreadCounts}" />
+                <CheckBox Grid.Column="1"
+                          Margin="8"
+                          HorizontalAlignment="Left"
+                          VerticalAlignment="Center"
+                          Content="新着ツイートをポップアップ通知"
+                          IsChecked="{Binding IsNotifyNewArrivals}" />
                 <Path Grid.Column="2"
                       Width="10.5"
                       Height="12"
