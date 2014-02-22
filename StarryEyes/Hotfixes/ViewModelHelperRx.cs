@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Threading;
 using System.Windows.Threading;
 using Livet;
 using StarryEyes.Hotfixes;
@@ -40,6 +39,7 @@ namespace StarryEyes
                 var subscribe =
                     sourceAsNotifyCollection
                         .ListenCollectionChanged()
+                        .ObserveOn(DispatcherHolder.Dispatcher)
                         .Where(_ => gate)
                         .Subscribe(e =>
                         {

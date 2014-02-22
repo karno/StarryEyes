@@ -233,29 +233,7 @@ namespace StarryEyes.Models.Timelines.Statuses
         {
             if (this.Status.FavoritedUsers != null && this.Status.FavoritedUsers.Length > 0)
             {
-                this.Status.FavoritedUsers
-                      .Distinct()
-                      .Reverse()
-                      .Where(_ =>
-                      {
-                          lock (this._favoritedsLock)
-                          {
-                              if (this._favoritedUsersDic.ContainsKey(_)) return false;
-                              this._favoritedUsersDic.Add(_, null);
-                              return true;
-                          }
-                      })
-                      .Select(u => Observable.Start(() => StoreHelper.GetUser(u)))
-                      .Merge()
-                      .SelectMany(_ => _)
-                      .Do(_ =>
-                      {
-                          lock (this._favoritedsLock)
-                          {
-                              this._favoritedUsersDic[_.Id] = _;
-                          }
-                      })
-                      .Subscribe(_ => this._favoritedUsers.Insert(0, _));
+                LoadUsers(this.Status.FavoritedUsers, _favoritedsLock, _favoritedUsersDic, _favoritedUsers);
             }
         }
 
@@ -263,30 +241,40 @@ namespace StarryEyes.Models.Timelines.Statuses
         {
             if (this.Status.RetweetedUsers != null && this.Status.RetweetedUsers.Length > 0)
             {
-                this.Status.RetweetedUsers
-                      .Distinct()
-                      .Reverse()
-                      .Where(_ =>
-                      {
-                          lock (this._retweetedsLock)
-                          {
-                              if (this._retweetedUsersDic.ContainsKey(_)) return false;
-                              this._retweetedUsersDic.Add(_, null);
-                              return true;
-                          }
-                      })
-                      .Select(u => Observable.Start(() => StoreHelper.GetUser(u)))
-                      .Merge()
-                      .SelectMany(_ => _)
-                      .Do(_ =>
-                      {
-                          lock (this._retweetedsLock)
-                          {
-                              this._retweetedUsersDic[_.Id] = _;
-                          }
-                      })
-                      .Subscribe(_ => this._retweetedUsers.Insert(0, _));
+                LoadUsers(this.Status.RetweetedUsers, _retweetedsLock, _retweetedUsersDic, _retweetedUsers);
             }
+        }
+
+        private static void LoadUsers(long[] users, object lockObject,
+            IDictionary<long, TwitterUser> dictionary,
+            ObservableSynchronizedCollection<TwitterUser> target)
+        {
+            users.Distinct()
+                 .Reverse()
+                 .Where(id =>
+                 {
+                     lock (lockObject)
+                     {
+                         if (dictionary.ContainsKey(id))
+                         {
+                             return false;
+                         }
+                         // acquire position
+                         dictionary.Add(id, null);
+                         return true;
+                     }
+                 })
+                 .Select(id => Observable.Start(() => StoreHelper.GetUser(id)))
+                 .Merge()
+                 .SelectMany(_ => _)
+                 .Subscribe(u =>
+                 {
+                     lock (lockObject)
+                     {
+                         dictionary[u.Id] = u;
+                     }
+                     target.Insert(0, u);
+                 });
         }
 
         public static void UpdateStatusInfo(long id,
