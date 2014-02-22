@@ -15,6 +15,11 @@ namespace StarryEyes.Models.Subsystems.Notifications.UI
             get { return _instance; }
         }
 
+        static SlimNotificator()
+        {
+            SlimNotificatorViewModel.Initialize();
+        }
+
         private readonly LinkedList<NotificationData> _urgentPriorityQueue = new LinkedList<NotificationData>();
 
         private readonly LinkedList<NotificationData> _highPriorityQueue = new LinkedList<NotificationData>();
@@ -36,7 +41,6 @@ namespace StarryEyes.Models.Subsystems.Notifications.UI
                 _middlePriorityQueue,
                 _lowPriorityQueue
             };
-            SlimNotificatorViewModel.Initialize();
         }
 
         public NotificationData GetQueuedNotification()

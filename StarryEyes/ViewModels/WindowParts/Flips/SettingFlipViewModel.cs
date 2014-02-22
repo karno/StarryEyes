@@ -20,6 +20,7 @@ using StarryEyes.Filters.Parsing;
 using StarryEyes.Models;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Receiving;
+using StarryEyes.Models.Subsystems.Notifications.UI;
 using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
 using StarryEyes.Settings.KeyAssigns;
@@ -354,6 +355,16 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         #endregion
 
         #region Notification and confirmation property
+
+        public int NotificationTypeIndex
+        {
+            get { return (int)Setting.NotificationType.Value; }
+            set
+            {
+                Setting.NotificationType.Value = (NotificationUIType)value;
+                RaisePropertyChanged();
+            }
+        }
 
         public bool ConfirmOnExitApp
         {

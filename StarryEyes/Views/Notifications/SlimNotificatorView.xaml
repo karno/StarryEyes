@@ -1,0 +1,157 @@
+﻿<Window x:Class="StarryEyes.Views.Notifications.SlimNotificatorView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:StarryEyes.Views.Controls"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:messaging="http://schemas.livet-mvvm.net/2011/wpf"
+        xmlns:notifications="clr-namespace:StarryEyes.ViewModels.Notifications"
+        xmlns:ui="clr-namespace:StarryEyes.Models.Subsystems.Notifications.UI"
+        Name="SlimNotificatorWindow"
+        Title=""
+        Width="{Binding Width}"
+        Height="24"
+        AllowsTransparency="True"
+        Background="Transparent"
+        Focusable="False"
+        Left="{Binding Left}"
+        Loaded="SlimNotificatorView_OnLoaded"
+        Opacity="0.9"
+        ResizeMode="NoResize"
+        ShowActivated="False"
+        ShowInTaskbar="False"
+        Top="{Binding Top}"
+        Topmost="True"
+        WindowStartupLocation="Manual"
+        WindowStyle="None"
+        d:DataContext="{d:DesignInstance notifications:SlimNotificatorViewModel}"
+        d:DesignWidth="300"
+        mc:Ignorable="d">
+    <i:Interaction.Triggers>
+        <messaging:InteractionMessageTrigger Messenger="{Binding Messenger}">
+            <messaging:WindowInteractionMessageAction />
+        </messaging:InteractionMessageTrigger>
+        <i:EventTrigger EventName="ContentRendered">
+            <ei:CallMethodAction MethodName="Shown" TargetObject="{Binding}" />
+            <ei:ControlStoryboardAction ControlStoryboardOption="Play">
+                <ei:ControlStoryboardAction.Storyboard>
+                    <Storyboard TargetProperty="(Grid.RenderTransform).(TranslateTransform.Y)" TargetName="RootGrid">
+                        <DoubleAnimation BeginTime="0:0:0"
+                                         Duration="0:0:0.2"
+                                         From="24"
+                                         To="0" />
+                        <DoubleAnimation BeginTime="0:0:0.7"
+                                         Duration="0:0:0.2"
+                                         From="0"
+                                         To="24" />
+                    </Storyboard>
+                </ei:ControlStoryboardAction.Storyboard>
+            </ei:ControlStoryboardAction>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    <Grid Name="RootGrid" Background="{Binding BackgroundBrush}">
+        <Grid.RenderTransform>
+            <TranslateTransform X="0" Y="24" />
+        </Grid.RenderTransform>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="24" />
+            <ColumnDefinition Width="24" />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <Grid>
+            <Path Width="16"
+                  Height="16"
+                  Data="F1 M 28.0946,9.98824L 24.0154,20.8382L 23.8748,20.8382L 20.0066,9.98824L 13.7471,13.6282L 21.1319,22.5182L 21.1319,22.6582L 10.1602,20.4182L 10.1602,27.4882L 21.2022,25.5282L 21.2725,25.6682L 13.7471,34.4182L 19.7956,37.9882L 23.8044,27.2082L 23.9451,27.2082L 28.0243,37.9882L 34.2135,34.4182L 26.6177,25.7382L 26.6177,25.5982L 37.9398,27.4882L 37.9398,20.4182L 26.688,22.6582L 26.688,22.5182L 34.2135,13.5582L 28.0946,9.98824 Z "
+                  Fill="White"
+                  Stretch="Fill">
+                <Path.Style>
+                    <Style TargetType="Path">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding NotificationKind}" Value="{x:Static ui:SlimNotificationKind.New}">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Path.Style>
+            </Path>
+            <Path Width="16"
+                  Height="15.4"
+                  Data="F1 M 22.08,30.02L 23.36,34.5L 18.24,30.02L 16.32,30.02L 16.32,18.5L 31.68,18.5L 31.68,30.02L 22.08,30.02 Z "
+                  Fill="White"
+                  Stretch="Fill">
+                <Path.Style>
+                    <Style TargetType="Path">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding NotificationKind}" Value="{x:Static ui:SlimNotificationKind.Mention}">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding NotificationKind}" Value="{x:Static ui:SlimNotificationKind.Message}">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Path.Style>
+            </Path>
+            <Path Width="16"
+                  Height="15.4"
+                  Data="F1 M 19.52,24.18L 21.44,24.18L 21.44,27.38L 24.64,27.38L 24.64,29.3L 21.44,29.3L 21.44,32.5L 19.52,32.5L 19.52,29.3L 16.32,29.3L 16.32,27.38L 19.52,27.38L 19.52,24.18 Z M 24,16.5C 26.24,16.5 27.2,17.78 26.8769,20.4667C 27.1656,20.6322 27.36,20.9434 27.36,21.3C 27.36,21.7364 27.0689,22.1047 26.6702,22.2214C 26.5037,22.815 26.2451,23.3404 25.92,23.7607L 25.92,25.78C 26.9867,25.9933 27.84,26.1 29.12,26.74C 30.4,27.38 30.8267,27.9667 31.68,28.82L 31.68,31.86L 22.08,31.86L 22.08,29.94L 25.28,29.94L 25.28,26.74L 22.08,26.74L 22.08,23.7607L 22.08,23.54L 21.9218,23.54C 21.6705,23.1618 21.4683,22.7152 21.3297,22.2214C 20.9311,22.1047 20.64,21.7364 20.64,21.3C 20.64,20.9434 20.8344,20.6322 21.123,20.4667C 20.8,17.78 21.76,16.5 24,16.5 Z M 16.32,31.86L 16.32,29.94L 18.88,29.94L 18.88,31.86L 16.32,31.86 Z "
+                  Fill="White"
+                  Stretch="Fill">
+                <Path.Style>
+                    <Style TargetType="Path">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding NotificationKind}" Value="{x:Static ui:SlimNotificationKind.Follow}">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Path.Style>
+            </Path>
+            <Path Width="16"
+                  Height="14.8"
+                  Data="F1 M 16,22.1538L 22.022,22.1538L 24,16.6154L 25.978,22.1538L 32,22.1538L 26.9849,25.7468L 29.2308,31.3846L 24,28.3077L 19.3846,31.3846L 21.1231,25.8308L 16,22.1538 Z "
+                  Fill="White"
+                  Stretch="Fill">
+                <Path.Style>
+                    <Style TargetType="Path">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding NotificationKind}" Value="{x:Static ui:SlimNotificationKind.Favorite}">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Path.Style>
+            </Path>
+            <Path Width="13.6"
+                  Height="16"
+                  Data="F1 M 24,17.2308C 25.9397,17.2308 27.6889,18.0466 28.9231,19.3539L 28.9231,16L 30.7692,17.8462L 30.7692,22.7692L 25.8461,22.7692L 24,20.9231L 27.4402,20.9231C 26.595,19.9789 25.3669,19.3846 24,19.3846C 21.6596,19.3846 19.7261,21.1265 19.4253,23.3846L 17.2584,23.3846C 17.5693,19.9345 20.4689,17.2308 24,17.2308 Z M 24,28.6154C 26.3403,28.6154 28.2739,26.8735 28.5747,24.6154L 30.7416,24.6154C 30.4307,28.0655 27.5311,30.7692 24,30.7692C 22.0603,30.7692 20.3111,29.9534 19.0769,28.6461L 19.0769,32L 17.2308,30.1539L 17.2308,25.2308L 22.1538,25.2308L 24,27.0769L 20.5598,27.0769C 21.4049,28.0212 22.6331,28.6154 24,28.6154 Z "
+                  Fill="White"
+                  Stretch="Fill">
+                <Path.Style>
+                    <Style TargetType="Path">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding NotificationKind}" Value="{x:Static ui:SlimNotificationKind.Retweet}">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Path.Style>
+            </Path>
+        </Grid>
+        <controls:LazyImage Grid.Column="1"
+                            DecodePixelWidth="24"
+                            UriSource="{Binding UserImage}" />
+        <TextBlock Grid.Column="2"
+                   Margin="4,0"
+                   HorizontalAlignment="Stretch"
+                   Foreground="White"
+                   Text="{Binding Description}" />
+    </Grid>
+</Window>
