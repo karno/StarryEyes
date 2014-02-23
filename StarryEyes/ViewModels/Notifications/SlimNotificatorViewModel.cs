@@ -67,9 +67,9 @@ namespace StarryEyes.ViewModels.Notifications
         }
 
         private readonly NotificationData _data;
-        private int _left;
-        private int _top;
-        private int _width;
+        private readonly int _left;
+        private readonly int _top;
+        private readonly int _width;
 
         private SlimNotificatorViewModel(NotificationData data)
         {
@@ -77,8 +77,8 @@ namespace StarryEyes.ViewModels.Notifications
             var bound = Screen.PrimaryScreen.WorkingArea;
             if (bound == Rect.Empty) return; // empty data
             _width = (int)(bound.Width * 0.7);
-            _left = (int)((bound.Width - this._width) / 2.0);
-            _top = (int)(bound.Height - 24);
+            _left = (int)((bound.Width - this._width) / 2.0 + bound.Left);
+            _top = (int)(bound.Height - 24 + bound.Top);
         }
 
         public int Left
@@ -169,7 +169,7 @@ namespace StarryEyes.ViewModels.Notifications
 
         public void Shown()
         {
-            Observable.Timer(TimeSpan.FromSeconds(1.6))
+            Observable.Timer(TimeSpan.FromSeconds(3.1))
                       .Subscribe(_ => this.Messenger.RaiseAsync(
                           new WindowActionMessage(WindowAction.Close)));
             Observable.Timer(TimeSpan.FromSeconds(0.1))

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Media;
@@ -112,7 +113,12 @@ namespace StarryEyes.ViewModels.Notifications
                     _slots.Add(true);
                 }
             }
-            var bound = Screen.PrimaryScreen.WorkingArea;
+            // get most right-left position screen
+            var screen = Screen.AllScreens.OrderByDescending(s => s.Bounds.Left)
+                               .ThenByDescending(s => s.Bounds.Top)
+                               .FirstOrDefault();
+            if (screen == null) return;
+            var bound = screen.WorkingArea;
             var wh = 80;
             var ww = 300;
             var ipl = (int)Math.Ceiling(bound.Height / wh);
@@ -120,8 +126,8 @@ namespace StarryEyes.ViewModels.Notifications
             {
                 return;
             }
-            _left = (int)(bound.Width - ww * (this._slotIndex / ipl + 1));
-            _top = (int)(bound.Height - wh * (this._slotIndex % ipl + 1));
+            _left = (int)((bound.Width - ww * (this._slotIndex / ipl + 1)) + bound.Left);
+            _top = (int)((bound.Height - wh * (this._slotIndex % ipl + 1)) + bound.Top);
             System.Diagnostics.Debug.WriteLine("#N - " + _slotIndex + " / " + _left + ", " + _top);
         }
 

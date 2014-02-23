@@ -41,7 +41,7 @@
                                          Duration="0:0:0.2"
                                          From="24"
                                          To="0" />
-                        <DoubleAnimation BeginTime="0:0:1.3"
+                        <DoubleAnimation BeginTime="0:0:2.8"
                                          Duration="0:0:0.2"
                                          From="0"
                                          To="24" />
