@@ -399,6 +399,7 @@
     <Compile Include="Views\Adorners\InsertionAdorner.cs" />
     <Compile Include="Views\Behaviors\DragStartBehavior.cs" />
     <Compile Include="Views\Behaviors\DropAcceptBehavior.cs" />
+    <Compile Include="Views\Behaviors\HideFromTaskSwitcherBehavior.cs" />
     <Compile Include="Views\Behaviors\KeyHandlingBehavior.cs" />
     <Compile Include="Views\Behaviors\Planerator.cs" />
     <Compile Include="Views\Behaviors\SquaredScrollBehavior.cs" />

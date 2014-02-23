@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
 
@@ -27,6 +28,18 @@ namespace StarryEyes.Nightmare.Windows
             wpl.rcNormalPosition.top = (int)placement.Top;
             wpl.rcNormalPosition.bottom = (int)placement.Bottom;
             WinApi.SetWindowPlacement(helper.Handle, ref wpl);
+        }
+
+        public static int GetWindowExStyle(this Window window)
+        {
+            var helper = new WindowInteropHelper(window);
+            return (int)WinApi.GetWindowLongPtr(helper.Handle, WinApi.GWL_EXSTYLE);
+        }
+
+        public static void SetWindowExStyle(this Window window, int style)
+        {
+            var helper = new WindowInteropHelper(window);
+            WinApi.SetWindowLongPtr(helper.Handle, WinApi.GWL_EXSTYLE, (IntPtr)style);
         }
     }
 }

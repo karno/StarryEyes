@@ -11,6 +11,7 @@ namespace StarryEyes.Nightmare.Windows
         internal const int UOI_HEAPSIZE = 5;
         internal const int WM_DRAWCLIPBOARD = 0x0308;
         internal const int WM_CHANGECBCHAIN = 0x030D;
+        internal const int GWL_EXSTYLE = -20;
 
         [DllImport("user32.dll", SetLastError = true)]
         internal static extern IntPtr OpenInputDesktop(uint dwFlags, bool fInherit,
@@ -22,6 +23,12 @@ namespace StarryEyes.Nightmare.Windows
         [DllImport("user32.dll", SetLastError = true)]
         internal static extern bool GetUserObjectInformation(IntPtr hObj, int nIndex,
           [Out] byte[] pvInfo, uint nLength, out uint lpnLengthNeeded);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        internal static extern IntPtr GetWindowLongPtr(IntPtr hWnd, int nIndex);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        internal static extern IntPtr SetWindowLongPtr(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
 
         [DllImport("user32.dll")]
         internal extern static bool GetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpWndPl);
