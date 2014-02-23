@@ -39,8 +39,8 @@ namespace StarryEyes
                 var subscribe =
                     sourceAsNotifyCollection
                         .ListenCollectionChanged()
-                        .ObserveOn(DispatcherHolder.Dispatcher)
                         .Where(_ => gate)
+                        .ObserveOn(DispatcherHolder.Dispatcher)
                         .Subscribe(e =>
                         {
                             lock (internalLock)

@@ -93,6 +93,11 @@ namespace StarryEyes.Models.Timelines.Tabs
             set
             {
                 if (_currentFocusColumnIndex == value) return;
+                if (value >= _columns.Count)
+                {
+                    value = _columns.Count - 1;
+                }
+                if (value == -1) return;
                 _currentFocusColumnIndex = value;
                 RaiseCurrentFocusColumnChanged();
             }
