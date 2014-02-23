@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Documents;
 using StarryEyes.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Feather.Proxies;
@@ -11,6 +10,7 @@ using StarryEyes.Filters;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Databases;
 using StarryEyes.Models.Plugins.Injections;
+using StarryEyes.Models.Receiving;
 using StarryEyes.Models.Receiving.Handling;
 using StarryEyes.Models.Subsystems.Notifications;
 using StarryEyes.Models.Timelines.Statuses;
@@ -36,6 +36,7 @@ namespace StarryEyes.Models.Subsystems
             // register binder
             BridgeSocketBinder.Bind(NotificationProxy.Socket,
                 p => RegisterProxy(new NotificationProxyWrapper(p)));
+            NotificationLatch.Initialize();
         }
 
         public static void RegisterProxy([NotNull] NotificationProxyWrapper proxyWrapper)
@@ -70,6 +71,9 @@ namespace StarryEyes.Models.Subsystems
 
         internal static void StartAcceptNewArrival(TwitterStatus status)
         {
+            // check muted or blocked
+            if (MuteBlockManager.CheckExcepted(status)) return;
+
             lock (_acceptingArrivals)
             {
                 _acceptingArrivals[status.Id] = new List<TabModel>();
@@ -91,20 +95,34 @@ namespace StarryEyes.Models.Subsystems
         internal static void EndAcceptNewArrival(TwitterStatus status)
         {
             List<TabModel> removal;
+            var isMention = FilterSystemUtil.InReplyToUsers(status).Intersect(Setting.Accounts.Ids).Any();
+            var isMessage = status.StatusType == StatusType.DirectMessage;
+            var alwaysAccept = (Setting.NotifyMention.Value && isMention) ||
+                               (Setting.NotifyMessage.Value && isMessage);
             lock (_acceptingArrivals)
             {
-                if (!_acceptingArrivals.TryGetValue(status.Id, out removal) || removal.Count == 0) return;
+                if (!_acceptingArrivals.TryGetValue(status.Id, out removal))
+                {
+                    return;
+                }
+                // end accept notification
+                _acceptingArrivals.Remove(status.Id);
+
+                if (!alwaysAccept && removal.Count == 0)
+                {
+                    return;
+                }
             }
             var soundSource = removal
                 .Select(t => t.NotifySoundSource)
                 .Where(s => !String.IsNullOrEmpty(s))
                 .Where(File.Exists)
                 .FirstOrDefault();
-            if (status.StatusType == StatusType.DirectMessage)
+            if (isMessage)
             {
                 Task.Run(() => NotifyNewArrival(status, NotificationType.DirectMessage, soundSource));
             }
-            else if (FilterSystemUtil.InReplyToUsers(status).Intersect(Setting.Accounts.Ids).Any())
+            else if (isMention)
             {
                 Task.Run(() => NotifyNewArrival(status, NotificationType.Mention, soundSource));
             }
@@ -121,55 +139,43 @@ namespace StarryEyes.Models.Subsystems
 
         #endregion
 
-        #region Remove duplicated notifications
-
-        private static NotificationDuplicationDetector followDetector = new NotificationDuplicationDetector();
-
-        private static NotificationDuplicationDetector unfollowDetector = new NotificationDuplicationDetector();
-
-        private static NotificationDuplicationDetector blockDetector = new NotificationDuplicationDetector();
-
-        private static NotificationDuplicationDetector unblockDetector = new NotificationDuplicationDetector();
-
-        private static NotificationDuplicationDetector favoriteDetector = new NotificationDuplicationDetector();
-
-        private static NotificationDuplicationDetector unfavoriteDetector = new NotificationDuplicationDetector();
-
-
-        #endregion
-
         internal static void NotifyFollowed(TwitterUser source, TwitterUser target)
         {
-            if (!followDetector.CheckAdd(source.Id, target.Id)) return;
-            unfollowDetector.CheckRemove(source.Id, target.Id);
+            if (MuteBlockManager.IsBlocked(source)) return;
+            if (!NotificationLatch.CheckSetPositive(
+                NotificationLatchTarget.Follow, source.Id, target.Id)) return;
             Head.NotifyFollowed(source, target);
         }
 
         internal static void NotifyUnfollowed(TwitterUser source, TwitterUser target)
         {
-            if (!unfollowDetector.CheckAdd(source.Id, target.Id)) return;
-            followDetector.CheckRemove(source.Id, target.Id);
+            if (MuteBlockManager.IsBlocked(source)) return;
+            if (!NotificationLatch.CheckSetNegative(
+                NotificationLatchTarget.Follow, source.Id, target.Id)) return;
             Head.NotifyUnfollowed(source, target);
         }
 
         internal static void NotifyBlocked(TwitterUser source, TwitterUser target)
         {
-            if (!blockDetector.CheckAdd(source.Id, target.Id)) return;
-            unblockDetector.CheckRemove(source.Id, target.Id);
+            if (MuteBlockManager.IsBlocked(source)) return;
+            if (!NotificationLatch.CheckSetPositive(
+                NotificationLatchTarget.Block, source.Id, target.Id)) return;
             Head.NotifyBlocked(source, target);
         }
 
         internal static void NotifyUnblocked(TwitterUser source, TwitterUser target)
         {
-            if (!unblockDetector.CheckAdd(source.Id, target.Id)) return;
-            blockDetector.CheckRemove(source.Id, target.Id);
+            if (MuteBlockManager.IsBlocked(source)) return;
+            if (!NotificationLatch.CheckSetNegative(
+                NotificationLatchTarget.Block, source.Id, target.Id)) return;
             Head.NotifyUnblocked(source, target);
         }
 
         internal static void NotifyFavorited(TwitterUser source, TwitterStatus status)
         {
-            if (!favoriteDetector.CheckAdd(source.Id, status.Id)) return;
-            unfavoriteDetector.CheckRemove(source.Id, status.Id);
+            if (MuteBlockManager.IsBlocked(source)) return;
+            if (!NotificationLatch.CheckSetPositive(
+                NotificationLatchTarget.Favorite, source.Id, status.Id)) return;
             Task.Run(() => UserProxy.StoreUserAsync(source));
             Task.Run(() => StatusModel.UpdateStatusInfo(
                 status.Id,
@@ -184,8 +190,9 @@ namespace StarryEyes.Models.Subsystems
 
         internal static void NotifyUnfavorited(TwitterUser source, TwitterStatus status)
         {
-            if (!unfavoriteDetector.CheckAdd(source.Id, status.Id)) return;
-            favoriteDetector.CheckRemove(source.Id, status.Id);
+            if (MuteBlockManager.IsBlocked(source)) return;
+            if (!NotificationLatch.CheckSetNegative(
+                NotificationLatchTarget.Favorite, source.Id, status.Id)) return;
             Task.Run(() => StatusModel.UpdateStatusInfo(
                 status.Id,
                 model => model.RemoveFavoritedUser(source.Id),
@@ -199,6 +206,7 @@ namespace StarryEyes.Models.Subsystems
 
         internal static void NotifyRetweeted(TwitterUser source, TwitterStatus status)
         {
+            if (MuteBlockManager.IsBlocked(source)) return;
             Task.Run(() => UserProxy.StoreUserAsync(source));
             Task.Run(() => StatusModel.UpdateStatusInfo(
                 status.Id,
@@ -232,6 +240,7 @@ namespace StarryEyes.Models.Subsystems
 
         internal static void NotifyUserUpdated(TwitterUser source)
         {
+            if (MuteBlockManager.IsBlocked(source)) return;
             Head.NotifyUserUpdated(source);
         }
 

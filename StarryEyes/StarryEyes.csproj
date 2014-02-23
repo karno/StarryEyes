@@ -273,7 +273,7 @@
     <Compile Include="Models\Subsystems\Notifications\Audio\AudioPlayer.cs" />
     <Compile Include="Models\Subsystems\Notifications\Audio\AutoDisposeFileReader.cs" />
     <Compile Include="Models\Subsystems\Notifications\INotificationSink.cs" />
-    <Compile Include="Models\Subsystems\Notifications\NotificationDuplicationDetector.cs" />
+    <Compile Include="Models\Subsystems\Notifications\NotificationLatch.cs" />
     <Compile Include="Models\Subsystems\Notifications\NotificationProxyWrapper.cs" />
     <Compile Include="Models\Subsystems\Notifications\NotificationSink.cs" />
     <Compile Include="Models\Subsystems\Notifications\UI\NormalNotificator.cs" />
@@ -354,9 +354,11 @@
     <Compile Include="Settings\Themes\ThemeProfile.cs" />
     <Compile Include="Settings\Themes\TweetTheme.cs" />
     <Compile Include="Settings\Themes\UserFlipTheme.cs" />
+    <Compile Include="ViewModels\Dialogs\DisplayMarkerViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\KeyOverrideViewModel.cs" />
     <Compile Include="ViewModels\DropAcceptDescription.cs" />
     <Compile Include="ViewModels\Notifications\NormalNotificatorViewModel.cs" />
+    <Compile Include="ViewModels\Notifications\NotificationUtil.cs" />
     <Compile Include="ViewModels\Notifications\SlimNotificatorViewModel.cs" />
     <Compile Include="ViewModels\Timelines\SearchFlips\SearchResultViewModel.cs" />
     <Compile Include="ViewModels\Timelines\SearchFlips\UserTimelineViewModel.cs" />
@@ -416,6 +418,9 @@
     </Compile>
     <Compile Include="Views\Dialogs\DatabaseOptimizingWindow.xaml.cs">
       <DependentUpon>DatabaseOptimizingWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Dialogs\DisplayMarkerWindow.xaml.cs">
+      <DependentUpon>DisplayMarkerWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Dialogs\KeyOverrideWindow.xaml.cs">
       <DependentUpon>KeyOverrideWindow.xaml</DependentUpon>
@@ -536,6 +541,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Dialogs\DatabaseOptimizingWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Dialogs\DisplayMarkerWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

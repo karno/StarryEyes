@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
@@ -21,7 +22,9 @@ using StarryEyes.Models;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Receiving;
 using StarryEyes.Models.Subsystems.Notifications.UI;
+using StarryEyes.Models.Timelines.Tabs;
 using StarryEyes.Nightmare.Windows;
+using StarryEyes.Nightmare.Windows.Forms;
 using StarryEyes.Settings;
 using StarryEyes.Settings.KeyAssigns;
 using StarryEyes.Settings.Themes;
@@ -324,6 +327,18 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         #endregion
 
+        public bool IsMuteBlockedUsers
+        {
+            get { return Setting.MuteBlockedUsers.Value; }
+            set { Setting.MuteBlockedUsers.Value = value; }
+        }
+
+        public bool IsMuteNoRetweetUsersRetweet
+        {
+            get { return Setting.MuteNoRetweets.Value; }
+            set { Setting.MuteNoRetweets.Value = value; }
+        }
+
         #endregion
 
         #region Input property
@@ -356,6 +371,27 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         #region Notification and confirmation property
 
+        public IEnumerable<string> Displays
+        {
+            get
+            {
+                return new[] { "メイン ディスプレイ(デフォルト)" }
+                    .Concat(Screen.AllScreens.Select((s, i) => "[" + i + "]" + s.DeviceName));
+            }
+        }
+
+        public int TargetDisplay
+        {
+            get { return Setting.NotifyScreenIndex.Value + 1; }
+            set
+            {
+                var newValue = value - 1;
+                if (Setting.NotifyScreenIndex.Value == newValue) return;
+                Setting.NotifyScreenIndex.Value = newValue;
+                DisplayMarkerViewModel.ShowMarker(newValue);
+            }
+        }
+
         public int NotificationTypeIndex
         {
             get { return (int)Setting.NotificationType.Value; }
@@ -364,6 +400,42 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 Setting.NotificationType.Value = (NotificationUIType)value;
                 RaisePropertyChanged();
             }
+        }
+
+        public bool IsNotifyWhenWindowIsActive
+        {
+            get { return Setting.NotifyWhenWindowIsActive.Value; }
+            set { Setting.NotifyWhenWindowIsActive.Value = value; }
+        }
+
+        public bool IsNotifyMentions
+        {
+            get { return Setting.NotifyMention.Value; }
+            set { Setting.NotifyMention.Value = value; }
+        }
+
+        public bool IsNotifyMessages
+        {
+            get { return Setting.NotifyMessage.Value; }
+            set { Setting.NotifyMessage.Value = value; }
+        }
+
+        public bool IsNotifyFollows
+        {
+            get { return Setting.NotifyFollow.Value; }
+            set { Setting.NotifyFollow.Value = value; }
+        }
+
+        public bool IsNotifyFavorites
+        {
+            get { return Setting.NotifyFavorite.Value; }
+            set { Setting.NotifyFavorite.Value = value; }
+        }
+
+        public bool IsNotifyRetweets
+        {
+            get { return Setting.NotifyRetweet.Value; }
+            set { Setting.NotifyRetweet.Value = value; }
         }
 
         public bool ConfirmOnExitApp
@@ -388,6 +460,19 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         {
             get { return Setting.ShowMessageOnTweetFailed.Value; }
             set { Setting.ShowMessageOnTweetFailed.Value = value; }
+        }
+
+        public void ClearAllTabNotification()
+        {
+            TabManager.Columns.SelectMany(c => c.Tabs).ForEach(t => t.NotifyNewArrivals = false);
+            _parent.Messenger.RaiseAsync(
+                new TaskDialogMessage(new TaskDialogOptions
+                {
+                    Title = "通知のクリア",
+                    MainIcon = VistaTaskDialogIcon.Information,
+                    MainInstruction = "すべてのタブの新着通知を解除しました。",
+                    CommonButtons = TaskDialogCommonButtons.Close,
+                }));
         }
 
         #endregion

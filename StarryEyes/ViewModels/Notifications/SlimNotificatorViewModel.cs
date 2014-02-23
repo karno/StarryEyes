@@ -5,7 +5,7 @@ using System.Windows.Media;
 using Livet;
 using Livet.Messaging.Windows;
 using StarryEyes.Models.Subsystems.Notifications.UI;
-using StarryEyes.Nightmare.Windows.Forms;
+using StarryEyes.Settings;
 using StarryEyes.Views;
 using StarryEyes.Views.Notifications;
 
@@ -52,7 +52,7 @@ namespace StarryEyes.ViewModels.Notifications
             DispatcherHolder.Enqueue(() =>
             {
                 var mwnd = Application.Current.MainWindow;
-                if (mwnd != null && !mwnd.IsActive)
+                if (mwnd != null && (Setting.NotifyWhenWindowIsActive.Value || !mwnd.IsActive))
                 {
                     new SlimNotificatorView
                     {
@@ -61,6 +61,7 @@ namespace StarryEyes.ViewModels.Notifications
                 }
                 else
                 {
+                    // do not show popup
                     ShowNext();
                 }
             });
@@ -74,7 +75,9 @@ namespace StarryEyes.ViewModels.Notifications
         private SlimNotificatorViewModel(NotificationData data)
         {
             this._data = data;
-            var bound = Screen.PrimaryScreen.WorkingArea;
+            var screen = NotificationUtil.GetNotifyTargetScreen();
+            if (screen == null) return;
+            var bound = screen.WorkingArea;
             if (bound == Rect.Empty) return; // empty data
             _width = (int)(bound.Width * 0.7);
             _left = (int)((bound.Width - this._width) / 2.0 + bound.Left);

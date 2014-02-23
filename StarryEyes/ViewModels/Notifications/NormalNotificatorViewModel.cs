@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Media;
@@ -8,7 +7,7 @@ using Livet;
 using Livet.Messaging.Windows;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models.Subsystems.Notifications.UI;
-using StarryEyes.Nightmare.Windows.Forms;
+using StarryEyes.Settings;
 using StarryEyes.Views;
 using StarryEyes.Views.Notifications;
 
@@ -69,15 +68,18 @@ namespace StarryEyes.ViewModels.Notifications
             DispatcherHolder.Enqueue(() =>
             {
                 var mwnd = Application.Current.MainWindow;
-                if (mwnd != null && mwnd.IsActive)
+                if (mwnd != null &&
+                    (Setting.NotifyWhenWindowIsActive.Value || !mwnd.IsActive))
+                {
+                    new NormalNotificatorView
+                    {
+                        DataContext = dataContext
+                    }.Show();
+                }
+                else
                 {
                     dataContext.ReleaseSlot();
-                    return;
                 }
-                new NormalNotificatorView
-                {
-                    DataContext = dataContext
-                }.Show();
             });
         }
 
@@ -89,7 +91,8 @@ namespace StarryEyes.ViewModels.Notifications
         private readonly int _left;
         private readonly int _top;
 
-        public NormalNotificatorViewModel(Color background, TwitterUser user, string header, string description)
+        public NormalNotificatorViewModel(
+            Color background, TwitterUser user, string header, string description)
         {
             this._background = background;
             this._user = user;
@@ -113,10 +116,7 @@ namespace StarryEyes.ViewModels.Notifications
                     _slots.Add(true);
                 }
             }
-            // get most right-left position screen
-            var screen = Screen.AllScreens.OrderByDescending(s => s.Bounds.Left)
-                               .ThenByDescending(s => s.Bounds.Top)
-                               .FirstOrDefault();
+            var screen = NotificationUtil.GetNotifyTargetScreen();
             if (screen == null) return;
             var bound = screen.WorkingArea;
             var wh = 80;

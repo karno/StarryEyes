@@ -163,14 +163,35 @@ namespace StarryEyes.Settings
 
         #region Notification and Confirmations
 
+        public static readonly SettingItemStruct<bool> ConfirmOnExitApp =
+            new SettingItemStruct<bool>("ConfirmOnExitApp", true);
+
         public static readonly SettingItemStruct<bool> PlaySounds =
             new SettingItemStruct<bool>("PlaySounds", true);
 
         public static readonly SettingItemStruct<NotificationUIType> NotificationType =
             new SettingItemStruct<NotificationUIType>("NotificationType", NotificationUIType.Slim);
 
-        public static readonly SettingItemStruct<bool> ConfirmOnExitApp =
-            new SettingItemStruct<bool>("ConfirmOnExitApp", true);
+        public static readonly SettingItemStruct<bool> NotifyWhenWindowIsActive =
+            new SettingItemStruct<bool>("NotifyWhenWindowIsActive", false);
+
+        public static readonly SettingItemStruct<bool> NotifyMention =
+            new SettingItemStruct<bool>("NotifyMention", true);
+
+        public static readonly SettingItemStruct<bool> NotifyMessage =
+            new SettingItemStruct<bool>("NotifyMessage", true);
+
+        public static readonly SettingItemStruct<bool> NotifyFollow =
+            new SettingItemStruct<bool>("NotifyFollow", true);
+
+        public static readonly SettingItemStruct<bool> NotifyFavorite =
+            new SettingItemStruct<bool>("NotifyFavorite", true);
+
+        public static readonly SettingItemStruct<bool> NotifyRetweet =
+            new SettingItemStruct<bool>("NotifyRetweet", true);
+
+        public static readonly SettingItemStruct<int> NotifyScreenIndex =
+            new SettingItemStruct<int>("NotifyScreenIndex", -1);
 
         #endregion
 

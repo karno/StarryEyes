@@ -102,6 +102,17 @@ namespace StarryEyes.Models.Subsystems.Notifications.UI
                 {
                     return false;
                 }
+
+                // convert to default notification ?
+                if (type == NotificationType.Mention && !Setting.NotifyMention.Value)
+                {
+                    type = NotificationType.Normal;
+                }
+                if (type == NotificationType.DirectMessage && !Setting.NotifyMessage.Value)
+                {
+                    type = NotificationType.Normal;
+                }
+
                 if (status.RetweetedOriginal != null && CheckMyself(status.RetweetedOriginal))
                 {
                     // suppress status which retweets our tweet
@@ -136,7 +147,8 @@ namespace StarryEyes.Models.Subsystems.Notifications.UI
 
             public bool NotifyFollowed(TwitterUser source, TwitterUser target)
             {
-                if (!CheckMyself(source) && CheckMyself(target))
+                if (Setting.NotifyFollow.Value &&
+                    !CheckMyself(source) && CheckMyself(target))
                 {
                     PlaySoundCore(GetSoundFilePath(NotifySoundType.Event));
                     GetNotificator().Followed(source, target);
@@ -161,7 +173,8 @@ namespace StarryEyes.Models.Subsystems.Notifications.UI
 
             public bool NotifyFavorited(TwitterUser source, TwitterStatus status)
             {
-                if (!CheckMyself(source) && CheckMyself(status))
+                if (Setting.NotifyFavorite.Value &&
+                    !CheckMyself(source) && CheckMyself(status))
                 {
                     PlaySoundCore(GetSoundFilePath(NotifySoundType.Event));
                     GetNotificator().Favorited(source, status);
@@ -176,7 +189,8 @@ namespace StarryEyes.Models.Subsystems.Notifications.UI
 
             public bool NotifyRetweeted(TwitterUser source, TwitterStatus status)
             {
-                if (!CheckMyself(source) && CheckMyself(status))
+                if (Setting.NotifyRetweet.Value &&
+                    !CheckMyself(source) && CheckMyself(status))
                 {
                     PlaySoundCore(GetSoundFilePath(NotifySoundType.Event));
                     GetNotificator().Retweeted(source, status);

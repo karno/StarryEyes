@@ -356,6 +356,7 @@
                         <RowDefinition />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <Grid Margin="16,0">
                         <Grid.ColumnDefinitions>
@@ -420,6 +421,19 @@
                             </Style>
                         </TextBlock.Style>
                     </TextBlock>
+                    <StackPanel Grid.Row="4" Orientation="Vertical">
+                        <TextBlock Margin="16,0,16,8">
+                            <Run Text="以下の設定は、Twitter Webで非表示となるツイートをKrileでも非表示にする設定となります。" />
+                            <LineBreak />
+                            <Run Text="特別な理由がない限り、チェックをつけておくことを推奨します。" />
+                        </TextBlock>
+                        <CheckBox Margin="16,8"
+                                  Content="ブロックしているユーザーをミュートする(_B) [推奨]"
+                                  IsChecked="{Binding IsMuteBlockedUsers}" />
+                        <CheckBox Margin="16,8"
+                                  Content="リツイートを非表示にしているユーザーのリツイートをミュートする(_R) [推奨]"
+                                  IsChecked="{Binding IsMuteNoRetweetUsersRetweet}" />
+                    </StackPanel>
                 </Grid>
                 <Grid Grid.Column="1" Margin="0,6,0,0">
                     <Grid.Style>
@@ -481,14 +495,72 @@
                         <CheckBox Margin="0,8"
                                   Content="ツイート失敗時にメッセージを表示する(_T)"
                                   IsChecked="{Binding ShowMessageOnTweetFailed}" />
-                        <StackPanel Margin="0,8" Orientation="Horizontal">
-                            <TextBlock Margin="0,0,8,0" Text="新着ツイートやイベントの通知:" />
-                            <ComboBox SelectedIndex="{Binding NotificationTypeIndex}">
-                                <clr:String>なし</clr:String>
-                                <clr:String>スリム</clr:String>
-                                <clr:String>ポップアップ</clr:String>
-                            </ComboBox>
-                        </StackPanel>
+                        <GroupBox Header="新着ツイートの通知" Padding="8,4,8,0">
+                            <StackPanel Orientation="Vertical">
+                                <Grid Margin="0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Margin="0,0,8,0"
+                                               HorizontalAlignment="Right"
+                                               VerticalAlignment="Center"
+                                               Text="通知のスタイル" />
+                                    <ComboBox Grid.Column="1"
+                                              Margin="4"
+                                              SelectedIndex="{Binding NotificationTypeIndex}">
+                                        <clr:String>なし</clr:String>
+                                        <clr:String>スリム</clr:String>
+                                        <clr:String>ポップアップ</clr:String>
+                                    </ComboBox>
+                                    <TextBlock Grid.Row="1"
+                                               Margin="0,0,8,0"
+                                               HorizontalAlignment="Right"
+                                               VerticalAlignment="Center"
+                                               Text="通知するディスプレイ" />
+                                    <ComboBox Grid.Row="1"
+                                              Grid.Column="1"
+                                              Margin="4"
+                                              ItemsSource="{Binding Displays}"
+                                              SelectedIndex="{Binding TargetDisplay}" />
+                                </Grid>
+                                <CheckBox Margin="0,0,0,8"
+                                          Content="ウィンドウが前面にある時もポップアップ通知を表示する(_P)"
+                                          IsChecked="{Binding IsNotifyWhenWindowIsActive}" />
+                                <CheckBox Margin="0,0,0,8"
+                                          Content="自分への返信を通知(_R)"
+                                          IsChecked="{Binding IsNotifyMentions}" />
+                                <CheckBox Margin="0,0,0,8"
+                                          Content="自分へのダイレクトメッセージを通知(_M)"
+                                          IsChecked="{Binding IsNotifyMessages}" />
+                                <CheckBox Margin="0,0,0,8"
+                                          Content="自分の新しいフォロワーを通知(_F)"
+                                          IsChecked="{Binding IsNotifyFollows}" />
+                                <CheckBox Margin="0,0,0,8"
+                                          Content="自分のツイートがお気に入り登録されたら通知(_V)"
+                                          IsChecked="{Binding IsNotifyFavorites}" />
+                                <CheckBox Margin="0,0,0,8"
+                                          Content="自分のツイートがリツイートされたら通知(_E)"
+                                          IsChecked="{Binding IsNotifyRetweets}" />
+                                <StackPanel Margin="0,0,0,8" Orientation="Horizontal">
+                                    <TextBlock Margin="0,0,8,0"
+                                               VerticalAlignment="Center"
+                                               Text="新着ツイートの通知はタブごとに切り替えることができます。" />
+                                    <Button Style="{StaticResource MetroSquareButtonStyle}">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="Click">
+                                                <ei:CallMethodAction MethodName="ClearAllTabNotification" TargetObject="{Binding}" />
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                        <TextBlock FontSize="12" Text="すべてのタブの新着通知をオフにする" />
+                                    </Button>
+                                </StackPanel>
+                            </StackPanel>
+                        </GroupBox>
                     </StackPanel>
                 </Grid>
                 <Grid Grid.Column="1" Margin="0,6,0,0">
