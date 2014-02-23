@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using StarryEyes.Albireo;
 using StarryEyes.Albireo.Collections;
 using StarryEyes.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
@@ -23,7 +24,11 @@ namespace StarryEyes.Models.Receiving
         private static AVLTree<long> _noRetweetUserIds = new AVLTree<long>();
         private static AVLTree<long> _blockingUserIds = new AVLTree<long>();
         private static Func<TwitterStatus, bool> _muteFilter = _ => false;
+        private static bool _muteBlockedUsers = true;
+        private static bool _muteNoRetweets = true;
         private static string _muteSqlQuery = string.Empty;
+
+        public static event Action RefreshTimelineRequired;
 
         /// <summary>
         /// Initializer method
@@ -36,18 +41,49 @@ namespace StarryEyes.Models.Receiving
                 InvalidateMute();
                 InvalidateNoRetweets();
             });
-            Setting.Muteds.ValueChanged += _ => InvalidateMute();
+            Setting.Muteds.ValueChanged += _ =>
+            {
+                InvalidateMute();
+                RefreshTimelineRequired.SafeInvoke();
+            };
+            Setting.MuteBlockedUsers.ValueChanged += _ =>
+            {
+                _muteBlockedUsers = Setting.MuteBlockedUsers.Value;
+                RefreshTimelineRequired.SafeInvoke();
+            };
+            Setting.MuteNoRetweets.ValueChanged += _ =>
+            {
+                _muteNoRetweets = Setting.MuteNoRetweets.Value;
+                RefreshTimelineRequired.SafeInvoke();
+            };
         }
 
         public static string FilteringSql
         {
             get
             {
-                const string exceptSql =
-                    "BaseUserId NOT IN (select TargetId from Blockings) AND " +
-                    "(RetweeterId IS NULL OR " +
-                    "(RetweeterId NOT IN (select TargetId from NoRetweets) AND " +
-                    "RetweeterId NOT IN (select TargetId from Blockings)))";
+                var exceptSql = String.Empty;
+                if (_muteBlockedUsers && _muteNoRetweets)
+                {
+                    exceptSql =
+                        "BaseUserId NOT IN (select TargetId from Blockings) AND " +
+                        "(RetweeterId IS NULL OR " +
+                        "(RetweeterId NOT IN (select TargetId from NoRetweets) AND " +
+                        "RetweeterId NOT IN (select TargetId from Blockings)))";
+                }
+                else if (_muteBlockedUsers)
+                {
+                    // mute blocked users
+                    exceptSql =
+                        "BaseUserId NOT IN (select TargetId from Blockings) AND " +
+                        "(RetweeterId IS NULL OR RetweeterId NOT IN (select TargetId from Blockings))";
+                }
+                else
+                {
+                    // mute no-retweet users
+                    exceptSql =
+                        "RetweeterId IS NULL OR RetweeterId NOT IN (select TargetId from NoRetweets)";
+                }
                 CheckUpdateMutes();
                 return _muteSqlQuery.SqlConcatAnd(exceptSql);
             }
@@ -56,10 +92,16 @@ namespace StarryEyes.Models.Receiving
         public static bool CheckExcepted([NotNull] TwitterStatus status)
         {
             if (status == null) throw new ArgumentNullException("status");
-            if (IsBlocked(status.User) ||
-                (status.RetweetedOriginal != null &&
-                 (IsNoRetweet(status.User) || IsBlocked(status.RetweetedOriginal.User))))
+            if (_muteBlockedUsers && (IsBlocked(status.User) ||
+                 (status.RetweetedOriginal != null && IsBlocked(status.RetweetedOriginal.User))))
             {
+                // blocked user
+                return true;
+            }
+            if (status.RetweetedOriginal != null &&
+                _muteNoRetweets && IsNoRetweet(status.User))
+            {
+                // no retweet specified
                 return true;
             }
             CheckUpdateMutes();

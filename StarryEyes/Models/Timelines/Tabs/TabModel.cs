@@ -8,6 +8,7 @@ using StarryEyes.Filters;
 using StarryEyes.Filters.Expressions;
 using StarryEyes.Filters.Parsing;
 using StarryEyes.Models.Databases;
+using StarryEyes.Models.Receiving;
 using StarryEyes.Models.Subsystems;
 using StarryEyes.Models.Timelines.Statuses;
 
@@ -55,11 +56,13 @@ namespace StarryEyes.Models.Timelines.Tabs
                 {
                     this._filterQuery.Activate();
                     this._filterQuery.InvalidateRequired += this.QueueInvalidateTimeline;
+                    MuteBlockManager.RefreshTimelineRequired += this.QueueInvalidateTimeline;
                 }
                 else
                 {
                     this._filterQuery.Deactivate();
                     this._filterQuery.InvalidateRequired -= this.QueueInvalidateTimeline;
+                    MuteBlockManager.RefreshTimelineRequired -= this.QueueInvalidateTimeline;
                 }
             }
         }

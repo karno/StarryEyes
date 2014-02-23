@@ -88,6 +88,12 @@ namespace StarryEyes.Settings
 
         public static readonly FilterSettingItem Muteds = new FilterSettingItem("Muteds");
 
+        public static readonly SettingItemStruct<bool> MuteBlockedUsers =
+            new SettingItemStruct<bool>("MuteBlockedUsers", true);
+
+        public static readonly SettingItemStruct<bool> MuteNoRetweets =
+            new SettingItemStruct<bool>("MuteNoRetweets", true);
+
         public static readonly SettingItemStruct<bool> AllowFavoriteMyself =
             new SettingItemStruct<bool>("AllowFavoriteMyself", false);
 
