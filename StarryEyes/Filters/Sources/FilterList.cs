@@ -55,6 +55,7 @@ namespace StarryEyes.Filters.Sources
             System.Diagnostics.Debug.WriteLine("receiving list: " + this.FilterValue);
             Task.Run(async () =>
             {
+                bool refreshRequired = false;
                 try
                 {
                     IEnumerable<long> users;
@@ -62,7 +63,11 @@ namespace StarryEyes.Filters.Sources
                     {
                         lock (_ids)
                         {
-                            users.ForEach(_ids.Add);
+                            if (users.Select(_ids.AddDistinct).ToArray().Any(b => b))
+                            {
+                                // diff exist
+                                refreshRequired = true;
+                            }
                         }
                         return;
                     }
@@ -80,6 +85,15 @@ namespace StarryEyes.Filters.Sources
                         cursor = result.NextCursor;
                     } while (cursor != 0);
                     if (memberList.Count <= 0) return;
+                    lock (this._ids)
+                    {
+                        if (this._ids.OrderBy(_ => _).SequenceEqual(memberList.OrderBy(_ => _)))
+                        {
+                            // no diff
+                            return;
+                        }
+                    }
+                    refreshRequired = true;
                     CacheStore.SetListUsers(this._listInfo, memberList);
                     lock (this._ids)
                     {
@@ -95,7 +109,10 @@ namespace StarryEyes.Filters.Sources
                 finally
                 {
                     _isPreparing = false;
-                    this.RaiseInvalidateRequired();
+                    if (refreshRequired)
+                    {
+                        this.RaiseInvalidateRequired();
+                    }
                 }
             });
         }
