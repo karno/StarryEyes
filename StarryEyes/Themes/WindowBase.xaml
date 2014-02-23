@@ -25,6 +25,10 @@
     <SolidColorBrush x:Key="BaseColorBackgroundBrush" Color="{DynamicResource BaseColorBackground}" />
     <SolidColorBrush x:Key="DisabledWhiteBrush" Color="{DynamicResource BaseColorBackground}" />
     <SolidColorBrush x:Key="WindowBackgroundBrush" Color="{DynamicResource BaseColorBackground}" />
+    <SolidColorBrush x:Key="GrayBrush10" Color="{DynamicResource BaseColorBackground}" />
+    <SolidColorBrush x:Key="GrayBrush8" Color="{DynamicResource BaseColorBackground}" />
+    <SolidColorBrush x:Key="GrayBrush7" Color="{DynamicResource BaseColorBackground}" />
+    <SolidColorBrush x:Key="GrayBrush1" Color="{DynamicResource BaseColorForeground}" />
 
     <!--  Context Menus  -->
     <SolidColorBrush x:Key="RightArrowFill" Color="#FF222222" />

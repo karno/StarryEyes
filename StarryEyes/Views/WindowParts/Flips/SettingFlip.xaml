@@ -430,7 +430,7 @@
                         <CheckBox Margin="16,8"
                                   Content="ブロックしているユーザーをミュートする(_B) [推奨]"
                                   IsChecked="{Binding IsMuteBlockedUsers}" />
-                        <CheckBox Margin="16,8"
+                        <CheckBox Margin="16,8,16,16"
                                   Content="リツイートを非表示にしているユーザーのリツイートをミュートする(_R) [推奨]"
                                   IsChecked="{Binding IsMuteNoRetweetUsersRetweet}" />
                     </StackPanel>
@@ -450,7 +450,7 @@
                         <CheckBox Margin="0"
                                   Content="フォールバックアカウントを遡って返信する(_B)"
                                   IsChecked="{Binding IsBacktrackFallback}" />
-                        <TextBlock Margin="20,0,0,8"
+                        <TextBlock Margin="20,8,0,8"
                                    Text="他のアカウントからのフォールバックになっているアカウントへの返信に対して返信する際に、フォールバック元アカウントを自動指定するようにします。"
                                    TextWrapping="Wrap" />
                         <CheckBox Margin="0,8"
