@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("starwing network")]
 [assembly: AssemblyProduct("Krile StarryEyes")]
-[assembly: AssemblyCopyright("Copyright ©  2013 Karno")]
+[assembly: AssemblyCopyright("Copyright © 2013 Karno")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

@@ -12,7 +12,7 @@ using System.Windows;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Krile")]
 [assembly: AssemblyProduct("Krile StarryEyes")]
-[assembly: AssemblyCopyright("Copyright© 2012 Karno")]
+[assembly: AssemblyCopyright("Copyright© 2009-2014 Karno")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -51,5 +51,5 @@ using System.Windows;
 // すべての値を指定するか、下のように '*' を使ってビルドおよびリビジョン番号を 
 // 既定値にすることができます:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("2.9.17.0")]
-[assembly: AssemblyFileVersion("2.9.17.0")]
+[assembly: AssemblyVersion("2.9.18.0")]
+[assembly: AssemblyFileVersion("2.9.18.0")]
