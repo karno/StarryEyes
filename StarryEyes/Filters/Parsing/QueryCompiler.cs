@@ -363,6 +363,21 @@ namespace StarryEyes.Filters.Parsing
                 reader.AssertGet(TokenType.CloseBracket);
                 return new FilterBracket { Value = ret };
             }
+            if (reader.LookAhead().Type == TokenType.OpenSquareBracket)
+            {
+                reader.AssertGet(TokenType.OpenSquareBracket);
+                var values = new HashSet<ValueBase>();
+                while (reader.LookAhead().Type != TokenType.CloseSquareBracket)
+                {
+                    values.Add(GetValue(reader));
+                    if (reader.LookAhead().Type == TokenType.Comma)
+                    {
+                        reader.AssertGet(TokenType.Comma);
+                    }
+                }
+                reader.AssertGet(TokenType.CloseSquareBracket);
+                return new UserSet(values);
+            }
             return GetValue(reader);
         }
 
