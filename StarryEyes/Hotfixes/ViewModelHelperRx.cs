@@ -45,40 +45,55 @@ namespace StarryEyes
                         {
                             lock (internalLock)
                             {
-                                switch (e.Action)
+                                if (e.NewItems != null && e.NewItems.Count >= 2)
                                 {
-                                    case NotifyCollectionChangedAction.Add:
-                                        target.Insert(e.NewStartingIndex, converter((TModel)e.NewItems[0]));
-                                        break;
-                                    case NotifyCollectionChangedAction.Move:
-                                        target.Move(e.OldStartingIndex, e.NewStartingIndex);
-                                        break;
-                                    case NotifyCollectionChangedAction.Remove:
-                                        if (typeof(IDisposable).IsAssignableFrom(typeof(TViewModel)))
-                                        {
-                                            ((IDisposable)target[e.OldStartingIndex]).Dispose();
-                                        }
-                                        target.RemoveAt(e.OldStartingIndex);
-                                        break;
-                                    case NotifyCollectionChangedAction.Replace:
-                                        if (typeof(IDisposable).IsAssignableFrom(typeof(TViewModel)))
-                                        {
-                                            ((IDisposable)target[e.NewStartingIndex]).Dispose();
-                                        }
-                                        target[e.NewStartingIndex] = converter((TModel)e.NewItems[0]);
-                                        break;
-                                    case NotifyCollectionChangedAction.Reset:
-                                        if (typeof(IDisposable).IsAssignableFrom(typeof(TViewModel)))
-                                        {
-                                            foreach (IDisposable item in target)
+                                    throw new ArgumentException("Too many new items.");
+                                }
+                                try
+                                {
+                                    switch (e.Action)
+                                    {
+                                        case NotifyCollectionChangedAction.Add:
+                                            target.Insert(e.NewStartingIndex, converter((TModel)e.NewItems[0]));
+                                            break;
+                                        case NotifyCollectionChangedAction.Move:
+                                            target.Move(e.OldStartingIndex, e.NewStartingIndex);
+                                            break;
+                                        case NotifyCollectionChangedAction.Remove:
+                                            if (typeof(IDisposable).IsAssignableFrom(typeof(TViewModel)))
                                             {
-                                                item.Dispose();
+                                                ((IDisposable)target[e.OldStartingIndex]).Dispose();
                                             }
-                                        }
-                                        target.Clear();
-                                        break;
-                                    default:
-                                        throw new ArgumentException();
+                                            target.RemoveAt(e.OldStartingIndex);
+                                            break;
+                                        case NotifyCollectionChangedAction.Replace:
+                                            if (typeof(IDisposable).IsAssignableFrom(typeof(TViewModel)))
+                                            {
+                                                ((IDisposable)target[e.NewStartingIndex]).Dispose();
+                                            }
+                                            target[e.NewStartingIndex] = converter((TModel)e.NewItems[0]);
+                                            break;
+                                        case NotifyCollectionChangedAction.Reset:
+                                            if (typeof(IDisposable).IsAssignableFrom(typeof(TViewModel)))
+                                            {
+                                                foreach (IDisposable item in target)
+                                                {
+                                                    item.Dispose();
+                                                }
+                                            }
+                                            target.Clear();
+                                            break;
+                                        default:
+                                            throw new ArgumentException();
+                                    }
+                                }
+                                catch (ArgumentOutOfRangeException aoex)
+                                {
+                                    throw new InvalidOperationException(
+                                        "Collection state is invalid." + Environment.NewLine +
+                                        "INDEX OUT OF RANGE - " + e.Action + " / new start: " + e.NewStartingIndex +
+                                        ", count: " + (e.NewItems == null ? "null" : e.NewItems.Count.ToString()) + ", " +
+                                        "but current target length is " + target.Count + ".");
                                 }
                             }
                         });
