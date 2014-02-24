@@ -24,11 +24,31 @@ namespace StarryEyes.Nightmare.Windows
         internal static extern bool GetUserObjectInformation(IntPtr hObj, int nIndex,
           [Out] byte[] pvInfo, uint nLength, out uint lpnLengthNeeded);
 
-        [DllImport("user32.dll", SetLastError = true)]
-        internal static extern IntPtr GetWindowLongPtr(IntPtr hWnd, int nIndex);
+        internal static IntPtr GetWindowLongPtr(IntPtr hWnd, int nIndex)
+        {
+            return Environment.Is64BitProcess
+                ? GetWindowLong64(hWnd, nIndex)
+                : GetWindowLong32(hWnd, nIndex);
+        }
 
-        [DllImport("user32.dll", SetLastError = true)]
-        internal static extern IntPtr SetWindowLongPtr(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
+        internal static IntPtr SetWindowLongPtr(IntPtr hWnd, int nIndex, IntPtr dwNewLong)
+        {
+            return Environment.Is64BitProcess
+                ? SetWindowLong64(hWnd, nIndex, dwNewLong)
+                : SetWindowLong32(hWnd, nIndex, dwNewLong);
+        }
+
+        [DllImport("user32.dll", EntryPoint = "GetWindowLongPtr", SetLastError = true)]
+        private static extern IntPtr GetWindowLong64(IntPtr hWnd, int nIndex);
+
+        [DllImport("user32.dll", EntryPoint = "SetWindowLongPtr", SetLastError = true)]
+        private static extern IntPtr SetWindowLong64(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
+
+        [DllImport("user32.dll", EntryPoint = "GetWindowLong", SetLastError = true)]
+        private static extern IntPtr GetWindowLong32(IntPtr hWnd, int nIndex);
+
+        [DllImport("user32.dll", EntryPoint = "SetWindowLong", SetLastError = true)]
+        private static extern IntPtr SetWindowLong32(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
 
         [DllImport("user32.dll")]
         internal extern static bool GetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpWndPl);
@@ -44,6 +64,7 @@ namespace StarryEyes.Nightmare.Windows
 
         [DllImport("user32.dll")]
         internal static extern bool ChangeClipboardChain(IntPtr hWnd, IntPtr hWndNext);
+
     }
 
     #region Data structures

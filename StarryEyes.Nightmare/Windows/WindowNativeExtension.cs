@@ -5,7 +5,7 @@ using System.Windows.Interop;
 
 namespace StarryEyes.Nightmare.Windows
 {
-    public static class WindowPlacements
+    public static class WindowNativeExtension
     {
         public static Rect GetWindowPlacement(this Window window)
         {
