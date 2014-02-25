@@ -45,6 +45,10 @@ namespace StarryEyes.Filters.Parsing
                     return "( [開き括弧]";
                 case TokenType.CloseBracket:
                     return ") [閉じ括弧]";
+                case TokenType.OpenSquareBracket:
+                    return "[ [開き角括弧]";
+                case TokenType.CloseSquareBracket:
+                    return "] [閉じ角括弧]";
                 case TokenType.OperatorPlus:
                     return "+ [和]";
                 case TokenType.OperatorMinus:
@@ -190,6 +194,14 @@ namespace StarryEyes.Filters.Parsing
         /// Close bracket, )
         /// </summary>
         CloseBracket,
+        /// <summary>
+        /// Open square bracket, (
+        /// </summary>
+        OpenSquareBracket,
+        /// <summary>
+        /// Close square bracket, ]
+        /// </summary>
+        CloseSquareBracket,
         /// <summary>
         /// Quoted string
         /// </summary>

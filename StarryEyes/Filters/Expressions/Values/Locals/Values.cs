@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models.Accounting;
 
@@ -217,6 +218,58 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
         public override string ToQuery()
         {
             return _expression.ToQuery() + ".blockings";
+        }
+    }
+
+    public sealed class UserSet : ValueBase
+    {
+        private readonly ICollection<ValueBase> _values;
+
+        public UserSet(ICollection<ValueBase> values)
+        {
+            this._values = values;
+        }
+
+        public override IEnumerable<FilterExpressionType> SupportedTypes
+        {
+            get
+            {
+                yield return FilterExpressionType.Set;
+            }
+        }
+
+        public override Func<TwitterStatus, IReadOnlyCollection<long>> GetSetValueProvider()
+        {
+            var cache = this._values
+                .Select(v => v.GetNumericValueProvider()(null)) // ok since the values must be LocalUser
+                .ToArray();
+            return _ => cache;
+        }
+
+        public override string GetSetSqlQuery()
+        {
+            return "(" + string.Join(",", this._values.Select(v => v.GetNumericSqlQuery())) + ")";
+        }
+
+        public override void BeginLifecycle()
+        {
+            foreach (var v in this._values)
+            {
+                v.BeginLifecycle();
+            }
+        }
+
+        public override void EndLifecycle()
+        {
+            foreach (var v in this._values)
+            {
+                v.EndLifecycle();
+            }
+        }
+
+        public override string ToQuery()
+        {
+            return "[" + string.Join(", ", this._values.Select(v => v.ToQuery())) + "]";
         }
     }
 }

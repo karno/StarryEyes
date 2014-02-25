@@ -60,6 +60,12 @@ namespace StarryEyes.Filters.Parsing
                     case ')':
                         yield return new Token(TokenType.CloseBracket, strptr);
                         break;
+                    case '[':
+                        yield return new Token(TokenType.OpenSquareBracket, strptr);
+                        break;
+                    case ']':
+                        yield return new Token(TokenType.CloseSquareBracket, strptr);
+                        break;
                     case '+':
                         yield return new Token(TokenType.OperatorPlus, strptr);
                         break;
@@ -121,7 +127,7 @@ namespace StarryEyes.Filters.Parsing
                     default:
                         var begin = strptr;
                         // 何らかのトークン分割子に出会うまで空回し
-                        const string tokens = "&|<>()+-*/.,:=!\" \t\r\n";
+                        const string tokens = "&|<>()[]+-*/.,:=!\" \t\r\n";
                         do
                         {
                             if (tokens.Contains(query[strptr]))
