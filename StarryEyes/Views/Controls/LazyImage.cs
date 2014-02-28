@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -66,43 +68,85 @@ namespace StarryEyes.Views.Controls
 
         #region Image cache
 
-        private static readonly TimeSpan _cacheExpiration = TimeSpan.FromMinutes(30);
+        private static readonly int MaxCacheCount = 512;
 
-        private static readonly ConcurrentDictionary<Uri, Tuple<byte[], DateTime>> _imageCache =
-            new ConcurrentDictionary<Uri, Tuple<byte[], DateTime>>();
+        private static readonly TimeSpan CacheExpiration = TimeSpan.FromMinutes(30);
+
+        private static readonly LinkedList<Tuple<Uri, byte[], DateTime>> _cacheList =
+            new LinkedList<Tuple<Uri, byte[], DateTime>>();
+
+        private static readonly Dictionary<Uri, LinkedListNode<Tuple<Uri, byte[], DateTime>>> _cacheTable =
+            new Dictionary<Uri, LinkedListNode<Tuple<Uri, byte[], DateTime>>>();
 
         private static bool GetCache([NotNull] Uri uri, out byte[] cache)
         {
             cache = null;
             if (uri == null) throw new ArgumentNullException("uri");
-            Tuple<byte[], DateTime> tuple;
-            if (!_imageCache.TryGetValue(uri, out tuple))
+            LinkedListNode<Tuple<Uri, byte[], DateTime>> data;
+            lock (_cacheList)
             {
-                return false;
+                if (!_cacheTable.TryGetValue(uri, out data))
+                {
+                    // cache not found
+                    return false;
+                }
+                if (DateTime.Now - data.Value.Item3 > CacheExpiration)
+                {
+                    // cache is explired
+                    _cacheList.Remove(data);
+                    _cacheTable.Remove(uri);
+                    return false;
+                }
+                // move to head
+                _cacheList.Remove(data);
+                _cacheList.AddFirst(data);
             }
-            if (DateTime.Now - tuple.Item2 > _cacheExpiration)
-            {
-                _imageCache.TryRemove(uri, out tuple);
-                return false;
-            }
-            cache = tuple.Item1;
+            cache = data.Value.Item2;
             return true;
         }
 
         private static void SetCache([NotNull] Uri uri, [NotNull]byte[] imageByte)
         {
-            if (uri == null) throw new ArgumentNullException("uri");
-            if (imageByte == null) throw new ArgumentNullException("imageByte");
-            _imageCache[uri] = Tuple.Create(imageByte, DateTime.Now);
+            lock (_cacheList)
+            {
+                // remove before adding data
+                LinkedListNode<Tuple<Uri, byte[], DateTime>> data;
+                if (_cacheTable.TryGetValue(uri, out data))
+                {
+                    // cache is already existed
+                    _cacheTable.Remove(uri);
+                    _cacheList.Remove(data);
+                }
+                var created = _cacheList.AddFirst(Tuple.Create(uri, imageByte, DateTime.Now));
+                _cacheTable[uri] = created;
+
+                // trim overflow cache
+                while (_cacheList.Count > MaxCacheCount)
+                {
+                    _cacheTable.Remove(_cacheList.Last.Value.Item1);
+                    _cacheList.RemoveLast();
+                }
+            }
         }
 
         private static void RemoveExpiredCaches()
         {
-            foreach (var tuple in _imageCache)
+            Tuple<Uri, byte[], DateTime>[] list;
+            lock (_cacheList)
             {
-                if (DateTime.Now - tuple.Value.Item2 <= _cacheExpiration) continue;
-                Tuple<byte[], DateTime> _;
-                _imageCache.TryRemove(tuple.Key, out _);
+                // copy current cache
+                list = _cacheList.ToArray();
+            }
+            var expireds = list.Where(node => DateTime.Now - node.Item3 > CacheExpiration)
+                               .ToList();
+            lock (_cacheList)
+            {
+                // remove expireds
+                foreach (var tuple in expireds)
+                {
+                    _cacheTable.Remove(tuple.Item1);
+                    _cacheList.Remove(tuple);
+                }
             }
             GC.Collect();
         }
