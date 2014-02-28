@@ -261,6 +261,9 @@ namespace StarryEyes.ViewModels.Timelines.Tabs
                 h => this._model.CurrentFocusTabChanged -= h)
                 .Select(_ => this._model.CurrentFocusTabIndex)
                 .Subscribe(this.UpdateFocusFromModel));
+            this.CompositeDisposable.Add(
+                _tabs.ListenCollectionChanged().Subscribe(_ =>
+                    this._tabs.ForEach(item => item.UpdateFocus())));
             if (this._tabs.Count > 0)
             {
                 this.FocusedTab = this._tabs[0];

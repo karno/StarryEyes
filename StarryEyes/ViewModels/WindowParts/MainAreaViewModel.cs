@@ -29,6 +29,9 @@ namespace StarryEyes.ViewModels.WindowParts
                     h => TabManager.CurrentFocusColumnChanged -= h)
                           .Select(_ => TabManager.CurrentFocusColumnIndex)
                           .Subscribe(UpdateFocusFromModel));
+            CompositeDisposable.Add(
+                _columns.ListenCollectionChanged()
+                        .Subscribe(_ => _columns.ForEach(c => c.UpdateFocus())));
             RegisterEvents();
         }
 
