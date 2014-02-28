@@ -208,6 +208,10 @@ namespace StarryEyes.Models.Receiving.Receivers
                         NotificationService.NotifyUnfavorited(item.Source, item.Status);
                         break;
                 }
+                if (item.Status != null)
+                {
+                    StatusInbox.Queue(item.Status);
+                }
             }
 
             public void OnTrackLimit(StreamTrackLimit item)
