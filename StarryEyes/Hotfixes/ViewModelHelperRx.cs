@@ -91,9 +91,10 @@ namespace StarryEyes
                                 {
                                     throw new InvalidOperationException(
                                         "Collection state is invalid." + Environment.NewLine +
-                                        "INDEX OUT OF RANGE - " + e.Action + " / new start: " + e.NewStartingIndex +
-                                        ", count: " + (e.NewItems == null ? "null" : e.NewItems.Count.ToString()) + ", " +
-                                        "but current target length is " + target.Count + ".");
+                                        "INDEX OUT OF RANGE - " + e.Action + "<" + typeof(TModel).Name + " -> " + typeof(TViewModel).Name + ">" + Environment.NewLine +
+                                        "new start: " + e.NewStartingIndex + ", count: " +
+                                        (e.NewItems == null ? "null" : e.NewItems.Count.ToString()) + Environment.NewLine +
+                                        "source length: " + source.Count + ", target length: " + target.Count + ".");
                                 }
                             }
                         });

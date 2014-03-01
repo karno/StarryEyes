@@ -226,11 +226,11 @@ namespace StarryEyes.Hotfixes
             }
             else
             {
-                var sourceAsConcurrentObservableCollection = _souceAsIList as ObservableSynchronizedCollection<T>;
+                var sourceAsSyncrhonizedCollection = _souceAsIList as ObservableSynchronizedCollection<T>;
 
-                if (sourceAsConcurrentObservableCollection != null)
+                if (sourceAsSyncrhonizedCollection != null)
                 {
-                    sourceAsConcurrentObservableCollection.Move(oldIndex, newIndex);
+                    sourceAsSyncrhonizedCollection.Move(oldIndex, newIndex);
                 }
             }
         }

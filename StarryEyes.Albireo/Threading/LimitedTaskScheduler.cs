@@ -33,9 +33,28 @@ namespace StarryEyes.Albireo.Threading
 
         protected override void QueueTask(Task task)
         {
+            QueueExternalTask(task);
+        }
+
+        public void QueueExternalTask(Task task)
+        {
             lock (_tasks)
             {
                 _tasks.AddLast(task);
+                if (this._currentRunningThreads >= this._maxConcurrency)
+                {
+                    return;
+                }
+                this._currentRunningThreads++;
+                this.RunNewTask();
+            }
+        }
+
+        public void PushExternalTask(Task task)
+        {
+            lock (_tasks)
+            {
+                _tasks.AddFirst(task);
                 if (this._currentRunningThreads >= this._maxConcurrency)
                 {
                     return;

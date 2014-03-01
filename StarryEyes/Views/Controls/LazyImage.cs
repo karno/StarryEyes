@@ -6,13 +6,13 @@ using System.Linq;
 using System.Net.Http;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
-using StarryEyes.Albireo.Threading;
 using StarryEyes.Annotations;
 
 namespace StarryEyes.Views.Controls
@@ -28,7 +28,7 @@ namespace StarryEyes.Views.Controls
         #region Constant variables
 
         private const int MaxRetryCount = 3;
-        private const int MaxParallelism = 16;
+        private const int MaxParallelism = 8;
 
         #endregion
 
@@ -153,95 +153,35 @@ namespace StarryEyes.Views.Controls
 
         #endregion
 
-        private static readonly ConcurrentDictionary<Uri, IObservable<byte[]>> _imageStreamer =
-            new ConcurrentDictionary<Uri, IObservable<byte[]>>();
+        #region Image Loader Thread
 
-        private static readonly TaskFactory _taskFactory = LimitedTaskScheduler.GetTaskFactory(MaxParallelism);
+        private static readonly ConcurrentStack<Tuple<Uri, Subject<byte[]>>> _workStack =
+            new ConcurrentStack<Tuple<Uri, Subject<byte[]>>>();
 
-        private static void ImagePropertyChanged(DependencyObject sender,
-            DependencyPropertyChangedEventArgs e)
+        private static int _concurrency;
+
+        private static void PushTask(Uri source, Subject<byte[]> resultSubject)
         {
-            if (e.NewValue == e.OldValue) return;
-            var img = sender as LazyImage;
-            if (img == null) return;
-            var uri = img.UriSource;
-            var dpw = img.DecodePixelWidth;
-            var dph = img.DecodePixelHeight;
-            System.Diagnostics.Debug.WriteLine("IMAGE DECODE:: URI:" + uri + " / DPW:" + dpw + " / DPH:" + dph + " / NVAL:" + e.NewValue);
-            SetImage(img, null, null);
-            if (uri != null)
+            _workStack.Push(Tuple.Create(source, resultSubject));
+            if (Interlocked.Increment(ref _concurrency) > MaxParallelism)
             {
-                ReloadImage(img, uri, dpw, dph);
+                Interlocked.Decrement(ref _concurrency);
+                return;
             }
+            // run task
+            RunNextTask();
         }
 
-        private static void ReloadImage(LazyImage img, Uri uri, int dpw, int dph)
+        private static void RunNextTask()
         {
-            try
+            Tuple<Uri, Subject<byte[]>> item;
+            if (!_workStack.TryPop(out item))
             {
-                if (uri.Scheme == "pack")
-                {
-                    // PACK image
-                    var bi = new BitmapImage(uri) { CacheOption = BitmapCacheOption.OnLoad };
-                    bi.Freeze();
-                    SetImage(img, bi, uri);
-                }
-                else
-                {
-                    byte[] cache;
-                    if (GetCache(uri, out cache))
-                    {
-                        _taskFactory.StartNew(() =>
-                        {
-                            var b = CreateImage(cache, dpw, dph);
-                            DispatcherHolder.Enqueue(() => SetImage(img, b, uri), DispatcherPriority.Loaded);
-                        });
-                        return;
-                    }
-                    img.Source = null;
-                    Subject<byte[]> publisher = null;
-                    _imageStreamer.GetOrAdd(uri, _ => publisher = new Subject<byte[]>())
-                                  .Select(b => CreateImage(b, dpw, dph))
-                                  .Subscribe(b => DispatcherHolder.Enqueue(
-                                      () => SetImage(img, b, uri), DispatcherPriority.Loaded)
-                                             , ex => { });
-                    if (publisher != null)
-                    {
-                        _taskFactory.StartNew(() => LoadBytes(uri, publisher));
-                    }
-                }
+                Interlocked.Decrement(ref _concurrency);
             }
-            // ReSharper disable EmptyGeneralCatchClause
-            catch
-            // ReSharper restore EmptyGeneralCatchClause
+            else
             {
-            }
-        }
-
-        private static BitmapImage CreateImage(byte[] b, int dpw, int dph)
-        {
-            try
-            {
-                using (var ms = new MemoryStream(b, false))
-                using (var ws = new WrappingStream(ms))
-                {
-                    var bi = new BitmapImage();
-                    bi.BeginInit();
-                    bi.CacheOption = BitmapCacheOption.OnLoad;
-                    bi.StreamSource = ws;
-                    if (dpw > 0 || dph > 0)
-                    {
-                        bi.DecodePixelWidth = dpw;
-                        bi.DecodePixelHeight = dph;
-                    }
-                    bi.EndInit();
-                    bi.Freeze();
-                    return bi;
-                }
-            }
-            catch
-            {
-                return null;
+                LoadBytes(item.Item1, item.Item2).ContinueWith(_ => RunNextTask());
             }
         }
 
@@ -285,8 +225,10 @@ namespace StarryEyes.Views.Controls
                     }
                 }
                 SetCache(source, result);
-                IObservable<byte[]> removal;
-                _imageStreamer.TryRemove(source, out removal);
+                lock (_imageObservables)
+                {
+                    _imageObservables.Remove(source);
+                }
                 subject.OnNext(result);
                 subject.OnCompleted();
             }
@@ -298,6 +240,107 @@ namespace StarryEyes.Views.Controls
             finally
             {
                 client.Dispose();
+            }
+        }
+
+        #endregion
+
+        private static readonly Dictionary<Uri, IObservable<byte[]>> _imageObservables =
+            new Dictionary<Uri, IObservable<byte[]>>();
+
+        private static void ImagePropertyChanged(DependencyObject sender,
+            DependencyPropertyChangedEventArgs e)
+        {
+            if (e.NewValue == e.OldValue) return;
+            var img = sender as LazyImage;
+            if (img == null) return;
+            var uri = img.UriSource;
+            var dpw = img.DecodePixelWidth;
+            var dph = img.DecodePixelHeight;
+            System.Diagnostics.Debug.WriteLine("IMAGE DECODE:: URI:" + uri + " / DPW:" + dpw + " / DPH:" + dph + " / NVAL:" + e.NewValue);
+            SetImage(img, null, null);
+            if (uri != null)
+            {
+                ReloadImage(img, uri, dpw, dph);
+            }
+        }
+
+        private static void ReloadImage(LazyImage img, Uri uri, int dpw, int dph)
+        {
+            try
+            {
+                if (uri.Scheme == "pack")
+                {
+                    // PACK image
+                    var bi = new BitmapImage(uri) { CacheOption = BitmapCacheOption.OnLoad };
+                    bi.Freeze();
+                    SetImage(img, bi, uri);
+                }
+                else
+                {
+                    byte[] cache;
+                    if (GetCache(uri, out cache))
+                    {
+                        // decode image
+                        Task.Run(() =>
+                        {
+                            var b = CreateImage(cache, dpw, dph);
+                            DispatcherHolder.Enqueue(() => SetImage(img, b, uri), DispatcherPriority.Loaded);
+                        });
+                        return;
+                    }
+                    img.Source = null;
+                    IObservable<byte[]> observable;
+                    Subject<byte[]> publisher = null;
+                    lock (_imageObservables)
+                    {
+                        if (!_imageObservables.TryGetValue(uri, out observable))
+                        {
+                            observable = publisher = new Subject<byte[]>();
+                            _imageObservables.Add(uri, publisher);
+                        }
+                    }
+                    observable.Select(b => CreateImage(b, dpw, dph))
+                              .Subscribe(b => DispatcherHolder.Enqueue(
+                                  () => SetImage(img, b, uri), DispatcherPriority.Loaded)
+                                  , ex => { });
+                    if (publisher != null)
+                    {
+                        PushTask(uri, publisher);
+                    }
+                }
+            }
+            // ReSharper disable EmptyGeneralCatchClause
+            catch
+            // ReSharper restore EmptyGeneralCatchClause
+            {
+            }
+        }
+
+        private static BitmapImage CreateImage(byte[] b, int dpw, int dph)
+        {
+            try
+            {
+                using (var ms = new MemoryStream(b, false))
+                using (var ws = new WrappingStream(ms))
+                {
+                    var bi = new BitmapImage();
+                    bi.BeginInit();
+                    bi.CacheOption = BitmapCacheOption.OnLoad;
+                    bi.StreamSource = ws;
+                    if (dpw > 0 || dph > 0)
+                    {
+                        bi.DecodePixelWidth = dpw;
+                        bi.DecodePixelHeight = dph;
+                    }
+                    bi.EndInit();
+                    bi.Freeze();
+                    return bi;
+                }
+            }
+            catch
+            {
+                return null;
             }
         }
 
