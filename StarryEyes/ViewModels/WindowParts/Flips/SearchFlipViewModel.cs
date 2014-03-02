@@ -396,7 +396,16 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             this.UserInfo = null;
             if (IsQueryMode)
             {
-                this.ShowSearchResult(new SearchResultModel(Text.Substring(1), SearchOption.Query));
+                try
+                {
+                    this.ShowSearchResult(new SearchResultModel(Text.Substring(1), SearchOption.Query));
+                }
+                catch (FilterQueryException)
+                {
+                    // query contains errors
+                    IsSearchResultAvailable = false;
+                    return;
+                }
             }
             else
             {
