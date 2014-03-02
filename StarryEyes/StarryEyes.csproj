@@ -270,7 +270,7 @@
     <Compile Include="Models\Inputting\InputSetting.cs" />
     <Compile Include="Models\Subsystems\AutoUpdateService.cs" />
     <Compile Include="Models\Subsystems\Notifications\Audio\AudioCache.cs" />
-    <Compile Include="Models\Subsystems\Notifications\Audio\AudioCacheSampleProvider.cs" />
+    <Compile Include="Models\Subsystems\Notifications\Audio\AudioCacheProvider.cs" />
     <Compile Include="Models\Subsystems\Notifications\Audio\AudioPlayer.cs" />
     <Compile Include="Models\Subsystems\Notifications\Audio\AutoDisposeFileReader.cs" />
     <Compile Include="Models\Subsystems\Notifications\INotificationSink.cs" />

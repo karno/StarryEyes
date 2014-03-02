@@ -1,30 +1,53 @@
-﻿using NAudio.Wave;
+﻿using System;
+using System.Collections.Generic;
+using System.Reactive.Disposables;
+using NAudio.Wave;
 
 namespace StarryEyes.Models.Subsystems.Notifications.Audio
 {
-    public sealed class AutoDisposeFileReader : ISampleProvider
+    public sealed class AutoDisposeSampleProvider : ISampleProvider, IDisposable
     {
-        private readonly AudioFileReader _reader;
         private bool _isDisposed;
-        public AutoDisposeFileReader(AudioFileReader reader)
+        private readonly ISampleProvider _provider;
+        private readonly CompositeDisposable _disposables;
+
+        public WaveFormat WaveFormat { get; private set; }
+
+        public AutoDisposeSampleProvider(ISampleProvider provider,
+             params IDisposable[] disposables)
+            : this(provider, (IEnumerable<IDisposable>)disposables)
         {
-            this._reader = reader;
-            this.WaveFormat = reader.WaveFormat;
+        }
+
+        public AutoDisposeSampleProvider(ISampleProvider provider,
+             IEnumerable<IDisposable> disposables)
+        {
+            this._provider = provider;
+            this._disposables = new CompositeDisposable(disposables);
+            this.WaveFormat = provider.WaveFormat;
         }
 
         public int Read(float[] buffer, int offset, int count)
         {
             if (this._isDisposed)
+            {
                 return 0;
-            int read = this._reader.Read(buffer, offset, count);
+            }
+            var read = this._provider.Read(buffer, offset, count);
             if (read == 0)
             {
-                this._reader.Dispose();
-                this._isDisposed = true;
+                this.Dispose();
             }
             return read;
         }
 
-        public WaveFormat WaveFormat { get; private set; }
+        public void Dispose()
+        {
+            if (!_isDisposed)
+            {
+                _isDisposed = true;
+                _disposables.Dispose();
+            }
+        }
     }
 }
