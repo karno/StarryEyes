@@ -154,6 +154,7 @@ namespace StarryEyes.Views.Controls
 		    new CompletionData("search", "search:", "検索タイムライン(引数: 検索文字列)"), 
 		    new CompletionData("track", "track:", "ストリームタイムライン(引数: 検索文字列[英数字])"), 
 		    new CompletionData("conv", "conv:", "返信タイムライン(引数: ツイートID)"), 
+		    new CompletionData("user", "user:", "指定ユーザーのツイート(引数: ユーザースクリーン名 または #ユーザーID)"), 
                 };
             }
             if (t.Any() &&

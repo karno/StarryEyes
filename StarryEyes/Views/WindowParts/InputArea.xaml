@@ -352,7 +352,7 @@
                                                  SuggestItemProvider="{Binding InputCoreViewModel.Provider}"
                                                  Text="{Binding InputCoreViewModel.InputText,
                                                                 UpdateSourceTrigger=PropertyChanged}"
-                                                 TextAlignment="Justify"
+                                                 TextAlignment="Left"
                                                  TextWrapping="Wrap"
                                                  VerticalScrollBarVisibility="Auto">
                         <i:Interaction.Triggers>
