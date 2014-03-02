@@ -104,6 +104,7 @@ namespace StarryEyes.Filters.Parsing
             {"conversation", typeof(FilterConversation)},
             {"talk", typeof(FilterConversation)},
             {"tree", typeof(FilterConversation)},
+            {"user", typeof(FilterUser)}
         };
 
         /// <summary>
