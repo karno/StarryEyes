@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -9,7 +10,6 @@ using StarryEyes.Anomaly.Utils;
 using StarryEyes.Filters;
 using StarryEyes.Filters.Expressions;
 using StarryEyes.Filters.Parsing;
-using StarryEyes.Filters.Sources;
 using StarryEyes.Models.Databases;
 using StarryEyes.Models.Receiving.Handling;
 using StarryEyes.Models.Timelines.Tabs;
@@ -144,7 +144,7 @@ namespace StarryEyes.Models.Timelines.SearchFlips
             {
                 case SearchOption.Local:
                 case SearchOption.CurrentTab:
-                    var pan = FilterSearch.SplitPositiveNegativeQuery(_query);
+                    var pan = SplitPositiveNegativeQuery(_query);
                     var query = pan.Item1.Select(s => "text contains \"" + s.Replace("\"", "\\\"") + "\"")
                                    .Concat(pan.Item2.Select(s => "!(text contains \"" + s.Replace("\"", "\\\"") + "\")"))
                                    .JoinString("&&");
@@ -173,6 +173,17 @@ namespace StarryEyes.Models.Timelines.SearchFlips
                     throw new ArgumentOutOfRangeException();
             }
 
+        }
+
+        public static Tuple<IEnumerable<string>, IEnumerable<string>> SplitPositiveNegativeQuery(string query)
+        {
+
+            var splitted = query.Split(new[] { " ", "\t", "　" },
+                                       StringSplitOptions.RemoveEmptyEntries)
+                                .Distinct().ToArray();
+            var positive = splitted.Where(s => !s.StartsWith("-")).ToArray();
+            var negative = splitted.Where(s => s.StartsWith("-")).Select(s => s.Substring(1)).ToArray();
+            return Tuple.Create(positive.AsEnumerable(), negative.AsEnumerable());
         }
     }
 

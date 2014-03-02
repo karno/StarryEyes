@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using StarryEyes.Anomaly.TwitterApi.Rest;
@@ -11,10 +12,12 @@ namespace StarryEyes.Models.Receiving.Receivers
     public class SearchReceiver : CyclicReceiverBase
     {
         private readonly string _query;
+        private readonly IEnumerable<ICollection<long>> _receiveCaches;
 
-        public SearchReceiver(string query)
+        public SearchReceiver(string query, IEnumerable<ICollection<long>> receiveCaches)
         {
             this._query = query;
+            this._receiveCaches = receiveCaches;
         }
 
         protected override string ReceiverName
@@ -40,7 +43,15 @@ namespace StarryEyes.Models.Receiving.Receivers
                         return;
                     }
                     var resp = await account.SearchAsync(this._query);
-                    resp.ForEach(StatusInbox.Queue);
+                    resp
+                        .Do(s =>
+                        {
+                            lock (_receiveCaches)
+                            {
+                                _receiveCaches.ForEach(c => c.Add(s.Id));
+                            }
+                        })
+                        .ForEach(StatusInbox.Queue);
                 }
                 catch (Exception ex)
                 {

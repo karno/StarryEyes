@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using StarryEyes.Albireo;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Receivers;
@@ -27,14 +28,14 @@ namespace StarryEyes.Models.Receiving
             BehaviorLogger.Log("RM", "init.");
         }
 
-        public static void RegisterSearchQuery(string query)
+        public static void RegisterSearchQuery(string query, ICollection<long> receiveCache)
         {
-            _searchReceiveManager.RegisterSearchQuery(query);
+            _searchReceiveManager.RegisterSearchQuery(query, receiveCache);
         }
 
-        public static void UnregisterSearchQuery(string query)
+        public static void UnregisterSearchQuery(string query, ICollection<long> receiveCache)
         {
-            _searchReceiveManager.UnregisterSearchQuery(query);
+            _searchReceiveManager.UnregisterSearchQuery(query, receiveCache);
         }
 
         public static void RegisterStreamingQuery(string query)
