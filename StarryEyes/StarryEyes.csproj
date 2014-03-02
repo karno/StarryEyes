@@ -74,8 +74,15 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\AsyncOAuth.0.8.3\lib\AsyncOAuth.dll</HintPath>
     </Reference>
-    <Reference Include="ICSharpCode.AvalonEdit">
-      <HintPath>..\packages\AvalonEdit.4.3.1.9430\lib\Net40\ICSharpCode.AvalonEdit.dll</HintPath>
+    <Reference Include="EntityFramework">
+      <HintPath>..\packages\EntityFramework.6.0.2\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer">
+      <HintPath>..\packages\EntityFramework.6.0.2\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="ICSharpCode.AvalonEdit, Version=4.4.0.9727, Culture=neutral, PublicKeyToken=9cc39be672370310, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\AvalonEdit.4.4.0.9727\lib\Net40\ICSharpCode.AvalonEdit.dll</HintPath>
     </Reference>
     <Reference Include="Livet, Version=1.1.0.0, Culture=neutral, PublicKeyToken=b0b1d3f711ef38cb, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -106,15 +113,19 @@
     </Reference>
     <Reference Include="PresentationFramework.Aero" />
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Data.SQLite, Version=1.0.90.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+    <Reference Include="System.Data.SQLite, Version=1.0.91.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\System.Data.SQLite.1.0.90.0\lib\net45\System.Data.SQLite.dll</HintPath>
+      <HintPath>..\packages\System.Data.SQLite.1.0.91.3\lib\net45\System.Data.SQLite.dll</HintPath>
     </Reference>
-    <Reference Include="System.Data.SQLite.Linq, Version=1.0.90.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+    <Reference Include="System.Data.SQLite.EF6">
+      <HintPath>..\packages\System.Data.SQLite.1.0.91.3\lib\net45\System.Data.SQLite.EF6.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data.SQLite.Linq, Version=1.0.91.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\System.Data.SQLite.1.0.90.0\lib\net45\System.Data.SQLite.Linq.dll</HintPath>
+      <HintPath>..\packages\System.Data.SQLite.1.0.91.3\lib\net45\System.Data.SQLite.Linq.dll</HintPath>
     </Reference>
     <Reference Include="System.Device" />
     <Reference Include="System.Interactive, Version=1.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -146,7 +157,7 @@
     </Reference>
     <Reference Include="System.Reactive.PlatformServices, Version=2.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Rx-PlatformServices.2.2.2\lib\net45\System.Reactive.PlatformServices.dll</HintPath>
+      <HintPath>..\packages\Rx-PlatformServices.2.2.3\lib\net45\System.Reactive.PlatformServices.dll</HintPath>
     </Reference>
     <Reference Include="System.Reactive.Windows.Threading, Version=2.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -171,8 +182,24 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="Xceed.Wpf.Toolkit">
-      <HintPath>..\packages\Extended.Wpf.Toolkit.2.0.0\lib\net40\Xceed.Wpf.Toolkit.dll</HintPath>
+    <Reference Include="Xceed.Wpf.AvalonDock">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.2.1.0\lib\net40\Xceed.Wpf.AvalonDock.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.Aero">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.2.1.0\lib\net40\Xceed.Wpf.AvalonDock.Themes.Aero.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.Metro">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.2.1.0\lib\net40\Xceed.Wpf.AvalonDock.Themes.Metro.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.VS2010">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.2.1.0\lib\net40\Xceed.Wpf.AvalonDock.Themes.VS2010.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.DataGrid">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.2.1.0\lib\net40\Xceed.Wpf.DataGrid.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.Toolkit, Version=2.1.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Extended.Wpf.Toolkit.2.1.0\lib\net40\Xceed.Wpf.Toolkit.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

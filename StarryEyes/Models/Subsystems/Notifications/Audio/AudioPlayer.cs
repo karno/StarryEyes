@@ -90,9 +90,6 @@ namespace StarryEyes.Models.Subsystems.Notifications.Audio
                 // mono -> stereo
                 return new MonoToStereoSampleProvider(input);
             }
-            else
-            {
-            }
             throw new ArgumentException("This audio source is not supported yet.");
         }
     }
