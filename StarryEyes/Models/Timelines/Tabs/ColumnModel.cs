@@ -9,14 +9,14 @@ namespace StarryEyes.Models.Timelines.Tabs
 {
     public class ColumnModel
     {
-        private readonly ObservableSynchronizedCollection<TabModel> _tabs =
-            new ObservableSynchronizedCollection<TabModel>();
+        private readonly ObservableSynchronizedCollectionEx<TabModel> _tabs =
+            new ObservableSynchronizedCollectionEx<TabModel>();
 
         private int _currentFocusTabIndex;
 
         public event Action CurrentFocusTabChanged;
 
-        public ObservableSynchronizedCollection<TabModel> Tabs
+        public ObservableSynchronizedCollectionEx<TabModel> Tabs
         {
             get { return this._tabs; }
         }

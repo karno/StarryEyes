@@ -12,8 +12,8 @@ namespace StarryEyes.Models.Timelines.Tabs
     {
         private static readonly Stack<TabModel> _closedTabsStack = new Stack<TabModel>();
 
-        private static readonly ObservableSynchronizedCollection<ColumnModel> _columns =
-            new ObservableSynchronizedCollection<ColumnModel>();
+        private static readonly ObservableSynchronizedCollectionEx<ColumnModel> _columns =
+            new ObservableSynchronizedCollectionEx<ColumnModel>();
 
         private static int _currentFocusColumnIndex;
 
@@ -24,7 +24,7 @@ namespace StarryEyes.Models.Timelines.Tabs
 
         public static event Action CurrentFocusColumnChanged;
 
-        public static ObservableSynchronizedCollection<ColumnModel> Columns
+        public static ObservableSynchronizedCollectionEx<ColumnModel> Columns
         {
             get { return _columns; }
         }
