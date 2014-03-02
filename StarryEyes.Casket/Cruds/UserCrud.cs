@@ -23,7 +23,7 @@ namespace StarryEyes.Casket.Cruds
         public async Task<DatabaseUser> GetAsync(string screenName)
         {
             return (await this.QueryAsync<DatabaseUser>(
-                this.CreateSql("ScreenName = @ScreenName limit 1"),
+                this.CreateSql("ScreenName COLLATE nocase = @ScreenName limit 1"),
                 new { ScreenName = screenName }))
                 .SingleOrDefault();
         }
@@ -33,7 +33,7 @@ namespace StarryEyes.Casket.Cruds
             using (var _ = this.AcquireReadLock())
             using (var con = this.OpenConnection())
             {
-                return con.Query<long>("select Id from " + TableName + " where ScreenName = @ScreenName limit 1;",
+                return con.Query<long>("select Id from " + TableName + " where ScreenName COLLATE nocase = @ScreenName limit 1;",
                                 new { ScreenName = screenName })
                    .SingleOrDefault();
             }
