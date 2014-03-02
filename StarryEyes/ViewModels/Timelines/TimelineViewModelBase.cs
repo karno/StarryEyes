@@ -158,14 +158,14 @@ namespace StarryEyes.ViewModels.Timelines
         {
             if (IsScrollInTop || IsLoading) return;
             ReadMore(this._model.Statuses
-                           .Select(s => s.Status.Id)
-                           .Append(long.MaxValue)
-                           .Min());
+                         .Select(s => s.Status.Id)
+                         .Append(long.MaxValue)
+                         .Min());
         }
 
-        protected virtual void ReadMore(long id)
+        public virtual void ReadMore(long id)
         {
-            if (IsScrollInTop || IsLoading) return;
+            if (IsLoading) return;
             this._model.IsAutoTrimEnabled = false;
             Task.Run(async () =>
             {

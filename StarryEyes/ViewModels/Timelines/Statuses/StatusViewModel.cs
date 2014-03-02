@@ -1217,6 +1217,11 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             });
         }
 
+        public void ReceiveOlder()
+        {
+            this.Parent.ReadMore(this.Status.Id);
+        }
+
         public void OpenNthLink(string index)
         {
             int value;

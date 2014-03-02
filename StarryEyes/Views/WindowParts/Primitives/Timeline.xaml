@@ -323,6 +323,14 @@
                                     </i:Interaction.Triggers>
                                 </MenuItem>
                             </MenuItem>
+                            <Separator />
+                            <MenuItem Header="これ以前のツイートを取得(_R)">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="Click">
+                                        <ei:CallMethodAction MethodName="ReceiveOlder" TargetObject="{Binding}" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </MenuItem>
                         </ContextMenu>
                     </Border.ContextMenu>
                     <Border.LayoutTransform>

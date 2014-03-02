@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reactive.Linq;
 using StarryEyes.Albireo;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Casket;
@@ -42,6 +43,11 @@ namespace StarryEyes.Filters
                 })
                 .JoinString(", ") +
                 " where " + PredicateTreeRoot.ToQuery();
+        }
+
+        public IObservable<TwitterStatus> ReceiveSources(long? maxId)
+        {
+            return Sources.Guard().ToObservable().SelectMany(s => s.Receive(maxId));
         }
 
         public Func<TwitterStatus, bool> GetEvaluator()

@@ -128,25 +128,6 @@ namespace StarryEyes.ViewModels.Timelines.Tabs
             this.RaisePropertyChanged(() => this.IsFocused);
         }
 
-        protected override void ReadMore(long id)
-        {
-            base.ReadMore(id);
-            this.ReadMoreFromWeb(id);
-        }
-
-        public void ReadMoreFromWeb(long? id)
-        {
-            // TODO: implement?
-            /*
-                TimelineModel.IsSuppressTimelineTrimming = true;
-                IsLoading = true;
-                Model.ReceiveTimelines(id)
-                     .Finally(() => IsLoading = false)
-                     .OnErrorResumeNext(Observable.Empty<Unit>())
-                     .Subscribe();
-            */
-        }
-
         public override void GotFocus()
         {
             this._parent.FocusedTab = this;
