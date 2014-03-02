@@ -92,20 +92,37 @@ namespace StarryEyes.Models.Subsystems
             }
             try
             {
-                Directory.CreateDirectory(App.LocalUpdateStorePath);
-                using (var http = new HttpClient())
+                if (IsUpdateBinaryExisted() || Directory.Exists(App.LocalUpdateStorePath))
                 {
-                    var patcher = await http.GetByteArrayAsync(_patcherUri);
-                    var patcherSign = await http.GetByteArrayAsync(_patcherSignUri);
-                    var pubkey = File.ReadAllText(App.PublicKeyFile);
-                    if (!VerifySignature(patcher, patcherSign, pubkey))
-                    {
-                        throw new Exception("Updater signature invalid.");
-                    }
-                    File.WriteAllBytes(ExecutablePath, patcher);
+                    // files are already downloaded.
+                    return true;
                 }
-                UpdateStateChanged.SafeInvoke();
-                return true;
+                try
+                {
+                    Directory.CreateDirectory(App.LocalUpdateStorePath);
+                    using (var http = new HttpClient())
+                    {
+                        var patcher = await http.GetByteArrayAsync(_patcherUri);
+                        var patcherSign = await http.GetByteArrayAsync(_patcherSignUri);
+                        var pubkey = File.ReadAllText(App.PublicKeyFile);
+                        if (!VerifySignature(patcher, patcherSign, pubkey))
+                        {
+                            throw new Exception("Updater signature is invalid.");
+                        }
+                        File.WriteAllBytes(ExecutablePath, patcher);
+                    }
+                    UpdateStateChanged.SafeInvoke();
+                    return true;
+                }
+                catch
+                {
+                    try
+                    {
+                        Directory.Delete(App.LocalUpdateStorePath);
+                    }
+                    catch { }
+                    throw;
+                }
             }
             catch (Exception ex)
             {
