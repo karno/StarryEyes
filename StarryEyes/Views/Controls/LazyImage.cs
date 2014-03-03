@@ -181,7 +181,8 @@ namespace StarryEyes.Views.Controls
             }
             else
             {
-                LoadBytes(item.Item1, item.Item2).ContinueWith(_ => RunNextTask());
+                Task.Run(async () => await LoadBytes(item.Item1, item.Item2))
+                    .ContinueWith(_ => RunNextTask());
             }
         }
 
