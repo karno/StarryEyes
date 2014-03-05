@@ -1,8 +1,8 @@
 ﻿using System.Windows;
 using System.Windows.Media;
-using System.Windows.Shapes;
 using Microsoft.Expression.Shapes;
 using StarryEyes.Annotations;
+using StarryEyes.Settings;
 
 namespace StarryEyes.Views.Adorners
 {
@@ -22,7 +22,7 @@ namespace StarryEyes.Views.Adorners
             return new RegularPolygon
             {
                 Margin = new Thickness(-6, -10, 0, 0),
-                Fill = Brushes.Black,
+                Fill = new SolidColorBrush(ThemeManager.CurrentTheme.BaseColor.Foreground),
                 Opacity = 0.5,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Top,
