@@ -859,6 +859,13 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                     if (r.Faileds != null)
                     {
                         var message = this.AnalyzeFailedReason(r.Exceptions) ?? "原因を特定できませんでした。";
+                        var ed = r.Exceptions
+                                  .Guard()
+                                  .SelectMany(ex => EnumerableEx.Generate(
+                                      ex, e => e != null, e => e.InnerException, e => e))
+                                  .Where(e => e != null)
+                                  .Select(e => e.ToString())
+                                  .JoinString(Environment.NewLine);
                         if (Setting.ShowMessageOnTweetFailed.Value)
                         {
                             var resp = _parent.Messenger.GetResponse(new TaskDialogMessage(new TaskDialogOptions
@@ -868,6 +875,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                                 MainInstruction = "ツイートに失敗しました。",
                                 Content = "エラー: " + message + Environment.NewLine +
                                           "もう一度投稿しますか？",
+                                ExpandedInfo = ed,
                                 FooterText = "再試行しない場合は、ツイートしようとした内容は下書きとして保存されます。",
                                 FooterIcon = VistaTaskDialogIcon.Information,
                                 VerificationText = "次回から表示しない",
@@ -902,6 +910,12 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                 {
                     // stash first message
                     fmsg = msg;
+                    var cex = exception.InnerException;
+                    while (cex != null)
+                    {
+                        fmsg += " - " + cex.Message;
+                        cex = cex.InnerException;
+                    }
                 }
                 if (msg.Contains("duplicate"))
                 {
