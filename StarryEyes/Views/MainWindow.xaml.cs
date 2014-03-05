@@ -2,6 +2,7 @@
 using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
 using StarryEyes.ViewModels;
+using ThemeManager = StarryEyes.Settings.ThemeManager;
 
 namespace StarryEyes.Views
 {
@@ -24,6 +25,14 @@ namespace StarryEyes.Views
             if (rect.IsEmpty) return;
             this.SetWindowPlacement(rect);
             this.WindowState = state;
+            ThemeManager.ThemeChanged += ApplyFont;
+            ApplyFont();
+        }
+
+        private void ApplyFont()
+        {
+            this.FontFamily = ThemeManager.CurrentTheme.GlobalFont.FontFamily;
+            this.FontSize = ThemeManager.CurrentTheme.GlobalFont.FontSize;
         }
 
         private void OnClosing(object sender, System.ComponentModel.CancelEventArgs e)
