@@ -446,12 +446,12 @@
                                         <Grid Visibility="{Binding IsCommunicating, Converter={StaticResource BooleanToInvisibleConverter}}">
                                             <TextBlock FontSize="9"
                                                        Foreground="{DynamicResource UserFlipFollowbackedBrush}"
-                                                       Text="FOLLOWBACKED"
+                                                       Text="IS FOLLOWING BACK"
                                                        Visibility="{Binding IsFollowedBack,
                                                                             Converter={StaticResource BooleanToVisibleConverter}}" />
                                             <TextBlock FontSize="9"
                                                        Foreground="{DynamicResource UserFlipNotFollowbackedBrush}"
-                                                       Text="NOT FOLLOWBACKED"
+                                                       Text="IS NOT FOLLOWING BACK"
                                                        Visibility="{Binding IsFollowedBack,
                                                                             Converter={StaticResource BooleanToInvisibleConverter}}" />
                                         </Grid>
