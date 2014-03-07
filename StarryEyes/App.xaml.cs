@@ -186,7 +186,7 @@ namespace StarryEyes
             }
             finally
             {
-                // アプリケーション ファイナライズ
+                // Exit aplication
                 AppFinalize(false);
             }
 
@@ -273,15 +273,14 @@ namespace StarryEyes
                 {
                     TaskDialog.Show(new TaskDialogOptions
                     {
-                        Title = "Krile スタートアップ エラー",
+                        Title = StarryEyes.Properties.Resources.MsgTitleStartupError,
                         MainIcon = VistaTaskDialogIcon.Error,
-                        MainInstruction = "Krileの起動に失敗しました。",
-                        Content = "データベース パスの指定が不正かもしれません。" + Environment.NewLine +
-                                  "Krile.exe.configの設定を確認してください。",
+                        MainInstruction = StarryEyes.Properties.Resources.MsgInstructionStartupError,
+                        Content = StarryEyes.Properties.Resources.MsgContentDatabasePathInvalid,
                         ExpandedInfo = ex.ToString(),
                         CommonButtons = TaskDialogCommonButtons.Close,
                         FooterIcon = VistaTaskDialogIcon.Information,
-                        FooterText = "改善しないときは、Krileの再インストールを試してください。"
+                        FooterText = StarryEyes.Properties.Resources.MsgFooterReInstallKrile,
                     });
                     throw;
                 }

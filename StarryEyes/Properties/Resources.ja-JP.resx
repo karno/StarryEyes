@@ -118,16 +118,16 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="MsgContentDatabasePathInvalid" xml:space="preserve">
-    <value>Maybe designation of database path is invalid.
-Please examine krile.exe.config .</value>
+    <value>データベース パスの指定が不正かもしれません。
+Krile.exe.config の設定を確認してください。</value>
   </data>
   <data name="MsgFooterReInstallKrile" xml:space="preserve">
-    <value>If problem is not solved, please re-installing Krile.</value>
+    <value>改善しないときは、Krileの再インストールを試してみてください。</value>
   </data>
   <data name="MsgInstructionStartupError" xml:space="preserve">
-    <value>Starting krile has failed.</value>
+    <value>Krileの起動に失敗しました。</value>
   </data>
   <data name="MsgTitleStartupError" xml:space="preserve">
-    <value>Krile Startup Error</value>
+    <value>Krile スタートアップ エラー</value>
   </data>
 </root>

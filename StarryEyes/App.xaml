@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:prop="clr-namespace:StarryEyes.Properties"
              xmlns:starryEyes="clr-namespace:StarryEyes"
              Startup="AppStartup"
              StartupUri="Views\MainWindow.xaml"
@@ -13,6 +14,7 @@
                 <ResourceDictionary Source="Simple Styles.xaml" />
                 <ResourceDictionary Source="Themes\DesignTimeDefault.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <prop:Resources x:Key="Resources" />
             <Style x:Key="TouchScrollItemsControlStyle" TargetType="{x:Type ItemsControl}">
                 <Setter Property="ScrollViewer.PanningMode" Value="VerticalOnly" />
                 <Setter Property="ScrollViewer.PanningDeceleration" Value="0.001" />
