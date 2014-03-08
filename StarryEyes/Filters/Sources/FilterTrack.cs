@@ -14,7 +14,7 @@ namespace StarryEyes.Filters.Sources
 
         public override Func<TwitterStatus, bool> GetEvaluator()
         {
-            return _ => _.Text.IndexOf(_query, StringComparison.Ordinal) >= 0;
+            return _ => _.Text.IndexOf(_query, StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
         public override string GetSqlQuery()
