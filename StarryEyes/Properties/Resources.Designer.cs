@@ -61,39 +61,168 @@ namespace StarryEyes.Properties {
         }
         
         /// <summary>
+        ///   Krile StarryEyes に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string AppName {
+            get {
+                return ResourceManager.GetString("AppName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Refer Microsoft KB に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgButtonBrowseMsKb {
+            get {
+                return ResourceManager.GetString("MsgButtonBrowseMsKb", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cancel に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgButtonCancel {
+            get {
+                return ResourceManager.GetString("MsgButtonCancel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Maybe designation of database path is invalid.
         ///Please examine krile.exe.config . に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        public static string MsgContentDatabasePathInvalid {
+        public static string MsgDbPathInvalidContent {
             get {
-                return ResourceManager.GetString("MsgContentDatabasePathInvalid", resourceCulture);
+                return ResourceManager.GetString("MsgDbPathInvalidContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   It will cause crashing Krile or hanging up your system.
+        ///Changing configuration of Windows may prevent this problem. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgDesktopHeapContent {
+            get {
+                return ResourceManager.GetString("MsgDesktopHeapContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Desktop Heap parameter is too small.
+        ///Current value: {0} / Lowest recommend: {1} に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgDesktopHeapInfo {
+            get {
+                return ResourceManager.GetString("MsgDesktopHeapInfo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   May fall into memory shortage. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgDesktopHeapInst {
+            get {
+                return ResourceManager.GetString("MsgDesktopHeapInst", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Don&apos;t ask me again に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgDoNotAskMeAgain {
+            get {
+                return ResourceManager.GetString("MsgDoNotAskMeAgain", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Are you sure you want to exit Krile? に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgExitInst {
+            get {
+                return ResourceManager.GetString("MsgExitInst", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Exit Krile に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgExitTitle {
+            get {
+                return ResourceManager.GetString("MsgExitTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Don&apos;t ask me again before exit に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgExitVerification {
+            get {
+                return ResourceManager.GetString("MsgExitVerification", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///    に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgInstructionTabWarning {
+            get {
+                return ResourceManager.GetString("MsgInstructionTabWarning", resourceCulture);
             }
         }
         
         /// <summary>
         ///   If problem is not solved, please re-installing Krile. に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        public static string MsgFooterReInstallKrile {
+        public static string MsgReInstallKrile {
             get {
-                return ResourceManager.GetString("MsgFooterReInstallKrile", resourceCulture);
+                return ResourceManager.GetString("MsgReInstallKrile", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Starting krile has failed. に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        public static string MsgInstructionStartupError {
+        public static string MsgStartupErrorInst {
             get {
-                return ResourceManager.GetString("MsgInstructionStartupError", resourceCulture);
+                return ResourceManager.GetString("MsgStartupErrorInst", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Krile Startup Error に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        public static string MsgTitleStartupError {
+        public static string MsgStartupErrorTitle {
             get {
-                return ResourceManager.GetString("MsgTitleStartupError", resourceCulture);
+                return ResourceManager.GetString("MsgStartupErrorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Tab information is empty.
+        ///Generate default tabs? に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgTabWarningContent {
+            get {
+                return ResourceManager.GetString("MsgTabWarningContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Tab information may have been lost. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgTabWarningInst {
+            get {
+                return ResourceManager.GetString("MsgTabWarningInst", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Tab Warning に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgTabWarningTitle {
+            get {
+                return ResourceManager.GetString("MsgTabWarningTitle", resourceCulture);
             }
         }
     }

@@ -15,6 +15,7 @@ using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Models.Subsystems;
 using StarryEyes.Models.Timelines.Tabs;
 using StarryEyes.Nightmare.Windows;
+using StarryEyes.Properties;
 using StarryEyes.Settings;
 using StarryEyes.ViewModels.Dialogs;
 using StarryEyes.ViewModels.WindowParts;
@@ -296,15 +297,13 @@ namespace StarryEyes.ViewModels
                     {
                         var msg = this.Messenger.GetResponse(new TaskDialogMessage(new TaskDialogOptions
                         {
-                            Title = "Krile StarryEyes",
+                            Title = Resources.AppName,
                             MainIcon = VistaTaskDialogIcon.Warning,
-                            MainInstruction = "メモリ不足に陥る可能性があります。",
-                            Content = "Krileのクラッシュやシステムの停止を引き起こす可能性があります。" + Environment.NewLine +
-                                      "Windowsの設定を変更することで、この問題を回避できる可能性があります。",
-                            ExpandedInfo = "デスクトップ ヒープの設定が少なすぎます。" + Environment.NewLine +
-                                           "現在の設定値: " + dh + " / 推奨下限設定値: " + rh,
-                            CommandButtons = new[] { "Microsoft KBを参照", "キャンセル" },
-                            VerificationText = "次回から表示しない"
+                            MainInstruction = Resources.MsgDesktopHeapInst,
+                            Content = Resources.MsgDesktopHeapContent,
+                            ExpandedInfo = String.Format(Resources.MsgDesktopHeapInfo, dh, rh),
+                            CommandButtons = new[] { Resources.MsgButtonBrowseMsKb, Resources.MsgButtonCancel },
+                            VerificationText = Resources.MsgDoNotAskMeAgain,
                         }));
                         Setting.CheckDesktopHeap.Value = !msg.Response.VerificationChecked.GetValueOrDefault();
                         if (msg.Response.CommandButtonResult == 0)
@@ -324,11 +323,10 @@ namespace StarryEyes.ViewModels
         {
             var response = this.Messenger.GetResponse(new TaskDialogMessage(new TaskDialogOptions
             {
-                Title = "タブ情報の警告",
+                Title = Resources.MsgTabWarningTitle,
                 MainIcon = VistaTaskDialogIcon.Warning,
-                MainInstruction = "タブ情報が失われた可能性があります。",
-                Content = "タブが空です。" + Environment.NewLine +
-                          "初回起動時に生成されるタブを再生成しますか？",
+                MainInstruction = Resources.MsgTabWarningInst,
+                Content = Resources.MsgTabWarningContent,
                 CommonButtons = TaskDialogCommonButtons.YesNo,
             }));
             if (response.Response.Result != TaskDialogSimpleResult.Yes) return;
@@ -346,11 +344,11 @@ namespace StarryEyes.ViewModels
                 var ret = Messenger.GetResponse(
                     new TaskDialogMessage(new TaskDialogOptions
                     {
-                        Title = "Krileの終了",
+                        Title = Resources.MsgExitTitle,
                         MainIcon = VistaTaskDialogIcon.Warning,
-                        MainInstruction = "Krileを終了してもよろしいですか？",
+                        MainInstruction = Resources.MsgExitInst,
                         CommonButtons = TaskDialogCommonButtons.OKCancel,
-                        VerificationText = "次回から確認せずに終了",
+                        VerificationText = Resources.MsgExitVerification,
                     }));
                 if (ret.Response == null) return true;
                 Setting.ConfirmOnExitApp.Value = !ret.Response.VerificationChecked.GetValueOrDefault();

@@ -273,14 +273,14 @@ namespace StarryEyes
                 {
                     TaskDialog.Show(new TaskDialogOptions
                     {
-                        Title = StarryEyes.Properties.Resources.MsgTitleStartupError,
+                        Title = StarryEyes.Properties.Resources.MsgStartupErrorTitle,
                         MainIcon = VistaTaskDialogIcon.Error,
-                        MainInstruction = StarryEyes.Properties.Resources.MsgInstructionStartupError,
-                        Content = StarryEyes.Properties.Resources.MsgContentDatabasePathInvalid,
+                        MainInstruction = StarryEyes.Properties.Resources.MsgStartupErrorInst,
+                        Content = StarryEyes.Properties.Resources.MsgDbPathInvalidContent,
                         ExpandedInfo = ex.ToString(),
                         CommonButtons = TaskDialogCommonButtons.Close,
                         FooterIcon = VistaTaskDialogIcon.Information,
-                        FooterText = StarryEyes.Properties.Resources.MsgFooterReInstallKrile,
+                        FooterText = StarryEyes.Properties.Resources.MsgReInstallKrile,
                     });
                     throw;
                 }

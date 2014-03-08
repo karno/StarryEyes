@@ -117,17 +117,59 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="MsgContentDatabasePathInvalid" xml:space="preserve">
+  <data name="AppName" xml:space="preserve">
+    <value>Krile StarryEyes</value>
+  </data>
+  <data name="MsgButtonBrowseMsKb" xml:space="preserve">
+    <value>Microsoft KBを参照</value>
+  </data>
+  <data name="MsgButtonCancel" xml:space="preserve">
+    <value>キャンセル</value>
+  </data>
+  <data name="MsgDbPathInvalidContent" xml:space="preserve">
     <value>データベース パスの指定が不正かもしれません。
 Krile.exe.config の設定を確認してください。</value>
   </data>
-  <data name="MsgFooterReInstallKrile" xml:space="preserve">
+  <data name="MsgDesktopHeapContent" xml:space="preserve">
+    <value>Krileのクラッシュやシステムの停止を引き起こす可能性があります。
+Windowsの設定を変更することで、この問題を回避できる可能性があります。</value>
+  </data>
+  <data name="MsgReInstallKrile" xml:space="preserve">
     <value>改善しないときは、Krileの再インストールを試してみてください。</value>
   </data>
-  <data name="MsgInstructionStartupError" xml:space="preserve">
+  <data name="MsgDesktopHeapInfo" xml:space="preserve">
+    <value>デスクトップ ヒープの設定が少なすぎます。
+現在の値: {0} / 推奨設定値の下限: {1}</value>
+  </data>
+  <data name="MsgDesktopHeapInst" xml:space="preserve">
+    <value>メモリ不足に陥る可能性があります。</value>
+  </data>
+  <data name="MsgStartupErrorInst" xml:space="preserve">
     <value>Krileの起動に失敗しました。</value>
   </data>
-  <data name="MsgTitleStartupError" xml:space="preserve">
+  <data name="MsgStartupErrorTitle" xml:space="preserve">
     <value>Krile スタートアップ エラー</value>
+  </data>
+  <data name="MsgTabWarningTitle" xml:space="preserve">
+    <value>タブ情報の警告</value>
+  </data>
+  <data name="MsgDoNotAskMeAgain" xml:space="preserve">
+    <value>次回から表示しない</value>
+  </data>
+  <data name="MsgExitInst" xml:space="preserve">
+    <value>Krileを終了してもよろしいですか？</value>
+  </data>
+  <data name="MsgExitTitle" xml:space="preserve">
+    <value>Krileの終了</value>
+  </data>
+  <data name="MsgExitVerification" xml:space="preserve">
+    <value>次回から確認せずに終了</value>
+  </data>
+  <data name="MsgTabWarningContent" xml:space="preserve">
+    <value>タブがありません。
+初回起動時のタブ構成に戻しますか？</value>
+  </data>
+  <data name="MsgTabWarningInst" xml:space="preserve">
+    <value>タブ情報が失われた可能性があります。</value>
   </data>
 </root>
