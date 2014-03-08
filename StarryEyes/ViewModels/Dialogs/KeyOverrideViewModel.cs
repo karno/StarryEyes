@@ -8,6 +8,7 @@ using Livet.Messaging.Windows;
 using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
 using StarryEyes.Views.Messaging;
+using StarryEyes.ViewsResources.Dialogs;
 
 namespace StarryEyes.ViewModels.Dialogs
 {
@@ -65,10 +66,10 @@ namespace StarryEyes.ViewModels.Dialogs
                 this.Messenger.Raise(new TaskDialogMessage(
                     new TaskDialogOptions
                     {
-                        Title = "キー設定エラー",
+                        Title = KeyOverrideWindowResources.MsgKeySettingError,
                         MainIcon = VistaTaskDialogIcon.Error,
-                        MainInstruction = "このキーは設定できません。",
-                        Content = "APIキーくらい横着しないで自分で取得しろ",
+                        MainInstruction = KeyOverrideWindowResources.MsgBlockingKeyInst,
+                        Content = KeyOverrideWindowResources.MsgBlockingKeyContent,
                         CommonButtons = TaskDialogCommonButtons.Close
                     }));
                 return;
@@ -78,10 +79,10 @@ namespace StarryEyes.ViewModels.Dialogs
                 this.Messenger.Raise(new TaskDialogMessage(
                     new TaskDialogOptions
                     {
-                        Title = "キー設定エラー",
+                        Title = KeyOverrideWindowResources.MsgKeySettingError,
                         MainIcon = VistaTaskDialogIcon.Error,
-                        MainInstruction = "Consumer Keyが間違っています。",
-                        Content = "入力されたConsumer Keyに使用できない文字が含まれています。入力したキーを確認してください。",
+                        MainInstruction = KeyOverrideWindowResources.MsgInvalidKeyInst,
+                        Content = KeyOverrideWindowResources.MsgInvalidKeyContent,
                         CommonButtons = TaskDialogCommonButtons.Close
                     }));
                 return;
@@ -91,10 +92,10 @@ namespace StarryEyes.ViewModels.Dialogs
                 this.Messenger.Raise(new TaskDialogMessage(
                     new TaskDialogOptions
                     {
-                        Title = "キー設定エラー",
+                        Title = KeyOverrideWindowResources.MsgKeySettingError,
                         MainIcon = VistaTaskDialogIcon.Error,
-                        MainInstruction = "Consumer Secretが間違っています。",
-                        Content = "入力されたConsumer Secretに使用できない文字が含まれています。入力したキーを確認してください。",
+                        MainInstruction = KeyOverrideWindowResources.MsgInvalidSecretInst,
+                        Content = KeyOverrideWindowResources.MsgInvalidSecretContent,
                         CommonButtons = TaskDialogCommonButtons.Close
                     }));
                 return;
@@ -118,13 +119,13 @@ namespace StarryEyes.ViewModels.Dialogs
                               new TaskDialogMessage(
                                   new TaskDialogOptions
                                   {
-                                      Title = "OAuth認証エラー",
+                                      Title = KeyOverrideWindowResources.MsgAuthErrorTitle,
                                       MainIcon = VistaTaskDialogIcon.Error,
-                                      MainInstruction = "API Keyの正当性を確認できませんでした。",
-                                      Content = "キーの入力を確認し、再度お試しください。",
+                                      MainInstruction = KeyOverrideWindowResources.MsgAuthErrorInst,
+                                      Content = KeyOverrideWindowResources.MsgAuthErrorContent,
                                       CommonButtons = TaskDialogCommonButtons.Close,
                                       FooterIcon = VistaTaskDialogIcon.Information,
-                                      FooterText = "Twitterの調子が悪いときやコンピュータの時計が大幅にずれている場合も認証が行えないことがあります。"
+                                      FooterText = KeyOverrideWindowResources.MsgAuthErrorFooter,
                                   })));
         }
 
@@ -136,15 +137,14 @@ namespace StarryEyes.ViewModels.Dialogs
                 var m = this.Messenger.GetResponse(new TaskDialogMessage(
                      new TaskDialogOptions
                      {
-                         Title = "APIキー設定のスキップ",
+                         Title = KeyOverrideWindowResources.MsgSkipTitle,
                          MainIcon = VistaTaskDialogIcon.Warning,
-                         MainInstruction = "APIキーの設定をスキップしますか？",
-                         Content = "スキップする場合、最大登録可能アカウント数が2つに制限されます。",
-                         CustomButtons = new[] { "スキップ", "キャンセル" },
-                         ExpandedInfo = "APIキーの状況によってはアカウントが登録できないことがあります。" + Environment.NewLine +
-                         "後からAPIキーを設定することもできますが、その際にすべてのアカウントを認証しなおす必要があります。"
+                         MainInstruction = KeyOverrideWindowResources.MsgSkipInst,
+                         Content = KeyOverrideWindowResources.MsgSkipContent,
+                         CommonButtons = TaskDialogCommonButtons.OKCancel,
+                         ExpandedInfo = KeyOverrideWindowResources.MsgSkipExInfo
                      }));
-                if (m.Response.CustomButtonResult.HasValue && m.Response.CustomButtonResult.Value == 0)
+                if (m.Response.Result == TaskDialogSimpleResult.Ok)
                 {
                     this.Messenger.Raise(new WindowActionMessage(WindowAction.Close));
                 }

@@ -7,12 +7,14 @@
                       xmlns:StarryEyes_Views_Messaging_Behaviors="clr-namespace:StarryEyes.Views.Messaging.Behaviors"
                       xmlns:StarryEyes_Views_Utils="clr-namespace:StarryEyes.Views.Utils"
                       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                      xmlns:dialogs="clr-namespace:StarryEyes.ViewsResources.Dialogs"
                       xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
                       xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                       Title="Twitter API Key Registration"
                       Width="460"
                       Height="240"
+                      GlowBrush="#1BA1E2"
                       ResizeMode="NoResize"
                       ShowInTaskbar="False"
                       WindowStartupLocation="CenterOwner"
@@ -27,6 +29,7 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/FlatButton.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <StarryEyes_Views_Utils:BooleanToVisibleConverter x:Key="BooleanToVisibleConverter" />
+            <dialogs:KeyOverrideWindowResources x:Key="Res" />
         </ResourceDictionary>
     </Controls:MetroWindow.Resources>
     <Controls:MetroWindow.DataContext>
@@ -50,13 +53,15 @@
         <TextBlock Margin="7.5,8,8.5,0"
                    FontSize="18.667"
                    Foreground="Black"
+                   Text="{Binding Source={StaticResource Res},
+                                  Path=HeaderText}"
                    TextWrapping="Wrap"
-                   d:LayoutOverrides="Height"><Run Language="ja-jp" Text="API キーの登録" />
-        </TextBlock>
+                   d:LayoutOverrides="Height" />
         <TextBlock Grid.Row="1"
-                   Margin="8,0,8,8"
+                   Margin="8,2,8,8"
                    Foreground="Black"
-                   Text="あなたが取得したAPI キーを登録することで、より快適にKrileを利用することができます。スキップすることもできますが、一部機能に制限がかかります。"
+                   Text="{Binding Source={StaticResource Res},
+                                  Path=InstructionText}"
                    TextWrapping="Wrap"
                    d:LayoutOverrides="Height" />
         <Grid Grid.Row="2" VerticalAlignment="Center">
@@ -101,7 +106,7 @@
                 Width="100"
                 Margin="0,8,8,8"
                 HorizontalAlignment="Right"
-                Content="スキップ"
+                Content="Skip"
                 IsEnabled="{Binding IsCkCsEditEnabled,
                                     Mode=OneWay}"
                 Style="{DynamicResource MetroSquareButtonStyle}">
@@ -129,7 +134,8 @@
         <TextBlock Grid.Row="3"
                    Margin="8,17.24,216,12.76"
                    TextWrapping="Wrap">
-            <Hyperlink Command="{Binding OpenApiKeyHelpCommand}"><Run Text="APIキーの取得について" />
+            <Hyperlink Command="{Binding OpenApiKeyHelpCommand}">
+                <Run Text="{Binding Source={StaticResource Res}, Path=HelpLink, Mode=OneWay}" />
             </Hyperlink>
         </TextBlock>
         <Grid Grid.RowSpan="4"

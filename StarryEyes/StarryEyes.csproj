@@ -404,6 +404,16 @@
     <Compile Include="ViewModels\Timelines\Statuses\UserViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Backstages\TwitterEventViewModel.cs" />
     <Compile Include="ViewModels\Common\TwitterAccountViewModel.cs" />
+    <Compile Include="ViewsResources\Dialogs\AuthorizationWindowResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AuthorizationWindowResources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="ViewsResources\Dialogs\KeyOverrideWindowResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>KeyOverrideWindowResources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Views\Adorners\AdornerBase.cs" />
     <Compile Include="Views\Adorners\InsertionAdorner.cs" />
     <Compile Include="Views\Behaviors\DragStartBehavior.cs" />
@@ -687,6 +697,18 @@
     </None>
     <AppDesigner Include="Properties\" />
     <EmbeddedResource Include="Properties\Resources.ja-JP.resx" />
+    <EmbeddedResource Include="ViewsResources\Dialogs\AuthorizationWindowResources.ja-JP.resx" />
+    <EmbeddedResource Include="ViewsResources\Dialogs\AuthorizationWindowResources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>AuthorizationWindowResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ViewsResources\Dialogs\KeyOverrideWindowResources.ja-JP.resx">
+      <LastGenOutput>KeyOverrideWindowResources.ja-JP.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ViewsResources\Dialogs\KeyOverrideWindowResources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>KeyOverrideWindowResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="Views\Controls\QueryEditorResources\KrileQuery.xshd" />
   </ItemGroup>
   <ItemGroup />

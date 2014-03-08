@@ -4,6 +4,7 @@
                       xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
                       xmlns:behaviors="clr-namespace:StarryEyes.Views.Messaging.Behaviors"
                       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                      xmlns:dialogs="clr-namespace:StarryEyes.ViewsResources.Dialogs"
                       xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
                       xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
                       xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"
@@ -11,9 +12,10 @@
                       xmlns:triggers="clr-namespace:StarryEyes.Views.Triggers"
                       xmlns:v="clr-namespace:StarryEyes.Views.Dialogs"
                       xmlns:vm="clr-namespace:StarryEyes.ViewModels.Dialogs"
-                      Title="Twitterへ認証"
-                      Width="320"
+                      Title="Add your account"
+                      Width="340"
                       Height="140"
+                      GlowBrush="#1BA1E2"
                       ResizeMode="NoResize"
                       ShowIconOnTitleBar="False"
                       ShowInTaskbar="False"
@@ -30,6 +32,7 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/FlatButton.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <dialogs:AuthorizationWindowResources x:Key="Res" />
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
             <l:VisibilityAndBooleanConverter x:Key="VisibilityAndBooleanConverter" />
         </ResourceDictionary>
@@ -38,11 +41,9 @@
         <vm:AuthorizationViewModel />
     </Controls:MetroWindow.DataContext>
     <i:Interaction.Triggers>
-        <!--  WindowのContentRenderedイベントのタイミングでViewModelのInitializeメソッドが呼ばれます  -->
         <i:EventTrigger EventName="ContentRendered">
             <l:LivetCallMethodAction MethodName="Initialize" MethodTarget="{Binding}" />
         </i:EventTrigger>
-        <!--  Windowが閉じたタイミングでViewModelのDisposeメソッドが呼ばれます  -->
         <i:EventTrigger EventName="Closed">
             <l:DataContextDisposeAction />
         </i:EventTrigger>
@@ -55,7 +56,6 @@
         <l:InteractionMessageTrigger Messenger="{Binding Messenger}">
             <behaviors:TaskDialogInteractionMessageAction />
         </l:InteractionMessageTrigger>
-        <!--  WindowのCloseキャンセル処理に対応する場合は、WindowCloseCancelBehaviorの使用を検討してください  -->
     </i:Interaction.Triggers>
     <Grid>
         <Grid.RowDefinitions>
@@ -66,7 +66,8 @@
         <TextBlock Margin="10,10,10,5"
                    HorizontalAlignment="Stretch"
                    VerticalAlignment="Top"
-                   Text="Twitterへログインし、アクセスを許可してください。 &#10;その後に表示された番号を入力してください。"
+                   Text="{Binding Source={StaticResource Res},
+                                  Path=MainText}"
                    TextWrapping="Wrap" />
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
@@ -113,7 +114,7 @@
                         <ei:CallMethodAction MethodName="ShowHelp" TargetObject="{Binding}" />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
-                <Run Text="認証できない場合" />
+                <Run Text="{Binding Source={StaticResource Res}, Path=HelpText, Mode=OneWay}" />
             </Hyperlink>
         </TextBlock>
         <Grid x:Name="ProcessingOverwrap"
@@ -145,7 +146,8 @@
                            HorizontalAlignment="Left"
                            VerticalAlignment="Center"
                            Foreground="Black"
-                           Text="Twitterと通信しています..."
+                           Text="{Binding Source={StaticResource Res},
+                                          Path=ConnectionText}"
                            TextAlignment="Center"
                            TextWrapping="Wrap"
                            d:LayoutOverrides="HorizontalAlignment, GridBox" />

@@ -10,7 +10,7 @@
         xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         Title=""
-        Width="300"
+        Width="360"
         Height="60"
         AllowsTransparency="True"
         Background="Transparent"
@@ -46,6 +46,6 @@
                    VerticalAlignment="Center"
                    FontSize="16"
                    Foreground="White"
-                   Text="通知はこのディスプレイに表示されます" />
+                   Text="notifications are displayed into this display." />
     </Border>
 </Window>
