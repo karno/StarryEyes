@@ -270,6 +270,7 @@ namespace StarryEyes.Views.Controls
         {
             try
             {
+                img.Source = null;
                 if (uri.Scheme == "pack")
                 {
                     // PACK image
@@ -290,7 +291,6 @@ namespace StarryEyes.Views.Controls
                         });
                         return;
                     }
-                    img.Source = null;
                     IObservable<byte[]> observable;
                     Subject<byte[]> publisher = null;
                     lock (_imageObservables)
