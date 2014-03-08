@@ -30,7 +30,7 @@ namespace StarryEyes.Models.Timelines.Tabs
                 Name = name,
                 FilterQuery = query != null ? QueryCompiler.Compile(query) : null,
                 ShowUnreadCounts = true,
-                NotifyNewArrivals = true
+                NotifyNewArrivals = false,
             };
             var cf = TabManager.CurrentFocusTab;
             if (cf != null)
