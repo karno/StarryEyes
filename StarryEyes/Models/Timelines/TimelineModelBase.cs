@@ -10,6 +10,7 @@ using Livet;
 using StarryEyes.Albireo;
 using StarryEyes.Albireo.Collections;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Models.Receiving;
 using StarryEyes.Models.Receiving.Handling;
 using StarryEyes.Models.Timelines.Statuses;
 
@@ -280,7 +281,12 @@ namespace StarryEyes.Models.Timelines
         /// <returns>if returns false, keep loading yet</returns>
         protected abstract bool PreInvalidateTimeline();
 
-        protected abstract bool CheckAcceptStatus(TwitterStatus status);
+        private bool CheckAcceptStatus(TwitterStatus status)
+        {
+            return !MuteBlockManager.IsUnwanted(status) && CheckAcceptStatusCore(status);
+        }
+
+        protected abstract bool CheckAcceptStatusCore(TwitterStatus status);
 
         protected abstract IObservable<TwitterStatus> Fetch(long? maxId, int? count);
 

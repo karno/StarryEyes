@@ -23,7 +23,7 @@ namespace StarryEyes.Models.Timelines.SearchFlips
             return true;
         }
 
-        protected override bool CheckAcceptStatus(TwitterStatus status)
+        protected override bool CheckAcceptStatusCore(TwitterStatus status)
         {
             // only from web-fetching
             return true;

@@ -62,7 +62,7 @@ namespace StarryEyes.Models.Receiving
         {
             get
             {
-                var exceptSql = String.Empty;
+                string exceptSql;
                 if (_muteBlockedUsers && _muteNoRetweets)
                 {
                     exceptSql =
@@ -89,7 +89,7 @@ namespace StarryEyes.Models.Receiving
             }
         }
 
-        public static bool CheckExcepted([NotNull] TwitterStatus status)
+        public static bool IsUnwanted([NotNull] TwitterStatus status)
         {
             if (status == null) throw new ArgumentNullException("status");
             if (_muteBlockedUsers && (IsBlocked(status.User) ||
@@ -104,8 +104,7 @@ namespace StarryEyes.Models.Receiving
                 // no retweet specified
                 return true;
             }
-            CheckUpdateMutes();
-            return _muteFilter(status);
+            return IsMuted(status);
         }
 
         public static bool IsMuted([NotNull] TwitterStatus status)

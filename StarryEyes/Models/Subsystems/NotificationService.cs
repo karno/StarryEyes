@@ -72,7 +72,7 @@ namespace StarryEyes.Models.Subsystems
         internal static void StartAcceptNewArrival(TwitterStatus status)
         {
             // check muted or blocked
-            if (MuteBlockManager.CheckExcepted(status)) return;
+            if (MuteBlockManager.IsUnwanted(status)) return;
 
             lock (_acceptingArrivals)
             {

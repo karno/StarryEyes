@@ -117,7 +117,7 @@ namespace StarryEyes.Models.Timelines.SearchFlips
             return true;
         }
 
-        protected override bool CheckAcceptStatus(TwitterStatus status)
+        protected override bool CheckAcceptStatusCore(TwitterStatus status)
         {
             return this._filterFunc(status);
         }

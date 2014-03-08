@@ -151,7 +151,7 @@ namespace StarryEyes.Models.Timelines.Tabs
             return !this._filterQuery.IsPreparing;
         }
 
-        protected override bool CheckAcceptStatus(TwitterStatus status)
+        protected override bool CheckAcceptStatusCore(TwitterStatus status)
         {
             return this._filterFunc(status);
         }
