@@ -44,9 +44,9 @@ namespace StarryEyes.Models.Databases
             return LoadUsersAsync(await Database.UserCrud.GetUsersAsync(partOfScreenName));
         }
 
-        public static async Task<IEnumerable<Tuple<long, string>>> GetUsersFastAsync(string partOfScreenName)
+        public static async Task<IEnumerable<Tuple<long, string>>> GetUsersFastAsync(string partOfScreenName, int count)
         {
-            var resp = await Database.UserCrud.GetUsersAsync(partOfScreenName);
+            var resp = await Database.UserCrud.GetUsersFastAsync(partOfScreenName, count);
             return resp.Guard().Select(d => Tuple.Create(d.Id, d.ScreenName));
         }
 

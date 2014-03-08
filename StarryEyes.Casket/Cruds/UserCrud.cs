@@ -45,5 +45,12 @@ namespace StarryEyes.Casket.Cruds
                 this.CreateSql("ScreenName like @Match"),
                 new { Match = "%" + partOfScreenName + "%" });
         }
+
+        public async Task<IEnumerable<DatabaseUser>> GetUsersFastAsync(string firstMatchScreenName, int count)
+        {
+            return await this.QueryAsync<DatabaseUser>(
+                this.CreateSql("ScreenName like @Match order by ScreenName limit " + count),
+                new { Match = firstMatchScreenName + "%" });
+        }
     }
 }

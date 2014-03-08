@@ -93,7 +93,12 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
         private async Task AddUserItems(string key)
         {
             Debug.WriteLine("current screen name: " + key);
-            var items = (await UserProxy.GetUsersFastAsync(key))
+            if (String.IsNullOrEmpty(key))
+            {
+                await DispatcherHelper.UIDispatcher.InvokeAsync(() => this._items.Clear());
+                return;
+            }
+            var items = (await UserProxy.GetUsersFastAsync(key, 1000))
                 .Select(t => t.Item2)
                 .ToArray();
             // re-ordering
