@@ -146,7 +146,7 @@ namespace StarryEyes.Views.Controls
             {
                 return new[]
                 {
-		    new CompletionData("local","Krile内のすべてのツイート(引数: なし)"), 
+		    new CompletionData("local","Krile内のツイート(引数: 参照タブ名[省略可能])"), 
 		    new CompletionData("home", "ユーザのホームタイムライン(引数: ユーザースクリーン名[省略可能])"), 
 		    new CompletionData("mention", "返信タイムライン(引数: ユーザースクリーン名[省略可能])"), 
 		    new CompletionData("messages", "ダイレクトメッセージ(引数: ユーザースクリーン名[省略可能])"), 
