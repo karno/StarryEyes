@@ -25,18 +25,18 @@ namespace StarryEyes.Filters.Sources
 
         public override Func<TwitterStatus, bool> GetEvaluator()
         {
-            this.ResolveTabReference();
-            return this._tab == null || this._tab.FilterQuery == null
+            ResolveTabReference();
+            return _tab == null || _tab.FilterQuery == null
                 ? FilterExpressionBase.Tautology
-                : this._tab.FilterQuery.GetEvaluator();
+                : _tab.FilterQuery.GetEvaluator();
         }
 
         public override string GetSqlQuery()
         {
-            this.ResolveTabReference();
-            return this._tab == null || this._tab.FilterQuery == null
+            ResolveTabReference();
+            return _tab == null || _tab.FilterQuery == null
                 ? "1"
-                : this._tab.FilterQuery.GetSqlQuery();
+                : _tab.FilterQuery.GetSqlQuery();
         }
 
         public override string FilterKey
@@ -68,7 +68,7 @@ namespace StarryEyes.Filters.Sources
                     .SelectMany(c => c.Tabs)
                     .FirstOrDefault(t => t.Name == _tabName);
 
-                if (this._tab == null)
+                if (_tab == null)
                 {
                     throw new ArgumentException("指定されたタブが見つかりませんでした。");
                 }
