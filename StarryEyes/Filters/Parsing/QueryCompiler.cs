@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using StarryEyes.Filters.Expressions;
 using StarryEyes.Filters.Expressions.Operators;
 using StarryEyes.Filters.Expressions.Values;
@@ -55,6 +56,14 @@ namespace StarryEyes.Filters.Parsing
             {
                 throw;
             }
+            catch (TargetInvocationException ex)
+            {
+                if (ex.InnerException is FilterQueryException)
+                {
+                    throw ex.InnerException;
+                }
+                throw new FilterQueryException("クエリのコンパイルに失敗しました。 " + ex.InnerException.Message, query, ex.InnerException);
+            }
             catch (Exception ex)
             {
                 throw new FilterQueryException("クエリのコンパイルに失敗しました。 " + ex.Message, query, ex);
@@ -72,6 +81,14 @@ namespace StarryEyes.Filters.Parsing
             catch (FilterQueryException)
             {
                 throw;
+            }
+            catch (TargetInvocationException ex)
+            {
+                if (ex.InnerException is FilterQueryException)
+                {
+                    throw ex.InnerException;
+                }
+                throw new FilterQueryException("クエリのコンパイルに失敗しました: " + ex.InnerException.Message, query, ex.InnerException);
             }
             catch (Exception ex)
             {
