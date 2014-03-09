@@ -362,6 +362,11 @@ namespace StarryEyes.Filters.Parsing
                 reader.AssertGet(TokenType.Exclamation);
                 return new FilterNegate { Value = CompileL7(reader) };
             }
+            if (reader.LookAhead().Value == "caseful")
+            {
+                reader.AssertGet(TokenType.Literal);
+                return new OperatorCaseful { Value = CompileL7(reader) };
+            }
             return CompileL8(reader);
         }
 

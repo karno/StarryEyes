@@ -32,7 +32,7 @@ namespace StarryEyes.Filters.Expressions.Operators
                 case FilterExpressionType.String:
                     var lsp = LeftValue.GetStringValueProvider();
                     var rsp = RightValue.GetStringValueProvider();
-                    return _ => lsp(_) == rsp(_);
+                    return _ => String.Equals(lsp(_), rsp(_), GetStringComparison());
                 default:
                     throw new InvalidOperationException("Invalid code path.");
             }
@@ -50,7 +50,14 @@ namespace StarryEyes.Filters.Expressions.Operators
                     converter = f => f.GetNumericSqlQuery();
                     break;
                 case FilterExpressionType.String:
-                    converter = f => f.GetStringSqlQuery();
+                    if (this.GetStringComparison() == StringComparison.CurrentCultureIgnoreCase)
+                    {
+                        converter = f => "LOWER(" + f.GetStringSqlQuery() + ")";
+                    }
+                    else
+                    {
+                        converter = f => f.GetStringSqlQuery();
+                    }
                     break;
                 default:
                     throw new InvalidOperationException("Invalid code path.");

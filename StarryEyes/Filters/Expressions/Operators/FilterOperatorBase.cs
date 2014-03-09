@@ -58,6 +58,8 @@ namespace StarryEyes.Filters.Expressions.Operators
             return null;//unreachable code
         }
 
+        public abstract StringComparison GetStringComparison();
+
         protected void ThrowMismatchType(FilterExpressionType type)
         {
             throw FilterQueryException.CreateUnsupportedType(this.OperatorString, type, this.ToQuery());
@@ -99,6 +101,11 @@ namespace StarryEyes.Filters.Expressions.Operators
             {
                 Value.EndLifecycle();
             }
+        }
+
+        public override StringComparison GetStringComparison()
+        {
+            return Value.GetStringComparison();
         }
     }
 
@@ -148,6 +155,14 @@ namespace StarryEyes.Filters.Expressions.Operators
         {
             LeftValue.EndLifecycle();
             RightValue.EndLifecycle();
+        }
+
+        public override StringComparison GetStringComparison()
+        {
+            return LeftValue.GetStringComparison() == StringComparison.CurrentCulture
+                || RightValue.GetStringComparison() == StringComparison.CurrentCulture
+                ? StringComparison.CurrentCulture
+                : StringComparison.CurrentCultureIgnoreCase;
         }
     }
 }

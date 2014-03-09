@@ -146,15 +146,15 @@ namespace StarryEyes.Views.Controls
             {
                 return new[]
                 {
-		    new CompletionData("local","Krile内のツイート(引数: 参照タブ名[省略可能])"), 
-		    new CompletionData("home", "ユーザのホームタイムライン(引数: ユーザースクリーン名[省略可能])"), 
-		    new CompletionData("mention", "返信タイムライン(引数: ユーザースクリーン名[省略可能])"), 
-		    new CompletionData("messages", "ダイレクトメッセージ(引数: ユーザースクリーン名[省略可能])"), 
-		    new CompletionData("list", "list:", "リスト(引数: (取得ユーザ名)/スクリーン名/リスト名)"), 
-		    new CompletionData("search", "search:", "検索タイムライン(引数: 検索文字列)"), 
-		    new CompletionData("track", "track:", "ストリームタイムライン(引数: 検索文字列[英数字])"), 
-		    new CompletionData("conv", "conv:", "返信タイムライン(引数: ツイートID)"), 
-		    new CompletionData("user", "user:", "指定ユーザーのツイート(引数: ユーザースクリーン名 または #ユーザーID)"), 
+                    new CompletionData("local","Krile内のツイート(引数: 参照タブ名[省略可能])"), 
+                    new CompletionData("home", "ユーザのホームタイムライン(引数: ユーザースクリーン名[省略可能])"), 
+                    new CompletionData("mention", "返信タイムライン(引数: ユーザースクリーン名[省略可能])"), 
+                    new CompletionData("messages", "ダイレクトメッセージ(引数: ユーザースクリーン名[省略可能])"), 
+                    new CompletionData("list", "list:", "リスト(引数: (取得ユーザ名)/スクリーン名/リスト名)"), 
+                    new CompletionData("search", "search:", "検索タイムライン(引数: 検索文字列)"), 
+                    new CompletionData("track", "track:", "ストリームタイムライン(引数: 検索文字列[英数字])"), 
+                    new CompletionData("conv", "conv:", "返信タイムライン(引数: ツイートID)"), 
+                    new CompletionData("user", "user:", "指定ユーザーのツイート(引数: ユーザースクリーン名 または #ユーザーID)"), 
                 };
             }
             if (t.Any() &&
@@ -327,20 +327,20 @@ namespace StarryEyes.Views.Controls
         {
             return new[]
             {
-		new CompletionData("us", "[Account] Krileに登録済みのアカウント一覧"), 
-		new CompletionData("user", "[User] ツイートのユーザー"), 
-		new CompletionData("retweeter", "[User] リツイートしたユーザー"), 
-		new CompletionData("direct_message", "[Boolean] ダイレクトメッセージであるか"), 
-		new CompletionData("retweet", "[Boolean] リツイートであるか"), 
-		new CompletionData("id", "[Numeric] ツイートのID"), 
-		new CompletionData("in_reply_to", "[Numeric] 返信先ツイートID"),
-		new CompletionData("text", "[String] ツイートの本文"),
-		new CompletionData("body", "[String] ツイートの本文"),
-		new CompletionData("via", "[String] ツイートの送信元クライアント"),
-		new CompletionData("from", "[String] ツイートの送信元クライアント"),
-		new CompletionData("to", "[Num/Str/Set] ツイートの返信先ユーザー"),
-		new CompletionData("favs", "[Num/Set] 被お気に入り登録数"),
-		new CompletionData("rts", "[Num/Set] 被リツイート数"),
+                new CompletionData("us", "[Account] Krileに登録済みのアカウント一覧"), 
+                new CompletionData("user", "[User] ツイートのユーザー"), 
+                new CompletionData("retweeter", "[User] リツイートしたユーザー"), 
+                new CompletionData("direct_message", "[Boolean] ダイレクトメッセージであるか"), 
+                new CompletionData("retweet", "[Boolean] リツイートであるか"), 
+                new CompletionData("id", "[Numeric] ツイートのID"), 
+                new CompletionData("in_reply_to", "[Numeric] 返信先ツイートID"),
+                new CompletionData("text", "[String] ツイートの本文"),
+                new CompletionData("body", "[String] ツイートの本文"),
+                new CompletionData("via", "[String] ツイートの送信元クライアント"),
+                new CompletionData("from", "[String] ツイートの送信元クライアント"),
+                new CompletionData("to", "[Num/Str/Set] ツイートの返信先ユーザー"),
+                new CompletionData("favs", "[Num/Set] 被お気に入り登録数"),
+                new CompletionData("rts", "[Num/Set] 被リツイート数"),
             };
         }
 
@@ -348,9 +348,9 @@ namespace StarryEyes.Views.Controls
         {
             return new[]
             {
-		new CompletionData("followings", "[Set] フォローしているユーザー"), 
-		new CompletionData("followers", "[Set] フォローされているユーザー"), 
-		new CompletionData("blockings", "[Set] ブロックしているユーザー"), 
+                new CompletionData("followings", "[Set] フォローしているユーザー"), 
+                new CompletionData("followers", "[Set] フォローされているユーザー"), 
+                new CompletionData("blockings", "[Set] ブロックしているユーザー"), 
             };
         }
 
