@@ -38,7 +38,7 @@ namespace StarryEyes.Filters.Expressions.Operators
                     var h = haystack(t);
                     var n = needle(t);
                     if (h == null || n == null) return false;
-                    return h.IndexOf(n, StringComparison.CurrentCultureIgnoreCase) >= 0;
+                    return h.IndexOf(n, GetStringComparison()) >= 0;
                 };
             }
             var lsp = this.LeftValue.GetSetValueProvider();
@@ -59,9 +59,9 @@ namespace StarryEyes.Filters.Expressions.Operators
         {
             if (this.CompareAsString())
             {
-                return this.LeftValue.GetStringSqlQuery() + " LIKE '%" +
-                       this.RightValue.GetStringSqlQuery().Unwrap() +
-                       "%' escape '\\'";
+                return this.GetStringComparison() == StringComparison.CurrentCultureIgnoreCase
+                    ? "LOWER(" + this.LeftValue.GetStringSqlQuery() + ") LIKE LOWER('%" + this.RightValue.GetStringSqlQuery().Unwrap() + "%') escape '\\'"
+                    : this.LeftValue.GetStringSqlQuery() + " LIKE '%" + this.RightValue.GetStringSqlQuery().Unwrap() + "%' escape '\\'";
             }
             var lq = this.LeftValue.GetSetSqlQuery();
             if (this.RightValue.SupportedTypes.Contains(FilterExpressionType.Numeric))

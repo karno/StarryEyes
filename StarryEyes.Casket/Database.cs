@@ -100,7 +100,7 @@ namespace StarryEyes.Casket
             {
                 tasks = new[]
                 {
-		    AccountInfoCrud.InitializeAsync(),
+                    AccountInfoCrud.InitializeAsync(),
                     StatusCrud.InitializeAsync(),
                     StatusEntityCrud.InitializeAsync(),
                     UserCrud.InitializeAsync(),

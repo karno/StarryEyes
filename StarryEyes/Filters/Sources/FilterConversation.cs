@@ -73,7 +73,7 @@ namespace StarryEyes.Filters.Sources
 
         public override string FilterKey
         {
-            get { return "talk:"; }
+            get { return "conv"; }
         }
 
         public override string FilterValue

@@ -34,7 +34,8 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
                     // {"Synchronous", "Off"}, 
                     {"Page Size", "2048"},
                     {"Pooling", "True"},
-                    {"Max Pool Size", "200"}
+                    {"Max Pool Size", "200"},
+                    {"PRAGMA case_sensitive_like", "True"},
                 };
             return dic.Select(kvp => kvp.Key + "=" + kvp.Value)
                       .JoinString(";");

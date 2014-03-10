@@ -64,6 +64,7 @@
       <Word>endswith</Word>
       <Word>regex</Word>
       <Word>match</Word>
+      <Word>caseful</Word>
     </Keywords>
 
   </RuleSet>

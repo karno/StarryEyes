@@ -209,7 +209,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             {
                 if (String.IsNullOrEmpty(_currentConfigurationTarget.Name))
                 {
-                    _currentConfigurationTarget.Name = "(empty)";
+                    _currentConfigurationTarget.Name = "(untitled)";
                 }
                 if (_filterQuery != null && _filterQuery.ToQuery() != _initialQuery)
                 {

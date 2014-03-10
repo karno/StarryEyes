@@ -47,13 +47,15 @@ namespace StarryEyes.Filters.Expressions.Operators
                 var h = haystack(t);
                 var n = needle(t);
                 if (h == null || n == null) return false;
-                return h.StartsWith(n, StringComparison.CurrentCultureIgnoreCase);
+                return h.StartsWith(n, GetStringComparison());
             };
         }
 
         public override string GetBooleanSqlQuery()
         {
-            return LeftValue.GetStringSqlQuery() + " LIKE '" + RightValue.GetStringSqlQuery().Unwrap() + "%' escape '\\'";
+            return GetStringComparison() == StringComparison.CurrentCultureIgnoreCase
+                ? "LOWER(" + LeftValue.GetStringSqlQuery() + ") LIKE LOWER('" + RightValue.GetStringSqlQuery().Unwrap() + "%') escape '\\'"
+                : LeftValue.GetStringSqlQuery() + " LIKE '" + RightValue.GetStringSqlQuery().Unwrap() + "%' escape '\\'";
         }
     }
 
@@ -78,13 +80,15 @@ namespace StarryEyes.Filters.Expressions.Operators
                 var h = haystack(t);
                 var n = needle(t);
                 if (h == null || n == null) return false;
-                return h.EndsWith(n, StringComparison.CurrentCultureIgnoreCase);
+                return h.EndsWith(n, GetStringComparison());
             };
         }
 
         public override string GetBooleanSqlQuery()
         {
-            return LeftValue.GetStringSqlQuery() + " LIKE '%" + RightValue.GetStringSqlQuery().Unwrap() + "' escape '\\'";
+            return GetStringComparison() == StringComparison.CurrentCultureIgnoreCase
+                ? "LOWER(" + LeftValue.GetStringSqlQuery() + ") LIKE LOWER('%" + RightValue.GetStringSqlQuery().Unwrap() + "') escape '\\'"
+                : LeftValue.GetStringSqlQuery() + " LIKE '%" + RightValue.GetStringSqlQuery().Unwrap() + "' escape '\\'";
         }
     }
 
@@ -141,6 +145,45 @@ namespace StarryEyes.Filters.Expressions.Operators
         public override string GetBooleanSqlQuery()
         {
             return LeftValue.GetStringSqlQuery() + " REGEXP " + RightValue.GetStringSqlQuery();
+        }
+    }
+
+    public class OperatorCaseful : FilterSingleValueOperator
+    {
+        protected override string OperatorString
+        {
+            get
+            {
+                return "caseful";
+            }
+        }
+
+        public override IEnumerable<FilterExpressionType> SupportedTypes
+        {
+            get
+            {
+                yield return FilterExpressionType.String;
+            }
+        }
+
+        public override Func<TwitterStatus, string> GetStringValueProvider()
+        {
+            return Value.GetStringValueProvider();
+        }
+
+        public override string GetStringSqlQuery()
+        {
+            return Value.GetStringSqlQuery();
+        }
+
+        public override string ToQuery()
+        {
+            return "caseful " + Value.ToQuery();
+        }
+
+        public override StringComparison GetStringComparison()
+        {
+            return StringComparison.CurrentCulture;
         }
     }
 }

@@ -11,6 +11,11 @@ namespace StarryEyes.Filters.Expressions.Values
             get { return this.ToQuery(); }
         }
 
+        public override StringComparison GetStringComparison()
+        {
+            return StringComparison.CurrentCultureIgnoreCase;
+        }
+
         protected static string Coalesce(string sql, [NotNull] string defaultValue)
         {
             if (defaultValue == null) throw new ArgumentNullException("defaultValue");
