@@ -11,6 +11,7 @@ namespace StarryEyes.Models.Receiving
     {
         private static SearchReceiveManager _searchReceiveManager;
         private static ListReceiveManager _listReceiveManager;
+        private static ListMemberReceiveManager _listMemberReceiveManager;
         private static UserReceiveManager _userReceiveManager;
         private static StreamTrackReceiveManager _streamTrackReceiveManager;
 
@@ -24,7 +25,8 @@ namespace StarryEyes.Models.Receiving
             _userReceiveManager = new UserReceiveManager();
             _searchReceiveManager = new SearchReceiveManager();
             _listReceiveManager = new ListReceiveManager();
-            _listReceiveManager.ListMemberChanged += li => ListMemberChanged.SafeInvoke(li);
+            _listMemberReceiveManager = new ListMemberReceiveManager();
+            _listMemberReceiveManager.ListMemberChanged += li => ListMemberChanged.SafeInvoke(li);
             _streamTrackReceiveManager = new StreamTrackReceiveManager(_userReceiveManager);
             _userReceiveManager.ConnectionStateChanged += arg => UserStreamsConnectionStateChanged.SafeInvoke(arg);
             BehaviorLogger.Log("RM", "init.");
@@ -52,22 +54,46 @@ namespace StarryEyes.Models.Receiving
 
         public static void RegisterList(ListInfo info)
         {
+            RegisterListMember(info);
             _listReceiveManager.StartReceive(info);
         }
 
         public static void RegisterList(string receiver, ListInfo info)
         {
+            RegisterListMember(receiver, info);
             _listReceiveManager.StartReceive(receiver, info);
         }
 
         public static void RegisterList(TwitterAccount authInfo, ListInfo info)
         {
+            RegisterListMember(authInfo, info);
             _listReceiveManager.StartReceive(authInfo, info);
+        }
+
+        public static void RegisterListMember(ListInfo info)
+        {
+            _listMemberReceiveManager.StartReceive(info);
+        }
+
+        public static void RegisterListMember(string receiver, ListInfo info)
+        {
+            _listMemberReceiveManager.StartReceive(receiver, info);
+        }
+
+        public static void RegisterListMember(TwitterAccount authInfo, ListInfo info)
+        {
+            _listMemberReceiveManager.StartReceive(authInfo, info);
         }
 
         public static void UnregisterList(ListInfo info)
         {
+            UnregisterListMember(info);
             _listReceiveManager.StopReceive(info);
+        }
+
+        public static void UnregisterListMember(ListInfo info)
+        {
+            _listMemberReceiveManager.StopReceive(info);
         }
 
         public static void ReconnectUserStreams(long id)
