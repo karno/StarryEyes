@@ -206,8 +206,18 @@ namespace StarryEyes.Views.Controls
             }
             if (_suggestListPopup.Parent == null)
             {
+                // initiate popup
                 var panel = (Panel)this.Parent;
                 panel.Children.Add(_suggestListPopup);
+
+                _suggestListPopup.Placement = PlacementMode.Custom;
+                _suggestListPopup.CustomPopupPlacementCallback += (popupSize, targetSize, offset) =>
+                    new[]
+                    {
+                        new CustomPopupPlacement(
+                            new Point(-2, targetSize.Height + 2),
+                            PopupPrimaryAxis.None)
+                    };
             }
             int tokenStart, _;
             var token = _provider.FindNearestToken(this.Text, this.CaretIndex, out tokenStart, out _);
