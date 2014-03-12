@@ -189,6 +189,7 @@
     <Compile Include="AppInitializer.cs" />
     <Compile Include="CustomColorButtonHelper.cs" />
     <Compile Include="Filters\Expressions\Operators\OperatorStrings.cs" />
+    <Compile Include="Filters\Expressions\Values\Lists\Sets.cs" />
     <Compile Include="Filters\Expressions\Values\Users\Booleans.cs" />
     <Compile Include="Filters\Expressions\Values\Users\Complexes.cs" />
     <Compile Include="Filters\Expressions\Values\Users\Numerics.cs" />

@@ -90,12 +90,12 @@ namespace StarryEyes.Filters.Sources
             }
             if (splited.Length == 2)
             {
-                _listInfo = new ListInfo { OwnerScreenName = splited[0], Slug = splited[1] };
+                _listInfo = new ListInfo(splited[0], splited[1]);
                 this._receiverScreenName = splited[0];
             }
             else
             {
-                _listInfo = new ListInfo { OwnerScreenName = splited[1], Slug = splited[2] };
+                _listInfo = new ListInfo(splited[1], splited[2]);
                 this._receiverScreenName = splited[0];
             }
         }

@@ -4,6 +4,14 @@ namespace StarryEyes.Models.Receiving
 {
     public class ListInfo : IEquatable<ListInfo>, IComparable<ListInfo>, IComparable
     {
+        public ListInfo() { }
+
+        public ListInfo(string screenName, string slug)
+        {
+            this.OwnerScreenName = screenName;
+            this.Slug = slug;
+        }
+
         public string Slug { get; set; }
 
         public string OwnerScreenName { get; set; }
@@ -16,7 +24,8 @@ namespace StarryEyes.Models.Receiving
         public bool Equals(ListInfo other)
         {
             if (other == null) return false;
-            return other.OwnerScreenName == this.OwnerScreenName && other.Slug == this.Slug;
+            return other.OwnerScreenName.Equals(this.OwnerScreenName, StringComparison.CurrentCultureIgnoreCase) &&
+                   other.Slug.Equals(this.Slug, StringComparison.CurrentCultureIgnoreCase);
         }
 
         public override int GetHashCode()
@@ -32,8 +41,8 @@ namespace StarryEyes.Models.Receiving
         public int CompareTo(ListInfo other)
         {
             return String.Compare(
-                this.OwnerScreenName + this.Slug,
-                other.OwnerScreenName + other.Slug,
+                this.OwnerScreenName + "/" + this.Slug,
+                other.OwnerScreenName + "/" + other.Slug,
                 StringComparison.Ordinal);
         }
 

@@ -6,6 +6,7 @@ using StarryEyes.Filters.Expressions;
 using StarryEyes.Filters.Expressions.Operators;
 using StarryEyes.Filters.Expressions.Values;
 using StarryEyes.Filters.Expressions.Values.Immediates;
+using StarryEyes.Filters.Expressions.Values.Lists;
 using StarryEyes.Filters.Expressions.Values.Locals;
 using StarryEyes.Filters.Expressions.Values.Statuses;
 using StarryEyes.Filters.Expressions.Values.Users;
@@ -460,6 +461,8 @@ namespace StarryEyes.Filters.Parsing
                 case "user":
                 case "retweeter":
                     return GetUserValue(literal.Value == "retweeter", reader);
+                case "list":
+                    return GetListValue(reader);
                 default:
                     long iv;
                     if (Int64.TryParse(literal.Value, out iv))
@@ -661,6 +664,25 @@ namespace StarryEyes.Filters.Parsing
                 default:
                     throw CreateUnexpectedTokenError(value, value + " " + reader.RemainQuery);
             }
+        }
+
+        private static ListMembers GetListValue(TokenReader reader)
+        {
+            reader.AssertGet(TokenType.Period);
+            var user = reader.AssertGet(TokenType.Literal).Value;
+            reader.AssertGet(TokenType.Period);
+            string slug;
+            var slugToken = reader.Get();
+            switch (slugToken.Type)
+            {
+                case TokenType.String:
+                case TokenType.Literal:
+                    slug = slugToken.Value;
+                    break;
+                default:
+                    throw CreateUnexpectedTokenError(slugToken.Value, reader.RemainQuery);
+            }
+            return new ListMembers(user, slug);
         }
 
         #endregion
