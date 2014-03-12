@@ -174,23 +174,42 @@ namespace StarryEyes.Views.Controls
             {
                 return null;
             }
-            var lts = tokens.TakeLast(2).ToArray();
-            if (lts.Length == 0)
+            var lts = tokens.TakeLast(3).ToArray();
+            Token first, second, third;
+            switch (lts.Length)
             {
-                // first
-                return this.GetVariableCompletionData();
+                case 0:
+                    // first token of this query
+                    return this.GetVariableCompletionData();
+                case 1:
+                    first = second = third = lts[0];
+                    break;
+                case 2:
+                    first = second = lts[0];
+                    third = lts[1];
+                    break;
+                case 3:
+                    first = lts[0];
+                    second = lts[1];
+                    third = lts[2];
+                    break;
+                default:
+                    return null;
             }
-            var lt = lts.LastOrDefault();
-            var plt = lts.FirstOrDefault();
-            if (lts.Length >= 2 && lt.Type == TokenType.Period)
+            if (lts.Length >= 2 && third.Type == TokenType.Period)
             {
-                if (plt.IsMatchTokenLiteral("user") || plt.IsMatchTokenLiteral("retweeter"))
+                if (second.IsMatchTokenLiteral("list") || first.Type == TokenType.Period)
+                {
+                    // if completing list.*, suppress auto-completion hint.
+                    return null;
+                }
+                if (second.IsMatchTokenLiteral("user") || second.IsMatchTokenLiteral("retweeter"))
                 {
                     return this.GetUserObjectFieldCompletionData();
                 }
                 return this.GetAccountObjectFieldCompletionData();
             }
-            return this.CheckPreviousIsVariable(lt) ? null : this.GetVariableCompletionData();
+            return this.CheckPreviousIsVariable(third) ? null : this.GetVariableCompletionData();
         }
 
         private bool CheckPreviousIsVariable(Token token)
@@ -341,6 +360,7 @@ namespace StarryEyes.Views.Controls
                 new CompletionData("to", "[Num/Str/Set] ツイートの返信先ユーザー"),
                 new CompletionData("favs", "[Num/Set] 被お気に入り登録数"),
                 new CompletionData("rts", "[Num/Set] 被リツイート数"),
+                new CompletionData("list", "[Set](list.user.slug) リスト登録されているユーザー"),
             };
         }
 
