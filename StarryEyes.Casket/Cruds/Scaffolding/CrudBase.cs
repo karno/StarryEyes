@@ -31,11 +31,12 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
                     {"Version", "3"},
                     {"Cache Size", "8000"},
                     // This option would cause damage to database image.
-                    // {"Synchronous", "Off"}, 
+                    // {"Synchronous", "Off"},
+                    {"Synchronous", "Normal"},
+                    {"Journal Mode", "WAL"},
                     {"Page Size", "2048"},
                     {"Pooling", "True"},
                     {"Max Pool Size", "200"},
-                    {"PRAGMA case_sensitive_like", "True"},
                 };
             return dic.Select(kvp => kvp.Key + "=" + kvp.Value)
                       .JoinString(";");
@@ -80,6 +81,7 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
             {
                 con = new SQLiteConnection(CreateConStr(Database.DbFilePath));
                 con.Open();
+                con.Execute("PRAGMA case_sensitive_like=1");
                 return con;
             }
             catch (SQLiteException)
