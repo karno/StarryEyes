@@ -54,7 +54,7 @@ namespace StarryEyes.Filters.Sources
             }
             // extract by screen name
             return "EXISTS (select ScreenName from User where Id = status.BaseUserId AND " +
-                   "ScreenName COLLATE nocase = '" + this._targetIdOrScreenName + "' limit 1)";
+                   "LOWER(ScreenName) = '" + this._targetIdOrScreenName.ToLower() + "' limit 1)";
         }
 
         protected override IObservable<TwitterStatus> ReceiveSink(long? maxId)

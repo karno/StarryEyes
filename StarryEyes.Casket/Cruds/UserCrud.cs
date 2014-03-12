@@ -23,8 +23,8 @@ namespace StarryEyes.Casket.Cruds
         public async Task<DatabaseUser> GetAsync(string screenName)
         {
             return (await this.QueryAsync<DatabaseUser>(
-                this.CreateSql("ScreenName COLLATE nocase = @ScreenName limit 1"),
-                new { ScreenName = screenName }))
+                this.CreateSql("LOWER(ScreenName) = @ScreenName limit 1"),
+                new { ScreenName = screenName.ToLower() }))
                 .SingleOrDefault();
         }
 
@@ -33,8 +33,8 @@ namespace StarryEyes.Casket.Cruds
             using (var _ = this.AcquireReadLock())
             using (var con = this.OpenConnection())
             {
-                return con.Query<long>("select Id from " + TableName + " where ScreenName COLLATE nocase = @ScreenName limit 1;",
-                                new { ScreenName = screenName })
+                return con.Query<long>("select Id from " + TableName + " where LOWER(ScreenName) = @ScreenName limit 1;",
+                                new { ScreenName = screenName.ToLower() })
                    .SingleOrDefault();
             }
         }
@@ -42,15 +42,15 @@ namespace StarryEyes.Casket.Cruds
         public async Task<IEnumerable<DatabaseUser>> GetUsersAsync(string partOfScreenName)
         {
             return await this.QueryAsync<DatabaseUser>(
-                this.CreateSql("ScreenName like @Match"),
-                new { Match = "%" + partOfScreenName + "%" });
+                this.CreateSql("LOWER(ScreenName) like @Match"),
+                new { Match = "%" + partOfScreenName.ToLower() + "%" });
         }
 
         public async Task<IEnumerable<DatabaseUser>> GetUsersFastAsync(string firstMatchScreenName, int count)
         {
             return await this.QueryAsync<DatabaseUser>(
-                this.CreateSql("ScreenName like @Match order by ScreenName limit " + count),
-                new { Match = firstMatchScreenName + "%" });
+                this.CreateSql("LOWER(ScreenName) like @Match order by ScreenName limit " + count),
+                new { Match = firstMatchScreenName.ToLower() + "%" });
         }
     }
 }
