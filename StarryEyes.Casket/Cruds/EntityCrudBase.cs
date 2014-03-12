@@ -38,7 +38,7 @@ namespace StarryEyes.Casket.Cruds
 
         internal Tuple<string, object> CreateDeleter(long parentId)
         {
-            return Tuple.Create("DELETE FROM " + this.TableName + " WHERE ParentId = @Id",
+            return Tuple.Create("delete from " + this.TableName + " where ParentId = @Id;",
                          (object)new { Id = parentId });
         }
     }

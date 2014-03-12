@@ -61,7 +61,7 @@ namespace StarryEyes.Casket.Cruds
             var tids = targetId.Select(i => i.ToString(CultureInfo.InvariantCulture)).JoinString(",");
             if (String.IsNullOrEmpty(tids)) return;
             await this.ExecuteAsync(
-                "delete from " + TableName + " where UserId = @UserId and TargetId IN (" + tids + ")",
+                "delete from " + TableName + " wherE UserId = @UserId and TargetId in (" + tids + ");",
                 new { UserId = userId });
         }
 
