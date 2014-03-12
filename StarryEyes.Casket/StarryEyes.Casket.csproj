@@ -87,6 +87,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cruds\AccountInfoCrud.cs" />
+    <Compile Include="Cruds\ListCrud.cs" />
+    <Compile Include="Cruds\ListUserCrud.cs" />
     <Compile Include="Cruds\ManagementCrud.cs" />
     <Compile Include="Cruds\Scaffolding\CrudBase.cs" />
     <Compile Include="Cruds\RelationCrudBase.cs" />
@@ -103,6 +105,8 @@
     <Compile Include="DatabaseModels\DatabaseAccountInfo.cs" />
     <Compile Include="DatabaseModels\DatabaseActivity.cs" />
     <Compile Include="DatabaseModels\DatabaseEntity.cs" />
+    <Compile Include="DatabaseModels\DatabaseList.cs" />
+    <Compile Include="DatabaseModels\DatabaseListUser.cs" />
     <Compile Include="DatabaseModels\DatabaseManagement.cs" />
     <Compile Include="DatabaseModels\DatabaseRelation.cs" />
     <Compile Include="DatabaseModels\DatabaseStatus.cs" />

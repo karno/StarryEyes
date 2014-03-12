@@ -18,6 +18,8 @@ namespace StarryEyes.Casket
         private static readonly UserCrud _userCrud = new UserCrud();
         private static readonly UserDescriptionEntityCrud _userDescEntityCrud = new UserDescriptionEntityCrud();
         private static readonly UserUrlEntityCrud _userUrlEntityCrud = new UserUrlEntityCrud();
+        private static readonly ListCrud _listCrud = new ListCrud();
+        private static readonly ListUserCrud _listUserCrud = new ListUserCrud();
         private static readonly FavoritesCrud _favoritesCrud = new FavoritesCrud();
         private static readonly RetweetsCrud _retweetsCrud = new RetweetsCrud();
         private static readonly RelationCrud _relationCrud = new RelationCrud();
@@ -56,6 +58,16 @@ namespace StarryEyes.Casket
         public static UserUrlEntityCrud UserUrlEntityCrud
         {
             get { return _userUrlEntityCrud; }
+        }
+
+        public static ListCrud ListCrud
+        {
+            get { return _listCrud; }
+        }
+
+        public static ListUserCrud ListUserCrud
+        {
+            get { return _listUserCrud; }
         }
 
         public static FavoritesCrud FavoritesCrud
@@ -106,6 +118,8 @@ namespace StarryEyes.Casket
                     UserCrud.InitializeAsync(),
                     UserDescriptionEntityCrud.InitializeAsync(),
                     UserUrlEntityCrud.InitializeAsync(),
+                    ListCrud.InitializeAsync(),
+                    ListUserCrud.InitializeAsync(),
                     FavoritesCrud.InitializeAsync(),
                     RetweetsCrud.InitializeAsync(),
                     RelationCrud.InitializeAsync(),

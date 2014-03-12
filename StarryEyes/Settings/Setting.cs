@@ -255,6 +255,9 @@ namespace StarryEyes.Settings
         public static readonly SettingItemStruct<int> ListReceivePeriod =
             new SettingItemStruct<int>("ListReceivePeriod", 90);
 
+        public static readonly SettingItemStruct<int> ListMemberReceivePeriod =
+            new SettingItemStruct<int>("ListMemberReceivePeriod", 1800);
+
         public static readonly SettingItemStruct<int> PostWindowTimeSec =
             new SettingItemStruct<int>("PostWindowTimeSec", 10800);
 

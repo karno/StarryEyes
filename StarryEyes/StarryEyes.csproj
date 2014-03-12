@@ -261,6 +261,7 @@
     <Compile Include="Models\Databases\AccountProxy.cs" />
     <Compile Include="Models\Databases\DatabaseException.cs" />
     <Compile Include="Models\Databases\DbTextUtil.cs" />
+    <Compile Include="Models\Databases\ListProxy.cs" />
     <Compile Include="Models\Databases\StatusProxy.cs" />
     <Compile Include="Models\Databases\Mapper.cs" />
     <Compile Include="Models\Databases\UserProxy.cs" />
@@ -272,6 +273,7 @@
     <Compile Include="Models\Plugins\Injections\BridgeSocketBinder.cs" />
     <Compile Include="Models\Plugins\Injections\InjectionInlet.cs" />
     <Compile Include="Models\BehaviorLogger.cs" />
+    <Compile Include="Models\Receiving\Receivers\ListMemberReceiver.cs" />
     <Compile Include="Models\Requests\UpdateFriendshipsRequest.cs" />
     <Compile Include="Models\Inputting\InputSetting.cs" />
     <Compile Include="Models\Subsystems\AutoUpdateService.cs" />

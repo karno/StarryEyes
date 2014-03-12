@@ -16,12 +16,15 @@ namespace StarryEyes.Models.Receiving
 
         public static event Action<TwitterAccount> UserStreamsConnectionStateChanged;
 
+        public static event Action<ListInfo> ListMemberChanged;
+
         public static void Initialize()
         {
             BehaviorLogger.Log("RM", "initializing...");
             _userReceiveManager = new UserReceiveManager();
             _searchReceiveManager = new SearchReceiveManager();
             _listReceiveManager = new ListReceiveManager();
+            _listReceiveManager.ListMemberChanged += li => ListMemberChanged.SafeInvoke(li);
             _streamTrackReceiveManager = new StreamTrackReceiveManager(_userReceiveManager);
             _userReceiveManager.ConnectionStateChanged += arg => UserStreamsConnectionStateChanged.SafeInvoke(arg);
             BehaviorLogger.Log("RM", "init.");

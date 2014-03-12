@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
-using StarryEyes.Anomaly.Utils;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Models.Receiving.Handling;
@@ -11,7 +9,7 @@ using StarryEyes.Settings;
 
 namespace StarryEyes.Models.Receiving.Receivers
 {
-    public class ListReceiver : CyclicReceiverBase
+    public sealed class ListReceiver : CyclicReceiverBase
     {
         private readonly ListInfo _listInfo;
         private readonly TwitterAccount _auth;
@@ -50,7 +48,7 @@ namespace StarryEyes.Models.Receiving.Receivers
                 if (authInfo == null)
                 {
                     BackstageModel.RegisterEvent(new OperationFailedEvent(
-                        "アカウントが登録されていないため、検索タイムラインを受信できませんでした。", null));
+                        "アカウントが登録されていないため、リストタイムラインを受信できませんでした。", null));
                     return;
                 }
 
@@ -67,11 +65,5 @@ namespace StarryEyes.Models.Receiving.Receivers
                 }
             });
         }
-
-        public static IObservable<TwitterStatus> DoReceive(TwitterAccount info, ListInfo list, long? maxId = null)
-        {
-            return info.GetListTimelineAsync(list.Slug, list.OwnerScreenName, maxId: maxId).ToObservable();
-        }
-
     }
 }

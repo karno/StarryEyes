@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Disposables;
+using StarryEyes.Albireo;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Receiving.Receivers;
 using StarryEyes.Nightmare.Windows;
@@ -10,17 +12,21 @@ namespace StarryEyes.Models.Receiving.Managers
 {
     internal class ListReceiveManager
     {
+        public event Action<ListInfo> ListMemberChanged;
+
         private readonly object _listReceiverLocker = new object();
-        private readonly IDictionary<ListInfo, ListReceiver> _listReceiverResolver
-            = new Dictionary<ListInfo, ListReceiver>();
-        private readonly IDictionary<ListInfo, int> _listReceiverReferenceCount
-            = new Dictionary<ListInfo, int>();
+
+        private readonly IDictionary<ListInfo, IDisposable> _receiverDictionary =
+            new Dictionary<ListInfo, IDisposable>();
+
+        private readonly IDictionary<ListInfo, int> _listReceiverReferenceCount =
+            new Dictionary<ListInfo, int>();
 
         public void StartReceive(ListInfo info)
         {
             var account =
-                            Setting.Accounts.Collection.FirstOrDefault(
-                                a => a.UnreliableScreenName.Equals(info.OwnerScreenName, StringComparison.CurrentCultureIgnoreCase));
+                Setting.Accounts.Collection.FirstOrDefault(
+                    a => a.UnreliableScreenName.Equals(info.OwnerScreenName, StringComparison.CurrentCultureIgnoreCase));
             if (account != null)
             {
                 this.StartReceive(account, info);
@@ -67,8 +73,10 @@ namespace StarryEyes.Models.Receiving.Managers
                 else
                 {
                     var lr = new ListReceiver(account, info);
+                    var lmr = new ListMemberReceiver(account, info);
+                    lmr.ListMemberChanged += () => ListMemberChanged.SafeInvoke(info);
                     this._listReceiverReferenceCount.Add(info, 1);
-                    this._listReceiverResolver.Add(info, lr);
+                    this._receiverDictionary.Add(info, new CompositeDisposable(lr, lmr));
                 }
             }
         }
@@ -83,11 +91,11 @@ namespace StarryEyes.Models.Receiving.Managers
                 }
 
                 if (--this._listReceiverReferenceCount[info] != 0) return;
-                // dispose connection
+                // dispose receivers
                 this._listReceiverReferenceCount.Remove(info);
-                var lr = this._listReceiverResolver[info];
-                this._listReceiverResolver.Remove(info);
-                lr.Dispose();
+                var d = _receiverDictionary[info];
+                _receiverDictionary.Remove(info);
+                d.Dispose();
             }
         }
     }

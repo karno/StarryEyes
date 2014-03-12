@@ -8,6 +8,49 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 {
     public static class Lists
     {
+        #region Show list data
+
+        public static Task<TwitterList> ShowListAsync(
+            this IOAuthCredential credential, long listId)
+        {
+            if (credential == null) throw new ArgumentNullException("credential");
+            return ShowListCoreAsync(credential, listId, null, null, null);
+        }
+
+        public static Task<TwitterList> ShowListAsync(
+            this IOAuthCredential credential, long userId, string slug)
+        {
+            if (credential == null) throw new ArgumentNullException("credential");
+            if (slug == null) throw new ArgumentNullException("slug");
+            return ShowListCoreAsync(credential, null, userId, null, slug);
+        }
+
+        public static Task<TwitterList> ShowListAsync(
+            this IOAuthCredential credential, string screenName, string slug)
+        {
+            if (credential == null) throw new ArgumentNullException("credential");
+            if (screenName == null) throw new ArgumentNullException("screenName");
+            if (slug == null) throw new ArgumentNullException("slug");
+            return ShowListCoreAsync(credential, null, null, screenName, slug);
+        }
+
+        private static async Task<TwitterList> ShowListCoreAsync(
+            IOAuthCredential credential, long? listId, long? userId, string screenName, string slug)
+        {
+            var param = new Dictionary<string, object>
+            {
+                {"list_id", listId},
+                {"owner_id", userId},
+                {"owner_screen_name", screenName},
+                {"slug", slug},
+            }.ParametalizeForGet();
+            var client = credential.CreateOAuthClient();
+            var response = await client.GetAsync(new ApiAccess("lists/show.json", param));
+            return await response.ReadAsListAsync();
+        }
+
+        #endregion
+
         #region Lists
 
         public static Task<IEnumerable<TwitterList>> GetListsAsync(
