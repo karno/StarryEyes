@@ -22,7 +22,7 @@ namespace StarryEyes.Filters.Expressions.Values.Lists
 
         public override string ToQuery()
         {
-            return "list." + _listInfo.OwnerScreenName + "." + _listInfo.Slug;
+            return "list." + _listInfo.OwnerScreenName + ".\"" + _listInfo.Slug + "\"";
         }
 
         public override IEnumerable<FilterExpressionType> SupportedTypes
@@ -52,6 +52,7 @@ namespace StarryEyes.Filters.Expressions.Values.Lists
         {
             ReceiveManager.ListMemberChanged += this.OnListMemberChanged;
             ReceiveManager.RegisterListMember(_listInfo);
+            RefreshMembers();
         }
 
         public override void EndLifecycle()
@@ -67,7 +68,6 @@ namespace StarryEyes.Filters.Expressions.Values.Lists
                 RefreshMembers();
             }
         }
-
 
         #region Manage members
 
