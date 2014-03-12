@@ -1,4 +1,3 @@
-
 #ignore thumbnails created by windows
 Thumbs.db
 #Ignore files build by Visual Studio
@@ -12,6 +11,7 @@ Thumbs.db
 *_i.c
 *_p.c
 *.ncb
+*.sln.docstates
 *.suo
 *.tlb
 *.tlh
@@ -19,12 +19,11 @@ Thumbs.db
 *.cache
 *.ilk
 *.log
-[Bb]in
-[Dd]ebug*/
+[Bb]in/
+[Oo]bj/
 *.lib
 *.sbr
-obj/
 [Rr]elease*/
 _ReSharper*/
-[Tt]est[Rr]esult*
-.nuget/
+[Tt]est[Rr]esult*/
+packages/
