@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using StarryEyes.Models.Accounting;
-using StarryEyes.Models.Receivers;
 using StarryEyes.Models.Receiving.Receivers;
 using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;

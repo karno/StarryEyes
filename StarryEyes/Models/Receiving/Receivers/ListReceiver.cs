@@ -6,7 +6,6 @@ using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Anomaly.Utils;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;
-using StarryEyes.Models.Receivers;
 using StarryEyes.Models.Receiving.Handling;
 using StarryEyes.Settings;
 

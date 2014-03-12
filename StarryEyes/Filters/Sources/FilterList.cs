@@ -11,7 +11,6 @@ using StarryEyes.Models;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Models.Databases;
-using StarryEyes.Models.Receivers;
 using StarryEyes.Models.Receiving;
 using StarryEyes.Models.Receiving.Receivers;
 using StarryEyes.Models.Stores;
@@ -21,6 +20,12 @@ namespace StarryEyes.Filters.Sources
 {
     public class FilterList : FilterSourceBase
     {
+        #region Receive list member and update database
+        #endregion
+
+        #region Filtering
+
+        #endregion
         private readonly string _receiver;
         private readonly ListInfo _listInfo;
         private readonly AVLTree<long> _ids = new AVLTree<long>();

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace StarryEyes.Models.Receivers
+namespace StarryEyes.Models.Receiving
 {
     public class ListInfo : IEquatable<ListInfo>, IComparable<ListInfo>, IComparable
     {
@@ -21,12 +21,12 @@ namespace StarryEyes.Models.Receivers
 
         public override int GetHashCode()
         {
-            return OwnerScreenName.GetHashCode() ^ Slug.GetHashCode();
+            return this.OwnerScreenName.GetHashCode() ^ this.Slug.GetHashCode();
         }
 
         public int CompareTo(object obj)
         {
-            return CompareTo((ListInfo)obj);
+            return this.CompareTo((ListInfo)obj);
         }
 
         public int CompareTo(ListInfo other)
@@ -39,7 +39,7 @@ namespace StarryEyes.Models.Receivers
 
         public override string ToString()
         {
-            return OwnerScreenName + "/" + Slug;
+            return this.OwnerScreenName + "/" + this.Slug;
         }
     }
 }

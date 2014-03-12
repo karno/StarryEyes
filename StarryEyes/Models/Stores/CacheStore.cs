@@ -5,7 +5,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Reactive.Linq;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
-using StarryEyes.Models.Receivers;
+using StarryEyes.Models.Receiving;
 using StarryEyes.Models.Receiving.Handling;
 
 namespace StarryEyes.Models.Stores
