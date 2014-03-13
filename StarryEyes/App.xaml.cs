@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
 using StarryEyes.Annotations;
@@ -25,7 +24,6 @@ namespace StarryEyes
         private static bool _requireOptimizeDb = false;
 
         private static readonly string DbVersion = "1.0";
-        private static Mutex _appMutex;
         private static DateTime _startupTime;
 
         /// <summary>
