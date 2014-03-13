@@ -169,7 +169,10 @@ namespace StarryEyes.Models.Timelines.Statuses
             ImageResolver.Resolve(status.GetEntityAidedText(true))
                          .Aggregate(new List<Tuple<Uri, Uri>>(), (l, i) =>
                          {
-                             l.Add(i);
+                             if (!i.Item2.AbsoluteUri.StartsWith("https://ton.twitter.com/1.1/ton/data/dm/"))
+                             {
+                                l.Add(i);
+                             }
                              return l;
                          })
                          .Finally(() =>
