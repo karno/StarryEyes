@@ -94,7 +94,8 @@ namespace StarryEyes
                                         "INDEX OUT OF RANGE - " + e.Action + "<" + typeof(TModel).Name + " -> " + typeof(TViewModel).Name + ">" + Environment.NewLine +
                                         "new start: " + e.NewStartingIndex + ", count: " +
                                         (e.NewItems == null ? "null" : e.NewItems.Count.ToString()) + Environment.NewLine +
-                                        "source length: " + source.Count + ", target length: " + target.Count + ".");
+                                        "source length: " + source.Count + ", target length: " + target.Count + ".",
+                                        aoex);
                                 }
                             }
                         });
