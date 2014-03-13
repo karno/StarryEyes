@@ -49,12 +49,26 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
                 if (element.delete())
                 {
                     type = "delete";
-                    // delete handler
-                    handler.OnDeleted(new StreamDelete
+                    // status or message is deleted
+                    if (element.delete.status())
                     {
-                        Id = Int64.Parse(element.delete.status.id_str),
-                        UserId = Int64.Parse(element.delete.status.user_id_str)
-                    });
+                        // status is deleted
+                        handler.OnDeleted(new StreamDelete
+                        {
+                            Id = Int64.Parse(element.delete.status.id_str),
+                            UserId = Int64.Parse(element.delete.status.user_id_str)
+                        });
+                    }
+                    if (element.delete.direct_message())
+                    {
+                        // message is deleted
+                        handler.OnDeleted(new StreamDelete
+                        {
+                            Id = Int64.Parse(element.delete.direct_message.id_str),
+                            // UserId = Int64.Parse(element.delete.status.user_id_str) // user_id_str field is not exist.
+                            UserId = Int64.Parse(element.delete.direct_message.user_id.ToString())
+                        });
+                    }
                     return;
                 }
                 if (element.scrub_geo())
@@ -166,6 +180,8 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
             }
             catch (Exception ex)
             {
+                string elemstr = element.ToString();
+                System.Diagnostics.Debug.WriteLine("!exception thrown!" + Environment.NewLine + elemstr);
                 handler.OnExceptionThrownDuringParsing(new Exception("type:" + type, ex));
             }
         }
