@@ -23,7 +23,6 @@ namespace StarryEyes
 {
     internal static class AppInitializer
     {
-        private static bool _requireOptimizeDb = false;
         private static Mutex _appMutex;
 
         #region pre-initialize application
@@ -149,7 +148,7 @@ namespace StarryEyes
         {
 #if DEBUG
             return true;
-#endif
+#else
             var resp = ConfirmationMassages.ConfirmRescue();
             if (!resp.CommandButtonResult.HasValue || resp.CommandButtonResult.Value == 2)
             {
@@ -160,6 +159,7 @@ namespace StarryEyes
                 return true;
             }
             return ShowMaintenanceDialog();
+#endif
         }
 
         /// <summary>
@@ -179,7 +179,7 @@ namespace StarryEyes
                 {
                     case 1:
                         // optimize database
-                        _requireOptimizeDb = true;
+                        ScheduleDatabaseOptimization();
                         break;
                     case 2:
                         // remove database
@@ -270,6 +270,37 @@ namespace StarryEyes
 
             // load cache manager
             CacheStore.Initialize();
+        }
+
+        #endregion
+
+        #region Database optimization
+
+        private static bool _isDatabaseOptimizationRequired;
+
+        private static void ScheduleDatabaseOptimization()
+        {
+            _isDatabaseOptimizationRequired = true;
+        }
+
+        public static void OptimizeDatabaseIfRequired()
+        {
+            if (!_isDatabaseOptimizationRequired) return;
+
+            // change application shutdown mode for preventing 
+            // auto-exit when optimization is completed.
+            Application.Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+            try
+            {
+                // run database optimization
+                var optDlg = new DatabaseOptimizingWindow();
+                optDlg.ShowDialog();
+            }
+            finally
+            {
+                // restore shutdown mode
+                Application.Current.ShutdownMode = ShutdownMode.OnLastWindowClose;
+            }
         }
 
         #endregion

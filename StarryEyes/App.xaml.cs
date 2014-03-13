@@ -11,7 +11,6 @@ using StarryEyes.Annotations;
 using StarryEyes.Casket;
 using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
-using StarryEyes.Views.Dialogs;
 using ThemeManager = StarryEyes.Settings.ThemeManager;
 
 namespace StarryEyes
@@ -21,8 +20,6 @@ namespace StarryEyes
     /// </summary>
     public partial class App
     {
-        private static bool _requireOptimizeDb = false;
-
         private static readonly string DbVersion = "1.0";
         private static DateTime _startupTime;
 
@@ -59,19 +56,8 @@ namespace StarryEyes
                 Environment.Exit(0);
             }
 
-            if (_requireOptimizeDb)
-            {
-                ShutdownMode = ShutdownMode.OnExplicitShutdown;
-                try
-                {
-                    var dboptwindow = new DatabaseOptimizingWindow();
-                    dboptwindow.ShowDialog();
-                }
-                finally
-                {
-                    ShutdownMode = ShutdownMode.OnLastWindowClose;
-                }
-            }
+            // Optimize database when user specified to do so in pre-execution dialog.
+            AppInitializer.OptimizeDatabaseIfRequired();
 
             // Apply theme
             InitializeTheme();
