@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using Livet;
 using StarryEyes.Annotations;
+using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Inputting;
 using StarryEyes.Settings;
 using StarryEyes.ViewModels.Common;
@@ -114,6 +115,59 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             // synchronize accounts
             AccountSelectionFlip.SelectedAccounts = InputModel.AccountSelector.Accounts;
             AccountSelectionFlip.Open();
+        }
+
+        public void SelectNext()
+        {
+            var next = GetNextOrPreviousAccount(true);
+            InputModel.AccountSelector.Accounts.Clear();
+            InputModel.AccountSelector.Accounts.Add(next);
+        }
+
+        public void SelectPrev()
+        {
+            var prev = GetNextOrPreviousAccount(false);
+            InputModel.AccountSelector.Accounts.Clear();
+            InputModel.AccountSelector.Accounts.Add(prev);
+        }
+
+        private TwitterAccount GetNextOrPreviousAccount(bool next)
+        {
+            var account = Setting.Accounts.Collection.ToArray();
+            if (account.Length < 1)
+            {
+                // accounts are not registered yet.
+                return null;
+            }
+            int index;
+            if (next)
+            {
+                index = Array.IndexOf(account, InputModel.AccountSelector.Accounts.LastOrDefault()) + 1;
+                if (index >= account.Length)
+                {
+                    index = 0;
+                }
+            }
+            else
+            {
+                index = Array.IndexOf(account, InputModel.AccountSelector.Accounts.FirstOrDefault()) - 1;
+                if (index < 0)
+                {
+                    index = account.Length - 1;
+                }
+            }
+            return account[index];
+        }
+
+        public void ClearAll()
+        {
+            InputModel.AccountSelector.Accounts.Clear();
+        }
+
+        public void SelectAll()
+        {
+            InputModel.AccountSelector.Accounts.Clear();
+            Setting.Accounts.Collection.ForEach(InputModel.AccountSelector.Accounts.Add);
         }
     }
 }

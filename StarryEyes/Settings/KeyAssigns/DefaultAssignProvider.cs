@@ -20,8 +20,8 @@ c+t: FocusToTimeline
 c+q: FocusToSearch
 c+a+down: SelectNextAccount
 c+a+up: SelectPreviousAccount
-c+a+left: ClearSelectAccount
-c+a+right: SelectAllAccount
+c+a+left: ClearSelectedAccounts
+c+a+right: SelectAllAccounts
 
 [Timeline]
 left: SelectLeftTab

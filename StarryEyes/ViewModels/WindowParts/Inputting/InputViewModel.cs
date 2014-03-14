@@ -84,7 +84,12 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                 KeyAssignAction.Create("ToggleEscape", () =>
                 {
                     this.InputCoreViewModel.IsUrlAutoEsacpeEnabled = !this.InputCoreViewModel.IsUrlAutoEsacpeEnabled;
-                }));
+                }),
+                KeyAssignAction.Create("SelectNextAccount", () => this.AccountSelectorViewModel.SelectNext()),
+                KeyAssignAction.Create("SelectPreviousAccount", () => this.AccountSelectorViewModel.SelectPrev()),
+                KeyAssignAction.Create("ClearSelectedAccounts", () => this.AccountSelectorViewModel.ClearAll()),
+                KeyAssignAction.Create("SelectAllAccounts", () => this.AccountSelectorViewModel.SelectAll())
+                );
         }
 
         public bool IsOpening
