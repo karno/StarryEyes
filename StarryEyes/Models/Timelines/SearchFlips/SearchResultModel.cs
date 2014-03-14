@@ -145,8 +145,8 @@ namespace StarryEyes.Models.Timelines.SearchFlips
                 case SearchOption.Local:
                 case SearchOption.CurrentTab:
                     var pan = SplitPositiveNegativeQuery(_query);
-                    var query = pan.Item1.Select(s => "text contains \"" + s.Replace("\"", "\\\"") + "\"")
-                                   .Concat(pan.Item2.Select(s => "!(text contains \"" + s.Replace("\"", "\\\"") + "\")"))
+                    var query = pan.Item1.Select(s => "text contains " + s.EscapeForQuery().Quote())
+                                   .Concat(pan.Item2.Select(s => "!(text contains " + s.EscapeForQuery().Quote() + ")"))
                                    .JoinString("&&");
                     var ctab = TabManager.CurrentFocusTab;
                     var ctf = ctab != null ? ctab.FilterQuery : null;
@@ -168,11 +168,10 @@ namespace StarryEyes.Models.Timelines.SearchFlips
                 case SearchOption.Query:
                     return this._filterQuery == null ? "!()" : this._query;
                 case SearchOption.Web:
-                    return "from search:\"" + this._query.Replace("\"", "\\\"") + "\" where ()";
+                    return "from search:" + this._query.EscapeForQuery().Quote() + " where ()";
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-
         }
 
         public static Tuple<IEnumerable<string>, IEnumerable<string>> SplitPositiveNegativeQuery(string query)

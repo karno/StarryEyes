@@ -58,6 +58,7 @@ namespace StarryEyes.ViewModels.Timelines.SearchFlips
             this._parent.RewindStack();
         }
 
+        [UsedImplicitly]
         public void PinToTab()
         {
             TabManager.CreateTab(TabModel.Create(Query, _model.CreateFilterQuery()));
