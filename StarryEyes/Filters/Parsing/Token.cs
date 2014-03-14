@@ -88,7 +88,7 @@ namespace StarryEyes.Filters.Parsing
                 case TokenType.Exclamation:
                     return "! [エクスクラメーション]";
                 case TokenType.String:
-                    return "文字列 (" + (Value == null ? "[null]" : "\"" + Value + "\"") + ")";
+                    return "文字列 (" + (Value == null ? "[null]" : Value.Quote()) + ")";
                 default:
                     return "[不明なトークン(" + Value + ")]";
 

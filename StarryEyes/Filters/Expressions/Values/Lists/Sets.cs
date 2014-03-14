@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using StarryEyes.Albireo.Collections;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Filters.Parsing;
 using StarryEyes.Models.Databases;
 using StarryEyes.Models.Receiving;
 
@@ -22,7 +23,8 @@ namespace StarryEyes.Filters.Expressions.Values.Lists
 
         public override string ToQuery()
         {
-            return "list." + _listInfo.OwnerScreenName + ".\"" + _listInfo.Slug + "\"";
+            return "list." + _listInfo.OwnerScreenName +
+                   (_listInfo.Slug.EscapeForQuery().Quote());
         }
 
         public override IEnumerable<FilterExpressionType> SupportedTypes

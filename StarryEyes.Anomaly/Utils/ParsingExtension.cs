@@ -46,7 +46,9 @@ namespace StarryEyes.Anomaly.Utils
             return DateTime.TryParseExact(s,
                 format,
                 System.Globalization.DateTimeFormatInfo.InvariantInfo,
-                System.Globalization.DateTimeStyles.None, out dt) ? dt : DateTime.MinValue;
+                System.Globalization.DateTimeStyles.None, out dt)
+                ? dt
+                : DateTime.MinValue;
         }
 
         public static DateTime ParseUnixTime(this string s)

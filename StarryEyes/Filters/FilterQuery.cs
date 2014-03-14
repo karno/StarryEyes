@@ -5,6 +5,7 @@ using StarryEyes.Albireo;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Casket;
 using StarryEyes.Filters.Expressions;
+using StarryEyes.Filters.Parsing;
 using StarryEyes.Filters.Sources;
 
 namespace StarryEyes.Filters
@@ -29,17 +30,17 @@ namespace StarryEyes.Filters
         public string ToQuery()
         {
             return "from " + Sources.GroupBy(s => s.FilterKey)
-                .Select(g => g.Distinct(_ => _.FilterValue).ToArray())
+                .Select(g => g.Distinct(_ => _.FilterValue).ToArray()) // remove duplicated query
                 .Select(fs =>
                 {
-                    if (fs.Length == 1)
+                    if (fs.Length == 1 && String.IsNullOrEmpty(fs[0].FilterValue))
                     {
-                        var item = fs[0];
-                        if (String.IsNullOrEmpty(item.FilterValue))
-                            return item.FilterKey;
-                        return item.FilterKey + ": \"" + item.FilterValue + "\"";
+                        // if filter value is not specified, return filter key only.
+                        return fs[0].FilterKey;
                     }
-                    return fs[0].FilterKey + ": " + fs.Select(f => "\"" + f.FilterValue + "\"").JoinString(", ");
+                    return fs[0].FilterKey + ": " +
+                           fs.Select(f => f.FilterValue.EscapeForQuery().Quote())
+                             .JoinString(", ");
                 })
                 .JoinString(", ") +
                 " where " + PredicateTreeRoot.ToQuery();

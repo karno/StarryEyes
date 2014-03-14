@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Filters.Expressions.Operators;
+using StarryEyes.Filters.Parsing;
 
 namespace StarryEyes.Filters.Expressions.Values.Immediates
 {
@@ -16,7 +17,7 @@ namespace StarryEyes.Filters.Expressions.Values.Immediates
 
         protected override string OperatorString
         {
-            get { return "\"" + this.Value + "\""; }
+            get { return this.Value.Quote(); }
         }
 
         public override IEnumerable<FilterExpressionType> SupportedTypes
@@ -44,7 +45,7 @@ namespace StarryEyes.Filters.Expressions.Values.Immediates
 
         public override string ToQuery()
         {
-            return "\"" + this.Value.Replace("\"", "\\\"") + "\"";
+            return this.Value.EscapeForQuery().Quote();
         }
     }
 }
