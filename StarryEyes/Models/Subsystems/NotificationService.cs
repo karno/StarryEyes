@@ -95,7 +95,11 @@ namespace StarryEyes.Models.Subsystems
         internal static void EndAcceptNewArrival(TwitterStatus status)
         {
             List<TabModel> removal;
-            var isMention = FilterSystemUtil.InReplyToUsers(status).Intersect(Setting.Accounts.Ids).Any();
+            // ignore retweet which mentions me
+            var isMention = status.RetweetedOriginal == null &&
+                            FilterSystemUtil.InReplyToUsers(status)
+                                            .Intersect(Setting.Accounts.Ids)
+                                            .Any();
             var isMessage = status.StatusType == StatusType.DirectMessage;
             var alwaysAccept = (Setting.NotifyMention.Value && isMention) ||
                                (Setting.NotifyMessage.Value && isMessage);
