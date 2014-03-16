@@ -86,6 +86,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             this.RefreshKeyAssignCandidates();
             this.RefreshThemeCandidates();
             this.ResetFilter();
+            this.KeyAssignEditorViewModel.RefreshRegisteredActions();
             this._completeCallback = subject;
             this._fsWatcher = new FileSystemWatcher(ThemeManager.ThemeProfileDirectoryPath, "*.xml");
             this._fsWatcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName |

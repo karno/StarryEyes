@@ -1,6 +1,7 @@
 ﻿<UserControl x:Class="StarryEyes.Views.WindowParts.Flips.SettingFlips.KeyAssignEditor"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:behaviors="clr-namespace:StarryEyes.Views.Behaviors"
              xmlns:controls="clr-namespace:StarryEyes.Views.Controls"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
@@ -39,6 +40,9 @@
                   ItemsSource="{Binding Assigns}"
                   SelectedItem="{Binding CurrentAssignViewModel,
                                          Mode=TwoWay}">
+            <i:Interaction.Behaviors>
+                <behaviors:ListBoxSelectionChangeToScrollIntoViewBehavior />
+            </i:Interaction.Behaviors>
             <ListView.View>
                 <GridView>
                     <GridViewColumn Width="100"

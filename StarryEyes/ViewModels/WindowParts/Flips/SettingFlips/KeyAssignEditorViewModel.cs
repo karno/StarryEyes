@@ -24,6 +24,12 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SettingFlips
 
         public KeyAssignEditorViewModel()
         {
+            RefreshRegisteredActions();
+        }
+
+        public void RefreshRegisteredActions()
+        {
+            this.Actions.Clear();
             KeyAssignManager.RegisteredActions
                             .ForEach(a => this.Actions.Add(new AssignActionViewModel(a)));
         }
@@ -102,9 +108,11 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SettingFlips
         [UsedImplicitly]
         public void AddNewAssign()
         {
-            this.Assigns.Add(new AssignViewModel(this,
+            var nvm = new AssignViewModel(this,
                 Key.Enter, ModifierKeys.None, KeyAssignGroup.Global,
-                null, null));
+                null, null);
+            this.Assigns.Add(nvm);
+            CurrentAssignViewModel = nvm;
             Commit();
         }
 
