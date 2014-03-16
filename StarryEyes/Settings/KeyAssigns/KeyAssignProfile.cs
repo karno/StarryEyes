@@ -33,12 +33,17 @@ namespace StarryEyes.Settings.KeyAssigns
 
         public void Save(string directory)
         {
-            var path = Path.Combine(directory, Name + ".txt");
+            var path = GetFilePath(directory);
             using (var stream = File.Create(path))
             using (var writer = new StreamWriter(stream))
             {
                 this.DumpText(writer);
             }
+        }
+
+        public string GetFilePath(string directory)
+        {
+            return Path.Combine(directory, Name + ".txt");
         }
 
         public string GetSourceText()
@@ -103,6 +108,17 @@ namespace StarryEyes.Settings.KeyAssigns
             TimelineBindings = new Dictionary<Key, IList<KeyAssign>>();
             InputBindings = new Dictionary<Key, IList<KeyAssign>>();
             SearchBindings = new Dictionary<Key, IList<KeyAssign>>();
+        }
+
+        public void ClearAssigns()
+        {
+            new[]
+            {
+                GlobalBindings,
+                TimelineBindings,
+                InputBindings,
+                SearchBindings
+            }.ForEach(d => d.Clear());
         }
 
         public void SetAssign(KeyAssignGroup group, KeyAssign assign)

@@ -11,6 +11,7 @@
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:settingFlips="clr-namespace:StarryEyes.Views.WindowParts.Flips.SettingFlips"
              xmlns:smb="clr-namespace:StarryEyes.Views.Messaging.Behaviors"
              xmlns:utils="clr-namespace:StarryEyes.Views.Utils"
              xmlns:vmp="clr-namespace:StarryEyes.ViewModels.WindowParts.Flips"
@@ -40,6 +41,9 @@
             </l:InteractionMessageTrigger>
             <l:InteractionMessageTrigger Messenger="{Binding Messenger}">
                 <l:OpenFileDialogInteractionMessageAction />
+            </l:InteractionMessageTrigger>
+            <l:InteractionMessageTrigger Messenger="{Binding Messenger}">
+                <l:TransitionInteractionMessageAction />
             </l:InteractionMessageTrigger>
         </i:Interaction.Triggers>
         <Grid Background="{DynamicResource BaseColorBackgroundBrush}">
@@ -79,7 +83,7 @@
                 <ListBox x:Name="SettingCategories"
                          Width="180"
                          HorizontalContentAlignment="Stretch"
-                         SelectedIndex="0">
+                         SelectedIndex="6">
                     <ListBox.Resources>
                         <Style TargetType="{x:Type ListBoxItem}">
                             <Setter Property="Margin" Value="0" />
@@ -758,13 +762,30 @@
                                    VerticalAlignment="Center"
                                    Text="使用するキーアサイン:" />
                         <ComboBox ItemsSource="{Binding KeyAssignCandidateFiles}" SelectedIndex="{Binding KeyAssignFile, Mode=TwoWay}" />
+                        <Button Margin="8,0,0,0" Style="{StaticResource MetroSquareTransparentButtonStyle}">
+                            <TextBlock Margin="-4"
+                                       FontSize="12"
+                                       Text="このキーアサインを削除" />
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="Click">
+                                    <ei:CallMethodAction MethodName="DeleteCurrentKeyAssign" TargetObject="{Binding}" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </Button>
+                        <Button Margin="8,0,0,0" Style="{StaticResource MetroSquareTransparentButtonStyle}">
+                            <TextBlock Margin="-4"
+                                       FontSize="12"
+                                       Text="新しいキーアサインを作成" />
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="Click">
+                                    <ei:CallMethodAction MethodName="AddNewKeyAssign" TargetObject="{Binding}" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </Button>
                     </StackPanel>
-                    <TextBox Grid.Row="1"
-                             Margin="16,0,16,16"
-                             IsReadOnly="True"
-                             Text="{Binding KeyAssignFileContents,
-                                            Mode=OneWay}"
-                             VerticalScrollBarVisibility="Visible" />
+                    <settingFlips:KeyAssignEditor Grid.Row="1"
+                                                  Margin="16,8,16,16"
+                                                  DataContext="{Binding KeyAssignEditorViewModel}" />
                 </Grid>
                 <Grid Grid.Column="1" Margin="0,6,0,0">
                     <Grid.Style>
@@ -958,9 +979,9 @@
                             </Style.Triggers>
                         </Style>
                     </Grid.Style>
-                    <flips:VersionInfo Margin="12,0"
-                                       HorizontalAlignment="Stretch"
-                                       VerticalAlignment="Stretch" />
+                    <settingFlips:VersionInfo Margin="12,0"
+                                              HorizontalAlignment="Stretch"
+                                              VerticalAlignment="Stretch" />
                 </Grid>
             </Grid>
         </Grid>

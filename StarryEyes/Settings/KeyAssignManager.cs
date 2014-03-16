@@ -27,6 +27,11 @@ namespace StarryEyes.Settings
             get { return Profiles.Keys; }
         }
 
+        public static IEnumerable<KeyAssignAction> RegisteredActions
+        {
+            get { return Actions.Values; }
+        }
+
         public static string KeyAssignsProfileDirectoryPath
         {
             get { return Path.Combine(App.ConfigurationDirectoryPath, App.KeyAssignProfilesDirectory); }
@@ -48,6 +53,9 @@ namespace StarryEyes.Settings
         public static void ReloadCandidates()
         {
             var path = KeyAssignsProfileDirectoryPath;
+
+            // clear loaded profiles.
+            Profiles.Clear();
 
             // load all assigns.
             foreach (var file in Directory.EnumerateFiles(path, "*.txt"))
@@ -145,6 +153,12 @@ namespace StarryEyes.Settings
 
     public sealed class KeyAssignAction
     {
+        private readonly string _name;
+
+        private readonly bool? _hasArgument;
+
+        private readonly Action<string> _callback;
+
         public static KeyAssignAction Create(string name, Action action)
         {
             return new KeyAssignAction(name, _ => action(), false);
@@ -167,15 +181,15 @@ namespace StarryEyes.Settings
             _hasArgument = hasArgument;
         }
 
-        private readonly string _name;
         public string Name
         {
             get { return _name; }
         }
 
-        private readonly Action<string> _callback;
-
-        private readonly bool? _hasArgument;
+        public bool? HasArgument
+        {
+            get { return _hasArgument; }
+        }
 
         public void Invoke(string argument)
         {

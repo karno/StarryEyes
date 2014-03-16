@@ -14,6 +14,7 @@ using System.Windows.Media.Imaging;
 using Livet;
 using Livet.Messaging;
 using Livet.Messaging.IO;
+using StarryEyes.Annotations;
 using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Anomaly.Utils;
 using StarryEyes.Filters.Expressions;
@@ -30,6 +31,7 @@ using StarryEyes.Settings.KeyAssigns;
 using StarryEyes.Settings.Themes;
 using StarryEyes.ViewModels.Common;
 using StarryEyes.ViewModels.Dialogs;
+using StarryEyes.ViewModels.WindowParts.Flips.SettingFlips;
 using StarryEyes.Views.Dialogs;
 using StarryEyes.Views.Messaging;
 using StarryEyes.Views.WindowParts.Primitives;
@@ -695,7 +697,16 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         #region Key assign property
 
-        private readonly ObservableCollection<string> _keyAssignCandidateFiles = new ObservableCollection<string>();
+        private readonly KeyAssignEditorViewModel _keyAssignEditorViewModel = new KeyAssignEditorViewModel();
+
+        public KeyAssignEditorViewModel KeyAssignEditorViewModel
+        {
+            get { return this._keyAssignEditorViewModel; }
+        }
+
+        private readonly ObservableCollection<string> _keyAssignCandidateFiles =
+            new ObservableCollection<string>();
+
         public ObservableCollection<string> KeyAssignCandidateFiles
         {
             get { return this._keyAssignCandidateFiles; }
@@ -717,23 +728,79 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                     name = this._keyAssignCandidateFiles[value];
                 }
                 Setting.KeyAssign.Value = name;
+                this._keyAssignEditorViewModel.Profile = KeyAssignManager.CurrentProfile;
                 this.RaisePropertyChanged();
-                this.RaisePropertyChanged(() => KeyAssignFileContents);
             }
         }
 
         public void RefreshKeyAssignCandidates()
         {
             _keyAssignCandidateFiles.Clear();
+            KeyAssignManager.ReloadCandidates();
             KeyAssignManager.LoadedProfiles.ForEach(f => _keyAssignCandidateFiles.Add(f));
             this.RaisePropertyChanged(() => KeyAssignFile);
-            this.RaisePropertyChanged(() => KeyAssignFileContents);
+            this._keyAssignEditorViewModel.Commit();
+            this._keyAssignEditorViewModel.Profile = KeyAssignManager.CurrentProfile;
         }
 
-        public string KeyAssignFileContents
+        [UsedImplicitly]
+        public void AddNewKeyAssign()
         {
-            get { return KeyAssignManager.CurrentProfile.GetSourceText(); }
+            var response = this.Messenger.GetResponse(new TransitionMessage(typeof(AddNewKeyAssignDialog),
+                new AddNewKeyAssignDialogViewModel(), TransitionMode.Modal));
+            var tranvm = (AddNewKeyAssignDialogViewModel)response.TransitionViewModel;
+            if (tranvm.Result)
+            {
+                var assign = new KeyAssignProfile(tranvm.FileName);
+                assign.Save(KeyAssignManager.KeyAssignsProfileDirectoryPath);
+                RefreshKeyAssignCandidates();
+            }
         }
+
+        [UsedImplicitly]
+        public void DeleteCurrentKeyAssign()
+        {
+            var response = this.Messenger.GetResponse(
+                new TaskDialogMessage(new TaskDialogOptions
+                {
+                    Title = "キーアサイン ファイルの削除",
+                    MainIcon = VistaTaskDialogIcon.Warning,
+                    MainInstruction = "現在のキーアサインを削除します。よろしいですか？",
+                    CommonButtons = TaskDialogCommonButtons.OKCancel
+                }));
+            if (response.Response.Result == TaskDialogSimpleResult.Ok)
+            {
+                try
+                {
+                    var path = KeyAssignManager.CurrentProfile.GetFilePath(
+                        KeyAssignManager.KeyAssignsProfileDirectoryPath);
+                    if (File.Exists(path))
+                    {
+                        File.Delete(path);
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException("file " + path + " does not exist.");
+                    }
+                    KeyAssignEditorViewModel.ClearCurrentProfile();
+                }
+                catch (Exception ex)
+                {
+                    this.Messenger.Raise(
+                        new TaskDialogMessage(new TaskDialogOptions
+                        {
+                            Title = "キーアサイン ファイルの削除",
+                            MainIcon = VistaTaskDialogIcon.Error,
+                            MainInstruction = "ファイルを削除できませんでした。",
+                            Content = ex.Message,
+                            ExpandedInfo = ex.ToString(),
+                            CommonButtons = TaskDialogCommonButtons.Close
+                        }));
+                }
+                RefreshKeyAssignCandidates();
+            }
+        }
+
         #endregion
 
         #region Outer and third party property

@@ -27,4 +27,17 @@ namespace StarryEyes.Views.Utils
             return input == Visibility.Collapsed;
         }
     }
+
+    public class BooleanInverterConverter : TwoWayConverter<bool, bool>
+    {
+        protected override bool ToTarget(bool input, object parameter)
+        {
+            return !input;
+        }
+
+        protected override bool ToSource(bool input, object parameter)
+        {
+            return !input;
+        }
+    }
 }

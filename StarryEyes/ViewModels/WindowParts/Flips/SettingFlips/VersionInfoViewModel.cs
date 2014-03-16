@@ -10,7 +10,7 @@ using Livet;
 using StarryEyes.Annotations;
 using StarryEyes.Models.Subsystems;
 
-namespace StarryEyes.ViewModels.WindowParts.Flips
+namespace StarryEyes.ViewModels.WindowParts.Flips.SettingFlips
 {
     public class VersionInfoViewModel : ViewModel
     {
@@ -19,9 +19,9 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         public VersionInfoViewModel()
         {
             // when update is available, callback this.
-            AutoUpdateService.UpdateStateChanged += () => _isUpdateAvailable = true;
+            AutoUpdateService.UpdateStateChanged += () => this._isUpdateAvailable = true;
             Observable.Timer(TimeSpan.FromSeconds(0), TimeSpan.FromHours(8))
-                      .Subscribe(_ => UpdateContributors());
+                      .Subscribe(_ => this.UpdateContributors());
         }
 
         [UsedImplicitly]
@@ -118,33 +118,33 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public bool IsChecking
         {
-            get { return _isChecking; }
+            get { return this._isChecking; }
         }
 
         public bool IsUpdateIsNotExisted
         {
-            get { return !_isChecking && !_isUpdateAvailable; }
+            get { return !this._isChecking && !this._isUpdateAvailable; }
         }
 
         public bool IsUpdateExisted
         {
-            get { return !_isChecking && _isUpdateAvailable; }
+            get { return !this._isChecking && this._isUpdateAvailable; }
         }
 
         public async void CheckUpdates()
         {
-            _isChecking = true;
+            this._isChecking = true;
             this.RefreshCheckState();
-            _isUpdateAvailable = await AutoUpdateService.CheckPrepareUpdate(App.Version);
-            _isChecking = false;
+            this._isUpdateAvailable = await AutoUpdateService.CheckPrepareUpdate(App.Version);
+            this._isChecking = false;
             this.RefreshCheckState();
         }
 
         private void RefreshCheckState()
         {
-            this.RaisePropertyChanged(() => IsChecking);
-            this.RaisePropertyChanged(() => IsUpdateExisted);
-            this.RaisePropertyChanged(() => IsUpdateIsNotExisted);
+            this.RaisePropertyChanged(() => this.IsChecking);
+            this.RaisePropertyChanged(() => this.IsUpdateExisted);
+            this.RaisePropertyChanged(() => this.IsUpdateIsNotExisted);
         }
 
         public void StartUpdate()
@@ -172,7 +172,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public bool IsLinkOpenable
         {
-            get { return _screenName != null; }
+            get { return this._screenName != null; }
         }
 
         public static ContributorsViewModel FromXml(XElement xElement)
@@ -191,7 +191,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public void OpenUserTwitter()
         {
-            BrowserHelper.Open(VersionInfoViewModel.Twitter + _screenName);
+            BrowserHelper.Open(VersionInfoViewModel.Twitter + this._screenName);
         }
     }
 }

@@ -1,20 +1,20 @@
-﻿<UserControl x:Class="StarryEyes.Views.WindowParts.Flips.VersionInfo"
+﻿<UserControl x:Class="StarryEyes.Views.WindowParts.Flips.SettingFlips.VersionInfo"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:ed="http://schemas.microsoft.com/expression/2010/drawing"
              xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
-             xmlns:flips="clr-namespace:StarryEyes.ViewModels.WindowParts.Flips"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:settingFlips="clr-namespace:StarryEyes.ViewModels.WindowParts.Flips.SettingFlips"
              xmlns:utils="clr-namespace:StarryEyes.Views.Utils"
-             d:DataContext="{d:DesignInstance flips:VersionInfoViewModel}"
+             d:DataContext="{d:DesignInstance settingFlips:VersionInfoViewModel}"
              d:DesignHeight="500"
              d:DesignWidth="600"
              mc:Ignorable="d">
     <UserControl.DataContext>
-        <flips:VersionInfoViewModel />
+        <settingFlips:VersionInfoViewModel />
     </UserControl.DataContext>
     <UserControl.Resources>
         <ResourceDictionary>

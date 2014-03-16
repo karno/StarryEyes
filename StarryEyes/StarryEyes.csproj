@@ -366,6 +366,7 @@
     <Compile Include="Settings\Themes\ThemeProfile.cs" />
     <Compile Include="Settings\Themes\TweetTheme.cs" />
     <Compile Include="Settings\Themes\UserFlipTheme.cs" />
+    <Compile Include="ViewModels\Dialogs\AddNewKeyAssignDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\DisplayMarkerViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\KeyOverrideViewModel.cs" />
     <Compile Include="ViewModels\DropAcceptDescription.cs" />
@@ -381,6 +382,7 @@
     <Compile Include="ViewModels\Common\FilterEditControlViewModel.cs" />
     <Compile Include="ViewModels\Common\FilterEditor\FilterPredicateViewModelBase.cs" />
     <Compile Include="ViewModels\Common\FilterEditor\FilterSourceViewModel.cs" />
+    <Compile Include="ViewModels\WindowParts\Flips\SettingFlips\KeyAssignEditorViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Inputting\BindHashtagViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\AccountSelectionFlipViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\BackstageViewModel.cs" />
@@ -396,7 +398,7 @@
     <Compile Include="ViewModels\WindowParts\Flips\SettingFlips\ThemeEditorViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\SettingFlipViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Flips\TabConfigurationFlipViewModel.cs" />
-    <Compile Include="ViewModels\WindowParts\Flips\VersionInfoViewModel.cs" />
+    <Compile Include="ViewModels\WindowParts\Flips\SettingFlips\VersionInfoViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Inputting\AccountSelectorViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Inputting\InputAreaSuggestItemProvider.cs" />
     <Compile Include="ViewModels\WindowParts\Inputting\InputCoreViewModel.cs" />
@@ -431,10 +433,14 @@
     <Compile Include="Views\Behaviors\TimelineScrollLockerBehavior.cs" />
     <Compile Include="Views\Behaviors\TimelineTriggerBehavior.cs" />
     <Compile Include="Views\Controls\DropDownMenuButton.cs" />
+    <Compile Include="Views\Controls\HotKeyTextBox.cs" />
     <Compile Include="Views\Controls\LazyImage.cs" />
     <Compile Include="Views\Controls\QueryEditor.cs" />
     <Compile Include="Views\Controls\QueryEditorResources\CompletionData.cs" />
     <Compile Include="Views\Controls\SuggestableTextBox.cs" />
+    <Compile Include="Views\Dialogs\AddNewKeyAssignDialog.xaml.cs">
+      <DependentUpon>AddNewKeyAssignDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Dialogs\AwaitDownloadingUpdateWindow.xaml.cs">
       <DependentUpon>AwaitDownloadingUpdateWindow.xaml</DependentUpon>
     </Compile>
@@ -505,7 +511,10 @@
     <Compile Include="Views\WindowParts\Flips\SettingFlip.xaml.cs">
       <DependentUpon>SettingFlip.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\WindowParts\Flips\VersionInfo.xaml.cs">
+    <Compile Include="Views\WindowParts\Flips\SettingFlips\KeyAssignEditor.xaml.cs">
+      <DependentUpon>KeyAssignEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\WindowParts\Flips\SettingFlips\VersionInfo.xaml.cs">
       <DependentUpon>VersionInfo.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\WindowParts\Primitives\TimelineSwapResourcesBehavior.cs" />
@@ -551,6 +560,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Themes\WindowBase.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Dialogs\AddNewKeyAssignDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -637,7 +650,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\WindowParts\Flips\VersionInfo.xaml">
+    <Page Include="Views\WindowParts\Flips\SettingFlips\KeyAssignEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\WindowParts\Flips\SettingFlips\VersionInfo.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
