@@ -102,6 +102,7 @@ namespace StarryEyes.Views.Behaviors
                              {
                                  if (ev.Action == NotifyCollectionChangedAction.Add)
                                  {
+                                     this.AssociatedObject.UpdateLayout();
                                      var vsp = this.AssociatedObject.FindVisualChild<VirtualizingStackPanel>();
                                      if (vsp != null)
                                      {
