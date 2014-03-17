@@ -28,7 +28,8 @@ namespace StarryEyes.Views.Controls
         #region Constant variables
 
         private const int MaxRetryCount = 3;
-        private const int MaxParallelism = 8;
+        private const int MaxReceiveConcurrency = 4;
+        private const int MaxDecodeConcurrency = 2;
 
         #endregion
 
@@ -153,36 +154,36 @@ namespace StarryEyes.Views.Controls
 
         #endregion
 
-        #region Image Loader Thread
+        #region Image Loader
 
-        private static readonly ConcurrentStack<Tuple<Uri, Subject<byte[]>>> _workStack =
+        private static readonly ConcurrentStack<Tuple<Uri, Subject<byte[]>>> _loadStack =
             new ConcurrentStack<Tuple<Uri, Subject<byte[]>>>();
 
-        private static int _concurrency;
+        private static int _loadThreadConcurrency;
 
-        private static void PushTask(Uri source, Subject<byte[]> resultSubject)
+        private static void PushLoadTask(Uri source, Subject<byte[]> resultSubject)
         {
-            _workStack.Push(Tuple.Create(source, resultSubject));
-            if (Interlocked.Increment(ref _concurrency) > MaxParallelism)
+            _loadStack.Push(Tuple.Create(source, resultSubject));
+            if (Interlocked.Increment(ref _loadThreadConcurrency) > MaxReceiveConcurrency)
             {
-                Interlocked.Decrement(ref _concurrency);
+                Interlocked.Decrement(ref _loadThreadConcurrency);
                 return;
             }
             // run task
-            RunNextTask();
+            RunNextLoadTask();
         }
 
-        private static void RunNextTask()
+        private static void RunNextLoadTask()
         {
             Tuple<Uri, Subject<byte[]>> item;
-            if (!_workStack.TryPop(out item))
+            if (!_loadStack.TryPop(out item))
             {
-                Interlocked.Decrement(ref _concurrency);
+                Interlocked.Decrement(ref _loadThreadConcurrency);
             }
             else
             {
                 Task.Run(async () => await LoadBytes(item.Item1, item.Item2))
-                    .ContinueWith(_ => RunNextTask());
+                    .ContinueWith(_ => RunNextLoadTask());
             }
         }
 
@@ -246,6 +247,46 @@ namespace StarryEyes.Views.Controls
 
         #endregion
 
+        #region Image Decoder
+
+        private static readonly ConcurrentStack<Tuple<Uri, LazyImage, byte[], int, int>> _decodeStack =
+        new ConcurrentStack<Tuple<Uri, LazyImage, byte[], int, int>>();
+
+        private static int _decodeThreadConcurrency;
+
+        private static void PushDecodeTask(Uri uriSource, LazyImage targetImage,
+            byte[] bytes, int dpw, int dph)
+        {
+            _decodeStack.Push(Tuple.Create(uriSource, targetImage, bytes, dpw, dph));
+            if (Interlocked.Increment(ref _decodeThreadConcurrency) > MaxDecodeConcurrency)
+            {
+                Interlocked.Decrement(ref _decodeThreadConcurrency);
+                return;
+            }
+            // run task
+            RunNextDecodeTask();
+        }
+
+        private static void RunNextDecodeTask()
+        {
+            Tuple<Uri, LazyImage, byte[], int, int> item;
+            if (!_decodeStack.TryPop(out item))
+            {
+                Interlocked.Decrement(ref _decodeThreadConcurrency);
+            }
+            else
+            {
+                Task.Run(() =>
+                {
+                    var b = CreateImage(item.Item3, item.Item4, item.Item5);
+                    DispatcherHolder.Enqueue(() => SetImage(item.Item2, b, item.Item1),
+                        DispatcherPriority.Loaded);
+                }).ContinueWith(_ => RunNextDecodeTask());
+            }
+        }
+
+        #endregion
+
         private static readonly Dictionary<Uri, IObservable<byte[]>> _imageObservables =
             new Dictionary<Uri, IObservable<byte[]>>();
 
@@ -284,11 +325,7 @@ namespace StarryEyes.Views.Controls
                     if (GetCache(uri, out cache))
                     {
                         // decode image
-                        Task.Run(() =>
-                        {
-                            var b = CreateImage(cache, dpw, dph);
-                            DispatcherHolder.Enqueue(() => SetImage(img, b, uri), DispatcherPriority.Loaded);
-                        });
+                        PushDecodeTask(uri, img, cache, dpw, dph);
                         return;
                     }
                     IObservable<byte[]> observable;
@@ -301,13 +338,10 @@ namespace StarryEyes.Views.Controls
                             _imageObservables.Add(uri, publisher);
                         }
                     }
-                    observable.Select(b => CreateImage(b, dpw, dph))
-                              .Subscribe(b => DispatcherHolder.Enqueue(
-                                  () => SetImage(img, b, uri), DispatcherPriority.Loaded)
-                                  , ex => { });
+                    observable.Subscribe(b => PushDecodeTask(uri, img, b, dpw, dph), ex => { });
                     if (publisher != null)
                     {
-                        PushTask(uri, publisher);
+                        PushLoadTask(uri, publisher);
                     }
                 }
             }
