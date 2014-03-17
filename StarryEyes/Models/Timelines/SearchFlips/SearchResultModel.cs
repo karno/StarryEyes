@@ -83,8 +83,8 @@ namespace StarryEyes.Models.Timelines.SearchFlips
                         status =>
                         positive.Any(s => status.Text.IndexOf(s, StringComparison.CurrentCultureIgnoreCase) >= 0) &&
                         !negative.Any(s => status.Text.IndexOf(s, StringComparison.CurrentCultureIgnoreCase) >= 0));
-                    var psql = positive.Select(s => "TEXT like '%" + s + "%'").JoinString(" OR ");
-                    var nsql = negative.Select(s => "TEXT not like '%" + s + "%'").JoinString(" AND ");
+                    var psql = positive.Select(s => "LOWER(TEXT) like LOWER('%" + s + "%')").JoinString(" OR ");
+                    var nsql = negative.Select(s => "LOWER(TEXT) not LOWER(like '%" + s + "%')").JoinString(" AND ");
                     var sql = psql.SqlConcatAnd(nsql);
                     var ctab = TabManager.CurrentFocusTab;
                     var ctf = ctab != null ? ctab.FilterQuery : null;

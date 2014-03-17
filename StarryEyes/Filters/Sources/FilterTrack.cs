@@ -19,7 +19,7 @@ namespace StarryEyes.Filters.Sources
 
         public override string GetSqlQuery()
         {
-            return "Text like '%" + _query + "%'";
+            return "LOWER(Text) like LOWER('%" + _query + "%')";
         }
 
         private bool _isActivated;
