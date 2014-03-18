@@ -27,7 +27,7 @@ namespace StarryEyes.Casket.Cruds
 
         private DatabaseManagement GetValueCore(long id)
         {
-            using (var _ = this.AcquireReadLock())
+            using (this.AcquireReadLock())
             using (var con = this.OpenConnection())
             {
                 return con.Query<DatabaseManagement>(
@@ -43,7 +43,7 @@ namespace StarryEyes.Casket.Cruds
 
         private void SetValueCore(DatabaseManagement mgmt)
         {
-            using (var _ = this.AcquireWriteLock())
+            using (this.AcquireWriteLock())
             using (var con = this.OpenConnection())
             using (var tr = con.BeginTransaction())
             {

@@ -69,11 +69,11 @@ namespace StarryEyes.Albireo.Threading
         public async Task Enqueue(Action exec,
             CancellationToken cancellationToken = default (CancellationToken))
         {
-            var _ = await this.Enqueue(() =>
-            {
-                exec();
-                return Unit.Default;
-            }, cancellationToken);
+            await this.Enqueue(() =>
+           {
+               exec();
+               return Unit.Default;
+           }, cancellationToken);
         }
 
         public async Task<T> Push<T>(Func<T> exec,
@@ -85,7 +85,7 @@ namespace StarryEyes.Albireo.Threading
         public async Task Push(Action exec,
             CancellationToken cancellationToken = default (CancellationToken))
         {
-            var _ = await this.Push(() =>
+            await this.Push(() =>
             {
                 exec();
                 return Unit.Default;
