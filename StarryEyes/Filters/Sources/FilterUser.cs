@@ -19,6 +19,15 @@ namespace StarryEyes.Filters.Sources
         public FilterUser(string screenName)
         {
             _targetIdOrScreenName = screenName.Trim();
+            if (screenName.StartsWith("#"))
+            {
+                // check
+                long result;
+                if (!Int64.TryParse(screenName.Substring(1), out result))
+                {
+                    throw new ArgumentException("不正な引数が指定されています(ソースフィルタ user)");
+                }
+            }
         }
 
         public override string FilterKey
@@ -41,7 +50,8 @@ namespace StarryEyes.Filters.Sources
             else
             {
                 // extract by screen name
-                return s => s.User.ScreenName.Equals(_targetIdOrScreenName, StringComparison.CurrentCultureIgnoreCase);
+                return
+                    s => s.User.ScreenName.Equals(_targetIdOrScreenName, StringComparison.CurrentCultureIgnoreCase);
             }
         }
 
