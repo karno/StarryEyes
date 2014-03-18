@@ -26,101 +26,96 @@ namespace StarryEyes
             if (sourceAsNotifyCollection == null) throw new ArgumentException("sourceがINotifyCollectionChangedを実装していません");
 
             var initCollection = new ObservableCollection<TViewModel>();
-            var internalLock = new object();
-            var gate = false;
-            lock (internalLock)
+            var target = new DispatcherCollectionRx<TViewModel>(initCollection, dispatcher)
             {
-                var target = new DispatcherCollectionRx<TViewModel>(initCollection, dispatcher)
-                {
-                    CollectionChangedDispatcherPriority = priority
-                };
-                var result = new ReadOnlyDispatcherCollectionRx<TViewModel>(target);
+                CollectionChangedDispatcherPriority = priority
+            };
+            var result = new ReadOnlyDispatcherCollectionRx<TViewModel>(target);
 
-                var subscribe =
-                    sourceAsNotifyCollection
-                        .ListenCollectionChanged()
-                        .Where(_ => gate)
-                        .ObserveOn(DispatcherHolder.Dispatcher)
-                        .Subscribe(e =>
+            var scx = source as ObservableSynchronizedCollectionEx<TModel>;
+            IList<TModel> frozen;
+            if (scx != null)
+            {
+                frozen = scx.SynchronizedToArray(
+                    () => result.Disposables.Add(CreateSubscription(sourceAsNotifyCollection, converter, target)));
+            }
+            else
+            {
+                frozen = new List<TModel>();
+                source.ForEach(frozen.Add);
+                result.Disposables.Add(CreateSubscription(sourceAsNotifyCollection, converter, target));
+            }
+
+            foreach (var model in frozen)
+            {
+                initCollection.Add(converter(model));
+            }
+            return result;
+        }
+
+        private static IDisposable CreateSubscription<TModel, TViewModel>(
+            INotifyCollectionChanged source, Func<TModel, TViewModel> converter,
+            DispatcherCollectionRx<TViewModel> target)
+        {
+            return source
+                .ListenCollectionChanged()
+                .ObserveOn(DispatcherHolder.Dispatcher)
+                .Subscribe(e =>
+                {
+                    if (e.NewItems != null && e.NewItems.Count >= 2)
+                    {
+                        throw new ArgumentException("Too many new items.");
+                    }
+                    try
+                    {
+                        switch (e.Action)
                         {
-                            lock (internalLock)
-                            {
-                                if (e.NewItems != null && e.NewItems.Count >= 2)
+                            case NotifyCollectionChangedAction.Add:
+                                target.Insert(e.NewStartingIndex, converter((TModel)e.NewItems[0]));
+                                break;
+                            case NotifyCollectionChangedAction.Move:
+                                target.Move(e.OldStartingIndex, e.NewStartingIndex);
+                                break;
+                            case NotifyCollectionChangedAction.Remove:
+                                if (typeof(IDisposable).IsAssignableFrom(typeof(TViewModel)))
                                 {
-                                    throw new ArgumentException("Too many new items.");
+                                    ((IDisposable)target[e.OldStartingIndex]).Dispose();
                                 }
-                                try
+                                target.RemoveAt(e.OldStartingIndex);
+                                break;
+                            case NotifyCollectionChangedAction.Replace:
+                                if (typeof(IDisposable).IsAssignableFrom(typeof(TViewModel)))
                                 {
-                                    switch (e.Action)
+                                    ((IDisposable)target[e.NewStartingIndex]).Dispose();
+                                }
+                                target[e.NewStartingIndex] = converter((TModel)e.NewItems[0]);
+                                break;
+                            case NotifyCollectionChangedAction.Reset:
+                                if (typeof(IDisposable).IsAssignableFrom(typeof(TViewModel)))
+                                {
+                                    foreach (IDisposable item in target)
                                     {
-                                        case NotifyCollectionChangedAction.Add:
-                                            target.Insert(e.NewStartingIndex, converter((TModel)e.NewItems[0]));
-                                            break;
-                                        case NotifyCollectionChangedAction.Move:
-                                            target.Move(e.OldStartingIndex, e.NewStartingIndex);
-                                            break;
-                                        case NotifyCollectionChangedAction.Remove:
-                                            if (typeof(IDisposable).IsAssignableFrom(typeof(TViewModel)))
-                                            {
-                                                ((IDisposable)target[e.OldStartingIndex]).Dispose();
-                                            }
-                                            target.RemoveAt(e.OldStartingIndex);
-                                            break;
-                                        case NotifyCollectionChangedAction.Replace:
-                                            if (typeof(IDisposable).IsAssignableFrom(typeof(TViewModel)))
-                                            {
-                                                ((IDisposable)target[e.NewStartingIndex]).Dispose();
-                                            }
-                                            target[e.NewStartingIndex] = converter((TModel)e.NewItems[0]);
-                                            break;
-                                        case NotifyCollectionChangedAction.Reset:
-                                            if (typeof(IDisposable).IsAssignableFrom(typeof(TViewModel)))
-                                            {
-                                                foreach (IDisposable item in target)
-                                                {
-                                                    item.Dispose();
-                                                }
-                                            }
-                                            target.Clear();
-                                            break;
-                                        default:
-                                            throw new ArgumentException();
+                                        item.Dispose();
                                     }
                                 }
-                                catch (ArgumentOutOfRangeException aoex)
-                                {
-                                    throw new InvalidOperationException(
-                                        "Collection state is invalid." + Environment.NewLine +
-                                        "INDEX OUT OF RANGE - " + e.Action + "<" + typeof(TModel).Name + " -> " + typeof(TViewModel).Name + ">" + Environment.NewLine +
-                                        "new start: " + e.NewStartingIndex + ", count: " +
-                                        (e.NewItems == null ? "null" : e.NewItems.Count.ToString()) + Environment.NewLine +
-                                        "source length: " + source.Count + ", target length: " + target.Count + ".",
-                                        aoex);
-                                }
-                            }
-                        });
-
-                result.Disposables.Add(subscribe);
-
-                var scx = source as ObservableSynchronizedCollectionEx<TModel>;
-                IList<TModel> frozen;
-                if (scx != null)
-                {
-                    frozen = scx.SynchronizedToArray(() => gate = true);
-                }
-                else
-                {
-                    frozen = new List<TModel>();
-                    source.ForEach(frozen.Add);
-                    gate = true;
-                }
-
-                foreach (var model in frozen)
-                {
-                    initCollection.Add(converter(model));
-                }
-                return result;
-            }
+                                target.Clear();
+                                break;
+                            default:
+                                throw new ArgumentException();
+                        }
+                    }
+                    catch (ArgumentOutOfRangeException aoex)
+                    {
+                        throw new InvalidOperationException(
+                            "Collection state is invalid." + Environment.NewLine +
+                            "INDEX OUT OF RANGE - " + e.Action + "<" + typeof(TModel).Name + " -> " +
+                            typeof(TViewModel).Name + ">" + Environment.NewLine +
+                            "new start: " + e.NewStartingIndex + ", count: " +
+                            (e.NewItems == null ? "null" : e.NewItems.Count.ToString()) + Environment.NewLine +
+                            "source length: " + ((IList<TModel>)source).Count + ", target length: " + target.Count + ".",
+                            aoex);
+                    }
+                });
         }
     }
 }
