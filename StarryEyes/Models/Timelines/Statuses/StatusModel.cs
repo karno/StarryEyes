@@ -24,10 +24,8 @@ namespace StarryEyes.Models.Timelines.Statuses
     {
         #region Static members
 
-        private static readonly object _staticCacheLock = new object();
-
-        private static readonly IDictionary<long, WeakReference> _staticCache =
-            new Dictionary<long, WeakReference>();
+        private static readonly ConcurrentDictionary<long, WeakReference> _staticCache =
+            new ConcurrentDictionary<long, WeakReference>();
 
         private static readonly ConcurrentDictionary<long, object> _generateLock =
             new ConcurrentDictionary<long, object>();
@@ -41,12 +39,11 @@ namespace StarryEyes.Models.Timelines.Statuses
         {
             StatusModel model = null;
             WeakReference wr;
-            lock (_staticCacheLock)
-            {
-                _staticCache.TryGetValue(id, out wr);
-            }
+            _staticCache.TryGetValue(id, out wr);
             if (wr != null)
+            {
                 model = (StatusModel)wr.Target;
+            }
             return model;
         }
 
@@ -74,10 +71,7 @@ namespace StarryEyes.Models.Timelines.Statuses
                     {
                         StatusModel model;
                         WeakReference wr;
-                        lock (_staticCacheLock)
-                        {
-                            _staticCache.TryGetValue(status.Id, out wr);
-                        }
+                        _staticCache.TryGetValue(status.Id, out wr);
                         if (wr != null)
                         {
                             model = (StatusModel)wr.Target;
@@ -90,10 +84,7 @@ namespace StarryEyes.Models.Timelines.Statuses
                         // cache is dead/not cached yet
                         model = new StatusModel(status, rto);
                         wr = new WeakReference(model);
-                        lock (_staticCacheLock)
-                        {
-                            _staticCache[status.Id] = wr;
-                        }
+                        _staticCache[status.Id] = wr;
                         return model;
                     }
                 }
@@ -117,25 +108,20 @@ namespace StarryEyes.Models.Timelines.Statuses
         {
             System.Diagnostics.Debug.WriteLine("*** COLLECT STATUS MODEL GARBAGES...");
             GC.Collect(2, GCCollectionMode.Optimized);
-            long[] values;
-            lock (_staticCacheLock)
-            {
-                values = _staticCache.Keys.ToArray();
-            }
+            var values = _staticCache.Keys.ToArray();
             foreach (var ids in values.Buffer(256))
             {
-                lock (_staticCacheLock)
+                foreach (var id in ids)
                 {
-                    foreach (var id in ids)
+                    WeakReference wr;
+                    if (_staticCache.TryGetValue(id, out wr) && wr.Target == null)
                     {
-                        WeakReference wr;
-                        _staticCache.TryGetValue(id, out wr);
-                        if (wr != null && wr.Target == null)
-                            _staticCache.Remove(id);
+                        _staticCache.TryRemove(id, out wr);
                     }
                 }
                 Thread.Sleep(0);
             }
+            GC.Collect(2, GCCollectionMode.Optimized);
         }
 
         #endregion
@@ -281,10 +267,7 @@ namespace StarryEyes.Models.Timelines.Statuses
             Action<StatusModel> ifCacheIsAlive, Action<long> ifCacheIsDead)
         {
             WeakReference wr;
-            lock (_staticCacheLock)
-            {
-                _staticCache.TryGetValue(id, out wr);
-            }
+            _staticCache.TryGetValue(id, out wr);
             if (wr != null)
             {
                 var target = (StatusModel)wr.Target;
