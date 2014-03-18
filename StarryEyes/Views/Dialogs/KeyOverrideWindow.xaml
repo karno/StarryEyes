@@ -1,16 +1,16 @@
-﻿<Controls:MetroWindow x:Class="StarryEyes.Views.Dialogs.KeyOverrideWindow"
+﻿<controls:MetroWindow x:Class="StarryEyes.Views.Dialogs.KeyOverrideWindow"
                       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                      xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
-                      xmlns:Custom="http://schemas.livet-mvvm.net/2011/wpf"
-                      xmlns:StarryEyes_ViewModels_Dialogs="clr-namespace:StarryEyes.ViewModels.Dialogs"
-                      xmlns:StarryEyes_Views_Messaging_Behaviors="clr-namespace:StarryEyes.Views.Messaging.Behaviors"
-                      xmlns:StarryEyes_Views_Utils="clr-namespace:StarryEyes.Views.Utils"
+                      xmlns:behaviors="clr-namespace:StarryEyes.Views.Messaging.Behaviors"
+                      xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+                      xmlns:custom="http://schemas.livet-mvvm.net/2011/wpf"
                       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                       xmlns:dialogs="clr-namespace:StarryEyes.ViewsResources.Dialogs"
+                      xmlns:dlgs="clr-namespace:StarryEyes.ViewModels.Dialogs"
                       xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
                       xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                      xmlns:utils="clr-namespace:StarryEyes.Views.Utils"
                       Title="Twitter API Key Registration"
                       Width="460"
                       Height="240"
@@ -20,7 +20,7 @@
                       WindowStartupLocation="CenterOwner"
                       WindowStyle="ToolWindow"
                       mc:Ignorable="d">
-    <Controls:MetroWindow.Resources>
+    <controls:MetroWindow.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
@@ -28,20 +28,19 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/FlatButton.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <StarryEyes_Views_Utils:BooleanToVisibleConverter x:Key="BooleanToVisibleConverter" />
-            <dialogs:KeyOverrideWindowResources x:Key="Res" />
+            <utils:BooleanToVisibleConverter x:Key="BooleanToVisibleConverter" />
         </ResourceDictionary>
-    </Controls:MetroWindow.Resources>
-    <Controls:MetroWindow.DataContext>
-        <StarryEyes_ViewModels_Dialogs:KeyOverrideViewModel />
-    </Controls:MetroWindow.DataContext>
+    </controls:MetroWindow.Resources>
+    <controls:MetroWindow.DataContext>
+        <dlgs:KeyOverrideViewModel />
+    </controls:MetroWindow.DataContext>
     <i:Interaction.Triggers>
-        <Custom:InteractionMessageTrigger Messenger="{Binding Messenger}">
-            <StarryEyes_Views_Messaging_Behaviors:TaskDialogInteractionMessageAction />
-        </Custom:InteractionMessageTrigger>
-        <Custom:InteractionMessageTrigger Messenger="{Binding Messenger}">
-            <Custom:WindowInteractionMessageAction />
-        </Custom:InteractionMessageTrigger>
+        <custom:InteractionMessageTrigger Messenger="{Binding Messenger}">
+            <behaviors:TaskDialogInteractionMessageAction />
+        </custom:InteractionMessageTrigger>
+        <custom:InteractionMessageTrigger Messenger="{Binding Messenger}">
+            <custom:WindowInteractionMessageAction />
+        </custom:InteractionMessageTrigger>
     </i:Interaction.Triggers>
     <Grid>
         <Grid.RowDefinitions>
@@ -53,15 +52,13 @@
         <TextBlock Margin="7.5,8,8.5,0"
                    FontSize="18.667"
                    Foreground="Black"
-                   Text="{Binding Source={StaticResource Res},
-                                  Path=HeaderText}"
+                   Text="{x:Static dialogs:KeyOverrideWindowResources.HeaderText}"
                    TextWrapping="Wrap"
                    d:LayoutOverrides="Height" />
         <TextBlock Grid.Row="1"
                    Margin="8,2,8,8"
                    Foreground="Black"
-                   Text="{Binding Source={StaticResource Res},
-                                  Path=InstructionText}"
+                   Text="{x:Static dialogs:KeyOverrideWindowResources.InstructionText}"
                    TextWrapping="Wrap"
                    d:LayoutOverrides="Height" />
         <Grid Grid.Row="2" VerticalAlignment="Center">
@@ -79,12 +76,14 @@
                        TextWrapping="Wrap"><Run Language="ja-jp" Text="Consumer Key" />
             </TextBlock>
             <TextBlock Grid.Row="1"
+                       Grid.Column="0"
                        Margin="8"
                        HorizontalAlignment="Left"
                        VerticalAlignment="Center"
                        TextWrapping="Wrap"><Run Language="ja-jp" Text="Consumer Sectret" />
             </TextBlock>
-            <TextBox Grid.Column="1"
+            <TextBox Grid.Row="0"
+                     Grid.Column="1"
                      Margin="8,8,8,4"
                      VerticalAlignment="Center"
                      IsEnabled="{Binding IsCkCsEditEnabled,
@@ -135,17 +134,18 @@
                    Margin="8,17.24,216,12.76"
                    TextWrapping="Wrap">
             <Hyperlink Command="{Binding OpenApiKeyHelpCommand}">
-                <Run Text="{Binding Source={StaticResource Res}, Path=HelpLink, Mode=OneWay}" />
+                <Run Text="{x:Static dialogs:KeyOverrideWindowResources.HelpLink}" />
             </Hyperlink>
         </TextBlock>
-        <Grid Grid.RowSpan="4"
+        <Grid Grid.Row="0"
+              Grid.RowSpan="4"
               Background="White"
               Opacity="0.6"
               Visibility="{Binding IsKeyChecking,
                                    Converter={StaticResource BooleanToVisibleConverter}}">
-            <Controls:ProgressRing HorizontalAlignment="Center"
+            <controls:ProgressRing HorizontalAlignment="Center"
                                    VerticalAlignment="Center"
                                    IsActive="True" />
         </Grid>
     </Grid>
-</Controls:MetroWindow>
+</controls:MetroWindow>

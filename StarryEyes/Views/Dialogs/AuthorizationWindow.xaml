@@ -32,7 +32,6 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/FlatButton.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <dialogs:AuthorizationWindowResources x:Key="Res" />
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
             <l:VisibilityAndBooleanConverter x:Key="VisibilityAndBooleanConverter" />
         </ResourceDictionary>
@@ -66,8 +65,7 @@
         <TextBlock Margin="10,10,10,5"
                    HorizontalAlignment="Stretch"
                    VerticalAlignment="Top"
-                   Text="{Binding Source={StaticResource Res},
-                                  Path=MainText}"
+                   Text="{x:Static dialogs:AuthorizationWindowResources.MainText}"
                    TextWrapping="Wrap" />
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
@@ -114,7 +112,7 @@
                         <ei:CallMethodAction MethodName="ShowHelp" TargetObject="{Binding}" />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
-                <Run Text="{Binding Source={StaticResource Res}, Path=HelpText, Mode=OneWay}" />
+                <Run Text="{x:Static dialogs:AuthorizationWindowResources.HelpText}" />
             </Hyperlink>
         </TextBlock>
         <Grid x:Name="ProcessingOverwrap"
@@ -146,8 +144,7 @@
                            HorizontalAlignment="Left"
                            VerticalAlignment="Center"
                            Foreground="Black"
-                           Text="{Binding Source={StaticResource Res},
-                                          Path=ConnectionText}"
+                           Text="{x:Static dialogs:AuthorizationWindowResources.ConnectionText}"
                            TextAlignment="Center"
                            TextWrapping="Wrap"
                            d:LayoutOverrides="HorizontalAlignment, GridBox" />
