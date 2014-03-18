@@ -13,9 +13,11 @@ namespace StarryEyes.Nightmare.Windows
             var wpl = new WINDOWPLACEMENT();
             wpl.length = Marshal.SizeOf(wpl);
             WinApi.GetWindowPlacement(helper.Handle, ref wpl);
+            var width = wpl.rcNormalPosition.right - wpl.rcNormalPosition.left;
+            var height = wpl.rcNormalPosition.bottom - wpl.rcNormalPosition.top;
             return new Rect(wpl.rcNormalPosition.left, wpl.rcNormalPosition.top,
-                wpl.rcNormalPosition.right - wpl.rcNormalPosition.left,
-                wpl.rcNormalPosition.bottom - wpl.rcNormalPosition.top);
+                width >= 0 ? width : 0,
+                height >= 0 ? height : 0);
         }
 
         public static void SetWindowPlacement(this Window window, Rect placement)
