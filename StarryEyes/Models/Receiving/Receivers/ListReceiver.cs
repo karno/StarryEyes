@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Models.Accounting;
@@ -29,9 +28,7 @@ namespace StarryEyes.Models.Receiving.Receivers
         {
             get
             {
-                return "リストタイムライン(" +
-                    (_auth == null ? "アカウント未指定" : "@" + _auth.UnreliableScreenName) + " - " +
-                       this._listInfo;
+                return "リストタイムライン(" + this._listInfo + ")";
             }
         }
 
@@ -40,30 +37,18 @@ namespace StarryEyes.Models.Receiving.Receivers
             get { return Setting.ListReceivePeriod.Value; }
         }
 
-        protected override void DoReceive()
+        protected override async Task DoReceive()
         {
-            Task.Run(async () =>
+            var authInfo = this._auth ?? Setting.Accounts.GetRandomOne();
+            if (authInfo == null)
             {
-                var authInfo = this._auth ?? Setting.Accounts.GetRandomOne();
-                if (authInfo == null)
-                {
-                    BackstageModel.RegisterEvent(new OperationFailedEvent(
-                        "アカウントが登録されていないため、リストタイムラインを受信できませんでした。", null));
-                    return;
-                }
+                BackstageModel.RegisterEvent(new OperationFailedEvent(
+                    "アカウントが登録されていないため、リストタイムラインを受信できませんでした。", null));
+                return;
+            }
 
-                try
-                {
-                    var statuses =
-                        await authInfo.GetListTimelineAsync(this._listInfo.Slug, this._listInfo.OwnerScreenName);
-                    statuses.ForEach(StatusInbox.Queue);
-                }
-                catch (Exception ex)
-                {
-                    BackstageModel.RegisterEvent(new OperationFailedEvent(
-                        "リストを受信できません: (@" + authInfo.UnreliableScreenName + " - \"" + this._listInfo + "\")", ex));
-                }
-            });
+            (await authInfo.GetListTimelineAsync(this._listInfo.Slug, this._listInfo.OwnerScreenName))
+                .ForEach(StatusInbox.Queue);
         }
     }
 }

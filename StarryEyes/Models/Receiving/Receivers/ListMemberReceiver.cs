@@ -6,7 +6,6 @@ using StarryEyes.Albireo;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Models.Accounting;
-using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Models.Databases;
 using StarryEyes.Settings;
 
@@ -29,9 +28,7 @@ namespace StarryEyes.Models.Receiving.Receivers
         {
             get
             {
-                return "リスト メンバー(" +
-                    (_auth == null ? "アカウント未指定" : "@" + _auth.UnreliableScreenName) + " - " +
-                       this._listInfo;
+                return "リスト情報(" + this._listInfo + ")";
             }
         }
 
@@ -40,31 +37,19 @@ namespace StarryEyes.Models.Receiving.Receivers
             get { return Setting.ListMemberReceivePeriod.Value; }
         }
 
-        protected override void DoReceive()
+        protected override async Task DoReceive()
         {
-            Task.Run(async () =>
+            var listData = await ReceiveListDescription(_auth, _listInfo);
+            var users = (await ReceiveListMembers(_auth, _listInfo)).OrderBy(l => l).ToArray();
+            var oldUsers = (await ListProxy.GetListMembers(listData.Id)).OrderBy(l => l).ToArray();
+            if (users.SequenceEqual(oldUsers))
             {
-                try
-                {
-                    var listData = await ReceiveListDescription(_auth, _listInfo);
-                    var users = (await ReceiveListMembers(_auth, _listInfo)).OrderBy(l => l).ToArray();
-                    var oldUsers = (await ListProxy.GetListMembers(listData.Id)).OrderBy(l => l).ToArray();
-                    if (users.SequenceEqual(oldUsers))
-                    {
-                        // not changed
-                        return;
-                    }
-                    // commit changes
-                    await ListProxy.SetListMembers(listData, users);
-                    ListMemberChanged.SafeInvoke();
-                }
-                catch (Exception ex)
-                {
-                    BackstageModel.RegisterEvent(new OperationFailedEvent(
-                        "リスト情報を受信できませんでした: " + _auth.UnreliableScreenName + " -> " + _listInfo.ToString(),
-                        ex));
-                }
-            });
+                // not changed
+                return;
+            }
+            // commit changes
+            await ListProxy.SetListMembers(listData, users);
+            ListMemberChanged.SafeInvoke();
         }
 
         private async Task<TwitterList> ReceiveListDescription(TwitterAccount account, ListInfo info)

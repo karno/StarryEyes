@@ -1,8 +1,7 @@
-﻿using System;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using StarryEyes.Anomaly.TwitterApi.Rest;
-using StarryEyes.Anomaly.Utils;
 using StarryEyes.Models.Accounting;
-using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Models.Receiving.Handling;
 using StarryEyes.Settings;
 
@@ -27,18 +26,13 @@ namespace StarryEyes.Models.Receiving.Receivers
             get { return Setting.RESTReceivePeriod.Value; }
         }
 
-        protected override void DoReceive()
+        protected override async Task DoReceive()
         {
-            this._account.GetDirectMessagesAsync(count: 50).ToObservable()
-                .Subscribe(StatusInbox.Queue,
-                    ex => BackstageModel.RegisterEvent(
-                        new OperationFailedEvent("messages receive error: " +
-                                                 this._account.UnreliableScreenName, ex)));
-            this._account.GetSentDirectMessagesAsync(count: 50).ToObservable()
-                .Subscribe(StatusInbox.Queue,
-                    ex => BackstageModel.RegisterEvent(
-                        new OperationFailedEvent("sent messages receive error: " +
-                                                 this._account.UnreliableScreenName, ex)));
+            await Task.WhenAll(
+                Task.Run(async () => (await this._account.GetDirectMessagesAsync(50))
+                    .ForEach(StatusInbox.Queue)),
+                Task.Run(async () => (await this._account.GetSentDirectMessagesAsync(50))
+                    .ForEach(StatusInbox.Queue)));
         }
     }
 }

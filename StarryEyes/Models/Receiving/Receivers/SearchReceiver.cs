@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using StarryEyes.Anomaly.TwitterApi.Rest;
@@ -30,34 +29,23 @@ namespace StarryEyes.Models.Receiving.Receivers
             get { return Setting.RESTSearchReceivePeriod.Value; }
         }
 
-        protected override void DoReceive()
+        protected override async Task DoReceive()
         {
-            Task.Run(async () =>
+            var account = Setting.Accounts.GetRandomOne();
+            if (account == null)
             {
-                try
+                BackstageModel.RegisterEvent(new OperationFailedEvent("アカウントが登録されていないため、検索タイムラインを受信できませんでした。", null));
+                return;
+            }
+            (await account.SearchAsync(this._query))
+                .Do(s =>
                 {
-                    var account = Setting.Accounts.GetRandomOne();
-                    if (account == null)
+                    lock (_receiveCaches)
                     {
-                        BackstageModel.RegisterEvent(new OperationFailedEvent("アカウントが登録されていないため、検索タイムラインを受信できませんでした。", null));
-                        return;
+                        _receiveCaches.ForEach(c => c.Add(s.Id));
                     }
-                    var resp = await account.SearchAsync(this._query);
-                    resp
-                        .Do(s =>
-                        {
-                            lock (_receiveCaches)
-                            {
-                                _receiveCaches.ForEach(c => c.Add(s.Id));
-                            }
-                        })
-                        .ForEach(StatusInbox.Queue);
-                }
-                catch (Exception ex)
-                {
-                    BackstageModel.RegisterEvent(new OperationFailedEvent("検索タイムラインを受信できません", ex));
-                }
-            });
+                })
+                .ForEach(StatusInbox.Queue);
         }
     }
 }

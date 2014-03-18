@@ -3,6 +3,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using StarryEyes.Models.Backstages.NotificationEvents;
 
 namespace StarryEyes.Models.Receiving.Receivers
@@ -39,14 +40,20 @@ namespace StarryEyes.Models.Receiving.Receivers
                           .Subscribe(_ => this.OnTimer()));
         }
 
-        private void OnTimer()
+        private async void OnTimer()
         {
             if (this._isDisposed) return;
             if (Interlocked.Decrement(ref this._remainCountDown) > 0) return;
             this._remainCountDown = this.IntervalSec;
             try
             {
-                this.DoReceive();
+                await Task.Run(async () =>
+                {
+                    using (MainWindowModel.SetState("受信中: " + ReceiverName))
+                    {
+                        await this.DoReceive();
+                    }
+                });
             }
             catch (Exception ex)
             {
@@ -54,7 +61,7 @@ namespace StarryEyes.Models.Receiving.Receivers
             }
         }
 
-        protected abstract void DoReceive();
+        protected abstract Task DoReceive();
 
         protected void AssertDisposed()
         {
