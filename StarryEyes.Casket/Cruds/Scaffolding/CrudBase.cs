@@ -34,6 +34,7 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
                 // This option would cause damage to database image.
                 // {"Synchronous", "Off"},
                 {"Synchronous", "Normal"},
+                {"Default Timeout", "3"},
                 {"Journal Mode", "WAL"},
                 {"Page Size", "2048"},
                 {"Pooling", "True"},

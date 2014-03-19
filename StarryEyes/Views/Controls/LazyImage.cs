@@ -28,8 +28,8 @@ namespace StarryEyes.Views.Controls
         #region Constant variables
 
         private const int MaxRetryCount = 3;
-        private const int MaxReceiveConcurrency = 4;
-        private const int MaxDecodeConcurrency = 2;
+        private const int MaxReceiveConcurrency = 2;
+        private const int MaxDecodeConcurrency = 1;
 
         #endregion
 
