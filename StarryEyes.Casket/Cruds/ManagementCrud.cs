@@ -29,7 +29,7 @@ namespace StarryEyes.Casket.Cruds
         private DatabaseManagement GetValueCore(long id)
         {
             using (this.AcquireReadLock())
-            using (var con = this.OpenConnection())
+            using (var con = this.DangerousOpenConnection())
             {
                 return con.Query<DatabaseManagement>(
                     this.CreateSql("Id = @Id"), new { Id = id })
@@ -45,7 +45,7 @@ namespace StarryEyes.Casket.Cruds
         private void SetValueCore(DatabaseManagement mgmt)
         {
             using (this.AcquireWriteLock())
-            using (var con = this.OpenConnection())
+            using (var con = this.DangerousOpenConnection())
             using (var tr = con.BeginTransaction(IsolationLevel.ReadCommitted))
             {
                 con.Execute(this.TableInserter, mgmt);
@@ -58,19 +58,12 @@ namespace StarryEyes.Casket.Cruds
         internal async Task VacuumAsync()
         {
             // should execute WITHOUT transaction.
-            await Task.Run(() =>
+            await WriteTaskFactory.StartNew(() =>
             {
-                try
+                using (AcquireWriteLock())
+                using (var con = this.DangerousOpenConnection())
                 {
-                    ReaderWriterLock.EnterWriteLock();
-                    using (var con = OpenConnection())
-                    {
-                        con.Execute("VACUUM;");
-                    }
-                }
-                finally
-                {
-                    ReaderWriterLock.ExitWriteLock();
+                    con.Execute("VACUUM;");
                 }
             });
         }

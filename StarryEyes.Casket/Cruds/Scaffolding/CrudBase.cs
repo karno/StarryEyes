@@ -53,9 +53,11 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
 
         #region threading
 
-        private static readonly LimitedTaskScheduler _scheduler = new LimitedTaskScheduler(16);
-        private static readonly TaskFactory _factory = new TaskFactory(_scheduler);
-        protected static TaskFactory QueryTaskFactory { get { return _factory; } }
+        private static readonly TaskFactory _readTaskFactory = LimitedTaskScheduler.GetTaskFactory(8);
+        protected static TaskFactory ReadTaskFactory { get { return _readTaskFactory; } }
+
+        private static readonly TaskFactory _writeTaskFactory = LimitedTaskScheduler.GetTaskFactory(1);
+        protected static TaskFactory WriteTaskFactory { get { return _writeTaskFactory; } }
 
         #endregion
 
@@ -76,7 +78,7 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
             return Disposable.Create(() => _rwlock.ExitReadLock());
         }
 
-        protected SQLiteConnection OpenConnection()
+        protected SQLiteConnection DangerousOpenConnection()
         {
             SQLiteConnection con = null;
             try
@@ -101,13 +103,13 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
 
         protected Task<int> ExecuteAsync(string query)
         {
-            return _factory.StartNew(() =>
+            return _writeTaskFactory.StartNew(() =>
             {
                 // System.Diagnostics.Debug.WriteLine("EXECUTE: " + query);
                 try
                 {
                     ReaderWriterLock.EnterWriteLock();
-                    using (var con = this.OpenConnection())
+                    using (var con = this.DangerousOpenConnection())
                     using (var tr = con.BeginTransaction(IsolationLevel.ReadCommitted))
                     {
                         var result = con.Execute(query, transaction: tr);
@@ -124,13 +126,13 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
 
         protected Task<int> ExecuteAsync(string query, dynamic param)
         {
-            return _factory.StartNew(() =>
+            return _writeTaskFactory.StartNew(() =>
             {
                 try
                 {
                     ReaderWriterLock.EnterWriteLock();
                     // System.Diagnostics.Debug.WriteLine("EXECUTE: " + query);
-                    using (var con = this.OpenConnection())
+                    using (var con = this.DangerousOpenConnection())
                     using (var tr = con.BeginTransaction(IsolationLevel.ReadCommitted))
                     {
                         var result = (int)SqlMapper.Execute(con, query, param, tr);
@@ -147,12 +149,12 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
 
         protected Task ExecuteAllAsync(IEnumerable<Tuple<string, object>> queryAndParams)
         {
-            return _factory.StartNew(() =>
+            return _writeTaskFactory.StartNew(() =>
             {
                 try
                 {
                     ReaderWriterLock.EnterWriteLock();
-                    using (var con = this.OpenConnection())
+                    using (var con = this.DangerousOpenConnection())
                     using (var tr = con.BeginTransaction(IsolationLevel.ReadCommitted))
                     {
                         foreach (var qap in queryAndParams)
@@ -173,12 +175,12 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
         protected Task<IEnumerable<T>> QueryAsync<T>(string query, object param)
         {
             // System.Diagnostics.Debug.WriteLine("QUERY: " + query);
-            return _factory.StartNew(() =>
+            return _readTaskFactory.StartNew(() =>
             {
                 try
                 {
                     ReaderWriterLock.EnterReadLock();
-                    using (var con = this.OpenConnection())
+                    using (var con = this.DangerousOpenConnection())
                     {
                         return con.Query<T>(query, param);
                     }

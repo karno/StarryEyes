@@ -31,7 +31,7 @@ namespace StarryEyes.Casket.Cruds
         public long GetId(string screenName)
         {
             using (this.AcquireReadLock())
-            using (var con = this.OpenConnection())
+            using (var con = this.DangerousOpenConnection())
             {
                 return con.Query<long>("select Id from " + TableName + " where LOWER(ScreenName) = @ScreenName limit 1;",
                                 new { ScreenName = screenName.ToLower() })

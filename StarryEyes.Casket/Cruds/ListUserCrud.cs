@@ -33,16 +33,24 @@ namespace StarryEyes.Casket.Cruds
 
         public async Task RegisterUsersAsync(long listId, IEnumerable<long> userIds)
         {
-            await Task.Run(() =>
+            await WriteTaskFactory.StartNew(() =>
             {
-                using (var conn = OpenConnection())
-                using (var tran = conn.BeginTransaction(IsolationLevel.ReadCommitted))
+                try
                 {
-                    foreach (var userId in userIds)
+                    ReaderWriterLock.EnterWriteLock();
+                    using (var conn = this.DangerousOpenConnection())
+                    using (var tran = conn.BeginTransaction(IsolationLevel.ReadCommitted))
                     {
-                        conn.Execute(TableInserter, new DatabaseListUser(listId, userId));
+                        foreach (var userId in userIds)
+                        {
+                            conn.Execute(TableInserter, new DatabaseListUser(listId, userId));
+                        }
+                        tran.Commit();
                     }
-                    tran.Commit();
+                }
+                finally
+                {
+                    ReaderWriterLock.ExitWriteLock();
                 }
             });
         }
