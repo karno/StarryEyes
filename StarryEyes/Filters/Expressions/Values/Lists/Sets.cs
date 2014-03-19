@@ -23,7 +23,7 @@ namespace StarryEyes.Filters.Expressions.Values.Lists
 
         public override string ToQuery()
         {
-            return "list." + _listInfo.OwnerScreenName +
+            return "list." + _listInfo.OwnerScreenName + "." +
                    (_listInfo.Slug.EscapeForQuery().Quote());
         }
 
