@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SQLite;
 using System.Linq;
 using System.Reactive.Disposables;
@@ -27,17 +28,17 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
         private static string CreateBaseConStr()
         {
             var dic = new Dictionary<string, string>
-                {
-                    {"Version", "3"},
-                    {"Cache Size", "8000"},
-                    // This option would cause damage to database image.
-                    // {"Synchronous", "Off"},
-                    {"Synchronous", "Normal"},
-                    {"Journal Mode", "WAL"},
-                    {"Page Size", "2048"},
-                    {"Pooling", "True"},
-                    {"Max Pool Size", "200"},
-                };
+            {
+                {"Version", "3"},
+                {"Cache Size", "8000"},
+                // This option would cause damage to database image.
+                // {"Synchronous", "Off"},
+                {"Synchronous", "Normal"},
+                {"Journal Mode", "WAL"},
+                {"Page Size", "2048"},
+                {"Pooling", "True"},
+                {"Max Pool Size", "200"},
+            };
             return dic.Select(kvp => kvp.Key + "=" + kvp.Value)
                       .JoinString(";");
         }
@@ -106,7 +107,7 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
                 {
                     ReaderWriterLock.EnterWriteLock();
                     using (var con = this.OpenConnection())
-                    using (var tr = con.BeginTransaction())
+                    using (var tr = con.BeginTransaction(IsolationLevel.ReadCommitted))
                     {
                         var result = con.Execute(query, transaction: tr);
                         tr.Commit();
@@ -129,7 +130,7 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
                     ReaderWriterLock.EnterWriteLock();
                     // System.Diagnostics.Debug.WriteLine("EXECUTE: " + query);
                     using (var con = this.OpenConnection())
-                    using (var tr = con.BeginTransaction())
+                    using (var tr = con.BeginTransaction(IsolationLevel.ReadCommitted))
                     {
                         var result = (int)SqlMapper.Execute(con, query, param, tr);
                         tr.Commit();
@@ -151,7 +152,7 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
                 {
                     ReaderWriterLock.EnterWriteLock();
                     using (var con = this.OpenConnection())
-                    using (var tr = con.BeginTransaction())
+                    using (var tr = con.BeginTransaction(IsolationLevel.ReadCommitted))
                     {
                         foreach (var qap in queryAndParams)
                         {

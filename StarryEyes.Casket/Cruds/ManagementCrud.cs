@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Data;
+using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using StarryEyes.Casket.Cruds.Scaffolding;
@@ -45,7 +46,7 @@ namespace StarryEyes.Casket.Cruds
         {
             using (this.AcquireWriteLock())
             using (var con = this.OpenConnection())
-            using (var tr = con.BeginTransaction())
+            using (var tr = con.BeginTransaction(IsolationLevel.ReadCommitted))
             {
                 con.Execute(this.TableInserter, mgmt);
                 tr.Commit();
