@@ -22,6 +22,11 @@ namespace StarryEyes
         {
             if (source == null) throw new ArgumentNullException("source");
 
+            if (!DispatcherHolder.Dispatcher.CheckAccess())
+            {
+                throw new ArgumentException("This method must be called on the Dispatcher thread.");
+            }
+
             var sourceAsNotifyCollection = source as INotifyCollectionChanged;
             if (sourceAsNotifyCollection == null) throw new ArgumentException("sourceがINotifyCollectionChangedを実装していません");
 
