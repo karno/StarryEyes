@@ -208,6 +208,11 @@ namespace Livet
             });
         }
 
+        public void SynchronizedToArray(Action<T[]> resultHandler)
+        {
+            ReadWithLockAction(() => resultHandler(this._list.ToArray()));
+        }
+
         /// <summary>
         /// 実際に格納されている要素の数を取得します。
         /// </summary>

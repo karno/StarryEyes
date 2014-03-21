@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Linq;
 using System.Reactive.Linq;
 using System.Windows.Threading;
 using Livet;
@@ -38,22 +37,24 @@ namespace StarryEyes
             var result = new ReadOnlyDispatcherCollectionRx<TViewModel>(target);
 
             var scx = source as ObservableSynchronizedCollectionEx<TModel>;
-            IList<TModel> frozen;
             if (scx != null)
             {
-                frozen = scx.SynchronizedToArray(
-                    () => result.Disposables.Add(CreateSubscription(sourceAsNotifyCollection, converter, target)));
+                scx.SynchronizedToArray(array =>
+                {
+                    result.Disposables.Add(CreateSubscription(sourceAsNotifyCollection, converter, target));
+                    foreach (var model in array)
+                    {
+                        initCollection.Add(converter(model));
+                    }
+                });
             }
             else
             {
-                frozen = new List<TModel>();
-                source.ForEach(frozen.Add);
+                foreach (var model in source)
+                {
+                    initCollection.Add(converter(model));
+                }
                 result.Disposables.Add(CreateSubscription(sourceAsNotifyCollection, converter, target));
-            }
-
-            foreach (var model in frozen)
-            {
-                initCollection.Add(converter(model));
             }
             return result;
         }
