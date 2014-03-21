@@ -229,6 +229,7 @@
     <Compile Include="Filters\Sources\FilterUser.cs" />
     <Compile Include="Helpers\FreezableHelper.cs" />
     <Compile Include="Helpers\TwitterRegexPatterns.cs" />
+    <Compile Include="Hotfixes\ClipboardEx.cs" />
     <Compile Include="Hotfixes\DispatcherCollectionRx.cs" />
     <Compile Include="Hotfixes\DispatcherEx.cs" />
     <Compile Include="Hotfixes\ReadOnlyDispatcherCollectionRx.cs" />

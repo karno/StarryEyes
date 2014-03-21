@@ -14,6 +14,7 @@ using Livet.Messaging.IO;
 using StarryEyes.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Helpers;
+using StarryEyes.Hotfixes;
 using StarryEyes.Models;
 using StarryEyes.Models.Backstages.NotificationEvents.PostEvents;
 using StarryEyes.Models.Inputting;
@@ -39,6 +40,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
         private UserViewModel _recipientViewModel;
         private InReplyToStatusViewModel _inReplyToViewModelCache;
         private bool _isLocationEnabled;
+        private string _tempDir;
 
         public InputCoreViewModel(InputViewModel parent)
         {
@@ -91,6 +93,14 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             var plistener = new PropertyChangedEventListener(InputModel.InputCore);
             plistener.Add(() => InputModel.InputCore.CurrentInputData, (_, e) => InputDataChanged());
             CompositeDisposable.Add(plistener);
+
+            // create temporary directory and reserve deletion before exit app.
+            do
+            {
+                _tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            } while (Directory.Exists(_tempDir));
+            Directory.CreateDirectory(_tempDir);
+            App.ApplicationExit += () => Directory.Delete(this._tempDir, true);
 
             // initialize clipboard watcher.
             ClipboardWatcher watcher;
@@ -567,11 +577,12 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             AttachedImage = null;
         }
 
+        [UsedImplicitly]
         public void AttachClipboardImage()
         {
             BitmapSource image;
-            if (!Clipboard.ContainsImage() || (image = Clipboard.GetImage()) == null) return;
-            var tempPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName() + ".png");
+            if (!Clipboard.ContainsImage() || (image = ClipboardEx.GetImage()) == null) return;
+            var tempPath = Path.Combine(_tempDir, Path.GetRandomFileName() + ".png");
             using (var fs = new FileStream(tempPath, FileMode.Create))
             {
                 var encoder = new PngBitmapEncoder();
@@ -605,6 +616,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             }
         }
 
+        [UsedImplicitly]
         public void StartSnippingTool()
         {
             try
