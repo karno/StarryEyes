@@ -20,7 +20,7 @@ namespace StarryEyes.Models.Inputting
         private TwitterAccount[] _accounts;
         private string _initText;
         private string _text;
-        private BitmapImage _attachedImage;
+        private byte[] _attachedImage;
         private GeoLocationInfo _geoInfo;
         private string[] _boundTags;
         private Dictionary<TwitterAccount, TwitterStatus> _amendTweets =
@@ -178,7 +178,7 @@ namespace StarryEyes.Models.Inputting
         }
 
         [CanBeNull]
-        public BitmapImage AttachedImage
+        public byte[] AttachedImage
         {
             get { return _attachedImage; }
             set
@@ -190,16 +190,10 @@ namespace StarryEyes.Models.Inputting
                         throw new InvalidOperationException(
                             "Could not attach image when InputData is in DirectMessage mode.");
                     }
-                    if (!value.IsFrozen)
-                    {
-                        value.Freeze();
-                    }
                 }
                 _attachedImage = value;
             }
         }
-
-        public ImageType AttachedImageType { get; set; }
 
         #endregion
 
@@ -211,7 +205,6 @@ namespace StarryEyes.Models.Inputting
                 _accounts = _accounts == null ? null : _accounts.ToArray(),
                 _amendTweets = _amendTweets.ToDictionary(p => p.Key, p => p.Value),
                 _attachedImage = _attachedImage,
-                AttachedImageType = AttachedImageType,
                 _boundTags = _boundTags,
                 _geoInfo = _geoInfo,
                 _inReplyTo = _inReplyTo,
@@ -242,35 +235,8 @@ namespace StarryEyes.Models.Inputting
             }
             else
             {
-                byte[] image = null;
-                if (AttachedImage != null)
-                {
-                    BitmapEncoder encoder;
-                    switch (AttachedImageType)
-                    {
-                        case ImageType.Gif:
-                            encoder = new GifBitmapEncoder();
-                            break;
-                        case ImageType.Jpg:
-                            encoder = new JpegBitmapEncoder();
-                            break;
-                        case ImageType.Tiff:
-                            encoder = new TiffBitmapEncoder();
-                            break;
-                        default:
-                            // default: use PNG format
-                            encoder = new PngBitmapEncoder();
-                            break;
-                    }
-                    encoder.Frames.Add(BitmapFrame.Create(AttachedImage));
-                    using (var ms = new MemoryStream())
-                    {
-                        encoder.Save(ms);
-                        image = ms.ToArray();
-                    }
-                }
                 request = new TweetPostingRequest(Text + binds, InReplyTo,
-                    AttachedGeoLocation, image);
+                    AttachedGeoLocation, _attachedImage);
             }
             var s = Observable.Defer(() => Observable.Start(() => _accounts.Guard().ToObservable()))
                               .SelectMany(a => a)
@@ -354,8 +320,50 @@ namespace StarryEyes.Models.Inputting
         Tiff,
     }
 
-    public static class ImageTypes
+    public static class ImageUtil
     {
+        public static BitmapImage CreateImage(byte[] bytes)
+        {
+            using (var ms = new MemoryStream(bytes))
+            {
+                var bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                bitmap.CreateOptions = BitmapCreateOptions.None;
+                bitmap.StreamSource = ms;
+                bitmap.EndInit();
+                bitmap.Freeze();
+                return bitmap;
+            }
+        }
+
+        public static byte[] SaveToBytes(this BitmapSource image, ImageType saveType = ImageType.Png)
+        {
+            BitmapEncoder encoder;
+            switch (saveType)
+            {
+                case ImageType.Gif:
+                    encoder = new GifBitmapEncoder();
+                    break;
+                case ImageType.Jpg:
+                    encoder = new JpegBitmapEncoder();
+                    break;
+                case ImageType.Tiff:
+                    encoder = new TiffBitmapEncoder();
+                    break;
+                default:
+                    // default: use PNG format
+                    encoder = new PngBitmapEncoder();
+                    break;
+            }
+            encoder.Frames.Add(BitmapFrame.Create(image));
+            using (var ms = new MemoryStream())
+            {
+                encoder.Save(ms);
+                return ms.ToArray();
+            }
+        }
+
         public static ImageType DetermineImageType(byte[] image)
         {
             using (Stream ms = new MemoryStream(image))

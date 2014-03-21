@@ -59,12 +59,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Windows\WinFormsClipboard.cs" />
     <Compile Include="Windows\ClipboardWatcher.cs" />
     <Compile Include="Windows\Forms\NotifyIcon.cs" />
     <Compile Include="Windows\Forms\Screen.cs" />
     <Compile Include="Windows\Forms\WinFormsIcon.cs" />
     <Compile Include="Windows\Forms\WinFormsMouseEventArgs.cs" />
     <Compile Include="Windows\Application.cs" />
+    <Compile Include="Windows\ImageInterop.cs" />
     <Compile Include="Windows\WinApi.cs" />
     <Compile Include="Windows\SystemInformation.cs" />
     <Compile Include="Windows\TaskDialog.cs" />

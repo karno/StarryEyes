@@ -65,6 +65,8 @@ namespace StarryEyes.Nightmare.Windows
         [DllImport("user32.dll")]
         internal static extern bool ChangeClipboardChain(IntPtr hWnd, IntPtr hWndNext);
 
+        [DllImport("gdi32.dll")]
+        public static extern bool DeleteObject(IntPtr hObject);
     }
 
     #region Data structures

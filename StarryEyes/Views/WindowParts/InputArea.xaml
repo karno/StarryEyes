@@ -714,7 +714,7 @@
                             <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ActiveBorderColorKey}}" />
                         </Border.BorderBrush>
                         <Grid>
-                            <Image Source="{Binding Path=AttachedImage.Source}" Stretch="Uniform" />
+                            <Image Source="{Binding Path=AttachedImage.Image}" Stretch="Uniform" />
                             <Border x:Name="Border"
                                     Background="#FFE51400"
                                     Opacity="0">

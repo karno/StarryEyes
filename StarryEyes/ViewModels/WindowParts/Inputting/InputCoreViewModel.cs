@@ -14,7 +14,6 @@ using Livet.Messaging.IO;
 using StarryEyes.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Helpers;
-using StarryEyes.Hotfixes;
 using StarryEyes.Models;
 using StarryEyes.Models.Backstages.NotificationEvents.PostEvents;
 using StarryEyes.Models.Inputting;
@@ -24,6 +23,7 @@ using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
 using StarryEyes.ViewModels.Timelines.Statuses;
 using StarryEyes.Views.Messaging;
+using Clipboard = System.Windows.Clipboard;
 
 namespace StarryEyes.ViewModels.WindowParts.Inputting
 {
@@ -40,7 +40,8 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
         private UserViewModel _recipientViewModel;
         private InReplyToStatusViewModel _inReplyToViewModelCache;
         private bool _isLocationEnabled;
-        private string _tempDir;
+
+        private readonly string _tempDir;
 
         public InputCoreViewModel(InputViewModel parent)
         {
@@ -535,11 +536,15 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
 
         public ImageDescriptionViewModel AttachedImage
         {
-            get { return new ImageDescriptionViewModel(InputData.AttachedImage, InputData.AttachedImageType); }
+            get
+            {
+                return InputData.AttachedImage != null
+                    ? new ImageDescriptionViewModel(InputData.AttachedImage)
+                    : null;
+            }
             set
             {
-                InputData.AttachedImage = value == null ? null : value.Source;
-                InputData.AttachedImageType = value == null ? ImageType.Png : value.SourceImageType;
+                InputData.AttachedImage = value == null ? null : value.ByteArray;
                 RaisePropertyChanged(() => AttachedImage);
                 RaisePropertyChanged(() => IsImageAttached);
                 RaisePropertyChanged(() => CanSaveToDraft);
@@ -581,7 +586,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
         public void AttachClipboardImage()
         {
             BitmapSource image;
-            if (!Clipboard.ContainsImage() || (image = ClipboardEx.GetImage()) == null) return;
+            if (!Clipboard.ContainsImage() || (image = WinFormsClipboard.GetWpfImage()) == null) return;
             var tempPath = Path.Combine(_tempDir, Path.GetRandomFileName() + ".png");
             using (var fs = new FileStream(tempPath, FileMode.Create))
             {
@@ -978,28 +983,41 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
 
     public class ImageDescriptionViewModel : ViewModel
     {
+        private BitmapImage _bitmap;
+        private byte[] _byteArray;
+
         public ImageDescriptionViewModel(string filePath)
+            : this(File.ReadAllBytes(filePath))
         {
-            SourceImageType = ImageTypes.DetermineImageType(File.ReadAllBytes(filePath));
-            var bitmap = new BitmapImage();
-            bitmap.BeginInit();
-            bitmap.CacheOption = BitmapCacheOption.OnLoad;
-            bitmap.CreateOptions = BitmapCreateOptions.None;
-            bitmap.UriSource = new Uri(filePath);
-            bitmap.EndInit();
-            Source = bitmap;
+        }
+
+        public ImageDescriptionViewModel(byte[] image)
+        {
+            ByteArray = image;
         }
 
         public ImageDescriptionViewModel(BitmapImage image, ImageType sourceType)
         {
-            Source = image;
-            SourceImageType = sourceType;
+            this._bitmap = image;
+            _byteArray = image.SaveToBytes(sourceType);
         }
 
-        public BitmapImage Source { get; set; }
+        public byte[] ByteArray
+        {
+            get { return this._byteArray; }
+            set
+            {
+                this._byteArray = value;
+                _bitmap = ImageUtil.CreateImage(value);
+                RaisePropertyChanged();
+                RaisePropertyChanged(() => Image);
+            }
+        }
 
-        public ImageType SourceImageType { get; set; }
-
+        public BitmapImage Image
+        {
+            get { return _bitmap; }
+        }
     }
 
     public class LocationDescriptionViewModel : ViewModel
