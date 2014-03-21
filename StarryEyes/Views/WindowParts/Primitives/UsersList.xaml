@@ -74,7 +74,7 @@
                         HorizontalAlignment="Center"
                         Orientation="Horizontal">
                 <Viewbox Width="20" Height="20">
-                    <mahapps:ProgressRing IsActive="True" />
+                    <mahapps:ProgressRing IsActive="{Binding IsLoading}" />
                 </Viewbox>
                 <TextBlock Margin="4"
                            VerticalAlignment="Center"

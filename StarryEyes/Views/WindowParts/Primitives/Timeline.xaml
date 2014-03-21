@@ -1748,7 +1748,7 @@
                         HorizontalAlignment="Center"
                         Orientation="Horizontal">
                 <Viewbox Width="20" Height="20">
-                    <Controls:ProgressRing IsActive="True" />
+                    <Controls:ProgressRing IsActive="{Binding IsLoading}" />
                 </Viewbox>
                 <TextBlock Margin="4"
                            VerticalAlignment="Center"
