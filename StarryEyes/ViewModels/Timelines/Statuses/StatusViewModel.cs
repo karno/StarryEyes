@@ -9,6 +9,7 @@ using System.Windows.Threading;
 using Livet;
 using Livet.Commands;
 using Livet.EventListeners;
+using StarryEyes.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.Utils;
 using StarryEyes.Filters;
@@ -643,6 +644,11 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
 
         public void Favorite(IEnumerable<TwitterAccount> infos, bool add)
         {
+            if (IsDirectMessage)
+            {
+                // disable on direct messages
+                return;
+            }
             Action<TwitterAccount> expected;
             Action<TwitterAccount> onFail;
             if (add)
@@ -678,6 +684,11 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
 
         public void Retweet(IEnumerable<TwitterAccount> infos, bool add)
         {
+            if (IsDirectMessage)
+            {
+                // disable on direct messages
+                return;
+            }
             Action<TwitterAccount> expected;
             Action<TwitterAccount> onFail;
             if (add)
@@ -770,8 +781,14 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             this.Parent.Messenger.Raise(msg);
         }
 
+        [UsedImplicitly]
         public void FavoriteAndRetweetImmediate()
         {
+            if (IsDirectMessage)
+            {
+                // disable on direct messages
+                return;
+            }
             if (!this.AssertQuickActionEnabled()) return;
             var accounts = this.GetImmediateAccounts()
                 .ToObservable()
@@ -871,9 +888,10 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                 });
         }
 
+        [UsedImplicitly]
         public void SendReplyOrDirectMessage()
         {
-            if (this.Status.StatusType == StatusType.DirectMessage)
+            if (IsDirectMessage)
             {
                 this.DirectMessage();
             }
@@ -885,7 +903,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
 
         public void SendReplyOrDirectMessage(string body)
         {
-            if (this.Status.StatusType == StatusType.DirectMessage)
+            if (IsDirectMessage)
             {
                 this.DirectMessage(body);
             }
@@ -897,11 +915,6 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
 
         private void Reply()
         {
-            if (IsDirectMessage)
-            {
-                this.DirectMessage();
-                return;
-            }
             if (this.IsSelected)
             {
                 this.Parent.ReplySelecteds();
@@ -912,11 +925,6 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
 
         private void Reply(string body)
         {
-            if (IsDirectMessage)
-            {
-                this.DirectMessage(body);
-                return;
-            }
             // from key assign
             if (String.IsNullOrEmpty(body))
             {
@@ -936,6 +944,11 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
 
         public void Quote()
         {
+            if (IsDirectMessage)
+            {
+                // disable on direct messages
+                return;
+            }
             var setting = InputSetting.CreateReply(this.Status,
                 " RT @" + this.User.ScreenName + " " + this.Status.GetEntityAidedText(true),
                 false);
@@ -945,6 +958,11 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
 
         public void QuotePermalink()
         {
+            if (IsDirectMessage)
+            {
+                // disable on direct messages
+                return;
+            }
             var setting = InputSetting.Create(this.Model.GetSuitableReplyAccount(),
                 " " + this.Status.Permalink);
             setting.CursorPosition = CursorPosition.Begin;
@@ -1029,6 +1047,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             this.Parent.Focus();
         }
 
+        [UsedImplicitly]
         public void Focus()
         {
             this.Parent.FocusedStatus = this;
@@ -1132,6 +1151,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                         });
         }
 
+        [UsedImplicitly]
         public void MuteKeyword()
         {
             if (String.IsNullOrWhiteSpace(this.SelectedText))
@@ -1217,6 +1237,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             });
         }
 
+        [UsedImplicitly]
         public void ReceiveOlder()
         {
             this.Parent.ReadMore(this.Status.Id);

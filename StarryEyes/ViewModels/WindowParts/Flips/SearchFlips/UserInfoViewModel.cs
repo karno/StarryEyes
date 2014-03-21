@@ -6,6 +6,7 @@ using System.Reactive.Linq;
 using System.Windows;
 using Livet;
 using Livet.Commands;
+using StarryEyes.Annotations;
 using StarryEyes.Anomaly.Utils;
 using StarryEyes.Models;
 using StarryEyes.Models.Inputting;
@@ -237,6 +238,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             }
         }
 
+        [UsedImplicitly]
         public void CopyText()
         {
             try
@@ -250,22 +252,27 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             }
         }
 
+        [UsedImplicitly]
         public void SetTextToInputBox()
         {
             InputModel.InputCore.SetText(InputSetting.Create(SelectedText));
         }
 
+        [UsedImplicitly]
         public void FindOnKrile()
         {
             SearchFlipModel.RequestSearch(SelectedText, SearchMode.Local);
         }
 
+        [UsedImplicitly]
         public void FindOnTwitter()
         {
             SearchFlipModel.RequestSearch(SelectedText, SearchMode.Web);
         }
 
         private const string GoogleUrl = @"http://www.google.com/search?q={0}";
+
+        [UsedImplicitly]
         public void FindOnGoogle()
         {
             var encoded = HttpUtility.UrlEncode(SelectedText);

@@ -113,14 +113,17 @@ namespace StarryEyes.Models.Inputting
             get { return _inReplyTo; }
             set
             {
-                if (value != null && IsDirectMessage)
+                if (value != null)
                 {
-                    throw new InvalidOperationException(
-                        "Could not set InReplyTo when InputData is in DirectMessage mode.");
-                }
-                if (value != null && value.StatusType == StatusType.DirectMessage)
-                {
-                    throw new ArgumentException("Could not set direct message as reply target.");
+                    if (this.IsDirectMessage)
+                    {
+                        throw new InvalidOperationException(
+                            "Could not set InReplyTo when InputData is in DirectMessage mode.");
+                    }
+                    if (value.StatusType == StatusType.DirectMessage)
+                    {
+                        throw new ArgumentException("Could not set direct message as reply target.");
+                    }
                 }
                 _inReplyTo = value;
             }
