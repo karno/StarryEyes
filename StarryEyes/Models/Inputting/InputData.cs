@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Text.RegularExpressions;
@@ -198,6 +199,8 @@ namespace StarryEyes.Models.Inputting
             }
         }
 
+        public ImageType AttachedImageType { get; set; }
+
         #endregion
 
         [NotNull]
@@ -208,6 +211,7 @@ namespace StarryEyes.Models.Inputting
                 _accounts = _accounts == null ? null : _accounts.ToArray(),
                 _amendTweets = _amendTweets.ToDictionary(p => p.Key, p => p.Value),
                 _attachedImage = _attachedImage,
+                AttachedImageType = AttachedImageType,
                 _boundTags = _boundTags,
                 _geoInfo = _geoInfo,
                 _inReplyTo = _inReplyTo,
@@ -238,11 +242,35 @@ namespace StarryEyes.Models.Inputting
             }
             else
             {
-                request = new TweetPostingRequest(
-                    Text + binds,
-                    InReplyTo,
-                    AttachedGeoLocation,
-                    AttachedImage);
+                byte[] image = null;
+                if (AttachedImage != null)
+                {
+                    BitmapEncoder encoder;
+                    switch (AttachedImageType)
+                    {
+                        case ImageType.Gif:
+                            encoder = new GifBitmapEncoder();
+                            break;
+                        case ImageType.Jpg:
+                            encoder = new JpegBitmapEncoder();
+                            break;
+                        case ImageType.Tiff:
+                            encoder = new TiffBitmapEncoder();
+                            break;
+                        default:
+                            // default: use PNG format
+                            encoder = new PngBitmapEncoder();
+                            break;
+                    }
+                    encoder.Frames.Add(BitmapFrame.Create(AttachedImage));
+                    using (var ms = new MemoryStream())
+                    {
+                        encoder.Save(ms);
+                        image = ms.ToArray();
+                    }
+                }
+                request = new TweetPostingRequest(Text + binds, InReplyTo,
+                    AttachedGeoLocation, image);
             }
             var s = Observable.Defer(() => Observable.Start(() => _accounts.Guard().ToObservable()))
                               .SelectMany(a => a)
@@ -315,5 +343,36 @@ namespace StarryEyes.Models.Inputting
 
         [CanBeNull]
         public IEnumerable<Exception> Exceptions { get; private set; }
+    }
+
+    public enum ImageType
+    {
+        Bmp,
+        Gif,
+        Jpg,
+        Png,
+        Tiff,
+    }
+
+    public static class ImageTypes
+    {
+        public static ImageType DetermineImageType(byte[] image)
+        {
+            using (Stream ms = new MemoryStream(image))
+            {
+                var table = new Dictionary<Type, ImageType>
+                {
+                    {typeof (BmpBitmapDecoder), ImageType.Bmp},
+                    {typeof (GifBitmapDecoder), ImageType.Gif},
+                    {typeof (JpegBitmapDecoder), ImageType.Jpg},
+                    {typeof (PngBitmapDecoder), ImageType.Png},
+                    {typeof (TiffBitmapDecoder), ImageType.Tiff},
+                };
+                var decoder = BitmapDecoder.Create(ms, BitmapCreateOptions.None, BitmapCacheOption.None);
+                return table.Where(imageType => decoder.GetType() == imageType.Key)
+                            .Select(imageType => imageType.Value)
+                            .FirstOrDefault();
+            }
+        }
     }
 }

@@ -1,7 +1,5 @@
 ﻿using System;
-using System.IO;
 using System.Threading.Tasks;
-using System.Windows.Media.Imaging;
 using StarryEyes.Anomaly.TwitterApi;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
@@ -30,33 +28,20 @@ namespace StarryEyes.Models.Requests
         private readonly byte[] _attachedImageBin;
 
         public TweetPostingRequest(string status,
-            TwitterStatus inReplyTo,
-            GeoLocationInfo geoInfo,
-            BitmapSource image)
-            : this(status, inReplyTo == null ? (long?)null : inReplyTo.Id, geoInfo, image)
+            TwitterStatus inReplyTo, GeoLocationInfo geoInfo,
+            byte[] attachedImageBytes)
+            : this(status, inReplyTo == null ? (long?)null : inReplyTo.Id,
+                geoInfo, attachedImageBytes)
         {
         }
 
-        public TweetPostingRequest(string status,
-            long? inReplyTo,
-            GeoLocationInfo geoInfo,
-            BitmapSource image)
+        public TweetPostingRequest(string status, long? inReplyTo,
+            GeoLocationInfo geoInfo, byte[] attachedImageBytes)
         {
             _status = status;
             _inReplyTo = inReplyTo;
             _geoInfo = geoInfo;
-            if (image != null)
-            {
-                var ms = new MemoryStream();
-                var encoder = new PngBitmapEncoder();
-                encoder.Frames.Add(BitmapFrame.Create(image));
-                encoder.Save(ms);
-                _attachedImageBin = ms.ToArray();
-            }
-            else
-            {
-                _attachedImageBin = null;
-            }
+            _attachedImageBin = attachedImageBytes;
         }
 
         public override async Task<TwitterStatus> Send(TwitterAccount account)

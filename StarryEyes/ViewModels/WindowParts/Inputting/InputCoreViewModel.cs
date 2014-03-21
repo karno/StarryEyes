@@ -525,10 +525,11 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
 
         public ImageDescriptionViewModel AttachedImage
         {
-            get { return new ImageDescriptionViewModel(InputData.AttachedImage); }
+            get { return new ImageDescriptionViewModel(InputData.AttachedImage, InputData.AttachedImageType); }
             set
             {
                 InputData.AttachedImage = value == null ? null : value.Source;
+                InputData.AttachedImageType = value == null ? ImageType.Png : value.SourceImageType;
                 RaisePropertyChanged(() => AttachedImage);
                 RaisePropertyChanged(() => IsImageAttached);
                 RaisePropertyChanged(() => CanSaveToDraft);
@@ -967,21 +968,26 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
     {
         public ImageDescriptionViewModel(string filePath)
         {
+            SourceImageType = ImageTypes.DetermineImageType(File.ReadAllBytes(filePath));
             var bitmap = new BitmapImage();
             bitmap.BeginInit();
             bitmap.CacheOption = BitmapCacheOption.OnLoad;
-            bitmap.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
+            bitmap.CreateOptions = BitmapCreateOptions.None;
             bitmap.UriSource = new Uri(filePath);
             bitmap.EndInit();
             Source = bitmap;
         }
 
-        public ImageDescriptionViewModel(BitmapImage image)
+        public ImageDescriptionViewModel(BitmapImage image, ImageType sourceType)
         {
             Source = image;
+            SourceImageType = sourceType;
         }
 
         public BitmapImage Source { get; set; }
+
+        public ImageType SourceImageType { get; set; }
+
     }
 
     public class LocationDescriptionViewModel : ViewModel
