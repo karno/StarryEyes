@@ -33,7 +33,7 @@ namespace StarryEyes.Models.Databases
             return await Database.ListUserCrud.GetUsersAsync(listId);
         }
 
-        public static async Task SetListMembers(TwitterList list, IEnumerable<long> users)
+        public static async Task SetListDescription(TwitterList list)
         {
             await Database.ListCrud.InsertAsync(new DatabaseList
             {
@@ -43,6 +43,11 @@ namespace StarryEyes.Models.Databases
                 FullName = list.FullName,
                 Slug = list.Slug
             });
+        }
+
+        public static async Task SetListMembers(TwitterList list, IEnumerable<long> users)
+        {
+            await SetListDescription(list);
             await SetListMembers(list.Id, users);
         }
 

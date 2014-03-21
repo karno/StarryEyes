@@ -17,6 +17,7 @@ namespace StarryEyes.Models.Receiving.Receivers
 
         private readonly ListInfo _listInfo;
         private readonly TwitterAccount _auth;
+        private long? _listId;
 
         public ListMemberReceiver(TwitterAccount auth, ListInfo listInfo)
         {
@@ -39,16 +40,25 @@ namespace StarryEyes.Models.Receiving.Receivers
 
         protected override async Task DoReceive()
         {
-            var listData = await ReceiveListDescription(_auth, _listInfo);
-            var users = (await ReceiveListMembers(_auth, _listInfo)).OrderBy(l => l).ToArray();
-            var oldUsers = (await ListProxy.GetListMembers(listData.Id)).OrderBy(l => l).ToArray();
+            if (_listId == null)
+            {
+                // get description
+                var list = (await ReceiveListDescription(_auth, _listInfo));
+                await ListProxy.SetListDescription(list);
+                _listId = list.Id;
+            }
+            // if list data is not found, abort receiving timeline.
+            if (_listId == null) return;
+            var id = _listId.Value;
+            var users = (await ReceiveListMembers(_auth, id)).OrderBy(l => l).ToArray();
+            var oldUsers = (await ListProxy.GetListMembers(id)).OrderBy(l => l).ToArray();
             if (users.SequenceEqual(oldUsers))
             {
                 // not changed
                 return;
             }
             // commit changes
-            await ListProxy.SetListMembers(listData, users);
+            await ListProxy.SetListMembers(id, users);
             ListMemberChanged.SafeInvoke();
         }
 
@@ -57,16 +67,14 @@ namespace StarryEyes.Models.Receiving.Receivers
             return await account.ShowListAsync(info.OwnerScreenName, info.Slug);
         }
 
-        private async Task<IEnumerable<long>> ReceiveListMembers(TwitterAccount account, ListInfo info)
+        private async Task<IEnumerable<long>> ReceiveListMembers(TwitterAccount account, long listId)
         {
             var memberList = new List<long>();
             long cursor = -1;
             do
             {
-                var result = await account.GetListMembersAsync(
-                    _listInfo.Slug, _listInfo.OwnerScreenName, cursor);
-                memberList.AddRange(
-                    result.Result
+                var result = await account.GetListMembersAsync(listId, cursor);
+                memberList.AddRange(result.Result
                           .Do(u => Task.Run(() => UserProxy.StoreUserAsync(u)))
                           .Select(u => u.Id));
                 cursor = result.NextCursor;

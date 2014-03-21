@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Linq;
-using System.Threading.Tasks;
-using StarryEyes.Albireo.Collections;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Anomaly.Utils;
 using StarryEyes.Models.Accounting;
-using StarryEyes.Models.Databases;
 using StarryEyes.Models.Receiving;
 using StarryEyes.Settings;
 
@@ -18,68 +15,10 @@ namespace StarryEyes.Filters.Sources
 
         private readonly string _receiverScreenName;
 
-        private long _listId;
+        private readonly ListWatcher _watcher;
 
         // activation control
         private bool _isActivated;
-
-        public override void Activate()
-        {
-            if (_isActivated) return;
-            _isActivated = true;
-            if (!String.IsNullOrEmpty(this._receiverScreenName))
-            {
-                ReceiveManager.RegisterList(this._receiverScreenName, _listInfo);
-            }
-            else
-            {
-                ReceiveManager.RegisterList(_listInfo);
-            }
-            ReceiveManager.ListMemberChanged += OnListMemberChanged;
-            RefreshMembers();
-        }
-
-        public override void Deactivate()
-        {
-            if (!_isActivated) return;
-            _isActivated = false;
-            ReceiveManager.ListMemberChanged -= OnListMemberChanged;
-            ReceiveManager.UnregisterList(_listInfo);
-        }
-
-        private void OnListMemberChanged(ListInfo obj)
-        {
-            if (obj.Equals(this._listInfo))
-            {
-                RefreshMembers();
-            }
-        }
-
-        #region Manage members
-
-        private readonly AVLTree<long> _ids = new AVLTree<long>();
-
-        private void RefreshMembers()
-        {
-            Task.Run(async () =>
-            {
-                var listDesc = await ListProxy.GetListDescription(_listInfo);
-                if (listDesc != null)
-                {
-                    _listId = listDesc.Id;
-                }
-                var userIds = await ListProxy.GetListMembers(_listInfo);
-                if (userIds == null) return;
-                lock (_ids)
-                {
-                    _ids.Clear();
-                    userIds.ForEach(id => _ids.Add(id));
-                }
-                RaiseInvalidateRequired();
-            });
-        }
-
-        #endregion
 
         public FilterList(string ownerAndslug)
         {
@@ -98,22 +37,47 @@ namespace StarryEyes.Filters.Sources
                 _listInfo = new ListInfo(splited[1], splited[2]);
                 this._receiverScreenName = splited[0];
             }
+            _watcher = new ListWatcher(_listInfo);
+            _watcher.OnListMemberUpdated += this.RaiseInvalidateRequired;
+        }
+
+        public override void Activate()
+        {
+            if (_isActivated) return;
+            _isActivated = true;
+            _watcher.Activate();
+            if (!String.IsNullOrEmpty(this._receiverScreenName))
+            {
+                ReceiveManager.RegisterList(this._receiverScreenName, _listInfo);
+            }
+            else
+            {
+                ReceiveManager.RegisterList(_listInfo);
+            }
+        }
+
+        public override void Deactivate()
+        {
+            if (!_isActivated) return;
+            _isActivated = false;
+            _watcher.Deactivate();
+            ReceiveManager.UnregisterList(_listInfo);
         }
 
         public override Func<TwitterStatus, bool> GetEvaluator()
         {
             return s =>
             {
-                lock (_ids)
+                lock (_watcher.Ids)
                 {
-                    return _ids.Contains(s.User.Id);
+                    return this._watcher.Ids.Contains(s.User.Id);
                 }
             };
         }
 
         public override string GetSqlQuery()
         {
-            return "exists (select * from ListUser where ListId = " + _listId + " and UserId = status.UserId limit 1)";
+            return "exists (select * from ListUser where ListId = " + _watcher.ListId + " and UserId = status.UserId limit 1)";
         }
 
         protected override IObservable<TwitterStatus> ReceiveSink(long? maxId)

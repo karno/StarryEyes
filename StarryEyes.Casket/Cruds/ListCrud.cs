@@ -29,7 +29,7 @@ namespace StarryEyes.Casket.Cruds
         public async Task<DatabaseList> GetAsync(long userId, string slug)
         {
             return (await this.QueryAsync<DatabaseList>(
-                CreateSql("UserId = @userId and Slug = @slug limit 1"),
+                CreateSql("UserId = @userId and LOWER(Slug) = LOWER(@slug) limit 1"),
                 new { userId, slug })).FirstOrDefault();
         }
 
