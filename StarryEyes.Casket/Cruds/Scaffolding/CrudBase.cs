@@ -117,6 +117,10 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
                         return result;
                     }
                 }
+                catch (Exception ex)
+                {
+                    throw new SQLiteException("Exception has thrown while executing query(ExecuteAsync): " + query, ex);
+                }
                 finally
                 {
                     ReaderWriterLock.ExitWriteLock();
@@ -140,6 +144,10 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
                         return result;
                     }
                 }
+                catch (Exception ex)
+                {
+                    throw new SQLiteException("Exception has thrown while executing query(ExecuteAsync2): " + query, ex);
+                }
                 finally
                 {
                     ReaderWriterLock.ExitWriteLock();
@@ -149,6 +157,7 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
 
         protected Task ExecuteAllAsync(IEnumerable<Tuple<string, object>> queryAndParams)
         {
+            var qnp = queryAndParams.Memoize();
             return _writeTaskFactory.StartNew(() =>
             {
                 try
@@ -157,13 +166,19 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
                     using (var con = this.DangerousOpenConnection())
                     using (var tr = con.BeginTransaction(IsolationLevel.ReadCommitted))
                     {
-                        foreach (var qap in queryAndParams)
+                        foreach (var qap in qnp)
                         {
                             // System.Diagnostics.Debug.WriteLine("EXECUTE: " + qap.Item1);
                             con.Execute(qap.Item1, qap.Item2, tr);
                         }
                         tr.Commit();
                     }
+                }
+                catch (Exception ex)
+                {
+                    throw new SQLiteException(
+                        "Exception has thrown while executing query(ExecuteAllAsyncAsync): " + Environment.NewLine +
+                        qnp.Select(q => q.Item1).JoinString(Environment.NewLine), ex);
                 }
                 finally
                 {
@@ -184,6 +199,10 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
                     {
                         return con.Query<T>(query, param);
                     }
+                }
+                catch (Exception ex)
+                {
+                    throw new SQLiteException("Exception has thrown while executing query(QueryAsync): " + query, ex);
                 }
                 finally
                 {
