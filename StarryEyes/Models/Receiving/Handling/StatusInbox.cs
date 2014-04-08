@@ -2,9 +2,11 @@
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using StarryEyes.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models.Databases;
+using StarryEyes.Models.Timelines.Statuses;
 
 namespace StarryEyes.Models.Receiving.Handling
 {
@@ -15,10 +17,21 @@ namespace StarryEyes.Models.Receiving.Handling
     {
         private static readonly ManualResetEventSlim _signal = new ManualResetEventSlim(false);
 
-        private static readonly ConcurrentQueue<StatusNotification> _queue = new ConcurrentQueue<StatusNotification>();
+        private static readonly ConcurrentQueue<StatusNotification> _queue =
+            new ConcurrentQueue<StatusNotification>();
+
+        private static readonly ConcurrentDictionary<long, DateTime> _removes =
+            new ConcurrentDictionary<long, DateTime>();
+
+        private static readonly TimeSpan _threshold = TimeSpan.FromMinutes(5);
 
         private static Thread _pumpThread;
+
         private static volatile bool _isHaltRequested;
+
+        private static long _lastReceivedTimestamp;
+
+        private static DateTime _cleanupPeriod;
 
         static StatusInbox()
         {
@@ -31,6 +44,7 @@ namespace StarryEyes.Models.Receiving.Handling
 
         internal static void Initialize()
         {
+            _cleanupPeriod = DateTime.Now;
             _pumpThread = new Thread(PumpQueuedStatuses);
             _pumpThread.Start();
         }
@@ -62,24 +76,31 @@ namespace StarryEyes.Models.Receiving.Handling
                 {
                     if (n.IsAdded)
                     {
-                        // check status duplication
-                        if (await StatusProxy.IsStatusExistsAsync(n.Status.Id)) continue;
-                        // store status
-                        await StatusProxy.StoreStatusAsync(n.Status);
+                        var removed = IsRegisteredAsRemoved(n.Status.Id) ||
+                                      (n.Status.RetweetedOriginalId != null &&
+                                       IsRegisteredAsRemoved(n.Status.RetweetedOriginalId.Value));
+                        if (removed || !await StatusReceived(n.Status))
+                        {
+                            // already received
+                            continue;
+                        }
+                        StatusBroadcaster.Queue(n);
                     }
                     else
                     {
-                        var removal = await StatusProxy.GetStatusAsync(n.StatusId);
-                        var rtt = StatusProxy.GetRetweetedStatusIds(n.StatusId);
-                        await StatusProxy.RemoveStatusAsync(n.StatusId);
-                        (await rtt).ForEach(QueueRemoval);
-                        if (removal != null)
-                        {
-                            n = new StatusNotification(removal, false);
-                        }
+                        StatusDeleted(n.StatusId);
+                        /*
+                                    var removal = await StatusProxy.GetStatusAsync(n.StatusId);
+                                    var rtt = StatusProxy.GetRetweetedStatusIds(n.StatusId);
+                                    await StatusProxy.RemoveStatusAsync(n.StatusId);
+                                    (await rtt).ForEach(QueueRemoval);
+                                    if (removal != null)
+                                    {
+                                        n = new StatusNotification(removal, false);
+                                    }
+                        */
                     }
                     // post next 
-                    StatusBroadcaster.Queue(n);
                     _signal.Reset();
                 }
                 if (_isHaltRequested)
@@ -88,6 +109,81 @@ namespace StarryEyes.Models.Receiving.Handling
                 }
                 _signal.Wait();
             }
+        }
+
+        private static async Task<bool> StatusReceived(TwitterStatus status)
+        {
+            if (!await CheckReceiveNew(status.Id))
+            {
+                return false;
+            }
+            StatusProxy.StoreStatus(status);
+            return true;
+            // already received
+        }
+
+        private static async Task<bool> CheckReceiveNew(long id)
+        {
+            // check new status based on timestamps
+            var stamp = GetTimestampFromSnowflakeId(id);
+            if (stamp > _lastReceivedTimestamp)
+            {
+                _lastReceivedTimestamp = stamp;
+                return false;
+            }
+            // check status based on model cache
+            if (StatusModel.GetIfCacheIsAlive(id) != null)
+            {
+                return false;
+            }
+            // check with database
+            return !(await StatusProxy.IsStatusExistsAsync(id));
+        }
+
+        private static long GetTimestampFromSnowflakeId(long id)
+        {
+            // [42bit:timestamp][10bit:machine_id][12bit:sequence_id];64bit
+            return id >> 22;
+        }
+
+        private static bool IsRegisteredAsRemoved(long id)
+        {
+            return _removes.ContainsKey(id);
+        }
+
+        private static void StatusDeleted(long statusId)
+        {
+            // registered as removed status
+            _removes[statusId] = DateTime.Now;
+            Task.Run(async () =>
+            {
+                // find removed statuses
+                var removeds = await StatusProxy.RemoveStatusAsync(statusId);
+
+                // notify removed ids
+                foreach (var removed in removeds)
+                {
+                    _removes[removed] = DateTime.Now;
+                    StatusBroadcaster.Queue(new StatusNotification(removed));
+                }
+
+                // check cleanup cycle
+                var stamp = DateTime.Now;
+                if (stamp - _cleanupPeriod > _threshold)
+                {
+                    // update period stamp
+                    _cleanupPeriod = stamp;
+
+                    // remove expireds
+                    _removes.Where(t => (stamp - t.Value) > _threshold)
+                            .ForEach(t =>
+                            {
+                                // remove expired
+                                DateTime value;
+                                _removes.TryRemove(t.Key, out value);
+                            });
+                }
+            });
         }
     }
 }

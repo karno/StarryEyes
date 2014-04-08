@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data.SQLite;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
@@ -60,7 +61,11 @@ namespace StarryEyes.Models.Subsystems
 
         private static async Task UpdateTweetCount()
         {
-            _estimatedGrossTweetCount = (int)(await StatusProxy.GetCountAsync());
+            try
+            {
+                _estimatedGrossTweetCount = (int)(await StatusProxy.GetCountAsync());
+            }
+            catch (SQLiteException) { }
         }
 
         private static void StopThread()

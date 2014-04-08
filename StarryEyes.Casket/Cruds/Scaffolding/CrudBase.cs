@@ -297,6 +297,12 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
         {
             await this.ExecuteAsync(this.TableDeleter, new { Id = key });
         }
+
+        public virtual async Task DeleteAllAsync(IEnumerable<long> key)
+        {
+            var queries = key.Select(k => Tuple.Create(this.TableDeleter, (object)new { Id = k })).ToArray();
+            await this.ExecuteAllAsync(queries);
+        }
     }
 
     public abstract class CachedCrudBase<T> : CrudBase<T> where T : class

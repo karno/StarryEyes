@@ -15,60 +15,91 @@ namespace StarryEyes.Models.Databases
 {
     public static class StatusProxy
     {
+        private static readonly TaskQueue<long, TwitterStatus> _statusQueue;
+
+        static StatusProxy()
+        {
+            _statusQueue = new TaskQueue<long, TwitterStatus>(200, async s => await StoreStatusesAsync(s));
+        }
+
         public static Task<long> GetCountAsync()
         {
             return Database.StatusCrud.GetCountAsync();
         }
 
-        public static async Task StoreStatusAsync([NotNull] TwitterStatus status)
+        #region Storing and removing status
+
+        /// <summary>
+        /// Queue store status 
+        /// </summary>
+        /// <param name="status"></param>
+        public static void StoreStatus([NotNull] TwitterStatus status)
         {
-            if (status == null) throw new ArgumentNullException("status");
-            if (status.RetweetedOriginal != null)
+            _statusQueue.Enqueue(status.Id, status);
+        }
+
+        private static async Task StoreStatusesAsync(IEnumerable<TwitterStatus> statuses)
+        {
+            // extracting retweeted status
+            var store = statuses.SelectMany(s =>
             {
-                await StoreStatusAsync(status.RetweetedOriginal);
-            }
-            var mappedStatus = Mapper.Map(status);
-            var mappedUser = Mapper.Map(status.User);
+                if (s.RetweetedOriginal != null)
+                {
+                    return new[] { s.RetweetedOriginal, s };
+                }
+                return new[] { s };
+            }).Select(s => StatusInsertBatch.CreateBatch(Mapper.Map(s), Mapper.Map(s.User)));
+            await Database.StoreStatuses(store);
+        }
+
+        /// <summary>
+        /// Remove statuses
+        /// </summary>
+        /// <param name="statusId">target status</param>
+        /// <returns>removed status ids</returns>
+        public static async Task<IEnumerable<long>> RemoveStatusAsync(long statusId)
+        {
             try
             {
-                if (!(await Database.StatusCrud.CheckExistsAsync(status.Id)))
-                {
-                    await Database.StoreStatus(
-                        mappedStatus.Item1, mappedStatus.Item2,
-                        mappedUser.Item1, mappedUser.Item2, mappedUser.Item3);
-                }
+                // remove queued statuses
+                _statusQueue.Remove(statusId);
+
+                // find retweets, remove from queue and concatenate id
+                var removals = (await GetRetweetedStatusIds(statusId))
+                    .Do(id => _statusQueue.Remove(id)) // remove from queue
+                    .Concat(new[] { statusId }) // concat original id
+                    .ToArray();
+
+                // remove status
+                await Database.StatusCrud.DeleteAllAsync(removals);
+                return removals;
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine(ex);
+                return Enumerable.Empty<long>();
             }
         }
+
+        #endregion
 
         public static async Task<IEnumerable<long>> GetRetweetedStatusIds(long originalId)
         {
             try
             {
                 var rts = await Database.StatusCrud.GetRetweetedStatusesAsync(originalId);
-                return rts.Select(r => r.Id);
-            }
-            catch
-            {
-                return Enumerable.Empty<long>();
-            }
-        }
-
-        public static async Task RemoveStatusAsync(long statusId)
-        {
-            try
-            {
-                // remove retweets
-                await Database.StatusCrud.DeleteAsync(statusId);
+                return rts.Select(r => r.Id)
+                          .Concat(_statusQueue.Find(s => s.RetweetedOriginalId == originalId)
+                                              .Select(s => s.Id));
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine(ex);
+                return Enumerable.Empty<long>();
             }
         }
+
+        #region Favorites and retweets
 
         public static async Task AddFavoritorAsync(long statusId, long userId)
         {
@@ -86,7 +117,7 @@ namespace StarryEyes.Models.Databases
         {
             try
             {
-                await Database.FavoritesCrud.RemoveWhereAsync(statusId, userId);
+                await Database.FavoritesCrud.DeleteAsync(statusId, userId);
             }
             catch (Exception ex)
             {
@@ -110,7 +141,7 @@ namespace StarryEyes.Models.Databases
         {
             try
             {
-                await Database.RetweetsCrud.RemoveWhereAsync(statusId, userId);
+                await Database.RetweetsCrud.DeleteAsync(statusId, userId);
             }
             catch (Exception ex)
             {
@@ -118,8 +149,11 @@ namespace StarryEyes.Models.Databases
             }
         }
 
+        #endregion
+
         public static async Task<bool> IsStatusExistsAsync(long id)
         {
+            if (_statusQueue.Contains(id)) return true;
             return await Database.StatusCrud.GetAsync(id) != null;
         }
 

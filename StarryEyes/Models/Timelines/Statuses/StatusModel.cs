@@ -8,6 +8,7 @@ using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
 using Livet;
+using StarryEyes.Albireo.Caching;
 using StarryEyes.Albireo.Threading;
 using StarryEyes.Annotations;
 using StarryEyes.Anomaly.Imaging;
@@ -24,41 +25,37 @@ namespace StarryEyes.Models.Timelines.Statuses
     {
         #region Static members
 
-        private static readonly ConcurrentDictionary<long, WeakReference> _staticCache =
-            new ConcurrentDictionary<long, WeakReference>();
+        private static readonly LruObjectCache<long, StatusModel> _cache =
+            new LruObjectCache<long, StatusModel>(2000);
 
         private static readonly ConcurrentDictionary<long, object> _generateLock =
             new ConcurrentDictionary<long, object>();
 
         public static int CachedObjectsCount
         {
-            get { return _staticCache.Count; }
+            get { return _cache.Count; }
         }
 
         public static StatusModel GetIfCacheIsAlive(long id)
         {
-            StatusModel model = null;
-            WeakReference wr;
-            _staticCache.TryGetValue(id, out wr);
-            if (wr != null)
-            {
-                model = (StatusModel)wr.Target;
-            }
-            return model;
+            StatusModel model;
+            return _cache.TryGetValue(id, out model) ? model : null;
         }
-
-        private const int CleanupInterval = 15000;
-
-        private static int _cleanupCount;
 
         private static readonly TaskFactory _loader = LimitedTaskScheduler.GetTaskFactory(1);
 
         public static async Task<StatusModel> Get(TwitterStatus status)
         {
-            return GetIfCacheIsAlive(status.Id) ?? await _loader.StartNew(async () =>
+            return GetIfCacheIsAlive(status.Id) ?? await Generate(status);
+        }
+
+        private static async Task<StatusModel> Generate(TwitterStatus status)
+        {
+            return await _loader.StartNew(async () =>
             {
                 if (status.GenerateFromJson)
                 {
+                    // query from database for synchronizing activities
                     status = await StatusProxy.SyncStatusActivityAsync(status);
                 }
                 var rto = status.RetweetedOriginal == null
@@ -70,58 +67,21 @@ namespace StarryEyes.Models.Timelines.Statuses
                     lock (lockerobj)
                     {
                         StatusModel model;
-                        WeakReference wr;
-                        _staticCache.TryGetValue(status.Id, out wr);
-                        if (wr != null)
+                        if (_cache.TryGetValue(status.Id, out model))
                         {
-                            model = (StatusModel)wr.Target;
-                            if (model != null)
-                            {
-                                return model;
-                            }
+                            return model;
                         }
-
                         // cache is dead/not cached yet
                         model = new StatusModel(status, rto);
-                        wr = new WeakReference(model);
-                        _staticCache[status.Id] = wr;
+                        _cache.AddOrUpdate(status.Id, model);
                         return model;
                     }
                 }
                 finally
                 {
                     _generateLock.TryRemove(status.Id, out lockerobj);
-                    // ReSharper disable InvertIf
-#pragma warning disable 4014
-                    if (Interlocked.Increment(ref _cleanupCount) == CleanupInterval)
-                    {
-                        Interlocked.Exchange(ref _cleanupCount, 0);
-                        Task.Run((Action)CollectGarbages);
-                    }
-#pragma warning restore 4014
-                    // ReSharper restore InvertIf
                 }
             }).Unwrap();
-        }
-
-        public static void CollectGarbages()
-        {
-            System.Diagnostics.Debug.WriteLine("*** COLLECT STATUS MODEL GARBAGES...");
-            GC.Collect(2, GCCollectionMode.Optimized);
-            var values = _staticCache.Keys.ToArray();
-            foreach (var ids in values.Buffer(256))
-            {
-                foreach (var id in ids)
-                {
-                    WeakReference wr;
-                    if (_staticCache.TryGetValue(id, out wr) && wr.Target == null)
-                    {
-                        _staticCache.TryRemove(id, out wr);
-                    }
-                }
-                Thread.Sleep(0);
-            }
-            GC.Collect(2, GCCollectionMode.Optimized);
         }
 
         #endregion
@@ -266,18 +226,15 @@ namespace StarryEyes.Models.Timelines.Statuses
         public static void UpdateStatusInfo(long id,
             Action<StatusModel> ifCacheIsAlive, Action<long> ifCacheIsDead)
         {
-            WeakReference wr;
-            _staticCache.TryGetValue(id, out wr);
-            if (wr != null)
+            StatusModel model;
+            if (_cache.TryGetValue(id, out model))
             {
-                var target = (StatusModel)wr.Target;
-                if (wr.IsAlive)
-                {
-                    ifCacheIsAlive(target);
-                    return;
-                }
+                ifCacheIsAlive(model);
             }
-            ifCacheIsDead(id);
+            else
+            {
+                ifCacheIsDead(id);
+            }
         }
 
         public void AddFavoritedUser(long userId)

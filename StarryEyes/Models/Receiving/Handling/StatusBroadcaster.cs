@@ -60,7 +60,6 @@ namespace StarryEyes.Models.Receiving.Handling
             _signal.Set();
         }
 
-
         private static void PumpQueuedStatuses()
         {
             StatusModelNotification notification;

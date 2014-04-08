@@ -24,6 +24,13 @@ namespace StarryEyes.Models.Databases
             await Database.StoreUser(map.Item1, map.Item2, map.Item3);
         }
 
+        public static async Task StoreUsersAsync(IEnumerable<TwitterUser> pendingUser)
+        {
+            var map = pendingUser.Select(Mapper.Map)
+                                 .Select(UserInsertBatch.CreateBatch);
+            await Database.StoreUsers(map);
+        }
+
         public static async Task<TwitterUser> GetUserAsync(long id)
         {
             var u = await Database.UserCrud.GetAsync(id);
@@ -185,5 +192,6 @@ namespace StarryEyes.Models.Databases
         {
             return await Database.RelationCrud.GetNoRetweetsAllAsync();
         }
+
     }
 }

@@ -152,59 +152,146 @@ namespace StarryEyes.Casket
             IEnumerable<DatabaseUserDescriptionEntity> userDescriptionEntities,
             IEnumerable<DatabaseUserUrlEntity> userUrlEntities)
         {
+            var batch = new StatusInsertBatch
+            {
+                Status = status,
+                StatusEntities = statusEntities,
+                User = user,
+                UserDescriptionEntities = userDescriptionEntities,
+                UserUrlEntities = userUrlEntities
+            };
+            await StoreStatuses(new[] { batch });
+        }
+
+
+        public static async Task StoreStatuses(IEnumerable<StatusInsertBatch> batches)
+        {
             try
             {
-                await StatusCrud.StoreCoreAsync(
-                    EnumerableEx.Concat(
-                        new[]
-                        {
-                            Tuple.Create(_statusInserter, (object) status),
-                            Tuple.Create(_userInserter, (object) user)
-                        },
-                        new[] { _statusEntityCrud.CreateDeleter(status.Id) },
-                        statusEntities.Select(e => Tuple.Create(_statusEntityInserter, (object)e)),
-                        new[] { _userDescEntityCrud.CreateDeleter(user.Id) },
-                        userDescriptionEntities.Select(e => Tuple.Create(_userDescEntityInserter, (object)e)),
-                        new[] { _userUrlEntityCrud.CreateDeleter(user.Id) },
-                        userUrlEntities.Select(e => Tuple.Create(_userUrlEntityInserter, (object)e))
-                        ));
+                await StatusCrud.StoreCoreAsync(batches.SelectMany(CreateQuery));
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine("# FAIL> storing status " + user.ScreenName + ": " + status.Text + Environment.NewLine + ex);
+                System.Diagnostics.Debug.WriteLine("# FAIL> storing statuses." + Environment.NewLine + ex);
             }
         }
-
 
         public static async Task StoreUser(DatabaseUser user,
             IEnumerable<DatabaseUserDescriptionEntity> userDescriptionEntities,
             IEnumerable<DatabaseUserUrlEntity> userUrlEntities)
         {
+            var batch = new UserInsertBatch
+            {
+                User = user,
+                UserDescriptionEntities = userDescriptionEntities,
+                UserUrlEntities = userUrlEntities
+            };
+            await StoreUsers(new[] { batch });
+        }
+
+        public static async Task StoreUsers(IEnumerable<UserInsertBatch> batches)
+        {
             try
             {
-                await StatusCrud.StoreCoreAsync(
-                    EnumerableEx.Concat(
-                        new[]
-                        {
-                            Tuple.Create(_userInserter, (object) user)
-                        },
-                        new[] { _userDescEntityCrud.CreateDeleter(user.Id) },
-                        userDescriptionEntities.Select(e => Tuple.Create(_userDescEntityInserter, (object)e)),
-                        new[] { _userUrlEntityCrud.CreateDeleter(user.Id) },
-                        userUrlEntities.Select(e => Tuple.Create(_userUrlEntityInserter, (object)e))
-                        ));
+                await StatusCrud.StoreCoreAsync(batches.SelectMany(CreateQuery));
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine("# FAIL> storing user " + user.ScreenName + Environment.NewLine + ex);
+                System.Diagnostics.Debug.WriteLine("# FAIL> storing users." + Environment.NewLine + ex);
             }
         }
+
         #endregion
+
+        private static IEnumerable<Tuple<string, object>> CreateQuery(StatusInsertBatch batch)
+        {
+            return EnumerableEx.Concat(
+                new[] { Tuple.Create(_statusInserter, (object)batch.Status) },
+                new[] { _statusEntityCrud.CreateDeleter(batch.Status.Id) },
+                batch.StatusEntities.Select(e => Tuple.Create(_statusEntityInserter, (object)e)))
+                               .Concat(CreateQuery(batch.UserInsertBatch));
+        }
+
+        private static IEnumerable<Tuple<string, object>> CreateQuery(UserInsertBatch batch)
+        {
+            return EnumerableEx.Concat(
+                new[] { Tuple.Create(_userInserter, (object)batch.User) },
+                new[] { _userDescEntityCrud.CreateDeleter(batch.User.Id) },
+                batch.UserDescriptionEntities.Select(e => Tuple.Create(_userDescEntityInserter, (object)e)),
+                new[] { _userUrlEntityCrud.CreateDeleter(batch.User.Id) },
+                batch.UserUrlEntities.Select(e => Tuple.Create(_userUrlEntityInserter, (object)e))
+                );
+        }
 
         public static async Task VacuumTables()
         {
             await _managementCrud.VacuumAsync();
         }
+    }
 
+    public class StatusInsertBatch
+    {
+        public static StatusInsertBatch CreateBatch(
+            Tuple<DatabaseStatus, IEnumerable<DatabaseStatusEntity>> status,
+            Tuple<DatabaseUser, IEnumerable<DatabaseUserDescriptionEntity>, IEnumerable<DatabaseUserUrlEntity>> user)
+        {
+            return new StatusInsertBatch
+            {
+                Status = status.Item1,
+                StatusEntities = status.Item2,
+                User = user.Item1,
+                UserDescriptionEntities = user.Item2,
+                UserUrlEntities = user.Item3
+            };
+        }
+
+        public StatusInsertBatch()
+        {
+            UserInsertBatch = new UserInsertBatch();
+        }
+
+        public DatabaseStatus Status { get; set; }
+
+        public IEnumerable<DatabaseStatusEntity> StatusEntities { get; set; }
+
+        public UserInsertBatch UserInsertBatch { get; set; }
+
+        public DatabaseUser User
+        {
+            get { return UserInsertBatch.User; }
+            set { UserInsertBatch.User = value; }
+        }
+
+        public IEnumerable<DatabaseUserDescriptionEntity> UserDescriptionEntities
+        {
+            get { return UserInsertBatch.UserDescriptionEntities; }
+            set { UserInsertBatch.UserDescriptionEntities = value; }
+        }
+
+        public IEnumerable<DatabaseUserUrlEntity> UserUrlEntities
+        {
+            get { return UserInsertBatch.UserUrlEntities; }
+            set { UserInsertBatch.UserUrlEntities = value; }
+        }
+    }
+
+    public class UserInsertBatch
+    {
+        public static UserInsertBatch CreateBatch(
+            Tuple<DatabaseUser, IEnumerable<DatabaseUserDescriptionEntity>, IEnumerable<DatabaseUserUrlEntity>> user)
+        {
+            return new UserInsertBatch
+            {
+                User = user.Item1,
+                UserDescriptionEntities = user.Item2,
+                UserUrlEntities = user.Item3
+            };
+        }
+
+        public DatabaseUser User { get; set; }
+
+        public IEnumerable<DatabaseUserDescriptionEntity> UserDescriptionEntities { get; set; }
+
+        public IEnumerable<DatabaseUserUrlEntity> UserUrlEntities { get; set; }
     }
 }

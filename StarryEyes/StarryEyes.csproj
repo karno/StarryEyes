@@ -263,6 +263,7 @@
     <Compile Include="Models\Backstages\TwitterEvents\UnknownEvent.cs" />
     <Compile Include="Models\Databases\AccountProxy.cs" />
     <Compile Include="Models\Databases\DatabaseException.cs" />
+    <Compile Include="Models\Databases\DatabaseTaskWorker.cs" />
     <Compile Include="Models\Databases\DbTextUtil.cs" />
     <Compile Include="Models\Databases\ListProxy.cs" />
     <Compile Include="Models\Databases\StatusProxy.cs" />

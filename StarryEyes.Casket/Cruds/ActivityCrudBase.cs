@@ -39,7 +39,7 @@ namespace StarryEyes.Casket.Cruds
             });
         }
 
-        public async Task RemoveWhereAsync(long statusId, long userId)
+        public async Task DeleteAsync(long statusId, long userId)
         {
             await this.ExecuteAsync(
                 "delete from " + this.TableName + " where StatusId = @Sid and UserId = @Uid;",
