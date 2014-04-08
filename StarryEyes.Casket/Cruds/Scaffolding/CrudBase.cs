@@ -177,7 +177,7 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
                 catch (Exception ex)
                 {
                     throw new SQLiteException(
-                        "Exception has thrown while executing query(ExecuteAllAsyncAsync): " + Environment.NewLine +
+                        "Exception has thrown while executing query(ExecuteAllAsync): " + Environment.NewLine +
                         qnp.Select(q => q.Item1).JoinString(Environment.NewLine), ex);
                 }
                 finally

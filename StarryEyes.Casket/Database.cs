@@ -131,13 +131,14 @@ namespace StarryEyes.Casket
 
         #region store in one transaction
 
-        private static readonly string _statusInserter = SentenceGenerator.GetTableInserter<DatabaseStatus>();
-
-        private static readonly string _userInserter =
-            SentenceGenerator.GetTableInserter<DatabaseUser>(onConflict: ResolutionMode.Replace);
+        private static readonly string _statusInserter =
+            SentenceGenerator.GetTableInserter<DatabaseStatus>(onConflict: ResolutionMode.Ignore);
 
         private static readonly string _statusEntityInserter =
             SentenceGenerator.GetTableInserter<DatabaseStatusEntity>();
+
+        private static readonly string _userInserter =
+            SentenceGenerator.GetTableInserter<DatabaseUser>(onConflict: ResolutionMode.Replace);
 
         private static readonly string _userDescEntityInserter =
             SentenceGenerator.GetTableInserter<DatabaseUserDescriptionEntity>();
@@ -168,7 +169,13 @@ namespace StarryEyes.Casket
         {
             try
             {
-                await StatusCrud.StoreCoreAsync(batches.SelectMany(CreateQuery));
+                var m = batches.Memoize();
+                var statusBatch = m.Distinct(b => b.Status.Id)
+                                         .SelectMany(CreateQuery);
+                var userBatch = m.Select(b => b.UserInsertBatch)
+                                       .Distinct(u => u.User.Id)
+                                       .SelectMany(CreateQuery);
+                await StatusCrud.StoreCoreAsync(statusBatch.Concat(userBatch));
             }
             catch (Exception ex)
             {
@@ -208,8 +215,7 @@ namespace StarryEyes.Casket
             return EnumerableEx.Concat(
                 new[] { Tuple.Create(_statusInserter, (object)batch.Status) },
                 new[] { _statusEntityCrud.CreateDeleter(batch.Status.Id) },
-                batch.StatusEntities.Select(e => Tuple.Create(_statusEntityInserter, (object)e)))
-                               .Concat(CreateQuery(batch.UserInsertBatch));
+                batch.StatusEntities.Select(e => Tuple.Create(_statusEntityInserter, (object)e)));
         }
 
         private static IEnumerable<Tuple<string, object>> CreateQuery(UserInsertBatch batch)
