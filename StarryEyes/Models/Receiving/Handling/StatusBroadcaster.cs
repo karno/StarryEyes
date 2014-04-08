@@ -14,10 +14,16 @@ namespace StarryEyes.Models.Receiving.Handling
     /// </summary>
     public static class StatusBroadcaster
     {
-        private static readonly Subject<StatusModelNotification> _broadcastSubject = new Subject<StatusModelNotification>();
+        private static readonly Subject<StatusModelNotification> _broadcastSubject =
+            new Subject<StatusModelNotification>();
+
+        private static readonly ConcurrentQueue<StatusModelNotification> _queue =
+            new ConcurrentQueue<StatusModelNotification>();
+
         private static readonly ManualResetEventSlim _signal = new ManualResetEventSlim(false);
-        private static readonly ConcurrentQueue<StatusModelNotification> _queue = new ConcurrentQueue<StatusModelNotification>();
+
         private static Thread _pumpThread;
+
         private static volatile bool _isHaltRequested;
 
         public static IObservable<StatusModelNotification> BroadcastPoint

@@ -61,6 +61,7 @@ namespace StarryEyes.Albireo.Caching
                     // conflicted -> rollback 
                     lock (_cacheList)
                     {
+                        _cacheList.AddLast(node);
                         _cacheList.Remove(newNode);
                     }
                 }
