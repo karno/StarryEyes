@@ -26,7 +26,7 @@ namespace StarryEyes.Models.Timelines.Statuses
         #region Static members
 
         private static readonly LruObjectCache<long, StatusModel> _cache =
-            new LruObjectCache<long, StatusModel>(2000);
+            new LruObjectCache<long, StatusModel>(300);
 
         private static readonly ConcurrentDictionary<long, object> _generateLock =
             new ConcurrentDictionary<long, object>();
@@ -271,7 +271,7 @@ namespace StarryEyes.Models.Timelines.Statuses
                     this._favoritedUsers.Add(user);
 #pragma warning disable 4014
                     StatusProxy.AddFavoritorAsync(this.Status.Id, user.Id);
-                    StatusBroadcaster.Republish(this.Status);
+                    StatusBroadcaster.Republish(this);
 #pragma warning restore 4014
                 }
             }
@@ -300,7 +300,7 @@ namespace StarryEyes.Models.Timelines.Statuses
                     this._favoritedUsers.Remove(remove);
 #pragma warning disable 4014
                     StatusProxy.RemoveFavoritorAsync(this.Status.Id, userId);
-                    StatusBroadcaster.Republish(this.Status);
+                    StatusBroadcaster.Republish(this);
 #pragma warning restore 4014
                 }
             }
@@ -338,7 +338,7 @@ namespace StarryEyes.Models.Timelines.Statuses
                     this._retweetedUsers.Add(user);
 #pragma warning disable 4014
                     StatusProxy.AddRetweeterAsync(this.Status.Id, user.Id);
-                    StatusBroadcaster.Republish(this.Status);
+                    StatusBroadcaster.Republish(this);
 #pragma warning restore 4014
                 }
             }
@@ -368,7 +368,7 @@ namespace StarryEyes.Models.Timelines.Statuses
                     // update persistent info
 #pragma warning disable 4014
                     StatusProxy.RemoveRetweeterAsync(this.Status.Id, userId);
-                    StatusBroadcaster.Republish(this.Status);
+                    StatusBroadcaster.Republish(this);
 #pragma warning restore 4014
                 }
             }

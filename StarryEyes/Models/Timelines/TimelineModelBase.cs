@@ -92,7 +92,7 @@ namespace StarryEyes.Models.Timelines
         {
             if (n.IsAdded && this.CheckAcceptStatus(n.StatusModel.Status))
             {
-                this.AddStatus(n.StatusModel, true);
+                this.AddStatus(n.StatusModel, n.IsNew);
             }
             else
             {
