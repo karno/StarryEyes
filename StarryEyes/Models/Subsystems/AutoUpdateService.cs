@@ -118,7 +118,7 @@ namespace StarryEyes.Models.Subsystems
                 {
                     try
                     {
-                        Directory.Delete(App.LocalUpdateStorePath);
+                        Directory.Delete(App.LocalUpdateStorePath, true);
                     }
                     catch { }
                     throw;
@@ -180,7 +180,7 @@ namespace StarryEyes.Models.Subsystems
                 {
                     if (Directory.Exists(App.LocalUpdateStorePath))
                     {
-                        Directory.Delete(App.LocalUpdateStorePath);
+                        Directory.Delete(App.LocalUpdateStorePath, true);
                     }
                 }
                 catch
