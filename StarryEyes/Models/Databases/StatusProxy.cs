@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SQLite;
 using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
+using System.Threading;
 using System.Threading.Tasks;
 using StarryEyes.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
@@ -265,17 +267,27 @@ namespace StarryEyes.Models.Databases
 
         #region Load from database
 
-        private static Task<TwitterStatus> LoadStatusAsync([NotNull] DatabaseStatus dbstatus)
+        private static async Task<TwitterStatus> LoadStatusAsync([NotNull] DatabaseStatus dbstatus)
         {
             if (dbstatus == null) throw new ArgumentNullException("dbstatus");
-            switch (dbstatus.StatusType)
+            while (true)
             {
-                case StatusType.Tweet:
-                    return LoadPublicStatusAsync(dbstatus);
-                case StatusType.DirectMessage:
-                    return LoadDirectMessageAsync(dbstatus);
-                default:
-                    throw new ArgumentOutOfRangeException();
+                try
+                {
+                    switch (dbstatus.StatusType)
+                    {
+                        case StatusType.Tweet:
+                            return await LoadPublicStatusAsync(dbstatus);
+                        case StatusType.DirectMessage:
+                            return await LoadDirectMessageAsync(dbstatus);
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                }
+                catch (SQLiteException)
+                {
+                    Thread.Sleep(100);
+                }
             }
         }
 
@@ -302,7 +314,7 @@ namespace StarryEyes.Models.Databases
             catch (ArgumentNullException anex)
             {
                 throw new DatabaseConsistencyException(
-                    "データベースから必要なデータを読み出せませんでした。(ステータスID " + dbstatus.Id + ", ユーザID " + dbstatus.UserId + ")",
+                    "データベースから必要なデータを読み出せませんでした。(モード: PS, ステータスID " + dbstatus.Id + ", ユーザID " + dbstatus.UserId + ")",
                     anex);
             }
         }
@@ -315,7 +327,16 @@ namespace StarryEyes.Models.Databases
             var user = UserProxy.GetUserAsync(dbstatus.UserId);
             var recipient = UserProxy.GetUserAsync(dbstatus.InReplyToOrRecipientUserId.Value);
             var se = Database.StatusEntityCrud.GetEntitiesAsync(id);
-            return Mapper.Map(dbstatus, await se, await user, await recipient);
+            try
+            {
+                return Mapper.Map(dbstatus, await se, await user, await recipient);
+            }
+            catch (ArgumentNullException anex)
+            {
+                throw new DatabaseConsistencyException(
+                    "データベースから必要なデータを読み出せませんでした。(モード: DM, ステータスID " + dbstatus.Id + ", ユーザID " + dbstatus.UserId + ")",
+                    anex);
+            }
         }
 
         #endregion

@@ -101,7 +101,17 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                 _tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
             } while (Directory.Exists(_tempDir));
             Directory.CreateDirectory(_tempDir);
-            App.ApplicationExit += () => Directory.Delete(this._tempDir, true);
+            App.ApplicationExit += () =>
+            {
+                try
+                {
+                    Directory.Delete(this._tempDir, true);
+                }
+                catch
+                {
+                    // I think that is sign from God that I must not delete that folder if failed.
+                }
+            };
 
             // initialize clipboard watcher.
             ClipboardWatcher watcher;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Data.SQLite;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
@@ -59,7 +60,19 @@ namespace StarryEyes.Models.Timelines.Statuses
             {
                 if (status.GenerateFromJson)
                 {
-                    status = await StatusProxy.SyncStatusActivityAsync(status);
+                    while (true)
+                    {
+                        try
+                        {
+                            status = await StatusProxy.SyncStatusActivityAsync(status);
+                            break;
+                        }
+                        catch (SQLiteException)
+                        {
+                            // retry
+                            Thread.Sleep(100);
+                        }
+                    }
                 }
                 var rto = status.RetweetedOriginal == null
                               ? null
