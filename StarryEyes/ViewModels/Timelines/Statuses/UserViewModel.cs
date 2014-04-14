@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Windows.Input;
 using Livet;
+using Livet.EventListeners;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.Utils;
 using StarryEyes.Models;
 using StarryEyes.Models.Timelines.Statuses;
+using StarryEyes.Settings;
 
 namespace StarryEyes.ViewModels.Timelines.Statuses
 {
@@ -13,6 +15,11 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         public UserViewModel(TwitterUser user)
         {
             this.Model = UserModel.Get(user);
+            this.CompositeDisposable.Add(
+                new EventListener<Action<TimelineIconResolution>>(
+                    h => Setting.IconResolution.ValueChanged += h,
+                    h => Setting.IconResolution.ValueChanged -= h,
+                    _ => this.RaisePropertyChanged(() => ProfileImageUriOptimized)));
         }
 
         public UserModel Model { get; private set; }
@@ -22,12 +29,41 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             get { return this.Model.User; }
         }
 
-        public Uri ProfileImageUriOriginal
+        public Uri ProfileImageUriOptimized
         {
             get
             {
+                if (!Setting.IsLoaded)
+                {
+                    return ProfileImageUriOriginal;
+                }
+                switch (Setting.IconResolution.Value)
+                {
+                    case TimelineIconResolution.Original:
+                        return this.ProfileImageUriOriginal;
+                    case TimelineIconResolution.High:
+                        return this.ProfileImageUriLarge;
+                    case TimelineIconResolution.Optimized:
+                        return this.ProfileImageUriNormal;
+                    case TimelineIconResolution.Low:
+                        return this.ProfileImageUriMini;
+                    case TimelineIconResolution.None:
+                        return null;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
                 return this.User.ProfileImageUri.ChangeImageSize(ImageSize.Original);
             }
+        }
+
+        public Uri ProfileImageUriOriginal
+        {
+            get { return this.User.ProfileImageUri.ChangeImageSize(ImageSize.Original); }
+        }
+
+        public Uri ProfileImageUriLarge
+        {
+            get { return this.User.ProfileImageUri.ChangeImageSize(ImageSize.Bigger); }
         }
 
         public Uri ProfileImageUriNormal

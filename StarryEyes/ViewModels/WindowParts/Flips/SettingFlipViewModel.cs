@@ -220,6 +220,12 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             set { Setting.ScrollLockStrategy.Value = (ScrollLockStrategy)value; }
         }
 
+        public int TimelineIconResolution
+        {
+            get { return (int)Setting.IconResolution.Value; }
+            set { Setting.IconResolution.Value = (TimelineIconResolution)value; }
+        }
+
         public bool ShowThumbnail
         {
             get { return Setting.ShowThumbnails.Value; }

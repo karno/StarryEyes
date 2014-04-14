@@ -318,18 +318,49 @@
                         </Style>
                     </Grid.Style>
                     <StackPanel Margin="16,0" Orientation="Vertical">
-                        <StackPanel Margin="0,8" Orientation="Horizontal">
-                            <TextBlock Margin="2,0,6,0"
+                        <Grid Margin="0,8">
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Row="0"
+                                       Grid.Column="0"
+                                       Margin="2,0,6,0"
+                                       HorizontalAlignment="Right"
                                        VerticalAlignment="Center"
                                        Text="タイムラインのスクロールロック:" />
-                            <ComboBox SelectedIndex="{Binding ScrollLockStrategy, Mode=TwoWay}">
+                            <ComboBox Grid.Row="0"
+                                      Grid.Column="1"
+                                      SelectedIndex="{Binding ScrollLockStrategy,
+                                                              Mode=TwoWay}">
                                 <clr:String>ロックしない</clr:String>
                                 <clr:String>常にロック</clr:String>
                                 <clr:String>明示的にロック(実装されていません)</clr:String>
                                 <clr:String>スクロールしていたらロック</clr:String>
                                 <clr:String>タイムライン上にマウスがあるときにロック</clr:String>
                             </ComboBox>
-                        </StackPanel>
+                            <TextBlock Grid.Row="1"
+                                       Grid.Column="0"
+                                       Margin="2,8,6,0"
+                                       HorizontalAlignment="Right"
+                                       VerticalAlignment="Center"
+                                       Text="タイムラインのアイコン品質:" />
+                            <ComboBox Grid.Row="1"
+                                      Grid.Column="1"
+                                      Margin="0,8,0,0"
+                                      SelectedIndex="{Binding TimelineIconResolution,
+                                                              Mode=TwoWay}">
+                                <clr:String>最高(原寸大のアイコンを取得します。最も綺麗に描画されますが、通信量が増大します)</clr:String>
+                                <clr:String>高(少し大きいサイズのアイコンを取得します。最高よりも通信量を抑えることができます)</clr:String>
+                                <clr:String>最適(最適なサイズのアイコンを取得します。通信量を減らせますが、アイコン品質が多少落ちます)</clr:String>
+                                <clr:String>最小(小さめのアイコンを拡大して表示します。通信量がかなり抑えられますが、アイコン品質もより悪化します)</clr:String>
+                                <clr:String>アイコン表示なし(アイコンがすべて空白になります)</clr:String>
+                            </ComboBox>
+                        </Grid>
                         <CheckBox Margin="0,0,0,8"
                                   VerticalAlignment="Top"
                                   Content="自分自身をお気に入り登録できるようにする(_F)"

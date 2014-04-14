@@ -188,8 +188,12 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         {
             get
             {
-                return this._user ??
-                       (this._user = new UserViewModel((this.Status.RetweetedOriginal ?? this.Status).User));
+                if (this._user == null)
+                {
+                    this._user = new UserViewModel((this.Status.RetweetedOriginal ?? this.Status).User);
+                    this.CompositeDisposable.Add(_user);
+                }
+                return this._user;
             }
         }
 

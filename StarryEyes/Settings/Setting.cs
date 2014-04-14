@@ -100,6 +100,9 @@ namespace StarryEyes.Settings
         public static readonly SettingItemStruct<ScrollLockStrategy> ScrollLockStrategy =
             new SettingItemStruct<ScrollLockStrategy>("ScrollLockStrategy", Settings.ScrollLockStrategy.WhenScrolled);
 
+        public static readonly SettingItemStruct<TimelineIconResolution> IconResolution =
+            new SettingItemStruct<TimelineIconResolution>("IconResolution", TimelineIconResolution.High);
+
         public static readonly SettingItem<string> Theme =
             new SettingItem<string>("Theme", null);
 
@@ -619,17 +622,19 @@ namespace StarryEyes.Settings
         Discard,
     }
 
-    public enum ImageUploaderService
-    {
-        TwitterOfficial,
-        TwitPic,
-        YFrog,
-    }
-
     public enum WebProxyConfiguration
     {
         Default,
         None,
         Custom
+    }
+
+    public enum TimelineIconResolution
+    {
+        Original,
+        High,
+        Optimized,
+        Low,
+        None
     }
 }

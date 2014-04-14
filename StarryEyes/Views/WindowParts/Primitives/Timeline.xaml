@@ -725,8 +725,8 @@
                                             SnapsToDevicePixels="True">
                                         <controls:LazyImage DecodePixelWidth="48"
                                                             RenderOptions.BitmapScalingMode="HighQuality"
-                                                            UriSource="{Binding User.ProfileImageUriNormal,
-                                                                                Mode=OneTime}"
+                                                            UriSource="{Binding User.ProfileImageUriOptimized,
+                                                                                Mode=OneWay}"
                                                             UseLayoutRounding="True">
                                             <i:Interaction.Triggers>
                                                 <i:EventTrigger EventName="MouseLeftButtonDown">

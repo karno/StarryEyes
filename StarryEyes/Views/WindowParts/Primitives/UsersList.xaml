@@ -40,8 +40,8 @@
                                     VerticalAlignment="Top"
                                     DecodePixelWidth="48"
                                     RenderOptions.BitmapScalingMode="HighQuality"
-                                    UriSource="{Binding ProfileImageUriNormal,
-                                                        Mode=OneTime}" />
+                                    UriSource="{Binding ProfileImageUriOptimized,
+                                                        Mode=OneWay}" />
                 <StackPanel Grid.Column="1" Orientation="Horizontal">
                     <TextBlock Margin="2,8,0,2"
                                VerticalAlignment="Center"

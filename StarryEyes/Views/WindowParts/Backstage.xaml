@@ -45,7 +45,7 @@
                                                         Cursor="Hand"
                                                         DecodePixelWidth="36"
                                                         RenderOptions.BitmapScalingMode="HighQuality"
-                                                        UriSource="{Binding User.ProfileImageUriNormal}">
+                                                        UriSource="{Binding User.ProfileImageUriOptimized}">
                                         <i:Interaction.Triggers>
                                             <i:EventTrigger EventName="MouseLeftButtonDown">
                                                 <ei:CallMethodAction MethodName="OpenProfile" TargetObject="{Binding}" />
