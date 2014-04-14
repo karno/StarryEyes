@@ -17,7 +17,7 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
     {
         #region Concurrent lock
 
-        private static ReaderWriterLockSlim _rwlock = new ReaderWriterLockSlim();
+        private static readonly ReaderWriterLockSlim _rwlock = new ReaderWriterLockSlim();
 
         #endregion
 
@@ -80,6 +80,14 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
 
         protected SQLiteConnection DangerousOpenConnection()
         {
+#if DEBUG
+            if (!ReaderWriterLock.IsReadLockHeld &&
+                !ReaderWriterLock.IsUpgradeableReadLockHeld &&
+                !ReaderWriterLock.IsWriteLockHeld)
+            {
+                throw new InvalidOperationException("This thread does not have any locks!");
+            }
+#endif
             SQLiteConnection con = null;
             try
             {
