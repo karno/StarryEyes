@@ -206,7 +206,7 @@ namespace StarryEyes.Settings
         #region Web proxy configuration
 
         public static readonly SettingItemStruct<WebProxyConfiguration> WebProxy =
-            new SettingItemStruct<WebProxyConfiguration>("WebProxy", WebProxyConfiguration.Default);
+            new SettingItemStruct<WebProxyConfiguration>("WebProxy", WebProxyConfiguration.None);
 
         public static readonly SettingItem<string> WebProxyHost =
             new SettingItem<string>("WebProxyHost", String.Empty);
