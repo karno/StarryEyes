@@ -31,7 +31,7 @@ namespace StarryEyes.Models.Receiving.Receivers
             var user = await this._account.ShowUserAsync(this._account.Id);
             this._account.UnreliableScreenName = user.ScreenName;
             this._account.UnreliableProfileImage = user.ProfileImageUri.ChangeImageSize(ImageSize.Original);
-            await UserProxy.StoreUserAsync(user);
+            UserProxy.StoreUser(user);
         }
     }
 }

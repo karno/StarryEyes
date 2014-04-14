@@ -89,16 +89,6 @@ namespace StarryEyes.Models.Receiving.Handling
                     else
                     {
                         StatusDeleted(n.StatusId);
-                        /*
-                                    var removal = await StatusProxy.GetStatusAsync(n.StatusId);
-                                    var rtt = StatusProxy.GetRetweetedStatusIds(n.StatusId);
-                                    await StatusProxy.RemoveStatusAsync(n.StatusId);
-                                    (await rtt).ForEach(QueueRemoval);
-                                    if (removal != null)
-                                    {
-                                        n = new StatusNotification(removal, false);
-                                    }
-                        */
                     }
                     // post next 
                     _signal.Reset();

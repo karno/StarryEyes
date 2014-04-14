@@ -1,58 +1,69 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
-namespace StarryEyes.Models.Databases
+namespace StarryEyes.Models.Databases.Caching
 {
     public class TaskQueue<TKey, TValue>
     {
         private readonly int _threshold;
+        private readonly object _intvlock = new object();
         private readonly Action<IEnumerable<TValue>> _writeback;
+        private readonly TimeSpan _minInterval;
 
         private readonly Dictionary<TKey, LinkedListNode<TValue>> _table =
             new Dictionary<TKey, LinkedListNode<TValue>>();
 
         private readonly LinkedList<TValue> _queue = new LinkedList<TValue>();
 
-        public TaskQueue(int threshold, Action<IEnumerable<TValue>> writeback)
+        private DateTime _lastWritebackStamp;
+
+        public TaskQueue(int threshold, TimeSpan minInterval, Action<IEnumerable<TValue>> writeback)
         {
             this._threshold = threshold;
             this._writeback = writeback;
+            this._minInterval = minInterval;
+            this._lastWritebackStamp = DateTime.Now;
         }
 
         public void Enqueue(TKey key, TValue value)
         {
             int count;
-            lock (_queue)
+            lock (this._queue)
             {
                 LinkedListNode<TValue> node;
-                if (_table.TryGetValue(key, out node))
+                if (this._table.TryGetValue(key, out node))
                 {
-                    _queue.Remove(node);
+                    this._queue.Remove(node);
                 }
-                _table[key] = _queue.AddFirst(value);
-                count = _queue.Count;
+                this._table[key] = this._queue.AddFirst(value);
+                count = this._queue.Count;
             }
-            if (count > _threshold)
+            if (count <= this._threshold) return;
+            lock (this._intvlock)
             {
-                Writeback();
+                var span = DateTime.Now - this._lastWritebackStamp;
+                if (span < this._minInterval) return;
+                this._lastWritebackStamp = DateTime.Now;
             }
+            Task.Run(() => this.Writeback());
         }
 
         public bool Contains(TKey key)
         {
-            lock (_queue)
+            lock (this._queue)
             {
-                return _table.ContainsKey(key);
+                return this._table.ContainsKey(key);
             }
         }
 
         public bool TryGetValue(TKey id, out TValue value)
         {
-            lock (_queue)
+            lock (this._queue)
             {
                 LinkedListNode<TValue> node;
-                if (_table.TryGetValue(id, out node))
+                if (this._table.TryGetValue(id, out node))
                 {
                     value = node.Value;
                     return true;
@@ -64,42 +75,42 @@ namespace StarryEyes.Models.Databases
 
         public void Remove(TKey id)
         {
-            lock (_queue)
+            lock (this._queue)
             {
                 LinkedListNode<TValue> node;
-                if (_table.TryGetValue(id, out node))
+                if (this._table.TryGetValue(id, out node))
                 {
-                    _queue.Remove(node);
+                    this._queue.Remove(node);
                 }
             }
         }
 
         public IEnumerable<TValue> Find(Func<TValue, bool> predicate)
         {
-            lock (_queue)
+            lock (this._queue)
             {
-                return _queue.Where(predicate).ToArray();
+                return this._queue.Where(predicate).ToArray();
             }
         }
 
         public void Writeback()
         {
             TValue[] list;
-            lock (_queue)
+            lock (this._queue)
             {
                 list = this._queue.ToArray();
-                _queue.Clear();
-                _table.Clear();
+                this._queue.Clear();
+                this._table.Clear();
             }
-            _writeback(list);
+            this._writeback(list);
         }
 
         public void Clear()
         {
-            lock (_queue)
+            lock (this._queue)
             {
-                _queue.Clear();
-                _table.Clear();
+                this._queue.Clear();
+                this._table.Clear();
             }
         }
     }

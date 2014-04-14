@@ -75,7 +75,7 @@ namespace StarryEyes.Models.Receiving.Receivers
             {
                 var result = await account.GetListMembersAsync(listId, cursor);
                 memberList.AddRange(result.Result
-                          .Do(u => Task.Run(() => UserProxy.StoreUserAsync(u)))
+                          .Do(u => Task.Run(() => UserProxy.StoreUser(u)))
                           .Select(u => u.Id));
                 cursor = result.NextCursor;
             } while (cursor != 0);

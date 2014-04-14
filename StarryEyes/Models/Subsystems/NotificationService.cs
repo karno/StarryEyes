@@ -180,13 +180,12 @@ namespace StarryEyes.Models.Subsystems
             if (MuteBlockManager.IsBlocked(source)) return;
             if (!NotificationLatch.CheckSetPositive(
                 NotificationLatchTarget.Favorite, source.Id, status.Id)) return;
-            Task.Run(() => UserProxy.StoreUserAsync(source));
+            Task.Run(() => UserProxy.StoreUser(source));
             Task.Run(() => StatusModel.UpdateStatusInfo(
                 status.Id,
-                model => model.AddFavoritedUser(source),
-                async _ =>
+                model => model.AddFavoritedUser(source), _ =>
                 {
-                    await StatusProxy.AddFavoritorAsync(status.Id, source.Id);
+                    StatusProxy.AddFavoritor(status.Id, source.Id);
                     StatusBroadcaster.Republish(status);
                 }));
             Head.NotifyFavorited(source, status);
@@ -199,10 +198,9 @@ namespace StarryEyes.Models.Subsystems
                 NotificationLatchTarget.Favorite, source.Id, status.Id)) return;
             Task.Run(() => StatusModel.UpdateStatusInfo(
                 status.Id,
-                model => model.RemoveFavoritedUser(source.Id),
-                async _ =>
+                model => model.RemoveFavoritedUser(source.Id), _ =>
                 {
-                    await StatusProxy.RemoveFavoritorAsync(status.Id, source.Id);
+                    StatusProxy.RemoveFavoritor(status.Id, source.Id);
                     StatusBroadcaster.Republish(status);
                 }));
             Head.NotifyUnfavorited(source, status);
@@ -211,13 +209,12 @@ namespace StarryEyes.Models.Subsystems
         internal static void NotifyRetweeted(TwitterUser source, TwitterStatus status)
         {
             if (MuteBlockManager.IsBlocked(source)) return;
-            Task.Run(() => UserProxy.StoreUserAsync(source));
+            Task.Run(() => UserProxy.StoreUser(source));
             Task.Run(() => StatusModel.UpdateStatusInfo(
                 status.Id,
-                model => model.AddRetweetedUser(source),
-                async _ =>
+                model => model.AddRetweetedUser(source), _ =>
                 {
-                    await StatusProxy.AddRetweeterAsync(status.Id, source.Id);
+                    StatusProxy.AddRetweeter(status.Id, source.Id);
                     StatusBroadcaster.Republish(status);
                 }));
             Head.NotifyRetweeted(source, status);
@@ -229,10 +226,9 @@ namespace StarryEyes.Models.Subsystems
             {
                 Task.Run(() => StatusModel.UpdateStatusInfo(
                     deleted.RetweetedOriginal.Id,
-                    model => model.RemoveRetweetedUser(
-                        deleted.User.Id),
-                    async _ => await StatusProxy.RemoveRetweeterAsync(
-                        deleted.RetweetedOriginal.Id, deleted.User.Id)));
+                    model => model.RemoveRetweetedUser(deleted.User.Id),
+                    _ => StatusProxy.RemoveRetweeter(deleted.RetweetedOriginal.Id,
+                        deleted.User.Id)));
             }
             Head.NotifyDeleted(statusId, deleted);
         }

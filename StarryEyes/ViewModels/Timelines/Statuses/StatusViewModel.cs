@@ -1149,8 +1149,12 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                         _ => { },
                         ex => BackstageModel.RegisterEvent(new InternalErrorEvent(ex.Message)), () =>
                         {
-                            var targetId = this.Status.User.Id.ToString(CultureInfo.InvariantCulture);
-                            StatusProxy.FetchStatuses("UserId = " + targetId + " OR BaseUserId = " + targetId)
+                            var tid = this.Status.User.Id;
+                            var tidstr = tid.ToString(CultureInfo.InvariantCulture);
+                            StatusProxy.FetchStatuses(
+                                s => s.User.Id == tid ||
+                                     (s.RetweetedOriginal != null && s.RetweetedOriginal.User.Id == tid),
+                                "UserId = " + tidstr + " OR BaseUserId = " + tidstr)
                                        .Subscribe(s => StatusInbox.QueueRemoval(s.Id));
                         });
         }

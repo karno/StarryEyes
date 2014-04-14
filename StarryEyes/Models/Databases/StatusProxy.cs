@@ -9,6 +9,7 @@ using StarryEyes.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Casket;
 using StarryEyes.Casket.DatabaseModels;
+using StarryEyes.Models.Databases.Caching;
 using StarryEyes.Models.Receiving;
 
 namespace StarryEyes.Models.Databases
@@ -19,7 +20,20 @@ namespace StarryEyes.Models.Databases
 
         static StatusProxy()
         {
-            _statusQueue = new TaskQueue<long, TwitterStatus>(200, async s => await StoreStatusesAsync(s));
+            _statusQueue = new TaskQueue<long, TwitterStatus>(200, TimeSpan.FromSeconds(30),
+                async s => await StoreStatusesAsync(s));
+            _favoriteQueue = new ActivityQueue(50, TimeSpan.FromSeconds(30),
+                s => Task.Run(() => Database.FavoritesCrud.InsertAllAsync(s)),
+                s => Task.Run(() => Database.FavoritesCrud.DeleteAllAsync(s)));
+            _retweetQueue = new ActivityQueue(50, TimeSpan.FromSeconds(30),
+                s => Task.Run(() => Database.RetweetsCrud.InsertAllAsync(s)),
+                s => Task.Run(() => Database.RetweetsCrud.DeleteAllAsync(s)));
+            App.ApplicationFinalize += () =>
+            {
+                _statusQueue.Writeback();
+                _favoriteQueue.Writeback();
+                _retweetQueue.Writeback();
+            };
         }
 
         public static Task<long> GetCountAsync()
@@ -27,7 +41,7 @@ namespace StarryEyes.Models.Databases
             return Database.StatusCrud.GetCountAsync();
         }
 
-        #region Storing and removing status
+        #region Store and remove statuses
 
         /// <summary>
         /// Queue store status 
@@ -81,7 +95,33 @@ namespace StarryEyes.Models.Databases
             }
         }
 
-        #endregion
+        public static async Task<bool> IsStatusExistsAsync(long id)
+        {
+            if (_statusQueue.Contains(id)) return true;
+            return await Database.StatusCrud.GetAsync(id) != null;
+        }
+
+        public static async Task<TwitterStatus> GetStatusAsync(long id)
+        {
+            TwitterStatus cache;
+            if (_statusQueue.TryGetValue(id, out cache))
+            {
+                return cache;
+            }
+            var status = await Database.StatusCrud.GetAsync(id);
+            if (status == null) return null;
+            return await LoadStatusAsync(status);
+        }
+
+        public static async Task<long?> GetInReplyToAsync(long id)
+        {
+            TwitterStatus cache;
+            if (_statusQueue.TryGetValue(id, out cache))
+            {
+                return cache.InReplyToStatusId;
+            }
+            return await Database.StatusCrud.GetInReplyToAsync(id);
+        }
 
         public static async Task<IEnumerable<long>> GetRetweetedStatusIds(long originalId)
         {
@@ -99,96 +139,63 @@ namespace StarryEyes.Models.Databases
             }
         }
 
-        #region Favorites and retweets
-
-        public static async Task AddFavoritorAsync(long statusId, long userId)
+        public static async Task<IEnumerable<long>> FindFromInReplyToAsync(long inReplyTo)
         {
-            try
-            {
-                await Database.FavoritesCrud.InsertAsync(statusId, userId);
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine(ex);
-            }
-        }
-
-        public static async Task RemoveFavoritorAsync(long statusId, long userId)
-        {
-            try
-            {
-                await Database.FavoritesCrud.DeleteAsync(statusId, userId);
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine(ex);
-            }
-        }
-
-        public static async Task AddRetweeterAsync(long statusId, long userId)
-        {
-            try
-            {
-                await Database.RetweetsCrud.InsertAsync(statusId, userId);
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine(ex);
-            }
-        }
-
-        public static async Task RemoveRetweeterAsync(long statusId, long userId)
-        {
-            try
-            {
-                await Database.RetweetsCrud.DeleteAsync(statusId, userId);
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine(ex);
-            }
+            var replies = await Database.StatusCrud.FindFromInReplyToAsync(inReplyTo);
+            return replies.Concat(_statusQueue.Find(s => s.InReplyToStatusId == inReplyTo)
+                                              .Select(s => s.Id));
         }
 
         #endregion
 
-        public static async Task<bool> IsStatusExistsAsync(long id)
+        #region Favorites and retweets
+
+        private static readonly ActivityQueue _favoriteQueue;
+
+        private static readonly ActivityQueue _retweetQueue;
+
+        public static void AddFavoritor(long statusId, long userId)
         {
-            if (_statusQueue.Contains(id)) return true;
-            return await Database.StatusCrud.GetAsync(id) != null;
+            _favoriteQueue.Add(statusId, userId);
         }
 
-        public static async Task<TwitterStatus> GetStatusAsync(long id)
+        public static void RemoveFavoritor(long statusId, long userId)
         {
-            var status = await Database.StatusCrud.GetAsync(id);
-            if (status == null) return null;
-            return await LoadStatusAsync(status);
+            _favoriteQueue.Remove(statusId, userId);
+        }
+
+        public static void AddRetweeter(long statusId, long userId)
+        {
+            _retweetQueue.Add(statusId, userId);
+        }
+
+        public static void RemoveRetweeter(long statusId, long userId)
+        {
+            _retweetQueue.Remove(statusId, userId);
         }
 
         public static async Task<TwitterStatus> SyncStatusActivityAsync(TwitterStatus status)
         {
             if (status.StatusType == StatusType.Tweet)
             {
+                IEnumerable<long> favadd, favremove, rtadd, rtremove;
+                _favoriteQueue.GetDirtyActivity(status.Id, out favadd, out favremove);
+                _retweetQueue.GetDirtyActivity(status.Id, out rtadd, out rtremove);
                 var favorers = await Database.FavoritesCrud.GetUsersAsync(status.Id);
                 var retweeters = await Database.RetweetsCrud.GetUsersAsync(status.Id);
-                status.FavoritedUsers = favorers.Guard().ToArray();
-                status.RetweetedUsers = retweeters.Guard().ToArray();
+                status.FavoritedUsers = favorers.Guard().Concat(favadd).Except(favremove).ToArray();
+                status.RetweetedUsers = retweeters.Guard().Concat(rtadd).Except(rtremove).ToArray();
             }
             return status;
         }
 
-        public static async Task<long?> GetInReplyToAsync(long id)
-        {
-            return await Database.StatusCrud.GetInReplyToAsync(id);
-        }
-
-        public static async Task<IEnumerable<long>> FindFromInReplyToAsync(long inReplyTo)
-        {
-            return await Database.StatusCrud.FindFromInReplyToAsync(inReplyTo);
-        }
+        #endregion
 
         public static IObservable<TwitterStatus> FetchStatuses(
-            string sql, long? maxId = null, int? count = null, bool applyMuteBlockFilter = true)
+            Func<TwitterStatus, bool> predicate, string sql,
+            long? maxId = null, int? count = null, bool applyMuteBlockFilter = true)
         {
+            var cache = FindCache(predicate, maxId, applyMuteBlockFilter);
             if (maxId != null)
             {
                 var midc = "Id < " + maxId.Value.ToString(CultureInfo.InvariantCulture);
@@ -207,13 +214,59 @@ namespace StarryEyes.Models.Databases
                 sql += " order by Id desc limit " + count.Value.ToString(CultureInfo.InvariantCulture);
             }
             sql = "select * from status" + sql + ";";
-            return Database.StatusCrud.FetchAsync(sql)
-                           .ToObservable()
-                           .SelectMany(_ => _)
-                           .SelectMany(s => LoadStatusAsync(s).ToObservable());
+
+            // find status and limit caches
+            var read = Task.Run(async () =>
+            {
+                var fetched = (await Database.StatusCrud.FetchAsync(sql)).ToArray();
+
+                var bcache = cache;
+                if (count != null && fetched.Length == count)
+                {
+                    // if database can yield more results, limit cache results.
+
+                    // find last id of database result
+                    var lid = fetched[fetched.Length - 1].Id;
+
+                    // limiting cache result
+                    cache = Task.Run(async () =>
+                    {
+                        await Task.Yield();
+                        var ext = await bcache;
+                        return maxId != null
+                            ? ext.Where(s => s.Id > lid && s.Id < maxId)
+                            : ext.Where(s => s.Id > lid);
+                    });
+                }
+                return fetched;
+            });
+            return read.ToObservable()
+                       .SelectMany(_ => _)
+                       .SelectMany(s => LoadStatusAsync(s).ToObservable())
+                       .Merge(cache.ToObservable().SelectMany(_ => _))
+                       .Distinct(s => s.Id);
         }
 
-        public static Task<TwitterStatus> LoadStatusAsync([NotNull] DatabaseStatus dbstatus)
+        private static async Task<IEnumerable<TwitterStatus>> FindCache(
+            Func<TwitterStatus, bool> predicate, long? maxId = null, bool applyMuteBlockFilter = true)
+        {
+            var cp = predicate;
+            if (maxId != null)
+            {
+                var op = predicate;
+                predicate = s => op(s) && s.Id < maxId;
+            }
+            if (applyMuteBlockFilter)
+            {
+                var op = predicate;
+                predicate = s => op(s) && !MuteBlockManager.IsUnwanted(s);
+            }
+            return await Task.Run(() => _statusQueue.Find(predicate));
+        }
+
+        #region Load from database
+
+        private static Task<TwitterStatus> LoadStatusAsync([NotNull] DatabaseStatus dbstatus)
         {
             if (dbstatus == null) throw new ArgumentNullException("dbstatus");
             switch (dbstatus.StatusType)
@@ -266,5 +319,6 @@ namespace StarryEyes.Models.Databases
             return Mapper.Map(dbstatus, await se, await user, await recipient);
         }
 
+        #endregion
     }
 }

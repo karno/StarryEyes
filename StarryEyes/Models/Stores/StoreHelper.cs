@@ -44,7 +44,7 @@ namespace StarryEyes.Models.Stores
                                 if (acc == null) return Observable.Empty<TwitterUser>();
                                 return acc.ShowUserAsync(id)
                                           .ToObservable()
-                                          .Do(u => Task.Run(() => UserProxy.StoreUserAsync(u)));
+                                          .Do(u => Task.Run(() => UserProxy.StoreUser(u)));
                             });
         }
 
@@ -60,7 +60,7 @@ namespace StarryEyes.Models.Stores
                                     if (acc == null) return Observable.Empty<TwitterUser>();
                                     return acc.ShowUserAsync(screenName)
                                               .ToObservable()
-                                              .Do(u => Task.Run(() => UserProxy.StoreUserAsync(u)));
+                                              .Do(u => Task.Run(() => UserProxy.StoreUser(u)));
                                 });
         }
     }

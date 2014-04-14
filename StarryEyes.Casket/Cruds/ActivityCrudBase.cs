@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using StarryEyes.Casket.Cruds.Scaffolding;
 using StarryEyes.Casket.DatabaseModels;
@@ -44,6 +46,26 @@ namespace StarryEyes.Casket.Cruds
             await this.ExecuteAsync(
                 "delete from " + this.TableName + " where StatusId = @Sid and UserId = @Uid;",
                 new { Sid = statusId, Uid = userId });
+        }
+
+        public async Task InsertAllAsync(IEnumerable<Tuple<long, long>> items)
+        {
+            var inserters = items.Select(i => Tuple.Create(
+                TableInserter,
+                (object)new DatabaseActivity
+                {
+                    StatusId = i.Item1,
+                    UserId = i.Item2
+                }));
+            await this.ExecuteAllAsync(inserters);
+        }
+
+        public async Task DeleteAllAsync(IEnumerable<Tuple<long, long>> items)
+        {
+            var deleters = items.Select(i => Tuple.Create(
+                "delete from " + this.TableName + " where StatusId = @Sid and UserId = @Uid;",
+                (object)new { Sid = i.Item1, Uid = i.Item2 }));
+            await this.ExecuteAllAsync(deleters);
         }
     }
 }

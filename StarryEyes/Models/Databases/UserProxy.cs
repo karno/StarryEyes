@@ -8,20 +8,33 @@ using StarryEyes.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Casket;
 using StarryEyes.Casket.DatabaseModels;
+using StarryEyes.Models.Databases.Caching;
 
 namespace StarryEyes.Models.Databases
 {
     public static class UserProxy
     {
-        public static long GetId(string screenName)
+        private static readonly TaskQueue<long, TwitterUser> _userQueue;
+
+        static UserProxy()
         {
-            return Database.UserCrud.GetId(screenName);
+            _userQueue = new TaskQueue<long, TwitterUser>(50, TimeSpan.FromSeconds(30),
+                async u => await StoreUsersAsync(u));
+            App.ApplicationFinalize += () => _userQueue.Writeback();
         }
 
-        public static async Task StoreUserAsync(TwitterUser user)
+        public static long GetId(string screenName)
         {
-            var map = Mapper.Map(user);
-            await Database.StoreUser(map.Item1, map.Item2, map.Item3);
+            var incache = _userQueue
+                .Find(u => u.ScreenName.Equals(screenName,
+                    StringComparison.CurrentCultureIgnoreCase))
+                .FirstOrDefault();
+            return incache != null ? incache.Id : Database.UserCrud.GetId(screenName);
+        }
+
+        public static void StoreUser(TwitterUser user)
+        {
+            _userQueue.Enqueue(user.Id, user);
         }
 
         public static async Task StoreUsersAsync(IEnumerable<TwitterUser> pendingUser)
@@ -33,6 +46,11 @@ namespace StarryEyes.Models.Databases
 
         public static async Task<TwitterUser> GetUserAsync(long id)
         {
+            TwitterUser cached;
+            if (_userQueue.TryGetValue(id, out cached))
+            {
+                return cached;
+            }
             var u = await Database.UserCrud.GetAsync(id);
             if (u == null) return null;
             var ude = Database.UserDescriptionEntityCrud.GetEntitiesAsync(id);
@@ -42,13 +60,24 @@ namespace StarryEyes.Models.Databases
 
         public static async Task<TwitterUser> GetUserAsync(string screenName)
         {
+            var incache = _userQueue
+               .Find(u => u.ScreenName.Equals(screenName,
+                   StringComparison.CurrentCultureIgnoreCase))
+               .FirstOrDefault();
+            if (incache != null)
+            {
+                return incache;
+            }
             var user = await Database.UserCrud.GetAsync(screenName);
             return user == null ? null : await LoadUserAsync(user);
         }
 
         public static async Task<IObservable<TwitterUser>> GetUsersAsync(string partOfScreenName)
         {
-            return LoadUsersAsync(await Database.UserCrud.GetUsersAsync(partOfScreenName));
+            return LoadUsersAsync(await Database.UserCrud.GetUsersAsync(partOfScreenName))
+                .Concat(_userQueue.Find(
+                    u => u.ScreenName.IndexOf(partOfScreenName, StringComparison.CurrentCultureIgnoreCase) >= 0)
+                                  .ToObservable());
         }
 
         public static async Task<IEnumerable<Tuple<long, string>>> GetUsersFastAsync(string partOfScreenName, int count)
