@@ -130,7 +130,7 @@ namespace StarryEyes.Models.Timelines.SearchFlips
                 if (acc == null) return Observable.Empty<TwitterStatus>();
                 return acc.SearchAsync(this._query, maxId: maxId, count: count)
                           .ToObservable()
-                          .Do(StatusInbox.Queue);
+                          .Do(StatusInbox.Enqueue);
             }
             return StatusProxy.FetchStatuses(this._filterFunc, this._filterSql, maxId, count)
                               .Merge(this._filterQuery != null

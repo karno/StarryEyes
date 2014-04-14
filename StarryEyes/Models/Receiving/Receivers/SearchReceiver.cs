@@ -45,7 +45,7 @@ namespace StarryEyes.Models.Receiving.Receivers
                         _receiveCaches.ForEach(c => c.Add(s.Id));
                     }
                 })
-                .ForEach(StatusInbox.Queue);
+                .ForEach(StatusInbox.Enqueue);
         }
     }
 }

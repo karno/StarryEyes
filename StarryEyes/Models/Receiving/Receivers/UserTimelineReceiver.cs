@@ -29,7 +29,7 @@ namespace StarryEyes.Models.Receiving.Receivers
         protected override async Task DoReceive()
         {
             (await this._account.GetUserTimelineAsync(this._account.Id, 100))
-                .ForEach(StatusInbox.Queue);
+                .ForEach(StatusInbox.Enqueue);
         }
     }
 }

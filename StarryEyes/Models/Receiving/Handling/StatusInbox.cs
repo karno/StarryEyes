@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Data.SQLite;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -45,28 +46,28 @@ namespace StarryEyes.Models.Receiving.Handling
         internal static void Initialize()
         {
             _cleanupPeriod = DateTime.Now;
-            _pumpThread = new Thread(PumpQueuedStatuses);
+            _pumpThread = new Thread(StatusPump);
             _pumpThread.Start();
         }
 
-        public static void Queue([NotNull] TwitterStatus status)
+        public static void Enqueue([NotNull] TwitterStatus status)
         {
             if (status == null) throw new ArgumentNullException("status");
             // store original status first
             if (status.RetweetedOriginal != null)
             {
-                Queue(status.RetweetedOriginal);
+                Enqueue(status.RetweetedOriginal);
             }
             _queue.Enqueue(new StatusNotification(status));
             _signal.Set();
         }
 
-        public static void QueueRemoval(long id)
+        public static void EnqueueRemoval(long id)
         {
             _queue.Enqueue(new StatusNotification(id));
         }
 
-        private static async void PumpQueuedStatuses()
+        private static async void StatusPump()
         {
             StatusNotification n;
             while (true)
@@ -84,7 +85,7 @@ namespace StarryEyes.Models.Receiving.Handling
                             // already received
                             continue;
                         }
-                        StatusBroadcaster.Queue(n);
+                        StatusBroadcaster.Enqueue(n);
                     }
                     else
                     {
@@ -103,13 +104,24 @@ namespace StarryEyes.Models.Receiving.Handling
 
         private static async Task<bool> StatusReceived(TwitterStatus status)
         {
-            if (!await CheckReceiveNew(status.Id))
+            try
             {
+                if (!await CheckReceiveNew(status.Id))
+                {
+                    // already received
+                    return false;
+                }
+                StatusProxy.StoreStatus(status);
+                return true;
+            }
+            catch (SQLiteException)
+            {
+                // enqueue for retry 
+                Enqueue(status);
+
+                // and return "already received" sign
                 return false;
             }
-            StatusProxy.StoreStatus(status);
-            return true;
-            // already received
         }
 
         private static async Task<bool> CheckReceiveNew(long id)
@@ -154,7 +166,7 @@ namespace StarryEyes.Models.Receiving.Handling
                 foreach (var removed in removeds)
                 {
                     _removes[removed] = DateTime.Now;
-                    StatusBroadcaster.Queue(new StatusNotification(removed));
+                    StatusBroadcaster.Enqueue(new StatusNotification(removed));
                 }
 
                 // check cleanup cycle

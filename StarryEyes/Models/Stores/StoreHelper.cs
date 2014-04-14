@@ -26,7 +26,7 @@ namespace StarryEyes.Models.Stores
                                   if (acc == null) return Observable.Empty<TwitterStatus>();
                                   return acc.ShowTweetAsync(id)
                                             .ToObservable()
-                                            .Do(StatusInbox.Queue);
+                                            .Do(StatusInbox.Enqueue);
                                   ;
                               });
         }

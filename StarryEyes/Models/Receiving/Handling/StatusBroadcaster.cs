@@ -42,11 +42,11 @@ namespace StarryEyes.Models.Receiving.Handling
 
         internal static void Initialize()
         {
-            _pumpThread = new Thread(PumpQueuedStatuses);
+            _pumpThread = new Thread(StatusPump);
             _pumpThread.Start();
         }
 
-        internal static async void Queue([NotNull] StatusNotification status)
+        internal static async void Enqueue([NotNull] StatusNotification status)
         {
             if (status == null) throw new ArgumentNullException("status");
             _queue.Enqueue(await StatusModelNotification.FromStatusNotification(status, true));
@@ -66,7 +66,7 @@ namespace StarryEyes.Models.Receiving.Handling
             _signal.Set();
         }
 
-        private static void PumpQueuedStatuses()
+        private static void StatusPump()
         {
             StatusModelNotification notification;
             while (true)

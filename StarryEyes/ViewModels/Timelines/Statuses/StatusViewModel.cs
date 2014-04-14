@@ -1031,7 +1031,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             if (info == null) return;
             var dreq = new DeletionRequest(this.OriginalStatus);
             RequestQueue.Enqueue(info, dreq)
-                .Subscribe(_ => StatusInbox.QueueRemoval(_.Id),
+                .Subscribe(_ => StatusInbox.EnqueueRemoval(_.Id),
                     ex => BackstageModel.RegisterEvent(new OperationFailedEvent("ツイートを削除できませんでした", ex)));
         }
 
@@ -1155,7 +1155,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                                 s => s.User.Id == tid ||
                                      (s.RetweetedOriginal != null && s.RetweetedOriginal.User.Id == tid),
                                 "UserId = " + tidstr + " OR BaseUserId = " + tidstr)
-                                       .Subscribe(s => StatusInbox.QueueRemoval(s.Id));
+                                       .Subscribe(s => StatusInbox.EnqueueRemoval(s.Id));
                         });
         }
 

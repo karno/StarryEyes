@@ -53,7 +53,7 @@ namespace StarryEyes.Filters.Sources
         public IObservable<TwitterStatus> Receive(long? maxId)
         {
             return ReceiveSink(maxId)
-                .Do(StatusInbox.Queue)
+                .Do(StatusInbox.Enqueue)
                 .Catch((Exception ex) =>
                 {
                     BackstageModel.RegisterEvent(new OperationFailedEvent(

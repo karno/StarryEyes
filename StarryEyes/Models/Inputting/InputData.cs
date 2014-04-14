@@ -288,7 +288,7 @@ namespace StarryEyes.Models.Inputting
             if (account == null) throw new ArgumentNullException("account");
             if (request == null) throw new ArgumentNullException("request");
             return RequestQueue.Enqueue(account, request)
-                               .Do(StatusInbox.Queue)
+                               .Do(StatusInbox.Enqueue)
                                .Select(s => Tuple.Create(account, s, (Exception)null))
                                .Catch((Exception ex) =>
                                    Observable.Return(Tuple.Create(account, (TwitterStatus)null, ex)));

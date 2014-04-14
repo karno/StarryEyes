@@ -172,12 +172,12 @@ namespace StarryEyes.Models.Receiving.Receivers
 
             public void OnStatus(TwitterStatus status)
             {
-                StatusInbox.Queue(status);
+                StatusInbox.Enqueue(status);
             }
 
             public void OnDeleted(StreamDelete item)
             {
-                StatusInbox.QueueRemoval(item.Id);
+                StatusInbox.EnqueueRemoval(item.Id);
             }
 
             public void OnDisconnect(StreamDisconnect streamDisconnect)
@@ -210,7 +210,7 @@ namespace StarryEyes.Models.Receiving.Receivers
                 }
                 if (item.Status != null)
                 {
-                    StatusInbox.Queue(item.Status);
+                    StatusInbox.Enqueue(item.Status);
                 }
             }
 

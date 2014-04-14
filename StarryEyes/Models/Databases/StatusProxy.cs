@@ -44,7 +44,7 @@ namespace StarryEyes.Models.Databases
         #region Store and remove statuses
 
         /// <summary>
-        /// Queue store status 
+        /// Enqueue store status 
         /// </summary>
         /// <param name="status"></param>
         public static void StoreStatus([NotNull] TwitterStatus status)
@@ -250,7 +250,6 @@ namespace StarryEyes.Models.Databases
         private static async Task<IEnumerable<TwitterStatus>> FindCache(
             Func<TwitterStatus, bool> predicate, long? maxId = null, bool applyMuteBlockFilter = true)
         {
-            var cp = predicate;
             if (maxId != null)
             {
                 var op = predicate;

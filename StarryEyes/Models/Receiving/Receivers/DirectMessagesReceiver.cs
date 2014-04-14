@@ -30,9 +30,9 @@ namespace StarryEyes.Models.Receiving.Receivers
         {
             await Task.WhenAll(
                 Task.Run(async () => (await this._account.GetDirectMessagesAsync(50))
-                    .ForEach(StatusInbox.Queue)),
+                    .ForEach(StatusInbox.Enqueue)),
                 Task.Run(async () => (await this._account.GetSentDirectMessagesAsync(50))
-                    .ForEach(StatusInbox.Queue)));
+                    .ForEach(StatusInbox.Enqueue)));
         }
     }
 }
