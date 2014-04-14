@@ -163,7 +163,7 @@
                                     Height="127"
                                     Margin="8"
                                     RenderOptions.BitmapScalingMode="Fant"
-                                    UriSource="{Binding User.ProfileImageUri}" />
+                                    UriSource="{Binding User.ProfileImageUriOriginal}" />
             </Grid>
             <ScrollViewer HorizontalScrollBarVisibility="Disabled"
                           Style="{StaticResource TouchScrollViewerStyle}"

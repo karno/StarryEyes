@@ -22,12 +22,22 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             get { return this.Model.User; }
         }
 
-        public Uri ProfileImageUri
+        public Uri ProfileImageUriOriginal
         {
             get
             {
                 return this.User.ProfileImageUri.ChangeImageSize(ImageSize.Original);
             }
+        }
+
+        public Uri ProfileImageUriNormal
+        {
+            get { return this.User.ProfileImageUri.ChangeImageSize(ImageSize.Normal); }
+        }
+
+        public Uri ProfileImageUriMini
+        {
+            get { return this.User.ProfileImageUri.ChangeImageSize(ImageSize.Mini); }
         }
 
         public Uri BackgroundImageUri

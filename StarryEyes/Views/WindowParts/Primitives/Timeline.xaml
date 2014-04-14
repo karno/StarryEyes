@@ -13,6 +13,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:primitives="clr-namespace:StarryEyes.Views.WindowParts.Primitives"
              xmlns:starryEyes="clr-namespace:StarryEyes"
+             xmlns:statuses="clr-namespace:StarryEyes.ViewModels.Timelines.Statuses"
              xmlns:tabs="clr-namespace:StarryEyes.ViewModels.Timelines.Tabs"
              xmlns:utils="clr-namespace:StarryEyes.Views.Utils"
              x:Name="userControl"
@@ -25,7 +26,7 @@
         <ResourceDictionary>
             <utils:BooleanToVisibleConverter x:Key="BooleanToVisibleConverter" />
             <utils:BooleanToInvisibleConverter x:Key="BooleanToInvisibleConverter" />
-            <DataTemplate x:Key="UserItemTemplate">
+            <DataTemplate x:Key="UserItemTemplate" DataType="{x:Type statuses:UserViewModel}">
                 <controls:LazyImage Width="20"
                                     Height="20"
                                     Cursor="Hand"
@@ -33,7 +34,7 @@
                                     RenderOptions.BitmapScalingMode="HighQuality"
                                     ToolTip="{Binding ScreenName,
                                                       Mode=OneTime}"
-                                    UriSource="{Binding ProfileImageUri,
+                                    UriSource="{Binding ProfileImageUriMini,
                                                         Mode=OneTime}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="MouseLeftButtonDown">
@@ -724,7 +725,7 @@
                                             SnapsToDevicePixels="True">
                                         <controls:LazyImage DecodePixelWidth="48"
                                                             RenderOptions.BitmapScalingMode="HighQuality"
-                                                            UriSource="{Binding User.ProfileImageUri,
+                                                            UriSource="{Binding User.ProfileImageUriNormal,
                                                                                 Mode=OneTime}"
                                                             UseLayoutRounding="True">
                                             <i:Interaction.Triggers>
