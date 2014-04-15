@@ -226,11 +226,19 @@ namespace StarryEyes.Hotfixes
             }
             else
             {
-                var sourceAsSyncrhonizedCollection = _souceAsIList as ObservableSynchronizedCollection<T>;
+                var sourceAsSynchronizedCollection = _souceAsIList as ObservableSynchronizedCollection<T>;
 
-                if (sourceAsSyncrhonizedCollection != null)
+                if (sourceAsSynchronizedCollection != null)
                 {
-                    sourceAsSyncrhonizedCollection.Move(oldIndex, newIndex);
+                    sourceAsSynchronizedCollection.Move(oldIndex, newIndex);
+                }
+                else
+                {
+                    var sourceAsSyncCollectionEx = _souceAsIList as ObservableSynchronizedCollectionEx<T>;
+                    if (sourceAsSyncCollectionEx != null)
+                    {
+                        sourceAsSyncCollectionEx.Move(oldIndex, newIndex);
+                    }
                 }
             }
         }
@@ -252,7 +260,8 @@ namespace StarryEyes.Hotfixes
         {
             get
             {
-                if (_souceAsIList is ObservableSynchronizedCollection<T>)
+                if (_souceAsIList is ObservableSynchronizedCollection<T> ||
+                    _souceAsIList is ObservableSynchronizedCollectionEx<T>)
                 {
                     return true;
                 }

@@ -138,16 +138,16 @@ namespace StarryEyes.Models.Timelines.Statuses
 
         private readonly TaskFactory _factory = LimitedTaskScheduler.GetTaskFactory(8);
 
-        private readonly ObservableSynchronizedCollection<TwitterUser> _favoritedUsers =
-            new ObservableSynchronizedCollection<TwitterUser>();
+        private readonly ObservableSynchronizedCollectionEx<TwitterUser> _favoritedUsers =
+            new ObservableSynchronizedCollectionEx<TwitterUser>();
 
         private readonly IDictionary<long, TwitterUser> _favoritedUsersDic =
             new SortedDictionary<long, TwitterUser>();
 
         private readonly object _favoritedsLock = new object();
 
-        private readonly ObservableSynchronizedCollection<TwitterUser> _retweetedUsers =
-            new ObservableSynchronizedCollection<TwitterUser>();
+        private readonly ObservableSynchronizedCollectionEx<TwitterUser> _retweetedUsers =
+            new ObservableSynchronizedCollectionEx<TwitterUser>();
 
         private readonly IDictionary<long, TwitterUser> _retweetedUsersDic =
             new SortedDictionary<long, TwitterUser>();
@@ -192,7 +192,7 @@ namespace StarryEyes.Models.Timelines.Statuses
 
         public StatusModel RetweetedOriginal { get; private set; }
 
-        public ObservableSynchronizedCollection<TwitterUser> FavoritedUsers
+        public ObservableSynchronizedCollectionEx<TwitterUser> FavoritedUsers
         {
             get
             {
@@ -205,7 +205,7 @@ namespace StarryEyes.Models.Timelines.Statuses
             }
         }
 
-        public ObservableSynchronizedCollection<TwitterUser> RetweetedUsers
+        public ObservableSynchronizedCollectionEx<TwitterUser> RetweetedUsers
         {
             get
             {
@@ -243,7 +243,7 @@ namespace StarryEyes.Models.Timelines.Statuses
 
         private static void LoadUsers(long[] users, object lockObject,
             IDictionary<long, TwitterUser> dictionary,
-            ObservableSynchronizedCollection<TwitterUser> target)
+            IList<TwitterUser> target)
         {
             users.Distinct()
                  .Reverse()

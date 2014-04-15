@@ -13,11 +13,11 @@ namespace StarryEyes.Models.Inputting
 {
     public class InputCoreModel : NotificationObject
     {
-        private readonly ObservableSynchronizedCollection<string> _bindingHashtags =
-            new ObservableSynchronizedCollection<string>();
+        private readonly ObservableSynchronizedCollectionEx<string> _bindingHashtags =
+            new ObservableSynchronizedCollectionEx<string>();
 
-        private readonly ObservableSynchronizedCollection<InputData> _drafts =
-            new ObservableSynchronizedCollection<InputData>();
+        private readonly ObservableSynchronizedCollectionEx<InputData> _drafts =
+            new ObservableSynchronizedCollectionEx<InputData>();
 
         private InputData _inputData = new InputData(String.Empty);
 
@@ -28,13 +28,13 @@ namespace StarryEyes.Models.Inputting
         #region properties
 
         [NotNull]
-        public ObservableSynchronizedCollection<string> BindingHashtags
+        public ObservableSynchronizedCollectionEx<string> BindingHashtags
         {
             get { return _bindingHashtags; }
         }
 
         [NotNull]
-        public ObservableSynchronizedCollection<InputData> Drafts
+        public ObservableSynchronizedCollectionEx<InputData> Drafts
         {
             get { return _drafts; }
         }

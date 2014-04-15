@@ -65,9 +65,9 @@ namespace StarryEyes.Models
 
         public const int TwitterEventMaxHoldCount = 256;
 
-        private static readonly ObservableSynchronizedCollection<TwitterEventBase> _twitterEvents =
-            new ObservableSynchronizedCollection<TwitterEventBase>();
-        public static ObservableSynchronizedCollection<TwitterEventBase> TwitterEvents
+        private static readonly ObservableSynchronizedCollectionEx<TwitterEventBase> _twitterEvents =
+            new ObservableSynchronizedCollectionEx<TwitterEventBase>();
+        public static ObservableSynchronizedCollectionEx<TwitterEventBase> TwitterEvents
         {
             get { return _twitterEvents; }
         }

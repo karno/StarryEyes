@@ -14,8 +14,8 @@ namespace StarryEyes.Models.Inputting
     {
         private readonly InputCoreModel _coreModel;
 
-        private readonly ObservableSynchronizedCollection<TwitterAccount> _accounts =
-            new ObservableSynchronizedCollection<TwitterAccount>();
+        private readonly ObservableSynchronizedCollectionEx<TwitterAccount> _accounts =
+            new ObservableSynchronizedCollectionEx<TwitterAccount>();
 
         private TabModel _currentFocusTab;
         private bool _isSynchronizedWithTab;
@@ -102,7 +102,7 @@ namespace StarryEyes.Models.Inputting
         }
 
         [NotNull]
-        public ObservableSynchronizedCollection<TwitterAccount> Accounts
+        public ObservableSynchronizedCollectionEx<TwitterAccount> Accounts
         {
             get { return _accounts; }
         }
