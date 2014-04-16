@@ -354,10 +354,10 @@
                                       Margin="0,8,0,0"
                                       SelectedIndex="{Binding TimelineIconResolution,
                                                               Mode=TwoWay}">
-                                <clr:String>最高(原寸大のアイコンを取得します。最も綺麗に描画されますが、通信量が増大します)</clr:String>
-                                <clr:String>高(少し大きいサイズのアイコンを取得します。最高よりも通信量を抑えることができます)</clr:String>
-                                <clr:String>最適(最適なサイズのアイコンを取得します。通信量を減らせますが、アイコン品質が多少落ちます)</clr:String>
-                                <clr:String>最小(小さめのアイコンを拡大して表示します。通信量がかなり抑えられますが、アイコン品質もより悪化します)</clr:String>
+                                <clr:String>最高(原寸大のアイコンを取得します。最高の品質となりますが、通信量が極端に増大します)</clr:String>
+                                <clr:String>高(少し大きいサイズのアイコンを取得します。品質が向上することがありますが、通信量が若干増大します)</clr:String>
+                                <clr:String>最適(最適なサイズのアイコンを取得します。通信量を抑えつつ、アイコン品質の悪化も防ぎます)</clr:String>
+                                <clr:String>最小(小さめのアイコンを拡大して表示します。通信量がかなり抑えられますが、アイコン品質がかなり悪化します)</clr:String>
                                 <clr:String>アイコン表示なし(アイコンがすべて空白になります)</clr:String>
                             </ComboBox>
                         </Grid>
