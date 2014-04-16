@@ -826,10 +826,10 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public int UseWebProxy
         {
-            get { return (int)Setting.WebProxy.Value; }
+            get { return (int)Setting.WebProxyType.Value; }
             set
             {
-                Setting.WebProxy.Value = (WebProxyConfiguration)value;
+                Setting.WebProxyType.Value = (WebProxyConfiguration)value;
                 this.RaisePropertyChanged();
                 this.RaisePropertyChanged(() => ExplicitSetProxy);
             }
@@ -837,7 +837,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public bool ExplicitSetProxy
         {
-            get { return Setting.WebProxy.Value == WebProxyConfiguration.Custom; }
+            get { return Setting.WebProxyType.Value == WebProxyConfiguration.Custom; }
         }
 
         public string WebProxyHost
