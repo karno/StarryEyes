@@ -487,6 +487,12 @@ namespace StarryEyes.Settings
 
         public static bool IsLoaded { get; private set; }
 
+        private static string BackupFilePath
+        {
+            get { return App.ConfigurationFilePath + ".bak"; }
+        }
+
+        #region Load settings
         public static bool LoadSettings()
         {
             IsFirstGenerated = false;
@@ -494,63 +500,12 @@ namespace StarryEyes.Settings
             {
                 try
                 {
-                    using (var fs = File.Open(App.ConfigurationFilePath, FileMode.Open, FileAccess.Read))
-                    {
-                        _settingValueHolder = new ConcurrentDictionary<string, object>(
-                            XamlServices.Load(fs) as IDictionary<string, object> ?? new Dictionary<string, object>());
-                    }
-                    _manager = new AccountManager(_accounts);
-                    IsLoaded = true;
+                    LoadSettingsFromFile(App.ConfigurationFilePath);
                     return true;
                 }
                 catch (Exception ex)
                 {
-                    var option = new TaskDialogOptions
-                    {
-                        Title = "Krile 設定読み込みエラー",
-                        MainIcon = VistaTaskDialogIcon.Error,
-                        MainInstruction = "設定が破損しています。",
-                        Content = "設定ファイルに異常があるため、読み込めませんでした。" + Environment.NewLine +
-                                  "どのような操作を行うか選択してください。",
-                        ExpandedInfo = ex.ToString(),
-                        CommandButtons = new[] { "設定を初期化", "バックアップを作成し初期化", "Krileを終了" },
-                    };
-                    var result = TaskDialog.Show(option);
-                    if (!result.CommandButtonResult.HasValue ||
-                        result.CommandButtonResult.Value == 2)
-                    {
-                        // shutdown
-                        return false;
-                    }
-                    if (result.CommandButtonResult == 1)
-                    {
-                        try
-                        {
-                            var cpfn = "Krile_CorruptedConfig_" + Path.GetRandomFileName() + ".xml";
-                            File.Copy(App.ConfigurationFilePath, Path.Combine(
-                                Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
-                                cpfn));
-                        }
-                        catch (Exception iex)
-                        {
-                            var noption = new TaskDialogOptions
-                            {
-                                Title = "バックアップ失敗",
-                                MainIcon = VistaTaskDialogIcon.Error,
-                                MainInstruction = "何らかの原因により、バックアップが正常に行えませんでした。",
-                                Content = "これ以上の動作を継続できません。",
-                                ExpandedInfo = iex.ToString(),
-                                CommandButtons = new[] { "Krileを終了" }
-                            };
-                            TaskDialog.Show(noption);
-                            return false;
-                        }
-                    }
-                    File.Delete(App.ConfigurationFilePath);
-                    _settingValueHolder = new ConcurrentDictionary<string, object>();
-                    _manager = new AccountManager(_accounts);
-                    IsLoaded = true;
-                    return true;
+                    return RecoverySettings(ex);
                 }
             }
             _settingValueHolder = new ConcurrentDictionary<string, object>();
@@ -560,7 +515,90 @@ namespace StarryEyes.Settings
             return true;
         }
 
+        private static void LoadSettingsFromFile(string xmlFile)
+        {
+            using (var fs = File.Open(xmlFile, FileMode.Open, FileAccess.Read))
+            {
+                _settingValueHolder = new ConcurrentDictionary<string, object>(
+                    XamlServices.Load(fs) as IDictionary<string, object> ?? new Dictionary<string, object>());
+            }
+            _manager = new AccountManager(_accounts);
+            IsLoaded = true;
+        }
+
+        private static bool RecoverySettings(Exception ex)
+        {
+            // check backup file is existed
+            if (File.Exists(BackupFilePath))
+            {
+                // try reading backup file
+                try
+                {
+                    LoadSettingsFromFile(BackupFilePath);
+                    // overwrite corrupted file
+                    Save(true);
+                    return true;
+                }
+                catch (Exception) { }
+            }
+
+            // backup file is not existed or backup file is corrupted
+            var option = new TaskDialogOptions
+            {
+                Title = "Krile 設定読み込みエラー",
+                MainIcon = VistaTaskDialogIcon.Error,
+                MainInstruction = "設定が破損しています。",
+                Content = "設定ファイルに異常があるため、読み込めませんでした。" + Environment.NewLine +
+                          "どのような操作を行うか選択してください。",
+                ExpandedInfo = ex.ToString(),
+                CommandButtons = new[] { "設定を初期化", "バックアップを作成し初期化", "Krileを終了" },
+            };
+            var result = TaskDialog.Show(option);
+            if (!result.CommandButtonResult.HasValue ||
+                result.CommandButtonResult.Value == 2)
+            {
+                // shutdown
+                return false;
+            }
+            if (result.CommandButtonResult == 1)
+            {
+                try
+                {
+                    var cpfn = "Krile_CorruptedConfig_" + Path.GetRandomFileName() + ".xml";
+                    File.Copy(App.ConfigurationFilePath, Path.Combine(
+                        Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
+                        cpfn));
+                }
+                catch (Exception iex)
+                {
+                    var noption = new TaskDialogOptions
+                    {
+                        Title = "バックアップ失敗",
+                        MainIcon = VistaTaskDialogIcon.Error,
+                        MainInstruction = "何らかの原因により、バックアップが正常に行えませんでした。",
+                        Content = "これ以上の動作を継続できません。",
+                        ExpandedInfo = iex.ToString(),
+                        CommandButtons = new[] { "Krileを終了" }
+                    };
+                    TaskDialog.Show(noption);
+                    return false;
+                }
+            }
+            File.Delete(App.ConfigurationFilePath);
+            _settingValueHolder = new ConcurrentDictionary<string, object>();
+            _manager = new AccountManager(_accounts);
+            IsLoaded = true;
+            return true;
+        }
+        #endregion
+
+        #region Save settings
         public static void Save()
+        {
+            Save(false);
+        }
+
+        private static void Save(bool skipBackup)
         {
             // save before load cause loss the setting!
             if (!IsLoaded) return;
@@ -568,12 +606,16 @@ namespace StarryEyes.Settings
             {
                 try
                 {
-                    using (var fs = File.Open(App.ConfigurationFilePath, FileMode.Create, FileAccess.ReadWrite))
+                    // create temporary file
+                    var tempfile = Path.Combine(App.ConfigurationDirectoryPath, Path.GetRandomFileName());
+                    using (var fs = File.Open(tempfile, FileMode.Create, FileAccess.ReadWrite))
                     {
                         // sort by key
                         var sd = new SortedDictionary<string, object>(_settingValueHolder);
                         XamlServices.Save(fs, sd);
                     }
+                    var backup = skipBackup ? null : BackupFilePath;
+                    File.Replace(tempfile, App.ConfigurationFilePath, backup);
                 }
                 catch (IOException)
                 {
@@ -585,6 +627,8 @@ namespace StarryEyes.Settings
                 }
             }
         }
+
+        #endregion
     }
 
     public enum ScrollLockStrategy
