@@ -101,7 +101,7 @@ namespace StarryEyes.Settings
             new SettingItemStruct<ScrollLockStrategy>("ScrollLockStrategy", Settings.ScrollLockStrategy.WhenScrolled);
 
         public static readonly SettingItemStruct<TimelineIconResolution> IconResolution =
-            new SettingItemStruct<TimelineIconResolution>("IconResolution", TimelineIconResolution.High);
+            new SettingItemStruct<TimelineIconResolution>("IconResolution", TimelineIconResolution.Optimized);
 
         public static readonly SettingItem<string> Theme =
             new SettingItem<string>("Theme", null);
