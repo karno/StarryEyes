@@ -72,11 +72,13 @@ namespace StarryEyes.Filters.Sources
             Func<TwitterAccount, Task<IEnumerable<TwitterStatus>>> uif;
             if (_targetIdOrScreenName.StartsWith("#"))
             {
-                uif = a => a.GetUserTimelineAsync(Int64.Parse(_targetIdOrScreenName.Substring(1)));
+                uif = a => a.GetUserTimelineAsync(Int64.Parse(_targetIdOrScreenName.Substring(1)),
+                    includeRetweets: true);
             }
             else
             {
-                uif = a => a.GetUserTimelineAsync(_targetIdOrScreenName);
+                uif = a => a.GetUserTimelineAsync(_targetIdOrScreenName,
+                    includeRetweets: true);
             }
             return Observable.Start(() => Setting.Accounts.GetRandomOne())
                              .Where(a => a != null)

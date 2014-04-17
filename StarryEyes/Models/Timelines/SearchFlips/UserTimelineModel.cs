@@ -35,7 +35,8 @@ namespace StarryEyes.Models.Timelines.SearchFlips
             switch (this._type)
             {
                 case TimelineType.User:
-                    return account.GetUserTimelineAsync(this._userId, count, maxId: maxId).ToObservable();
+                    return account.GetUserTimelineAsync(this._userId, count, maxId: maxId, includeRetweets: true)
+                                  .ToObservable();
                 case TimelineType.Favorites:
                     return account.GetFavoritesAsync(this._userId, count, maxId: maxId).ToObservable();
                 default:

@@ -49,7 +49,9 @@ namespace StarryEyes.ViewModels.Timelines.SearchFlips
         public void PinToTab()
         {
             TabManager.CreateTab(TabModel.Create(
-                _parent.ScreenName, "from local where user == \"" + _parent.ScreenName + "\""));
+                _parent.ScreenName,
+                "from local where (user == \"" + _parent.ScreenName + "\" & !retweet) | retweeter == \"" +
+                _parent.ScreenName + "\""));
             _parent.Close();
         }
 
