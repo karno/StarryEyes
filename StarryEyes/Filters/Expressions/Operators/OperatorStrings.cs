@@ -107,24 +107,48 @@ namespace StarryEyes.Filters.Expressions.Operators
         public override Func<TwitterStatus, bool> GetBooleanValueProvider()
         {
             // pre-check regular expressions
-            this.AssertRegex(this.RightValue as StringValue);
-            var haystack = LeftValue.GetStringValueProvider();
-            var needle = RightValue.GetStringValueProvider();
-            return t =>
+            var sv = this.RightValue as StringValue;
+            if (sv != null)
             {
-                var h = haystack(t);
-                var n = needle(t);
-                if (h == null || n == null) return false;
-                try
+                this.AssertRegex(sv);
+                var haystack = LeftValue.GetStringValueProvider();
+                // optimize by pre-compiling
+                var needleRegex = new Regex(sv.Value, RegexOptions.Compiled);
+                return t =>
                 {
-                    return Regex.IsMatch(h, n);
-                }
-                catch (ArgumentException)
+                    var h = haystack(t);
+                    if (h == null) return false;
+                    try
+                    {
+                        return needleRegex.IsMatch(h);
+                    }
+                    catch (ArgumentException)
+                    {
+                        // exception occured
+                        return false;
+                    }
+                };
+            }
+            else
+            {
+                var haystack = LeftValue.GetStringValueProvider();
+                var needle = RightValue.GetStringValueProvider();
+                return t =>
                 {
-                    // exception occured
-                    return false;
-                }
-            };
+                    var h = haystack(t);
+                    var n = needle(t);
+                    if (h == null || n == null) return false;
+                    try
+                    {
+                        return Regex.IsMatch(h, n);
+                    }
+                    catch (ArgumentException)
+                    {
+                        // exception occured
+                        return false;
+                    }
+                };
+            }
         }
 
         private void AssertRegex(StringValue value)
