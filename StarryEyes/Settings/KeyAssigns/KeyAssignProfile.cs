@@ -203,5 +203,20 @@ namespace StarryEyes.Settings.KeyAssigns
                     throw new ArgumentOutOfRangeException();
             }
         }
+
+        public override string ToString()
+        {
+            using (var ms = new MemoryStream())
+            using (var sw = new StreamWriter(ms))
+            {
+                DumpText(sw);
+                sw.Flush();
+                ms.Seek(0, SeekOrigin.Begin);
+                using (var sr = new StreamReader(ms))
+                {
+                    return sr.ReadToEnd();
+                }
+            }
+        }
     }
 }

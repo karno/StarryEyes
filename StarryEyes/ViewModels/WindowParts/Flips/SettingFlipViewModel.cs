@@ -759,6 +759,13 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             if (tranvm.Result)
             {
                 var assign = new KeyAssignProfile(tranvm.FileName);
+                if (tranvm.IsCreateAsCopy)
+                {
+                    assign.SetAssigns(
+                        KeyAssignManager.CurrentProfile
+                                        .ToString()
+                                        .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries));
+                }
                 assign.Save(KeyAssignManager.KeyAssignsProfileDirectoryPath);
                 RefreshKeyAssignCandidates();
             }
@@ -772,7 +779,9 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 {
                     Title = "キーアサイン ファイルの削除",
                     MainIcon = VistaTaskDialogIcon.Warning,
-                    MainInstruction = "現在のキーアサインを削除します。よろしいですか？",
+                    MainInstruction = "キーアサインを削除します。",
+                    Content = "キーアサイン " + KeyAssignManager.CurrentProfile.Name + " を削除します。" + Environment.NewLine +
+                              "よろしいですか?",
                     CommonButtons = TaskDialogCommonButtons.OKCancel
                 }));
             if (response.Response.Result == TaskDialogSimpleResult.Ok)
