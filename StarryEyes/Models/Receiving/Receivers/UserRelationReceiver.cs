@@ -54,8 +54,7 @@ namespace StarryEyes.Models.Receiving.Receivers
                 reldata.SetFollowingsAsync(newFollowings),
                 reldata.SetFollowersAsync(newFollowers),
                 reldata.SetBlockingsAsync(newBlockings),
-                reldata.SetNoRetweetsAsync(newNoRetweets)
-                );
+                reldata.SetNoRetweetsAsync(newNoRetweets));
         }
     }
 }

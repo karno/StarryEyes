@@ -129,10 +129,11 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                     this.IsBlocking = fs.IsBlocking;
                     await rds.SetBlockingAsync(_target.Id, fs.IsBlocking);
                 }
-                if (this.IsNoRetweets == fs.IsWantRetweets)
+                var nort = !fs.IsWantRetweets.GetValueOrDefault(true);
+                if (this.IsNoRetweets != nort)
                 {
-                    this.IsNoRetweets = !fs.IsWantRetweets;
-                    await rds.SetNoRetweetsAsync(_target.Id, !fs.IsWantRetweets);
+                    this.IsNoRetweets = nort;
+                    await rds.SetNoRetweetsAsync(_target.Id, nort);
                 }
                 // ReSharper restore InvertIf
             }
