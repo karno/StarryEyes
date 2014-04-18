@@ -30,7 +30,7 @@ namespace StarryEyes.Models.Databases.Caching
         }
 
         public void GetDirtyActivity(long statusId,
-            out IEnumerable<long> additions, out IEnumerable<long> deleltions)
+            out IEnumerable<long> additions, out IEnumerable<long> deletions)
         {
             var adds = new List<long>();
             var removes = new List<long>();
@@ -58,7 +58,7 @@ namespace StarryEyes.Models.Databases.Caching
                 }
             }
             additions = adds;
-            deleltions = removes;
+            deletions = removes;
         }
 
         public void Add(long statusId, long userId)

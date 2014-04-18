@@ -228,7 +228,7 @@ namespace StarryEyes.Models.Receiving
                            h => r.AccountDataUpdated -= h)
                                  .Where(info => info.Change == RelationDataChange.NoRetweets)
                                  .Subscribe(_ => InvalidateNoRetweets())))
-                // select blocked users
+                // select no retweet users
                    .SelectMany(r => r.NoRetweets)
                    .ForEach(repl.Add);
             _noRetweetUserIds = repl;

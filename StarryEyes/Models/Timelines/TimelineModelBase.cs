@@ -245,10 +245,7 @@ namespace StarryEyes.Models.Timelines
                         this._statusIdCache.Clear();
                         this.Statuses.Clear();
                     }
-                    await this.Fetch(null, TimelineChunkCount)
-                              .Where(this.CheckAcceptStatus)
-                              .SelectMany(s => this.AddStatus(s, false).ToObservable())
-                              .LastOrDefaultAsync();
+                    await this.ReadMore(null);
                 }
                 finally
                 {
