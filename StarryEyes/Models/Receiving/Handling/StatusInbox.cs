@@ -83,6 +83,10 @@ namespace StarryEyes.Models.Receiving.Handling
                         if (removed || !await StatusReceived(n.Status))
                         {
                             // already received
+                            if (n.Status != null)
+                            {
+                                System.Diagnostics.Debug.WriteLine("discarded: " + n.Status);
+                            }
                             continue;
                         }
                         StatusBroadcaster.Enqueue(n);
@@ -106,7 +110,7 @@ namespace StarryEyes.Models.Receiving.Handling
         {
             try
             {
-                if (!await CheckReceiveNew(status.Id))
+                if (await CheckAlreadyExisted(status.Id))
                 {
                     // already received
                     return false;
@@ -114,8 +118,10 @@ namespace StarryEyes.Models.Receiving.Handling
                 StatusProxy.StoreStatus(status);
                 return true;
             }
-            catch (SQLiteException)
+            catch (SQLiteException sqex)
             {
+                System.Diagnostics.Debug.WriteLine("Requeue: " + status);
+
                 // enqueue for retry 
                 Enqueue(status);
 
@@ -124,22 +130,27 @@ namespace StarryEyes.Models.Receiving.Handling
             }
         }
 
-        private static async Task<bool> CheckReceiveNew(long id)
+        /// <summary>
+        /// Check received status is already existed or not.
+        /// </summary>
+        /// <param name="id">status id</param>
+        /// <returns>if id is already existed, return true.</returns>
+        private static async Task<bool> CheckAlreadyExisted(long id)
         {
             // check new status based on timestamps
             var stamp = GetTimestampFromSnowflakeId(id);
             if (stamp > _lastReceivedTimestamp)
             {
                 _lastReceivedTimestamp = stamp;
-                return false;
+                return false; // new status
             }
             // check status based on model cache
             if (StatusModel.GetIfCacheIsAlive(id) != null)
             {
-                return false;
+                return true; // already existed
             }
             // check with database
-            return !(await StatusProxy.IsStatusExistsAsync(id));
+            return await StatusProxy.IsStatusExistsAsync(id);
         }
 
         private static long GetTimestampFromSnowflakeId(long id)
