@@ -61,7 +61,7 @@ namespace Wonder
         private void inFile_TextChanged(object sender, EventArgs e)
         {
             var path = inFile.Text;
-            if (String.IsNullOrEmpty(path) && Directory.Exists(path))
+            if (!String.IsNullOrEmpty(path) && Directory.Exists(path))
             {
                 outFile.Text = Path.Combine(Path.GetDirectoryName(path),
                     Path.GetFileName(path) + ".ksz");
