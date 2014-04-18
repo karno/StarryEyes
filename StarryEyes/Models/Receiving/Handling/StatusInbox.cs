@@ -82,11 +82,6 @@ namespace StarryEyes.Models.Receiving.Handling
                                        IsRegisteredAsRemoved(n.Status.RetweetedOriginalId.Value));
                         if (removed || !await StatusReceived(n.Status))
                         {
-                            // already received
-                            if (n.Status != null)
-                            {
-                                System.Diagnostics.Debug.WriteLine("discarded: " + n.Status);
-                            }
                             continue;
                         }
                         StatusBroadcaster.Enqueue(n);
