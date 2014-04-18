@@ -1,8 +1,10 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using System.Xml.Linq;
 
 namespace SweetMagic
@@ -89,12 +91,39 @@ namespace SweetMagic
             {
                 throw new UpdateException("patch path is not valid.");
             }
-            // ensure create directory
-            Directory.CreateDirectory(dir);
-            using (var fstream = File.Create(fn))
+            try
             {
-                await entry.Open().CopyToAsync(fstream);
+                // ensure create directory
+                Directory.CreateDirectory(dir);
+                // remove previous file
+                if (File.Exists(fn))
+                {
+                    File.Delete(fn);
+                }
+                using (var fstream = File.Create(fn))
+                {
+                    await entry.Open().CopyToAsync(fstream);
+                }
+                // complete.
+                return;
             }
+            catch (Exception ex)
+            {
+                var resp = MessageBox.Show(
+                    "Could not extract file: " + entry.FullName + Environment.NewLine +
+                    ex.Message + Environment.NewLine +
+                    "Would you like to retry?",
+                    "Krile Automatic Update",
+                    MessageBoxButtons.RetryCancel,
+                    MessageBoxIcon.Error);
+                if (resp == DialogResult.Cancel)
+                {
+                    // cancelled.
+                    return;
+                }
+            }
+            // failed, retrying...
+            await Extract(entry, basePath);
         }
     }
 
