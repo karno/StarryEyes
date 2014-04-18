@@ -54,8 +54,17 @@ namespace Wonder
                 if (fbd.ShowDialog() == DialogResult.OK)
                 {
                     inFile.Text = fbd.SelectedPath;
-                    outFile.Text = Path.Combine(Path.GetDirectoryName(fbd.SelectedPath), "archive.ksz");
                 }
+            }
+        }
+
+        private void inFile_TextChanged(object sender, EventArgs e)
+        {
+            var path = inFile.Text;
+            if (String.IsNullOrEmpty(path) && Directory.Exists(path))
+            {
+                outFile.Text = Path.Combine(Path.GetDirectoryName(path),
+                    Path.GetFileName(path) + ".ksz");
             }
         }
 
@@ -80,7 +89,6 @@ namespace Wonder
         {
             using (var ofd = new OpenFileDialog())
             {
-                ofd.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
                 ofd.Filter = "private key|*.prv";
                 if (ofd.ShowDialog() == DialogResult.OK)
                 {
@@ -163,5 +171,6 @@ namespace Wonder
                 return formatter.CreateSignature(hash);
             }
         }
+
     }
 }

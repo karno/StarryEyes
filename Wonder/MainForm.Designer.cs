@@ -61,6 +61,7 @@
             this.inFile.Name = "inFile";
             this.inFile.Size = new System.Drawing.Size(336, 19);
             this.inFile.TabIndex = 1;
+            this.inFile.TextChanged += new System.EventHandler(this.inFile_TextChanged);
             // 
             // outFile
             // 
