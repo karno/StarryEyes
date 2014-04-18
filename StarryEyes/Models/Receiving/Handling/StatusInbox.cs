@@ -134,7 +134,11 @@ namespace StarryEyes.Models.Receiving.Handling
         {
             // check new status based on timestamps
             var stamp = GetTimestampFromSnowflakeId(id);
-            if (stamp > _lastReceivedTimestamp)
+            if (_lastReceivedTimestamp == 0)
+            {
+                _lastReceivedTimestamp = stamp;
+            }
+            else if (stamp > _lastReceivedTimestamp)
             {
                 _lastReceivedTimestamp = stamp;
                 return false; // new status
