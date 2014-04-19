@@ -457,17 +457,39 @@
                         </TextBlock.Style>
                     </TextBlock>
                     <StackPanel Grid.Row="4" Orientation="Vertical">
-                        <TextBlock Margin="16,0,16,8">
-                            <Run Text="以下の設定は、Twitter Webで非表示となるツイートをKrileでも非表示にする設定となります。" />
+                        <CheckBox Margin="16,0,16,8"
+                                  Content="軽量なミュートを利用する(_L)[パワーユーザー向け]"
+                                  IsChecked="{Binding UseLightweightMute}" />
+                        <TextBlock Margin="16,0,16,12" TextWrapping="Wrap">
+                            <Run Text="ミュートフィルタにregexなど複雑なクエリを用いた場合、タイムライン構築に十分以上かかるようになる場合があります。" />
                             <LineBreak />
-                            <Run Text="特別な理由がない限り、チェックをつけておくことを推奨します。" />
+                            <Run Text="軽量なミュートを有効にすると、受信時にミュートされていたツイートはデータベースに登録されなくなるため、タイムラインの構築速度が向上することがあります。" />
+                            <Run Text="ただし、以下の制限がかかりますので注意して下さい。" />
+                            <LineBreak />
+                            <Run Text="★ミュートフィルタで非表示となるのは、受信時にミュート対象となっていたツイートだけです。ミュートフィルタを変更しても、すでにデータベースに登録されているツイートはミュートされません。" />
+                            <LineBreak />
+                            <Run Text="★受信時にミュート対象だったツイートは、後からミュートフィルタを変更してもタイムラインには表示されません。" />
+                            <LineBreak />
+                            <Run Text="★ブロックしたユーザーやリツイートを非表示にしているユーザーは変更が常に反映されます。" />
+                            <LineBreak />
+                            <Run Text="設定を切り替えた後は、データベースファイルを一旦消去されることをおすすめします。" />
                         </TextBlock>
-                        <CheckBox Margin="16,8"
-                                  Content="ブロックしているユーザーをミュートする(_B) [推奨]"
-                                  IsChecked="{Binding IsMuteBlockedUsers}" />
-                        <CheckBox Margin="16,8,16,16"
-                                  Content="リツイートを非表示にしているユーザーのリツイートをミュートする(_R) [推奨]"
-                                  IsChecked="{Binding IsMuteNoRetweetUsersRetweet}" />
+                        <GroupBox Margin="16,0,16,8" Header="追加ミュートの設定">
+                            <StackPanel>
+                                <TextBlock Margin="16,8">
+                                    <Run Text="以下の設定は、Twitter Webで非表示となるツイートをKrileでも非表示にする設定となります。" />
+                                    <LineBreak />
+                                    <Run Text="特別な理由がない限り、チェックをつけておくことを推奨します。" />
+                                </TextBlock>
+                                <CheckBox Margin="16,8"
+                                          Content="ブロックしているユーザーをミュートする(_B) [推奨]"
+                                          IsChecked="{Binding IsMuteBlockedUsers}" />
+                                <CheckBox Margin="16,8,16,16"
+                                          Content="リツイートを非表示にしているユーザーのリツイートをミュートする(_R) [推奨]"
+                                          IsChecked="{Binding IsMuteNoRetweetUsersRetweet}" />
+                            </StackPanel>
+                        </GroupBox>
+
                     </StackPanel>
                 </Grid>
                 <Grid Grid.Column="1" Margin="0,6,0,0">
@@ -855,7 +877,7 @@
                         <DockPanel Margin="0,8">
                             <TextBlock VerticalAlignment="Center" Text="Web プロキシ: " />
                             <ComboBox SelectedIndex="{Binding UseWebProxy}">
-                                <clr:String>Internet Explorerの設定を使用</clr:String>
+                                <clr:String>Internet Explorerの設定を使用(投稿に時間がかかるようになることがあります)</clr:String>
                                 <clr:String>プロキシを使用しない</clr:String>
                                 <clr:String>利用するプロキシを指定する</clr:String>
                             </ComboBox>
@@ -883,7 +905,6 @@
                                          VerticalScrollBarVisibility="Auto" />
                             </StackPanel>
                         </GroupBox>
-
                     </StackPanel>
                 </Grid>
                 <Grid Grid.Column="1" Margin="0,6,0,0">
@@ -898,7 +919,8 @@
                         </Style>
                     </Grid.Style>
                     <StackPanel Margin="16, 0" Orientation="Vertical">
-                        <CheckBox Margin="0,0,0,8"
+                        <TextBlock Margin="0,0,0,8" Text="以下の設定は上級者向けのものです。どのように利用されているかは、ソースコードをご覧ください。" />
+                        <CheckBox Margin="0,8"
                                   Content="開発途上版のパッチを適用する(_R) [不安定な更新が行われることがあります]"
                                   IsChecked="{Binding ApplyUnstablePatch}" />
                         <CheckBox Margin="0,8"
