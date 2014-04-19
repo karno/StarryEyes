@@ -71,6 +71,7 @@ namespace StarryEyes.Settings
             new SettingItem<List<TwitterAccount>>("Accounts", new List<TwitterAccount>());
 
         private static AccountManager _manager;
+
         public static AccountManager Accounts
         {
             get { return _manager; }
@@ -86,25 +87,27 @@ namespace StarryEyes.Settings
 
         #region Timeline display and action
 
-        public static readonly FilterSettingItem Muteds = new FilterSettingItem("Muteds");
-
-        public static readonly SettingItemStruct<bool> MuteBlockedUsers =
-            new SettingItemStruct<bool>("MuteBlockedUsers", true);
-
-        public static readonly SettingItemStruct<bool> MuteNoRetweets =
-            new SettingItemStruct<bool>("MuteNoRetweets", true);
-
-        public static readonly SettingItemStruct<bool> UseLightweightMute =
-            new SettingItemStruct<bool>("UseLightweightMute", false);
-
-        public static readonly SettingItemStruct<bool> AllowFavoriteMyself =
-            new SettingItemStruct<bool>("AllowFavoriteMyself", false);
+        public static readonly SettingItemStruct<TweetDisplayMode> TimelineDisplayMode =
+            new SettingItemStruct<TweetDisplayMode>("TimelineDisplayMode", TweetDisplayMode.Expanded);
 
         public static readonly SettingItemStruct<ScrollLockStrategy> ScrollLockStrategy =
             new SettingItemStruct<ScrollLockStrategy>("ScrollLockStrategy", Settings.ScrollLockStrategy.WhenScrolled);
 
         public static readonly SettingItemStruct<TimelineIconResolution> IconResolution =
             new SettingItemStruct<TimelineIconResolution>("IconResolution", TimelineIconResolution.Optimized);
+
+        public static readonly SettingItemStruct<bool> AllowFavoriteMyself =
+            new SettingItemStruct<bool>("AllowFavoriteMyself", false);
+
+        public static readonly SettingItemStruct<bool> ShowThumbnails =
+            new SettingItemStruct<bool>("ShowThumbnails", true);
+
+        public static readonly SettingItemStruct<bool> OpenTwitterImageWithOriginalSize =
+            new SettingItemStruct<bool>("OpenTwitterImageWithOriginalSize", true);
+
+        #endregion
+
+        #region Themes and Key Assigns
 
         public static readonly SettingItem<string> Theme =
             new SettingItem<string>("Theme", null);
@@ -118,11 +121,20 @@ namespace StarryEyes.Settings
         public static readonly SettingItem<string> KeyAssign =
             new SettingItem<string>("KeyAssign", null);
 
-        public static readonly SettingItemStruct<bool> ShowThumbnails =
-            new SettingItemStruct<bool>("ShowThumbnails", true);
+        #endregion
 
-        public static readonly SettingItemStruct<bool> OpenTwitterImageWithOriginalSize =
-            new SettingItemStruct<bool>("OpenTwitterImageWithOriginalSize", true);
+        #region Mutes
+
+        public static readonly FilterSettingItem Muteds = new FilterSettingItem("Muteds");
+
+        public static readonly SettingItemStruct<bool> MuteBlockedUsers =
+            new SettingItemStruct<bool>("MuteBlockedUsers", true);
+
+        public static readonly SettingItemStruct<bool> MuteNoRetweets =
+            new SettingItemStruct<bool>("MuteNoRetweets", true);
+
+        public static readonly SettingItemStruct<bool> UseLightweightMute =
+            new SettingItemStruct<bool>("UseLightweightMute", false);
 
         #endregion
 
@@ -204,7 +216,7 @@ namespace StarryEyes.Settings
         #region High-level configurations
 
         public static readonly SettingItemStruct<bool> AcceptUnstableVersion =
-                    new SettingItemStruct<bool>("AcceptUnstableVersion", App.IsUnstableVersion);
+            new SettingItemStruct<bool>("AcceptUnstableVersion", App.IsUnstableVersion);
 
         public static readonly SettingItem<string> UserAgent =
             new SettingItem<string>("UserAgent", null);
@@ -384,7 +396,10 @@ namespace StarryEyes.Settings
                 this._name = name;
             }
 
-            public string Name { get { return _name; } }
+            public string Name
+            {
+                get { return _name; }
+            }
 
             public abstract T Value { get; set; }
 
@@ -465,8 +480,8 @@ namespace StarryEyes.Settings
                     if (_valueCache != null) return _valueCache.Value;
                     object value;
                     return _settingValueHolder.TryGetValue(this.Name, out value)
-                               ? (this._valueCache = (T)value).Value
-                               : (this._valueCache = this._defaultValue).Value;
+                        ? (this._valueCache = (T)value).Value
+                        : (this._valueCache = this._defaultValue).Value;
                 }
                 set
                 {
@@ -496,6 +511,7 @@ namespace StarryEyes.Settings
         }
 
         #region Load settings
+
         public static bool LoadSettings()
         {
             IsFirstGenerated = false;
@@ -542,7 +558,9 @@ namespace StarryEyes.Settings
                     Save(true);
                     return true;
                 }
-                catch (Exception) { }
+                catch (Exception)
+                {
+                }
             }
 
             // backup file is not existed or backup file is corrupted
@@ -593,9 +611,11 @@ namespace StarryEyes.Settings
             IsLoaded = true;
             return true;
         }
+
         #endregion
 
         #region Save settings
+
         public static void Save()
         {
             Save(false);
@@ -632,6 +652,13 @@ namespace StarryEyes.Settings
         }
 
         #endregion
+    }
+
+    public enum TweetDisplayMode
+    {
+        SingleLine,
+        Mixed,
+        Expanded
     }
 
     public enum ScrollLockStrategy

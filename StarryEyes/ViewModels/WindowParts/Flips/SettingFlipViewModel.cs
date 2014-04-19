@@ -22,6 +22,7 @@ using StarryEyes.Filters.Parsing;
 using StarryEyes.Models;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Receiving;
+using StarryEyes.Models.Subsystems;
 using StarryEyes.Models.Subsystems.Notifications.UI;
 using StarryEyes.Models.Timelines.Tabs;
 using StarryEyes.Nightmare.Windows;
@@ -208,10 +209,14 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         #region Timeline property
 
-        public bool IsAllowFavoriteMyself
+        public int TimelineDisplayMode
         {
-            get { return Setting.AllowFavoriteMyself.Value; }
-            set { Setting.AllowFavoriteMyself.Value = value; }
+            get { return (int)Setting.TimelineDisplayMode.Value; }
+            set
+            {
+                Setting.TimelineDisplayMode.Value = (TweetDisplayMode)value;
+                RaisePropertyChanged(() => IsDonationVisible);
+            }
         }
 
         public int ScrollLockStrategy
@@ -226,6 +231,12 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             set { Setting.IconResolution.Value = (TimelineIconResolution)value; }
         }
 
+        public bool IsAllowFavoriteMyself
+        {
+            get { return Setting.AllowFavoriteMyself.Value; }
+            set { Setting.AllowFavoriteMyself.Value = value; }
+        }
+
         public bool ShowThumbnail
         {
             get { return Setting.ShowThumbnails.Value; }
@@ -236,6 +247,24 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         {
             get { return Setting.OpenTwitterImageWithOriginalSize.Value; }
             set { Setting.OpenTwitterImageWithOriginalSize.Value = value; }
+        }
+
+        public bool IsDonationVisible
+        {
+            get
+            {
+                var users = ContributionService.Contributors.Select(c => c.ScreenName).ToArray();
+                if (Setting.Accounts.Collection.Any(c => users.Contains(c.UnreliableScreenName)))
+                {
+                    return false;
+                }
+                return TimelineDisplayMode != (int)TweetDisplayMode.Expanded;
+            }
+        }
+
+        public void OpenDonationPage()
+        {
+            var viv = new VersionInfoViewModel();
         }
 
         #endregion
