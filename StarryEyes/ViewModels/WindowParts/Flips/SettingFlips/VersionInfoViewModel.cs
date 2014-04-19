@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Reactive.Linq;
-using System.Threading.Tasks;
-using System.Xml.Linq;
+﻿using System.Threading.Tasks;
 using Livet;
 using StarryEyes.Annotations;
 using StarryEyes.Models.Subsystems;
@@ -20,8 +13,9 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SettingFlips
         {
             // when update is available, callback this.
             AutoUpdateService.UpdateStateChanged += () => this._isUpdateAvailable = true;
-            Observable.Timer(TimeSpan.FromSeconds(0), TimeSpan.FromHours(8))
-                      .Subscribe(_ => this.UpdateContributors());
+            _contributors = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
+                ContributionService.Contributors, c => new ContributorViewModel(c),
+                DispatcherHolder.Dispatcher);
         }
 
         [UsedImplicitly]
@@ -61,47 +55,11 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SettingFlips
 
         #region Contributors
 
-        private readonly ObservableCollection<ContributorsViewModel> _contributors =
-            new ObservableCollection<ContributorsViewModel>();
-        public ObservableCollection<ContributorsViewModel> Contributors
+        private readonly ReadOnlyDispatcherCollectionRx<ContributorViewModel> _contributors;
+
+        public ReadOnlyDispatcherCollectionRx<ContributorViewModel> Contributors
         {
             get { return this._contributors; }
-        }
-
-        private async void UpdateContributors()
-        {
-            try
-            {
-                var vms = await Task.Run(async () =>
-                {
-                    var hc = new HttpClient();
-                    var str = await hc.GetStringAsync(App.ContributorsUrl);
-                    using (var sr = new StringReader(str))
-                    {
-                        var xml = XDocument.Load(sr);
-                        return xml.Root
-                                  .Descendants("contributor")
-                                  .Where(
-                                      e =>
-                                      e.Attribute("visible") == null ||
-                                      e.Attribute("visible").Value.ToLower() != "false")
-                                  .Select(ContributorsViewModel.FromXml)
-                                  .ToArray();
-                    }
-                });
-                await DispatcherHelper.UIDispatcher.InvokeAsync(
-                    () =>
-                    {
-                        this.Contributors.Clear();
-                        this.Contributors.Add(new ContributorsViewModel("thanks to:", null));
-                        vms.OrderBy(v => v.ScreenName ?? "~" + v.Name)
-                           .ForEach(this.Contributors.Add);
-                    });
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine(ex);
-            }
         }
 
         #endregion
@@ -113,8 +71,8 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SettingFlips
             get { return App.FormattedVersion; }
         }
 
-        private bool _isChecking = false;
-        private bool _isUpdateAvailable = false;
+        private bool _isChecking;
+        private bool _isUpdateAvailable;
 
         public bool IsChecking
         {
@@ -155,7 +113,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SettingFlips
         #endregion
     }
 
-    public class ContributorsViewModel : ViewModel
+    public class ContributorViewModel : ViewModel
     {
         private readonly string _name;
         private readonly string _screenName;
@@ -175,18 +133,10 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SettingFlips
             get { return this._screenName != null; }
         }
 
-        public static ContributorsViewModel FromXml(XElement xElement)
+        public ContributorViewModel(Contributor contributor)
         {
-            var twitter = xElement.Attribute("twitter");
-            return twitter != null
-                       ? new ContributorsViewModel(xElement.Value, twitter.Value)
-                       : new ContributorsViewModel(xElement.Value, null);
-        }
-
-        public ContributorsViewModel(string name, string screenName)
-        {
-            this._name = name;
-            this._screenName = screenName;
+            this._name = contributor.Name;
+            this._screenName = contributor.ScreenName;
         }
 
         public void OpenUserTwitter()

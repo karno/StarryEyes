@@ -279,6 +279,7 @@
     <Compile Include="Models\Requests\UpdateFriendshipsRequest.cs" />
     <Compile Include="Models\Inputting\InputSetting.cs" />
     <Compile Include="Models\Subsystems\AutoUpdateService.cs" />
+    <Compile Include="Models\Subsystems\ContributionService.cs" />
     <Compile Include="Models\Subsystems\Notifications\Audio\AudioCache.cs" />
     <Compile Include="Models\Subsystems\Notifications\Audio\AudioCacheProvider.cs" />
     <Compile Include="Models\Subsystems\Notifications\Audio\AudioPlayer.cs" />
@@ -780,6 +781,7 @@
     <None Include="assets\70.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Resource Include="kriletan.png" />
     <Content Include="media\event.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
