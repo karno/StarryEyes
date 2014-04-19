@@ -94,6 +94,9 @@ namespace StarryEyes.Settings
         public static readonly SettingItemStruct<bool> MuteNoRetweets =
             new SettingItemStruct<bool>("MuteNoRetweets", true);
 
+        public static readonly SettingItemStruct<bool> UseLightweightMute =
+            new SettingItemStruct<bool>("UseLightweightMute", false);
+
         public static readonly SettingItemStruct<bool> AllowFavoriteMyself =
             new SettingItemStruct<bool>("AllowFavoriteMyself", false);
 

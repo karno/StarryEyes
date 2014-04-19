@@ -8,6 +8,7 @@ using StarryEyes.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models.Databases;
 using StarryEyes.Models.Timelines.Statuses;
+using StarryEyes.Settings;
 
 namespace StarryEyes.Models.Receiving.Handling
 {
@@ -75,6 +76,14 @@ namespace StarryEyes.Models.Receiving.Handling
                 _signal.Reset();
                 while (_queue.TryDequeue(out n) && !_isHaltRequested)
                 {
+                    if (Setting.UseLightweightMute.Value)
+                    {
+                        if (MuteBlockManager.IsUnwanted(n.Status))
+                        {
+                            // muted
+                            continue;
+                        }
+                    }
                     if (n.IsAdded)
                     {
                         var removed = IsRegisteredAsRemoved(n.Status.Id) ||

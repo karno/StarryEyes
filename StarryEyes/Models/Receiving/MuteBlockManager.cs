@@ -78,14 +78,18 @@ namespace StarryEyes.Models.Receiving
                         "BaseUserId NOT IN (select TargetId from Blockings) AND " +
                         "(RetweeterId IS NULL OR RetweeterId NOT IN (select TargetId from Blockings))";
                 }
-                else
+                else if (_muteNoRetweets)
                 {
                     // mute no-retweet users
                     exceptSql =
                         "RetweeterId IS NULL OR RetweeterId NOT IN (select TargetId from NoRetweets)";
                 }
+                else
+                {
+                    exceptSql = String.Empty;
+                }
                 CheckUpdateMutes();
-                return _muteSqlQuery.SqlConcatAnd(exceptSql);
+                return Setting.UseLightweightMute.Value ? exceptSql : _muteSqlQuery.SqlConcatAnd(exceptSql);
             }
         }
 

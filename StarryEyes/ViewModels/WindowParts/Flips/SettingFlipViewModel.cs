@@ -336,6 +336,12 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         #endregion
 
+        public bool UseLightweightMute
+        {
+            get { return Setting.UseLightweightMute.Value; }
+            set { Setting.UseLightweightMute.Value = value; }
+        }
+
         public bool IsMuteBlockedUsers
         {
             get { return Setting.MuteBlockedUsers.Value; }
