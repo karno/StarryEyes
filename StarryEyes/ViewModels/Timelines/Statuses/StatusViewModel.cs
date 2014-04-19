@@ -536,7 +536,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
 
         private void LoadInReplyTo()
         {
-            if (this._isInReplyToLoading) return;
+            if (this._isInReplyToLoading || this._isInReplyToLoaded) return;
             var inReplyToStatusId = this.Status.InReplyToStatusId;
             if (inReplyToStatusId == null)
             {
