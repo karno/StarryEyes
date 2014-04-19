@@ -638,7 +638,25 @@ namespace StarryEyes.Settings
                         XamlServices.Save(fs, sd);
                     }
                     var backup = skipBackup ? null : BackupFilePath;
-                    File.Replace(tempfile, App.ConfigurationFilePath, backup);
+
+                    // File.Replace is too buggy to use.
+                    // File.Replace(tempfile, App.ConfigurationFilePath, backup);
+                    if (File.Exists(App.ConfigurationFilePath))
+                    {
+                        if (backup != null)
+                        {
+                            if (File.Exists(backup))
+                            {
+                                File.Delete(backup);
+                            }
+                            File.Move(App.ConfigurationFilePath, backup);
+                        }
+                        else
+                        {
+                            File.Delete(App.ConfigurationFilePath);
+                        }
+                    }
+                    File.Move(tempfile, App.ConfigurationFilePath);
                 }
                 catch (IOException)
                 {
