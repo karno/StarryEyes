@@ -25,12 +25,25 @@ namespace StarryEyes.Models.Receiving.Handling
             this.IsNew = isNew;
         }
 
+        /// <summary>
+        /// Notify this status as new tweet
+        /// </summary>
         public bool IsNew { get; private set; }
 
+        /// <summary>
+        /// Flag for determine new receive notification or deleted notification
+        /// </summary>
         public bool IsAdded { get; private set; }
 
+        /// <summary>
+        /// Target status id
+        /// </summary>
         public long StatusId { get; private set; }
 
+        /// <summary>
+        /// Target status
+        /// </summary>
+        [CanBeNull]
         public TwitterStatus Status { get; private set; }
     }
 
@@ -66,6 +79,7 @@ namespace StarryEyes.Models.Receiving.Handling
 
         public long StatusId { get; private set; }
 
+        [CanBeNull]
         public StatusModel StatusModel { get; private set; }
     }
 }

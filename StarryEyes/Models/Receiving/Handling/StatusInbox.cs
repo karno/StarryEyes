@@ -76,20 +76,20 @@ namespace StarryEyes.Models.Receiving.Handling
                 _signal.Reset();
                 while (_queue.TryDequeue(out n) && !_isHaltRequested)
                 {
-                    if (Setting.UseLightweightMute.Value)
+                    var status = n.Status;
+                    if (n.IsAdded && status != null)
                     {
-                        if (MuteBlockManager.IsUnwanted(n.Status))
+                        if (Setting.UseLightweightMute.Value && MuteBlockManager.IsUnwanted(status))
                         {
                             // muted
                             continue;
                         }
-                    }
-                    if (n.IsAdded)
-                    {
-                        var removed = IsRegisteredAsRemoved(n.Status.Id) ||
-                                      (n.Status.RetweetedOriginalId != null &&
-                                       IsRegisteredAsRemoved(n.Status.RetweetedOriginalId.Value));
-                        if (removed || !await StatusReceived(n.Status))
+                        // check registered as removed or not
+                        var removed = IsRegisteredAsRemoved(status.Id) ||
+                                      (status.RetweetedOriginalId != null &&
+                                      IsRegisteredAsRemoved(status.RetweetedOriginalId.Value));
+                        // check status is registered as removed or already received
+                        if (removed || !await StatusReceived(status))
                         {
                             continue;
                         }
@@ -110,8 +110,9 @@ namespace StarryEyes.Models.Receiving.Handling
             }
         }
 
-        private static async Task<bool> StatusReceived(TwitterStatus status)
+        private static async Task<bool> StatusReceived([NotNull] TwitterStatus status)
         {
+            if (status == null) throw new ArgumentNullException("status");
             try
             {
                 if (await CheckAlreadyExisted(status.Id))
