@@ -211,7 +211,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
 
         public string Text
         {
-            get { return this.Status.GetEntityAidedText(); }
+            get { return this.Status.GetEntityAidedText().Replace('\n', ' ').Replace("\r", ""); }
         }
 
         public bool IsRetweetedUserExists
