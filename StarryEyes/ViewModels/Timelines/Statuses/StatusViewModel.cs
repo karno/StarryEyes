@@ -209,7 +209,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             get { return this._recipient ?? (this._recipient = new UserViewModel(this.Status.Recipient)); }
         }
 
-        public string Text
+        public string SingleLinedText
         {
             get { return this.Status.GetEntityAidedText().Replace('\n', ' ').Replace("\r", ""); }
         }
