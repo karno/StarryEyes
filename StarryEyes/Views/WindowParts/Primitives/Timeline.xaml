@@ -410,6 +410,7 @@
                             <TextBlock Grid.Column="2"
                                        Margin="8,0,0,0"
                                        VerticalAlignment="Center"
+                                       Foreground="{DynamicResource TweetForegroundBrush}"
                                        Text="{Binding SingleLinedText}"
                                        TextTrimming="CharacterEllipsis"
                                        TextWrapping="NoWrap" />
