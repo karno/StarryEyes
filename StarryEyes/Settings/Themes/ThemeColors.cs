@@ -24,7 +24,7 @@ namespace StarryEyes.Settings.Themes
             ResourceDictionary dictionary, string prefix)
         {
             dictionary[prefix] = color;
-            dictionary[prefix + "Brush"] = new SolidColorBrush(color);
+            dictionary[prefix + "Brush"] = new SolidColorBrush(color).ToFrozen();
         }
     }
 

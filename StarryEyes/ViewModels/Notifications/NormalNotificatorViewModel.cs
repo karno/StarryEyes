@@ -148,7 +148,7 @@ namespace StarryEyes.ViewModels.Notifications
 
         public Brush BackgroundBrush
         {
-            get { return new SolidColorBrush(Background); }
+            get { return new SolidColorBrush(this.Background).ToFrozen(); }
         }
 
         public TwitterUser User
