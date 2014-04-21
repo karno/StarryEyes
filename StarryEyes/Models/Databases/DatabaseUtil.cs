@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Data.SQLite;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace StarryEyes.Models.Databases
 {
-    public static class DbTextUtil
+    public static class DatabaseUtil
     {
         public static string CreateNgram(string source, int n)
         {
@@ -49,6 +52,48 @@ namespace StarryEyes.Models.Databases
             if (string.IsNullOrEmpty(left)) return right;
             if (string.IsNullOrEmpty(right)) return left;
             return "(" + left + ") and (" + right + ")";
+        }
+
+        public static async Task AutoRetryWhenLocked(Func<Task> func,
+            int waitMillisec = 100)
+        {
+            while (true)
+            {
+                try
+                {
+                    await func();
+                }
+                catch (SQLiteException sqex)
+                {
+                    if (sqex.ResultCode != SQLiteErrorCode.Locked)
+                    {
+                        throw;
+                    }
+                    // if database is locked, wait shortly and retry.
+                    Thread.Sleep(waitMillisec);
+                }
+            }
+        }
+
+        public static async Task<T> AutoRetryWhenLocked<T>(Func<Task<T>> func,
+            int waitMillisec = 100)
+        {
+            while (true)
+            {
+                try
+                {
+                    return await func();
+                }
+                catch (SQLiteException sqex)
+                {
+                    if (sqex.ResultCode != SQLiteErrorCode.Locked)
+                    {
+                        throw;
+                    }
+                    // if database is locked, wait shortly and retry.
+                    Thread.Sleep(waitMillisec);
+                }
+            }
         }
     }
 }
