@@ -1,11 +1,14 @@
 ﻿using System;
+using System.Data.SQLite;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Runtime;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using Livet;
+using StarryEyes.Casket;
 using StarryEyes.Models;
 using StarryEyes.Models.Plugins;
 using StarryEyes.Models.Receiving;
@@ -293,13 +296,34 @@ namespace StarryEyes
             try
             {
                 // run database optimization
-                var optDlg = new DatabaseOptimizingWindow();
+                var optDlg = new WorkingWindow(
+                    "optimizing database...",
+                    OptimizeDatabase);
                 optDlg.ShowDialog();
             }
             finally
             {
                 // restore shutdown mode
                 Application.Current.ShutdownMode = ShutdownMode.OnLastWindowClose;
+            }
+        }
+
+        private static async Task OptimizeDatabase()
+        {
+            try
+            {
+                await Database.VacuumTables();
+            }
+            catch (SQLiteException sqex)
+            {
+                TaskDialog.Show(new TaskDialogOptions
+                {
+                    MainIcon = VistaTaskDialogIcon.Error,
+                    Title = "Krile Database Optimization",
+                    MainInstruction = "データベースの最適化に失敗しました。",
+                    Content = sqex.Message,
+                    ExpandedInfo = sqex.ToString()
+                });
             }
         }
 

@@ -1,4 +1,4 @@
-﻿<Window x:Class="StarryEyes.Views.Dialogs.DatabaseOptimizingWindow"
+﻿<Window x:Class="StarryEyes.Views.Dialogs.WorkingWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:my="http://metro.mahapps.com/winfx/xaml/controls"
@@ -26,7 +26,7 @@
                        VerticalAlignment="Center"
                        FontSize="16"
                        Foreground="White">
-                <Run Text="optimizing database" />
+                <Run Name="DetailText" Text="working..." />
                 <LineBreak />
                 <Run FontSize="10" Text="please wait for a while..." />
             </TextBlock>

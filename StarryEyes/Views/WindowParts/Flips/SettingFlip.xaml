@@ -334,14 +334,29 @@
                                        HorizontalAlignment="Right"
                                        VerticalAlignment="Center"
                                        Text="タイムラインの表示形式:" />
-                            <ComboBox Grid.Row="0"
-                                      Grid.Column="1"
-                                      SelectedIndex="{Binding TimelineDisplayMode,
-                                                              Mode=TwoWay}">
-                                <clr:String>常に一行表示</clr:String>
-                                <clr:String>フォーカス時に拡大</clr:String>
-                                <clr:String>常に全行表示</clr:String>
-                            </ComboBox>
+                            <DockPanel Grid.Row="0"
+                                       Grid.Column="1"
+                                       LastChildFill="True">
+                                <TextBlock Margin="8,0,0,0"
+                                           VerticalAlignment="Center"
+                                           DockPanel.Dock="Right"
+                                           Visibility="{Binding IsDonationVisible,
+                                                                Converter={StaticResource BoolVisibleConverter}}">
+                                    <Hyperlink>
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="Click">
+                                                <ei:CallMethodAction MethodName="OpenDonationPage" TargetObject="{Binding}" />
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                        <Run Text="Krileの開発を継続するため、寄付にご協力ください。" />
+                                    </Hyperlink>
+                                </TextBlock>
+                                <ComboBox SelectedIndex="{Binding TimelineDisplayMode, Mode=TwoWay}">
+                                    <clr:String>常に一行表示</clr:String>
+                                    <clr:String>フォーカス時に拡大</clr:String>
+                                    <clr:String>常に全行表示</clr:String>
+                                </ComboBox>
+                            </DockPanel>
                             <TextBlock Grid.Row="1"
                                        Grid.Column="0"
                                        Margin="2,8,6,0"
@@ -486,11 +501,11 @@
                             <LineBreak />
                             <Run Text="★受信時にミュート対象だったツイートは、後からミュートフィルタを変更してもタイムラインには表示されません。" />
                             <LineBreak />
-                            <Run Text="★ブロックしたユーザーやリツイートを非表示にしているユーザーは変更が常に反映されます。" />
-                            <LineBreak />
                             <Run Text="設定を切り替えた後は、データベースファイルを一旦消去されることをおすすめします。" />
+                            <LineBreak />
+                            <Run Text="なお、ブロックしたユーザーのツイートや、リツイートを非表示にしているユーザーのリツイートはこれまでと同様にフィルタされます。" />
                         </TextBlock>
-                        <GroupBox Margin="16,0,16,8" Header="追加ミュートの設定">
+                        <GroupBox Margin="16,0,16,16" Header="追加ミュートの設定">
                             <StackPanel>
                                 <TextBlock Margin="16,8">
                                     <Run Text="以下の設定は、Twitter Webで非表示となるツイートをKrileでも非表示にする設定となります。" />

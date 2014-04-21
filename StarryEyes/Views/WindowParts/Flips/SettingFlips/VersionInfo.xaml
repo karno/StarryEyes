@@ -230,7 +230,10 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <TextBlock Margin="0,4" VerticalAlignment="Top">
+                <TextBlock Margin="0,4"
+                           VerticalAlignment="Top"
+                           Visibility="{Binding IsDonated,
+                                                Converter={StaticResource BoolInvisibleConverter}}">
                     <Hyperlink>
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="Click">
@@ -238,6 +241,19 @@
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
                         <Run Text="下記の方々をはじめとする多くの方の寄付・尽力によってKrileの開発が継続されています:" />
+                    </Hyperlink>
+                </TextBlock>
+                <TextBlock Margin="0,4"
+                           VerticalAlignment="Top"
+                           Visibility="{Binding IsDonated,
+                                                Converter={StaticResource BoolVisibleConverter}}">
+                    <Hyperlink>
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <ei:CallMethodAction MethodName="OpenDonation" TargetObject="{Binding}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                        <Run Text="あなたをはじめとする多くの方の寄付・尽力によってKrileの開発が継続されています:" />
                     </Hyperlink>
                 </TextBlock>
                 <ItemsControl Grid.Row="1" ItemsSource="{Binding Contributors}">

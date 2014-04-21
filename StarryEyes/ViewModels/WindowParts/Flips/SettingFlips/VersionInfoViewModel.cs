@@ -1,7 +1,11 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Linq;
+using System.Reactive.Linq;
+using System.Threading.Tasks;
 using Livet;
 using StarryEyes.Annotations;
 using StarryEyes.Models.Subsystems;
+using StarryEyes.Settings;
 
 namespace StarryEyes.ViewModels.WindowParts.Flips.SettingFlips
 {
@@ -16,6 +20,9 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SettingFlips
             _contributors = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
                 ContributionService.Contributors, c => new ContributorViewModel(c),
                 DispatcherHolder.Dispatcher);
+            this.CompositeDisposable.Add(
+                _contributors.ListenCollectionChanged()
+                             .Subscribe(_ => RaisePropertyChanged(() => IsDonated)));
         }
 
         [UsedImplicitly]
@@ -56,10 +63,18 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SettingFlips
         #region Contributors
 
         private readonly ReadOnlyDispatcherCollectionRx<ContributorViewModel> _contributors;
-
         public ReadOnlyDispatcherCollectionRx<ContributorViewModel> Contributors
         {
             get { return this._contributors; }
+        }
+
+        public bool IsDonated
+        {
+            get
+            {
+                var users = ContributionService.Contributors.Select(c => c.ScreenName).ToArray();
+                return Setting.Accounts.Collection.Any(c => users.Contains(c.UnreliableScreenName));
+            }
         }
 
         #endregion

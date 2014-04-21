@@ -214,8 +214,13 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             get { return (int)Setting.TimelineDisplayMode.Value; }
             set
             {
-                Setting.TimelineDisplayMode.Value = (TweetDisplayMode)value;
-                RaisePropertyChanged(() => IsDonationVisible);
+                var ww = new WorkingWindow(
+                    "changing timeline mode...", async () =>
+                    {
+                        await Task.Run(() => Setting.TimelineDisplayMode.Value = (TweetDisplayMode)value);
+                        RaisePropertyChanged(() => IsDonationVisible);
+                    });
+                ww.ShowDialog();
             }
         }
 
@@ -262,9 +267,10 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             }
         }
 
+        [UsedImplicitly]
         public void OpenDonationPage()
         {
-            var viv = new VersionInfoViewModel();
+            BrowserHelper.Open(App.DonationUrl);
         }
 
         #endregion
