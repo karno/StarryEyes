@@ -269,6 +269,7 @@ namespace StarryEyes.Views.Controls
 
         private static void RunNextDecodeTask()
         {
+            // uri, LazyImage, dpw, dph
             Tuple<Uri, LazyImage, byte[], int, int> item;
             if (!_decodeStack.TryPop(out item))
             {
@@ -280,7 +281,7 @@ namespace StarryEyes.Views.Controls
                 {
                     var b = CreateImage(item.Item3, item.Item4, item.Item5);
                     DispatcherHolder.Enqueue(() => SetImage(item.Item2, b, item.Item1),
-                        DispatcherPriority.Loaded);
+                        DispatcherPriority.Background);
                 }).ContinueWith(_ => RunNextDecodeTask());
             }
         }
