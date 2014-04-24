@@ -67,7 +67,6 @@ namespace StarryEyes.Models.Databases
         public static async Task<T> AutoRetryWhenLocked<T>(Func<Task<T>> func,
             int waitMillisec = 100)
         {
-            var count = 0;
             while (true)
             {
                 try
@@ -83,7 +82,6 @@ namespace StarryEyes.Models.Databases
                     // if database is locked, wait shortly and retry.
                     Thread.Sleep(waitMillisec);
                 }
-                System.Diagnostics.Debug.WriteLine("LOCK COUNT: " + ++count);
             }
         }
     }
