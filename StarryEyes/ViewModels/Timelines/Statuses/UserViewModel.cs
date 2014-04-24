@@ -49,8 +49,6 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                         return this.ProfileImageUriMini;
                     case TimelineIconResolution.None:
                         return null;
-                    default:
-                        throw new ArgumentOutOfRangeException();
                 }
                 return this.User.ProfileImageUri.ChangeImageSize(ImageSize.Original);
             }

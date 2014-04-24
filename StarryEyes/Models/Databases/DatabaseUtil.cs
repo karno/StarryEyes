@@ -57,27 +57,17 @@ namespace StarryEyes.Models.Databases
         public static async Task AutoRetryWhenLocked(Func<Task> func,
             int waitMillisec = 100)
         {
-            while (true)
+            await AutoRetryWhenLocked(async () =>
             {
-                try
-                {
-                    await func();
-                }
-                catch (SQLiteException sqex)
-                {
-                    if (sqex.ResultCode != SQLiteErrorCode.Locked)
-                    {
-                        throw;
-                    }
-                    // if database is locked, wait shortly and retry.
-                    Thread.Sleep(waitMillisec);
-                }
-            }
+                await func();
+                return 0;
+            }, waitMillisec);
         }
 
         public static async Task<T> AutoRetryWhenLocked<T>(Func<Task<T>> func,
             int waitMillisec = 100)
         {
+            var count = 0;
             while (true)
             {
                 try
@@ -93,6 +83,7 @@ namespace StarryEyes.Models.Databases
                     // if database is locked, wait shortly and retry.
                     Thread.Sleep(waitMillisec);
                 }
+                System.Diagnostics.Debug.WriteLine("LOCK COUNT: " + ++count);
             }
         }
     }

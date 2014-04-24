@@ -69,7 +69,7 @@ namespace StarryEyes.Views.Controls
 
         #region Image cache
 
-        private static readonly int MaxCacheCount = 512;
+        private const int MaxCacheCount = 256;
 
         private static readonly TimeSpan CacheExpiration = TimeSpan.FromMinutes(30);
 
@@ -149,7 +149,6 @@ namespace StarryEyes.Views.Controls
                     _cacheList.Remove(tuple);
                 }
             }
-            GC.Collect();
         }
 
         #endregion

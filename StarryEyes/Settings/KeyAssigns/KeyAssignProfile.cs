@@ -48,9 +48,11 @@ namespace StarryEyes.Settings.KeyAssigns
 
         public string GetSourceText()
         {
-            var sw = new StringWriter();
-            this.DumpText(sw);
-            return sw.ToString();
+            using (var sw = new StringWriter())
+            {
+                this.DumpText(sw);
+                return sw.ToString();
+            }
         }
 
         private void DumpText(TextWriter writer)

@@ -110,7 +110,10 @@ namespace StarryEyes
             try
             {
                 // create lock file
-                File.Create(App.LockFilePath);
+                using (File.Create(App.LockFilePath))
+                {
+                    // do nothing
+                }
             }
             catch (Exception ex)
             {

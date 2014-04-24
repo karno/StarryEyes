@@ -74,13 +74,13 @@ namespace StarryEyes.Nightmare.Windows
             public void StartWatching()
             {
                 if (nextHandle != IntPtr.Zero) return;
-                nextHandle = WinApi.SetClipboardViewer(this.Handle);
+                nextHandle = NativeMethods.SetClipboardViewer(this.Handle);
             }
 
             public void StopWatching()
             {
                 if (nextHandle == IntPtr.Zero) return;
-                WinApi.ChangeClipboardChain(this.Handle, nextHandle);
+                NativeMethods.ChangeClipboardChain(this.Handle, nextHandle);
                 nextHandle = IntPtr.Zero;
             }
 
@@ -88,22 +88,22 @@ namespace StarryEyes.Nightmare.Windows
             {
                 switch (m.Msg)
                 {
-                    case WinApi.WM_DRAWCLIPBOARD:
-                        WinApi.SendMessage(nextHandle, m.Msg, m.WParam, m.LParam);
+                    case NativeMethods.WM_DRAWCLIPBOARD:
+                        NativeMethods.SendMessage(nextHandle, m.Msg, m.WParam, m.LParam);
                         var handler = DrawClipboard;
                         if (handler != null)
                         {
                             handler();
                         }
                         break;
-                    case WinApi.WM_CHANGECBCHAIN:
+                    case NativeMethods.WM_CHANGECBCHAIN:
                         if (m.WParam == nextHandle)
                         {
                             nextHandle = m.LParam;
                         }
                         else
                         {
-                            WinApi.SendMessage(nextHandle, m.Msg, m.WParam, m.LParam);
+                            NativeMethods.SendMessage(nextHandle, m.Msg, m.WParam, m.LParam);
                         }
                         break;
                 }

@@ -12,7 +12,7 @@ namespace StarryEyes.Nightmare.Windows
             var helper = new WindowInteropHelper(window);
             var wpl = new WINDOWPLACEMENT();
             wpl.length = Marshal.SizeOf(wpl);
-            WinApi.GetWindowPlacement(helper.Handle, ref wpl);
+            NativeMethods.GetWindowPlacement(helper.Handle, ref wpl);
             var width = wpl.rcNormalPosition.right - wpl.rcNormalPosition.left;
             var height = wpl.rcNormalPosition.bottom - wpl.rcNormalPosition.top;
             return new Rect(wpl.rcNormalPosition.left, wpl.rcNormalPosition.top,
@@ -29,19 +29,19 @@ namespace StarryEyes.Nightmare.Windows
             wpl.rcNormalPosition.right = (int)placement.Right;
             wpl.rcNormalPosition.top = (int)placement.Top;
             wpl.rcNormalPosition.bottom = (int)placement.Bottom;
-            WinApi.SetWindowPlacement(helper.Handle, ref wpl);
+            NativeMethods.SetWindowPlacement(helper.Handle, ref wpl);
         }
 
         public static int GetWindowExStyle(this Window window)
         {
             var helper = new WindowInteropHelper(window);
-            return (int)WinApi.GetWindowLongPtr(helper.Handle, WinApi.GWL_EXSTYLE);
+            return (int)NativeMethods.GetWindowLongPtr(helper.Handle, NativeMethods.GWL_EXSTYLE);
         }
 
         public static void SetWindowExStyle(this Window window, int style)
         {
             var helper = new WindowInteropHelper(window);
-            WinApi.SetWindowLongPtr(helper.Handle, WinApi.GWL_EXSTYLE, (IntPtr)style);
+            NativeMethods.SetWindowLongPtr(helper.Handle, NativeMethods.GWL_EXSTYLE, (IntPtr)style);
         }
     }
 }

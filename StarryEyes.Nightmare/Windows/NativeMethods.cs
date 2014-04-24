@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 namespace StarryEyes.Nightmare.Windows
 {
     // ReSharper disable InconsistentNaming
-    internal static class WinApi
+    internal static class NativeMethods
     {
         // constants
         internal const uint GENERIC_READ = 0x80000000;

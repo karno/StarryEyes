@@ -219,10 +219,11 @@ namespace StarryEyes.Settings.Themes
                             .Select(s =>
                             {
                                 var res = rd[s];
-                                if (res is SolidColorBrush)
+                                var brush = res as SolidColorBrush;
+                                if (brush != null)
                                 {
                                     return "<SolidColorBrush x:Key=\"" + s + "\">" +
-                                           ((SolidColorBrush)res).Color.ToColorString() +
+                                           brush.Color.ToColorString() +
                                            "</SolidColorBrush>";
                                 }
                                 if (res is Color)

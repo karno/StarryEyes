@@ -4,8 +4,6 @@ using System.Data;
 using System.Data.SQLite;
 using System.Linq;
 using System.Reactive.Disposables;
-using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
@@ -311,47 +309,5 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
             var queries = key.Select(k => Tuple.Create(this.TableDeleter, (object)new { Id = k })).ToArray();
             await this.ExecuteAllAsync(queries);
         }
-    }
-
-    public abstract class CachedCrudBase<T> : CrudBase<T> where T : class
-    {
-        protected CachedCrudBase(ResolutionMode onConflict)
-            : base(onConflict)
-        {
-            this.ConnectEntrant();
-        }
-
-        protected CachedCrudBase(string tableName, ResolutionMode onConflict)
-            : base(tableName, onConflict)
-        {
-            this.ConnectEntrant();
-        }
-
-        private readonly Subject<T> _entrant = new Subject<T>();
-
-        protected abstract int DelayMilliSec { get; }
-
-        private void ConnectEntrant()
-        {
-            _entrant.Buffer(TimeSpan.FromMilliseconds(DelayMilliSec))
-                    .Where(l => l.Count > 0)
-                    .Subscribe(this.CyclicWriteback);
-        }
-
-        private async void CyclicWriteback(IEnumerable<T> item)
-        {
-            var array = item.Select(i => Tuple.Create(this.TableInserter, (object)i)).ToArray();
-            System.Diagnostics.Debug.WriteLine("Write " + array.Length + " items in one batch...");
-            await this.ExecuteAllAsync(array);
-        }
-
-#pragma warning disable 1998
-#pragma warning disable 4014
-        public override async Task InsertAsync(T item)
-        {
-            Task.Run(() => _entrant.OnNext(item));
-        }
-#pragma warning restore 1998
-#pragma warning restore 4014
     }
 }

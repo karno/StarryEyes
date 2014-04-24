@@ -183,11 +183,11 @@ namespace StarryEyes.ViewModels.Notifications
 
         public void ReleaseSlot()
         {
-
             lock (_slots)
             {
                 _slots[_slotIndex] = false;
             }
+            this.Dispose();
         }
     }
 }

@@ -30,7 +30,7 @@ namespace StarryEyes.Nightmare.Windows
         {
             get
             {
-                var hDesktop = WinApi.OpenInputDesktop(0, false, WinApi.GENERIC_READ);
+                var hDesktop = NativeMethods.OpenInputDesktop(0, false, NativeMethods.GENERIC_READ);
                 if (hDesktop == IntPtr.Zero)
                 {
                     throw new Win32Exception();
@@ -39,7 +39,7 @@ namespace StarryEyes.Nightmare.Windows
                 {
                     var buffer = new byte[4]; // unsigned long(32bit)
                     uint n;
-                    if (!WinApi.GetUserObjectInformation(hDesktop, WinApi.UOI_HEAPSIZE, buffer, sizeof(byte) * 4, out n))
+                    if (!NativeMethods.GetUserObjectInformation(hDesktop, NativeMethods.UOI_HEAPSIZE, buffer, sizeof(byte) * 4, out n))
                     {
                         throw new Win32Exception();
                     }
@@ -47,7 +47,7 @@ namespace StarryEyes.Nightmare.Windows
                 }
                 finally
                 {
-                    WinApi.CloseDesktop(hDesktop);
+                    NativeMethods.CloseDesktop(hDesktop);
                 }
             }
         }

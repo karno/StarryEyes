@@ -102,8 +102,6 @@ namespace StarryEyes.Models.Timelines.Statuses
 
         public static void CollectGarbages()
         {
-            System.Diagnostics.Debug.WriteLine("*** COLLECT STATUS MODEL GARBAGES...");
-            GC.Collect(2, GCCollectionMode.Optimized);
             var values = _staticCache.Keys.ToArray();
             foreach (var ids in values.Buffer(256))
             {
@@ -118,7 +116,6 @@ namespace StarryEyes.Models.Timelines.Statuses
                 }
                 Thread.Sleep(0);
             }
-            GC.Collect(2, GCCollectionMode.Optimized);
         }
 
         #endregion
