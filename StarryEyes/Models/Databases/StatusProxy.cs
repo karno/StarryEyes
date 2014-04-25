@@ -311,7 +311,7 @@ namespace StarryEyes.Models.Databases
                             await DatabaseUtil.AutoRetryWhenLocked(async () => await se),
                             await DatabaseUtil.AutoRetryWhenLocked(async () => await favorers),
                             await DatabaseUtil.AutoRetryWhenLocked(async () => await retweeters),
-                            await user);
+                            orig, await user);
                     }
                 }
                 return Mapper.Map(dbstatus, await se, await favorers, await retweeters, await user);
