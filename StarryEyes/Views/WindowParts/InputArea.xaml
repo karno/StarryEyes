@@ -112,7 +112,7 @@
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
                 <Button.ToolTip>
-                    <TextBlock Foreground="White"><Run Text="{Binding AuthInfoScreenNames, Mode=OneWay}" />
+                    <TextBlock Foreground="Black"><Run Text="{Binding AuthInfoScreenNames, Mode=OneWay}" />
                         <LineBreak /><Run Text="クリックすると変更することができます。" />
                     </TextBlock>
                 </Button.ToolTip>
