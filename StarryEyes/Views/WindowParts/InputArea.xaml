@@ -112,8 +112,10 @@
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
                 <Button.ToolTip>
-                    <TextBlock Foreground="Black"><Run Text="{Binding AuthInfoScreenNames, Mode=OneWay}" />
-                        <LineBreak /><Run Text="クリックすると変更することができます。" />
+                    <TextBlock>
+                        <Run Text="{Binding AuthInfoScreenNames, Mode=OneWay}" />
+                        <LineBreak />
+                        <Run Text="クリックすると変更することができます。" />
                     </TextBlock>
                 </Button.ToolTip>
                 <ItemsControl x:Name="ItemsControl"
