@@ -225,7 +225,7 @@
                                                     BorderBrush="{DynamicResource TitleBarBackgroundBrush}"
                                                     BorderThickness="1,0,1,1">
                                                 <StackPanel Background="{x:Null}" Orientation="Vertical">
-                                                    <DockPanel Margin="8,8,8,4" Visibility="{Binding CanFallback}">
+                                                    <DockPanel Margin="8,8,8,4" Visibility="{Binding CanFallback, Converter={StaticResource BoolVisibleConverter}}">
                                                         <CheckBox Margin="0,0,4,0"
                                                                   VerticalAlignment="Center"
                                                                   Content="POST規制時にフォールバック"
