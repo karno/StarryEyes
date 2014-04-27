@@ -87,8 +87,8 @@ namespace StarryEyes.Settings
 
         #region Timeline display and action
 
-        public static readonly SettingItemStruct<TweetDisplayMode> TimelineDisplayMode =
-            new SettingItemStruct<TweetDisplayMode>("TimelineDisplayMode", TweetDisplayMode.Expanded);
+        public static readonly SettingItemStruct<TweetDisplayMode> TweetDisplayMode =
+            new SettingItemStruct<TweetDisplayMode>("TweetDisplayMode", Settings.TweetDisplayMode.Expanded);
 
         public static readonly SettingItemStruct<ScrollLockStrategy> ScrollLockStrategy =
             new SettingItemStruct<ScrollLockStrategy>("ScrollLockStrategy", Settings.ScrollLockStrategy.WhenScrolled);

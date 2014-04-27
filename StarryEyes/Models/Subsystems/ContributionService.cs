@@ -6,6 +6,7 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Livet;
+using StarryEyes.Settings;
 
 namespace StarryEyes.Models.Subsystems
 {
@@ -54,6 +55,12 @@ namespace StarryEyes.Models.Subsystems
             {
                 System.Diagnostics.Debug.WriteLine(ex);
             }
+        }
+
+        public static bool IsContributor()
+        {
+            var users = Contributors.Select(c => c.ScreenName).ToArray();
+            return Setting.Accounts.Collection.Any(c => users.Contains(c.UnreliableScreenName));
         }
     }
 

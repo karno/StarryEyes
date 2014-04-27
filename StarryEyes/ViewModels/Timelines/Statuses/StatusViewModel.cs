@@ -114,8 +114,8 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                     _ => this.RaisePropertyChanged(() => IsThumbnailAvailable)));
             this.CompositeDisposable.Add(
                 new EventListener<Action<TweetDisplayMode>>(
-                    h => Setting.TimelineDisplayMode.ValueChanged += h,
-                    h => Setting.TimelineDisplayMode.ValueChanged -= h,
+                    h => Setting.TweetDisplayMode.ValueChanged += h,
+                    h => Setting.TweetDisplayMode.ValueChanged -= h,
                     _ => this.RaisePropertyChanged(() => IsExpanded)));
             // when account is added/removed, all timelines are regenerated.
             // so, we don't have to listen any events which notify accounts addition/deletion.
@@ -349,7 +349,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         {
             get
             {
-                switch (Setting.TimelineDisplayMode.Value)
+                switch (Setting.TweetDisplayMode.Value)
                 {
                     case TweetDisplayMode.SingleLine:
                         return false;

@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using Livet;
 using Livet.Messaging;
 using Livet.Messaging.IO;
@@ -209,19 +210,78 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         #region Timeline property
 
-        public int TimelineDisplayMode
+        private int _tweetDisplayMode = (int)Setting.TweetDisplayMode.Value;
+
+        public int TweetDisplayMode
         {
-            get { return (int)Setting.TimelineDisplayMode.Value; }
+            get { return this._tweetDisplayMode; }
             set
+            {
+                this._tweetDisplayMode = value;
+                Task.Run(() => ChangeDisplayOfTimeline((TweetDisplayMode)value));
+                RaisePropertyChanged();
+            }
+        }
+
+        private async void ChangeDisplayOfTimeline(TweetDisplayMode newValue)
+        {
+            if (Setting.TweetDisplayMode.Value == newValue)
+            {
+                RaisePropertyChanged();
+                return;
+            }
+            var showDonationInfo = false;
+            if (Setting.TweetDisplayMode.Value == Settings.TweetDisplayMode.Expanded &&
+                (newValue == Settings.TweetDisplayMode.SingleLine || newValue == Settings.TweetDisplayMode.Mixed))
+            {
+                var resp = this.Messenger.GetResponse(new TaskDialogMessage(new TaskDialogOptions
+                {
+                    Title = "一行表示モードの警告",
+                    MainIcon = VistaTaskDialogIcon.Warning,
+                    MainInstruction = "一行表示モードを有効にしようとしています。",
+                    Content = "一行表示モードは複数行表示モードに比べ、リソースを大量に消費します。" + Environment.NewLine +
+                              "また、Krile StarryEyesは一行表示モードをベースとして設計されてはいないため、意図しない動作をする可能性があります。" +
+                              Environment.NewLine +
+                              "一行表示モードを本当に有効にしますか?",
+                    CommonButtons = TaskDialogCommonButtons.YesNo
+                }));
+                if (resp.Response.Result == TaskDialogSimpleResult.No)
+                {
+                    this.TweetDisplayMode = (int)Settings.TweetDisplayMode.Expanded;
+                    return;
+                }
+                showDonationInfo = true;
+            }
+            await DispatcherHolder.BeginInvoke(async () =>
             {
                 var ww = new WorkingWindow(
                     "changing timeline mode...", async () =>
                     {
-                        await Task.Run(() => Setting.TimelineDisplayMode.Value = (TweetDisplayMode)value);
+                        await Task.Run(() => Setting.TweetDisplayMode.Value = newValue);
                         RaisePropertyChanged(() => IsDonationVisible);
+                        await DispatcherHolder.BeginInvoke(async () =>
+                        {
+                            await Dispatcher.Yield(DispatcherPriority.Background);
+                        });
                     });
+                if (showDonationInfo && !ContributionService.IsContributor())
+                {
+                    ww.Closed += async (o, e) =>
+                    {
+                        await this.Messenger.RaiseAsync(new TaskDialogMessage(new TaskDialogOptions
+                        {
+                            Title = "Krileの開発にご協力ください。",
+                            MainIcon = VistaTaskDialogIcon.Information,
+                            MainInstruction = "Krileの開発にご協力ください。",
+                            Content = "多くのユーザーの補助によってKrileが開発されています。" + Environment.NewLine +
+                                      "Krileの開発を継続するため、寄付にご協力ください。",
+                            CustomButtons = new[] { "開発者に寄付" }
+                        }));
+                        BrowserHelper.Open(App.DonationUrl);
+                    };
+                }
                 ww.ShowDialog();
-            }
+            });
         }
 
         public int ScrollLockStrategy
@@ -258,12 +318,11 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         {
             get
             {
-                var users = ContributionService.Contributors.Select(c => c.ScreenName).ToArray();
-                if (Setting.Accounts.Collection.Any(c => users.Contains(c.UnreliableScreenName)))
+                if (ContributionService.IsContributor())
                 {
                     return false;
                 }
-                return TimelineDisplayMode != (int)TweetDisplayMode.Expanded;
+                return this.TweetDisplayMode != (int)Settings.TweetDisplayMode.Expanded;
             }
         }
 
