@@ -124,19 +124,14 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
 
         private void UpdateGeoLocationService(bool isEnabled)
         {
-            if (!isEnabled && _geoWatcher != null)
+            if (isEnabled == (_geoWatcher != null))
             {
-                var watcher = _geoWatcher;
-                _geoWatcher = null;
-                CompositeDisposable.Remove(watcher);
-                watcher.Stop();
-                watcher.Dispose();
-                IsLocationEnabled = false;
-                AttachedLocation = null;
+                // not changed
                 return;
             }
-            if (isEnabled && this._geoWatcher == null)
+            if (isEnabled)
             {
+                // enable
                 _geoWatcher = new GeoCoordinateWatcher();
                 _geoWatcher.StatusChanged += (_, e) =>
                 {
@@ -149,9 +144,20 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                         IsLocationEnabled = false;
                         AttachedLocation = null;
                     }
-                    _geoWatcher.Start();
                 };
+                _geoWatcher.Start();
                 CompositeDisposable.Add(_geoWatcher);
+            }
+            else
+            {
+                // disable
+                var watcher = _geoWatcher;
+                _geoWatcher = null;
+                CompositeDisposable.Remove(watcher);
+                watcher.Stop();
+                watcher.Dispose();
+                IsLocationEnabled = false;
+                AttachedLocation = null;
             }
         }
 
