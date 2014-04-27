@@ -601,16 +601,23 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
         [UsedImplicitly]
         public void AttachClipboardImage()
         {
-            BitmapSource image;
-            if (!Clipboard.ContainsImage() || (image = WinFormsClipboard.GetWpfImage()) == null) return;
-            var tempPath = Path.Combine(_tempDir, Path.GetRandomFileName() + ".png");
-            using (var fs = new FileStream(tempPath, FileMode.Create))
+            try
             {
-                var encoder = new PngBitmapEncoder();
-                encoder.Frames.Add(BitmapFrame.Create(image));
-                encoder.Save(fs);
+                BitmapSource image;
+                if (!Clipboard.ContainsImage() || (image = WinFormsClipboard.GetWpfImage()) == null) return;
+                var tempPath = Path.Combine(_tempDir, Path.GetRandomFileName() + ".png");
+                using (var fs = new FileStream(tempPath, FileMode.Create))
+                {
+                    var encoder = new PngBitmapEncoder();
+                    encoder.Frames.Add(BitmapFrame.Create(image));
+                    encoder.Save(fs);
+                }
+                AttachImageFromPath(tempPath);
             }
-            AttachImageFromPath(tempPath);
+            catch (Exception ex)
+            {
+                ShowImageAttachErrorMessage(ex);
+            }
         }
 
         private bool AttachImageFromPath(string file)
@@ -622,19 +629,24 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             }
             catch (Exception ex)
             {
-                _parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
-                {
-                    Title = "画像読み込みエラー",
-                    MainIcon = VistaTaskDialogIcon.Error,
-                    MainInstruction = "画像の添付ができませんでした。",
-                    Content = "画像の読み込み時にエラーが発生しました。" + Environment.NewLine +
-                              "未対応の画像か、データが破損しています。",
-                    ExpandedInfo = ex.ToString(),
-                    CommonButtons = TaskDialogCommonButtons.Close,
-                }));
+                ShowImageAttachErrorMessage(ex);
                 AttachedImage = null;
                 return false;
             }
+        }
+
+        private void ShowImageAttachErrorMessage(Exception ex)
+        {
+            _parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
+            {
+                Title = "画像読み込みエラー",
+                MainIcon = VistaTaskDialogIcon.Error,
+                MainInstruction = "画像の添付ができませんでした。",
+                Content = "画像の読み込み時にエラーが発生しました。" + Environment.NewLine +
+                          "未対応の画像か、データが破損している可能性があります。",
+                ExpandedInfo = ex.ToString(),
+                CommonButtons = TaskDialogCommonButtons.Close,
+            }));
         }
 
         [UsedImplicitly]
