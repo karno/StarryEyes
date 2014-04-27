@@ -296,10 +296,14 @@ namespace StarryEyes.Models.Databases
         {
             if (dbstatus == null) throw new ArgumentNullException("dbstatus");
             var id = dbstatus.Id;
-            var user = UserProxy.GetUserAsync(dbstatus.UserId);
-            var se = Database.StatusEntityCrud.GetEntitiesAsync(id);
-            var favorers = Database.FavoritesCrud.GetUsersAsync(id);
-            var retweeters = Database.RetweetsCrud.GetUsersAsync(id);
+            var user = DatabaseUtil.AutoRetryWhenLocked(async () =>
+                await UserProxy.GetUserAsync(dbstatus.UserId));
+            var se = DatabaseUtil.AutoRetryWhenLocked(async () =>
+                await Database.StatusEntityCrud.GetEntitiesAsync(id));
+            var favorers = DatabaseUtil.AutoRetryWhenLocked(async () =>
+                await Database.FavoritesCrud.GetUsersAsync(id));
+            var retweeters = DatabaseUtil.AutoRetryWhenLocked(async () =>
+                await Database.RetweetsCrud.GetUsersAsync(id));
             try
             {
                 if (dbstatus.RetweetOriginalId != null)
