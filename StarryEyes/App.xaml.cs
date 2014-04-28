@@ -234,6 +234,15 @@ namespace StarryEyes
             }
         }
 
+        public static bool DatabaseDirectoryUserSpecified
+        {
+            get
+            {
+                var path = ConfigurationManager.AppSettings["DatabaseDirectoryPath"];
+                return !String.IsNullOrEmpty(path);
+            }
+        }
+
         public static string DatabaseDirectoryPath
         {
             get

@@ -175,4 +175,28 @@ Generate default tabs?</value>
   <data name="MsgTabWarningInst" xml:space="preserve">
     <value>Tab information may have been lost.</value>
   </data>
+  <data name="MsgDatabasePathWarningContent" xml:space="preserve">
+    <value>Changing database path is a debug feature, you should not use this option as part of customize for daily use.</value>
+  </data>
+  <data name="MsgDatabasePathWarningFooter" xml:space="preserve">
+    <value>Krile may crash when you put a setting file or a database file on cloud storage (e.g. OneDrive, Dropbox).</value>
+  </data>
+  <data name="MsgDatabasePathWarningInst" xml:space="preserve">
+    <value>Database path is specified explicitly.</value>
+  </data>
+  <data name="MsgDatabasePathWarningTitle" xml:space="preserve">
+    <value>Database path warning</value>
+  </data>
+  <data name="MsgExecModeWarningContent" xml:space="preserve">
+    <value>Execution mode is a debug feature, you should not use this option as part of customize for daily use.</value>
+  </data>
+  <data name="MsgExecModeWarningFooter" xml:space="preserve">
+    <value>Krile may crash when you put a setting file or a database file on cloud storage (e.g. OneDrive, Dropbox).</value>
+  </data>
+  <data name="MsgExecModeWarningInst" xml:space="preserve">
+    <value>Execution Mode has set as Standalone.</value>
+  </data>
+  <data name="MsgExecModeWarningTitle" xml:space="preserve">
+    <value>Execution Mode Warning</value>
+  </data>
 </root>

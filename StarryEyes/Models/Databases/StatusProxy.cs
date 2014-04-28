@@ -63,7 +63,7 @@ namespace StarryEyes.Models.Databases
                 }
                 return new[] { s };
             }).Select(s => StatusInsertBatch.CreateBatch(Mapper.Map(s), Mapper.Map(s.User)));
-            await DatabaseUtil.AutoRetryWhenLocked(async () => await Database.StoreStatuses(store));
+            await DatabaseUtil.RetryIfLocked(async () => await Database.StoreStatuses(store));
         }
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace StarryEyes.Models.Databases
                     .ToArray();
 
                 // remove status
-                await DatabaseUtil.AutoRetryWhenLocked(
+                await DatabaseUtil.RetryIfLocked(
                     async () => await Database.StatusCrud.DeleteAllAsync(removals));
                 return removals;
             }
@@ -99,7 +99,7 @@ namespace StarryEyes.Models.Databases
         public static async Task<bool> IsStatusExistsAsync(long id)
         {
             if (_statusQueue.Contains(id)) return true;
-            return await DatabaseUtil.AutoRetryWhenLocked(
+            return await DatabaseUtil.RetryIfLocked(
                 async () => await Database.StatusCrud.GetAsync(id)) != null;
         }
 
@@ -110,7 +110,7 @@ namespace StarryEyes.Models.Databases
             {
                 return cache;
             }
-            var status = await DatabaseUtil.AutoRetryWhenLocked(
+            var status = await DatabaseUtil.RetryIfLocked(
                 async () => await Database.StatusCrud.GetAsync(id));
             if (status == null) return null;
             return await LoadStatusAsync(status);
@@ -118,7 +118,7 @@ namespace StarryEyes.Models.Databases
 
         public static async Task<long?> GetInReplyToAsync(long id)
         {
-            return await DatabaseUtil.AutoRetryWhenLocked(async () =>
+            return await DatabaseUtil.RetryIfLocked(async () =>
             {
                 TwitterStatus cache;
                 if (_statusQueue.TryGetValue(id, out cache))
@@ -133,7 +133,7 @@ namespace StarryEyes.Models.Databases
         {
             try
             {
-                var rts = await DatabaseUtil.AutoRetryWhenLocked(
+                var rts = await DatabaseUtil.RetryIfLocked(
                     async () => await Database.StatusCrud.GetRetweetedStatusesAsync(originalId));
                 return rts.Select(r => r.Id)
                           .Concat(_statusQueue.Find(s => s.RetweetedOriginalId == originalId)
@@ -148,7 +148,7 @@ namespace StarryEyes.Models.Databases
 
         public static async Task<IEnumerable<long>> FindFromInReplyToAsync(long inReplyTo)
         {
-            var replies = await DatabaseUtil.AutoRetryWhenLocked(
+            var replies = await DatabaseUtil.RetryIfLocked(
                 async () => await Database.StatusCrud.FindFromInReplyToAsync(inReplyTo));
             return replies.Concat(_statusQueue.Find(s => s.InReplyToStatusId == inReplyTo)
                                               .Select(s => s.Id));
@@ -189,9 +189,9 @@ namespace StarryEyes.Models.Databases
                 IEnumerable<long> favadd, favremove, rtadd, rtremove;
                 _favoriteQueue.GetDirtyActivity(status.Id, out favadd, out favremove);
                 _retweetQueue.GetDirtyActivity(status.Id, out rtadd, out rtremove);
-                var favorers = await DatabaseUtil.AutoRetryWhenLocked(
+                var favorers = await DatabaseUtil.RetryIfLocked(
                     async () => await Database.FavoritesCrud.GetUsersAsync(status.Id));
-                var retweeters = await DatabaseUtil.AutoRetryWhenLocked(
+                var retweeters = await DatabaseUtil.RetryIfLocked(
                     async () => await Database.RetweetsCrud.GetUsersAsync(status.Id));
                 status.FavoritedUsers = favorers.Guard().Concat(favadd).Except(favremove).ToArray();
                 status.RetweetedUsers = retweeters.Guard().Concat(rtadd).Except(rtremove).ToArray();
@@ -278,7 +278,7 @@ namespace StarryEyes.Models.Databases
         private static async Task<TwitterStatus> LoadStatusAsync([NotNull] DatabaseStatus dbstatus)
         {
             if (dbstatus == null) throw new ArgumentNullException("dbstatus");
-            return await DatabaseUtil.AutoRetryWhenLocked(async () =>
+            return await DatabaseUtil.RetryIfLocked(async () =>
             {
                 switch (dbstatus.StatusType)
                 {
@@ -296,13 +296,13 @@ namespace StarryEyes.Models.Databases
         {
             if (dbstatus == null) throw new ArgumentNullException("dbstatus");
             var id = dbstatus.Id;
-            var user = DatabaseUtil.AutoRetryWhenLocked(async () =>
+            var user = DatabaseUtil.RetryIfLocked(async () =>
                 await UserProxy.GetUserAsync(dbstatus.UserId));
-            var se = DatabaseUtil.AutoRetryWhenLocked(async () =>
+            var se = DatabaseUtil.RetryIfLocked(async () =>
                 await Database.StatusEntityCrud.GetEntitiesAsync(id));
-            var favorers = DatabaseUtil.AutoRetryWhenLocked(async () =>
+            var favorers = DatabaseUtil.RetryIfLocked(async () =>
                 await Database.FavoritesCrud.GetUsersAsync(id));
-            var retweeters = DatabaseUtil.AutoRetryWhenLocked(async () =>
+            var retweeters = DatabaseUtil.RetryIfLocked(async () =>
                 await Database.RetweetsCrud.GetUsersAsync(id));
             try
             {
@@ -312,9 +312,9 @@ namespace StarryEyes.Models.Databases
                     if (orig != null)
                     {
                         return Mapper.Map(dbstatus,
-                            await DatabaseUtil.AutoRetryWhenLocked(async () => await se),
-                            await DatabaseUtil.AutoRetryWhenLocked(async () => await favorers),
-                            await DatabaseUtil.AutoRetryWhenLocked(async () => await retweeters),
+                            await se,
+                            await favorers,
+                            await retweeters,
                             orig, await user);
                     }
                 }
@@ -340,7 +340,7 @@ namespace StarryEyes.Models.Databases
             try
             {
                 return Mapper.Map(dbstatus,
-                    await DatabaseUtil.AutoRetryWhenLocked(async () => await se),
+                    await DatabaseUtil.RetryIfLocked(async () => await se),
                     await user, await recipient);
             }
             catch (ArgumentNullException anex)

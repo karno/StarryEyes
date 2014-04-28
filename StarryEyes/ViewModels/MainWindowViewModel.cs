@@ -277,6 +277,34 @@ namespace StarryEyes.ViewModels
                 this.ReInitTabs();
             }
 
+            // check execution properties
+            if (App.ExecutionMode == ExecutionMode.Standalone)
+            {
+                this.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
+                {
+                    Title = Resources.MsgExecModeWarningTitle,
+                    MainIcon = VistaTaskDialogIcon.Warning,
+                    MainInstruction = Resources.MsgExecModeWarningInst,
+                    Content = Resources.MsgExecModeWarningContent,
+                    FooterIcon = VistaTaskDialogIcon.Error,
+                    FooterText = Resources.MsgExecModeWarningFooter,
+                    CommonButtons = TaskDialogCommonButtons.Close,
+                }));
+            }
+            else if (App.DatabaseDirectoryUserSpecified)
+            {
+                this.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
+                {
+                    Title = Resources.MsgDatabasePathWarningTitle,
+                    MainIcon = VistaTaskDialogIcon.Warning,
+                    MainInstruction = Resources.MsgDatabasePathWarningInst,
+                    Content = Resources.MsgDatabasePathWarningContent,
+                    FooterIcon = VistaTaskDialogIcon.Error,
+                    FooterText = Resources.MsgDatabasePathWarningFooter,
+                    CommonButtons = TaskDialogCommonButtons.Close,
+                }));
+            }
+
             Task.Run(() => App.RaiseUserInterfaceReady());
 
             // initially focus to timeline

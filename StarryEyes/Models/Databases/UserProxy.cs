@@ -60,7 +60,7 @@ namespace StarryEyes.Models.Databases
         {
             var map = pendingUser.Select(Mapper.Map)
                                  .Select(UserInsertBatch.CreateBatch);
-            await DatabaseUtil.AutoRetryWhenLocked(async () => await Database.StoreUsers(map));
+            await DatabaseUtil.RetryIfLocked(async () => await Database.StoreUsers(map));
         }
 
         public static async Task<TwitterUser> GetUserAsync(long id)
@@ -70,13 +70,13 @@ namespace StarryEyes.Models.Databases
             {
                 return cached;
             }
-            var u = await DatabaseUtil.AutoRetryWhenLocked(async () => await Database.UserCrud.GetAsync(id));
+            var u = await DatabaseUtil.RetryIfLocked(async () => await Database.UserCrud.GetAsync(id));
             if (u == null) return null;
             var ude = Database.UserDescriptionEntityCrud.GetEntitiesAsync(id);
             var uue = Database.UserUrlEntityCrud.GetEntitiesAsync(id);
             return Mapper.Map(u,
-                await DatabaseUtil.AutoRetryWhenLocked(async () => await ude),
-                await DatabaseUtil.AutoRetryWhenLocked(async () => await uue));
+                await DatabaseUtil.RetryIfLocked(async () => await ude),
+                await DatabaseUtil.RetryIfLocked(async () => await uue));
         }
 
         public static async Task<TwitterUser> GetUserAsync(string screenName)
@@ -95,7 +95,7 @@ namespace StarryEyes.Models.Databases
 
         public static async Task<IObservable<TwitterUser>> GetUsersAsync(string partOfScreenName)
         {
-            var dbu = await DatabaseUtil.AutoRetryWhenLocked(async () =>
+            var dbu = await DatabaseUtil.RetryIfLocked(async () =>
                 await Database.UserCrud.GetUsersAsync(partOfScreenName));
             return LoadUsersAsync(dbu).Concat(
                 _userQueue.Find(u => u.ScreenName
@@ -105,7 +105,7 @@ namespace StarryEyes.Models.Databases
 
         public static async Task<IEnumerable<Tuple<long, string>>> GetUsersFastAsync(string partOfScreenName, int count)
         {
-            var resp = await DatabaseUtil.AutoRetryWhenLocked(
+            var resp = await DatabaseUtil.RetryIfLocked(
                 async () => await Database.UserCrud.GetUsersFastAsync(partOfScreenName, count));
             return resp.Guard().Select(d => Tuple.Create(d.Id, d.ScreenName));
         }
@@ -128,145 +128,145 @@ namespace StarryEyes.Models.Databases
 
         public static async Task<bool> IsFollowingAsync(long userId, long targetId)
         {
-            return await DatabaseUtil.AutoRetryWhenLocked(async () =>
+            return await DatabaseUtil.RetryIfLocked(async () =>
                 await Database.RelationCrud.IsFollowingAsync(userId, targetId));
         }
 
         public static async Task<bool> IsFollowerAsync(long userId, long targetId)
         {
-            return await DatabaseUtil.AutoRetryWhenLocked(async () =>
+            return await DatabaseUtil.RetryIfLocked(async () =>
                 await Database.RelationCrud.IsFollowerAsync(userId, targetId));
         }
 
         public static async Task<bool> IsBlockingAsync(long userId, long targetId)
         {
-            return await DatabaseUtil.AutoRetryWhenLocked(async () =>
+            return await DatabaseUtil.RetryIfLocked(async () =>
                 await Database.RelationCrud.IsBlockingAsync(userId, targetId));
         }
 
         public static async Task<bool> IsNoRetweetsAsync(long userId, long targetId)
         {
-            return await DatabaseUtil.AutoRetryWhenLocked(async () =>
+            return await DatabaseUtil.RetryIfLocked(async () =>
                 await Database.RelationCrud.IsNoRetweetsAsync(userId, targetId));
         }
 
         public static async Task SetFollowingAsync(long userId, long targetId, bool following)
         {
-            await DatabaseUtil.AutoRetryWhenLocked(async () =>
+            await DatabaseUtil.RetryIfLocked(async () =>
                 await Database.RelationCrud.SetFollowingAsync(userId, targetId, following));
         }
 
         public static async Task SetFollowerAsync(long userId, long targetId, bool followed)
         {
-            await DatabaseUtil.AutoRetryWhenLocked(async () =>
+            await DatabaseUtil.RetryIfLocked(async () =>
                 await Database.RelationCrud.SetFollowerAsync(userId, targetId, followed));
         }
 
         public static async Task SetBlockingAsync(long userId, long targetId, bool blocking)
         {
-            await DatabaseUtil.AutoRetryWhenLocked(async () =>
+            await DatabaseUtil.RetryIfLocked(async () =>
                 await Database.RelationCrud.SetBlockingAsync(userId, targetId, blocking));
         }
 
         public static async Task SetNoRetweetsAsync(long userId, long targetId, bool suppressing)
         {
-            await DatabaseUtil.AutoRetryWhenLocked(async () =>
+            await DatabaseUtil.RetryIfLocked(async () =>
                 await Database.RelationCrud.SetNoRetweetsAsync(userId, targetId, suppressing));
         }
 
         public static async Task AddFollowingsAsync(long userId, IEnumerable<long> targetIds)
         {
-            await DatabaseUtil.AutoRetryWhenLocked(async () =>
+            await DatabaseUtil.RetryIfLocked(async () =>
                 await Database.RelationCrud.AddFollowingsAsync(userId, targetIds));
         }
 
         public static async Task RemoveFollowingsAsync(long userId, IEnumerable<long> removals)
         {
-            await DatabaseUtil.AutoRetryWhenLocked(async () =>
+            await DatabaseUtil.RetryIfLocked(async () =>
                 await Database.RelationCrud.RemoveFollowingsAsync(userId, removals));
         }
 
         public static async Task AddFollowersAsync(long userId, IEnumerable<long> targetIds)
         {
-            await DatabaseUtil.AutoRetryWhenLocked(async () =>
+            await DatabaseUtil.RetryIfLocked(async () =>
                 await Database.RelationCrud.AddFollowersAsync(userId, targetIds));
         }
 
         public static async Task RemoveFollowersAsync(long userId, IEnumerable<long> removals)
         {
-            await DatabaseUtil.AutoRetryWhenLocked(async () =>
+            await DatabaseUtil.RetryIfLocked(async () =>
                 await Database.RelationCrud.RemoveFollowersAsync(userId, removals));
         }
 
         public static async Task AddBlockingsAsync(long userId, IEnumerable<long> targetIds)
         {
-            await DatabaseUtil.AutoRetryWhenLocked(async () =>
+            await DatabaseUtil.RetryIfLocked(async () =>
                 await Database.RelationCrud.AddBlockingsAsync(userId, targetIds));
         }
 
         public static async Task RemoveBlockingsAsync(long userId, IEnumerable<long> removals)
         {
-            await DatabaseUtil.AutoRetryWhenLocked(async () =>
+            await DatabaseUtil.RetryIfLocked(async () =>
                 await Database.RelationCrud.RemoveBlockingsAsync(userId, removals));
         }
 
         public static async Task AddNoRetweetssAsync(long userId, IEnumerable<long> targetIds)
         {
-            await DatabaseUtil.AutoRetryWhenLocked(async () =>
+            await DatabaseUtil.RetryIfLocked(async () =>
                 await Database.RelationCrud.AddNoRetweetsAsync(userId, targetIds));
         }
 
         public static async Task RemoveNoRetweetssAsync(long userId, IEnumerable<long> removals)
         {
-            await DatabaseUtil.AutoRetryWhenLocked(async () =>
+            await DatabaseUtil.RetryIfLocked(async () =>
                 await Database.RelationCrud.RemoveNoRetweetsAsync(userId, removals));
         }
 
         public static async Task<IEnumerable<long>> GetFollowingsAsync(long userId)
         {
-            return await DatabaseUtil.AutoRetryWhenLocked(async () =>
+            return await DatabaseUtil.RetryIfLocked(async () =>
                 await Database.RelationCrud.GetFollowingsAsync(userId));
         }
 
         public static async Task<IEnumerable<long>> GetFollowersAsync(long userId)
         {
-            return await DatabaseUtil.AutoRetryWhenLocked(async () =>
+            return await DatabaseUtil.RetryIfLocked(async () =>
                 await Database.RelationCrud.GetFollowersAsync(userId));
         }
 
         public static async Task<IEnumerable<long>> GetBlockingsAsync(long userId)
         {
-            return await DatabaseUtil.AutoRetryWhenLocked(async () =>
+            return await DatabaseUtil.RetryIfLocked(async () =>
                 await Database.RelationCrud.GetBlockingsAsync(userId));
         }
 
         public static async Task<IEnumerable<long>> GetNoRetweetsAsync(long userId)
         {
-            return await DatabaseUtil.AutoRetryWhenLocked(async () =>
+            return await DatabaseUtil.RetryIfLocked(async () =>
                 await Database.RelationCrud.GetNoRetweetsAsync(userId));
         }
 
         public static async Task<IEnumerable<long>> GetFollowingsAllAsync()
         {
-            return await DatabaseUtil.AutoRetryWhenLocked(async () =>
+            return await DatabaseUtil.RetryIfLocked(async () =>
                 await Database.RelationCrud.GetFollowingsAllAsync());
         }
 
         public static async Task<IEnumerable<long>> GetFollowersAllAsync()
         {
-            return await DatabaseUtil.AutoRetryWhenLocked(async () =>
+            return await DatabaseUtil.RetryIfLocked(async () =>
                 await Database.RelationCrud.GetFollowersAllAsync());
         }
 
         public static async Task<IEnumerable<long>> GetBlockingsAllAsync()
         {
-            return await DatabaseUtil.AutoRetryWhenLocked(async () =>
+            return await DatabaseUtil.RetryIfLocked(async () =>
                 await Database.RelationCrud.GetBlockingsAllAsync());
         }
 
         public static async Task<IEnumerable<long>> GetNoRetweetsAllAsync()
         {
-            return await DatabaseUtil.AutoRetryWhenLocked(async () =>
+            return await DatabaseUtil.RetryIfLocked(async () =>
                 await Database.RelationCrud.GetNoRetweetsAllAsync());
         }
 

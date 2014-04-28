@@ -54,19 +54,20 @@ namespace StarryEyes.Models.Databases
             return "(" + left + ") and (" + right + ")";
         }
 
-        public static async Task AutoRetryWhenLocked(Func<Task> func,
+        public static async Task RetryIfLocked(Func<Task> func,
             int waitMillisec = 100)
         {
-            await AutoRetryWhenLocked(async () =>
+            await RetryIfLocked(async () =>
             {
                 await func();
                 return 0;
             }, waitMillisec);
         }
 
-        public static async Task<T> AutoRetryWhenLocked<T>(Func<Task<T>> func,
+        public static async Task<T> RetryIfLocked<T>(Func<Task<T>> func,
             int waitMillisec = 100)
         {
+            await Task.Yield();
             while (true)
             {
                 try
@@ -75,7 +76,8 @@ namespace StarryEyes.Models.Databases
                 }
                 catch (SQLiteException sqex)
                 {
-                    if (sqex.ResultCode != SQLiteErrorCode.Locked)
+                    if (sqex.ResultCode != SQLiteErrorCode.Locked &&
+                        sqex.ErrorCode != 0x80004005) // database is locked
                     {
                         throw;
                     }
