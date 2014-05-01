@@ -280,7 +280,7 @@ namespace StarryEyes.ViewModels
             // check execution properties
             if (App.ExecutionMode == ExecutionMode.Standalone)
             {
-                this.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
+                var msg = this.Messenger.GetResponse(new TaskDialogMessage(new TaskDialogOptions
                 {
                     Title = Resources.MsgExecModeWarningTitle,
                     MainIcon = VistaTaskDialogIcon.Warning,
@@ -289,11 +289,13 @@ namespace StarryEyes.ViewModels
                     FooterIcon = VistaTaskDialogIcon.Error,
                     FooterText = Resources.MsgExecModeWarningFooter,
                     CommonButtons = TaskDialogCommonButtons.Close,
+                    VerificationText = Resources.MsgDoNotShowAgain
                 }));
+                Setting.ShowStartupConfigurationWarning.Value = !msg.Response.VerificationChecked.GetValueOrDefault();
             }
             else if (App.DatabaseDirectoryUserSpecified)
             {
-                this.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
+                var msg = this.Messenger.GetResponse(new TaskDialogMessage(new TaskDialogOptions
                 {
                     Title = Resources.MsgDatabasePathWarningTitle,
                     MainIcon = VistaTaskDialogIcon.Warning,
@@ -302,7 +304,9 @@ namespace StarryEyes.ViewModels
                     FooterIcon = VistaTaskDialogIcon.Error,
                     FooterText = Resources.MsgDatabasePathWarningFooter,
                     CommonButtons = TaskDialogCommonButtons.Close,
+                    VerificationText = Resources.MsgDoNotShowAgain
                 }));
+                Setting.ShowStartupConfigurationWarning.Value = !msg.Response.VerificationChecked.GetValueOrDefault();
             }
 
             Task.Run(() => App.RaiseUserInterfaceReady());
@@ -331,7 +335,7 @@ namespace StarryEyes.ViewModels
                             Content = Resources.MsgDesktopHeapContent,
                             ExpandedInfo = String.Format(Resources.MsgDesktopHeapInfo, dh, rh),
                             CommandButtons = new[] { Resources.MsgButtonBrowseMsKb, Resources.MsgButtonCancel },
-                            VerificationText = Resources.MsgDoNotAskMeAgain,
+                            VerificationText = Resources.MsgDoNotShowAgain,
                         }));
                         Setting.CheckDesktopHeap.Value = !msg.Response.VerificationChecked.GetValueOrDefault();
                         if (msg.Response.CommandButtonResult == 0)

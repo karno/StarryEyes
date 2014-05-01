@@ -285,6 +285,9 @@ namespace StarryEyes.Settings
         public static readonly SettingItemStruct<bool> IsBehaviorLogEnabled =
             new SettingItemStruct<bool>("IsBehaviorLogEnabled", false);
 
+        public static readonly SettingItemStruct<bool> ShowStartupConfigurationWarning =
+            new SettingItemStruct<bool>("ShowStartupConfigurationWarning", true);
+
         #endregion
 
         #region Krile internal state

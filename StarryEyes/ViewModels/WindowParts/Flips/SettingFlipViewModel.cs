@@ -252,7 +252,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 }
                 showDonationInfo = true;
             }
-            await DispatcherHolder.BeginInvoke(async () =>
+            await DispatcherHolder.BeginInvoke(() =>
             {
                 var ww = new WorkingWindow(
                     "changing timeline mode...", async () =>

@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.Security.Cryptography.Pkcs;
+﻿using System.Collections.ObjectModel;
 using Livet;
-using StarryEyes.Nightmare.Windows;
-using StarryEyes.Views.Messaging;
 using ThemeManager = StarryEyes.Settings.ThemeManager;
 
 namespace StarryEyes.ViewModels.WindowParts.Flips.SettingFlips

@@ -156,9 +156,6 @@ Current value: {0} / Lowest recommend: {1}</value>
   <data name="MsgTabWarningTitle" xml:space="preserve">
     <value>Tab Warning</value>
   </data>
-  <data name="MsgDoNotAskMeAgain" xml:space="preserve">
-    <value>Don't ask me again</value>
-  </data>
   <data name="MsgExitInst" xml:space="preserve">
     <value>Are you sure you want to exit Krile?</value>
   </data>
@@ -198,5 +195,8 @@ Generate default tabs?</value>
   </data>
   <data name="MsgExecModeWarningTitle" xml:space="preserve">
     <value>Execution Mode Warning</value>
+  </data>
+  <data name="MsgDoNotShowAgain" xml:space="preserve">
+    <value>Do not show this message again</value>
   </data>
 </root>

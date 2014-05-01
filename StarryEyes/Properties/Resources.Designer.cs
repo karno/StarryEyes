@@ -163,11 +163,11 @@ namespace StarryEyes.Properties {
         }
         
         /// <summary>
-        ///   Don&apos;t ask me again に類似しているローカライズされた文字列を検索します。
+        ///   Do not show this message again に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        public static string MsgDoNotAskMeAgain {
+        public static string MsgDoNotShowAgain {
             get {
-                return ResourceManager.GetString("MsgDoNotAskMeAgain", resourceCulture);
+                return ResourceManager.GetString("MsgDoNotShowAgain", resourceCulture);
             }
         }
         

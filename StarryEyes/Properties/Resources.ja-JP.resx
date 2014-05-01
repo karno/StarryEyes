@@ -153,9 +153,6 @@ Windowsの設定を変更することで、この問題を回避できる可能�
   <data name="MsgTabWarningTitle" xml:space="preserve">
     <value>タブ情報の警告</value>
   </data>
-  <data name="MsgDoNotAskMeAgain" xml:space="preserve">
-    <value>次回から表示しない</value>
-  </data>
   <data name="MsgExitInst" xml:space="preserve">
     <value>Krileを終了してもよろしいですか？</value>
   </data>
@@ -197,5 +194,8 @@ Windowsの設定を変更することで、この問題を回避できる可能�
   </data>
   <data name="MsgExecModeWarningTitle" xml:space="preserve">
     <value>実行モードの警告</value>
+  </data>
+  <data name="MsgDoNotShowAgain" xml:space="preserve">
+    <value>次回からこのメッセージを表示しない</value>
   </data>
 </root>
