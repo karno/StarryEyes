@@ -127,6 +127,7 @@
     <Compile Include="IMultiplexPredicate.cs" />
     <Compile Include="Infrastructure\SqliteRegExp.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SqliteCrudException.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

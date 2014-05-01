@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
@@ -30,12 +31,20 @@ namespace StarryEyes.Casket.Cruds
 
         public long GetId(string screenName)
         {
-            using (this.AcquireReadLock())
-            using (var con = this.DangerousOpenConnection())
+            var sql = "select Id from " + TableName + " where LOWER(ScreenName) = @ScreenName limit 1;";
+            try
             {
-                return con.Query<long>("select Id from " + TableName + " where LOWER(ScreenName) = @ScreenName limit 1;",
-                                new { ScreenName = screenName.ToLower() })
-                   .SingleOrDefault();
+                using (this.AcquireReadLock())
+                using (var con = this.DangerousOpenConnection())
+                {
+                    return
+                        con.Query<long>(sql, new { ScreenName = screenName.ToLower() })
+                           .SingleOrDefault();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw WrapException(ex, "GetId", sql);
             }
         }
 

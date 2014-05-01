@@ -48,6 +48,10 @@ namespace StarryEyes.Casket.Cruds
                         tran.Commit();
                     }
                 }
+                catch (Exception ex)
+                {
+                    throw WrapException(ex, "RegisterUserAsync", TableInserter);
+                }
                 finally
                 {
                     ReaderWriterLock.ExitWriteLock();

@@ -5,6 +5,7 @@ using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using StarryEyes.Albireo;
+using StarryEyes.Casket;
 using StarryEyes.Models.Databases;
 
 namespace StarryEyes.Models.Subsystems
@@ -65,6 +66,7 @@ namespace StarryEyes.Models.Subsystems
             {
                 _estimatedGrossTweetCount = (int)(await StatusProxy.GetCountAsync());
             }
+            catch (SqliteCrudException) { }
             catch (SQLiteException) { }
         }
 

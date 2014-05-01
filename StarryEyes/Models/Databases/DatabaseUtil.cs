@@ -3,6 +3,7 @@ using System.Data.SQLite;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using StarryEyes.Casket;
 
 namespace StarryEyes.Models.Databases
 {
@@ -76,8 +77,16 @@ namespace StarryEyes.Models.Databases
                 }
                 catch (SQLiteException sqex)
                 {
-                    if (sqex.ResultCode != SQLiteErrorCode.Locked &&
-                        sqex.ErrorCode != 0x80004005) // database is locked
+                    if (sqex.ResultCode != SQLiteErrorCode.Locked) // database is locked
+                    {
+                        throw;
+                    }
+                    // if database is locked, wait shortly and retry.
+                    Thread.Sleep(waitMillisec);
+                }
+                catch (SqliteCrudException cex)
+                {
+                    if (cex.ErrorCode != SQLiteErrorCode.Locked) // database is locked
                     {
                         throw;
                     }

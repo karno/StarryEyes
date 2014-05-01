@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using StarryEyes.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Casket;
 using StarryEyes.Models.Databases;
 using StarryEyes.Models.Timelines.Statuses;
 using StarryEyes.Settings;
@@ -123,16 +124,16 @@ namespace StarryEyes.Models.Receiving.Handling
                 StatusProxy.StoreStatus(status);
                 return true;
             }
-            catch (SQLiteException sqex)
-            {
-                System.Diagnostics.Debug.WriteLine("Requeue: " + status);
+            catch (SqliteCrudException) { }
+            catch (SQLiteException) { }
 
-                // enqueue for retry 
-                Enqueue(status);
+            // when throw exception from database: retry.
 
-                // and return "already received" sign
-                return false;
-            }
+            // enqueue for retry
+            Enqueue(status);
+
+            // and return "already received" sign
+            return false;
         }
 
         /// <summary>

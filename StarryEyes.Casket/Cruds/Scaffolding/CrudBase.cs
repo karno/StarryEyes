@@ -94,7 +94,7 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
                 con.Execute("PRAGMA case_sensitive_like=1");
                 return con;
             }
-            catch (SQLiteException)
+            catch (Exception)
             {
                 if (con != null)
                 {
@@ -125,7 +125,7 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
                 }
                 catch (Exception ex)
                 {
-                    throw new SQLiteException("Exception has thrown while executing query(ExecuteAsync): " + query, ex);
+                    throw WrapException(ex, "ExecuteAsync", query);
                 }
                 finally
                 {
@@ -152,7 +152,7 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
                 }
                 catch (Exception ex)
                 {
-                    throw new SQLiteException("Exception has thrown while executing query(ExecuteAsync2): " + query, ex);
+                    throw WrapException(ex, "ExecuteAsyncWithParam", query);
                 }
                 finally
                 {
@@ -182,9 +182,8 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
                 }
                 catch (Exception ex)
                 {
-                    throw new SQLiteException(
-                        "Exception has thrown while executing query(ExecuteAllAsync): " + Environment.NewLine +
-                        qnp.Select(q => q.Item1).JoinString(Environment.NewLine), ex);
+                    throw WrapException(ex, "ExecuteAllAsync",
+                        qnp.Select(q => q.Item1).JoinString(Environment.NewLine));
                 }
                 finally
                 {
@@ -208,13 +207,18 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
                 }
                 catch (Exception ex)
                 {
-                    throw new SQLiteException("Exception has thrown while executing query(QueryAsync): " + query, ex);
+                    throw WrapException(ex, "QueryAsync", query);
                 }
                 finally
                 {
                     ReaderWriterLock.ExitReadLock();
                 }
             });
+        }
+
+        protected SqliteCrudException WrapException(Exception exception, string command, string query)
+        {
+            return new SqliteCrudException(exception, command, query);
         }
     }
 

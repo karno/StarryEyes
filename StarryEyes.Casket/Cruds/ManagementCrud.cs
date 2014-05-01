@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
@@ -28,12 +29,19 @@ namespace StarryEyes.Casket.Cruds
 
         private DatabaseManagement GetValueCore(long id)
         {
-            using (this.AcquireReadLock())
-            using (var con = this.DangerousOpenConnection())
+            var sql = this.CreateSql("Id = @Id");
+            try
             {
-                return con.Query<DatabaseManagement>(
-                    this.CreateSql("Id = @Id"), new { Id = id })
-                          .SingleOrDefault();
+                using (this.AcquireReadLock())
+                using (var con = this.DangerousOpenConnection())
+                {
+                    return con.Query<DatabaseManagement>(sql, new { Id = id })
+                              .SingleOrDefault();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw WrapException(ex, "GetValueCore", sql);
             }
         }
 
@@ -44,12 +52,19 @@ namespace StarryEyes.Casket.Cruds
 
         private void SetValueCore(DatabaseManagement mgmt)
         {
-            using (this.AcquireWriteLock())
-            using (var con = this.DangerousOpenConnection())
-            using (var tr = con.BeginTransaction(IsolationLevel.ReadCommitted))
+            try
             {
-                con.Execute(this.TableInserter, mgmt);
-                tr.Commit();
+                using (this.AcquireWriteLock())
+                using (var con = this.DangerousOpenConnection())
+                using (var tr = con.BeginTransaction(IsolationLevel.ReadCommitted))
+                {
+                    con.Execute(this.TableInserter, mgmt);
+                    tr.Commit();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw WrapException(ex, "SetValueCore", this.TableInserter);
             }
         }
 
@@ -60,10 +75,17 @@ namespace StarryEyes.Casket.Cruds
             // should execute WITHOUT transaction.
             await WriteTaskFactory.StartNew(() =>
             {
-                using (AcquireWriteLock())
-                using (var con = this.DangerousOpenConnection())
+                try
                 {
-                    con.Execute("VACUUM;");
+                    using (AcquireWriteLock())
+                    using (var con = this.DangerousOpenConnection())
+                    {
+                        con.Execute("VACUUM;");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw WrapException(ex, "VacuumAsync", "VACUUM;");
                 }
             });
         }

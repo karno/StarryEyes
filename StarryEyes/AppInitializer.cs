@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data.SQLite;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -317,15 +316,15 @@ namespace StarryEyes
             {
                 await Database.VacuumTables();
             }
-            catch (SQLiteException sqex)
+            catch (SqliteCrudException cex)
             {
                 TaskDialog.Show(new TaskDialogOptions
                 {
                     MainIcon = VistaTaskDialogIcon.Error,
                     Title = "Krile Database Optimization",
                     MainInstruction = "データベースの最適化に失敗しました。",
-                    Content = sqex.Message,
-                    ExpandedInfo = sqex.ToString()
+                    Content = cex.Message,
+                    ExpandedInfo = cex.ToString()
                 });
             }
         }

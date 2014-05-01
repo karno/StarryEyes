@@ -46,7 +46,13 @@ namespace StarryEyes.Models.Databases
                     {
                         throw;
                     }
-                    continue;
+                }
+                catch (SqliteCrudException cex)
+                {
+                    if (cex.ErrorCode != SQLiteErrorCode.Locked)
+                    {
+                        throw;
+                    }
                 }
             }
         }
