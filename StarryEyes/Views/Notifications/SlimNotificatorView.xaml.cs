@@ -16,6 +16,7 @@ namespace StarryEyes.Views.Notifications
         private void SlimNotificatorView_OnLoaded(object sender, RoutedEventArgs e)
         {
             var viewModel = this.DataContext as SlimNotificatorViewModel;
+            if (viewModel == null) return;
             this.Left = viewModel.Left;
             this.Top = viewModel.Top;
             this.Width = viewModel.Width;

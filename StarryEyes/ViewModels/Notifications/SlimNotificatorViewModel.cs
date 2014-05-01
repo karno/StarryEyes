@@ -80,8 +80,8 @@ namespace StarryEyes.ViewModels.Notifications
             var bound = screen.WorkingArea;
             if (bound == Rect.Empty) return; // empty data
             _width = (int)(bound.Width * 0.7);
-            _left = (int)((bound.Width - this._width) / 2.0 + bound.Left);
-            _top = (int)(bound.Height - 24 + bound.Top);
+            _left = (int)(bound.Left + (bound.Width - this._width) / 2.0);
+            _top = (int)(bound.Bottom - 24);
         }
 
         public int Left
