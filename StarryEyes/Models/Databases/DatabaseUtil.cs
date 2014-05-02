@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using StarryEyes.Casket;
+using StarryEyes.Models.Backstages.NotificationEvents;
 
 namespace StarryEyes.Models.Databases
 {
@@ -69,6 +70,7 @@ namespace StarryEyes.Models.Databases
             int waitMillisec = 100)
         {
             await Task.Yield();
+            int count = 0;
             while (true)
             {
                 try
@@ -91,6 +93,13 @@ namespace StarryEyes.Models.Databases
                 }
                 // if database is locked, wait shortly and retry.
                 Thread.Sleep(waitMillisec);
+                count++;
+                if (count >= 100)
+                {
+                    count = 0;
+                    BackstageModel.RegisterEvent(new InternalErrorEvent(
+                        "何らかの原因で、データベースがロックされたまま開放されません。Krileをリスタートしてください。"));
+                }
             }
         }
     }
