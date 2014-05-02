@@ -81,8 +81,6 @@ namespace StarryEyes.Models.Databases
                     {
                         throw;
                     }
-                    // if database is locked, wait shortly and retry.
-                    Thread.Sleep(waitMillisec);
                 }
                 catch (SqliteCrudException cex)
                 {
@@ -90,9 +88,9 @@ namespace StarryEyes.Models.Databases
                     {
                         throw;
                     }
-                    // if database is locked, wait shortly and retry.
-                    Thread.Sleep(waitMillisec);
                 }
+                // if database is locked, wait shortly and retry.
+                Thread.Sleep(waitMillisec);
             }
         }
     }

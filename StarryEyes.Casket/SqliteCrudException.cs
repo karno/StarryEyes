@@ -7,16 +7,19 @@ namespace StarryEyes.Casket
     {
         public SQLiteErrorCode ErrorCode
         {
-            get
-            {
-                var sx = InnerException as SQLiteException;
-                return sx == null ? SQLiteErrorCode.Unknown : sx.ResultCode;
-            }
+            get { return GetErrorCode(InnerException); }
         }
 
         public SqliteCrudException(Exception exception, string tag, string sql)
-            : base("Exception has thrown while executing query#" + tag + ": " + sql, exception)
+            : base("Exception has thrown while executing query#" + tag + "(code: " + GetErrorCode(exception) + "): " + sql,
+                exception)
         {
+        }
+
+        private static SQLiteErrorCode GetErrorCode(Exception exception)
+        {
+            var sx = exception as SQLiteException;
+            return sx == null ? SQLiteErrorCode.Unknown : sx.ResultCode;
         }
     }
 }
