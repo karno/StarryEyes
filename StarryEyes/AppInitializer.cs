@@ -130,6 +130,9 @@ namespace StarryEyes
                 // failed loading settings
                 Environment.Exit(-1);
             }
+
+            // prepare user anonymous id
+
             InitializeSubsystemsAfterSettingsLoaded();
         }
 
