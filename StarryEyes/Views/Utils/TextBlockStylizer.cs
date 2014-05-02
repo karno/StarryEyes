@@ -105,8 +105,10 @@ namespace StarryEyes.Views.Utils
                 }
 
                 // filter and merge entities
-                var entities = user.DescriptionEntities.Where(ent => ent.EntityType == EntityType.Urls)
-                                   .Concat(GetUserMentionEntities(user.Description));
+                var entities = user.DescriptionEntities == null
+                    ? null
+                    : user.DescriptionEntities.Where(ent => ent.EntityType == EntityType.Urls)
+                          .Concat(GetUserMentionEntities(user.Description));
 
                 // generate contents
                 GenerateInlines(o, user.Description, entities)
