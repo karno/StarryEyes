@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -9,6 +10,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.Utils;
+using StarryEyes.Helpers;
 using StarryEyes.Models;
 
 namespace StarryEyes.Views.Utils
@@ -102,8 +104,12 @@ namespace StarryEyes.Views.Utils
                     return;
                 }
 
+                // filter and merge entities
+                var entities = user.DescriptionEntities.Where(ent => ent.EntityType == EntityType.Urls)
+                                   .Concat(GetUserMentionEntities(user.Description));
+
                 // generate contents
-                GenerateInlines(o, user.Description, user.DescriptionEntities)
+                GenerateInlines(o, user.Description, entities)
                     .Select(inline =>
                     {
                         var run = inline as Run;
@@ -115,6 +121,29 @@ namespace StarryEyes.Views.Utils
                     })
                     .ForEach(textBlock.Inlines.Add);
             }));
+
+        private static IEnumerable<TwitterEntity> GetUserMentionEntities(string text)
+        {
+            return TwitterRegexPatterns
+                .ValidMentionOrList
+                .Matches(text)
+                .OfType<Match>()
+                .Select(m =>
+                {
+                    var display =
+                        m.Groups[TwitterRegexPatterns.ValidMentionOrListGroupAt].Value +
+                        m.Groups[TwitterRegexPatterns.ValidMentionOrListGroupUsername].Value;
+                    var index = m.Groups[TwitterRegexPatterns.ValidMentionOrListGroupAt].Index;
+
+                    return new TwitterEntity
+                    {
+                        EntityType = EntityType.UserMentions,
+                        DisplayText = display,
+                        StartIndex = index,
+                        EndIndex = index + display.Length,
+                    };
+                });
+        }
 
         #endregion
 
