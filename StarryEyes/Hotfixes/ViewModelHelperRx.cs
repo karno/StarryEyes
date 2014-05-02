@@ -63,7 +63,6 @@ namespace StarryEyes
             INotifyCollectionChanged source, Func<TModel, TViewModel> converter,
             DispatcherCollectionRx<TViewModel> target)
         {
-            bool resetOccured = false;
             return source
                 .ListenCollectionChanged()
                 .ObserveOn(DispatcherHolder.Dispatcher)
@@ -104,7 +103,6 @@ namespace StarryEyes
                                     {
                                         item.Dispose();
                                     }
-                                    resetOccured = true;
                                 }
                                 target.Clear();
                                 break;
@@ -116,11 +114,11 @@ namespace StarryEyes
                     {
                         throw new InvalidOperationException(
                             "Collection state is invalid." + Environment.NewLine +
-                            "INDEX OUT OF RANGE - " + e.Action + "[" + typeof (TModel).Name + " -> " +
-                            typeof (TViewModel).Name + ", reset: " + resetOccured + " ]" + Environment.NewLine +
+                            "INDEX OUT OF RANGE - " + e.Action + "[" + typeof(TModel).Name + " -> " +
+                            typeof(TViewModel).Name + ", reset: " + " ]" + Environment.NewLine +
                             "new start: " + e.NewStartingIndex + ", count: " +
                             (e.NewItems == null ? "null" : e.NewItems.Count.ToString()) + Environment.NewLine +
-                            "source length: " + ((IList<TModel>) source).Count + ", target length: " + target.Count +
+                            "source length: " + ((IList<TModel>)source).Count + ", target length: " + target.Count +
                             ".",
                             aoex);
                     }
