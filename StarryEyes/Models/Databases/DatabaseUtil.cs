@@ -84,7 +84,7 @@ namespace StarryEyes.Models.Databases
                 }
                 catch (SqliteCrudException cex)
                 {
-                    if (cex.ErrorCode != SQLiteErrorCode.Locked) // database is locked
+                    if (!cex.IsDatabaseLockedError) // database is locked
                     {
                         throw;
                     }

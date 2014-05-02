@@ -10,6 +10,16 @@ namespace StarryEyes.Casket
             get { return GetErrorCode(InnerException); }
         }
 
+        public bool IsDatabaseLockedError
+        {
+            get
+            {
+                return ErrorCode == SQLiteErrorCode.Locked ||
+                       InnerException.Message
+                                     .IndexOf("database is locked", StringComparison.CurrentCultureIgnoreCase) >= 0;
+            }
+        }
+
         public SqliteCrudException(Exception exception, string tag, string sql)
             : base("Exception has thrown while executing query#" + tag + "(code: " + GetErrorCode(exception) + "): " + sql,
                 exception)
