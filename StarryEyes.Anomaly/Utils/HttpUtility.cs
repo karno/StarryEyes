@@ -130,7 +130,8 @@ namespace StarryEyes.Anomaly.Utils
             }
             var str = imageUri.ToString();
             int extpos;
-            if ((extpos = str.LastIndexOf('.')) < 0)
+            if ((extpos = str.LastIndexOf('.')) < 0 ||
+                str.Length - extpos > 10) // extension is too long
             {
                 return imageUri;
             }
