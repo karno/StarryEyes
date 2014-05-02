@@ -235,6 +235,10 @@ namespace StarryEyes.Views.Controls
             }
             catch (Exception ex)
             {
+                lock (_imageObservables)
+                {
+                    _imageObservables.Remove(source);
+                }
                 subject.OnError(ex);
                 subject.Dispose();
             }
