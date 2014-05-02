@@ -199,7 +199,7 @@
                           Visibility="{Binding IsPostLimitPredictionEnabled,
                                                Converter={StaticResource BooleanToVisibleConverter}}">
                         <Grid.ToolTip>
-                            <TextBlock Foreground="White">
+                            <TextBlock>
                                 <Run Text="規制までおよそ " />
                                 <Run Text="{Binding RemainUpdate, Mode=OneWay}" />
                                 <Run Text=" ツイート" />
