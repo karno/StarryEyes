@@ -108,7 +108,7 @@ namespace StarryEyes.Views.Utils
                 var entities = user.DescriptionEntities == null
                     ? null
                     : user.DescriptionEntities.Where(ent => ent.EntityType == EntityType.Urls)
-                          .Concat(GetUserMentionEntities(user.Description));
+                          .Concat(GetUserMentionEntities(user.Description ?? String.Empty));
 
                 // generate contents
                 GenerateInlines(o, user.Description, entities)

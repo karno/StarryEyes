@@ -115,7 +115,7 @@ namespace StarryEyes
                         throw new InvalidOperationException(
                             "Collection state is invalid." + Environment.NewLine +
                             "INDEX OUT OF RANGE - " + e.Action + "[" + typeof(TModel).Name + " -> " +
-                            typeof(TViewModel).Name + ", reset: " + " ]" + Environment.NewLine +
+                            typeof(TViewModel).Name + "]" + Environment.NewLine +
                             "new start: " + e.NewStartingIndex + ", count: " +
                             (e.NewItems == null ? "null" : e.NewItems.Count.ToString()) + Environment.NewLine +
                             "source length: " + ((IList<TModel>)source).Count + ", target length: " + target.Count +
