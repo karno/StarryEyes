@@ -278,35 +278,38 @@ namespace StarryEyes.ViewModels
             }
 
             // check execution properties
-            if (App.ExecutionMode == ExecutionMode.Standalone)
+            if (Setting.ShowStartupConfigurationWarning.Value)
             {
-                var msg = this.Messenger.GetResponse(new TaskDialogMessage(new TaskDialogOptions
+                if (App.ExecutionMode == ExecutionMode.Standalone)
                 {
-                    Title = Resources.MsgExecModeWarningTitle,
-                    MainIcon = VistaTaskDialogIcon.Warning,
-                    MainInstruction = Resources.MsgExecModeWarningInst,
-                    Content = Resources.MsgExecModeWarningContent,
-                    FooterIcon = VistaTaskDialogIcon.Error,
-                    FooterText = Resources.MsgExecModeWarningFooter,
-                    CommonButtons = TaskDialogCommonButtons.Close,
-                    VerificationText = Resources.MsgDoNotShowAgain
-                }));
-                Setting.ShowStartupConfigurationWarning.Value = !msg.Response.VerificationChecked.GetValueOrDefault();
-            }
-            else if (App.DatabaseDirectoryUserSpecified)
-            {
-                var msg = this.Messenger.GetResponse(new TaskDialogMessage(new TaskDialogOptions
+                    var msg = this.Messenger.GetResponse(new TaskDialogMessage(new TaskDialogOptions
+                    {
+                        Title = Resources.MsgExecModeWarningTitle,
+                        MainIcon = VistaTaskDialogIcon.Warning,
+                        MainInstruction = Resources.MsgExecModeWarningInst,
+                        Content = Resources.MsgExecModeWarningContent,
+                        FooterIcon = VistaTaskDialogIcon.Error,
+                        FooterText = Resources.MsgExecModeWarningFooter,
+                        CommonButtons = TaskDialogCommonButtons.Close,
+                        VerificationText = Resources.MsgDoNotShowAgain
+                    }));
+                    Setting.ShowStartupConfigurationWarning.Value = !msg.Response.VerificationChecked.GetValueOrDefault();
+                }
+                else if (App.DatabaseDirectoryUserSpecified)
                 {
-                    Title = Resources.MsgDatabasePathWarningTitle,
-                    MainIcon = VistaTaskDialogIcon.Warning,
-                    MainInstruction = Resources.MsgDatabasePathWarningInst,
-                    Content = Resources.MsgDatabasePathWarningContent,
-                    FooterIcon = VistaTaskDialogIcon.Error,
-                    FooterText = Resources.MsgDatabasePathWarningFooter,
-                    CommonButtons = TaskDialogCommonButtons.Close,
-                    VerificationText = Resources.MsgDoNotShowAgain
-                }));
-                Setting.ShowStartupConfigurationWarning.Value = !msg.Response.VerificationChecked.GetValueOrDefault();
+                    var msg = this.Messenger.GetResponse(new TaskDialogMessage(new TaskDialogOptions
+                    {
+                        Title = Resources.MsgDatabasePathWarningTitle,
+                        MainIcon = VistaTaskDialogIcon.Warning,
+                        MainInstruction = Resources.MsgDatabasePathWarningInst,
+                        Content = Resources.MsgDatabasePathWarningContent,
+                        FooterIcon = VistaTaskDialogIcon.Error,
+                        FooterText = Resources.MsgDatabasePathWarningFooter,
+                        CommonButtons = TaskDialogCommonButtons.Close,
+                        VerificationText = Resources.MsgDoNotShowAgain
+                    }));
+                    Setting.ShowStartupConfigurationWarning.Value = !msg.Response.VerificationChecked.GetValueOrDefault();
+                }
             }
 
             Task.Run(() => App.RaiseUserInterfaceReady());
