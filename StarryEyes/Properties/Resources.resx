@@ -199,4 +199,96 @@ Generate default tabs?</value>
   <data name="MsgDoNotShowAgain" xml:space="preserve">
     <value>Do not show this message again</value>
   </data>
+  <data name="MsgDbOptimizationFailedInst" xml:space="preserve">
+    <value>Database optimization failed.</value>
+  </data>
+  <data name="MsgDbOptimizationFailedTitle" xml:space="preserve">
+    <value>Krile Database Optimization</value>
+  </data>
+  <data name="MsgFailGeneralProcessContent" xml:space="preserve">
+    <value>Please retry process or reboot Windows.</value>
+  </data>
+  <data name="MsgFailGeneralProcessInst" xml:space="preserve">
+    <value>Process is not complete properly.</value>
+  </data>
+  <data name="MsgFailInitConfDirContent" xml:space="preserve">
+    <value>Could not create setting directory.</value>
+  </data>
+  <data name="MsgFailInitConfDirFooterText" xml:space="preserve">
+    <value>Please place Krile into other directory.</value>
+  </data>
+  <data name="MsgFailInitLockContent" xml:space="preserve">
+    <value>Could not create locking file.</value>
+  </data>
+  <data name="MsgFailInitLockFooter" xml:space="preserve">
+    <value>Please reboot Windows if problem is not solved.</value>
+  </data>
+  <data name="MsgFailLaunchDuplicatedContent" xml:space="preserve">
+    <value>Krile can not run duplicated that sharing settings each other.</value>
+  </data>
+  <data name="MsgFailLaunchDuplicatedExInfo" xml:space="preserve">
+    <value>Running multiple krile needs configuring krile.exe.config.
+Visit official site or repository for more detail.</value>
+  </data>
+  <data name="MsgFailLaunchDuplicatedInst" xml:space="preserve">
+    <value>Krile is already running.</value>
+  </data>
+  <data name="MsgFailStartInst" xml:space="preserve">
+    <value>Failed starting Krile.</value>
+  </data>
+  <data name="MsgFailTitle" xml:space="preserve">
+    <value>Krile StarryEyes</value>
+  </data>
+  <data name="MsgMaintenanceCmdCleanInstall" xml:space="preserve">
+    <value>Delete all and &amp;reinstall latest version</value>
+  </data>
+  <data name="MsgMaintenanceCmdContinue" xml:space="preserve">
+    <value>&amp;Continue starting Krile</value>
+  </data>
+  <data name="MsgMaintenanceCmdDeleteAll" xml:space="preserve">
+    <value>Delete &amp;all settings and database</value>
+  </data>
+  <data name="MsgMaintenanceCmdDeleteAllAndExit" xml:space="preserve">
+    <value>&amp;Exit after deleting all settings and database</value>
+  </data>
+  <data name="MsgMaintenanceCmdDeleteDb" xml:space="preserve">
+    <value>&amp;Delete database</value>
+  </data>
+  <data name="MsgMaintenanceCmdExit" xml:space="preserve">
+    <value>Cancel and E&amp;xit</value>
+  </data>
+  <data name="MsgMaintenanceCmdOptimize" xml:space="preserve">
+    <value>&amp;Optimize database</value>
+  </data>
+  <data name="MsgMaintenanceContent" xml:space="preserve">
+    <value>Deleted data can not recover. Please backup before deletion if needed.</value>
+  </data>
+  <data name="MsgMaintenanceInst" xml:space="preserve">
+    <value>Managing data stored in Krile.</value>
+  </data>
+  <data name="MsgMaintenanceTitle" xml:space="preserve">
+    <value>Maintenance Krile</value>
+  </data>
+  <data name="MsgRecoveryCmdContinue" xml:space="preserve">
+    <value>&amp;Continue starting Krile</value>
+  </data>
+  <data name="MsgRecoveryCmdExit" xml:space="preserve">
+    <value>E&amp;xit immediately</value>
+  </data>
+  <data name="MsgRecoveryCmdMaintenance" xml:space="preserve">
+    <value>Show &amp;maintenance dialog</value>
+  </data>
+  <data name="MsgRecoveryContent" xml:space="preserve">
+    <value>If crash caused by temporarily problem, you can continue starting.
+Deleting database file or rebooting Windows will help starting Krile when problem is continue.</value>
+  </data>
+  <data name="MsgRecoveryFooter" xml:space="preserve">
+    <value>Maintenance Dialog can delete database or/and delete settings.</value>
+  </data>
+  <data name="MsgRecoveryInst" xml:space="preserve">
+    <value>Krile had not shut down properly.</value>
+  </data>
+  <data name="MsgRecoveryTitle" xml:space="preserve">
+    <value>Recovery your Krile</value>
+  </data>
 </root>

@@ -17,6 +17,7 @@ using StarryEyes.Models.Subsystems;
 using StarryEyes.Models.Subsystems.Notifications.UI;
 using StarryEyes.Nightmare.Windows;
 using StarryEyes.Plugins;
+using StarryEyes.Properties;
 using StarryEyes.Settings;
 using StarryEyes.Views.Dialogs;
 using Application = System.Windows.Application;
@@ -116,7 +117,7 @@ namespace StarryEyes
             }
             catch (Exception ex)
             {
-                FailMessages.InitLockFileFailed(ex);
+                FailMessages.InitLockFailed(ex);
                 Environment.Exit(-1);
             }
 
@@ -324,8 +325,8 @@ namespace StarryEyes
                 TaskDialog.Show(new TaskDialogOptions
                 {
                     MainIcon = VistaTaskDialogIcon.Error,
-                    Title = "Krile Database Optimization",
-                    MainInstruction = "データベースの最適化に失敗しました。",
+                    Title = Resources.MsgDbOptimizationFailedTitle,
+                    MainInstruction = Resources.MsgDbOptimizationFailedInst,
                     Content = cex.Message,
                     ExpandedInfo = cex.ToString()
                 });
@@ -408,43 +409,40 @@ namespace StarryEyes
             public static TaskDialogResult ConfirmRescue()
             {
                 return ShowMessage(new TaskDialogOptions
-                 {
-                     Title = "Krileの回復",
-                     MainIcon = VistaTaskDialogIcon.Error,
-                     MainInstruction = "Krileは正しく終了しませんでした。",
-                     Content = "一時的な問題である場合は、このまま起動を継続できます。" + Environment.NewLine +
-                     "問題が継続して発生する場合は、データベースファイルの削除などを行うと回復することがあります。" + Environment.NewLine +
-                     "データベースや設定の削除、クリーンインストールなどを行うには「メンテナンスダイアログを表示」を選択してください。" + Environment.NewLine +
-                     "バックアップなどを取得するためにこのままKrileを終了する場合は「起動せずにKrileを終了」を選択してください。",
-                     CommandButtons = new[]
                 {
-                    /* 0 */ "このまま起動(&C)",
-                    /* 1 */ "メンテナンスダイアログを表示(&M)",
-                    /* 2 */ "起動せずにKrileを終了(&X)"
-                },
-                 });
+                    Title = Resources.MsgRecoveryTitle,
+                    MainIcon = VistaTaskDialogIcon.Error,
+                    MainInstruction = Resources.MsgRecoveryInst,
+                    Content = Resources.MsgRecoveryContent,
+                    FooterIcon = VistaTaskDialogIcon.Information,
+                    FooterText = Resources.MsgRecoveryFooter,
+                    CommandButtons = new[]
+                    {
+                        /* 0 */ Resources.MsgRecoveryCmdContinue,
+                        /* 1 */ Resources.MsgRecoveryCmdMaintenance,
+                        /* 2 */ Resources.MsgRecoveryCmdExit
+                    }
+                });
             }
 
             public static TaskDialogResult ConfirmMaintenance()
             {
                 return ShowMessage(new TaskDialogOptions
                 {
-                    Title = "Krileのメンテナンス",
+                    Title = Resources.MsgMaintenanceTitle,
                     MainIcon = VistaTaskDialogIcon.Warning,
-                    MainInstruction = "Krileが保持するデータを管理できます。",
-                    Content = "消去したデータはもとに戻せません。必要なデータは予めバックアップしてください。",
+                    MainInstruction = Resources.MsgMaintenanceInst,
+                    Content = Resources.MsgMaintenanceContent,
                     CommandButtons = new[]
-                {
-                    /* 0 */ "このまま起動(&C)",
-                    /* 1 */ "データベースを最適化して起動(&O)",
-                    /* 2 */ "データベースを消去して起動(&D)",
-                    /* 3 */ "すべての設定・データベースを消去して起動(&R)",
-                    /* 4 */ "すべての設定・データベースを消去して終了(&E)",
-                    /* 5 */ "最新版をクリーンインストール(&U)",
-                    /* 6 */ "キャンセル(&X)"
-                },
-                    FooterIcon = VistaTaskDialogIcon.Information,
-                    FooterText = "クリーンインストールを行うと、全ての設定・データベースが消去されます。"
+                    {
+                        /* 0 */ Resources.MsgMaintenanceCmdContinue,
+                        /* 1 */ Resources.MsgMaintenanceCmdOptimize,
+                        /* 2 */ Resources.MsgMaintenanceCmdDeleteDb,
+                        /* 3 */ Resources.MsgMaintenanceCmdDeleteAll,
+                        /* 4 */ Resources.MsgMaintenanceCmdDeleteAllAndExit,
+                        /* 5 */ Resources.MsgMaintenanceCmdCleanInstall,
+                        /* 6 */ Resources.MsgMaintenanceCmdExit
+                    }
                 });
             }
 
@@ -463,12 +461,11 @@ namespace StarryEyes
             {
                 ShowMessage(new TaskDialogOptions
                 {
-                    Title = "Krile StarryEyes",
+                    Title = Resources.MsgFailTitle,
                     MainIcon = VistaTaskDialogIcon.Error,
-                    MainInstruction = "Krileはすでに起動しています。",
-                    Content = "同じ設定を共有するKrileを多重起動することはできません。",
-                    ExpandedInfo = "Krileを多重起動するためには、krile.exe.configを編集する必要があります。" + Environment.NewLine +
-                                   "詳しくは公式ウェブサイト上のFAQを参照してください。",
+                    MainInstruction = Resources.MsgFailLaunchDuplicatedInst,
+                    Content = Resources.MsgFailLaunchDuplicatedContent,
+                    ExpandedInfo = Resources.MsgFailLaunchDuplicatedExInfo,
                     CommonButtons = TaskDialogCommonButtons.Close
                 });
             }
@@ -477,29 +474,29 @@ namespace StarryEyes
             {
                 ShowMessage(new TaskDialogOptions
                 {
-                    Title = "Krile StarryEyes",
+                    Title = Resources.MsgFailTitle,
                     MainIcon = VistaTaskDialogIcon.Error,
-                    MainInstruction = "Krileの起動に失敗しました。",
-                    Content = "設定を保持するディレクトリを作成できません。",
+                    MainInstruction = Resources.MsgFailStartInst,
+                    Content = Resources.MsgFailInitConfDirContent,
                     ExpandedInfo = ex.ToString(),
                     CommonButtons = TaskDialogCommonButtons.Close,
                     FooterIcon = VistaTaskDialogIcon.Information,
-                    FooterText = "別の場所への配置を試みてください。"
+                    FooterText = Resources.MsgFailInitConfDirFooterText,
                 });
             }
 
-            public static void InitLockFileFailed(Exception ex)
+            public static void InitLockFailed(Exception ex)
             {
                 ShowMessage(new TaskDialogOptions
                 {
-                    Title = "Krile StarryEyes",
+                    Title = Resources.MsgFailTitle,
                     MainIcon = VistaTaskDialogIcon.Error,
-                    MainInstruction = "Krileの起動に失敗しました。",
-                    Content = "起動状態ファイルを作成できません。",
+                    MainInstruction = Resources.MsgFailStartInst,
+                    Content = Resources.MsgFailInitLockContent,
                     ExpandedInfo = ex.ToString(),
                     CommonButtons = TaskDialogCommonButtons.Close,
                     FooterIcon = VistaTaskDialogIcon.Information,
-                    FooterText = "症状が改善しない場合は、Windowsを再起動してみてください。"
+                    FooterText = Resources.MsgFailInitLockFooter
                 });
             }
 
@@ -507,10 +504,10 @@ namespace StarryEyes
             {
                 ShowMessage(new TaskDialogOptions
                 {
-                    Title = "Krile StarryEyes",
+                    Title = App.AppFullName,
                     MainIcon = VistaTaskDialogIcon.Error,
-                    MainInstruction = "処理が正常に完了しませんでした。",
-                    Content = "Krileを再起動してもう一度試すか、コンピュータを再起動してみてください。",
+                    MainInstruction = Resources.MsgFailGeneralProcessInst,
+                    Content = Resources.MsgFailGeneralProcessContent,
                     ExpandedInfo = ex.ToString(),
                     CommonButtons = TaskDialogCommonButtons.Close,
                 });

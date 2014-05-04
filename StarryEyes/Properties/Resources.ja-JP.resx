@@ -198,4 +198,96 @@ Windowsの設定を変更することで、この問題を回避できる可能�
   <data name="MsgDoNotShowAgain" xml:space="preserve">
     <value>次回からこのメッセージを表示しない</value>
   </data>
+  <data name="MsgDbOptimizationFailedInst" xml:space="preserve">
+    <value>データベースの最適化に失敗しました。</value>
+  </data>
+  <data name="MsgDbOptimizationFailedTitle" xml:space="preserve">
+    <value>Krile データベースの最適化</value>
+  </data>
+  <data name="MsgFailGeneralProcessContent" xml:space="preserve">
+    <value>Krileを再起動してもう一度試すか、Windowsを再起動してみてください。</value>
+  </data>
+  <data name="MsgFailGeneralProcessInst" xml:space="preserve">
+    <value>処理が正常に完了しませんでした。</value>
+  </data>
+  <data name="MsgFailInitConfDirContent" xml:space="preserve">
+    <value>設定を保持するディレクトリを作成できません。</value>
+  </data>
+  <data name="MsgFailInitConfDirFooterText" xml:space="preserve">
+    <value>Krileを別のディレクトリへ配置してみるか、Windowsを再起動してみてください。</value>
+  </data>
+  <data name="MsgFailInitLockContent" xml:space="preserve">
+    <value>起動状態記録ファイルを作成できません。</value>
+  </data>
+  <data name="MsgFailInitLockFooter" xml:space="preserve">
+    <value>症状が改善しない場合は、Windowsを再起動してみてください。</value>
+  </data>
+  <data name="MsgFailLaunchDuplicatedContent" xml:space="preserve">
+    <value>同じ設定を共有するKrileは多重起動できません。</value>
+  </data>
+  <data name="MsgFailLaunchDuplicatedExInfo" xml:space="preserve">
+    <value>多重起動を行うには krile.exe.config を編集する必要があります。
+詳しくは公式Webサイトやファイルリポジトリをご覧ください。</value>
+  </data>
+  <data name="MsgFailLaunchDuplicatedInst" xml:space="preserve">
+    <value>Krileはすでに起動しています。</value>
+  </data>
+  <data name="MsgFailStartInst" xml:space="preserve">
+    <value>Krileの起動に失敗しました。</value>
+  </data>
+  <data name="MsgFailTitle" xml:space="preserve">
+    <value>Krile StarryEyes</value>
+  </data>
+  <data name="MsgMaintenanceCmdCleanInstall" xml:space="preserve">
+    <value>全てを削除して最新版を再インストール(&amp;R)</value>
+  </data>
+  <data name="MsgMaintenanceCmdContinue" xml:space="preserve">
+    <value>このまま起動(&amp;C)</value>
+  </data>
+  <data name="MsgMaintenanceCmdDeleteAll" xml:space="preserve">
+    <value>すべての設定・データベースを消去して起動(&amp;A)</value>
+  </data>
+  <data name="MsgMaintenanceCmdDeleteAllAndExit" xml:space="preserve">
+    <value>すべての設定・データベースを消去して終了(&amp;E)</value>
+  </data>
+  <data name="MsgMaintenanceCmdDeleteDb" xml:space="preserve">
+    <value>データベースを消去して起動(&amp;D)</value>
+  </data>
+  <data name="MsgMaintenanceCmdExit" xml:space="preserve">
+    <value>キャンセル(&amp;X)</value>
+  </data>
+  <data name="MsgMaintenanceCmdOptimize" xml:space="preserve">
+    <value>データベースを最適化して起動(&amp;O)</value>
+  </data>
+  <data name="MsgMaintenanceContent" xml:space="preserve">
+    <value>削除したデータは元に戻せません。必要なデータはあらかじめバックアップしてください。</value>
+  </data>
+  <data name="MsgMaintenanceInst" xml:space="preserve">
+    <value>Krileが保持しているデータを管理できます。</value>
+  </data>
+  <data name="MsgMaintenanceTitle" xml:space="preserve">
+    <value>Krileのメンテナンス</value>
+  </data>
+  <data name="MsgRecoveryCmdContinue" xml:space="preserve">
+    <value>このまま起動(&amp;C)</value>
+  </data>
+  <data name="MsgRecoveryCmdExit" xml:space="preserve">
+    <value>起動せずにKrileを終了(&amp;X)</value>
+  </data>
+  <data name="MsgRecoveryCmdMaintenance" xml:space="preserve">
+    <value>メンテナンスダイアログを表示(&amp;M)</value>
+  </data>
+  <data name="MsgRecoveryContent" xml:space="preserve">
+    <value>一時的な問題が原因だと思われる場合は、このまま起動を継続してください。
+問題が継続して発生する場合は、Windowsの再起動やデータベースファイルの削除を試してみてください。</value>
+  </data>
+  <data name="MsgRecoveryFooter" xml:space="preserve">
+    <value>データベースや設定の削除を行うには、メンテナンスダイアログを表示してください。</value>
+  </data>
+  <data name="MsgRecoveryInst" xml:space="preserve">
+    <value>Krileは正しく終了しませんでした。</value>
+  </data>
+  <data name="MsgRecoveryTitle" xml:space="preserve">
+    <value>Krileの回復</value>
+  </data>
 </root>

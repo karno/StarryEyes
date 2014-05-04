@@ -124,6 +124,24 @@ namespace StarryEyes.Properties {
         }
         
         /// <summary>
+        ///   Database optimization failed. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgDbOptimizationFailedInst {
+            get {
+                return ResourceManager.GetString("MsgDbOptimizationFailedInst", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Krile Database Optimization に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgDbOptimizationFailedTitle {
+            get {
+                return ResourceManager.GetString("MsgDbOptimizationFailedTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Maybe designation of database path is invalid.
         ///Please examine krile.exe.config . に類似しているローカライズされた文字列を検索します。
         /// </summary>
@@ -235,11 +253,265 @@ namespace StarryEyes.Properties {
         }
         
         /// <summary>
+        ///   Please retry process or reboot Windows. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgFailGeneralProcessContent {
+            get {
+                return ResourceManager.GetString("MsgFailGeneralProcessContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Process is not complete properly. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgFailGeneralProcessInst {
+            get {
+                return ResourceManager.GetString("MsgFailGeneralProcessInst", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Could not create setting directory. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgFailInitConfDirContent {
+            get {
+                return ResourceManager.GetString("MsgFailInitConfDirContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Please place Krile into other directory. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgFailInitConfDirFooterText {
+            get {
+                return ResourceManager.GetString("MsgFailInitConfDirFooterText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Could not create locking file. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgFailInitLockContent {
+            get {
+                return ResourceManager.GetString("MsgFailInitLockContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Please reboot Windows if problem is not solved. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgFailInitLockFooter {
+            get {
+                return ResourceManager.GetString("MsgFailInitLockFooter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Krile can not run duplicated that sharing settings each other. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgFailLaunchDuplicatedContent {
+            get {
+                return ResourceManager.GetString("MsgFailLaunchDuplicatedContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Running multiple krile needs configuring krile.exe.config.
+        ///Visit official site or repository for more detail. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgFailLaunchDuplicatedExInfo {
+            get {
+                return ResourceManager.GetString("MsgFailLaunchDuplicatedExInfo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Krile is already running. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgFailLaunchDuplicatedInst {
+            get {
+                return ResourceManager.GetString("MsgFailLaunchDuplicatedInst", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Failed starting Krile. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgFailStartInst {
+            get {
+                return ResourceManager.GetString("MsgFailStartInst", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Krile StarryEyes に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgFailTitle {
+            get {
+                return ResourceManager.GetString("MsgFailTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///    に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string MsgInstructionTabWarning {
             get {
                 return ResourceManager.GetString("MsgInstructionTabWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Delete all and &amp;reinstall latest version に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgMaintenanceCmdCleanInstall {
+            get {
+                return ResourceManager.GetString("MsgMaintenanceCmdCleanInstall", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   &amp;Continue starting Krile に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgMaintenanceCmdContinue {
+            get {
+                return ResourceManager.GetString("MsgMaintenanceCmdContinue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Delete &amp;all settings and database に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgMaintenanceCmdDeleteAll {
+            get {
+                return ResourceManager.GetString("MsgMaintenanceCmdDeleteAll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   &amp;Exit after deleting all settings and database に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgMaintenanceCmdDeleteAllAndExit {
+            get {
+                return ResourceManager.GetString("MsgMaintenanceCmdDeleteAllAndExit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   &amp;Delete database に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgMaintenanceCmdDeleteDb {
+            get {
+                return ResourceManager.GetString("MsgMaintenanceCmdDeleteDb", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cancel and E&amp;xit に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgMaintenanceCmdExit {
+            get {
+                return ResourceManager.GetString("MsgMaintenanceCmdExit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   &amp;Optimize database に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgMaintenanceCmdOptimize {
+            get {
+                return ResourceManager.GetString("MsgMaintenanceCmdOptimize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Deleted data can not recover. Please backup before deletion if needed. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgMaintenanceContent {
+            get {
+                return ResourceManager.GetString("MsgMaintenanceContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Managing data stored in Krile. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgMaintenanceInst {
+            get {
+                return ResourceManager.GetString("MsgMaintenanceInst", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Maintenance Krile に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgMaintenanceTitle {
+            get {
+                return ResourceManager.GetString("MsgMaintenanceTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   &amp;Continue starting Krile に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgRecoveryCmdContinue {
+            get {
+                return ResourceManager.GetString("MsgRecoveryCmdContinue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   E&amp;xit immediately に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgRecoveryCmdExit {
+            get {
+                return ResourceManager.GetString("MsgRecoveryCmdExit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Show &amp;maintenance dialog に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgRecoveryCmdMaintenance {
+            get {
+                return ResourceManager.GetString("MsgRecoveryCmdMaintenance", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   If crash caused by temporarily problem, you can continue starting.
+        ///Deleting database file or rebooting Windows will help starting Krile when problem is continue. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgRecoveryContent {
+            get {
+                return ResourceManager.GetString("MsgRecoveryContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Maintenance Dialog can delete database or/and delete settings. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgRecoveryFooter {
+            get {
+                return ResourceManager.GetString("MsgRecoveryFooter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Krile had not shut down properly. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgRecoveryInst {
+            get {
+                return ResourceManager.GetString("MsgRecoveryInst", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recovery your Krile に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgRecoveryTitle {
+            get {
+                return ResourceManager.GetString("MsgRecoveryTitle", resourceCulture);
             }
         }
         
