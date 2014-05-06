@@ -78,7 +78,7 @@ namespace StarryEyes.Filters.Sources
 
         public override string FilterValue
         {
-            get { return this._original.ToString(); }
+            get { return this._original.ToString(CultureInfo.InvariantCulture); }
         }
 
         public override Func<TwitterStatus, bool> GetEvaluator()

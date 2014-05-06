@@ -13,7 +13,13 @@ namespace StarryEyes.Models.Accounting
     /// </summary>
     public sealed class TwitterAccount : IOAuthCredential
     {
-        public TwitterAccount() { }
+        // accessed from serializer
+        [UsedImplicitly]
+        public TwitterAccount()
+        {
+            Id = 0;
+            UnreliableScreenName = String.Empty;
+        }
 
         public TwitterAccount(long id, string screenName, [NotNull] AccessToken token)
         {
@@ -36,21 +42,25 @@ namespace StarryEyes.Models.Accounting
         /// <summary>
         /// User specified consumer key.
         /// </summary>
+        [CanBeNull]
         public string OverridedConsumerKey { get; set; }
 
         /// <summary>
         /// User specified consumer secret.
         /// </summary>
+        [CanBeNull]
         public string OverridedConsumerSecret { get; set; }
 
         /// <summary>
         /// Access token of this account.
         /// </summary>
+        [NotNull]
         public string OAuthAccessToken { get; set; }
 
         /// <summary>
         /// Token secret of this account.
         /// </summary>
+        [NotNull]
         public string OAuthAccessTokenSecret { get; set; }
 
         #endregion
@@ -60,11 +70,13 @@ namespace StarryEyes.Models.Accounting
         /// <summary>
         /// Screen Name of user. This is a cache, so do not use this property for identifying user.
         /// </summary>
+        [NotNull]
         public string UnreliableScreenName { get; set; }
 
         /// <summary>
         /// Profile image of user. This is a cache property, so do not use this property for identifying user.
         /// </summary>
+        [CanBeNull]
         public Uri UnreliableProfileImage { get; set; }
 
         [NotNull]

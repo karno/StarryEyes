@@ -147,9 +147,6 @@ Current value: {0} / Lowest recommend: {1}</value>
   <data name="MsgStartupErrorInst" xml:space="preserve">
     <value>Starting krile has failed.</value>
   </data>
-  <data name="MsgInstructionTabWarning" xml:space="preserve">
-    <value />
-  </data>
   <data name="MsgStartupErrorTitle" xml:space="preserve">
     <value>Krile Startup Error</value>
   </data>

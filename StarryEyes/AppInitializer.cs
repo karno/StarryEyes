@@ -16,7 +16,6 @@ using StarryEyes.Models.Stores;
 using StarryEyes.Models.Subsystems;
 using StarryEyes.Models.Subsystems.Notifications.UI;
 using StarryEyes.Nightmare.Windows;
-using StarryEyes.Plugins;
 using StarryEyes.Properties;
 using StarryEyes.Settings;
 using StarryEyes.Views.Dialogs;

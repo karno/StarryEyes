@@ -6,7 +6,6 @@
              xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:primitives="clr-namespace:StarryEyes.Views.WindowParts.Primitives"
-             xmlns:searchFlips="clr-namespace:StarryEyes.Views.WindowParts.Flips.SearchFlips"
              d:DesignHeight="300"
              d:DesignWidth="300"
              mc:Ignorable="d">

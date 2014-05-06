@@ -250,6 +250,7 @@ namespace StarryEyes.Models.Databases
                 }
                 return fetched;
             });
+            // ReSharper disable once PossibleMultipleEnumeration
             return read.ToObservable()
                        .SelectMany(_ => _)
                        .SelectMany(s => LoadStatusAsync(s).ToObservable())

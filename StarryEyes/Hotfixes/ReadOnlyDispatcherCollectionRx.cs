@@ -8,6 +8,7 @@ using System.Threading;
 using System.Windows.Threading;
 using StarryEyes.Hotfixes;
 
+// ReSharper disable once CheckNamespace
 namespace StarryEyes
 {
     public class ReadOnlyDispatcherCollectionRx<T> : ReadOnlyCollection<T>, INotifyCollectionChanged, INotifyPropertyChanged, IDisposable
@@ -115,6 +116,7 @@ namespace StarryEyes
 
                 if (typeof(IDisposable).IsAssignableFrom(typeof(T)))
                 {
+                    // ReSharper disable once PossibleInvalidCastExceptionInForeachLoop
                     foreach (IDisposable i in _collection)
                     {
                         i.Dispose();

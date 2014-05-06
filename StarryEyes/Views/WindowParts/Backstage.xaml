@@ -15,7 +15,6 @@
     <UserControl.Resources>
         <utils:BooleanToVisibleConverter x:Key="BooleanToVisibleConverter" />
         <utils:BooleanToInvisibleConverter x:Key="BooleanToInvisibleConverter" />
-        <utils:StringToVisibleConverter x:Key="StringToVisibleConverter" />
     </UserControl.Resources>
     <UserControl.DataContext>
         <windowParts:BackstageViewModel />
@@ -128,8 +127,7 @@
         </Border>
         <Border Grid.Column="1" Background="{DynamicResource BaseColorBackgroundBrush}">
             <!--  Main area  -->
-            <ScrollViewer Grid.Row="1"
-                          HorizontalAlignment="Stretch"
+            <ScrollViewer HorizontalAlignment="Stretch"
                           VerticalAlignment="Stretch"
                           Style="{StaticResource TouchScrollViewerStyle}">
                 <ItemsControl FocusVisualStyle="{x:Null}" ItemsSource="{Binding TwitterEvents}">

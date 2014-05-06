@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
+using JetBrains.Annotations;
 using StarryEyes.Anomaly.Utils;
 
 namespace StarryEyes.Anomaly.TwitterApi.DataModels
@@ -13,10 +14,11 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
         public const string TwitterStatusUrl = "https://twitter.com/{0}/status/{1}";
         public const string FavstarStatusUrl = "http://favstar.fm/users/{0}/status/{1}";
 
-        public TwitterStatus()
+        public TwitterStatus([NotNull] TwitterUser user, [NotNull] string text)
         {
             this.GenerateFromJson = false;
-            Entities = new TwitterEntity[0];
+            this.User = user;
+            this.Text = text;
         }
 
         public TwitterStatus(dynamic json)
@@ -52,11 +54,12 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
                 }
                 if (json.retweeted_status())
                 {
-                    this.RetweetedOriginal = new TwitterStatus(json.retweeted_status);
-                    this.RetweetedOriginalId = this.RetweetedOriginal.Id;
+                    var original = new TwitterStatus(json.retweeted_status);
+                    this.RetweetedOriginal = original;
+                    this.RetweetedOriginalId = original.Id;
                     // merge text and entities
-                    this.Text = this.RetweetedOriginal.Text;
-                    this.Entities = this.RetweetedOriginal.Entities.ToArray();
+                    this.Text = original.Text;
+                    this.Entities = original.Entities.Guard().ToArray();
                 }
                 if (json.coordinates() && json.coordinates != null)
                 {
@@ -81,12 +84,14 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
         /// <summary>
         /// User of this tweet/message.
         /// </summary>
-        public TwitterUser User { get; set; }
+        [NotNull]
+        public TwitterUser User { get; private set; }
 
         /// <summary>
         /// Body of this tweet/message. Escape sequences are already resolved.
         /// </summary>
-        public string Text { get; set; }
+        [NotNull]
+        public string Text { get; private set; }
 
         /// <summary>
         /// Created at of this tweet/message.
@@ -98,6 +103,7 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
         /// <summary>
         /// Source of this tweet. (a.k.a. via, from, ...)
         /// </summary>
+        [CanBeNull]
         public string Source { get; set; }
 
         /// <summary>
@@ -113,6 +119,7 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
         /// <summary>
         /// User screen name which replied this tweet.
         /// </summary>
+        [CanBeNull]
         public string InReplyToScreenName { get; set; }
 
         /// <summary>
@@ -133,6 +140,7 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
         /// <summary>
         /// Status which represents original of this(retweeted) tweet
         /// </summary>
+        [CanBeNull]
         public TwitterStatus RetweetedOriginal { get; set; }
 
         #endregion
@@ -142,6 +150,7 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
         /// <summary>
         /// Recipient of this message. (ONLY FOR DIRECT MESSAGE)
         /// </summary>
+        [CanBeNull]
         public TwitterUser Recipient { get; set; }
 
         #endregion
@@ -151,11 +160,13 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
         /// <summary>
         /// Favorited users IDs.
         /// </summary>
+        [CanBeNull]
         public long[] FavoritedUsers { get; set; }
 
         /// <summary>
         /// Retweeted users IDs.
         /// </summary>
+        [CanBeNull]
         public long[] RetweetedUsers { get; set; }
 
         #endregion
@@ -163,25 +174,33 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
         /// <summary>
         /// Entities of this tweet
         /// </summary>
+        [CanBeNull]
         public TwitterEntity[] Entities { get; set; }
 
+        [NotNull]
         public string Permalink
         {
             get { return String.Format(TwitterStatusUrl, User.ScreenName, Id); }
         }
 
+        [NotNull]
         public string FavstarPermalink
         {
             get { return String.Format(FavstarStatusUrl, User.ScreenName, Id); }
         }
 
         // ReSharper disable InconsistentNaming
+        [NotNull]
         public string STOTString
         {
-            get { return this.User.ScreenName + ": " + this.Text + " [" + this.Permalink + "]"; }
+            get
+            {
+                return "@" + this.User.ScreenName + ": " + this.Text + " [" + this.Permalink + "]";
+            }
         }
         // ReSharper restore InconsistentNaming
 
+        [NotNull]
         public string GetEntityAidedText(bool showFullUrl = false)
         {
             try
@@ -250,7 +269,7 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
         /// <returns></returns>
         public override string ToString()
         {
-            return "@" + (User == null ? "[unknown user]" : User.ScreenName) + ": " + this.Text;
+            return "@" + User.ScreenName + ": " + this.Text;
         }
 
         // override object.Equals

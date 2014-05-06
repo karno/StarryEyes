@@ -4,6 +4,7 @@ using StarryEyes.Anomaly.TwitterApi.DataModels;
 
 namespace StarryEyes.Filters.Expressions.Operators
 {
+    // ReSharper disable MemberCanBeProtected.Global
     public abstract class FilterOperatorBase : FilterExpressionBase
     {
         protected abstract string OperatorString { get; }
@@ -165,4 +166,5 @@ namespace StarryEyes.Filters.Expressions.Operators
                 : StringComparison.CurrentCultureIgnoreCase;
         }
     }
+    // ReSharper restore MemberCanBeProtected.Global
 }

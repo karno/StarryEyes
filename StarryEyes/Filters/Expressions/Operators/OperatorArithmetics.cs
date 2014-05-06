@@ -16,7 +16,7 @@ namespace StarryEyes.Filters.Expressions.Operators
         {
             get
             {
-                return new[] { FilterExpressionType.Numeric, FilterExpressionType.Set, FilterExpressionType.String, }
+                return new[] { FilterExpressionType.Numeric, FilterExpressionType.Set, FilterExpressionType.String }
                     .Intersect(LeftValue.SupportedTypes)
                     .Intersect(RightValue.SupportedTypes);
             }

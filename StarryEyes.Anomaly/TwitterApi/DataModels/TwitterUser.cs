@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
+using JetBrains.Annotations;
 using StarryEyes.Anomaly.Utils;
 
 namespace StarryEyes.Anomaly.TwitterApi.DataModels
@@ -9,6 +10,7 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
     {
         public TwitterUser()
         {
+            ScreenName = String.Empty;
         }
 
         public TwitterUser(dynamic json)
@@ -63,27 +65,32 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
         /// <summary>
         /// ScreenName ( sometimes also call @ID ) of this user.
         /// </summary>
+        [NotNull]
         public string ScreenName { get; set; }
 
         /// <summary>
         /// Name for the display of this user.
         /// </summary>
+        [CanBeNull]
         public string Name { get; set; }
 
         /// <summary>
         /// Description of this user, also calls &quot;Bio&quot;
         /// </summary>
+        [CanBeNull]
         public string Description { get; set; }
 
         /// <summary>
         /// Location of this user.
         /// </summary>
+        [CanBeNull]
         public string Location { get; set; }
 
         /// <summary>
         /// Url of this user. <para />
         /// Warning: This property, named URL but, may not be exactly URI.
         /// </summary>
+        [CanBeNull]
         public string Url { get; set; }
 
         /// <summary>
@@ -94,16 +101,19 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
         /// <summary>
         /// Profile image of this user.
         /// </summary>
+        [CanBeNull]
         public Uri ProfileImageUri { get; set; }
 
         /// <summary>
         /// Profile background image of this user.
         /// </summary>
+        [CanBeNull]
         public Uri ProfileBackgroundImageUri { get; set; }
 
         /// <summary>
         /// Profile background image of this user.
         /// </summary>
+        [CanBeNull]
         public Uri ProfileBannerUri { get; set; }
 
         /// <summary>
@@ -169,23 +179,28 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
         /// <summary>
         /// Entities of this user url
         /// </summary>
+        [CanBeNull]
         public TwitterEntity[] UrlEntities { get; set; }
 
         /// <summary>
         /// Entities of this user description
         /// </summary>
+        [CanBeNull]
         public TwitterEntity[] DescriptionEntities { get; set; }
 
+        [NotNull]
         public string UserPermalink
         {
             get { return String.Format(TwitterUserUrl, ScreenName); }
         }
 
+        [NotNull]
         public string FavstarUserPermalink
         {
             get { return String.Format(FavstarUserUrl, ScreenName); }
         }
 
+        [NotNull]
         public string TwilogUserPermalink
         {
             get { return String.Format(TwilogUserUrl, ScreenName); }
@@ -201,6 +216,7 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
             return this.Id == ((TwitterUser)obj).Id;
         }
 
+        [NotNull]
         public string GetEntityAidedUrl()
         {
             if (this.UrlEntities != null)
@@ -211,13 +227,14 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
                     return entity.OriginalUrl;
                 }
             }
-            return Url;
+            return Url ?? String.Empty;
         }
 
+        [NotNull]
         public string GetEntityAidedDescription(bool showFullUrl = false)
         {
             var builder = new StringBuilder();
-            var escaped = ParsingExtension.EscapeEntity(this.Description);
+            var escaped = ParsingExtension.EscapeEntity(this.Description ?? String.Empty);
             TwitterEntity prevEntity = null;
             foreach (var entity in this.DescriptionEntities.Guard().OrderBy(e => e.StartIndex))
             {

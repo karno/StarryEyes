@@ -19,14 +19,12 @@ namespace StarryEyes.Filters.Sources
         public FilterUser(string screenName)
         {
             _targetIdOrScreenName = screenName.Trim();
-            if (screenName.StartsWith("#"))
+            if (!screenName.StartsWith("#")) return;
+            // if specified by ID, check variable is numerics
+            long result;
+            if (!Int64.TryParse(screenName.Substring(1), out result))
             {
-                // check
-                long result;
-                if (!Int64.TryParse(screenName.Substring(1), out result))
-                {
-                    throw new ArgumentException("不正な引数が指定されています(ソースフィルタ user)");
-                }
+                throw new ArgumentException("不正な引数が指定されています(ソースフィルタ user)");
             }
         }
 
@@ -42,17 +40,9 @@ namespace StarryEyes.Filters.Sources
 
         public override Func<TwitterStatus, bool> GetEvaluator()
         {
-            if (_targetIdOrScreenName.StartsWith("#"))
-            {
-                // extract by id
-                return s => s.User.Id == Int64.Parse(_targetIdOrScreenName.Substring(1));
-            }
-            else
-            {
-                // extract by screen name
-                return
-                    s => s.User.ScreenName.Equals(_targetIdOrScreenName, StringComparison.CurrentCultureIgnoreCase);
-            }
+            return this._targetIdOrScreenName.StartsWith("#")
+                ? (Func<TwitterStatus, bool>)(s => s.User.Id == Int64.Parse(this._targetIdOrScreenName.Substring(1)))
+                : (s => s.User.ScreenName.Equals(this._targetIdOrScreenName, StringComparison.CurrentCultureIgnoreCase));
         }
 
         public override string GetSqlQuery()

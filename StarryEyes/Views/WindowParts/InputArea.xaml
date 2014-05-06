@@ -5,14 +5,12 @@
              xmlns:controls="clr-namespace:StarryEyes.Views.Controls"
              xmlns:custom="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:ed="http://schemas.microsoft.com/expression/2010/drawing"
              xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:inputting="clr-namespace:StarryEyes.ViewModels.WindowParts.Inputting"
              xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:seb="clr-namespace:StarryEyes.Views.Behaviors"
-             xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:triggers="clr-namespace:StarryEyes.Views.Triggers"
              xmlns:utils="clr-namespace:StarryEyes.Views.Utils"
              x:Name="UserControl"
@@ -32,7 +30,7 @@
             <utils:BooleanToVisibleConverter x:Key="BooleanToVisibleConverter" />
             <utils:BooleanToInvisibleConverter x:Key="BooleanToInvisibleConverter" />
             <utils:StringRemoveLineConverter x:Key="StringRemoveLineConverter" />
-            <DataTemplate x:Key="HashtagDataTemplate">
+            <DataTemplate x:Key="HashtagDataTemplate" DataType="{x:Type inputting:BindHashtagViewModel}">
                 <Button Width="Auto"
                         HorizontalAlignment="Left"
                         VerticalAlignment="Top"
@@ -373,6 +371,7 @@
                         </i:Interaction.Behaviors>
                         <controls:SuggestableTextBox.ListItemTemplate>
                             <DataTemplate>
+                                <!--  ReSharper disable once Xaml.BindingWithContextNotResolved  -->
                                 <TextBlock Foreground="Black" Text="{Binding Body}" />
                             </DataTemplate>
                         </controls:SuggestableTextBox.ListItemTemplate>
@@ -442,6 +441,7 @@
                                                          Visibility="{Binding IsDraftsExisted,
                                                                               Converter={StaticResource BooleanToVisibleConverter}}">
                                 <controls:DropDownMenuButton.DropDownContextMenu>
+                                    <!--  ReSharper disable once Xaml.BindingWithContextNotResolved  -->
                                     <ContextMenu DataContext="{Binding PlacementTarget.DataContext,
                                                                        RelativeSource={RelativeSource Self}}"
                                                  DisplayMemberPath="Text"
@@ -492,6 +492,7 @@
                                           Fill="{DynamicResource BaseColorForegroundBrush}"
                                           Stretch="Fill" />
                                     <Button.ContextMenu>
+                                        <!--  ReSharper disable once Xaml.BindingWithContextNotResolved  -->
                                         <ContextMenu DataContext="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
                                             <MenuItem Header="添付するファイルを選択...">
                                                 <i:Interaction.Triggers>
@@ -608,11 +609,7 @@
                                     <custom:ToggleSwitchButton x:Name="ToggleUrlAutoEscapeButton"
                                                                IsChecked="{Binding IsUrlAutoEsacpeEnabled}"
                                                                SwitchForeground="{DynamicResource GlobalKeyBrush}"
-                                                               ToolTip="URLリンク化自動回避のオンオフを切り替えます。">
-                                        <custom:ToggleSwitchButton.Resources>
-                                            <SolidColorBrush x:Key="BlackBrush" Color="{DynamicResource BaseColorForeground}" />
-                                        </custom:ToggleSwitchButton.Resources>
-                                    </custom:ToggleSwitchButton>
+                                                               ToolTip="URLリンク化自動回避のオンオフを切り替えます。" />
                                 </Viewbox>
                             </Grid>
                         </StackPanel>

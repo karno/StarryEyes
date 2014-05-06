@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
@@ -44,7 +45,6 @@ namespace StarryEyes.Views.Controls
             DependencyProperty.Register("IsSourceFilterEditable", typeof(bool), typeof(QueryEditor), new PropertyMetadata(true));
 
         public QueryEditor()
-            : base()
         {
             this.ShowLineNumbers = true;
             this.LoadXshd();
@@ -52,19 +52,19 @@ namespace StarryEyes.Views.Controls
             this.TextArea.TextEntered += TextArea_TextEntered;
         }
 
-        private const string resourceName = "StarryEyes.Views.Controls.QueryEditorResources.KrileQuery.xshd";
+        private const string ResourceName = "StarryEyes.Views.Controls.QueryEditorResources.KrileQuery.xshd";
 
         private void LoadXshd()
         {
             var asm = Assembly.GetExecutingAssembly();
-            using (var stream = asm.GetManifestResourceStream(resourceName))
+            using (var stream = asm.GetManifestResourceStream(ResourceName) ?? Stream.Null)
             using (var reader = XmlReader.Create(stream))
             {
                 this.SyntaxHighlighting = HighlightingLoader.Load(reader, HighlightingManager.Instance);
             }
         }
 
-        protected override void OnTextChanged(System.EventArgs e)
+        protected override void OnTextChanged(EventArgs e)
         {
             QueryText = this.Text;
             base.OnTextChanged(e);
@@ -80,10 +80,11 @@ namespace StarryEyes.Views.Controls
             var wnd = new CompletionWindow(this.TextArea);
             wnd.Closed += (o, e) =>
             {
-                if (this._completionWindow == wnd)
+                if (this._completionWindow.Equals(wnd))
+                {
                     this._completionWindow = null;
+                }
             };
-            var elems = wnd.CompletionList.CompletionData;
             completions.ForEach(wnd.CompletionList.CompletionData.Add);
             // insert elements
             this._completionWindow = wnd;
@@ -154,7 +155,7 @@ namespace StarryEyes.Views.Controls
                     new CompletionData("search", "search:", "検索タイムライン(引数: 検索文字列)"), 
                     new CompletionData("track", "track:", "ストリームタイムライン(引数: 検索文字列[英数字])"), 
                     new CompletionData("conv", "conv:", "返信タイムライン(引数: ツイートID)"), 
-                    new CompletionData("user", "user:", "指定ユーザーのツイート(引数: ユーザースクリーン名 または #ユーザーID)"), 
+                    new CompletionData("user", "user:", "指定ユーザーのツイート(引数: ユーザースクリーン名 または #ユーザーID)") 
                 };
             }
             if (t.Any() &&
@@ -196,20 +197,20 @@ namespace StarryEyes.Views.Controls
                 default:
                     return null;
             }
-            if (lts.Length >= 2 && third.Type == TokenType.Period)
+            if (lts.Length < 2 || third.Type != TokenType.Period)
             {
-                if (second.IsMatchTokenLiteral("list") || first.Type == TokenType.Period)
-                {
-                    // if completing list.*, suppress auto-completion hint.
-                    return null;
-                }
-                if (second.IsMatchTokenLiteral("user") || second.IsMatchTokenLiteral("retweeter"))
-                {
-                    return this.GetUserObjectFieldCompletionData();
-                }
-                return this.GetAccountObjectFieldCompletionData();
+                return this.CheckPreviousIsVariable(third) ? null : this.GetVariableCompletionData();
             }
-            return this.CheckPreviousIsVariable(third) ? null : this.GetVariableCompletionData();
+            if (second.IsMatchTokenLiteral("list") || first.Type == TokenType.Period)
+            {
+                // if completing list.*, suppress auto-completion hint.
+                return null;
+            }
+            if (second.IsMatchTokenLiteral("user") || second.IsMatchTokenLiteral("retweeter"))
+            {
+                return this.GetUserObjectFieldCompletionData();
+            }
+            return this.GetAccountObjectFieldCompletionData();
         }
 
         private bool CheckPreviousIsVariable(Token token)
@@ -360,7 +361,7 @@ namespace StarryEyes.Views.Controls
                 new CompletionData("to", "[Num/Str/Set] ツイートの返信先ユーザー"),
                 new CompletionData("favs", "[Num/Set] 被お気に入り登録数"),
                 new CompletionData("rts", "[Num/Set] 被リツイート数"),
-                new CompletionData("list", "[Set](list.user.slug) リスト登録されているユーザー"),
+                new CompletionData("list", "[Set](list.user.slug) リスト登録されているユーザー")
             };
         }
 
@@ -370,7 +371,7 @@ namespace StarryEyes.Views.Controls
             {
                 new CompletionData("followings", "[Set] フォローしているユーザー"), 
                 new CompletionData("followers", "[Set] フォローされているユーザー"), 
-                new CompletionData("blockings", "[Set] ブロックしているユーザー"), 
+                new CompletionData("blockings", "[Set] ブロックしているユーザー") 
             };
         }
 
@@ -393,7 +394,7 @@ namespace StarryEyes.Views.Controls
                 new CompletionData("name", "[String] ユーザー名"),
                 new CompletionData("bio", "[String] プロフィール"),
                 new CompletionData("loc", "[String] 所在地"),
-                new CompletionData("lang", "[String] 言語"),
+                new CompletionData("lang", "[String] 言語")
             };
         }
 

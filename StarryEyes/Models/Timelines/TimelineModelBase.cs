@@ -90,7 +90,7 @@ namespace StarryEyes.Models.Timelines
 
         private void AcceptStatus(StatusModelNotification n)
         {
-            if (n.IsAdded && this.CheckAcceptStatus(n.StatusModel.Status))
+            if (n.IsAdded && n.StatusModel != null && this.CheckAcceptStatus(n.StatusModel.Status))
             {
                 this.AddStatus(n.StatusModel, n.IsNew);
             }

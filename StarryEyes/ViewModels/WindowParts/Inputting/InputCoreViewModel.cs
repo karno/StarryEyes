@@ -107,7 +107,8 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                 {
                     Directory.Delete(this._tempDir, true);
                 }
-                catch
+                // ReSharper disable once EmptyGeneralCatchClause
+                catch (Exception)
                 {
                     // I think that is sign from God that I must not delete that folder if failed.
                 }
@@ -230,7 +231,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                 var currentTextLength = StatusTextUtil.CountText(InputText);
                 if (IsImageAttached)
                 {
-                    currentTextLength += TwitterConfigurationService.HttpsUrlLength;
+                    currentTextLength += TwitterConfigurationService.MediaUrlLength;
                 }
                 var tags = TwitterRegexPatterns.ValidHashtag.Matches(InputText)
                                            .OfType<Match>()
@@ -321,7 +322,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                         ClearInput(clearTo, true);
                         return true;
                     default:
-                        throw new InvalidOperationException("Invalid return value:" + action.ToString());
+                        throw new InvalidOperationException("Invalid return value:" + action);
                 }
             }
             ClearInput(clearTo);
@@ -590,7 +591,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             }
 
             Setting.LastImageOpenDir.Value = Path.GetDirectoryName(m.Response[0]);
-            AttachImageFromPath(m.Response[0]);
+            this.AttachImageFromPath(m.Response[0]);
         }
 
         public void DetachImage()
@@ -612,7 +613,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                     encoder.Frames.Add(BitmapFrame.Create(image));
                     encoder.Save(fs);
                 }
-                AttachImageFromPath(tempPath);
+                this.AttachImageFromPath(tempPath);
             }
             catch (Exception ex)
             {
@@ -620,18 +621,16 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             }
         }
 
-        private bool AttachImageFromPath(string file)
+        private void AttachImageFromPath(string file)
         {
             try
             {
                 AttachedImage = new ImageDescriptionViewModel(file);
-                return true;
             }
             catch (Exception ex)
             {
                 ShowImageAttachErrorMessage(ex);
                 AttachedImage = null;
-                return false;
             }
         }
 

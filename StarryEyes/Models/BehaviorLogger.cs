@@ -3,7 +3,7 @@ using System.IO;
 using System.Reactive.Disposables;
 using StarryEyes.Settings;
 
-namespace StarryEyes.Models.Receiving
+namespace StarryEyes.Models
 {
     internal static class BehaviorLogger
     {
@@ -70,6 +70,7 @@ namespace StarryEyes.Models.Receiving
                             " " + log);
                 }
             }
+            // ReSharper disable once EmptyGeneralCatchClause
             catch { }
         }
 

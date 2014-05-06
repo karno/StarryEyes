@@ -100,7 +100,7 @@ namespace StarryEyes.Models
                             yield return new TextToken(TokenKind.Hashtag, body);
                             break;
                         default:
-                            throw new InvalidOperationException("invalid grouping:" + kind.ToString());
+                            throw new InvalidOperationException("invalid grouping:" + kind);
                     }
                 }
                 else

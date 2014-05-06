@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Xml.Linq;
+using JetBrains.Annotations;
 
 namespace StarryEyes.Anomaly.Utils
 {
@@ -235,7 +236,7 @@ namespace StarryEyes.Anomaly.Utils
 
         #region for General Text
 
-        public static string ResolveEntity(string text)
+        public static string ResolveEntity([NotNull] string text)
         {
             return text
                 // .Replace("&quot;", "\"")
@@ -244,7 +245,7 @@ namespace StarryEyes.Anomaly.Utils
                 .Replace("&amp;", "&");
         }
 
-        public static string EscapeEntity(string text)
+        public static string EscapeEntity([NotNull] string text)
         {
             return text
                 .Replace("&", "&amp;")

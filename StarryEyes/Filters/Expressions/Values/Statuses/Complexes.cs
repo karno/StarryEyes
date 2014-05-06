@@ -20,9 +20,9 @@ namespace StarryEyes.Filters.Expressions.Values.Statuses
 
         public override Func<TwitterStatus, long> GetNumericValueProvider()
         {
-            return _ => _.StatusType == StatusType.Tweet ?
-                _.GetOriginal().InReplyToUserId.GetValueOrDefault(-1) :
-                _.Recipient.Id;
+            return s => s.StatusType == StatusType.Tweet || s.Recipient == null ?
+                s.GetOriginal().InReplyToUserId.GetValueOrDefault(-1) :
+                s.Recipient.Id;
         }
 
         public override string GetNumericSqlQuery()
@@ -32,9 +32,9 @@ namespace StarryEyes.Filters.Expressions.Values.Statuses
 
         public override Func<TwitterStatus, string> GetStringValueProvider()
         {
-            return _ => _.StatusType == StatusType.Tweet ?
-                _.GetOriginal().InReplyToScreenName ?? String.Empty :
-                _.Recipient.ScreenName;
+            return s => s.StatusType == StatusType.Tweet || s.Recipient == null ?
+                s.GetOriginal().InReplyToScreenName ?? String.Empty :
+                s.Recipient.ScreenName;
         }
 
         public override string GetStringSqlQuery()
@@ -44,9 +44,9 @@ namespace StarryEyes.Filters.Expressions.Values.Statuses
 
         public override Func<TwitterStatus, IReadOnlyCollection<long>> GetSetValueProvider()
         {
-            return _ => _.StatusType == StatusType.Tweet ?
-                FilterSystemUtil.InReplyToUsers(_.GetOriginal()).ToList() :
-                new[] { _.Recipient.Id }.ToList();
+            return s => s.StatusType == StatusType.Tweet || s.Recipient == null ?
+                FilterSystemUtil.InReplyToUsers(s.GetOriginal()).ToList() :
+                new[] { s.Recipient.Id }.ToList();
         }
 
         public override string GetSetSqlQuery()

@@ -40,6 +40,7 @@ namespace StarryEyes.Models.Inputting
             {
                 mention = "@" + inReplyTo.User.ScreenName + " " +
                           inReplyTo.Entities
+                                   .Guard()
                                    .Where(e => e.EntityType == EntityType.UserMentions)
                                    .Where(e => !except.Contains(e.UserId.GetValueOrDefault()))
                                    .Select(e => e.DisplayText)
@@ -81,11 +82,12 @@ namespace StarryEyes.Models.Inputting
         [CanBeNull]
         private static TwitterAccount GetSuitableReplyAccount(TwitterStatus status)
         {
-            if (status.StatusType == StatusType.DirectMessage)
+            if (status.StatusType == StatusType.DirectMessage && status.Recipient != null)
             {
                 return Setting.Accounts.Get(status.Recipient.Id);
             }
             var replyTargets = status.Entities
+                                     .Guard()
                                      .Where(e => e.EntityType == EntityType.UserMentions && e.UserId != null)
                                      .Select(e => e.UserId.GetValueOrDefault())
                                      .ToArray();

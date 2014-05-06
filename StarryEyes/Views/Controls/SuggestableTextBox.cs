@@ -256,6 +256,7 @@ namespace StarryEyes.Views.Controls
 
     public abstract class SuggestItemProviderBase : INotifyPropertyChanged
     {
+        [UsedImplicitly]
         public abstract IList CandidateCollection { get; }
 
         [UsedImplicitly]

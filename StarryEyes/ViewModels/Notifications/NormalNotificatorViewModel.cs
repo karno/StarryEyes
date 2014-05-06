@@ -15,7 +15,7 @@ namespace StarryEyes.ViewModels.Notifications
 {
     public class NormalNotificatorViewModel : ViewModel
     {
-        public static readonly List<bool> _slots = new List<bool>();
+        private static readonly List<bool> Slots = new List<bool>();
 
         public static void Initialize()
         {
@@ -99,36 +99,36 @@ namespace StarryEyes.ViewModels.Notifications
             this._header = header;
             this._description = description;
             // acquire slot
-            lock (_slots)
+            lock (Slots)
             {
                 _slotIndex = 0;
-                while (_slotIndex < _slots.Count)
+                while (_slotIndex < Slots.Count)
                 {
-                    if (!_slots[_slotIndex]) break;
+                    if (!Slots[_slotIndex]) break;
                     _slotIndex++;
                 }
-                if (_slotIndex < _slots.Count)
+                if (_slotIndex < Slots.Count)
                 {
-                    _slots[_slotIndex] = true;
+                    Slots[_slotIndex] = true;
                 }
                 else
                 {
-                    _slots.Add(true);
+                    Slots.Add(true);
                 }
             }
             var screen = NotificationUtil.GetNotifyTargetScreen();
             if (screen == null) return;
             var bound = screen.WorkingArea;
-	    // size of notificator
-            var wh = 80;
-            var ww = 300;
+            // size of notificator
+            const int wh = 80;
+            const int ww = 300;
 
-	    // items per one (vertical) line
+            // items per one (vertical) line
             var ipl = (int)Math.Ceiling(bound.Height / wh);
 
             if (ipl == 0)
             {
-		// can not place any dialog
+                // can not place any dialog
                 return;
             }
 
@@ -189,9 +189,9 @@ namespace StarryEyes.ViewModels.Notifications
 
         public void ReleaseSlot()
         {
-            lock (_slots)
+            lock (Slots)
             {
-                _slots[_slotIndex] = false;
+                Slots[_slotIndex] = false;
             }
             this.Dispose();
         }

@@ -69,14 +69,14 @@ namespace StarryEyes.Filters.Expressions.Operators
         {
             var supported = LeftValue.SupportedTypes
                                      .Intersect(RightValue.SupportedTypes)
-                                     .Except(new[] { FilterExpressionType.Set, })
+                                     .Except(new[] { FilterExpressionType.Set })
                                      .ToArray();
             if (supported.Any())
             {
                 return supported.First();
             }
             supported = LeftValue.SupportedTypes
-                                 .Except(new[] { FilterExpressionType.Set, })
+                                 .Except(new[] { FilterExpressionType.Set })
                                  .ToArray();
             if (supported.Any())
             {

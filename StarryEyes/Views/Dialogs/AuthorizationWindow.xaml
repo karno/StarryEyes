@@ -1,8 +1,8 @@
-﻿<Controls:MetroWindow x:Class="StarryEyes.Views.Dialogs.AuthorizationWindow"
+﻿<controls:MetroWindow x:Class="StarryEyes.Views.Dialogs.AuthorizationWindow"
                       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                      xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
                       xmlns:behaviors="clr-namespace:StarryEyes.Views.Messaging.Behaviors"
+                      xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
                       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                       xmlns:dialogs="clr-namespace:StarryEyes.ViewsResources.Dialogs"
                       xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
@@ -10,7 +10,6 @@
                       xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                       xmlns:triggers="clr-namespace:StarryEyes.Views.Triggers"
-                      xmlns:v="clr-namespace:StarryEyes.Views.Dialogs"
                       xmlns:vm="clr-namespace:StarryEyes.ViewModels.Dialogs"
                       Title="Add your account"
                       Width="340"
@@ -24,7 +23,7 @@
                       WindowStartupLocation="CenterOwner"
                       WindowStyle="ToolWindow"
                       mc:Ignorable="d">
-    <Controls:MetroWindow.Resources>
+    <controls:MetroWindow.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
@@ -33,12 +32,11 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/FlatButton.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-            <l:VisibilityAndBooleanConverter x:Key="VisibilityAndBooleanConverter" />
         </ResourceDictionary>
-    </Controls:MetroWindow.Resources>
-    <Controls:MetroWindow.DataContext>
+    </controls:MetroWindow.Resources>
+    <controls:MetroWindow.DataContext>
         <vm:AuthorizationViewModel />
-    </Controls:MetroWindow.DataContext>
+    </controls:MetroWindow.DataContext>
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="ContentRendered">
             <l:LivetCallMethodAction MethodName="Initialize" MethodTarget="{Binding}" />
@@ -75,11 +73,11 @@
             <TextBox Margin="10, 0"
                      VerticalAlignment="Center"
                      VerticalContentAlignment="Center"
-                     Controls:TextboxHelper.Watermark="Enter PIN"
                      Text="{Binding Pin,
                                     Mode=TwoWay,
                                     UpdateSourceTrigger=PropertyChanged}"
-                     TextWrapping="Wrap">
+                     TextWrapping="Wrap"
+                     controls:TextboxHelper.Watermark="Enter PIN">
                 <i:Interaction.Triggers>
                     <triggers:EnterKeyTrigger>
                         <ei:CallMethodAction MethodName="OnEnterKeyDown" TargetObject="{Binding}" />
@@ -130,15 +128,15 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
-                <Controls:ProgressRing Grid.RowSpan="2"
+                <controls:ProgressRing Grid.RowSpan="2"
                                        HorizontalAlignment="Left"
                                        VerticalAlignment="Center"
                                        IsActive="True"
                                        d:LayoutOverrides="GridBox">
-                    <Controls:ProgressRing.Foreground>
+                    <controls:ProgressRing.Foreground>
                         <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.HotTrackColorKey}}" />
-                    </Controls:ProgressRing.Foreground>
-                </Controls:ProgressRing>
+                    </controls:ProgressRing.Foreground>
+                </controls:ProgressRing>
                 <TextBlock Grid.Column="1"
                            Margin="12,0,0,0"
                            HorizontalAlignment="Left"
@@ -151,4 +149,4 @@
             </Grid>
         </Grid>
     </Grid>
-</Controls:MetroWindow>
+</controls:MetroWindow>

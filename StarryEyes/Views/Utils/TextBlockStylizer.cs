@@ -8,6 +8,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using JetBrains.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.Utils;
 using StarryEyes.Helpers;
@@ -104,14 +105,16 @@ namespace StarryEyes.Views.Utils
                     return;
                 }
 
+                var desc = user.Description ?? String.Empty;
+
                 // filter and merge entities
                 var entities = user.DescriptionEntities == null
                     ? null
                     : user.DescriptionEntities.Where(ent => ent.EntityType == EntityType.Urls)
-                          .Concat(GetUserMentionEntities(user.Description ?? String.Empty));
+                          .Concat(GetUserMentionEntities(desc));
 
                 // generate contents
-                GenerateInlines(o, user.Description, entities)
+                GenerateInlines(o, desc, entities)
                     .Select(inline =>
                     {
                         var run = inline as Run;
@@ -124,7 +127,7 @@ namespace StarryEyes.Views.Utils
                     .ForEach(textBlock.Inlines.Add);
             }));
 
-        private static IEnumerable<TwitterEntity> GetUserMentionEntities(string text)
+        private static IEnumerable<TwitterEntity> GetUserMentionEntities([NotNull] string text)
         {
             return TwitterRegexPatterns
                 .ValidMentionOrList
@@ -189,9 +192,9 @@ namespace StarryEyes.Views.Utils
 
         #region Common Entitied Text Utility
 
-        private static IEnumerable<Inline> GenerateInlines(DependencyObject obj, string text, IEnumerable<TwitterEntity> entities)
+        private static IEnumerable<Inline> GenerateInlines([NotNull] DependencyObject obj,
+            [NotNull] string text, [CanBeNull] IEnumerable<TwitterEntity> entities)
         {
-            text = text ?? String.Empty;
             if (entities == null)
             {
                 foreach (var inline in GenerateInlines(obj, text))
@@ -224,7 +227,8 @@ namespace StarryEyes.Views.Utils
                             yield return GenerateLink(obj, display, ParsingExtension.ResolveEntity(entity.OriginalUrl));
                             break;
                         case EntityType.UserMentions:
-                            yield return GenerateUserLink(obj, display, ParsingExtension.ResolveEntity(entity.DisplayText));
+                            yield return
+                                GenerateUserLink(obj, display, ParsingExtension.ResolveEntity(entity.DisplayText));
                             break;
                     }
                 }
@@ -261,7 +265,7 @@ namespace StarryEyes.Views.Utils
                 GenerateInlines(o, text).ForEach(textBlock.Inlines.Add);
             }));
 
-        private static IEnumerable<Inline> GenerateInlines(DependencyObject obj, string text)
+        private static IEnumerable<Inline> GenerateInlines([NotNull] DependencyObject obj, [NotNull] string text)
         {
             foreach (var tok in StatusTextUtil.Tokenize(text))
             {
@@ -306,7 +310,7 @@ namespace StarryEyes.Views.Utils
 
         #endregion
 
-        private static void SetForeBrushBinding(TextElement inline, object property)
+        private static void SetForeBrushBinding([NotNull] FrameworkContentElement inline, [NotNull] object property)
         {
             var binding = new Binding
             {
@@ -316,14 +320,15 @@ namespace StarryEyes.Views.Utils
             inline.SetBinding(TextElement.ForegroundProperty, binding);
         }
 
-        private static Inline GenerateText(string surface)
+        private static Inline GenerateText([NotNull] string surface)
         {
             var run = new Run { Text = surface, Focusable = false };
             SetForeBrushBinding(run, ForegroundBrushProperty);
             return run;
         }
 
-        private static Inline GenerateLink(DependencyObject obj, string surface, string linkUrl)
+        private static Inline GenerateLink([NotNull] DependencyObject obj,
+            [NotNull] string surface, [NotNull] string linkUrl)
         {
             var hl = new Hyperlink { Focusable = false };
             hl.Inlines.Add(surface);
@@ -338,14 +343,15 @@ namespace StarryEyes.Views.Utils
             return hl;
         }
 
-        private static Inline GenerateUserLink(DependencyObject obj, string surface, string userScreenName)
+        private static Inline GenerateUserLink([NotNull] DependencyObject obj,
+            [NotNull] string surface, [NotNull] string userScreenName)
         {
             return GenerateLink(obj,
                 surface.StartsWith("@") ? surface : "@" + surface,
                 UserNavigation + userScreenName);
         }
 
-        private static Inline GenerateHashtagLink(DependencyObject obj, string surface)
+        private static Inline GenerateHashtagLink([NotNull] DependencyObject obj, [NotNull] string surface)
         {
             return GenerateLink(obj,
                 surface.StartsWith("#") ? surface : "#" + surface,
@@ -355,7 +361,7 @@ namespace StarryEyes.Views.Utils
 
     public class ProxyCommand : ICommand
     {
-        public ProxyCommand(Action<object> callback)
+        public ProxyCommand([NotNull] Action<object> callback)
         {
             this._callback = callback;
         }

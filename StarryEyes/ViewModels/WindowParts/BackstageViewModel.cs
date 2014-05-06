@@ -9,6 +9,7 @@ using StarryEyes.Models;
 using StarryEyes.Models.Backstages;
 using StarryEyes.Settings;
 using StarryEyes.ViewModels.WindowParts.Backstages;
+using StarryEyes.Views.Utils;
 
 namespace StarryEyes.ViewModels.WindowParts
 {
@@ -88,6 +89,7 @@ namespace StarryEyes.ViewModels.WindowParts
         /// </summary>
         public BackstageViewModel()
         {
+            if (DesignTimeUtil.IsInDesignMode) return;
             _twitterEvents = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
                 BackstageModel.TwitterEvents,
                 tev => new TwitterEventViewModel(tev),

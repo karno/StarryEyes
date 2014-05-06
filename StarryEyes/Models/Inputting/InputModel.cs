@@ -30,6 +30,8 @@ namespace StarryEyes.Models.Inputting
                                 (o, e) => _accounts.CurrentInputDataChanged());
             _disposables.Add(icmpc);
             SetEventPropagation();
+
+            App.ApplicationFinalize += () => _disposables.Dispose();
         }
 
         #region composite events

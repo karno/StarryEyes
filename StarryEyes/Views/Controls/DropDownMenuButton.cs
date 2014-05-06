@@ -1,7 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Data;
 
 namespace StarryEyes.Views.Controls
 {
@@ -23,7 +22,7 @@ namespace StarryEyes.Views.Controls
             this.DropDownContextMenu.PlacementTarget = this;
             this.DropDownContextMenu.Placement = PlacementMode.Bottom;
             this.DropDownContextMenu.IsOpen = !this.DropDownContextMenu.IsOpen;
-            this.DropDownContextMenu.FlowDirection = System.Windows.FlowDirection.LeftToRight;
+            this.DropDownContextMenu.FlowDirection = FlowDirection.LeftToRight;
         }
     }
 }

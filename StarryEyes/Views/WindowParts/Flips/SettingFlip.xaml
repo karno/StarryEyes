@@ -216,9 +216,7 @@
                                                 </Button>
                                             </Grid>
                                             <Border Grid.Row="1"
-                                                    Grid.RowSpan="1"
                                                     Grid.Column="0"
-                                                    Grid.ColumnSpan="1"
                                                     Height="Auto"
                                                     HorizontalAlignment="Stretch"
                                                     VerticalAlignment="Stretch"

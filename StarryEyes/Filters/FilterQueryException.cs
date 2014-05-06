@@ -8,26 +8,26 @@ namespace StarryEyes.Filters
     [Serializable]
     public class FilterQueryException : Exception
     {
-        private string innerQuery;
+        private string _innerQuery;
         public string InnerQuery
         {
-            get { return innerQuery; }
-            set { innerQuery = value; }
+            get { return this._innerQuery; }
+            set { this._innerQuery = value; }
         }
 
         public FilterQueryException(string innerQuery)
         {
-            this.innerQuery = innerQuery;
+            this._innerQuery = innerQuery;
         }
         public FilterQueryException(string message, string innerQuery)
             : base(message)
         {
-            this.innerQuery = innerQuery;
+            this._innerQuery = innerQuery;
         }
         public FilterQueryException(string message, string innerQuery, Exception inner)
             : base(message, inner)
         {
-            this.innerQuery = innerQuery;
+            this._innerQuery = innerQuery;
         }
         protected FilterQueryException(
           System.Runtime.Serialization.SerializationInfo info,
@@ -36,7 +36,7 @@ namespace StarryEyes.Filters
 
         public override string ToString()
         {
-            return base.ToString() + Environment.NewLine + " クエリ: " + innerQuery;
+            return base.ToString() + Environment.NewLine + " クエリ: " + this._innerQuery;
         }
 
         public static FilterQueryException CreateException(string msg, string query)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using JetBrains.Annotations;
 using StarryEyes.Filters.Expressions.Operators;
 
@@ -24,7 +25,7 @@ namespace StarryEyes.Filters.Expressions.Values
 
         protected static string Coalesce(string sql, long defaultValue)
         {
-            return CoalesceSql(sql, defaultValue.ToString());
+            return CoalesceSql(sql, defaultValue.ToString(CultureInfo.InvariantCulture));
         }
 
         private static string CoalesceSql(string sql, [NotNull] string defaultSql)

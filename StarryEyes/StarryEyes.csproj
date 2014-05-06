@@ -427,7 +427,6 @@
     <Compile Include="Views\Behaviors\HideFromTaskSwitcherBehavior.cs" />
     <Compile Include="Views\Behaviors\KeyHandlingBehavior.cs" />
     <Compile Include="Views\Behaviors\ListBoxSelectionChangeToScrollIntoViewBehavior.cs" />
-    <Compile Include="Views\Behaviors\Planerator.cs" />
     <Compile Include="Views\Behaviors\SquaredScrollBehavior.cs" />
     <Compile Include="Views\Behaviors\TextBlockDragSelectBehavior.cs" />
     <Compile Include="Views\Behaviors\TimelineScrollLockerBehavior.cs" />
@@ -704,6 +703,7 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="app.config" />
     <None Include="app.manifest">

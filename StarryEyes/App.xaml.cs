@@ -11,6 +11,7 @@ using JetBrains.Annotations;
 using StarryEyes.Casket;
 using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
+using Application = System.Windows.Application;
 using ThemeManager = StarryEyes.Settings.ThemeManager;
 
 namespace StarryEyes
@@ -130,25 +131,23 @@ namespace StarryEyes
         {
             try
             {
-                var aex = ex as AggregateException;
                 if (ex.Message.IndexOf("8007007e", StringComparison.CurrentCultureIgnoreCase) >= 0 &&
                     ex.Message.Contains("CLSID {E5B8E079-EE6D-4E33-A438-C87F2E959254}"))
                 {
                     Setting.DisableGeoLocationService.Value = false;
                 }
 
-                // TODO:ロギング処理など
                 Debug.WriteLine("##### SYSTEM CRASH! #####");
                 Debug.WriteLine(ex.ToString());
 
                 // Build stack trace report file
                 var builder = new StringBuilder();
-                builder.AppendLine("Krile STARRYEYES #" + FormattedVersion + " - " + DateTime.Now.ToString());
+                builder.AppendLine("Krile STARRYEYES #" + FormattedVersion + " - " + DateTime.Now);
                 builder.AppendLine("User ID: " + _userId);
                 builder.AppendLine(Environment.OSVersion + " " + (Environment.Is64BitProcess ? "x64" : "x86"));
-                builder.AppendLine("execution mode: " + ExecutionMode.ToString() + ", " +
-                    "multicore JIT: " + IsMulticoreJitEnabled.ToString() + ", " +
-                    "hardware rendering: " + IsHardwareRenderingEnabled.ToString());
+                builder.AppendLine("execution mode: " + ExecutionMode + ", " +
+                    "multicore JIT: " + IsMulticoreJitEnabled + ", " +
+                    "hardware rendering: " + IsHardwareRenderingEnabled);
                 var uptime = DateTime.Now - _startupTime;
                 builder.AppendLine("application uptime: " + ((int)uptime.TotalHours).ToString("00") +
                                    uptime.ToString("\\:mm\\:ss"));
@@ -609,7 +608,8 @@ namespace StarryEyes
 
         public static T FindResource<T>(string name) where T : DispatcherObject
         {
-            return App.Current.TryFindResource(name) as T;
+            // ReSharper disable once RedundantNameQualifier
+            return Application.Current.TryFindResource(name) as T;
         }
 
         #endregion
@@ -630,4 +630,5 @@ namespace StarryEyes
         /// </summary>
         Standalone,
     }
+
 }

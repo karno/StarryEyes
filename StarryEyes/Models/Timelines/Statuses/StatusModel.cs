@@ -327,7 +327,7 @@ namespace StarryEyes.Models.Timelines.Statuses
                     if (this._favoritedUsersDic.TryGetValue(userId, out remove))
                     {
                         this._favoritedUsersDic.Remove(userId);
-                        this.Status.FavoritedUsers = this.Status.FavoritedUsers.Except(new[] { userId }).ToArray();
+                        this.Status.FavoritedUsers = this.Status.FavoritedUsers.Guard().Except(new[] { userId }).ToArray();
                     }
                 }
                 if (remove != null)
@@ -394,7 +394,7 @@ namespace StarryEyes.Models.Timelines.Statuses
                     if (this._retweetedUsersDic.TryGetValue(userId, out remove))
                     {
                         this._retweetedUsersDic.Remove(userId);
-                        this.Status.RetweetedUsers = this.Status.RetweetedUsers.Except(new[] { userId }).ToArray();
+                        this.Status.RetweetedUsers = this.Status.RetweetedUsers.Guard().Except(new[] { userId }).ToArray();
                     }
                 }
                 if (remove != null)
@@ -441,6 +441,10 @@ namespace StarryEyes.Models.Timelines.Statuses
             var uid = this.Status.InReplyToUserId.GetValueOrDefault();
             if (this.Status.StatusType == StatusType.DirectMessage)
             {
+                if (this.Status.Recipient == null)
+                {
+                    throw new ArgumentException("Inconsistent status state: Recipient is not spcified in spite of status is direct message.");
+                }
                 uid = this.Status.Recipient.Id;
             }
             var account = Setting.Accounts.Get(uid);

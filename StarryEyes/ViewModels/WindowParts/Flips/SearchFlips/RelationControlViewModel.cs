@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Net;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -286,7 +287,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 return "Twitter API エラー: " + tex.Message + Environment.NewLine +
                        "ステータスコード: " + tex.StatusCode + Environment.NewLine +
                        "Twitter エラーコード: " + (tex.TwitterErrorCode.HasValue
-                           ? tex.TwitterErrorCode.Value.ToString()
+                           ? tex.TwitterErrorCode.Value.ToString(CultureInfo.InvariantCulture)
                            : "なし");
             }
             var wex = ex as WebException;

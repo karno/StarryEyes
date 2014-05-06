@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Globalization;
 using System.Reactive.Linq;
 using System.Windows.Threading;
 using Livet;
@@ -77,6 +78,10 @@ namespace StarryEyes
                         switch (e.Action)
                         {
                             case NotifyCollectionChangedAction.Add:
+                                if (e.NewItems == null)
+                                {
+                                    throw new ArgumentException("New item is null.");
+                                }
                                 target.Insert(e.NewStartingIndex, converter((TModel)e.NewItems[0]));
                                 break;
                             case NotifyCollectionChangedAction.Move:
@@ -94,11 +99,16 @@ namespace StarryEyes
                                 {
                                     ((IDisposable)target[e.NewStartingIndex]).Dispose();
                                 }
+                                if (e.NewItems == null)
+                                {
+                                    throw new ArgumentException("New item is null.");
+                                }
                                 target[e.NewStartingIndex] = converter((TModel)e.NewItems[0]);
                                 break;
                             case NotifyCollectionChangedAction.Reset:
                                 if (typeof(IDisposable).IsAssignableFrom(typeof(TViewModel)))
                                 {
+                                    // ReSharper disable once PossibleInvalidCastExceptionInForeachLoop
                                     foreach (IDisposable item in target)
                                     {
                                         item.Dispose();
@@ -117,7 +127,10 @@ namespace StarryEyes
                             "INDEX OUT OF RANGE - " + e.Action + "[" + typeof(TModel).Name + " -> " +
                             typeof(TViewModel).Name + "]" + Environment.NewLine +
                             "new start: " + e.NewStartingIndex + ", count: " +
-                            (e.NewItems == null ? "null" : e.NewItems.Count.ToString()) + Environment.NewLine +
+                            (e.NewItems == null
+                                ? "null"
+                                : e.NewItems.Count.ToString(CultureInfo.InvariantCulture)) +
+                            Environment.NewLine +
                             "source length: " + ((IList<TModel>)source).Count + ", target length: " + target.Count +
                             ".",
                             aoex);

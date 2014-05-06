@@ -15,7 +15,7 @@ namespace StarryEyes.ViewModels.Notifications
     {
         private static readonly object _dequeueLocker = new object();
 
-        private static bool _isDisplaying = false;
+        private static bool _isDisplaying;
 
         public static void Initialize()
         {

@@ -20,9 +20,9 @@ namespace StarryEyes.Models.Subsystems
 
         private static int _estimatedGrossTweetCount;
 
-        private static int _tweetsPerMinutes = 0;
+        private static int _tweetsPerMinutes;
 
-        private static readonly int[] _tweetsCountArray = new[] { 0, 0, 0, 0, 0, 0 };
+        private static readonly int[] _tweetsCountArray = { 0, 0, 0, 0, 0, 0 };
 
         private static int _currentChannel = -1;
 

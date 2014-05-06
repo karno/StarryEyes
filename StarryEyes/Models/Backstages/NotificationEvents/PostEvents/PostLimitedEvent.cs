@@ -23,7 +23,7 @@ namespace StarryEyes.Models.Backstages.NotificationEvents.PostEvents
 
         public override string Detail
         {
-            get { return "POST規制されました。予想解除時刻は " + _releaseTime.ToString("HH\\:mm\\:ss") + " です。"; }
+            get { return "@" + _account.UnreliableScreenName + "がPOST規制されました。予想解除時刻は " + _releaseTime.ToString("HH\\:mm\\:ss") + " です。"; }
         }
 
         public override Color Background

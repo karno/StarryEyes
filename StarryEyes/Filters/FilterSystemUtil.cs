@@ -18,6 +18,10 @@ namespace StarryEyes.Filters
         {
             if (status.StatusType == StatusType.DirectMessage)
             {
+                if (status.Recipient == null)
+                {
+                    throw new ArgumentException("Inconsistent status state: Recipient is not spcified in spite of status is direct message.");
+                }
                 return new[] { status.Recipient.Id };
             }
             if (status.Entities == null)

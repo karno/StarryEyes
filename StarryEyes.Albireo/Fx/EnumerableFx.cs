@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using JetBrains.Annotations;
 
 // ReSharper disable CheckNamespace
+
 namespace System.Linq
 // ReSharper restore CheckNamespace
 {
@@ -8,12 +10,12 @@ namespace System.Linq
     {
         private static readonly Random _rng = new Random();
 
-        public static IEnumerable<T> Append<T>(this IEnumerable<T> source, params T[] item)
+        public static IEnumerable<T> Append<T>([NotNull] this IEnumerable<T> source, [NotNull] params T[] item)
         {
             return source.Concat(item);
         }
 
-        public static IOrderedEnumerable<TSource> Shuffle<TSource>(this IEnumerable<TSource> source)
+        public static IOrderedEnumerable<TSource> Shuffle<TSource>([NotNull] this IEnumerable<TSource> source)
         {
             if (source == null)
                 throw new ArgumentNullException("source");
@@ -21,7 +23,8 @@ namespace System.Linq
             return source.OrderBy(_ => _rng.Next());
         }
 
-        public static IEnumerable<T> WhereDo<T>(this IEnumerable<T> source, Func<T, bool> condition, Action<T> passed)
+        public static IEnumerable<T> WhereDo<T>([NotNull] this IEnumerable<T> source, [NotNull] Func<T, bool> condition,
+           [NotNull] Action<T> passed)
         {
             foreach (var v in source)
             {
@@ -31,7 +34,8 @@ namespace System.Linq
             }
         }
 
-        public static IEnumerable<T> Steal<T>(this IEnumerable<T> source, Func<T, bool> condition, Action<T> passed)
+        public static IEnumerable<T> Steal<T>([NotNull] this IEnumerable<T> source, [NotNull] Func<T, bool> condition,
+           [NotNull] Action<T> passed)
         {
             foreach (var v in source)
             {
@@ -42,41 +46,43 @@ namespace System.Linq
             }
         }
 
-        public static IEnumerable<T> Guard<T>(this IEnumerable<T> source)
+        public static IEnumerable<T> Guard<T>([CanBeNull] this IEnumerable<T> source)
         {
             return source ?? Enumerable.Empty<T>();
         }
 
-        public static IEnumerable<T> Guard<T>(this IEnumerable<T> source, Func<bool> guard)
+        public static IEnumerable<T> Guard<T>([CanBeNull] this IEnumerable<T> source, [NotNull] Func<bool> guard)
         {
-            return guard() ? source : Enumerable.Empty<T>();
+            return guard() ? source.Guard() : Enumerable.Empty<T>();
         }
 
-        public static IEnumerable<T> Guard<T>(this IEnumerable<T> source, Func<IEnumerable<T>, bool> guard)
+        public static IEnumerable<T> Guard<T>([CanBeNull] this IEnumerable<T> source,
+           [NotNull] Func<IEnumerable<T>, bool> guard)
         {
-            var buffer = source.Memoize();
+            var buffer = source.Guard().Memoize();
             return guard(buffer) ? buffer : Enumerable.Empty<T>();
         }
 
-        public static IEnumerable<TResult> Singlize<TSource, TIntermediate, TResult>(this IEnumerable<TSource> source,
-            Func<IEnumerable<TSource>, TIntermediate> generator, Func<TSource, TIntermediate, TResult> mapper)
+        public static IEnumerable<TResult> Singlize<TSource, TIntermediate, TResult>(
+            [NotNull] this IEnumerable<TSource> source, [NotNull] Func<IEnumerable<TSource>, TIntermediate> generator,
+            [NotNull] Func<TSource, TIntermediate, TResult> mapper)
         {
             var cached = source.Share();
             var i = generator(cached);
             return cached.Select(s => mapper(s, i));
         }
 
-        public static TResult Using<T, TResult>(this T disposable, Func<T, TResult> func) where T : IDisposable
+        public static TResult Using<T, TResult>(this T disposable, [NotNull] Func<T, TResult> func) where T : IDisposable
         {
             using (disposable) return func(disposable);
         }
 
-        public static string JoinString(this IEnumerable<string> source, string separator)
+        public static string JoinString([NotNull] this IEnumerable<string> source, [NotNull] string separator)
         {
             return String.Join(separator, source);
         }
 
-        public static IEnumerable<T> TakeIfNotNull<T>(this IEnumerable<T> source, int? take)
+        public static IEnumerable<T> TakeIfNotNull<T>([NotNull] this IEnumerable<T> source, int? take)
         {
             return take == null ? source : source.Take(take.Value);
         }

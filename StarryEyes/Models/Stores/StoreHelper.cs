@@ -27,7 +27,6 @@ namespace StarryEyes.Models.Stores
                                   return acc.ShowTweetAsync(id)
                                             .ToObservable()
                                             .Do(StatusInbox.Enqueue);
-                                  ;
                               });
         }
 

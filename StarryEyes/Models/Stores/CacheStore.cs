@@ -71,9 +71,10 @@ namespace StarryEyes.Models.Stores
         public static void RegisterStatus(TwitterStatus status)
         {
             status.Entities
-                .Where(e => e.EntityType == EntityType.Hashtags)
-                .Select(e => e.DisplayText)
-                .ForEach(RegisterHashtag);
+                  .Guard()
+                  .Where(e => e.EntityType == EntityType.Hashtags)
+                  .Select(e => e.DisplayText)
+                  .ForEach(RegisterHashtag);
         }
 
         private const int HashtagMaxCount = 2048;

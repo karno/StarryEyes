@@ -355,7 +355,6 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                         return false;
                     case TweetDisplayMode.Mixed:
                         return IsFocused;
-                    case TweetDisplayMode.Expanded:
                     default:
                         return true;
                 }
@@ -376,7 +375,14 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         {
             get
             {
-                if (!this.IsSourceIsLink) return this.Status.Source;
+                if (this.Status.Source == null)
+                {
+                    return String.Empty;
+                }
+                if (!this.IsSourceIsLink)
+                {
+                    return this.Status.Source;
+                }
                 var start = this.Status.Source.IndexOf(">", StringComparison.Ordinal);
                 var end = this.Status.Source.IndexOf("<", start + 1, StringComparison.Ordinal);
                 if (start >= 0 && end >= 0)
@@ -464,7 +470,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
 
         public void OpenSourceLink()
         {
-            if (!this.IsSourceIsLink) return;
+            if (this.Status.Source == null || !this.IsSourceIsLink) return;
             var start = this.Status.Source.IndexOf("\"", StringComparison.Ordinal);
             var end = this.Status.Source.IndexOf("\"", start + 1, StringComparison.Ordinal);
             if (start < 0 || end < 0) return;
@@ -1049,7 +1055,9 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             TwitterAccount info;
             if (this.IsDirectMessage)
             {
-                var ids = new[] { this.Status.User.Id, this.Status.Recipient.Id };
+                var ids = this.Status.Recipient == null
+                    ? new[] { this.Status.User.Id }
+                    : new[] { this.Status.User.Id, this.Status.Recipient.Id };
                 info = ids
                     .Select(Setting.Accounts.Get).FirstOrDefault(_ => _ != null);
             }
@@ -1107,7 +1115,6 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                 Content = "Favstar は オワコン",
                 Title = "ツイート賞の授与",
             }));
-            return;
             /*
             if (!this.AssertQuickActionEnabled()) return;
             if (Setting.FavstarApiKey.Value == null)
@@ -1286,6 +1293,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             int value;
             if (!int.TryParse(index, out value)) value = 0;
             var links = this.Status.Entities
+                            .Guard()
                             .OrderBy(e => e.StartIndex)
                             .Select(e =>
                             {

@@ -221,6 +221,7 @@
                         <i:Interaction.Behaviors>
                             <behaviors:TextBlockDragSelectBehavior ForegroundBrush="{DynamicResource BaseColorBackgroundBrush}" SelectedText="{Binding SelectedText, Mode=OneWayToSource}">
                                 <behaviors:TextBlockDragSelectBehavior.SelectContextMenu>
+                                    <!--  ReSharper disable once Xaml.BindingWithContextNotResolved  -->
                                     <ContextMenu DataContext="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
                                         <MenuItem Header="クリップボードにコピー(_C)">
                                             <i:Interaction.Triggers>
@@ -395,6 +396,7 @@
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <DataTemplate.Resources>
+                                    <!--  ReSharper disable once Xaml.BindingWithContextNotResolved  -->
                                     <ContextMenu x:Key="BlockMenu" DataContext="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
                                         <MenuItem Header="ブロック(_B)">
                                             <i:Interaction.Triggers>

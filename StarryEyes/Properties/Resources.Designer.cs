@@ -353,15 +353,6 @@ namespace StarryEyes.Properties {
         }
         
         /// <summary>
-        ///    に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        public static string MsgInstructionTabWarning {
-            get {
-                return ResourceManager.GetString("MsgInstructionTabWarning", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Delete all and &amp;reinstall latest version に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string MsgMaintenanceCmdCleanInstall {

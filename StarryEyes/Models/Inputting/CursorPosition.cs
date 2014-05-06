@@ -15,12 +15,12 @@ namespace StarryEyes.Models.Inputting
         {
             if (index < -1)
             {
-                throw new ArgumentOutOfRangeException(
+                throw new ArgumentOutOfRangeException("index",
                     "Could not set index: " + index);
             }
             if (index < 0 && selectionLength != 0)
             {
-                throw new ArgumentOutOfRangeException(
+                throw new ArgumentOutOfRangeException("selectionLength",
                     "Could not set SelectionLength as not zero when index set as -1.");
             }
             this._index = index;

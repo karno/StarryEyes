@@ -121,7 +121,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                     var last = drafts[drafts.Count - 1];
                     drafts.RemoveAt(drafts.Count - 1);
                     InputCoreViewModel.InputData = last;
-                    Messenger.Raise(new TextBoxSetCaretMessage(InputCoreViewModel.InputData.Text.Length, 0));
+                    Messenger.Raise(new TextBoxSetCaretMessage(last.Text.Length, 0));
                 }
             }
             else

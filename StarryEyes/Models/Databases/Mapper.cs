@@ -94,7 +94,7 @@ namespace StarryEyes.Models.Databases
                 RetweeterId = status.RetweetedOriginal != null ? status.User.Id : (long?)null,
                 RetweetOriginalUserId = status.RetweetedOriginal != null ? status.RetweetedOriginal.User.Id : (long?)null
             };
-            var ent = status.Entities.Select(e => Map<DatabaseStatusEntity>(status.Id, e));
+            var ent = status.Entities.Guard().Select(e => Map<DatabaseStatusEntity>(status.Id, e));
             return Tuple.Create(dbs, ent);
         }
 
@@ -179,7 +179,7 @@ namespace StarryEyes.Models.Databases
             {
                 throw new ArgumentException("ID mismatched between status and entities.");
             }
-            return new TwitterStatus
+            return new TwitterStatus(user, status.Text)
             {
                 CreatedAt = status.CreatedAt,
                 Entities = ent.Select(Map).ToArray(),
@@ -193,8 +193,6 @@ namespace StarryEyes.Models.Databases
                 RetweetedUsers = retweeters.Guard().ToArray(),
                 StatusType = StatusType.Tweet,
                 Source = status.Source,
-                Text = status.Text,
-                User = user,
             };
         }
 
@@ -224,7 +222,7 @@ namespace StarryEyes.Models.Databases
             {
                 throw new ArgumentException("ID mismatched between status and entities.");
             }
-            return new TwitterStatus
+            return new TwitterStatus(user, status.Text)
             {
                 CreatedAt = status.CreatedAt,
                 Entities = ent.Select(Map).ToArray(),
@@ -240,8 +238,6 @@ namespace StarryEyes.Models.Databases
                 RetweetedUsers = retweeters.Guard().ToArray(),
                 Source = status.Source,
                 StatusType = StatusType.Tweet,
-                Text = status.Text,
-                User = user,
             };
         }
 
@@ -262,7 +258,7 @@ namespace StarryEyes.Models.Databases
             {
                 throw new ArgumentException("ID mismatched between status and entities.");
             }
-            return new TwitterStatus
+            return new TwitterStatus(sender, status.Text)
             {
                 CreatedAt = status.CreatedAt,
                 Entities = ent.Select(Map).ToArray(),
@@ -274,8 +270,6 @@ namespace StarryEyes.Models.Databases
                 Longitude = status.Longitude,
                 Recipient = recipient,
                 StatusType = StatusType.DirectMessage,
-                Text = status.Text,
-                User = sender,
             };
         }
 

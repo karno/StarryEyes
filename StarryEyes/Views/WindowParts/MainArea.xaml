@@ -33,6 +33,7 @@
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
                         <StackPanel.ContextMenu>
+                            <!--  ReSharper disable once Xaml.BindingWithContextNotResolved  -->
                             <ContextMenu DataContext="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
                                 <MenuItem Command="{Binding EditTabCommand}" Header="編集..." />
                                 <MenuItem Header="このタブの新着ツイートをポップアップ通知"
@@ -96,6 +97,7 @@
                             <behaviors:AdornedDropAcceptBehavior Description="{Binding DropAcceptDescription}" />
                         </i:Interaction.Behaviors>
                         <ItemsControl.ContextMenu>
+                            <!--  ReSharper disable once Xaml.BindingWithContextNotResolved  -->
                             <ContextMenu DataContext="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
                                 <MenuItem Command="{Binding CreateNewTabCommand}" Header="新しいタブの追加..." />
                                 <MenuItem Command="{Binding RestoreLastClosedTabCommand}" Header="最後に閉じたタブを元に戻す" />
@@ -120,8 +122,7 @@
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <primitives:Timeline Grid.Row="1"
-                                                     HorizontalAlignment="Stretch"
+                                <primitives:Timeline HorizontalAlignment="Stretch"
                                                      VerticalAlignment="Stretch"
                                                      DataContext="{Binding}"
                                                      Visibility="{Binding IsFocused,

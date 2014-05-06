@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -182,19 +181,23 @@ namespace StarryEyes.Views.Behaviors
         {
             var point = this.AssociatedObject.GetPositionFromPoint(
                 Mouse.GetPosition(this.AssociatedObject), true);
+            if (point == null) return;
             var rect = point.GetCharacterRect(LogicalDirection.Forward);
             this.SelectContextMenu.PlacementTarget = this.AssociatedObject;
             this.SelectContextMenu.Placement = PlacementMode.RelativePoint;
             this.SelectContextMenu.HorizontalOffset = rect.X;
             this.SelectContextMenu.VerticalOffset = rect.Y;
             this.SelectContextMenu.IsOpen = true;
-            IDisposable listener = null;
-            listener = Observable.FromEventPattern(this.SelectContextMenu, "Closed")
-                                 .Subscribe(_ =>
-                                 {
-                                     if (listener != null) listener.Dispose();
-                                     this.AssociatedObject_MouseLeave(null, null);
-                                 });
+            RoutedEventHandler handler = null;
+            handler = (sender, args) =>
+            {
+                if (handler != null)
+                {
+                    this.SelectContextMenu.Closed -= handler;
+                }
+                this.AssociatedObject_MouseLeave(null, null);
+            };
+            this.SelectContextMenu.Closed += handler;
         }
 
         private void FinalizeSelect()

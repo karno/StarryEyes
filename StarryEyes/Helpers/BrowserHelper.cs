@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using StarryEyes.Settings;
 
+// ReSharper disable once CheckNamespace
 namespace StarryEyes
 {
     public static class BrowserHelper
@@ -15,6 +16,7 @@ namespace StarryEyes
                 else
                     Process.Start(Setting.ExternalBrowserPath.Value, url);
             }
+            // ReSharper disable once EmptyGeneralCatchClause
             catch { }
         }
 

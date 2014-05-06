@@ -1,9 +1,10 @@
 ﻿
+// ReSharper disable once CheckNamespace
 namespace System.Windows
 {
     public static class FreezableHelper
     {
-        public static T ToFrozen<T>(this T freezable) where T:Freezable
+        public static T ToFrozen<T>(this T freezable) where T : Freezable
         {
             if (!freezable.IsFrozen)
             {
