@@ -286,7 +286,7 @@
                        HorizontalAlignment="Left"
                        VerticalAlignment="Bottom"
                        TextWrapping="Wrap">
-                <Run Text="Built with: AsyncOAuth, AvalonEdit, Dapper, DynamicJson, Extended WPF Toolkit, Livet, MahApps.Metro, NAudio, System.Data.SQLite, WPF Task Dialog, and any other Microsoft's libraries." />
+                <Run Text="Built with: AsyncOAuth, AvalonEdit, Dapper, DynamicJson, Extended WPF Toolkit, JetBrains.Annotations, Livet, MahApps.Metro, NAudio, System.Data.SQLite, WPF Task Dialog, and any other Microsoft's libraries." />
             </TextBlock>
         </Grid>
     </Grid>

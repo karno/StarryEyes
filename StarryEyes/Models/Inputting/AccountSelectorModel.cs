@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using JetBrains.Annotations;
 using Livet;
-using StarryEyes.Annotations;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Timelines.Tabs;
 using StarryEyes.Settings;

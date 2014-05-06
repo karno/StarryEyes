@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
+using JetBrains.Annotations;
 using Livet;
 using StarryEyes.Albireo;
-using StarryEyes.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Timelines.Tabs;

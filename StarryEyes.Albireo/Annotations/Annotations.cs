@@ -16,7 +16,8 @@
 
 using System;
 
-namespace StarryEyes.Annotations
+// ReSharper disable once CheckNamespace
+namespace JetBrains.Annotations
 {
     /// <summary>
     /// Indicates that marked element should be localized or not.

@@ -4,7 +4,7 @@ using System.Data.SQLite;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using StarryEyes.Annotations;
+using JetBrains.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Casket;
 using StarryEyes.Models.Databases;

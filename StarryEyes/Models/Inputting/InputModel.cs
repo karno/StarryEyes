@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Disposables;
+using JetBrains.Annotations;
 using Livet.EventListeners;
 using StarryEyes.Albireo;
-using StarryEyes.Annotations;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Settings;
 

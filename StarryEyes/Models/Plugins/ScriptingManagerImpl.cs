@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using StarryEyes.Annotations;
+using JetBrains.Annotations;
 using StarryEyes.Feather.Scripting;
 
 namespace StarryEyes.Plugins

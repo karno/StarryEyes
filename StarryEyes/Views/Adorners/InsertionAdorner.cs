@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Media;
+using JetBrains.Annotations;
 using Microsoft.Expression.Shapes;
-using StarryEyes.Annotations;
 using StarryEyes.Settings;
 
 namespace StarryEyes.Views.Adorners

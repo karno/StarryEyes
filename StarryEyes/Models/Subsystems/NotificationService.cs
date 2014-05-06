@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using StarryEyes.Annotations;
+using JetBrains.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Feather.Proxies;
 using StarryEyes.Filters;

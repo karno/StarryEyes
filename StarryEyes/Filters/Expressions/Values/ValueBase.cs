@@ -1,5 +1,5 @@
 ﻿using System;
-using StarryEyes.Annotations;
+using JetBrains.Annotations;
 using StarryEyes.Filters.Expressions.Operators;
 
 namespace StarryEyes.Filters.Expressions.Values

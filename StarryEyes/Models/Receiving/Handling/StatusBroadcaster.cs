@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using System.Reactive.Subjects;
 using System.Threading;
-using StarryEyes.Annotations;
+using JetBrains.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models.Subsystems;
 using StarryEyes.Models.Timelines.Statuses;

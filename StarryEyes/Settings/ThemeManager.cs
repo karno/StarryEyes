@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using JetBrains.Annotations;
 using StarryEyes.Albireo;
-using StarryEyes.Annotations;
 using StarryEyes.Models;
 using StarryEyes.Models.Backstages.SystemEvents;
 using StarryEyes.Nightmare.Windows;

@@ -9,7 +9,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
-using StarryEyes.Annotations;
+using JetBrains.Annotations;
 
 namespace StarryEyes.Views.Controls
 {

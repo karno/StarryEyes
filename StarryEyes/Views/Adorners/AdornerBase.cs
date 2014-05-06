@@ -2,7 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
-using StarryEyes.Annotations;
+using JetBrains.Annotations;
 
 namespace StarryEyes.Views.Adorners
 {

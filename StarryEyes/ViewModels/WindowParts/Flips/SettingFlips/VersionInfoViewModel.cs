@@ -2,8 +2,8 @@
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using Livet;
-using StarryEyes.Annotations;
 using StarryEyes.Models.Subsystems;
 using StarryEyes.Settings;
 

@@ -76,6 +76,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Annotations\Annotations.cs" />
     <Compile Include="Caching\LruObjectCache.cs" />
     <Compile Include="Collections\AVLTree.cs" />
     <Compile Include="Collections\ComparableKeyValuePair.cs" />

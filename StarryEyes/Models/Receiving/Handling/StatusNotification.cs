@@ -1,6 +1,6 @@
 using System;
 using System.Threading.Tasks;
-using StarryEyes.Annotations;
+using JetBrains.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models.Timelines.Statuses;
 

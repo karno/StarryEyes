@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 using System.Windows;
 using System.Windows.Media;
 using System.Xml;
-using StarryEyes.Annotations;
+using JetBrains.Annotations;
 
 namespace StarryEyes.Settings.Themes
 {

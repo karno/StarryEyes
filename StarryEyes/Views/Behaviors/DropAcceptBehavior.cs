@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interactivity;
-using StarryEyes.Annotations;
+using JetBrains.Annotations;
 using StarryEyes.ViewModels;
 using StarryEyes.Views.Adorners;
 

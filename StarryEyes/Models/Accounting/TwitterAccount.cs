@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using AsyncOAuth;
-using StarryEyes.Annotations;
+using JetBrains.Annotations;
 using StarryEyes.Anomaly;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Settings;

@@ -2,8 +2,8 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
+using JetBrains.Annotations;
 using Livet;
-using StarryEyes.Annotations;
 using StarryEyes.Settings;
 using StarryEyes.Settings.KeyAssigns;
 using StarryEyes.Views.Controls;

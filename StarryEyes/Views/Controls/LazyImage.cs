@@ -13,7 +13,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
-using StarryEyes.Annotations;
+using JetBrains.Annotations;
 
 namespace StarryEyes.Views.Controls
 {

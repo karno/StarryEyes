@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Reactive.Linq;
+using JetBrains.Annotations;
 using Livet;
-using StarryEyes.Annotations;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Inputting;
 using StarryEyes.Settings;

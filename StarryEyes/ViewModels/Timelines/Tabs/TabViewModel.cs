@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Threading;
+using JetBrains.Annotations;
 using Livet.EventListeners;
 using Livet.Messaging;
-using StarryEyes.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Filters.Parsing;
 using StarryEyes.Models;

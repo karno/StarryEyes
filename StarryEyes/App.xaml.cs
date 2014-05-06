@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Text;
 using System.Windows;
 using System.Windows.Threading;
-using StarryEyes.Annotations;
+using JetBrains.Annotations;
 using StarryEyes.Casket;
 using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;

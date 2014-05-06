@@ -348,7 +348,6 @@
     <Compile Include="Models\Timelines\TimelineModelBase.cs" />
     <Compile Include="Models\Timelines\Statuses\UserModel.cs" />
     <Compile Include="Models\Plugins\ScriptingManagerImpl.cs" />
-    <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Settings\AccountManager.cs" />
     <Compile Include="Settings\KeyAssignManager.cs" />
     <Compile Include="Settings\KeyAssigns\KeyAssignGroup.cs" />
