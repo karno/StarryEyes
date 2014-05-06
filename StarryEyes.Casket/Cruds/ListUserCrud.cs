@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -39,7 +38,7 @@ namespace StarryEyes.Casket.Cruds
                 {
                     ReaderWriterLock.EnterWriteLock();
                     using (var conn = this.DangerousOpenConnection())
-                    using (var tran = conn.BeginTransaction(IsolationLevel.ReadCommitted))
+                    using (var tran = conn.BeginTransaction(DefaultIsolationLevel))
                     {
                         foreach (var userId in userIds)
                         {

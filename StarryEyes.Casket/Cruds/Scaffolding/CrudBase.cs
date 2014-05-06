@@ -13,6 +13,11 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
 {
     public abstract class CrudBase
     {
+        protected IsolationLevel DefaultIsolationLevel
+        {
+            get { return IsolationLevel.Serializable; }
+        }
+
         #region Concurrent lock
 
         private static readonly ReaderWriterLockSlim _rwlock = new ReaderWriterLockSlim();
@@ -33,6 +38,7 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
                 // {"Synchronous", "Off"},
                 {"Synchronous", "Normal"},
                 {"Default Timeout", "3"},
+                {"Default IsolationLevel", "Serializable"},
                 {"Journal Mode", "WAL"},
                 {"Page Size", "2048"},
                 {"Pooling", "True"},
@@ -116,7 +122,7 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
                 {
                     ReaderWriterLock.EnterWriteLock();
                     using (var con = this.DangerousOpenConnection())
-                    using (var tr = con.BeginTransaction(IsolationLevel.ReadCommitted))
+                    using (var tr = con.BeginTransaction(DefaultIsolationLevel))
                     {
                         var result = con.Execute(query, transaction: tr);
                         tr.Commit();
@@ -143,7 +149,7 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
                     ReaderWriterLock.EnterWriteLock();
                     // System.Diagnostics.Debug.WriteLine("EXECUTE: " + query);
                     using (var con = this.DangerousOpenConnection())
-                    using (var tr = con.BeginTransaction(IsolationLevel.ReadCommitted))
+                    using (var tr = con.BeginTransaction(DefaultIsolationLevel))
                     {
                         var result = (int)SqlMapper.Execute(con, query, param, tr);
                         tr.Commit();
@@ -170,7 +176,7 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
                 {
                     ReaderWriterLock.EnterWriteLock();
                     using (var con = this.DangerousOpenConnection())
-                    using (var tr = con.BeginTransaction(IsolationLevel.ReadCommitted))
+                    using (var tr = con.BeginTransaction(DefaultIsolationLevel))
                     {
                         foreach (var qap in qnp)
                         {
