@@ -853,7 +853,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         [UsedImplicitly]
         public void AddNewKeyAssign()
         {
-            var response = this.Messenger.GetResponse(new TransitionMessage(typeof(AddNewKeyAssignDialog),
+            var response = this.Messenger.GetResponse(new TransitionMessage(typeof(AddNewKeyAssignWindow),
                 new AddNewKeyAssignDialogViewModel(), TransitionMode.Modal));
             var tranvm = (AddNewKeyAssignDialogViewModel)response.TransitionViewModel;
             if (tranvm.Result)

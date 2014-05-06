@@ -285,4 +285,7 @@ Deleting database file or rebooting Windows will help starting Krile when proble
   <data name="MsgRecoveryTitle" xml:space="preserve">
     <value>Recovery your Krile</value>
   </data>
+  <data name="MsgButtonOk" xml:space="preserve">
+    <value>Ok</value>
+  </data>
 </root>

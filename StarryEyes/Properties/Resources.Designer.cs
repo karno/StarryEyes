@@ -88,6 +88,15 @@ namespace StarryEyes.Properties {
         }
         
         /// <summary>
+        ///   Ok に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgButtonOk {
+            get {
+                return ResourceManager.GetString("MsgButtonOk", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Changing database path is a debug feature, you should not use this option as part of customize for daily use. に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string MsgDatabasePathWarningContent {

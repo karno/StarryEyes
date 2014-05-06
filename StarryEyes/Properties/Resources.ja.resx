@@ -290,4 +290,7 @@ Windowsの設定を変更することで、この問題を回避できる可能�
   <data name="MsgRecoveryTitle" xml:space="preserve">
     <value>Krileの回復</value>
   </data>
+  <data name="MsgButtonOk" xml:space="preserve">
+    <value>OK</value>
+  </data>
 </root>

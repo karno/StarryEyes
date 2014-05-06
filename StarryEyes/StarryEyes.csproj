@@ -410,6 +410,11 @@
     <Compile Include="ViewModels\Timelines\Statuses\UserViewModel.cs" />
     <Compile Include="ViewModels\WindowParts\Backstages\TwitterEventViewModel.cs" />
     <Compile Include="ViewModels\Common\TwitterAccountViewModel.cs" />
+    <Compile Include="ViewsResources\Dialogs\AddNewKeyAssignWindowResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AddNewKeyAssignWindowResources.resx</DependentUpon>
+    </Compile>
     <Compile Include="ViewsResources\Dialogs\AuthorizationWindowResources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -447,8 +452,8 @@
     <Compile Include="Views\Controls\QueryEditor.cs" />
     <Compile Include="Views\Controls\QueryEditorResources\CompletionData.cs" />
     <Compile Include="Views\Controls\SuggestableTextBox.cs" />
-    <Compile Include="Views\Dialogs\AddNewKeyAssignDialog.xaml.cs">
-      <DependentUpon>AddNewKeyAssignDialog.xaml</DependentUpon>
+    <Compile Include="Views\Dialogs\AddNewKeyAssignWindow.xaml.cs">
+      <DependentUpon>AddNewKeyAssignWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Dialogs\AwaitDownloadingUpdateWindow.xaml.cs">
       <DependentUpon>AwaitDownloadingUpdateWindow.xaml</DependentUpon>
@@ -572,7 +577,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\Dialogs\AddNewKeyAssignDialog.xaml">
+    <Page Include="Views\Dialogs\AddNewKeyAssignWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -729,6 +734,13 @@
     </None>
     <AppDesigner Include="Properties\" />
     <EmbeddedResource Include="Properties\Resources.ja.resx" />
+    <EmbeddedResource Include="ViewsResources\Dialogs\AddNewKeyAssignWindowResources.ja.resx">
+      <DependentUpon>AddNewKeyAssignWindowResources.resx</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ViewsResources\Dialogs\AddNewKeyAssignWindowResources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>AddNewKeyAssignWindowResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="ViewsResources\Dialogs\AuthorizationWindowResources.ja.resx">
       <DependentUpon>AuthorizationWindowResources.resx</DependentUpon>
     </EmbeddedResource>
