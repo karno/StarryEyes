@@ -420,6 +420,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>KeyOverrideWindowResources.resx</DependentUpon>
     </Compile>
+    <Compile Include="ViewsResources\MainWindowResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MainWindowResources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Views\Adorners\AdornerBase.cs" />
     <Compile Include="Views\Adorners\InsertionAdorner.cs" />
     <Compile Include="Views\Behaviors\DragStartBehavior.cs" />
@@ -718,18 +723,27 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
-    <EmbeddedResource Include="Properties\Resources.ja-JP.resx" />
-    <EmbeddedResource Include="ViewsResources\Dialogs\AuthorizationWindowResources.ja-JP.resx" />
+    <EmbeddedResource Include="Properties\Resources.ja.resx" />
+    <EmbeddedResource Include="ViewsResources\Dialogs\AuthorizationWindowResources.ja.resx">
+      <DependentUpon>AuthorizationWindowResources.resx</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ViewsResources\Dialogs\AuthorizationWindowResources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>AuthorizationWindowResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="ViewsResources\Dialogs\KeyOverrideWindowResources.ja-JP.resx">
-      <LastGenOutput>KeyOverrideWindowResources.ja-JP.Designer.cs</LastGenOutput>
+    <EmbeddedResource Include="ViewsResources\Dialogs\KeyOverrideWindowResources.ja.resx">
+      <DependentUpon>KeyOverrideWindowResources.resx</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ViewsResources\Dialogs\KeyOverrideWindowResources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>KeyOverrideWindowResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ViewsResources\MainWindowResources.ja.resx">
+      <DependentUpon>MainWindowResources.resx</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ViewsResources\MainWindowResources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>MainWindowResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="Views\Controls\QueryEditorResources\KrileQuery.xshd" />
   </ItemGroup>

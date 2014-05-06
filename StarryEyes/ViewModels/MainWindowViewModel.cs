@@ -415,7 +415,7 @@ namespace StarryEyes.ViewModels
 
         public string TweetsPerMinutes
         {
-            get { return (StatisticsService.TweetsPerMinutes).ToString(CultureInfo.InvariantCulture); }
+            get { return StatisticsService.TweetsPerMinutes.ToString(CultureInfo.InvariantCulture); }
         }
 
         public int GrossTweetCount

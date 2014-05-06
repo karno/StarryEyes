@@ -11,6 +11,7 @@
                       xmlns:sebehaviors="clr-namespace:StarryEyes.Views.Messaging.Behaviors"
                       xmlns:triggers="clr-namespace:StarryEyes.Views.Triggers"
                       xmlns:utils="clr-namespace:StarryEyes.Views.Utils"
+                      xmlns:viewsResources="clr-namespace:StarryEyes.ViewsResources"
                       xmlns:vm="clr-namespace:StarryEyes.ViewModels"
                       xmlns:windowParts="clr-namespace:StarryEyes.Views.WindowParts"
                       Title="{Binding WindowTitle}"
@@ -18,7 +19,7 @@
                       Height="750"
                       Background="{DynamicResource BaseColorBackgroundBrush}"
                       Closing="OnClosing"
-                      FontFamily="Meiryo"
+                      FontFamily="Yu Gothic"
                       GlowBrush="{DynamicResource AccentColorBrush}"
                       InputMethod.IsInputMethodEnabled="False"
                       ResizeMode="CanResizeWithGrip"
@@ -321,7 +322,7 @@
                 </Grid.ColumnDefinitions>
                 <Button Name="MuteToggleButton"
                         Style="{StaticResource MetroSquareTransparentButtonStyle}"
-                        ToolTip="通知音を再生するかどうかを切り替えます。">
+                        ToolTip="{x:Static viewsResources:MainWindowResources.ToggleNotificationSound}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="Click">
                             <ei:CallMethodAction MethodName="ToggleMute" TargetObject="{Binding}" />
@@ -349,11 +350,11 @@
                 <TextBlock Grid.Column="1"
                            Margin="8"
                            Text="{Binding StateString}"
-                           ToolTip="ここをクリックすると、バックステージを開くことができます。" />
+                           ToolTip="{x:Static viewsResources:MainWindowResources.OpenBackstage}" />
                 <StackPanel Grid.Column="2"
                             Margin="8"
                             Orientation="Horizontal"
-                            ToolTip="現在保持している総ツイート数です。">
+                            ToolTip="{x:Static viewsResources:MainWindowResources.TotalTweets}">
                     <Path Width="9"
                           Height="11"
                           Margin="0,2,4,0"
@@ -369,7 +370,7 @@
                 <StackPanel Grid.Column="3"
                             Margin="8"
                             Orientation="Horizontal"
-                            ToolTip="一分間あたりのツイート受信数の目安です。">
+                            ToolTip="{x:Static viewsResources:MainWindowResources.TweetsPerMinutes}">
                     <Path Width="12"
                           Height="7.5"
                           Margin="0,2,4,0"
@@ -385,7 +386,7 @@
                 <StackPanel Grid.Column="4"
                             Margin="8"
                             Orientation="Horizontal"
-                            ToolTip="Krileの起動時間です。">
+                            ToolTip="{x:Static viewsResources:MainWindowResources.UpTime}">
                     <Path Width="11"
                           Height="11"
                           Margin="0,2,4,0"
