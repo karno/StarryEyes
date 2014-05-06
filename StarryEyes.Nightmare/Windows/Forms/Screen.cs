@@ -12,14 +12,7 @@ namespace StarryEyes.Nightmare.Windows.Forms
         /// </summary>
         public static Screen[] AllScreens
         {
-            get
-            {
-                var all = WinForms.Screen.AllScreens;
-                if (all == null)
-                    return null;
-                else
-                    return all.Select(s => Wrap(s)).ToArray();
-            }
+            get { return WinForms.Screen.AllScreens.Select(Wrap).ToArray(); }
         }
 
         /// <summary>
@@ -56,13 +49,13 @@ namespace StarryEyes.Nightmare.Windows.Forms
                 return new Screen(screen);
         }
 
-        readonly WinForms.Screen original;
+        private readonly WinForms.Screen _original;
 
         private Screen(WinForms.Screen wfScreen)
         {
             if (wfScreen == null)
                 throw new ArgumentNullException("wfScreen");
-            this.original = wfScreen;
+            this._original = wfScreen;
         }
 
         /// <summary>
@@ -70,7 +63,7 @@ namespace StarryEyes.Nightmare.Windows.Forms
         /// </summary>
         public int BitsPerPixel
         {
-            get { return this.original.BitsPerPixel; }
+            get { return this._original.BitsPerPixel; }
         }
 
         /// <summary>
@@ -81,10 +74,10 @@ namespace StarryEyes.Nightmare.Windows.Forms
             get
             {
                 return new Rect(
-                      this.original.Bounds.Left,
-                      this.original.Bounds.Top,
-                      this.original.Bounds.Width,
-                      this.original.Bounds.Bottom);
+                      this._original.Bounds.Left,
+                      this._original.Bounds.Top,
+                      this._original.Bounds.Width,
+                      this._original.Bounds.Bottom);
             }
         }
 
@@ -96,10 +89,10 @@ namespace StarryEyes.Nightmare.Windows.Forms
             get
             {
                 return new Rect(
-                      this.original.WorkingArea.Left,
-                      this.original.WorkingArea.Top,
-                      this.original.WorkingArea.Width,
-                      this.original.WorkingArea.Bottom);
+                      this._original.WorkingArea.X,
+                      this._original.WorkingArea.Y,
+                      this._original.WorkingArea.Width,
+                      this._original.WorkingArea.Height);
             }
         }
 
@@ -108,7 +101,7 @@ namespace StarryEyes.Nightmare.Windows.Forms
         /// </summary>
         public string DeviceName
         {
-            get { return this.original.DeviceName; }
+            get { return this._original.DeviceName; }
         }
 
         /// <summary>
@@ -116,7 +109,7 @@ namespace StarryEyes.Nightmare.Windows.Forms
         /// </summary>
         public bool IsPrimary
         {
-            get { return this.original.Primary; }
+            get { return this._original.Primary; }
         }
     }
 }

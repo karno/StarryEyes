@@ -16,6 +16,7 @@ namespace StarryEyes.Views.Notifications
         private void NormalNotificatorView_OnLoaded(object sender, RoutedEventArgs e)
         {
             var viewModel = this.DataContext as NormalNotificatorViewModel;
+            if (viewModel == null) return;
             this.Left = viewModel.Left;
             this.Top = viewModel.Top;
         }

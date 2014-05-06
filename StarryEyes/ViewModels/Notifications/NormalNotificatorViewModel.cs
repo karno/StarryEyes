@@ -119,13 +119,19 @@ namespace StarryEyes.ViewModels.Notifications
             var screen = NotificationUtil.GetNotifyTargetScreen();
             if (screen == null) return;
             var bound = screen.WorkingArea;
+	    // size of notificator
             var wh = 80;
             var ww = 300;
+
+	    // items per one (vertical) line
             var ipl = (int)Math.Ceiling(bound.Height / wh);
+
             if (ipl == 0)
             {
+		// can not place any dialog
                 return;
             }
+
             _left = (int)((bound.Width - ww * (this._slotIndex / ipl + 1)) + bound.Left);
             _top = (int)((bound.Height - wh * (this._slotIndex % ipl + 1)) + bound.Top);
             System.Diagnostics.Debug.WriteLine("#N - " + _slotIndex + " / " + _left + ", " + _top);
