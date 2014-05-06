@@ -27,6 +27,17 @@ namespace StarryEyes.Models.Databases.Caching
             this._lastWritebackStamp = DateTime.Now;
         }
 
+        public int Count
+        {
+            get
+            {
+                lock (this._queue)
+                {
+                    return _queue.Count;
+                }
+            }
+        }
+
         public void Enqueue(TKey key, TValue value)
         {
             int count;

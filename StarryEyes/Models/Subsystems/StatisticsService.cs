@@ -15,12 +15,14 @@ namespace StarryEyes.Models.Subsystems
     /// </summary>
     public static class StatisticsService
     {
-        private static readonly object StatisticsWorkProcSync = new object();
+        private static readonly object _statisticsWorkProcSync = new object();
         private static volatile bool _isThreadAlive = true;
 
         private static int _estimatedGrossTweetCount;
 
         private static int _tweetsPerMinutes;
+
+        private static int _queuedStatusesCount;
 
         private static readonly int[] _tweetsCountArray = { 0, 0, 0, 0, 0, 0 };
 
@@ -50,9 +52,9 @@ namespace StarryEyes.Models.Subsystems
             Observable.Interval(TimeSpan.FromSeconds(10))
                       .Subscribe(_ =>
                       {
-                          lock (StatisticsWorkProcSync)
+                          lock (_statisticsWorkProcSync)
                           {
-                              Monitor.Pulse(StatisticsWorkProcSync);
+                              Monitor.Pulse(_statisticsWorkProcSync);
                           }
                       });
             App.ApplicationFinalize += StopThread;
@@ -64,7 +66,7 @@ namespace StarryEyes.Models.Subsystems
         {
             try
             {
-                _estimatedGrossTweetCount = (int)(await StatusProxy.GetCountAsync());
+                _estimatedGrossTweetCount = (int)(await StatusProxy.GetCountAsync()) + _queuedStatusesCount;
             }
             catch (SqliteCrudException) { }
             catch (SQLiteException) { }
@@ -72,11 +74,16 @@ namespace StarryEyes.Models.Subsystems
 
         private static void StopThread()
         {
-            lock (StatisticsWorkProcSync)
+            lock (_statisticsWorkProcSync)
             {
                 _isThreadAlive = false;
-                Monitor.Pulse(StatisticsWorkProcSync);
+                Monitor.Pulse(_statisticsWorkProcSync);
             }
+        }
+
+        internal static void SetQueuedStatusCount(int count)
+        {
+            _queuedStatusesCount = count;
         }
 
         /// <summary>
@@ -86,10 +93,10 @@ namespace StarryEyes.Models.Subsystems
         {
             while (_isThreadAlive)
             {
-                lock (StatisticsWorkProcSync)
+                lock (_statisticsWorkProcSync)
                 {
                     if (!_isThreadAlive) return;
-                    Monitor.Wait(StatisticsWorkProcSync);
+                    Monitor.Wait(_statisticsWorkProcSync);
                 }
                 if (!_isThreadAlive) return;
 
@@ -97,6 +104,7 @@ namespace StarryEyes.Models.Subsystems
                 var previousGross = _estimatedGrossTweetCount;
                 await UpdateTweetCount();
                 var delta = _estimatedGrossTweetCount - previousGross;
+                System.Diagnostics.Debug.WriteLine("status count: " + _estimatedGrossTweetCount + ", delta: " + delta);
 
                 // indicate next channel
                 _currentChannel = (_currentChannel + 1) % 6;

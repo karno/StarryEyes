@@ -11,6 +11,7 @@ using StarryEyes.Casket;
 using StarryEyes.Casket.DatabaseModels;
 using StarryEyes.Models.Databases.Caching;
 using StarryEyes.Models.Receiving;
+using StarryEyes.Models.Subsystems;
 
 namespace StarryEyes.Models.Databases
 {
@@ -50,6 +51,7 @@ namespace StarryEyes.Models.Databases
         public static void StoreStatus([NotNull] TwitterStatus status)
         {
             _statusQueue.Enqueue(status.Id, status);
+            StatisticsService.SetQueuedStatusCount(_statusQueue.Count);
         }
 
         private static async Task StoreStatusesAsync(IEnumerable<TwitterStatus> statuses)
@@ -64,6 +66,7 @@ namespace StarryEyes.Models.Databases
                 return new[] { s };
             }).Select(s => StatusInsertBatch.CreateBatch(Mapper.Map(s), Mapper.Map(s.User)));
             await DatabaseUtil.RetryIfLocked(async () => await Database.StoreStatuses(store));
+            StatisticsService.SetQueuedStatusCount(_statusQueue.Count);
         }
 
         /// <summary>
