@@ -425,6 +425,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>MainWindowResources.resx</DependentUpon>
     </Compile>
+    <Compile Include="ViewsResources\WindowParts\InputAreaResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>InputAreaResources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Views\Adorners\AdornerBase.cs" />
     <Compile Include="Views\Adorners\InsertionAdorner.cs" />
     <Compile Include="Views\Behaviors\DragStartBehavior.cs" />
@@ -744,6 +749,13 @@
     <EmbeddedResource Include="ViewsResources\MainWindowResources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>MainWindowResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ViewsResources\WindowParts\InputAreaResources.ja.resx">
+      <DependentUpon>InputAreaResources.resx</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ViewsResources\WindowParts\InputAreaResources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>InputAreaResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="Views\Controls\QueryEditorResources\KrileQuery.xshd" />
   </ItemGroup>

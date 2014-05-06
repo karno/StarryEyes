@@ -13,6 +13,7 @@
              xmlns:seb="clr-namespace:StarryEyes.Views.Behaviors"
              xmlns:triggers="clr-namespace:StarryEyes.Views.Triggers"
              xmlns:utils="clr-namespace:StarryEyes.Views.Utils"
+             xmlns:windowParts="clr-namespace:StarryEyes.ViewsResources.WindowParts"
              x:Name="UserControl"
              MaxHeight="200"
              d:DataContext="{d:DesignInstance Type={x:Type inputting:InputViewModel}}"
@@ -113,7 +114,7 @@
                     <TextBlock>
                         <Run Text="{Binding AuthInfoScreenNames, Mode=OneWay}" />
                         <LineBreak />
-                        <Run Text="クリックすると変更することができます。" />
+                        <Run Text="{x:Static windowParts:InputAreaResources.ClickToSelectAccount}" />
                     </TextBlock>
                 </Button.ToolTip>
                 <ItemsControl x:Name="ItemsControl"
@@ -148,7 +149,7 @@
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
                 <Border.ToolTip>
-                    <TextBlock Text="アカウントが自動選択されています。クリックすると解除します。" />
+                    <TextBlock Text="{x:Static windowParts:InputAreaResources.ClickToSelectAccount}" />
                 </Border.ToolTip>
             </Border>
         </Grid>
@@ -184,10 +185,11 @@
                                Margin="4,0,4,0"
                                DataContext="{Binding InputCoreViewModel}"
                                Foreground="Green"
+                               Text="{Binding DraftCount,
+                                              Mode=OneWay,
+                                              StringFormat={x:Static windowParts:InputAreaResources.DraftCountFormat}}"
                                Visibility="{Binding IsDraftsExisted,
-                                                    Converter={StaticResource BooleanToVisibleConverter}}">
-                        <Run Text="{Binding DraftCount, Mode=OneWay}" /><Run Text="件の下書きがあります" />
-                    </TextBlock>
+                                                    Converter={StaticResource BooleanToVisibleConverter}}" />
                     <Grid Grid.Column="2"
                           Width="{Binding MaxControlWidth}"
                           Height="12"
@@ -197,11 +199,7 @@
                           Visibility="{Binding IsPostLimitPredictionEnabled,
                                                Converter={StaticResource BooleanToVisibleConverter}}">
                         <Grid.ToolTip>
-                            <TextBlock>
-                                <Run Text="規制までおよそ " />
-                                <Run Text="{Binding RemainUpdate, Mode=OneWay}" />
-                                <Run Text=" ツイート" />
-                            </TextBlock>
+                            <TextBlock Text="{Binding RemainUpdate, Mode=OneWay, StringFormat={x:Static windowParts:InputAreaResources.RemainUpdateFormat}}" />
                         </Grid.ToolTip>
                         <Grid Width="{Binding ControlWidth}"
                               HorizontalAlignment="Left"
@@ -337,7 +335,7 @@
                               Stretch="Fill" />
                         <TextBlock VerticalAlignment="Center"
                                    Foreground="White"
-                                   Text="アカウントが選択されていません。左側のエリアをクリックして、投稿するアカウントを選択してください。" />
+                                   Text="{x:Static windowParts:InputAreaResources.AccountIsNotSelected}" />
                     </DockPanel>
                     <controls:SuggestableTextBox Grid.Row="1"
                                                  Grid.Column="0"
@@ -391,7 +389,7 @@
                                 FontSize="10.667"
                                 IsEnabled="{Binding CanSend}"
                                 Style="{DynamicResource MetroSquareDefaultButtonStyle}"
-                                ToolTip="ツイートの送信">
+                                ToolTip="{x:Static windowParts:InputAreaResources.PostTweet}">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="Click">
                                     <ei:CallMethodAction MethodName="Send" TargetObject="{Binding Mode=OneWay}" />
@@ -406,7 +404,7 @@
                         <Button DockPanel.Dock="Right"
                                 Focusable=" False"
                                 Style="{DynamicResource MetroSquareUnfocusableFlatButton}"
-                                ToolTip="直前のツイートを訂正"
+                                ToolTip="{x:Static windowParts:InputAreaResources.AmendPreviousOne}"
                                 Visibility="{Binding CanAmend,
                                                      Converter={StaticResource BooleanToVisibleConverter}}">
                             <i:Interaction.Triggers>
@@ -422,7 +420,7 @@
                                   Stretch="Fill" />
                         </Button>
                         <Grid DockPanel.Dock="Right"
-                              ToolTip="直前のツイートを訂正中です。訂正をやめるには、投稿ボックスを一旦閉じてください。"
+                              ToolTip="{x:Static windowParts:InputAreaResources.AmendingPreviousOne}"
                               Visibility="{Binding IsAmending,
                                                    Converter={StaticResource BooleanToVisibleConverter}}">
                             <Path Width="12"
@@ -437,7 +435,7 @@
                                     Orientation="Horizontal">
                             <controls:DropDownMenuButton Focusable="False"
                                                          Style="{DynamicResource MetroSquareUnfocusableFlatButton}"
-                                                         ToolTip="下書き"
+                                                         ToolTip="{x:Static windowParts:InputAreaResources.Drafts}"
                                                          Visibility="{Binding IsDraftsExisted,
                                                                               Converter={StaticResource BooleanToVisibleConverter}}">
                                 <controls:DropDownMenuButton.DropDownContextMenu>
@@ -471,7 +469,7 @@
                                 <Button Name="ImageAttachOptionButton"
                                         Width="40"
                                         Style="{StaticResource MetroSquareUnfocusableFlatButton}"
-                                        ToolTip="画像添付オプション">
+                                        ToolTip="{x:Static windowParts:InputAreaResources.ImageAttachOption}">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="Click">
                                             <ei:ChangePropertyAction PropertyName="IsOpen"
@@ -494,14 +492,14 @@
                                     <Button.ContextMenu>
                                         <!--  ReSharper disable once Xaml.BindingWithContextNotResolved  -->
                                         <ContextMenu DataContext="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
-                                            <MenuItem Header="添付するファイルを選択...">
+                                            <MenuItem Header="{x:Static windowParts:InputAreaResources.SelectAttachImageFile}">
                                                 <i:Interaction.Triggers>
                                                     <i:EventTrigger EventName="Click">
                                                         <ei:CallMethodAction MethodName="AttachImage" TargetObject="{Binding Mode=OneWay}" />
                                                     </i:EventTrigger>
                                                 </i:Interaction.Triggers>
                                             </MenuItem>
-                                            <MenuItem Header="クリップボードの画像を添付" IsEnabled="{Binding IsClipboardContentImage, Mode=OneWay}">
+                                            <MenuItem Header="{x:Static windowParts:InputAreaResources.AttachClipboardImage}" IsEnabled="{Binding IsClipboardContentImage, Mode=OneWay}">
                                                 <i:Interaction.Triggers>
                                                     <i:EventTrigger EventName="Click">
                                                         <ei:CallMethodAction MethodName="AttachClipboardImage" TargetObject="{Binding Mode=OneWay}" />
@@ -509,7 +507,7 @@
                                                 </i:Interaction.Triggers>
                                             </MenuItem>
                                             <Separator />
-                                            <MenuItem Header="Snipping Toolを起動">
+                                            <MenuItem Header="{x:Static windowParts:InputAreaResources.StartSnippingTool}">
                                                 <i:Interaction.Triggers>
                                                     <i:EventTrigger EventName="Click">
                                                         <ei:CallMethodAction MethodName="StartSnippingTool" TargetObject="{Binding Mode=OneWay}" />
@@ -523,7 +521,7 @@
                                         HorizontalAlignment="Left"
                                         Focusable="False"
                                         Style="{DynamicResource MetroSquareUnfocusableFlatButton}"
-                                        ToolTip="画像の添付">
+                                        ToolTip="{x:Static windowParts:InputAreaResources.SelectAttachImageFile}">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="Click">
                                             <ei:CallMethodAction MethodName="AttachImage" TargetObject="{Binding Mode=OneWay}" />
@@ -539,7 +537,7 @@
                             <Button Width="28"
                                     Focusable="False"
                                     Style="{DynamicResource MetroSquareUnfocusableFlatButton}"
-                                    ToolTip="位置情報の追加・更新"
+                                    ToolTip="{x:Static windowParts:InputAreaResources.AttachOrUpdateLocation}"
                                     Visibility="{Binding IsLocationEnabled,
                                                          Converter={StaticResource BooleanToVisibleConverter}}">
                                 <i:Interaction.Triggers>
@@ -556,7 +554,7 @@
                             <Button Width="28"
                                     Focusable="False"
                                     Style="{DynamicResource MetroSquareUnfocusableFlatButton}"
-                                    ToolTip="位置情報の削除"
+                                    ToolTip="{x:Static windowParts:InputAreaResources.DeleteLocation}"
                                     Visibility="{Binding IsLocationAttached,
                                                          Converter={StaticResource BooleanToVisibleConverter}}">
                                 <i:Interaction.Triggers>
@@ -581,7 +579,7 @@
                                     <ColumnDefinition />
                                 </Grid.ColumnDefinitions>
                                 <Border VerticalAlignment="Center"
-                                        ToolTip="URLリンク化自動回避は行われません。"
+                                        ToolTip="{x:Static windowParts:InputAreaResources.UrlAutoEscapeDisabled}"
                                         Visibility="{Binding IsChecked,
                                                              Converter={StaticResource BooleanToInvisibleConverter},
                                                              ElementName=ToggleUrlAutoEscapeButton}">
@@ -592,7 +590,7 @@
                                 </Border>
                                 <Border Grid.Column="0"
                                         VerticalAlignment="Center"
-                                        ToolTip="URLリンク化自動回避を行います(スキームのないURLのTLDの前にゼロ幅スペースが自動挿入されます)。"
+                                        ToolTip="{x:Static windowParts:InputAreaResources.UrlAutoEscapeEnabled}"
                                         Visibility="{Binding IsChecked,
                                                              Converter={StaticResource BooleanToVisibleConverter},
                                                              ElementName=ToggleUrlAutoEscapeButton}">
@@ -609,7 +607,7 @@
                                     <custom:ToggleSwitchButton x:Name="ToggleUrlAutoEscapeButton"
                                                                IsChecked="{Binding IsUrlAutoEsacpeEnabled}"
                                                                SwitchForeground="{DynamicResource GlobalKeyBrush}"
-                                                               ToolTip="URLリンク化自動回避のオンオフを切り替えます。" />
+                                                               ToolTip="{x:Static windowParts:InputAreaResources.ToggleUrlAutoEscape}" />
                                 </Viewbox>
                             </Grid>
                         </StackPanel>
@@ -617,7 +615,7 @@
                             <Border Width="14"
                                     Height="14"
                                     Margin="7,0"
-                                    ToolTip="ロックされているハッシュタグ"
+                                    ToolTip="{x:Static windowParts:InputAreaResources.LockedHashtags}"
                                     Visibility="{Binding IsBindingHashtagExisted,
                                                          Converter={StaticResource BooleanToVisibleConverter}}">
                                 <Path Margin="0,0,2.332,-0.002"
@@ -637,7 +635,7 @@
                             <Border Width="14"
                                     Height="14"
                                     Margin="7,0"
-                                    ToolTip="ロック可能なハッシュタグ"
+                                    ToolTip="{x:Static windowParts:InputAreaResources.LockableHashtags}"
                                     Visibility="{Binding IsBindableHashtagExisted,
                                                          Converter={StaticResource BooleanToVisibleConverter}}">
                                 <Path Data="F1 M 18.8704,16.7929L 22.1351,16.7929L 30.4452,25.103C 30.9088,25.5666 30.9088,26.3183 30.4452,26.7819L 26.7819,30.4452C 26.3183,30.9088 25.5666,30.9088 25.103,30.4452L 16.7929,22.1351L 16.7929,18.8704C 16.7929,18.1779 16.7929,17.4854 17.1391,17.1392C 17.4854,16.7929 18.1779,16.7929 18.8704,16.7929 Z M 19.7608,18.5736C 19.1051,18.5736 18.5736,19.1051 18.5736,19.7608C 18.5736,20.4164 19.1051,20.9479 19.7608,20.9479C 20.4164,20.9479 20.9479,20.4164 20.9479,19.7608C 20.9479,19.1051 20.4164,18.5736 19.7608,18.5736 Z "
@@ -692,7 +690,7 @@
                             VerticalAlignment="Center"
                             BorderThickness="1"
                             DataContext="{Binding InputCoreViewModel}"
-                            ToolTip="クリックで画像の添付を解除します。"
+                            ToolTip="{x:Static windowParts:InputAreaResources.ClickToRemoveImage}"
                             Visibility="{Binding IsImageAttached,
                                                  Converter={StaticResource BooleanToVisibleConverter}}">
                         <Border.Background>

@@ -383,7 +383,7 @@ namespace StarryEyes.ViewModels
                         MainIcon = VistaTaskDialogIcon.Warning,
                         MainInstruction = Resources.MsgExitInst,
                         CommonButtons = TaskDialogCommonButtons.OKCancel,
-                        VerificationText = Resources.MsgExitVerification,
+                        VerificationText = Resources.MsgDoNotShowAgain,
                     }));
                 if (ret.Response == null) return true;
                 Setting.ConfirmOnExitApp.Value = !ret.Response.VerificationChecked.GetValueOrDefault();

@@ -8,6 +8,7 @@ using StarryEyes.Models.Inputting;
 using StarryEyes.Settings;
 using StarryEyes.ViewModels.Common;
 using StarryEyes.ViewModels.WindowParts.Flips;
+using StarryEyes.ViewsResources.WindowParts;
 
 namespace StarryEyes.ViewModels.WindowParts.Inputting
 {
@@ -92,9 +93,10 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
         {
             get
             {
-                if (this._accounts.Count == 0)
-                    return "アカウントは選択されていません。";
-                return this._accounts.Select(_ => _.ScreenName).JoinString(", ") + "が選択されています。";
+                return this._accounts.Count == 0
+                    ? InputAreaResources.AccountSelectorNotSelected
+                    : String.Format(InputAreaResources.AccountSelectorSelected,
+                        this._accounts.Select(_ => _.ScreenName).JoinString(", "));
             }
         }
 

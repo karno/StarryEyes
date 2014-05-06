@@ -20,9 +20,11 @@ using StarryEyes.Models.Inputting;
 using StarryEyes.Models.Requests;
 using StarryEyes.Models.Subsystems;
 using StarryEyes.Nightmare.Windows;
+using StarryEyes.Properties;
 using StarryEyes.Settings;
 using StarryEyes.ViewModels.Timelines.Statuses;
 using StarryEyes.Views.Messaging;
+using StarryEyes.ViewsResources.WindowParts;
 using Clipboard = System.Windows.Clipboard;
 
 namespace StarryEyes.ViewModels.WindowParts.Inputting
@@ -291,19 +293,19 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                         new TaskDialogMessage(
                             new TaskDialogOptions
                             {
-                                Title = "下書きへの保存",
+                                Title = InputAreaResources.MsgSaveToDraftTitle,
                                 MainIcon = VistaTaskDialogIcon.Information,
-                                MainInstruction = "現在の内容を下書きに保存しますか？",
-                                CustomButtons = new[] { "保存(&Y)", "破棄(&N)", "キャンセル" },
-                                VerificationText = "次回から表示しない",
+                                MainInstruction = InputAreaResources.MsgSaveToDraftInst,
+                                CommonButtons = TaskDialogCommonButtons.YesNoCancel,
+                                VerificationText = Resources.MsgDoNotShowAgain,
                                 AllowDialogCancellation = true,
                             }));
-                    switch (msg.Response.CustomButtonResult)
+                    switch (msg.Response.Result)
                     {
-                        case 0:
+                        case TaskDialogSimpleResult.Yes:
                             action = TweetBoxClosingAction.SaveToDraft;
                             break;
-                        case 1:
+                        case TaskDialogSimpleResult.No:
                             action = TweetBoxClosingAction.Discard;
                             break;
                         default:
@@ -578,10 +580,12 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             }
             var msg = new OpeningFileSelectionMessage
             {
-                Filter = "画像ファイル|*.jpg;*.jpeg;*.jpe;*.png;*.gif;*.bmp;*.dib|全てのファイル|*.*",
+                Filter =
+                    InputAreaResources.AttachImageDlgFilterImg + "|*.jpg;*.jpeg;*.jpe;*.png;*.gif;*.bmp;*.dib|" +
+                    InputAreaResources.AttachImageDlgFilterAll + "|*.*",
                 InitialDirectory = dir,
                 MultiSelect = false,
-                Title = "添付する画像ファイルを指定"
+                Title = InputAreaResources.AttachImageDlgTitle
             };
             var m = _parent.Messenger.GetResponse(msg);
             if (m.Response == null || m.Response.Length <= 0 ||
@@ -638,11 +642,10 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
         {
             _parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
             {
-                Title = "画像読み込みエラー",
+                Title = InputAreaResources.MsgImageLoadErrorTitle,
                 MainIcon = VistaTaskDialogIcon.Error,
-                MainInstruction = "画像の添付ができませんでした。",
-                Content = "画像の読み込み時にエラーが発生しました。" + Environment.NewLine +
-                          "未対応の画像か、データが破損している可能性があります。",
+                MainInstruction = InputAreaResources.MsgImageLoadErrorInst,
+                Content = InputAreaResources.MsgImageLoadErrorContent,
                 ExpandedInfo = ex.ToString(),
                 CommonButtons = TaskDialogCommonButtons.Close,
             }));
@@ -659,10 +662,10 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             {
                 _parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
                  {
-                     Title = "エラー",
+                     Title = InputAreaResources.MsgSnippingToolErrorTitle,
                      MainIcon = VistaTaskDialogIcon.Error,
-                     MainInstruction = "Snipping Toolの起動に失敗しました。",
-                     Content = "スタートメニューからの起動を試してみてください。",
+                     MainInstruction = InputAreaResources.MsgSnippingToolErrorInst,
+                     Content = InputAreaResources.MsgSnippingToolErrorContent,
                      ExpandedInfo = ex.ToString(),
                      CommonButtons = TaskDialogCommonButtons.Close
                  }));
@@ -829,20 +832,20 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                 var dual = InputData.AmendTargetTweets.Count();
                 if (dual > 2)
                 {
-                    removal += " (" + dual + "件のツイートが同時に削除されます)";
+                    removal += " " + String.Format(InputAreaResources.MsgAmendExInfoMultiple, dual);
                 }
                 // amend mode
                 var amend = _parent.Messenger.GetResponse(
                     new TaskDialogMessage(
                         new TaskDialogOptions
                         {
-                            Title = "ツイートの訂正",
+                            Title = InputAreaResources.MsgAmendTitle,
                             MainIcon = VistaTaskDialogIcon.Information,
-                            MainInstruction = "直前のツイートを削除し、再投稿します。",
-                            Content = "削除に失敗した場合でも投稿は行われます。",
-                            ExpandedInfo = "削除されるツイート: " + removal,
+                            MainInstruction = InputAreaResources.MsgAmendInst,
+                            Content = InputAreaResources.MsgAmendContent,
+                            ExpandedInfo = InputAreaResources.MsgAmendExInfo + removal,
                             CommonButtons = TaskDialogCommonButtons.OKCancel,
-                            VerificationText = "次回から表示しない",
+                            VerificationText = Resources.MsgDoNotShowAgain,
                         }));
                 Setting.WarnAmending.Value = !amend.Response.VerificationChecked.GetValueOrDefault();
                 if (amend.Response.Result == TaskDialogSimpleResult.Cancel)
@@ -875,11 +878,10 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                     var thirdreply = _parent.Messenger.GetResponse(
                         new TaskDialogMessage(new TaskDialogOptions
                         {
-                            Title = "割込みリプライ警告",
+                            Title = InputAreaResources.MsgThirdReplyWarnTitle,
                             MainIcon = VistaTaskDialogIcon.Warning,
-                            Content = "違うアカウントから会話を継続しようとしています。" + Environment.NewLine +
-                                      "投稿してもよろしいですか？",
-                            VerificationText = "次回から表示しない",
+                            Content = InputAreaResources.MsgThirdReplyWarnContent,
+                            VerificationText = Resources.MsgDoNotShowAgain,
                             CommonButtons = TaskDialogCommonButtons.OKCancel,
                         }));
                     Setting.WarnReplyFromThirdAccount.Value =
@@ -903,7 +905,8 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                     }
                     if (r.Faileds != null)
                     {
-                        var message = this.AnalyzeFailedReason(r.Exceptions) ?? "原因を特定できませんでした。";
+                        var message = this.AnalyzeFailedReason(r.Exceptions) ??
+                                      InputAreaResources.MsgTweetFailedReasonUnknown;
                         var ed = r.Exceptions
                                   .Guard()
                                   .SelectMany(ex => EnumerableEx.Generate(
@@ -915,15 +918,14 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                         {
                             var resp = _parent.Messenger.GetResponse(new TaskDialogMessage(new TaskDialogOptions
                             {
-                                Title = "ツイートの失敗",
+                                Title = InputAreaResources.MsgTweetFailedTitle,
                                 MainIcon = VistaTaskDialogIcon.Error,
-                                MainInstruction = "ツイートに失敗しました。",
-                                Content = "エラー: " + message + Environment.NewLine +
-                                          "もう一度投稿しますか？",
+                                MainInstruction = InputAreaResources.MsgTweetFailedInst,
+                                Content = String.Format(InputAreaResources.MsgTweetFailedContent, message),
                                 ExpandedInfo = ed,
-                                FooterText = "再試行しない場合は、ツイートしようとした内容は下書きとして保存されます。",
+                                FooterText = InputAreaResources.MsgTweetFailedFooter,
                                 FooterIcon = VistaTaskDialogIcon.Information,
-                                VerificationText = "次回から表示しない",
+                                VerificationText = Resources.MsgDoNotShowAgain,
                                 CommonButtons = TaskDialogCommonButtons.RetryCancel
                             }));
                             Setting.ShowMessageOnTweetFailed.Value =
@@ -964,11 +966,11 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                 }
                 if (msg.Contains("duplicate"))
                 {
-                    return "直近のツイートと重複しています。";
+                    return InputAreaResources.MsgTweetFailedReasonDuplicate;
                 }
                 if (msg.Contains("User is over daily update limit."))
                 {
-                    return "POST規制されています。";
+                    return InputAreaResources.MsgTweetFailedReasonPostLimited;
                 }
                 // TODO: Implement more cases.
             }

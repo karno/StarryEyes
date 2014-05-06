@@ -46,7 +46,6 @@ namespace StarryEyes.ViewModels.Timelines
             set
             {
                 if (_isLoading == value) return;
-                System.Diagnostics.Debug.WriteLine("load state: " + value);
                 _isLoading = value;
                 RaisePropertyChanged();
             }

@@ -244,15 +244,6 @@ namespace StarryEyes.Properties {
         }
         
         /// <summary>
-        ///   Don&apos;t ask me again before exit に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        public static string MsgExitVerification {
-            get {
-                return ResourceManager.GetString("MsgExitVerification", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Please retry process or reboot Windows. に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string MsgFailGeneralProcessContent {

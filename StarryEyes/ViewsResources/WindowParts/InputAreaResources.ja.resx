@@ -1,0 +1,267 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AccountIsAutomaticallySelected" xml:space="preserve">
+    <value>アカウントが自動選択されています。クリックすると解除します。</value>
+  </data>
+  <data name="AccountIsNotSelected" xml:space="preserve">
+    <value>アカウントが選択されていません。左側のエリアをクリックして、投稿するアカウントを選択してください。</value>
+  </data>
+  <data name="AccountSelectorNotSelected" xml:space="preserve">
+    <value>アカウントは選択されていません。</value>
+  </data>
+  <data name="AccountSelectorSelected" xml:space="preserve">
+    <value>{0} が選択されています。</value>
+  </data>
+  <data name="AmendingPreviousOne" xml:space="preserve">
+    <value>直前のツイートを訂正中です。訂正をやめるには、投稿ボックスを一旦閉じてください。</value>
+  </data>
+  <data name="AmendPreviousOne" xml:space="preserve">
+    <value>最後に投稿したツイートを訂正</value>
+  </data>
+  <data name="AttachClipboardImage" xml:space="preserve">
+    <value>クリップボードの画像を添付</value>
+  </data>
+  <data name="AttachImageDlgFilterAll" xml:space="preserve">
+    <value>全てのファイル</value>
+  </data>
+  <data name="AttachImageDlgFilterImg" xml:space="preserve">
+    <value>画像ファイル</value>
+  </data>
+  <data name="AttachImageDlgTitle" xml:space="preserve">
+    <value>添付する画像ファイルを指定</value>
+  </data>
+  <data name="AttachOrUpdateLocation" xml:space="preserve">
+    <value>位置情報の添付・更新</value>
+  </data>
+  <data name="ClickToRemoveImage" xml:space="preserve">
+    <value>クリックで画像の添付を解除します。</value>
+  </data>
+  <data name="ClickToSelectAccount" xml:space="preserve">
+    <value>クリックすると投稿するアカウントを選択することができます。</value>
+  </data>
+  <data name="DeleteLocation" xml:space="preserve">
+    <value>位置情報の削除</value>
+  </data>
+  <data name="DraftCountFormat" xml:space="preserve">
+    <value>{0} 件の下書きがあります</value>
+  </data>
+  <data name="Drafts" xml:space="preserve">
+    <value>下書き</value>
+  </data>
+  <data name="ImageAttachOption" xml:space="preserve">
+    <value>画像添付オプション</value>
+  </data>
+  <data name="LockableHashtags" xml:space="preserve">
+    <value>ロック可能なハッシュタグ</value>
+  </data>
+  <data name="LockedHashtags" xml:space="preserve">
+    <value>ロックされているハッシュタグ</value>
+  </data>
+  <data name="MsgAmendContent" xml:space="preserve">
+    <value>削除に失敗した場合でも投稿は行われます。</value>
+  </data>
+  <data name="MsgAmendExInfo" xml:space="preserve">
+    <value>削除されるツイート: </value>
+  </data>
+  <data name="MsgAmendExInfoMultiple" xml:space="preserve">
+    <value>({0} 件のツイートが同時に削除されます)</value>
+  </data>
+  <data name="MsgAmendInst" xml:space="preserve">
+    <value>直前のツイートを削除し、再投稿します。</value>
+  </data>
+  <data name="MsgAmendTitle" xml:space="preserve">
+    <value>ツイートの訂正</value>
+  </data>
+  <data name="MsgImageLoadErrorContent" xml:space="preserve">
+    <value>画像の読み込み時にエラーが発生しました。
+画像形式が未対応のものであるか、または画像が破損している可能性があります。</value>
+  </data>
+  <data name="MsgImageLoadErrorInst" xml:space="preserve">
+    <value>画像の添付ができませんでした。</value>
+  </data>
+  <data name="MsgImageLoadErrorTitle" xml:space="preserve">
+    <value>画像読み込みエラー</value>
+  </data>
+  <data name="MsgSaveToDraftInst" xml:space="preserve">
+    <value>現在の内容を下書きに保存しますか？</value>
+  </data>
+  <data name="MsgSaveToDraftTitle" xml:space="preserve">
+    <value>下書きへの保存</value>
+  </data>
+  <data name="MsgSnippingToolErrorContent" xml:space="preserve">
+    <value>スタートスクリーンからの起動を試してみてください。</value>
+  </data>
+  <data name="MsgSnippingToolErrorInst" xml:space="preserve">
+    <value>Snipping Toolを起動できませんでした。</value>
+  </data>
+  <data name="MsgSnippingToolErrorTitle" xml:space="preserve">
+    <value>Snipping Tool エラー</value>
+  </data>
+  <data name="MsgThirdReplyWarnContent" xml:space="preserve">
+    <value>違うアカウントから会話を継続しようとしています。
+投稿してもよろしいですか？</value>
+  </data>
+  <data name="MsgThirdReplyWarnTitle" xml:space="preserve">
+    <value>誤爆リプライ警告</value>
+  </data>
+  <data name="MsgTweetFailedContent" xml:space="preserve">
+    <value>エラー: {0}
+もう一度投稿しますか？</value>
+  </data>
+  <data name="MsgTweetFailedFooter" xml:space="preserve">
+    <value>再試行しない場合は、ツイートしようとした内容は下書きに保存されます。</value>
+  </data>
+  <data name="MsgTweetFailedInst" xml:space="preserve">
+    <value>ツイートに失敗しました。</value>
+  </data>
+  <data name="MsgTweetFailedReasonDuplicate" xml:space="preserve">
+    <value>直近のツイートと重複しています。</value>
+  </data>
+  <data name="MsgTweetFailedReasonPostLimited" xml:space="preserve">
+    <value>POST規制されています。</value>
+  </data>
+  <data name="MsgTweetFailedReasonUnknown" xml:space="preserve">
+    <value>原因を特定できませんでした。</value>
+  </data>
+  <data name="MsgTweetFailedTitle" xml:space="preserve">
+    <value>ツイートの失敗</value>
+  </data>
+  <data name="PostTweet" xml:space="preserve">
+    <value>ツイートを投稿</value>
+  </data>
+  <data name="RemainUpdateFormat" xml:space="preserve">
+    <value>規制までおよそ {0} ツイート</value>
+  </data>
+  <data name="SelectAttachImageFile" xml:space="preserve">
+    <value>添付するファイルを選択...</value>
+  </data>
+  <data name="StartSnippingTool" xml:space="preserve">
+    <value>Snipping Toolを起動...</value>
+  </data>
+  <data name="ToggleUrlAutoEscape" xml:space="preserve">
+    <value>URLリンク化自動回避のオンオフを切り替えます。</value>
+  </data>
+  <data name="UrlAutoEscapeDisabled" xml:space="preserve">
+    <value>URLリンク化自動回避は行われません。</value>
+  </data>
+  <data name="UrlAutoEscapeEnabled" xml:space="preserve">
+    <value>URLリンク化自動回避を行います(スキームのないURLのTLDの前にゼロ幅スペースが自動挿入されます)。</value>
+  </data>
+</root>

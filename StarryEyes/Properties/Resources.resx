@@ -159,9 +159,6 @@ Current value: {0} / Lowest recommend: {1}</value>
   <data name="MsgExitTitle" xml:space="preserve">
     <value>Exit Krile</value>
   </data>
-  <data name="MsgExitVerification" xml:space="preserve">
-    <value>Don't ask me again before exit</value>
-  </data>
   <data name="MsgTabWarningContent" xml:space="preserve">
     <value>Tab information is empty.
 Generate default tabs?</value>
