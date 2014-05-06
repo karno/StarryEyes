@@ -92,6 +92,7 @@ namespace StarryEyes.Models.Databases.Caching
                 if (this._table.TryGetValue(id, out node))
                 {
                     this._queue.Remove(node);
+                    this._table.Remove(id);
                 }
             }
         }
