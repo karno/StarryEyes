@@ -50,7 +50,7 @@ namespace StarryEyes.Models.Timelines.Tabs
         {
             Setting.Columns
                    .Select(c => new ColumnModel(c.Tabs.Select(d => d.ToTabModel()).ToArray()))
-                   .ForEach(_columns.Add);
+                   .ForEach(Columns.Add);
             CleanupColumn();
             if (_loaded) return;
             _loaded = true;
@@ -74,9 +74,9 @@ namespace StarryEyes.Models.Timelines.Tabs
         {
             get
             {
-                if (_currentFocusColumnIndex < 0 || _currentFocusColumnIndex >= _columns.Count)
+                if (_currentFocusColumnIndex < 0 || _currentFocusColumnIndex >= Columns.Count)
                     return null;
-                var col = _columns[_currentFocusColumnIndex];
+                var col = Columns[_currentFocusColumnIndex];
                 var cti = col.CurrentFocusTabIndex;
                 if (cti < 0 || cti >= col.Tabs.Count)
                     return null;
@@ -93,9 +93,9 @@ namespace StarryEyes.Models.Timelines.Tabs
             set
             {
                 if (_currentFocusColumnIndex == value) return;
-                if (value >= _columns.Count)
+                if (value >= Columns.Count)
                 {
-                    value = _columns.Count - 1;
+                    value = Columns.Count - 1;
                 }
                 if (value == -1) return;
                 _currentFocusColumnIndex = value;
@@ -105,7 +105,7 @@ namespace StarryEyes.Models.Timelines.Tabs
 
         private static void RaiseCurrentFocusColumnChanged()
         {
-            var col = _columns[_currentFocusColumnIndex];
+            var col = Columns[_currentFocusColumnIndex];
             if (col.Tabs.Count > 0)
             {
                 InputModel.AccountSelector.CurrentFocusTab = col.Tabs[col.CurrentFocusTabIndex];
@@ -127,7 +127,7 @@ namespace StarryEyes.Models.Timelines.Tabs
         /// <returns></returns>
         internal static IEnumerable<ColumnInfo> GetColumnInfoData()
         {
-            return _columns.Select(c => new ColumnInfo(c.Tabs));
+            return Columns.Select(c => new ColumnInfo(c.Tabs));
         }
 
         /// <summary>
@@ -137,9 +137,9 @@ namespace StarryEyes.Models.Timelines.Tabs
         /// <returns>If found, returns >= 0. Otherwise, return -1.</returns>
         public static int FindColumnIndex(ColumnModel column)
         {
-            for (var ci = 0; ci < _columns.Count; ci++)
+            for (var ci = 0; ci < Columns.Count; ci++)
             {
-                if (_columns[ci] == column)
+                if (Columns[ci] == column)
                 {
                     return ci;
                 }
@@ -154,9 +154,9 @@ namespace StarryEyes.Models.Timelines.Tabs
         /// <param name="colIndex">column index</param>
         public static int FindTabIndex(TabModel info, int colIndex)
         {
-            for (var ti = 0; ti < _columns[colIndex].Tabs.Count; ti++)
+            for (var ti = 0; ti < Columns[colIndex].Tabs.Count; ti++)
             {
-                if (_columns[colIndex].Tabs[ti] == info)
+                if (Columns[colIndex].Tabs[ti] == info)
                 {
                     return ti;
                 }
@@ -172,11 +172,11 @@ namespace StarryEyes.Models.Timelines.Tabs
         /// <param name="tabIndex">tab index</param>
         public static bool FindColumnTabIndex(TabModel info, out int colIndex, out int tabIndex)
         {
-            for (var ci = 0; ci < _columns.Count; ci++)
+            for (var ci = 0; ci < Columns.Count; ci++)
             {
-                for (var ti = 0; ti < _columns[ci].Tabs.Count; ti++)
+                for (var ti = 0; ti < Columns[ci].Tabs.Count; ti++)
                 {
-                    if (_columns[ci].Tabs[ti] != info) continue;
+                    if (Columns[ci].Tabs[ti] != info) continue;
                     colIndex = ci;
                     tabIndex = ti;
                     return true;
@@ -195,17 +195,17 @@ namespace StarryEyes.Models.Timelines.Tabs
             if (fromColumnIndex == destColumnIndex)
             {
                 // in-column moving
-                _columns[fromColumnIndex].Tabs.Move(fromTabIndex, destTabIndex);
+                Columns[fromColumnIndex].Tabs.Move(fromTabIndex, destTabIndex);
             }
             else
             {
-                var tab = _columns[fromColumnIndex].Tabs[fromTabIndex];
-                _columns[fromColumnIndex].Tabs.RemoveAt(fromTabIndex);
-                _columns[destColumnIndex].Tabs.Insert(destTabIndex, tab);
-                if (_columns[fromColumnIndex].Tabs.Count > 0 &&
-                    _columns[fromColumnIndex].CurrentFocusTabIndex >= _columns[fromColumnIndex].Tabs.Count)
+                var tab = Columns[fromColumnIndex].Tabs[fromTabIndex];
+                Columns[fromColumnIndex].Tabs.RemoveAt(fromTabIndex);
+                Columns[destColumnIndex].Tabs.Insert(destTabIndex, tab);
+                if (Columns[fromColumnIndex].Tabs.Count > 0 &&
+                    Columns[fromColumnIndex].CurrentFocusTabIndex >= Columns[fromColumnIndex].Tabs.Count)
                 {
-                    _columns[fromColumnIndex].CurrentFocusTabIndex = _columns[fromColumnIndex].Tabs.Count - 1;
+                    Columns[fromColumnIndex].CurrentFocusTabIndex = Columns[fromColumnIndex].Tabs.Count - 1;
                 }
             }
             CleanupColumn();
@@ -228,21 +228,21 @@ namespace StarryEyes.Models.Timelines.Tabs
         public static void CreateTab(TabModel info, int columnIndex)
         {
             // ReSharper disable LocalizableElement
-            if (columnIndex > _columns.Count) // column index is only for existed or new column
+            if (columnIndex > Columns.Count) // column index is only for existed or new column
                 throw new ArgumentOutOfRangeException(
                     "columnIndex",
-                    "currently " + _columns.Count +
+                    "currently " + Columns.Count +
                     " columns are existed. so, you can't set this parameter as " +
                     columnIndex + ".");
             // ReSharper restore LocalizableElement
-            if (columnIndex == _columns.Count)
+            if (columnIndex == Columns.Count)
             {
                 // create new
                 CreateColumn(info);
             }
             else
             {
-                _columns[columnIndex].CreateTab(info);
+                Columns[columnIndex].CreateTab(info);
                 Save();
             }
         }
@@ -253,8 +253,8 @@ namespace StarryEyes.Models.Timelines.Tabs
         /// <param name="info">initial created tab</param>
         public static void CreateColumn(params TabModel[] info)
         {
-            _columns.Add(new ColumnModel(info));
-            CurrentFocusColumnIndex = _columns.Count - 1;
+            Columns.Add(new ColumnModel(info));
+            CurrentFocusColumnIndex = Columns.Count - 1;
             Save();
         }
 
@@ -265,7 +265,7 @@ namespace StarryEyes.Models.Timelines.Tabs
         /// <param name="info">initial created tab</param>
         public static void CreateColumn(int index, params TabModel[] info)
         {
-            _columns.Insert(index, new ColumnModel(info));
+            Columns.Insert(index, new ColumnModel(info));
             CurrentFocusColumnIndex = index;
             Save();
         }
@@ -275,10 +275,10 @@ namespace StarryEyes.Models.Timelines.Tabs
         /// </summary>
         public static void CloseTab(int colIndex, int tabIndex)
         {
-            var ti = _columns[colIndex].Tabs[tabIndex];
+            var ti = Columns[colIndex].Tabs[tabIndex];
             ti.IsActivated = false;
             _closedTabsStack.Push(ti);
-            _columns[colIndex].RemoveTab(tabIndex);
+            Columns[colIndex].RemoveTab(tabIndex);
             CleanupColumn();
             Save();
         }
@@ -289,13 +289,13 @@ namespace StarryEyes.Models.Timelines.Tabs
         /// <param name="colIndex">column index</param>
         public static void CloseColumn(int colIndex)
         {
-            var col = _columns[colIndex];
+            var col = Columns[colIndex];
             col.Tabs.ForEach(ti =>
             {
                 ti.IsActivated = false;
                 _closedTabsStack.Push(ti);
             });
-            _columns.RemoveAt(colIndex);
+            Columns.RemoveAt(colIndex);
             Save();
         }
 
@@ -344,9 +344,9 @@ namespace StarryEyes.Models.Timelines.Tabs
                 .Select(t => t.Index)
                 .OrderByDescending(i => i)
                 .ForEach(CloseColumn);
-            if (_columns.Count == 0)
+            if (Columns.Count == 0)
             {
-                _columns.Add(new ColumnModel(Enumerable.Empty<TabModel>()));
+                Columns.Add(new ColumnModel(Enumerable.Empty<TabModel>()));
             }
             if (_currentFocusColumnIndex >= Columns.Count)
             {

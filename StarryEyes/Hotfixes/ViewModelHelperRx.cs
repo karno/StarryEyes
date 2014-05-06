@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Globalization;
-using System.Reactive.Linq;
 using System.Windows.Threading;
 using Livet;
+using Livet.EventListeners;
 using StarryEyes.Hotfixes;
 
 // ReSharper disable CheckNamespace
@@ -64,10 +64,8 @@ namespace StarryEyes
             INotifyCollectionChanged source, Func<TModel, TViewModel> converter,
             DispatcherCollectionRx<TViewModel> target)
         {
-            return source
-                .ListenCollectionChanged()
-                .ObserveOn(DispatcherHolder.Dispatcher)
-                .Subscribe(e =>
+            return new CollectionChangedEventListener(source, (o, e) =>
+                DispatcherHolder.Enqueue(() =>
                 {
                     if (e.NewItems != null && e.NewItems.Count >= 2)
                     {
@@ -135,7 +133,7 @@ namespace StarryEyes
                             ".",
                             aoex);
                     }
-                });
+                }));
         }
     }
 }
