@@ -17,6 +17,7 @@ using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
 using StarryEyes.ViewModels.Timelines.Statuses;
 using StarryEyes.Views.Messaging;
+using StarryEyes.ViewsResources.WindowParts;
 
 namespace StarryEyes.ViewModels.Timelines
 {
@@ -218,10 +219,10 @@ namespace StarryEyes.ViewModels.Timelines
             {
                 var msg = new TaskDialogMessage(new TaskDialogOptions
                 {
-                    Title = "クイックアクション エラー",
+                    Title = MainAreaTimelineResources.MsgQuickActionFailedTitle,
                     MainIcon = VistaTaskDialogIcon.Error,
-                    MainInstruction = "ツイートをお気に入り登録できません。",
-                    Content = "アカウントが選択されていません。",
+                    MainInstruction = MainAreaTimelineResources.MsgFavoriteFailedInst,
+                    Content = MainAreaTimelineResources.MsgQuickActionAccountIsNotSelected,
                     CommonButtons = TaskDialogCommonButtons.Close,
                 });
                 this.Messenger.Raise(msg);

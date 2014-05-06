@@ -1,0 +1,424 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="TimelineSelectedReplyAll" xml:space="preserve">
+    <value>_Mention selected users</value>
+  </data>
+  <data name="TabClose" xml:space="preserve">
+    <value>_Close this tab</value>
+  </data>
+  <data name="TabCreateCopy" xml:space="preserve">
+    <value>Create c_opy tab</value>
+  </data>
+  <data name="TabCreateNew" xml:space="preserve">
+    <value>Create _new tab...</value>
+  </data>
+  <data name="TabEdit" xml:space="preserve">
+    <value>_Edit...</value>
+  </data>
+  <data name="TabRestoreLast" xml:space="preserve">
+    <value>_Restore last closed tab</value>
+  </data>
+  <data name="TabToggleNotify" xml:space="preserve">
+    <value>_Notify new tweets in this tab</value>
+  </data>
+  <data name="TextCopyClipboard" xml:space="preserve">
+    <value>_Copy to clipboard</value>
+  </data>
+  <data name="TextCopyInput" xml:space="preserve">
+    <value>Copy to _input box</value>
+  </data>
+  <data name="TextMute" xml:space="preserve">
+    <value>_Mute keyword</value>
+  </data>
+  <data name="TextSearchGoogle" xml:space="preserve">
+    <value>Search _google...</value>
+  </data>
+  <data name="TextSearchLocal" xml:space="preserve">
+    <value>_Search in Krile</value>
+  </data>
+  <data name="TextSearchTwitter" xml:space="preserve">
+    <value>Search _twitter</value>
+  </data>
+  <data name="TimelineCmdDelete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="TimelineCmdExtractAll" xml:space="preserve">
+    <value>Extract all</value>
+  </data>
+  <data name="TimelineCmdFavorite" xml:space="preserve">
+    <value>Favorite</value>
+  </data>
+  <data name="TimelineCmdFavoriteAll" xml:space="preserve">
+    <value>Favorite all</value>
+  </data>
+  <data name="TimelineCmdFavoriteAndRetweet" xml:space="preserve">
+    <value>Favorite and Retweet</value>
+  </data>
+  <data name="TimelineCmdFavoriteSelect" xml:space="preserve">
+    <value>Favorite with selected account</value>
+  </data>
+  <data name="TimelineCmdReply" xml:space="preserve">
+    <value>Reply</value>
+  </data>
+  <data name="TimelineCmdReplyAll" xml:space="preserve">
+    <value>Mention selected users</value>
+  </data>
+  <data name="TimelineCmdRetweet" xml:space="preserve">
+    <value>Retweet</value>
+  </data>
+  <data name="TimelineCmdRetweetSelect" xml:space="preserve">
+    <value>Retweet with selected account</value>
+  </data>
+  <data name="TimelineCmdUnfavorite" xml:space="preserve">
+    <value>Unfavorite</value>
+  </data>
+  <data name="TimelineCmdUnretweet" xml:space="preserve">
+    <value>Unretweet</value>
+  </data>
+  <data name="TimelineCmdUnselectAll" xml:space="preserve">
+    <value>Unselect all</value>
+  </data>
+  <data name="TimelineDelete" xml:space="preserve">
+    <value>_Delete</value>
+  </data>
+  <data name="TimelineErrorCouldNotReceiveInReplyTo" xml:space="preserve">
+    <value>Could not receive in reply to tweet. Click here to extract mention tree.</value>
+  </data>
+  <data name="TimelineFavorite" xml:space="preserve">
+    <value>_Favorite</value>
+  </data>
+  <data name="TimelineFavoriteSelect" xml:space="preserve">
+    <value>F_avorite with selecting account</value>
+  </data>
+  <data name="TimelineSelectedExtract" xml:space="preserve">
+    <value>_Extract users</value>
+  </data>
+  <data name="TimelineSelectedFavorite" xml:space="preserve">
+    <value>_Favorite all</value>
+  </data>
+  <data name="TimelineSelectedOperation" xml:space="preserve">
+    <value>Se_lected statuses</value>
+  </data>
+  <data name="TimelineSelectedUnselectAll" xml:space="preserve">
+    <value>_Unselect all</value>
+  </data>
+  <data name="TimelineMute" xml:space="preserve">
+    <value>_Mute</value>
+  </data>
+  <data name="TimelineMuteClient" xml:space="preserve">
+    <value>_Mute client</value>
+  </data>
+  <data name="TimelineMuteUser" xml:space="preserve">
+    <value>Mute _user</value>
+  </data>
+  <data name="TimelineQuote" xml:space="preserve">
+    <value>_Quote</value>
+  </data>
+  <data name="TimelineQuotePermalink" xml:space="preserve">
+    <value>_Quote permalink</value>
+  </data>
+  <data name="TimelineReceiveOlder" xml:space="preserve">
+    <value>Receive _older tweets</value>
+  </data>
+  <data name="TimelineReply" xml:space="preserve">
+    <value>Reply(_M)</value>
+  </data>
+  <data name="TimelineReplyAll" xml:space="preserve">
+    <value>Reply All(_M)</value>
+  </data>
+  <data name="TimelineRetweet" xml:space="preserve">
+    <value>_Retweet</value>
+  </data>
+  <data name="TimelineRetweetSelect" xml:space="preserve">
+    <value>R_etweet with selecting account</value>
+  </data>
+  <data name="TimelineSelect" xml:space="preserve">
+    <value>_Select</value>
+  </data>
+  <data name="TimelineThisTweet" xml:space="preserve">
+    <value>This _tweet</value>
+  </data>
+  <data name="TimelineThisTweetCopyBody" xml:space="preserve">
+    <value>_Copy body</value>
+  </data>
+  <data name="TimelineThisTweetCopyPermalink" xml:space="preserve">
+    <value>Copy _permalink</value>
+  </data>
+  <data name="TimelineThisTweetCopySTOT" xml:space="preserve">
+    <value>Copy _STOT</value>
+  </data>
+  <data name="TimelineThisTweetOpenConversation" xml:space="preserve">
+    <value>_Open conversation</value>
+  </data>
+  <data name="TimelineThisTweetOpenFavstar" xml:space="preserve">
+    <value>Open _favstar</value>
+  </data>
+  <data name="TimelineThisTweetOpenWeb" xml:space="preserve">
+    <value>Open _web</value>
+  </data>
+  <data name="TimelineThisUser" xml:space="preserve">
+    <value>This _user</value>
+  </data>
+  <data name="TimelineThisUserDirectMessage" xml:space="preserve">
+    <value>_Direct message</value>
+  </data>
+  <data name="TimelineThisUserOpenFavstar" xml:space="preserve">
+    <value>Open _favstar</value>
+  </data>
+  <data name="TimelineThisUserOpenTwilog" xml:space="preserve">
+    <value>Open _twilog</value>
+  </data>
+  <data name="TimelineThisUserOpenTwitter" xml:space="preserve">
+    <value>_Open twitter</value>
+  </data>
+  <data name="TimelineThisUserProfile" xml:space="preserve">
+    <value>_Show profile</value>
+  </data>
+  <data name="TimelineThisUserReportSpam" xml:space="preserve">
+    <value>_Report as spam</value>
+  </data>
+  <data name="TimelineQuoteUnofficialRetweet" xml:space="preserve">
+    <value>_Unofficial Retweet</value>
+  </data>
+  <data name="TimelineUnselect" xml:space="preserve">
+    <value>Un_select</value>
+  </data>
+  <data name="MsgClipboardErrorInst" xml:space="preserve">
+    <value>Copy failed.</value>
+  </data>
+  <data name="MsgClipboardErrorTitle" xml:space="preserve">
+    <value>Clipboard error</value>
+  </data>
+  <data name="MsgFavoriteFailed" xml:space="preserve">
+    <value>Favorite failed</value>
+  </data>
+  <data name="MsgQuickActionAccountIsNotSelected" xml:space="preserve">
+    <value>Account is not selected.</value>
+  </data>
+  <data name="MsgFavoriteFailedInst" xml:space="preserve">
+    <value>Tweet could not favorited.</value>
+  </data>
+  <data name="MsgProhibitFavorite" xml:space="preserve">
+    <value>Favorite is not allowed for this tweet.</value>
+  </data>
+  <data name="MsgQuickActionFailedTitle" xml:space="preserve">
+    <value>QuickAction error</value>
+  </data>
+  <data name="MsgRetweetFailed" xml:space="preserve">
+    <value>Retweet failed</value>
+  </data>
+  <data name="MsgProhibitRetweet" xml:space="preserve">
+    <value>Retweet is not allowed for this tweet.</value>
+  </data>
+  <data name="MsgUnfavoriteFailed" xml:space="preserve">
+    <value>Unfavorite failed</value>
+  </data>
+  <data name="MsgUnretweetFailed" xml:space="preserve">
+    <value>Unretweet failed</value>
+  </data>
+  <data name="MsgProhibitFavoriteDirectMessage" xml:space="preserve">
+    <value>Favorite is not allowed to direct message.</value>
+  </data>
+  <data name="MsgProhibitFavoriteMyself" xml:space="preserve">
+    <value>Favorite tweet posted by yourself is not allowed by setting.</value>
+  </data>
+  <data name="MsgProhibitRetweetDirectMessage" xml:space="preserve">
+    <value>Retweeting direct messages or protected user's tweet is not allowed.</value>
+  </data>
+  <data name="MsgProhibitRetweetMyself" xml:space="preserve">
+    <value>Retweet tweet posted by yourself is not allowed.</value>
+  </data>
+  <data name="MsgQuickActionAccountIsNotSelectedDetail" xml:space="preserve">
+    <value>Accounts must be selected for using quick actions.
+Selected accounts are memorized for each tabs.</value>
+  </data>
+  <data name="MsgDeleteCmdDelete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="MsgDeleteContent" xml:space="preserve">
+    <value>Deleted tweet can not be restored.</value>
+  </data>
+  <data name="MsgDeleteFooter" xml:space="preserve">
+    <value>Amend last one tweet is available on post box.</value>
+  </data>
+  <data name="MsgDeleteFooterWithKey" xml:space="preserve">
+    <value>Amend last one tweet is available on post box with {0} key.</value>
+  </data>
+  <data name="MsgDeleteInst" xml:space="preserve">
+    <value>Are you sure you want to delete tweet?</value>
+  </data>
+  <data name="MsgDeleteTitle" xml:space="preserve">
+    <value>Delete tweet</value>
+  </data>
+  <data name="MsgMuteClientContent" xml:space="preserve">
+    <value>All tweets from this client are remove from all tabs.</value>
+  </data>
+  <data name="MsgMuteClientInst" xml:space="preserve">
+    <value>Are you sure you want to mute client {0} ?</value>
+  </data>
+  <data name="MsgMuteClientTitle" xml:space="preserve">
+    <value>Mute client</value>
+  </data>
+  <data name="MsgMuteCmdMute" xml:space="preserve">
+    <value>Mute</value>
+  </data>
+  <data name="MsgMuteFooter" xml:space="preserve">
+    <value>Configure mute predicates is available in setting.</value>
+  </data>
+  <data name="MsgMuteKeywordContent" xml:space="preserve">
+    <value>All tweets that contains keyword are removed from all tabs.</value>
+  </data>
+  <data name="MsgMuteKeywordInst" xml:space="preserve">
+    <value>Are you sure you want to mute keyword {0} ?</value>
+  </data>
+  <data name="MsgMuteKeywordSelectContent" xml:space="preserve">
+    <value>Click and drag text to select keywords.</value>
+  </data>
+  <data name="MsgMuteKeywordSelectInst" xml:space="preserve">
+    <value>Select keyword for muting.</value>
+  </data>
+  <data name="MsgMuteKeywordTitle" xml:space="preserve">
+    <value>Mute keyword</value>
+  </data>
+  <data name="MsgMuteUserContent" xml:space="preserve">
+    <value>All tweets from this user are removed from all tabs.</value>
+  </data>
+  <data name="MsgMuteUserInst" xml:space="preserve">
+    <value>Are you sure you want to mute user {0} ?</value>
+  </data>
+  <data name="MsgMuteUserTitle" xml:space="preserve">
+    <value>Mute user</value>
+  </data>
+  <data name="MsgReportAsSpamCmdReportAsSpam" xml:space="preserve">
+    <value>Report</value>
+  </data>
+  <data name="MsgReportAsSpamContent" xml:space="preserve">
+    <value>Block from all accounts, and report spam from one account.</value>
+  </data>
+  <data name="MsgReportAsSpamInst" xml:space="preserve">
+    <value>Report {0} as spam?</value>
+  </data>
+  <data name="MsgReportAsSpamTitle" xml:space="preserve">
+    <value>Report user as spam</value>
+  </data>
+  <data name="MsgTweetDeleteFailed" xml:space="preserve">
+    <value>Tweet could not be deleted.</value>
+  </data>
+</root>

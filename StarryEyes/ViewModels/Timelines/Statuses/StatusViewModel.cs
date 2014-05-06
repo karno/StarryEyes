@@ -28,10 +28,12 @@ using StarryEyes.Models.Requests;
 using StarryEyes.Models.Stores;
 using StarryEyes.Models.Timelines.Statuses;
 using StarryEyes.Nightmare.Windows;
+using StarryEyes.Properties;
 using StarryEyes.Settings;
 using StarryEyes.Settings.KeyAssigns;
 using StarryEyes.Views.Messaging;
 using StarryEyes.Views.Utils;
+using StarryEyes.ViewsResources.WindowParts;
 
 namespace StarryEyes.ViewModels.Timelines.Statuses
 {
@@ -670,9 +672,9 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             {
                 var msg = new TaskDialogMessage(new TaskDialogOptions
                 {
-                    Title = "クリップボード エラー",
+                    Title = MainAreaTimelineResources.MsgClipboardErrorTitle,
                     MainIcon = VistaTaskDialogIcon.Error,
-                    MainInstruction = "コピーを行えませんでした。",
+                    MainInstruction = MainAreaTimelineResources.MsgClipboardErrorInst,
                     Content = ex.Message,
                     CommonButtons = TaskDialogCommonButtons.Close,
                 });
@@ -709,8 +711,8 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                                               {
                                                   onFail(a);
                                                   var desc = add
-                                                      ? "お気に入り登録に失敗"
-                                                      : "お気に入り登録解除に失敗";
+                                                      ? MainAreaTimelineResources.MsgFavoriteFailed
+                                                      : MainAreaTimelineResources.MsgUnfavoriteFailed;
                                                   BackstageModel.RegisterEvent(new OperationFailedEvent(
                                                       desc + "(" + a.UnreliableScreenName + " -> " +
                                                       this.Status.User.ScreenName + ")", ex));
@@ -748,8 +750,8 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                                               {
                                                   onFail(a);
                                                   var desc = add
-                                                      ? "リツイートに失敗"
-                                                      : "リツイート解除に失敗";
+                                                      ? MainAreaTimelineResources.MsgRetweetFailed
+                                                      : MainAreaTimelineResources.MsgUnretweetFailed;
                                                   BackstageModel.RegisterEvent(new OperationFailedEvent(
                                                       desc + "(" + a.UnreliableScreenName + " -> " +
                                                       this.Status.User.ScreenName + ")", ex));
@@ -764,14 +766,16 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             if (!this.AssertQuickActionEnabled()) return;
             if (this.IsDirectMessage)
             {
-                this.NotifyQuickActionFailed("このツイートはお気に入り登録できません。",
-                    "ダイレクトメッセージはお気に入り登録できません。");
+                this.NotifyQuickActionFailed(
+                    MainAreaTimelineResources.MsgProhibitFavorite,
+                    MainAreaTimelineResources.MsgProhibitFavoriteDirectMessage);
                 return;
             }
             if (!this.CanFavoriteImmediate && !this.IsFavorited)
             {
-                this.NotifyQuickActionFailed("このツイートはお気に入り登録できません。",
-                    "自分自身のツイートをお気に入り登録しないよう設定されています。");
+                this.NotifyQuickActionFailed(
+                    MainAreaTimelineResources.MsgProhibitFavorite,
+                    MainAreaTimelineResources.MsgProhibitFavoriteMyself);
                 return;
             }
             this.Favorite(this.GetImmediateAccounts(), !this.IsFavorited);
@@ -784,13 +788,15 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             {
                 if (this.IsMyselfStrict)
                 {
-                    this.NotifyQuickActionFailed("このツイートは現在のアカウントからリツイートできません。",
-                        "自分自身のツイートはリツイートできません。");
+                    this.NotifyQuickActionFailed(
+                        MainAreaTimelineResources.MsgProhibitRetweet,
+                        MainAreaTimelineResources.MsgProhibitRetweetMyself);
                 }
                 else
                 {
-                    this.NotifyQuickActionFailed("このツイートはリツイートできません。",
-                        "非公開アカウントのツイートやダイレクトメッセージはリツイートできません。");
+                    this.NotifyQuickActionFailed(
+                        MainAreaTimelineResources.MsgProhibitRetweet,
+                        MainAreaTimelineResources.MsgProhibitRetweetDirectMessage);
                 }
                 return;
             }
@@ -800,9 +806,9 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         private bool AssertQuickActionEnabled()
         {
             if (this.BindingAccounts.Any()) return true;
-            this.NotifyQuickActionFailed("アカウントが選択されていません。",
-                "クイックアクションを利用するには、投稿欄横のエリアからアカウントを選択する必要があります。" + Environment.NewLine +
-                "選択されているアカウントはタブごとに保持されます。");
+            this.NotifyQuickActionFailed(
+                MainAreaTimelineResources.MsgQuickActionAccountIsNotSelected,
+                MainAreaTimelineResources.MsgQuickActionAccountIsNotSelectedDetail);
             return false;
         }
 
@@ -810,7 +816,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         {
             var msg = new TaskDialogMessage(new TaskDialogOptions
             {
-                Title = "クイックアクション エラー",
+                Title = MainAreaTimelineResources.MsgQuickActionFailedTitle,
                 MainIcon = VistaTaskDialogIcon.Error,
                 MainInstruction = main,
                 Content = body,
@@ -876,10 +882,11 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         {
             if (!this.CanFavorite)
             {
-                this.NotifyQuickActionFailed("このツイートはお気に入り登録できません。",
+                this.NotifyQuickActionFailed(
+                    MainAreaTimelineResources.MsgProhibitFavorite,
                     this.IsDirectMessage
-                        ? "ダイレクトメッセージはお気に入り登録できません。"
-                        : "自分自身のツイートをお気に入り登録しないよう設定されています。");
+                        ? MainAreaTimelineResources.MsgProhibitFavoriteDirectMessage
+                        : MainAreaTimelineResources.MsgProhibitFavoriteMyself);
                 return;
             }
             var model = this.RetweetedOriginalModel ?? this.Model;
@@ -905,6 +912,11 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         {
             if (!this.CanRetweet)
             {
+                this.NotifyQuickActionFailed(
+                    MainAreaTimelineResources.MsgProhibitRetweet,
+                    this.IsDirectMessage
+                        ? MainAreaTimelineResources.MsgProhibitRetweetDirectMessage
+                        : MainAreaTimelineResources.MsgProhibitRetweetMyself);
                 return;
             }
             var model = this.RetweetedOriginalModel ?? this.Model;
@@ -977,7 +989,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             }
             catch (Exception ex)
             {
-                BackstageModel.RegisterEvent(new OperationFailedEvent("返信フォーマット エラー(フォーマット: " + body + ")", ex));
+                BackstageModel.RegisterEvent(new OperationFailedEvent("Reply format error: " + body, ex));
             }
         }
 
@@ -1024,24 +1036,27 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
 
         public void ConfirmDelete()
         {
-            var footer = "直近一件のツイートの訂正は投稿欄から行えます。";
+            var footer = MainAreaTimelineResources.MsgDeleteFooter;
             var amendkey = KeyAssignManager.CurrentProfile
                                            .FindAssignFromActionName("Amend", KeyAssignGroup.Input)
                                            .FirstOrDefault();
             if (amendkey != null)
             {
-                footer = "直近一件のツイートの訂正は、投稿欄で" + amendkey.GetKeyDescribeString() + "キーを押すと行えます。";
+                footer = String.Format(
+                    MainAreaTimelineResources.MsgDeleteFooterWithKey,
+                    amendkey.GetKeyDescribeString());
             }
             var msg = new TaskDialogMessage(new TaskDialogOptions
             {
-                Title = "ツイートの削除",
+                Title = MainAreaTimelineResources.MsgDeleteTitle,
                 MainIcon = VistaTaskDialogIcon.Warning,
-                MainInstruction = "ツイートを削除しますか？",
-                Content = "削除したツイートはもとに戻せません。",
-                CustomButtons = new[] { "削除", "キャンセル" },
+                MainInstruction = MainAreaTimelineResources.MsgDeleteInst,
+                Content = MainAreaTimelineResources.MsgDeleteContent,
+                CustomButtons = new[] { MainAreaTimelineResources.MsgDeleteCmdDelete, Resources.MsgButtonCancel },
                 AllowDialogCancellation = true,
+                DefaultButtonIndex = 0,
                 FooterIcon = VistaTaskDialogIcon.Information,
-                FooterText = footer,
+                FooterText = footer
             });
             var response = this.Parent.Messenger.GetResponse(msg);
             if (response.Response.CustomButtonResult == 0)
@@ -1069,7 +1084,8 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             var dreq = new DeletionRequest(this.OriginalStatus);
             RequestQueue.Enqueue(info, dreq)
                         .Subscribe(_ => StatusInbox.EnqueueRemoval(_.Id),
-                            ex => BackstageModel.RegisterEvent(new OperationFailedEvent("ツイートを削除できませんでした", ex)));
+                            ex => BackstageModel.RegisterEvent(
+                                new OperationFailedEvent(MainAreaTimelineResources.MsgTweetDeleteFailed, ex)));
         }
 
         private bool _lastSelectState;
@@ -1157,11 +1173,17 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         {
             var msg = new TaskDialogMessage(new TaskDialogOptions
             {
-                Title = "ユーザーをスパムとして報告",
+                Title = MainAreaTimelineResources.MsgReportAsSpamTitle,
                 MainIcon = VistaTaskDialogIcon.Warning,
-                MainInstruction = "ユーザー " + this.Status.User.ScreenName + " をスパム報告しますか？",
-                Content = "全てのアカウントからブロックし、代表のアカウントからスパム報告します。",
-                CustomButtons = new[] { "スパム報告", "キャンセル" },
+                MainInstruction = String.Format(MainAreaTimelineResources.MsgReportAsSpamInst,
+                    "@" + this.Status.User.ScreenName),
+                Content = MainAreaTimelineResources.MsgReportAsSpamContent,
+                CustomButtons = new[]
+                {
+                    MainAreaTimelineResources.MsgReportAsSpamCmdReportAsSpam,
+                    Resources.MsgButtonCancel
+                },
+                DefaultButtonIndex = 0,
                 AllowDialogCancellation = true,
             });
             var response = this.Parent.Messenger.GetResponse(msg);
@@ -1203,26 +1225,17 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             {
                 this.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
                 {
-                    Title = "キーワードのミュート",
+                    Title = MainAreaTimelineResources.MsgMuteKeywordTitle,
                     MainIcon = VistaTaskDialogIcon.Information,
-                    MainInstruction = "キーワードを選択してください。",
-                    Content = "ミュートしたいキーワードをドラッグで選択できます。",
+                    MainInstruction = MainAreaTimelineResources.MsgMuteKeywordSelectInst,
+                    Content = MainAreaTimelineResources.MsgMuteKeywordSelectContent,
                     CommonButtons = TaskDialogCommonButtons.Close,
                 }));
                 return;
             }
-            var msg = new TaskDialogMessage(new TaskDialogOptions
-            {
-                Title = "キーワードのミュート",
-                MainIcon = VistaTaskDialogIcon.Warning,
-                MainInstruction = "キーワード " + this.SelectedText + " をミュートしますか？",
-                Content = "このキーワードを含むツイートが全てのタブから除外されるようになります。",
-                CustomButtons = new[] { "ミュート", "キャンセル" },
-                FooterIcon = VistaTaskDialogIcon.Information,
-                FooterText = "ミュートの解除は設定画面から行えます。",
-                AllowDialogCancellation = true,
-            });
-            var response = this.Parent.Messenger.GetResponse(msg);
+            var response = QueryMuteMessage(MainAreaTimelineResources.MsgMuteKeywordTitle,
+                String.Format(MainAreaTimelineResources.MsgMuteKeywordInst, this.SelectedText),
+                MainAreaTimelineResources.MsgMuteKeywordContent);
             if (response.Response.CustomButtonResult != 0) return;
             System.Diagnostics.Debug.WriteLine("Mute: " + this.Status.User.ScreenName);
             Setting.Muteds.AddPredicate(new FilterOperatorContains
@@ -1234,18 +1247,9 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
 
         public void MuteUser()
         {
-            var msg = new TaskDialogMessage(new TaskDialogOptions
-            {
-                Title = "ユーザーのミュート",
-                MainIcon = VistaTaskDialogIcon.Warning,
-                MainInstruction = "ユーザー " + this.Status.User.ScreenName + " をミュートしますか？",
-                Content = "このユーザーのツイートが全てのタブから除外されるようになります。",
-                CustomButtons = new[] { "ミュート", "キャンセル" },
-                FooterIcon = VistaTaskDialogIcon.Information,
-                FooterText = "ミュートの解除は設定画面から行えます。",
-                AllowDialogCancellation = true,
-            });
-            var response = this.Parent.Messenger.GetResponse(msg);
+            var response = QueryMuteMessage(MainAreaTimelineResources.MsgMuteUserTitle,
+                String.Format(MainAreaTimelineResources.MsgMuteUserInst, "@" + this.Status.User.ScreenName),
+                MainAreaTimelineResources.MsgMuteUserContent);
             if (response.Response.CustomButtonResult != 0) return;
             System.Diagnostics.Debug.WriteLine("Mute: " + this.Status.User.ScreenName);
             Setting.Muteds.AddPredicate(new FilterOperatorEquals
@@ -1261,18 +1265,9 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
 
         public void MuteClient()
         {
-            var msg = new TaskDialogMessage(new TaskDialogOptions
-            {
-                Title = "クライアントのミュート",
-                MainIcon = VistaTaskDialogIcon.Warning,
-                MainInstruction = "クライアント " + this.SourceText + " をミュートしますか？",
-                Content = "このクライアントからのツイートが全てのタブから除外されるようになります。",
-                CustomButtons = new[] { "ミュート", "キャンセル" },
-                FooterIcon = VistaTaskDialogIcon.Information,
-                FooterText = "ミュートの解除は設定画面から行えます。",
-                AllowDialogCancellation = true,
-            });
-            var response = this.Parent.Messenger.GetResponse(msg);
+            var response = QueryMuteMessage(MainAreaTimelineResources.MsgMuteClientTitle,
+                String.Format(MainAreaTimelineResources.MsgMuteClientInst, "@" + this.SourceText),
+                MainAreaTimelineResources.MsgMuteClientContent);
             if (response.Response.CustomButtonResult != 0) return;
             System.Diagnostics.Debug.WriteLine("Mute: " + this.Status.Source);
             Setting.Muteds.AddPredicate(new FilterOperatorContains
@@ -1280,6 +1275,23 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                 LeftValue = new StatusSource(),
                 RightValue = new StringValue(this.SourceText)
             });
+        }
+
+        private TaskDialogMessage QueryMuteMessage(string title, string inst, string content)
+        {
+            var msg = new TaskDialogMessage(new TaskDialogOptions
+            {
+                Title = title,
+                MainIcon = VistaTaskDialogIcon.Warning,
+                MainInstruction = inst,
+                Content = content,
+                CustomButtons = new[] { MainAreaTimelineResources.MsgMuteCmdMute, Resources.MsgButtonCancel },
+                DefaultButtonIndex = 0,
+                FooterIcon = VistaTaskDialogIcon.Information,
+                FooterText = MainAreaTimelineResources.MsgMuteFooter,
+                AllowDialogCancellation = true,
+            });
+            return this.Parent.Messenger.GetResponse(msg);
         }
 
         [UsedImplicitly]

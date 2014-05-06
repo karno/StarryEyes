@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:localize="clr-namespace:StarryEyes.ViewsResources.WindowParts"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:primitives="clr-namespace:StarryEyes.Views.WindowParts.Primitives"
              xmlns:tabs="clr-namespace:StarryEyes.ViewModels.Timelines.Tabs"
@@ -35,16 +36,16 @@
                         <StackPanel.ContextMenu>
                             <!--  ReSharper disable once Xaml.BindingWithContextNotResolved  -->
                             <ContextMenu DataContext="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
-                                <MenuItem Command="{Binding EditTabCommand}" Header="編集..." />
-                                <MenuItem Header="このタブの新着ツイートをポップアップ通知"
+                                <MenuItem Command="{Binding EditTabCommand}" Header="{x:Static localize:MainAreaTimelineResources.TabEdit}" />
+                                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TabToggleNotify}"
                                           IsCheckable="True"
                                           IsChecked="{Binding IsNotifyNewArrivals}" />
                                 <Separator />
-                                <MenuItem Command="{Binding Parent.CreateNewTabCommand}" Header="新しいタブの追加..." />
-                                <MenuItem Command="{Binding CopyTabCommand}" Header="このタブをコピーして追加" />
-                                <MenuItem Command="{Binding Parent.RestoreLastClosedTabCommand}" Header="最後に閉じたタブを元に戻す" />
+                                <MenuItem Command="{Binding Parent.CreateNewTabCommand}" Header="{x:Static localize:MainAreaTimelineResources.TabCreateNew}" />
+                                <MenuItem Command="{Binding CopyTabCommand}" Header="{x:Static localize:MainAreaTimelineResources.TabCreateCopy}" />
+                                <MenuItem Command="{Binding Parent.RestoreLastClosedTabCommand}" Header="{x:Static localize:MainAreaTimelineResources.TabRestoreLast}" />
                                 <Separator />
-                                <MenuItem Command="{Binding CloseTabCommand}" Header="タブを閉じる" />
+                                <MenuItem Command="{Binding CloseTabCommand}" Header="{x:Static localize:MainAreaTimelineResources.TabClose}" />
                             </ContextMenu>
                         </StackPanel.ContextMenu>
                         <TextBlock x:Name="TabName"
@@ -99,8 +100,8 @@
                         <ItemsControl.ContextMenu>
                             <!--  ReSharper disable once Xaml.BindingWithContextNotResolved  -->
                             <ContextMenu DataContext="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
-                                <MenuItem Command="{Binding CreateNewTabCommand}" Header="新しいタブの追加..." />
-                                <MenuItem Command="{Binding RestoreLastClosedTabCommand}" Header="最後に閉じたタブを元に戻す" />
+                                <MenuItem Command="{Binding CreateNewTabCommand}" Header="{x:Static localize:MainAreaTimelineResources.TabCreateNew}" />
+                                <MenuItem Command="{Binding RestoreLastClosedTabCommand}" Header="{x:Static localize:MainAreaTimelineResources.TabRestoreLast}" />
                             </ContextMenu>
                         </ItemsControl.ContextMenu>
                         <ItemsControl.ItemsPanel>

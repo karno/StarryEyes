@@ -8,6 +8,7 @@
              xmlns:helpers="clr-namespace:StarryEyes.Views.Utils"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"
+             xmlns:localize="clr-namespace:StarryEyes.ViewsResources.WindowParts"
              xmlns:mbehaviors="clr-namespace:StarryEyes.Views.Messaging.Behaviors"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:metrocontrols="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
@@ -102,14 +103,14 @@
                     <Grid.ContextMenu>
                         <!--  ReSharper disable once Xaml.BindingWithContextNotResolved  -->
                         <ContextMenu DataContext="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
-                            <MenuItem Header="返信(_M)" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToInvisibleConverter}}">
+                            <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineReply}" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToInvisibleConverter}}">
                                 <i:Interaction.Triggers>
                                     <i:EventTrigger EventName="Click">
                                         <ei:CallMethodAction MethodName="SendReplyOrDirectMessage" TargetObject="{Binding}" />
                                     </i:EventTrigger>
                                 </i:Interaction.Triggers>
                             </MenuItem>
-                            <MenuItem Header="選択ツイートすべてに返信(_M)" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibleConverter}}">
+                            <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineSelectedReplyAll}" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibleConverter}}">
                                 <i:Interaction.Triggers>
                                     <i:EventTrigger EventName="Click">
                                         <ei:CallMethodAction MethodName="ReplySelecteds" TargetObject="{Binding Parent}" />
@@ -117,36 +118,36 @@
                                 </i:Interaction.Triggers>
                             </MenuItem>
                             <Separator />
-                            <MenuItem Header="このツイートを選択(_S)" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToInvisibleConverter}}">
+                            <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineSelect}" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToInvisibleConverter}}">
                                 <i:Interaction.Triggers>
                                     <i:EventTrigger EventName="Click">
                                         <ei:CallMethodAction MethodName="ToggleSelect" TargetObject="{Binding}" />
                                     </i:EventTrigger>
                                 </i:Interaction.Triggers>
                             </MenuItem>
-                            <MenuItem Header="選択を解除(_S)" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibleConverter}}">
+                            <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineUnselect}" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibleConverter}}">
                                 <i:Interaction.Triggers>
                                     <i:EventTrigger EventName="Click">
                                         <ei:CallMethodAction MethodName="ToggleSelect" TargetObject="{Binding}" />
                                     </i:EventTrigger>
                                 </i:Interaction.Triggers>
                             </MenuItem>
-                            <MenuItem Header="選択ツイートの操作(_A)" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibleConverter}}">
-                                <MenuItem Header="お気に入り登録(_F)" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibleConverter}}">
+                            <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineSelectedOperation}" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibleConverter}}">
+                                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineSelectedFavorite}" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibleConverter}}">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="Click">
                                             <ei:CallMethodAction MethodName="FavoriteSelecteds" TargetObject="{Binding Parent}" />
                                         </i:EventTrigger>
                                     </i:Interaction.Triggers>
                                 </MenuItem>
-                                <MenuItem Header="ユーザーを抽出(_E)" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibleConverter}}">
+                                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineSelectedExtract}" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibleConverter}}">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="Click">
                                             <ei:CallMethodAction MethodName="ExtractSelecteds" TargetObject="{Binding Parent}" />
                                         </i:EventTrigger>
                                     </i:Interaction.Triggers>
                                 </MenuItem>
-                                <MenuItem Header="すべて解除(_Z)" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibleConverter}}">
+                                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineSelectedUnselectAll}" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibleConverter}}">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="Click">
                                             <ei:CallMethodAction MethodName="DeselectAll" TargetObject="{Binding Parent}" />
@@ -155,14 +156,14 @@
                                 </MenuItem>
                             </MenuItem>
                             <Separator />
-                            <MenuItem Header="お気に入り登録(_F)" Visibility="{Binding CanFavoriteImmediate, Converter={StaticResource BooleanToVisibleConverter}}">
+                            <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineFavorite}" Visibility="{Binding CanFavoriteImmediate, Converter={StaticResource BooleanToVisibleConverter}}">
                                 <i:Interaction.Triggers>
                                     <i:EventTrigger EventName="Click">
                                         <ei:CallMethodAction MethodName="ToggleFavoriteImmediate" TargetObject="{Binding}" />
                                     </i:EventTrigger>
                                 </i:Interaction.Triggers>
                             </MenuItem>
-                            <MenuItem Header="アカウントを選択してお気に入り登録(_V)" Visibility="{Binding CanFavorite, Converter={StaticResource BooleanToVisibleConverter}}">
+                            <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineFavoriteSelect}" Visibility="{Binding CanFavorite, Converter={StaticResource BooleanToVisibleConverter}}">
                                 <i:Interaction.Triggers>
                                     <i:EventTrigger EventName="Click">
                                         <ei:CallMethodAction MethodName="ToggleFavorite" TargetObject="{Binding}" />
@@ -170,29 +171,29 @@
                                 </i:Interaction.Triggers>
                             </MenuItem>
 
-                            <MenuItem Header="リツイート(_R)" Visibility="{Binding CanRetweetImmediate, Converter={StaticResource BooleanToVisibleConverter}}">
+                            <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineRetweet}" Visibility="{Binding CanRetweetImmediate, Converter={StaticResource BooleanToVisibleConverter}}">
                                 <i:Interaction.Triggers>
                                     <i:EventTrigger EventName="Click">
                                         <ei:CallMethodAction MethodName="ToggleRetweetImmediate" TargetObject="{Binding}" />
                                     </i:EventTrigger>
                                 </i:Interaction.Triggers>
                             </MenuItem>
-                            <MenuItem Header="アカウントを選択してリツイート(_W)" Visibility="{Binding CanRetweet, Converter={StaticResource BooleanToVisibleConverter}}">
+                            <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineRetweetSelect}" Visibility="{Binding CanRetweet, Converter={StaticResource BooleanToVisibleConverter}}">
                                 <i:Interaction.Triggers>
                                     <i:EventTrigger EventName="Click">
                                         <ei:CallMethodAction MethodName="ToggleRetweet" TargetObject="{Binding}" />
                                     </i:EventTrigger>
                                 </i:Interaction.Triggers>
                             </MenuItem>
-                            <MenuItem Header="引用(_Q)">
-                                <MenuItem Header="パーマリンクで引用(_L)">
+                            <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineQuote}">
+                                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineQuotePermalink}">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="Click">
                                             <ei:CallMethodAction MethodName="QuotePermalink" TargetObject="{Binding}" />
                                         </i:EventTrigger>
                                     </i:Interaction.Triggers>
                                 </MenuItem>
-                                <MenuItem Header="非公式RT(_Q)">
+                                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineQuoteUnofficialRetweet}">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="Click">
                                             <ei:CallMethodAction MethodName="Quote" TargetObject="{Binding}" />
@@ -200,10 +201,16 @@
                                     </i:Interaction.Triggers>
                                 </MenuItem>
                             </MenuItem>
+                            <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineDelete}" Visibility="{Binding CanDelete, Converter={StaticResource BooleanToVisibleConverter}}">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="Click">
+                                        <ei:CallMethodAction MethodName="ConfirmDelete" TargetObject="{Binding}" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </MenuItem>
                             <Separator />
-
-                            <MenuItem Header="このツイート(_T)">
-                                <MenuItem Header="会話を開く(_C)">
+                            <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineThisTweet}">
+                                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineThisTweetOpenConversation}">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="Click">
                                             <ei:CallMethodAction MethodName="ShowConversation" TargetObject="{Binding}" />
@@ -211,21 +218,21 @@
                                     </i:Interaction.Triggers>
                                 </MenuItem>
                                 <Separator />
-                                <MenuItem Header="本文をコピー(_B)">
+                                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineThisTweetCopyBody}">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="Click">
                                             <ei:CallMethodAction MethodName="CopyBody" TargetObject="{Binding}" />
                                         </i:EventTrigger>
                                     </i:Interaction.Triggers>
                                 </MenuItem>
-                                <MenuItem Header="パーマリンクをコピー(_P)">
+                                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineThisTweetCopyPermalink}">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="Click">
                                             <ei:CallMethodAction MethodName="CopyPermalink" TargetObject="{Binding}" />
                                         </i:EventTrigger>
                                     </i:Interaction.Triggers>
                                 </MenuItem>
-                                <MenuItem Header="STOT形式でコピー(_S)">
+                                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineThisTweetCopySTOT}">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="Click">
                                             <ei:CallMethodAction MethodName="CopySTOT" TargetObject="{Binding}" />
@@ -233,14 +240,14 @@
                                     </i:Interaction.Triggers>
                                 </MenuItem>
                                 <Separator />
-                                <MenuItem Header="Webを開く(_W)">
+                                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineThisTweetOpenWeb}">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="Click">
                                             <ei:CallMethodAction MethodName="OpenWeb" TargetObject="{Binding}" />
                                         </i:EventTrigger>
                                     </i:Interaction.Triggers>
                                 </MenuItem>
-                                <MenuItem Header="Favstarを開く(_F)">
+                                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineThisTweetOpenFavstar}">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="Click">
                                             <ei:CallMethodAction MethodName="OpenFavstar" TargetObject="{Binding}" />
@@ -258,15 +265,15 @@
                                     </MenuItem>
                                 -->
                             </MenuItem>
-                            <MenuItem Header="このユーザー(_U)">
-                                <MenuItem Header="プロフィール(_P)">
+                            <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineThisUser}">
+                                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineThisUserProfile}">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="Click">
                                             <ei:CallMethodAction MethodName="ShowUserProfile" TargetObject="{Binding}" />
                                         </i:EventTrigger>
                                     </i:Interaction.Triggers>
                                 </MenuItem>
-                                <MenuItem Header="ダイレクトメッセージ(_D)">
+                                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineThisUserDirectMessage}">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="Click">
                                             <ei:CallMethodAction MethodName="DirectMessage" TargetObject="{Binding}" />
@@ -274,21 +281,21 @@
                                     </i:Interaction.Triggers>
                                 </MenuItem>
                                 <Separator />
-                                <MenuItem Header="Twitterで見る(_T)">
+                                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineThisUserOpenTwitter}">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="Click">
                                             <ei:CallMethodAction MethodName="OpenUserDetailOnTwitter" TargetObject="{Binding}" />
                                         </i:EventTrigger>
                                     </i:Interaction.Triggers>
                                 </MenuItem>
-                                <MenuItem Header="Twilogで見る(_L)">
+                                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineThisUserOpenTwilog}">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="Click">
                                             <ei:CallMethodAction MethodName="OpenUserTwilog" TargetObject="{Binding}" />
                                         </i:EventTrigger>
                                     </i:Interaction.Triggers>
                                 </MenuItem>
-                                <MenuItem Header="Favstarで見る(_F)">
+                                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineThisUserOpenFavstar}">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="Click">
                                             <ei:CallMethodAction MethodName="OpenUserFavstar" TargetObject="{Binding}" />
@@ -296,7 +303,7 @@
                                     </i:Interaction.Triggers>
                                 </MenuItem>
                                 <Separator />
-                                <MenuItem Header="スパムとして報告(_S)">
+                                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineThisUserReportSpam}">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="Click">
                                             <ei:CallMethodAction MethodName="ReportAsSpam" TargetObject="{Binding}" />
@@ -304,15 +311,15 @@
                                     </i:Interaction.Triggers>
                                 </MenuItem>
                             </MenuItem>
-                            <MenuItem Header="ミュート(_X)">
-                                <MenuItem Header="ユーザーをミュート(_U)">
+                            <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineMute}">
+                                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineMuteUser}">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="Click">
                                             <ei:CallMethodAction MethodName="MuteUser" TargetObject="{Binding}" />
                                         </i:EventTrigger>
                                     </i:Interaction.Triggers>
                                 </MenuItem>
-                                <MenuItem Header="クライアントをミュート(_C)">
+                                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineMuteClient}">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="Click">
                                             <ei:CallMethodAction MethodName="MuteClient" TargetObject="{Binding}" />
@@ -321,7 +328,7 @@
                                 </MenuItem>
                             </MenuItem>
                             <Separator />
-                            <MenuItem Header="これ以前のツイートを取得(_R)">
+                            <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineReceiveOlder}">
                                 <i:Interaction.Triggers>
                                     <i:EventTrigger EventName="Click">
                                         <ei:CallMethodAction MethodName="ReceiveOlder" TargetObject="{Binding}" />
@@ -844,7 +851,7 @@
                                                     </StackPanel>
                                                 </Grid>
                                                 <Grid Margin="7" Visibility="{Binding IsInReplyToAvailable, Converter={StaticResource BooleanToInvisibleConverter}}">
-                                                    <TextBlock Foreground="{DynamicResource TweetDefaultSubTextBrush}" Text="返信先を受信できませんでした。ここをクリックすると個別に抽出できます。" />
+                                                    <TextBlock Foreground="{DynamicResource TweetDefaultSubTextBrush}" Text="{x:Static localize:MainAreaTimelineResources.TimelineErrorCouldNotReceiveInReplyTo}" />
                                                 </Grid>
                                             </StackPanel>
                                             <Grid Margin="7" Visibility="{Binding IsInReplyToLoading, Converter={StaticResource BooleanToVisibleConverter}}">
@@ -1044,14 +1051,14 @@
                                                         <behaviors:TextBlockDragSelectBehavior.SelectContextMenu>
                                                             <!--  ReSharper disable once Xaml.BindingWithContextNotResolved  -->
                                                             <ContextMenu DataContext="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
-                                                                <MenuItem Header="クリップボードにコピー(_C)">
+                                                                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TextCopyClipboard}">
                                                                     <i:Interaction.Triggers>
                                                                         <i:EventTrigger EventName="Click">
                                                                             <ei:CallMethodAction MethodName="CopyText" TargetObject="{Binding}" />
                                                                         </i:EventTrigger>
                                                                     </i:Interaction.Triggers>
                                                                 </MenuItem>
-                                                                <MenuItem Header="ツイート入力欄にコピー(_I)">
+                                                                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TextCopyInput}">
                                                                     <i:Interaction.Triggers>
                                                                         <i:EventTrigger EventName="Click">
                                                                             <ei:CallMethodAction MethodName="SetTextToInputBox" TargetObject="{Binding}" />
@@ -1059,14 +1066,14 @@
                                                                     </i:Interaction.Triggers>
                                                                 </MenuItem>
                                                                 <Separator />
-                                                                <MenuItem Header="Krile内のツイートを検索(_K)">
+                                                                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TextSearchLocal}">
                                                                     <i:Interaction.Triggers>
                                                                         <i:EventTrigger EventName="Click">
                                                                             <ei:CallMethodAction MethodName="FindOnKrile" TargetObject="{Binding}" />
                                                                         </i:EventTrigger>
                                                                     </i:Interaction.Triggers>
                                                                 </MenuItem>
-                                                                <MenuItem Header="Twitterからツイートを検索(_T)">
+                                                                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TextSearchTwitter}">
                                                                     <i:Interaction.Triggers>
                                                                         <i:EventTrigger EventName="Click">
                                                                             <ei:CallMethodAction MethodName="FindOnTwitter" TargetObject="{Binding}" />
@@ -1074,7 +1081,7 @@
                                                                     </i:Interaction.Triggers>
                                                                 </MenuItem>
                                                                 <Separator />
-                                                                <MenuItem Header="Googleで検索(_G)">
+                                                                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TextSearchGoogle}">
                                                                     <i:Interaction.Triggers>
                                                                         <i:EventTrigger EventName="Click">
                                                                             <ei:CallMethodAction MethodName="FindOnGoogle" TargetObject="{Binding}" />
@@ -1082,7 +1089,7 @@
                                                                     </i:Interaction.Triggers>
                                                                 </MenuItem>
                                                                 <Separator />
-                                                                <MenuItem Header="キーワードをミュート(_M)">
+                                                                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TextMute}">
                                                                     <i:Interaction.Triggers>
                                                                         <i:EventTrigger EventName="Click">
                                                                             <ei:CallMethodAction MethodName="MuteKeyword" TargetObject="{Binding}" />
@@ -1172,7 +1179,7 @@
                                                         Height="22"
                                                         Margin="0,-2"
                                                         Style="{StaticResource MetroCustomColorFlatButton}"
-                                                        ToolTip="ふぁぼってリツイート"
+                                                        ToolTip="{x:Static localize:MainAreaTimelineResources.TimelineCmdFavoriteAndRetweet}"
                                                         Visibility="{Binding CanFavoriteAndRetweet,
                                                                              Mode=OneWay,
                                                                              Converter={StaticResource BooleanToVisibleConverter}}"
@@ -1208,7 +1215,7 @@
                                                         Height="22"
                                                         Margin="0,-2"
                                                         Style="{StaticResource MetroCustomColorFlatButton}"
-                                                        ToolTip="アカウントを選択してお気に入り登録"
+                                                        ToolTip="{x:Static localize:MainAreaTimelineResources.TimelineCmdFavoriteSelect}"
                                                         Visibility="{Binding CanFavorite,
                                                                              Mode=OneTime,
                                                                              Converter={StaticResource BooleanToVisibleConverter}}"
@@ -1251,7 +1258,7 @@
                                                             Height="22"
                                                             Margin="0,-2,0,-2"
                                                             Style="{StaticResource MetroCustomColorFlatButton}"
-                                                            ToolTip="お気に入り登録"
+                                                            ToolTip="{x:Static localize:MainAreaTimelineResources.TimelineCmdFavorite}"
                                                             Visibility="{Binding IsFavorited,
                                                                                  Mode=OneWay,
                                                                                  Converter={StaticResource BooleanToInvisibleConverter}}"
@@ -1288,7 +1295,7 @@
                                                             Height="22"
                                                             Margin="0,-2,0,-2"
                                                             Style="{StaticResource MetroCustomColorFlatButton}"
-                                                            ToolTip="お気に入りを削除"
+                                                            ToolTip="{x:Static localize:MainAreaTimelineResources.TimelineCmdUnfavorite}"
                                                             Visibility="{Binding IsFavorited,
                                                                                  Mode=OneWay,
                                                                                  Converter={StaticResource BooleanToVisibleConverter}}"
@@ -1326,7 +1333,7 @@
                                                         Height="22"
                                                         Margin="0,-2"
                                                         Style="{StaticResource MetroCustomColorFlatButton}"
-                                                        ToolTip="アカウントを選択してリツイート"
+                                                        ToolTip="{x:Static localize:MainAreaTimelineResources.TimelineCmdRetweetSelect}"
                                                         Visibility="{Binding CanRetweet,
                                                                              Mode=OneTime,
                                                                              Converter={StaticResource BooleanToVisibleConverter}}"
@@ -1369,7 +1376,7 @@
                                                             Height="22"
                                                             Margin="0,-2,0,-2"
                                                             Style="{StaticResource MetroCustomColorFlatButton}"
-                                                            ToolTip="リツイート"
+                                                            ToolTip="{x:Static localize:MainAreaTimelineResources.TimelineCmdRetweet}"
                                                             Visibility="{Binding IsRetweeted,
                                                                                  Mode=OneWay,
                                                                                  Converter={StaticResource BooleanToInvisibleConverter}}"
@@ -1406,7 +1413,7 @@
                                                             Height="22"
                                                             Margin="0,-2,0,-2"
                                                             Style="{StaticResource MetroCustomColorFlatButton}"
-                                                            ToolTip="リツイートを取り消す"
+                                                            ToolTip="{x:Static localize:MainAreaTimelineResources.TimelineCmdUnretweet}"
                                                             Visibility="{Binding IsRetweeted,
                                                                                  Mode=OneWay,
                                                                                  Converter={StaticResource BooleanToVisibleConverter}}"
@@ -1444,7 +1451,7 @@
                                                         Height="22"
                                                         Margin="0,-2"
                                                         Style="{StaticResource MetroCustomColorFlatButton}"
-                                                        ToolTip="このツイートに返信"
+                                                        ToolTip="{x:Static localize:MainAreaTimelineResources.TimelineCmdReply}"
                                                         starryEyes:CustomColorButtonHelper.DefaultBrush="{DynamicResource MentionBackground}"
                                                         starryEyes:CustomColorButtonHelper.HoverBrush="{DynamicResource MentionHoveringBackground}"
                                                         starryEyes:CustomColorButtonHelper.PressedBrush="{DynamicResource MentionPressedBackground}">
@@ -1478,7 +1485,7 @@
                                                         Height="22"
                                                         Margin="0,-2"
                                                         Style="{StaticResource MetroCustomColorFlatButton}"
-                                                        ToolTip="このツイートを削除"
+                                                        ToolTip="{x:Static localize:MainAreaTimelineResources.TimelineCmdDelete}"
                                                         Visibility="{Binding CanDelete,
                                                                              Mode=OneWay,
                                                                              Converter={StaticResource BooleanToVisibleConverter}}"
@@ -1901,7 +1908,7 @@
                         Height="32"
                         Margin="12,4"
                         Template="{DynamicResource MetroBlackCircleButtonTemplate}"
-                        ToolTip="選択したユーザー全員に返信">
+                        ToolTip="{x:Static localize:MainAreaTimelineResources.TimelineCmdReplyAll}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="Click">
                             <ei:CallMethodAction MethodName="ReplySelecteds" TargetObject="{Binding Mode=OneWay}" />
@@ -1920,7 +1927,7 @@
                         Height="32"
                         Margin="12,4"
                         Template="{DynamicResource MetroBlackCircleButtonTemplate}"
-                        ToolTip="選択したツイートをお気に入りに追加">
+                        ToolTip="{x:Static localize:MainAreaTimelineResources.TimelineCmdFavoriteAll}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="Click">
                             <ei:CallMethodAction MethodName="FavoriteSelecteds" TargetObject="{Binding Mode=OneWay}" />
@@ -1938,7 +1945,7 @@
                         Height="32"
                         Margin="12,4"
                         Template="{DynamicResource MetroBlackCircleButtonTemplate}"
-                        ToolTip="選択したユーザーを新しいタブに抽出">
+                        ToolTip="{x:Static localize:MainAreaTimelineResources.TimelineCmdExtractAll}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="Click">
                             <ei:CallMethodAction MethodName="ExtractSelecteds" TargetObject="{Binding Mode=OneWay}" />
@@ -1957,7 +1964,7 @@
                         Height="32"
                         Margin="12,4"
                         Template="{DynamicResource MetroBlackCircleButtonTemplate}"
-                        ToolTip="選択をすべて解除">
+                        ToolTip="{x:Static localize:MainAreaTimelineResources.TimelineCmdUnselectAll}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="Click">
                             <ei:CallMethodAction MethodName="DeselectAll" TargetObject="{Binding Mode=OneWay}" />
