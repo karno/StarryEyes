@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -34,6 +35,17 @@ namespace SweetMagic
     public abstract class ReleaseActionBase
     {
         public abstract Task DoWork(UpdateTaskExecutor executor);
+
+        protected void AssertPath(string path)
+        {
+            if (path == null) throw new ArgumentNullException("path");
+            if (path.Contains("..") || path.Contains("%") ||
+                Path.GetInvalidPathChars().Any(path.Contains))
+            {
+                // invalid path
+                throw new ArgumentException("Invalid path spcified.");
+            }
+        }
     }
 
     public sealed class PackageAction : ReleaseActionBase
@@ -134,6 +146,7 @@ namespace SweetMagic
 
         public ExecuteAction(string path, bool awaitProcess)
         {
+            AssertPath(path);
             _path = path;
             _awaitProcess = awaitProcess;
         }
@@ -157,13 +170,26 @@ namespace SweetMagic
 
         public DeleteAction(string path)
         {
+            AssertPath(path);
             _path = path;
         }
 
         public override async Task DoWork(UpdateTaskExecutor executor)
         {
-            executor.NotifyProgress("removing file: " + _path + " ...", false);
-            await Task.Run(() => File.Delete(Path.Combine(executor.BasePath, _path)));
+            if (_path.EndsWith("/"))
+            {
+                // directory
+                executor.NotifyProgress("removing directory: " + _path + " ...", false);
+                await Task.Run(() => Directory.Delete(
+                    Path.Combine(executor.BasePath, _path.Substring(0, _path.Length - 1)),
+                    true));
+            }
+            else
+            {
+                // file
+                executor.NotifyProgress("removing file: " + _path + " ...", false);
+                await Task.Run(() => File.Delete(Path.Combine(executor.BasePath, _path)));
+            }
             executor.NotifyProgress("ok.");
         }
     }
