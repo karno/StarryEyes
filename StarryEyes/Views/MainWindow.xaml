@@ -21,6 +21,7 @@
                       Closing="OnClosing"
                       FontFamily="Yu Gothic"
                       GlowBrush="{DynamicResource AccentColorBrush}"
+                      IconEdgeMode="Unspecified"
                       InputMethod.IsInputMethodEnabled="False"
                       ResizeMode="CanResizeWithGrip"
                       ShowIconOnTitleBar="True"
