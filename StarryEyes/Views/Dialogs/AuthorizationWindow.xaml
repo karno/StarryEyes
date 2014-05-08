@@ -4,7 +4,7 @@
                       xmlns:behaviors="clr-namespace:StarryEyes.Views.Messaging.Behaviors"
                       xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
                       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-                      xmlns:dialogs="clr-namespace:StarryEyes.ViewsResources.Dialogs"
+                      xmlns:dialogs="clr-namespace:StarryEyes.Globalization.Dialogs"
                       xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
                       xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
                       xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"

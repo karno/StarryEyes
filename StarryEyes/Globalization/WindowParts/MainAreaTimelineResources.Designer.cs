@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace StarryEyes.ViewsResources.WindowParts {
+namespace StarryEyes.Globalization.WindowParts {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace StarryEyes.ViewsResources.WindowParts {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("StarryEyes.ViewsResources.WindowParts.MainAreaTimelineResources", typeof(MainAreaTimelineResources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("StarryEyes.Globalization.WindowParts.MainAreaTimelineResources", typeof(MainAreaTimelineResources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

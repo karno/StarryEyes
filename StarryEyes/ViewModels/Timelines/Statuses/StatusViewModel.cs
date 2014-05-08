@@ -17,6 +17,7 @@ using StarryEyes.Filters.Expressions.Operators;
 using StarryEyes.Filters.Expressions.Values.Immediates;
 using StarryEyes.Filters.Expressions.Values.Statuses;
 using StarryEyes.Filters.Expressions.Values.Users;
+using StarryEyes.Globalization.WindowParts;
 using StarryEyes.Models;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;
@@ -33,7 +34,6 @@ using StarryEyes.Settings;
 using StarryEyes.Settings.KeyAssigns;
 using StarryEyes.Views.Messaging;
 using StarryEyes.Views.Utils;
-using StarryEyes.ViewsResources.WindowParts;
 
 namespace StarryEyes.ViewModels.Timelines.Statuses
 {

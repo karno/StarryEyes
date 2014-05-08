@@ -6,7 +6,7 @@
         xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"
-        xmlns:localize="clr-namespace:StarryEyes.ViewsResources.Dialogs"
+        xmlns:localize="clr-namespace:StarryEyes.Globalization.Dialogs"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:properties="clr-namespace:StarryEyes.Properties"
         xmlns:utils="clr-namespace:StarryEyes.Views.Utils"

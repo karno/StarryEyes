@@ -9,6 +9,7 @@ using System.Windows;
 using System.Windows.Threading;
 using JetBrains.Annotations;
 using StarryEyes.Casket;
+using StarryEyes.Globalization;
 using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
 using Application = System.Windows.Application;
@@ -279,14 +280,14 @@ namespace StarryEyes
                 {
                     TaskDialog.Show(new TaskDialogOptions
                     {
-                        Title = StarryEyes.Properties.Resources.MsgStartupErrorTitle,
+                        Title = AppInitResources.MsgStartupErrorTitle,
                         MainIcon = VistaTaskDialogIcon.Error,
-                        MainInstruction = StarryEyes.Properties.Resources.MsgStartupErrorInst,
-                        Content = StarryEyes.Properties.Resources.MsgDbPathInvalidContent,
+                        MainInstruction = AppInitResources.MsgStartupErrorInst,
+                        Content = AppInitResources.MsgDbPathInvalidContent,
                         ExpandedInfo = ex.ToString(),
                         CommonButtons = TaskDialogCommonButtons.Close,
                         FooterIcon = VistaTaskDialogIcon.Information,
-                        FooterText = StarryEyes.Properties.Resources.MsgReInstallKrile,
+                        FooterText = AppInitResources.MsgReInstallKrile,
                     });
                     throw;
                 }

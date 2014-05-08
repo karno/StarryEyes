@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace StarryEyes.ViewsResources.Dialogs {
+namespace StarryEyes.Globalization.Dialogs {
     using System;
     
     
@@ -22,14 +22,14 @@ namespace StarryEyes.ViewsResources.Dialogs {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class AddNewKeyAssignWindowResources {
+    public class AuthorizationWindowResources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal AddNewKeyAssignWindowResources() {
+        internal AuthorizationWindowResources() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace StarryEyes.ViewsResources.Dialogs {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("StarryEyes.ViewsResources.Dialogs.AddNewKeyAssignWindowResources", typeof(AddNewKeyAssignWindowResources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("StarryEyes.Globalization.Dialogs.AuthorizationWindowResources", typeof(AuthorizationWindowResources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,47 +61,30 @@ namespace StarryEyes.ViewsResources.Dialogs {
         }
         
         /// <summary>
-        ///   Add key assign に類似しているローカライズされた文字列を検索します。
+        ///   Accessing Twitter... に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        public static string AddKeyAssignTitle {
+        public static string ConnectionText {
             get {
-                return ResourceManager.GetString("AddKeyAssignTitle", resourceCulture);
+                return ResourceManager.GetString("ConnectionText", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Create _empty file に類似しているローカライズされた文字列を検索します。
+        ///   Need Help? に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        public static string CreateEmpty {
+        public static string HelpText {
             get {
-                return ResourceManager.GetString("CreateEmpty", resourceCulture);
+                return ResourceManager.GetString("HelpText", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Create new key assign file. に類似しているローカライズされた文字列を検索します。
+        ///   Log into Twitter and permit access.
+        ///After, enter displayed number. に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        public static string CreateNewKeyAssignFile {
+        public static string MainText {
             get {
-                return ResourceManager.GetString("CreateNewKeyAssignFile", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Create _copy with current file に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        public static string CreateWithCopy {
-            get {
-                return ResourceManager.GetString("CreateWithCopy", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Key Assign Name:  に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        public static string KeyAssignName {
-            get {
-                return ResourceManager.GetString("KeyAssignName", resourceCulture);
+                return ResourceManager.GetString("MainText", resourceCulture);
             }
         }
     }

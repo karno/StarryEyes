@@ -1,0 +1,279 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="MsgButtonBrowseMsKb" xml:space="preserve">
+    <value>Refer Microsoft KB</value>
+  </data>
+  <data name="MsgDatabasePathWarningContent" xml:space="preserve">
+    <value>Changing database path is a debug feature, you should not use this option as part of customize for daily use.</value>
+  </data>
+  <data name="MsgDatabasePathWarningFooter" xml:space="preserve">
+    <value>Krile may crash when you put a setting file or a database file on cloud storage (e.g. OneDrive, Dropbox).</value>
+  </data>
+  <data name="MsgDatabasePathWarningInst" xml:space="preserve">
+    <value>Database path is specified explicitly.</value>
+  </data>
+  <data name="MsgDatabasePathWarningTitle" xml:space="preserve">
+    <value>Database path warning</value>
+  </data>
+  <data name="MsgDbOptimizationFailedInst" xml:space="preserve">
+    <value>Database optimization failed.</value>
+  </data>
+  <data name="MsgDbOptimizationFailedTitle" xml:space="preserve">
+    <value>Krile Database Optimization</value>
+  </data>
+  <data name="MsgDbPathInvalidContent" xml:space="preserve">
+    <value>Maybe designation of database path is invalid.
+Please examine krile.exe.config .</value>
+  </data>
+  <data name="MsgDesktopHeapContent" xml:space="preserve">
+    <value>It will cause crashing Krile or hanging up your system.
+Changing configuration of Windows may prevent this problem.</value>
+  </data>
+  <data name="MsgDesktopHeapInfo" xml:space="preserve">
+    <value>Desktop Heap parameter is too small.
+Current value: {0} / Lowest recommend: {1}</value>
+  </data>
+  <data name="MsgDesktopHeapInst" xml:space="preserve">
+    <value>May fall into memory shortage.</value>
+  </data>
+  <data name="MsgExecModeWarningContent" xml:space="preserve">
+    <value>Execution mode is a debug feature, you should not use this option as part of customize for daily use.</value>
+  </data>
+  <data name="MsgExecModeWarningFooter" xml:space="preserve">
+    <value>Krile may crash when you put a setting file or a database file on cloud storage (e.g. OneDrive, Dropbox).</value>
+  </data>
+  <data name="MsgExecModeWarningInst" xml:space="preserve">
+    <value>Execution Mode has set as Standalone.</value>
+  </data>
+  <data name="MsgExecModeWarningTitle" xml:space="preserve">
+    <value>Execution Mode Warning</value>
+  </data>
+  <data name="MsgExitInst" xml:space="preserve">
+    <value>Are you sure you want to exit Krile?</value>
+  </data>
+  <data name="MsgExitTitle" xml:space="preserve">
+    <value>Exit Krile</value>
+  </data>
+  <data name="MsgFailGeneralProcessContent" xml:space="preserve">
+    <value>Please retry process or reboot Windows.</value>
+  </data>
+  <data name="MsgFailGeneralProcessInst" xml:space="preserve">
+    <value>Process is not complete properly.</value>
+  </data>
+  <data name="MsgFailInitConfDirContent" xml:space="preserve">
+    <value>Could not create setting directory.</value>
+  </data>
+  <data name="MsgFailInitConfDirFooterText" xml:space="preserve">
+    <value>Please place Krile into other directory.</value>
+  </data>
+  <data name="MsgFailInitLockContent" xml:space="preserve">
+    <value>Could not create locking file.</value>
+  </data>
+  <data name="MsgFailInitLockFooter" xml:space="preserve">
+    <value>Please reboot Windows if problem is not solved.</value>
+  </data>
+  <data name="MsgFailLaunchDuplicatedContent" xml:space="preserve">
+    <value>Krile can not run duplicated that sharing settings each other.</value>
+  </data>
+  <data name="MsgFailLaunchDuplicatedExInfo" xml:space="preserve">
+    <value>Running multiple krile needs configuring krile.exe.config.
+Visit official site or repository for more detail.</value>
+  </data>
+  <data name="MsgFailLaunchDuplicatedInst" xml:space="preserve">
+    <value>Krile is already running.</value>
+  </data>
+  <data name="MsgFailStartInst" xml:space="preserve">
+    <value>Failed starting Krile.</value>
+  </data>
+  <data name="MsgFailTitle" xml:space="preserve">
+    <value>Krile StarryEyes</value>
+  </data>
+  <data name="MsgMaintenanceCmdCleanInstall" xml:space="preserve">
+    <value>Delete all and &amp;reinstall latest version</value>
+  </data>
+  <data name="MsgMaintenanceCmdContinue" xml:space="preserve">
+    <value>&amp;Continue starting Krile</value>
+  </data>
+  <data name="MsgMaintenanceCmdDeleteAll" xml:space="preserve">
+    <value>Delete &amp;all settings and database</value>
+  </data>
+  <data name="MsgMaintenanceCmdDeleteAllAndExit" xml:space="preserve">
+    <value>&amp;Exit after deleting all settings and database</value>
+  </data>
+  <data name="MsgMaintenanceCmdDeleteDb" xml:space="preserve">
+    <value>&amp;Delete database</value>
+  </data>
+  <data name="MsgMaintenanceCmdExit" xml:space="preserve">
+    <value>Cancel and E&amp;xit</value>
+  </data>
+  <data name="MsgMaintenanceCmdOptimize" xml:space="preserve">
+    <value>&amp;Optimize database</value>
+  </data>
+  <data name="MsgMaintenanceContent" xml:space="preserve">
+    <value>Deleted data can not recover. Please backup before deletion if needed.</value>
+  </data>
+  <data name="MsgMaintenanceInst" xml:space="preserve">
+    <value>Managing data stored in Krile.</value>
+  </data>
+  <data name="MsgMaintenanceTitle" xml:space="preserve">
+    <value>Maintenance Krile</value>
+  </data>
+  <data name="MsgRecoveryCmdContinue" xml:space="preserve">
+    <value>&amp;Continue starting Krile</value>
+  </data>
+  <data name="MsgRecoveryCmdExit" xml:space="preserve">
+    <value>E&amp;xit immediately</value>
+  </data>
+  <data name="MsgRecoveryCmdMaintenance" xml:space="preserve">
+    <value>Show &amp;maintenance dialog</value>
+  </data>
+  <data name="MsgRecoveryContent" xml:space="preserve">
+    <value>If crash caused by temporarily problem, you can continue starting.
+Deleting database file or rebooting Windows will help starting Krile when problem is continue.</value>
+  </data>
+  <data name="MsgRecoveryFooter" xml:space="preserve">
+    <value>Maintenance Dialog can delete database or/and delete settings.</value>
+  </data>
+  <data name="MsgRecoveryInst" xml:space="preserve">
+    <value>Krile had not shut down properly.</value>
+  </data>
+  <data name="MsgRecoveryTitle" xml:space="preserve">
+    <value>Recovery your Krile</value>
+  </data>
+  <data name="MsgReInstallKrile" xml:space="preserve">
+    <value>If problem is not solved, please re-installing Krile.</value>
+  </data>
+  <data name="MsgStartupErrorInst" xml:space="preserve">
+    <value>Starting krile has failed.</value>
+  </data>
+  <data name="MsgStartupErrorTitle" xml:space="preserve">
+    <value>Krile Startup Error</value>
+  </data>
+  <data name="MsgTabWarningContent" xml:space="preserve">
+    <value>Tab information is empty.
+Generate default tabs?</value>
+  </data>
+  <data name="MsgTabWarningInst" xml:space="preserve">
+    <value>Tab information may have been lost.</value>
+  </data>
+  <data name="MsgTabWarningTitle" xml:space="preserve">
+    <value>Tab Warning</value>
+  </data>
+</root>

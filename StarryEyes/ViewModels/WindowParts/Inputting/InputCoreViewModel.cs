@@ -13,6 +13,7 @@ using Livet;
 using Livet.EventListeners;
 using Livet.Messaging.IO;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Globalization.WindowParts;
 using StarryEyes.Helpers;
 using StarryEyes.Models;
 using StarryEyes.Models.Backstages.NotificationEvents.PostEvents;
@@ -24,7 +25,6 @@ using StarryEyes.Properties;
 using StarryEyes.Settings;
 using StarryEyes.ViewModels.Timelines.Statuses;
 using StarryEyes.Views.Messaging;
-using StarryEyes.ViewsResources.WindowParts;
 using Clipboard = System.Windows.Clipboard;
 
 namespace StarryEyes.ViewModels.WindowParts.Inputting

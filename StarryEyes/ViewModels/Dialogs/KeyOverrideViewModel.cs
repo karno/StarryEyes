@@ -5,10 +5,10 @@ using System.Reactive.Threading.Tasks;
 using AsyncOAuth;
 using Livet;
 using Livet.Messaging.Windows;
+using StarryEyes.Globalization.Dialogs;
 using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
 using StarryEyes.Views.Messaging;
-using StarryEyes.ViewsResources.Dialogs;
 
 namespace StarryEyes.ViewModels.Dialogs
 {

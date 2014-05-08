@@ -11,7 +11,7 @@
                       xmlns:sebehaviors="clr-namespace:StarryEyes.Views.Messaging.Behaviors"
                       xmlns:triggers="clr-namespace:StarryEyes.Views.Triggers"
                       xmlns:utils="clr-namespace:StarryEyes.Views.Utils"
-                      xmlns:viewsResources="clr-namespace:StarryEyes.ViewsResources"
+                      xmlns:viewsResources="clr-namespace:StarryEyes.Globalization"
                       xmlns:vm="clr-namespace:StarryEyes.ViewModels"
                       xmlns:windowParts="clr-namespace:StarryEyes.Views.WindowParts"
                       Title="{Binding WindowTitle}"

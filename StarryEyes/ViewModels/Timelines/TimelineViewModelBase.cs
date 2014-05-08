@@ -9,6 +9,7 @@ using System.Windows.Threading;
 using JetBrains.Annotations;
 using Livet;
 using Livet.EventListeners;
+using StarryEyes.Globalization.WindowParts;
 using StarryEyes.Models.Inputting;
 using StarryEyes.Models.Timelines;
 using StarryEyes.Models.Timelines.Statuses;
@@ -17,7 +18,6 @@ using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
 using StarryEyes.ViewModels.Timelines.Statuses;
 using StarryEyes.Views.Messaging;
-using StarryEyes.ViewsResources.WindowParts;
 
 namespace StarryEyes.ViewModels.Timelines
 {

@@ -3,12 +3,12 @@ using System.Linq;
 using System.Reactive.Linq;
 using JetBrains.Annotations;
 using Livet;
+using StarryEyes.Globalization.WindowParts;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Inputting;
 using StarryEyes.Settings;
 using StarryEyes.ViewModels.Common;
 using StarryEyes.ViewModels.WindowParts.Flips;
-using StarryEyes.ViewsResources.WindowParts;
 
 namespace StarryEyes.ViewModels.WindowParts.Inputting
 {

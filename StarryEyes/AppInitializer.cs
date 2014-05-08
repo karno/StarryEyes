@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using Livet;
 using StarryEyes.Casket;
+using StarryEyes.Globalization;
 using StarryEyes.Models;
 using StarryEyes.Models.Plugins;
 using StarryEyes.Models.Receiving;
@@ -16,7 +17,6 @@ using StarryEyes.Models.Stores;
 using StarryEyes.Models.Subsystems;
 using StarryEyes.Models.Subsystems.Notifications.UI;
 using StarryEyes.Nightmare.Windows;
-using StarryEyes.Properties;
 using StarryEyes.Settings;
 using StarryEyes.Views.Dialogs;
 using Application = System.Windows.Application;
@@ -324,8 +324,8 @@ namespace StarryEyes
                 TaskDialog.Show(new TaskDialogOptions
                 {
                     MainIcon = VistaTaskDialogIcon.Error,
-                    Title = Resources.MsgDbOptimizationFailedTitle,
-                    MainInstruction = Resources.MsgDbOptimizationFailedInst,
+                    Title = AppInitResources.MsgDbOptimizationFailedTitle,
+                    MainInstruction = AppInitResources.MsgDbOptimizationFailedInst,
                     Content = cex.Message,
                     ExpandedInfo = cex.ToString()
                 });
@@ -409,17 +409,17 @@ namespace StarryEyes
             {
                 return ShowMessage(new TaskDialogOptions
                 {
-                    Title = Resources.MsgRecoveryTitle,
+                    Title = AppInitResources.MsgRecoveryTitle,
                     MainIcon = VistaTaskDialogIcon.Error,
-                    MainInstruction = Resources.MsgRecoveryInst,
-                    Content = Resources.MsgRecoveryContent,
+                    MainInstruction = AppInitResources.MsgRecoveryInst,
+                    Content = AppInitResources.MsgRecoveryContent,
                     FooterIcon = VistaTaskDialogIcon.Information,
-                    FooterText = Resources.MsgRecoveryFooter,
+                    FooterText = AppInitResources.MsgRecoveryFooter,
                     CommandButtons = new[]
                     {
-                        /* 0 */ Resources.MsgRecoveryCmdContinue,
-                        /* 1 */ Resources.MsgRecoveryCmdMaintenance,
-                        /* 2 */ Resources.MsgRecoveryCmdExit
+                        /* 0 */ AppInitResources.MsgRecoveryCmdContinue,
+                        /* 1 */ AppInitResources.MsgRecoveryCmdMaintenance,
+                        /* 2 */ AppInitResources.MsgRecoveryCmdExit
                     }
                 });
             }
@@ -428,19 +428,19 @@ namespace StarryEyes
             {
                 return ShowMessage(new TaskDialogOptions
                 {
-                    Title = Resources.MsgMaintenanceTitle,
+                    Title = AppInitResources.MsgMaintenanceTitle,
                     MainIcon = VistaTaskDialogIcon.Warning,
-                    MainInstruction = Resources.MsgMaintenanceInst,
-                    Content = Resources.MsgMaintenanceContent,
+                    MainInstruction = AppInitResources.MsgMaintenanceInst,
+                    Content = AppInitResources.MsgMaintenanceContent,
                     CommandButtons = new[]
                     {
-                        /* 0 */ Resources.MsgMaintenanceCmdContinue,
-                        /* 1 */ Resources.MsgMaintenanceCmdOptimize,
-                        /* 2 */ Resources.MsgMaintenanceCmdDeleteDb,
-                        /* 3 */ Resources.MsgMaintenanceCmdDeleteAll,
-                        /* 4 */ Resources.MsgMaintenanceCmdDeleteAllAndExit,
-                        /* 5 */ Resources.MsgMaintenanceCmdCleanInstall,
-                        /* 6 */ Resources.MsgMaintenanceCmdExit
+                        /* 0 */ AppInitResources.MsgMaintenanceCmdContinue,
+                        /* 1 */ AppInitResources.MsgMaintenanceCmdOptimize,
+                        /* 2 */ AppInitResources.MsgMaintenanceCmdDeleteDb,
+                        /* 3 */ AppInitResources.MsgMaintenanceCmdDeleteAll,
+                        /* 4 */ AppInitResources.MsgMaintenanceCmdDeleteAllAndExit,
+                        /* 5 */ AppInitResources.MsgMaintenanceCmdCleanInstall,
+                        /* 6 */ AppInitResources.MsgMaintenanceCmdExit
                     }
                 });
             }
@@ -460,11 +460,11 @@ namespace StarryEyes
             {
                 ShowMessage(new TaskDialogOptions
                 {
-                    Title = Resources.MsgFailTitle,
+                    Title = AppInitResources.MsgFailTitle,
                     MainIcon = VistaTaskDialogIcon.Error,
-                    MainInstruction = Resources.MsgFailLaunchDuplicatedInst,
-                    Content = Resources.MsgFailLaunchDuplicatedContent,
-                    ExpandedInfo = Resources.MsgFailLaunchDuplicatedExInfo,
+                    MainInstruction = AppInitResources.MsgFailLaunchDuplicatedInst,
+                    Content = AppInitResources.MsgFailLaunchDuplicatedContent,
+                    ExpandedInfo = AppInitResources.MsgFailLaunchDuplicatedExInfo,
                     CommonButtons = TaskDialogCommonButtons.Close
                 });
             }
@@ -473,14 +473,14 @@ namespace StarryEyes
             {
                 ShowMessage(new TaskDialogOptions
                 {
-                    Title = Resources.MsgFailTitle,
+                    Title = AppInitResources.MsgFailTitle,
                     MainIcon = VistaTaskDialogIcon.Error,
-                    MainInstruction = Resources.MsgFailStartInst,
-                    Content = Resources.MsgFailInitConfDirContent,
+                    MainInstruction = AppInitResources.MsgFailStartInst,
+                    Content = AppInitResources.MsgFailInitConfDirContent,
                     ExpandedInfo = ex.ToString(),
                     CommonButtons = TaskDialogCommonButtons.Close,
                     FooterIcon = VistaTaskDialogIcon.Information,
-                    FooterText = Resources.MsgFailInitConfDirFooterText,
+                    FooterText = AppInitResources.MsgFailInitConfDirFooterText,
                 });
             }
 
@@ -488,14 +488,14 @@ namespace StarryEyes
             {
                 ShowMessage(new TaskDialogOptions
                 {
-                    Title = Resources.MsgFailTitle,
+                    Title = AppInitResources.MsgFailTitle,
                     MainIcon = VistaTaskDialogIcon.Error,
-                    MainInstruction = Resources.MsgFailStartInst,
-                    Content = Resources.MsgFailInitLockContent,
+                    MainInstruction = AppInitResources.MsgFailStartInst,
+                    Content = AppInitResources.MsgFailInitLockContent,
                     ExpandedInfo = ex.ToString(),
                     CommonButtons = TaskDialogCommonButtons.Close,
                     FooterIcon = VistaTaskDialogIcon.Information,
-                    FooterText = Resources.MsgFailInitLockFooter
+                    FooterText = AppInitResources.MsgFailInitLockFooter
                 });
             }
 
@@ -505,8 +505,8 @@ namespace StarryEyes
                 {
                     Title = App.AppFullName,
                     MainIcon = VistaTaskDialogIcon.Error,
-                    MainInstruction = Resources.MsgFailGeneralProcessInst,
-                    Content = Resources.MsgFailGeneralProcessContent,
+                    MainInstruction = AppInitResources.MsgFailGeneralProcessInst,
+                    Content = AppInitResources.MsgFailGeneralProcessContent,
                     ExpandedInfo = ex.ToString(),
                     CommonButtons = TaskDialogCommonButtons.Close,
                 });

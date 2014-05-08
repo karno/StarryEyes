@@ -10,6 +10,7 @@ using System.Windows.Media.Imaging;
 using JetBrains.Annotations;
 using Livet;
 using Livet.Messaging;
+using StarryEyes.Globalization;
 using StarryEyes.Models;
 using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Models.Subsystems;
@@ -284,12 +285,12 @@ namespace StarryEyes.ViewModels
                 {
                     var msg = this.Messenger.GetResponse(new TaskDialogMessage(new TaskDialogOptions
                     {
-                        Title = Resources.MsgExecModeWarningTitle,
+                        Title = AppInitResources.MsgExecModeWarningTitle,
                         MainIcon = VistaTaskDialogIcon.Warning,
-                        MainInstruction = Resources.MsgExecModeWarningInst,
-                        Content = Resources.MsgExecModeWarningContent,
+                        MainInstruction = AppInitResources.MsgExecModeWarningInst,
+                        Content = AppInitResources.MsgExecModeWarningContent,
                         FooterIcon = VistaTaskDialogIcon.Error,
-                        FooterText = Resources.MsgExecModeWarningFooter,
+                        FooterText = AppInitResources.MsgExecModeWarningFooter,
                         CommonButtons = TaskDialogCommonButtons.Close,
                         VerificationText = Resources.MsgDoNotShowAgain
                     }));
@@ -299,12 +300,12 @@ namespace StarryEyes.ViewModels
                 {
                     var msg = this.Messenger.GetResponse(new TaskDialogMessage(new TaskDialogOptions
                     {
-                        Title = Resources.MsgDatabasePathWarningTitle,
+                        Title = AppInitResources.MsgDatabasePathWarningTitle,
                         MainIcon = VistaTaskDialogIcon.Warning,
-                        MainInstruction = Resources.MsgDatabasePathWarningInst,
-                        Content = Resources.MsgDatabasePathWarningContent,
+                        MainInstruction = AppInitResources.MsgDatabasePathWarningInst,
+                        Content = AppInitResources.MsgDatabasePathWarningContent,
                         FooterIcon = VistaTaskDialogIcon.Error,
-                        FooterText = Resources.MsgDatabasePathWarningFooter,
+                        FooterText = AppInitResources.MsgDatabasePathWarningFooter,
                         CommonButtons = TaskDialogCommonButtons.Close,
                         VerificationText = Resources.MsgDoNotShowAgain
                     }));
@@ -334,10 +335,10 @@ namespace StarryEyes.ViewModels
                         {
                             Title = Resources.AppName,
                             MainIcon = VistaTaskDialogIcon.Warning,
-                            MainInstruction = Resources.MsgDesktopHeapInst,
-                            Content = Resources.MsgDesktopHeapContent,
-                            ExpandedInfo = String.Format(Resources.MsgDesktopHeapInfo, dh, rh),
-                            CommandButtons = new[] { Resources.MsgButtonBrowseMsKb, Resources.MsgButtonCancel },
+                            MainInstruction = AppInitResources.MsgDesktopHeapInst,
+                            Content = AppInitResources.MsgDesktopHeapContent,
+                            ExpandedInfo = String.Format(AppInitResources.MsgDesktopHeapInfo, dh, rh),
+                            CommandButtons = new[] { AppInitResources.MsgButtonBrowseMsKb, Resources.MsgButtonCancel },
                             VerificationText = Resources.MsgDoNotShowAgain,
                         }));
                         Setting.CheckDesktopHeap.Value = !msg.Response.VerificationChecked.GetValueOrDefault();
@@ -358,10 +359,10 @@ namespace StarryEyes.ViewModels
         {
             var response = this.Messenger.GetResponse(new TaskDialogMessage(new TaskDialogOptions
             {
-                Title = Resources.MsgTabWarningTitle,
+                Title = AppInitResources.MsgTabWarningTitle,
                 MainIcon = VistaTaskDialogIcon.Warning,
-                MainInstruction = Resources.MsgTabWarningInst,
-                Content = Resources.MsgTabWarningContent,
+                MainInstruction = AppInitResources.MsgTabWarningInst,
+                Content = AppInitResources.MsgTabWarningContent,
                 CommonButtons = TaskDialogCommonButtons.YesNo,
             }));
             if (response.Response.Result != TaskDialogSimpleResult.Yes) return;
@@ -379,9 +380,9 @@ namespace StarryEyes.ViewModels
                 var ret = Messenger.GetResponse(
                     new TaskDialogMessage(new TaskDialogOptions
                     {
-                        Title = Resources.MsgExitTitle,
+                        Title = AppInitResources.MsgExitTitle,
                         MainIcon = VistaTaskDialogIcon.Warning,
-                        MainInstruction = Resources.MsgExitInst,
+                        MainInstruction = AppInitResources.MsgExitInst,
                         CommonButtons = TaskDialogCommonButtons.OKCancel,
                         VerificationText = Resources.MsgDoNotShowAgain,
                     }));
