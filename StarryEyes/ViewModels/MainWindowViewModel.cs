@@ -337,7 +337,7 @@ namespace StarryEyes.ViewModels
                             MainIcon = VistaTaskDialogIcon.Warning,
                             MainInstruction = AppInitResources.MsgDesktopHeapInst,
                             Content = AppInitResources.MsgDesktopHeapContent,
-                            ExpandedInfo = String.Format(AppInitResources.MsgDesktopHeapInfo, dh, rh),
+                            ExpandedInfo = String.Format(AppInitResources.MsgDesktopHeapInfoFormat, dh, rh),
                             CommandButtons = new[] { AppInitResources.MsgButtonBrowseMsKb, Resources.MsgButtonCancel },
                             VerificationText = Resources.MsgDoNotShowAgain,
                         }));

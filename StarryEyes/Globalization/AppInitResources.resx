@@ -146,7 +146,7 @@ Please examine krile.exe.config .</value>
     <value>It will cause crashing Krile or hanging up your system.
 Changing configuration of Windows may prevent this problem.</value>
   </data>
-  <data name="MsgDesktopHeapInfo" xml:space="preserve">
+  <data name="MsgDesktopHeapInfoFormat" xml:space="preserve">
     <value>Desktop Heap parameter is too small.
 Current value: {0} / Lowest recommend: {1}</value>
   </data>

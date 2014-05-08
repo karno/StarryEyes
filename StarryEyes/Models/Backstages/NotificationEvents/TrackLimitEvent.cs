@@ -1,4 +1,6 @@
-﻿using System.Windows.Media;
+﻿using System;
+using System.Windows.Media;
+using StarryEyes.Globalization;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Views;
 
@@ -22,7 +24,12 @@ namespace StarryEyes.Models.Backstages.NotificationEvents
 
         public override string Detail
         {
-            get { return _drop + " 件のツイートを受信できませんでした。 " + _info.UnreliableScreenName + " のタイムラインが速すぎます。"; }
+            get
+            {
+                return String.Format(
+                    BackstageResources.TrackLimitFormat,
+                    _drop, "@" + _info.UnreliableScreenName);
+            }
         }
 
         public override Color Background

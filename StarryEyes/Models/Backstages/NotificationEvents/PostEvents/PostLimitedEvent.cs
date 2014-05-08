@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Media;
+using StarryEyes.Globalization;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Views;
 
@@ -23,7 +24,12 @@ namespace StarryEyes.Models.Backstages.NotificationEvents.PostEvents
 
         public override string Detail
         {
-            get { return "@" + _account.UnreliableScreenName + "がPOST規制されました。予想解除時刻は " + _releaseTime.ToString("HH\\:mm\\:ss") + " です。"; }
+            get
+            {
+                return String.Format(BackstageResources.PostLimitFormat,
+                    "@" + _account.UnreliableScreenName,
+                    _releaseTime.ToString("HH\\:mm\\:ss"));
+            }
         }
 
         public override Color Background

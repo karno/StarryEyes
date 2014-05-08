@@ -1,4 +1,7 @@
 ﻿
+using System;
+using StarryEyes.Globalization;
+
 namespace StarryEyes.Models.Backstages.SystemEvents
 {
     public class ThemeProfileNotFoundEvent : SystemEventBase
@@ -17,7 +20,7 @@ namespace StarryEyes.Models.Backstages.SystemEvents
 
         public override string Detail
         {
-            get { return "テーマプロファイル " + _profile + " は見つかりませんでした。既定のプロファイルを使用します。"; }
+            get { return String.Format(BackstageResources.ProfileNotFoundFormat, _profile); }
         }
     }
 }

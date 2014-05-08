@@ -1,4 +1,6 @@
-﻿using System.Windows.Media;
+﻿using System;
+using System.Windows.Media;
+using StarryEyes.Globalization;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Views;
 
@@ -33,10 +35,10 @@ namespace StarryEyes.Models.Backstages.NotificationEvents.PostEvents
         {
             get
             {
-                return this._account.UnreliableScreenName +
-                    " はPOST規制されているため、 " +
-                    this._fallbackAccount.UnreliableScreenName +
-                    " へフォールバックされました。";
+                return String.Format(
+                    BackstageResources.FallbackFormat,
+                    "@" + this._account.UnreliableScreenName,
+                    "@" + this._fallbackAccount.UnreliableScreenName);
             }
         }
 

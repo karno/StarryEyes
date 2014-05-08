@@ -4,6 +4,7 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using StarryEyes.Albireo;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Globalization;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Models.Backstages.NotificationEvents.PostEvents;
@@ -66,14 +67,16 @@ namespace StarryEyes.Models.Backstages
             this._account = account;
             this.UpdateConnectionState();
             StoreHelper.GetUser(this._account.Id)
-                .Subscribe(
-                    u =>
-                    {
-                        _user = u;
-                        this.RaiseTwitterUserChanged();
-                    },
-                    ex => BackstageModel.RegisterEvent(
-                        new OperationFailedEvent("アカウント情報を取得できません(@" + _account.UnreliableScreenName + ")", ex)));
+                       .Subscribe(
+                           u =>
+                           {
+                               _user = u;
+                               this.RaiseTwitterUserChanged();
+                           },
+                           ex => BackstageModel.RegisterEvent(
+                               new OperationFailedEvent(String.Format(
+                                   BackstageResources.GetAccountInfoFailedFormat,
+                                   "@" + _account.UnreliableScreenName), ex)));
         }
 
         internal void UpdateConnectionState()

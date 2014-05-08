@@ -147,9 +147,9 @@ namespace StarryEyes.Globalization {
         ///   Desktop Heap parameter is too small.
         ///Current value: {0} / Lowest recommend: {1} に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        public static string MsgDesktopHeapInfo {
+        public static string MsgDesktopHeapInfoFormat {
             get {
-                return ResourceManager.GetString("MsgDesktopHeapInfo", resourceCulture);
+                return ResourceManager.GetString("MsgDesktopHeapInfoFormat", resourceCulture);
             }
         }
         

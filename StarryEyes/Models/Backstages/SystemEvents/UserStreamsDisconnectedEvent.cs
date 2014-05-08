@@ -1,4 +1,6 @@
-﻿using StarryEyes.Models.Accounting;
+﻿using System;
+using StarryEyes.Globalization;
+using StarryEyes.Models.Accounting;
 
 namespace StarryEyes.Models.Backstages.SystemEvents
 {
@@ -20,7 +22,13 @@ namespace StarryEyes.Models.Backstages.SystemEvents
 
         public override string Detail
         {
-            get { return "User Streamsが切断されました: " + this._account.UnreliableScreenName + ", " + _reason; }
+            get
+            {
+                return String.Format(
+                    BackstageResources.UserStreamDisconnectedFormat,
+                    "@" + this._account.UnreliableScreenName,
+                    _reason);
+            }
         }
     }
 }

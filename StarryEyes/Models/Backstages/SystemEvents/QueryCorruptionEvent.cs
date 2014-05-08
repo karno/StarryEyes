@@ -1,4 +1,5 @@
 ﻿using System;
+using StarryEyes.Globalization;
 
 namespace StarryEyes.Models.Backstages.SystemEvents
 {
@@ -20,7 +21,7 @@ namespace StarryEyes.Models.Backstages.SystemEvents
 
         public override string Detail
         {
-            get { return "タブ " + _tabName + " のクエリが破損していたため、フィルタが初期化されました。(" + _ex.Message + ")"; }
+            get { return String.Format(BackstageResources.QueryCorruptedFormat, _tabName, _ex.Message); }
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Media;
+using StarryEyes.Globalization;
 using StarryEyes.Views;
 
 namespace StarryEyes.Models.Backstages.NotificationEvents
@@ -22,7 +23,10 @@ namespace StarryEyes.Models.Backstages.NotificationEvents
 
         public override string Detail
         {
-            get { return "解析できないデータを受信(@" + _screenName + "): " + _exception.Message; }
+            get
+            {
+                return String.Format(BackstageResources.StreamDecodeFailedFormat, "@" + _screenName, _exception.Message);
+            }
         }
 
         public override Color Background

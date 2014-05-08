@@ -147,7 +147,7 @@ Krile.exe.config の設定を確認してください。</value>
     <value>Krileのクラッシュやシステムの停止を引き起こす可能性があります。
 Windowsの設定を変更することで、この問題を回避できる可能性があります。</value>
   </data>
-  <data name="MsgDesktopHeapInfo" xml:space="preserve">
+  <data name="MsgDesktopHeapInfoFormat" xml:space="preserve">
     <value>デスクトップ ヒープの設定が少なすぎます。
 現在の値: {0} / 推奨設定値の下限: {1}</value>
   </data>
