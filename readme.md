@@ -8,7 +8,7 @@ Windows Vista or later(we recommend Windows 8.1 x64), and .NET Framework 4.5 .
 
 ## Getting Started
 
-Visit [krile.starwing.net][http://krile.starwing.net/] .
+Visit [krile.starwing.net](http://krile.starwing.net/) .
 
 ## License
 This software is licensed under the MIT/X11 License.  
