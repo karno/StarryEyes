@@ -73,10 +73,10 @@ namespace StarryEyes.Models.Backstages
                                _user = u;
                                this.RaiseTwitterUserChanged();
                            },
-                           ex => BackstageModel.RegisterEvent(
-                               new OperationFailedEvent(String.Format(
-                                   BackstageResources.GetAccountInfoFailedFormat,
-                                   "@" + _account.UnreliableScreenName), ex)));
+                           ex => BackstageModel.RegisterEvent(new OperationFailedEvent(
+                               BackstageResources.GetAccountInfoFailedFormat.SafeFormat(
+                                   "@" + _account.UnreliableScreenName),
+                               ex)));
         }
 
         internal void UpdateConnectionState()

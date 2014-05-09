@@ -17,6 +17,7 @@ using StarryEyes.Filters.Expressions.Operators;
 using StarryEyes.Filters.Expressions.Values.Immediates;
 using StarryEyes.Filters.Expressions.Values.Statuses;
 using StarryEyes.Filters.Expressions.Values.Users;
+using StarryEyes.Globalization;
 using StarryEyes.Globalization.WindowParts;
 using StarryEyes.Models;
 using StarryEyes.Models.Accounting;
@@ -1029,9 +1030,16 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
 
         public void DirectMessage(string body)
         {
-            var formatted = String.Format(body, this.User.ScreenName, this.User.Name);
-            InputModel.InputCore.SetText(InputSetting.CreateDirectMessage(
-                this.Model.GetSuitableReplyAccount(), this.Status.User, formatted));
+            try
+            {
+                var formatted = String.Format(body, this.User.ScreenName, this.User.Name);
+                InputModel.InputCore.SetText(InputSetting.CreateDirectMessage(
+                    this.Model.GetSuitableReplyAccount(), this.Status.User, formatted));
+            }
+            catch (Exception ex)
+            {
+                BackstageModel.RegisterEvent(new OperationFailedEvent("Direct Message format error: " + body, ex));
+            }
         }
 
         public void ConfirmDelete()
@@ -1042,9 +1050,8 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                                            .FirstOrDefault();
             if (amendkey != null)
             {
-                footer = String.Format(
-                    MainAreaTimelineResources.MsgDeleteFooterWithKey,
-                    amendkey.GetKeyDescribeString());
+                footer = MainAreaTimelineResources.MsgDeleteFooterWithKeyFormat
+                                                  .SafeFormat(amendkey.GetKeyDescribeString());
             }
             var msg = new TaskDialogMessage(new TaskDialogOptions
             {
@@ -1175,8 +1182,8 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             {
                 Title = MainAreaTimelineResources.MsgReportAsSpamTitle,
                 MainIcon = VistaTaskDialogIcon.Warning,
-                MainInstruction = String.Format(MainAreaTimelineResources.MsgReportAsSpamInst,
-                    "@" + this.Status.User.ScreenName),
+                MainInstruction = MainAreaTimelineResources.MsgReportAsSpamInstFormat
+                    .SafeFormat("@" + this.Status.User.ScreenName),
                 Content = MainAreaTimelineResources.MsgReportAsSpamContent,
                 CustomButtons = new[]
                 {
@@ -1234,7 +1241,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                 return;
             }
             var response = QueryMuteMessage(MainAreaTimelineResources.MsgMuteKeywordTitle,
-                String.Format(MainAreaTimelineResources.MsgMuteKeywordInst, this.SelectedText),
+                MainAreaTimelineResources.MsgMuteKeywordInstFormat.SafeFormat(this.SelectedText),
                 MainAreaTimelineResources.MsgMuteKeywordContent);
             if (response.Response.CustomButtonResult != 0) return;
             System.Diagnostics.Debug.WriteLine("Mute: " + this.Status.User.ScreenName);
@@ -1248,7 +1255,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         public void MuteUser()
         {
             var response = QueryMuteMessage(MainAreaTimelineResources.MsgMuteUserTitle,
-                String.Format(MainAreaTimelineResources.MsgMuteUserInst, "@" + this.Status.User.ScreenName),
+                MainAreaTimelineResources.MsgMuteUserInstFormat.SafeFormat("@" + this.Status.User.ScreenName),
                 MainAreaTimelineResources.MsgMuteUserContent);
             if (response.Response.CustomButtonResult != 0) return;
             System.Diagnostics.Debug.WriteLine("Mute: " + this.Status.User.ScreenName);
@@ -1266,7 +1273,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         public void MuteClient()
         {
             var response = QueryMuteMessage(MainAreaTimelineResources.MsgMuteClientTitle,
-                String.Format(MainAreaTimelineResources.MsgMuteClientInst, "@" + this.SourceText),
+                MainAreaTimelineResources.MsgMuteClientInstFormat.SafeFormat("@" + this.SourceText),
                 MainAreaTimelineResources.MsgMuteClientContent);
             if (response.Response.CustomButtonResult != 0) return;
             System.Diagnostics.Debug.WriteLine("Mute: " + this.Status.Source);

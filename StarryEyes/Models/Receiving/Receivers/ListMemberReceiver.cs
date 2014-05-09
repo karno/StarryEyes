@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using StarryEyes.Albireo;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
+using StarryEyes.Globalization;
+using StarryEyes.Globalization.Models;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Databases;
 using StarryEyes.Settings;
@@ -27,10 +29,7 @@ namespace StarryEyes.Models.Receiving.Receivers
 
         protected override string ReceiverName
         {
-            get
-            {
-                return "リスト情報(" + this._listInfo + ")";
-            }
+            get { return ReceivingResources.ReceiverListInfoFormat.SafeFormat(_listInfo); }
         }
 
         protected override int IntervalSec

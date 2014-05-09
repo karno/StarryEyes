@@ -117,151 +117,92 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AccountIsAutomaticallySelected" xml:space="preserve">
-    <value>Account is automatically selected. Click to unlock</value>
+  <data name="AccountIsNotRegisteredForList" xml:space="preserve">
+    <value>Could not receive list timeline due to account is not registered.</value>
   </data>
-  <data name="AccountIsNotSelected" xml:space="preserve">
-    <value>Account is not selected. click left area to select account for posting status.</value>
+  <data name="AccountIsNotRegisteredForSearch" xml:space="preserve">
+    <value>Could not receive search timeline due to account is not registered.</value>
   </data>
-  <data name="AccountSelectorNotSelected" xml:space="preserve">
-    <value>account is not selected.</value>
+  <data name="DisconnectedAuthError" xml:space="preserve">
+    <value>Could not authorize you. Check system clock is correct.</value>
   </data>
-  <data name="AccountSelectorSelectedFormat" xml:space="preserve">
-    <value>selected: {0}</value>
+  <data name="DisconnectedProtocolError" xml:space="preserve">
+    <value>Too many protocol errors occured. Twitter service disruption?</value>
   </data>
-  <data name="AmendingPreviousOne" xml:space="preserve">
-    <value>Amending last posted tweet. Close post box for cancel amending</value>
+  <data name="DisconnectedEndpointError" xml:space="preserve">
+    <value>Could not connect to endpoint. Access is denied?</value>
   </data>
-  <data name="AmendPreviousOne" xml:space="preserve">
-    <value>Amend last posted tweet</value>
+  <data name="DisconnectedLimitError" xml:space="preserve">
+    <value>Too many User Stream session is connected. Please close other clients.</value>
   </data>
-  <data name="AttachClipboardImage" xml:space="preserve">
-    <value>attach from clipboard</value>
+  <data name="DisconnectedRangeError" xml:space="preserve">
+    <value>Could not connect stream. Permission denied or out of range.</value>
   </data>
-  <data name="AttachImageDlgFilterAll" xml:space="preserve">
-    <value>All Files</value>
+  <data name="DisconnectedTrackErrorFormat" xml:space="preserve">
+    <value>Tracking keyword too long or invalid. (keywords: {0})</value>
   </data>
-  <data name="AttachImageDlgFilterImg" xml:space="preserve">
-    <value>Images</value>
+  <data name="MsgListReceiveErrorContentFormat" xml:space="preserve">
+    <value>Account is not specified for receiving list {0}.</value>
   </data>
-  <data name="AttachImageDlgTitle" xml:space="preserve">
-    <value>Specify attaching image</value>
+  <data name="MsgListReceiveErrorExInfo" xml:space="preserve">
+    <value>When receiving list created by someone(not yourself), you have to specify account explicitly for receiving list.
+ex: list: "receiver/user/listname"</value>
   </data>
-  <data name="AttachOrUpdateLocation" xml:space="preserve">
-    <value>attach or update location</value>
+  <data name="MsgListReceiveErrorInst" xml:space="preserve">
+    <value>Could not start receiving list.</value>
   </data>
-  <data name="ClickToRemoveImage" xml:space="preserve">
-    <value>Click to cancel attaching</value>
+  <data name="MsgListReceiveErrorTitle" xml:space="preserve">
+    <value>List receiving error.</value>
   </data>
-  <data name="ClickToSelectAccount" xml:space="preserve">
-    <value>Click to select posting account</value>
+  <data name="ReceiveFailedFormat" xml:space="preserve">
+    <value>Receive failed: {0}</value>
   </data>
-  <data name="DeleteLocation" xml:space="preserve">
-    <value>delete location</value>
+  <data name="ReceiverDirectMessageFormat" xml:space="preserve">
+    <value>Direct messages({0})</value>
   </data>
-  <data name="DraftCountFormat" xml:space="preserve">
-    <value>{0} drafts saved</value>
+  <data name="ReceiverHomeFormat" xml:space="preserve">
+    <value>Home({0})</value>
   </data>
-  <data name="Drafts" xml:space="preserve">
-    <value>Drafts</value>
+  <data name="ReceiverListInfoFormat" xml:space="preserve">
+    <value>List info({0})</value>
   </data>
-  <data name="ImageAttachOption" xml:space="preserve">
-    <value>Options for attaching image</value>
+  <data name="ReceiverListTimelineFormat" xml:space="preserve">
+    <value>List({0})</value>
   </data>
-  <data name="LockableHashtags" xml:space="preserve">
-    <value>Lockable hashtags</value>
+  <data name="ReceiverMentionFormat" xml:space="preserve">
+    <value>Replies({0})</value>
   </data>
-  <data name="LockedHashtags" xml:space="preserve">
-    <value>Locked hashtags</value>
+  <data name="ReceiverRelationFormat" xml:space="preserve">
+    <value>Follow and follower info({0})</value>
   </data>
-  <data name="MsgAmendContent" xml:space="preserve">
-    <value>Tweet will be posted even if deleting last status is failed.</value>
+  <data name="ReceiverSearchFormat" xml:space="preserve">
+    <value>Search({0})</value>
   </data>
-  <data name="MsgAmendExInfo" xml:space="preserve">
-    <value>Deleting tweet: </value>
+  <data name="ReceiverUserInfoFormat" xml:space="preserve">
+    <value>User info({0})</value>
   </data>
-  <data name="MsgAmendExInfoMultipleFormat" xml:space="preserve">
-    <value>({0} tweets will be deleted)</value>
+  <data name="ReceiverUserTimelineFormat" xml:space="preserve">
+    <value>User({0})</value>
   </data>
-  <data name="MsgAmendInst" xml:space="preserve">
-    <value>Delete last tweet and repost this.</value>
+  <data name="ReceivingFormat" xml:space="preserve">
+    <value>Receiving: {0}</value>
   </data>
-  <data name="MsgAmendTitle" xml:space="preserve">
-    <value>Amending tweet</value>
+  <data name="UserStreamDisconnectedFormat" xml:space="preserve">
+    <value>User streams is disconnected. (code: {0}, error: {1})</value>
   </data>
-  <data name="MsgImageLoadErrorContent" xml:space="preserve">
-    <value>An error has occurred while loading image.
-Image might be incompatible or corrupted.</value>
+  <data name="UserStreamReconnecting" xml:space="preserve">
+    <value>Reconnecting user streams...</value>
   </data>
-  <data name="MsgImageLoadErrorInst" xml:space="preserve">
-    <value>Could not attach the image.</value>
+  <data name="ConnectFailedByNetwork" xml:space="preserve">
+    <value>Could not connect user streams. (Network Error)</value>
   </data>
-  <data name="MsgImageLoadErrorTitle" xml:space="preserve">
-    <value>Image load error</value>
+  <data name="ConnectFailedByProtocol" xml:space="preserve">
+    <value>Could not connect user streams. (Protocol Error)</value>
   </data>
-  <data name="MsgSaveToDraftInst" xml:space="preserve">
-    <value>Save current content to drafts?</value>
+  <data name="DisconnectedNetworkError" xml:space="preserve">
+    <value>Too many network errors occured. Twitter service disruption?</value>
   </data>
-  <data name="MsgSaveToDraftTitle" xml:space="preserve">
-    <value>Save to drafts</value>
-  </data>
-  <data name="MsgSnippingToolErrorContent" xml:space="preserve">
-    <value>Try to start Snipping Tool via start screen.</value>
-  </data>
-  <data name="MsgSnippingToolErrorInst" xml:space="preserve">
-    <value>Could not start Snipping Tool.</value>
-  </data>
-  <data name="MsgSnippingToolErrorTitle" xml:space="preserve">
-    <value>Snipping Tool error</value>
-  </data>
-  <data name="MsgThirdReplyWarnContent" xml:space="preserve">
-    <value>You are going to continue conversation with OTHER ACCOUNT.
-Are you sure you want to continue?</value>
-  </data>
-  <data name="MsgThirdReplyWarnTitle" xml:space="preserve">
-    <value>Reply with Wrong Account Warning</value>
-  </data>
-  <data name="MsgTweetFailedContentFormat" xml:space="preserve">
-    <value>Error: {0}
-Are you want to retry?</value>
-  </data>
-  <data name="MsgTweetFailedFooter" xml:space="preserve">
-    <value>If you do not want to retry, body of tweet will be saved to draft.</value>
-  </data>
-  <data name="MsgTweetFailedInst" xml:space="preserve">
-    <value>Tweet has failed.</value>
-  </data>
-  <data name="MsgTweetFailedReasonDuplicate" xml:space="preserve">
-    <value>tweet is duplicated with recent posted.</value>
-  </data>
-  <data name="MsgTweetFailedReasonPostLimited" xml:space="preserve">
-    <value>POST limited.</value>
-  </data>
-  <data name="MsgTweetFailedReasonUnknown" xml:space="preserve">
-    <value>Analysis failed or unknown error.</value>
-  </data>
-  <data name="MsgTweetFailedTitle" xml:space="preserve">
-    <value>Tweet failed</value>
-  </data>
-  <data name="PostTweet" xml:space="preserve">
-    <value>Post tweet</value>
-  </data>
-  <data name="RemainUpdateFormat" xml:space="preserve">
-    <value>{0} tweets remain until post-limit</value>
-  </data>
-  <data name="SelectAttachImageFile" xml:space="preserve">
-    <value>select image file to attach...</value>
-  </data>
-  <data name="StartSnippingTool" xml:space="preserve">
-    <value>snipping tool...</value>
-  </data>
-  <data name="ToggleUrlAutoEscape" xml:space="preserve">
-    <value>Toggle URL auto-link avoidance</value>
-  </data>
-  <data name="UrlAutoEscapeDisabled" xml:space="preserve">
-    <value>URL auto-link avoidance is disabled</value>
-  </data>
-  <data name="UrlAutoEscapeEnabled" xml:space="preserve">
-    <value>URL auto-link avoidance is enabled (Insert zero-width space before TLD of URL without schemes.)</value>
+  <data name="ReconnectingFormat" xml:space="preserve">
+    <value>Try to reconnect User Streams... (waiting {0} ms)</value>
   </data>
 </root>

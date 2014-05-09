@@ -234,6 +234,12 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>BackstageResources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Globalization\GlobalizationHelper.cs" />
+    <Compile Include="Globalization\Models\ReceivingResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ReceivingResources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Helpers\FreezableHelper.cs" />
     <Compile Include="Helpers\TwitterRegexPatterns.cs" />
     <Compile Include="Hotfixes\DispatcherCollectionRx.cs" />
@@ -747,6 +753,11 @@
       <LastGenOutput>BackstageResources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Globalization\Models\ReceivingResources.ja.resx" />
+    <EmbeddedResource Include="Globalization\Models\ReceivingResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ReceivingResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -796,10 +807,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Globalization\WindowParts\InputAreaResources.ja.resx">
       <DependentUpon>InputAreaResources.resx</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Globalization\WindowParts\InputAreaResources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>InputAreaResources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Globalization\WindowParts\MainAreaTimelineResources.ja.resx">
       <DependentUpon>MainAreaTimelineResources.resx</DependentUpon>

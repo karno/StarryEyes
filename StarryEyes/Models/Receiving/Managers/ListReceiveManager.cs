@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using StarryEyes.Albireo;
+using StarryEyes.Globalization;
+using StarryEyes.Globalization.Models;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Receiving.Receivers;
 using StarryEyes.Nightmare.Windows;
@@ -32,12 +34,11 @@ namespace StarryEyes.Models.Receiving.Managers
             {
                 MainWindowModel.ShowTaskDialog(new TaskDialogOptions
                 {
-                    Title = "リスト受信エラー",
+                    Title = ReceivingResources.MsgListReceiveErrorTitle,
                     MainIcon = VistaTaskDialogIcon.Error,
-                    MainInstruction = "リスト受信を開始できません。",
-                    Content = "リスト " + info + " を受信するアカウントを特定できませんでした。",
-                    ExpandedInfo = "自分以外が作成したリストを受信する際は、そのリストをどのアカウントで受信するかを明示的に記述しなければなりません。" + Environment.NewLine +
-                                   "例: receiver/user/listname",
+                    MainInstruction = ReceivingResources.MsgListReceiveErrorInst,
+                    Content = ReceivingResources.MsgListReceiveErrorContentFormat.SafeFormat(info),
+                    ExpandedInfo = ReceivingResources.MsgListReceiveErrorExInfo,
                     ExpandedByDefault = true,
                     CommonButtons = TaskDialogCommonButtons.Close,
                 });
@@ -119,12 +120,11 @@ namespace StarryEyes.Models.Receiving.Managers
             {
                 MainWindowModel.ShowTaskDialog(new TaskDialogOptions
                 {
-                    Title = "リスト受信エラー",
+                    Title = ReceivingResources.MsgListReceiveErrorTitle,
                     MainIcon = VistaTaskDialogIcon.Error,
-                    MainInstruction = "リスト受信を開始できません。",
-                    Content = "リスト " + info + " を受信するアカウントを特定できませんでした。",
-                    ExpandedInfo = "自分以外が作成したリストを受信する際は、そのリストをどのアカウントで受信するかを明示的に記述しなければなりません。" + Environment.NewLine +
-                                   "例: receiver/user/listname",
+                    MainInstruction = ReceivingResources.MsgListReceiveErrorInst,
+                    Content = ReceivingResources.MsgListReceiveErrorContentFormat.SafeFormat(info),
+                    ExpandedInfo = ReceivingResources.MsgListReceiveErrorExInfo,
                     ExpandedByDefault = true,
                     CommonButtons = TaskDialogCommonButtons.Close,
                 });

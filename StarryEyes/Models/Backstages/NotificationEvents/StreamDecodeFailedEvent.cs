@@ -25,7 +25,7 @@ namespace StarryEyes.Models.Backstages.NotificationEvents
         {
             get
             {
-                return String.Format(BackstageResources.StreamDecodeFailedFormat, "@" + _screenName, _exception.Message);
+                return BackstageResources.StreamDecodeFailedFormat.SafeFormat("@" + _screenName, _exception.Message);
             }
         }
 

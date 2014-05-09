@@ -1,5 +1,4 @@
-﻿using System;
-using StarryEyes.Globalization;
+﻿using StarryEyes.Globalization;
 using StarryEyes.Models.Accounting;
 
 namespace StarryEyes.Models.Backstages.SystemEvents
@@ -24,8 +23,7 @@ namespace StarryEyes.Models.Backstages.SystemEvents
         {
             get
             {
-                return String.Format(
-                    BackstageResources.UserStreamDisconnectedFormat,
+                return BackstageResources.UserStreamDisconnectedFormat.SafeFormat(
                     "@" + this._account.UnreliableScreenName,
                     _reason);
             }

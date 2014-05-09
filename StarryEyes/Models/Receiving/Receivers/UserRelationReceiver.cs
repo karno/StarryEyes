@@ -4,6 +4,8 @@ using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Anomaly.Utils;
+using StarryEyes.Globalization;
+using StarryEyes.Globalization.Models;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Settings;
 
@@ -20,7 +22,7 @@ namespace StarryEyes.Models.Receiving.Receivers
 
         protected override string ReceiverName
         {
-            get { return "フォロー・フォロワー情報(@" + _account.UnreliableScreenName + ")"; }
+            get { return ReceivingResources.ReceiverRelationFormat.SafeFormat("@" + _account.UnreliableScreenName); }
         }
 
         protected override int IntervalSec

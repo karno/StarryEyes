@@ -26,7 +26,7 @@ namespace StarryEyes.Models.Backstages.NotificationEvents.PostEvents
         {
             get
             {
-                return String.Format(BackstageResources.PostLimitFormat,
+                return BackstageResources.PostLimitFormat.SafeFormat(
                     "@" + _account.UnreliableScreenName,
                     _releaseTime.ToString("HH\\:mm\\:ss"));
             }

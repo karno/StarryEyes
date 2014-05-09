@@ -21,7 +21,7 @@ namespace StarryEyes.Models.Backstages.SystemEvents
 
         public override string Detail
         {
-            get { return String.Format(BackstageResources.QueryCorruptedFormat, _tabName, _ex.Message); }
+            get { return BackstageResources.QueryCorruptedFormat.SafeFormat(_tabName, _ex.Message); }
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿
-using System;
 using StarryEyes.Globalization;
 
 namespace StarryEyes.Models.Backstages.SystemEvents
@@ -20,7 +19,7 @@ namespace StarryEyes.Models.Backstages.SystemEvents
 
         public override string Detail
         {
-            get { return String.Format(BackstageResources.ProfileNotFoundFormat, _profile); }
+            get { return BackstageResources.ProfileNotFoundFormat.SafeFormat(_profile); }
         }
     }
 }

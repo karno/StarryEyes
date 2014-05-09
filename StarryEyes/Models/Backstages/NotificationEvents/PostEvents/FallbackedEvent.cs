@@ -1,5 +1,4 @@
-﻿using System;
-using System.Windows.Media;
+﻿using System.Windows.Media;
 using StarryEyes.Globalization;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Views;
@@ -35,10 +34,9 @@ namespace StarryEyes.Models.Backstages.NotificationEvents.PostEvents
         {
             get
             {
-                return String.Format(
-                    BackstageResources.FallbackFormat,
-                    "@" + this._account.UnreliableScreenName,
-                    "@" + this._fallbackAccount.UnreliableScreenName);
+                return BackstageResources.FallbackFormat.SafeFormat(
+                        "@" + this._account.UnreliableScreenName,
+                        "@" + this._fallbackAccount.UnreliableScreenName);
             }
         }
 

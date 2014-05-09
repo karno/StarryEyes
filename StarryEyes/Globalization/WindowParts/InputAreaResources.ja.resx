@@ -126,7 +126,7 @@
   <data name="AccountSelectorNotSelected" xml:space="preserve">
     <value>アカウントは選択されていません。</value>
   </data>
-  <data name="AccountSelectorSelected" xml:space="preserve">
+  <data name="AccountSelectorSelectedFormat" xml:space="preserve">
     <value>{0} が選択されています。</value>
   </data>
   <data name="AmendingPreviousOne" xml:space="preserve">
@@ -180,7 +180,7 @@
   <data name="MsgAmendExInfo" xml:space="preserve">
     <value>削除されるツイート: </value>
   </data>
-  <data name="MsgAmendExInfoMultiple" xml:space="preserve">
+  <data name="MsgAmendExInfoMultipleFormat" xml:space="preserve">
     <value>({0} 件のツイートが同時に削除されます)</value>
   </data>
   <data name="MsgAmendInst" xml:space="preserve">
@@ -221,7 +221,7 @@
   <data name="MsgThirdReplyWarnTitle" xml:space="preserve">
     <value>誤爆リプライ警告</value>
   </data>
-  <data name="MsgTweetFailedContent" xml:space="preserve">
+  <data name="MsgTweetFailedContentFormat" xml:space="preserve">
     <value>エラー: {0}
 もう一度投稿しますか？</value>
   </data>

@@ -2,6 +2,8 @@
 using System.Linq;
 using System.Threading.Tasks;
 using StarryEyes.Anomaly.TwitterApi.Rest;
+using StarryEyes.Globalization;
+using StarryEyes.Globalization.Models;
 using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Models.Receiving.Handling;
 using StarryEyes.Settings;
@@ -21,7 +23,7 @@ namespace StarryEyes.Models.Receiving.Receivers
 
         protected override string ReceiverName
         {
-            get { return "検索タイムライン(" + _query + ")"; }
+            get { return ReceivingResources.ReceiverSearchFormat.SafeFormat(_query); }
         }
 
         protected override int IntervalSec
@@ -34,7 +36,8 @@ namespace StarryEyes.Models.Receiving.Receivers
             var account = Setting.Accounts.GetRandomOne();
             if (account == null)
             {
-                BackstageModel.RegisterEvent(new OperationFailedEvent("アカウントが登録されていないため、検索タイムラインを受信できませんでした。", null));
+                BackstageModel.RegisterEvent(new OperationFailedEvent(
+                    ReceivingResources.AccountIsNotRegisteredForSearch, null));
                 return;
             }
             (await account.SearchAsync(this._query))

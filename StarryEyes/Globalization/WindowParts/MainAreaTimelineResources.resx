@@ -358,7 +358,7 @@ Selected accounts are memorized for each tabs.</value>
   <data name="MsgDeleteFooter" xml:space="preserve">
     <value>Amend last one tweet is available on post box.</value>
   </data>
-  <data name="MsgDeleteFooterWithKey" xml:space="preserve">
+  <data name="MsgDeleteFooterWithKeyFormat" xml:space="preserve">
     <value>Amend last one tweet is available on post box with {0} key.</value>
   </data>
   <data name="MsgDeleteInst" xml:space="preserve">
@@ -370,7 +370,7 @@ Selected accounts are memorized for each tabs.</value>
   <data name="MsgMuteClientContent" xml:space="preserve">
     <value>All tweets from this client are remove from all tabs.</value>
   </data>
-  <data name="MsgMuteClientInst" xml:space="preserve">
+  <data name="MsgMuteClientInstFormat" xml:space="preserve">
     <value>Are you sure you want to mute client {0} ?</value>
   </data>
   <data name="MsgMuteClientTitle" xml:space="preserve">
@@ -385,7 +385,7 @@ Selected accounts are memorized for each tabs.</value>
   <data name="MsgMuteKeywordContent" xml:space="preserve">
     <value>All tweets that contains keyword are removed from all tabs.</value>
   </data>
-  <data name="MsgMuteKeywordInst" xml:space="preserve">
+  <data name="MsgMuteKeywordInstFormat" xml:space="preserve">
     <value>Are you sure you want to mute keyword {0} ?</value>
   </data>
   <data name="MsgMuteKeywordSelectContent" xml:space="preserve">
@@ -400,7 +400,7 @@ Selected accounts are memorized for each tabs.</value>
   <data name="MsgMuteUserContent" xml:space="preserve">
     <value>All tweets from this user are removed from all tabs.</value>
   </data>
-  <data name="MsgMuteUserInst" xml:space="preserve">
+  <data name="MsgMuteUserInstFormat" xml:space="preserve">
     <value>Are you sure you want to mute user {0} ?</value>
   </data>
   <data name="MsgMuteUserTitle" xml:space="preserve">
@@ -412,7 +412,7 @@ Selected accounts are memorized for each tabs.</value>
   <data name="MsgReportAsSpamContent" xml:space="preserve">
     <value>Block from all accounts, and report spam from one account.</value>
   </data>
-  <data name="MsgReportAsSpamInst" xml:space="preserve">
+  <data name="MsgReportAsSpamInstFormat" xml:space="preserve">
     <value>Report {0} as spam?</value>
   </data>
   <data name="MsgReportAsSpamTitle" xml:space="preserve">

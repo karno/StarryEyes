@@ -1,6 +1,8 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using StarryEyes.Anomaly.TwitterApi.Rest;
+using StarryEyes.Globalization;
+using StarryEyes.Globalization.Models;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Models.Receiving.Handling;
@@ -26,10 +28,7 @@ namespace StarryEyes.Models.Receiving.Receivers
 
         protected override string ReceiverName
         {
-            get
-            {
-                return "リストタイムライン(" + this._listInfo + ")";
-            }
+            get { return ReceivingResources.ReceiverListTimelineFormat.SafeFormat(_listInfo); }
         }
 
         protected override int IntervalSec
@@ -43,7 +42,7 @@ namespace StarryEyes.Models.Receiving.Receivers
             if (authInfo == null)
             {
                 BackstageModel.RegisterEvent(new OperationFailedEvent(
-                    "アカウントが登録されていないため、リストタイムラインを受信できませんでした。", null));
+                    ReceivingResources.AccountIsNotRegisteredForList, null));
                 return;
             }
 

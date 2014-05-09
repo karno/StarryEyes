@@ -90,9 +90,9 @@ namespace StarryEyes.Globalization.WindowParts {
         /// <summary>
         ///   selected: {0} に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        public static string AccountSelectorSelected {
+        public static string AccountSelectorSelectedFormat {
             get {
-                return ResourceManager.GetString("AccountSelectorSelected", resourceCulture);
+                return ResourceManager.GetString("AccountSelectorSelectedFormat", resourceCulture);
             }
         }
         
@@ -252,9 +252,9 @@ namespace StarryEyes.Globalization.WindowParts {
         /// <summary>
         ///   ({0} tweets will be deleted) に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        public static string MsgAmendExInfoMultiple {
+        public static string MsgAmendExInfoMultipleFormat {
             get {
-                return ResourceManager.GetString("MsgAmendExInfoMultiple", resourceCulture);
+                return ResourceManager.GetString("MsgAmendExInfoMultipleFormat", resourceCulture);
             }
         }
         
@@ -372,9 +372,9 @@ namespace StarryEyes.Globalization.WindowParts {
         ///   Error: {0}
         ///Are you want to retry? に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        public static string MsgTweetFailedContent {
+        public static string MsgTweetFailedContentFormat {
             get {
-                return ResourceManager.GetString("MsgTweetFailedContent", resourceCulture);
+                return ResourceManager.GetString("MsgTweetFailedContentFormat", resourceCulture);
             }
         }
         

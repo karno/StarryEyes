@@ -108,9 +108,9 @@ namespace StarryEyes.Globalization.WindowParts {
         /// <summary>
         ///   Amend last one tweet is available on post box with {0} key. に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        public static string MsgDeleteFooterWithKey {
+        public static string MsgDeleteFooterWithKeyFormat {
             get {
-                return ResourceManager.GetString("MsgDeleteFooterWithKey", resourceCulture);
+                return ResourceManager.GetString("MsgDeleteFooterWithKeyFormat", resourceCulture);
             }
         }
         
@@ -162,9 +162,9 @@ namespace StarryEyes.Globalization.WindowParts {
         /// <summary>
         ///   Are you sure you want to mute client {0} ? に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        public static string MsgMuteClientInst {
+        public static string MsgMuteClientInstFormat {
             get {
-                return ResourceManager.GetString("MsgMuteClientInst", resourceCulture);
+                return ResourceManager.GetString("MsgMuteClientInstFormat", resourceCulture);
             }
         }
         
@@ -207,9 +207,9 @@ namespace StarryEyes.Globalization.WindowParts {
         /// <summary>
         ///   Are you sure you want to mute keyword {0} ? に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        public static string MsgMuteKeywordInst {
+        public static string MsgMuteKeywordInstFormat {
             get {
-                return ResourceManager.GetString("MsgMuteKeywordInst", resourceCulture);
+                return ResourceManager.GetString("MsgMuteKeywordInstFormat", resourceCulture);
             }
         }
         
@@ -252,9 +252,9 @@ namespace StarryEyes.Globalization.WindowParts {
         /// <summary>
         ///   Are you sure you want to mute user {0} ? に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        public static string MsgMuteUserInst {
+        public static string MsgMuteUserInstFormat {
             get {
-                return ResourceManager.GetString("MsgMuteUserInst", resourceCulture);
+                return ResourceManager.GetString("MsgMuteUserInstFormat", resourceCulture);
             }
         }
         
@@ -370,9 +370,9 @@ namespace StarryEyes.Globalization.WindowParts {
         /// <summary>
         ///   Report {0} as spam? に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        public static string MsgReportAsSpamInst {
+        public static string MsgReportAsSpamInstFormat {
             get {
-                return ResourceManager.GetString("MsgReportAsSpamInst", resourceCulture);
+                return ResourceManager.GetString("MsgReportAsSpamInstFormat", resourceCulture);
             }
         }
         

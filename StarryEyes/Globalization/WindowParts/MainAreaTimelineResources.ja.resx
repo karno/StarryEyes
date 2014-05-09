@@ -358,7 +358,7 @@
   <data name="MsgDeleteFooter" xml:space="preserve">
     <value>直近1件のツイートの訂正は投稿欄から行えます。</value>
   </data>
-  <data name="MsgDeleteFooterWithKey" xml:space="preserve">
+  <data name="MsgDeleteFooterWithKeyFormat" xml:space="preserve">
     <value>直近1件のツイートの訂正は、投稿欄で {0} キーを押すと行えます。</value>
   </data>
   <data name="MsgDeleteInst" xml:space="preserve">
@@ -370,7 +370,7 @@
   <data name="MsgMuteClientContent" xml:space="preserve">
     <value>このクライアントからのツイートはすべてのタブで表示されなくなります。</value>
   </data>
-  <data name="MsgMuteClientInst" xml:space="preserve">
+  <data name="MsgMuteClientInstFormat" xml:space="preserve">
     <value>クライアント {0} をミュートしますか？</value>
   </data>
   <data name="MsgMuteClientTitle" xml:space="preserve">
@@ -385,7 +385,7 @@
   <data name="MsgMuteKeywordContent" xml:space="preserve">
     <value>このキーワードを含むツイートはすべてのタブで表示されなくなります。</value>
   </data>
-  <data name="MsgMuteKeywordInst" xml:space="preserve">
+  <data name="MsgMuteKeywordInstFormat" xml:space="preserve">
     <value>キーワード {0} をミュートしますか？</value>
   </data>
   <data name="MsgMuteKeywordSelectContent" xml:space="preserve">
@@ -400,7 +400,7 @@
   <data name="MsgMuteUserContent" xml:space="preserve">
     <value>このユーザーのツイートはすべてのタブで表示されなくなります。</value>
   </data>
-  <data name="MsgMuteUserInst" xml:space="preserve">
+  <data name="MsgMuteUserInstFormat" xml:space="preserve">
     <value>ユーザー {0} をミュートしますか？</value>
   </data>
   <data name="MsgMuteUserTitle" xml:space="preserve">
@@ -412,7 +412,7 @@
   <data name="MsgReportAsSpamContent" xml:space="preserve">
     <value>すべてのアカウントからブロックし、代表のアカウントからスパム報告します。</value>
   </data>
-  <data name="MsgReportAsSpamInst" xml:space="preserve">
+  <data name="MsgReportAsSpamInstFormat" xml:space="preserve">
     <value>ユーザー {0} をスパムとして報告しますか？</value>
   </data>
   <data name="MsgReportAsSpamTitle" xml:space="preserve">

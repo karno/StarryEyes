@@ -13,6 +13,7 @@ using Livet;
 using Livet.EventListeners;
 using Livet.Messaging.IO;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Globalization;
 using StarryEyes.Globalization.WindowParts;
 using StarryEyes.Helpers;
 using StarryEyes.Models;
@@ -832,7 +833,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                 var dual = InputData.AmendTargetTweets.Count();
                 if (dual > 2)
                 {
-                    removal += " " + String.Format(InputAreaResources.MsgAmendExInfoMultiple, dual);
+                    removal += " " + InputAreaResources.MsgAmendExInfoMultipleFormat.SafeFormat(dual);
                 }
                 // amend mode
                 var amend = _parent.Messenger.GetResponse(
@@ -921,7 +922,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                                 Title = InputAreaResources.MsgTweetFailedTitle,
                                 MainIcon = VistaTaskDialogIcon.Error,
                                 MainInstruction = InputAreaResources.MsgTweetFailedInst,
-                                Content = String.Format(InputAreaResources.MsgTweetFailedContent, message),
+                                Content = InputAreaResources.MsgTweetFailedContentFormat.SafeFormat(message),
                                 ExpandedInfo = ed,
                                 FooterText = InputAreaResources.MsgTweetFailedFooter,
                                 FooterIcon = VistaTaskDialogIcon.Information,

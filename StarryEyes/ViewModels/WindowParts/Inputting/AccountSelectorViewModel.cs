@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using JetBrains.Annotations;
 using Livet;
+using StarryEyes.Globalization;
 using StarryEyes.Globalization.WindowParts;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Inputting;
@@ -95,7 +96,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             {
                 return this._accounts.Count == 0
                     ? InputAreaResources.AccountSelectorNotSelected
-                    : String.Format(InputAreaResources.AccountSelectorSelected,
+                    : InputAreaResources.AccountSelectorSelectedFormat.SafeFormat(
                         this._accounts.Select(_ => _.ScreenName).JoinString(", "));
             }
         }

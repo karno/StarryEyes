@@ -4,6 +4,8 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using StarryEyes.Globalization;
+using StarryEyes.Globalization.Models;
 using StarryEyes.Models.Backstages.NotificationEvents;
 
 namespace StarryEyes.Models.Receiving.Receivers
@@ -49,7 +51,7 @@ namespace StarryEyes.Models.Receiving.Receivers
             {
                 await Task.Run(async () =>
                 {
-                    using (MainWindowModel.SetState("受信中: " + ReceiverName))
+                    using (MainWindowModel.SetState(ReceivingResources.ReceivingFormat.SafeFormat(ReceiverName)))
                     {
                         await this.DoReceive();
                     }
@@ -57,7 +59,9 @@ namespace StarryEyes.Models.Receiving.Receivers
             }
             catch (Exception ex)
             {
-                BackstageModel.RegisterEvent(new OperationFailedEvent("受信に失敗しました:" + ReceiverName, ex));
+                BackstageModel.RegisterEvent(new OperationFailedEvent(
+                    ReceivingResources.ReceiveFailedFormat.SafeFormat(ReceiverName),
+                    ex));
             }
         }
 
