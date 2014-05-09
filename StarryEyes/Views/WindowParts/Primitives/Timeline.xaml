@@ -185,7 +185,7 @@
                                     </i:EventTrigger>
                                 </i:Interaction.Triggers>
                             </MenuItem>
-                            <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineQuote}">
+                            <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineQuote}" Visibility="{Binding IsDirectMessage, Converter={StaticResource BooleanToInvisibleConverter}}">
                                 <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineQuotePermalink}">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="Click">
@@ -209,7 +209,7 @@
                                 </i:Interaction.Triggers>
                             </MenuItem>
                             <Separator />
-                            <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineThisTweet}">
+                            <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineThisTweet}" Visibility="{Binding IsDirectMessage, Converter={StaticResource BooleanToInvisibleConverter}}">
                                 <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineThisTweetOpenConversation}">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="Click">
@@ -311,7 +311,7 @@
                                     </i:Interaction.Triggers>
                                 </MenuItem>
                             </MenuItem>
-                            <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineMute}">
+                            <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineMute}" Visibility="{Binding IsDirectMessage, Converter={StaticResource BooleanToInvisibleConverter}}">
                                 <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineMuteUser}">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="Click">
