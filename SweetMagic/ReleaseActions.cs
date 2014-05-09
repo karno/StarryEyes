@@ -179,16 +179,30 @@ namespace SweetMagic
             if (_path.EndsWith("/"))
             {
                 // directory
-                executor.NotifyProgress("removing directory: " + _path + " ...", false);
-                await Task.Run(() => Directory.Delete(
-                    Path.Combine(executor.BasePath, _path.Substring(0, _path.Length - 1)),
-                    true));
+                var target = Path.Combine(executor.BasePath, _path.Substring(0, _path.Length - 1));
+                if (Directory.Exists(target))
+                {
+                    executor.NotifyProgress("removing directory: " + _path + " ...", false);
+                    await Task.Run(() => Directory.Delete(target, true));
+                }
+                else
+                {
+                    executor.NotifyProgress("directory " + _path + " is not existed. nothing to do.");
+                }
             }
             else
             {
                 // file
-                executor.NotifyProgress("removing file: " + _path + " ...", false);
-                await Task.Run(() => File.Delete(Path.Combine(executor.BasePath, _path)));
+                var target = Path.Combine(executor.BasePath, _path);
+                if (File.Exists(target))
+                {
+                    executor.NotifyProgress("removing file: " + _path + " ...", false);
+                    await Task.Run(() => File.Delete(target));
+                }
+                else
+                {
+                    executor.NotifyProgress("file " + _path + " is not existed. nothing to do.");
+                }
             }
             executor.NotifyProgress("ok.");
         }
