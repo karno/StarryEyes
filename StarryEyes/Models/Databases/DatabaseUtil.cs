@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using StarryEyes.Casket;
-using StarryEyes.Models.Backstages.NotificationEvents;
 
 namespace StarryEyes.Models.Databases
 {
@@ -79,14 +78,14 @@ namespace StarryEyes.Models.Databases
                 }
                 catch (SQLiteException sqex)
                 {
-                    if (sqex.ResultCode != SQLiteErrorCode.Locked) // database is locked
+                    if (sqex.ResultCode != SQLiteErrorCode.Locked || count > 100)
                     {
                         throw;
                     }
                 }
                 catch (SqliteCrudException cex)
                 {
-                    if (!cex.IsDatabaseLockedError) // database is locked
+                    if (!cex.IsDatabaseLockedError || count > 100)
                     {
                         throw;
                     }
@@ -94,12 +93,6 @@ namespace StarryEyes.Models.Databases
                 // if database is locked, wait shortly and retry.
                 Thread.Sleep(waitMillisec);
                 count++;
-                if (count >= 100)
-                {
-                    count = 0;
-                    BackstageModel.RegisterEvent(new InternalErrorEvent(
-                        "何らかの原因で、データベースがロックされたまま開放されません。Krileをリスタートしてください。"));
-                }
             }
         }
     }
