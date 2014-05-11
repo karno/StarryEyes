@@ -118,37 +118,38 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="DatabaseImageIsMalformed" xml:space="preserve">
-    <value>SQLite database is corrupted.
-Restart krile to rebuild database.
+    <value>SQLite データベースが破損しています。
+このまま Krile をリスタートすると、データベースの再構築を行うことができます。
 
-If rebuild is not suggested after restarting, please enter maintenance mode manually or delete database via explorer.
-Refer official web site for how to enter mantenance mode or finding location of database files.</value>
+リスタートしてもデータベースのクリアが提案されない場合は、メンテナンスモードでのKrileの起動を試みるか、手動でデータベースを削除してください。
+メンテナンスモードでの起動方法やデータベースファイルの場所については、公式サイトのFAQを参照してください。</value>
   </data>
   <data name="DatabaseIsLocked" xml:space="preserve">
-    <value>SQLite file is locked by other processes.
-Could not access to krile.db, krile.db-wal, krile.db-shm.
+    <value>SQLite ファイルが別のプロセスにロックされています。
+krile.db及びkrile.db-wal, krile.db-shmファイルのいずれかにアクセスできません。
 
-This probrem was occured by below reason:
-* Synchronizing file by Cloud Storage Deamons
-* Scanning file by Anti-Virus Softwares
-* Sharing file on Network Drive</value>
+この問題は、以下のような原因によって起こることがあります。
+・クラウド ストレージ デーモンによるファイルの同期
+・ウイルス対策ソフトによるファイルの検査
+・ネットワーク ドライブにおけるファイル共有によるファイル ロック</value>
   </data>
   <data name="EssentialFileIsMissing" xml:space="preserve">
-    <value>Essential library is missing or load failed.
-Suggested reason is below:
+    <value>必須ライブラリの読み込みに失敗しました。
+このエラーの原因としては、以下の問題が考えられます。
 
-* File is not correctly located
-  When automatic update is failed, sometimes files are not located or update, or broken.
-  Please re-installing Krile.
+・Krileのファイルが正しく配置されていない
+　自動アップデート等で失敗すると発生することがあります。
+　Webから最新のKrileをダウンロードし、上書きしてみてください。
 
-* Execute Krile on unsupported platform
-  Windows Vista or later is supported.
-  Ensure not running on virtual machines or emulators.
+・サポートされていないプラットフォームで実行しようとしている
+　サポートされているプラットフォームは、Windows Vista以降です。
+　64bit環境でも問題なく動作することを確認しています。
+　バーチャルマシンなどでの環境では正しく動作しないことがあります。
 
-* Authority is required
-  Please start krile with administrator authority.
+・Krileの起動に必要な権限が不足している
+　Krileを管理者権限で起動し、問題が改善されるか確認してください。
 
-* .NET Framework is corrupted
-  Please re-install .NET Framework 4.5.</value>
+・.NET Framework 4.5 のインストールが正しく行われていない
+　.NET Framework 4.5 の再インストールを試してみてください。</value>
   </data>
 </root>

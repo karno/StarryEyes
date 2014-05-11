@@ -81,18 +81,26 @@
       <DependentUpon>SelfAnalyzedForm.cs</DependentUpon>
     </Compile>
     <Compile Include="SelfAnalyzer.cs" />
+    <EmbeddedResource Include="MainForm.ja.resx">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
+      <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="Properties\Resources.ja.resx" />
+    <EmbeddedResource Include="SelfAnalyzedForm.ja.resx">
+      <DependentUpon>SelfAnalyzedForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="SelfAnalyzedForm.resx">
       <DependentUpon>SelfAnalyzedForm.cs</DependentUpon>
     </EmbeddedResource>

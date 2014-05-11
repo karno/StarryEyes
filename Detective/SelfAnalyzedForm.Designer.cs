@@ -28,14 +28,15 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SelfAnalyzedForm));
             this.mainPanel = new System.Windows.Forms.Panel();
+            this.label3 = new System.Windows.Forms.Label();
             this.restartButton = new System.Windows.Forms.Button();
             this.exitButton = new System.Windows.Forms.Button();
             this.panel2 = new System.Windows.Forms.Panel();
             this.errorText = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
             this.mainPanel.SuspendLayout();
             this.panel2.SuspendLayout();
             this.SuspendLayout();
@@ -50,111 +51,66 @@
             this.mainPanel.Controls.Add(this.panel2);
             this.mainPanel.Controls.Add(this.label2);
             this.mainPanel.Controls.Add(this.label1);
-            this.mainPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.mainPanel.Font = new System.Drawing.Font("Meiryo UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.mainPanel.Location = new System.Drawing.Point(0, 0);
+            resources.ApplyResources(this.mainPanel, "mainPanel");
             this.mainPanel.Name = "mainPanel";
-            this.mainPanel.Size = new System.Drawing.Size(580, 300);
-            this.mainPanel.TabIndex = 1;
+            // 
+            // label3
+            // 
+            resources.ApplyResources(this.label3, "label3");
+            this.label3.ForeColor = System.Drawing.Color.White;
+            this.label3.Name = "label3";
             // 
             // restartButton
             // 
-            this.restartButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.restartButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.restartButton.Font = new System.Drawing.Font("Meiryo UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            resources.ApplyResources(this.restartButton, "restartButton");
             this.restartButton.ForeColor = System.Drawing.Color.White;
-            this.restartButton.Location = new System.Drawing.Point(281, 255);
             this.restartButton.Name = "restartButton";
-            this.restartButton.Size = new System.Drawing.Size(140, 30);
-            this.restartButton.TabIndex = 2;
-            this.restartButton.Text = "Krileをリスタート";
             this.restartButton.UseVisualStyleBackColor = true;
             this.restartButton.Click += new System.EventHandler(this.restartButton_Click);
             // 
             // exitButton
             // 
-            this.exitButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            resources.ApplyResources(this.exitButton, "exitButton");
             this.exitButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.exitButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.exitButton.Font = new System.Drawing.Font("Meiryo UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.exitButton.ForeColor = System.Drawing.Color.White;
-            this.exitButton.Location = new System.Drawing.Point(427, 255);
             this.exitButton.Name = "exitButton";
-            this.exitButton.Size = new System.Drawing.Size(140, 30);
-            this.exitButton.TabIndex = 3;
-            this.exitButton.Text = "終了";
             this.exitButton.UseVisualStyleBackColor = true;
             this.exitButton.Click += new System.EventHandler(this.exitButton_Click);
             // 
             // panel2
             // 
-            this.panel2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            resources.ApplyResources(this.panel2, "panel2");
             this.panel2.BackColor = System.Drawing.SystemColors.Control;
             this.panel2.Controls.Add(this.errorText);
-            this.panel2.Location = new System.Drawing.Point(-1, 81);
             this.panel2.Name = "panel2";
-            this.panel2.Padding = new System.Windows.Forms.Padding(16, 0, 0, 0);
-            this.panel2.Size = new System.Drawing.Size(580, 160);
-            this.panel2.TabIndex = 3;
             // 
             // errorText
             // 
             this.errorText.BackColor = System.Drawing.SystemColors.Control;
             this.errorText.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.errorText.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.errorText.Location = new System.Drawing.Point(16, 0);
-            this.errorText.Multiline = true;
+            resources.ApplyResources(this.errorText, "errorText");
             this.errorText.Name = "errorText";
             this.errorText.ReadOnly = true;
-            this.errorText.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.errorText.Size = new System.Drawing.Size(564, 160);
-            this.errorText.TabIndex = 0;
             // 
             // label2
             // 
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Meiryo UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            resources.ApplyResources(this.label2, "label2");
             this.label2.ForeColor = System.Drawing.Color.White;
-            this.label2.Location = new System.Drawing.Point(14, 49);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(367, 17);
-            this.label2.TabIndex = 1;
-            this.label2.Text = "エラー内容の自己診断結果を以下に表示しています。ご確認ください。";
             // 
             // label1
             // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Meiryo UI", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            resources.ApplyResources(this.label1, "label1");
             this.label1.ForeColor = System.Drawing.Color.White;
-            this.label1.Location = new System.Drawing.Point(10, 13);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(358, 26);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "Krileの実行中にエラーが発生しました。";
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("Meiryo UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.label3.ForeColor = System.Drawing.Color.White;
-            this.label3.Location = new System.Drawing.Point(14, 261);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(243, 17);
-            this.label3.TabIndex = 4;
-            this.label3.Text = "改善されない場合は作者までご連絡ください。";
             // 
             // SelfAnalyzedForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
+            resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(580, 300);
             this.Controls.Add(this.mainPanel);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "SelfAnalyzedForm";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "SelfAnalyzedForm";
             this.mainPanel.ResumeLayout(false);
             this.mainPanel.PerformLayout();
             this.panel2.ResumeLayout(false);

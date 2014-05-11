@@ -117,38 +117,23 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="DatabaseImageIsMalformed" xml:space="preserve">
-    <value>SQLite database is corrupted.
-Restart krile to rebuild database.
-
-If rebuild is not suggested after restarting, please enter maintenance mode manually or delete database via explorer.
-Refer official web site for how to enter mantenance mode or finding location of database files.</value>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="label3.Size" type="System.Drawing.Size, System.Drawing">
+    <value>234, 17</value>
   </data>
-  <data name="DatabaseIsLocked" xml:space="preserve">
-    <value>SQLite file is locked by other processes.
-Could not access to krile.db, krile.db-wal, krile.db-shm.
-
-This probrem was occured by below reason:
-* Synchronizing file by Cloud Storage Deamons
-* Scanning file by Anti-Virus Softwares
-* Sharing file on Network Drive</value>
+  <data name="label3.Text" xml:space="preserve">
+    <value>改善されない場合は作者までご連絡ください</value>
   </data>
-  <data name="EssentialFileIsMissing" xml:space="preserve">
-    <value>Essential library is missing or load failed.
-Suggested reason is below:
-
-* File is not correctly located
-  When automatic update is failed, sometimes files are not located or update, or broken.
-  Please re-installing Krile.
-
-* Execute Krile on unsupported platform
-  Windows Vista or later is supported.
-  Ensure not running on virtual machines or emulators.
-
-* Authority is required
-  Please start krile with administrator authority.
-
-* .NET Framework is corrupted
-  Please re-install .NET Framework 4.5.</value>
+  <data name="label2.Size" type="System.Drawing.Size, System.Drawing">
+    <value>369, 17</value>
+  </data>
+  <data name="label2.Text" xml:space="preserve">
+    <value>自己診断結果を以下に表示しています。必要な対策を施してください。</value>
+  </data>
+  <data name="label1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>368, 26</value>
+  </data>
+  <data name="label1.Text" xml:space="preserve">
+    <value>Krileはエラーにより強制終了されました。</value>
   </data>
 </root>

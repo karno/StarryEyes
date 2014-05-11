@@ -117,38 +117,35 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="DatabaseImageIsMalformed" xml:space="preserve">
-    <value>SQLite database is corrupted.
-Restart krile to rebuild database.
-
-If rebuild is not suggested after restarting, please enter maintenance mode manually or delete database via explorer.
-Refer official web site for how to enter mantenance mode or finding location of database files.</value>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="mainInstructionLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>368, 26</value>
   </data>
-  <data name="DatabaseIsLocked" xml:space="preserve">
-    <value>SQLite file is locked by other processes.
-Could not access to krile.db, krile.db-wal, krile.db-shm.
-
-This probrem was occured by below reason:
-* Synchronizing file by Cloud Storage Deamons
-* Scanning file by Anti-Virus Softwares
-* Sharing file on Network Drive</value>
+  <data name="mainInstructionLabel.Text" xml:space="preserve">
+    <value>Krileはエラーにより強制終了されました。</value>
   </data>
-  <data name="EssentialFileIsMissing" xml:space="preserve">
-    <value>Essential library is missing or load failed.
-Suggested reason is below:
-
-* File is not correctly located
-  When automatic update is failed, sometimes files are not located or update, or broken.
-  Please re-installing Krile.
-
-* Execute Krile on unsupported platform
-  Windows Vista or later is supported.
-  Ensure not running on virtual machines or emulators.
-
-* Authority is required
-  Please start krile with administrator authority.
-
-* .NET Framework is corrupted
-  Please re-install .NET Framework 4.5.</value>
+  <data name="isSendFeedback.Size" type="System.Drawing.Size, System.Drawing">
+    <value>171, 19</value>
+  </data>
+  <data name="isSendFeedback.Text" xml:space="preserve">
+    <value>開発者にエラー情報を送信する</value>
+  </data>
+  <data name="restartButton.Text" xml:space="preserve">
+    <value>Krileをリスタート</value>
+  </data>
+  <data name="exitButton.Text" xml:space="preserve">
+    <value>終了</value>
+  </data>
+  <data name="subInstructionLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>471, 17</value>
+  </data>
+  <data name="subInstructionLabel.Text" xml:space="preserve">
+    <value>Krileは以下のエラーを検知し、強制終了しました。ご迷惑をおかけし、申し訳ございません。</value>
+  </data>
+  <data name="feedbackLabel.Text" xml:space="preserve">
+    <value>エラー情報を送信しています。しばらくお待ちください...</value>
+  </data>
+  <data name="$this.Text" xml:space="preserve">
+    <value>Krile エラー レポート</value>
   </data>
 </root>
