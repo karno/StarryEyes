@@ -15,10 +15,11 @@ namespace StarryEyes.Casket
             get
             {
                 return ErrorCode == SQLiteErrorCode.Locked ||
+                       ErrorCode == SQLiteErrorCode.Busy ||
                        InnerException.Message
-                                     .IndexOf("database is locked", StringComparison.CurrentCultureIgnoreCase) >= 0 ||
+                           .IndexOf("database is locked", StringComparison.CurrentCultureIgnoreCase) >= 0 ||
                        InnerException.Message
-                                     .IndexOf("locking protocol", StringComparison.CurrentCultureIgnoreCase) >= 0;
+                           .IndexOf("locking protocol", StringComparison.CurrentCultureIgnoreCase) >= 0;
             }
         }
 
