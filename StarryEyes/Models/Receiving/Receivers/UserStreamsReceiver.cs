@@ -115,7 +115,8 @@ namespace StarryEyes.Models.Receiving.Receivers
                 this.Disconnect();
                 return;
             }
-            this._stateUpdater.UpdateState(_account.UnreliableScreenName + ReceivingResources.UserStreamReconnecting);
+            this._stateUpdater.UpdateState("@" + _account.UnreliableScreenName + ": " +
+                                           ReceivingResources.UserStreamReconnecting);
             this.CleanupConnection();
             Task.Run(() => this._currentConnection.Add(this.ConnectCore()));
         }
