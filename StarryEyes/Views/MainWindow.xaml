@@ -19,7 +19,6 @@
                       Height="750"
                       Background="{DynamicResource BaseColorBackgroundBrush}"
                       Closing="OnClosing"
-                      FontFamily="Yu Gothic"
                       GlowBrush="{DynamicResource AccentColorBrush}"
                       IconEdgeMode="Unspecified"
                       InputMethod.IsInputMethodEnabled="False"
