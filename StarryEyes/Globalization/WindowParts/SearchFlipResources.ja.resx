@@ -1,0 +1,240 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="InfoDeleteQueryFailed" xml:space="preserve">
+    <value>保存済みの検索クエリを削除できませんでした。</value>
+  </data>
+  <data name="InfoSavedQueriesReceiveFailedFormat" xml:space="preserve">
+    <value>保存済み検索クエリを受信できませんでした(@{0})</value>
+  </data>
+  <data name="MsgErrorBlockInst" xml:space="preserve">
+    <value>ブロックできませんでした。</value>
+  </data>
+  <data name="MsgErrorBlockTitle" xml:space="preserve">
+    <value>ブロック エラー</value>
+  </data>
+  <data name="MsgErrorFollowInst" xml:space="preserve">
+    <value>フォローできませんでした。</value>
+  </data>
+  <data name="MsgErrorFollowTitle" xml:space="preserve">
+    <value>フォロー エラー</value>
+  </data>
+  <data name="MsgErrorReportSpamInst" xml:space="preserve">
+    <value>スパム報告できませんでした。</value>
+  </data>
+  <data name="MsgErrorReportSpamTitle" xml:space="preserve">
+    <value>スパム報告エラー</value>
+  </data>
+  <data name="MsgErrorSuppressRetweetsInst" xml:space="preserve">
+    <value>リツイートを非表示にできませんでした。</value>
+  </data>
+  <data name="MsgErrorSuppressRetweetsTitle" xml:space="preserve">
+    <value>リツイート非表示エラー</value>
+  </data>
+  <data name="MsgErrorUnblockInst" xml:space="preserve">
+    <value>ブロックを解除できませんでした。</value>
+  </data>
+  <data name="MsgErrorUnblockTitle" xml:space="preserve">
+    <value>アンブロック エラー</value>
+  </data>
+  <data name="MsgErrorUnfollowInst" xml:space="preserve">
+    <value>フォローを解除できませんでした。</value>
+  </data>
+  <data name="MsgErrorUnfollowTitle" xml:space="preserve">
+    <value>フォロー解除 エラー</value>
+  </data>
+  <data name="MsgErrorUnsuppressRetweetsInst" xml:space="preserve">
+    <value>リツイート非表示を解除できませんでした。</value>
+  </data>
+  <data name="MsgErrorUnsuppressRetweetsTitle" xml:space="preserve">
+    <value>リツイート非表示解除エラー</value>
+  </data>
+  <data name="MsgUserInfoLoadErrorAccountIsNotExist" xml:space="preserve">
+    <value>アカウントが登録されていません。</value>
+  </data>
+  <data name="MsgUserInfoLoadErrorInst" xml:space="preserve">
+    <value>ユーザーの読み込みに失敗しました。</value>
+  </data>
+  <data name="MsgUserInfoLoadErrorTitle" xml:space="preserve">
+    <value>読み込みエラー</value>
+  </data>
+  <data name="SearchFlipDeleteSavedKeyword" xml:space="preserve">
+    <value>このアイテムを削除(_D)</value>
+  </data>
+  <data name="SearchFlipQueryCompiling" xml:space="preserve">
+    <value>コンパイルしています...</value>
+  </data>
+  <data name="SearchFlipQueryEmpty" xml:space="preserve">
+    <value>クエリの本文がありません。</value>
+  </data>
+  <data name="SearchFlipQueryHelp" xml:space="preserve">
+    <value>先頭に「?」を入力することでクエリを用いて検索できます。</value>
+  </data>
+  <data name="SearchFlipQueryInvalid" xml:space="preserve">
+    <value>クエリにエラーがあります: </value>
+  </data>
+  <data name="SearchFlipQueryValid" xml:space="preserve">
+    <value>クエリは正しく解釈されました。Enterキーを押すと検索が開始されます。</value>
+  </data>
+  <data name="SearchFlipSavedKeywordsFormat" xml:space="preserve">
+    <value>{0}が保存しているキーワード:</value>
+  </data>
+  <data name="SearchFlipSavedKeywordsUnavailable" xml:space="preserve">
+    <value>アクティブアカウントがひとつだけの場合、そのアカウントが保存している検索キーワードがここに表示されます。</value>
+  </data>
+  <data name="SearchFlipSearchBySavedKeywordFormat" xml:space="preserve">
+    <value>Twitterから {0} を検索します。</value>
+  </data>
+  <data name="SearchFlipSearchLocal" xml:space="preserve">
+    <value>すべてのローカルデータ</value>
+  </data>
+  <data name="SearchFlipSearchLocalDesc" xml:space="preserve">
+    <value>Krileに蓄積されているすべてのツイートから検索します。</value>
+  </data>
+  <data name="SearchFlipSearchScreenName" xml:space="preserve">
+    <value>ユーザー@ID</value>
+  </data>
+  <data name="SearchFlipSearchScreenNameDesc" xml:space="preserve">
+    <value>この@IDを持つユーザーを表示します。</value>
+  </data>
+  <data name="SearchFlipSearchTab" xml:space="preserve">
+    <value>選択中のタブ</value>
+  </data>
+  <data name="SearchFlipSearchTabDesc" xml:space="preserve">
+    <value>現在選択中のタブに表示されているツイートから検索します。</value>
+  </data>
+  <data name="SearchFlipSearchTwitter" xml:space="preserve">
+    <value>Twitter上のツイート</value>
+  </data>
+  <data name="SearchFlipSearchTwitterDesc" xml:space="preserve">
+    <value>Twitter APIを用いてツイートを検索します。</value>
+  </data>
+  <data name="SearchFlipSearchUser" xml:space="preserve">
+    <value>ユーザー名</value>
+  </data>
+  <data name="SearchFlipSearchUserDesc" xml:space="preserve">
+    <value>Twitter APIを用いてユーザーを検索します。</value>
+  </data>
+  <data name="UserInfoBlock" xml:space="preserve">
+    <value>ブロック(_B)</value>
+  </data>
+  <data name="UserInfoReportAsSpam" xml:space="preserve">
+    <value>スパムとして報告(_R)</value>
+  </data>
+</root>

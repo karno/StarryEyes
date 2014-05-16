@@ -7,9 +7,8 @@ using System.Threading.Tasks;
 using Livet;
 using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Anomaly.TwitterApi.Rest.Infrastructure;
-using StarryEyes.Models;
+using StarryEyes.Globalization.WindowParts;
 using StarryEyes.Models.Accounting;
-using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
 using StarryEyes.Views.Messaging;
@@ -83,13 +82,13 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 {
                     _parent.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
                     {
-                        Title = "読み込みエラー",
+                        Title = SearchFlipResources.MsgUserInfoLoadErrorTitle,
                         MainIcon = VistaTaskDialogIcon.Error,
-                        MainInstruction = "ユーザーの読み込みに失敗しました。",
-                        Content = "アカウントが登録されていません。",
+                        MainInstruction = SearchFlipResources.MsgUserInfoLoadErrorInst,
+                        Content = SearchFlipResources.MsgUserInfoLoadErrorAccountIsNotExist,
                         CommonButtons = TaskDialogCommonButtons.Close,
                     }));
-                    BackstageModel.RegisterEvent(new OperationFailedEvent("アカウントが登録されていません。", null));
+                    return;
                 }
                 var page = Interlocked.Increment(ref _currentPageCount);
                 var ids = _userIds.Skip(page * 100).Take(100).ToArray();
@@ -122,13 +121,12 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 {
                     _parent.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
                     {
-                        Title = "読み込みエラー",
+                        Title = SearchFlipResources.MsgUserInfoLoadErrorTitle,
                         MainIcon = VistaTaskDialogIcon.Error,
-                        MainInstruction = "ユーザーの読み込みに失敗しました。",
+                        MainInstruction = SearchFlipResources.MsgUserInfoLoadErrorInst,
                         Content = ex.Message,
                         CommonButtons = TaskDialogCommonButtons.Close,
                     }));
-                    BackstageModel.RegisterEvent(new OperationFailedEvent("ユーザーの読み込みに失敗しました", ex));
                 }
             });
         }
@@ -151,9 +149,9 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 this._parent.Parent.Messenger.Raise(
                     new TaskDialogMessage(new TaskDialogOptions
                     {
-                        Title = "ユーザー受信エラー",
+                        Title = SearchFlipResources.MsgUserInfoLoadErrorTitle,
                         MainIcon = VistaTaskDialogIcon.Error,
-                        MainInstruction = "ユーザー情報を受信できませんでした。",
+                        MainInstruction = SearchFlipResources.MsgUserInfoLoadErrorInst,
                         Content = ex.Message,
                         CommonButtons = TaskDialogCommonButtons.Close,
                     }));

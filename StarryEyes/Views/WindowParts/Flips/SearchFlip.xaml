@@ -7,6 +7,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:localize="clr-namespace:StarryEyes.Globalization.WindowParts"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:searchFlips="clr-namespace:StarryEyes.Views.WindowParts.Flips.SearchFlips"
              xmlns:triggers="clr-namespace:StarryEyes.Views.Triggers"
@@ -342,14 +343,14 @@
             <TextBlock Grid.Row="1"
                        Margin="8"
                        Foreground="{DynamicResource SearchFlipForegroundBrush}"
-                       Text="先頭に?を入力することでクエリを用いて検索できます。"
+                       Text="{x:Static localize:SearchFlipResources.SearchFlipQueryHelp}"
                        TextWrapping="Wrap"
                        Visibility="{Binding IsQueryMode,
                                             Converter={StaticResource BooleanToInvisibleConverter}}" />
             <Grid Grid.Row="1" Visibility="{Binding IsQueryMode, Converter={StaticResource BooleanToVisibleConverter}}">
                 <TextBlock Margin="8"
                            Foreground="{DynamicResource SearchFlipForegroundBrush}"
-                           Text="クエリは正しく解釈されました。Enterキーを入力すると検索が開始されます。"
+                           Text="{x:Static localize:SearchFlipResources.SearchFlipQueryValid}"
                            TextWrapping="Wrap"
                            Visibility="{Binding HasError,
                                                 Converter={StaticResource BooleanToInvisibleConverter}}" />
@@ -358,7 +359,7 @@
                            TextWrapping="Wrap"
                            Visibility="{Binding HasError,
                                                 Converter={StaticResource BooleanToVisibleConverter}}">
-                    <Run Text="クエリにエラーがあります: " />
+                    <Run Text="{x:Static localize:SearchFlipResources.SearchFlipQueryInvalid}" />
                     <Run Text="{Binding ErrorText, Mode=OneWay}" />
                 </TextBlock>
             </Grid>
@@ -393,7 +394,7 @@
                             </Style.Triggers>
                         </Style>
                     </Grid.Style>
-                    <Button Content="タブ内のツイート"
+                    <Button Content="{x:Static localize:SearchFlipResources.SearchFlipSearchTab}"
                             Focusable="False"
                             Style="{StaticResource FlatFloatButtonStyle}">
                         <i:Interaction.Triggers>
@@ -402,7 +403,7 @@
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
                         <Button.ToolTip>
-                            <TextBlock Margin="4" Text="現在選択されているタブに表示されているツイートを検索します。" />
+                            <TextBlock Margin="4" Text="{x:Static localize:SearchFlipResources.SearchFlipSearchTabDesc}" />
                         </Button.ToolTip>
                     </Button>
                 </Grid>
@@ -417,7 +418,7 @@
                             </Style.Triggers>
                         </Style>
                     </Grid.Style>
-                    <Button Content="すべてのローカルデータ"
+                    <Button Content="{x:Static localize:SearchFlipResources.SearchFlipSearchLocal}"
                             Focusable="False"
                             Style="{StaticResource FlatFloatButtonStyle}">
                         <i:Interaction.Triggers>
@@ -426,7 +427,7 @@
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
                         <Button.ToolTip>
-                            <TextBlock Margin="4" Text="Krileに蓄積されているすべてのツイートから検索します。" />
+                            <TextBlock Margin="4" Text="{x:Static localize:SearchFlipResources.SearchFlipSearchLocalDesc}" />
                         </Button.ToolTip>
                     </Button>
                 </Grid>
@@ -442,7 +443,7 @@
                             </Style.Triggers>
                         </Style>
                     </Grid.Style>
-                    <Button Content="Twitter上のツイート"
+                    <Button Content="{x:Static localize:SearchFlipResources.SearchFlipSearchTwitter}"
                             Focusable="False"
                             Style="{StaticResource FlatFloatButtonStyle}">
                         <i:Interaction.Triggers>
@@ -451,7 +452,7 @@
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
                         <Button.ToolTip>
-                            <TextBlock Margin="4" Text="Twitterに問い合わせてツイートを検索します。" />
+                            <TextBlock Margin="4" Text="{x:Static localize:SearchFlipResources.SearchFlipSearchTwitterDesc}" />
                         </Button.ToolTip>
                     </Button>
                 </Grid>
@@ -467,7 +468,7 @@
                             </Style.Triggers>
                         </Style>
                     </Grid.Style>
-                    <Button Content="ユーザー名"
+                    <Button Content="{x:Static localize:SearchFlipResources.SearchFlipSearchUser}"
                             Focusable="False"
                             Style="{StaticResource FlatFloatButtonStyle}">
                         <i:Interaction.Triggers>
@@ -476,7 +477,7 @@
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
                         <Button.ToolTip>
-                            <TextBlock Margin="4" Text="Twitterに問い合わせてユーザーを検索します。" />
+                            <TextBlock Margin="4" Text="{x:Static localize:SearchFlipResources.SearchFlipSearchUserDesc}" />
                         </Button.ToolTip>
                     </Button>
                 </Grid>
@@ -492,7 +493,7 @@
                             </Style.Triggers>
                         </Style>
                     </Grid.Style>
-                    <Button Content="ユーザー@ID"
+                    <Button Content="{x:Static localize:SearchFlipResources.SearchFlipSearchScreenName}"
                             Focusable="False"
                             Style="{StaticResource FlatFloatButtonStyle}">
                         <i:Interaction.Triggers>
@@ -501,7 +502,7 @@
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
                         <Button.ToolTip>
-                            <TextBlock Margin="4" Text="この@IDを持つユーザーを表示します。" />
+                            <TextBlock Margin="4" Text="{x:Static localize:SearchFlipResources.SearchFlipSearchScreenNameDesc}" />
                         </Button.ToolTip>
                     </Button>
                 </Grid>
@@ -511,7 +512,7 @@
                        Margin="8"
                        VerticalAlignment="Bottom"
                        Foreground="{DynamicResource SearchFlipForegroundBrush}"
-                       Text="アクティブアカウントが一つだけの場合、保存されている検索キーワードを表示します。"
+                       Text="{x:Static localize:SearchFlipResources.SearchFlipSavedKeywordsUnavailable}"
                        TextWrapping="Wrap"
                        Visibility="{Binding SearchCandidate.IsSearchCandidateAvailable,
                                             Converter={StaticResource BooleanToInvisibleConverter}}" />
@@ -529,8 +530,7 @@
                     <TextBlock Margin="4,8,8,8"
                                VerticalAlignment="Center"
                                Foreground="{DynamicResource SearchFlipForegroundBrush}">
-                        <Run Text="{Binding SearchCandidate.CurrentUserScreenName, Mode=OneWay}" />
-                        <Run Text="が保存している検索キーワード:" />
+                        <Run Text="{Binding SearchCandidate.CurrentUserScreenName, Mode=OneWay, StringFormat={x:Static localize:SearchFlipResources.SearchFlipSavedKeywordsFormat}}" />
                     </TextBlock>
                 </StackPanel>
                 <ItemsControl FocusVisualStyle="{x:Null}" ItemsSource="{Binding SearchCandidate.SearchCandidates}">
@@ -557,15 +557,11 @@
                                 <Button.ContextMenu>
                                     <!--  ReSharper disable once Xaml.BindingWithContextNotResolved  -->
                                     <ContextMenu DataContext="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
-                                        <MenuItem Command="{Binding RemoveCommand}" Header="このアイテムを削除(_D)" />
+                                        <MenuItem Command="{Binding RemoveCommand}" Header="{x:Static localize:SearchFlipResources.SearchFlipDeleteSavedKeyword}" />
                                     </ContextMenu>
                                 </Button.ContextMenu>
                                 <Button.ToolTip>
-                                    <TextBlock Margin="4">
-                                        <Run Text="Twitterから" />
-                                        <Run Text="{Binding Query, Mode=OneWay}" />
-                                        <Run Text="を検索します。" />
-                                    </TextBlock>
+                                    <TextBlock Margin="4" Text="{Binding Query, Mode=OneWay, StringFormat={x:Static localize:SearchFlipResources.SearchFlipSearchBySavedKeywordFormat}}" />
                                 </Button.ToolTip>
                             </Button>
                         </DataTemplate>

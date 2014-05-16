@@ -9,6 +9,7 @@ using Livet.EventListeners;
 using Livet.Messaging;
 using StarryEyes.Filters;
 using StarryEyes.Filters.Parsing;
+using StarryEyes.Globalization.WindowParts;
 using StarryEyes.Models;
 using StarryEyes.Models.Inputting;
 using StarryEyes.Models.Timelines.SearchFlips;
@@ -278,12 +279,12 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 IsQueryMode = true;
                 IsSearchOptionAvailable = false;
                 IsSearchResultAvailable = false;
-                ErrorText = "コンパイルしています...";
+                ErrorText = SearchFlipResources.SearchFlipQueryCompiling;
                 try
                 {
                     if (value == "?")
                     {
-                        ErrorText = "クエリの本文がありません。";
+                        ErrorText = SearchFlipResources.SearchFlipQueryEmpty;
                         IsSearchResultAvailable = false;
                         return;
                     }

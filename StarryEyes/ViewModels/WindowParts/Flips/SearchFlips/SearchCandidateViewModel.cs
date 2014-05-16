@@ -3,6 +3,8 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Livet;
 using StarryEyes.Anomaly.TwitterApi.Rest;
+using StarryEyes.Globalization;
+using StarryEyes.Globalization.WindowParts;
 using StarryEyes.Models;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;
@@ -96,7 +98,8 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             catch (Exception ex)
             {
                 BackstageModel.RegisterEvent(new OperationFailedEvent(
-                    "保存済み検索クエリを受信できませんでした(@" + aid.UnreliableScreenName + ")", ex));
+                    SearchFlipResources.InfoSavedQueriesReceiveFailedFormat.SafeFormat(aid.UnreliableScreenName),
+                    ex));
             }
         }
     }
@@ -156,7 +159,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             }
             catch (Exception ex)
             {
-                BackstageModel.RegisterEvent(new OperationFailedEvent("検索クエリの削除に失敗しました", ex));
+                BackstageModel.RegisterEvent(new OperationFailedEvent(SearchFlipResources.InfoDeleteQueryFailed, ex));
             }
         }
         #endregion

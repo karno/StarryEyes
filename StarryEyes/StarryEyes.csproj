@@ -240,6 +240,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>ReceivingResources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Globalization\WindowParts\SearchFlipResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SearchFlipResources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Helpers\FreezableHelper.cs" />
     <Compile Include="Helpers\TwitterRegexPatterns.cs" />
     <Compile Include="Hotfixes\DispatcherCollectionRx.cs" />
@@ -757,6 +762,11 @@
     <EmbeddedResource Include="Globalization\Models\ReceivingResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>ReceivingResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Globalization\WindowParts\SearchFlipResources.ja.resx" />
+    <EmbeddedResource Include="Globalization\WindowParts\SearchFlipResources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>SearchFlipResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>

@@ -3,10 +3,12 @@ using System.Globalization;
 using System.Net;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using Livet;
 using StarryEyes.Anomaly.TwitterApi;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
+using StarryEyes.Globalization.WindowParts;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Requests;
 using StarryEyes.Nightmare.Windows;
@@ -144,6 +146,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             }
         }
 
+        [UsedImplicitly]
         public void Follow()
         {
             this.DispatchAction(
@@ -155,14 +158,15 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 },
                 ex => this._parent.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
                 {
-                    Title = "フォロー エラー",
+                    Title = SearchFlipResources.MsgErrorFollowTitle,
                     MainIcon = VistaTaskDialogIcon.Error,
-                    MainInstruction = "フォローできませんでした。",
+                    MainInstruction = SearchFlipResources.MsgErrorFollowInst,
                     Content = GetExceptionDescription(ex),
                     CommonButtons = TaskDialogCommonButtons.Close,
                 })));
         }
 
+        [UsedImplicitly]
         public void Remove()
         {
             this.DispatchAction(
@@ -174,14 +178,15 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 },
                 ex => this._parent.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
                 {
-                    Title = "アンフォロー エラー",
+                    Title = SearchFlipResources.MsgErrorUnfollowTitle,
                     MainIcon = VistaTaskDialogIcon.Error,
-                    MainInstruction = "フォロー解除できませんでした。",
+                    MainInstruction = SearchFlipResources.MsgErrorUnfollowInst,
                     Content = GetExceptionDescription(ex),
                     CommonButtons = TaskDialogCommonButtons.Close,
                 })));
         }
 
+        [UsedImplicitly]
         public void Block()
         {
             this.DispatchAction(
@@ -195,14 +200,15 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 },
                 ex => this._parent.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
                 {
-                    Title = "ブロック エラー",
+                    Title = SearchFlipResources.MsgErrorBlockTitle,
                     MainIcon = VistaTaskDialogIcon.Error,
-                    MainInstruction = "ブロックできませんでした。",
+                    MainInstruction = SearchFlipResources.MsgErrorBlockInst,
                     Content = GetExceptionDescription(ex),
                     CommonButtons = TaskDialogCommonButtons.Close,
                 })));
         }
 
+        [UsedImplicitly]
         public void Unblock()
         {
             this.DispatchAction(
@@ -214,14 +220,15 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 },
                 ex => this._parent.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
                 {
-                    Title = "アンブロック エラー",
+                    Title = SearchFlipResources.MsgErrorUnblockTitle,
                     MainIcon = VistaTaskDialogIcon.Error,
-                    MainInstruction = "ブロックを解除できませんでした。",
+                    MainInstruction = SearchFlipResources.MsgErrorUnblockInst,
                     Content = GetExceptionDescription(ex),
                     CommonButtons = TaskDialogCommonButtons.Close,
                 })));
         }
 
+        [UsedImplicitly]
         public void SuppressRetweets()
         {
             this.DispatchRetweetSuppression(
@@ -233,14 +240,15 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 },
                 ex => this._parent.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
                 {
-                    Title = "リツイート非表示 エラー",
+                    Title = SearchFlipResources.MsgErrorSuppressRetweetsTitle,
                     MainIcon = VistaTaskDialogIcon.Error,
-                    MainInstruction = "このユーザのリツイートを非表示にできませんでした。",
+                    MainInstruction = SearchFlipResources.MsgErrorSuppressRetweetsInst,
                     Content = GetExceptionDescription(ex),
                     CommonButtons = TaskDialogCommonButtons.Close,
                 })));
         }
 
+        [UsedImplicitly]
         public void UnsuppressRetweets()
         {
             this.DispatchRetweetSuppression(
@@ -252,14 +260,15 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 },
                 ex => this._parent.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
                 {
-                    Title = "リツイート非表示解除 エラー",
+                    Title = SearchFlipResources.MsgErrorUnsuppressRetweetsTitle,
                     MainIcon = VistaTaskDialogIcon.Error,
-                    MainInstruction = "このユーザのリツイート非表示を解除できませんでした。",
+                    MainInstruction = SearchFlipResources.MsgErrorUnsuppressRetweetsInst,
                     Content = GetExceptionDescription(ex),
                     CommonButtons = TaskDialogCommonButtons.Close,
                 })));
         }
 
+        [UsedImplicitly]
         public void ReportForSpam()
         {
             this.DispatchAction(
@@ -271,9 +280,9 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 },
                 ex => this._parent.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
                 {
-                    Title = "スパム報告 エラー",
+                    Title = SearchFlipResources.MsgErrorReportSpamTitle,
                     MainIcon = VistaTaskDialogIcon.Error,
-                    MainInstruction = "スパム報告できませんでした。",
+                    MainInstruction = SearchFlipResources.MsgErrorReportSpamInst,
                     Content = GetExceptionDescription(ex),
                     CommonButtons = TaskDialogCommonButtons.Close,
                 })));
@@ -284,17 +293,17 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             var tex = ex as TwitterApiException;
             if (tex != null)
             {
-                return "Twitter API エラー: " + tex.Message + Environment.NewLine +
-                       "ステータスコード: " + tex.StatusCode + Environment.NewLine +
-                       "Twitter エラーコード: " + (tex.TwitterErrorCode.HasValue
+                return "Twitter API Error: " + tex.Message + Environment.NewLine +
+                       "HTTP Status Code: " + tex.StatusCode + Environment.NewLine +
+                       "Twitter Error Code: " + (tex.TwitterErrorCode.HasValue
                            ? tex.TwitterErrorCode.Value.ToString(CultureInfo.InvariantCulture)
-                           : "なし");
+                           : "None");
             }
             var wex = ex as WebException;
             if (wex != null)
             {
-                return "Web エラー: " + wex.Message + Environment.NewLine +
-                       "ステータスコード: " + wex.Status;
+                return "Web Error: " + wex.Message + Environment.NewLine +
+                       "HTTP Status Code: " + wex.Status;
             }
             return ex.Message;
         }

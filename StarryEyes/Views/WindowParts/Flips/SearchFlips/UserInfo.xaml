@@ -6,6 +6,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:ei="clr-namespace:Microsoft.Expression.Interactivity.Core;assembly=Microsoft.Expression.Interactions"
              xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+             xmlns:localize="clr-namespace:StarryEyes.Globalization.WindowParts"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:primitives="clr-namespace:StarryEyes.Views.WindowParts.Primitives"
              xmlns:utils="clr-namespace:StarryEyes.Views.Utils"
@@ -219,18 +220,18 @@
                                                                                        Mode=OneTime}"
                                utils:TextBlockStylizer.TwitterUser="{Binding User.User}">
                         <i:Interaction.Behaviors>
-                            <behaviors:TextBlockDragSelectBehavior ForegroundBrush="{DynamicResource BaseColorBackgroundBrush}" SelectedText="{Binding SelectedText, Mode=OneWayToSource}">
+                            <behaviors:TextBlockDragSelectBehavior ForegroundBrush="{DynamicResource BaseColorForegroundBrush}" SelectedText="{Binding SelectedText, Mode=OneWayToSource}">
                                 <behaviors:TextBlockDragSelectBehavior.SelectContextMenu>
                                     <!--  ReSharper disable once Xaml.BindingWithContextNotResolved  -->
                                     <ContextMenu DataContext="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
-                                        <MenuItem Header="クリップボードにコピー(_C)">
+                                        <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TextCopyClipboard}">
                                             <i:Interaction.Triggers>
                                                 <i:EventTrigger EventName="Click">
                                                     <ei:CallMethodAction MethodName="CopyText" TargetObject="{Binding}" />
                                                 </i:EventTrigger>
                                             </i:Interaction.Triggers>
                                         </MenuItem>
-                                        <MenuItem Header="ツイート入力欄にコピー(_I)">
+                                        <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TextCopyInput}">
                                             <i:Interaction.Triggers>
                                                 <i:EventTrigger EventName="Click">
                                                     <ei:CallMethodAction MethodName="SetTextToInputBox" TargetObject="{Binding}" />
@@ -238,14 +239,14 @@
                                             </i:Interaction.Triggers>
                                         </MenuItem>
                                         <Separator />
-                                        <MenuItem Header="Krile内のツイートを検索(_K)">
+                                        <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TextSearchLocal}">
                                             <i:Interaction.Triggers>
                                                 <i:EventTrigger EventName="Click">
                                                     <ei:CallMethodAction MethodName="FindOnKrile" TargetObject="{Binding}" />
                                                 </i:EventTrigger>
                                             </i:Interaction.Triggers>
                                         </MenuItem>
-                                        <MenuItem Header="Twitterからツイートを検索(_T)">
+                                        <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TextSearchTwitter}">
                                             <i:Interaction.Triggers>
                                                 <i:EventTrigger EventName="Click">
                                                     <ei:CallMethodAction MethodName="FindOnTwitter" TargetObject="{Binding}" />
@@ -253,7 +254,7 @@
                                             </i:Interaction.Triggers>
                                         </MenuItem>
                                         <Separator />
-                                        <MenuItem Header="Googleで検索(_G)">
+                                        <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TextSearchGoogle}">
                                             <i:Interaction.Triggers>
                                                 <i:EventTrigger EventName="Click">
                                                     <ei:CallMethodAction MethodName="FindOnGoogle" TargetObject="{Binding}" />
@@ -398,14 +399,14 @@
                                 <DataTemplate.Resources>
                                     <!--  ReSharper disable once Xaml.BindingWithContextNotResolved  -->
                                     <ContextMenu x:Key="BlockMenu" DataContext="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
-                                        <MenuItem Header="ブロック(_B)">
+                                        <MenuItem Header="{x:Static localize:SearchFlipResources.UserInfoBlock}">
                                             <i:Interaction.Triggers>
                                                 <i:EventTrigger EventName="Click">
                                                     <ei:CallMethodAction MethodName="Block" TargetObject="{Binding}" />
                                                 </i:EventTrigger>
                                             </i:Interaction.Triggers>
                                         </MenuItem>
-                                        <MenuItem Header="スパムとして報告(_R)">
+                                        <MenuItem Header="{x:Static localize:SearchFlipResources.UserInfoReportAsSpam}">
                                             <i:Interaction.Triggers>
                                                 <i:EventTrigger EventName="Click">
                                                     <ei:CallMethodAction MethodName="ReportForSpam" TargetObject="{Binding}" />

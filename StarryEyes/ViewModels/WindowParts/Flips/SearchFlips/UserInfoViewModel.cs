@@ -8,6 +8,7 @@ using JetBrains.Annotations;
 using Livet;
 using Livet.Commands;
 using StarryEyes.Anomaly.Utils;
+using StarryEyes.Globalization.WindowParts;
 using StarryEyes.Models;
 using StarryEyes.Models.Inputting;
 using StarryEyes.Models.Stores;
@@ -189,9 +190,9 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                                {
                                    parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
                                    {
-                                       Title = "ユーザー表示エラー",
+                                       Title = SearchFlipResources.MsgUserInfoLoadErrorTitle,
                                        MainIcon = VistaTaskDialogIcon.Error,
-                                       MainInstruction = "ユーザーを表示できません。",
+                                       MainInstruction = SearchFlipResources.MsgUserInfoLoadErrorInst,
                                        Content = ex.Message,
                                        CommonButtons = TaskDialogCommonButtons.Close
                                    }));
