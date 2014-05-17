@@ -23,6 +23,7 @@ namespace StarryEyes.Views.Controls
         {
             Observable.Timer(TimeSpan.FromMinutes(5), TimeSpan.FromMinutes(5))
                       .Subscribe(_ => RemoveExpiredCaches());
+            StartDecodeThread();
         }
 
         #region Constant variables
@@ -252,44 +253,67 @@ namespace StarryEyes.Views.Controls
 
         #region Image Decoder
 
-        private static readonly ConcurrentStack<Tuple<Uri, LazyImage, byte[], int, int>> _decodeStack =
-        new ConcurrentStack<Tuple<Uri, LazyImage, byte[], int, int>>();
+        private static Thread _decoderThread;
 
-        private static int _decodeThreadConcurrency;
+        private static void StartDecodeThread()
+        {
+            if (_decoderThread != null)
+            {
+                throw new InvalidOperationException("decoder thread is already started.");
+            }
+            _decoderThread = new Thread(DecodeTaskWorker);
+            _decoderThread.Start();
+        }
+
+        private static readonly ConcurrentStack<Tuple<Uri, LazyImage, byte[], int, int>> _decodeStack =
+            new ConcurrentStack<Tuple<Uri, LazyImage, byte[], int, int>>();
+
+        private static readonly ManualResetEventSlim _decodeSignal = new ManualResetEventSlim();
 
         private static void PushDecodeTask(Uri uriSource, LazyImage targetImage,
             byte[] bytes, int dpw, int dph)
         {
             _decodeStack.Push(Tuple.Create(uriSource, targetImage, bytes, dpw, dph));
-            if (Interlocked.Increment(ref _decodeThreadConcurrency) > MaxDecodeConcurrency)
-            {
-                Interlocked.Decrement(ref _decodeThreadConcurrency);
-                return;
-            }
-            // run task
-            RunNextDecodeTask();
+            _decodeSignal.Set();
         }
 
-        private static void RunNextDecodeTask()
+        private static void DecodeTaskWorker()
         {
-            // uri, LazyImage, dpw, dph
-            Tuple<Uri, LazyImage, byte[], int, int> item;
-            if (!_decodeStack.TryPop(out item))
+            var loop = true;
+
+            // exit handler
+            App.ApplicationFinalize += () =>
             {
-                Interlocked.Decrement(ref _decodeThreadConcurrency);
-            }
-            else
+                loop = false;
+                _decodeSignal.Set();
+            };
+
+            // ReSharper disable once LoopVariableIsNeverChangedInsideLoop
+            while (loop)
             {
-                Task.Run(() =>
+                _decodeSignal.Reset();
+
+                // uri, LazyImage, dpw, dph
+                Tuple<Uri, LazyImage, byte[], int, int> item;
+
+                while (_decodeStack.TryPop(out item))
                 {
+                    // create image
                     var b = CreateImage(item.Item3, item.Item4, item.Item5);
-                    DispatcherHolder.Enqueue(() => SetImage(item.Item2, b, item.Item1),
-                        DispatcherPriority.Background);
-                    // shutdown current dispatcher
-                    Dispatcher.CurrentDispatcher.BeginInvokeShutdown(DispatcherPriority.SystemIdle);
-                    Dispatcher.Run();
-                }).ContinueWith(_ => RunNextDecodeTask(), TaskContinuationOptions.ExecuteSynchronously);
+
+                    // push dispatcher queue
+                    var image = item.Item2;
+                    var uri = item.Item1;
+                    DispatcherHolder.Enqueue(() => SetImage(image, b, uri), DispatcherPriority.Background);
+
+                    // reset signal
+                    _decodeSignal.Reset();
+                }
+                _decodeSignal.Wait();
             }
+
+            Dispatcher.CurrentDispatcher.BeginInvokeShutdown(DispatcherPriority.SystemIdle);
+            Dispatcher.Run();
         }
 
         #endregion
