@@ -285,7 +285,10 @@ namespace StarryEyes.Views.Controls
                     var b = CreateImage(item.Item3, item.Item4, item.Item5);
                     DispatcherHolder.Enqueue(() => SetImage(item.Item2, b, item.Item1),
                         DispatcherPriority.Background);
-                }).ContinueWith(_ => RunNextDecodeTask());
+                    // shutdown current dispatcher
+                    Dispatcher.CurrentDispatcher.BeginInvokeShutdown(DispatcherPriority.SystemIdle);
+                    Dispatcher.Run();
+                }).ContinueWith(_ => RunNextDecodeTask(), TaskContinuationOptions.ExecuteSynchronously);
             }
         }
 
