@@ -146,7 +146,7 @@ namespace StarryEyes.Models.Timelines.Statuses
         private StatusModel(TwitterStatus status)
         {
             this.Status = status;
-            ImageResolver.Resolve(status.GetEntityAidedText(true))
+            ImageResolver.Resolve(status.GetEntityAidedText(EntityDisplayMode.MediaUri))
                          .Aggregate(new List<Tuple<Uri, Uri>>(), (l, i) =>
                          {
                              l.Add(i);

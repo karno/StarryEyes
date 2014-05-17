@@ -85,7 +85,7 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
         public EntityType EntityType { get; set; }
 
         /// <summary>
-        /// String which represents displaying text. <para />
+        /// String which represents displaying text.
         /// </summary>
         public string DisplayText { get; set; }
 
@@ -105,12 +105,12 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
         public string MediaUrl { get; set; }
 
         /// <summary>
-        /// Start index of this element
+        /// Start index of text for attaching entity.
         /// </summary>
         public int StartIndex { get; set; }
 
         /// <summary>
-        /// End index of this element
+        /// End index of text for attaching entity.
         /// </summary>
         public int EndIndex { get; set; }
     }

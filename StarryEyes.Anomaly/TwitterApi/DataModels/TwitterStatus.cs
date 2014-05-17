@@ -201,7 +201,7 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
         // ReSharper restore InconsistentNaming
 
         [NotNull]
-        public string GetEntityAidedText(bool showFullUrl = false)
+        public string GetEntityAidedText(EntityDisplayMode displayMode = EntityDisplayMode.DisplayText)
         {
             try
             {
@@ -227,14 +227,17 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
                                 builder.Append("#" + entity.DisplayText);
                                 break;
                             case EntityType.Urls:
-                                builder.Append(showFullUrl
-                                                   ? ParsingExtension.ResolveEntity(entity.OriginalUrl)
-                                                   : ParsingExtension.ResolveEntity(entity.DisplayText));
+                                builder.Append(displayMode == EntityDisplayMode.DisplayText
+                                    ? ParsingExtension.ResolveEntity(entity.DisplayText)
+                                    : ParsingExtension.ResolveEntity(entity.OriginalUrl));
                                 break;
                             case EntityType.Media:
-                                builder.Append(showFullUrl
-                                                   ? ParsingExtension.ResolveEntity(entity.MediaUrl)
-                                                   : ParsingExtension.ResolveEntity(entity.DisplayText));
+                                builder.Append(
+                                    displayMode == EntityDisplayMode.DisplayText
+                                        ? ParsingExtension.ResolveEntity(entity.DisplayText)
+                                        : displayMode == EntityDisplayMode.LinkUri
+                                            ? ParsingExtension.ResolveEntity(entity.OriginalUrl)
+                                            : ParsingExtension.ResolveEntity(entity.MediaUrl));
                                 break;
                             case EntityType.UserMentions:
                                 builder.Append("@" + entity.DisplayText);
@@ -302,5 +305,12 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
         /// Status is direct message.
         /// </summary>
         DirectMessage,
+    }
+
+    public enum EntityDisplayMode
+    {
+        DisplayText,
+        LinkUri,
+        MediaUri
     }
 }

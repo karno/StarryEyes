@@ -650,7 +650,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
 
         public void CopyBody()
         {
-            this.SetClipboard(this.Status.GetEntityAidedText(true));
+            this.SetClipboard(this.Status.GetEntityAidedText(EntityDisplayMode.LinkUri));
         }
 
         public void CopyPermalink()
@@ -1002,7 +1002,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                 return;
             }
             var setting = InputSetting.CreateReply(this.Status,
-                " RT @" + this.User.ScreenName + ": " + this.Status.GetEntityAidedText(true),
+                " RT @" + this.User.ScreenName + ": " + this.Status.GetEntityAidedText(EntityDisplayMode.LinkUri),
                 false);
             setting.CursorPosition = CursorPosition.Begin;
             InputModel.InputCore.SetText(setting);
