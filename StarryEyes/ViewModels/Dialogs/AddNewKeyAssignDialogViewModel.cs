@@ -97,7 +97,7 @@ namespace StarryEyes.ViewModels.Dialogs
 
         private void Close()
         {
-            this.Messenger.Raise(new WindowActionMessage(WindowAction.Close));
+            this.Messenger.RaiseSafe(() => new WindowActionMessage(WindowAction.Close));
         }
     }
 }

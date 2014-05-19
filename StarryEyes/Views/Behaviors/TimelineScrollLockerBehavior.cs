@@ -65,18 +65,29 @@ namespace StarryEyes.Views.Behaviors
                           .Subscribe(
                               e =>
                               {
+                                  // get source
                                   var source = ItemsSource;
                                   if (source == null) return;
+
+                                  // check and update items count latch
                                   var itemCount = source.Count;
                                   if (_previousItemCount == itemCount) return;
                                   _previousItemCount = itemCount;
+
+                                  // if scroll extent is not changed or shrinked, nothing to do.
                                   if (e.ExtentHeightChange <= 0) return;
-                                  this.AssociatedObject.ScrollToVerticalOffset(
-                                      e.VerticalOffset + e.ExtentHeightChange);
+
+                                  // calculate position should scroll to.
+                                  var prevPosition = e.VerticalOffset + e.ExtentHeightChange;
+
+                                  // scroll back to previous position
+                                  this.AssociatedObject.ScrollToVerticalOffset(prevPosition);
+                                  System.Diagnostics.Debug.WriteLine("*** SCROLL (LOCK) ***");
+
                                   if (!this.IsScrollLockEnabled)
                                   {
-                                      this.RunAnimation(e.VerticalOffset + e.ExtentHeightChange,
-                                                        e.ExtentHeightChange);
+                                      // animate to new position
+                                      this.RunAnimation(prevPosition, e.ExtentHeightChange);
                                   }
                               }));
         }
@@ -90,34 +101,46 @@ namespace StarryEyes.Views.Behaviors
             }
         }
 
+        /// <summary>
+        /// Reflect changing items source
+        /// </summary>
         private void ItemsSourceChanged()
         {
-            var capture = ItemsSource;
-            var nc = capture as INotifyCollectionChanged;
+            // capture current value
+            var itemsSource = ItemsSource;
+
+            // validate interface
+            var nc = itemsSource as INotifyCollectionChanged;
             if (nc == null) return;
 
-            this._previousItemCount = capture.Count;
-            var listener = nc.ListenCollectionChanged()
-                             .Subscribe(ev =>
-                             {
-                                 if (ev.Action == NotifyCollectionChangedAction.Add)
-                                 {
-                                     var vsp = this.AssociatedObject.FindVisualChild<VirtualizingStackPanel>();
-                                     if (vsp != null)
-                                     {
-                                         var index = vsp.ItemContainerGenerator.IndexFromGeneratorPosition(
-                                             new GeneratorPosition(0, 0));
-                                         if (ev.NewStartingIndex > index)
-                                         {
-                                             this._previousItemCount = capture.Count;
-                                         }
-                                     }
-                                 }
-                                 else
-                                 {
-                                     this._previousItemCount = capture.Count;
-                                 }
-                             });
+            // initialize count
+            this._previousItemCount = itemsSource.Count;
+
+            // create listener of timeline changes
+            var listener =
+                nc.ListenCollectionChanged()
+                  .Subscribe(ev =>
+                  {
+                      if (ev.Action == NotifyCollectionChangedAction.Add)
+                      {
+                          // get virtualizing stack panel
+                          var vsp = this.AssociatedObject.FindVisualChild<VirtualizingStackPanel>();
+                          if (vsp != null)
+                          {
+                              var index = vsp.ItemContainerGenerator
+                                             .IndexFromGeneratorPosition(new GeneratorPosition(0, 0));
+                              // check new index is newer than the bottom item of current viewport items.
+                              if (ev.NewStartingIndex <= index)
+                              {
+                                  return;
+                              }
+                          }
+                      }
+                      // we should not scroll -> update items count.
+                      this._previousItemCount = itemsSource.Count;
+                  });
+
+            // swap old listener
             var disposable = Interlocked.Exchange(
                 ref this._itemSourceCollectionChangeListener, listener);
             if (disposable != null)
@@ -129,12 +152,23 @@ namespace StarryEyes.Views.Behaviors
         private double _currentOffset;
         private double _remainHeight;
         private volatile bool _isAnimationRunning;
+        /// <summary>
+        /// Run scroll animation.
+        /// </summary>
+        /// <param name="offset">beginning scroll offset</param>
+        /// <param name="height">animation height(to scroll)</param>
         private void RunAnimation(double offset, double height)
         {
-            if (_remainHeight < 0) _remainHeight = 0;
-            if (_currentOffset < 0) _currentOffset = 0;
+            // reset remain height
+            if (_remainHeight < 0)
+            {
+                _remainHeight = 0;
+            }
+            // scroll start offset
             _currentOffset = offset;
+            // scroll height
             _remainHeight += height;
+
             if (_isAnimationRunning) return;
             _isAnimationRunning = true;
             Task.Run(() =>
@@ -146,6 +180,7 @@ namespace StarryEyes.Views.Behaviors
                     _remainHeight -= dx;
                     _currentOffset -= dx;
                     DispatcherHolder.Enqueue(() => this.AssociatedObject.ScrollToVerticalOffset(_currentOffset));
+                    System.Diagnostics.Debug.WriteLine("*** SCROLL (ANIMATE) ***");
                 }
                 _isAnimationRunning = false;
             });

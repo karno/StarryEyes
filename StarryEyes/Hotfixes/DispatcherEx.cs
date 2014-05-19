@@ -63,6 +63,7 @@ public static class DispatcherHolder
     #endregion
 
     public static Dispatcher Dispatcher { get; private set; }
+
     public static void Initialize(Dispatcher dispatcher)
     {
         Dispatcher = dispatcher;
@@ -93,5 +94,19 @@ public static class DispatcherHolder
         var descriptor = Dispatcher.BeginInvoke(func, null);
         await descriptor;
         return (T)descriptor.Result;
+    }
+
+    public static void VerifyAccess()
+    {
+        Dispatcher.VerifyAccess();
+    }
+}
+
+public static class DispatcherExtension
+{
+    public static void BeginInvokeShutdown()
+    {
+        Dispatcher.CurrentDispatcher.BeginInvokeShutdown(DispatcherPriority.SystemIdle);
+        Dispatcher.Run();
     }
 }

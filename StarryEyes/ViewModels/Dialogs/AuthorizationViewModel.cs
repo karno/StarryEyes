@@ -42,13 +42,14 @@ namespace StarryEyes.ViewModels.Dialogs
             CurrentAuthenticationStep = AuthenticationStep.RequestingToken;
             Observable.Defer(() => _authorizer.GetRequestToken(RequestTokenEndpoint).ToObservable())
                       .Retry(3, TimeSpan.FromSeconds(3)) // twitter sometimes returns an error without any troubles.
-                      .Subscribe(t =>
-                      {
-                          _currentRequestToken = t.Token;
-                          CurrentAuthenticationStep = AuthenticationStep.WaitingPinInput;
-                          BrowserHelper.Open(_authorizer.BuildAuthorizeUrl(AuthorizationEndpoint, t.Token));
-                      },
-                          ex => this.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
+                      .Subscribe(
+                          t =>
+                          {
+                              _currentRequestToken = t.Token;
+                              CurrentAuthenticationStep = AuthenticationStep.WaitingPinInput;
+                              BrowserHelper.Open(_authorizer.BuildAuthorizeUrl(AuthorizationEndpoint, t.Token));
+                          },
+                          ex => this.Messenger.RaiseSafe(() => new TaskDialogMessage(new TaskDialogOptions
                           {
                               Title = "OAuth認証エラー",
                               MainIcon = VistaTaskDialogIcon.Error,
@@ -116,22 +117,21 @@ namespace StarryEyes.ViewModels.Dialogs
                     var id = long.Parse(r.ExtraData["user_id"].First());
                     var sn = r.ExtraData["screen_name"].First();
                     _returnSubject.OnNext(new TwitterAccount(id, sn, r.Token));
-                    this.Messenger.Raise(new WindowActionMessage(WindowAction.Close));
+                    this.Messenger.RaiseSafe(() => new WindowActionMessage(WindowAction.Close));
                 },
                 ex =>
                 {
                     CurrentAuthenticationStep = AuthenticationStep.WaitingPinInput;
-                    this.Messenger.Raise(new TaskDialogMessage(
-                        new TaskDialogOptions
-                        {
-                            Title = "アクセス許可取得失敗",
-                            MainIcon = VistaTaskDialogIcon.Error,
-                            MainInstruction = "アカウントを認証できませんでした。",
-                            Content = "PINを確認しもう一度入力するか、最初からやり直してみてください。",
-                            CommonButtons = TaskDialogCommonButtons.Close,
-                            FooterIcon = VistaTaskDialogIcon.Information,
-                            FooterText = "コンピュータの時計が大幅にずれている場合も認証が行えないことがあります。"
-                        }));
+                    this.Messenger.RaiseSafe(() => new TaskDialogMessage(new TaskDialogOptions
+                    {
+                        Title = "アクセス許可取得失敗",
+                        MainIcon = VistaTaskDialogIcon.Error,
+                        MainInstruction = "アカウントを認証できませんでした。",
+                        Content = "PINを確認しもう一度入力するか、最初からやり直してみてください。",
+                        CommonButtons = TaskDialogCommonButtons.Close,
+                        FooterIcon = VistaTaskDialogIcon.Information,
+                        FooterText = "コンピュータの時計が大幅にずれている場合も認証が行えないことがあります。"
+                    }));
                 });
         }
         #endregion

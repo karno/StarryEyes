@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Media;
+using JetBrains.Annotations;
 using Livet;
 using Livet.Messaging.Windows;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
@@ -177,12 +178,13 @@ namespace StarryEyes.ViewModels.Notifications
             get { return this._description; }
         }
 
+        [UsedImplicitly]
         public void Shown()
         {
             Observable.Timer(TimeSpan.FromSeconds(3))
                       .Subscribe(_ =>
                       {
-                          this.Messenger.RaiseAsync(new WindowActionMessage(WindowAction.Close));
+                          this.Messenger.RaiseSafe(() => new WindowActionMessage(WindowAction.Close));
                           ReleaseSlot();
                       });
         }

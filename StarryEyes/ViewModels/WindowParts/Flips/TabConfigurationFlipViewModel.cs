@@ -112,12 +112,13 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public void SelectSoundSource()
         {
-            var msg = this.Messenger.GetResponse(new OpeningFileSelectionMessage
-            {
-                Title = "タブの通知音を選択",
-                Filter = "Wave ファイル|*.wav",
-                FileName = NotifySoundSourcePath,
-            });
+            var msg = this.Messenger.GetResponseSafe(() =>
+                new OpeningFileSelectionMessage
+                {
+                    Title = "タブの通知音を選択",
+                    Filter = "Wave ファイル|*.wav",
+                    FileName = NotifySoundSourcePath,
+                });
             if (msg.Response != null && msg.Response.Length > 0)
             {
                 NotifySoundSourcePath = msg.Response[0];

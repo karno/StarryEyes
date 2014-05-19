@@ -100,7 +100,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                 if (_isOpening == value) return;
                 _isOpening = value;
                 RaisePropertyChanged(() => IsOpening);
-                Messenger.RaiseAsync(value ? new GoToStateMessage("Open") : new GoToStateMessage("Close"));
+                Messenger.RaiseSafe(() => value ? new GoToStateMessage("Open") : new GoToStateMessage("Close"));
             }
         }
 
@@ -121,7 +121,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                     var last = drafts[drafts.Count - 1];
                     drafts.RemoveAt(drafts.Count - 1);
                     InputCoreViewModel.InputData = last;
-                    Messenger.Raise(new TextBoxSetCaretMessage(last.Text.Length, 0));
+                    Messenger.RaiseSafe(() => new TextBoxSetCaretMessage(last.Text.Length, 0));
                 }
             }
             else
@@ -146,7 +146,8 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
 
         public void FocusToTextBox()
         {
-            this.Messenger.Raise(new InteractionMessage("FocusToTextBox"));
+            DispatcherHolder.VerifyAccess();
+            this.Messenger.RaiseSafe(() => new InteractionMessage("FocusToTextBox"));
         }
     }
 }

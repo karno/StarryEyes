@@ -404,7 +404,6 @@ namespace StarryEyes
 
         public static class ConfirmationMassages
         {
-
             public static TaskDialogResult ConfirmRescue()
             {
                 return ShowMessage(new TaskDialogOptions

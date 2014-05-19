@@ -197,7 +197,8 @@ namespace StarryEyes.ViewModels
                 Observable.FromEvent<TaskDialogOptions>(
                     h => MainWindowModel.TaskDialogRequested += h,
                     h => MainWindowModel.TaskDialogRequested -= h)
-                          .Subscribe(options => this.Messenger.Raise(new TaskDialogMessage(options))));
+                          .Subscribe(options => this.Messenger.RaiseSafe(() =>
+                              new TaskDialogMessage(options))));
             CompositeDisposable.Add(
                 Observable.FromEvent(
                     h => MainWindowModel.StateStringChanged += h,
@@ -252,9 +253,9 @@ namespace StarryEyes.ViewModels
             if (Setting.IsFirstGenerated)
             {
                 var kovm = new KeyOverrideViewModel();
-                Messenger.Raise(new TransitionMessage(
-                                         typeof(KeyOverrideWindow),
-                                         kovm, TransitionMode.Modal, null));
+                Messenger.RaiseSafeSync(() => new TransitionMessage(
+                    typeof(KeyOverrideWindow),
+                    kovm, TransitionMode.Modal, null));
             }
 
             // register new account if accounts haven't been authorized yet
@@ -263,9 +264,9 @@ namespace StarryEyes.ViewModels
                 var auth = new AuthorizationViewModel();
                 auth.AuthorizeObservable
                     .Subscribe(Setting.Accounts.Collection.Add);
-                Messenger.RaiseAsync(new TransitionMessage(
-                                         typeof(AuthorizationWindow),
-                                         auth, TransitionMode.Modal, null));
+                Messenger.RaiseSafeSync(() => new TransitionMessage(
+                    typeof(AuthorizationWindow),
+                    auth, TransitionMode.Modal, null));
             }
             #endregion
 
@@ -283,7 +284,8 @@ namespace StarryEyes.ViewModels
             {
                 if (App.ExecutionMode == ExecutionMode.Standalone)
                 {
-                    var msg = this.Messenger.GetResponse(new TaskDialogMessage(new TaskDialogOptions
+                    var msg = this.Messenger.GetResponseSafe(() =>
+                        new TaskDialogMessage(new TaskDialogOptions
                     {
                         Title = AppInitResources.MsgExecModeWarningTitle,
                         MainIcon = VistaTaskDialogIcon.Warning,
@@ -298,7 +300,8 @@ namespace StarryEyes.ViewModels
                 }
                 else if (App.DatabaseDirectoryUserSpecified)
                 {
-                    var msg = this.Messenger.GetResponse(new TaskDialogMessage(new TaskDialogOptions
+                    var msg = this.Messenger.GetResponseSafe(() =>
+                        new TaskDialogMessage(new TaskDialogOptions
                     {
                         Title = AppInitResources.MsgDatabasePathWarningTitle,
                         MainIcon = VistaTaskDialogIcon.Warning,
@@ -331,16 +334,17 @@ namespace StarryEyes.ViewModels
                     var rh = App.LeastDesktopHeapSize;
                     if (dh < rh)
                     {
-                        var msg = this.Messenger.GetResponse(new TaskDialogMessage(new TaskDialogOptions
-                        {
-                            Title = Resources.AppName,
-                            MainIcon = VistaTaskDialogIcon.Warning,
-                            MainInstruction = AppInitResources.MsgDesktopHeapInst,
-                            Content = AppInitResources.MsgDesktopHeapContent,
-                            ExpandedInfo = AppInitResources.MsgDesktopHeapInfoFormat.SafeFormat(dh, rh),
-                            CommandButtons = new[] { AppInitResources.MsgButtonBrowseMsKb, Resources.MsgButtonCancel },
-                            VerificationText = Resources.MsgDoNotShowAgain,
-                        }));
+                        var msg = this.Messenger.GetResponseSafe(() =>
+                            new TaskDialogMessage(new TaskDialogOptions
+                            {
+                                Title = Resources.AppName,
+                                MainIcon = VistaTaskDialogIcon.Warning,
+                                MainInstruction = AppInitResources.MsgDesktopHeapInst,
+                                Content = AppInitResources.MsgDesktopHeapContent,
+                                ExpandedInfo = AppInitResources.MsgDesktopHeapInfoFormat.SafeFormat(dh, rh),
+                                CommandButtons = new[] { AppInitResources.MsgButtonBrowseMsKb, Resources.MsgButtonCancel },
+                                VerificationText = Resources.MsgDoNotShowAgain,
+                            }));
                         Setting.CheckDesktopHeap.Value = !msg.Response.VerificationChecked.GetValueOrDefault();
                         if (msg.Response.CommandButtonResult == 0)
                         {
@@ -357,14 +361,15 @@ namespace StarryEyes.ViewModels
 
         private void ReInitTabs()
         {
-            var response = this.Messenger.GetResponse(new TaskDialogMessage(new TaskDialogOptions
-            {
-                Title = AppInitResources.MsgTabWarningTitle,
-                MainIcon = VistaTaskDialogIcon.Warning,
-                MainInstruction = AppInitResources.MsgTabWarningInst,
-                Content = AppInitResources.MsgTabWarningContent,
-                CommonButtons = TaskDialogCommonButtons.YesNo,
-            }));
+            var response = this.Messenger.GetResponseSafe(() =>
+                new TaskDialogMessage(new TaskDialogOptions
+                {
+                    Title = AppInitResources.MsgTabWarningTitle,
+                    MainIcon = VistaTaskDialogIcon.Warning,
+                    MainInstruction = AppInitResources.MsgTabWarningInst,
+                    Content = AppInitResources.MsgTabWarningContent,
+                    CommonButtons = TaskDialogCommonButtons.YesNo,
+                }));
             if (response.Response.Result != TaskDialogSimpleResult.Yes) return;
             Setting.ResetTabInfo();
             TabManager.Columns.Clear();
@@ -377,7 +382,7 @@ namespace StarryEyes.ViewModels
         {
             if (Setting.ConfirmOnExitApp.Value && !MainWindowModel.SuppressCloseConfirmation)
             {
-                var ret = Messenger.GetResponse(
+                var ret = Messenger.GetResponseSafe(() =>
                     new TaskDialogMessage(new TaskDialogOptions
                     {
                         Title = AppInitResources.MsgExitTitle,

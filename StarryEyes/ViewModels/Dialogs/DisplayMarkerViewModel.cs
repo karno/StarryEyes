@@ -43,7 +43,8 @@ namespace StarryEyes.ViewModels.Dialogs
         public void Shown()
         {
             Observable.Timer(TimeSpan.FromSeconds(1))
-                      .Subscribe(_ => this.Messenger.RaiseAsync(new WindowActionMessage(WindowAction.Close)));
+                      .Subscribe(_ => this.Messenger.RaiseSafe(() =>
+                          new WindowActionMessage(WindowAction.Close)));
 
         }
     }

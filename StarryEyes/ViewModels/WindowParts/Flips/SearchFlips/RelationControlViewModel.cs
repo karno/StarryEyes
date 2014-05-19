@@ -156,14 +156,14 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                     this.IsFollowing = true;
                     Task.Run(() => _source.RelationData.SetFollowingAsync(_target.Id, true));
                 },
-                ex => this._parent.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
+                ex => ShowTaskDialogMessage(new TaskDialogOptions
                 {
                     Title = SearchFlipResources.MsgErrorFollowTitle,
                     MainIcon = VistaTaskDialogIcon.Error,
                     MainInstruction = SearchFlipResources.MsgErrorFollowInst,
                     Content = GetExceptionDescription(ex),
                     CommonButtons = TaskDialogCommonButtons.Close,
-                })));
+                }));
         }
 
         [UsedImplicitly]
@@ -176,14 +176,14 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                     this.IsFollowing = false;
                     Task.Run(() => _source.RelationData.SetFollowingAsync(_target.Id, false));
                 },
-                ex => this._parent.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
+                ex => ShowTaskDialogMessage(new TaskDialogOptions
                 {
                     Title = SearchFlipResources.MsgErrorUnfollowTitle,
                     MainIcon = VistaTaskDialogIcon.Error,
                     MainInstruction = SearchFlipResources.MsgErrorUnfollowInst,
                     Content = GetExceptionDescription(ex),
                     CommonButtons = TaskDialogCommonButtons.Close,
-                })));
+                }));
         }
 
         [UsedImplicitly]
@@ -198,14 +198,14 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                     Task.Run(() => _source.RelationData.SetFollowingAsync(_target.Id, false));
                     Task.Run(() => _source.RelationData.SetBlockingAsync(_target.Id, true));
                 },
-                ex => this._parent.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
+                ex => ShowTaskDialogMessage(new TaskDialogOptions
                 {
                     Title = SearchFlipResources.MsgErrorBlockTitle,
                     MainIcon = VistaTaskDialogIcon.Error,
                     MainInstruction = SearchFlipResources.MsgErrorBlockInst,
                     Content = GetExceptionDescription(ex),
                     CommonButtons = TaskDialogCommonButtons.Close,
-                })));
+                }));
         }
 
         [UsedImplicitly]
@@ -218,14 +218,14 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                     this.IsBlocking = false;
                     Task.Run(() => _source.RelationData.SetBlockingAsync(_target.Id, false));
                 },
-                ex => this._parent.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
+                ex => ShowTaskDialogMessage(new TaskDialogOptions
                 {
                     Title = SearchFlipResources.MsgErrorUnblockTitle,
                     MainIcon = VistaTaskDialogIcon.Error,
                     MainInstruction = SearchFlipResources.MsgErrorUnblockInst,
                     Content = GetExceptionDescription(ex),
                     CommonButtons = TaskDialogCommonButtons.Close,
-                })));
+                }));
         }
 
         [UsedImplicitly]
@@ -238,14 +238,14 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                     this.IsNoRetweets = true;
                     Task.Run(() => _source.RelationData.SetNoRetweetsAsync(_target.Id, true));
                 },
-                ex => this._parent.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
+                ex => ShowTaskDialogMessage(new TaskDialogOptions
                 {
                     Title = SearchFlipResources.MsgErrorSuppressRetweetsTitle,
                     MainIcon = VistaTaskDialogIcon.Error,
                     MainInstruction = SearchFlipResources.MsgErrorSuppressRetweetsInst,
                     Content = GetExceptionDescription(ex),
                     CommonButtons = TaskDialogCommonButtons.Close,
-                })));
+                }));
         }
 
         [UsedImplicitly]
@@ -258,14 +258,14 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                     this.IsNoRetweets = false;
                     Task.Run(() => _source.RelationData.SetNoRetweetsAsync(_target.Id, false));
                 },
-                ex => this._parent.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
+                ex => ShowTaskDialogMessage(new TaskDialogOptions
                 {
                     Title = SearchFlipResources.MsgErrorUnsuppressRetweetsTitle,
                     MainIcon = VistaTaskDialogIcon.Error,
                     MainInstruction = SearchFlipResources.MsgErrorUnsuppressRetweetsInst,
                     Content = GetExceptionDescription(ex),
                     CommonButtons = TaskDialogCommonButtons.Close,
-                })));
+                }));
         }
 
         [UsedImplicitly]
@@ -278,14 +278,14 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                     this.IsFollowing = false;
                     this.IsBlocking = true;
                 },
-                ex => this._parent.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
+                ex => ShowTaskDialogMessage(new TaskDialogOptions
                 {
                     Title = SearchFlipResources.MsgErrorReportSpamTitle,
                     MainIcon = VistaTaskDialogIcon.Error,
                     MainInstruction = SearchFlipResources.MsgErrorReportSpamInst,
                     Content = GetExceptionDescription(ex),
                     CommonButtons = TaskDialogCommonButtons.Close,
-                })));
+                }));
         }
 
         private string GetExceptionDescription(Exception ex)
@@ -326,6 +326,11 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                         .Subscribe(_ => { },
                                    failed,
                                    succeeded);
+        }
+
+        private void ShowTaskDialogMessage(TaskDialogOptions options)
+        {
+            this._parent.Parent.Messenger.RaiseSafe(() => new TaskDialogMessage(options));
         }
     }
 }

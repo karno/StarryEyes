@@ -352,7 +352,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public void FocusToSearchBox()
         {
-            this.Messenger.Raise(new InteractionMessage("FocusToTextBox"));
+            this.Messenger.RaiseSafe(() => new InteractionMessage("FocusToTextBox"));
         }
 
         public void GotFocusToSearchBox()

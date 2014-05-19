@@ -44,7 +44,7 @@ namespace StarryEyes.ViewModels.Timelines.SearchFlips
 
         public void SetFocus()
         {
-            this.Messenger.Raise(new InteractionMessage("SetFocus"));
+            this.Messenger.RaiseSafe(() => new InteractionMessage("SetFocus"));
         }
 
         public override void GotFocus()

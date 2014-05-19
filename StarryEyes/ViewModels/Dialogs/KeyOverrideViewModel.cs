@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using AsyncOAuth;
+using JetBrains.Annotations;
 using Livet;
 using Livet.Messaging.Windows;
 using StarryEyes.Globalization.Dialogs;
@@ -59,45 +60,43 @@ namespace StarryEyes.ViewModels.Dialogs
             get { return !_isKeyChecking; }
         }
 
+        [UsedImplicitly]
         public void CheckAuthorize()
         {
             if (OverrideConsumerKey == App.ConsumerKey)
             {
-                this.Messenger.Raise(new TaskDialogMessage(
-                    new TaskDialogOptions
-                    {
-                        Title = KeyOverrideWindowResources.MsgKeySettingError,
-                        MainIcon = VistaTaskDialogIcon.Error,
-                        MainInstruction = KeyOverrideWindowResources.MsgBlockingKeyInst,
-                        Content = KeyOverrideWindowResources.MsgBlockingKeyContent,
-                        CommonButtons = TaskDialogCommonButtons.Close
-                    }));
+                this.Messenger.RaiseSafe(() => new TaskDialogMessage(new TaskDialogOptions
+                {
+                    Title = KeyOverrideWindowResources.MsgKeySettingError,
+                    MainIcon = VistaTaskDialogIcon.Error,
+                    MainInstruction = KeyOverrideWindowResources.MsgBlockingKeyInst,
+                    Content = KeyOverrideWindowResources.MsgBlockingKeyContent,
+                    CommonButtons = TaskDialogCommonButtons.Close
+                }));
                 return;
             }
             if (!(System.Text.RegularExpressions.Regex.Match(OverrideConsumerKey, "^[a-zA-Z0-9]+$")).Success)
             {
-                this.Messenger.Raise(new TaskDialogMessage(
-                    new TaskDialogOptions
-                    {
-                        Title = KeyOverrideWindowResources.MsgKeySettingError,
-                        MainIcon = VistaTaskDialogIcon.Error,
-                        MainInstruction = KeyOverrideWindowResources.MsgInvalidKeyInst,
-                        Content = KeyOverrideWindowResources.MsgInvalidKeyContent,
-                        CommonButtons = TaskDialogCommonButtons.Close
-                    }));
+                this.Messenger.RaiseSafe(() => new TaskDialogMessage(new TaskDialogOptions
+                {
+                    Title = KeyOverrideWindowResources.MsgKeySettingError,
+                    MainIcon = VistaTaskDialogIcon.Error,
+                    MainInstruction = KeyOverrideWindowResources.MsgInvalidKeyInst,
+                    Content = KeyOverrideWindowResources.MsgInvalidKeyContent,
+                    CommonButtons = TaskDialogCommonButtons.Close
+                }));
                 return;
             }
             if (!(System.Text.RegularExpressions.Regex.Match(OverrideConsumerSecret, "^[a-zA-Z0-9]+$")).Success)
             {
-                this.Messenger.Raise(new TaskDialogMessage(
-                    new TaskDialogOptions
-                    {
-                        Title = KeyOverrideWindowResources.MsgKeySettingError,
-                        MainIcon = VistaTaskDialogIcon.Error,
-                        MainInstruction = KeyOverrideWindowResources.MsgInvalidSecretInst,
-                        Content = KeyOverrideWindowResources.MsgInvalidSecretContent,
-                        CommonButtons = TaskDialogCommonButtons.Close
-                    }));
+                this.Messenger.RaiseSafe(() => new TaskDialogMessage(new TaskDialogOptions
+                {
+                    Title = KeyOverrideWindowResources.MsgKeySettingError,
+                    MainIcon = VistaTaskDialogIcon.Error,
+                    MainInstruction = KeyOverrideWindowResources.MsgInvalidSecretInst,
+                    Content = KeyOverrideWindowResources.MsgInvalidSecretContent,
+                    CommonButtons = TaskDialogCommonButtons.Close
+                }));
                 return;
             }
             if (IsKeyChecking) return;
@@ -113,45 +112,43 @@ namespace StarryEyes.ViewModels.Dialogs
                               Setting.GlobalConsumerKey.Value = this.OverrideConsumerKey;
                               Setting.GlobalConsumerSecret.Value = this.OverrideConsumerSecret;
                               UpdateEndpointKey();
-                              this.Messenger.Raise(new WindowActionMessage(WindowAction.Close));
+                              this.Messenger.RaiseSafe(() => new WindowActionMessage(WindowAction.Close));
                           },
-                          ex => this.Messenger.Raise(
-                              new TaskDialogMessage(
-                                  new TaskDialogOptions
-                                  {
-                                      Title = KeyOverrideWindowResources.MsgAuthErrorTitle,
-                                      MainIcon = VistaTaskDialogIcon.Error,
-                                      MainInstruction = KeyOverrideWindowResources.MsgAuthErrorInst,
-                                      Content = KeyOverrideWindowResources.MsgAuthErrorContent,
-                                      CommonButtons = TaskDialogCommonButtons.Close,
-                                      FooterIcon = VistaTaskDialogIcon.Information,
-                                      FooterText = KeyOverrideWindowResources.MsgAuthErrorFooter,
-                                  })));
+                          ex => this.Messenger.RaiseSafe(() => new TaskDialogMessage(new TaskDialogOptions
+                          {
+                              Title = KeyOverrideWindowResources.MsgAuthErrorTitle,
+                              MainIcon = VistaTaskDialogIcon.Error,
+                              MainInstruction = KeyOverrideWindowResources.MsgAuthErrorInst,
+                              Content = KeyOverrideWindowResources.MsgAuthErrorContent,
+                              CommonButtons = TaskDialogCommonButtons.Close,
+                              FooterIcon = VistaTaskDialogIcon.Information,
+                              FooterText = KeyOverrideWindowResources.MsgAuthErrorFooter,
+                          })));
         }
 
+        [UsedImplicitly]
         public void SkipAuthorize()
         {
             if (String.IsNullOrEmpty(Setting.GlobalConsumerKey.Value) &&
                 String.IsNullOrEmpty(Setting.GlobalConsumerSecret.Value))
             {
-                var m = this.Messenger.GetResponse(new TaskDialogMessage(
-                     new TaskDialogOptions
-                     {
-                         Title = KeyOverrideWindowResources.MsgSkipTitle,
-                         MainIcon = VistaTaskDialogIcon.Warning,
-                         MainInstruction = KeyOverrideWindowResources.MsgSkipInst,
-                         Content = KeyOverrideWindowResources.MsgSkipContent,
-                         CommonButtons = TaskDialogCommonButtons.OKCancel,
-                         ExpandedInfo = KeyOverrideWindowResources.MsgSkipExInfo
-                     }));
+                var m = this.Messenger.GetResponseSafe(() => new TaskDialogMessage(new TaskDialogOptions
+                {
+                    Title = KeyOverrideWindowResources.MsgSkipTitle,
+                    MainIcon = VistaTaskDialogIcon.Warning,
+                    MainInstruction = KeyOverrideWindowResources.MsgSkipInst,
+                    Content = KeyOverrideWindowResources.MsgSkipContent,
+                    CommonButtons = TaskDialogCommonButtons.OKCancel,
+                    ExpandedInfo = KeyOverrideWindowResources.MsgSkipExInfo
+                }));
                 if (m.Response.Result == TaskDialogSimpleResult.Ok)
                 {
-                    this.Messenger.Raise(new WindowActionMessage(WindowAction.Close));
+                    this.Messenger.RaiseSafe(() => new WindowActionMessage(WindowAction.Close));
                 }
             }
             else
             {
-                this.Messenger.Raise(new WindowActionMessage(WindowAction.Close));
+                this.Messenger.RaiseSafe(() => new WindowActionMessage(WindowAction.Close));
             }
         }
 

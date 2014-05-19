@@ -290,17 +290,16 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                 var action = Setting.TweetBoxClosingAction.Value;
                 if (action == TweetBoxClosingAction.Confirm)
                 {
-                    var msg = _parent.Messenger.GetResponse(
-                        new TaskDialogMessage(
-                            new TaskDialogOptions
-                            {
-                                Title = InputAreaResources.MsgSaveToDraftTitle,
-                                MainIcon = VistaTaskDialogIcon.Information,
-                                MainInstruction = InputAreaResources.MsgSaveToDraftInst,
-                                CommonButtons = TaskDialogCommonButtons.YesNoCancel,
-                                VerificationText = Resources.MsgDoNotShowAgain,
-                                AllowDialogCancellation = true,
-                            }));
+                    var msg = _parent.Messenger.GetResponseSafe(() =>
+                        new TaskDialogMessage(new TaskDialogOptions
+                        {
+                            Title = InputAreaResources.MsgSaveToDraftTitle,
+                            MainIcon = VistaTaskDialogIcon.Information,
+                            MainInstruction = InputAreaResources.MsgSaveToDraftInst,
+                            CommonButtons = TaskDialogCommonButtons.YesNoCancel,
+                            VerificationText = Resources.MsgDoNotShowAgain,
+                            AllowDialogCancellation = true,
+                        }));
                     switch (msg.Response.Result)
                     {
                         case TaskDialogSimpleResult.Yes:
@@ -484,7 +483,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
 
         private void SetCursor(CursorPosition position)
         {
-            this._parent.Messenger.Raise(new TextBoxSetCaretMessage(
+            this._parent.Messenger.RaiseSafe(() => new TextBoxSetCaretMessage(
                 position.Index < 0 ? InputText.Length : position.Index, position.SelectionLength));
         }
 
@@ -579,16 +578,16 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             {
                 dir = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
             }
-            var msg = new OpeningFileSelectionMessage
-            {
-                Filter =
-                    InputAreaResources.AttachImageDlgFilterImg + "|*.jpg;*.jpeg;*.jpe;*.png;*.gif;*.bmp;*.dib|" +
-                    InputAreaResources.AttachImageDlgFilterAll + "|*.*",
-                InitialDirectory = dir,
-                MultiSelect = false,
-                Title = InputAreaResources.AttachImageDlgTitle
-            };
-            var m = _parent.Messenger.GetResponse(msg);
+            var m = _parent.Messenger.GetResponseSafe(() =>
+                new OpeningFileSelectionMessage
+                {
+                    Filter =
+                        InputAreaResources.AttachImageDlgFilterImg + "|*.jpg;*.jpeg;*.jpe;*.png;*.gif;*.bmp;*.dib|" +
+                        InputAreaResources.AttachImageDlgFilterAll + "|*.*",
+                    InitialDirectory = dir,
+                    MultiSelect = false,
+                    Title = InputAreaResources.AttachImageDlgTitle
+                });
             if (m.Response == null || m.Response.Length <= 0 ||
                 String.IsNullOrEmpty(m.Response[0]) || !File.Exists(m.Response[0]))
             {
@@ -641,15 +640,16 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
 
         private void ShowImageAttachErrorMessage(Exception ex)
         {
-            _parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
-            {
-                Title = InputAreaResources.MsgImageLoadErrorTitle,
-                MainIcon = VistaTaskDialogIcon.Error,
-                MainInstruction = InputAreaResources.MsgImageLoadErrorInst,
-                Content = InputAreaResources.MsgImageLoadErrorContent,
-                ExpandedInfo = ex.ToString(),
-                CommonButtons = TaskDialogCommonButtons.Close,
-            }));
+            _parent.Messenger.RaiseSafe(() =>
+                new TaskDialogMessage(new TaskDialogOptions
+                {
+                    Title = InputAreaResources.MsgImageLoadErrorTitle,
+                    MainIcon = VistaTaskDialogIcon.Error,
+                    MainInstruction = InputAreaResources.MsgImageLoadErrorInst,
+                    Content = InputAreaResources.MsgImageLoadErrorContent,
+                    ExpandedInfo = ex.ToString(),
+                    CommonButtons = TaskDialogCommonButtons.Close,
+                }));
         }
 
         [UsedImplicitly]
@@ -661,15 +661,16 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             }
             catch (Exception ex)
             {
-                _parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
-                 {
-                     Title = InputAreaResources.MsgSnippingToolErrorTitle,
-                     MainIcon = VistaTaskDialogIcon.Error,
-                     MainInstruction = InputAreaResources.MsgSnippingToolErrorInst,
-                     Content = InputAreaResources.MsgSnippingToolErrorContent,
-                     ExpandedInfo = ex.ToString(),
-                     CommonButtons = TaskDialogCommonButtons.Close
-                 }));
+                _parent.Messenger.RaiseSafe(() =>
+                    new TaskDialogMessage(new TaskDialogOptions
+                    {
+                        Title = InputAreaResources.MsgSnippingToolErrorTitle,
+                        MainIcon = VistaTaskDialogIcon.Error,
+                        MainInstruction = InputAreaResources.MsgSnippingToolErrorInst,
+                        Content = InputAreaResources.MsgSnippingToolErrorContent,
+                        ExpandedInfo = ex.ToString(),
+                        CommonButtons = TaskDialogCommonButtons.Close
+                    }));
             }
         }
 
@@ -836,18 +837,17 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                     removal += " " + InputAreaResources.MsgAmendExInfoMultipleFormat.SafeFormat(dual);
                 }
                 // amend mode
-                var amend = _parent.Messenger.GetResponse(
-                    new TaskDialogMessage(
-                        new TaskDialogOptions
-                        {
-                            Title = InputAreaResources.MsgAmendTitle,
-                            MainIcon = VistaTaskDialogIcon.Information,
-                            MainInstruction = InputAreaResources.MsgAmendInst,
-                            Content = InputAreaResources.MsgAmendContent,
-                            ExpandedInfo = InputAreaResources.MsgAmendExInfo + removal,
-                            CommonButtons = TaskDialogCommonButtons.OKCancel,
-                            VerificationText = Resources.MsgDoNotShowAgain,
-                        }));
+                var amend = _parent.Messenger.GetResponseSafe(() =>
+                    new TaskDialogMessage(new TaskDialogOptions
+                    {
+                        Title = InputAreaResources.MsgAmendTitle,
+                        MainIcon = VistaTaskDialogIcon.Information,
+                        MainInstruction = InputAreaResources.MsgAmendInst,
+                        Content = InputAreaResources.MsgAmendContent,
+                        ExpandedInfo = InputAreaResources.MsgAmendExInfo + removal,
+                        CommonButtons = TaskDialogCommonButtons.OKCancel,
+                        VerificationText = Resources.MsgDoNotShowAgain,
+                    }));
                 Setting.WarnAmending.Value = !amend.Response.VerificationChecked.GetValueOrDefault();
                 if (amend.Response.Result == TaskDialogSimpleResult.Cancel)
                 {
@@ -876,7 +876,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                              .Select(_ => _.UnreliableScreenName)
                              .Any(replies.Contains))
                 {
-                    var thirdreply = _parent.Messenger.GetResponse(
+                    var thirdreply = _parent.Messenger.GetResponseSafe(() =>
                         new TaskDialogMessage(new TaskDialogOptions
                         {
                             Title = InputAreaResources.MsgThirdReplyWarnTitle,
@@ -917,18 +917,19 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                                   .JoinString(Environment.NewLine);
                         if (Setting.ShowMessageOnTweetFailed.Value)
                         {
-                            var resp = _parent.Messenger.GetResponse(new TaskDialogMessage(new TaskDialogOptions
-                            {
-                                Title = InputAreaResources.MsgTweetFailedTitle,
-                                MainIcon = VistaTaskDialogIcon.Error,
-                                MainInstruction = InputAreaResources.MsgTweetFailedInst,
-                                Content = InputAreaResources.MsgTweetFailedContentFormat.SafeFormat(message),
-                                ExpandedInfo = ed,
-                                FooterText = InputAreaResources.MsgTweetFailedFooter,
-                                FooterIcon = VistaTaskDialogIcon.Information,
-                                VerificationText = Resources.MsgDoNotShowAgain,
-                                CommonButtons = TaskDialogCommonButtons.RetryCancel
-                            }));
+                            var resp = _parent.Messenger.GetResponseSafe(() =>
+                                new TaskDialogMessage(new TaskDialogOptions
+                                {
+                                    Title = InputAreaResources.MsgTweetFailedTitle,
+                                    MainIcon = VistaTaskDialogIcon.Error,
+                                    MainInstruction = InputAreaResources.MsgTweetFailedInst,
+                                    Content = InputAreaResources.MsgTweetFailedContentFormat.SafeFormat(message),
+                                    ExpandedInfo = ed,
+                                    FooterText = InputAreaResources.MsgTweetFailedFooter,
+                                    FooterIcon = VistaTaskDialogIcon.Information,
+                                    VerificationText = Resources.MsgDoNotShowAgain,
+                                    CommonButtons = TaskDialogCommonButtons.RetryCancel
+                                }));
                             Setting.ShowMessageOnTweetFailed.Value =
                                 !resp.Response.VerificationChecked.GetValueOrDefault();
                             if (resp.Response.Result == TaskDialogSimpleResult.Retry)

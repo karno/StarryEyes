@@ -1986,6 +1986,8 @@
                       ItemTemplate="{StaticResource StatusItemTemplate}"
                       ItemsSource="{Binding Timeline,
                                             Mode=OneWay}"
+                      VirtualizingPanel.CacheLength="3"
+                      VirtualizingPanel.CacheLengthUnit="Page"
                       VirtualizingPanel.IsVirtualizing="True"
                       VirtualizingPanel.ScrollUnit="Pixel"
                       VirtualizingPanel.VirtualizationMode="Recycling">

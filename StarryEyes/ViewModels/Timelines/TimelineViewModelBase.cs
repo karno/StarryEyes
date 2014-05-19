@@ -209,6 +209,7 @@ namespace StarryEyes.ViewModels.Timelines
             DeselectAll();
         }
 
+        [UsedImplicitly]
         public void FavoriteSelecteds()
         {
             var accounts = CurrentAccounts
@@ -217,15 +218,15 @@ namespace StarryEyes.ViewModels.Timelines
                 .ToArray();
             if (accounts.Length == 0)
             {
-                var msg = new TaskDialogMessage(new TaskDialogOptions
-                {
-                    Title = MainAreaTimelineResources.MsgQuickActionFailedTitle,
-                    MainIcon = VistaTaskDialogIcon.Error,
-                    MainInstruction = MainAreaTimelineResources.MsgFavoriteFailedInst,
-                    Content = MainAreaTimelineResources.MsgQuickActionAccountIsNotSelected,
-                    CommonButtons = TaskDialogCommonButtons.Close,
-                });
-                this.Messenger.Raise(msg);
+                this.Messenger.RaiseSafe(() =>
+                    new TaskDialogMessage(new TaskDialogOptions
+                    {
+                        Title = MainAreaTimelineResources.MsgQuickActionFailedTitle,
+                        MainIcon = VistaTaskDialogIcon.Error,
+                        MainInstruction = MainAreaTimelineResources.MsgFavoriteFailedInst,
+                        Content = MainAreaTimelineResources.MsgQuickActionAccountIsNotSelected,
+                        CommonButtons = TaskDialogCommonButtons.Close,
+                    }));
                 return;
             }
             SelectedStatuses
@@ -234,6 +235,7 @@ namespace StarryEyes.ViewModels.Timelines
             DeselectAll();
         }
 
+        [UsedImplicitly]
         public void ExtractSelecteds()
         {
             var users = SelectedStatuses
@@ -269,12 +271,14 @@ namespace StarryEyes.ViewModels.Timelines
                 var previous = _focusedStatus;
                 _focusedStatus = value;
                 if (previous != null)
+                {
                     previous.RaiseFocusedChanged();
+                }
                 if (value != null)
                 {
                     value.RaiseFocusedChanged();
                     var index = this.Timeline.IndexOf(value);
-                    this.Messenger.RaiseAsync(new ScrollIntoViewMessage(index));
+                    this.Messenger.RaiseSafe(() => new ScrollIntoViewMessage(index));
                 }
             }
         }

@@ -11,6 +11,7 @@ namespace StarryEyes.Views.Messaging
         public TextBoxSetCaretMessage(string messageKey) : base(messageKey) { }
         public TextBoxSetCaretMessage(int caretIndex, int selectionLength)
         {
+            DispatcherHolder.VerifyAccess();
             this.CaretIndex = caretIndex;
             SelectionLength = selectionLength;
         }

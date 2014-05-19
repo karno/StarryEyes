@@ -188,7 +188,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                                },
                                ex =>
                                {
-                                   parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
+                                   parent.Messenger.RaiseSafe(() => new TaskDialogMessage(new TaskDialogOptions
                                    {
                                        Title = SearchFlipResources.MsgUserInfoLoadErrorTitle,
                                        MainIcon = VistaTaskDialogIcon.Error,

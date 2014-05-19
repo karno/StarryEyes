@@ -34,14 +34,14 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 MainWindowModel.SetShowMainWindowCommands(false);
             }
             IsVisible = true;
-            this.Messenger.Raise(new GoToStateMessage("Open"));
+            this.Messenger.RaiseSafe(() => new GoToStateMessage("Open"));
         }
 
         public virtual void Close()
         {
             if (!IsVisible) return;
             IsVisible = false;
-            this.Messenger.Raise(new GoToStateMessage("Close"));
+            this.Messenger.RaiseSafe(() => new GoToStateMessage("Close"));
             if (IsWindowCommandsRelated)
             {
                 MainWindowModel.SetShowMainWindowCommands(true);

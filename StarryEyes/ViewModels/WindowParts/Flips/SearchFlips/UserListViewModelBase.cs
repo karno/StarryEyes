@@ -80,14 +80,15 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 var info = Setting.Accounts.GetRandomOne();
                 if (info == null)
                 {
-                    _parent.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
-                    {
-                        Title = SearchFlipResources.MsgUserInfoLoadErrorTitle,
-                        MainIcon = VistaTaskDialogIcon.Error,
-                        MainInstruction = SearchFlipResources.MsgUserInfoLoadErrorInst,
-                        Content = SearchFlipResources.MsgUserInfoLoadErrorAccountIsNotExist,
-                        CommonButtons = TaskDialogCommonButtons.Close,
-                    }));
+                    _parent.Parent.Messenger.RaiseSafe(() =>
+                        new TaskDialogMessage(new TaskDialogOptions
+                        {
+                            Title = SearchFlipResources.MsgUserInfoLoadErrorTitle,
+                            MainIcon = VistaTaskDialogIcon.Error,
+                            MainInstruction = SearchFlipResources.MsgUserInfoLoadErrorInst,
+                            Content = SearchFlipResources.MsgUserInfoLoadErrorAccountIsNotExist,
+                            CommonButtons = TaskDialogCommonButtons.Close,
+                        }));
                     return;
                 }
                 var page = Interlocked.Increment(ref _currentPageCount);
@@ -119,14 +120,15 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 }
                 catch (Exception ex)
                 {
-                    _parent.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
-                    {
-                        Title = SearchFlipResources.MsgUserInfoLoadErrorTitle,
-                        MainIcon = VistaTaskDialogIcon.Error,
-                        MainInstruction = SearchFlipResources.MsgUserInfoLoadErrorInst,
-                        Content = ex.Message,
-                        CommonButtons = TaskDialogCommonButtons.Close,
-                    }));
+                    _parent.Parent.Messenger.RaiseSafe(() =>
+                        new TaskDialogMessage(new TaskDialogOptions
+                        {
+                            Title = SearchFlipResources.MsgUserInfoLoadErrorTitle,
+                            MainIcon = VistaTaskDialogIcon.Error,
+                            MainInstruction = SearchFlipResources.MsgUserInfoLoadErrorInst,
+                            Content = ex.Message,
+                            CommonButtons = TaskDialogCommonButtons.Close,
+                        }));
                 }
             });
         }
@@ -146,7 +148,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             }
             catch (Exception ex)
             {
-                this._parent.Parent.Messenger.Raise(
+                _parent.Parent.Messenger.RaiseSafe(() =>
                     new TaskDialogMessage(new TaskDialogOptions
                     {
                         Title = SearchFlipResources.MsgUserInfoLoadErrorTitle,

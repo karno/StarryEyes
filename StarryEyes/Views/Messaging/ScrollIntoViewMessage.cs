@@ -9,6 +9,7 @@ namespace StarryEyes.Views.Messaging
         public ScrollIntoViewMessage(string messageKey, int index)
             : base(messageKey)
         {
+            DispatcherHolder.VerifyAccess();
             _index = index;
         }
 

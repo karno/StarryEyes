@@ -173,8 +173,7 @@ namespace StarryEyes.ViewModels.Notifications
         public void Shown()
         {
             Observable.Timer(TimeSpan.FromSeconds(3.1))
-                      .Subscribe(_ => this.Messenger.RaiseAsync(
-                          new WindowActionMessage(WindowAction.Close)));
+                      .Subscribe(_ => this.Messenger.RaiseSafe(() => new WindowActionMessage(WindowAction.Close)));
             Observable.Timer(TimeSpan.FromSeconds(0.1))
                       .Subscribe(_ => ShowNext());
         }

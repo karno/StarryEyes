@@ -162,7 +162,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 (Setting.GlobalConsumerKey.Value == null || Setting.GlobalConsumerSecret.Value == null) ||
                 Setting.GlobalConsumerKey.Value == App.ConsumerKey)
             {
-                _parent.Messenger.RaiseAsync(
+                _parent.Messenger.RaiseSafe(() =>
                     new TaskDialogMessage(new TaskDialogOptions
                     {
                         Title = "認証の上限",
@@ -177,7 +177,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             }
             var auth = new AuthorizationViewModel();
             auth.AuthorizeObservable.Subscribe(Setting.Accounts.Collection.Add);
-            this._parent.Messenger.RaiseAsync(
+            this._parent.Messenger.RaiseSafe(() =>
                 new TransitionMessage(typeof(AuthorizationWindow), auth, TransitionMode.Modal, null));
         }
 
@@ -188,7 +188,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             {
                 reconf = "設定";
             }
-            var resp = await this.Messenger.GetResponseAsync(
+            var resp = this.Messenger.GetResponseSafe(() =>
                 new TaskDialogMessage(new TaskDialogOptions
                 {
                     Title = "APIキーの" + reconf,
@@ -202,7 +202,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 return;
             }
             var kovm = new KeyOverrideViewModel();
-            this._parent.Messenger.Raise(
+            this._parent.Messenger.RaiseSafe(() =>
                 new TransitionMessage(typeof(KeyOverrideWindow), kovm, TransitionMode.Modal, null));
         }
 
@@ -234,7 +234,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             if (Setting.TweetDisplayMode.Value == Settings.TweetDisplayMode.Expanded &&
                 (newValue == Settings.TweetDisplayMode.SingleLine || newValue == Settings.TweetDisplayMode.Mixed))
             {
-                var resp = this.Messenger.GetResponse(new TaskDialogMessage(new TaskDialogOptions
+                var resp = this.Messenger.GetResponseSafe(() => new TaskDialogMessage(new TaskDialogOptions
                 {
                     Title = "一行表示モードの警告",
                     MainIcon = VistaTaskDialogIcon.Warning,
@@ -268,7 +268,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 {
                     ww.Closed += async (o, e) =>
                     {
-                        await this.Messenger.RaiseAsync(new TaskDialogMessage(new TaskDialogOptions
+                        await this.Messenger.RaiseSafeAsync(() => new TaskDialogMessage(new TaskDialogOptions
                         {
                             Title = "Krileの開発にご協力ください。",
                             MainIcon = VistaTaskDialogIcon.Information,
@@ -571,10 +571,11 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             set { Setting.ShowMessageOnTweetFailed.Value = value; }
         }
 
+        [UsedImplicitly]
         public void ClearAllTabNotification()
         {
             TabManager.Columns.SelectMany(c => c.Tabs).ForEach(t => t.NotifyNewArrivals = false);
-            _parent.Messenger.RaiseAsync(
+            _parent.Messenger.RaiseSafe(() =>
                 new TaskDialogMessage(new TaskDialogOptions
                 {
                     Title = "通知のクリア",
@@ -610,18 +611,22 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             }
         }
 
+        [UsedImplicitly]
         public void SelectBackgroundImage()
         {
-            var msg = new OpeningFileSelectionMessage
+            var resp = this.Messenger.GetResponseSafe(() =>
             {
-                Filter = "画像ファイル|*.png;*.jpg;*.jpeg;*.gif;*.bmp",
-                Title = "背景画像を選択"
-            };
-            if (!String.IsNullOrEmpty(BackgroundImagePath))
-            {
-                msg.FileName = BackgroundImagePath;
-            }
-            var resp = this.Messenger.GetResponse(msg);
+                var msg = new OpeningFileSelectionMessage
+                {
+                    Filter = "画像ファイル|*.png;*.jpg;*.jpeg;*.gif;*.bmp",
+                    Title = "背景画像を選択"
+                };
+                if (!String.IsNullOrEmpty(BackgroundImagePath))
+                {
+                    msg.FileName = BackgroundImagePath;
+                }
+                return msg;
+            });
             if (resp.Response != null && resp.Response.Length > 0)
             {
                 BackgroundImagePath = resp.Response[0];
@@ -853,7 +858,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         [UsedImplicitly]
         public void AddNewKeyAssign()
         {
-            var response = this.Messenger.GetResponse(new TransitionMessage(typeof(AddNewKeyAssignWindow),
+            var response = this.Messenger.GetResponseSafe(() => new TransitionMessage(typeof(AddNewKeyAssignWindow),
                 new AddNewKeyAssignDialogViewModel(), TransitionMode.Modal));
             var tranvm = (AddNewKeyAssignDialogViewModel)response.TransitionViewModel;
             if (tranvm.Result)
@@ -874,7 +879,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         [UsedImplicitly]
         public void DeleteCurrentKeyAssign()
         {
-            var response = this.Messenger.GetResponse(
+            var response = this.Messenger.GetResponseSafe(() =>
                 new TaskDialogMessage(new TaskDialogOptions
                 {
                     Title = "キーアサイン ファイルの削除",
@@ -902,7 +907,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 }
                 catch (Exception ex)
                 {
-                    this.Messenger.Raise(
+                    this.Messenger.RaiseSafe(() =>
                         new TaskDialogMessage(new TaskDialogOptions
                         {
                             Title = "キーアサイン ファイルの削除",
@@ -1304,15 +1309,16 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public void Deauthorize()
         {
-            var resp = _parent.Messenger.GetResponse(new TaskDialogMessage(new TaskDialogOptions
-            {
-                Title = "アカウントの削除",
-                MainIcon = VistaTaskDialogIcon.Warning,
-                MainInstruction = "@" + ScreenName + " の認証を解除してもよろしいですか？",
-                Content = "このアカウントに関するタイムラインを取得できなくなり、投稿も行えなくなります。" + Environment.NewLine +
-                          "完全に認証を解除するには、Twitter公式サイトのアプリ管理ページからアクセス権を剥奪する必要があります。",
-                CommonButtons = TaskDialogCommonButtons.OKCancel
-            }));
+            var resp = _parent.Messenger.GetResponseSafe(() =>
+                new TaskDialogMessage(new TaskDialogOptions
+                {
+                    Title = "アカウントの削除",
+                    MainIcon = VistaTaskDialogIcon.Warning,
+                    MainInstruction = "@" + ScreenName + " の認証を解除してもよろしいですか？",
+                    Content = "このアカウントに関するタイムラインを取得できなくなり、投稿も行えなくなります。" + Environment.NewLine +
+                              "完全に認証を解除するには、Twitter公式サイトのアプリ管理ページからアクセス権を剥奪する必要があります。",
+                    CommonButtons = TaskDialogCommonButtons.OKCancel
+                }));
             if (resp.Response.Result == TaskDialogSimpleResult.Ok)
             {
                 Setting.Accounts.RemoveAccountFromId(Account.Id);

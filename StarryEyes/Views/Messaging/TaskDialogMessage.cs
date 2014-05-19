@@ -10,6 +10,7 @@ namespace StarryEyes.Views.Messaging
 
         public TaskDialogMessage(TaskDialogOptions options)
         {
+            DispatcherHolder.VerifyAccess();
             this.Options = options;
         }
         public TaskDialogMessage(string messageKey, TaskDialogOptions options)

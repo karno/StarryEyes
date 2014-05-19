@@ -671,15 +671,14 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             }
             catch (Exception ex)
             {
-                var msg = new TaskDialogMessage(new TaskDialogOptions
+                this.Parent.Messenger.RaiseSafe(() => new TaskDialogMessage(new TaskDialogOptions
                 {
                     Title = MainAreaTimelineResources.MsgClipboardErrorTitle,
                     MainIcon = VistaTaskDialogIcon.Error,
                     MainInstruction = MainAreaTimelineResources.MsgClipboardErrorInst,
                     Content = ex.Message,
                     CommonButtons = TaskDialogCommonButtons.Close,
-                });
-                this.Parent.Messenger.Raise(msg);
+                }));
             }
         }
 
@@ -815,15 +814,15 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
 
         private void NotifyQuickActionFailed(string main, string body)
         {
-            var msg = new TaskDialogMessage(new TaskDialogOptions
-            {
-                Title = MainAreaTimelineResources.MsgQuickActionFailedTitle,
-                MainIcon = VistaTaskDialogIcon.Error,
-                MainInstruction = main,
-                Content = body,
-                CommonButtons = TaskDialogCommonButtons.Close,
-            });
-            this.Parent.Messenger.Raise(msg);
+            this.Parent.Messenger.RaiseSafe(() =>
+                new TaskDialogMessage(new TaskDialogOptions
+                {
+                    Title = MainAreaTimelineResources.MsgQuickActionFailedTitle,
+                    MainIcon = VistaTaskDialogIcon.Error,
+                    MainInstruction = main,
+                    Content = body,
+                    CommonButtons = TaskDialogCommonButtons.Close,
+                }));
         }
 
         [UsedImplicitly]
@@ -1053,19 +1052,19 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                 footer = MainAreaTimelineResources.MsgDeleteFooterWithKeyFormat
                                                   .SafeFormat(amendkey.GetKeyDescribeString());
             }
-            var msg = new TaskDialogMessage(new TaskDialogOptions
-            {
-                Title = MainAreaTimelineResources.MsgDeleteTitle,
-                MainIcon = VistaTaskDialogIcon.Warning,
-                MainInstruction = MainAreaTimelineResources.MsgDeleteInst,
-                Content = MainAreaTimelineResources.MsgDeleteContent,
-                CustomButtons = new[] { MainAreaTimelineResources.MsgDeleteCmdDelete, Resources.MsgButtonCancel },
-                AllowDialogCancellation = true,
-                DefaultButtonIndex = 0,
-                FooterIcon = VistaTaskDialogIcon.Information,
-                FooterText = footer
-            });
-            var response = this.Parent.Messenger.GetResponse(msg);
+            var response = this.Parent.Messenger.GetResponseSafe(() =>
+                new TaskDialogMessage(new TaskDialogOptions
+                {
+                    Title = MainAreaTimelineResources.MsgDeleteTitle,
+                    MainIcon = VistaTaskDialogIcon.Warning,
+                    MainInstruction = MainAreaTimelineResources.MsgDeleteInst,
+                    Content = MainAreaTimelineResources.MsgDeleteContent,
+                    CustomButtons = new[] { MainAreaTimelineResources.MsgDeleteCmdDelete, Resources.MsgButtonCancel },
+                    AllowDialogCancellation = true,
+                    DefaultButtonIndex = 0,
+                    FooterIcon = VistaTaskDialogIcon.Information,
+                    FooterText = footer
+                }));
             if (response.Response.CustomButtonResult == 0)
             {
                 this.Delete();
@@ -1129,7 +1128,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         // this method is not supported yet.
         public void GiveFavstarTrophy()
         {
-            this.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
+            this.Parent.Messenger.RaiseSafe(() => new TaskDialogMessage(new TaskDialogOptions
             {
                 AllowDialogCancellation = true,
                 CommonButtons = TaskDialogCommonButtons.Close,
@@ -1178,22 +1177,22 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
 
         public void ReportAsSpam()
         {
-            var msg = new TaskDialogMessage(new TaskDialogOptions
-            {
-                Title = MainAreaTimelineResources.MsgReportAsSpamTitle,
-                MainIcon = VistaTaskDialogIcon.Warning,
-                MainInstruction = MainAreaTimelineResources.MsgReportAsSpamInstFormat
-                    .SafeFormat("@" + this.Status.User.ScreenName),
-                Content = MainAreaTimelineResources.MsgReportAsSpamContent,
-                CustomButtons = new[]
+            var response = this.Parent.Messenger.GetResponseSafe(() =>
+                new TaskDialogMessage(new TaskDialogOptions
                 {
-                    MainAreaTimelineResources.MsgReportAsSpamCmdReportAsSpam,
-                    Resources.MsgButtonCancel
-                },
-                DefaultButtonIndex = 0,
-                AllowDialogCancellation = true,
-            });
-            var response = this.Parent.Messenger.GetResponse(msg);
+                    Title = MainAreaTimelineResources.MsgReportAsSpamTitle,
+                    MainIcon = VistaTaskDialogIcon.Warning,
+                    MainInstruction = MainAreaTimelineResources.MsgReportAsSpamInstFormat
+                                                               .SafeFormat("@" + this.Status.User.ScreenName),
+                    Content = MainAreaTimelineResources.MsgReportAsSpamContent,
+                    CustomButtons = new[]
+                    {
+                        MainAreaTimelineResources.MsgReportAsSpamCmdReportAsSpam,
+                        Resources.MsgButtonCancel
+                    },
+                    DefaultButtonIndex = 0,
+                    AllowDialogCancellation = true,
+                }));
             if (response.Response.CustomButtonResult != 0) return;
             // report as a spam
             var accounts = Setting.Accounts.Collection.ToArray();
@@ -1230,14 +1229,15 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         {
             if (String.IsNullOrWhiteSpace(this.SelectedText))
             {
-                this.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
-                {
-                    Title = MainAreaTimelineResources.MsgMuteKeywordTitle,
-                    MainIcon = VistaTaskDialogIcon.Information,
-                    MainInstruction = MainAreaTimelineResources.MsgMuteKeywordSelectInst,
-                    Content = MainAreaTimelineResources.MsgMuteKeywordSelectContent,
-                    CommonButtons = TaskDialogCommonButtons.Close,
-                }));
+                this.Parent.Messenger.RaiseSafe(() =>
+                    new TaskDialogMessage(new TaskDialogOptions
+                    {
+                        Title = MainAreaTimelineResources.MsgMuteKeywordTitle,
+                        MainIcon = VistaTaskDialogIcon.Information,
+                        MainInstruction = MainAreaTimelineResources.MsgMuteKeywordSelectInst,
+                        Content = MainAreaTimelineResources.MsgMuteKeywordSelectContent,
+                        CommonButtons = TaskDialogCommonButtons.Close,
+                    }));
                 return;
             }
             var response = QueryMuteMessage(MainAreaTimelineResources.MsgMuteKeywordTitle,
@@ -1286,19 +1286,19 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
 
         private TaskDialogMessage QueryMuteMessage(string title, string inst, string content)
         {
-            var msg = new TaskDialogMessage(new TaskDialogOptions
-            {
-                Title = title,
-                MainIcon = VistaTaskDialogIcon.Warning,
-                MainInstruction = inst,
-                Content = content,
-                CustomButtons = new[] { MainAreaTimelineResources.MsgMuteCmdMute, Resources.MsgButtonCancel },
-                DefaultButtonIndex = 0,
-                FooterIcon = VistaTaskDialogIcon.Information,
-                FooterText = MainAreaTimelineResources.MsgMuteFooter,
-                AllowDialogCancellation = true,
-            });
-            return this.Parent.Messenger.GetResponse(msg);
+            return this.Parent.Messenger.GetResponseSafe(() =>
+                new TaskDialogMessage(new TaskDialogOptions
+                {
+                    Title = title,
+                    MainIcon = VistaTaskDialogIcon.Warning,
+                    MainInstruction = inst,
+                    Content = content,
+                    CustomButtons = new[] { MainAreaTimelineResources.MsgMuteCmdMute, Resources.MsgButtonCancel },
+                    DefaultButtonIndex = 0,
+                    FooterIcon = VistaTaskDialogIcon.Information,
+                    FooterText = MainAreaTimelineResources.MsgMuteFooter,
+                    AllowDialogCancellation = true,
+                }));
         }
 
         [UsedImplicitly]

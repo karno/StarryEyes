@@ -7,6 +7,7 @@ namespace StarryEyes.Views.Messaging
         public GoToStateMessage(string messageKey, string stateName, bool useTransitions = true)
             : base(messageKey)
         {
+            DispatcherHolder.VerifyAccess();
             this.StateName = stateName;
             this.UseTransitions = useTransitions;
         }
