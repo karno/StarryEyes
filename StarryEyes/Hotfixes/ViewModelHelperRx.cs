@@ -18,7 +18,7 @@ namespace StarryEyes
     public static class ViewModelHelperRx
     {
         public static ReadOnlyDispatcherCollectionRx<TViewModel> CreateReadOnlyDispatcherCollectionRx<TModel, TViewModel>
-            (IList<TModel> source, Func<TModel, TViewModel> converter, Dispatcher dispatcher, DispatcherPriority priority = DispatcherPriority.Normal)
+            (ObservableSynchronizedCollectionEx<TModel> source, Func<TModel, TViewModel> converter, Dispatcher dispatcher, DispatcherPriority priority = DispatcherPriority.Normal)
         {
             if (source == null) throw new ArgumentNullException("source");
 
@@ -37,26 +37,14 @@ namespace StarryEyes
             };
             var result = new ReadOnlyDispatcherCollectionRx<TViewModel>(target);
 
-            var scx = source as ObservableSynchronizedCollectionEx<TModel>;
-            if (scx != null)
+            source.SynchronizedToArray(array =>
             {
-                scx.SynchronizedToArray(array =>
-                {
-                    result.Disposables.Add(CreateSubscription(sourceAsNotifyCollection, converter, target));
-                    foreach (var model in array)
-                    {
-                        initCollection.Add(converter(model));
-                    }
-                });
-            }
-            else
-            {
-                foreach (var model in source)
+                foreach (var model in array)
                 {
                     initCollection.Add(converter(model));
                 }
                 result.Disposables.Add(CreateSubscription(sourceAsNotifyCollection, converter, target));
-            }
+            });
             return result;
         }
 
