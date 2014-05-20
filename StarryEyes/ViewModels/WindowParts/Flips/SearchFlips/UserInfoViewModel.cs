@@ -147,6 +147,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                                user =>
                                {
                                    User = new UserViewModel(user);
+                                   cd.Add(User);
                                    var ps = this._statuses;
                                    var usm = new UserTimelineModel(user.Id, TimelineType.User);
                                    this._statuses = new UserTimelineViewModel(this, usm);
@@ -173,6 +174,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                                    {
                                        pfw.Dispose();
                                    }
+
                                    var pfr = this._followers;
                                    this._followers = new UserFollowersViewModel(this);
                                    this.RaisePropertyChanged(() => Followers);

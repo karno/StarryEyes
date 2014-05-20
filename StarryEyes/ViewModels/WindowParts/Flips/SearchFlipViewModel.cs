@@ -457,7 +457,6 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 this.Close();
                 return;
             }
-            _backStack.Pop();
             var item = _backStack.Peek();
             this.Text = item.Item1;
             if (this.SearchMode == item.Item2)

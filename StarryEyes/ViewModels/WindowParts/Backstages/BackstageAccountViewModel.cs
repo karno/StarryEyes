@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reactive.Linq;
+using System.Threading;
 using Livet;
 using StarryEyes.Models;
 using StarryEyes.Models.Backstages;
@@ -14,9 +15,16 @@ namespace StarryEyes.ViewModels.WindowParts.Backstages
     {
         private readonly BackstageViewModel _parent;
         private readonly BackstageAccountModel _model;
+
+        private UserViewModel _uvmCache;
+
         public UserViewModel User
         {
-            get { return _model.User == null ? null : new UserViewModel(_model.User); }
+            get
+            {
+                UpdateUserCache();
+                return _uvmCache;
+            }
         }
 
         public UserStreamsConnectionState ConnectionState
@@ -67,6 +75,26 @@ namespace StarryEyes.ViewModels.WindowParts.Backstages
                               this.RaisePropertyChanged(() => MaxUpdate);
                               this.RaisePropertyChanged(() => IsWarningPostLimit);
                           }));
+            this.CompositeDisposable.Add(() =>
+            {
+                if (this._uvmCache == null) return;
+                var cache = this._uvmCache;
+                this._uvmCache = null;
+                cache.Dispose();
+            });
+            UpdateUserCache();
+        }
+
+        private void UpdateUserCache()
+        {
+            var old = Interlocked.Exchange(ref _uvmCache,
+                _model.User != null
+                    ? new UserViewModel(_model.User)
+                    : null);
+            if (old != null)
+            {
+                old.Dispose();
+            }
         }
 
         private void UserChanged()

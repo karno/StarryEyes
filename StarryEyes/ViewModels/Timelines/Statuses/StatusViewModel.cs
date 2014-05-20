@@ -193,23 +193,26 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         {
             get
             {
-                if (this._user == null)
-                {
-                    this._user = new UserViewModel((this.Status.RetweetedOriginal ?? this.Status).User);
-                    this.CompositeDisposable.Add(_user);
-                }
-                return this._user;
+                return this._user ??
+                       (this._user = CreateUserViewModel((this.Status.RetweetedOriginal ?? this.Status).User));
             }
         }
 
         public UserViewModel Retweeter
         {
-            get { return this._retweeter ?? (this._retweeter = new UserViewModel(this.OriginalStatus.User)); }
+            get { return this._retweeter ?? (this._retweeter = CreateUserViewModel(this.OriginalStatus.User)); }
         }
 
         public UserViewModel Recipient
         {
-            get { return this._recipient ?? (this._recipient = new UserViewModel(this.Status.Recipient)); }
+            get { return this._recipient ?? (this._recipient = CreateUserViewModel(this.Status.Recipient)); }
+        }
+
+        private UserViewModel CreateUserViewModel(TwitterUser user)
+        {
+            var uvm = new UserViewModel(user);
+            this.CompositeDisposable.Add(uvm);
+            return uvm;
         }
 
         public string SingleLinedText

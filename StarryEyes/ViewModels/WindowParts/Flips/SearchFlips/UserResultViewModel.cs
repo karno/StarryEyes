@@ -56,6 +56,14 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             this._parent = parent;
             this._query = query;
             LoadMore();
+            this.CompositeDisposable.Add(() =>
+            {
+                foreach (var vm in _users)
+                {
+                    vm.Dispose();
+                }
+                _users.Clear();
+            });
         }
 
         public bool IsScrollInBottom

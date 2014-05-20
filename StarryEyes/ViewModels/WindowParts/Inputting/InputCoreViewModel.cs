@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using JetBrains.Annotations;
@@ -402,21 +403,22 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                 if (_recipientViewModel == null ||
                     _recipientViewModel.User.Id != InputData.MessageRecipient.Id)
                 {
-                    _recipientViewModel = new UserViewModel(InputData.MessageRecipient);
+                    var old = Interlocked.Exchange(ref _recipientViewModel,
+                        _recipientViewModel = new UserViewModel(InputData.MessageRecipient));
+                    if (old != null)
+                    {
+                        old.Dispose();
+                    }
                 }
                 return _recipientViewModel;
             }
             set
             {
-                if (value == null)
+                this.InputData.MessageRecipient = value == null ? null : value.User;
+                var old = Interlocked.Exchange(ref _recipientViewModel, value);
+                if (old != null)
                 {
-                    InputData.MessageRecipient = null;
-                    _recipientViewModel = null;
-                }
-                else
-                {
-                    InputData.MessageRecipient = value.User;
-                    _recipientViewModel = value;
+                    old.Dispose();
                 }
                 RaisePropertyChanged(() => DirectMessageTo);
                 RaisePropertyChanged(() => IsDirectMessageEnabled);
