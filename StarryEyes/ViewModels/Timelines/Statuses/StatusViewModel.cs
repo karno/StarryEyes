@@ -53,11 +53,6 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         private bool _isInReplyToLoading;
         private bool _isInReplyToLoaded;
 
-        public StatusViewModel(StatusModel status)
-            : this(null, status, null)
-        {
-        }
-
         public StatusViewModel(TimelineViewModelBase parent, StatusModel status,
             IEnumerable<long> initialBoundAccounts)
         {
@@ -70,10 +65,10 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             this._bindingAccounts = initialBoundAccounts.Guard().ToArray();
 
             // initialize users information
-            this._favoritedUsers = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
-                this.Model.FavoritedUsers, user => new UserViewModel(user),
-                DispatcherHelper.UIDispatcher, DispatcherPriority.Background);
-            this.CompositeDisposable.Add(this._favoritedUsers);
+            this.CompositeDisposable.Add(
+                this._favoritedUsers = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
+                    this.Model.FavoritedUsers, user => new UserViewModel(user),
+                    DispatcherHelper.UIDispatcher, DispatcherPriority.Background));
             this.CompositeDisposable.Add(
                 this._favoritedUsers.ListenCollectionChanged()
                     .Subscribe(_ =>
@@ -82,10 +77,10 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                         this.RaisePropertyChanged(() => this.IsFavoritedUserExists);
                         this.RaisePropertyChanged(() => this.FavoriteCount);
                     }));
-            this._retweetedUsers = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
-                this.Model.RetweetedUsers, user => new UserViewModel(user),
-                DispatcherHelper.UIDispatcher, DispatcherPriority.Background);
-            this.CompositeDisposable.Add(this._retweetedUsers);
+            this.CompositeDisposable.Add(
+                this._retweetedUsers = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
+                    this.Model.RetweetedUsers, user => new UserViewModel(user),
+                    DispatcherHelper.UIDispatcher, DispatcherPriority.Background));
             this.CompositeDisposable.Add(
                 this._retweetedUsers.ListenCollectionChanged()
                     .Subscribe(_ =>
@@ -129,16 +124,16 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             {
                 lock (imgsubj)
                 {
-                    var subscribe = imgsubj
-                        .Finally(() =>
-                        {
-                            this.RaisePropertyChanged(() => this.Images);
-                            this.RaisePropertyChanged(() => this.ThumbnailImage);
-                            this.RaisePropertyChanged(() => this.IsImageAvailable);
-                            this.RaisePropertyChanged(() => this.IsThumbnailAvailable);
-                        })
-                        .Subscribe();
-                    this.CompositeDisposable.Add(subscribe);
+                    this.CompositeDisposable.Add(
+                        imgsubj
+                            .Finally(() =>
+                            {
+                                this.RaisePropertyChanged(() => this.Images);
+                                this.RaisePropertyChanged(() => this.ThumbnailImage);
+                                this.RaisePropertyChanged(() => this.IsImageAvailable);
+                                this.RaisePropertyChanged(() => this.IsThumbnailAvailable);
+                            })
+                            .Subscribe());
                 }
             }
 

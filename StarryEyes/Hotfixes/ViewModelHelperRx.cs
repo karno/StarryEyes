@@ -120,6 +120,7 @@ namespace StarryEyes
                     }
                     catch (ArgumentOutOfRangeException aoex)
                     {
+                        // collection inconsistent state
                         throw new InvalidOperationException(
                             "Collection state is invalid." + Environment.NewLine +
                             "INDEX OUT OF RANGE - " + e.Action + "[" + typeof(TModel).Name + " -> " +

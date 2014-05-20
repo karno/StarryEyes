@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows;
 using JetBrains.Annotations;
@@ -137,9 +136,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
         {
             this._parent = parent;
             this._screenName = screenName;
-            var cd = new CompositeDisposable();
-            this.CompositeDisposable.Add(cd);
-            cd.Add(
+            this.CompositeDisposable.Add(
                 StoreHelper.GetUser(screenName)
                            .Finally(() => Communicating = false)
                            .ObserveOnDispatcher()
@@ -147,42 +144,22 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                                user =>
                                {
                                    User = new UserViewModel(user);
-                                   cd.Add(User);
-                                   var ps = this._statuses;
-                                   var usm = new UserTimelineModel(user.Id, TimelineType.User);
-                                   this._statuses = new UserTimelineViewModel(this, usm);
-                                   this.RaisePropertyChanged(() => Statuses);
-                                   cd.Add(_statuses);
-                                   if (ps != null)
-                                   {
-                                       ps.Dispose();
-                                   }
-                                   var pf = this._favorites;
-                                   var ufm = new UserTimelineModel(user.Id, TimelineType.Favorites);
-                                   this._favorites = new UserTimelineViewModel(this, ufm);
-                                   this.RaisePropertyChanged(() => Favorites);
-                                   cd.Add(_favorites);
-                                   if (pf != null)
-                                   {
-                                       pf.Dispose();
-                                   }
-                                   var pfw = this._following;
-                                   this._following = new UserFollowingViewModel(this);
-                                   this.RaisePropertyChanged(() => Following);
-                                   cd.Add(_following);
-                                   if (pfw != null)
-                                   {
-                                       pfw.Dispose();
-                                   }
+                                   this.CompositeDisposable.Add(User);
 
-                                   var pfr = this._followers;
-                                   this._followers = new UserFollowersViewModel(this);
+                                   this.CompositeDisposable.Add(this._statuses = new UserTimelineViewModel(this,
+                                       new UserTimelineModel(user.Id, TimelineType.User)));
+                                   this.RaisePropertyChanged(() => Statuses);
+
+                                   this.CompositeDisposable.Add(this._favorites = new UserTimelineViewModel(this,
+                                       new UserTimelineModel(user.Id, TimelineType.Favorites)));
+                                   this.RaisePropertyChanged(() => Favorites);
+
+                                   this.CompositeDisposable.Add(this._following = new UserFollowingViewModel(this));
+                                   this.RaisePropertyChanged(() => Following);
+
+                                   this.CompositeDisposable.Add(this._followers = new UserFollowersViewModel(this));
                                    this.RaisePropertyChanged(() => Followers);
-                                   cd.Add(_followers);
-                                   if (pfr != null)
-                                   {
-                                       pfr.Dispose();
-                                   }
+
                                    Setting.Accounts.Collection
                                           .Where(a => a.Id != user.Id)
                                           .Select(a => new RelationControlViewModel(this, a, user))

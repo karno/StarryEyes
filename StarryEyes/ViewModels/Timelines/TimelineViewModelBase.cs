@@ -318,7 +318,7 @@ namespace StarryEyes.ViewModels.Timelines
 
         #endregion
 
-        private IDisposable _listener = null;
+        private IDisposable _listener;
         private void InitializeCollection()
         {
             // on dispatcher.
@@ -335,10 +335,12 @@ namespace StarryEyes.ViewModels.Timelines
                                           .Subscribe(e => DispatcherHolder.Enqueue(
                                               () => this.ReflectCollectionChanged(e),
                                               DispatcherPriority.Background)));
+                var items = _timeline.ToArray();
                 this._timeline.Clear();
                 sts.OrderByDescending(s => s.Status.CreatedAt)
                    .Select(this.GenerateStatusViewModel)
                    .ForEach(this._timeline.Add);
+                Task.Run(() => items.ForEach(i => i.Dispose()));
             }
         }
 
@@ -352,7 +354,7 @@ namespace StarryEyes.ViewModels.Timelines
                     {
                         case NotifyCollectionChangedAction.Add:
                             this._timeline.Insert(e.NewStartingIndex,
-                                                  GenerateStatusViewModel((StatusModel)e.NewItems[0]));
+                                GenerateStatusViewModel((StatusModel)e.NewItems[0]));
                             break;
                         case NotifyCollectionChangedAction.Move:
                             this._timeline.Move(e.OldStartingIndex, e.NewStartingIndex);
