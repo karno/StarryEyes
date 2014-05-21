@@ -121,10 +121,10 @@
     <value>Account is automatically selected. Click to unlock</value>
   </data>
   <data name="AccountIsNotSelected" xml:space="preserve">
-    <value>Account is not selected. click left area to select account for posting status.</value>
+    <value>No Account selected. Click on the left area to select an account to post tweets.</value>
   </data>
   <data name="AccountSelectorNotSelected" xml:space="preserve">
-    <value>account is not selected.</value>
+    <value>No Account selected.</value>
   </data>
   <data name="AccountSelectorSelectedFormat" xml:space="preserve">
     <value>selected: {0}</value>
@@ -215,15 +215,15 @@ Image might be incompatible or corrupted.</value>
     <value>Snipping Tool error</value>
   </data>
   <data name="MsgThirdReplyWarnContent" xml:space="preserve">
-    <value>You are going to continue conversation with OTHER ACCOUNT.
+    <value>You are going to continue conversation with ANOTHER ACCOUNT.
 Are you sure you want to continue?</value>
   </data>
   <data name="MsgThirdReplyWarnTitle" xml:space="preserve">
-    <value>Reply with Wrong Account Warning</value>
+    <value>Reply with Wrong Account - Warning</value>
   </data>
   <data name="MsgTweetFailedContentFormat" xml:space="preserve">
     <value>Error: {0}
-Are you want to retry?</value>
+Do you want to retry?</value>
   </data>
   <data name="MsgTweetFailedFooter" xml:space="preserve">
     <value>If you do not want to retry, body of tweet will be saved to draft.</value>
@@ -232,7 +232,7 @@ Are you want to retry?</value>
     <value>Tweet has failed.</value>
   </data>
   <data name="MsgTweetFailedReasonDuplicate" xml:space="preserve">
-    <value>tweet is duplicated with recent posted.</value>
+    <value>Tweet is a duplicate.</value>
   </data>
   <data name="MsgTweetFailedReasonPostLimited" xml:space="preserve">
     <value>POST limited.</value>
