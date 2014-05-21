@@ -551,25 +551,25 @@
                   Fill="{DynamicResource UserFlipForegroundBrush}"
                   Stretch="Fill" />
         </Button>
-        <DockPanel x:Name="RightStatusPanel"
+        <DockPanel x:Name="StatusPanel"
                    Grid.Column="1"
                    Visibility="{Binding IsVisibleStatuses,
                                         Converter={StaticResource BooleanToVisibleConverter}}">
             <primitives:Timeline DataContext="{Binding Statuses}" />
         </DockPanel>
-        <DockPanel x:Name="RightFavoritesPanel"
+        <DockPanel x:Name="FavoritesPanel"
                    Grid.Column="1"
                    Visibility="{Binding IsVisibleFavorites,
                                         Converter={StaticResource BooleanToVisibleConverter}}">
             <primitives:Timeline DataContext="{Binding Favorites}" />
         </DockPanel>
-        <DockPanel x:Name="RightFollowingPanel"
+        <DockPanel x:Name="FollowingPanel"
                    Grid.Column="1"
                    Visibility="{Binding IsVisibleFollowing,
                                         Converter={StaticResource BooleanToVisibleConverter}}">
             <primitives:UsersList DataContext="{Binding Following}" />
         </DockPanel>
-        <DockPanel x:Name="RightFollowersPanel"
+        <DockPanel x:Name="FollowersPanel"
                    Grid.Column="1"
                    Visibility="{Binding IsVisibleFollowers,
                                         Converter={StaticResource BooleanToVisibleConverter}}">

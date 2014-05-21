@@ -155,6 +155,23 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             }
         }
 
+        private bool _displaySlimView;
+        public bool DisplaySlimView
+        {
+            get { return this._displaySlimView; }
+            set
+            {
+                if (_displaySlimView == value) return;
+                this._displaySlimView = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public void NotifyResultWidthChanged(double width)
+        {
+            this.DisplaySlimView = width < 572;
+        }
+
         #region Search options
 
         public void SetNextSearchOption()

@@ -3,10 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:behaviors="clr-namespace:StarryEyes.Views.Messaging.Behaviors"
              xmlns:controls="clr-namespace:StarryEyes.Views.Controls"
-             xmlns:custom="http://schemas.livet-mvvm.net/2011/wpf"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"
              xmlns:localize="clr-namespace:StarryEyes.Globalization.WindowParts"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:searchFlips="clr-namespace:StarryEyes.Views.WindowParts.Flips.SearchFlips"
@@ -96,10 +96,10 @@
     </UserControl.Resources>
     <i:Interaction.Triggers>
         <triggers:KeyAssignTrigger Group="Timeline" />
-        <custom:InteractionMessageTrigger Messenger="{Binding Messenger}">
+        <l:InteractionMessageTrigger Messenger="{Binding Messenger}">
             <behaviors:GoToStateInteractionMessageAction />
             <behaviors:TaskDialogInteractionMessageAction />
-        </custom:InteractionMessageTrigger>
+        </l:InteractionMessageTrigger>
     </i:Interaction.Triggers>
     <Grid x:Name="OuterGrid">
         <Grid.ColumnDefinitions>
@@ -274,6 +274,7 @@
         <Grid x:Name="ResultGrid"
               Grid.Column="0"
               Background="{DynamicResource BaseColorBackgroundBrush}"
+              SizeChanged="ResultGrid_OnSizeChanged               "
               Visibility="Collapsed">
             <Grid.RenderTransform>
                 <TransformGroup>
@@ -297,9 +298,14 @@
             <DockPanel Visibility="{Binding UserResult, Converter={StaticResource NotNullToVisibleConverter}}">
                 <searchFlips:UserResult DataContext="{Binding UserResult}" />
             </DockPanel>
-            <DockPanel Visibility="{Binding UserInfo, Converter={StaticResource NotNullToVisibleConverter}}">
-                <searchFlips:UserInfo DataContext="{Binding UserInfo}" />
-            </DockPanel>
+            <Grid Visibility="{Binding UserInfo, Converter={StaticResource NotNullToVisibleConverter}}">
+                <DockPanel Visibility="{Binding DisplaySlimView, Converter={StaticResource BooleanToInvisibleConverter}}">
+                    <searchFlips:UserInfo DataContext="{Binding UserInfo}" />
+                </DockPanel>
+                <DockPanel Visibility="{Binding DisplaySlimView, Converter={StaticResource BooleanToVisibleConverter}}">
+                    <searchFlips:UserInfoSlim DataContext="{Binding UserInfo}" />
+                </DockPanel>
+            </Grid>
         </Grid>
 
         <!--  Search navigations  -->

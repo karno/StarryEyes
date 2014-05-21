@@ -549,6 +549,9 @@
     <Compile Include="Views\WindowParts\Flips\SearchFlips\UserInfo.xaml.cs">
       <DependentUpon>UserInfo.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\WindowParts\Flips\SearchFlips\UserInfoSlim.xaml.cs">
+      <DependentUpon>UserInfoSlim.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\WindowParts\Flips\SettingFlip.xaml.cs">
       <DependentUpon>SettingFlip.xaml</DependentUpon>
     </Compile>
@@ -684,6 +687,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\WindowParts\Flips\SearchFlips\UserInfo.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\WindowParts\Flips\SearchFlips\UserInfoSlim.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
