@@ -124,7 +124,7 @@
     <value>_Close this tab</value>
   </data>
   <data name="TabCreateCopy" xml:space="preserve">
-    <value>Create c_opy tab</value>
+    <value>_Clone tab</value>
   </data>
   <data name="TabCreateNew" xml:space="preserve">
     <value>Create _new tab...</value>
@@ -313,7 +313,7 @@
     <value>Account is not selected.</value>
   </data>
   <data name="MsgFavoriteFailedInst" xml:space="preserve">
-    <value>Tweet could not favorited.</value>
+    <value>Tweet could not be favorited.</value>
   </data>
   <data name="MsgProhibitFavorite" xml:space="preserve">
     <value>Favorite is not allowed for this tweet.</value>
@@ -334,7 +334,7 @@
     <value>Unretweet failed</value>
   </data>
   <data name="MsgProhibitFavoriteDirectMessage" xml:space="preserve">
-    <value>Favorite is not allowed to direct message.</value>
+    <value>You can't favorite direct messages!</value>
   </data>
   <data name="MsgProhibitFavoriteMyself" xml:space="preserve">
     <value>Favorite tweet posted by yourself is not allowed by setting.</value>
@@ -343,7 +343,7 @@
     <value>Retweeting direct messages or protected user's tweet is not allowed.</value>
   </data>
   <data name="MsgProhibitRetweetMyself" xml:space="preserve">
-    <value>Retweet tweet posted by yourself is not allowed.</value>
+    <value>You can't retweet your own tweets!</value>
   </data>
   <data name="MsgQuickActionAccountIsNotSelectedDetail" xml:space="preserve">
     <value>Accounts must be selected for using quick actions.
