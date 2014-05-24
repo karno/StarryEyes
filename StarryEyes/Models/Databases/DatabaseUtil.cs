@@ -55,6 +55,19 @@ namespace StarryEyes.Models.Databases
             return "(" + left + ") and (" + right + ")";
         }
 
+        /// <summary>
+        /// Concatenate two sql sentence with or.
+        /// </summary>
+        /// <param name="left">left sentence, empty, or null</param>
+        /// <param name="right">right sentence, empty, or null</param>
+        /// <returns>concatenated sql</returns>
+        public static string SqlConcatOr(this string left, string right)
+        {
+            if (string.IsNullOrEmpty(left)) return right;
+            if (string.IsNullOrEmpty(right)) return left;
+            return "(" + left + ") or (" + right + ")";
+        }
+
         public static async Task RetryIfLocked(Func<Task> func,
             int waitMillisec = 100)
         {

@@ -7,6 +7,7 @@ using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Anomaly.Utils;
 using StarryEyes.Models.Accounting;
+using StarryEyes.Models.Databases;
 
 namespace StarryEyes.Filters.Sources
 {
@@ -23,7 +24,7 @@ namespace StarryEyes.Filters.Sources
         public override Func<TwitterStatus, bool> GetEvaluator()
         {
             var ads = GetAccountsFromString(_screenName);
-            return _ => CheckVisibleTimeline(_, ads);
+            return s => CheckVisibleTimeline(s, ads);
         }
 
         public override string GetSqlQuery()
@@ -35,11 +36,17 @@ namespace StarryEyes.Filters.Sources
             var followings = accounts.SelectMany(a => a.RelationData.Followings)
                                      .Select(id => id.ToString(CultureInfo.InvariantCulture))
                                      .JoinString(",");
-            return "(UserId in (" + ads + ") OR " +
-                   "UserId in (" + followings + ") OR " +
-                   "Id in (select ParentId from StatusEntity where " +
-                   "EntityType = " + userMention + " and " +
-                   "UserId in (" + ads + "))";
+            var mytweets = "UserId in (" + ads + ")";
+            var friends = "UserId in (" + followings + ")";
+            var inReplyToMe = "Id in (select ParentId from StatusEntity where " +
+                              "EntityType = " + userMention + " AND UserId in (" + ads + "))";
+            var notReply = "InReplyToOrRecipientUserId = 0 ";
+            var inReplyToFollowings = "InReplyToOrRecipientUserId in (" + followings + ")";
+            return inReplyToMe
+                .SqlConcatOr(mytweets)
+                .SqlConcatOr(friends
+                    .SqlConcatAnd(notReply
+                        .SqlConcatOr(inReplyToFollowings)));
         }
 
         private bool CheckVisibleTimeline(TwitterStatus status, IEnumerable<TwitterAccount> datas)

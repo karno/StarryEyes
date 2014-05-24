@@ -76,7 +76,7 @@ namespace StarryEyes.Filters.Sources
         {
             if (String.IsNullOrEmpty(screenName))
             {
-                return Setting.Accounts.Collection;
+                return Setting.Accounts.Collection.ToArray();
             }
             // *kar => unkar
             // kar* => karno
