@@ -847,6 +847,7 @@
                         <Button Margin="8,0,0,0" Style="{StaticResource MetroSquareTransparentButtonStyle}">
                             <TextBlock Margin="-4"
                                        FontSize="12"
+                                       Foreground="{DynamicResource BaseColorForegroundBrush}"
                                        Text="このキーアサインを削除" />
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="Click">
@@ -857,6 +858,7 @@
                         <Button Margin="8,0,0,0" Style="{StaticResource MetroSquareTransparentButtonStyle}">
                             <TextBlock Margin="-4"
                                        FontSize="12"
+                                       Foreground="{DynamicResource BaseColorForegroundBrush}"
                                        Text="新しいキーアサインを作成" />
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="Click">

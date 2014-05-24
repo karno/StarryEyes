@@ -468,7 +468,8 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public void RewindStack()
         {
-            if (_backStack.Count <= 1)
+            _backStack.Pop();
+            if (_backStack.Count <= 0)
             {
                 _backStack.Clear();
                 this.Close();
