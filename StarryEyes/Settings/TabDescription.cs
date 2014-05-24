@@ -44,7 +44,7 @@ namespace StarryEyes.Settings
             this.BindingAccountIds = model.BindingAccounts.ToArray();
             this.BindingHashtags = model.BindingHashtags.ToArray();
             this.NotifySoundSource = model.NotifySoundSource;
-            this.Query = model.FilterQuery != null ? model.FilterQuery.ToQuery() : null;
+            this.Query = model.GetQueryString();
         }
 
         public TabModel ToTabModel()
@@ -63,6 +63,7 @@ namespace StarryEyes.Settings
              {
                  Name = Name,
                  FilterQuery = filter,
+                 RawQueryString = Query,
                  BindingHashtags = this.BindingHashtags,
                  NotifyNewArrivals = this.NotifyNewArrivals,
                  NotifySoundSource = this.NotifySoundSource,

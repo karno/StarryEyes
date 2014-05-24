@@ -54,10 +54,13 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             this._completeCallback = callback;
             this._currentConfigurationTarget = model;
             this.IsConfigurationActive = true;
-            _filterQuery = model.FilterQuery;
-            _initialQuery = _filterQuery == null ? String.Empty : _filterQuery.ToQuery();
+            this._lastValidFilterQuery = model.FilterQuery;
+            this._initialNormalizedQuery =
+                _lastValidFilterQuery == null
+                    ? String.Empty
+                    : _lastValidFilterQuery.ToQuery();
             _foundError = false;
-            _currentQueryString = _initialQuery;
+            _currentQueryString = model.GetQueryString();
             RaisePropertyChanged(() => TabName);
             RaisePropertyChanged(() => IsShowUnreadCounts);
             RaisePropertyChanged(() => IsNotifyNewArrivals);
@@ -125,9 +128,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             }
         }
 
-        private string _initialQuery;
-
-        private FilterQuery _filterQuery;
+        private string _initialNormalizedQuery;
 
         private string _currentQueryString;
         public string QueryString
@@ -165,19 +166,25 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             }
         }
 
-        private async void CheckCompile(string source)
+        private FilterQuery _lastValidFilterQuery;
+        private string _lastValidFilterQueryString;
+
+        private async Task<bool> CheckCompile(string source)
         {
             try
             {
                 var newFilter = await Task.Run(() => QueryCompiler.Compile(source));
                 newFilter.GetEvaluator(); // validate types
-                _filterQuery = newFilter;
+                _lastValidFilterQuery = newFilter;
+                _lastValidFilterQueryString = source;
                 FoundError = false;
+                return true;
             }
             catch (Exception ex)
             {
                 FoundError = true;
                 ExceptionMessage = ex.Message;
+                return false;
             }
         }
 
@@ -202,19 +209,17 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         }
         #endregion
 
-        public void Close()
+        public async void Close()
         {
             if (!IsConfigurationActive) return;
             this.IsConfigurationActive = false;
             if (_currentConfigurationTarget != null)
             {
-                if (String.IsNullOrEmpty(_currentConfigurationTarget.Name))
+                if (this._lastValidFilterQuery != null &&
+                    this._lastValidFilterQuery.ToQuery() != this._initialNormalizedQuery)
                 {
-                    _currentConfigurationTarget.Name = "(untitled)";
-                }
-                if (_filterQuery != null && _filterQuery.ToQuery() != _initialQuery)
-                {
-                    _currentConfigurationTarget.FilterQuery = _filterQuery;
+                    _currentConfigurationTarget.RawQueryString = _lastValidFilterQueryString;
+                    _currentConfigurationTarget.FilterQuery = _lastValidFilterQuery;
                 }
                 if (_completeCallback != null)
                 {

@@ -6,8 +6,11 @@ using JetBrains.Annotations;
 using Livet.EventListeners;
 using Livet.Messaging;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Filters;
 using StarryEyes.Filters.Parsing;
+using StarryEyes.Globalization.Filters;
 using StarryEyes.Models;
+using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Models.Timelines.Tabs;
 
 namespace StarryEyes.ViewModels.Timelines.Tabs
@@ -165,17 +168,26 @@ namespace StarryEyes.ViewModels.Timelines.Tabs
 
         public void CopyTab()
         {
-            var model = new TabModel
+            try
             {
-                Name = this.Name,
-                FilterQuery = this.Model.FilterQuery != null ? QueryCompiler.Compile(this.Model.FilterQuery.ToQuery()) : null,
-                BindingHashtags = this.Model.BindingHashtags.ToArray(),
-                NotifyNewArrivals = this.Model.NotifyNewArrivals,
-                ShowUnreadCounts = this.Model.ShowUnreadCounts,
-                NotifySoundSource = this.Model.NotifySoundSource
-            };
-            this.Model.BindingAccounts.ForEach(id => model.BindingAccounts.Add(id));
-            this.Parent.Model.CreateTab(model);
+                var model = new TabModel
+                {
+                    Name = this.Name,
+                    FilterQuery = this.Model.FilterQuery != null ? QueryCompiler.Compile(this.Model.FilterQuery.ToQuery()) : null,
+                    RawQueryString = this.Model.RawQueryString,
+                    BindingHashtags = this.Model.BindingHashtags.ToArray(),
+                    NotifyNewArrivals = this.Model.NotifyNewArrivals,
+                    ShowUnreadCounts = this.Model.ShowUnreadCounts,
+                    NotifySoundSource = this.Model.NotifySoundSource
+                };
+                this.Model.BindingAccounts.ForEach(id => model.BindingAccounts.Add(id));
+                this.Parent.Model.CreateTab(model);
+            }
+            catch (FilterQueryException fqex)
+            {
+                BackstageModel.RegisterEvent(
+                    new OperationFailedEvent(QueryCompilerResources.QueryCompileFailed, fqex));
+            }
         }
         #endregion
 

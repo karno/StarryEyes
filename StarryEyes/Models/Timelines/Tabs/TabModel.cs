@@ -29,6 +29,7 @@ namespace StarryEyes.Models.Timelines.Tabs
             {
                 Name = name,
                 FilterQuery = query != null ? QueryCompiler.Compile(query) : null,
+                RawQueryString = query,
                 ShowUnreadCounts = true,
                 NotifyNewArrivals = false,
             };
@@ -130,6 +131,25 @@ namespace StarryEyes.Models.Timelines.Tabs
         public bool ShowUnreadCounts { get; set; }
 
         public string NotifySoundSource { get; set; }
+
+        public string RawQueryString { get; set; }
+
+        public string GetQueryString()
+        {
+            // check raw query string is equals filter query
+            try
+            {
+                if (RawQueryString != null)
+                {
+                    if (QueryCompiler.Compile(RawQueryString).ToQuery() == FilterQuery.ToQuery())
+                    {
+                        return RawQueryString;
+                    }
+                }
+            }
+            catch { }
+            return this.FilterQuery != null ? this.FilterQuery.ToQuery() : String.Empty;
+        }
 
         #endregion
 
