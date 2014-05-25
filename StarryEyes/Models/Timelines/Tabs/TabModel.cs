@@ -98,12 +98,17 @@ namespace StarryEyes.Models.Timelines.Tabs
 
         #region Tab Parameters
 
+        private string _name;
         private readonly AVLTree<long> _bindingAccountIds = new AVLTree<long>();
         private List<string> _bindingHashtags = new List<string>();
 
         public event Action BindingAccountsChanged;
 
-        public string Name { get; set; }
+        public string Name
+        {
+            get { return String.IsNullOrWhiteSpace(this._name) ? "(untitled)" : this._name; }
+            set { this._name = value; }
+        }
 
         public ICollection<long> BindingAccounts
         {
