@@ -11,6 +11,7 @@ using ICSharpCode.AvalonEdit.CodeCompletion;
 using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using StarryEyes.Filters.Parsing;
+using StarryEyes.Globalization.Filters;
 using StarryEyes.Views.Controls.QueryEditorResources;
 
 namespace StarryEyes.Views.Controls
@@ -133,9 +134,9 @@ namespace StarryEyes.Views.Controls
             switch (inputted.ToLower())
             {
                 case "f":
-                    return new[] { new CompletionData("from", "rom", "from につづいて、ソースクエリを指定できます。") };
+                    return new[] { new CompletionData("from", "rom", QueryCompletionResources.KeywordFrom) };
                 case "w":
-                    return new[] { new CompletionData("where", "here", "where につづいて、フィルタクエリを指定できます。") };
+                    return new[] { new CompletionData("where", "here", QueryCompletionResources.KeywordWhere) };
             }
             return null;
         }
@@ -147,15 +148,15 @@ namespace StarryEyes.Views.Controls
             {
                 return new[]
                 {
-                    new CompletionData("local","Krile内のツイート(引数: 参照タブ名[省略可能])"), 
-                    new CompletionData("home", "ユーザのホームタイムライン(引数: ユーザースクリーン名[省略可能])"), 
-                    new CompletionData("mention", "返信タイムライン(引数: ユーザースクリーン名[省略可能])"), 
-                    new CompletionData("messages", "ダイレクトメッセージ(引数: ユーザースクリーン名[省略可能])"), 
-                    new CompletionData("list", "list:", "リスト(引数: (取得ユーザ名)/スクリーン名/リスト名)"), 
-                    new CompletionData("search", "search:", "検索タイムライン(引数: 検索文字列)"), 
-                    new CompletionData("track", "track:", "ストリームタイムライン(引数: 検索文字列[英数字])"), 
-                    new CompletionData("conv", "conv:", "返信タイムライン(引数: ツイートID)"), 
-                    new CompletionData("user", "user:", "指定ユーザーのツイート(引数: ユーザースクリーン名 または #ユーザーID)") 
+                    new CompletionData("local", QueryCompletionResources.SourceLocal),
+                    new CompletionData("home", QueryCompletionResources.SourceHome),
+                    new CompletionData("mention", QueryCompletionResources.SourceMention),
+                    new CompletionData("messages", QueryCompletionResources.SourceMessages),
+                    new CompletionData("list", "list:", QueryCompletionResources.SourceList),
+                    new CompletionData("search", "search:", QueryCompletionResources.SourceSearch),
+                    new CompletionData("track", "track:", QueryCompletionResources.SourceTrack),
+                    new CompletionData("conv", "conv:", QueryCompletionResources.SourceConv),
+                    new CompletionData("user", "user:", QueryCompletionResources.SourceUser)
                 };
             }
             if (t.Any() &&
@@ -163,7 +164,7 @@ namespace StarryEyes.Views.Controls
                  t.Last().Type == TokenType.String) &&
                 inputted == " ")
             {
-                return new[] { new CompletionData("where", "where につづいて、フィルタクエリを指定できます。") };
+                return new[] { new CompletionData("where", QueryCompletionResources.KeywordWhere) };
             }
             return null;
         }
@@ -215,7 +216,7 @@ namespace StarryEyes.Views.Controls
 
         private bool CheckPreviousIsVariable(Token token)
         {
-            if (token.Type == TokenType.CloseBracket) return true;
+            if (token.Type == TokenType.CloseParenthesis) return true;
             if (token.Type == TokenType.String) return false;
             if (token.Type == TokenType.Literal)
             {
@@ -347,21 +348,21 @@ namespace StarryEyes.Views.Controls
         {
             return new[]
             {
-                new CompletionData("us", "[Account] Krileに登録済みのアカウント一覧"), 
-                new CompletionData("user", "[User] ツイートのユーザー"), 
-                new CompletionData("retweeter", "[User] リツイートしたユーザー"), 
-                new CompletionData("direct_message", "[Boolean] ダイレクトメッセージであるか"), 
-                new CompletionData("retweet", "[Boolean] リツイートであるか"), 
-                new CompletionData("id", "[Numeric] ツイートのID"), 
-                new CompletionData("in_reply_to", "[Numeric] 返信先ツイートID"),
-                new CompletionData("text", "[String] ツイートの本文"),
-                new CompletionData("body", "[String] ツイートの本文"),
-                new CompletionData("via", "[String] ツイートの送信元クライアント"),
-                new CompletionData("from", "[String] ツイートの送信元クライアント"),
-                new CompletionData("to", "[Num/Str/Set] ツイートの返信先ユーザー"),
-                new CompletionData("favs", "[Num/Set] 被お気に入り登録数"),
-                new CompletionData("rts", "[Num/Set] 被リツイート数"),
-                new CompletionData("list", "[Set](list.user.slug) リスト登録されているユーザー")
+                new CompletionData("us", QueryCompletionResources.VariableUser),
+                new CompletionData("user", QueryCompletionResources.VariableUser),
+                new CompletionData("retweeter", QueryCompletionResources.VariableRetweeter),
+                new CompletionData("direct_message", QueryCompletionResources.VariableDirectMessage),
+                new CompletionData("retweet", QueryCompletionResources.VariableRetweet),
+                new CompletionData("id", QueryCompletionResources.VariableId),
+                new CompletionData("in_reply_to", QueryCompletionResources.VariableInReplyTo),
+                new CompletionData("body", QueryCompletionResources.VariableBody),
+                new CompletionData("text", QueryCompletionResources.VariableBody),
+                new CompletionData("via", QueryCompletionResources.VariableVia),
+                new CompletionData("from", QueryCompletionResources.VariableVia),
+                new CompletionData("to", QueryCompletionResources.VariableTo),
+                new CompletionData("favs", QueryCompletionResources.VariableFavorites),
+                new CompletionData("rts", QueryCompletionResources.VariableRetweets),
+                new CompletionData("list", QueryCompletionResources.VariableList)
             };
         }
 
@@ -369,9 +370,9 @@ namespace StarryEyes.Views.Controls
         {
             return new[]
             {
-                new CompletionData("followings", "[Set] フォローしているユーザー"), 
-                new CompletionData("followers", "[Set] フォローされているユーザー"), 
-                new CompletionData("blockings", "[Set] ブロックしているユーザー") 
+                new CompletionData("followings", QueryCompletionResources.AcccountObjectFollowings),
+                new CompletionData("followers", QueryCompletionResources.AccountObjectFollowers),
+                new CompletionData("blockings", QueryCompletionResources.AccountObjectBlockings)
             };
         }
 
@@ -379,22 +380,22 @@ namespace StarryEyes.Views.Controls
         {
             return new[]
             {
-                new CompletionData("protected", "[Boolean] ツイートを非公開にしているか"),
-                new CompletionData("verified", "[Boolean] 公式認証済みであるか"),
-                new CompletionData("translator", "[Boolean] 翻訳者であるか"),
-                new CompletionData("contributors_enabled", "[Boolean] コントリビュータを有効にしているか"),
-                new CompletionData("geo_enabled", "[Boolean] 位置情報を有効にしているか"),
-                new CompletionData("id", "[Numeric] ユーザーID"),
-                new CompletionData("statuses", "[Numeric] ツイート数"),
-                new CompletionData("followings", "[Numeric] フォロー数"),
-                new CompletionData("followers", "[Numeric] フォロワー数"),
-                new CompletionData("favs", "[Numeric] お気に入り登録数"),
-                new CompletionData("listed_count", "[Numeric] リスト被登録"),
-                new CompletionData("screen_name", "[String] スクリーン名(@ID)"),
-                new CompletionData("name", "[String] ユーザー名"),
-                new CompletionData("bio", "[String] プロフィール"),
-                new CompletionData("loc", "[String] 所在地"),
-                new CompletionData("lang", "[String] 言語")
+                new CompletionData("protected", QueryCompletionResources.UserObjectProtected),
+                new CompletionData("verified", QueryCompletionResources.UserObjectVerified),
+                new CompletionData("translator", QueryCompletionResources.UserObjectTranslator),
+                new CompletionData("contributors_enabled", QueryCompletionResources.UserObjectContributorsEnabled),
+                new CompletionData("geo_enabled", QueryCompletionResources.UserObjectGeoEnabled),
+                new CompletionData("id", QueryCompletionResources.UserObjectId),
+                new CompletionData("statuses", QueryCompletionResources.UserObjectStatuses),
+                new CompletionData("followings", QueryCompletionResources.UserObjectFollowings),
+                new CompletionData("followers", QueryCompletionResources.UserObjectFollowers),
+                new CompletionData("favs", QueryCompletionResources.UserObjectFavorites),
+                new CompletionData("listed_count", QueryCompletionResources.UserObjectListedCount),
+                new CompletionData("screen_name", QueryCompletionResources.UserObjectScreenName),
+                new CompletionData("name", QueryCompletionResources.UserObjectName),
+                new CompletionData("bio", QueryCompletionResources.UserObjectBio),
+                new CompletionData("loc", QueryCompletionResources.UserObjectLocation),
+                new CompletionData("lang", QueryCompletionResources.UserObjectLanguage)
             };
         }
 

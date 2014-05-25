@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using StarryEyes.Globalization.Filters;
 
 namespace StarryEyes.Filters.Parsing
 {
@@ -28,18 +28,8 @@ namespace StarryEyes.Filters.Parsing
         public Token LookAhead()
         {
             if (!IsRemainToken)
-                throw new FilterQueryException("クエリは途中で終了しました。", RemainQuery);
+                throw new FilterQueryException(QueryCompilerResources.QueryInterrupted, RemainQuery);
             return _tokenQueueList[_queueCursor];
-        }
-
-        /// <summary>
-        /// Rewind queue.
-        /// </summary>
-        public void RewindOne()
-        {
-            if (_queueCursor == 0)
-                throw new InvalidOperationException("トークンリーダーは初期状態まで巻き戻っています。もう戻せません。");
-            _queueCursor--;
         }
 
         /// <summary>
@@ -78,7 +68,9 @@ namespace StarryEyes.Filters.Parsing
 
         private void RaiseQueryInvalidTerminatedError(TokenType expected, string innerQuery)
         {
-            throw new FilterQueryException("クエリは途中で終了しています。次のトークンが続くと予測されています: " + expected.ToString(), innerQuery);
+            throw new FilterQueryException(
+                QueryCompilerResources.QueryInterrupted +
+                QueryCompilerResources.QueryPredictNextToken + " " + expected, innerQuery);
         }
     }
 }

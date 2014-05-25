@@ -11,6 +11,7 @@ using StarryEyes.Filters.Expressions.Values.Locals;
 using StarryEyes.Filters.Expressions.Values.Statuses;
 using StarryEyes.Filters.Expressions.Values.Users;
 using StarryEyes.Filters.Sources;
+using StarryEyes.Globalization.Filters;
 
 namespace StarryEyes.Filters.Parsing
 {
@@ -51,7 +52,7 @@ namespace StarryEyes.Filters.Parsing
                     var filters = CompileFilters(tokens.Skip(1));
                     return new FilterQuery { Sources = sources, PredicateTreeRoot = filters };
                 }
-                throw new FormatException("クエリは\"from\"キーワードか\"where\"キーワードで始まらなければなりません。");
+                throw new FormatException(QueryCompilerResources.QueryMustBeStartedWithFromOrWhere);
             }
             catch (FilterQueryException)
             {
@@ -63,11 +64,15 @@ namespace StarryEyes.Filters.Parsing
                 {
                     throw ex.InnerException;
                 }
-                throw new FilterQueryException("クエリのコンパイルに失敗しました。 " + ex.InnerException.Message, query, ex.InnerException);
+                throw new FilterQueryException(
+                    QueryCompilerResources.QueryCompileFailed + " " +
+                    ex.InnerException.Message, query, ex.InnerException);
             }
             catch (Exception ex)
             {
-                throw new FilterQueryException("クエリのコンパイルに失敗しました。 " + ex.Message, query, ex);
+                throw new FilterQueryException(
+                    QueryCompilerResources.QueryCompileFailed + " " +
+                    ex.Message, query, ex);
             }
         }
 
@@ -89,11 +94,15 @@ namespace StarryEyes.Filters.Parsing
                 {
                     throw ex.InnerException;
                 }
-                throw new FilterQueryException("クエリのコンパイルに失敗しました: " + ex.InnerException.Message, query, ex.InnerException);
+                throw new FilterQueryException(
+                    QueryCompilerResources.QueryCompileFailed + " " +
+                    ex.InnerException.Message, query, ex.InnerException);
             }
             catch (Exception ex)
             {
-                throw new FilterQueryException("クエリのコンパイルに失敗しました: " + ex.Message, query, ex);
+                throw new FilterQueryException(
+                    QueryCompilerResources.QueryCompileFailed + " " +
+                    ex.Message, query, ex);
             }
         }
 
@@ -139,12 +148,15 @@ namespace StarryEyes.Filters.Parsing
                 var filter = reader.Get();
                 if (filter.Type != TokenType.Literal && filter.Type != TokenType.OperatorMultiple)
                 {
-                    throw new ArgumentException("このトークンは無効です: " + filter.Type +
-                                                " (リテラルか \'*\' です。)");
+                    throw CreateUnexpectedTokenError(filter.Value, reader.RemainQuery);
                 }
                 Type fstype;
                 if (!FilterSourceResolver.TryGetValue(filter.Value, out fstype))
-                    throw new ArgumentException("フィルタ ソースが一致しません: " + filter.Value);
+                {
+                    throw new ArgumentException(
+                        QueryCompilerResources.QueryUnknownFilterSource + " " +
+                        filter.Value);
+                }
                 if (reader.IsRemainToken && reader.LookAhead().Type == TokenType.Collon) // with argument
                 {
                     reader.AssertGet(TokenType.Collon);
@@ -373,18 +385,18 @@ namespace StarryEyes.Filters.Parsing
 
         private static FilterOperatorBase CompileL8(TokenReader reader)
         {
-            if (reader.LookAhead().Type == TokenType.OpenBracket)
+            if (reader.LookAhead().Type == TokenType.OpenParenthesis)
             {
                 // in bracket
-                reader.AssertGet(TokenType.OpenBracket);
-                if (reader.LookAhead().Type == TokenType.CloseBracket)
+                reader.AssertGet(TokenType.OpenParenthesis);
+                if (reader.LookAhead().Type == TokenType.CloseParenthesis)
                 {
                     // empty bracket
-                    reader.AssertGet(TokenType.CloseBracket);
+                    reader.AssertGet(TokenType.CloseParenthesis);
                     return new FilterBracket();
                 }
                 var ret = CompileL0(reader);
-                reader.AssertGet(TokenType.CloseBracket);
+                reader.AssertGet(TokenType.CloseParenthesis);
                 return new FilterBracket { Value = ret };
             }
             if (reader.LookAhead().Type == TokenType.OpenSquareBracket)
@@ -689,8 +701,9 @@ namespace StarryEyes.Filters.Parsing
 
         internal static FilterQueryException CreateUnexpectedTokenError(string token, string innerQuery)
         {
-            return new FilterQueryException("不正なトークン: " + token,
-                                     innerQuery);
+            return new FilterQueryException(
+                QueryCompilerResources.QueryInvalidToken + " " + token,
+                innerQuery);
         }
     }
 }

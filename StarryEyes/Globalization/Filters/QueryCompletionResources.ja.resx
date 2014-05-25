@@ -1,0 +1,249 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AcccountObjectFollowings" xml:space="preserve">
+    <value>[Set] フォローしているユーザー</value>
+  </data>
+  <data name="AccountObjectBlockings" xml:space="preserve">
+    <value>[Set] ブロックしているユーザー</value>
+  </data>
+  <data name="AccountObjectFollowers" xml:space="preserve">
+    <value>[Set] フォローされているユーザー</value>
+  </data>
+  <data name="KeywordFrom" xml:space="preserve">
+    <value>"from"につづいて、ソースクエリを指定できます。</value>
+  </data>
+  <data name="KeywordWhere" xml:space="preserve">
+    <value>"where"につづいて、フィルタクエリを指定できます。</value>
+  </data>
+  <data name="SourceConv" xml:space="preserve">
+    <value>返信タイムライン(引数: ツイートID)</value>
+  </data>
+  <data name="SourceHome" xml:space="preserve">
+    <value>ユーザのホームタイムライン(引数: ユーザースクリーン名[省略可能])</value>
+  </data>
+  <data name="SourceList" xml:space="preserve">
+    <value>リスト(引数: (取得ユーザ名)/スクリーン名/リスト名)</value>
+  </data>
+  <data name="SourceLocal" xml:space="preserve">
+    <value>Krile内のツイート(引数: 参照タブ名[省略可能])</value>
+  </data>
+  <data name="SourceMention" xml:space="preserve">
+    <value>返信タイムライン(引数: ユーザースクリーン名[省略可能])</value>
+  </data>
+  <data name="SourceMessages" xml:space="preserve">
+    <value>ダイレクトメッセージ(引数: ユーザースクリーン名[省略可能])</value>
+  </data>
+  <data name="SourceSearch" xml:space="preserve">
+    <value>検索タイムライン(引数: 検索文字列)</value>
+  </data>
+  <data name="SourceTrack" xml:space="preserve">
+    <value>ストリームタイムライン(引数: 検索文字列[英数字])</value>
+  </data>
+  <data name="SourceUser" xml:space="preserve">
+    <value>指定ユーザーのツイート(引数: ユーザースクリーン名 または #ユーザーID)</value>
+  </data>
+  <data name="UserObjectBio" xml:space="preserve">
+    <value>[String] プロフィール</value>
+  </data>
+  <data name="UserObjectContributorsEnabled" xml:space="preserve">
+    <value>[Boolean] コントリビュータを有効にしているか</value>
+  </data>
+  <data name="UserObjectFavorites" xml:space="preserve">
+    <value>[Numeric] お気に入り登録数</value>
+  </data>
+  <data name="UserObjectFollowers" xml:space="preserve">
+    <value>[Numeric] フォロワー数</value>
+  </data>
+  <data name="UserObjectFollowings" xml:space="preserve">
+    <value>[Numeric] フォロー数</value>
+  </data>
+  <data name="UserObjectGeoEnabled" xml:space="preserve">
+    <value>[Boolean] 位置情報を有効にしているか</value>
+  </data>
+  <data name="UserObjectId" xml:space="preserve">
+    <value>[Numeric] ユーザー数値ID</value>
+  </data>
+  <data name="UserObjectLanguage" xml:space="preserve">
+    <value>[String] 言語</value>
+  </data>
+  <data name="UserObjectListedCount" xml:space="preserve">
+    <value>[Numeric] リスト被登録数</value>
+  </data>
+  <data name="UserObjectLocation" xml:space="preserve">
+    <value>[String] 所在地</value>
+  </data>
+  <data name="UserObjectName" xml:space="preserve">
+    <value>[String] ユーザー名</value>
+  </data>
+  <data name="UserObjectProtected" xml:space="preserve">
+    <value>[Boolean] ツイートを非公開にしているか</value>
+  </data>
+  <data name="UserObjectScreenName" xml:space="preserve">
+    <value>[String] スクリーン名 (@ID)</value>
+  </data>
+  <data name="UserObjectStatuses" xml:space="preserve">
+    <value>[Numeric] ツイート数</value>
+  </data>
+  <data name="UserObjectTranslator" xml:space="preserve">
+    <value>[Boolean] 翻訳者であるか</value>
+  </data>
+  <data name="UserObjectVerified" xml:space="preserve">
+    <value>[Boolean] 公式認証済みであるか</value>
+  </data>
+  <data name="VariableBody" xml:space="preserve">
+    <value>[String] ツイートの本文</value>
+  </data>
+  <data name="VariableDirectMessage" xml:space="preserve">
+    <value>[Boolean] ダイレクトメッセージであるか</value>
+  </data>
+  <data name="VariableFavorites" xml:space="preserve">
+    <value>[Num/Set] 被お気に入り登録数/お気に入り登録済みユーザー</value>
+  </data>
+  <data name="VariableId" xml:space="preserve">
+    <value>[Numeric] ツイートのID</value>
+  </data>
+  <data name="VariableInReplyTo" xml:space="preserve">
+    <value>[Numeric] 返信先ツイートID</value>
+  </data>
+  <data name="VariableList" xml:space="preserve">
+    <value>[Set](list.user.slug) リストに登録されているユーザー</value>
+  </data>
+  <data name="VariableRetweet" xml:space="preserve">
+    <value>[Boolean] リツイートであるか</value>
+  </data>
+  <data name="VariableRetweeter" xml:space="preserve">
+    <value>[User] リツイートしたユーザー</value>
+  </data>
+  <data name="VariableRetweets" xml:space="preserve">
+    <value>[Num/Set] 被リツイート登録数/リツイート済みユーザー</value>
+  </data>
+  <data name="VariableTo" xml:space="preserve">
+    <value>[Num/Str/Set] ツイートの返信先ユーザーID/ユーザー名</value>
+  </data>
+  <data name="VariableUs" xml:space="preserve">
+    <value>[Account] Krileに登録済みのアカウント一覧</value>
+  </data>
+  <data name="VariableUser" xml:space="preserve">
+    <value>[User] ツイートのユーザー</value>
+  </data>
+  <data name="VariableVia" xml:space="preserve">
+    <value>[String] ツイートの送信元クライアント名</value>
+  </data>
+</root>

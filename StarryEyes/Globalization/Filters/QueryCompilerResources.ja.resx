@@ -1,0 +1,219 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="QueryCompileFailed" xml:space="preserve">
+    <value>クエリのコンパイルに失敗しました。</value>
+  </data>
+  <data name="QueryEndsWithBackslash" xml:space="preserve">
+    <value>クエリはバックスラッシュで終了しています。</value>
+  </data>
+  <data name="QueryInterrupted" xml:space="preserve">
+    <value>クエリが途中で途切れています。</value>
+  </data>
+  <data name="QueryInvalidToken" xml:space="preserve">
+    <value>不正なトークン:</value>
+  </data>
+  <data name="QueryMustBeStartedWithFromOrWhere" xml:space="preserve">
+    <value>クエリは"from"キーワードか"where"キーワードで始まらなければなりません。</value>
+  </data>
+  <data name="QueryPredictNextToken" xml:space="preserve">
+    <value>次のトークンが続くと予測されています:</value>
+  </data>
+  <data name="QueryStringIsNotClosed" xml:space="preserve">
+    <value>文字列が閉じられていません:</value>
+  </data>
+  <data name="QueryUnknownFilterSource" xml:space="preserve">
+    <value>指定したフィルタ ソースは存在しません:</value>
+  </data>
+  <data name="TokenCloseParenthesis" xml:space="preserve">
+    <value>閉じ括弧</value>
+  </data>
+  <data name="TokenCloseSquareBracket" xml:space="preserve">
+    <value>閉じ角括弧</value>
+  </data>
+  <data name="TokenCollon" xml:space="preserve">
+    <value>コロン</value>
+  </data>
+  <data name="TokenComma" xml:space="preserve">
+    <value>カンマ</value>
+  </data>
+  <data name="TokenExclamation" xml:space="preserve">
+    <value>エクスクラメーション</value>
+  </data>
+  <data name="TokenLiteral" xml:space="preserve">
+    <value>リテラル</value>
+  </data>
+  <data name="TokenOpenParenthesis" xml:space="preserve">
+    <value>開き括弧</value>
+  </data>
+  <data name="TokenOpenSquareBracket" xml:space="preserve">
+    <value>開き角括弧</value>
+  </data>
+  <data name="TokenOperatorAnd" xml:space="preserve">
+    <value>論理積</value>
+  </data>
+  <data name="TokenOperatorContains" xml:space="preserve">
+    <value>含む</value>
+  </data>
+  <data name="TokenOperatorDivide" xml:space="preserve">
+    <value>商</value>
+  </data>
+  <data name="TokenOperatorEquals" xml:space="preserve">
+    <value>等しい</value>
+  </data>
+  <data name="TokenOperatorGreaterThan" xml:space="preserve">
+    <value>より大きい</value>
+  </data>
+  <data name="TokenOperatorGreaterThanOrEqual" xml:space="preserve">
+    <value>より大きいか等しい</value>
+  </data>
+  <data name="TokenOperatorIn" xml:space="preserve">
+    <value>含まれる</value>
+  </data>
+  <data name="TokenOperatorLessThan" xml:space="preserve">
+    <value>より小さい</value>
+  </data>
+  <data name="TokenOperatorLessThanOrEqual" xml:space="preserve">
+    <value>より小さいか等しい</value>
+  </data>
+  <data name="TokenOperatorMinus" xml:space="preserve">
+    <value>差</value>
+  </data>
+  <data name="TokenOperatorMultiple" xml:space="preserve">
+    <value>積</value>
+  </data>
+  <data name="TokenOperatorNotEquals" xml:space="preserve">
+    <value>等しくない</value>
+  </data>
+  <data name="TokenOperatorOr" xml:space="preserve">
+    <value>論理和</value>
+  </data>
+  <data name="TokenOperatorPlus" xml:space="preserve">
+    <value>和</value>
+  </data>
+  <data name="TokenPeriod" xml:space="preserve">
+    <value>ピリオド</value>
+  </data>
+  <data name="TokenString" xml:space="preserve">
+    <value>文字列</value>
+  </data>
+  <data name="TokenUnknown" xml:space="preserve">
+    <value>不明なトークン</value>
+  </data>
+</root>

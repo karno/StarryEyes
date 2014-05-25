@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using StarryEyes.Globalization.Filters;
 
 namespace StarryEyes.Filters.Parsing
 {
@@ -55,10 +56,10 @@ namespace StarryEyes.Filters.Parsing
                         }
                         break;
                     case '(':
-                        yield return new Token(TokenType.OpenBracket, strptr);
+                        yield return new Token(TokenType.OpenParenthesis, strptr);
                         break;
                     case ')':
-                        yield return new Token(TokenType.CloseBracket, strptr);
+                        yield return new Token(TokenType.CloseParenthesis, strptr);
                         break;
                     case '[':
                         yield return new Token(TokenType.OpenSquareBracket, strptr);
@@ -126,21 +127,21 @@ namespace StarryEyes.Filters.Parsing
                         break;
                     default:
                         var begin = strptr;
-                        // 何らかのトークン分割子に出会うまで空回し
+                        // fast forward to hit any token splitters
                         const string tokens = "&|<>()[]+-*/.,:=!\" \t\r\n";
                         do
                         {
                             if (tokens.Contains(query[strptr]))
                             {
-                                // リテラル生成
+                                // create literal
                                 yield return new Token(TokenType.Literal,
                                     query.Substring(begin, strptr - begin), begin);
-                                strptr--; // 巻き戻し
+                                strptr--; // prepare to increment bottom (indicate correct point after incremented)
                                 break;
                             }
                             strptr++;
                         } while (strptr < query.Length);
-                        // トークン分割子に出会わなかった場合
+                        // token splitters is not contained
                         if (strptr == query.Length)
                         {
                             yield return new Token(TokenType.Literal,
@@ -166,14 +167,14 @@ namespace StarryEyes.Filters.Parsing
             {
                 if (query[cursor] == '\\')
                 {
-                    // 次のダブルクオートかバックスラッシュを読み飛ばす
+                    // skip next double quote or backslash
                     if (cursor + 1 == query.Length)
                     {
                         if (suppressErrors)
                         {
                             return query.Substring(begin + 1).UnescapeFromQuery();
                         }
-                        throw new ArgumentException("クエリはバックスラッシュで終了しています。");
+                        throw new ArgumentException(QueryCompilerResources.QueryEndsWithBackslash);
                     }
                     if (query[cursor + 1] == '"' || query[cursor + 1] == '\\')
                     {
@@ -182,17 +183,17 @@ namespace StarryEyes.Filters.Parsing
                 }
                 else if (query[cursor] == '"')
                 {
-                    // ここで文字列おしまい
+                    // string is closed
                     return query.Substring(begin + 1, cursor - begin - 1).UnescapeFromQuery();
                 }
                 cursor++;
             }
-            // 文字列を無理やり終える
+            // end string forced
             if (suppressErrors)
             {
                 return query.Substring(begin + 1).UnescapeFromQuery();
             }
-            throw new ArgumentException("文字列が閉じられていません: " + query.Substring(begin));
+            throw new ArgumentException(QueryCompilerResources.QueryStringIsNotClosed + " " + query.Substring(begin));
         }
 
         public static bool CheckNext(string q, int i, char c)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Filters.Expressions.Values.Immediates;
+using StarryEyes.Globalization.Filters;
 
 namespace StarryEyes.Filters.Expressions.Operators
 {
@@ -162,7 +163,9 @@ namespace StarryEyes.Filters.Expressions.Operators
             }
             catch (ArgumentException aex)
             {
-                throw new FilterQueryException("正規表現に誤りがあります: " + aex.Message, value.ToQuery(), aex);
+                throw new FilterQueryException(
+                    FilterObjectResources.OperatorRegexInvalidPattern +
+                    " " + aex.Message, value.ToQuery(), aex);
             }
         }
 

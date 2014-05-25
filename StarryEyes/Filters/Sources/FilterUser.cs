@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Anomaly.Utils;
+using StarryEyes.Globalization.Filters;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Settings;
 
@@ -24,7 +25,7 @@ namespace StarryEyes.Filters.Sources
             long result;
             if (!Int64.TryParse(screenName.Substring(1), out result))
             {
-                throw new ArgumentException("不正な引数が指定されています(ソースフィルタ user)");
+                throw new ArgumentException(FilterObjectResources.FilterUserInvalidArgument);
             }
         }
 

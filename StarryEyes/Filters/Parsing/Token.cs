@@ -1,4 +1,6 @@
 ﻿
+using StarryEyes.Globalization.Filters;
+
 namespace StarryEyes.Filters.Parsing
 {
     /// <summary>
@@ -7,17 +9,17 @@ namespace StarryEyes.Filters.Parsing
     internal struct Token
     {
         /// <summary>
-        /// このトークンの種別
+        /// Type of token
         /// </summary>
         public TokenType Type { get; set; }
 
         /// <summary>
-        /// このトークンの値
+        /// Value of token
         /// </summary>
         public string Value { get; set; }
 
         /// <summary>
-        /// デバッグ用のインデックス
+        /// Index for debugging
         /// </summary>
         public int DebugIndex { get; set; }
 
@@ -41,56 +43,56 @@ namespace StarryEyes.Filters.Parsing
         {
             switch (Type)
             {
-                case TokenType.OpenBracket:
-                    return "( [開き括弧]";
-                case TokenType.CloseBracket:
-                    return ") [閉じ括弧]";
+                case TokenType.OpenParenthesis:
+                    return "( [" + QueryCompilerResources.TokenOpenParenthesis + "]";
+                case TokenType.CloseParenthesis:
+                    return ") [" + QueryCompilerResources.TokenCloseParenthesis + "]";
                 case TokenType.OpenSquareBracket:
-                    return "[ [開き角括弧]";
+                    return "[ [" + QueryCompilerResources.TokenOpenSquareBracket + "]";
                 case TokenType.CloseSquareBracket:
-                    return "] [閉じ角括弧]";
+                    return "] [" + QueryCompilerResources.TokenCloseSquareBracket + "]";
                 case TokenType.OperatorPlus:
-                    return "+ [和]";
+                    return "+ [" + QueryCompilerResources.TokenOperatorPlus + "]";
                 case TokenType.OperatorMinus:
-                    return "- [差]";
+                    return "- [" + QueryCompilerResources.TokenOperatorMinus + "]";
                 case TokenType.OperatorMultiple:
-                    return "* [積]";
+                    return "* [" + QueryCompilerResources.TokenOperatorMultiple + "]";
                 case TokenType.OperatorDivide:
-                    return "/ [商]";
+                    return "/ [" + QueryCompilerResources.TokenOperatorDivide + "]";
                 case TokenType.OperatorAnd:
-                    return "&& [論理積]";
+                    return "&& [" + QueryCompilerResources.TokenOperatorAnd + "]";
                 case TokenType.OperatorOr:
-                    return "|| [論理和]";
+                    return "|| [" + QueryCompilerResources.TokenOperatorOr + "]";
                 case TokenType.OperatorContains:
-                    return "-> [含む]";
+                    return "-> [" + QueryCompilerResources.TokenOperatorContains + "]";
                 case TokenType.OperatorIn:
-                    return "<- [含まれる]";
+                    return "<- [" + QueryCompilerResources.TokenOperatorIn + "]";
                 case TokenType.OperatorEquals:
-                    return "== [等しい]";
+                    return "== [" + QueryCompilerResources.TokenOperatorEquals + "]";
                 case TokenType.OperatorNotEquals:
-                    return "!= [等しくない]";
+                    return "!= [" + QueryCompilerResources.TokenOperatorNotEquals + "]";
                 case TokenType.OperatorLessThan:
-                    return "< [より小さい]";
+                    return "< [" + QueryCompilerResources.TokenOperatorLessThan + "]";
                 case TokenType.OperatorLessThanOrEqual:
-                    return "<= [より小さいか等しい]";
+                    return "<= [" + QueryCompilerResources.TokenOperatorLessThanOrEqual + "]";
                 case TokenType.OperatorGreaterThan:
-                    return "> [より大きい]";
+                    return "> [" + QueryCompilerResources.TokenOperatorGreaterThan + "]";
                 case TokenType.OperatorGreaterThanOrEqual:
-                    return ">= [より大きいか等しい]";
+                    return ">= [" + QueryCompilerResources.TokenOperatorGreaterThanOrEqual + "]";
                 case TokenType.Literal:
-                    return "リテラル (" + (Value ?? "[null]") + ")";
+                    return "[" + QueryCompilerResources.TokenLiteral + " (" + (Value ?? "[null]") + ")]";
                 case TokenType.Period:
-                    return ". [ピリオド]";
+                    return ". [" + QueryCompilerResources.TokenPeriod + "]";
                 case TokenType.Comma:
-                    return ", [カンマ]";
+                    return ", [" + QueryCompilerResources.TokenComma + "]";
                 case TokenType.Collon:
-                    return ": [コロン]";
+                    return ": [" + QueryCompilerResources.TokenCollon + "]";
                 case TokenType.Exclamation:
-                    return "! [エクスクラメーション]";
+                    return "! [" + QueryCompilerResources.TokenExclamation + "]";
                 case TokenType.String:
-                    return "文字列 (" + (Value == null ? "[null]" : Value.Quote()) + ")";
+                    return "[" + QueryCompilerResources.TokenString + " (" + (Value == null ? "[null]" : Value.Quote()) + ")]";
                 default:
-                    return "[不明なトークン(" + Value + ")]";
+                    return "[" + QueryCompilerResources.TokenUnknown + " (" + Value + ")]";
 
             }
         }
@@ -189,11 +191,11 @@ namespace StarryEyes.Filters.Parsing
         /// <summary>
         /// Open bracket, (
         /// </summary>
-        OpenBracket,
+        OpenParenthesis,
         /// <summary>
         /// Close bracket, )
         /// </summary>
-        CloseBracket,
+        CloseParenthesis,
         /// <summary>
         /// Open square bracket, (
         /// </summary>

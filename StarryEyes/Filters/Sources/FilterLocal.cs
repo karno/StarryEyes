@@ -2,6 +2,7 @@
 using System.Linq;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Filters.Expressions;
+using StarryEyes.Globalization.Filters;
 using StarryEyes.Models.Timelines.Tabs;
 
 namespace StarryEyes.Filters.Sources
@@ -70,7 +71,7 @@ namespace StarryEyes.Filters.Sources
 
                 if (_tab == null)
                 {
-                    throw new ArgumentException("指定されたタブが見つかりませんでした。");
+                    throw new ArgumentException(FilterObjectResources.FilterLocalTabNotFound);
                 }
             }
 
@@ -83,7 +84,7 @@ namespace StarryEyes.Filters.Sources
                 .Any(f => f._tab == _tab)
             )
             {
-                throw new ArgumentException("タブの参照が循環しています。");
+                throw new ArgumentException(FilterObjectResources.FilterLocalTabIsRecursion);
             }
         }
     }

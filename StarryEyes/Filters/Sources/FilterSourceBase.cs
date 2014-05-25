@@ -5,6 +5,7 @@ using System.Reactive.Linq;
 using System.Text.RegularExpressions;
 using StarryEyes.Albireo;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Globalization.Filters;
 using StarryEyes.Models;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;
@@ -57,7 +58,8 @@ namespace StarryEyes.Filters.Sources
                 .Catch((Exception ex) =>
                 {
                     BackstageModel.RegisterEvent(new OperationFailedEvent(
-                        "フィルタソースからの受信に失敗しました: " + FilterKey + ": " + FilterValue, ex));
+                        FilterObjectResources.FilterSourceBaseReceiveFailed +
+                        " " + FilterKey + ": " + FilterValue, ex));
                     return Observable.Empty<TwitterStatus>();
                 });
         }

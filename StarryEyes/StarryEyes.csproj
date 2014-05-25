@@ -234,6 +234,21 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>BackstageResources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Globalization\Filters\FilterObjectResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>FilterObjectResources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Globalization\Filters\QueryCompilerResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>QueryCompilerResources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Globalization\Filters\QueryCompletionResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>QueryCompletionResources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Globalization\GlobalizationHelper.cs" />
     <Compile Include="Globalization\Models\ReceivingResources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -766,6 +781,22 @@
       <LastGenOutput>BackstageResources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Globalization\Filters\FilterObjectResources.ja.resx" />
+    <EmbeddedResource Include="Globalization\Filters\FilterObjectResources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>FilterObjectResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Globalization\Filters\QueryCompilerResources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>QueryCompilerResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Globalization\Filters\QueryCompletionResources.ja.resx">
+      <DependentUpon>QueryCompletionResources.resx</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Globalization\Filters\QueryCompletionResources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>QueryCompletionResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="Globalization\Models\ReceivingResources.ja.resx" />
     <EmbeddedResource Include="Globalization\Models\ReceivingResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -785,6 +816,10 @@
     <None Include="app.manifest">
       <SubType>Designer</SubType>
     </None>
+    <EmbeddedResource Include="Globalization\Filters\QueryCompilerResources.ja.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>QueryCompilerResources.resx</DependentUpon>
+    </EmbeddedResource>
     <None Include="krile.pub">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
