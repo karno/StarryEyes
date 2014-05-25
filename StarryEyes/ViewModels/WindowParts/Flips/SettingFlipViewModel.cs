@@ -694,7 +694,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         private void ApplyTheme()
         {
-            if (_themeCache != null)
+            if (_themeCache != null && _themeCache != Setting.Theme.Value)
             {
                 Setting.Theme.Value = _themeCache;
                 // refresh colors in timeline
