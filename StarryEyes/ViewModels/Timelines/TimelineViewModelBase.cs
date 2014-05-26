@@ -321,6 +321,7 @@ namespace StarryEyes.ViewModels.Timelines
         private IDisposable _listener;
         private void InitializeCollection()
         {
+            if (this._disposed) return;
             // on dispatcher.
             if (_listener != null)
             {
@@ -348,6 +349,7 @@ namespace StarryEyes.ViewModels.Timelines
         {
             try
             {
+                if (this._disposed) return;
                 lock (this._timelineLock)
                 {
                     switch (e.Action)

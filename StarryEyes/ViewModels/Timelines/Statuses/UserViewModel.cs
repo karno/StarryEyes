@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive.Disposables;
 using System.Windows.Input;
 using Livet;
 using Livet.EventListeners;
@@ -15,11 +16,11 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         public UserViewModel(TwitterUser user)
         {
             this.Model = UserModel.Get(user);
-            this.CompositeDisposable.Add(
+            this.CompositeDisposable.Add(new CompositeDisposable(
                 new EventListener<Action<TimelineIconResolution>>(
                     h => Setting.IconResolution.ValueChanged += h,
                     h => Setting.IconResolution.ValueChanged -= h,
-                    _ => this.RaisePropertyChanged(() => ProfileImageUriOptimized)));
+                    _ => this.RaisePropertyChanged(() => ProfileImageUriOptimized))));
         }
 
         public UserModel Model { get; private set; }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -52,10 +53,12 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         private UserViewModel _user;
         private bool _isInReplyToLoading;
         private bool _isInReplyToLoaded;
+        private readonly CompositeDisposable _disposables;
 
         public StatusViewModel(TimelineViewModelBase parent, StatusModel status,
             IEnumerable<long> initialBoundAccounts)
         {
+            this.CompositeDisposable.Add(_disposables = new CompositeDisposable());
             this._parent = parent;
             // get status model
             this.Model = status;
@@ -65,11 +68,11 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             this._bindingAccounts = initialBoundAccounts.Guard().ToArray();
 
             // initialize users information
-            this.CompositeDisposable.Add(
+            this._disposables.Add(
                 this._favoritedUsers = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
                     this.Model.FavoritedUsers, user => new UserViewModel(user),
                     DispatcherHelper.UIDispatcher, DispatcherPriority.Background));
-            this.CompositeDisposable.Add(
+            this._disposables.Add(
                 this._favoritedUsers.ListenCollectionChanged()
                     .Subscribe(_ =>
                     {
@@ -77,11 +80,11 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                         this.RaisePropertyChanged(() => this.IsFavoritedUserExists);
                         this.RaisePropertyChanged(() => this.FavoriteCount);
                     }));
-            this.CompositeDisposable.Add(
+            this._disposables.Add(
                 this._retweetedUsers = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
                     this.Model.RetweetedUsers, user => new UserViewModel(user),
                     DispatcherHelper.UIDispatcher, DispatcherPriority.Background));
-            this.CompositeDisposable.Add(
+            this._disposables.Add(
                 this._retweetedUsers.ListenCollectionChanged()
                     .Subscribe(_ =>
                     {
@@ -89,28 +92,29 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                         this.RaisePropertyChanged(() => this.IsRetweetedUserExists);
                         this.RaisePropertyChanged(() => this.RetweetCount);
                     }));
+
             if (this.RetweetedOriginalModel != null)
             {
-                this.CompositeDisposable.Add(
+                this._disposables.Add(
                     this.RetweetedOriginalModel.FavoritedUsers.ListenCollectionChanged()
                         .Subscribe(_ => this.RaisePropertyChanged(() => this.IsFavorited)));
-                this.CompositeDisposable.Add(
+                this._disposables.Add(
                     this.RetweetedOriginalModel.RetweetedUsers.ListenCollectionChanged()
                         .Subscribe(_ => this.RaisePropertyChanged(() => this.IsRetweeted)));
             }
 
             // listen settings
-            this.CompositeDisposable.Add(
+            this._disposables.Add(
                 new EventListener<Action<bool>>(
                     h => Setting.AllowFavoriteMyself.ValueChanged += h,
                     h => Setting.AllowFavoriteMyself.ValueChanged -= h,
                     _ => this.RaisePropertyChanged(() => CanFavorite)));
-            this.CompositeDisposable.Add(
+            this._disposables.Add(
                 new EventListener<Action<bool>>(
                     h => Setting.ShowThumbnails.ValueChanged += h,
                     h => Setting.ShowThumbnails.ValueChanged -= h,
                     _ => this.RaisePropertyChanged(() => IsThumbnailAvailable)));
-            this.CompositeDisposable.Add(
+            this._disposables.Add(
                 new EventListener<Action<TweetDisplayMode>>(
                     h => Setting.TweetDisplayMode.ValueChanged += h,
                     h => Setting.TweetDisplayMode.ValueChanged -= h,
@@ -124,7 +128,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             {
                 lock (imgsubj)
                 {
-                    this.CompositeDisposable.Add(
+                    this._disposables.Add(
                         imgsubj
                             .Finally(() =>
                             {
@@ -206,7 +210,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         private UserViewModel CreateUserViewModel(TwitterUser user)
         {
             var uvm = new UserViewModel(user);
-            this.CompositeDisposable.Add(uvm);
+            this._disposables.Add(uvm);
             return uvm;
         }
 
