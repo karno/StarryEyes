@@ -129,6 +129,11 @@ namespace StarryEyes.Casket
             Task.WaitAll(tasks);
         }
 
+        public static async Task ReInitializeAsync<T>(CrudBase<T> crudBase) where T : class
+        {
+            await crudBase.InitializeAsync();
+        }
+
         #region store in one transaction
 
         private static readonly string _statusInserter =
@@ -232,6 +237,11 @@ namespace StarryEyes.Casket
         public static async Task VacuumTables()
         {
             await _managementCrud.VacuumAsync();
+        }
+
+        public static async Task ExecuteAsync(string query)
+        {
+            await CrudBase.ExecuteAsync(query);
         }
     }
 

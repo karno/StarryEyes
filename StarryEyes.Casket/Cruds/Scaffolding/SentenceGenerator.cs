@@ -215,6 +215,61 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
             return builder.ToString();
         }
 
+        public static string GetTableAlterer(Type type, IEnumerable<string> existColumns, string tableName = null)
+        {
+            var exist = existColumns.Select(n => n.ToLower()).ToArray();
+            var builder = new StringBuilder();
+            foreach (var prop in type.GetProperties())
+            {
+                // name
+                var name = prop.GetDbNameOfProperty();
+                if (exist.Contains(name.ToLower())) continue; // existed
+
+                builder.Append("ALTER TABLE ");
+                builder.Append(tableName ?? GetTableName(type));
+                builder.Append(" ADD ");
+
+                // type & nullable
+                var isNullable = false;
+                var ptype = prop.PropertyType;
+                if (ptype.IsGenericType &&
+                    ptype.GetGenericTypeDefinition() == typeof(Nullable<>))
+                {
+                    isNullable = true;
+                    ptype = ptype.GetGenericArguments().First();
+                }
+                else if (prop.GetCustomAttributes(typeof(DbOptionalAttribute), false).Any())
+                {
+                    isNullable = true;
+                }
+                if (typeof(Enum).IsAssignableFrom(ptype))
+                {
+                    ptype = typeof(Enum);
+                }
+                var typeStr = TypeMapping[ptype];
+
+                // build attributes
+                var attrs = "";
+                var pk = prop.GetTypedCustomAttribute<DbPrimaryKeyAttribute>();
+                if (pk != null)
+                {
+                    if (isNullable)
+                    {
+                        throw new ArgumentException("Primary key is not nullable.");
+                    }
+                    attrs += " PRIMARY KEY" +
+                             (pk.IsAutoIncrement ? " AUTOINCREMENT" : "");
+                }
+                else if (!isNullable)
+                {
+                    attrs = " NOT NULL";
+                }
+                builder.Append(name + " " + typeStr + attrs);
+                builder.Append(";");
+            }
+            return builder.ToString();
+        }
+
         private static string GetDbNameOfProperty(this PropertyInfo prop)
         {
             var pn = prop.GetTypedCustomAttribute<DbNameAttribute>();

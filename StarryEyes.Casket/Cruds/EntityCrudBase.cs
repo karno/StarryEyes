@@ -24,14 +24,14 @@ namespace StarryEyes.Casket.Cruds
 
         public async Task<IEnumerable<T>> GetEntitiesAsync(long parentId)
         {
-            return await this.QueryAsync<T>(
+            return await QueryAsync<T>(
                 this.CreateSql("ParentId = @Id"),
                 new { Id = parentId });
         }
 
         public async Task DeleteAndInsertAsync(long parentId, IEnumerable<T> entities)
         {
-            await this.ExecuteAllAsync(
+            await ExecuteAllAsync(
                 new[] { this.CreateDeleter(parentId) }
                     .Concat(entities.Select(e => Tuple.Create(this.TableInserter, (object)e))));
         }

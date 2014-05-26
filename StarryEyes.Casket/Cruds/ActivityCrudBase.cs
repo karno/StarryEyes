@@ -26,10 +26,9 @@ namespace StarryEyes.Casket.Cruds
 
         public Task<IEnumerable<long>> GetUsersAsync(long statusId)
         {
-            return
-                this.QueryAsync<long>(
-                    "select UserId from " + TableName + " where StatusId = @Id;",
-                    new { Id = statusId });
+            return QueryAsync<long>(
+                "select UserId from " + TableName + " where StatusId = @Id;",
+                new { Id = statusId });
         }
 
         public async Task InsertAsync(long statusId, long userId)
@@ -43,7 +42,7 @@ namespace StarryEyes.Casket.Cruds
 
         public async Task DeleteAsync(long statusId, long userId)
         {
-            await this.ExecuteAsync(
+            await ExecuteAsync(
                 "delete from " + this.TableName + " where StatusId = @Sid and UserId = @Uid;",
                 new { Sid = statusId, Uid = userId });
         }
@@ -57,7 +56,7 @@ namespace StarryEyes.Casket.Cruds
                     StatusId = i.Item1,
                     UserId = i.Item2
                 }));
-            await this.ExecuteAllAsync(inserters);
+            await ExecuteAllAsync(inserters);
         }
 
         public async Task DeleteAllAsync(IEnumerable<Tuple<long, long>> items)
@@ -65,7 +64,7 @@ namespace StarryEyes.Casket.Cruds
             var deleters = items.Select(i => Tuple.Create(
                 "delete from " + this.TableName + " where StatusId = @Sid and UserId = @Uid;",
                 (object)new { Sid = i.Item1, Uid = i.Item2 }));
-            await this.ExecuteAllAsync(deleters);
+            await ExecuteAllAsync(deleters);
         }
     }
 }

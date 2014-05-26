@@ -15,13 +15,13 @@ namespace StarryEyes.Casket.Cruds
 
         public async Task<IEnumerable<long>> GetAllAsync()
         {
-            return (await this.QueryAsync<DatabaseAccountInfo>("select * from " + TableName + ";", null))
+            return (await QueryAsync<DatabaseAccountInfo>("select * from " + TableName + ";", null))
                 .Select(a => a.Id);
         }
 
         public async Task DropAllAsync()
         {
-            await this.ExecuteAsync("delete from " + TableName + ";");
+            await ExecuteAsync("delete from " + TableName + ";");
         }
     }
 }

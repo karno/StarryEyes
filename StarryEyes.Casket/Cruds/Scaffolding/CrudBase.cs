@@ -13,7 +13,7 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
 {
     public abstract class CrudBase
     {
-        protected IsolationLevel DefaultIsolationLevel
+        protected static IsolationLevel DefaultIsolationLevel
         {
             get { return IsolationLevel.Serializable; }
         }
@@ -65,24 +65,24 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
 
         #endregion
 
-        protected ReaderWriterLockSlim ReaderWriterLock
+        protected static ReaderWriterLockSlim ReaderWriterLock
         {
             get { return _rwlock; }
         }
 
-        protected IDisposable AcquireWriteLock()
+        internal static IDisposable AcquireWriteLock()
         {
             _rwlock.EnterWriteLock();
             return Disposable.Create(() => _rwlock.ExitWriteLock());
         }
 
-        protected IDisposable AcquireReadLock()
+        internal static IDisposable AcquireReadLock()
         {
             _rwlock.EnterReadLock();
             return Disposable.Create(() => _rwlock.ExitReadLock());
         }
 
-        protected SQLiteConnection DangerousOpenConnection()
+        protected static SQLiteConnection DangerousOpenConnection()
         {
 #if DEBUG
             if (!ReaderWriterLock.IsReadLockHeld &&
@@ -113,7 +113,7 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
             }
         }
 
-        protected Task<int> ExecuteAsync(string query)
+        internal static Task<int> ExecuteAsync(string query)
         {
             return _writeTaskFactory.StartNew(() =>
             {
@@ -121,7 +121,7 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
                 try
                 {
                     ReaderWriterLock.EnterWriteLock();
-                    using (var con = this.DangerousOpenConnection())
+                    using (var con = DangerousOpenConnection())
                     using (var tr = con.BeginTransaction(DefaultIsolationLevel))
                     {
                         var result = con.Execute(query, transaction: tr);
@@ -140,15 +140,15 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
             });
         }
 
-        protected Task<int> ExecuteAsync(string query, dynamic param)
+        internal static Task<int> ExecuteAsync(string query, dynamic param)
         {
             return _writeTaskFactory.StartNew(() =>
             {
                 try
                 {
-                    ReaderWriterLock.EnterWriteLock();
+                    _rwlock.EnterWriteLock();
                     // System.Diagnostics.Debug.WriteLine("EXECUTE: " + query);
-                    using (var con = this.DangerousOpenConnection())
+                    using (var con = DangerousOpenConnection())
                     using (var tr = con.BeginTransaction(DefaultIsolationLevel))
                     {
                         var result = (int)SqlMapper.Execute(con, query, param, tr);
@@ -167,7 +167,7 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
             });
         }
 
-        protected Task ExecuteAllAsync(IEnumerable<Tuple<string, object>> queryAndParams)
+        internal static Task ExecuteAllAsync(IEnumerable<Tuple<string, object>> queryAndParams)
         {
             var qnp = queryAndParams.Memoize();
             return _writeTaskFactory.StartNew(() =>
@@ -175,7 +175,7 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
                 try
                 {
                     ReaderWriterLock.EnterWriteLock();
-                    using (var con = this.DangerousOpenConnection())
+                    using (var con = DangerousOpenConnection())
                     using (var tr = con.BeginTransaction(DefaultIsolationLevel))
                     {
                         foreach (var qap in qnp)
@@ -198,7 +198,7 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
             });
         }
 
-        protected Task<IEnumerable<T>> QueryAsync<T>(string query, object param)
+        internal static Task<IEnumerable<T>> QueryAsync<T>(string query, object param)
         {
             // System.Diagnostics.Debug.WriteLine("QUERY: " + query);
             return _readTaskFactory.StartNew(() =>
@@ -206,7 +206,7 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
                 try
                 {
                     ReaderWriterLock.EnterReadLock();
-                    using (var con = this.DangerousOpenConnection())
+                    using (var con = DangerousOpenConnection())
                     {
                         return con.Query<T>(query, param);
                     }
@@ -222,10 +222,11 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
             });
         }
 
-        protected SqliteCrudException WrapException(Exception exception, string command, string query)
+        protected static SqliteCrudException WrapException(Exception exception, string command, string query)
         {
             return new SqliteCrudException(exception, command, query);
         }
+
     }
 
     public abstract class CrudBase<T> : CrudBase where T : class
@@ -288,36 +289,41 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
 
         internal virtual async Task InitializeAsync()
         {
-            await this.ExecuteAsync(TableCreator);
+            await ExecuteAsync(TableCreator);
         }
 
         protected async Task CreateIndexAsync(string indexName, string column, bool unique)
         {
-            await this.ExecuteAsync("CREATE " + (unique ? "UNIQUE " : "") + "INDEX IF NOT EXISTS " +
-                                    indexName + " ON " + TableName + "(" + column + ")");
+            await ExecuteAsync("CREATE " + (unique ? "UNIQUE " : "") + "INDEX IF NOT EXISTS " +
+                               indexName + " ON " + TableName + "(" + column + ")");
         }
 
         public virtual async Task<T> GetAsync(long key)
         {
-            return (await this.QueryAsync<T>(
+            return (await QueryAsync<T>(
                 this.CreateSql("Id = @Id"),
                 new { Id = key })).SingleOrDefault();
         }
 
         public virtual async Task InsertAsync(T item)
         {
-            await this.ExecuteAsync(this.TableInserter, item);
+            await ExecuteAsync(this.TableInserter, item);
         }
 
         public virtual async Task DeleteAsync(long key)
         {
-            await this.ExecuteAsync(this.TableDeleter, new { Id = key });
+            await ExecuteAsync(this.TableDeleter, new { Id = key });
         }
 
         public virtual async Task DeleteAllAsync(IEnumerable<long> key)
         {
             var queries = key.Select(k => Tuple.Create(this.TableDeleter, (object)new { Id = k })).ToArray();
-            await this.ExecuteAllAsync(queries);
+            await ExecuteAllAsync(queries);
+        }
+
+        public async Task AlterAsync(string newTableName)
+        {
+            await ExecuteAsync("ALTER TABLE " + this._tableName + " RENAME TO " + newTableName + ";");
         }
     }
 }

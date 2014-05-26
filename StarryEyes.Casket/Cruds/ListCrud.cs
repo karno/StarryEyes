@@ -28,14 +28,14 @@ namespace StarryEyes.Casket.Cruds
 
         public async Task<DatabaseList> GetAsync(long userId, string slug)
         {
-            return (await this.QueryAsync<DatabaseList>(
+            return (await QueryAsync<DatabaseList>(
                 CreateSql("UserId = @userId and LOWER(Slug) = LOWER(@slug) limit 1"),
                 new { userId, slug })).FirstOrDefault();
         }
 
         public async Task<IEnumerable<DatabaseList>> FindOwnedListAsync(long userId)
         {
-            return (await this.QueryAsync<DatabaseList>(
+            return (await QueryAsync<DatabaseList>(
                 CreateSql("UserId = @userId"),
                 new { userId }));
         }

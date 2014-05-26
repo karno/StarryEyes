@@ -25,7 +25,7 @@ namespace StarryEyes.Casket.Cruds
 
         public async Task<IEnumerable<long>> GetUsersAsync(long listId)
         {
-            return (await this.QueryAsync<DatabaseListUser>(
+            return (await QueryAsync<DatabaseListUser>(
                 CreateSql("ListId = @listId"), new { listId }))
                 .Select(l => l.UserId);
         }
@@ -37,7 +37,7 @@ namespace StarryEyes.Casket.Cruds
                 try
                 {
                     ReaderWriterLock.EnterWriteLock();
-                    using (var conn = this.DangerousOpenConnection())
+                    using (var conn = DangerousOpenConnection())
                     using (var tran = conn.BeginTransaction(DefaultIsolationLevel))
                     {
                         foreach (var userId in userIds)
@@ -67,7 +67,7 @@ namespace StarryEyes.Casket.Cruds
         {
             var uids = removalUserIds.Select(i => i.ToString(CultureInfo.InvariantCulture)).JoinString(",");
             if (String.IsNullOrEmpty(uids)) return;
-            await this.ExecuteAsync(
+            await ExecuteAsync(
                 "delete from " + TableName + " where " +
                 "ListId = @listId and UserId in (" + uids + ");",
                 new { listId });
@@ -75,7 +75,7 @@ namespace StarryEyes.Casket.Cruds
 
         public async Task DeleteUserAsync(long listId, long userId)
         {
-            await this.ExecuteAsync("delete from " + TableName + "where " +
+            await ExecuteAsync("delete from " + TableName + "where " +
                                     "ListId = @listId and UserId = @userId", new { listId, userId });
         }
 
@@ -84,13 +84,13 @@ namespace StarryEyes.Casket.Cruds
             var uids = users.Select(i => i.ToString(CultureInfo.InvariantCulture)).JoinString(",");
             if (String.IsNullOrEmpty(uids))
             {
-                await this.ExecuteAsync(
+                await ExecuteAsync(
                     "delete from " + TableName + " where ListId = @listId;",
                     new { listId });
             }
             else
             {
-                await this.ExecuteAsync(
+                await ExecuteAsync(
                     "delete from " + TableName + " where " +
                     "ListId = @listId and UserId not in (" + uids + ");",
                     new { listId });

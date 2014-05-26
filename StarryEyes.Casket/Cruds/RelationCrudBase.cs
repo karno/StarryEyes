@@ -20,21 +20,20 @@ namespace StarryEyes.Casket.Cruds
 
         public async Task<IEnumerable<DatabaseRelation>> GetAllAsync()
         {
-            return await this.QueryAsync<DatabaseRelation>(this.CreateSql(null), null);
+            return await QueryAsync<DatabaseRelation>(this.CreateSql(null), null);
         }
 
         internal async Task DropTableAsync()
         {
-            await this.ExecuteAsync("drop table " + TableName);
+            await ExecuteAsync("drop table " + TableName);
         }
 
         public async Task<bool> ContainsAsync(long userId, long targetId)
         {
-            return
-                (await this.QueryAsync<DatabaseRelation>(
-                    this.CreateSql("UserId = @UserId and TargetId = @TargetId limit 1"),
-                    new { UserId = userId, TargetId = targetId }))
-                    .SingleOrDefault() != null;
+            return (await QueryAsync<DatabaseRelation>(
+                this.CreateSql("UserId = @UserId and TargetId = @TargetId limit 1"),
+                new { UserId = userId, TargetId = targetId }))
+                .SingleOrDefault() != null;
         }
 
         public async Task AddOrUpdateAsync(long userId, long targetId)
@@ -44,14 +43,13 @@ namespace StarryEyes.Casket.Cruds
 
         public async Task AddOrUpdateAllAsync(long userId, IEnumerable<long> targetIds)
         {
-            await
-                this.ExecuteAllAsync(targetIds.Select(
-                    id => Tuple.Create(this.TableInserter, (object)new DatabaseRelation(userId, id))));
+            await ExecuteAllAsync(targetIds.Select(
+                id => Tuple.Create(this.TableInserter, (object)new DatabaseRelation(userId, id))));
         }
 
         public async Task DeleteAsync(long userId, long targetId)
         {
-            await this.ExecuteAsync(
+            await ExecuteAsync(
                 "delete from " + TableName + " where UserId = @UserId and TargetId = @TargetId;",
                 new { UserId = userId, TargetId = targetId });
         }
@@ -60,21 +58,21 @@ namespace StarryEyes.Casket.Cruds
         {
             var tids = targetId.Select(i => i.ToString(CultureInfo.InvariantCulture)).JoinString(",");
             if (String.IsNullOrEmpty(tids)) return;
-            await this.ExecuteAsync(
+            await ExecuteAsync(
                 "delete from " + TableName + " wherE UserId = @UserId and TargetId in (" + tids + ");",
                 new { UserId = userId });
         }
 
         public async Task<IEnumerable<long>> GetUsersAsync(long userId)
         {
-            return (await this.QueryAsync<long>(
+            return (await QueryAsync<long>(
                 "select TargetId from " + TableName + " where UserId = @UserId;",
                 new { UserId = userId }));
         }
 
         public async Task<IEnumerable<long>> GetUsersAllAsync()
         {
-            return (await this.QueryAsync<long>(
+            return (await QueryAsync<long>(
                 "select distinct TargetId from " + TableName + ";", null));
         }
     }

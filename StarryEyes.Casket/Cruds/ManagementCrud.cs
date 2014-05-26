@@ -31,8 +31,8 @@ namespace StarryEyes.Casket.Cruds
             var sql = this.CreateSql("Id = @Id");
             try
             {
-                using (this.AcquireReadLock())
-                using (var con = this.DangerousOpenConnection())
+                using (AcquireReadLock())
+                using (var con = DangerousOpenConnection())
                 {
                     return con.Query<DatabaseManagement>(sql, new { Id = id })
                               .SingleOrDefault();
@@ -53,8 +53,8 @@ namespace StarryEyes.Casket.Cruds
         {
             try
             {
-                using (this.AcquireWriteLock())
-                using (var con = this.DangerousOpenConnection())
+                using (AcquireWriteLock())
+                using (var con = DangerousOpenConnection())
                 using (var tr = con.BeginTransaction(DefaultIsolationLevel))
                 {
                     con.Execute(this.TableInserter, mgmt);
@@ -77,7 +77,7 @@ namespace StarryEyes.Casket.Cruds
                 try
                 {
                     using (AcquireWriteLock())
-                    using (var con = this.DangerousOpenConnection())
+                    using (var con = DangerousOpenConnection())
                     {
                         con.Execute("VACUUM;");
                     }
