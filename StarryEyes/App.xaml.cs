@@ -10,6 +10,7 @@ using System.Windows.Threading;
 using JetBrains.Annotations;
 using StarryEyes.Casket;
 using StarryEyes.Globalization;
+using StarryEyes.Models.Databases;
 using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
 using Application = System.Windows.Application;
@@ -22,7 +23,7 @@ namespace StarryEyes
     /// </summary>
     public partial class App
     {
-        private static readonly string DbVersion = "1.0";
+        private static readonly string DbVersion = "A";
         private static DateTime _startupTime;
         private static string _userId = String.Empty;
 
@@ -98,7 +99,14 @@ namespace StarryEyes
             }
             else if (ver != DbVersion)
             {
-                // todo: update db
+                switch (ver)
+                {
+                    // base version
+                    case "1.0":
+                        DatabaseMigrator.MigrateToVersionA();
+                        Database.ManagementCrud.DatabaseVersion = DbVersion;
+                        return true;
+                }
                 return false;
             }
             return true;

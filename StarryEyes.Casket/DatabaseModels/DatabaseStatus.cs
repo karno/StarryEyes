@@ -26,9 +26,14 @@ namespace StarryEyes.Casket.DatabaseModels
 
         public long? RetweetOriginalUserId { get; set; }
 
+        public string EntityAidedText { get; set; }
+
         public string Text { get; set; }
 
         public DateTime CreatedAt { get; set; }
+
+        [DbOptional]
+        public string BaseSource { get; set; }
 
         [DbOptional]
         public string Source { get; set; }
