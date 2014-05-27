@@ -299,11 +299,29 @@
                 <searchFlips:UserResult DataContext="{Binding UserResult}" />
             </DockPanel>
             <Grid Visibility="{Binding UserInfo, Converter={StaticResource NotNullToVisibleConverter}}">
+                <i:Interaction.Triggers>
+                    <ei:DataTrigger Binding="{Binding DisplaySlimView}" Value="False">
+                        <ei:ChangePropertyAction PropertyName="DataContext"
+                                                 TargetName="NormalInfo"
+                                                 Value="{Binding UserInfo}" />
+                        <ei:ChangePropertyAction PropertyName="DataContext"
+                                                 TargetName="SlimInfo"
+                                                 Value="{x:Null}" />
+                    </ei:DataTrigger>
+                    <ei:DataTrigger Binding="{Binding DisplaySlimView}" Value="True">
+                        <ei:ChangePropertyAction PropertyName="DataContext"
+                                                 TargetName="NormalInfo"
+                                                 Value="{x:Null}" />
+                        <ei:ChangePropertyAction PropertyName="DataContext"
+                                                 TargetName="SlimInfo"
+                                                 Value="{Binding UserInfo}" />
+                    </ei:DataTrigger>
+                </i:Interaction.Triggers>
                 <DockPanel Visibility="{Binding DisplaySlimView, Converter={StaticResource BooleanToInvisibleConverter}}">
-                    <searchFlips:UserInfo DataContext="{Binding UserInfo}" />
+                    <searchFlips:UserInfo x:Name="NormalInfo" DataContext="{Binding UserInfo}" />
                 </DockPanel>
                 <DockPanel Visibility="{Binding DisplaySlimView, Converter={StaticResource BooleanToVisibleConverter}}">
-                    <searchFlips:UserInfoSlim DataContext="{Binding UserInfo}" />
+                    <searchFlips:UserInfoSlim x:Name="SlimInfo" DataContext="{x:Null}" />
                 </DockPanel>
             </Grid>
         </Grid>

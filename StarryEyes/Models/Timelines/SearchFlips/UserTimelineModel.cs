@@ -15,7 +15,6 @@ namespace StarryEyes.Models.Timelines.SearchFlips
         {
             this._userId = userId;
             this._type = type;
-
         }
 
         protected override bool PreInvalidateTimeline()
