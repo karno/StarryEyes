@@ -12,7 +12,7 @@ using StarryEyes.Settings;
 namespace StarryEyes.ViewModels.WindowParts.Flips
 {
     /// <summary>
-    /// アカウントを選択するコンポーネント用ビューモデル
+    /// ViewModel for account selector component
     /// </summary>
     public class AccountSelectionFlipViewModel : PartialFlipViewModelBase
     {
@@ -72,7 +72,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
     }
 
     /// <summary>
-    /// AccountSelectorViewModelで選択されるアカウント
+    /// Represents account in the AccountSelectorViewModel.
     /// </summary>
     public class SelectableAccountViewModel : ViewModel
     {

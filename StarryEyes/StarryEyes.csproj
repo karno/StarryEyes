@@ -255,6 +255,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>ReceivingResources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Globalization\WindowParts\GeneralFlipResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>GeneralFlipResources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Globalization\WindowParts\SearchFlipResources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -801,6 +806,11 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>ReceivingResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Include="Globalization\WindowParts\GeneralFlipResources.ja.resx" />
+    <EmbeddedResource Include="Globalization\WindowParts\GeneralFlipResources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>GeneralFlipResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="Globalization\WindowParts\InputAreaResources.ja.resx" />
     <EmbeddedResource Include="Globalization\WindowParts\MainAreaTimelineResources.ja.resx" />
     <EmbeddedResource Include="Globalization\WindowParts\SearchFlipResources.ja.resx" />
@@ -855,9 +865,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Views\Controls\QueryEditorResources\KrileQuery.xshd" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Globalization\Settings\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\MahApps.Metro\MahApps.Metro\MahApps.Metro.csproj">
       <Project>{5b1710d2-5dc8-4754-91b2-19165de49b3d}</Project>

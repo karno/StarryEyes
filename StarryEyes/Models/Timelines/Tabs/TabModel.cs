@@ -17,6 +17,8 @@ namespace StarryEyes.Models.Timelines.Tabs
 {
     public sealed class TabModel : TimelineModelBase
     {
+        private const string EmptyTabName = "(untitled)";
+
         /// <summary>
         /// Create new tab model
         /// </summary>
@@ -106,7 +108,7 @@ namespace StarryEyes.Models.Timelines.Tabs
 
         public string Name
         {
-            get { return String.IsNullOrWhiteSpace(this._name) ? "(untitled)" : this._name; }
+            get { return String.IsNullOrWhiteSpace(this._name) ? EmptyTabName : this._name; }
             set { this._name = value; }
         }
 

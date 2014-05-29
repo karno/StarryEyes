@@ -8,6 +8,7 @@
              xmlns:flips="clr-namespace:StarryEyes.ViewModels.WindowParts.Flips"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"
+             xmlns:localize="clr-namespace:StarryEyes.Globalization.WindowParts"
              xmlns:mahapps="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              x:Name="FlipRoot"
@@ -33,11 +34,7 @@
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                     <Grid.ToolTip>
-                        <TextBlock>
-                            <Run Text="左クリックするとこのアカウントの選択を切り替えます。" />
-                            <LineBreak />
-                            <Run Text="右クリックでこのアカウントだけを選択します。" />
-                        </TextBlock>
+                        <TextBlock Text="{x:Static localize:GeneralFlipResources.AccountSelectionHelp}" />
                     </Grid.ToolTip>
                     <Viewbox Width="Auto"
                              Height="16"
