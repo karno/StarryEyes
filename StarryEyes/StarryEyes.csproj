@@ -765,44 +765,44 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <EmbeddedResource Include="Globalization\AppInitResources.ja.resx">
-      <DependentUpon>AppInitResources.resx</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
+    <EmbeddedResource Include="Globalization\AppInitResources.ja.resx" />
     <EmbeddedResource Include="Globalization\AppInitResources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>AppInitResources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Globalization\BackstageResources.ja.resx">
-      <DependentUpon>BackstageResources.resx</DependentUpon>
-    </EmbeddedResource>
+    <EmbeddedResource Include="Globalization\BackstageResources.ja.resx" />
     <EmbeddedResource Include="Globalization\BackstageResources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>BackstageResources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Globalization\Dialogs\AddNewKeyAssignWindowResources.ja.resx" />
+    <EmbeddedResource Include="Globalization\Dialogs\AuthorizationWindowResources.ja.resx" />
+    <EmbeddedResource Include="Globalization\Dialogs\KeyOverrideWindowResources.ja.resx" />
     <EmbeddedResource Include="Globalization\Filters\FilterObjectResources.ja.resx" />
     <EmbeddedResource Include="Globalization\Filters\FilterObjectResources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>FilterObjectResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Include="Globalization\Filters\QueryCompilerResources.ja.resx" />
     <EmbeddedResource Include="Globalization\Filters\QueryCompilerResources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>QueryCompilerResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="Globalization\Filters\QueryCompletionResources.ja.resx">
-      <DependentUpon>QueryCompletionResources.resx</DependentUpon>
-    </EmbeddedResource>
+    <EmbeddedResource Include="Globalization\Filters\QueryCompletionResources.ja.resx" />
     <EmbeddedResource Include="Globalization\Filters\QueryCompletionResources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>QueryCompletionResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Include="Globalization\MainWindowResources.ja.resx" />
     <EmbeddedResource Include="Globalization\Models\ReceivingResources.ja.resx" />
     <EmbeddedResource Include="Globalization\Models\ReceivingResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>ReceivingResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Include="Globalization\WindowParts\InputAreaResources.ja.resx" />
+    <EmbeddedResource Include="Globalization\WindowParts\MainAreaTimelineResources.ja.resx" />
     <EmbeddedResource Include="Globalization\WindowParts\SearchFlipResources.ja.resx" />
     <EmbeddedResource Include="Globalization\WindowParts\SearchFlipResources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
@@ -817,10 +817,6 @@
     <None Include="app.manifest">
       <SubType>Designer</SubType>
     </None>
-    <EmbeddedResource Include="Globalization\Filters\QueryCompilerResources.ja.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>QueryCompilerResources.resx</DependentUpon>
-    </EmbeddedResource>
     <None Include="krile.pub">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -831,45 +827,25 @@
     </None>
     <AppDesigner Include="Properties\" />
     <EmbeddedResource Include="Properties\Resources.ja.resx" />
-    <EmbeddedResource Include="Globalization\Dialogs\AddNewKeyAssignWindowResources.ja.resx">
-      <DependentUpon>AddNewKeyAssignWindowResources.resx</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Globalization\Dialogs\AddNewKeyAssignWindowResources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>AddNewKeyAssignWindowResources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Globalization\Dialogs\AuthorizationWindowResources.ja.resx">
-      <DependentUpon>AuthorizationWindowResources.resx</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Globalization\Dialogs\AuthorizationWindowResources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>AuthorizationWindowResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="Globalization\Dialogs\KeyOverrideWindowResources.ja.resx">
-      <DependentUpon>KeyOverrideWindowResources.resx</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Globalization\Dialogs\KeyOverrideWindowResources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>KeyOverrideWindowResources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Globalization\MainWindowResources.ja.resx">
-      <DependentUpon>MainWindowResources.resx</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Globalization\MainWindowResources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>MainWindowResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="Globalization\WindowParts\InputAreaResources.ja.resx">
-      <DependentUpon>InputAreaResources.resx</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="Globalization\WindowParts\InputAreaResources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>InputAreaResources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Globalization\WindowParts\MainAreaTimelineResources.ja.resx">
-      <DependentUpon>MainAreaTimelineResources.resx</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Globalization\WindowParts\MainAreaTimelineResources.resx">
@@ -879,7 +855,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Views\Controls\QueryEditorResources\KrileQuery.xshd" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Globalization\Settings\" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MahApps.Metro\MahApps.Metro\MahApps.Metro.csproj">
       <Project>{5b1710d2-5dc8-4754-91b2-19165de49b3d}</Project>
