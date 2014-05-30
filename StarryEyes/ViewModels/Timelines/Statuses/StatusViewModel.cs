@@ -1127,56 +1127,6 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             this.Parent.FocusedStatus = null;
         }
 
-        // this method is not supported yet.
-        public void GiveFavstarTrophy()
-        {
-            this.Parent.Messenger.RaiseSafe(() => new TaskDialogMessage(new TaskDialogOptions
-            {
-                AllowDialogCancellation = true,
-                CommonButtons = TaskDialogCommonButtons.Close,
-                MainIcon = VistaTaskDialogIcon.Error,
-                MainInstruction = "この操作は実装されていません。",
-                Content = "Favstar は オワコン",
-                Title = "ツイート賞の授与",
-            }));
-            /*
-            if (!this.AssertQuickActionEnabled()) return;
-            if (Setting.FavstarApiKey.Value == null)
-            {
-                this.Parent.Messenger.Raise(new TaskDialogMessage(new TaskDialogOptions
-                {
-                    AllowDialogCancellation = true,
-                    CommonButtons = TaskDialogCommonButtons.Close,
-                    MainIcon = VistaTaskDialogIcon.Error,
-                    MainInstruction = "この操作にはFavstar APIキーが必要です。",
-                    Content = "Favstar APIキーを取得し、設定画面で登録してください。",
-                    FooterIcon = VistaTaskDialogIcon.Information,
-                    FooterText = "FavstarのProメンバーのみこの操作を行えます。",
-                    Title = "ツイート賞の授与",
-                }));
-                return;
-            }
-            var msg = new TaskDialogMessage(new TaskDialogOptions
-                        {
-                            AllowDialogCancellation = true,
-                            CommonButtons = TaskDialogCommonButtons.OKCancel,
-                            MainIcon = VistaTaskDialogIcon.Information,
-                            MainInstruction = "このツイートに今日のツイート賞を与えますか？",
-                            Content = this.Status.ToString(),
-                            FooterIcon = VistaTaskDialogIcon.Information,
-                            FooterText = "FavstarのProメンバーのみこの操作を行えます。",
-                            Title = "Favstar ツイート賞の授与",
-                        });
-            var response = this.Parent.Messenger.GetResponse(msg);
-            if (response.Response.Result != TaskDialogSimpleResult.Ok) return;
-            var accounts = this.GetImmediateAccounts()
-                .ToObservable();
-                accounts.SelectMany(a => new FavstarTrophyOperation(a, this.Status).Run())
-                        .Do(_ => this.RaisePropertyChanged(() => this.IsFavorited))
-                        .Subscribe();
-            */
-        }
-
         public void ReportAsSpam()
         {
             var response = this.Parent.Messenger.GetResponseSafe(() =>

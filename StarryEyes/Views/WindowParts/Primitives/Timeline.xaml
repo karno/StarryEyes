@@ -254,16 +254,6 @@
                                         </i:EventTrigger>
                                     </i:Interaction.Triggers>
                                 </MenuItem>
-                                <!--
-                                    <Separator />
-                                    <MenuItem Header="Favstar トロフィーを授与(_T)">
-                                    <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="Click">
-                                    <ei:CallMethodAction MethodName="GiveFavstarTrophy" TargetObject="{Binding}" />
-                                    </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                    </MenuItem>
-                                -->
                             </MenuItem>
                             <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineThisUser}">
                                 <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineThisUserProfile}">
