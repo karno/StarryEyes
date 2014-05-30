@@ -10,6 +10,7 @@ using StarryEyes.Albireo;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Timelines.Tabs;
 using StarryEyes.Nightmare.Windows;
+using StarryEyes.Properties;
 using StarryEyes.Settings;
 
 namespace StarryEyes.Models
@@ -111,11 +112,7 @@ namespace StarryEyes.Models
                 {
                     item = _stateStack.First;
                 }
-                if (item != null)
-                {
-                    return item.Value;
-                }
-                return App.DefaultStatusMessage;
+                return item != null ? item.Value : Resources.DefaultStatusMessage;
             }
         }
 

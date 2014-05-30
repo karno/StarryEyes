@@ -129,4 +129,7 @@
   <data name="MsgButtonOk" xml:space="preserve">
     <value>OK</value>
   </data>
+  <data name="DefaultStatusMessage" xml:space="preserve">
+    <value>完了</value>
+  </data>
 </root>

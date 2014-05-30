@@ -445,8 +445,6 @@ namespace StarryEyes
 
         public static readonly string BehaviorLogFileName = "krile.log";
 
-        public static readonly string DefaultStatusMessage = "完了";
-
         public static readonly string RemoteVersionXml = "http://krile.starwing.net/shared/update.xml";
 
         public static readonly string PublicKeyFile = "krile.pub";

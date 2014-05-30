@@ -70,6 +70,15 @@ namespace StarryEyes.Properties {
         }
         
         /// <summary>
+        ///   Done に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string DefaultStatusMessage {
+            get {
+                return ResourceManager.GetString("DefaultStatusMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Cancel に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string MsgButtonCancel {
