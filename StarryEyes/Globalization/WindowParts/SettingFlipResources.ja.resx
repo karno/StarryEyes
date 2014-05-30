@@ -181,13 +181,13 @@
     <value>タイムライン</value>
   </data>
   <data name="HighApplyUnstablePatch" xml:space="preserve">
-    <value>開発途上版のパッチを適用する(_A) [不安定なバージョンへの更新が行われることがあります]</value>
+    <value>開発途上版のパッチを適用する [不安定なバージョンへの更新が行われることがあります]</value>
   </data>
   <data name="HighDescription" xml:space="preserve">
     <value>以下の設定は上級者向けのものです。どのように利用されているかは、ソースコードをご覧ください。</value>
   </data>
   <data name="HighDisableGeolocationService" xml:space="preserve">
-    <value>位置情報サービスを無効にする(_G) [この設定は自動的に変更されることがあります]</value>
+    <value>位置情報サービスを無効にする [この設定は自動的に変更されることがあります]</value>
   </data>
   <data name="HighEventDisplayDuration" xml:space="preserve">
     <value>イベント表示時間:</value>
@@ -199,10 +199,10 @@
     <value>最小(msec):</value>
   </data>
   <data name="HighLoadDeveloperPlugin" xml:space="preserve">
-    <value>開発用フォルダから署名のないプラグインをロードする(_D)</value>
+    <value>開発用フォルダから署名のないプラグインをロードする</value>
   </data>
   <data name="HighLogKrileBehavior" xml:space="preserve">
-    <value>Krileの動作を記録する(_L) [処理速度が低下します] [再起動後に反映されます]</value>
+    <value>Krileの動作を記録する [処理速度が低下します] [再起動後に反映されます]</value>
   </data>
   <data name="HighMaintenanceModeDescription" xml:space="preserve">
     <value>設定とデータベースの削除やデータベースの最適化が行えます。</value>
@@ -241,7 +241,7 @@
     <value>他のアカウントからのフォールバックになっているアカウントへの返信に対して返信する際に、フォールバック元アカウントを自動指定するようにします。</value>
   </data>
   <data name="InputBacktrackFallback" xml:space="preserve">
-    <value>フォールバックアカウントを遡って返信する(_B)</value>
+    <value>フォールバックアカウントを遡って返信する</value>
   </data>
   <data name="InputCloseAction" xml:space="preserve">
     <value>ツイートボックスを閉じるとき:</value>
@@ -256,10 +256,10 @@
     <value>常に下書きに保存する</value>
   </data>
   <data name="InputRestorePreviousStashed" xml:space="preserve">
-    <value>ツイートボックスを開くときに下書きが存在していたら下書きを開く(_S)</value>
+    <value>ツイートボックスを開くときに下書きが存在していたら下書きを開く</value>
   </data>
   <data name="InputSuppressTagBindInReply" xml:space="preserve">
-    <value>誰かに返信するときはバインドされているタグを無視する(_I)</value>
+    <value>誰かに返信するときはバインドされているタグを無視する</value>
   </data>
   <data name="KeyAssignAction" xml:space="preserve">
     <value>アクション:</value>
@@ -301,7 +301,7 @@
     <value>使用するキーアサイン:</value>
   </data>
   <data name="MuteBlockingUsers" xml:space="preserve">
-    <value>ブロックしているユーザーをミュートする(_B) [推奨]</value>
+    <value>ブロックしているユーザーをミュートする [推奨]</value>
   </data>
   <data name="MuteDetailDescription" xml:space="preserve">
     <value>以下の設定は、Twitter Webで非表示となるツイートをKrileでも非表示にする設定となります。
@@ -323,16 +323,16 @@
 なお、ブロックしたユーザーのツイートや、リツイートを非表示にしているユーザーのリツイートはこれまでと同様に変更がすぐに適用されます。</value>
   </data>
   <data name="MuteNoRetweets" xml:space="preserve">
-    <value>リツイートを非表示にしているユーザーのリツイートをミュートする(_R) [推奨]</value>
+    <value>リツイートを非表示にしているユーザーのリツイートをミュートする [推奨]</value>
   </data>
   <data name="MuteReset" xml:space="preserve">
     <value>編集をリセット</value>
   </data>
   <data name="MuteUseLightweightMute" xml:space="preserve">
-    <value>軽量なミュートを使用する(_L) [パワーユーザー向け]</value>
+    <value>軽量なミュートを使用する [パワーユーザー向け]</value>
   </data>
   <data name="NotifyConfirmOnExit" xml:space="preserve">
-    <value>アプリケーションを閉じるときに確認する(_X)</value>
+    <value>アプリケーションを閉じるときに確認する</value>
   </data>
   <data name="NotifyDisableNotifyAllTabs" xml:space="preserve">
     <value>すべてのタブの新着通知をオフにする</value>
@@ -341,28 +341,28 @@
     <value>通知するディスプレイ</value>
   </data>
   <data name="NotifyFavorites" xml:space="preserve">
-    <value>自分のツイートがお気に入り登録されたら通知(_F)</value>
+    <value>自分のツイートがお気に入り登録されたら通知</value>
   </data>
   <data name="NotifyNewDirectMessages" xml:space="preserve">
-    <value>自分へのダイレクトメッセージを通知(_D)</value>
+    <value>自分へのダイレクトメッセージを通知</value>
   </data>
   <data name="NotifyNewFollowers" xml:space="preserve">
-    <value>自分の新しいフォロワーを通知(_N)</value>
+    <value>自分の新しいフォロワーを通知</value>
   </data>
   <data name="NotifyNewReplies" xml:space="preserve">
-    <value>自分への返信を通知(_M)</value>
+    <value>自分への返信を通知</value>
   </data>
   <data name="NotifyNewTweets" xml:space="preserve">
     <value>新着ツイートの通知</value>
   </data>
   <data name="NotifyRetweets" xml:space="preserve">
-    <value>自分のツイートがリツイートされたら通知(_R)</value>
+    <value>自分のツイートがリツイートされたら通知</value>
   </data>
   <data name="NotifyShowMessageOnTweetFailed" xml:space="preserve">
-    <value>ツイートが失敗した際にメッセージを表示する(_P)</value>
+    <value>ツイートが失敗した際にメッセージを表示する</value>
   </data>
   <data name="NotifyShowPopupWhenWindowIsActive" xml:space="preserve">
-    <value>ウィンドウが前面にある時もポップアップ通知を表示する(_S)</value>
+    <value>ウィンドウが前面にある時もポップアップ通知を表示する</value>
   </data>
   <data name="NotifyStyleNone" xml:space="preserve">
     <value>なし</value>
@@ -380,10 +380,10 @@
     <value>新着ツイートの通知はタブごとに切り替えることができます。</value>
   </data>
   <data name="NotifyWarnAmending" xml:space="preserve">
-    <value>ツイートの訂正を行う際に警告する(_A)</value>
+    <value>ツイートの訂正を行う際に警告する</value>
   </data>
   <data name="NotifyWarnReplyFromThirdAccount" xml:space="preserve">
-    <value>返信されたアカウントと別のアカウントでリプライしようとする際に警告する(_W)</value>
+    <value>返信されたアカウントと別のアカウントでリプライしようとする際に警告する</value>
   </data>
   <data name="ProxyApiProxy" xml:space="preserve">
     <value>API プロキシ (空欄で使用しない):</value>
@@ -392,7 +392,7 @@
     <value>プロキシをバイパスするホスト リスト (改行区切り):</value>
   </data>
   <data name="ProxyBypassLocal" xml:space="preserve">
-    <value>ローカルホストを参照するときには使用しない(_B)</value>
+    <value>ローカルホストを参照するときには使用しない</value>
   </data>
   <data name="ProxyDetailHost" xml:space="preserve">
     <value>ホスト:</value>
@@ -431,7 +431,7 @@
     <value>ブラウザのパス(空白で既定のブラウザを使用):</value>
   </data>
   <data name="TimelineAllowFavoriteMyself" xml:space="preserve">
-    <value>自分自身をお気に入り登録できるようにする(_F)</value>
+    <value>自分自身をお気に入り登録できるようにする</value>
   </data>
   <data name="TimelineDisplayMixed" xml:space="preserve">
     <value>フォーカス時に拡大</value>
@@ -467,7 +467,7 @@
     <value>Krileの開発を継続するため、寄付にご協力ください。</value>
   </data>
   <data name="TimelineOpenTwitterPicWithOriginalSize" xml:space="preserve">
-    <value>Twitterにアップロードされた画像のサムネイルをクリックした時に原寸で開く(_O)</value>
+    <value>Twitterにアップロードされた画像のサムネイルをクリックした時に原寸で開く</value>
   </data>
   <data name="TimelineScrollLockAlways" xml:space="preserve">
     <value>常にロックする</value>
@@ -488,7 +488,7 @@
     <value>スクロールしていたらロック</value>
   </data>
   <data name="TimelineShowThumbnails" xml:space="preserve">
-    <value>添付されている画像のサムネイルを表示する(_T)</value>
+    <value>添付されている画像のサムネイルを表示する</value>
   </data>
   <data name="AccountLimitContent" xml:space="preserve">
     <value>さらにアカウントを認証するには、Twitter APIキーを登録する必要があります。</value>

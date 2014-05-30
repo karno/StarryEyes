@@ -133,7 +133,7 @@ namespace StarryEyes.Globalization.WindowParts {
         }
         
         /// <summary>
-        ///   Set sensitive flag to uploading media. に類似しているローカライズされた文字列を検索します。
+        ///   Set sensitive flag to uploading media に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string AccountMarkMediaSensitive {
             get {
@@ -369,7 +369,7 @@ namespace StarryEyes.Globalization.WindowParts {
         }
         
         /// <summary>
-        ///   _Apply unstable patch [krile may become unstable by auto-updating] に類似しているローカライズされた文字列を検索します。
+        ///   Apply unstable patch [krile may become unstable by auto-updating] に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string HighApplyUnstablePatch {
             get {
@@ -387,7 +387,7 @@ namespace StarryEyes.Globalization.WindowParts {
         }
         
         /// <summary>
-        ///   Disable _geolocation service [this property may be changed by automatically] に類似しているローカライズされた文字列を検索します。
+        ///   Disable geolocation service [this property may be changed by automatically] に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string HighDisableGeolocationService {
             get {
@@ -423,7 +423,7 @@ namespace StarryEyes.Globalization.WindowParts {
         }
         
         /// <summary>
-        ///   Load unsigned plugin from _development folder に類似しているローカライズされた文字列を検索します。
+        ///   Load unsigned plugin from development folder に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string HighLoadDeveloperPlugin {
             get {
@@ -549,7 +549,7 @@ namespace StarryEyes.Globalization.WindowParts {
         }
         
         /// <summary>
-        ///   _Backtrack fallbacked account when reply に類似しているローカライズされた文字列を検索します。
+        ///   Backtrack fallbacked account when reply に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string InputBacktrackFallback {
             get {
@@ -594,7 +594,7 @@ namespace StarryEyes.Globalization.WindowParts {
         }
         
         /// <summary>
-        ///   Open _stashed text automaticaly if exists に類似しているローカライズされた文字列を検索します。
+        ///   Open stashed text automaticaly if exists に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string InputRestorePreviousStashed {
             get {
@@ -603,7 +603,7 @@ namespace StarryEyes.Globalization.WindowParts {
         }
         
         /// <summary>
-        ///   _Ignore bound tags when replying someone に類似しているローカライズされた文字列を検索します。
+        ///   Ignore bound tags when replying someone に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string InputSuppressTagBindInReply {
             get {
@@ -775,7 +775,7 @@ namespace StarryEyes.Globalization.WindowParts {
         }
         
         /// <summary>
-        ///   Mute _blocking users [recommended] に類似しているローカライズされた文字列を検索します。
+        ///   Mute blocking users [recommended] に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string MuteBlockingUsers {
             get {
@@ -827,7 +827,7 @@ namespace StarryEyes.Globalization.WindowParts {
         }
         
         /// <summary>
-        ///   Mute no _retweets [recommended] に類似しているローカライズされた文字列を検索します。
+        ///   Mute no retweets [recommended] に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string MuteNoRetweets {
             get {
@@ -845,7 +845,7 @@ namespace StarryEyes.Globalization.WindowParts {
         }
         
         /// <summary>
-        ///   Use _Lightweight mute [FOR POWER USER] に類似しているローカライズされた文字列を検索します。
+        ///   Use Lightweight mute [FOR POWER USER] に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string MuteUseLightweightMute {
             get {
@@ -872,7 +872,7 @@ namespace StarryEyes.Globalization.WindowParts {
         }
         
         /// <summary>
-        ///   Confirm on e_xit application に類似しているローカライズされた文字列を検索します。
+        ///   Confirm on exit application に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string NotifyConfirmOnExit {
             get {
@@ -899,7 +899,7 @@ namespace StarryEyes.Globalization.WindowParts {
         }
         
         /// <summary>
-        ///   Notify my tweets are _favorited に類似しているローカライズされた文字列を検索します。
+        ///   Notify my tweets are favorited に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string NotifyFavorites {
             get {
@@ -917,7 +917,7 @@ namespace StarryEyes.Globalization.WindowParts {
         }
         
         /// <summary>
-        ///   Notify _direct messages for me に類似しているローカライズされた文字列を検索します。
+        ///   Notify direct messages for me に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string NotifyNewDirectMessages {
             get {
@@ -926,7 +926,7 @@ namespace StarryEyes.Globalization.WindowParts {
         }
         
         /// <summary>
-        ///   Notify _new followers of me に類似しているローカライズされた文字列を検索します。
+        ///   Notify new followers of me に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string NotifyNewFollowers {
             get {
@@ -935,7 +935,7 @@ namespace StarryEyes.Globalization.WindowParts {
         }
         
         /// <summary>
-        ///   Notify _mentions for me に類似しているローカライズされた文字列を検索します。
+        ///   Notify mentions for me に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string NotifyNewReplies {
             get {
@@ -953,7 +953,7 @@ namespace StarryEyes.Globalization.WindowParts {
         }
         
         /// <summary>
-        ///   Notify my tweets are _retweeted に類似しているローカライズされた文字列を検索します。
+        ///   Notify my tweets are retweeted に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string NotifyRetweets {
             get {
@@ -962,7 +962,7 @@ namespace StarryEyes.Globalization.WindowParts {
         }
         
         /// <summary>
-        ///   Show message when _post is failed に類似しているローカライズされた文字列を検索します。
+        ///   Show message when post is failed に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string NotifyShowMessageOnTweetFailed {
             get {
@@ -971,7 +971,7 @@ namespace StarryEyes.Globalization.WindowParts {
         }
         
         /// <summary>
-        ///   _Show popup notification when window is active に類似しているローカライズされた文字列を検索します。
+        ///   Show popup notification when window is active に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string NotifyShowPopupWhenWindowIsActive {
             get {
@@ -1025,7 +1025,7 @@ namespace StarryEyes.Globalization.WindowParts {
         }
         
         /// <summary>
-        ///   Warn when _amending tweet に類似しているローカライズされた文字列を検索します。
+        ///   Warn when amending tweet に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string NotifyWarnAmending {
             get {
@@ -1034,7 +1034,7 @@ namespace StarryEyes.Globalization.WindowParts {
         }
         
         /// <summary>
-        ///   _Warn replying if posting account is not replied account に類似しているローカライズされた文字列を検索します。
+        ///   Warn replying if posting account is not replied account に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string NotifyWarnReplyFromThirdAccount {
             get {
@@ -1061,7 +1061,7 @@ namespace StarryEyes.Globalization.WindowParts {
         }
         
         /// <summary>
-        ///   _Bypass localhost に類似しているローカライズされた文字列を検索します。
+        ///   Bypass localhost に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string ProxyBypassLocal {
             get {
@@ -1196,7 +1196,7 @@ namespace StarryEyes.Globalization.WindowParts {
         }
         
         /// <summary>
-        ///   Allow _favorite myself に類似しているローカライズされた文字列を検索します。
+        ///   Allow favorite myself に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string TimelineAllowFavoriteMyself {
             get {
@@ -1367,7 +1367,7 @@ namespace StarryEyes.Globalization.WindowParts {
         }
         
         /// <summary>
-        ///   Show _thumbnails of attached images に類似しているローカライズされた文字列を検索します。
+        ///   Show thumbnails of attached images に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string TimelineShowThumbnails {
             get {
