@@ -4,11 +4,11 @@ using System.Collections.Specialized;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Interactivity;
+using System.Windows.Threading;
 using StarryEyes.Views.Utils;
 
 namespace StarryEyes.Views.Behaviors
@@ -81,10 +81,11 @@ namespace StarryEyes.Views.Behaviors
                                   var prevPosition = e.VerticalOffset + e.ExtentHeightChange;
 
                                   // scroll back to previous position
-                                  this.AssociatedObject.ScrollToVerticalOffset(prevPosition);
-                                  System.Diagnostics.Debug.WriteLine("*** SCROLL (LOCK) ***");
-
-                                  if (!this.IsScrollLockEnabled)
+                                  if (this.IsScrollLockEnabled)
+                                  {
+                                      this.AssociatedObject.ScrollToVerticalOffset(prevPosition);
+                                  }
+                                  else
                                   {
                                       // animate to new position
                                       this.RunAnimation(prevPosition, e.ExtentHeightChange);
@@ -151,39 +152,43 @@ namespace StarryEyes.Views.Behaviors
 
         private double _currentOffset;
         private double _remainHeight;
-        private volatile bool _isAnimationRunning;
+        private int _animationRunningFlag;
+
         /// <summary>
         /// Run scroll animation.
         /// </summary>
-        /// <param name="offset">beginning scroll offset</param>
+        /// <param name="beginOffset">beginning scroll beginOffset</param>
         /// <param name="height">animation height(to scroll)</param>
-        private void RunAnimation(double offset, double height)
+        private void RunAnimation(double beginOffset, double height)
         {
-            // reset remain height
-            if (_remainHeight < 0)
+            if (Interlocked.Exchange(ref _animationRunningFlag, 1) == 1)
             {
-                _remainHeight = 0;
+                _remainHeight += height;
+                return;
             }
-            // scroll start offset
-            _currentOffset = offset;
-            // scroll height
-            _remainHeight += height;
 
-            if (_isAnimationRunning) return;
-            _isAnimationRunning = true;
-            Task.Run(() =>
+            _remainHeight = height;
+            _currentOffset = beginOffset;
+
+            this.AssociatedObject.ScrollToVerticalOffset(beginOffset);
+
+            var timer = new DispatcherTimer(DispatcherPriority.Render, DispatcherHolder.Dispatcher);
+            timer.Interval = TimeSpan.FromMilliseconds(10);
+            timer.Tick += (o, e) =>
             {
-                for (var i = 20; i > 0; i--)
+                var dx = _remainHeight > 60 ? _remainHeight / 20 : (_remainHeight > 3 ? 3 : _remainHeight);
+                _remainHeight -= dx;
+                _currentOffset -= dx;
+                this.AssociatedObject.ScrollToVerticalOffset(_currentOffset);
+                if (_remainHeight < 1)
                 {
-                    Thread.Sleep(10);
-                    var dx = _remainHeight / i;
-                    _remainHeight -= dx;
-                    _currentOffset -= dx;
-                    DispatcherHolder.Enqueue(() => this.AssociatedObject.ScrollToVerticalOffset(_currentOffset));
-                    System.Diagnostics.Debug.WriteLine("*** SCROLL (ANIMATE) ***");
+                    this.AssociatedObject.ScrollToVerticalOffset(0);
+                    Interlocked.Exchange(ref _animationRunningFlag, 0);
+                    timer.Stop();
+                    timer = null;
                 }
-                _isAnimationRunning = false;
-            });
+            };
+            timer.Start();
         }
 
         protected override void OnDetaching()

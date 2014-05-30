@@ -23,14 +23,16 @@ namespace StarryEyes.ViewModels.Timelines
 {
     public abstract class TimelineViewModelBase : ViewModel
     {
+        private const int MaxReadCount = 5;
         private readonly object _timelineLock = new object();
         private readonly ObservableCollection<StatusViewModel> _timeline;
         private readonly TimelineModelBase _model;
 
+        private int _readCount;
         private bool _isLoading;
         private bool _isMouseOver;
         private bool _isScrollInBottom;
-        private bool _isScrollInTop;
+        private bool _isScrollOnTop;
         private bool _isScrollLockExplicit;
         private StatusViewModel _focusedStatus;
 
@@ -64,16 +66,20 @@ namespace StarryEyes.ViewModels.Timelines
             }
         }
 
-        public bool IsScrollInTop
+        public bool IsScrollOnTop
         {
-            get { return _isScrollInTop; }
+            get { return this._isScrollOnTop; }
             set
             {
-                if (_isScrollInTop == value) return;
-                _isScrollInTop = value;
+                if (this._isScrollOnTop == value) return;
+                this._isScrollOnTop = value;
                 RaisePropertyChanged();
                 RaisePropertyChanged(() => IsScrollLock);
-                this._model.IsAutoTrimEnabled = true;
+                if (!this._model.IsAutoTrimEnabled)
+                {
+                    this._model.IsAutoTrimEnabled = true;
+                    _readCount = 0;
+                }
             }
         }
 
@@ -122,7 +128,7 @@ namespace StarryEyes.ViewModels.Timelines
                     case ScrollLockStrategy.WhenMouseOver:
                         return IsMouseOver;
                     case ScrollLockStrategy.WhenScrolled:
-                        return !_isScrollInTop;
+                        return !this._isScrollOnTop;
                     case ScrollLockStrategy.Explicit:
                         return IsScrollLockExplicit;
                     default:
@@ -156,23 +162,36 @@ namespace StarryEyes.ViewModels.Timelines
 
         public void ReadMore()
         {
-            if (IsScrollInTop || IsLoading) return;
+            if (this.IsScrollOnTop || IsLoading) return;
             ReadMore(this._model.Statuses
                          .Select(s => s.Status.Id)
                          .Append(long.MaxValue)
                          .Min());
         }
 
-        public virtual void ReadMore(long id)
+        public void ReadMore(long id)
         {
             if (IsLoading) return;
-            this._model.IsAutoTrimEnabled = false;
+            if (!this._model.IsAutoTrimEnabled)
+            {
+                if (_readCount >= MaxReadCount) return;
+                _readCount++;
+            }
+            else
+            {
+                this._model.IsAutoTrimEnabled = false;
+            }
             Task.Run(async () =>
             {
                 this.IsLoading = true;
-                await this._model.ReadMore(id == long.MaxValue ? (long?)null : id);
+                await ReadMoreCore(id == long.MaxValue ? (long?)null : id);
                 this.IsLoading = false;
             });
+        }
+
+        protected virtual async Task ReadMoreCore(long? id)
+        {
+            await this._model.ReadMore(id);
         }
 
         #region Selection Control
