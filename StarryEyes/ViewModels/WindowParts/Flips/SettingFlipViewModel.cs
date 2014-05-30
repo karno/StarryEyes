@@ -20,6 +20,8 @@ using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Anomaly.Utils;
 using StarryEyes.Filters.Expressions;
 using StarryEyes.Filters.Parsing;
+using StarryEyes.Globalization;
+using StarryEyes.Globalization.WindowParts;
 using StarryEyes.Models;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Receiving;
@@ -156,6 +158,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             get { return this._accounts; }
         }
 
+        [UsedImplicitly]
         public void AddNewAccount()
         {
             if (Setting.Accounts.Collection.Count >= 2 &&
@@ -165,13 +168,13 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 _parent.Messenger.RaiseSafe(() =>
                     new TaskDialogMessage(new TaskDialogOptions
                     {
-                        Title = "認証の上限",
+                        Title = SettingFlipResources.AccountLimitTitle,
                         MainIcon = VistaTaskDialogIcon.Error,
-                        MainInstruction = "認証数の上限に達しました。",
-                        Content = "さらにアカウントを認証するには、Twitter API キーを登録しなければなりません。",
+                        MainInstruction = SettingFlipResources.AccountLimitInst,
+                        Content = SettingFlipResources.AccountLimitContent,
                         FooterIcon = VistaTaskDialogIcon.Information,
-                        FooterText = "APIキーを登録すると、すべてのアカウントの登録が一旦解除されます。",
-                        CommonButtons = TaskDialogCommonButtons.Close,
+                        FooterText = SettingFlipResources.AccountLimitFooter,
+                        CommonButtons = TaskDialogCommonButtons.Close
                     }));
                 return;
             }
@@ -181,20 +184,21 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 new TransitionMessage(typeof(AuthorizationWindow), auth, TransitionMode.Modal, null));
         }
 
-        public async void SetApiKeys()
+        [UsedImplicitly]
+        public void ResetApiKeys()
         {
-            var reconf = "再設定";
-            if (Setting.GlobalConsumerKey.Value == null)
-            {
-                reconf = "設定";
-            }
+            var reconf = Setting.GlobalConsumerKey.Value != null;
             var resp = this.Messenger.GetResponseSafe(() =>
                 new TaskDialogMessage(new TaskDialogOptions
                 {
-                    Title = "APIキーの" + reconf,
+                    Title = reconf
+                        ? SettingFlipResources.AccountResetKeyTitle
+                        : SettingFlipResources.AccountSetKeyTitle,
                     MainIcon = VistaTaskDialogIcon.Warning,
-                    MainInstruction = "登録されたアカウントがすべて登録解除されます。",
-                    Content = "APIキーの" + reconf + "を行うと、登録されたアカウントはすべてKrileから消去されます。" + Environment.NewLine + "続行しますか？",
+                    MainInstruction = SettingFlipResources.AccountSetResetKeyInst,
+                    Content = reconf
+                        ? SettingFlipResources.AccountResetKeyContent
+                        : SettingFlipResources.AccountSetKeyContent,
                     CommonButtons = TaskDialogCommonButtons.YesNo
                 }));
             if (resp.Response.Result == TaskDialogSimpleResult.No)
@@ -230,19 +234,15 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 RaisePropertyChanged();
                 return;
             }
-            var showDonationInfo = false;
             if (Setting.TweetDisplayMode.Value == Settings.TweetDisplayMode.Expanded &&
                 (newValue == Settings.TweetDisplayMode.SingleLine || newValue == Settings.TweetDisplayMode.Mixed))
             {
                 var resp = this.Messenger.GetResponseSafe(() => new TaskDialogMessage(new TaskDialogOptions
                 {
-                    Title = "一行表示モードの警告",
+                    Title = SettingFlipResources.TimelineSinglelineWarnTitle,
                     MainIcon = VistaTaskDialogIcon.Warning,
-                    MainInstruction = "一行表示モードを有効にしようとしています。",
-                    Content = "一行表示モードは複数行表示モードに比べ、リソースを大量に消費します。" + Environment.NewLine +
-                              "また、Krile StarryEyesは一行表示モードをベースとして設計されてはいないため、意図しない動作をする可能性があります。" +
-                              Environment.NewLine +
-                              "一行表示モードを本当に有効にしますか?",
+                    MainInstruction = SettingFlipResources.TimelineSingleLineWarnInst,
+                    Content = SettingFlipResources.TimelineSingleLineWarnContent,
                     CommonButtons = TaskDialogCommonButtons.YesNo
                 }));
                 if (resp.Response.Result == TaskDialogSimpleResult.No)
@@ -250,7 +250,6 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                     this.TweetDisplayMode = (int)Settings.TweetDisplayMode.Expanded;
                     return;
                 }
-                showDonationInfo = true;
             }
             await DispatcherHolder.BeginInvoke(() =>
             {
@@ -264,22 +263,6 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                             await Dispatcher.Yield(DispatcherPriority.Background);
                         });
                     });
-                if (showDonationInfo && !ContributionService.IsContributor())
-                {
-                    ww.Closed += async (o, e) =>
-                    {
-                        await this.Messenger.RaiseSafeAsync(() => new TaskDialogMessage(new TaskDialogOptions
-                        {
-                            Title = "Krileの開発にご協力ください。",
-                            MainIcon = VistaTaskDialogIcon.Information,
-                            MainInstruction = "Krileの開発にご協力ください。",
-                            Content = "多くのユーザーの補助によってKrileが開発されています。" + Environment.NewLine +
-                                      "Krileの開発を継続するため、寄付にご協力ください。",
-                            CustomButtons = new[] { "開発者に寄付" }
-                        }));
-                        BrowserHelper.Open(App.DonationUrl);
-                    };
-                }
                 ww.ShowDialog();
             });
         }
@@ -436,10 +419,10 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             set { Setting.UseLightweightMute.Value = value; }
         }
 
-        public bool IsMuteBlockedUsers
+        public bool IsMuteBlockingUsers
         {
-            get { return Setting.MuteBlockedUsers.Value; }
-            set { Setting.MuteBlockedUsers.Value = value; }
+            get { return Setting.MuteBlockingUsers.Value; }
+            set { Setting.MuteBlockingUsers.Value = value; }
         }
 
         public bool IsMuteNoRetweetUsersRetweet
@@ -484,7 +467,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         {
             get
             {
-                return new[] { "メイン ディスプレイ(デフォルト)" }
+                return new[] { SettingFlipResources.NotifyMainDisplay }
                     .Concat(Screen.AllScreens.Select((s, i) => "[" + i + "]" + s.DeviceName));
             }
         }
@@ -578,9 +561,9 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             _parent.Messenger.RaiseSafe(() =>
                 new TaskDialogMessage(new TaskDialogOptions
                 {
-                    Title = "通知のクリア",
+                    Title = SettingFlipResources.NotifyAllTabDisabledTitle,
                     MainIcon = VistaTaskDialogIcon.Information,
-                    MainInstruction = "すべてのタブの新着通知を解除しました。",
+                    MainInstruction = SettingFlipResources.NotifyAllTabDisabledInst,
                     CommonButtons = TaskDialogCommonButtons.Close,
                 }));
         }
@@ -618,8 +601,8 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             {
                 var msg = new OpeningFileSelectionMessage
                 {
-                    Filter = "画像ファイル|*.png;*.jpg;*.jpeg;*.gif;*.bmp",
-                    Title = "背景画像を選択"
+                    Title = SettingFlipResources.ThemeOpenPictureTitle,
+                    Filter = SettingFlipResources.ThemeOpenPictureFilter + "|*.png;*.jpg;*.jpeg;*.gif;*.bmp"
                 };
                 if (!String.IsNullOrEmpty(BackgroundImagePath))
                 {
@@ -882,11 +865,10 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             var response = this.Messenger.GetResponseSafe(() =>
                 new TaskDialogMessage(new TaskDialogOptions
                 {
-                    Title = "キーアサイン ファイルの削除",
+                    Title = SettingFlipResources.KeyAssignDeleteTitle,
                     MainIcon = VistaTaskDialogIcon.Warning,
-                    MainInstruction = "キーアサインを削除します。",
-                    Content = "キーアサイン " + KeyAssignManager.CurrentProfile.Name + " を削除します。" + Environment.NewLine +
-                              "よろしいですか?",
+                    MainInstruction = SettingFlipResources.KeyAssignDeleteInst,
+                    Content = SettingFlipResources.KeyAssignDeleteContentFormat.SafeFormat(KeyAssignManager.CurrentProfile.Name),
                     CommonButtons = TaskDialogCommonButtons.OKCancel
                 }));
             if (response.Response.Result == TaskDialogSimpleResult.Ok)
@@ -910,9 +892,9 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                     this.Messenger.RaiseSafe(() =>
                         new TaskDialogMessage(new TaskDialogOptions
                         {
-                            Title = "キーアサイン ファイルの削除",
+                            Title = SettingFlipResources.KeyAssignDeleteFailedTitle,
                             MainIcon = VistaTaskDialogIcon.Error,
-                            MainInstruction = "ファイルを削除できませんでした。",
+                            MainInstruction = SettingFlipResources.KeyAssignDeleteFailedInst,
                             Content = ex.Message,
                             ExpandedInfo = ex.ToString(),
                             CommonButtons = TaskDialogCommonButtons.Close
@@ -1001,22 +983,10 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             set { Setting.AcceptUnstableVersion.Value = value; }
         }
 
-        public bool LoadUnsafePlugin
-        {
-            get { return Setting.LoadUnsafePlugins.Value; }
-            set { Setting.LoadUnsafePlugins.Value = value; }
-        }
-
         public bool LoadPluginFromDevFolder
         {
             get { return Setting.LoadPluginFromDevFolder.Value; }
             set { Setting.LoadPluginFromDevFolder.Value = value; }
-        }
-
-        public bool RotateWindowContent
-        {
-            get { return Setting.RotateWindowContent.Value; }
-            set { Setting.RotateWindowContent.Value = value; }
         }
 
         public int EventDisplayMinimumMillisec
@@ -1085,6 +1055,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             set { Setting.IsBehaviorLogEnabled.Value = value; }
         }
 
+        [UsedImplicitly]
         public void RestartAsMaintenance()
         {
             var psi = new ProcessStartInfo
@@ -1307,16 +1278,18 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             set { this.Account.MarkMediaAsPossiblySensitive = value; }
         }
 
-        public void Deauthorize()
+        [UsedImplicitly]
+        public void Unauthorize()
         {
             var resp = _parent.Messenger.GetResponseSafe(() =>
                 new TaskDialogMessage(new TaskDialogOptions
                 {
-                    Title = "アカウントの削除",
+                    Title = SettingFlipResources.AccountUnauthorizeTitle,
                     MainIcon = VistaTaskDialogIcon.Warning,
-                    MainInstruction = "@" + ScreenName + " の認証を解除してもよろしいですか？",
-                    Content = "このアカウントに関するタイムラインを取得できなくなり、投稿も行えなくなります。" + Environment.NewLine +
-                              "完全に認証を解除するには、Twitter公式サイトのアプリ管理ページからアクセス権を剥奪する必要があります。",
+                    MainInstruction = SettingFlipResources.AccountUnauthorizeInstFormat.SafeFormat("@" + ScreenName),
+                    Content = SettingFlipResources.AccountUnauthorizeContent,
+                    FooterIcon = VistaTaskDialogIcon.Information,
+                    FooterText = SettingFlipResources.AccountUnauthorizeFooter,
                     CommonButtons = TaskDialogCommonButtons.OKCancel
                 }));
             if (resp.Response.Result == TaskDialogSimpleResult.Ok)

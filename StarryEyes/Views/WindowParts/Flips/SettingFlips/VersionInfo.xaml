@@ -7,6 +7,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:settingFlips="clr-namespace:StarryEyes.ViewModels.WindowParts.Flips.SettingFlips"
              xmlns:utils="clr-namespace:StarryEyes.Views.Utils"
+             xmlns:windowParts="clr-namespace:StarryEyes.Globalization.WindowParts"
              d:DataContext="{d:DesignInstance settingFlips:VersionInfoViewModel}"
              d:DesignHeight="500"
              d:DesignWidth="600"
@@ -89,7 +90,7 @@
             <Border Margin="4,0"
                     VerticalAlignment="Center"
                     Padding="4,0"
-                    ToolTip="アップデートを確認しています..."
+                    ToolTip="{x:Static windowParts:VersionInfoResources.UpdateRefreshingDescription}"
                     Visibility="{Binding IsChecking,
                                          Converter={StaticResource BoolVisibleConverter}}">
                 <StackPanel Margin="0,2" Orientation="Horizontal">
@@ -102,7 +103,7 @@
                                VerticalAlignment="Center"
                                FontSize="11"
                                Foreground="#FF008A00"
-                               Text="refreshing..."
+                               Text="{x:Static windowParts:VersionInfoResources.UpdateRefreshingLabel}"
                                TextWrapping="Wrap" />
                 </StackPanel>
             </Border>
@@ -110,7 +111,7 @@
                     VerticalAlignment="Center"
                     Background="#FF1BA1E2"
                     Padding="4,2"
-                    ToolTip="アップデートはありません。クリックするともう一度チェックします。"
+                    ToolTip="{x:Static windowParts:VersionInfoResources.UpdateLatestDescription}"
                     Visibility="{Binding IsUpdateIsNotExisted,
                                          Converter={StaticResource BoolVisibleConverter}}">
                 <i:Interaction.Triggers>
@@ -128,7 +129,7 @@
                                VerticalAlignment="Center"
                                FontSize="11"
                                Foreground="White"
-                               Text="latest version"
+                               Text="{x:Static windowParts:VersionInfoResources.UpdateLatestLabel}"
                                TextWrapping="Wrap" />
                 </StackPanel>
             </Border>
@@ -136,7 +137,7 @@
                     VerticalAlignment="Center"
                     Background="#FFFA6800"
                     Padding="4,2"
-                    ToolTip="アップデートがあります。クリックするとインストールします..."
+                    ToolTip="{x:Static windowParts:VersionInfoResources.UpdateAvailableDescription}"
                     Visibility="{Binding IsUpdateExisted,
                                          Converter={StaticResource BoolVisibleConverter}}">
                 <i:Interaction.Triggers>
@@ -154,7 +155,7 @@
                                VerticalAlignment="Center"
                                FontSize="11"
                                Foreground="White"
-                               Text="update is available! (click to install)"
+                               Text="{x:Static windowParts:VersionInfoResources.UpdateAvailableLabel}"
                                TextWrapping="Wrap" />
                 </StackPanel>
             </Border>
@@ -238,7 +239,7 @@
                                 <ei:CallMethodAction MethodName="OpenDonation" TargetObject="{Binding}" />
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
-                        <Run Text="下記の方々をはじめとする多くの方の寄付・尽力によってKrileの開発が継続されています:" />
+                        <Run Text="{x:Static windowParts:VersionInfoResources.DonateLabel}" />
                     </Hyperlink>
                 </TextBlock>
                 <TextBlock Margin="0,4"
@@ -251,7 +252,7 @@
                                 <ei:CallMethodAction MethodName="OpenDonation" TargetObject="{Binding}" />
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
-                        <Run Text="あなたをはじめとする多くの方の寄付・尽力によってKrileの開発が継続されています:" />
+                        <Run Text="{x:Static windowParts:VersionInfoResources.DonateThanksLabel}" />
                     </Hyperlink>
                 </TextBlock>
                 <ItemsControl Grid.Row="1" ItemsSource="{Binding Contributors}">

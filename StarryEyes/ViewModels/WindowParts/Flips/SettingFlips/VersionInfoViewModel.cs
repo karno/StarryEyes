@@ -6,6 +6,7 @@ using JetBrains.Annotations;
 using Livet;
 using StarryEyes.Models.Subsystems;
 using StarryEyes.Settings;
+using StarryEyes.Views.Utils;
 
 namespace StarryEyes.ViewModels.WindowParts.Flips.SettingFlips
 {
@@ -16,6 +17,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SettingFlips
         public VersionInfoViewModel()
         {
             // when update is available, callback this.
+            if (DesignTimeUtil.IsInDesignMode) return;
             AutoUpdateService.UpdateStateChanged += () => this._isUpdateAvailable = true;
             _contributors = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
                 ContributionService.Contributors, c => new ContributorViewModel(c),

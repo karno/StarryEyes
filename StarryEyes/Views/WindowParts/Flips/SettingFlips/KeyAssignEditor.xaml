@@ -6,6 +6,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:localize="clr-namespace:StarryEyes.Globalization.WindowParts"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:utils="clr-namespace:StarryEyes.Views.Utils"
@@ -24,17 +25,31 @@
             <RowDefinition />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <Grid>
-            <TextBlock VerticalAlignment="Center" Text="設定されているアサイン: " />
-            <Button HorizontalAlignment="Right" Style="{DynamicResource MetroSquareTransparentButtonStyle}">
-                <TextBlock FontSize="12" Text="新しいアサインを追加" />
+        <DockPanel>
+            <Button HorizontalAlignment="Right"
+                    DockPanel.Dock="Right"
+                    Style="{DynamicResource MetroSquareTransparentButtonStyle}">
+                <TextBlock FontSize="12" Text="{x:Static localize:SettingFlipResources.KeyAssignAddAssign}" />
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="Click">
                         <ei:CallMethodAction MethodName="AddNewAssign" TargetObject="{Binding}" />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
             </Button>
-        </Grid>
+            <Button HorizontalAlignment="Right"
+                    DockPanel.Dock="Right"
+                    Style="{DynamicResource MetroSquareTransparentButtonStyle}">
+                <TextBlock Margin="-4"
+                           FontSize="12"
+                           Text="{x:Static localize:SettingFlipResources.KeyAssignDeleteAssign}" />
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="Click">
+                        <ei:CallMethodAction MethodName="Remove" TargetObject="{Binding}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </Button>
+            <TextBlock VerticalAlignment="Center" Text="{x:Static localize:SettingFlipResources.KeyAssignCurrentAssign}" />
+        </DockPanel>
         <ListView Name="AssignListView"
                   Grid.Row="1"
                   ItemsSource="{Binding Assigns}"
@@ -66,82 +81,74 @@
                     <RowDefinition Height="1*" />
                     <RowDefinition Height="1*" />
                 </Grid.RowDefinitions>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="1*" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="1*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Margin="4"
-                               VerticalAlignment="Center"
-                               Text="キー:" />
-                    <controls:HotKeyTextBox Key="{Binding Key,
-                                                          Mode=TwoWay}"
-                                            Grid.Column="1"
-                                            ModifierKeys="{Binding Modifier,
-                                                                   Mode=TwoWay}" />
-                    <TextBlock Grid.Column="2"
-                               Margin="4"
-                               VerticalAlignment="Center"
-                               Text="グループ" />
-                    <ComboBox Grid.Column="3" SelectedIndex="{Binding GroupIndex, Mode=TwoWay}">
-                        <system:String>Global</system:String>
-                        <system:String>Timeline</system:String>
-                        <system:String>Input</system:String>
-                        <system:String>Search</system:String>
-                    </ComboBox>
-                    <Button Grid.Column="4"
-                            HorizontalAlignment="Right"
-                            Style="{DynamicResource MetroSquareTransparentButtonStyle}">
-                        <TextBlock Margin="-4"
-                                   FontSize="12"
-                                   Text="このアサインを削除" />
-                        <i:Interaction.Triggers>
-                            <i:EventTrigger EventName="Click">
-                                <ei:CallMethodAction MethodName="Remove" TargetObject="{Binding}" />
-                            </i:EventTrigger>
-                        </i:Interaction.Triggers>
-                    </Button>
-                </Grid>
-                <Grid Grid.Row="1">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="1*" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="1*" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Margin="4" Text="アクション:" />
-                    <ComboBox Grid.Column="1"
-                              IsSynchronizedWithCurrentItem="True"
-                              ItemsSource="{Binding Actions}"
-                              SelectedItem="{Binding CurrentActionViewModel,
-                                                     Mode=TwoWay}">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="{Binding Name}" />
-                                    <TextBlock Margin="6,0,0,0"
-                                               FontSize="10"
-                                               Opacity="0.8"
-                                               Text="{Binding ArgumentType}" />
-                                </StackPanel>
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>
-                    <TextBlock Grid.Column="2"
-                               Margin="4"
-                               Text="引数:"
-                               Visibility="{Binding IsArgumentEnabled,
-                                                    Converter={StaticResource BooleanToVisibilityConverter}}" />
-                    <TextBox Grid.Column="3"
-                             Text="{Binding Argument,
-                                            UpdateSourceTrigger=PropertyChanged}"
-                             Visibility="{Binding IsArgumentEnabled,
-                                                  Converter={StaticResource BooleanToVisibilityConverter}}" />
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Margin="4"
+                           HorizontalAlignment="Right"
+                           VerticalAlignment="Center"
+                           Text="{x:Static localize:SettingFlipResources.KeyAssignKey}" />
+                <controls:HotKeyTextBox Key="{Binding Key,
+                                                      Mode=TwoWay}"
+                                        Grid.Row="0"
+                                        Grid.Column="1"
+                                        ModifierKeys="{Binding Modifier,
+                                                               Mode=TwoWay}" />
+                <TextBlock Grid.Row="0"
+                           Grid.Column="2"
+                           Margin="4"
+                           HorizontalAlignment="Right"
+                           VerticalAlignment="Center"
+                           Text="{x:Static localize:SettingFlipResources.KeyAssignGroup}" />
+                <ComboBox Grid.Row="0"
+                          Grid.Column="3"
+                          SelectedIndex="{Binding GroupIndex,
+                                                  Mode=TwoWay}">
+                    <system:String>Global</system:String>
+                    <system:String>Timeline</system:String>
+                    <system:String>Input</system:String>
+                    <system:String>Search</system:String>
+                </ComboBox>
+                <TextBlock Grid.Row="1"
+                           Grid.Column="0"
+                           Margin="4"
+                           HorizontalAlignment="Right"
+                           Text="{x:Static localize:SettingFlipResources.KeyAssignAction}" />
+                <ComboBox Grid.Row="1"
+                          Grid.Column="1"
+                          IsSynchronizedWithCurrentItem="True"
+                          ItemsSource="{Binding Actions}"
+                          SelectedItem="{Binding CurrentActionViewModel,
+                                                 Mode=TwoWay}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding Name}" />
+                                <TextBlock Margin="6,0,0,0"
+                                           FontSize="10"
+                                           Opacity="0.8"
+                                           Text="{Binding ArgumentType}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                <TextBlock Grid.Row="1"
+                           Grid.Column="2"
+                           Margin="4"
+                           HorizontalAlignment="Right"
+                           Text="{x:Static localize:SettingFlipResources.KeyAssignArgument}"
+                           Visibility="{Binding IsArgumentEnabled,
+                                                Converter={StaticResource BooleanToVisibilityConverter}}" />
+                <TextBox Grid.Row="1"
+                         Grid.Column="3"
+                         Text="{Binding Argument,
+                                        UpdateSourceTrigger=PropertyChanged}"
+                         Visibility="{Binding IsArgumentEnabled,
+                                              Converter={StaticResource BooleanToVisibilityConverter}}" />
 
-                </Grid>
             </Grid>
         </Grid>
     </Grid>

@@ -265,6 +265,16 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>SearchFlipResources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Globalization\WindowParts\SettingFlipResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SettingFlipResources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Globalization\WindowParts\VersionInfoResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>VersionInfoResources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Helpers\FreezableHelper.cs" />
     <Compile Include="Helpers\TwitterRegexPatterns.cs" />
     <Compile Include="Hotfixes\DispatcherCollectionRx.cs" />
@@ -818,6 +828,16 @@
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>SearchFlipResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Include="Globalization\WindowParts\SettingFlipResources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>SettingFlipResources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Globalization\WindowParts\VersionInfoResources.ja.resx" />
+    <EmbeddedResource Include="Globalization\WindowParts\VersionInfoResources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>VersionInfoResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -827,6 +847,9 @@
     <None Include="app.manifest">
       <SubType>Designer</SubType>
     </None>
+    <EmbeddedResource Include="Globalization\WindowParts\SettingFlipResources.ja.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <None Include="krile.pub">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

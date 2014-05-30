@@ -10,6 +10,7 @@
              xmlns:flips="clr-namespace:StarryEyes.Views.WindowParts.Flips"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"
+             xmlns:localize="clr-namespace:StarryEyes.Globalization.WindowParts"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:settingFlips="clr-namespace:StarryEyes.Views.WindowParts.Flips.SettingFlips"
              xmlns:smb="clr-namespace:StarryEyes.Views.Messaging.Behaviors"
@@ -122,7 +123,7 @@
                                 <TextBlock x:Name="DisplayText"
                                            Grid.Column="1"
                                            Margin="12,6"
-                                           Text="{Binding}" />
+                                           Text="{Binding Text}" />
                             </Grid>
                             <DataTemplate.Triggers>
                                 <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBoxItem}}}" Value="True">
@@ -134,17 +135,17 @@
                             </DataTemplate.Triggers>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
-                    <clr:String>アカウント</clr:String>
-                    <clr:String>タイムライン</clr:String>
-                    <clr:String>ミュート</clr:String>
-                    <clr:String>入力</clr:String>
-                    <clr:String>通知と確認</clr:String>
-                    <clr:String>テーマ</clr:String>
-                    <clr:String>キーアサイン</clr:String>
-                    <clr:String>外部サービス</clr:String>
-                    <clr:String>プロキシー</clr:String>
-                    <clr:String>高度な設定</clr:String>
-                    <clr:String>Krileについて</clr:String>
+                    <TextBlock Text="{x:Static localize:SettingFlipResources.CategoryAccount}" />
+                    <TextBlock Text="{x:Static localize:SettingFlipResources.CategoryTimeline}" />
+                    <TextBlock Text="{x:Static localize:SettingFlipResources.CategoryMute}" />
+                    <TextBlock Text="{x:Static localize:SettingFlipResources.CategoryInput}" />
+                    <TextBlock Text="{x:Static localize:SettingFlipResources.CategoryNotifyConfirm}" />
+                    <TextBlock Text="{x:Static localize:SettingFlipResources.CategoryTheme}" />
+                    <TextBlock Text="{x:Static localize:SettingFlipResources.CategoryKeyAssign}" />
+                    <TextBlock Text="{x:Static localize:SettingFlipResources.CategoryThirdService}" />
+                    <TextBlock Text="{x:Static localize:SettingFlipResources.CategoryProxy}" />
+                    <TextBlock Text="{x:Static localize:SettingFlipResources.CategoryHighLevel}" />
+                    <TextBlock Text="{x:Static localize:SettingFlipResources.CategoryAbout}" />
                 </ListBox>
                 <Grid Grid.Column="1" Margin="0,6,0,0">
                     <Grid.Style>
@@ -204,13 +205,13 @@
                                                         HorizontalAlignment="Right"
                                                         VerticalAlignment="Stretch"
                                                         Background="#FFE51400"
-                                                        Content="このアカウントを削除"
+                                                        Content="{x:Static localize:SettingFlipResources.AccountDelete}"
                                                         Foreground="White"
                                                         Padding="8,0"
                                                         Style="{StaticResource MetroSquareButtonStyle}">
                                                     <i:Interaction.Triggers>
                                                         <i:EventTrigger EventName="Click">
-                                                            <ei:CallMethodAction MethodName="Deauthorize" TargetObject="{Binding Mode=OneWay}" />
+                                                            <ei:CallMethodAction MethodName="Unauthorize" TargetObject="{Binding Mode=OneWay}" />
                                                         </i:EventTrigger>
                                                     </i:Interaction.Triggers>
                                                 </Button>
@@ -226,10 +227,10 @@
                                                     <DockPanel Margin="8,8,8,4" Visibility="{Binding CanFallback, Converter={StaticResource BoolVisibleConverter}}">
                                                         <CheckBox Margin="0,0,4,0"
                                                                   VerticalAlignment="Center"
-                                                                  Content="POST規制時にフォールバック"
+                                                                  Content="{x:Static localize:SettingFlipResources.AccountPostFallback}"
                                                                   IsChecked="{Binding IsFallbackEnabled}" />
                                                         <CheckBox Margin="4"
-                                                                  Content="お気に入りもフォールバック"
+                                                                  Content="{x:Static localize:SettingFlipResources.AccountFavoriteFallback}"
                                                                   DockPanel.Dock="Right"
                                                                   IsChecked="{Binding FallbackFavorites}"
                                                                   Visibility="{Binding IsFallbackEnabled,
@@ -254,21 +255,21 @@
                                                     </DockPanel>
                                                     <StackPanel Margin="8,4" Orientation="Horizontal">
                                                         <CheckBox Margin="0,0,4,0"
-                                                                  Content="ツイートをリアルタイムに受信する[推奨]"
+                                                                  Content="{x:Static localize:SettingFlipResources.AccountUseUserStreams}"
                                                                   IsChecked="{Binding IsUserStreamsEnabled}" />
                                                         <CheckBox Margin="4,0"
-                                                                  Content="他人へのリプライを受信する"
+                                                                  Content="{x:Static localize:SettingFlipResources.AccountReceiveRepliesAll}"
                                                                   IsChecked="{Binding ReceiveRepliesAll}"
                                                                   Visibility="{Binding IsUserStreamsEnabled,
                                                                                        Converter={StaticResource BoolVisibleConverter}}" />
                                                         <CheckBox Margin="4,0"
-                                                                  Content="他人のアクティビティを受信する"
+                                                                  Content="{x:Static localize:SettingFlipResources.AccountReceiveFollowingsActivity}"
                                                                   IsChecked="{Binding ReceiveFollowingsActivity}"
                                                                   Visibility="{Binding IsUserStreamsEnabled,
                                                                                        Converter={StaticResource BoolVisibleConverter}}" />
                                                     </StackPanel>
                                                     <CheckBox Margin="8,4,8,8"
-                                                              Content="アップロードするメディアにSensitiveフラグを付ける"
+                                                              Content="{x:Static localize:SettingFlipResources.AccountMarkMediaSensitive}"
                                                               IsChecked="{Binding IsMarkMediaAsPossiblySensitive}" />
                                                 </StackPanel>
                                             </Border>
@@ -280,7 +281,7 @@
                     </Border>
                     <TextBlock Grid.Row="1"
                                Margin="16, 2"
-                               Text="アカウントのアイコンをドラッグすると並び替えることができます。" />
+                               Text="{x:Static localize:SettingFlipResources.AccountDragDropToChangeOrder}" />
                     <DockPanel Grid.Row="2"
                                Margin="16"
                                LastChildFill="False">
@@ -292,15 +293,15 @@
                             </i:Interaction.Triggers>
                             <TextBlock Margin="8,0"
                                        Foreground="White"
-                                       Text="新しいアカウントを追加" />
+                                       Text="{x:Static localize:SettingFlipResources.AccountAdd}" />
                         </Button>
                         <Button DockPanel.Dock="Left" Style="{StaticResource MetroSquareButtonStyle}">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="Click">
-                                    <ei:CallMethodAction MethodName="SetApiKeys" TargetObject="{Binding Mode=OneWay}" />
+                                    <ei:CallMethodAction MethodName="ResetApiKeys" TargetObject="{Binding Mode=OneWay}" />
                                 </i:EventTrigger>
                             </i:Interaction.Triggers>
-                            <TextBlock Margin="8,0" Text="API キーの再設定" />
+                            <TextBlock Margin="8,0" Text="{x:Static localize:SettingFlipResources.AccountResetKey}" />
                         </Button>
                     </DockPanel>
                 </Grid>
@@ -331,7 +332,7 @@
                                        Margin="2,0,6,0"
                                        HorizontalAlignment="Right"
                                        VerticalAlignment="Center"
-                                       Text="タイムラインの表示形式:" />
+                                       Text="{x:Static localize:SettingFlipResources.TimelineDisplayType}" />
                             <DockPanel Grid.Row="0"
                                        Grid.Column="1"
                                        LastChildFill="True">
@@ -346,13 +347,15 @@
                                                 <ei:CallMethodAction MethodName="OpenDonationPage" TargetObject="{Binding}" />
                                             </i:EventTrigger>
                                         </i:Interaction.Triggers>
-                                        <Run Text="Krileの開発を継続するため、寄付にご協力ください。" />
+                                        <Run Text="{x:Static localize:SettingFlipResources.TimelineKampa}" />
                                     </Hyperlink>
                                 </TextBlock>
                                 <ComboBox SelectedIndex="{Binding TweetDisplayMode, Mode=TwoWay}">
-                                    <clr:String>常に一行表示</clr:String>
-                                    <clr:String>フォーカス時に拡大</clr:String>
-                                    <clr:String>常に全行表示</clr:String>
+                                    <ComboBox.Items>
+                                        <ComboBoxItem Content="{x:Static localize:SettingFlipResources.TimelineDisplaySingleLine}" />
+                                        <ComboBoxItem Content="{x:Static localize:SettingFlipResources.TimelineDisplayMixed}" />
+                                        <ComboBoxItem Content="{x:Static localize:SettingFlipResources.TimelineDisplayMultiline}" />
+                                    </ComboBox.Items>
                                 </ComboBox>
                             </DockPanel>
                             <TextBlock Grid.Row="1"
@@ -360,47 +363,51 @@
                                        Margin="2,8,6,0"
                                        HorizontalAlignment="Right"
                                        VerticalAlignment="Center"
-                                       Text="タイムラインのスクロールロック:" />
+                                       Text="{x:Static localize:SettingFlipResources.TimelineScrollLockType}" />
                             <ComboBox Grid.Row="1"
                                       Grid.Column="1"
                                       Margin="0,8,0,0"
                                       SelectedIndex="{Binding ScrollLockStrategy,
                                                               Mode=TwoWay}">
-                                <clr:String>ロックしない</clr:String>
-                                <clr:String>常にロック</clr:String>
-                                <clr:String>明示的にロック(実装されていません)</clr:String>
-                                <clr:String>スクロールしていたらロック</clr:String>
-                                <clr:String>タイムライン上にマウスがあるときにロック</clr:String>
+                                <ComboBox.Items>
+                                    <ComboBoxItem Content="{x:Static localize:SettingFlipResources.TimelineScrollLockUnlock}" />
+                                    <ComboBoxItem Content="{x:Static localize:SettingFlipResources.TimelineScrollLockAlways}" />
+                                    <ComboBoxItem Content="{x:Static localize:SettingFlipResources.TimelineScrollLockExplicit}" />
+                                    <ComboBoxItem Content="{x:Static localize:SettingFlipResources.TimelineScrollLockWhenScrolled}" />
+                                    <ComboBoxItem Content="{x:Static localize:SettingFlipResources.TimelineScrollLockMouseOver}" />
+                                </ComboBox.Items>
                             </ComboBox>
                             <TextBlock Grid.Row="2"
                                        Grid.Column="0"
                                        Margin="2,8,6,0"
                                        HorizontalAlignment="Right"
                                        VerticalAlignment="Center"
-                                       Text="タイムラインのアイコン品質:" />
+                                       Text="{x:Static localize:SettingFlipResources.TimelineIconQualityType}" />
                             <ComboBox Grid.Row="2"
                                       Grid.Column="1"
                                       Margin="0,8,0,0"
                                       SelectedIndex="{Binding TimelineIconResolution,
                                                               Mode=TwoWay}">
-                                <clr:String>最高(原寸大のアイコンを取得します。最高の品質となりますが、通信量が極端に増大します)</clr:String>
-                                <clr:String>高(少し大きいサイズのアイコンを取得します。品質が向上することがありますが、通信量が若干増大します)</clr:String>
-                                <clr:String>最適(最適なサイズのアイコンを取得します。通信量を抑えつつ、アイコン品質の悪化も防ぎます)</clr:String>
-                                <clr:String>最小(小さめのアイコンを拡大して表示します。通信量がかなり抑えられますが、アイコン品質がかなり悪化します)</clr:String>
-                                <clr:String>アイコン表示なし(アイコンがすべて空白になります)</clr:String>
+                                <ComboBox.Items>
+                                    <ComboBoxItem Content="{x:Static localize:SettingFlipResources.TimelineIconQualityOriginal}" />
+                                    <ComboBoxItem Content="{x:Static localize:SettingFlipResources.TimelineIconQualityHigh}" />
+                                    <ComboBoxItem Content="{x:Static localize:SettingFlipResources.TimelineIconQualityOptimized}" />
+                                    <ComboBoxItem Content="{x:Static localize:SettingFlipResources.TimelineIconQualityMinimum}" />
+                                    <ComboBoxItem Content="{x:Static localize:SettingFlipResources.TimelineIconQualityNone}" />
+                                </ComboBox.Items>
                             </ComboBox>
                         </Grid>
                         <CheckBox Margin="0,0,0,8"
                                   VerticalAlignment="Top"
-                                  Content="自分自身をお気に入り登録できるようにする(_F)"
+                                  Content="{x:Static localize:SettingFlipResources.TimelineAllowFavoriteMyself}"
                                   IsChecked="{Binding IsAllowFavoriteMyself}" />
                         <CheckBox Margin="0,0,0,8"
                                   VerticalAlignment="Top"
-                                  Content="添付されている画像のサムネイルを表示する(_T)"
+                                  Content="{x:Static localize:SettingFlipResources.TimelineShowThumbnails}"
                                   IsChecked="{Binding ShowThumbnail}" />
                         <CheckBox Margin="20,0,0,8"
                                   VerticalAlignment="Top"
-                                  Content="Twitterにアップロードされた画像のサムネイルをクリックした時に原寸で開く(_O)"
+                                  Content="{x:Static localize:SettingFlipResources.TimelineOpenTwitterPicWithOriginalSize}"
                                   IsChecked="{Binding OpenTwitterImageWithOriginalSize}" />
                     </StackPanel>
                 </Grid>
@@ -430,16 +437,21 @@
                         <Border Grid.ColumnSpan="2"
                                 Background="{DynamicResource BaseColorForegroundBrush}"
                                 Opacity="0.05" />
-                        <TextBlock Margin="24,0"
+                        <TextBlock Grid.Column="0"
+                                   Margin="24,0"
                                    HorizontalAlignment="Left"
                                    VerticalAlignment="Center"
-                                   Text="ミュート クエリの編集" />
-                        <TextBlock Margin="8,8,8,4" HorizontalAlignment="Right">
-                            <Hyperlink Command="{Binding OpenQueryReferenceCommand}">Krile Queryのヘルプ...</Hyperlink>
+                                   Text="{x:Static localize:SettingFlipResources.MuteHeader}" />
+                        <TextBlock Grid.Column="0"
+                                   Margin="8,8,8,4"
+                                   HorizontalAlignment="Right">
+                            <Hyperlink Command="{Binding OpenQueryReferenceCommand}">
+                                <Run Text="{x:Static localize:GeneralFlipResources.TabConfigQueryHelp}" />
+                            </Hyperlink>
                         </TextBlock>
                         <Button Grid.Column="1"
                                 HorizontalAlignment="Right"
-                                Content="編集をリセット"
+                                Content="{x:Static localize:SettingFlipResources.MuteReset}"
                                 Style="{StaticResource MetroSquareButtonStyle}">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="Click">
@@ -475,11 +487,11 @@
                         <TextBlock.Style>
                             <Style TargetType="{x:Type TextBlock}">
                                 <Setter Property="Background" Value="#FF1BA1E2" />
-                                <Setter Property="Text" Value="クエリを正しく解析できました。" />
+                                <Setter Property="Text" Value="{x:Static localize:GeneralFlipResources.TabConfigQueryValid}" />
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding FoundError}" Value="True">
                                         <Setter Property="Background" Value="#FFE51400" />
-                                        <Setter Property="Text" Value="クエリにエラーが存在します。(現在の結果は反映されません)" />
+                                        <Setter Property="Text" Value="{x:Static localize:GeneralFlipResources.TabConfigQueryContainsError}" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
@@ -487,34 +499,19 @@
                     </TextBlock>
                     <StackPanel Grid.Row="4" Orientation="Vertical">
                         <CheckBox Margin="16,0,16,8"
-                                  Content="軽量なミュートを利用する(_L)[パワーユーザー向け]"
+                                  Content="{x:Static localize:SettingFlipResources.MuteUseLightweightMute}"
                                   IsChecked="{Binding UseLightweightMute}" />
-                        <TextBlock Margin="16,0,16,12" TextWrapping="Wrap">
-                            <Run Text="ミュートフィルタにregexなど複雑なクエリを用いた場合、タイムライン構築に十分以上かかるようになる場合があります。" />
-                            <LineBreak />
-                            <Run Text="軽量なミュートを有効にすると、受信時にミュートされていたツイートはデータベースに登録されなくなるため、タイムラインの構築速度が向上することがあります。" />
-                            <Run Text="ただし、以下の制限がかかりますので注意して下さい。" />
-                            <LineBreak />
-                            <Run Text="★ミュートフィルタで非表示となるのは、受信時にミュート対象となっていたツイートだけです。ミュートフィルタを変更しても、すでにデータベースに登録されているツイートはミュートされません。" />
-                            <LineBreak />
-                            <Run Text="★受信時にミュート対象だったツイートは、後からミュートフィルタを変更してもタイムラインには表示されません。" />
-                            <LineBreak />
-                            <Run Text="設定を切り替えた後は、データベースファイルを一旦消去されることをおすすめします。" />
-                            <LineBreak />
-                            <Run Text="なお、ブロックしたユーザーのツイートや、リツイートを非表示にしているユーザーのリツイートはこれまでと同様にフィルタされます。" />
-                        </TextBlock>
-                        <GroupBox Margin="16,0,16,16" Header="追加ミュートの設定">
+                        <TextBlock Margin="16,0,16,12"
+                                   Text="{x:Static localize:SettingFlipResources.MuteLightweightMuteDescription}"
+                                   TextWrapping="Wrap" />
+                        <GroupBox Margin="16,0,16,16" Header="{x:Static localize:SettingFlipResources.MuteDetailSettings}">
                             <StackPanel>
-                                <TextBlock Margin="16,8">
-                                    <Run Text="以下の設定は、Twitter Webで非表示となるツイートをKrileでも非表示にする設定となります。" />
-                                    <LineBreak />
-                                    <Run Text="特別な理由がない限り、チェックをつけておくことを推奨します。" />
-                                </TextBlock>
+                                <TextBlock Margin="16,8" Text="{x:Static localize:SettingFlipResources.MuteDetailDescription}" />
                                 <CheckBox Margin="16,8"
-                                          Content="ブロックしているユーザーをミュートする(_B) [推奨]"
-                                          IsChecked="{Binding IsMuteBlockedUsers}" />
+                                          Content="{x:Static localize:SettingFlipResources.MuteBlockingUsers}"
+                                          IsChecked="{Binding IsMuteBlockingUsers}" />
                                 <CheckBox Margin="16,8,16,16"
-                                          Content="リツイートを非表示にしているユーザーのリツイートをミュートする(_R) [推奨]"
+                                          Content="{x:Static localize:SettingFlipResources.MuteNoRetweets}"
                                           IsChecked="{Binding IsMuteNoRetweetUsersRetweet}" />
                             </StackPanel>
                         </GroupBox>
@@ -534,25 +531,27 @@
                     </Grid.Style>
                     <StackPanel Margin="16, 0" Orientation="Vertical">
                         <CheckBox Margin="0"
-                                  Content="フォールバックアカウントを遡って返信する(_B)"
+                                  Content="{x:Static localize:SettingFlipResources.InputBacktrackFallback}"
                                   IsChecked="{Binding IsBacktrackFallback}" />
                         <TextBlock Margin="20,8,0,8"
-                                   Text="他のアカウントからのフォールバックになっているアカウントへの返信に対して返信する際に、フォールバック元アカウントを自動指定するようにします。"
+                                   Text="{x:Static localize:SettingFlipResources.InputBacktrackDescription}"
                                    TextWrapping="Wrap" />
                         <CheckBox Margin="0,8"
-                                  Content="誰かに返信する時はバインドされているタグを無視する(_T)"
+                                  Content="{x:Static localize:SettingFlipResources.InputSuppressTagBindInReply}"
                                   IsChecked="{Binding SuppressTagBindInReply}" />
                         <CheckBox Margin="0,8"
-                                  Content="ツイートボックスを開くときに下書きが存在していたら下書きを開く(_R)"
+                                  Content="{x:Static localize:SettingFlipResources.InputRestorePreviousStashed}"
                                   IsChecked="{Binding RestorePreviousStashed}" />
                         <StackPanel Margin="0,8" Orientation="Horizontal">
                             <TextBlock Margin="0,0,8,0"
                                        VerticalAlignment="Center"
-                                       Text="内容が書き込まれたツイートボックスを閉じるとき:" />
+                                       Text="{x:Static localize:SettingFlipResources.InputCloseAction}" />
                             <ComboBox SelectedIndex="{Binding TweetBoxClosingAction}">
-                                <clr:String>下書きへ保存するか確認する</clr:String>
-                                <clr:String>常に下書きへ保存する</clr:String>
-                                <clr:String>確認せずに破棄する</clr:String>
+                                <ComboBox.Items>
+                                    <ComboBoxItem Content="{x:Static localize:SettingFlipResources.InputCloseConfirm}" />
+                                    <ComboBoxItem Content="{x:Static localize:SettingFlipResources.InputCloseStash}" />
+                                    <ComboBoxItem Content="{x:Static localize:SettingFlipResources.InputCloseDestroy}" />
+                                </ComboBox.Items>
                             </ComboBox>
                         </StackPanel>
                     </StackPanel>
@@ -570,18 +569,18 @@
                     </Grid.Style>
                     <StackPanel Margin="16, 0" Orientation="Vertical">
                         <CheckBox Margin="0,0,0,8"
-                                  Content="アプリケーションを閉じるときに確認する(_X)"
+                                  Content="{x:Static localize:SettingFlipResources.NotifyConfirmOnExit}"
                                   IsChecked="{Binding ConfirmOnExitApp}" />
                         <CheckBox Margin="0,8"
-                                  Content="別のアカウントで行われている会話に割り込む場合に警告する(_T)"
+                                  Content="{x:Static localize:SettingFlipResources.NotifyWarnReplyFromThirdAccount}"
                                   IsChecked="{Binding WarnReplyFromThirdAccount}" />
                         <CheckBox Margin="0,8"
-                                  Content="ツイートの訂正を行うときに警告する(_A)"
+                                  Content="{x:Static localize:SettingFlipResources.NotifyWarnAmending}"
                                   IsChecked="{Binding WarnAmendTweet}" />
                         <CheckBox Margin="0,8"
-                                  Content="ツイート失敗時にメッセージを表示する(_T)"
+                                  Content="{x:Static localize:SettingFlipResources.NotifyShowMessageOnTweetFailed}"
                                   IsChecked="{Binding ShowMessageOnTweetFailed}" />
-                        <GroupBox Header="新着ツイートの通知" Padding="8,4,8,0">
+                        <GroupBox Header="{x:Static localize:SettingFlipResources.NotifyNewTweets}" Padding="8,4,8,0">
                             <StackPanel Orientation="Vertical">
                                 <Grid Margin="0,8">
                                     <Grid.ColumnDefinitions>
@@ -595,19 +594,23 @@
                                     <TextBlock Margin="0,0,8,0"
                                                HorizontalAlignment="Right"
                                                VerticalAlignment="Center"
-                                               Text="通知のスタイル" />
-                                    <ComboBox Grid.Column="1"
+                                               Text="{x:Static localize:SettingFlipResources.NotifyStyleType}" />
+                                    <ComboBox Grid.Row="0"
+                                              Grid.Column="1"
                                               Margin="4"
                                               SelectedIndex="{Binding NotificationTypeIndex}">
-                                        <clr:String>なし</clr:String>
-                                        <clr:String>スリム</clr:String>
-                                        <clr:String>ポップアップ</clr:String>
+                                        <ComboBox.Items>
+                                            <ComboBoxItem Content="{x:Static localize:SettingFlipResources.NotifyStyleNone}" />
+                                            <ComboBoxItem Content="{x:Static localize:SettingFlipResources.NotifyStyleSlim}" />
+                                            <ComboBoxItem Content="{x:Static localize:SettingFlipResources.NotifyStylePopup}" />
+                                        </ComboBox.Items>
                                     </ComboBox>
                                     <TextBlock Grid.Row="1"
+                                               Grid.Column="0"
                                                Margin="0,0,8,0"
                                                HorizontalAlignment="Right"
                                                VerticalAlignment="Center"
-                                               Text="通知するディスプレイ" />
+                                               Text="{x:Static localize:SettingFlipResources.NotifyDisplay}" />
                                     <ComboBox Grid.Row="1"
                                               Grid.Column="1"
                                               Margin="4"
@@ -615,34 +618,34 @@
                                               SelectedIndex="{Binding TargetDisplay}" />
                                 </Grid>
                                 <CheckBox Margin="0,0,0,8"
-                                          Content="ウィンドウが前面にある時もポップアップ通知を表示する(_P)"
+                                          Content="{x:Static localize:SettingFlipResources.NotifyShowPopupWhenWindowIsActive}"
                                           IsChecked="{Binding IsNotifyWhenWindowIsActive}" />
                                 <CheckBox Margin="0,0,0,8"
-                                          Content="自分への返信を通知(_R)"
+                                          Content="{x:Static localize:SettingFlipResources.NotifyNewReplies}"
                                           IsChecked="{Binding IsNotifyMentions}" />
                                 <CheckBox Margin="0,0,0,8"
-                                          Content="自分へのダイレクトメッセージを通知(_M)"
+                                          Content="{x:Static localize:SettingFlipResources.NotifyNewDirectMessages}"
                                           IsChecked="{Binding IsNotifyMessages}" />
                                 <CheckBox Margin="0,0,0,8"
-                                          Content="自分の新しいフォロワーを通知(_F)"
+                                          Content="{x:Static localize:SettingFlipResources.NotifyNewFollowers}"
                                           IsChecked="{Binding IsNotifyFollows}" />
                                 <CheckBox Margin="0,0,0,8"
-                                          Content="自分のツイートがお気に入り登録されたら通知(_V)"
+                                          Content="{x:Static localize:SettingFlipResources.NotifyFavorites}"
                                           IsChecked="{Binding IsNotifyFavorites}" />
                                 <CheckBox Margin="0,0,0,8"
-                                          Content="自分のツイートがリツイートされたら通知(_E)"
+                                          Content="{x:Static localize:SettingFlipResources.NotifyRetweets}"
                                           IsChecked="{Binding IsNotifyRetweets}" />
                                 <StackPanel Margin="0,0,0,8" Orientation="Horizontal">
                                     <TextBlock Margin="0,0,8,0"
                                                VerticalAlignment="Center"
-                                               Text="新着ツイートの通知はタブごとに切り替えることができます。" />
+                                               Text="{x:Static localize:SettingFlipResources.NotifyToggleParTabsDescription}" />
                                     <Button Style="{StaticResource MetroSquareButtonStyle}">
                                         <i:Interaction.Triggers>
                                             <i:EventTrigger EventName="Click">
                                                 <ei:CallMethodAction MethodName="ClearAllTabNotification" TargetObject="{Binding}" />
                                             </i:EventTrigger>
                                         </i:Interaction.Triggers>
-                                        <TextBlock FontSize="12" Text="すべてのタブの新着通知をオフにする" />
+                                        <TextBlock FontSize="12" Text="{x:Static localize:SettingFlipResources.NotifyDisableNotifyAllTabs}" />
                                     </Button>
                                 </StackPanel>
                             </StackPanel>
@@ -671,9 +674,10 @@
                             <RowDefinition />
                         </Grid.RowDefinitions>
                         <DockPanel>
-                            <TextBlock VerticalAlignment="Center"
+                            <TextBlock Margin="0,0,8,0"
+                                       VerticalAlignment="Center"
                                        DockPanel.Dock="Left"
-                                       Text="使用するテーマ: " />
+                                       Text="{x:Static localize:SettingFlipResources.ThemeUsingTheme}" />
                             <Button DockPanel.Dock="Right" Style="{StaticResource MetroSquareButtonStyle}">
                                 <i:Interaction.Triggers>
                                     <i:EventTrigger EventName="Click">
@@ -682,7 +686,7 @@
                                 </i:Interaction.Triggers>
                                 <TextBlock Margin="2,-4"
                                            FontSize="12"
-                                           Text="テーマフォルダを開く" />
+                                           Text="{x:Static localize:SettingFlipResources.ThemeOpenFolder}" />
                             </Button>
                             <ComboBox ItemsSource="{Binding ThemeCandidateFiles}" SelectedIndex="{Binding ThemeFileIndex}" />
                         </DockPanel>
@@ -796,10 +800,16 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <TextBlock Margin="4"
+                                   HorizontalAlignment="Right"
                                    VerticalAlignment="Center"
-                                   Text="タイムラインの壁紙: " />
-                        <TextBox Grid.Column="1" Text="{Binding BackgroundImagePath, UpdateSourceTrigger=PropertyChanged}" />
-                        <Button Grid.Column="2" Content="...">
+                                   Text="{x:Static localize:SettingFlipResources.ThemeWallpaperFile}" />
+                        <TextBox Grid.Row="0"
+                                 Grid.Column="1"
+                                 Text="{Binding BackgroundImagePath,
+                                                UpdateSourceTrigger=PropertyChanged}" />
+                        <Button Grid.Row="0"
+                                Grid.Column="2"
+                                Content=" ... ">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="Click">
                                     <ei:CallMethodAction MethodName="SelectBackgroundImage" TargetObject="{Binding}" />
@@ -807,8 +817,10 @@
                             </i:Interaction.Triggers>
                         </Button>
                         <TextBlock Grid.Row="1"
+                                   Grid.Column="0"
                                    Margin="4"
-                                   Text="壁紙の透過度" />
+                                   HorizontalAlignment="Right"
+                                   Text="{x:Static localize:SettingFlipResources.ThemeWallpaperTransparency}" />
                         <Slider Grid.Row="1"
                                 Grid.Column="1"
                                 Grid.ColumnSpan="2"
@@ -842,13 +854,13 @@
                     <StackPanel Margin="16,0,16,4" Orientation="Horizontal">
                         <TextBlock Margin="0,0,8,0"
                                    VerticalAlignment="Center"
-                                   Text="使用するキーアサイン:" />
+                                   Text="{x:Static localize:SettingFlipResources.KeyAssignUsingAssign}" />
                         <ComboBox ItemsSource="{Binding KeyAssignCandidateFiles}" SelectedIndex="{Binding KeyAssignFile, Mode=TwoWay}" />
                         <Button Margin="8,0,0,0" Style="{StaticResource MetroSquareTransparentButtonStyle}">
                             <TextBlock Margin="-4"
                                        FontSize="12"
                                        Foreground="{DynamicResource BaseColorForegroundBrush}"
-                                       Text="このキーアサインを削除" />
+                                       Text="{x:Static localize:SettingFlipResources.KeyAssignDelete}" />
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="Click">
                                     <ei:CallMethodAction MethodName="DeleteCurrentKeyAssign" TargetObject="{Binding}" />
@@ -859,7 +871,7 @@
                             <TextBlock Margin="-4"
                                        FontSize="12"
                                        Foreground="{DynamicResource BaseColorForegroundBrush}"
-                                       Text="新しいキーアサインを作成" />
+                                       Text="{x:Static localize:SettingFlipResources.KeyAssignNew}" />
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="Click">
                                     <ei:CallMethodAction MethodName="AddNewKeyAssign" TargetObject="{Binding}" />
@@ -884,7 +896,9 @@
                     </Grid.Style>
                     <StackPanel Margin="16, 0" Orientation="Vertical">
                         <DockPanel Margin="0,0,0,8">
-                            <TextBlock VerticalAlignment="Center" Text="呼び出すブラウザのパス(空欄でデフォルトのブラウザ): " />
+                            <TextBlock Margin="0,0,4,0"
+                                       VerticalAlignment="Center"
+                                       Text="{x:Static localize:SettingFlipResources.ThirdBrowserPath}" />
                             <TextBox VerticalAlignment="Center" Text="{Binding ExternalBrowserPath}" />
                         </DockPanel>
                     </StackPanel>
@@ -902,34 +916,42 @@
                     </Grid.Style>
                     <StackPanel Margin="16, 0" Orientation="Vertical">
                         <DockPanel Margin="0,0,0,8">
-                            <TextBlock VerticalAlignment="Center" Text="API プロキシ(空欄で利用しない): " />
+                            <TextBlock Margin="0,0,4,0"
+                                       VerticalAlignment="Center"
+                                       Text="{x:Static localize:SettingFlipResources.ProxyApiProxy}" />
                             <TextBox VerticalAlignment="Center" Text="{Binding ApiProxy}" />
                         </DockPanel>
                         <DockPanel Margin="0,8">
-                            <TextBlock VerticalAlignment="Center" Text="Web プロキシ: " />
+                            <TextBlock Margin="0,0,4,0"
+                                       VerticalAlignment="Center"
+                                       Text="{x:Static localize:SettingFlipResources.ProxyWebProxy}" />
                             <ComboBox SelectedIndex="{Binding UseWebProxy}">
-                                <clr:String>Internet Explorerの設定を使用(投稿に時間がかかるようになることがあります)</clr:String>
-                                <clr:String>プロキシを使用しない</clr:String>
-                                <clr:String>利用するプロキシを指定する</clr:String>
+                                <ComboBox.Items>
+                                    <ComboBoxItem Content="{x:Static localize:SettingFlipResources.ProxyWebProxyIE}" />
+                                    <ComboBoxItem Content="{x:Static localize:SettingFlipResources.ProxyWebProxyNone}" />
+                                    <ComboBoxItem Content="{x:Static localize:SettingFlipResources.ProxyWebProxyExplicit}" />
+                                </ComboBox.Items>
                             </ComboBox>
                         </DockPanel>
-                        <GroupBox Header="プロキシ設定" Visibility="{Binding ExplicitSetProxy, Converter={StaticResource BoolVisibleConverter}}">
+                        <GroupBox Header="{x:Static localize:SettingFlipResources.ProxyDetailSettings}" Visibility="{Binding ExplicitSetProxy, Converter={StaticResource BoolVisibleConverter}}">
                             <StackPanel Margin="8" Orientation="Vertical">
                                 <DockPanel Margin="0,4">
-                                    <TextBlock VerticalAlignment="Center" Text="ホスト: " />
+                                    <TextBlock Margin="0,0,4,0"
+                                               VerticalAlignment="Center"
+                                               Text="{x:Static localize:SettingFlipResources.ProxyDetailHost}" />
                                     <xctk:IntegerUpDown Width="80"
                                                         DockPanel.Dock="Right"
                                                         Value="{Binding WebProxyPort}" />
-                                    <TextBlock Margin="8,0,0,0"
+                                    <TextBlock Margin="8,0,4,0"
                                                VerticalAlignment="Center"
                                                DockPanel.Dock="Right"
-                                               Text="ポート: " />
+                                               Text="{x:Static localize:SettingFlipResources.ProxyDetailPort}" />
                                     <TextBox VerticalAlignment="Center" Text="{Binding WebProxyHost}" />
                                 </DockPanel>
                                 <CheckBox Margin="0,4"
-                                          Content="ローカルホストを参照するときには使用しない(_B)"
+                                          Content="{x:Static localize:SettingFlipResources.ProxyBypassLocal}"
                                           IsChecked="{Binding BypassProxyInLocal}" />
-                                <TextBlock Margin="0,4" Text="バイパスするホスト リスト(改行区切り):" />
+                                <TextBlock Margin="0,4" Text="{x:Static localize:SettingFlipResources.ProxyBypassList}" />
                                 <TextBox Height="120"
                                          AcceptsReturn="True"
                                          Text="{Binding BypassList}"
@@ -950,38 +972,34 @@
                         </Style>
                     </Grid.Style>
                     <StackPanel Margin="16, 0" Orientation="Vertical">
-                        <TextBlock Margin="0,0,0,8" Text="以下の設定は上級者向けのものです。どのように利用されているかは、ソースコードをご覧ください。" />
+                        <TextBlock Margin="0,0,0,8"
+                                   Text="{x:Static localize:SettingFlipResources.HighDescription}"
+                                   TextWrapping="Wrap" />
                         <CheckBox Margin="0,8"
-                                  Content="開発途上版のパッチを適用する(_R) [不安定な更新が行われることがあります]"
+                                  Content="{x:Static localize:SettingFlipResources.HighApplyUnstablePatch}"
                                   IsChecked="{Binding ApplyUnstablePatch}" />
                         <CheckBox Margin="0,8"
-                                  Content="アンセーフ プラグインをロード(_U)"
-                                  IsChecked="{Binding LoadUnsafePlugin}" />
-                        <CheckBox Margin="0,8"
-                                  Content="開発用フォルダからプラグインをロード(_D)"
+                                  Content="{x:Static localize:SettingFlipResources.HighLoadDeveloperPlugin}"
                                   IsChecked="{Binding LoadPluginFromDevFolder}" />
-                        <CheckBox Margin="0,8"
-                                  Content="タイムラインを反転し、投稿欄を下に移動する"
-                                  IsChecked="{Binding RotateWindowContent}" />
                         <DockPanel Margin="0,8" LastChildFill="False">
-                            <TextBlock VerticalAlignment="Center" Text="イベント表示時間: " />
+                            <TextBlock VerticalAlignment="Center" Text="{x:Static localize:SettingFlipResources.HighEventDisplayDuration}" />
                             <TextBlock Margin="4,0"
                                        VerticalAlignment="Center"
-                                       Text="最小(msec) " />
+                                       Text="{x:Static localize:SettingFlipResources.HighEventDisplayMin}" />
                             <xctk:IntegerUpDown Width="80" Value="{Binding EventDisplayMinimumMillisec}" />
                             <TextBlock Margin="8,0,4,0"
                                        VerticalAlignment="Center"
-                                       Text="最大(msec) " />
+                                       Text="{x:Static localize:SettingFlipResources.HighEventDisplayMax}" />
                             <xctk:IntegerUpDown Width="80" Value="{Binding EventDisplayMaximumMillisec}" />
                         </DockPanel>
 
-                        <GroupBox Header="REST APIの受信間隔">
+                        <GroupBox Header="{x:Static localize:SettingFlipResources.HighRestApiInterval}">
                             <StackPanel Margin="8,4" Orientation="Vertical">
                                 <StackPanel Margin="0,4" Orientation="Horizontal">
                                     <TextBlock Width="120"
                                                Margin="4,0"
                                                VerticalAlignment="Center"
-                                               Text="ユーザー情報"
+                                               Text="{x:Static localize:SettingFlipResources.HighRestUserInfoInterval}"
                                                TextAlignment="Right" />
                                     <xctk:IntegerUpDown Width="80" Value="{Binding UserInfoReceivePeriod}" />
                                 </StackPanel>
@@ -989,7 +1007,7 @@
                                     <TextBlock Width="120"
                                                Margin="4,0"
                                                VerticalAlignment="Center"
-                                               Text="リレーション"
+                                               Text="{x:Static localize:SettingFlipResources.HighRestRelationInterval}"
                                                TextAlignment="Right" />
                                     <xctk:IntegerUpDown Width="80" Value="{Binding UserRelationReceivePeriod}" />
                                 </StackPanel>
@@ -997,7 +1015,7 @@
                                     <TextBlock Width="120"
                                                Margin="4,0"
                                                VerticalAlignment="Center"
-                                               Text="タイムライン"
+                                               Text="{x:Static localize:SettingFlipResources.HighRestTimelineInterval}"
                                                TextAlignment="Right" />
                                     <xctk:IntegerUpDown Width="80" Value="{Binding RESTReceivePeriod}" />
                                 </StackPanel>
@@ -1005,7 +1023,7 @@
                                     <TextBlock Width="120"
                                                Margin="4,0"
                                                VerticalAlignment="Center"
-                                               Text="検索タイムライン"
+                                               Text="{x:Static localize:SettingFlipResources.HighRestSearchInterval}"
                                                TextAlignment="Right" />
                                     <xctk:IntegerUpDown Width="80" Value="{Binding RESTSearchReceivePeriod}" />
                                 </StackPanel>
@@ -1013,7 +1031,7 @@
                                     <TextBlock Width="120"
                                                Margin="4,0"
                                                VerticalAlignment="Center"
-                                               Text="リストタイムライン"
+                                               Text="{x:Static localize:SettingFlipResources.HighRestListInterval}"
                                                TextAlignment="Right" />
                                     <xctk:IntegerUpDown Width="80" Value="{Binding ListReceivePeriod}" />
                                 </StackPanel>
@@ -1021,27 +1039,27 @@
                         </GroupBox>
 
                         <DockPanel Margin="0,8" LastChildFill="False">
-                            <TextBlock VerticalAlignment="Center" Text="投稿規制パラメータ: " />
+                            <TextBlock VerticalAlignment="Center" Text="{x:Static localize:SettingFlipResources.HighPostLimitParameter}" />
                             <TextBlock Margin="4,0"
                                        VerticalAlignment="Center"
-                                       Text="ウィンドウタイム(sec) " />
+                                       Text="{x:Static localize:SettingFlipResources.HighPostWindowTime}" />
                             <xctk:IntegerUpDown Width="80" Value="{Binding PostWindowTimeSec}" />
                             <TextBlock Margin="8,0,4,0"
                                        VerticalAlignment="Center"
-                                       Text="ウィンドウあたりの投稿上限 " />
+                                       Text="{x:Static localize:SettingFlipResources.HighPostTweetsPerWindow}" />
                             <xctk:IntegerUpDown Width="80" Value="{Binding PostLimitPerWindow}" />
                         </DockPanel>
                         <CheckBox Margin="0,8"
-                                  Content="位置情報サービスをロードしない(_G) [この設定は自動的に変更されることがあります]"
+                                  Content="{x:Static localize:SettingFlipResources.HighDisableGeolocationService}"
                                   IsChecked="{Binding DisableGeoLocationService}" />
                         <CheckBox Margin="0,8"
-                                  Content="Krileの動作を記録する(_L) [処理速度が低下します][再起動後に反映されます]"
+                                  Content="{x:Static localize:SettingFlipResources.HighLogKrileBehavior}"
                                   IsChecked="{Binding IsBehaviorLogEnabled}" />
                     </StackPanel>
                     <StackPanel VerticalAlignment="Bottom" Orientation="Horizontal">
                         <Button Margin="12"
                                 HorizontalAlignment="Left"
-                                Content="Krileをメンテナンスモードでリスタート"
+                                Content="{x:Static localize:SettingFlipResources.HighRestartAsMaintenanceMode}"
                                 Style="{StaticResource MetroSquareButtonStyle}">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="Click">
@@ -1049,7 +1067,7 @@
                                 </i:EventTrigger>
                             </i:Interaction.Triggers>
                         </Button>
-                        <TextBlock VerticalAlignment="Center" Text="設定とデータベースの削除やデータベースの最適化などが行えます。" />
+                        <TextBlock VerticalAlignment="Center" Text="{x:Static localize:SettingFlipResources.HighMaintenanceModeDescription}" />
                     </StackPanel>
                 </Grid>
                 <Grid Grid.Column="1" Margin="0,6,0,0">

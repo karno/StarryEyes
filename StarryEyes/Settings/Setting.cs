@@ -130,8 +130,8 @@ namespace StarryEyes.Settings
 
         public static readonly FilterSettingItem Muteds = new FilterSettingItem("Muteds");
 
-        public static readonly SettingItemStruct<bool> MuteBlockedUsers =
-            new SettingItemStruct<bool>("MuteBlockedUsers", true);
+        public static readonly SettingItemStruct<bool> MuteBlockingUsers =
+            new SettingItemStruct<bool>("MuteBlockingUsers", true);
 
         public static readonly SettingItemStruct<bool> MuteNoRetweets =
             new SettingItemStruct<bool>("MuteNoRetweets", true);
@@ -246,9 +246,6 @@ namespace StarryEyes.Settings
         public static readonly SettingItem<string> ApiProxy =
             new SettingItem<string>("ApiProxy", null);
 
-        public static readonly SettingItemStruct<bool> LoadUnsafePlugins =
-            new SettingItemStruct<bool>("LoadUnsafePlugins", false);
-
         public static readonly SettingItemStruct<bool> LoadPluginFromDevFolder =
             new SettingItemStruct<bool>("LoadPluginFromDevFolder", false);
 
@@ -306,13 +303,6 @@ namespace StarryEyes.Settings
 
         public static readonly SettingItemStruct<int> SettingVersion =
             new SettingItemStruct<int>("SettingVersion", 1);
-
-        #endregion
-
-        #region Easter egg
-
-        public static readonly SettingItemStruct<bool> RotateWindowContent =
-            new SettingItemStruct<bool>("RotateWindowContent", false);
 
         #endregion
 

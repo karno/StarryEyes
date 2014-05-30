@@ -46,9 +46,9 @@ namespace StarryEyes.Models.Receiving
                 InvalidateMute();
                 RefreshTimelineRequired.SafeInvoke();
             };
-            Setting.MuteBlockedUsers.ValueChanged += _ =>
+            Setting.MuteBlockingUsers.ValueChanged += _ =>
             {
-                _muteBlockedUsers = Setting.MuteBlockedUsers.Value;
+                _muteBlockedUsers = Setting.MuteBlockingUsers.Value;
                 RefreshTimelineRequired.SafeInvoke();
             };
             Setting.MuteNoRetweets.ValueChanged += _ =>

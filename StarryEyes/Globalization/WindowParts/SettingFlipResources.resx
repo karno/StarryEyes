@@ -1,0 +1,576 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AccountAdd" xml:space="preserve">
+    <value>Add New Account</value>
+  </data>
+  <data name="AccountDelete" xml:space="preserve">
+    <value>Delete This Account</value>
+  </data>
+  <data name="AccountDragDropToChangeOrder" xml:space="preserve">
+    <value>Drag and drop icon to change order of accounts.</value>
+  </data>
+  <data name="AccountFavoriteFallback" xml:space="preserve">
+    <value>Fallback favorites</value>
+  </data>
+  <data name="AccountMarkMediaSensitive" xml:space="preserve">
+    <value>Set sensitive flag to uploading media.</value>
+  </data>
+  <data name="AccountPostFallback" xml:space="preserve">
+    <value>Fallback when POST limited</value>
+  </data>
+  <data name="AccountReceiveFollowingsActivity" xml:space="preserve">
+    <value>Receive others activities</value>
+  </data>
+  <data name="AccountReceiveRepliesAll" xml:space="preserve">
+    <value>Receive replies to not followings</value>
+  </data>
+  <data name="AccountResetKey" xml:space="preserve">
+    <value>Reset API Key</value>
+  </data>
+  <data name="AccountUseUserStreams" xml:space="preserve">
+    <value>Receive tweets in real-time [recommended]</value>
+  </data>
+  <data name="CategoryAbout" xml:space="preserve">
+    <value>About Krile</value>
+  </data>
+  <data name="CategoryAccount" xml:space="preserve">
+    <value>Accounts</value>
+  </data>
+  <data name="CategoryHighLevel" xml:space="preserve">
+    <value>High-Level Config</value>
+  </data>
+  <data name="CategoryInput" xml:space="preserve">
+    <value>Input</value>
+  </data>
+  <data name="CategoryKeyAssign" xml:space="preserve">
+    <value>Key Assign</value>
+  </data>
+  <data name="CategoryMute" xml:space="preserve">
+    <value>Mutes</value>
+  </data>
+  <data name="CategoryNotifyConfirm" xml:space="preserve">
+    <value>Notify and Confirm</value>
+  </data>
+  <data name="CategoryProxy" xml:space="preserve">
+    <value>Proxy</value>
+  </data>
+  <data name="CategoryTheme" xml:space="preserve">
+    <value>Theme</value>
+  </data>
+  <data name="CategoryThirdService" xml:space="preserve">
+    <value>Third Services</value>
+  </data>
+  <data name="CategoryTimeline" xml:space="preserve">
+    <value>Timeline</value>
+  </data>
+  <data name="HighApplyUnstablePatch" xml:space="preserve">
+    <value>_Apply unstable patch [krile may become unstable by auto-updating]</value>
+  </data>
+  <data name="HighDescription" xml:space="preserve">
+    <value>Below configurations are targeting power users. How behavior of Krile is changed by each property, should read source codes.</value>
+  </data>
+  <data name="HighDisableGeolocationService" xml:space="preserve">
+    <value>Disable _geolocation service [this property may be changed by automatically]</value>
+  </data>
+  <data name="HighEventDisplayDuration" xml:space="preserve">
+    <value>Event display time:</value>
+  </data>
+  <data name="HighEventDisplayMax" xml:space="preserve">
+    <value>Max (msec):</value>
+  </data>
+  <data name="HighEventDisplayMin" xml:space="preserve">
+    <value>Min (msec):</value>
+  </data>
+  <data name="HighLoadDeveloperPlugin" xml:space="preserve">
+    <value>Load unsigned plugin from _development folder</value>
+  </data>
+  <data name="HighLogKrileBehavior" xml:space="preserve">
+    <value>Log krile's behaviors [Krile will be slow down] [need to restart]</value>
+  </data>
+  <data name="HighMaintenanceModeDescription" xml:space="preserve">
+    <value>Optimizing database or delete settings/database.</value>
+  </data>
+  <data name="HighPostLimitParameter" xml:space="preserve">
+    <value>Post limit parameter:</value>
+  </data>
+  <data name="HighPostTweetsPerWindow" xml:space="preserve">
+    <value>Tweets per window:</value>
+  </data>
+  <data name="HighPostWindowTime" xml:space="preserve">
+    <value>Window time (sec):</value>
+  </data>
+  <data name="HighRestApiInterval" xml:space="preserve">
+    <value>REST API receive interval</value>
+  </data>
+  <data name="HighRestartAsMaintenanceMode" xml:space="preserve">
+    <value>Restart krile as maintenance mode</value>
+  </data>
+  <data name="HighRestListInterval" xml:space="preserve">
+    <value>List Timeline:</value>
+  </data>
+  <data name="HighRestRelationInterval" xml:space="preserve">
+    <value>Relation:</value>
+  </data>
+  <data name="HighRestSearchInterval" xml:space="preserve">
+    <value>Search Timeline:</value>
+  </data>
+  <data name="HighRestTimelineInterval" xml:space="preserve">
+    <value>Home timeline:</value>
+  </data>
+  <data name="HighRestUserInfoInterval" xml:space="preserve">
+    <value>User info:</value>
+  </data>
+  <data name="InputBacktrackDescription" xml:space="preserve">
+    <value>When sending a reply to the reply to the account which is fall back from other account, falling back agency account is specified automatically.</value>
+  </data>
+  <data name="InputBacktrackFallback" xml:space="preserve">
+    <value>_Backtrack fallbacked account when reply</value>
+  </data>
+  <data name="InputCloseAction" xml:space="preserve">
+    <value>Closing tweet box: </value>
+  </data>
+  <data name="InputCloseConfirm" xml:space="preserve">
+    <value>Confirm stashing or not</value>
+  </data>
+  <data name="InputCloseDestroy" xml:space="preserve">
+    <value>Destroy immediately</value>
+  </data>
+  <data name="InputCloseStash" xml:space="preserve">
+    <value>Save into stash</value>
+  </data>
+  <data name="InputRestorePreviousStashed" xml:space="preserve">
+    <value>Open _stashed text automaticaly if exists</value>
+  </data>
+  <data name="InputSuppressTagBindInReply" xml:space="preserve">
+    <value>_Ignore bound tags when replying someone</value>
+  </data>
+  <data name="KeyAssignAction" xml:space="preserve">
+    <value>Action:</value>
+  </data>
+  <data name="KeyAssignAddAssign" xml:space="preserve">
+    <value>Add new assign</value>
+  </data>
+  <data name="KeyAssignArgument" xml:space="preserve">
+    <value>Argument:</value>
+  </data>
+  <data name="KeyAssignArgumentNone" xml:space="preserve">
+    <value>no argument</value>
+  </data>
+  <data name="KeyAssignArgumentOptional" xml:space="preserve">
+    <value>argument optional</value>
+  </data>
+  <data name="KeyAssignArgumentRequired" xml:space="preserve">
+    <value>argument required</value>
+  </data>
+  <data name="KeyAssignCurrentAssign" xml:space="preserve">
+    <value>Configured Assigns:</value>
+  </data>
+  <data name="KeyAssignDelete" xml:space="preserve">
+    <value>Delete this key assigns</value>
+  </data>
+  <data name="KeyAssignDeleteAssign" xml:space="preserve">
+    <value>Delete selected assign</value>
+  </data>
+  <data name="KeyAssignGroup" xml:space="preserve">
+    <value>Group:</value>
+  </data>
+  <data name="KeyAssignKey" xml:space="preserve">
+    <value>Key:</value>
+  </data>
+  <data name="KeyAssignNew" xml:space="preserve">
+    <value>Create new key assigns</value>
+  </data>
+  <data name="KeyAssignUsingAssign" xml:space="preserve">
+    <value>Using key assign:</value>
+  </data>
+  <data name="MuteBlockingUsers" xml:space="preserve">
+    <value>Mute _blocking users [recommended]</value>
+  </data>
+  <data name="MuteDetailDescription" xml:space="preserve">
+    <value>The following configurations make mute tweets which is undisplayed at Twitter Web.
+We recommend be checked, as long as there is no special reason.</value>
+  </data>
+  <data name="MuteDetailSettings" xml:space="preserve">
+    <value>Detail settings of mutes</value>
+  </data>
+  <data name="MuteHeader" xml:space="preserve">
+    <value>Edit mute query</value>
+  </data>
+  <data name="MuteLightweightMuteDescription" xml:space="preserve">
+    <value>It will cause very-slow timeline construction when use complicated mute filter such as regex.
+When lightweight-mute is enabled, muted tweets will not be recorded into database. This will lead to improve speed of timeline construction.
+But, some limitations will be applied.
+* Mute filter is not applied immediately. Each tweets are filtered once when received.
+* Muted tweets will not appear even if mute predicate is changed.
+You should clear database file when setting is changed.
+Blocked users or no-retweet users are applied immediately as before.</value>
+  </data>
+  <data name="MuteNoRetweets" xml:space="preserve">
+    <value>Mute no _retweets [recommended]</value>
+  </data>
+  <data name="MuteReset" xml:space="preserve">
+    <value>Reset changes</value>
+  </data>
+  <data name="MuteUseLightweightMute" xml:space="preserve">
+    <value>Use _Lightweight mute [FOR POWER USER]</value>
+  </data>
+  <data name="NotifyConfirmOnExit" xml:space="preserve">
+    <value>Confirm on e_xit application</value>
+  </data>
+  <data name="NotifyDisableNotifyAllTabs" xml:space="preserve">
+    <value>Turn off new tweet notification in all tabs</value>
+  </data>
+  <data name="NotifyDisplay" xml:space="preserve">
+    <value>Notification Display</value>
+  </data>
+  <data name="NotifyFavorites" xml:space="preserve">
+    <value>Notify my tweets are _favorited</value>
+  </data>
+  <data name="NotifyNewDirectMessages" xml:space="preserve">
+    <value>Notify _direct messages for me</value>
+  </data>
+  <data name="NotifyNewFollowers" xml:space="preserve">
+    <value>Notify _new followers of me</value>
+  </data>
+  <data name="NotifyNewReplies" xml:space="preserve">
+    <value>Notify _mentions for me</value>
+  </data>
+  <data name="NotifyNewTweets" xml:space="preserve">
+    <value>Notification of new tweets</value>
+  </data>
+  <data name="NotifyRetweets" xml:space="preserve">
+    <value>Notify my tweets are _retweeted</value>
+  </data>
+  <data name="NotifyShowMessageOnTweetFailed" xml:space="preserve">
+    <value>Show message when _post is failed</value>
+  </data>
+  <data name="NotifyShowPopupWhenWindowIsActive" xml:space="preserve">
+    <value>_Show popup notification when window is active</value>
+  </data>
+  <data name="NotifyStyleNone" xml:space="preserve">
+    <value>None</value>
+  </data>
+  <data name="NotifyStylePopup" xml:space="preserve">
+    <value>Popup</value>
+  </data>
+  <data name="NotifyStyleSlim" xml:space="preserve">
+    <value>Slim</value>
+  </data>
+  <data name="NotifyStyleType" xml:space="preserve">
+    <value>Notification Style</value>
+  </data>
+  <data name="NotifyToggleParTabsDescription" xml:space="preserve">
+    <value>Notification of new tweets can set on each tab.</value>
+  </data>
+  <data name="NotifyWarnAmending" xml:space="preserve">
+    <value>Warn when _amending tweet</value>
+  </data>
+  <data name="NotifyWarnReplyFromThirdAccount" xml:space="preserve">
+    <value>_Warn replying if posting account is not replied account</value>
+  </data>
+  <data name="ProxyApiProxy" xml:space="preserve">
+    <value>API Proxy (empty for not use):</value>
+  </data>
+  <data name="ProxyBypassList" xml:space="preserve">
+    <value>Bypass host list (separated by line):</value>
+  </data>
+  <data name="ProxyBypassLocal" xml:space="preserve">
+    <value>_Bypass localhost</value>
+  </data>
+  <data name="ProxyDetailHost" xml:space="preserve">
+    <value>Host:</value>
+  </data>
+  <data name="ProxyDetailPort" xml:space="preserve">
+    <value>Port:</value>
+  </data>
+  <data name="ProxyDetailSettings" xml:space="preserve">
+    <value>Web proxy configuration</value>
+  </data>
+  <data name="ProxyWebProxy" xml:space="preserve">
+    <value>Web Proxy:</value>
+  </data>
+  <data name="ProxyWebProxyExplicit" xml:space="preserve">
+    <value>Specify using proxy</value>
+  </data>
+  <data name="ProxyWebProxyIE" xml:space="preserve">
+    <value>Use Internet Explorer's configuration (sometimes posting tweets take more seconds)</value>
+  </data>
+  <data name="ProxyWebProxyNone" xml:space="preserve">
+    <value>Do not use proxy</value>
+  </data>
+  <data name="ThemeOpenFolder" xml:space="preserve">
+    <value>Open theme folder</value>
+  </data>
+  <data name="ThemeUsingTheme" xml:space="preserve">
+    <value>Using theme:</value>
+  </data>
+  <data name="ThemeWallpaperFile" xml:space="preserve">
+    <value>Timeline wallpaper:</value>
+  </data>
+  <data name="ThemeWallpaperTransparency" xml:space="preserve">
+    <value>Wallpaper transparency:</value>
+  </data>
+  <data name="ThirdBrowserPath" xml:space="preserve">
+    <value>Browser path (empty for use default):</value>
+  </data>
+  <data name="TimelineAllowFavoriteMyself" xml:space="preserve">
+    <value>Allow _favorite myself</value>
+  </data>
+  <data name="TimelineDisplayMixed" xml:space="preserve">
+    <value>Focus to expand</value>
+  </data>
+  <data name="TimelineDisplayMultiline" xml:space="preserve">
+    <value>Always multi line (expanded)</value>
+  </data>
+  <data name="TimelineDisplaySingleLine" xml:space="preserve">
+    <value>Always single line</value>
+  </data>
+  <data name="TimelineDisplayType" xml:space="preserve">
+    <value>Timeline Type:</value>
+  </data>
+  <data name="TimelineIconQualityHigh" xml:space="preserve">
+    <value>Larger size (high quality, slower)</value>
+  </data>
+  <data name="TimelineIconQualityMinimum" xml:space="preserve">
+    <value>Minimum size (poor quality, fast)</value>
+  </data>
+  <data name="TimelineIconQualityNone" xml:space="preserve">
+    <value>None (displays empty region)</value>
+  </data>
+  <data name="TimelineIconQualityOptimized" xml:space="preserve">
+    <value>Optimized size (good quality, speedy)</value>
+  </data>
+  <data name="TimelineIconQualityOriginal" xml:space="preserve">
+    <value>Original size (best quality, very slow)</value>
+  </data>
+  <data name="TimelineIconQualityType" xml:space="preserve">
+    <value>Timeline Icon Quality:</value>
+  </data>
+  <data name="TimelineKampa" xml:space="preserve">
+    <value>Please donate Krile for continue developing.</value>
+  </data>
+  <data name="TimelineOpenTwitterPicWithOriginalSize" xml:space="preserve">
+    <value>Open original size when clicked thumbnail of twitter-official picture.</value>
+  </data>
+  <data name="TimelineScrollLockAlways" xml:space="preserve">
+    <value>Always</value>
+  </data>
+  <data name="TimelineScrollLockExplicit" xml:space="preserve">
+    <value>Explicit (not implemented yet)</value>
+  </data>
+  <data name="TimelineScrollLockMouseOver" xml:space="preserve">
+    <value>When mouse is over</value>
+  </data>
+  <data name="TimelineScrollLockType" xml:space="preserve">
+    <value>Timeline Scroll-Lock:</value>
+  </data>
+  <data name="TimelineScrollLockUnlock" xml:space="preserve">
+    <value>None</value>
+  </data>
+  <data name="TimelineScrollLockWhenScrolled" xml:space="preserve">
+    <value>When scroll-downed</value>
+  </data>
+  <data name="TimelineShowThumbnails" xml:space="preserve">
+    <value>Show _thumbnails of attached images</value>
+  </data>
+  <data name="AccountLimitContent" xml:space="preserve">
+    <value>You should register API keys for use more accounts.</value>
+  </data>
+  <data name="AccountLimitFooter" xml:space="preserve">
+    <value>All accounts will be unregistered after registering api key.</value>
+  </data>
+  <data name="AccountLimitInst" xml:space="preserve">
+    <value>Reaching limit of accounts.</value>
+  </data>
+  <data name="AccountLimitTitle" xml:space="preserve">
+    <value>Limitation of authentication</value>
+  </data>
+  <data name="AccountResetKeyContent" xml:space="preserve">
+    <value>Resetting API key make unregistering all accounts from Krile.
+Continue?</value>
+  </data>
+  <data name="AccountResetKeyTitle" xml:space="preserve">
+    <value>Reset API keys</value>
+  </data>
+  <data name="AccountSetKeyContent" xml:space="preserve">
+    <value>Setting API key make unregistering all accounts from Krile.
+Continue?</value>
+  </data>
+  <data name="AccountSetKeyTitle" xml:space="preserve">
+    <value>Set API keys</value>
+  </data>
+  <data name="AccountSetResetKeyInst" xml:space="preserve">
+    <value>All accounts will be unregistered from Krile.</value>
+  </data>
+  <data name="AccountUnauthorizeContent" xml:space="preserve">
+    <value>You can not receive this account's timeline nor post from this account.</value>
+  </data>
+  <data name="AccountUnauthorizeFooter" xml:space="preserve">
+    <value>In order to unauthorize completely, it is necessary to revoke the right to access from the application management page of a Twitter official site.</value>
+  </data>
+  <data name="AccountUnauthorizeInstFormat" xml:space="preserve">
+    <value>Are you sure you unauthorize {0} from Krile?</value>
+  </data>
+  <data name="AccountUnauthorizeTitle" xml:space="preserve">
+    <value>Delete account</value>
+  </data>
+  <data name="KeyAssignDeleteContentFormat" xml:space="preserve">
+    <value>Delete {0}.
+Are you sure?</value>
+  </data>
+  <data name="KeyAssignDeleteFailedInst" xml:space="preserve">
+    <value>File could not be deleted.</value>
+  </data>
+  <data name="KeyAssignDeleteFailedTitle" xml:space="preserve">
+    <value>Deletion failed</value>
+  </data>
+  <data name="KeyAssignDeleteInst" xml:space="preserve">
+    <value>Deleting key assign.</value>
+  </data>
+  <data name="KeyAssignDeleteTitle" xml:space="preserve">
+    <value>Delete key assign file</value>
+  </data>
+  <data name="NotifyAllTabDisabledInst" xml:space="preserve">
+    <value>New tweet notification in all tabs are disabled.</value>
+  </data>
+  <data name="NotifyAllTabDisabledTitle" xml:space="preserve">
+    <value>Disable notifications</value>
+  </data>
+  <data name="NotifyMainDisplay" xml:space="preserve">
+    <value>Main Display (default)</value>
+  </data>
+  <data name="ThemeOpenPictureFilter" xml:space="preserve">
+    <value>Image files</value>
+  </data>
+  <data name="ThemeOpenPictureTitle" xml:space="preserve">
+    <value>Select wallpaper image</value>
+  </data>
+  <data name="TimelineSingleLineWarnContent" xml:space="preserve">
+    <value>Single-line mode consumes more resources than multi-line mode.
+Krile StarryEyes is designed with multi-line mode. Single-line mode might cause problems.
+Are you sure you enable single-line mode?</value>
+  </data>
+  <data name="TimelineSingleLineWarnInst" xml:space="preserve">
+    <value>You are going to enable single-line mode.</value>
+  </data>
+  <data name="TimelineSinglelineWarnTitle" xml:space="preserve">
+    <value>Waning Single-Line Mode</value>
+  </data>
+</root>

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows.Input;
 using JetBrains.Annotations;
 using Livet;
+using StarryEyes.Globalization.WindowParts;
 using StarryEyes.Settings;
 using StarryEyes.Settings.KeyAssigns;
 using StarryEyes.Views.Controls;
@@ -270,10 +271,10 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SettingFlips
             get
             {
                 return this._action.HasArgument == null
-                    ? "引数あり(省略可能)"
-                    : (this._action.HasArgument == false
-                        ? "引数なし"
-                        : "引数あり");
+                    ? SettingFlipResources.KeyAssignArgumentOptional
+                    : (this._action.HasArgument.Value
+                        ? SettingFlipResources.KeyAssignArgumentRequired
+                        : SettingFlipResources.KeyAssignArgumentNone);
             }
         }
 

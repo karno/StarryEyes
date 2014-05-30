@@ -60,16 +60,6 @@
         <vm:MainWindowViewModel />
     </controls:MetroWindow.DataContext>
     <i:Interaction.Triggers>
-        <ei:DataTrigger Binding="{Binding RotateWindowContent}" Value="True">
-            <ei:ChangePropertyAction PropertyName="Angle"
-                                     TargetObject="{Binding ElementName=Rotation}"
-                                     Value="180" />
-        </ei:DataTrigger>
-        <ei:DataTrigger Binding="{Binding RotateWindowContent}" Value="False">
-            <ei:ChangePropertyAction PropertyName="Angle"
-                                     TargetObject="{Binding ElementName=Rotation}"
-                                     Value="0" />
-        </ei:DataTrigger>
         <!--  WindowのContentRenderedイベントのタイミングでViewModelのInitializeメソッドが呼ばれます  -->
         <i:EventTrigger EventName="ContentRendered">
             <l:LivetCallMethodAction MethodName="Initialize" MethodTarget="{Binding}" />

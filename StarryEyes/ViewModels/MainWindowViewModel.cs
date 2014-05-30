@@ -148,8 +148,6 @@ namespace StarryEyes.ViewModels
                 }));
             CompositeDisposable.Add(Setting.BackgroundImageTransparency.ListenValueChanged(
                 _ => RaisePropertyChanged(() => BackgroundImageOpacity)));
-            CompositeDisposable.Add(Setting.RotateWindowContent.ListenValueChanged(
-                _ => RaisePropertyChanged(() => RotateWindowContent)));
             this._backstageViewModel.Initialize();
         }
 
@@ -502,11 +500,6 @@ namespace StarryEyes.ViewModels
         public double BackgroundImageOpacity
         {
             get { return (255 - Math.Min(255, Setting.BackgroundImageTransparency.Value)) / 255.0; }
-        }
-
-        public bool RotateWindowContent
-        {
-            get { return Setting.RotateWindowContent.Value; }
         }
 
         #endregion
