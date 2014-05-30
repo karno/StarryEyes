@@ -179,7 +179,7 @@ namespace StarryEyes.Views.Behaviors
             timer.Interval = TimeSpan.FromMilliseconds(10);
             timer.Tick += (o, e) =>
             {
-                var d = _remainHeight / 20;
+                var d = _remainHeight / 10;
                 if (d < 3)
                 {
                     d = 3;
