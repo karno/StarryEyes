@@ -81,7 +81,7 @@ namespace StarryEyes.Views.Behaviors
                                   var prevPosition = e.VerticalOffset + e.ExtentHeightChange;
 
                                   // scroll back to previous position
-                                  if (this.IsScrollLockEnabled)
+                                  if (this.IsScrollLockEnabled && !_isAnimationRunning)
                                   {
                                       this.AssociatedObject.ScrollToVerticalOffset(prevPosition);
                                   }
@@ -150,25 +150,28 @@ namespace StarryEyes.Views.Behaviors
             }
         }
 
-        private double _currentOffset;
         private double _remainHeight;
-        private int _animationRunningFlag;
+        private readonly object _animationLock = new object();
+        private bool _isAnimationRunning;
 
         /// <summary>
         /// Run scroll animation.
         /// </summary>
         /// <param name="beginOffset">beginning scroll beginOffset</param>
-        /// <param name="height">animation height(to scroll)</param>
-        private void RunAnimation(double beginOffset, double height)
+        /// <param name="extent">animation extent(to scroll)</param>
+        private void RunAnimation(double beginOffset, double extent)
         {
-            if (Interlocked.Exchange(ref _animationRunningFlag, 1) == 1)
+            lock (_animationLock)
             {
-                _remainHeight += height;
-                return;
+                if (_isAnimationRunning)
+                {
+                    _remainHeight += extent;
+                    return;
+                }
             }
 
-            _remainHeight = height;
-            _currentOffset = beginOffset;
+            _isAnimationRunning = true;
+            _remainHeight = extent;
 
             this.AssociatedObject.ScrollToVerticalOffset(beginOffset);
 
@@ -176,17 +179,25 @@ namespace StarryEyes.Views.Behaviors
             timer.Interval = TimeSpan.FromMilliseconds(10);
             timer.Tick += (o, e) =>
             {
-                var dx = _remainHeight > 60 ? _remainHeight / 20 : (_remainHeight > 3 ? 3 : _remainHeight);
-                _remainHeight -= dx;
-                _currentOffset -= dx;
-                this.AssociatedObject.ScrollToVerticalOffset(_currentOffset);
-                if (_remainHeight < 1)
+                var d = _remainHeight / 20;
+                if (d < 3)
                 {
-                    this.AssociatedObject.ScrollToVerticalOffset(0);
-                    Interlocked.Exchange(ref _animationRunningFlag, 0);
-                    timer.Stop();
-                    timer = null;
+                    d = 3;
                 }
+                _remainHeight -= d;
+                var newpos = this.AssociatedObject.VerticalOffset - d;
+                this.AssociatedObject.ScrollToVerticalOffset(newpos > 1 ? newpos : 0);
+                lock (_animationLock)
+                {
+                    if (_remainHeight > 0)
+                    {
+                        return;
+                    }
+                    // stop animation
+                    _isAnimationRunning = false;
+                }
+                timer.Stop();
+                timer = null;
             };
             timer.Start();
         }
