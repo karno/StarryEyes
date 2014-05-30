@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using JetBrains.Annotations;
 using StarryEyes.Albireo;
+using StarryEyes.Globalization.Models;
 using StarryEyes.Models;
 using StarryEyes.Models.Backstages.SystemEvents;
 using StarryEyes.Nightmare.Windows;
@@ -47,13 +48,11 @@ namespace StarryEyes.Settings
                     MainWindowModel.ShowTaskDialog(
                         new TaskDialogOptions
                         {
-                            Title = "テーマの互換性",
+                            Title = SettingModelResources.ThemeIncompatibleTitle,
                             MainIcon = VistaTaskDialogIcon.Warning,
-                            MainInstruction = "テーマ ファイルを読み込めませんでした。",
-                            Content = "テーマ バージョンが古いため、互換性がありません。" + Environment.NewLine +
-                                      file,
-                            ExpandedInfo = "新しいバージョンのテーマを入手するか、最新のフォーマットに則った記述へ変更してください。" + Environment.NewLine +
-                                           "(default.xmlについてこのエラーが表示された場合は、自動的に最新のフォーマットに更新されます。)",
+                            MainInstruction = SettingModelResources.ThemeIncompatibleInst,
+                            Content = SettingModelResources.ThemeIncompatibleContent + Environment.NewLine + file,
+                            ExpandedInfo = SettingModelResources.ThemeIncompatibleExInfo,
                             CommonButtons = TaskDialogCommonButtons.Close
                         });
                     return;
@@ -65,11 +64,10 @@ namespace StarryEyes.Settings
                 MainWindowModel.ShowTaskDialog(
                     new TaskDialogOptions
                     {
-                        Title = "テーマ エラー",
+                        Title = SettingModelResources.ThemeErrorTitle,
                         MainIcon = VistaTaskDialogIcon.Error,
-                        MainInstruction = "テーマ ファイルを読み込めませんでした。",
-                        Content = "XMLの記述に誤りがあります:" + Environment.NewLine +
-                                  file,
+                        MainInstruction = SettingModelResources.ThemeErrorInst,
+                        Content = SettingModelResources.ThemeErrorContent + Environment.NewLine + file,
                         ExpandedInfo = ex.Message,
                         CommonButtons = TaskDialogCommonButtons.Close
                     });

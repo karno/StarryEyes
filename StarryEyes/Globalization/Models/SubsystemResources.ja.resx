@@ -117,38 +117,35 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AccountSelectionHelp" xml:space="preserve">
-    <value>Click to toggle selection this account.
-Right click to select this account only.</value>
+  <data name="AutoUpdateFailedContent" xml:space="preserve">
+    <value>Krileを再起動してやり直すか、手動で最新版を入手してください。</value>
   </data>
-  <data name="TabConfigNameHelp" xml:space="preserve">
-    <value>Tab name</value>
+  <data name="AutoUpdateFailedInst" xml:space="preserve">
+    <value>自動更新を開始できませんでした。</value>
   </data>
-  <data name="TabConfigNotificationSound" xml:space="preserve">
-    <value>Notification sound of this tab</value>
+  <data name="AutoUpdateFailedTitle" xml:space="preserve">
+    <value>自動更新エラー</value>
   </data>
-  <data name="TabConfigOpenSoundFilter" xml:space="preserve">
-    <value>Wave file</value>
+  <data name="FailedCheckingUpdate" xml:space="preserve">
+    <value>更新の確認に失敗しました。</value>
   </data>
-  <data name="TabConfigOpenSoundTitle" xml:space="preserve">
-    <value>Select notification sound</value>
+  <data name="FailedPrepareUpdate" xml:space="preserve">
+    <value>自動更新の準備に失敗しました。</value>
   </data>
-  <data name="TabConfigQuery" xml:space="preserve">
-    <value>Query of this tab</value>
+  <data name="TwitterConfigurationReceiveError" xml:space="preserve">
+    <value>Twitter API構成情報の受信に失敗しました。</value>
   </data>
-  <data name="TabConfigQueryContainsError" xml:space="preserve">
-    <value>Query contains some errors. This result will not saved.</value>
+  <data name="UpdateCompleteErrorContent" xml:space="preserve">
+    <value>ユーザーデータディレクトリに存在するupdateフォルダを手動で削除してください。</value>
   </data>
-  <data name="TabConfigQueryHelp" xml:space="preserve">
-    <value>Krile Query Help...</value>
+  <data name="UpdateCompleteErrorExInfo" xml:space="preserve">
+    <value>ユーザーデータディレクトリの位置については、FAQを参照してください。
+削除できない場合は、Windowsを再起動する必要があるかもしれません。</value>
   </data>
-  <data name="TabConfigQueryValid" xml:space="preserve">
-    <value>Query is compiled successfully.</value>
+  <data name="UpdateCompleteErrorInst" xml:space="preserve">
+    <value>更新エージェントを削除できません。</value>
   </data>
-  <data name="TabConfigShowCounts" xml:space="preserve">
-    <value>Show new tweet count</value>
-  </data>
-  <data name="TabConfigShowPopup" xml:space="preserve">
-    <value>Popup new tweets</value>
+  <data name="UpdateCompleteErrorTitle" xml:space="preserve">
+    <value>更新完了エラー</value>
   </data>
 </root>

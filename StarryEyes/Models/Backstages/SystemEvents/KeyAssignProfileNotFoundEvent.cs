@@ -1,4 +1,6 @@
-﻿
+﻿using StarryEyes.Globalization;
+using StarryEyes.Globalization.Models;
+
 namespace StarryEyes.Models.Backstages.SystemEvents
 {
     public sealed class KeyAssignProfileNotFoundEvent : SystemEventBase
@@ -17,7 +19,7 @@ namespace StarryEyes.Models.Backstages.SystemEvents
 
         public override string Detail
         {
-            get { return "キーアサインプロファイル " + _profile + "が見つかりませんでした。既定のプロファイルを使用します。"; }
+            get { return SettingModelResources.KeyAssignProfileNotFoundFormat.SafeFormat(_profile); }
         }
     }
 }

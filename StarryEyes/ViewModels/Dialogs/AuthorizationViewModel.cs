@@ -8,6 +8,7 @@ using JetBrains.Annotations;
 using Livet;
 using Livet.Commands;
 using Livet.Messaging.Windows;
+using StarryEyes.Globalization.Dialogs;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
@@ -35,6 +36,7 @@ namespace StarryEyes.ViewModels.Dialogs
         private OAuthAuthorizer _authorizer;
         private RequestToken _currentRequestToken;
 
+        [UsedImplicitly]
         public void Initialize()
         {
             _authorizer = new OAuthAuthorizer(Setting.GlobalConsumerKey.Value ?? App.ConsumerKey,
@@ -51,13 +53,13 @@ namespace StarryEyes.ViewModels.Dialogs
                           },
                           ex => this.Messenger.RaiseSafe(() => new TaskDialogMessage(new TaskDialogOptions
                           {
-                              Title = "OAuth認証エラー",
+                              Title = AuthorizationWindowResources.OAuthErrorTitle,
                               MainIcon = VistaTaskDialogIcon.Error,
-                              MainInstruction = "Twitterと正しく通信できませんでした。",
-                              Content = "何度も繰り返し発生する場合は、しばらく時間を置いて試してみてください。",
+                              MainInstruction = AuthorizationWindowResources.OAuthErrorInst,
+                              Content = AuthorizationWindowResources.OAuthErrorContent,
                               CommonButtons = TaskDialogCommonButtons.Close,
                               FooterIcon = VistaTaskDialogIcon.Information,
-                              FooterText = "コンピュータの時計が大幅にずれている場合も認証が行えないことがあります。"
+                              FooterText = AuthorizationWindowResources.OAuthErrorFooter,
                           })));
         }
 
@@ -117,6 +119,7 @@ namespace StarryEyes.ViewModels.Dialogs
                     var id = long.Parse(r.ExtraData["user_id"].First());
                     var sn = r.ExtraData["screen_name"].First();
                     _returnSubject.OnNext(new TwitterAccount(id, sn, r.Token));
+                    CurrentAuthenticationStep = AuthenticationStep.AuthorizationCompleted;
                     this.Messenger.RaiseSafe(() => new WindowActionMessage(WindowAction.Close));
                 },
                 ex =>
@@ -124,13 +127,13 @@ namespace StarryEyes.ViewModels.Dialogs
                     CurrentAuthenticationStep = AuthenticationStep.WaitingPinInput;
                     this.Messenger.RaiseSafe(() => new TaskDialogMessage(new TaskDialogOptions
                     {
-                        Title = "アクセス許可取得失敗",
+                        Title = AuthorizationWindowResources.OAuthFailedTitle,
                         MainIcon = VistaTaskDialogIcon.Error,
-                        MainInstruction = "アカウントを認証できませんでした。",
-                        Content = "PINを確認しもう一度入力するか、最初からやり直してみてください。",
+                        MainInstruction = AuthorizationWindowResources.OAuthFailedInst,
+                        Content = AuthorizationWindowResources.OAuthFailedContent,
                         CommonButtons = TaskDialogCommonButtons.Close,
                         FooterIcon = VistaTaskDialogIcon.Information,
-                        FooterText = "コンピュータの時計が大幅にずれている場合も認証が行えないことがあります。"
+                        FooterText = AuthorizationWindowResources.OAuthErrorFooter
                     }));
                 });
         }
@@ -138,6 +141,7 @@ namespace StarryEyes.ViewModels.Dialogs
 
         #region Text box control
 
+        [UsedImplicitly]
         public void OnEnterKeyDown()
         {
             if (CanVerifyPin())

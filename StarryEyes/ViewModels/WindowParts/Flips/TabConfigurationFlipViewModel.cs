@@ -3,10 +3,12 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using Livet;
 using Livet.Messaging.IO;
 using StarryEyes.Filters;
 using StarryEyes.Filters.Parsing;
+using StarryEyes.Globalization.WindowParts;
 using StarryEyes.Models;
 using StarryEyes.Models.Timelines.Tabs;
 
@@ -113,13 +115,14 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             }
         }
 
+        [UsedImplicitly]
         public void SelectSoundSource()
         {
             var msg = this.Messenger.GetResponseSafe(() =>
                 new OpeningFileSelectionMessage
                 {
-                    Title = "タブの通知音を選択",
-                    Filter = "Wave ファイル|*.wav",
+                    Title = GeneralFlipResources.TabConfigOpenSoundTitle,
+                    Filter = GeneralFlipResources.TabConfigOpenSoundFilter + "|*.wav",
                     FileName = NotifySoundSourcePath,
                 });
             if (msg.Response != null && msg.Response.Length > 0)

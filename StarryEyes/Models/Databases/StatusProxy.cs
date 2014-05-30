@@ -327,7 +327,7 @@ namespace StarryEyes.Models.Databases
             catch (ArgumentNullException anex)
             {
                 throw new DatabaseConsistencyException(
-                    "データベースから必要なデータを読み出せませんでした。(モード: PS, ステータスID " + dbstatus.Id + ", ユーザID " + dbstatus.UserId + ")",
+                    "Lacking required data in database.(mode: PS, status ID " + dbstatus.Id + ", user ID " + dbstatus.UserId + ")",
                     anex);
             }
         }
@@ -350,7 +350,7 @@ namespace StarryEyes.Models.Databases
             catch (ArgumentNullException anex)
             {
                 throw new DatabaseConsistencyException(
-                    "データベースから必要なデータを読み出せませんでした。(モード: DM, ステータスID " + dbstatus.Id + ", ユーザID " + dbstatus.UserId + ")",
+                    "Lacking required data in database.(mode: DM, status ID " + dbstatus.Id + ", user ID " + dbstatus.UserId + ")",
                     anex);
             }
         }

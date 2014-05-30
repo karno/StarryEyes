@@ -117,38 +117,78 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AccountSelectionHelp" xml:space="preserve">
-    <value>Click to toggle selection this account.
-Right click to select this account only.</value>
+  <data name="BackupFailedContent" xml:space="preserve">
+    <value>Operation is uncontinuable any more.</value>
   </data>
-  <data name="TabConfigNameHelp" xml:space="preserve">
-    <value>Tab name</value>
+  <data name="BackupFailedExit" xml:space="preserve">
+    <value>Exit Krile</value>
   </data>
-  <data name="TabConfigNotificationSound" xml:space="preserve">
-    <value>Notification sound of this tab</value>
+  <data name="BackupFailedInst" xml:space="preserve">
+    <value>Backup failed due to some reasons.</value>
   </data>
-  <data name="TabConfigOpenSoundFilter" xml:space="preserve">
-    <value>Wave file</value>
+  <data name="BackupFailedTitle" xml:space="preserve">
+    <value>Backup failed</value>
   </data>
-  <data name="TabConfigOpenSoundTitle" xml:space="preserve">
-    <value>Select notification sound</value>
+  <data name="KeyAssignError" xml:space="preserve">
+    <value>Key Assign Error</value>
   </data>
-  <data name="TabConfigQuery" xml:space="preserve">
-    <value>Query of this tab</value>
+  <data name="KeyAssignErrorArgumentRequiredFormat" xml:space="preserve">
+    <value>Argument is required in key assign {0}.</value>
   </data>
-  <data name="TabConfigQueryContainsError" xml:space="preserve">
-    <value>Query contains some errors. This result will not saved.</value>
+  <data name="KeyAssignErrorArgumentUnsupportedFormat" xml:space="preserve">
+    <value>Argument is not supported in key assign {0}.</value>
   </data>
-  <data name="TabConfigQueryHelp" xml:space="preserve">
-    <value>Krile Query Help...</value>
+  <data name="KeyAssignErrorContent" xml:space="preserve">
+    <value>Script of the key assignment file have errors:</value>
   </data>
-  <data name="TabConfigQueryValid" xml:space="preserve">
-    <value>Query is compiled successfully.</value>
+  <data name="KeyAssignErrorInst" xml:space="preserve">
+    <value>Could not read key assign file.</value>
   </data>
-  <data name="TabConfigShowCounts" xml:space="preserve">
-    <value>Show new tweet count</value>
+  <data name="KeyAssignErrorTitle" xml:space="preserve">
+    <value>Key assign error</value>
   </data>
-  <data name="TabConfigShowPopup" xml:space="preserve">
-    <value>Popup new tweets</value>
+  <data name="KeyAssignProfileNotFoundFormat" xml:space="preserve">
+    <value>Key assign profile {0} is not found. Use default.</value>
+  </data>
+  <data name="LoadFailedCommandBackup" xml:space="preserve">
+    <value>Create backup and initialize setting</value>
+  </data>
+  <data name="LoadFailedCommandInitialize" xml:space="preserve">
+    <value>Initialize setting</value>
+  </data>
+  <data name="LoadFailedContent" xml:space="preserve">
+    <value>Since it was in a configuration file about abnormalities, it was not able to read. 
+Choose next action.</value>
+  </data>
+  <data name="LoadFailedExit" xml:space="preserve">
+    <value>Exit krile</value>
+  </data>
+  <data name="LoadFailedInst" xml:space="preserve">
+    <value>Setting is corrupted.</value>
+  </data>
+  <data name="LoadFailedTitle" xml:space="preserve">
+    <value>Krile setting load failed</value>
+  </data>
+  <data name="ThemeErrorContent" xml:space="preserve">
+    <value>Theme XML contains some errors:</value>
+  </data>
+  <data name="ThemeErrorInst" xml:space="preserve">
+    <value>File could not load.</value>
+  </data>
+  <data name="ThemeErrorTitle" xml:space="preserve">
+    <value>Theme error</value>
+  </data>
+  <data name="ThemeIncompatibleContent" xml:space="preserve">
+    <value>Theme version is incompatible:</value>
+  </data>
+  <data name="ThemeIncompatibleExInfo" xml:space="preserve">
+    <value>Get newer version of theme, or change to new format.
+(if display this error about default.xml, automatically convert to new format.)</value>
+  </data>
+  <data name="ThemeIncompatibleInst" xml:space="preserve">
+    <value>Theme file could not read.</value>
+  </data>
+  <data name="ThemeIncompatibleTitle" xml:space="preserve">
+    <value>Theme compatibility issue</value>
   </data>
 </root>

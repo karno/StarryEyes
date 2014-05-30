@@ -1,7 +1,9 @@
 ﻿using System;
 using System.IO;
+using JetBrains.Annotations;
 using Livet;
 using Livet.Messaging.Windows;
+using StarryEyes.Globalization.Dialogs;
 using StarryEyes.Settings;
 
 namespace StarryEyes.ViewModels.Dialogs
@@ -38,7 +40,7 @@ namespace StarryEyes.ViewModels.Dialogs
             {
                 if (String.IsNullOrEmpty(FileName))
                 {
-                    ErrorMessage = "ファイル名が入力されていません。";
+                    ErrorMessage = AddNewKeyAssignWindowResources.ErrorFileNameIsEmpty;
                     IsAcceptOk = false;
                     return;
                 }
@@ -49,7 +51,7 @@ namespace StarryEyes.ViewModels.Dialogs
                 var fi = new FileInfo(Path.Combine(KeyAssignManager.KeyAssignsProfileDirectoryPath, FileName));
                 if (fi.Exists)
                 {
-                    ErrorMessage = "同じ名前のキーアサインがすでに存在します。";
+                    ErrorMessage = AddNewKeyAssignWindowResources.ErrorFileNameIsDuplicated;
                     IsAcceptOk = false;
                     return;
                 }
@@ -58,7 +60,7 @@ namespace StarryEyes.ViewModels.Dialogs
             }
             catch
             {
-                ErrorMessage = "使用できない文字が含まれています。";
+                ErrorMessage = AddNewKeyAssignWindowResources.ErrorFileNameContainsInvalidChars;
                 IsAcceptOk = false;
             }
         }
@@ -83,12 +85,14 @@ namespace StarryEyes.ViewModels.Dialogs
             }
         }
 
+        [UsedImplicitly]
         public void Ok()
         {
             Result = true;
             Close();
         }
 
+        [UsedImplicitly]
         public void Cancel()
         {
             Result = false;

@@ -2,6 +2,7 @@
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using StarryEyes.Anomaly.TwitterApi.Rest;
+using StarryEyes.Globalization.Models;
 using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Settings;
 
@@ -61,7 +62,7 @@ namespace StarryEyes.Models.Subsystems
             }
             catch (Exception ex)
             {
-                BackstageModel.RegisterEvent(new OperationFailedEvent("TwitterAPI構成情報の受信に失敗しました", ex));
+                BackstageModel.RegisterEvent(new OperationFailedEvent(SubsystemResources.TwitterConfigurationReceiveError, ex));
                 // execute later
                 Observable.Timer(TimeSpan.FromMinutes(5))
                           .ObserveOn(TaskPoolScheduler.Default)

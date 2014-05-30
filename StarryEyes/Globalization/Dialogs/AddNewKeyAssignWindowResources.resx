@@ -129,6 +129,15 @@
   <data name="CreateWithCopy" xml:space="preserve">
     <value>Create _copy with current file</value>
   </data>
+  <data name="ErrorFileNameContainsInvalidChars" xml:space="preserve">
+    <value>使用できない文字が含まれています。</value>
+  </data>
+  <data name="ErrorFileNameIsDuplicated" xml:space="preserve">
+    <value>同じ名前のキーアサインがすでに存在します。</value>
+  </data>
+  <data name="ErrorFileNameIsEmpty" xml:space="preserve">
+    <value>ファイル名が入力されていません。</value>
+  </data>
   <data name="KeyAssignName" xml:space="preserve">
     <value>Key Assign Name: </value>
   </data>

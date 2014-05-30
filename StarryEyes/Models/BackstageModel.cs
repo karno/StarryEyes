@@ -12,7 +12,7 @@ using StarryEyes.Settings;
 namespace StarryEyes.Models
 {
     /// <summary>
-    /// バックパネル及びステータスエリアのモデル
+    /// Model for backstage and status area.
     /// </summary>
     public static class BackstageModel
     {

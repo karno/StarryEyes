@@ -11,6 +11,7 @@ using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Filters;
 using StarryEyes.Filters.Expressions;
 using StarryEyes.Filters.Parsing;
+using StarryEyes.Globalization.Models;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Subsystems.Notifications.UI;
 using StarryEyes.Models.Timelines.Tabs;
@@ -562,13 +563,17 @@ namespace StarryEyes.Settings
             // backup file is not existed or backup file is corrupted
             var option = new TaskDialogOptions
             {
-                Title = "Krile 設定読み込みエラー",
+                Title = SettingModelResources.LoadFailedTitle,
                 MainIcon = VistaTaskDialogIcon.Error,
-                MainInstruction = "設定が破損しています。",
-                Content = "設定ファイルに異常があるため、読み込めませんでした。" + Environment.NewLine +
-                          "どのような操作を行うか選択してください。",
+                MainInstruction = SettingModelResources.LoadFailedInst,
+                Content = SettingModelResources.LoadFailedContent,
                 ExpandedInfo = ex.ToString(),
-                CommandButtons = new[] { "設定を初期化", "バックアップを作成し初期化", "Krileを終了" },
+                CommandButtons = new[]
+                {
+                    SettingModelResources.LoadFailedCommandInitialize,
+                    SettingModelResources.LoadFailedCommandBackup,
+                    SettingModelResources.LoadFailedExit
+                }
             };
             var result = TaskDialog.Show(option);
             if (!result.CommandButtonResult.HasValue ||
@@ -590,12 +595,12 @@ namespace StarryEyes.Settings
                 {
                     var noption = new TaskDialogOptions
                     {
-                        Title = "バックアップ失敗",
+                        Title = SettingModelResources.BackupFailedTitle,
                         MainIcon = VistaTaskDialogIcon.Error,
-                        MainInstruction = "何らかの原因により、バックアップが正常に行えませんでした。",
-                        Content = "これ以上の動作を継続できません。",
+                        MainInstruction = SettingModelResources.BackupFailedInst,
+                        Content = SettingModelResources.BackupFailedContent,
                         ExpandedInfo = iex.ToString(),
-                        CommandButtons = new[] { "Krileを終了" }
+                        CommandButtons = new[] { SettingModelResources.BackupFailedExit }
                     };
                     TaskDialog.Show(noption);
                     return false;

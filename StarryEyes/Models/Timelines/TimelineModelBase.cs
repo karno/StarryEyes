@@ -17,7 +17,7 @@ using StarryEyes.Models.Timelines.Statuses;
 namespace StarryEyes.Models.Timelines
 {
     /// <summary>
-    /// 検索フリップなどのタイムラインの基幹部分
+    /// Base of timeline
     /// </summary>
     public abstract class TimelineModelBase : IDisposable
     {

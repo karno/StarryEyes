@@ -61,6 +61,33 @@ namespace StarryEyes.Globalization.Filters {
         }
         
         /// <summary>
+        ///   Query: に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string FilterQueryExceptionQuery {
+            get {
+                return ResourceManager.GetString("FilterQueryExceptionQuery", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Filter {0} could not convert type {1}. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string FilterQueryExceptionUnsupportedTypeFormat {
+            get {
+                return ResourceManager.GetString("FilterQueryExceptionUnsupportedTypeFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Filter {0} could not convert any type of {1}. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string FilterQueryExceptionUnsupportedTypeManyFormat {
+            get {
+                return ResourceManager.GetString("FilterQueryExceptionUnsupportedTypeManyFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Query is invalid. に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string QueryCompileFailed {

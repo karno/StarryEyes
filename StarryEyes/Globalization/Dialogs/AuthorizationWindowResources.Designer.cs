@@ -87,5 +87,68 @@ namespace StarryEyes.Globalization.Dialogs {
                 return ResourceManager.GetString("MainText", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   If problem is occured many times, please take a coffee break before retrying. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string OAuthErrorContent {
+            get {
+                return ResourceManager.GetString("OAuthErrorContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Authentication will be failed if your computer&apos;s clock is out. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string OAuthErrorFooter {
+            get {
+                return ResourceManager.GetString("OAuthErrorFooter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Could not communicate twitter. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string OAuthErrorInst {
+            get {
+                return ResourceManager.GetString("OAuthErrorInst", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   OAuth authentication error に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string OAuthErrorTitle {
+            get {
+                return ResourceManager.GetString("OAuthErrorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Check PIN and retry inputting, or retry from scratch. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string OAuthFailedContent {
+            get {
+                return ResourceManager.GetString("OAuthFailedContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Account could be authorized. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string OAuthFailedInst {
+            get {
+                return ResourceManager.GetString("OAuthFailedInst", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   OAuth authorization error に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string OAuthFailedTitle {
+            get {
+                return ResourceManager.GetString("OAuthFailedTitle", resourceCulture);
+            }
+        }
     }
 }

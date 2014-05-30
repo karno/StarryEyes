@@ -117,38 +117,35 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AccountSelectionHelp" xml:space="preserve">
-    <value>Click to toggle selection this account.
-Right click to select this account only.</value>
+  <data name="AutoUpdateFailedContent" xml:space="preserve">
+    <value>Restart Krile and retry, or update by manual.</value>
   </data>
-  <data name="TabConfigNameHelp" xml:space="preserve">
-    <value>Tab name</value>
+  <data name="AutoUpdateFailedInst" xml:space="preserve">
+    <value>Could not start update.</value>
   </data>
-  <data name="TabConfigNotificationSound" xml:space="preserve">
-    <value>Notification sound of this tab</value>
+  <data name="AutoUpdateFailedTitle" xml:space="preserve">
+    <value>Auto update error</value>
   </data>
-  <data name="TabConfigOpenSoundFilter" xml:space="preserve">
-    <value>Wave file</value>
+  <data name="FailedCheckingUpdate" xml:space="preserve">
+    <value>Failed checking updates.</value>
   </data>
-  <data name="TabConfigOpenSoundTitle" xml:space="preserve">
-    <value>Select notification sound</value>
+  <data name="FailedPrepareUpdate" xml:space="preserve">
+    <value>Failed preparing updates.</value>
   </data>
-  <data name="TabConfigQuery" xml:space="preserve">
-    <value>Query of this tab</value>
+  <data name="TwitterConfigurationReceiveError" xml:space="preserve">
+    <value>Failed receiving twitter api configuration.</value>
   </data>
-  <data name="TabConfigQueryContainsError" xml:space="preserve">
-    <value>Query contains some errors. This result will not saved.</value>
+  <data name="UpdateCompleteErrorContent" xml:space="preserve">
+    <value>Remove update folder located in user data directory.</value>
   </data>
-  <data name="TabConfigQueryHelp" xml:space="preserve">
-    <value>Krile Query Help...</value>
+  <data name="UpdateCompleteErrorExInfo" xml:space="preserve">
+    <value>Please reference FAQ for find location.
+If you can't delete it, you may need restarting Windows.</value>
   </data>
-  <data name="TabConfigQueryValid" xml:space="preserve">
-    <value>Query is compiled successfully.</value>
+  <data name="UpdateCompleteErrorInst" xml:space="preserve">
+    <value>Failed removing update agent.</value>
   </data>
-  <data name="TabConfigShowCounts" xml:space="preserve">
-    <value>Show new tweet count</value>
-  </data>
-  <data name="TabConfigShowPopup" xml:space="preserve">
-    <value>Popup new tweets</value>
+  <data name="UpdateCompleteErrorTitle" xml:space="preserve">
+    <value>Update completion error</value>
   </data>
 </root>

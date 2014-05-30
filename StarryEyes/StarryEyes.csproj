@@ -255,6 +255,16 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>ReceivingResources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Globalization\Models\SettingModelResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SettingModelResources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Globalization\Models\SubsystemResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SubsystemResources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Globalization\WindowParts\GeneralFlipResources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -815,6 +825,16 @@
     <EmbeddedResource Include="Globalization\Models\ReceivingResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>ReceivingResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Globalization\Models\SettingModelResources.ja.resx" />
+    <EmbeddedResource Include="Globalization\Models\SettingModelResources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>SettingModelResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Globalization\Models\SubsystemResources.ja.resx" />
+    <EmbeddedResource Include="Globalization\Models\SubsystemResources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>SubsystemResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="Globalization\WindowParts\GeneralFlipResources.ja.resx" />
     <EmbeddedResource Include="Globalization\WindowParts\GeneralFlipResources.resx">

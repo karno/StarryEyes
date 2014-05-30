@@ -89,6 +89,24 @@ namespace StarryEyes.Globalization.WindowParts {
         }
         
         /// <summary>
+        ///   Wave file に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string TabConfigOpenSoundFilter {
+            get {
+                return ResourceManager.GetString("TabConfigOpenSoundFilter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Select notification sound に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string TabConfigOpenSoundTitle {
+            get {
+                return ResourceManager.GetString("TabConfigOpenSoundTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Query of this tab に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string TabConfigQuery {

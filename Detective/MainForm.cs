@@ -80,7 +80,7 @@ namespace Detective
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "フィードバック エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, "Feedback Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
             return true;

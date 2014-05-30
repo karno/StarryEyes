@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using StarryEyes.Filters.Expressions;
+using StarryEyes.Globalization;
+using StarryEyes.Globalization.Filters;
 
 namespace StarryEyes.Filters
 {
@@ -19,6 +21,7 @@ namespace StarryEyes.Filters
         {
             this._innerQuery = innerQuery;
         }
+
         public FilterQueryException(string message, string innerQuery)
             : base(message)
         {
@@ -36,7 +39,7 @@ namespace StarryEyes.Filters
 
         public override string ToString()
         {
-            return base.ToString() + Environment.NewLine + " クエリ: " + this._innerQuery;
+            return base.ToString() + Environment.NewLine + " " + QueryCompilerResources.FilterQueryExceptionQuery + " " + this._innerQuery;
         }
 
         public static FilterQueryException CreateException(string msg, string query)
@@ -46,14 +49,17 @@ namespace StarryEyes.Filters
 
         public static FilterQueryException CreateUnsupportedType(string filter, FilterExpressionType transformFailedType, string innerQuery)
         {
-            var msg = string.Format("フィルタ {0} は型 {1} へ変換できません。", filter, transformFailedType.ToString());
+            var msg = QueryCompilerResources
+                .FilterQueryExceptionUnsupportedTypeFormat
+                .SafeFormat(filter, transformFailedType.ToString());
             return CreateException(msg, innerQuery);
         }
 
         public static FilterQueryException CreateUnsupportedType(string filter, IEnumerable<FilterExpressionType> transformFailedTypes, string innerQuery)
         {
-            var msg = string.Format("フィルタ {0} は {1} のいずれの型へも変換できません。", filter,
-                                    String.Join(", ", transformFailedTypes.Select(f => f.ToString())));
+            var msg = QueryCompilerResources
+                .FilterQueryExceptionUnsupportedTypeManyFormat
+                .SafeFormat(filter, String.Join(", ", transformFailedTypes.Select(f => f.ToString())));
             return CreateException(msg, innerQuery);
         }
     }

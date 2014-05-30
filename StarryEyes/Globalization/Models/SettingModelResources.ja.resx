@@ -117,38 +117,78 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AccountSelectionHelp" xml:space="preserve">
-    <value>Click to toggle selection this account.
-Right click to select this account only.</value>
+  <data name="BackupFailedContent" xml:space="preserve">
+    <value>これ以上の動作を継続できません。</value>
   </data>
-  <data name="TabConfigNameHelp" xml:space="preserve">
-    <value>Tab name</value>
+  <data name="BackupFailedExit" xml:space="preserve">
+    <value>Krileを終了</value>
   </data>
-  <data name="TabConfigNotificationSound" xml:space="preserve">
-    <value>Notification sound of this tab</value>
+  <data name="BackupFailedInst" xml:space="preserve">
+    <value>何らかの原因により、バックアップが正常に行えませんでした。</value>
   </data>
-  <data name="TabConfigOpenSoundFilter" xml:space="preserve">
-    <value>Wave file</value>
+  <data name="BackupFailedTitle" xml:space="preserve">
+    <value>バックアップ失敗</value>
   </data>
-  <data name="TabConfigOpenSoundTitle" xml:space="preserve">
-    <value>Select notification sound</value>
+  <data name="KeyAssignError" xml:space="preserve">
+    <value>キーアサイン エラー</value>
   </data>
-  <data name="TabConfigQuery" xml:space="preserve">
-    <value>Query of this tab</value>
+  <data name="KeyAssignErrorArgumentRequiredFormat" xml:space="preserve">
+    <value>キーアサイン {0} には引数の指定が必要です。</value>
   </data>
-  <data name="TabConfigQueryContainsError" xml:space="preserve">
-    <value>Query contains some errors. This result will not saved.</value>
+  <data name="KeyAssignErrorArgumentUnsupportedFormat" xml:space="preserve">
+    <value>キーアサイン {0} には引数を指定することはできません。</value>
   </data>
-  <data name="TabConfigQueryHelp" xml:space="preserve">
-    <value>Krile Query Help...</value>
+  <data name="KeyAssignErrorContent" xml:space="preserve">
+    <value>キーアサインファイルの記述に誤りがあります:</value>
   </data>
-  <data name="TabConfigQueryValid" xml:space="preserve">
-    <value>Query is compiled successfully.</value>
+  <data name="KeyAssignErrorInst" xml:space="preserve">
+    <value>キーアサイン ファイルを読み込めませんでした。</value>
   </data>
-  <data name="TabConfigShowCounts" xml:space="preserve">
-    <value>Show new tweet count</value>
+  <data name="KeyAssignErrorTitle" xml:space="preserve">
+    <value>キーアサイン エラー</value>
   </data>
-  <data name="TabConfigShowPopup" xml:space="preserve">
-    <value>Popup new tweets</value>
+  <data name="KeyAssignProfileNotFoundFormat" xml:space="preserve">
+    <value>キーアサインプロファイル {0} が見つかりませんでした。既定のプロファイルを使用します。</value>
+  </data>
+  <data name="LoadFailedCommandBackup" xml:space="preserve">
+    <value>バックアップを作成し初期化</value>
+  </data>
+  <data name="LoadFailedCommandInitialize" xml:space="preserve">
+    <value>設定を初期化</value>
+  </data>
+  <data name="LoadFailedContent" xml:space="preserve">
+    <value>設定ファイルに異常があるため、読み込めませんでした。
+どのような操作を行うか選択してください。</value>
+  </data>
+  <data name="LoadFailedExit" xml:space="preserve">
+    <value>Krileを終了</value>
+  </data>
+  <data name="LoadFailedInst" xml:space="preserve">
+    <value>設定が破損しています。</value>
+  </data>
+  <data name="LoadFailedTitle" xml:space="preserve">
+    <value>Krile 設定読み込みエラー</value>
+  </data>
+  <data name="ThemeErrorContent" xml:space="preserve">
+    <value>XMLの記述に誤りがあります:</value>
+  </data>
+  <data name="ThemeErrorInst" xml:space="preserve">
+    <value>テーマ ファイルを読み込めませんでした。</value>
+  </data>
+  <data name="ThemeErrorTitle" xml:space="preserve">
+    <value>テーマ エラー</value>
+  </data>
+  <data name="ThemeIncompatibleContent" xml:space="preserve">
+    <value>テーマ バージョンが古いため、互換性がありません。</value>
+  </data>
+  <data name="ThemeIncompatibleExInfo" xml:space="preserve">
+    <value>新しいバージョンのテーマを入手するか、最新のフォーマットに則った記述へ変更してください。
+(default.xmlについてこのエラーが表示された場合は、自動的に最新のフォーマットに更新されます。)</value>
+  </data>
+  <data name="ThemeIncompatibleInst" xml:space="preserve">
+    <value>テーマ ファイルを読み込めませんでした。</value>
+  </data>
+  <data name="ThemeIncompatibleTitle" xml:space="preserve">
+    <value>テーマの互換性</value>
   </data>
 </root>

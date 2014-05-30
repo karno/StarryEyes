@@ -214,7 +214,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SettingFlips
             set
             {
                 this._action = value.Name;
-                if (!value.IsArgumentEnabled)
+                if (!value.IsArgumentRequired)
                 {
                     Argument = null;
                 }
@@ -230,7 +230,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SettingFlips
             get
             {
                 var cavm = CurrentActionViewModel;
-                return cavm != null && cavm.IsArgumentEnabled;
+                return cavm != null && cavm.IsArgumentRequired;
             }
         }
 
@@ -270,17 +270,17 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SettingFlips
         {
             get
             {
-                return this._action.HasArgument == null
+                return this._action.ArgumentRequired == null
                     ? SettingFlipResources.KeyAssignArgumentOptional
-                    : (this._action.HasArgument.Value
+                    : (this._action.ArgumentRequired.Value
                         ? SettingFlipResources.KeyAssignArgumentRequired
                         : SettingFlipResources.KeyAssignArgumentNone);
             }
         }
 
-        public bool IsArgumentEnabled
+        public bool IsArgumentRequired
         {
-            get { return _action.HasArgument.GetValueOrDefault(true); }
+            get { return _action.ArgumentRequired.GetValueOrDefault(true); }
         }
     }
 }

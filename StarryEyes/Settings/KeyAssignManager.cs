@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using StarryEyes.Albireo;
+using StarryEyes.Globalization;
+using StarryEyes.Globalization.Models;
 using StarryEyes.Models;
 using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Models.Backstages.SystemEvents;
@@ -78,10 +80,10 @@ namespace StarryEyes.Settings
                 MainWindowModel.ShowTaskDialog(
                     new TaskDialogOptions
                     {
-                        Title = "キーアサイン エラー",
+                        Title = SettingModelResources.KeyAssignErrorTitle,
                         MainIcon = VistaTaskDialogIcon.Error,
-                        MainInstruction = "キーアサインファイルを読み込めませんでした。",
-                        Content = "キーアサインファイルの記述に誤りがあります:" + Environment.NewLine +
+                        MainInstruction = SettingModelResources.KeyAssignErrorInst,
+                        Content = SettingModelResources.KeyAssignErrorContent + Environment.NewLine +
                                   file,
                         ExpandedInfo = ex.Message,
                         CommonButtons = TaskDialogCommonButtons.Close
@@ -142,7 +144,7 @@ namespace StarryEyes.Settings
                 }
                 catch (Exception ex)
                 {
-                    BackstageModel.RegisterEvent(new OperationFailedEvent("キーアサイン エラー", ex));
+                    BackstageModel.RegisterEvent(new OperationFailedEvent(SettingModelResources.KeyAssignError, ex));
                 }
                 return true;
             }
@@ -155,7 +157,7 @@ namespace StarryEyes.Settings
     {
         private readonly string _name;
 
-        private readonly bool? _hasArgument;
+        private readonly bool? _argumentRequired;
 
         private readonly Action<string> _callback;
 
@@ -174,11 +176,11 @@ namespace StarryEyes.Settings
             return new KeyAssignAction(name, action);
         }
 
-        public KeyAssignAction(string name, Action<string> callback, bool? hasArgument = null)
+        public KeyAssignAction(string name, Action<string> callback, bool? argumentRequired = null)
         {
             _name = name;
             _callback = callback;
-            _hasArgument = hasArgument;
+            this._argumentRequired = argumentRequired;
         }
 
         public string Name
@@ -186,19 +188,20 @@ namespace StarryEyes.Settings
             get { return _name; }
         }
 
-        public bool? HasArgument
+        public bool? ArgumentRequired
         {
-            get { return _hasArgument; }
+            get { return this._argumentRequired; }
         }
 
         public void Invoke(string argument)
         {
-            if (_hasArgument != null && _hasArgument.Value == String.IsNullOrEmpty(argument))
+            if (this._argumentRequired != null && this._argumentRequired.Value == String.IsNullOrEmpty(argument))
             {
                 BackstageModel.RegisterEvent(new OperationFailedEvent(
-                    String.Format(_hasArgument.Value
-                        ? "キーアサイン {0} には引数の指定が必要です。"
-                        : "キーアサイン {0} に引数を指定することはできません。", Name),
+                    (this._argumentRequired.Value
+                        ? SettingModelResources.KeyAssignErrorArgumentRequiredFormat
+                        : SettingModelResources.KeyAssignErrorArgumentUnsupportedFormat)
+                        .SafeFormat(Name),
                     null));
             }
             else

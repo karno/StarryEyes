@@ -127,6 +127,12 @@
   <data name="TabConfigNotificationSound" xml:space="preserve">
     <value>このタブの新着通知音</value>
   </data>
+  <data name="TabConfigOpenSoundFilter" xml:space="preserve">
+    <value>Wave ファイル</value>
+  </data>
+  <data name="TabConfigOpenSoundTitle" xml:space="preserve">
+    <value>通知音を選択</value>
+  </data>
   <data name="TabConfigQuery" xml:space="preserve">
     <value>このタブのクエリ</value>
   </data>

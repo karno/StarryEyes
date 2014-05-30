@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using StarryEyes.Albireo;
+using StarryEyes.Globalization.Models;
 using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Models.Backstages.SystemEvents;
 using StarryEyes.Nightmare.Windows;
@@ -74,8 +75,8 @@ namespace StarryEyes.Models.Subsystems
             }
             catch (Exception ex)
             {
-                BackstageModel.RegisterEvent(
-                    new OperationFailedEvent("更新の確認に失敗しました", ex));
+                BackstageModel.RegisterEvent(new OperationFailedEvent(
+                    SubsystemResources.FailedCheckingUpdate, ex));
             }
             return false;
         }
@@ -126,7 +127,8 @@ namespace StarryEyes.Models.Subsystems
             }
             catch (Exception ex)
             {
-                BackstageModel.RegisterEvent(new OperationFailedEvent("自動更新の準備に失敗しました", ex));
+                BackstageModel.RegisterEvent(new OperationFailedEvent(
+                    SubsystemResources.FailedPrepareUpdate, ex));
                 return false;
             }
         }
@@ -168,10 +170,10 @@ namespace StarryEyes.Models.Subsystems
             {
                 TaskDialog.Show(new TaskDialogOptions
                 {
-                    Title = "自動アップデート エラー",
+                    Title = SubsystemResources.AutoUpdateFailedTitle,
                     MainIcon = VistaTaskDialogIcon.Error,
-                    MainInstruction = "アップデートを開始できませんでした。",
-                    Content = "Krileを再起動してやり直すか、手動で最新版を入手してください。",
+                    MainInstruction = SubsystemResources.AutoUpdateFailedInst,
+                    Content = SubsystemResources.AutoUpdateFailedContent,
                     ExpandedInfo = ex.ToString(),
                     CommonButtons = TaskDialogCommonButtons.Close
                 });
@@ -226,12 +228,11 @@ namespace StarryEyes.Models.Subsystems
             {
                 TaskDialog.Show(new TaskDialogOptions
                 {
-                    Title = "アップデート完了エラー",
+                    Title = SubsystemResources.UpdateCompleteErrorTitle,
                     MainIcon = VistaTaskDialogIcon.Error,
-                    MainInstruction = "更新バイナリを削除できません。",
-                    Content = "ユーザーデータディレクトリに存在するupdateフォルダを手動で削除してください。",
-                    ExpandedInfo = "ユーザーデータディレクトリの位置については、FAQを参照してください。" + Environment.NewLine +
-                                   "削除出来ない場合は、Windowsを再起動する必要があるかもしれません。",
+                    MainInstruction = SubsystemResources.UpdateCompleteErrorInst,
+                    Content = SubsystemResources.UpdateCompleteErrorContent,
+                    ExpandedInfo = SubsystemResources.UpdateCompleteErrorExInfo,
                     CommonButtons = TaskDialogCommonButtons.Close
                 });
             }

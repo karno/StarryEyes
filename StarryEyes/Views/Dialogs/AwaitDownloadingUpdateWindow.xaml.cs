@@ -21,10 +21,10 @@ namespace StarryEyes.Views.Dialogs
             {
                 TaskDialog.Show(new TaskDialogOptions
                 {
-                    Title = "自動アップデート エラー",
+                    Title = "Auto update error",
                     MainIcon = VistaTaskDialogIcon.Error,
-                    MainInstruction = "アップデートパッチをダウンロードできませんでした。",
-                    Content = "アップデート サーバが利用可能でないか、利用可能なパッチが存在しません。",
+                    MainInstruction = "Update agent could not be downloaded.",
+                    Content = "Update server is down, or patches are not available.",
                     CommonButtons = TaskDialogCommonButtons.Close
                 });
                 this.Close();

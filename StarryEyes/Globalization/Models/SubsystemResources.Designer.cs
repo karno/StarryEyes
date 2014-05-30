@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace StarryEyes.Globalization.Dialogs {
+namespace StarryEyes.Globalization.Models {
     using System;
     
     
@@ -22,14 +22,14 @@ namespace StarryEyes.Globalization.Dialogs {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class AddNewKeyAssignWindowResources {
+    public class SubsystemResources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal AddNewKeyAssignWindowResources() {
+        internal SubsystemResources() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace StarryEyes.Globalization.Dialogs {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("StarryEyes.Globalization.Dialogs.AddNewKeyAssignWindowResources", typeof(AddNewKeyAssignWindowResources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("StarryEyes.Globalization.Models.SubsystemResources", typeof(SubsystemResources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,74 +61,93 @@ namespace StarryEyes.Globalization.Dialogs {
         }
         
         /// <summary>
-        ///   Add key assign に類似しているローカライズされた文字列を検索します。
+        ///   Restart Krile and retry, or update by manual. に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        public static string AddKeyAssignTitle {
+        public static string AutoUpdateFailedContent {
             get {
-                return ResourceManager.GetString("AddKeyAssignTitle", resourceCulture);
+                return ResourceManager.GetString("AutoUpdateFailedContent", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Create _empty file に類似しているローカライズされた文字列を検索します。
+        ///   Could not start update. に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        public static string CreateEmpty {
+        public static string AutoUpdateFailedInst {
             get {
-                return ResourceManager.GetString("CreateEmpty", resourceCulture);
+                return ResourceManager.GetString("AutoUpdateFailedInst", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Create new key assign file. に類似しているローカライズされた文字列を検索します。
+        ///   Auto update error に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        public static string CreateNewKeyAssignFile {
+        public static string AutoUpdateFailedTitle {
             get {
-                return ResourceManager.GetString("CreateNewKeyAssignFile", resourceCulture);
+                return ResourceManager.GetString("AutoUpdateFailedTitle", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Create _copy with current file に類似しているローカライズされた文字列を検索します。
+        ///   Failed checking updates. に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        public static string CreateWithCopy {
+        public static string FailedCheckingUpdate {
             get {
-                return ResourceManager.GetString("CreateWithCopy", resourceCulture);
+                return ResourceManager.GetString("FailedCheckingUpdate", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   使用できない文字が含まれています。 に類似しているローカライズされた文字列を検索します。
+        ///   Failed preparing updates. に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        public static string ErrorFileNameContainsInvalidChars {
+        public static string FailedPrepareUpdate {
             get {
-                return ResourceManager.GetString("ErrorFileNameContainsInvalidChars", resourceCulture);
+                return ResourceManager.GetString("FailedPrepareUpdate", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   同じ名前のキーアサインがすでに存在します。 に類似しているローカライズされた文字列を検索します。
+        ///   Failed receiving twitter api configuration. に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        public static string ErrorFileNameIsDuplicated {
+        public static string TwitterConfigurationReceiveError {
             get {
-                return ResourceManager.GetString("ErrorFileNameIsDuplicated", resourceCulture);
+                return ResourceManager.GetString("TwitterConfigurationReceiveError", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   ファイル名が入力されていません。 に類似しているローカライズされた文字列を検索します。
+        ///   Remove update folder located in user data directory. に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        public static string ErrorFileNameIsEmpty {
+        public static string UpdateCompleteErrorContent {
             get {
-                return ResourceManager.GetString("ErrorFileNameIsEmpty", resourceCulture);
+                return ResourceManager.GetString("UpdateCompleteErrorContent", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Key Assign Name:  に類似しているローカライズされた文字列を検索します。
+        ///   Please reference FAQ for find location.
+        ///If you can&apos;t delete it, you may need restarting Windows. に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        public static string KeyAssignName {
+        public static string UpdateCompleteErrorExInfo {
             get {
-                return ResourceManager.GetString("KeyAssignName", resourceCulture);
+                return ResourceManager.GetString("UpdateCompleteErrorExInfo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Failed removing update agent. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string UpdateCompleteErrorInst {
+            get {
+                return ResourceManager.GetString("UpdateCompleteErrorInst", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Update completion error に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string UpdateCompleteErrorTitle {
+            get {
+                return ResourceManager.GetString("UpdateCompleteErrorTitle", resourceCulture);
             }
         }
     }

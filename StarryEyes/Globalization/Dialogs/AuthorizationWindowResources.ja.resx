@@ -127,4 +127,25 @@
     <value>Twitterへログインし、アクセスを許可してください。 
 その後に表示された番号を入力してください。</value>
   </data>
+  <data name="OAuthErrorContent" xml:space="preserve">
+    <value>数回試してもエラーが発生する場合、しばらく時間を置いてから試してみてください。</value>
+  </data>
+  <data name="OAuthErrorFooter" xml:space="preserve">
+    <value>コンピュータの時計が大幅にずれている場合も認証が行えないことがあります。</value>
+  </data>
+  <data name="OAuthErrorInst" xml:space="preserve">
+    <value>Twitterと正しく通信できませんでした。</value>
+  </data>
+  <data name="OAuthErrorTitle" xml:space="preserve">
+    <value>OAuth認証エラー</value>
+  </data>
+  <data name="OAuthFailedContent" xml:space="preserve">
+    <value>PINを確認してもう一度入力するか、はじめからやり直してみてください。</value>
+  </data>
+  <data name="OAuthFailedInst" xml:space="preserve">
+    <value>アカウントを認証できませんでした。</value>
+  </data>
+  <data name="OAuthFailedTitle" xml:space="preserve">
+    <value>アクセス許可エラー</value>
+  </data>
 </root>

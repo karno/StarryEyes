@@ -127,4 +127,25 @@
     <value>Log into Twitter and permit access.
 After, enter displayed number.</value>
   </data>
+  <data name="OAuthErrorContent" xml:space="preserve">
+    <value>If problem is occured many times, please take a coffee break before retrying.</value>
+  </data>
+  <data name="OAuthErrorFooter" xml:space="preserve">
+    <value>Authentication will be failed if your computer's clock is out.</value>
+  </data>
+  <data name="OAuthErrorInst" xml:space="preserve">
+    <value>Could not communicate twitter.</value>
+  </data>
+  <data name="OAuthErrorTitle" xml:space="preserve">
+    <value>OAuth authentication error</value>
+  </data>
+  <data name="OAuthFailedContent" xml:space="preserve">
+    <value>Check PIN and retry inputting, or retry from scratch.</value>
+  </data>
+  <data name="OAuthFailedInst" xml:space="preserve">
+    <value>Account could be authorized.</value>
+  </data>
+  <data name="OAuthFailedTitle" xml:space="preserve">
+    <value>OAuth authorization error</value>
+  </data>
 </root>
