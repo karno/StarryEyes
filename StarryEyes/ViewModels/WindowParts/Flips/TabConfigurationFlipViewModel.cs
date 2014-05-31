@@ -212,7 +212,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         }
         #endregion
 
-        public async void Close()
+        public void Close()
         {
             if (!IsConfigurationActive) return;
             this.IsConfigurationActive = false;
