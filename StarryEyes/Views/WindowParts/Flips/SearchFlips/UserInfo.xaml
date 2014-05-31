@@ -146,10 +146,14 @@
     </UserControl.Resources>
     <Grid Background="{DynamicResource BaseColorBackgroundBrush}">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="286" />
+            <ColumnDefinition Width="Auto" />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
-        <DockPanel Background="{DynamicResource UserFlipBackgroundBrush}">
+        <!--  Normal View  -->
+        <DockPanel Width="286"
+                   Background="{DynamicResource UserFlipBackgroundBrush}"
+                   Visibility="{Binding DisplaySlimView,
+                                        Converter={StaticResource BooleanToInvisibleConverter}}">
             <Grid Height="143"
                   Background="Black"
                   DockPanel.Dock="Top">
@@ -312,11 +316,7 @@
                                 </Style.Triggers>
                             </Style>
                         </Grid.Style>
-                        <Button x:Name="StatusesButton"
-                                Content="{Binding User.StatusesCount,
-                                                  Converter={StaticResource StringFormatConverter},
-                                                  ConverterParameter={}{0} tweets}"
-                                Style="{StaticResource FlatFloatButtonStyle}">
+                        <Button Content="{Binding User.StatusesCount, Converter={StaticResource StringFormatConverter}, ConverterParameter={}{0} tweets}" Style="{StaticResource FlatFloatButtonStyle}">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="Click">
                                     <ei:CallMethodAction MethodName="ShowStatuses" TargetObject="{Binding}" />
@@ -335,11 +335,7 @@
                                 </Style.Triggers>
                             </Style>
                         </Grid.Style>
-                        <Button x:Name="FollowingsButton"
-                                Content="{Binding User.FollowingsCount,
-                                                  Converter={StaticResource StringFormatConverter},
-                                                  ConverterParameter={}{0} following}"
-                                Style="{StaticResource FlatFloatButtonStyle}">
+                        <Button Content="{Binding User.FollowingsCount, Converter={StaticResource StringFormatConverter}, ConverterParameter={}{0} following}" Style="{StaticResource FlatFloatButtonStyle}">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="Click">
                                     <ei:CallMethodAction MethodName="ShowFollowing" TargetObject="{Binding}" />
@@ -358,11 +354,7 @@
                                 </Style.Triggers>
                             </Style>
                         </Grid.Style>
-                        <Button x:Name="FollowersButton"
-                                Content="{Binding User.FollowersCount,
-                                                  Converter={StaticResource StringFormatConverter},
-                                                  ConverterParameter={}{0} followers}"
-                                Style="{StaticResource FlatFloatButtonStyle}">
+                        <Button Content="{Binding User.FollowersCount, Converter={StaticResource StringFormatConverter}, ConverterParameter={}{0} followers}" Style="{StaticResource FlatFloatButtonStyle}">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="Click">
                                     <ei:CallMethodAction MethodName="ShowFollowers" TargetObject="{Binding}" />
@@ -381,11 +373,7 @@
                                 </Style.Triggers>
                             </Style>
                         </Grid.Style>
-                        <Button x:Name="FavoritesButton"
-                                Content="{Binding User.FavoritesCount,
-                                                  Converter={StaticResource StringFormatConverter},
-                                                  ConverterParameter={}{0} favorites}"
-                                Style="{StaticResource FlatFloatButtonStyle}">
+                        <Button Content="{Binding User.FavoritesCount, Converter={StaticResource StringFormatConverter}, ConverterParameter={}{0} favorites}" Style="{StaticResource FlatFloatButtonStyle}">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="Click">
                                     <ei:CallMethodAction MethodName="ShowFavorites" TargetObject="{Binding}" />
@@ -525,7 +513,419 @@
                 </StackPanel>
             </ScrollViewer>
         </DockPanel>
+        <Grid Grid.Column="1" Background="{DynamicResource BaseColorBackgroundBrush}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="1*" />
+            </Grid.RowDefinitions>
+            <!--  Slim View  -->
+            <StackPanel Background="{DynamicResource UserFlipBackgroundBrush}"
+                        Orientation="Vertical"
+                        Visibility="{Binding DisplaySlimView,
+                                             Converter={StaticResource BooleanToVisibleConverter}}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="64" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <controls:LazyImage Width="48"
+                                        Height="48"
+                                        Margin="8"
+                                        RenderOptions.BitmapScalingMode="Fant"
+                                        UriSource="{Binding User.ProfileImageUriOriginal}" />
+                    <StackPanel Grid.Column="1" Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal">
+
+                            <TextBlock Margin="8,3"
+                                       VerticalAlignment="Center"
+                                       Cursor="Hand"
+                                       FontSize="24"
+                                       FontWeight="Bold"
+                                       Foreground="{DynamicResource GlobalKeyBrush}"
+                                       Text="{Binding ScreenName,
+                                                      Mode=OneTime}">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="MouseLeftButtonDown">
+                                        <ei:CallMethodAction MethodName="OpenUserDetailOnTwitter" TargetObject="{Binding User}" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </TextBlock>
+                            <Path Width="13"
+                                  Height="16"
+                                  Margin="0,8,8,8"
+                                  Data="F1 M 14.0021,23.0031L 16.0022,23.0031L 16.0022,20.0028C 16.0022,15.5839 19.5845,12.0017 24.0033,12.0017C 28.4222,12.0017 32.0045,15.5839 32.0045,20.0028L 32.0045,23.0031L 34.0049,23.0031L 34.0049,36.005L 14.0021,36.005L 14.0021,23.0031 Z M 29.004,20.0028C 29.004,17.241 26.7652,15.0021 24.0033,15.0021C 21.2415,15.0021 19.0026,17.241 19.0026,20.0028L 19.0026,23.0031L 29.004,23.0031L 29.004,20.0028 Z "
+                                  DockPanel.Dock="Right"
+                                  Fill="{DynamicResource UserFlipForegroundBrush}"
+                                  Stretch="Fill"
+                                  Visibility="{Binding User.IsProtected,
+                                                       Converter={StaticResource BooleanToVisibleConverter}}" />
+                            <Path Width="16"
+                                  Height="13"
+                                  Margin="0,8,8,8"
+                                  Data="F1 M 18,22L 22.6667,26.6667L 30,17.3334L 32,19.3334L 22.6667,30.6667L 16,24L 18,22 Z "
+                                  Fill="{DynamicResource UserFlipForegroundBrush}"
+                                  Stretch="Fill"
+                                  Visibility="{Binding User.IsVerified,
+                                                       Converter={StaticResource BooleanToVisibleConverter}}" />
+                        </StackPanel>
+                        <TextBlock Margin="8,4,8,6"
+                                   Foreground="{DynamicResource UserFlipForegroundBrush}"
+                                   Text="{Binding User.Name,
+                                                  Mode=OneWay}" />
+                    </StackPanel>
+                </Grid>
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Margin="8,6"
+                               VerticalAlignment="Top"
+                               Foreground="{DynamicResource UserFlipForegroundBrush}"
+                               TextWrapping="Wrap"
+                               Visibility="{Binding User.Bio,
+                                                    Converter={StaticResource NotNullOrEmptyToVisibleConverter}}"
+                               utils:TextBlockStylizer.ForegroundBrush="{DynamicResource UserFlipForegroundBrush}"
+                               utils:TextBlockStylizer.HyperlinkBrush="{DynamicResource UserFlipForegroundBrush}"
+                               utils:TextBlockStylizer.LinkNavigationCommand="{Binding OpenLinkCommand,
+                                                                                       Mode=OneTime}"
+                               utils:TextBlockStylizer.TwitterUser="{Binding User.User}">
+                        <i:Interaction.Behaviors>
+                            <behaviors:TextBlockDragSelectBehavior ForegroundBrush="{DynamicResource BaseColorForegroundBrush}" SelectedText="{Binding SelectedText, Mode=OneWayToSource}">
+                                <behaviors:TextBlockDragSelectBehavior.SelectContextMenu>
+                                    <!--  ReSharper disable once Xaml.BindingWithContextNotResolved  -->
+                                    <ContextMenu DataContext="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                                        <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TextCopyClipboard}">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="Click">
+                                                    <ei:CallMethodAction MethodName="CopyText" TargetObject="{Binding}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </MenuItem>
+                                        <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TextCopyInput}">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="Click">
+                                                    <ei:CallMethodAction MethodName="SetTextToInputBox" TargetObject="{Binding}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </MenuItem>
+                                        <Separator />
+                                        <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TextSearchLocal}">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="Click">
+                                                    <ei:CallMethodAction MethodName="FindOnKrile" TargetObject="{Binding}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </MenuItem>
+                                        <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TextSearchTwitter}">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="Click">
+                                                    <ei:CallMethodAction MethodName="FindOnTwitter" TargetObject="{Binding}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </MenuItem>
+                                        <Separator />
+                                        <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TextSearchGoogle}">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="Click">
+                                                    <ei:CallMethodAction MethodName="FindOnGoogle" TargetObject="{Binding}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </MenuItem>
+                                    </ContextMenu>
+                                </behaviors:TextBlockDragSelectBehavior.SelectContextMenu>
+                            </behaviors:TextBlockDragSelectBehavior>
+                        </i:Interaction.Behaviors>
+                    </TextBlock>
+                    <TextBlock Margin="8,6"
+                               Foreground="{DynamicResource UserFlipForegroundBrush}"
+                               Text="{Binding User.Location}"
+                               Visibility="{Binding User.Location,
+                                                    Converter={StaticResource NotNullOrEmptyToVisibleConverter}}" />
+                    <TextBlock Margin="8,6"
+                               Cursor="Hand"
+                               Foreground="{DynamicResource UserFlipForegroundBrush}"
+                               Text="{Binding User.Web}"
+                               TextDecorations="Underline"
+                               TextTrimming="CharacterEllipsis"
+                               Visibility="{Binding User.Web,
+                                                    Converter={StaticResource NotNullOrEmptyToVisibleConverter}}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="MouseLeftButtonDown">
+                                <ei:CallMethodAction MethodName="OpenUserWeb" TargetObject="{Binding User}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </TextBlock>
+                </StackPanel>
+                <UniformGrid Rows="1">
+                    <Button Content="favstar" Style="{StaticResource FlatFloatButtonStyle}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <ei:CallMethodAction MethodName="OpenUserFavstar" TargetObject="{Binding User}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </Button>
+                    <Button Content="twilog" Style="{StaticResource FlatFloatButtonStyle}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <ei:CallMethodAction MethodName="OpenUserTwilog" TargetObject="{Binding User}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </Button>
+                </UniformGrid>
+                <Expander MaxHeight="200"
+                          Foreground="{StaticResource UserFlipForegroundBrush}"
+                          Header="relations"
+                          IsExpanded="False">
+                    <Expander.Content>
+                        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                            <DockPanel>
+                                <TextBlock Margin="8,4"
+                                           HorizontalAlignment="Right"
+                                           DockPanel.Dock="Top"
+                                           FontSize="9"
+                                           Foreground="{DynamicResource UserFlipForegroundBrush}"
+                                           Text="RIGHT CLICK TO BLOCK USER" />
+                                <ItemsControl FocusVisualStyle="{x:Null}" ItemsSource="{Binding RelationControls}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <DataTemplate.Resources>
+                                                <!--  ReSharper disable once Xaml.BindingWithContextNotResolved  -->
+                                                <ContextMenu x:Key="BlockMenu" DataContext="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                                                    <MenuItem Header="{x:Static localize:SearchFlipResources.UserInfoBlock}">
+                                                        <i:Interaction.Triggers>
+                                                            <i:EventTrigger EventName="Click">
+                                                                <ei:CallMethodAction MethodName="Block" TargetObject="{Binding}" />
+                                                            </i:EventTrigger>
+                                                        </i:Interaction.Triggers>
+                                                    </MenuItem>
+                                                    <MenuItem Header="{x:Static localize:SearchFlipResources.UserInfoReportAsSpam}">
+                                                        <i:Interaction.Triggers>
+                                                            <i:EventTrigger EventName="Click">
+                                                                <ei:CallMethodAction MethodName="ReportForSpam" TargetObject="{Binding}" />
+                                                            </i:EventTrigger>
+                                                        </i:Interaction.Triggers>
+                                                    </MenuItem>
+                                                </ContextMenu>
+                                            </DataTemplate.Resources>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <Border Margin="8,4"
+                                                        HorizontalAlignment="Center"
+                                                        VerticalAlignment="Center">
+                                                    <controls:LazyImage Width="40"
+                                                                        Height="40"
+                                                                        Margin="0"
+                                                                        HorizontalAlignment="Left"
+                                                                        VerticalAlignment="Stretch"
+                                                                        RenderOptions.BitmapScalingMode="HighQuality"
+                                                                        UriSource="{Binding SourceUserProfileImage}" />
+                                                </Border>
+                                                <StackPanel Grid.Column="1"
+                                                            Margin="0,2,0,0"
+                                                            VerticalAlignment="Center"
+                                                            Orientation="Vertical">
+                                                    <TextBlock FontSize="16"
+                                                               Foreground="{DynamicResource UserFlipForegroundBrush}"
+                                                               Text="{Binding SourceUserScreenName,
+                                                                              FallbackValue=user}" />
+                                                    <TextBlock FontSize="9"
+                                                               Foreground="{DynamicResource UserFlipForegroundBrush}"
+                                                               Text="PLEASE WAIT A MOMENT..."
+                                                               Visibility="{Binding IsCommunicating,
+                                                                                    Converter={StaticResource BooleanToVisibleConverter}}" />
+
+                                                    <Grid Visibility="{Binding IsCommunicating, Converter={StaticResource BooleanToInvisibleConverter}}">
+                                                        <TextBlock FontSize="9"
+                                                                   Foreground="{DynamicResource UserFlipFollowbackedBrush}"
+                                                                   Text="IS FOLLOWING BACK"
+                                                                   Visibility="{Binding IsFollowedBack,
+                                                                                        Converter={StaticResource BooleanToVisibleConverter}}" />
+                                                        <TextBlock FontSize="9"
+                                                                   Foreground="{DynamicResource UserFlipNotFollowbackedBrush}"
+                                                                   Text="IS NOT FOLLOWING BACK"
+                                                                   Visibility="{Binding IsFollowedBack,
+                                                                                        Converter={StaticResource BooleanToInvisibleConverter}}" />
+                                                    </Grid>
+                                                </StackPanel>
+                                                <Grid Grid.Column="2" Visibility="{Binding IsCommunicating, Converter={StaticResource BooleanToInvisibleConverter}}">
+                                                    <Border Width="88"
+                                                            Height="24"
+                                                            Margin="8,0"
+                                                            Background="{DynamicResource UserFlipNotFollowedBrush}">
+                                                        <Button Content="FOLLOW"
+                                                                ContextMenu="{StaticResource BlockMenu}"
+                                                                FontWeight="Normal"
+                                                                Foreground="White"
+                                                                Style="{DynamicResource MetroSquareUnfocusableFlatButton}">
+                                                            <i:Interaction.Triggers>
+                                                                <i:EventTrigger EventName="Click">
+                                                                    <ei:CallMethodAction MethodName="Follow" TargetObject="{Binding}" />
+                                                                </i:EventTrigger>
+                                                            </i:Interaction.Triggers>
+                                                        </Button>
+                                                    </Border>
+                                                    <Border Width="88"
+                                                            Height="24"
+                                                            Margin="8,0"
+                                                            VerticalAlignment="Center"
+                                                            Background="{DynamicResource UserFlipFollowingBrush}"
+                                                            Visibility="{Binding IsFollowing,
+                                                                                 Converter={StaticResource BooleanToVisibleConverter}}">
+                                                        <Button Content="FOLLOWING"
+                                                                ContextMenu="{StaticResource BlockMenu}"
+                                                                FontWeight="Normal"
+                                                                Foreground="White"
+                                                                Style="{DynamicResource MetroSquareUnfocusableFlatButton}">
+                                                            <i:Interaction.Triggers>
+                                                                <i:EventTrigger EventName="Click">
+                                                                    <ei:CallMethodAction MethodName="Remove" TargetObject="{Binding}" />
+                                                                </i:EventTrigger>
+                                                            </i:Interaction.Triggers>
+                                                        </Button>
+                                                    </Border>
+                                                    <Border Width="88"
+                                                            Height="24"
+                                                            Margin="8,0"
+                                                            Background="{DynamicResource UserFlipBlockingBrush}"
+                                                            Visibility="{Binding IsBlocking,
+                                                                                 Converter={StaticResource BooleanToVisibleConverter}}">
+                                                        <Button Content="BLOCKED"
+                                                                FontWeight="Normal"
+                                                                Foreground="White"
+                                                                Style="{DynamicResource MetroSquareUnfocusableFlatButton}">
+                                                            <i:Interaction.Triggers>
+                                                                <i:EventTrigger EventName="Click">
+                                                                    <ei:CallMethodAction MethodName="Unblock" TargetObject="{Binding}" />
+                                                                </i:EventTrigger>
+                                                            </i:Interaction.Triggers>
+                                                        </Button>
+                                                    </Border>
+                                                </Grid>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </DockPanel>
+                        </ScrollViewer>
+                    </Expander.Content>
+                </Expander>
+                <UniformGrid Rows="1">
+                    <Grid>
+                        <Grid.Style>
+                            <Style TargetType="Grid">
+                                <Setter Property="Background" Value="Transparent" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding DisplayKind}" Value="Statuses">
+                                        <Setter Property="Background" Value="{DynamicResource UserFlipHoveringBackgroundBrush}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
+                        <Button Style="{StaticResource FlatFloatButtonStyle}">
+                            <Button.Content>
+                                <Binding Converter="{StaticResource StringFormatConverter}"
+                                         ConverterParameter="{}{0}&#10;tweets"
+                                         Path="User.StatusesCount" />
+                            </Button.Content>
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="Click">
+                                    <ei:CallMethodAction MethodName="ShowStatuses" TargetObject="{Binding}" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </Button>
+                    </Grid>
+                    <Grid>
+                        <Grid.Style>
+                            <Style TargetType="Grid">
+                                <Setter Property="Background" Value="Transparent" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding DisplayKind}" Value="Following">
+                                        <Setter Property="Background" Value="{DynamicResource UserFlipHoveringBackgroundBrush}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
+                        <Button Style="{StaticResource FlatFloatButtonStyle}">
+                            <Button.Content>
+                                <Binding Converter="{StaticResource StringFormatConverter}"
+                                         ConverterParameter="{}{0}&#10;following"
+                                         Path="User.FollowingsCount" />
+                            </Button.Content>
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="Click">
+                                    <ei:CallMethodAction MethodName="ShowFollowing" TargetObject="{Binding}" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </Button>
+                    </Grid>
+                    <Grid>
+                        <Grid.Style>
+                            <Style TargetType="Grid">
+                                <Setter Property="Background" Value="Transparent" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding DisplayKind}" Value="Followers">
+                                        <Setter Property="Background" Value="{DynamicResource UserFlipHoveringBackgroundBrush}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
+                        <Button Style="{StaticResource FlatFloatButtonStyle}">
+                            <Button.Content>
+                                <Binding Converter="{StaticResource StringFormatConverter}"
+                                         ConverterParameter="{}{0}&#10;followers"
+                                         Path="User.FollowersCount" />
+                            </Button.Content>
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="Click">
+                                    <ei:CallMethodAction MethodName="ShowFollowers" TargetObject="{Binding}" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </Button>
+                    </Grid>
+                    <Grid>
+                        <Grid.Style>
+                            <Style TargetType="Grid">
+                                <Setter Property="Background" Value="Transparent" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding DisplayKind}" Value="Favorites">
+                                        <Setter Property="Background" Value="{DynamicResource UserFlipHoveringBackgroundBrush}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
+                        <Button Style="{StaticResource FlatFloatButtonStyle}">
+                            <Button.Content>
+                                <Binding Converter="{StaticResource StringFormatConverter}"
+                                         ConverterParameter="{}{0}&#10;favorites"
+                                         Path="User.FavoritesCount" />
+                            </Button.Content>
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="Click">
+                                    <ei:CallMethodAction MethodName="ShowFavorites" TargetObject="{Binding}" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </Button>
+                    </Grid>
+                </UniformGrid>
+            </StackPanel>
+            <Grid Row="1">
+                <DockPanel Visibility="{Binding IsVisibleStatuses, Converter={StaticResource BooleanToVisibleConverter}}">
+                    <primitives:Timeline DataContext="{Binding Statuses}" />
+                </DockPanel>
+                <DockPanel Visibility="{Binding IsVisibleFavorites, Converter={StaticResource BooleanToVisibleConverter}}">
+                    <primitives:Timeline DataContext="{Binding Favorites}" />
+                </DockPanel>
+                <DockPanel Visibility="{Binding IsVisibleFollowing, Converter={StaticResource BooleanToVisibleConverter}}">
+                    <primitives:UsersList DataContext="{Binding Following}" />
+                </DockPanel>
+                <DockPanel Visibility="{Binding IsVisibleFollowers, Converter={StaticResource BooleanToVisibleConverter}}">
+                    <primitives:UsersList DataContext="{Binding Followers}" />
+                </DockPanel>
+            </Grid>
+        </Grid>
         <Ellipse Grid.Column="0"
+                 Grid.ColumnSpan="2"
                  Width="52"
                  Height="52"
                  Margin="-8,-8,0,0"
@@ -551,29 +951,5 @@
                   Fill="{DynamicResource UserFlipForegroundBrush}"
                   Stretch="Fill" />
         </Button>
-        <DockPanel x:Name="StatusPanel"
-                   Grid.Column="1"
-                   Visibility="{Binding IsVisibleStatuses,
-                                        Converter={StaticResource BooleanToVisibleConverter}}">
-            <primitives:Timeline DataContext="{Binding Statuses}" />
-        </DockPanel>
-        <DockPanel x:Name="FavoritesPanel"
-                   Grid.Column="1"
-                   Visibility="{Binding IsVisibleFavorites,
-                                        Converter={StaticResource BooleanToVisibleConverter}}">
-            <primitives:Timeline DataContext="{Binding Favorites}" />
-        </DockPanel>
-        <DockPanel x:Name="FollowingPanel"
-                   Grid.Column="1"
-                   Visibility="{Binding IsVisibleFollowing,
-                                        Converter={StaticResource BooleanToVisibleConverter}}">
-            <primitives:UsersList DataContext="{Binding Following}" />
-        </DockPanel>
-        <DockPanel x:Name="FollowersPanel"
-                   Grid.Column="1"
-                   Visibility="{Binding IsVisibleFollowers,
-                                        Converter={StaticResource BooleanToVisibleConverter}}">
-            <primitives:UsersList DataContext="{Binding Followers}" />
-        </DockPanel>
     </Grid>
 </UserControl>

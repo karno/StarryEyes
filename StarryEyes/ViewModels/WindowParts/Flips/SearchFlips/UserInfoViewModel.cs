@@ -132,10 +132,18 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             get { return DisplayKind == UserDisplayKind.Followers; }
         }
 
+        public bool DisplaySlimView
+        {
+            get { return _parent.DisplaySlimView; }
+        }
+
         public UserInfoViewModel(SearchFlipViewModel parent, string screenName)
         {
             this._parent = parent;
             this._screenName = screenName;
+            this.CompositeDisposable.Add(
+                parent.ListenPropertyChanged(() => parent.DisplaySlimView)
+                      .Subscribe(_ => RaisePropertyChanged(() => DisplaySlimView)));
             this.CompositeDisposable.Add(
                 StoreHelper.GetUser(screenName)
                            .Finally(() => Communicating = false)
