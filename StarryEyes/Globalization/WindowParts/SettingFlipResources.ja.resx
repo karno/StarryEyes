@@ -573,4 +573,16 @@ Krile StarryEyesは複数行表示モードをもとに設計されているた�
   <data name="TimelineSinglelineWarnTitle" xml:space="preserve">
     <value>一行表示モードの警告</value>
   </data>
+  <data name="HighSearchLocale" xml:space="preserve">
+    <value>Twitter検索クエリのロケール コード:</value>
+  </data>
+  <data name="TimelineSearchLanguage" xml:space="preserve">
+    <value>ツイート検索の言語:</value>
+  </data>
+  <data name="TimelineSearchLanguageInvalid" xml:space="preserve">
+    <value>(不明な言語: 登録されていないか、入力にエラーがあります)</value>
+  </data>
+  <data name="TimelineSearchLanguageUnspecified" xml:space="preserve">
+    <value>指定なし (すべての言語のツイートを対象にする)</value>
+  </data>
 </root>

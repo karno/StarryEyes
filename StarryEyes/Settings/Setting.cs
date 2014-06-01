@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Windows;
 using System.Xaml;
 using StarryEyes.Albireo;
@@ -108,6 +109,9 @@ namespace StarryEyes.Settings
 
         public static readonly SettingItemStruct<bool> OpenTwitterImageWithOriginalSize =
             new SettingItemStruct<bool>("OpenTwitterImageWithOriginalSize", true);
+
+        public static readonly SettingItem<string> SearchLanguage =
+            new SettingItem<string>("SearchLanguage", Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName);
 
         #endregion
 
@@ -246,6 +250,9 @@ namespace StarryEyes.Settings
 
         public static readonly SettingItem<string> ApiProxy =
             new SettingItem<string>("ApiProxy", null);
+
+        public static readonly SettingItem<string> SearchLocale =
+            new SettingItem<string>("SearchLocale", null);
 
         public static readonly SettingItemStruct<bool> LoadPluginFromDevFolder =
             new SettingItemStruct<bool>("LoadPluginFromDevFolder", false);

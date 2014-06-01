@@ -573,4 +573,16 @@ Are you sure you enable single-line mode?</value>
   <data name="TimelineSinglelineWarnTitle" xml:space="preserve">
     <value>Waning Single-Line Mode</value>
   </data>
+  <data name="HighSearchLocale" xml:space="preserve">
+    <value>Locale code of query for searching twitter:</value>
+  </data>
+  <data name="TimelineSearchLanguage" xml:space="preserve">
+    <value>Language of searching twitter:</value>
+  </data>
+  <data name="TimelineSearchLanguageInvalid" xml:space="preserve">
+    <value>(Unknown language: unregistered code or invalid input)</value>
+  </data>
+  <data name="TimelineSearchLanguageUnspecified" xml:space="preserve">
+    <value>Unspecified (targets all languages)</value>
+  </data>
 </root>

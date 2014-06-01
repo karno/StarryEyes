@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reactive;
@@ -313,6 +314,58 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         public void OpenDonationPage()
         {
             BrowserHelper.Open(App.DonationUrl);
+        }
+
+        public string SearchLanguage
+        {
+            get { return Setting.SearchLanguage.Value; }
+            set
+            {
+                Setting.SearchLanguage.Value = value;
+                RaisePropertyChanged();
+                RaisePropertyChanged(() => SearchLanguageDescription);
+            }
+        }
+
+        public IEnumerable<string> SupportedLanguages
+        {
+            get
+            {
+                return new[]
+                {
+                    "", "aa", "ab", "ae", "af", "ak", "am", "an", "ar", "as", "av", "ay", "az", "ba", "be", "bg", "bh",
+                    "bi", "bm", "bn", "bo", "br", "bs", "ca", "ce", "ch", "co", "cr", "cs", "cu", "cv", "cy", "da", "de",
+                    "dv", "dz", "ee", "el", "en", "eo", "es", "et", "eu", "fa", "ff", "fi", "fj", "fo", "fr", "fy", "ga",
+                    "gd", "gl", "gn", "gu", "gv", "ha", "he", "hi", "ho", "hr", "ht", "hu", "hy", "hz", "ia", "id", "ie",
+                    "ig", "ii", "ik", "io", "is", "it", "iu", "ja", "jv", "ka", "kg", "ki", "kj", "kk", "kl", "km", "kn",
+                    "ko", "kr", "ks", "ku", "kv", "kw", "ky", "la", "lb", "lg", "li", "ln", "lo", "lt", "lu", "lv", "mg",
+                    "mh", "mi", "mk", "ml", "mn", "mr", "ms", "mt", "my", "na", "nb", "nd", "ne", "ng", "nl", "nn", "no",
+                    "nr", "nv", "ny", "oc", "oj", "om", "or", "os", "pa", "pi", "pl", "ps", "pt", "qu", "rm", "rn", "ro",
+                    "ru", "rw", "sa", "sc", "sd", "se", "sg", "si", "sk", "sl", "sm", "sn", "so", "sq", "sr", "ss", "st",
+                    "su", "sv", "sw", "ta", "te", "tg", "th", "ti", "tk", "tl", "tn", "to", "tr", "ts", "tt", "tw", "ty",
+                    "ug", "uk", "ur", "uz", "ve", "vi", "vo", "wa", "wo", "xh", "yi", "yo", "za", "zh", "zu"
+                };
+            }
+        }
+
+        public string SearchLanguageDescription
+        {
+            get
+            {
+                try
+                {
+                    var culture = new CultureInfo(SearchLanguage);
+                    if (CultureInfo.InvariantCulture.Equals(culture))
+                    {
+                        return SettingFlipResources.TimelineSearchLanguageUnspecified;
+                    }
+                    return culture.DisplayName + " (" + culture.EnglishName + ")";
+                }
+                catch (CultureNotFoundException)
+                {
+                    return SettingFlipResources.TimelineSearchLanguageInvalid;
+                }
+            }
         }
 
         #endregion
@@ -983,12 +1036,6 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             set { Setting.AcceptUnstableVersion.Value = value; }
         }
 
-        public bool LoadPluginFromDevFolder
-        {
-            get { return Setting.LoadPluginFromDevFolder.Value; }
-            set { Setting.LoadPluginFromDevFolder.Value = value; }
-        }
-
         public int EventDisplayMinimumMillisec
         {
             get { return Setting.EventDisplayMinimumMSec.Value; }
@@ -1041,6 +1088,18 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         {
             get { return Setting.PostLimitPerWindow.Value; }
             set { Setting.PostLimitPerWindow.Value = value; }
+        }
+
+        public string SearchLocale
+        {
+            get { return Setting.SearchLocale.Value; }
+            set { Setting.SearchLocale.Value = value; }
+        }
+
+        public bool LoadPluginFromDevFolder
+        {
+            get { return Setting.LoadPluginFromDevFolder.Value; }
+            set { Setting.LoadPluginFromDevFolder.Value = value; }
         }
 
         public bool DisableGeoLocationService

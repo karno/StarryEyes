@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using StarryEyes.Anomaly.TwitterApi.Rest;
@@ -40,7 +41,10 @@ namespace StarryEyes.Models.Receiving.Receivers
                     ReceivingResources.AccountIsNotRegisteredForSearch, null));
                 return;
             }
-            (await account.SearchAsync(this._query))
+            System.Diagnostics.Debug.WriteLine("SEARCHRECEIVER SEARCH QUERY: " + this._query);
+            (await account.SearchAsync(this._query,
+                lang: String.IsNullOrWhiteSpace(Setting.SearchLanguage.Value) ? null : Setting.SearchLanguage.Value,
+                locale: String.IsNullOrWhiteSpace(Setting.SearchLocale.Value) ? null : Setting.SearchLocale.Value))
                 .Do(s =>
                 {
                     lock (_receiveCaches)

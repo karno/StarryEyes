@@ -128,7 +128,10 @@ namespace StarryEyes.Models.Timelines.SearchFlips
             {
                 var acc = Setting.Accounts.GetRandomOne();
                 if (acc == null) return Observable.Empty<TwitterStatus>();
-                return acc.SearchAsync(this._query, maxId: maxId, count: count)
+                System.Diagnostics.Debug.WriteLine("SEARCHPANE SEARCH QUERY: " + this._query);
+                return acc.SearchAsync(this._query, maxId: maxId, count: count,
+                    lang: String.IsNullOrWhiteSpace(Setting.SearchLanguage.Value) ? null : Setting.SearchLanguage.Value,
+                    locale: String.IsNullOrWhiteSpace(Setting.SearchLocale.Value) ? null : Setting.SearchLocale.Value)
                           .ToObservable()
                           .Do(StatusInbox.Enqueue);
             }

@@ -84,7 +84,7 @@
                 <ListBox x:Name="SettingCategories"
                          Width="180"
                          HorizontalContentAlignment="Stretch"
-                         SelectedIndex="0">
+                         SelectedIndex="1">
                     <ListBox.Resources>
                         <Style TargetType="{x:Type ListBoxItem}">
                             <Setter Property="Margin" Value="0" />
@@ -409,6 +409,21 @@
                                   VerticalAlignment="Top"
                                   Content="{x:Static localize:SettingFlipResources.TimelineOpenTwitterPicWithOriginalSize}"
                                   IsChecked="{Binding OpenTwitterImageWithOriginalSize}" />
+                        <StackPanel Margin="0,8" Orientation="Horizontal">
+                            <TextBlock Margin="0,0,4,0"
+                                       VerticalAlignment="Center"
+                                       Text="{x:Static localize:SettingFlipResources.TimelineSearchLanguage}" />
+                            <ComboBox Width="80"
+                                      IsEditable="True"
+                                      ItemsSource="{Binding SupportedLanguages,
+                                                            Mode=OneTime}"
+                                      Text="{Binding SearchLanguage,
+                                                     UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock Margin="4,0"
+                                       VerticalAlignment="Center"
+                                       Text="{Binding SearchLanguageDescription,
+                                                      Mode=OneWay}" />
+                        </StackPanel>
                     </StackPanel>
                 </Grid>
                 <Grid Grid.Column="1" Margin="0,6,0,0">
@@ -978,9 +993,16 @@
                         <CheckBox Margin="0,8"
                                   Content="{x:Static localize:SettingFlipResources.HighApplyUnstablePatch}"
                                   IsChecked="{Binding ApplyUnstablePatch}" />
-                        <CheckBox Margin="0,8"
-                                  Content="{x:Static localize:SettingFlipResources.HighLoadDeveloperPlugin}"
-                                  IsChecked="{Binding LoadPluginFromDevFolder}" />
+                        <StackPanel Margin="0,8" Orientation="Horizontal">
+                            <TextBlock Margin="0,0,8,0"
+                                       VerticalAlignment="Center"
+                                       Text="{x:Static localize:SettingFlipResources.HighSearchLocale}" />
+                            <TextBox Width="120"
+                                     VerticalAlignment="Center"
+                                     Text="{Binding SearchLocale,
+                                                    UpdateSourceTrigger=PropertyChanged}" />
+                        </StackPanel>
+
                         <DockPanel Margin="0,8" LastChildFill="False">
                             <TextBlock VerticalAlignment="Center" Text="{x:Static localize:SettingFlipResources.HighEventDisplayDuration}" />
                             <TextBlock Margin="4,0"
@@ -993,7 +1015,7 @@
                             <xctk:IntegerUpDown Width="80" Value="{Binding EventDisplayMaximumMillisec}" />
                         </DockPanel>
 
-                        <GroupBox Header="{x:Static localize:SettingFlipResources.HighRestApiInterval}">
+                        <GroupBox Margin="0,8" Header="{x:Static localize:SettingFlipResources.HighRestApiInterval}">
                             <StackPanel Margin="8,4" Orientation="Vertical">
                                 <StackPanel Margin="0,4" Orientation="Horizontal">
                                     <TextBlock Width="120"
@@ -1049,6 +1071,10 @@
                                        Text="{x:Static localize:SettingFlipResources.HighPostTweetsPerWindow}" />
                             <xctk:IntegerUpDown Width="80" Value="{Binding PostLimitPerWindow}" />
                         </DockPanel>
+
+                        <CheckBox Margin="0,8"
+                                  Content="{x:Static localize:SettingFlipResources.HighLoadDeveloperPlugin}"
+                                  IsChecked="{Binding LoadPluginFromDevFolder}" />
                         <CheckBox Margin="0,8"
                                   Content="{x:Static localize:SettingFlipResources.HighDisableGeolocationService}"
                                   IsChecked="{Binding DisableGeoLocationService}" />

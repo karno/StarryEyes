@@ -37,9 +37,17 @@ namespace StarryEyes.Filters.Sources
 
         protected override IObservable<TwitterStatus> ReceiveSink(long? maxId)
         {
+            System.Diagnostics.Debug.WriteLine("RECEIVESINK SEARCH QUERY: " + _query);
             return Observable.Start(() => Setting.Accounts.GetRandomOne())
                              .Where(a => a != null)
-                             .SelectMany(a => a.SearchAsync(_query, maxId: maxId).ToObservable())
+                             .SelectMany(a => a.SearchAsync(_query, maxId: maxId,
+                                 lang: String.IsNullOrWhiteSpace(Setting.SearchLanguage.Value)
+                                     ? null
+                                     : Setting.SearchLanguage.Value,
+                                 locale: String.IsNullOrWhiteSpace(Setting.SearchLocale.Value)
+                                     ? null
+                                     : Setting.SearchLocale.Value)
+                                               .ToObservable())
                              .Do(s =>
                              {
                                  lock (_acceptIds)

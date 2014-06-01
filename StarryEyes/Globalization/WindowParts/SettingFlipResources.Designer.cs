@@ -540,6 +540,15 @@ namespace StarryEyes.Globalization.WindowParts {
         }
         
         /// <summary>
+        ///   Locale code of query for searching twitter: に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string HighSearchLocale {
+            get {
+                return ResourceManager.GetString("HighSearchLocale", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   When sending a reply to the reply to the account which is fall back from other account, falling back agency account is specified automatically. に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string InputBacktrackDescription {
@@ -1363,6 +1372,33 @@ namespace StarryEyes.Globalization.WindowParts {
         public static string TimelineScrollLockWhenScrolled {
             get {
                 return ResourceManager.GetString("TimelineScrollLockWhenScrolled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Language of searching twitter: に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string TimelineSearchLanguage {
+            get {
+                return ResourceManager.GetString("TimelineSearchLanguage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   (Unknown language: unregistered code or invalid input) に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string TimelineSearchLanguageInvalid {
+            get {
+                return ResourceManager.GetString("TimelineSearchLanguageInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Unspecified (targets all languages) に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string TimelineSearchLanguageUnspecified {
+            get {
+                return ResourceManager.GetString("TimelineSearchLanguageUnspecified", resourceCulture);
             }
         }
         
