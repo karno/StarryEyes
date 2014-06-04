@@ -87,7 +87,7 @@
     <Compile Include="Fx\ObservableFx.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Threading\LimitedTaskScheduler.cs" />
-    <Compile Include="Threading\SingleThreadRunner.cs" />
+    <Compile Include="Threading\SerialTaskWorker.cs" />
     <Compile Include="Util.cs" />
   </ItemGroup>
   <ItemGroup>

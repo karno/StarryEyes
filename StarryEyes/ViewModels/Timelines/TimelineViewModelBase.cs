@@ -9,6 +9,7 @@ using System.Windows.Threading;
 using JetBrains.Annotations;
 using Livet;
 using Livet.EventListeners;
+using StarryEyes.Albireo.Threading;
 using StarryEyes.Globalization.WindowParts;
 using StarryEyes.Models.Inputting;
 using StarryEyes.Models.Timelines;
@@ -23,6 +24,14 @@ namespace StarryEyes.ViewModels.Timelines
 {
     public abstract class TimelineViewModelBase : ViewModel
     {
+        private static readonly SerialTaskWorker _disposeWorker;
+
+        static TimelineViewModelBase()
+        {
+            _disposeWorker = new SerialTaskWorker();
+            App.ApplicationFinalize += () => _disposeWorker.Dispose();
+        }
+
         private const int MaxReadCount = 5;
         private readonly object _timelineLock = new object();
         private readonly ObservableCollection<StatusViewModel> _timeline;
@@ -360,7 +369,7 @@ namespace StarryEyes.ViewModels.Timelines
                 sts.OrderByDescending(s => s.Status.CreatedAt)
                    .Select(this.GenerateStatusViewModel)
                    .ForEach(this._timeline.Add);
-                Task.Run(() => items.ForEach(i => i.Dispose()));
+                _disposeWorker.Queue(() => items.ForEach(i => i.Dispose()));
             }
         }
 
@@ -383,12 +392,12 @@ namespace StarryEyes.ViewModels.Timelines
                         case NotifyCollectionChangedAction.Remove:
                             var removal = this._timeline[e.OldStartingIndex];
                             this._timeline.RemoveAt(e.OldStartingIndex);
-                            removal.Dispose();
+                            _disposeWorker.Queue(() => removal.Dispose());
                             break;
                         case NotifyCollectionChangedAction.Reset:
                             var cache = this._timeline.ToArray();
                             this._timeline.Clear();
-                            Task.Run(() => cache.ForEach(c => c.Dispose()));
+                            _disposeWorker.Queue(() => cache.ForEach(c => c.Dispose()));
                             break;
                         default:
                             throw new ArgumentException();
