@@ -14,14 +14,28 @@ namespace StarryEyes.Models.Databases
         /// </summary>
         public static void MigrateToVersionA()
         {
-            MigrateWorkCore(() => Task.Run(async () =>
+            MigrateWorkCore(updateLabel => Task.Run(async () =>
             {
                 const string tempTableName = "TEMP_Status";
+
+                updateLabel("checking database...");
+
+                // drop table before migration (preventing errors).
+                await Database.ExecuteAsync("DROP TABLE IF EXISTS " + tempTableName + ";");
+
+                updateLabel("optimizing...");
+
+                // vacuuming table
+                await Database.VacuumTables();
+
+                updateLabel("preparing for migration...");
 
                 await Database.StatusCrud.AlterAsync(tempTableName);
 
                 // re-create table
                 await Database.ReInitializeAsync(Database.StatusCrud);
+
+                updateLabel("migrating database...");
 
                 // insert all records
                 await Database.ExecuteAsync(
@@ -29,13 +43,15 @@ namespace StarryEyes.Models.Databases
                     "SELECT Id, BaseId, RetweetId, RetweetOriginalId, StatusType, UserId, BaseUserId, RetweeterId, RetweetOriginalUserId, Text, Text, CreatedAt, Source, Source, InReplyToStatusId, InReplyToOrRecipientUserId, InReplyToOrRecipientScreenName, Longitude, Latitude " +
                     "FROM " + tempTableName + ";");
 
+                updateLabel("cleaning up...");
+
                 await Database.ExecuteAsync("DROP TABLE " + tempTableName + ";");
 
                 await Database.VacuumTables();
             }));
         }
 
-        private static void MigrateWorkCore(Func<Task> migration)
+        private static void MigrateWorkCore(Func<Action<string>, Task> migration)
         {
             // change application shutdown mode for preventing 
             // auto-exit when optimization is completed.
