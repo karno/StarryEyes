@@ -311,9 +311,13 @@ namespace StarryEyes.Views.Controls
                 }
                 _decodeSignal.Wait();
             }
+            // dispose decode signal
+            _decodeSignal.Dispose();
 
+            // cleaning up dispatcher.
             Dispatcher.CurrentDispatcher.BeginInvokeShutdown(DispatcherPriority.SystemIdle);
             Dispatcher.Run();
+
         }
 
         #endregion

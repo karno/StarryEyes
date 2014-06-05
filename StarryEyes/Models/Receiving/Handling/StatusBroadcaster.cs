@@ -104,6 +104,7 @@ namespace StarryEyes.Models.Receiving.Handling
                 }
                 _signal.Wait();
             }
+            _signal.Dispose();
             _broadcastSubject.OnCompleted();
         }
     }

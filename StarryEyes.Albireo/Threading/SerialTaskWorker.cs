@@ -56,13 +56,13 @@ namespace StarryEyes.Albireo.Threading
                     }
                 }
             }
+            _event.Dispose();
         }
 
         public void Dispose()
         {
             _isAlive = false;
             _event.Set();
-            _event.Dispose();
         }
 
         private class WorkObject

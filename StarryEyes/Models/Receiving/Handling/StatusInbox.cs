@@ -109,6 +109,7 @@ namespace StarryEyes.Models.Receiving.Handling
                 }
                 _signal.Wait();
             }
+            _signal.Dispose();
         }
 
         private static async Task<bool> StatusReceived([NotNull] TwitterStatus status)
