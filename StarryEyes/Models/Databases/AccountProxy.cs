@@ -20,11 +20,13 @@ namespace StarryEyes.Models.Databases
         public static async Task RemoveAccountAsync(long id)
         {
             await Database.AccountInfoCrud.DeleteAsync(id);
+            await Database.RelationCrud.DropUserAsync(id);
         }
 
         public static async Task RemoveAllAccountsAsync()
         {
             await Database.AccountInfoCrud.DropAllAsync();
+            await Database.RelationCrud.DropAllAsync();
         }
     }
 }

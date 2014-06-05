@@ -82,6 +82,11 @@ namespace StarryEyes.Casket.Cruds
                 "delete from " + TableName + " where UserId = @UserId;",
                 new { UserId = userId });
         }
+
+        public async Task DropAllAsync()
+        {
+            await ExecuteAsync("delete from " + TableName + ";");
+        }
     }
 
     public class RelationCrud
@@ -223,6 +228,15 @@ namespace StarryEyes.Casket.Cruds
                 _followers.DropUserAsync(userId),
                 _blockings.DropUserAsync(userId),
                 _noRetweets.DropUserAsync(userId)));
+        }
+
+        public async Task DropAllAsync()
+        {
+            await Task.Run(() => Task.WaitAll(
+                _followings.DropAllAsync(),
+                _followers.DropAllAsync(),
+                _blockings.DropAllAsync(),
+                _noRetweets.DropAllAsync()));
         }
 
         public async Task<IEnumerable<long>> GetFollowingsAsync(long userId)

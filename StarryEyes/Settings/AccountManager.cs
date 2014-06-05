@@ -106,13 +106,13 @@ namespace StarryEyes.Settings
                 case NotifyCollectionChangedAction.Add:
                     if (added == null) throw new ArgumentException("added item is null.");
                     _accountCache[added.Id] = added;
-                    Task.Run(() => AccountProxy.AddAccountAsync(added.Id));
+                    Task.Run(() => AddAccountSub(added.Id));
                     break;
                 case NotifyCollectionChangedAction.Remove:
                     if (removed == null) throw new ArgumentException("removed item is null.");
                     TwitterAccount removal;
                     _accountCache.TryRemove(removed.Id, out removal);
-                    Task.Run(() => AccountProxy.RemoveAccountAsync(removed.Id));
+                    Task.Run(() => RemoveAccountSub(removed.Id));
                     break;
                 case NotifyCollectionChangedAction.Replace:
                     if (added == null) throw new ArgumentException("added item is null.");
@@ -120,8 +120,8 @@ namespace StarryEyes.Settings
                     _accountCache[added.Id] = added;
                     TwitterAccount replacee;
                     _accountCache.TryRemove(removed.Id, out replacee);
-                    Task.Run(() => AccountProxy.AddAccountAsync(added.Id));
-                    Task.Run(() => AccountProxy.RemoveAccountAsync(removed.Id));
+                    Task.Run(() => AddAccountSub(added.Id));
+                    Task.Run(() => RemoveAccountSub(removed.Id));
                     break;
                 case NotifyCollectionChangedAction.Reset:
                     _accountCache.Clear();
@@ -130,6 +130,16 @@ namespace StarryEyes.Settings
                     break;
             }
             _settingItem.Value = _accountObservableCollection.ToList();
+        }
+
+        private async Task AddAccountSub(long id)
+        {
+            await AccountProxy.AddAccountAsync(id);
+        }
+
+        private async Task RemoveAccountSub(long id)
+        {
+            await AccountProxy.RemoveAccountAsync(id);
         }
     }
 }
