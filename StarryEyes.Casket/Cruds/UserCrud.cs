@@ -60,5 +60,22 @@ namespace StarryEyes.Casket.Cruds
                 this.CreateSql("LOWER(ScreenName) like @Match order by ScreenName limit " + count),
                 new { Match = firstMatchScreenName.ToLower() + "%" });
         }
+
+        public async Task<IEnumerable<DatabaseUser>> GetRelatedUsersFastAsync(
+            string firstMatchScreenName, bool followingsOnly, int count)
+        {
+            var targetTables = followingsOnly
+                ? new[] { "Followings" }
+                : new[] { "Followings", "Followers" };
+            var union = targetTables.Select(t => "select distinct TargetId from " + t)
+                                    .JoinString(" union ");
+
+            return await QueryAsync<DatabaseUser>(
+                "select * " +
+                "from " + this.TableName + " " +
+                "inner join (" + union + ") on Id = TargetId " +
+                "where LOWER(ScreenName) like @Match order by ScreenName limit " + count + ";",
+                new { Match = firstMatchScreenName.ToLower() + "%" });
+        }
     }
 }

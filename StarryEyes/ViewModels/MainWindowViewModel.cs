@@ -486,12 +486,16 @@ namespace StarryEyes.ViewModels
                     var bi = new BitmapImage();
                     bi.BeginInit();
                     bi.CacheOption = BitmapCacheOption.OnLoad;
+                    bi.CreateOptions = BitmapCreateOptions.None;
                     bi.UriSource = uri;
                     bi.EndInit();
+                    bi.Freeze();
                     return bi;
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    BehaviorLogger.Log("Wallpaper",
+                        "Fail to load image: " + Environment.NewLine + ex);
                     return null;
                 }
             }

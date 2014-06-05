@@ -325,18 +325,36 @@ namespace StarryEyes.Models.Inputting
 
     public static class ImageUtil
     {
-        public static BitmapImage CreateImage(byte[] bytes)
+        [CanBeNull]
+        public static BitmapImage CreateImage([CanBeNull] byte[] bytes, bool checkDispatcherThread = true)
         {
-            using (var ms = new MemoryStream(bytes))
+            if (checkDispatcherThread && !DispatcherHolder.Dispatcher.CheckAccess())
             {
-                var bitmap = new BitmapImage();
-                bitmap.BeginInit();
-                bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                bitmap.CreateOptions = BitmapCreateOptions.None;
-                bitmap.StreamSource = ms;
-                bitmap.EndInit();
-                bitmap.Freeze();
-                return bitmap;
+                throw new InvalidOperationException("Could not call this method from not an UI thread.");
+            }
+            if (bytes == null)
+            {
+                return null;
+            }
+            try
+            {
+                using (var ms = new MemoryStream(bytes))
+                {
+                    var bitmap = new BitmapImage();
+                    bitmap.BeginInit();
+                    bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                    bitmap.CreateOptions = BitmapCreateOptions.None;
+                    bitmap.StreamSource = ms;
+                    bitmap.EndInit();
+                    bitmap.Freeze();
+                    return bitmap;
+                }
+            }
+            catch (Exception ex)
+            {
+                BehaviorLogger.Log("Image util",
+                    "Fail to load image: " + Environment.NewLine + ex);
+                return null;
             }
         }
 

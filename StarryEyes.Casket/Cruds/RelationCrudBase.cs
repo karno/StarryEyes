@@ -59,7 +59,7 @@ namespace StarryEyes.Casket.Cruds
             var tids = targetId.Select(i => i.ToString(CultureInfo.InvariantCulture)).JoinString(",");
             if (String.IsNullOrEmpty(tids)) return;
             await ExecuteAsync(
-                "delete from " + TableName + " wherE UserId = @UserId and TargetId in (" + tids + ");",
+                "delete from " + TableName + " where UserId = @UserId and TargetId in (" + tids + ");",
                 new { UserId = userId });
         }
 
@@ -74,6 +74,13 @@ namespace StarryEyes.Casket.Cruds
         {
             return (await QueryAsync<long>(
                 "select distinct TargetId from " + TableName + ";", null));
+        }
+
+        public async Task DropUserAsync(long userId)
+        {
+            await ExecuteAsync(
+                "delete from " + TableName + " where UserId = @UserId;",
+                new { UserId = userId });
         }
     }
 
@@ -207,6 +214,15 @@ namespace StarryEyes.Casket.Cruds
         public async Task RemoveNoRetweetsAsync(long userId, IEnumerable<long> removals)
         {
             await _noRetweets.DeleteAllAsync(userId, removals);
+        }
+
+        public async Task DropUserAsync(long userId)
+        {
+            await Task.Run(() => Task.WaitAll(
+                _followings.DropUserAsync(userId),
+                _followers.DropUserAsync(userId),
+                _blockings.DropUserAsync(userId),
+                _noRetweets.DropUserAsync(userId)));
         }
 
         public async Task<IEnumerable<long>> GetFollowingsAsync(long userId)

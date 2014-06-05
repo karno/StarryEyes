@@ -151,6 +151,13 @@ namespace StarryEyes.Settings
         public static readonly SettingItemStruct<bool> IsUrlAutoEscapeEnabled =
             new SettingItemStruct<bool>("IsUrlAutoEscapeEnabled", false);
 
+        public static readonly SettingItemStruct<bool> IsInputSuggestEnabled =
+            new SettingItemStruct<bool>("IsInputSuggestEnabled", true);
+
+        public static readonly SettingItemStruct<InputUserSuggestMode> InputUserSuggestMode =
+            new SettingItemStruct<InputUserSuggestMode>("InputUserSuggestMode",
+                Settings.InputUserSuggestMode.RelatedOnly);
+
         public static readonly SettingItemStruct<bool> WarnAmending =
             new SettingItemStruct<bool>("WarnAmending", true);
 
@@ -171,9 +178,6 @@ namespace StarryEyes.Settings
 
         public static readonly SettingItemStruct<bool> ShowMessageOnTweetFailed =
             new SettingItemStruct<bool>("ShowMessageOnTweetFailed", true);
-
-        public static readonly SettingItemStruct<bool> CheckDesktopHeap =
-            new SettingItemStruct<bool>("CheckDesktopHeap", true);
 
         #endregion
 
@@ -293,9 +297,6 @@ namespace StarryEyes.Settings
         public static readonly SettingItemStruct<bool> IsBehaviorLogEnabled =
             new SettingItemStruct<bool>("IsBehaviorLogEnabled", false);
 
-        public static readonly SettingItemStruct<bool> ShowStartupConfigurationWarning =
-            new SettingItemStruct<bool>("ShowStartupConfigurationWarning", true);
-
         #endregion
 
         #region Krile internal state
@@ -311,6 +312,12 @@ namespace StarryEyes.Settings
 
         public static readonly SettingItemStruct<int> SettingVersion =
             new SettingItemStruct<int>("SettingVersion", 1);
+
+        public static readonly SettingItemStruct<bool> ShowStartupConfigurationWarning =
+            new SettingItemStruct<bool>("ShowStartupConfigurationWarning", true);
+
+        public static readonly SettingItemStruct<bool> CheckDesktopHeap =
+            new SettingItemStruct<bool>("CheckDesktopHeap", true);
 
         #endregion
 
@@ -736,5 +743,12 @@ namespace StarryEyes.Settings
         Optimized,
         Low,
         None
+    }
+
+    public enum InputUserSuggestMode
+    {
+        All,
+        RelatedOnly,
+        FollowingsOnly,
     }
 }

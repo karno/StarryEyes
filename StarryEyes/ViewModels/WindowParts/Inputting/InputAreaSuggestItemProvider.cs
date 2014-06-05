@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Livet;
 using StarryEyes.Models.Databases;
 using StarryEyes.Models.Stores;
+using StarryEyes.Settings;
 using StarryEyes.Views.Controls;
 
 namespace StarryEyes.ViewModels.WindowParts.Inputting
@@ -81,13 +82,18 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
 
         public override bool CheckTriggerCharInputted(char inputchar)
         {
+            if (!Setting.IsInputSuggestEnabled.Value)
+            {
+                return false;
+            }
             switch (inputchar)
             {
                 case '@':
                 case '#':
                     return true;
+                default:
+                    return false;
             }
-            return false;
         }
 
         private async Task AddUserItems(string key)
@@ -98,9 +104,20 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                 await DispatcherHelper.UIDispatcher.InvokeAsync(() => this._items.Clear());
                 return;
             }
-            var items = (await UserProxy.GetUsersFastAsync(key, 1000))
-                .Select(t => t.Item2)
-                .ToArray();
+            string[] items;
+            if (Setting.InputUserSuggestMode.Value == InputUserSuggestMode.All)
+            {
+                items = (await UserProxy.GetUsersFastAsync(key, 1000))
+                   .Select(t => t.Item2)
+                   .ToArray();
+            }
+            else
+            {
+                items = (await UserProxy.GetRelatedUsersFastAsync(key,
+                    Setting.InputUserSuggestMode.Value == InputUserSuggestMode.FollowingsOnly, 1000))
+                    .Select(t => t.Item2)
+                    .ToArray();
+            }
             // re-ordering
             var ordered = items.Where(s => s.StartsWith(key))
                                .OrderBy(s => s)

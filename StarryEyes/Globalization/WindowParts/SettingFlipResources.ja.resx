@@ -585,4 +585,19 @@ Krile StarryEyesは複数行表示モードをもとに設計されているた�
   <data name="TimelineSearchLanguageUnspecified" xml:space="preserve">
     <value>指定なし (すべての言語のツイートを対象にする)</value>
   </data>
+  <data name="InputSuggestEnabled" xml:space="preserve">
+    <value>入力補完を使用する</value>
+  </data>
+  <data name="InputUserSuggestAll" xml:space="preserve">
+    <value>すべてのユーザー</value>
+  </data>
+  <data name="InputUserSuggestFollowingsOnly" xml:space="preserve">
+    <value>フォローしているユーザー</value>
+  </data>
+  <data name="InputUserSuggestMode" xml:space="preserve">
+    <value>補完に使用するユーザー:</value>
+  </data>
+  <data name="InputUserSuggestRelated" xml:space="preserve">
+    <value>フォローしている または フォローされているユーザー</value>
+  </data>
 </root>

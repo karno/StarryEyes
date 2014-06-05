@@ -552,6 +552,22 @@
                                    Text="{x:Static localize:SettingFlipResources.InputBacktrackDescription}"
                                    TextWrapping="Wrap" />
                         <CheckBox Margin="0,8"
+                                  Content="{x:Static localize:SettingFlipResources.InputSuggestEnabled}"
+                                  IsChecked="{Binding IsInputSuggestEnabled}" />
+                        <StackPanel Margin="20,8,0,8"
+                                    Orientation="Horizontal"
+                                    Visibility="{Binding IsInputSuggestEnabled,
+                                                         Converter={StaticResource BoolVisibleConverter}}">
+                            <TextBlock Margin="0,0,4,0" Text="{x:Static localize:SettingFlipResources.InputUserSuggestMode}" />
+                            <ComboBox SelectedIndex="{Binding InputUserSuggestActionIndex}">
+                                <ComboBox.Items>
+                                    <ComboBoxItem Content="{x:Static localize:SettingFlipResources.InputUserSuggestAll}" />
+                                    <ComboBoxItem Content="{x:Static localize:SettingFlipResources.InputUserSuggestRelated}" />
+                                    <ComboBoxItem Content="{x:Static localize:SettingFlipResources.InputUserSuggestFollowingsOnly}" />
+                                </ComboBox.Items>
+                            </ComboBox>
+                        </StackPanel>
+                        <CheckBox Margin="0,8"
                                   Content="{x:Static localize:SettingFlipResources.InputSuppressTagBindInReply}"
                                   IsChecked="{Binding SuppressTagBindInReply}" />
                         <CheckBox Margin="0,8"
@@ -561,7 +577,7 @@
                             <TextBlock Margin="0,0,8,0"
                                        VerticalAlignment="Center"
                                        Text="{x:Static localize:SettingFlipResources.InputCloseAction}" />
-                            <ComboBox SelectedIndex="{Binding TweetBoxClosingAction}">
+                            <ComboBox SelectedIndex="{Binding TweetBoxClosingActionIndex}">
                                 <ComboBox.Items>
                                     <ComboBoxItem Content="{x:Static localize:SettingFlipResources.InputCloseConfirm}" />
                                     <ComboBoxItem Content="{x:Static localize:SettingFlipResources.InputCloseStash}" />

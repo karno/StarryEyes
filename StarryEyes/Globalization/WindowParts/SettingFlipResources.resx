@@ -585,4 +585,19 @@ Are you sure you enable single-line mode?</value>
   <data name="TimelineSearchLanguageUnspecified" xml:space="preserve">
     <value>Unspecified (targets all languages)</value>
   </data>
+  <data name="InputSuggestEnabled" xml:space="preserve">
+    <value>Enable input-suggestion</value>
+  </data>
+  <data name="InputUserSuggestAll" xml:space="preserve">
+    <value>All users</value>
+  </data>
+  <data name="InputUserSuggestFollowingsOnly" xml:space="preserve">
+    <value>Followings only</value>
+  </data>
+  <data name="InputUserSuggestMode" xml:space="preserve">
+    <value>Suggestion scope of users:</value>
+  </data>
+  <data name="InputUserSuggestRelated" xml:space="preserve">
+    <value>Related users (users follow you or followed from you)</value>
+  </data>
 </root>

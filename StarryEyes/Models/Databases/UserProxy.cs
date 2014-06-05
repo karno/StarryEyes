@@ -116,6 +116,15 @@ namespace StarryEyes.Models.Databases
             return resp.Guard().Select(d => Tuple.Create(d.Id, d.ScreenName));
         }
 
+        public static async Task<IEnumerable<Tuple<long, string>>> GetRelatedUsersFastAsync(
+            string partOfScreenName, bool followingsOnly, int count)
+        {
+            var resp = await DatabaseUtil.RetryIfLocked(
+                async () => await Database.UserCrud.GetRelatedUsersFastAsync(partOfScreenName, followingsOnly, count));
+            return resp.Guard().Select(d => Tuple.Create(d.Id, d.ScreenName));
+        }
+
+
         public static IObservable<TwitterUser> LoadUsersAsync([NotNull] IEnumerable<DatabaseUser> dbusers)
         {
             if (dbusers == null) throw new ArgumentNullException("dbusers");

@@ -612,11 +612,56 @@ namespace StarryEyes.Globalization.WindowParts {
         }
         
         /// <summary>
+        ///   Enable input-suggestion に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string InputSuggestEnabled {
+            get {
+                return ResourceManager.GetString("InputSuggestEnabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ignore bound tags when replying someone に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string InputSuppressTagBindInReply {
             get {
                 return ResourceManager.GetString("InputSuppressTagBindInReply", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   All users に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string InputUserSuggestAll {
+            get {
+                return ResourceManager.GetString("InputUserSuggestAll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Followings only に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string InputUserSuggestFollowingsOnly {
+            get {
+                return ResourceManager.GetString("InputUserSuggestFollowingsOnly", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Suggestion scope of users: に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string InputUserSuggestMode {
+            get {
+                return ResourceManager.GetString("InputUserSuggestMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Related users (users follow you or followed from you) に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string InputUserSuggestRelated {
+            get {
+                return ResourceManager.GetString("InputUserSuggestRelated", resourceCulture);
             }
         }
         

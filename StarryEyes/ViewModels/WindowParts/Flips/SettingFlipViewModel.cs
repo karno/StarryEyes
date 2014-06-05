@@ -488,7 +488,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         #region Input property
 
-        public int TweetBoxClosingAction
+        public int TweetBoxClosingActionIndex
         {
             get { return (int)Setting.TweetBoxClosingAction.Value; }
             set { Setting.TweetBoxClosingAction.Value = (TweetBoxClosingAction)value; }
@@ -498,6 +498,26 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         {
             get { return Setting.IsBacktrackFallback.Value; }
             set { Setting.IsBacktrackFallback.Value = value; }
+        }
+
+        public bool IsInputSuggestEnabled
+        {
+            get { return Setting.IsInputSuggestEnabled.Value; }
+            set
+            {
+                Setting.IsInputSuggestEnabled.Value = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public int InputUserSuggestActionIndex
+        {
+            get { return (int)Setting.InputUserSuggestMode.Value; }
+            set
+            {
+                Setting.InputUserSuggestMode.Value = (InputUserSuggestMode)value;
+                RaisePropertyChanged();
+            }
         }
 
         public bool RestorePreviousStashed
