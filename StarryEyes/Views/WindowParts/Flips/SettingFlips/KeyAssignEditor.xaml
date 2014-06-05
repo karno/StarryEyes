@@ -29,7 +29,9 @@
             <Button HorizontalAlignment="Right"
                     DockPanel.Dock="Right"
                     Style="{DynamicResource MetroSquareTransparentButtonStyle}">
-                <TextBlock FontSize="12" Text="{x:Static localize:SettingFlipResources.KeyAssignAddAssign}" />
+                <TextBlock FontSize="12"
+                           Foreground="{DynamicResource BaseColorForegroundBrush}"
+                           Text="{x:Static localize:SettingFlipResources.KeyAssignAddAssign}" />
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="Click">
                         <ei:CallMethodAction MethodName="AddNewAssign" TargetObject="{Binding}" />
@@ -38,13 +40,16 @@
             </Button>
             <Button HorizontalAlignment="Right"
                     DockPanel.Dock="Right"
-                    Style="{DynamicResource MetroSquareTransparentButtonStyle}">
+                    Style="{DynamicResource MetroSquareTransparentButtonStyle}"
+                    Visibility="{Binding CurrentAssignViewModel,
+                                         Converter={StaticResource NotNullToVisibleConverter}}">
                 <TextBlock Margin="-4"
                            FontSize="12"
+                           Foreground="{DynamicResource BaseColorForegroundBrush}"
                            Text="{x:Static localize:SettingFlipResources.KeyAssignDeleteAssign}" />
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="Click">
-                        <ei:CallMethodAction MethodName="Remove" TargetObject="{Binding}" />
+                        <ei:CallMethodAction MethodName="Remove" TargetObject="{Binding CurrentAssignViewModel}" />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
             </Button>
