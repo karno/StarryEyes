@@ -1265,6 +1265,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             if (!int.TryParse(index, out value)) value = 0;
             var links = this.Status.Entities
                             .Guard()
+                            .Distinct(e => e.StartIndex) // ignore extended_entities
                             .OrderBy(e => e.StartIndex)
                             .Select(e =>
                             {

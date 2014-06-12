@@ -20,7 +20,8 @@ namespace StarryEyes.Anomaly.Utils
             var escaped = ParsingExtension.EscapeEntity(text);
             var endIndex = 0;
 
-            foreach (var entity in entities.OrderBy(e => e.StartIndex))
+            // distinct by startindex ignores extended_entities.
+            foreach (var entity in entities.Distinct(e => e.StartIndex).OrderBy(e => e.StartIndex))
             {
                 if (endIndex < entity.StartIndex)
                 {

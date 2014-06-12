@@ -27,7 +27,20 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
             this.Id = ((string)json.id_str).ParseLong();
             this.CreatedAt = ((string)json.created_at).ParseDateTime(ParsingExtension.TwitterDateTimeFormat);
             this.Text = ParsingExtension.ResolveEntity(json.text);
-            this.Entities = Enumerable.ToArray(TwitterEntity.GetEntities(json.entities));
+            if (json.extended_entities())
+            {
+                this.Entities = Enumerable.ToArray(Enumerable.Concat(
+                    TwitterEntity.GetEntities(json.entities),
+                    TwitterEntity.GetEntities(json.extended_entities)));
+            }
+            else if (json.entities())
+            {
+                this.Entities = Enumerable.ToArray(TwitterEntity.GetEntities(json.entities));
+            }
+            else
+            {
+                this.Entities = new TwitterEntity[0];
+            }
             if (json.recipient())
             {
                 // THIS IS DIRECT MESSAGE!
@@ -227,16 +240,23 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
                                 builder.Append("#" + entity.DisplayText);
                                 break;
                             case EntityType.Urls:
+                                // url entity:
+                                // display_url: example.com/CUTTED OFF...
+                                // original_url => expanded_url: example.com/full_original_url
                                 builder.Append(displayMode == EntityDisplayMode.DisplayText
                                     ? ParsingExtension.ResolveEntity(entity.DisplayText)
                                     : ParsingExtension.ResolveEntity(entity.OriginalUrl));
                                 break;
                             case EntityType.Media:
+                                // media entity:
+                                // display_url: pic.twitter.com/IMAGE_ID
+                                // media_url: pbs.twimg.com/media/ACTUAL_IMAGE_RESOURCE_ID
+                                // url: t.co/IMAGE_ID
                                 builder.Append(
                                     displayMode == EntityDisplayMode.DisplayText
                                         ? ParsingExtension.ResolveEntity(entity.DisplayText)
                                         : displayMode == EntityDisplayMode.LinkUri
-                                            ? ParsingExtension.ResolveEntity(entity.OriginalUrl)
+                                            ? ParsingExtension.ResolveEntity(entity.DisplayText)
                                             : ParsingExtension.ResolveEntity(entity.MediaUrl));
                                 break;
                             case EntityType.UserMentions:
