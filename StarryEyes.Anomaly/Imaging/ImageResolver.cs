@@ -26,6 +26,7 @@ namespace StarryEyes.Anomaly.Imaging
                 {"http://twitter.yfrog.com/", s => s.Replace("twitter", "") + ":medium"},
                 {"http://pckles.com/", s => s + ".png"},
                 {"http://pckl.es/", s => s + ".png"},
+                {"http://gyazo.com/", s => s + ".png"},
                 {
                     "http://p.twipple.jp",
                     s => PreCheck(s.Length > 20, () => "http://p.twipple.jp/show/orig/" + s.Substring(20))
@@ -62,7 +63,8 @@ namespace StarryEyes.Anomaly.Imaging
                     "http://youtu.be/",
                     s => PreCheck(s.Length > 16, () => "http://i.ytimg.com/vi/" + s.Substring(16) + "/default.jpg")
                 },
-                {"http://instagr.am/", s => s + "media/?size=m"},
+                {"http://instagr.am/p/", s => EnsureEndsWithSlash(s) + "media/?size=m"},
+                {"http://instagram.com/p/", s => EnsureEndsWithSlash(s) + "media/?size=m"},
                 {
                     "http://photozou.jp/photo/show/",
                     s =>
@@ -77,7 +79,6 @@ namespace StarryEyes.Anomaly.Imaging
                     s => PreCheck(s.Length > 20, () => "http://p.twipple.jp/show/large/" + s.Substring(20))
                 },
                 {"http://p.twimg.com/", s => s},
-                {"http://via.me/", s => s + "/thumb/r600x600"},
                 {
                     "http://www.pixiv.net/member_illust.php?", p =>
                     {
@@ -87,6 +88,11 @@ namespace StarryEyes.Anomaly.Imaging
                     }
                 }
             };
+
+        private static string EnsureEndsWithSlash(string url)
+        {
+            return url.EndsWith("/") ? url : url + "/";
+        }
 
         private static string PreCheck(bool condition, Func<string> stringProvider)
         {
