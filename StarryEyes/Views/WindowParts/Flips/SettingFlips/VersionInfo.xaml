@@ -62,7 +62,7 @@
                            FontSize="28">
                     <Run Text="Krile-tan, the official mascot" />
                     <LineBreak />
-                    <Run Text="llustrated by @ichimy" />
+                    <Run Text="Illustrated by @ichimy" />
                 </TextBlock>
             </Grid>
         </Viewbox>
