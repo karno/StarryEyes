@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30110.0
+VisualStudioVersion = 12.0.30501.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarryEyes", "StarryEyes\StarryEyes.csproj", "{3BF1F46A-B095-40EC-A89D-A34EBBACA966}"
 EndProject
@@ -48,6 +48,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MahApps.Metro", "MahApps.Metro\MahApps.Metro\MahApps.Metro.csproj", "{5B1710D2-5DC8-4754-91B2-19165DE49B3D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MahApps.Metro.Resources", "MahApps.Metro\MahApps.Metro.Resources\MahApps.Metro.Resources.csproj", "{E708AC99-605B-42A0-8D20-ABCA8FE42DD2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarryEyes.Fragments", "StarryEyes.Fragments\StarryEyes.Fragments.csproj", "{9F6DBEA1-0C36-4D92-835E-B42B14B84D73}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -107,6 +109,10 @@ Global
 		{E708AC99-605B-42A0-8D20-ABCA8FE42DD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E708AC99-605B-42A0-8D20-ABCA8FE42DD2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E708AC99-605B-42A0-8D20-ABCA8FE42DD2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F6DBEA1-0C36-4D92-835E-B42B14B84D73}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F6DBEA1-0C36-4D92-835E-B42B14B84D73}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F6DBEA1-0C36-4D92-835E-B42B14B84D73}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F6DBEA1-0C36-4D92-835E-B42B14B84D73}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -114,9 +120,9 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{F26CDB6B-3D72-4240-BC11-CEB7351672F1} = {B2DF914A-A068-4FD0-8ED9-50743E1AFF71}
 		{11F115EE-8D61-42F3-89CA-E75E591E4E49} = {B2DF914A-A068-4FD0-8ED9-50743E1AFF71}
-		{60761FCD-DB0B-40CC-8645-441CE88349D7} = {B2DF914A-A068-4FD0-8ED9-50743E1AFF71}
 		{2C279B20-2AA2-4C6A-B7D0-B7BD143697F5} = {65C47B8C-93EE-4291-8870-E3092BE22DB5}
 		{41D14775-20AA-4CB2-9B8A-371599D2552F} = {21AD8FB0-D270-4940-BACE-B89842E2CBC5}
+		{60761FCD-DB0B-40CC-8645-441CE88349D7} = {B2DF914A-A068-4FD0-8ED9-50743E1AFF71}
 		{5B1710D2-5DC8-4754-91B2-19165DE49B3D} = {28BF4974-FFE2-4440-ABAB-674DC0C6AB4E}
 		{E708AC99-605B-42A0-8D20-ABCA8FE42DD2} = {28BF4974-FFE2-4440-ABAB-674DC0C6AB4E}
 	EndGlobalSection
