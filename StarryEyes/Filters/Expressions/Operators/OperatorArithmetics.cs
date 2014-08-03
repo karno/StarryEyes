@@ -101,6 +101,35 @@ namespace StarryEyes.Filters.Expressions.Operators
         }
     }
 
+    public sealed class FilterOperatorMinusSingle : FilterSingleValueOperator
+    {
+        public override string ToQuery()
+        {
+            return "-" + Value.ToQuery();
+        }
+
+        protected override string OperatorString
+        {
+            get { return "-"; }
+        }
+
+        public override Func<TwitterStatus, long> GetNumericValueProvider()
+        {
+            var nmp = Value.GetNumericValueProvider();
+            return _ => -nmp(_);
+        }
+
+        public override string GetNumericSqlQuery()
+        {
+            return "-" + Value.GetNumericSqlQuery();
+        }
+
+        public override IEnumerable<FilterExpressionType> SupportedTypes
+        {
+            get { yield return FilterExpressionType.Numeric; }
+        }
+    }
+
     public sealed class FilterOperatorProduct : FilterTwoValueOperator
     {
         protected override string OperatorString

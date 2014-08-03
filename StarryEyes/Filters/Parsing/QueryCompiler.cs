@@ -210,7 +210,7 @@ namespace StarryEyes.Filters.Parsing
         // L4: <- -> in contains
         // L5: + -
         // L6: * /
-        // L7: !
+        // L7: ! -(single)
         // L8: value (or in bracket, return L0)
 
         private static FilterOperatorBase CompileL0(TokenReader reader)
@@ -374,6 +374,11 @@ namespace StarryEyes.Filters.Parsing
             {
                 reader.AssertGet(TokenType.Exclamation);
                 return new FilterNegate { Value = CompileL7(reader) };
+            }
+            if (reader.LookAhead().Type == TokenType.OperatorMinus)
+            {
+                reader.AssertGet(TokenType.OperatorMinus);
+                return new FilterOperatorMinusSingle { Value = CompileL7(reader) };
             }
             if (reader.LookAhead().Value == "caseful")
             {
