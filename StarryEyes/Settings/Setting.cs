@@ -101,6 +101,9 @@ namespace StarryEyes.Settings
         public static readonly SettingItemStruct<TimelineIconResolution> IconResolution =
             new SettingItemStruct<TimelineIconResolution>("IconResolution", TimelineIconResolution.Optimized);
 
+        public static readonly SettingItemStruct<bool> ScrollToNewTweetWithAnimation =
+            new SettingItemStruct<bool>("ScrollToNewTweetWithAnimation", true);
+
         public static readonly SettingItemStruct<bool> AllowFavoriteMyself =
             new SettingItemStruct<bool>("AllowFavoriteMyself", false);
 

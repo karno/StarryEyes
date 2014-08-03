@@ -60,6 +60,8 @@ namespace StarryEyes.ViewModels.Timelines
                 if (_isLoading == value) return;
                 _isLoading = value;
                 RaisePropertyChanged();
+                RaisePropertyChanged(() => IsScrollLock);
+                RaisePropertyChanged(() => IsAnimationEnabled);
             }
         }
 
@@ -84,6 +86,7 @@ namespace StarryEyes.ViewModels.Timelines
                 this._isScrollOnTop = value;
                 RaisePropertyChanged();
                 RaisePropertyChanged(() => IsScrollLock);
+                // revive auto trim
                 if (!this._model.IsAutoTrimEnabled)
                 {
                     this._model.IsAutoTrimEnabled = true;
@@ -128,21 +131,45 @@ namespace StarryEyes.ViewModels.Timelines
         {
             get
             {
+                if (this.IsLoading)
+                {
+                    // when loading, skip scroll-locking.
+                    return false;
+                }
                 switch (Setting.ScrollLockStrategy.Value)
                 {
                     case ScrollLockStrategy.None:
                         return false;
                     case ScrollLockStrategy.Always:
+                    case ScrollLockStrategy.WhenScrolled:
+                        // when scrolled -> consider on TimelineScrollLockBehavior.
+                        // cf: IsScrollLockOnlyScrolled property
                         return true;
                     case ScrollLockStrategy.WhenMouseOver:
                         return IsMouseOver;
-                    case ScrollLockStrategy.WhenScrolled:
-                        return !this._isScrollOnTop;
                     case ScrollLockStrategy.Explicit:
                         return IsScrollLockExplicit;
                     default:
                         return false;
                 }
+            }
+        }
+
+        public bool IsScrollLockOnlyScrolled
+        {
+            get { return Setting.ScrollLockStrategy.Value == ScrollLockStrategy.WhenScrolled; }
+        }
+
+        public bool IsAnimationEnabled
+        {
+            get
+            {
+                if (this.IsLoading)
+                {
+                    // when loading, skip scroll-locking.
+                    return false;
+                }
+                return Setting.ScrollToNewTweetWithAnimation.Value;
             }
         }
 
@@ -165,6 +192,12 @@ namespace StarryEyes.ViewModels.Timelines
                     .ObserveOnDispatcher()
                     .Select(_ => this.CurrentAccounts.ToArray())
                     .Subscribe(a => _timeline.ForEach(s => s.BindingAccounts = a)));
+            this.CompositeDisposable.Add(
+                Setting.ScrollLockStrategy.ListenValueChanged(
+                    v => RaisePropertyChanged(() => IsScrollLock)));
+            this.CompositeDisposable.Add(
+                Setting.ScrollToNewTweetWithAnimation.ListenValueChanged(
+                    v => RaisePropertyChanged(() => IsAnimationEnabled)));
             this.IsLoading = true;
             this._model.InvalidateTimeline();
         }

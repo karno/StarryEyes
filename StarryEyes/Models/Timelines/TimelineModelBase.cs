@@ -26,14 +26,21 @@ namespace StarryEyes.Models.Timelines
 
         private IDisposable _timelineListener;
         private bool _isAutoTrimEnabled;
+        private bool _isInvalidating;
 
         private readonly AVLTree<long> _statusIdCache;
         private readonly ObservableSynchronizedCollectionEx<StatusModel> _statuses;
+
+        public bool IsInvalidating
+        {
+            get { return _isInvalidating; }
+        }
 
         public event Action<bool> InvalidationStateChanged;
 
         protected virtual void OnInvalidationStateChanged(bool invalidationState)
         {
+            _isInvalidating = invalidationState;
             this.InvalidationStateChanged.SafeInvoke(invalidationState);
         }
 

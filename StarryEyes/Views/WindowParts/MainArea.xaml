@@ -122,12 +122,21 @@
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
-                            <DataTemplate>
+                            <DataTemplate DataType="{x:Type tabs:TabViewModel}">
                                 <primitives:Timeline HorizontalAlignment="Stretch"
                                                      VerticalAlignment="Stretch"
-                                                     DataContext="{Binding}"
-                                                     Visibility="{Binding IsFocused,
-                                                                          Converter={StaticResource BooleanToVisibleConverter}}" />
+                                                     DataContext="{Binding}">
+                                    <primitives:Timeline.Style>
+                                        <Style TargetType="{x:Type UserControl}">
+                                            <Setter Property="Visibility" Value="Hidden" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsFocused}" Value="True">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </primitives:Timeline.Style>
+                                </primitives:Timeline>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>

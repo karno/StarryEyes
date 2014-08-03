@@ -2014,9 +2014,14 @@
                                                                                           Mode=OneWayToSource}"
                                                                IsScrollOnTop="{Binding IsScrollOnTop,
                                                                                        Mode=OneWayToSource}" />
-                            <behaviors:TimelineScrollLockerBehavior IsScrollLockEnabled="{Binding IsScrollLock, Mode=OneWay}" ItemsSource="{Binding Timeline, Mode=OneWay}" />
-                            <!--  Squared scrolling has been disabled due to problem of scrolling.  -->
-                            <!--  <behaviors:SquaredScrollBehavior />  -->
+                            <behaviors:TimelineScrollLockerBehavior IsAnimationEnabled="{Binding IsAnimationEnabled,
+                                                                                                 Mode=OneWay}"
+                                                                    IsScrollLockEnabled="{Binding IsScrollLock,
+                                                                                                  Mode=OneWay}"
+                                                                    IsScrollLockOnlyScrolled="{Binding IsScrollLockOnlyScrolled,
+                                                                                                       Mode=OneWay}"
+                                                                    ItemsSource="{Binding Timeline,
+                                                                                          Mode=OneWay}" />
                         </i:Interaction.Behaviors>
                         <ItemsPresenter />
                     </ScrollViewer>

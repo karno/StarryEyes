@@ -510,7 +510,6 @@
     <Compile Include="Views\Behaviors\HideFromTaskSwitcherBehavior.cs" />
     <Compile Include="Views\Behaviors\KeyHandlingBehavior.cs" />
     <Compile Include="Views\Behaviors\ListBoxSelectionChangeToScrollIntoViewBehavior.cs" />
-    <Compile Include="Views\Behaviors\SquaredScrollBehavior.cs" />
     <Compile Include="Views\Behaviors\TextBlockDragSelectBehavior.cs" />
     <Compile Include="Views\Behaviors\TimelineScrollLockerBehavior.cs" />
     <Compile Include="Views\Behaviors\TimelineTriggerBehavior.cs" />
