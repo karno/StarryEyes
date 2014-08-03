@@ -463,9 +463,6 @@ Blocked users or no-retweet users are applied immediately as before.</value>
   <data name="TimelineIconQualityType" xml:space="preserve">
     <value>Timeline Icon Quality:</value>
   </data>
-  <data name="TimelineKampa" xml:space="preserve">
-    <value>Please donate Krile for continue developing.</value>
-  </data>
   <data name="TimelineOpenTwitterPicWithOriginalSize" xml:space="preserve">
     <value>Open original size when clicked thumbnail of twitter-official picture.</value>
   </data>
@@ -562,17 +559,6 @@ Are you sure?</value>
   <data name="ThemeOpenPictureTitle" xml:space="preserve">
     <value>Select wallpaper image</value>
   </data>
-  <data name="TimelineSingleLineWarnContent" xml:space="preserve">
-    <value>Single-line mode consumes more resources than multi-line mode.
-Krile StarryEyes is designed with multi-line mode. Single-line mode might cause problems.
-Are you sure you enable single-line mode?</value>
-  </data>
-  <data name="TimelineSingleLineWarnInst" xml:space="preserve">
-    <value>You are going to enable single-line mode.</value>
-  </data>
-  <data name="TimelineSinglelineWarnTitle" xml:space="preserve">
-    <value>Waning Single-Line Mode</value>
-  </data>
   <data name="HighSearchLocale" xml:space="preserve">
     <value>Locale code of query for searching twitter:</value>
   </data>
@@ -599,5 +585,11 @@ Are you sure you enable single-line mode?</value>
   </data>
   <data name="InputUserSuggestRelated" xml:space="preserve">
     <value>Related users (users follow you or followed from you)</value>
+  </data>
+  <data name="TimelineAnimateNewTweet" xml:space="preserve">
+    <value>Animate to show new tweet</value>
+  </data>
+  <data name="TimelineScrollByPixel" xml:space="preserve">
+    <value>Scroll timeline pixel by pixel</value>
   </data>
 </root>

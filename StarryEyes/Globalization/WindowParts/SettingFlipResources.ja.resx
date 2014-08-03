@@ -463,9 +463,6 @@
   <data name="TimelineIconQualityType" xml:space="preserve">
     <value>タイムラインのアイコン品質:</value>
   </data>
-  <data name="TimelineKampa" xml:space="preserve">
-    <value>Krileの開発を継続するため、寄付にご協力ください。</value>
-  </data>
   <data name="TimelineOpenTwitterPicWithOriginalSize" xml:space="preserve">
     <value>Twitterにアップロードされた画像のサムネイルをクリックした時に原寸で開く</value>
   </data>
@@ -562,17 +559,6 @@
   <data name="ThemeOpenPictureTitle" xml:space="preserve">
     <value>背景画像を選択</value>
   </data>
-  <data name="TimelineSingleLineWarnContent" xml:space="preserve">
-    <value>一行表示モードは複数行表示モードに比べ、リソースを大量に消費します。
-Krile StarryEyesは複数行表示モードをもとに設計されているため、一行表示モードでは意図しない動作をするおそれがあります。
-一行表示モードを本当に有効にしますか？</value>
-  </data>
-  <data name="TimelineSingleLineWarnInst" xml:space="preserve">
-    <value>一行表示モードを有効にしようとしています。</value>
-  </data>
-  <data name="TimelineSinglelineWarnTitle" xml:space="preserve">
-    <value>一行表示モードの警告</value>
-  </data>
   <data name="HighSearchLocale" xml:space="preserve">
     <value>Twitter検索クエリのロケール コード:</value>
   </data>
@@ -599,5 +585,11 @@ Krile StarryEyesは複数行表示モードをもとに設計されているた�
   </data>
   <data name="InputUserSuggestRelated" xml:space="preserve">
     <value>フォローしている または フォローされているユーザー</value>
+  </data>
+  <data name="TimelineAnimateNewTweet" xml:space="preserve">
+    <value>新着ツイートをアニメーション表示する</value>
+  </data>
+  <data name="TimelineScrollByPixel" xml:space="preserve">
+    <value>タイムラインをピクセルごとにスクロールする</value>
   </data>
 </root>

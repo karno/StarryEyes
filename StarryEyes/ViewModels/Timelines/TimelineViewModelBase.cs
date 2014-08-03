@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Windows.Threading;
 using JetBrains.Annotations;
 using Livet;
@@ -122,6 +123,11 @@ namespace StarryEyes.ViewModels.Timelines
             }
         }
 
+        public ScrollUnit ScrollUnit
+        {
+            get { return Setting.IsScrollByPixel.Value ? ScrollUnit.Pixel : ScrollUnit.Item; }
+        }
+
         public bool IsScrollLockExplicitEnabled
         {
             get { return Setting.ScrollLockStrategy.Value == ScrollLockStrategy.Explicit; }
@@ -169,7 +175,7 @@ namespace StarryEyes.ViewModels.Timelines
                     // when loading, skip scroll-locking.
                     return false;
                 }
-                return Setting.ScrollToNewTweetWithAnimation.Value;
+                return Setting.IsScrollByPixel.Value && Setting.IsAnimateScrollToNewTweet.Value;
             }
         }
 
@@ -196,8 +202,15 @@ namespace StarryEyes.ViewModels.Timelines
                 Setting.ScrollLockStrategy.ListenValueChanged(
                     v => RaisePropertyChanged(() => IsScrollLock)));
             this.CompositeDisposable.Add(
-                Setting.ScrollToNewTweetWithAnimation.ListenValueChanged(
+                Setting.IsAnimateScrollToNewTweet.ListenValueChanged(
                     v => RaisePropertyChanged(() => IsAnimationEnabled)));
+            this.CompositeDisposable.Add(
+                Setting.IsScrollByPixel.ListenValueChanged(
+                    v =>
+                    {
+                        RaisePropertyChanged(() => ScrollUnit);
+                        RaisePropertyChanged(() => IsAnimationEnabled);
+                    }));
             this.IsLoading = true;
             this._model.InvalidateTimeline();
         }

@@ -19,6 +19,7 @@
              xmlns:utils="clr-namespace:StarryEyes.Views.Utils"
              x:Name="TimelineRoot"
              FocusVisualStyle="{x:Null}"
+             SnapsToDevicePixels="True"
              d:DataContext="{d:DesignInstance Type={x:Type tabs:TabViewModel}}"
              d:DesignHeight="300"
              d:DesignWidth="300"
@@ -332,7 +333,6 @@
                             Background="#00000000"
                             Padding="0"
                             RenderTransformOrigin="0.5,1"
-                            SnapsToDevicePixels="True"
                             Visibility="{Binding IsExpanded,
                                                  Converter={StaticResource BooleanToInvisibleConverter}}"
                             primitives:TimelineSwapResourcesBehavior.ResourceSet="Default">
@@ -478,7 +478,6 @@
                             Margin="0"
                             Padding="0"
                             RenderTransformOrigin="0.5,1"
-                            SnapsToDevicePixels="True"
                             Visibility="{Binding IsExpanded,
                                                  Converter={StaticResource BooleanToVisibleConverter}}"
                             primitives:TimelineSwapResourcesBehavior.ResourceSet="Default">
@@ -791,8 +790,7 @@
                                                             Margin="0,7"
                                                             HorizontalAlignment="Right"
                                                             VerticalAlignment="Top"
-                                                            Background="#19808080"
-                                                            SnapsToDevicePixels="True">
+                                                            Background="#19808080">
                                                         <controls:LazyImage DecodePixelWidth="48"
                                                                             RenderOptions.BitmapScalingMode="HighQuality"
                                                                             UriSource="{Binding InReplyToUserImage,
@@ -870,8 +868,7 @@
                                                 Height="48"
                                                 HorizontalAlignment="Right"
                                                 VerticalAlignment="Top"
-                                                Background="#191BA1E2"
-                                                SnapsToDevicePixels="True">
+                                                Background="#191BA1E2">
                                             <controls:LazyImage DecodePixelWidth="48"
                                                                 RenderOptions.BitmapScalingMode="HighQuality"
                                                                 UriSource="{Binding User.ProfileImageUriOptimized,
@@ -1735,9 +1732,7 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type CheckBox}">
-                            <Grid x:Name="templateRoot"
-                                  Background="Transparent"
-                                  SnapsToDevicePixels="True">
+                            <Grid x:Name="templateRoot" Background="Transparent">
                                 <VisualStateManager.VisualStateGroups>
                                     <VisualStateGroup x:Name="CommonStates" />
                                     <VisualStateGroup x:Name="FocusStates" />
@@ -1979,7 +1974,7 @@
                       VirtualizingPanel.CacheLength="3"
                       VirtualizingPanel.CacheLengthUnit="Page"
                       VirtualizingPanel.IsVirtualizing="True"
-                      VirtualizingPanel.ScrollUnit="Pixel"
+                      VirtualizingPanel.ScrollUnit="{Binding ScrollUnit}"
                       VirtualizingPanel.VirtualizationMode="Recycling">
             <i:Interaction.Triggers>
                 <l:InteractionMessageTrigger Messenger="{Binding Messenger, Mode=OneTime}">

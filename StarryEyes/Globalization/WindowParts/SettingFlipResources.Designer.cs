@@ -1259,6 +1259,15 @@ namespace StarryEyes.Globalization.WindowParts {
         }
         
         /// <summary>
+        ///   Animate to show new tweet に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string TimelineAnimateNewTweet {
+            get {
+                return ResourceManager.GetString("TimelineAnimateNewTweet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Focus to expand に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string TimelineDisplayMixed {
@@ -1349,20 +1358,20 @@ namespace StarryEyes.Globalization.WindowParts {
         }
         
         /// <summary>
-        ///   Please donate Krile for continue developing. に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        public static string TimelineKampa {
-            get {
-                return ResourceManager.GetString("TimelineKampa", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Open original size when clicked thumbnail of twitter-official picture. に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string TimelineOpenTwitterPicWithOriginalSize {
             get {
                 return ResourceManager.GetString("TimelineOpenTwitterPicWithOriginalSize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Scroll timeline pixel by pixel に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string TimelineScrollByPixel {
+            get {
+                return ResourceManager.GetString("TimelineScrollByPixel", resourceCulture);
             }
         }
         
@@ -1453,35 +1462,6 @@ namespace StarryEyes.Globalization.WindowParts {
         public static string TimelineShowThumbnails {
             get {
                 return ResourceManager.GetString("TimelineShowThumbnails", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Single-line mode consumes more resources than multi-line mode.
-        ///Krile StarryEyes is designed with multi-line mode. Single-line mode might cause problems.
-        ///Are you sure you enable single-line mode? に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        public static string TimelineSingleLineWarnContent {
-            get {
-                return ResourceManager.GetString("TimelineSingleLineWarnContent", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   You are going to enable single-line mode. に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        public static string TimelineSingleLineWarnInst {
-            get {
-                return ResourceManager.GetString("TimelineSingleLineWarnInst", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Waning Single-Line Mode に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        public static string TimelineSinglelineWarnTitle {
-            get {
-                return ResourceManager.GetString("TimelineSinglelineWarnTitle", resourceCulture);
             }
         }
     }

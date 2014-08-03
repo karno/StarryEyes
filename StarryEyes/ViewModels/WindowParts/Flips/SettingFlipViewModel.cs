@@ -26,7 +26,6 @@ using StarryEyes.Globalization.WindowParts;
 using StarryEyes.Models;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Receiving;
-using StarryEyes.Models.Subsystems;
 using StarryEyes.Models.Subsystems.Notifications.UI;
 using StarryEyes.Models.Timelines.Tabs;
 using StarryEyes.Nightmare.Windows;
@@ -232,25 +231,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         {
             if (Setting.TweetDisplayMode.Value == newValue)
             {
-                RaisePropertyChanged();
                 return;
-            }
-            if (Setting.TweetDisplayMode.Value == Settings.TweetDisplayMode.Expanded &&
-                (newValue == Settings.TweetDisplayMode.SingleLine || newValue == Settings.TweetDisplayMode.Mixed))
-            {
-                var resp = this.Messenger.GetResponseSafe(() => new TaskDialogMessage(new TaskDialogOptions
-                {
-                    Title = SettingFlipResources.TimelineSinglelineWarnTitle,
-                    MainIcon = VistaTaskDialogIcon.Warning,
-                    MainInstruction = SettingFlipResources.TimelineSingleLineWarnInst,
-                    Content = SettingFlipResources.TimelineSingleLineWarnContent,
-                    CommonButtons = TaskDialogCommonButtons.YesNo
-                }));
-                if (resp.Response.Result == TaskDialogSimpleResult.No)
-                {
-                    this.TweetDisplayMode = (int)Settings.TweetDisplayMode.Expanded;
-                    return;
-                }
             }
             await DispatcherHolder.BeginInvoke(() =>
             {
@@ -258,7 +239,6 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                     "changing timeline mode...", async () =>
                     {
                         await Task.Run(() => Setting.TweetDisplayMode.Value = newValue);
-                        RaisePropertyChanged(() => IsDonationVisible);
                         await DispatcherHolder.BeginInvoke(async () =>
                         {
                             await Dispatcher.Yield(DispatcherPriority.Background);
@@ -280,6 +260,22 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             set { Setting.IconResolution.Value = (TimelineIconResolution)value; }
         }
 
+        public bool IsScrollByPixel
+        {
+            get { return Setting.IsScrollByPixel.Value; }
+            set
+            {
+                Setting.IsScrollByPixel.Value = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public bool IsAnimateNewTweet
+        {
+            get { return Setting.IsAnimateScrollToNewTweet.Value; }
+            set { Setting.IsAnimateScrollToNewTweet.Value = value; }
+        }
+
         public bool IsAllowFavoriteMyself
         {
             get { return Setting.AllowFavoriteMyself.Value; }
@@ -296,18 +292,6 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         {
             get { return Setting.OpenTwitterImageWithOriginalSize.Value; }
             set { Setting.OpenTwitterImageWithOriginalSize.Value = value; }
-        }
-
-        public bool IsDonationVisible
-        {
-            get
-            {
-                if (ContributionService.IsContributor())
-                {
-                    return false;
-                }
-                return this.TweetDisplayMode != (int)Settings.TweetDisplayMode.Expanded;
-            }
         }
 
         [UsedImplicitly]
