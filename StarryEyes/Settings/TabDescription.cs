@@ -64,7 +64,7 @@ namespace StarryEyes.Settings
                  Name = Name,
                  FilterQuery = filter,
                  RawQueryString = Query,
-                 BindingHashtags = this.BindingHashtags,
+                 BindingHashtags = this.BindingHashtags.Guard(),
                  NotifyNewArrivals = this.NotifyNewArrivals,
                  NotifySoundSource = this.NotifySoundSource,
                  ShowUnreadCounts = this.ShowUnreadCounts

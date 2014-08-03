@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
+using JetBrains.Annotations;
 using StarryEyes.Albireo;
 using StarryEyes.Albireo.Collections;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
@@ -83,6 +84,7 @@ namespace StarryEyes.Models.Timelines.Tabs
                 if ((value == null && _filterQuery == null) || (value != null && value.Equals(_filterQuery))) return;
                 var old = this._filterQuery;
                 this._filterQuery = value;
+                this._isQueryStringValid = false;
                 this.QueueInvalidateTimeline();
                 if (!this._isActivated) return;
                 if (this._filterQuery != null)
@@ -101,6 +103,8 @@ namespace StarryEyes.Models.Timelines.Tabs
         #region Tab Parameters
 
         private string _name;
+        private string _rawQueryString;
+        private bool _isQueryStringValid;
         private readonly AVLTree<long> _bindingAccountIds = new AVLTree<long>();
         private List<string> _bindingHashtags = new List<string>();
 
@@ -112,16 +116,19 @@ namespace StarryEyes.Models.Timelines.Tabs
             set { this._name = value; }
         }
 
+        [NotNull]
         public ICollection<long> BindingAccounts
         {
             get { return new NotifyCollection<long>(this._bindingAccountIds, this.OnUpdateBoundAccounts); }
         }
 
+        [NotNull]
         public IEnumerable<string> BindingHashtags
         {
             get { return this._bindingHashtags ?? Enumerable.Empty<string>(); }
             set
             {
+                if (value.SequenceEqual(this._bindingHashtags)) return; // equal
                 this._bindingHashtags = value.Guard().ToList();
                 TabManager.Save();
             }
@@ -139,23 +146,35 @@ namespace StarryEyes.Models.Timelines.Tabs
 
         public string NotifySoundSource { get; set; }
 
-        public string RawQueryString { get; set; }
+        public string RawQueryString
+        {
+            get { return this._rawQueryString; }
+            set
+            {
+                this._rawQueryString = value;
+                this._isQueryStringValid = false;
+            }
+        }
 
         public string GetQueryString()
         {
-            // check raw query string is equals filter query
+            // check raw query string is equals to filter query
             try
             {
                 if (RawQueryString != null)
                 {
-                    if (QueryCompiler.Compile(RawQueryString).ToQuery() == FilterQuery.ToQuery())
+                    if (!this._isQueryStringValid &&
+                        QueryCompiler.Compile(this.RawQueryString).ToQuery() == this.FilterQuery.ToQuery())
                     {
-                        return RawQueryString;
+                        this._isQueryStringValid = true;
                     }
+                    return RawQueryString;
                 }
             }
             catch { }
-            return this.FilterQuery != null ? this.FilterQuery.ToQuery() : String.Empty;
+            RawQueryString = this.FilterQuery != null ? this.FilterQuery.ToQuery() : String.Empty;
+            this._isQueryStringValid = true;
+            return RawQueryString;
         }
 
         #endregion

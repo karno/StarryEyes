@@ -20,10 +20,8 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
             _originalScreenName = screenName;
             _userId = Setting.Accounts
                              .Collection
-                             .Where(
-                                 u =>
-                                 u.UnreliableScreenName.Equals(
-                                     screenName, StringComparison.CurrentCultureIgnoreCase))
+                             .Where(u => u.UnreliableScreenName.Equals(
+                                 screenName, StringComparison.CurrentCultureIgnoreCase))
                              .Select(u => u.Id)
                              .FirstOrDefault();
             if (_userId == 0)
@@ -132,9 +130,9 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 
         public override string ToQuery()
         {
-            if (String.IsNullOrEmpty(_originalScreenName))
-                return "#" + _userId.ToString(CultureInfo.InvariantCulture);
-            return "@" + _originalScreenName;
+            return String.IsNullOrEmpty(this._originalScreenName)
+                ? "#" + this._userId.ToString(CultureInfo.InvariantCulture)
+                : "@" + this._originalScreenName;
         }
     }
 }

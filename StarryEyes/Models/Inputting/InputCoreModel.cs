@@ -115,7 +115,6 @@ namespace StarryEyes.Models.Inputting
             if (replace != null)
             {
                 replace.BindingHashtags
-                       .Guard()
                        .ToArray()
                        .ForEach(_bindingHashtags.Add);
             }
