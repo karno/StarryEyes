@@ -850,7 +850,7 @@
                                    Text="{x:Static localize:SettingFlipResources.ThemeWallpaperTransparency}" />
                         <Slider Grid.Row="1"
                                 Grid.Column="1"
-                                Grid.ColumnSpan="2"
+                                VerticalAlignment="Center"
                                 Maximum="255"
                                 Minimum="0"
                                 Value="{Binding BackgroundImageTransparency,
@@ -860,7 +860,8 @@
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Center"
                                    Text="{Binding BackgroundImageTransparency,
-                                                  Mode=OneWay}" />
+                                                  Mode=OneWay,
+                                                  FallbackValue=0}" />
                     </Grid>
                 </Grid>
                 <Grid Grid.Column="1" Margin="0,6,0,0">
