@@ -1,11 +1,13 @@
 ﻿<UserControl x:Class="StarryEyes.Views.WindowParts.Flips.SettingFlips.VersionInfo"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:behaviors="clr-namespace:StarryEyes.Views.Behaviors"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:settingFlips="clr-namespace:StarryEyes.ViewModels.WindowParts.Flips.SettingFlips"
+             xmlns:starryEyes="clr-namespace:StarryEyes"
              xmlns:utils="clr-namespace:StarryEyes.Views.Utils"
              xmlns:windowParts="clr-namespace:StarryEyes.Globalization.WindowParts"
              d:DataContext="{d:DesignInstance settingFlips:VersionInfoViewModel}"
@@ -62,7 +64,13 @@
                            FontSize="28">
                     <Run Text="Krile-tan, the official mascot" />
                     <LineBreak />
-                    <Run Text="Illustrated by @ichimy" />
+                    <Run Text="Illustrated by" />
+                    <Hyperlink NavigateUri="http://twitter.com/ichimy">
+                        <i:Interaction.Behaviors>
+                            <behaviors:NavigateHyperlinkBehavior />
+                        </i:Interaction.Behaviors>
+                        <Run Text="@ichimy" />
+                    </Hyperlink><Run Text="." />
                 </TextBlock>
             </Grid>
         </Viewbox>
@@ -166,7 +174,7 @@
                    HorizontalAlignment="Left"
                    VerticalAlignment="Bottom"
                    TextWrapping="Wrap">
-            <Run Language="ja-jp" Text="(C) 2013 Karno. This software is licensed under" />
+            <Run Text="(C) 2013 Karno. This software is licensed under" />
             <Hyperlink>
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="Click">
@@ -190,37 +198,25 @@
                 <TextBlock HorizontalAlignment="Left"
                            VerticalAlignment="Center"
                            TextWrapping="Wrap">
-                    <Run Language="ja-jp" Text="Krile series 3rd product, Project &quot;StarryEyes&quot;" />
+                    <Run Text="Krile series 3rd product, Project &quot;StarryEyes&quot;" />
                 </TextBlock>
                 <TextBlock Margin="0,4,0,0" TextWrapping="Wrap">
-                    <Hyperlink>
-                        <i:Interaction.Triggers>
-                            <i:EventTrigger EventName="Click">
-                                <ei:CallMethodAction MethodName="OpenOfficial" TargetObject="{Binding}" />
-                            </i:EventTrigger>
-                        </i:Interaction.Triggers>
-                        <Run Language="ja-jp" Text="http://krile.starwing.net/" />
+                    <Hyperlink NavigateUri="http://krile.starwing.net/">
+                        <i:Interaction.Behaviors>
+                            <behaviors:NavigateHyperlinkBehavior />
+                        </i:Interaction.Behaviors>
+                        <Run Text="http://krile.starwing.net/" />
                     </Hyperlink>
                 </TextBlock>
                 <TextBlock HorizontalAlignment="Left"
                            VerticalAlignment="Top"
                            TextWrapping="Wrap">
-                    <Hyperlink>
-                        <i:Interaction.Triggers>
-                            <i:EventTrigger EventName="Click">
-                                <ei:CallMethodAction MethodName="OpenKarno" TargetObject="{Binding}" />
-                            </i:EventTrigger>
-                        </i:Interaction.Triggers>
-                        <Run Language="ja-jp" Text="@karno" />
-                    </Hyperlink>
-                    <Run Language="ja-jp" Text="/" />
-                    <Hyperlink>
-                        <i:Interaction.Triggers>
-                            <i:EventTrigger EventName="Click">
-                                <ei:CallMethodAction MethodName="OpenKriletan" TargetObject="{Binding}" />
-                            </i:EventTrigger>
-                        </i:Interaction.Triggers>
-                        <Run Language="ja-jp" Text="@kriletan" />
+                    <Run Text="official twitter:" />
+                    <Hyperlink NavigateUri="http://twitter.com/kriletan">
+                        <i:Interaction.Behaviors>
+                            <behaviors:NavigateHyperlinkBehavior />
+                        </i:Interaction.Behaviors>
+                        <Run Text="@kriletan" />
                     </Hyperlink>
                 </TextBlock>
             </StackPanel>
@@ -285,7 +281,76 @@
                        HorizontalAlignment="Left"
                        VerticalAlignment="Bottom"
                        TextWrapping="Wrap">
-                <Run Text="Built with: AsyncOAuth, AvalonEdit, Dapper, DynamicJson, Extended WPF Toolkit, JetBrains.Annotations, Livet, MahApps.Metro, NAudio, System.Data.SQLite, WPF Task Dialog, and any other Microsoft's libraries." />
+                <Run Text="Bulit with" />
+                <Hyperlink NavigateUri="https://github.com/neuecc/AsyncOAuth">
+                    <i:Interaction.Behaviors>
+                        <behaviors:NavigateHyperlinkBehavior />
+                    </i:Interaction.Behaviors>
+                    <Run Text="AsyncOAuth" />
+                </Hyperlink><Run Text="," />
+                <Hyperlink NavigateUri="http://avalonedit.net/">
+                    <i:Interaction.Behaviors>
+                        <behaviors:NavigateHyperlinkBehavior />
+                    </i:Interaction.Behaviors>
+                    <Run Text="AvalonEdit" />
+                </Hyperlink><Run Text="," />
+                <Hyperlink NavigateUri="https://code.google.com/p/dapper-dot-net/">
+                    <i:Interaction.Behaviors>
+                        <behaviors:NavigateHyperlinkBehavior />
+                    </i:Interaction.Behaviors>
+                    <Run Text="Dapper" />
+                </Hyperlink><Run Text="," />
+                <Hyperlink NavigateUri="https://dynamicjson.codeplex.com/">
+                    <i:Interaction.Behaviors>
+                        <behaviors:NavigateHyperlinkBehavior />
+                    </i:Interaction.Behaviors>
+                    <Run Text="DynamicJson" />
+                </Hyperlink><Run Text="," />
+                <Hyperlink NavigateUri="http://www.jetbrains.com/resharper/buy/opensource_license.html">
+                    <i:Interaction.Behaviors>
+                        <behaviors:NavigateHyperlinkBehavior />
+                    </i:Interaction.Behaviors>
+                    <Run Text="JetBrains.Annotations" />
+                </Hyperlink><Run Text="," />
+                <Hyperlink NavigateUri="http://ugaya40.net/livet">
+                    <i:Interaction.Behaviors>
+                        <behaviors:NavigateHyperlinkBehavior />
+                    </i:Interaction.Behaviors>
+                    <Run Text="Livet" />
+                </Hyperlink><Run Text="," />
+                <Hyperlink NavigateUri="http://mahapps.com/">
+                    <i:Interaction.Behaviors>
+                        <behaviors:NavigateHyperlinkBehavior />
+                    </i:Interaction.Behaviors>
+                    <Run Text="MahApps.Metro" />
+                </Hyperlink><Run Text="," />
+                <Hyperlink NavigateUri="http://naudio.codeplex.com/">
+                    <i:Interaction.Behaviors>
+                        <behaviors:NavigateHyperlinkBehavior />
+                    </i:Interaction.Behaviors>
+                    <Run Text="NAudio" />
+                </Hyperlink><Run Text="," />
+                <Hyperlink NavigateUri="http://system.data.sqlite.org/">
+                    <i:Interaction.Behaviors>
+                        <behaviors:NavigateHyperlinkBehavior />
+                    </i:Interaction.Behaviors>
+                    <Run Text="System.Data.SQLite" />
+                </Hyperlink><Run Text="," />
+                <Hyperlink NavigateUri="http://www.codeproject.com/Articles/137552/WPF-TaskDialog-Wrapper-and-Emulator">
+                    <i:Interaction.Behaviors>
+                        <behaviors:NavigateHyperlinkBehavior />
+                    </i:Interaction.Behaviors>
+                    <Run Text="WPF Task Dialog" />
+                </Hyperlink><Run Text="," />
+                <Run Text="and any other Microsoft's libraries." />
+                <LineBreak />
+                <Run Text="Some icons are designed by" />
+                <Hyperlink NavigateUri="http://templarian.com/project_windows_phone_icons/">
+                    <i:Interaction.Behaviors>
+                        <behaviors:NavigateHyperlinkBehavior />
+                    </i:Interaction.Behaviors>
+                    <Run Text="Templarian" />
+                </Hyperlink><Run Text="." />
             </TextBlock>
         </Grid>
     </Grid>

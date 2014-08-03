@@ -35,16 +35,6 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SettingFlips
 
         #region Open links
 
-        public void OpenOfficial()
-        {
-            BrowserHelper.Open(App.OfficialUrl);
-        }
-
-        public void OpenKarno()
-        {
-            BrowserHelper.Open(Twitter + "karno");
-        }
-
         public void OpenKriletan()
         {
             BrowserHelper.Open(Twitter + "kriletan");
