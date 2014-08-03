@@ -36,7 +36,6 @@
                         HorizontalAlignment="Left"
                         VerticalAlignment="Top"
                         VerticalContentAlignment="Stretch"
-                        Content="{Binding DisplayHashtag}"
                         Focusable="False"
                         Foreground="{DynamicResource BaseColorForegroundBrush}"
                         Style="{DynamicResource MetroSquareUnfocusableFlatButton}">
@@ -45,6 +44,7 @@
                             <ei:CallMethodAction MethodName="ToggleBind" TargetObject="{Binding Mode=OneWay}" />
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
+                    <TextBlock Text="{Binding DisplayHashtag, Mode=OneWay}" />
                 </Button>
             </DataTemplate>
         </ResourceDictionary>
