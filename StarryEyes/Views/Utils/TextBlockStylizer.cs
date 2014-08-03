@@ -129,9 +129,11 @@ namespace StarryEyes.Views.Utils
 
         private static IEnumerable<TwitterEntity> GetUserMentionEntities([NotNull] string text)
         {
+            // entity indices uses escaped index
+            var escaped = ParsingExtension.EscapeEntity(text);
             return TwitterRegexPatterns
                 .ValidMentionOrList
-                .Matches(text)
+                .Matches(escaped)
                 .OfType<Match>()
                 .Select(m =>
                 {
@@ -139,13 +141,14 @@ namespace StarryEyes.Views.Utils
                         m.Groups[TwitterRegexPatterns.ValidMentionOrListGroupAt].Value +
                         m.Groups[TwitterRegexPatterns.ValidMentionOrListGroupUsername].Value;
                     var index = m.Groups[TwitterRegexPatterns.ValidMentionOrListGroupAt].Index;
+                    var scIndex = escaped.Substring(0, index).SurrogatedLength();
 
                     return new TwitterEntity
                     {
                         EntityType = EntityType.UserMentions,
                         DisplayText = display,
-                        StartIndex = index,
-                        EndIndex = index + display.Length,
+                        StartIndex = scIndex,
+                        EndIndex = scIndex + display.SurrogatedLength()
                     };
                 });
         }

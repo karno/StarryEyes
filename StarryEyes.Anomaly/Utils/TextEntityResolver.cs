@@ -27,10 +27,10 @@ namespace StarryEyes.Anomaly.Utils
                 {
                     // return raw string
                     yield return new TextEntityDescription(ParsingExtension.ResolveEntity(
-                        escaped.SubstringForSurrogatePaire(endIndex, entity.StartIndex - endIndex)));
+                        escaped.SurrogatedSubstring(endIndex, entity.StartIndex - endIndex)));
                 }
                 // get entitied text
-                var body = ParsingExtension.ResolveEntity(escaped.SubstringForSurrogatePaire(
+                var body = ParsingExtension.ResolveEntity(escaped.SurrogatedSubstring(
                     entity.StartIndex, entity.EndIndex - entity.StartIndex));
                 yield return new TextEntityDescription(body, entity);
                 endIndex = entity.EndIndex;
@@ -44,48 +44,13 @@ namespace StarryEyes.Anomaly.Utils
             {
                 // return remain text
                 yield return new TextEntityDescription(ParsingExtension.ResolveEntity(
-                    escaped.SubstringForSurrogatePaire(endIndex)));
+                    escaped.SurrogatedSubstring(endIndex)));
             }
         }
 
         // below code from Mystique pull request #53.
         // Thanks for Hotspring-r
         // https://github.com/karno/Mystique/commit/a8d174bcfe9292290bd9058ecf7ce2b68dc4162e
-
-        /// <summary>
-        /// Pick substring from string considering surrogate pairs.
-        /// </summary>
-        /// <param name="str">source text</param>
-        /// <param name="startIndex">start index</param>
-        /// <param name="length">cut length</param>
-        /// <returns>substring of text</returns>
-        public static string SubstringForSurrogatePaire(this string str, int startIndex, int length = -1)
-        {
-            if (str == null) throw new ArgumentNullException("str");
-            var s = GetLengthForSurrogatePaire(str, startIndex, 0);
-
-            if (length == -1)
-            {
-                return str.Substring(s);
-            }
-
-            var l = GetLengthForSurrogatePaire(str, length, s);
-            return str.Substring(s, l);
-        }
-
-        private static int GetLengthForSurrogatePaire(string str, int len, int s)
-        {
-            var l = 0;
-            for (var i = 0; i < len; i++)
-            {
-                if (Char.IsHighSurrogate(str[l + s]))
-                {
-                    l++;
-                }
-                l++;
-            }
-            return l;
-        }
     }
 
     public class TextEntityDescription
