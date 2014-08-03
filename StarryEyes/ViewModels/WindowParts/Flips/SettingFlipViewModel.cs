@@ -30,6 +30,7 @@ using StarryEyes.Models.Subsystems.Notifications.UI;
 using StarryEyes.Models.Timelines.Tabs;
 using StarryEyes.Nightmare.Windows;
 using StarryEyes.Nightmare.Windows.Forms;
+using StarryEyes.Properties;
 using StarryEyes.Settings;
 using StarryEyes.Settings.KeyAssigns;
 using StarryEyes.Settings.Themes;
@@ -188,6 +189,14 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         public void ResetApiKeys()
         {
             var reconf = Setting.GlobalConsumerKey.Value != null;
+            var buttons = reconf
+                ? new[]
+                {
+                    SettingFlipResources.AccountButtonResetKey,
+                    SettingFlipResources.AccountButtonUseDefaultKey,
+                    Resources.MsgButtonCancel
+                }
+                : new[] { SettingFlipResources.AccountButtonSetKey, Resources.MsgButtonCancel };
             var resp = this.Messenger.GetResponseSafe(() =>
                 new TaskDialogMessage(new TaskDialogOptions
                 {
@@ -196,18 +205,38 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                         : SettingFlipResources.AccountSetKeyTitle,
                     MainIcon = VistaTaskDialogIcon.Warning,
                     MainInstruction = SettingFlipResources.AccountSetResetKeyInst,
+                    AllowDialogCancellation = true,
                     Content = reconf
                         ? SettingFlipResources.AccountResetKeyContent
                         : SettingFlipResources.AccountSetKeyContent,
-                    CommonButtons = TaskDialogCommonButtons.YesNo
+                    CommandButtons = buttons
                 }));
-            if (resp.Response.Result == TaskDialogSimpleResult.No)
+            switch (resp.Response.CommandButtonResult ?? -1)
             {
-                return;
+                case 0:
+                    // reconf
+                    var kovm = new KeyOverrideViewModel();
+                    this._parent.Messenger.RaiseSafe(() =>
+                        new TransitionMessage(typeof(KeyOverrideWindow), kovm, TransitionMode.Modal, null));
+                    break;
+                case 1:
+                    if (!reconf)
+                    {
+                        goto default;
+                    }
+                    // clear authorization
+                    Setting.Accounts.Collection
+                           .Select(a => a.Id)
+                           .ToArray()
+                           .ForEach(Setting.Accounts.RemoveAccountFromId);
+                    // use default key
+                    Setting.GlobalConsumerKey.Value = null;
+                    Setting.GlobalConsumerSecret.Value = null;
+                    break;
+                default:
+                    //cancel
+                    return;
             }
-            var kovm = new KeyOverrideViewModel();
-            this._parent.Messenger.RaiseSafe(() =>
-                new TransitionMessage(typeof(KeyOverrideWindow), kovm, TransitionMode.Modal, null));
         }
 
         #endregion

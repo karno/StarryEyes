@@ -592,4 +592,13 @@
   <data name="TimelineScrollByPixel" xml:space="preserve">
     <value>タイムラインをピクセルごとにスクロールする</value>
   </data>
+  <data name="AccountButtonResetKey" xml:space="preserve">
+    <value>APIキーを再設定(&amp;R)</value>
+  </data>
+  <data name="AccountButtonUseDefaultKey" xml:space="preserve">
+    <value>デフォルトのキーに戻す(&amp;D)</value>
+  </data>
+  <data name="AccountButtonSetKey" xml:space="preserve">
+    <value>APIキーを設定(&amp;S)</value>
+  </data>
 </root>

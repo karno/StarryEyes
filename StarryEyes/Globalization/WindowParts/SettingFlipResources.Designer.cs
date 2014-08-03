@@ -70,6 +70,33 @@ namespace StarryEyes.Globalization.WindowParts {
         }
         
         /// <summary>
+        ///   &amp;Reset custom API key に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string AccountButtonResetKey {
+            get {
+                return ResourceManager.GetString("AccountButtonResetKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   &amp;Set custom API key に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string AccountButtonSetKey {
+            get {
+                return ResourceManager.GetString("AccountButtonSetKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Use &amp;default key に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string AccountButtonUseDefaultKey {
+            get {
+                return ResourceManager.GetString("AccountButtonUseDefaultKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Delete This Account に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string AccountDelete {

@@ -592,4 +592,13 @@ Are you sure?</value>
   <data name="TimelineScrollByPixel" xml:space="preserve">
     <value>Scroll timeline pixel by pixel</value>
   </data>
+  <data name="AccountButtonResetKey" xml:space="preserve">
+    <value>&amp;Reset custom API key</value>
+  </data>
+  <data name="AccountButtonUseDefaultKey" xml:space="preserve">
+    <value>Use &amp;default key</value>
+  </data>
+  <data name="AccountButtonSetKey" xml:space="preserve">
+    <value>&amp;Set custom API key</value>
+  </data>
 </root>
