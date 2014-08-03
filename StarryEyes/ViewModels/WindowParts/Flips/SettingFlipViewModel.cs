@@ -285,7 +285,11 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         public bool ShowThumbnail
         {
             get { return Setting.ShowThumbnails.Value; }
-            set { Setting.ShowThumbnails.Value = value; }
+            set
+            {
+                Setting.ShowThumbnails.Value = value;
+                RaisePropertyChanged();
+            }
         }
 
         public bool OpenTwitterImageWithOriginalSize

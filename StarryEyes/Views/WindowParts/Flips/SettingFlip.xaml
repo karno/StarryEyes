@@ -84,7 +84,7 @@
                 <ListBox x:Name="SettingCategories"
                          Width="180"
                          HorizontalContentAlignment="Stretch"
-                         SelectedIndex="1">
+                         SelectedIndex="0">
                     <ListBox.Resources>
                         <Style TargetType="{x:Type ListBoxItem}">
                             <Setter Property="Margin" Value="0" />
@@ -387,11 +387,15 @@
                                   VerticalAlignment="Top"
                                   Content="{x:Static localize:SettingFlipResources.TimelineScrollByPixel}"
                                   IsChecked="{Binding IsScrollByPixel}" />
-                        <CheckBox Margin="0,0,0,8"
+                        <CheckBox Margin="20,0,0,8"
                                   VerticalAlignment="Top"
                                   Content="{x:Static localize:SettingFlipResources.TimelineAnimateNewTweet}"
                                   IsChecked="{Binding IsAnimateNewTweet}"
                                   IsEnabled="{Binding IsScrollByPixel}" />
+                        <CheckBox Margin="0,0,0,8"
+                                  VerticalAlignment="Top"
+                                  Content="{x:Static localize:SettingFlipResources.TimelineAllowFavoriteMyself}"
+                                  IsChecked="{Binding IsAllowFavoriteMyself}" />
                         <CheckBox Margin="0,0,0,8"
                                   VerticalAlignment="Top"
                                   Content="{x:Static localize:SettingFlipResources.TimelineShowThumbnails}"
@@ -399,7 +403,8 @@
                         <CheckBox Margin="20,0,0,8"
                                   VerticalAlignment="Top"
                                   Content="{x:Static localize:SettingFlipResources.TimelineOpenTwitterPicWithOriginalSize}"
-                                  IsChecked="{Binding OpenTwitterImageWithOriginalSize}" />
+                                  IsChecked="{Binding OpenTwitterImageWithOriginalSize}"
+                                  IsEnabled="{Binding ShowThumbnail}" />
                         <StackPanel Margin="0,8" Orientation="Horizontal">
                             <TextBlock Margin="0,0,4,0"
                                        VerticalAlignment="Center"
