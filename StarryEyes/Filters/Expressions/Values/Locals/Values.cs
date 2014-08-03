@@ -248,7 +248,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 
         public override string GetSetSqlQuery()
         {
-            return "(" + string.Join(",", this._values.Select(v => v.GetNumericSqlQuery())) + ")";
+            return "(select " + string.Join(" union select ", this._values.Select(v => v.GetNumericSqlQuery())) + ")";
         }
 
         public override void BeginLifecycle()
