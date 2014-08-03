@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Livet;
 using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Anomaly.TwitterApi.Rest.Infrastructure;
+using StarryEyes.Globalization;
 using StarryEyes.Globalization.WindowParts;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Nightmare.Windows;
@@ -17,6 +18,8 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
 {
     public abstract class UserListViewModelBase : ViewModel
     {
+        protected abstract string UserListName { get; }
+
         private readonly UserInfoViewModel _parent;
 
         public UserInfoViewModel Parent
@@ -85,7 +88,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                         {
                             Title = SearchFlipResources.MsgUserInfoLoadErrorTitle,
                             MainIcon = VistaTaskDialogIcon.Error,
-                            MainInstruction = SearchFlipResources.MsgUserInfoLoadErrorInst,
+                            MainInstruction = SearchFlipResources.MsgUserInfoLoadErrorInstFormat.SafeFormat(UserListName),
                             Content = SearchFlipResources.MsgUserInfoLoadErrorAccountIsNotExist,
                             CommonButtons = TaskDialogCommonButtons.Close,
                         }));
@@ -125,7 +128,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                         {
                             Title = SearchFlipResources.MsgUserInfoLoadErrorTitle,
                             MainIcon = VistaTaskDialogIcon.Error,
-                            MainInstruction = SearchFlipResources.MsgUserInfoLoadErrorInst,
+                            MainInstruction = SearchFlipResources.MsgUserInfoLoadErrorInstFormat.SafeFormat(UserListName),
                             Content = ex.Message,
                             CommonButtons = TaskDialogCommonButtons.Close,
                         }));
@@ -153,7 +156,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                     {
                         Title = SearchFlipResources.MsgUserInfoLoadErrorTitle,
                         MainIcon = VistaTaskDialogIcon.Error,
-                        MainInstruction = SearchFlipResources.MsgUserInfoLoadErrorInst,
+                        MainInstruction = SearchFlipResources.MsgUserInfoLoadErrorInstFormat.SafeFormat(UserListName),
                         Content = ex.Message,
                         CommonButtons = TaskDialogCommonButtons.Close,
                     }));

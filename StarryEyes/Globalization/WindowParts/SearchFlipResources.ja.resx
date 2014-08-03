@@ -165,14 +165,23 @@
   <data name="MsgErrorUnsuppressRetweetsTitle" xml:space="preserve">
     <value>リツイート非表示解除エラー</value>
   </data>
+  <data name="MsgUserFollowers" xml:space="preserve">
+    <value>フォロワー</value>
+  </data>
+  <data name="MsgUserFollowing" xml:space="preserve">
+    <value>フォロー</value>
+  </data>
   <data name="MsgUserInfoLoadErrorAccountIsNotExist" xml:space="preserve">
     <value>アカウントが登録されていません。</value>
   </data>
-  <data name="MsgUserInfoLoadErrorInst" xml:space="preserve">
-    <value>ユーザーの読み込みに失敗しました。</value>
+  <data name="MsgUserInfoLoadErrorInstFormat" xml:space="preserve">
+    <value>ユーザー情報の読み込みに失敗しました: {0}</value>
   </data>
   <data name="MsgUserInfoLoadErrorTitle" xml:space="preserve">
     <value>読み込みエラー</value>
+  </data>
+  <data name="MsgUserProfile" xml:space="preserve">
+    <value>プロフィール情報</value>
   </data>
   <data name="SearchFlipDeleteSavedKeyword" xml:space="preserve">
     <value>このアイテムを削除(_D)</value>

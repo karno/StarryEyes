@@ -205,6 +205,24 @@ namespace StarryEyes.Globalization.WindowParts {
         }
         
         /// <summary>
+        ///   Followers に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgUserFollowers {
+            get {
+                return ResourceManager.GetString("MsgUserFollowers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Following に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgUserFollowing {
+            get {
+                return ResourceManager.GetString("MsgUserFollowing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Account is not registered. に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string MsgUserInfoLoadErrorAccountIsNotExist {
@@ -214,11 +232,11 @@ namespace StarryEyes.Globalization.WindowParts {
         }
         
         /// <summary>
-        ///   Could not load user information. に類似しているローカライズされた文字列を検索します。
+        ///   Could not load user information: {0} に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        public static string MsgUserInfoLoadErrorInst {
+        public static string MsgUserInfoLoadErrorInstFormat {
             get {
-                return ResourceManager.GetString("MsgUserInfoLoadErrorInst", resourceCulture);
+                return ResourceManager.GetString("MsgUserInfoLoadErrorInstFormat", resourceCulture);
             }
         }
         
@@ -228,6 +246,15 @@ namespace StarryEyes.Globalization.WindowParts {
         public static string MsgUserInfoLoadErrorTitle {
             get {
                 return ResourceManager.GetString("MsgUserInfoLoadErrorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Profile information に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgUserProfile {
+            get {
+                return ResourceManager.GetString("MsgUserProfile", resourceCulture);
             }
         }
         

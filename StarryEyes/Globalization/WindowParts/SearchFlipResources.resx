@@ -165,14 +165,23 @@
   <data name="MsgErrorUnsuppressRetweetsTitle" xml:space="preserve">
     <value>Unsuppressing retweets error</value>
   </data>
+  <data name="MsgUserFollowers" xml:space="preserve">
+    <value>Followers</value>
+  </data>
+  <data name="MsgUserFollowing" xml:space="preserve">
+    <value>Following</value>
+  </data>
   <data name="MsgUserInfoLoadErrorAccountIsNotExist" xml:space="preserve">
     <value>Account is not registered.</value>
   </data>
-  <data name="MsgUserInfoLoadErrorInst" xml:space="preserve">
-    <value>Could not load user information.</value>
+  <data name="MsgUserInfoLoadErrorInstFormat" xml:space="preserve">
+    <value>Could not load user information: {0}</value>
   </data>
   <data name="MsgUserInfoLoadErrorTitle" xml:space="preserve">
     <value>Load error</value>
+  </data>
+  <data name="MsgUserProfile" xml:space="preserve">
+    <value>Profile information</value>
   </data>
   <data name="SearchFlipDeleteSavedKeyword" xml:space="preserve">
     <value>_Delete this item</value>

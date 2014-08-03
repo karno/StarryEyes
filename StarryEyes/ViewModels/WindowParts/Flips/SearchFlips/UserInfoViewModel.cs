@@ -7,6 +7,7 @@ using JetBrains.Annotations;
 using Livet;
 using Livet.Commands;
 using StarryEyes.Anomaly.Utils;
+using StarryEyes.Globalization;
 using StarryEyes.Globalization.WindowParts;
 using StarryEyes.Models;
 using StarryEyes.Models.Inputting;
@@ -179,7 +180,9 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                                    {
                                        Title = SearchFlipResources.MsgUserInfoLoadErrorTitle,
                                        MainIcon = VistaTaskDialogIcon.Error,
-                                       MainInstruction = SearchFlipResources.MsgUserInfoLoadErrorInst,
+                                       MainInstruction =
+                                           SearchFlipResources.MsgUserInfoLoadErrorInstFormat.SafeFormat(
+                                               SearchFlipResources.MsgUserProfile),
                                        Content = ex.Message,
                                        CommonButtons = TaskDialogCommonButtons.Close
                                    }));

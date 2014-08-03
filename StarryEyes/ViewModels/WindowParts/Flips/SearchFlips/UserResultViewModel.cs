@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Livet;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
+using StarryEyes.Globalization;
 using StarryEyes.Globalization.WindowParts;
 using StarryEyes.Models;
 using StarryEyes.Nightmare.Windows;
@@ -99,7 +100,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                         {
                             Title = SearchFlipResources.MsgUserInfoLoadErrorTitle,
                             MainIcon = VistaTaskDialogIcon.Error,
-                            MainInstruction = SearchFlipResources.MsgUserInfoLoadErrorInst,
+                            MainInstruction = SearchFlipResources.MsgUserInfoLoadErrorInstFormat.SafeFormat(_query),
                             Content = SearchFlipResources.MsgUserInfoLoadErrorAccountIsNotExist,
                             CommonButtons = TaskDialogCommonButtons.Close,
                         }));
@@ -128,7 +129,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                         {
                             Title = SearchFlipResources.MsgUserInfoLoadErrorTitle,
                             MainIcon = VistaTaskDialogIcon.Error,
-                            MainInstruction = SearchFlipResources.MsgUserInfoLoadErrorInst,
+                            MainInstruction = SearchFlipResources.MsgUserInfoLoadErrorInstFormat.SafeFormat(_query),
                             Content = ex.Message,
                             CommonButtons = TaskDialogCommonButtons.Close,
                         }));
