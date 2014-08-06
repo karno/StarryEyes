@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using StarryEyes.Casket.Connections;
 using StarryEyes.Casket.Cruds.Scaffolding;
 using StarryEyes.Casket.DatabaseModels;
 
@@ -16,22 +17,22 @@ namespace StarryEyes.Casket.Cruds
 
         protected abstract string IndexPrefix { get; }
 
-        internal override async Task InitializeAsync()
+        internal override async Task InitializeAsync(IDatabaseConnectionDescriptor descriptor)
         {
-            await base.InitializeAsync();
+            await base.InitializeAsync(descriptor);
             await this.CreateIndexAsync(IndexPrefix + "_PID", "ParentId", false);
         }
 
         public async Task<IEnumerable<T>> GetEntitiesAsync(long parentId)
         {
-            return await QueryAsync<T>(
+            return await Descriptor.QueryAsync<T>(
                 this.CreateSql("ParentId = @Id"),
                 new { Id = parentId });
         }
 
         public async Task DeleteAndInsertAsync(long parentId, IEnumerable<T> entities)
         {
-            await ExecuteAllAsync(
+            await Descriptor.ExecuteAllAsync(
                 new[] { this.CreateDeleter(parentId) }
                     .Concat(entities.Select(e => Tuple.Create(this.TableInserter, (object)e))));
         }

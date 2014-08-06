@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
+using StarryEyes.Casket.Connections;
 using StarryEyes.Casket.Cruds.Scaffolding;
 using StarryEyes.Casket.DatabaseModels;
 
@@ -28,11 +29,12 @@ namespace StarryEyes.Casket.Cruds
 
         private DatabaseManagement GetValueCore(long id)
         {
+            // synchronized read
             var sql = this.CreateSql("Id = @Id");
             try
             {
-                using (AcquireReadLock())
-                using (var con = DangerousOpenConnection())
+                using (Descriptor.AcquireReadLock())
+                using (var con = Descriptor.GetConnection())
                 {
                     return con.Query<DatabaseManagement>(sql, new { Id = id })
                               .SingleOrDefault();
@@ -40,7 +42,7 @@ namespace StarryEyes.Casket.Cruds
             }
             catch (Exception ex)
             {
-                throw WrapException(ex, "GetValueCore", sql);
+                throw DatabaseConnectionHelper.WrapException(ex, "GetValueCore", sql);
             }
         }
 
@@ -51,11 +53,12 @@ namespace StarryEyes.Casket.Cruds
 
         private void SetValueCore(DatabaseManagement mgmt)
         {
+            // synchronized insert
             try
             {
-                using (AcquireWriteLock())
-                using (var con = DangerousOpenConnection())
-                using (var tr = con.BeginTransaction(DefaultIsolationLevel))
+                using (Descriptor.AcquireWriteLock())
+                using (var con = Descriptor.GetConnection())
+                using (var tr = con.BeginTransaction(DatabaseConnectionHelper.DefaultIsolationLevel))
                 {
                     con.Execute(this.TableInserter, mgmt);
                     tr.Commit();
@@ -63,7 +66,7 @@ namespace StarryEyes.Casket.Cruds
             }
             catch (Exception ex)
             {
-                throw WrapException(ex, "SetValueCore", this.TableInserter);
+                throw DatabaseConnectionHelper.WrapException(ex, "SetValueCore", this.TableInserter);
             }
         }
 
@@ -71,22 +74,27 @@ namespace StarryEyes.Casket.Cruds
 
         internal async Task VacuumAsync()
         {
-            // should execute WITHOUT transaction.
-            await WriteTaskFactory.StartNew(() =>
-            {
-                try
+            await Descriptor
+                .GetTaskFactory(true)
+                .StartNew(() =>
                 {
-                    using (AcquireWriteLock())
-                    using (var con = DangerousOpenConnection())
+                    // should execute WITHOUT transaction.
+                    try
                     {
-                        con.Execute("VACUUM;");
+                        using (Descriptor.AcquireWriteLock())
+                        using (var con = Descriptor.GetConnection())
+                        using (var tr = con.BeginTransaction(DatabaseConnectionHelper.DefaultIsolationLevel)
+                            )
+                        {
+                            con.Execute("VACUUM;");
+                            tr.Commit();
+                        }
                     }
-                }
-                catch (Exception ex)
-                {
-                    throw WrapException(ex, "VacuumAsync", "VACUUM;");
-                }
-            });
+                    catch (Exception ex)
+                    {
+                        throw DatabaseConnectionHelper.WrapException(ex, "VacuumAsync", this.TableInserter);
+                    }
+                });
         }
     }
 }

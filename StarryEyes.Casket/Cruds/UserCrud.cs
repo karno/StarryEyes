@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
+using StarryEyes.Casket.Connections;
 using StarryEyes.Casket.Cruds.Scaffolding;
 using StarryEyes.Casket.DatabaseModels;
 
@@ -15,15 +16,15 @@ namespace StarryEyes.Casket.Cruds
         {
         }
 
-        internal override async Task InitializeAsync()
+        internal override async Task InitializeAsync(IDatabaseConnectionDescriptor descriptor)
         {
-            await base.InitializeAsync();
+            await base.InitializeAsync(descriptor);
             await this.CreateIndexAsync("UT_SN", "ScreenName", true);
         }
 
         public async Task<DatabaseUser> GetAsync(string screenName)
         {
-            return (await QueryAsync<DatabaseUser>(
+            return (await Descriptor.QueryAsync<DatabaseUser>(
                 this.CreateSql("LOWER(ScreenName) = @ScreenName limit 1"),
                 new { ScreenName = screenName.ToLower() }))
                 .SingleOrDefault();
@@ -31,11 +32,12 @@ namespace StarryEyes.Casket.Cruds
 
         public long GetId(string screenName)
         {
+            // synchronized read
             var sql = "select Id from " + TableName + " where LOWER(ScreenName) = @ScreenName limit 1;";
             try
             {
-                using (AcquireReadLock())
-                using (var con = DangerousOpenConnection())
+                using (Descriptor.AcquireReadLock())
+                using (var con = Descriptor.GetConnection())
                 {
                     return con.Query<long>(sql, new { ScreenName = screenName.ToLower() })
                               .SingleOrDefault();
@@ -43,20 +45,20 @@ namespace StarryEyes.Casket.Cruds
             }
             catch (Exception ex)
             {
-                throw WrapException(ex, "GetId", sql);
+                throw DatabaseConnectionHelper.WrapException(ex, "GetId", sql);
             }
         }
 
         public async Task<IEnumerable<DatabaseUser>> GetUsersAsync(string partOfScreenName)
         {
-            return await QueryAsync<DatabaseUser>(
+            return await Descriptor.QueryAsync<DatabaseUser>(
                 this.CreateSql("LOWER(ScreenName) like @Match"),
                 new { Match = "%" + partOfScreenName.ToLower() + "%" });
         }
 
         public async Task<IEnumerable<DatabaseUser>> GetUsersFastAsync(string firstMatchScreenName, int count)
         {
-            return await QueryAsync<DatabaseUser>(
+            return await Descriptor.QueryAsync<DatabaseUser>(
                 this.CreateSql("LOWER(ScreenName) like @Match order by ScreenName limit " + count),
                 new { Match = firstMatchScreenName.ToLower() + "%" });
         }
@@ -70,7 +72,7 @@ namespace StarryEyes.Casket.Cruds
             var union = targetTables.Select(t => "select distinct TargetId from " + t)
                                     .JoinString(" union ");
 
-            return await QueryAsync<DatabaseUser>(
+            return await Descriptor.QueryAsync<DatabaseUser>(
                 "select * " +
                 "from " + this.TableName + " " +
                 "inner join (" + union + ") on Id = TargetId " +

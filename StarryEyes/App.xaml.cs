@@ -9,6 +9,7 @@ using System.Windows;
 using System.Windows.Threading;
 using JetBrains.Annotations;
 using StarryEyes.Casket;
+using StarryEyes.Casket.Connections;
 using StarryEyes.Globalization;
 using StarryEyes.Models.Databases;
 using StarryEyes.Nightmare.Windows;
@@ -64,7 +65,7 @@ namespace StarryEyes
             }
 
             // initialize database
-            Database.Initialize(DatabaseFilePath);
+            Database.Initialize(new DatabaseConnectionDescriptor(DatabaseFilePath));
             if (!this.CheckDatabase())
             {
                 // db migration failed

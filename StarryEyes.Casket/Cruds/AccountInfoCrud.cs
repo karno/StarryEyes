@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using StarryEyes.Casket.Connections;
 using StarryEyes.Casket.Cruds.Scaffolding;
 using StarryEyes.Casket.DatabaseModels;
 
@@ -15,13 +16,13 @@ namespace StarryEyes.Casket.Cruds
 
         public async Task<IEnumerable<long>> GetAllAsync()
         {
-            return (await QueryAsync<DatabaseAccountInfo>("select * from " + TableName + ";", null))
+            return (await Descriptor.QueryAsync<DatabaseAccountInfo>("select * from " + TableName + ";", null))
                 .Select(a => a.Id);
         }
 
         public async Task DropAllAsync()
         {
-            await ExecuteAsync("delete from " + TableName + ";");
+            await Descriptor.ExecuteAsync("delete from " + TableName + ";");
         }
     }
 }

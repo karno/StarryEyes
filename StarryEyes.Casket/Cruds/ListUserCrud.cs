@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using Dapper;
+using StarryEyes.Casket.Connections;
 using StarryEyes.Casket.Cruds.Scaffolding;
 using StarryEyes.Casket.DatabaseModels;
 
@@ -16,46 +16,24 @@ namespace StarryEyes.Casket.Cruds
         {
         }
 
-        internal override async Task InitializeAsync()
+        internal override async Task InitializeAsync(IDatabaseConnectionDescriptor descriptor)
         {
-            await base.InitializeAsync();
+            await base.InitializeAsync(descriptor);
             await this.CreateIndexAsync("ListUserLID", "ListId", false);
             await this.CreateIndexAsync("ListUserUID", "UserId", false);
         }
 
         public async Task<IEnumerable<long>> GetUsersAsync(long listId)
         {
-            return (await QueryAsync<DatabaseListUser>(
+            return (await Descriptor.QueryAsync<DatabaseListUser>(
                 CreateSql("ListId = @listId"), new { listId }))
                 .Select(l => l.UserId);
         }
 
         public async Task RegisterUsersAsync(long listId, IEnumerable<long> userIds)
         {
-            await WriteTaskFactory.StartNew(() =>
-            {
-                try
-                {
-                    ReaderWriterLock.EnterWriteLock();
-                    using (var conn = DangerousOpenConnection())
-                    using (var tran = conn.BeginTransaction(DefaultIsolationLevel))
-                    {
-                        foreach (var userId in userIds)
-                        {
-                            conn.Execute(TableInserter, new DatabaseListUser(listId, userId));
-                        }
-                        tran.Commit();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    throw WrapException(ex, "RegisterUserAsync", TableInserter);
-                }
-                finally
-                {
-                    ReaderWriterLock.ExitWriteLock();
-                }
-            });
+            await Descriptor.ExecuteAllAsync(userIds.Select(
+                uid => Tuple.Create(this.TableInserter, (object)new DatabaseListUser(listId, uid))));
         }
 
         public async Task RegisterUserAsync(long listId, long userId)
@@ -67,7 +45,7 @@ namespace StarryEyes.Casket.Cruds
         {
             var uids = removalUserIds.Select(i => i.ToString(CultureInfo.InvariantCulture)).JoinString(",");
             if (String.IsNullOrEmpty(uids)) return;
-            await ExecuteAsync(
+            await Descriptor.ExecuteAsync(
                 "delete from " + TableName + " where " +
                 "ListId = @listId and UserId in (" + uids + ");",
                 new { listId });
@@ -75,7 +53,7 @@ namespace StarryEyes.Casket.Cruds
 
         public async Task DeleteUserAsync(long listId, long userId)
         {
-            await ExecuteAsync("delete from " + TableName + "where " +
+            await Descriptor.ExecuteAsync("delete from " + TableName + "where " +
                                     "ListId = @listId and UserId = @userId", new { listId, userId });
         }
 
@@ -84,13 +62,13 @@ namespace StarryEyes.Casket.Cruds
             var uids = users.Select(i => i.ToString(CultureInfo.InvariantCulture)).JoinString(",");
             if (String.IsNullOrEmpty(uids))
             {
-                await ExecuteAsync(
+                await Descriptor.ExecuteAsync(
                     "delete from " + TableName + " where ListId = @listId;",
                     new { listId });
             }
             else
             {
-                await ExecuteAsync(
+                await Descriptor.ExecuteAsync(
                     "delete from " + TableName + " where " +
                     "ListId = @listId and UserId not in (" + uids + ");",
                     new { listId });

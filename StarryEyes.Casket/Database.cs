@@ -4,6 +4,7 @@ using System.Data.SQLite;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using StarryEyes.Casket.Connections;
 using StarryEyes.Casket.Cruds;
 using StarryEyes.Casket.Cruds.Scaffolding;
 using StarryEyes.Casket.DatabaseModels;
@@ -25,10 +26,9 @@ namespace StarryEyes.Casket
         private static readonly RelationCrud _relationCrud = new RelationCrud();
         private static readonly ManagementCrud _managementCrud = new ManagementCrud();
 
-        private static string _dbFilePath;
-        private static bool _isInitialized;
+        private static IDatabaseConnectionDescriptor _descriptor;
 
-        public static string DbFilePath { get { return _dbFilePath; } }
+        private static bool _isInitialized;
 
         public static AccountInfoCrud AccountInfoCrud
         {
@@ -90,14 +90,15 @@ namespace StarryEyes.Casket
             get { return _managementCrud; }
         }
 
-        public static void Initialize(string dbFilePath)
+        public static void Initialize(IDatabaseConnectionDescriptor descriptor)
         {
-            System.Diagnostics.Debug.WriteLine("Krile DB Initializing...(" + dbFilePath + ")");
+            System.Diagnostics.Debug.WriteLine("Krile DB Initializing...");
             if (_isInitialized)
             {
                 throw new InvalidOperationException("Database core is already initialized.");
             }
             _isInitialized = true;
+            _descriptor = descriptor;
 
             // register sqlite functions
             var asm = Assembly.GetExecutingAssembly();
@@ -106,24 +107,23 @@ namespace StarryEyes.Casket
                .ForEach(SQLiteFunction.RegisterFunction);
 
             // initialize tables
-            _dbFilePath = dbFilePath;
             var tasks = new Task[] { };
             Task.WaitAll(Task.Factory.StartNew(() =>
             {
                 tasks = new[]
                 {
-                    AccountInfoCrud.InitializeAsync(),
-                    StatusCrud.InitializeAsync(),
-                    StatusEntityCrud.InitializeAsync(),
-                    UserCrud.InitializeAsync(),
-                    UserDescriptionEntityCrud.InitializeAsync(),
-                    UserUrlEntityCrud.InitializeAsync(),
-                    ListCrud.InitializeAsync(),
-                    ListUserCrud.InitializeAsync(),
-                    FavoritesCrud.InitializeAsync(),
-                    RetweetsCrud.InitializeAsync(),
-                    RelationCrud.InitializeAsync(),
-                    ManagementCrud.InitializeAsync()
+                    AccountInfoCrud.InitializeAsync(descriptor),
+                    StatusCrud.InitializeAsync(descriptor),
+                    StatusEntityCrud.InitializeAsync(descriptor),
+                    UserCrud.InitializeAsync(descriptor),
+                    UserDescriptionEntityCrud.InitializeAsync(descriptor),
+                    UserUrlEntityCrud.InitializeAsync(descriptor),
+                    ListCrud.InitializeAsync(descriptor),
+                    ListUserCrud.InitializeAsync(descriptor),
+                    FavoritesCrud.InitializeAsync(descriptor),
+                    RetweetsCrud.InitializeAsync(descriptor),
+                    RelationCrud.InitializeAsync(descriptor),
+                    ManagementCrud.InitializeAsync(descriptor)
                 };
             }));
             Task.WaitAll(tasks);
@@ -131,7 +131,7 @@ namespace StarryEyes.Casket
 
         public static async Task ReInitializeAsync<T>(CrudBase<T> crudBase) where T : class
         {
-            await crudBase.InitializeAsync();
+            await crudBase.InitializeAsync(_descriptor);
         }
 
         #region store in one transaction
@@ -241,7 +241,7 @@ namespace StarryEyes.Casket
 
         public static async Task ExecuteAsync(string query)
         {
-            await CrudBase.ExecuteAsync(query);
+            await _descriptor.ExecuteAsync(query);
         }
     }
 

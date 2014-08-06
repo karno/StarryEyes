@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using StarryEyes.Casket.Connections;
 using StarryEyes.Casket.Cruds.Scaffolding;
 using StarryEyes.Casket.DatabaseModels;
 
@@ -17,16 +18,16 @@ namespace StarryEyes.Casket.Cruds
             _tableName = tableName;
         }
 
-        internal override async Task InitializeAsync()
+        internal override async Task InitializeAsync(IDatabaseConnectionDescriptor descriptor)
         {
-            await base.InitializeAsync();
+            await base.InitializeAsync(descriptor);
             await this.CreateIndexAsync(_tableName + "_SID", "StatusId", false);
             await this.CreateIndexAsync(_tableName + "_UID", "UserId", false);
         }
 
         public Task<IEnumerable<long>> GetUsersAsync(long statusId)
         {
-            return QueryAsync<long>(
+            return Descriptor.QueryAsync<long>(
                 "select UserId from " + TableName + " where StatusId = @Id;",
                 new { Id = statusId });
         }
@@ -42,7 +43,7 @@ namespace StarryEyes.Casket.Cruds
 
         public async Task DeleteAsync(long statusId, long userId)
         {
-            await ExecuteAsync(
+            await Descriptor.ExecuteAsync(
                 "delete from " + this.TableName + " where StatusId = @Sid and UserId = @Uid;",
                 new { Sid = statusId, Uid = userId });
         }
@@ -56,7 +57,7 @@ namespace StarryEyes.Casket.Cruds
                     StatusId = i.Item1,
                     UserId = i.Item2
                 }));
-            await ExecuteAllAsync(inserters);
+            await Descriptor.ExecuteAllAsync(inserters);
         }
 
         public async Task DeleteAllAsync(IEnumerable<Tuple<long, long>> items)
@@ -64,7 +65,7 @@ namespace StarryEyes.Casket.Cruds
             var deleters = items.Select(i => Tuple.Create(
                 "delete from " + this.TableName + " where StatusId = @Sid and UserId = @Uid;",
                 (object)new { Sid = i.Item1, Uid = i.Item2 }));
-            await ExecuteAllAsync(deleters);
+            await Descriptor.ExecuteAllAsync(deleters);
         }
     }
 }

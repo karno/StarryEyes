@@ -1,241 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.SQLite;
 using System.Linq;
-using System.Reactive.Disposables;
-using System.Threading;
 using System.Threading.Tasks;
-using Dapper;
-using StarryEyes.Albireo.Threading;
+using JetBrains.Annotations;
+using StarryEyes.Casket.Connections;
 
 namespace StarryEyes.Casket.Cruds.Scaffolding
 {
-    public abstract class CrudBase
-    {
-        protected static IsolationLevel DefaultIsolationLevel
-        {
-            get { return IsolationLevel.Serializable; }
-        }
-
-        #region Concurrent lock
-
-        private static readonly ReaderWriterLockSlim _rwlock = new ReaderWriterLockSlim();
-
-        #endregion
-
-        #region connection string builder
-
-        private static readonly string _baseConStr = CreateBaseConStr();
-
-        private static string CreateBaseConStr()
-        {
-            var dic = new Dictionary<string, string>
-            {
-                {"Version", "3"},
-                {"Cache Size", "8000"},
-                // This option would cause damage to database image.
-                // {"Synchronous", "Off"},
-                {"Synchronous", "Normal"},
-                {"Default Timeout", "3"},
-                {"Default IsolationLevel", "Serializable"},
-                {"Journal Mode", "WAL"},
-                {"Page Size", "2048"},
-                {"Pooling", "True"},
-                {"Max Pool Size", "200"},
-            };
-            return dic.Select(kvp => kvp.Key + "=" + kvp.Value)
-                      .JoinString(";");
-        }
-
-        private static string CreateConStr(string dbfilepath)
-        {
-            return "Data Source=" + dbfilepath + ";" + _baseConStr;
-        }
-
-        #endregion
-
-        #region threading
-
-        private static readonly TaskFactory _readTaskFactory = LimitedTaskScheduler.GetTaskFactory(8);
-        protected static TaskFactory ReadTaskFactory { get { return _readTaskFactory; } }
-
-        private static readonly TaskFactory _writeTaskFactory = LimitedTaskScheduler.GetTaskFactory(1);
-        protected static TaskFactory WriteTaskFactory { get { return _writeTaskFactory; } }
-
-        #endregion
-
-        protected static ReaderWriterLockSlim ReaderWriterLock
-        {
-            get { return _rwlock; }
-        }
-
-        internal static IDisposable AcquireWriteLock()
-        {
-            _rwlock.EnterWriteLock();
-            return Disposable.Create(() => _rwlock.ExitWriteLock());
-        }
-
-        internal static IDisposable AcquireReadLock()
-        {
-            _rwlock.EnterReadLock();
-            return Disposable.Create(() => _rwlock.ExitReadLock());
-        }
-
-        protected static SQLiteConnection DangerousOpenConnection()
-        {
-#if DEBUG
-            if (!ReaderWriterLock.IsReadLockHeld &&
-                !ReaderWriterLock.IsUpgradeableReadLockHeld &&
-                !ReaderWriterLock.IsWriteLockHeld)
-            {
-                throw new InvalidOperationException("This thread does not have any locks!");
-            }
-#endif
-            SQLiteConnection con = null;
-            try
-            {
-                con = new SQLiteConnection(CreateConStr(Database.DbFilePath));
-                con.Open();
-                con.Execute("PRAGMA case_sensitive_like=1");
-                return con;
-            }
-            catch (Exception)
-            {
-                if (con != null)
-                {
-                    try { con.Dispose(); }
-                    // ReSharper disable EmptyGeneralCatchClause
-                    catch { }
-                    // ReSharper restore EmptyGeneralCatchClause
-                }
-                throw;
-            }
-        }
-
-        internal static Task<int> ExecuteAsync(string query)
-        {
-            return _writeTaskFactory.StartNew(() =>
-            {
-                // System.Diagnostics.Debug.WriteLine("EXECUTE: " + query);
-                try
-                {
-                    ReaderWriterLock.EnterWriteLock();
-                    using (var con = DangerousOpenConnection())
-                    using (var tr = con.BeginTransaction(DefaultIsolationLevel))
-                    {
-                        var result = con.Execute(query, transaction: tr);
-                        tr.Commit();
-                        return result;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    throw WrapException(ex, "ExecuteAsync", query);
-                }
-                finally
-                {
-                    ReaderWriterLock.ExitWriteLock();
-                }
-            });
-        }
-
-        internal static Task<int> ExecuteAsync(string query, dynamic param)
-        {
-            return _writeTaskFactory.StartNew(() =>
-            {
-                try
-                {
-                    _rwlock.EnterWriteLock();
-                    // System.Diagnostics.Debug.WriteLine("EXECUTE: " + query);
-                    using (var con = DangerousOpenConnection())
-                    using (var tr = con.BeginTransaction(DefaultIsolationLevel))
-                    {
-                        var result = (int)SqlMapper.Execute(con, query, param, tr);
-                        tr.Commit();
-                        return result;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    throw WrapException(ex, "ExecuteAsyncWithParam", query);
-                }
-                finally
-                {
-                    ReaderWriterLock.ExitWriteLock();
-                }
-            });
-        }
-
-        internal static Task ExecuteAllAsync(IEnumerable<Tuple<string, object>> queryAndParams)
-        {
-            var qnp = queryAndParams.Memoize();
-            return _writeTaskFactory.StartNew(() =>
-            {
-                try
-                {
-                    ReaderWriterLock.EnterWriteLock();
-                    using (var con = DangerousOpenConnection())
-                    using (var tr = con.BeginTransaction(DefaultIsolationLevel))
-                    {
-                        foreach (var qap in qnp)
-                        {
-                            // System.Diagnostics.Debug.WriteLine("EXECUTE: " + qap.Item1);
-                            con.Execute(qap.Item1, qap.Item2, tr);
-                        }
-                        tr.Commit();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    throw WrapException(ex, "ExecuteAllAsync",
-                        qnp.Select(q => q.Item1).JoinString(Environment.NewLine));
-                }
-                finally
-                {
-                    ReaderWriterLock.ExitWriteLock();
-                }
-            });
-        }
-
-        internal static Task<IEnumerable<T>> QueryAsync<T>(string query, object param)
-        {
-            // System.Diagnostics.Debug.WriteLine("QUERY: " + query);
-            return _readTaskFactory.StartNew(() =>
-            {
-                try
-                {
-                    ReaderWriterLock.EnterReadLock();
-                    using (var con = DangerousOpenConnection())
-                    {
-                        return con.Query<T>(query, param);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    throw WrapException(ex, "QueryAsync", query);
-                }
-                finally
-                {
-                    ReaderWriterLock.ExitReadLock();
-                }
-            });
-        }
-
-        protected static SqliteCrudException WrapException(Exception exception, string command, string query)
-        {
-            return new SqliteCrudException(exception, command, query);
-        }
-
-    }
-
-    public abstract class CrudBase<T> : CrudBase where T : class
+    public abstract class CrudBase<T> where T : class
     {
         private readonly string _tableName;
         private readonly string _tableCreator;
         private readonly string _tableInserter;
         private readonly string _tableUpdater;
         private readonly string _tableDeleter;
+
+        private IDatabaseConnectionDescriptor _descriptor;
+
+        [NotNull]
+        protected IDatabaseConnectionDescriptor Descriptor
+        {
+            get
+            {
+                if (_descriptor == null)
+                {
+                    throw new InvalidOperationException("CrudBase has not initialized yet: " + this.GetType().Name);
+                }
+                return _descriptor;
+            }
+        }
 
         public CrudBase(ResolutionMode onConflict)
             : this(null, onConflict)
@@ -287,43 +80,45 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
             get { return this._tableDeleter; }
         }
 
-        internal virtual async Task InitializeAsync()
+        internal virtual async Task InitializeAsync(IDatabaseConnectionDescriptor descriptor)
         {
-            await ExecuteAsync(TableCreator);
+            // initialize descriptor
+            _descriptor = descriptor;
+            await Descriptor.ExecuteAsync(TableCreator);
         }
 
         protected async Task CreateIndexAsync(string indexName, string column, bool unique)
         {
-            await ExecuteAsync("CREATE " + (unique ? "UNIQUE " : "") + "INDEX IF NOT EXISTS " +
+            await Descriptor.ExecuteAsync("CREATE " + (unique ? "UNIQUE " : "") + "INDEX IF NOT EXISTS " +
                                indexName + " ON " + TableName + "(" + column + ")");
         }
 
         public virtual async Task<T> GetAsync(long key)
         {
-            return (await QueryAsync<T>(
+            return (await Descriptor.QueryAsync<T>(
                 this.CreateSql("Id = @Id"),
                 new { Id = key })).SingleOrDefault();
         }
 
         public virtual async Task InsertAsync(T item)
         {
-            await ExecuteAsync(this.TableInserter, item);
+            await Descriptor.ExecuteAsync(this.TableInserter, item);
         }
 
         public virtual async Task DeleteAsync(long key)
         {
-            await ExecuteAsync(this.TableDeleter, new { Id = key });
+            await Descriptor.ExecuteAsync(this.TableDeleter, new { Id = key });
         }
 
         public virtual async Task DeleteAllAsync(IEnumerable<long> key)
         {
             var queries = key.Select(k => Tuple.Create(this.TableDeleter, (object)new { Id = k })).ToArray();
-            await ExecuteAllAsync(queries);
+            await Descriptor.ExecuteAllAsync(queries);
         }
 
         public async Task AlterAsync(string newTableName)
         {
-            await ExecuteAsync("ALTER TABLE " + this._tableName + " RENAME TO " + newTableName + ";");
+            await Descriptor.ExecuteAsync("ALTER TABLE " + this._tableName + " RENAME TO " + newTableName + ";");
         }
     }
 }

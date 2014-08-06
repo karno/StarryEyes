@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using StarryEyes.Casket.Connections;
 using StarryEyes.Casket.Cruds.Scaffolding;
 using StarryEyes.Casket.DatabaseModels;
 
@@ -12,25 +13,25 @@ namespace StarryEyes.Casket.Cruds
     {
         internal RelationCrudBase(string tableName) : base(tableName, ResolutionMode.Ignore) { }
 
-        internal override async Task InitializeAsync()
+        internal override async Task InitializeAsync(IDatabaseConnectionDescriptor descriptor)
         {
-            await base.InitializeAsync();
+            await base.InitializeAsync(descriptor);
             await this.CreateIndexAsync(TableName + "_IDX_UID", "UserId", false);
         }
 
         public async Task<IEnumerable<DatabaseRelation>> GetAllAsync()
         {
-            return await QueryAsync<DatabaseRelation>(this.CreateSql(null), null);
+            return await Descriptor.QueryAsync<DatabaseRelation>(this.CreateSql(null), null);
         }
 
         internal async Task DropTableAsync()
         {
-            await ExecuteAsync("drop table " + TableName);
+            await Descriptor.ExecuteAsync("drop table " + TableName);
         }
 
         public async Task<bool> ContainsAsync(long userId, long targetId)
         {
-            return (await QueryAsync<DatabaseRelation>(
+            return (await Descriptor.QueryAsync<DatabaseRelation>(
                 this.CreateSql("UserId = @UserId and TargetId = @TargetId limit 1"),
                 new { UserId = userId, TargetId = targetId }))
                 .SingleOrDefault() != null;
@@ -38,18 +39,18 @@ namespace StarryEyes.Casket.Cruds
 
         public async Task AddOrUpdateAsync(long userId, long targetId)
         {
-            await this.InsertAsync(new DatabaseRelation(userId, targetId));
+            await InsertAsync(new DatabaseRelation(userId, targetId));
         }
 
         public async Task AddOrUpdateAllAsync(long userId, IEnumerable<long> targetIds)
         {
-            await ExecuteAllAsync(targetIds.Select(
+            await Descriptor.ExecuteAllAsync(targetIds.Select(
                 id => Tuple.Create(this.TableInserter, (object)new DatabaseRelation(userId, id))));
         }
 
         public async Task DeleteAsync(long userId, long targetId)
         {
-            await ExecuteAsync(
+            await Descriptor.ExecuteAsync(
                 "delete from " + TableName + " where UserId = @UserId and TargetId = @TargetId;",
                 new { UserId = userId, TargetId = targetId });
         }
@@ -58,34 +59,34 @@ namespace StarryEyes.Casket.Cruds
         {
             var tids = targetId.Select(i => i.ToString(CultureInfo.InvariantCulture)).JoinString(",");
             if (String.IsNullOrEmpty(tids)) return;
-            await ExecuteAsync(
+            await Descriptor.ExecuteAsync(
                 "delete from " + TableName + " where UserId = @UserId and TargetId in (" + tids + ");",
                 new { UserId = userId });
         }
 
         public async Task<IEnumerable<long>> GetUsersAsync(long userId)
         {
-            return (await QueryAsync<long>(
+            return (await Descriptor.QueryAsync<long>(
                 "select TargetId from " + TableName + " where UserId = @UserId;",
                 new { UserId = userId }));
         }
 
         public async Task<IEnumerable<long>> GetUsersAllAsync()
         {
-            return (await QueryAsync<long>(
+            return (await Descriptor.QueryAsync<long>(
                 "select distinct TargetId from " + TableName + ";", null));
         }
 
         public async Task DropUserAsync(long userId)
         {
-            await ExecuteAsync(
+            await Descriptor.ExecuteAsync(
                 "delete from " + TableName + " where UserId = @UserId;",
                 new { UserId = userId });
         }
 
         public async Task DropAllAsync()
         {
-            await ExecuteAsync("delete from " + TableName + ";");
+            await Descriptor.ExecuteAsync("delete from " + TableName + ";");
         }
     }
 
@@ -104,13 +105,13 @@ namespace StarryEyes.Casket.Cruds
             _noRetweets = new RelationCrudBase("NoRetweets");
         }
 
-        public async Task InitializeAsync()
+        public async Task InitializeAsync(IDatabaseConnectionDescriptor descriptor)
         {
             await Task.WhenAll(
-                this._followings.InitializeAsync(),
-                this._followers.InitializeAsync(),
-                this._blockings.InitializeAsync(),
-                this._noRetweets.InitializeAsync());
+                this._followings.InitializeAsync(descriptor),
+                this._followers.InitializeAsync(descriptor),
+                this._blockings.InitializeAsync(descriptor),
+                this._noRetweets.InitializeAsync(descriptor));
         }
 
         public async Task<bool> IsFollowingAsync(long userId, long targetId)
