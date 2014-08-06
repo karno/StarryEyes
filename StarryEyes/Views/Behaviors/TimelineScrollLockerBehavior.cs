@@ -254,9 +254,6 @@ namespace StarryEyes.Views.Behaviors
         /// </summary>
         private void ItemsSourceChanged()
         {
-            // check is this behavior attached
-            if (AssociatedObject == null) return;
-
             // capture current value
             var itemsSource = ItemsSource;
 
@@ -290,6 +287,7 @@ namespace StarryEyes.Views.Behaviors
             return ((INotifyCollectionChanged)source).ListenCollectionChanged()
                   .Subscribe(ev =>
                   {
+                      if (this.AssociatedObject == null) return;
                       if (ev.Action == NotifyCollectionChangedAction.Add)
                       {
                           // get virtualizing stack panel
