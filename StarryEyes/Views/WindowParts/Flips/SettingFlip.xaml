@@ -84,7 +84,7 @@
                 <ListBox x:Name="SettingCategories"
                          Width="180"
                          HorizontalContentAlignment="Stretch"
-                         SelectedIndex="0">
+                         SelectedIndex="4">
                     <ListBox.Resources>
                         <Style TargetType="{x:Type ListBoxItem}">
                             <Setter Property="Margin" Value="0" />
@@ -647,6 +647,9 @@
                                 <CheckBox Margin="0,0,0,8"
                                           Content="{x:Static localize:SettingFlipResources.NotifyShowPopupWhenWindowIsActive}"
                                           IsChecked="{Binding IsNotifyWhenWindowIsActive}" />
+                                <CheckBox Margin="0,0,0,8"
+                                          Content="{x:Static localize:SettingFlipResources.NotifyBackfilledTweets}"
+                                          IsChecked="{Binding IsNotifyBackfilledTweets}" />
                                 <CheckBox Margin="0,0,0,8"
                                           Content="{x:Static localize:SettingFlipResources.NotifyNewReplies}"
                                           IsChecked="{Binding IsNotifyMentions}" />

@@ -590,6 +590,12 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             set { Setting.NotifyWhenWindowIsActive.Value = value; }
         }
 
+        public bool IsNotifyBackfilledTweets
+        {
+            get { return Setting.NotifyBackfilledTweets.Value; }
+            set { Setting.NotifyBackfilledTweets.Value = value; }
+        }
+
         public bool IsNotifyMentions
         {
             get { return Setting.NotifyMention.Value; }

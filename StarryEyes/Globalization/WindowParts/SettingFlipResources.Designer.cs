@@ -962,6 +962,15 @@ namespace StarryEyes.Globalization.WindowParts {
         }
         
         /// <summary>
+        ///   Notify backfilled tweets に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string NotifyBackfilledTweets {
+            get {
+                return ResourceManager.GetString("NotifyBackfilledTweets", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Confirm on exit application に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string NotifyConfirmOnExit {

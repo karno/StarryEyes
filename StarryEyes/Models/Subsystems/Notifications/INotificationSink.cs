@@ -22,7 +22,7 @@ namespace StarryEyes.Models.Subsystems.Notifications
 
         void NotifyUnfavorited(TwitterUser source, TwitterStatus status);
 
-        void NotifyRetweeted(TwitterUser source, TwitterStatus status);
+        void NotifyRetweeted(TwitterUser source, TwitterStatus original, TwitterStatus retweet);
 
         void NotifyDeleted(long statusId, TwitterStatus deleted);
 

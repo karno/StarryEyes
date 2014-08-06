@@ -99,9 +99,10 @@ namespace StarryEyes.Feather.Proxies
         /// The user retweeted the tweet.
         /// </summary>
         /// <param name="source">source user</param>
-        /// <param name="status">target status</param>
+        /// <param name="original">original tweet</param>
+        /// <param name="retweet">retweeted tweet</param>
         /// <returns>return true to trap notification</returns>
-        bool NotifyRetweeted(TwitterUser source, TwitterStatus status);
+        bool NotifyRetweeted(TwitterUser source, TwitterStatus original, TwitterStatus retweet);
 
         /// <summary>
         /// The status is deleted.

@@ -604,4 +604,7 @@ Are you sure?</value>
   <data name="HighUseInMemoryDatabase" xml:space="preserve">
     <value>Use in-memory database mode [need restarting Krile for apply]</value>
   </data>
+  <data name="NotifyBackfilledTweets" xml:space="preserve">
+    <value>Notify backfilled tweets</value>
+  </data>
 </root>

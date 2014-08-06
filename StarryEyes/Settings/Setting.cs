@@ -211,6 +211,9 @@ namespace StarryEyes.Settings
         public static readonly SettingItemStruct<bool> NotifyWhenWindowIsActive =
             new SettingItemStruct<bool>("NotifyWhenWindowIsActive", false);
 
+        public static readonly SettingItemStruct<bool> NotifyBackfilledTweets =
+            new SettingItemStruct<bool>("NotifyBackfilledTweets", false);
+
         public static readonly SettingItemStruct<bool> NotifyMention =
             new SettingItemStruct<bool>("NotifyMention", true);
 

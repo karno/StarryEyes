@@ -56,9 +56,9 @@ namespace StarryEyes.Models.Subsystems.Notifications.UI
             OnFavorited.SafeInvoke(source, target);
         }
 
-        public void Retweeted(TwitterUser source, TwitterStatus target)
+        public void Retweeted(TwitterUser source, TwitterStatus original, TwitterStatus retweet)
         {
-            OnRetweeted.SafeInvoke(source, target);
+            OnRetweeted.SafeInvoke(source, original);
         }
     }
 }

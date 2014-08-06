@@ -60,7 +60,7 @@ namespace StarryEyes.Models.Subsystems
         {
             if (status.RetweetedOriginal != null)
             {
-                NotifyRetweeted(status.User, status.RetweetedOriginal);
+                NotifyRetweeted(status.User, status.RetweetedOriginal, status);
             }
             Head.NotifyReceived(status);
         }
@@ -73,6 +73,13 @@ namespace StarryEyes.Models.Subsystems
         {
             // check muted or blocked
             if (MuteBlockManager.IsUnwanted(status)) return;
+
+            if (!Setting.NotifyBackfilledTweets.Value &&
+                status.CreatedAt < App.StartupDateTime)
+            {
+                // backfilled tweets
+                return;
+            }
 
             lock (_acceptingArrivals)
             {
@@ -206,18 +213,24 @@ namespace StarryEyes.Models.Subsystems
             Head.NotifyUnfavorited(source, status);
         }
 
-        internal static void NotifyRetweeted(TwitterUser source, TwitterStatus status)
+        internal static void NotifyRetweeted(TwitterUser source, TwitterStatus original, TwitterStatus retweet)
         {
             if (MuteBlockManager.IsBlocked(source)) return;
+            if (!Setting.NotifyBackfilledTweets.Value &&
+                retweet.CreatedAt < App.StartupDateTime)
+            {
+                // backfilled tweets
+                return;
+            }
             Task.Run(() => UserProxy.StoreUser(source));
             Task.Run(() => StatusModel.UpdateStatusInfo(
-                status.Id,
+                original.Id,
                 model => model.AddRetweetedUser(source), _ =>
                 {
-                    StatusProxy.AddRetweeter(status.Id, source.Id);
-                    StatusBroadcaster.Republish(status);
+                    StatusProxy.AddRetweeter(original.Id, source.Id);
+                    StatusBroadcaster.Republish(original);
                 }));
-            Head.NotifyRetweeted(source, status);
+            Head.NotifyRetweeted(source, original, retweet);
         }
 
         internal static void NotifyDeleted(long statusId, TwitterStatus deleted)

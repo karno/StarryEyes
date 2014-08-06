@@ -23,6 +23,6 @@ namespace StarryEyes.Models.Subsystems.Notifications.UI
 
         public void Favorited(TwitterUser source, TwitterStatus target) { }
 
-        public void Retweeted(TwitterUser source, TwitterStatus target) { }
+        public void Retweeted(TwitterUser source, TwitterStatus original, TwitterStatus retweet) { }
     }
 }

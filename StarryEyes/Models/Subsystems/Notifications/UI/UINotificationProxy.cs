@@ -187,13 +187,13 @@ namespace StarryEyes.Models.Subsystems.Notifications.UI
                 return false;
             }
 
-            public bool NotifyRetweeted(TwitterUser source, TwitterStatus status)
+            public bool NotifyRetweeted(TwitterUser source, TwitterStatus original, TwitterStatus retweet)
             {
                 if (Setting.NotifyRetweet.Value &&
-                    !CheckMyself(source) && CheckMyself(status))
+                    !CheckMyself(source) && CheckMyself(original))
                 {
                     PlaySoundCore(GetSoundFilePath(NotifySoundType.Event));
-                    GetNotificator().Retweeted(source, status);
+                    GetNotificator().Retweeted(source, original, retweet);
                 }
                 return false;
             }
