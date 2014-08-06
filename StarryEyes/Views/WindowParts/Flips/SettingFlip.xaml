@@ -1006,6 +1006,9 @@
                         <CheckBox Margin="0,8"
                                   Content="{x:Static localize:SettingFlipResources.HighApplyUnstablePatch}"
                                   IsChecked="{Binding ApplyUnstablePatch}" />
+                        <CheckBox Margin="0,8"
+                                  Content="{x:Static localize:SettingFlipResources.HighUseInMemoryDatabase}"
+                                  IsChecked="{Binding UseInMemoryDatabase}" />
                         <StackPanel Margin="0,8" Orientation="Horizontal">
                             <TextBlock Margin="0,0,8,0"
                                        VerticalAlignment="Center"

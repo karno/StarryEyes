@@ -65,7 +65,14 @@ namespace StarryEyes
             }
 
             // initialize database
-            Database.Initialize(new DatabaseConnectionDescriptor(DatabaseFilePath));
+            if (Setting.UseInMemoryDatabase.Value)
+            {
+                Database.Initialize(new InMemoryDatabaseConnectionDescriptor());
+            }
+            else
+            {
+                Database.Initialize(new DatabaseConnectionDescriptor(DatabaseFilePath));
+            }
             if (!this.CheckDatabase())
             {
                 // db migration failed
@@ -214,28 +221,19 @@ namespace StarryEyes
 
         public static bool IsOperatingSystemSupported
         {
-            get
-            {
-                return Environment.OSVersion.Version.Major == 6;
-            }
+            get { return Environment.OSVersion.Version.Major == 6; }
         }
 
         [NotNull]
         public static string ExeFilePath
         {
-            get
-            {
-                return Process.GetCurrentProcess().MainModule.FileName;
-            }
+            get { return Process.GetCurrentProcess().MainModule.FileName; }
         }
 
         [NotNull]
         public static string ExeFileDir
         {
-            get
-            {
-                return Path.GetDirectoryName(ExeFilePath) ?? ExeFilePath + "_";
-            }
+            get { return Path.GetDirectoryName(ExeFilePath) ?? ExeFilePath + "_"; }
         }
 
         public static ExecutionMode ExecutionMode
@@ -348,10 +346,7 @@ namespace StarryEyes
         [NotNull]
         public static string ConfigurationFilePath
         {
-            get
-            {
-                return Path.Combine(ConfigurationDirectoryPath, ConfigurationFileName);
-            }
+            get { return Path.Combine(ConfigurationDirectoryPath, ConfigurationFileName); }
         }
 
         [NotNull]

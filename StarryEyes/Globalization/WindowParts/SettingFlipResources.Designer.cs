@@ -576,6 +576,15 @@ namespace StarryEyes.Globalization.WindowParts {
         }
         
         /// <summary>
+        ///   Use in-memory database mode [need restarting Krile for apply] に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string HighUseInMemoryDatabase {
+            get {
+                return ResourceManager.GetString("HighUseInMemoryDatabase", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   When sending a reply to the reply to the account which is fall back from other account, falling back agency account is specified automatically. に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string InputBacktrackDescription {

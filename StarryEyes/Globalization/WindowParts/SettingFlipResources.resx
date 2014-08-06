@@ -601,4 +601,7 @@ Are you sure?</value>
   <data name="AccountButtonSetKey" xml:space="preserve">
     <value>&amp;Set custom API key</value>
   </data>
+  <data name="HighUseInMemoryDatabase" xml:space="preserve">
+    <value>Use in-memory database mode [need restarting Krile for apply]</value>
+  </data>
 </root>

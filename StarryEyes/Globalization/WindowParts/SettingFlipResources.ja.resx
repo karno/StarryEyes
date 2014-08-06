@@ -601,4 +601,7 @@
   <data name="AccountButtonSetKey" xml:space="preserve">
     <value>APIキーを設定(&amp;S)</value>
   </data>
+  <data name="HighUseInMemoryDatabase" xml:space="preserve">
+    <value>インメモリ データベース モードを使用する [反映にはKrileの再起動が必要です]</value>
+  </data>
 </root>

@@ -236,6 +236,9 @@ namespace StarryEyes.Settings
         public static readonly SettingItemStruct<bool> AcceptUnstableVersion =
             new SettingItemStruct<bool>("AcceptUnstableVersion", App.IsUnstableVersion);
 
+        public static readonly SettingItemStruct<bool> UseInMemoryDatabase =
+            new SettingItemStruct<bool>("UseInMemoryDatabase", false);
+
         public static readonly SettingItem<string> UserAgent =
             new SettingItem<string>("UserAgent", null);
 

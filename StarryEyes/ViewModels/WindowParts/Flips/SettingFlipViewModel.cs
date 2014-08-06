@@ -1073,6 +1073,12 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             set { Setting.AcceptUnstableVersion.Value = value; }
         }
 
+        public bool UseInMemoryDatabase
+        {
+            get { return Setting.UseInMemoryDatabase.Value; }
+            set { Setting.UseInMemoryDatabase.Value = value; }
+        }
+
         public int EventDisplayMinimumMillisec
         {
             get { return Setting.EventDisplayMinimumMSec.Value; }
