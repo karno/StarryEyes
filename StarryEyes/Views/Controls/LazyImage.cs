@@ -301,10 +301,13 @@ namespace StarryEyes.Views.Controls
                     // create image
                     var b = CreateImage(item.Item3, item.Item4, item.Item5);
 
-                    // push dispatcher queue
-                    var image = item.Item2;
-                    var uri = item.Item1;
-                    DispatcherHolder.Enqueue(() => SetImage(image, b, uri), DispatcherPriority.Background);
+                    if (b != null)
+                    {
+                        // push dispatcher queue
+                        var image = item.Item2;
+                        var uri = item.Item1;
+                        DispatcherHolder.Enqueue(() => SetImage(image, b, uri), DispatcherPriority.Background);
+                    }
 
                     // reset signal
                     _decodeSignal.Reset();
@@ -334,6 +337,7 @@ namespace StarryEyes.Views.Controls
             var uri = img.UriSource;
             var dpw = img.DecodePixelWidth;
             var dph = img.DecodePixelHeight;
+            // clear image
             SetImage(img, null, null);
             if (uri != null)
             {
