@@ -1,9 +1,8 @@
 ﻿using System;
-using StarryEyes.Feather.Scripting;
 
 namespace StarryJs
 {
-    public class Program : IScriptExecutor
+    public class Program
     {
         public Guid Id
         {

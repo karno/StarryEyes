@@ -347,9 +347,8 @@
     <Compile Include="Models\Inputting\InputCoreModel.cs" />
     <Compile Include="Models\Inputting\InputData.cs" />
     <Compile Include="Models\Inputting\InputModel.cs" />
-    <Compile Include="Models\Plugins\Injections\BridgeSocketBinder.cs" />
-    <Compile Include="Models\Plugins\Injections\InjectionInlet.cs" />
     <Compile Include="Models\BehaviorLogger.cs" />
+    <Compile Include="Models\Plugins\BridgeImpl.cs" />
     <Compile Include="Models\Receiving\Receivers\ListMemberReceiver.cs" />
     <Compile Include="Models\Requests\UpdateFriendshipsRequest.cs" />
     <Compile Include="Models\Inputting\InputSetting.cs" />
@@ -423,7 +422,6 @@
     <Compile Include="Models\Timelines\Tabs\TabModel.cs" />
     <Compile Include="Models\Timelines\TimelineModelBase.cs" />
     <Compile Include="Models\Timelines\Statuses\UserModel.cs" />
-    <Compile Include="Models\Plugins\ScriptingManagerImpl.cs" />
     <Compile Include="Settings\AccountManager.cs" />
     <Compile Include="Settings\KeyAssignManager.cs" />
     <Compile Include="Settings\KeyAssigns\KeyAssignGroup.cs" />
@@ -939,9 +937,9 @@
       <Project>{316927de-96c9-47c8-947d-b6d8a8da1e14}</Project>
       <Name>StarryEyes.Casket</Name>
     </ProjectReference>
-    <ProjectReference Include="..\StarryEyes.Feather\StarryEyes.Feather.csproj">
-      <Project>{E47FA479-005C-4236-BAFB-ADD664535E59}</Project>
-      <Name>StarryEyes.Feather</Name>
+    <ProjectReference Include="..\StarryEyes.Fragments\StarryEyes.Fragments.csproj">
+      <Project>{9f6dbea1-0c36-4d92-835e-b42b14b84d73}</Project>
+      <Name>StarryEyes.Fragments</Name>
     </ProjectReference>
     <ProjectReference Include="..\StarryEyes.Nightmare\StarryEyes.Nightmare.csproj">
       <Project>{3A78CEB3-A112-4A66-8724-BFF2BFA9182B}</Project>

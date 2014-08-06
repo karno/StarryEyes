@@ -1,29 +1,18 @@
-﻿using System.ComponentModel;
-using StarryEyes.Anomaly;
+﻿using StarryEyes.Anomaly;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
-using StarryEyes.Feather.Injections;
 
-namespace StarryEyes.Feather.Proxies
+namespace StarryEyes.Fragments.Proxies
 {
     /// <summary>
     /// Notification proxy.
     /// </summary>
-    public static class NotificationProxy
+    public interface INotificationProxyManager
     {
-        /// <summary>
-        /// For internal framework.
-        /// </summary>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static readonly BridgeSocket<INotificationProxy> Socket = new BridgeSocket<INotificationProxy>();
-
         /// <summary>
         /// Register new proxy.
         /// </summary>
-        /// <param name="proxy"></param>
-        public static void Register(INotificationProxy proxy)
-        {
-            Socket.Call(proxy);
-        }
+        /// <param name="proxy">registing proxy</param>
+        void Register(INotificationProxy proxy);
     }
 
     /// <summary>

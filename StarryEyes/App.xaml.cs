@@ -11,8 +11,10 @@ using System.Windows.Threading;
 using JetBrains.Annotations;
 using StarryEyes.Casket;
 using StarryEyes.Casket.Connections;
+using StarryEyes.Fragments;
 using StarryEyes.Globalization;
 using StarryEyes.Models.Databases;
+using StarryEyes.Models.Plugins;
 using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
 using Application = System.Windows.Application;
@@ -23,10 +25,11 @@ namespace StarryEyes
     /// <summary>
     /// App.xaml の相互作用ロジック
     /// </summary>
-    public partial class App
+    public partial class App : IBridgeProvider
     {
         private static readonly string DbVersion = "A";
-        private static DateTime _startupTime;
+        private static readonly DateTime _startupTime = DateTime.Now;
+        private static readonly IBridge _bridge = new BridgeImpl();
         private static string _userId = String.Empty;
 
         /// <summary>
@@ -34,8 +37,6 @@ namespace StarryEyes
         /// </summary>
         private void AppStartup(object sender, StartupEventArgs e)
         {
-            _startupTime = DateTime.Now;
-
             // create default theme xaml
             // File.WriteAllText("default.xaml", BuiltInThemeProvider.ExportThemeAsXaml(BuiltInThemeProvider.GetDefault()));
             // Environment.Exit(0);
@@ -633,6 +634,11 @@ namespace StarryEyes
         }
 
         #endregion
+
+        public IBridge GetBridge()
+        {
+            return _bridge;
+        }
     }
 
     public enum ExecutionMode

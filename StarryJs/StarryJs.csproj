@@ -70,13 +70,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\StarryEyes.Feather\StarryEyes.Feather.csproj">
-      <Project>{E47FA479-005C-4236-BAFB-ADD664535E59}</Project>
-      <Name>StarryEyes.Feather</Name>
-      <Private>False</Private>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>

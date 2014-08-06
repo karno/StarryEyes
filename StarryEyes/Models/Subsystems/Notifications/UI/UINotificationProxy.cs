@@ -3,7 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using StarryEyes.Anomaly;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
-using StarryEyes.Feather.Proxies;
+using StarryEyes.Fragments.Proxies;
 using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Models.Subsystems.Notifications.Audio;
 using StarryEyes.Settings;

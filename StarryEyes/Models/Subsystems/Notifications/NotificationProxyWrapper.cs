@@ -2,7 +2,7 @@
 using JetBrains.Annotations;
 using StarryEyes.Anomaly;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
-using StarryEyes.Feather.Proxies;
+using StarryEyes.Fragments.Proxies;
 
 namespace StarryEyes.Models.Subsystems.Notifications
 {

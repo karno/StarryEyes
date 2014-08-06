@@ -5,11 +5,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
-using StarryEyes.Feather.Proxies;
 using StarryEyes.Filters;
+using StarryEyes.Fragments.Proxies;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Databases;
-using StarryEyes.Models.Plugins.Injections;
 using StarryEyes.Models.Receiving;
 using StarryEyes.Models.Receiving.Handling;
 using StarryEyes.Models.Subsystems.Notifications;
@@ -34,8 +33,6 @@ namespace StarryEyes.Models.Subsystems
         public static void Initialize()
         {
             // register binder
-            BridgeSocketBinder.Bind(NotificationProxy.Socket,
-                p => RegisterProxy(new NotificationProxyWrapper(p)));
             NotificationLatch.Initialize();
         }
 

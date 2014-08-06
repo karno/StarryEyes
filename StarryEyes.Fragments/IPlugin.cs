@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Controls;
 
-namespace StarryEyes.Feather
+namespace StarryEyes.Fragments
 {
     /// <summary>
     /// Interface for plugins works on Krile StarryEyes

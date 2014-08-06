@@ -1,6 +1,6 @@
 ﻿using StarryEyes.Anomaly;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
-using StarryEyes.Feather.Proxies;
+using StarryEyes.Fragments.Proxies;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Models.Backstages.TwitterEvents;

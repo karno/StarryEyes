@@ -397,7 +397,7 @@ namespace StarryEyes
             PluginManager.LoadedPlugins.ForEach(p => p.Initialize());
 
             // activate scripts
-            ScriptingManagerImpl.Initialize();
+            // ScriptingManager.Initialize();
 
             // other core systems initialize
             ReceiveManager.Initialize();

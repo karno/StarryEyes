@@ -1,8 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.IO.Compression;
+using StarryEyes.Feather.Packaging;
 
-namespace StarryEyes.Feather.Packaging
+namespace StarryEyes.Fragments
 {
     internal class PluginPackage
     {
@@ -33,7 +34,7 @@ namespace StarryEyes.Feather.Packaging
             else
             {
                 throw new ArgumentException(
-                    "description file is not found in plugin package.(" + PluginPackagePath + ")");
+                    "description file is not found in plugin package.(" + this.PluginPackagePath + ")");
             }
             var sigfile = Path.Combine(path, PluginPublicKeyFile);
             if (File.Exists(sigfile))
