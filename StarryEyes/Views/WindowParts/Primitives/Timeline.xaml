@@ -19,7 +19,6 @@
              xmlns:utils="clr-namespace:StarryEyes.Views.Utils"
              x:Name="TimelineRoot"
              FocusVisualStyle="{x:Null}"
-             SnapsToDevicePixels="True"
              UseLayoutRounding="True"
              d:DataContext="{d:DesignInstance Type={x:Type tabs:TabViewModel}}"
              d:DesignHeight="300"
@@ -879,18 +878,56 @@
                                                 Height="48"
                                                 HorizontalAlignment="Right"
                                                 VerticalAlignment="Top"
-                                                Background="#191BA1E2">
-                                            <controls:LazyImage DecodePixelWidth="48"
-                                                                RenderOptions.BitmapScalingMode="HighQuality"
-                                                                UriSource="{Binding User.ProfileImageUriOptimized,
-                                                                                    Mode=OneWay}"
-                                                                UseLayoutRounding="True">
-                                                <i:Interaction.Triggers>
-                                                    <i:EventTrigger EventName="MouseLeftButtonDown">
-                                                        <ei:CallMethodAction MethodName="ShowUserProfile" TargetObject="{Binding}" />
-                                                    </i:EventTrigger>
-                                                </i:Interaction.Triggers>
-                                            </controls:LazyImage>
+                                                Background="#191BA1E2"
+                                                UseLayoutRounding="True">
+                                            <Grid>
+                                                <!--  user  -->
+                                                <controls:LazyImage DecodePixelWidth="48"
+                                                                    RenderOptions.BitmapScalingMode="HighQuality"
+                                                                    UriSource="{Binding User.ProfileImageUriOptimized,
+                                                                                        Mode=OneWay}"
+                                                                    UseLayoutRounding="True">
+                                                    <i:Interaction.Triggers>
+                                                        <i:EventTrigger EventName="MouseLeftButtonDown">
+                                                            <ei:CallMethodAction MethodName="ShowUserProfile" TargetObject="{Binding}" />
+                                                        </i:EventTrigger>
+                                                    </i:Interaction.Triggers>
+                                                </controls:LazyImage>
+                                                <!--  retweeter  -->
+                                                <controls:LazyImage Width="24"
+                                                                    Height="24"
+                                                                    Margin="28,28,-4,-4"
+                                                                    DecodePixelWidth="24"
+                                                                    RenderOptions.BitmapScalingMode="HighQuality"
+                                                                    UriSource="{Binding Retweeter.ProfileImageUriOptimized,
+                                                                                        Mode=OneWay}"
+                                                                    UseLayoutRounding="True"
+                                                                    Visibility="{Binding IsRetweet,
+                                                                                         Converter={StaticResource BooleanToVisibleConverter}}">
+                                                    <i:Interaction.Triggers>
+                                                        <i:EventTrigger EventName="MouseLeftButtonDown">
+                                                            <ei:CallMethodAction MethodName="ShowRetweeterProfile" TargetObject="{Binding}" />
+                                                        </i:EventTrigger>
+                                                    </i:Interaction.Triggers>
+                                                </controls:LazyImage>
+                                                <!--  message recipient  -->
+                                                <controls:LazyImage Width="24"
+                                                                    Height="24"
+                                                                    Margin="28,28,-4,-4"
+                                                                    DecodePixelWidth="24"
+                                                                    RenderOptions.BitmapScalingMode="HighQuality"
+                                                                    UriSource="{Binding Recipient.ProfileImageUriOptimized,
+                                                                                        Mode=OneWay}"
+                                                                    UseLayoutRounding="True"
+                                                                    Visibility="{Binding IsDirectMessage,
+                                                                                         Converter={StaticResource BooleanToVisibleConverter}}">
+                                                    <i:Interaction.Triggers>
+                                                        <i:EventTrigger EventName="MouseLeftButtonDown">
+                                                            <ei:CallMethodAction MethodName="ShowRecipientProfile" TargetObject="{Binding}" />
+                                                        </i:EventTrigger>
+                                                    </i:Interaction.Triggers>
+                                                </controls:LazyImage>
+                                            </Grid>
                                         </Border>
                                         <Border x:Name="CheckBoxBorder"
                                                 Grid.Column="0"
@@ -1660,7 +1697,7 @@
                                                 </ItemsControl>
                                             </DockPanel>
                                         </StackPanel>
-                                        <DockPanel Margin="7,8,7,-1"
+                                        <DockPanel Margin="7,5,7,-1"
                                                    Background="Transparent"
                                                    Visibility="{Binding IsRetweet,
                                                                         Mode=OneTime,
@@ -1685,6 +1722,36 @@
                                                 <i:Interaction.Triggers>
                                                     <i:EventTrigger EventName="MouseLeftButtonDown">
                                                         <ei:CallMethodAction MethodName="ShowRetweeterProfile" TargetObject="{Binding}" />
+                                                    </i:EventTrigger>
+                                                </i:Interaction.Triggers>
+                                            </TextBlock>
+                                        </DockPanel>
+                                        <DockPanel Margin="7,5,7,-1"
+                                                   Background="Transparent"
+                                                   Visibility="{Binding IsDirectMessage,
+                                                                        Mode=OneTime,
+                                                                        Converter={StaticResource BooleanToVisibleConverter}}">
+                                            <Path Width="11"
+                                                  Height="10"
+                                                  Margin="3,1"
+                                                  Data="F1 M 11.5,20.5834C 10.3333,16.25 13.6667,12.9167 16.5,12.4167C 19.3334,11.9167 21.6667,14.25 24,16.5833C 26.3334,14.25 28.6667,11.9167 31.5,12.4167C 34.3333,12.9167 37.6666,16.25 36.5,20.5833C 35.3333,24.9167 29.6667,30.25 24,35.5833C 18.3334,30.25 12.6667,24.9167 11.5,20.5834 Z "
+                                                  Fill="{x:Null}"
+                                                  Stretch="Fill"
+                                                  Stroke="{DynamicResource KeyTextBrush}"
+                                                  StrokeThickness="2" />
+                                            <TextBlock Margin="1,-2,0,0"
+                                                       HorizontalAlignment="Left"
+                                                       VerticalAlignment="Center"
+                                                       Cursor="Hand"
+                                                       FontFamily="Segoe UI Semilight"
+                                                       FontSize="12"
+                                                       Foreground="{DynamicResource KeyTextBrush}"
+                                                       TextWrapping="NoWrap">
+                                                <Run Text="sent to" />
+                                                <Run Text="{Binding Recipient.ScreenName, Mode=OneTime, FallbackValue=user}" />
+                                                <i:Interaction.Triggers>
+                                                    <i:EventTrigger EventName="MouseLeftButtonDown">
+                                                        <ei:CallMethodAction MethodName="ShowRecipientProfile" TargetObject="{Binding}" />
                                                     </i:EventTrigger>
                                                 </i:Interaction.Triggers>
                                             </TextBlock>
@@ -1781,7 +1848,8 @@
                                                   VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                                   Focusable="False"
                                                   RecognizesAccessKey="True"
-                                                  SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                                  SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                                  UseLayoutRounding="{TemplateBinding UseLayoutRounding}" />
                             </Grid>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="HasContent" Value="true">
@@ -1982,6 +2050,7 @@
                       ItemTemplate="{StaticResource StatusItemTemplate}"
                       ItemsSource="{Binding Timeline,
                                             Mode=OneWay}"
+                      UseLayoutRounding="True"
                       VirtualizingPanel.CacheLength="3"
                       VirtualizingPanel.CacheLengthUnit="Page"
                       VirtualizingPanel.IsVirtualizing="True"

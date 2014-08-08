@@ -203,12 +203,27 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
 
         public UserViewModel Retweeter
         {
-            get { return this._retweeter ?? (this._retweeter = CreateUserViewModel(this.OriginalStatus.User)); }
+            get
+            {
+                if (!this.IsRetweet)
+                {
+                    return null;
+                }
+                return this._retweeter ?? (this._retweeter = CreateUserViewModel(this.OriginalStatus.User));
+
+            }
         }
 
         public UserViewModel Recipient
         {
-            get { return this._recipient ?? (this._recipient = CreateUserViewModel(this.Status.Recipient)); }
+            get
+            {
+                if (!this.IsDirectMessage)
+                {
+                    return null;
+                }
+                return this._recipient ?? (this._recipient = CreateUserViewModel(this.Status.Recipient));
+            }
         }
 
         private UserViewModel CreateUserViewModel(TwitterUser user)
@@ -475,6 +490,11 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         public void ShowRetweeterProfile()
         {
             SearchFlipModel.RequestSearch(this.Retweeter.ScreenName, SearchMode.UserScreenName);
+        }
+
+        public void ShowRecipientProfile()
+        {
+            SearchFlipModel.RequestSearch(this.Recipient.ScreenName, SearchMode.UserScreenName);
         }
 
         public void OpenWeb()
