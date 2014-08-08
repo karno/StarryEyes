@@ -16,7 +16,7 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
         public TwitterUser(dynamic json)
         {
             this.Id = ((string)json.id_str).ParseLong();
-            this.ScreenName = json.screen_name;
+            this.ScreenName = ParsingExtension.ResolveEntity(json.screen_name);
             this.Name = json.name;
             this.Description = json.description;
             this.Location = json.location;
