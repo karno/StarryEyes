@@ -83,11 +83,8 @@ namespace StarryEyes.Casket.Cruds
                     {
                         using (Descriptor.AcquireWriteLock())
                         using (var con = Descriptor.GetConnection())
-                        using (var tr = con.BeginTransaction(DatabaseConnectionHelper.DefaultIsolationLevel)
-                            )
                         {
                             con.Execute("VACUUM;");
-                            tr.Commit();
                         }
                     }
                     catch (Exception ex)
