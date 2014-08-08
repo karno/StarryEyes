@@ -345,7 +345,7 @@
                                 <mbehaviors:BringIntoViewInteractionMessageAction />
                             </l:InteractionMessageTrigger>
                         </i:Interaction.Triggers>
-                        <Grid Height="24">
+                        <Grid MinHeight="24">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="64" />
                                 <ColumnDefinition Width="96" />
@@ -410,9 +410,19 @@
                                        Margin="8,0,0,0"
                                        VerticalAlignment="Center"
                                        Foreground="{DynamicResource TweetForegroundBrush}"
-                                       Text="{Binding SingleLinedText}"
+                                       Text="{Binding SingleLineText}"
                                        TextTrimming="CharacterEllipsis"
-                                       TextWrapping="NoWrap" />
+                                       TextWrapping="NoWrap"
+                                       Visibility="{Binding IsSingleLine,
+                                                            Converter={StaticResource BooleanToVisibleConverter}}" />
+                            <TextBlock Grid.Column="2"
+                                       Margin="8,0,0,0"
+                                       VerticalAlignment="Center"
+                                       Foreground="{DynamicResource TweetForegroundBrush}"
+                                       Text="{Binding MultiLineText}"
+                                       TextWrapping="Wrap"
+                                       Visibility="{Binding IsSingleLine,
+                                                            Converter={StaticResource BooleanToInvisibleConverter}}" />
                             <StackPanel Grid.Column="3"
                                         Width="Auto"
                                         Margin="4,0"

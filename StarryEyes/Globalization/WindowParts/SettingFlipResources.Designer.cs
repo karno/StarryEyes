@@ -1313,20 +1313,29 @@ namespace StarryEyes.Globalization.WindowParts {
         }
         
         /// <summary>
-        ///   Focus to expand に類似しているローカライズされた文字列を検索します。
+        ///   Always expanded (default) に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        public static string TimelineDisplayMixed {
+        public static string TimelineDisplayExpanded {
             get {
-                return ResourceManager.GetString("TimelineDisplayMixed", resourceCulture);
+                return ResourceManager.GetString("TimelineDisplayExpanded", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Always multi line (expanded) に類似しているローカライズされた文字列を検索します。
+        ///   Always shrinked multi line に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string TimelineDisplayMultiline {
             get {
                 return ResourceManager.GetString("TimelineDisplayMultiline", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Compact multi line (focus to expand) に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string TimelineDisplayMultiLineMixed {
+            get {
+                return ResourceManager.GetString("TimelineDisplayMultiLineMixed", resourceCulture);
             }
         }
         
@@ -1336,6 +1345,15 @@ namespace StarryEyes.Globalization.WindowParts {
         public static string TimelineDisplaySingleLine {
             get {
                 return ResourceManager.GetString("TimelineDisplaySingleLine", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Single line (focus to expand) に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string TimelineDisplaySingleLineMixed {
+            get {
+                return ResourceManager.GetString("TimelineDisplaySingleLineMixed", resourceCulture);
             }
         }
         

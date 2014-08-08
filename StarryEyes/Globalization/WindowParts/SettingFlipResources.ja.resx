@@ -433,11 +433,11 @@
   <data name="TimelineAllowFavoriteMyself" xml:space="preserve">
     <value>自分自身をお気に入り登録できるようにする</value>
   </data>
-  <data name="TimelineDisplayMixed" xml:space="preserve">
-    <value>フォーカス時に拡大</value>
+  <data name="TimelineDisplaySingleLineMixed" xml:space="preserve">
+    <value>一行表示(フォーカス時に拡大)</value>
   </data>
   <data name="TimelineDisplayMultiline" xml:space="preserve">
-    <value>常に全行表示</value>
+    <value>常に縮小複数行表示</value>
   </data>
   <data name="TimelineDisplaySingleLine" xml:space="preserve">
     <value>常に一行表示</value>
@@ -606,5 +606,11 @@
   </data>
   <data name="NotifyBackfilledTweets" xml:space="preserve">
     <value>過去に遡って受信したツイートも通知する</value>
+  </data>
+  <data name="TimelineDisplayExpanded" xml:space="preserve">
+    <value>常に拡大表示(既定)</value>
+  </data>
+  <data name="TimelineDisplayMultiLineMixed" xml:space="preserve">
+    <value>縮小複数行表示(フォーカス時に拡大)</value>
   </data>
 </root>

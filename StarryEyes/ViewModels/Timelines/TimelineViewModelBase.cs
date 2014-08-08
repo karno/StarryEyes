@@ -86,7 +86,7 @@ namespace StarryEyes.ViewModels.Timelines
                 if (this._isScrollOnTop == value) return;
                 this._isScrollOnTop = value;
                 RaisePropertyChanged();
-                RaisePropertyChanged(() => IsScrollLock);
+                // RaisePropertyChanged(() => IsScrollLock);
                 // revive auto trim
                 if (!this._model.IsAutoTrimEnabled)
                 {

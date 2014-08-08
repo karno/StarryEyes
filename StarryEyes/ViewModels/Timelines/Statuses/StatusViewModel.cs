@@ -118,7 +118,11 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                 new EventListener<Action<TweetDisplayMode>>(
                     h => Setting.TweetDisplayMode.ValueChanged += h,
                     h => Setting.TweetDisplayMode.ValueChanged -= h,
-                    _ => this.RaisePropertyChanged(() => IsExpanded)));
+                    _ =>
+                    {
+                        this.RaisePropertyChanged(() => IsExpanded);
+                        this.RaisePropertyChanged(() => IsSingleLine);
+                    }));
             // when account is added/removed, all timelines are regenerated.
             // so, we don't have to listen any events which notify accounts addition/deletion.
 
@@ -214,7 +218,12 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             return uvm;
         }
 
-        public string SingleLinedText
+        public string MultiLineText
+        {
+            get { return this.Status.GetEntityAidedText(); }
+        }
+
+        public string SingleLineText
         {
             get { return this.Status.GetEntityAidedText().Replace('\n', ' ').Replace("\r", ""); }
         }
@@ -357,9 +366,29 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                 switch (Setting.TweetDisplayMode.Value)
                 {
                     case TweetDisplayMode.SingleLine:
+                    case TweetDisplayMode.MultiLine:
                         return false;
-                    case TweetDisplayMode.Mixed:
+                    case TweetDisplayMode.MixedSingleLine:
+                    case TweetDisplayMode.MixedMultiLine:
                         return IsFocused;
+                    default:
+                        return true;
+                }
+            }
+        }
+
+        public bool IsSingleLine
+        {
+            get
+            {
+                switch (Setting.TweetDisplayMode.Value)
+                {
+                    case TweetDisplayMode.SingleLine:
+                    case TweetDisplayMode.MixedSingleLine:
+                        return true;
+                    case TweetDisplayMode.MultiLine:
+                    case TweetDisplayMode.MixedMultiLine:
+                        return false;
                     default:
                         return true;
                 }

@@ -702,7 +702,9 @@ namespace StarryEyes.Settings
     public enum TweetDisplayMode
     {
         SingleLine,
-        Mixed,
+        MultiLine,
+        MixedSingleLine,
+        MixedMultiLine,
         Expanded
     }
 

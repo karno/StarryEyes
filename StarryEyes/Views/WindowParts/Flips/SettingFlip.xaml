@@ -339,8 +339,10 @@
                                 <ComboBox SelectedIndex="{Binding TweetDisplayMode, Mode=TwoWay}">
                                     <ComboBox.Items>
                                         <ComboBoxItem Content="{x:Static localize:SettingFlipResources.TimelineDisplaySingleLine}" />
-                                        <ComboBoxItem Content="{x:Static localize:SettingFlipResources.TimelineDisplayMixed}" />
                                         <ComboBoxItem Content="{x:Static localize:SettingFlipResources.TimelineDisplayMultiline}" />
+                                        <ComboBoxItem Content="{x:Static localize:SettingFlipResources.TimelineDisplaySingleLineMixed}" />
+                                        <ComboBoxItem Content="{x:Static localize:SettingFlipResources.TimelineDisplayMultiLineMixed}" />
+                                        <ComboBoxItem Content="{x:Static localize:SettingFlipResources.TimelineDisplayExpanded}" />
                                     </ComboBox.Items>
                                 </ComboBox>
                             </DockPanel>

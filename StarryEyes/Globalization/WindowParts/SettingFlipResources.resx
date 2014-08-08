@@ -433,11 +433,11 @@ Blocked users or no-retweet users are applied immediately as before.</value>
   <data name="TimelineAllowFavoriteMyself" xml:space="preserve">
     <value>Allow favorite myself</value>
   </data>
-  <data name="TimelineDisplayMixed" xml:space="preserve">
-    <value>Focus to expand</value>
+  <data name="TimelineDisplaySingleLineMixed" xml:space="preserve">
+    <value>Single line (focus to expand)</value>
   </data>
   <data name="TimelineDisplayMultiline" xml:space="preserve">
-    <value>Always multi line (expanded)</value>
+    <value>Always shrinked multi line</value>
   </data>
   <data name="TimelineDisplaySingleLine" xml:space="preserve">
     <value>Always single line</value>
@@ -606,5 +606,11 @@ Are you sure?</value>
   </data>
   <data name="NotifyBackfilledTweets" xml:space="preserve">
     <value>Notify backfilled tweets</value>
+  </data>
+  <data name="TimelineDisplayExpanded" xml:space="preserve">
+    <value>Always expanded (default)</value>
+  </data>
+  <data name="TimelineDisplayMultiLineMixed" xml:space="preserve">
+    <value>Compact multi line (focus to expand)</value>
   </data>
 </root>
