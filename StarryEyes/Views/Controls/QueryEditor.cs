@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Xml;
 using ICSharpCode.AvalonEdit;
@@ -51,6 +52,23 @@ namespace StarryEyes.Views.Controls
             this.LoadXshd();
             this.TextArea.TextEntering += TextArea_TextEntering;
             this.TextArea.TextEntered += TextArea_TextEntered;
+            this.ContextMenu = this.BuildContextMenu();
+        }
+
+
+        private ContextMenu BuildContextMenu()
+        {
+            var cm = new ContextMenu();
+            cm.Items.Add(new MenuItem { Command = ApplicationCommands.Undo });
+            cm.Items.Add(new MenuItem { Command = ApplicationCommands.Redo });
+            cm.Items.Add(new Separator());
+            cm.Items.Add(new MenuItem { Command = ApplicationCommands.Cut });
+            cm.Items.Add(new MenuItem { Command = ApplicationCommands.Copy });
+            cm.Items.Add(new MenuItem { Command = ApplicationCommands.Paste });
+            cm.Items.Add(new MenuItem { Command = ApplicationCommands.Delete });
+            cm.Items.Add(new Separator());
+            cm.Items.Add(new MenuItem { Command = ApplicationCommands.SelectAll });
+            return cm;
         }
 
         private const string ResourceName = "StarryEyes.Views.Controls.QueryEditorResources.KrileQuery.xshd";
