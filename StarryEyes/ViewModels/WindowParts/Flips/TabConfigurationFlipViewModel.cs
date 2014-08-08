@@ -143,7 +143,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 RaisePropertyChanged();
                 Observable.Timer(TimeSpan.FromMilliseconds(100))
                           .Where(_ => _currentQueryString == value)
-                          .Subscribe(_ => CheckCompile(value));
+                          .Subscribe(_ => Task.Run(async () => await CheckCompile(value)));
             }
         }
 
