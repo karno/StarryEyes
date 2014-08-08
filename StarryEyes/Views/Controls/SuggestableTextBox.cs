@@ -116,6 +116,7 @@ namespace StarryEyes.Views.Controls
                 {
                     case Key.Space:
                     case Key.Enter:
+                    case Key.Tab:
                         ApplySelected();
                         this.CloseCandidates();
                         if (e.Key == Key.Space)
