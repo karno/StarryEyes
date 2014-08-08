@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -31,6 +32,8 @@ namespace StarryEyes.Views.Controls
         private const int MaxRetryCount = 3;
         private const int MaxReceiveConcurrency = 2;
         private const int MaxDecodeConcurrency = 1;
+
+        private const int LoadTimeoutMillisec = 5000;
 
         #endregion
 
@@ -189,7 +192,7 @@ namespace StarryEyes.Views.Controls
 
         private static async Task LoadBytes(Uri source, Subject<byte[]> subject)
         {
-            var client = new HttpClient();
+            var client = new HttpClient { Timeout = TimeSpan.FromMilliseconds(LoadTimeoutMillisec) };
             try
             {
                 byte[] result;
@@ -285,6 +288,7 @@ namespace StarryEyes.Views.Controls
             App.ApplicationFinalize += () =>
             {
                 loop = false;
+                // ReSharper disable once AccessToDisposedClosure
                 _decodeSignal.Set();
             };
 
