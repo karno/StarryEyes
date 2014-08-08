@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Media.Imaging;
-using System.Windows.Threading;
 using JetBrains.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Helpers;
@@ -339,8 +338,6 @@ namespace StarryEyes.Models.Inputting
             }
             try
             {
-                // prevent dispatcher leak?
-                Dispatcher.Run();
                 using (var ms = new MemoryStream(bytes))
                 {
                     var bitmap = new BitmapImage();
@@ -358,6 +355,11 @@ namespace StarryEyes.Models.Inputting
                 BehaviorLogger.Log("Image util",
                     "Fail to load image: " + Environment.NewLine + ex);
                 return null;
+            }
+            finally
+            {
+                // shutdown dispatcher correctly.
+                DispatcherExtension.BeginInvokeShutdown();
             }
         }
 

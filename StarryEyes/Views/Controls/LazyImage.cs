@@ -320,9 +320,7 @@ namespace StarryEyes.Views.Controls
             _decodeSignal.Dispose();
 
             // cleaning up dispatcher.
-            Dispatcher.CurrentDispatcher.BeginInvokeShutdown(DispatcherPriority.SystemIdle);
-            Dispatcher.Run();
-
+            DispatcherExtension.BeginInvokeShutdown();
         }
 
         #endregion
