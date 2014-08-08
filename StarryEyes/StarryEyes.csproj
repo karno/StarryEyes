@@ -509,6 +509,7 @@
     <Compile Include="Views\Behaviors\DropAcceptBehavior.cs" />
     <Compile Include="Views\Behaviors\HideFromTaskSwitcherBehavior.cs" />
     <Compile Include="Views\Behaviors\KeyHandlingBehavior.cs" />
+    <Compile Include="Views\Behaviors\KeyPreviewTrigger.cs" />
     <Compile Include="Views\Behaviors\ListBoxSelectionChangeToScrollIntoViewBehavior.cs" />
     <Compile Include="Views\Behaviors\NavigateHyperlinkBehavior.cs" />
     <Compile Include="Views\Behaviors\TextBlockDragSelectBehavior.cs" />

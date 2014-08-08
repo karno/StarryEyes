@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using JetBrains.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Helpers;
@@ -338,6 +339,8 @@ namespace StarryEyes.Models.Inputting
             }
             try
             {
+                // prevent dispatcher leak?
+                Dispatcher.Run();
                 using (var ms = new MemoryStream(bytes))
                 {
                     var bitmap = new BitmapImage();

@@ -360,6 +360,9 @@
                             <l:InteractionMessageTrigger Messenger="{Binding Messenger}">
                                 <behaviors:TextBoxSetCaretInteractionMessageAction />
                             </l:InteractionMessageTrigger>
+                            <seb:KeyPreviewTrigger Key="V" Modifiers="Control">
+                                <ei:CallMethodAction MethodName="AttachClipboardImage" TargetObject="{Binding InputCoreViewModel}" />
+                            </seb:KeyPreviewTrigger>
                         </i:Interaction.Triggers>
                         <i:Interaction.Behaviors>
                             <l:TextBoxBindingSupportBehavior SelectedText="{Binding InputCoreViewModel.SelectedText}"

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -31,9 +30,8 @@ namespace StarryEyes.Views.Controls
 
         private const int MaxRetryCount = 3;
         private const int MaxReceiveConcurrency = 2;
-        private const int MaxDecodeConcurrency = 1;
 
-        private const int LoadTimeoutMillisec = 5000;
+        private const int LoadTimeoutMillisec = 3000;
 
         #endregion
 
