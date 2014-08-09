@@ -244,6 +244,12 @@ namespace StarryEyes.ViewModels
                                                          });
                                   _globalAccountSelectionFlipViewModel.Open();
                               }));
+            CompositeDisposable.Add(
+                Observable.FromEvent(
+                    h => ThemeManager.ThemeChanged += h,
+                    h => ThemeManager.ThemeChanged -= h
+                    ).Subscribe(_ => this.Messenger.RaiseAsync(new InteractionMessage("InvalidateTheme"))));
+
             #endregion
 
             #region special navigations

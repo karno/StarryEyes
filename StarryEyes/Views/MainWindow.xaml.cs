@@ -25,11 +25,10 @@ namespace StarryEyes.Views
             if (rect.IsEmpty) return;
             this.SetWindowPlacement(rect);
             this.WindowState = state;
-            ThemeManager.ThemeChanged += ApplyFont;
-            ApplyFont();
+            UpdateTheme();
         }
 
-        private void ApplyFont()
+        public void UpdateTheme()
         {
             this.FontFamily = ThemeManager.CurrentTheme.GlobalFont.FontFamily;
             this.FontSize = ThemeManager.CurrentTheme.GlobalFont.FontSize;
