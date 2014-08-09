@@ -25,7 +25,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
     public class UserInfoViewModel : ViewModel
     {
         private readonly SearchFlipViewModel _parent;
-        private readonly string _screenName;
+        private string _screenName;
         private UserTimelineViewModel _statuses;
         private UserTimelineViewModel _favorites;
         private UserFollowingViewModel _following;
@@ -152,6 +152,10 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                            .Subscribe(
                                user =>
                                {
+                                   // overwrite by oficially-provided screen name
+                                   this._screenName = user.ScreenName;
+                                   RaisePropertyChanged(() => ScreenName);
+
                                    User = new UserViewModel(user);
                                    this.CompositeDisposable.Add(User);
 

@@ -183,7 +183,7 @@
                                    FontWeight="Bold"
                                    Foreground="{DynamicResource GlobalKeyBrush}"
                                    Text="{Binding ScreenName,
-                                                  Mode=OneTime}">
+                                                  Mode=OneWay}">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="MouseLeftButtonDown">
                                     <ei:CallMethodAction MethodName="OpenUserDetailOnTwitter" TargetObject="{Binding User}" />
@@ -543,7 +543,7 @@
                                        FontWeight="Bold"
                                        Foreground="{DynamicResource GlobalKeyBrush}"
                                        Text="{Binding ScreenName,
-                                                      Mode=OneTime}">
+                                                      Mode=OneWay}">
                                 <i:Interaction.Triggers>
                                     <i:EventTrigger EventName="MouseLeftButtonDown">
                                         <ei:CallMethodAction MethodName="OpenUserDetailOnTwitter" TargetObject="{Binding User}" />
