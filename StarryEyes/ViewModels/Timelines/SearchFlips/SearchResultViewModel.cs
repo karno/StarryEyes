@@ -61,8 +61,25 @@ namespace StarryEyes.ViewModels.Timelines.SearchFlips
         [UsedImplicitly]
         public void PinToTab()
         {
-            TabManager.CreateTab(TabModel.Create(Query, _model.CreateFilterQuery()));
-            this._parent.RewindStack();
+            try
+            {
+                var filterQuery = _model.CreateFilterQuery();
+                try
+                {
+                    TabManager.CreateTab(TabModel.Create(Query, filterQuery));
+                    this._parent.RewindStack();
+                }
+                catch (Exception ex)
+                {
+                    throw new InvalidOperationException(
+                        "Invalid query was generated: " + filterQuery, ex);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException(
+                    "Failed pinning into tab: " + Query, ex);
+            }
         }
 
         protected override void Dispose(bool disposing)

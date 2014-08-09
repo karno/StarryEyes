@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using Livet.EventListeners;
 using Livet.Messaging;
 using StarryEyes.Models.Timelines.SearchFlips;
@@ -46,12 +47,16 @@ namespace StarryEyes.ViewModels.Timelines.SearchFlips
             this.Messenger.RaiseSafe(() => new InteractionMessage("SetFocus"));
         }
 
+        [UsedImplicitly]
         public void PinToTab()
         {
-            TabManager.CreateTab(TabModel.Create(
-                _parent.ScreenName,
-                "from local where (user == @" + _parent.ScreenName + " & !retweet) | retweeter == @" +
-                _parent.ScreenName));
+            var sn = _parent.ScreenName;
+            if (sn.StartsWith("@"))
+            {
+                sn = sn.Substring(1);
+            }
+            TabManager.CreateTab(TabModel.Create(sn,
+                "from local where (user == @" + sn + " & !retweet) | retweeter == @" + sn));
             _parent.Close();
         }
 
