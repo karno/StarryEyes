@@ -252,10 +252,22 @@ namespace StarryEyes.Views.Behaviors
                               }));
         }
 
+        protected override void OnDetaching()
+        {
+            _disposables.Dispose();
+            lock (_scrollOffsetQueue)
+            {
+                _scrollOffsetQueue.Clear();
+                _scrollTimer.Stop();
+            }
+            _scrollTimer.Stop();
+        }
+
         private static void ItemsSourceChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
         {
             var behavior = dependencyObject as TimelineScrollLockerBehavior;
-            if (behavior != null)
+            // sender is ScollLockerBehavior and that is attached.
+            if (behavior != null && behavior.AssociatedObject != null)
             {
                 // call ItemsSourceChanged on the instance.
                 behavior.ItemsSourceChanged();
@@ -344,6 +356,7 @@ namespace StarryEyes.Views.Behaviors
 
             // scroll to initial position (enforced)
             ScrollToVerticalOffset(offset);
+            // call via dispatcher causes flickers in timeline.
             // await Dispatcher.InvokeAsync(() => ScrollToVerticalOffset(offset), DispatcherPriority.Render);
 
             System.Diagnostics.Debug.WriteLine("# Registering new animation. (magic ignore?" + setMagicalIgnore + ")");
@@ -405,17 +418,6 @@ namespace StarryEyes.Views.Behaviors
             System.Diagnostics.Debug.WriteLine("# Scroll to: " + offset + " by " + caller);
             this._lastScrollOffset = offset;
             this.AssociatedObject.ScrollToVerticalOffset(offset);
-        }
-
-        protected override void OnDetaching()
-        {
-            _disposables.Dispose();
-            lock (_scrollOffsetQueue)
-            {
-                _scrollOffsetQueue.Clear();
-                _scrollTimer.Stop();
-            }
-            _scrollTimer.Stop();
         }
     }
 }
