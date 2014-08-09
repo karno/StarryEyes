@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows;
@@ -207,7 +206,7 @@ namespace StarryEyes.Views.Utils
                 }
                 yield break;
             }
-            foreach (var description in CheckDescriptions(TextEntityResolver.ParseText(text, entities)))
+            foreach (var description in TextEntityResolver.ParseText(text, entities))
             {
                 if (!description.IsEntityAvailable)
                 {
@@ -236,97 +235,6 @@ namespace StarryEyes.Views.Utils
                             break;
                     }
                 }
-            }
-        }
-
-        /// <summary>
-        /// Check text is correctly entitied
-        /// </summary>
-        /// <param name="descriptions"></param>
-        /// <returns></returns>
-        private static IEnumerable<TextEntityDescription> CheckDescriptions(IEnumerable<TextEntityDescription> descriptions)
-        {
-            var pd = (TextEntityDescription)null;
-            // pick descripted blocks
-            foreach (var desc in descriptions)
-            {
-                if (desc.IsEntityAvailable)
-                {
-                    var entity = desc.Entity;
-                    var display = entity.DisplayText;
-                    if (String.IsNullOrEmpty(display))
-                    {
-                        display = entity.OriginalUrl;
-                    }
-                    var trimChar = '\0';
-                    switch (entity.EntityType)
-                    {
-                        case EntityType.UserMentions:
-                            if (!display.StartsWith("@"))
-                            {
-                                // fix display text marker
-                                desc.Entity.DisplayText = "@" + display;
-                                trimChar = '@';
-                            }
-                            break;
-                        case EntityType.Hashtags:
-                            if (!display.StartsWith("#"))
-                            {
-                                // fix display text marker
-                                desc.Entity.DisplayText = "#" + display;
-                                trimChar = '#';
-                            }
-                            break;
-                        default:
-                            // case EntityType.Media:
-                            // case EntityType.Urls:
-                            // nothing to do
-                            break;
-                    }
-                    // check and trim last char.
-                    if (trimChar != '\0' && pd != null)
-                    {
-                        var trimStr = trimChar.ToString(CultureInfo.InvariantCulture);
-                        if (pd.IsEntityAvailable)
-                        {
-                            var pe = pd.Entity;
-                            var ne = new TwitterEntity
-                            {
-                                DisplayText = pe.DisplayText,
-                                EndIndex = pe.EndIndex,
-                                MediaUrl = pe.MediaUrl,
-                                EntityType = pe.EntityType,
-                                OriginalUrl = pe.OriginalUrl,
-                                StartIndex = pe.StartIndex,
-                                UserId = pe.UserId
-                            };
-                            if (!String.IsNullOrEmpty(ne.DisplayText) && ne.DisplayText.EndsWith(trimStr))
-                            {
-                                ne.DisplayText = ne.DisplayText.Substring(0, ne.DisplayText.Length - 1);
-                            }
-                            pd = new TextEntityDescription(pd.Text.Substring(0, pd.Text.Length - 1), ne);
-                        }
-                        else if (pd.Text.EndsWith(trimStr))
-                        {
-                            pd = new TextEntityDescription(pd.Text.Substring(0, pd.Text.Length - 1));
-                        }
-                    }
-                }
-
-                // raise previous block
-                if (pd != null)
-                {
-                    yield return pd;
-                }
-
-                // set next cursor
-                pd = desc;
-            }
-
-            // raise final block
-            if (pd != null)
-            {
-                yield return pd;
             }
         }
 
@@ -364,6 +272,11 @@ namespace StarryEyes.Views.Utils
         {
             foreach (var tok in StatusTextUtil.Tokenize(text))
             {
+                if (String.IsNullOrEmpty(tok.Text))
+                {
+                    // skip empty block
+                    continue;
+                }
                 switch (tok.Kind)
                 {
                     case TokenKind.Url:
