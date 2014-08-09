@@ -49,7 +49,7 @@ namespace StarryEyes.ViewModels.Notifications
 
         private static void Show(NotificationData next)
         {
-            DispatcherHolder.Enqueue(() =>
+            DispatcherHelper.UIDispatcher.InvokeAsync(() =>
             {
                 var mwnd = Application.Current.MainWindow;
                 if (mwnd != null && (Setting.NotifyWhenWindowIsActive.Value || !mwnd.IsActive))

@@ -22,7 +22,7 @@ namespace StarryEyes
         {
             if (source == null) throw new ArgumentNullException("source");
 
-            if (!DispatcherHolder.Dispatcher.CheckAccess())
+            if (!DispatcherHelper.UIDispatcher.CheckAccess())
             {
                 throw new ArgumentException("This method must be called on the Dispatcher thread.");
             }
@@ -53,7 +53,7 @@ namespace StarryEyes
             DispatcherCollectionRx<TViewModel> target)
         {
             return new CollectionChangedEventListener(source, (o, e) =>
-                DispatcherHolder.Enqueue(() =>
+                DispatcherHelper.UIDispatcher.InvokeAsync(() =>
                 {
                     if (e.NewItems != null && e.NewItems.Count >= 2)
                     {

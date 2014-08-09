@@ -1,4 +1,5 @@
-﻿using Livet.Messaging;
+﻿using Livet;
+using Livet.Messaging;
 
 namespace StarryEyes.Views.Messaging
 {
@@ -7,7 +8,7 @@ namespace StarryEyes.Views.Messaging
         public GoToStateMessage(string messageKey, string stateName, bool useTransitions = true)
             : base(messageKey)
         {
-            DispatcherHolder.VerifyAccess();
+            DispatcherHelper.UIDispatcher.VerifyAccess();
             this.StateName = stateName;
             this.UseTransitions = useTransitions;
         }

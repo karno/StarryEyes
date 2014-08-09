@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using Livet;
 using Livet.Messaging;
 using StarryEyes.Nightmare.Windows;
 
@@ -10,7 +11,7 @@ namespace StarryEyes.Views.Messaging
 
         public TaskDialogMessage(TaskDialogOptions options)
         {
-            DispatcherHolder.VerifyAccess();
+            DispatcherHelper.UIDispatcher.VerifyAccess();
             this.Options = options;
         }
         public TaskDialogMessage(string messageKey, TaskDialogOptions options)

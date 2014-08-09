@@ -66,11 +66,10 @@ namespace StarryEyes.ViewModels.Notifications
 
         static void Show(NormalNotificatorViewModel dataContext)
         {
-            DispatcherHolder.Enqueue(() =>
+            DispatcherHelper.UIDispatcher.InvokeAsync(() =>
             {
                 var mwnd = Application.Current.MainWindow;
-                if (mwnd != null &&
-                    (Setting.NotifyWhenWindowIsActive.Value || !mwnd.IsActive))
+                if (mwnd != null && (Setting.NotifyWhenWindowIsActive.Value || !mwnd.IsActive))
                 {
                     new NormalNotificatorView
                     {

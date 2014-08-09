@@ -70,7 +70,6 @@ namespace StarryEyes
 
             // initialize dispatcher helper
             DispatcherHelper.UIDispatcher = Application.Current.Dispatcher;
-            DispatcherHolder.Initialize(Application.Current.Dispatcher);
 
             // set rendering mode
             if (!useHardwareRendering)

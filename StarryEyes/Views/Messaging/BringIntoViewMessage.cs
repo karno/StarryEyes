@@ -1,4 +1,5 @@
-﻿using Livet.Messaging;
+﻿using Livet;
+using Livet.Messaging;
 
 namespace StarryEyes.Views.Messaging
 {
@@ -6,7 +7,7 @@ namespace StarryEyes.Views.Messaging
     {
         public BringIntoViewMessage()
         {
-            DispatcherHolder.VerifyAccess();
+            DispatcherHelper.UIDispatcher.VerifyAccess();
         }
 
         protected override System.Windows.Freezable CreateInstanceCore()

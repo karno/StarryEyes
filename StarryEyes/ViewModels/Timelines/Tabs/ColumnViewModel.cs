@@ -239,7 +239,7 @@ namespace StarryEyes.ViewModels.Timelines.Tabs
 
         private void UpdateFocusFromModel(int newFocus)
         {
-            DispatcherHolder.Enqueue(() =>
+            DispatcherHelper.UIDispatcher.InvokeAsync(() =>
             {
                 this._tabs.ForEach(item => item.UpdateFocus());
                 this.RaisePropertyChanged(() => this.FocusedTab);

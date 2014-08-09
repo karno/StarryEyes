@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using JetBrains.Annotations;
+using Livet;
 
 namespace StarryEyes.Views.Controls
 {
@@ -308,7 +309,8 @@ namespace StarryEyes.Views.Controls
                         // push dispatcher queue
                         var image = item.Item2;
                         var uri = item.Item1;
-                        DispatcherHolder.Enqueue(() => SetImage(image, b, uri), DispatcherPriority.Background);
+                        DispatcherHelper.UIDispatcher.InvokeAsync(
+                            () => SetImage(image, b, uri), DispatcherPriority.Background);
                     }
 
                     // reset signal

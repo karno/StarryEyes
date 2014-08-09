@@ -62,10 +62,9 @@ namespace StarryEyes.Hotfixes
                                  {
                                      if (!Dispatcher.CheckAccess())
                                      {
-                                         Dispatcher.Invoke(
-                                             CollectionChangedDispatcherPriority,
-                                             (Action)
-                                             (() => OnPropertyChanged(e.PropertyName)));
+                                         Dispatcher.InvokeAsync(
+                                             () => OnPropertyChanged(e.PropertyName),
+                                             CollectionChangedDispatcherPriority);
                                      }
                                      else
                                      {
@@ -79,8 +78,9 @@ namespace StarryEyes.Hotfixes
                                  {
                                      if (!Dispatcher.CheckAccess())
                                      {
-                                         Dispatcher.Invoke(CollectionChangedDispatcherPriority,
-                                                           (Action)(() => OnCollectionChanged(e)));
+                                         Dispatcher.InvokeAsync(
+                                             () => OnCollectionChanged(e),
+                                             CollectionChangedDispatcherPriority);
                                      }
                                      else
                                      {

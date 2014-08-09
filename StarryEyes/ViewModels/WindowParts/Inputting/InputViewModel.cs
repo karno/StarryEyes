@@ -146,7 +146,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
 
         public void FocusToTextBox()
         {
-            DispatcherHolder.VerifyAccess();
+            DispatcherHelper.UIDispatcher.VerifyAccess();
             this.Messenger.RaiseSafe(() => new InteractionMessage("FocusToTextBox"));
         }
     }

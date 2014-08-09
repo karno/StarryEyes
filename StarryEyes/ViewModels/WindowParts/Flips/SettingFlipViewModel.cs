@@ -93,13 +93,17 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             this.ResetFilter();
             this.KeyAssignEditorViewModel.RefreshRegisteredActions();
             this._completeCallback = subject;
-            this._fsWatcher = new FileSystemWatcher(ThemeManager.ThemeProfileDirectoryPath, "*.xml");
-            this._fsWatcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName |
-                                           NotifyFilters.DirectoryName | NotifyFilters.Size;
-            this._fsWatcher.Changed += (_, e) => DispatcherHolder.Enqueue(this.RefreshThemeCandidates);
-            this._fsWatcher.Created += (_, e) => DispatcherHolder.Enqueue(this.RefreshThemeCandidates);
-            this._fsWatcher.Deleted += (_, e) => DispatcherHolder.Enqueue(this.RefreshThemeCandidates);
-            this._fsWatcher.Renamed += (_, e) => DispatcherHolder.Enqueue(this.RefreshThemeCandidates);
+            this._fsWatcher = new FileSystemWatcher(ThemeManager.ThemeProfileDirectoryPath, "*.xml")
+            {
+                NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName |
+                               NotifyFilters.DirectoryName | NotifyFilters.Size
+            };
+            var refreshHandler = new FileSystemEventHandler(
+                    (o, e) => DispatcherHelper.UIDispatcher.InvokeAsync(this.RefreshThemeCandidates));
+            this._fsWatcher.Changed += refreshHandler;
+            this._fsWatcher.Created += refreshHandler;
+            this._fsWatcher.Deleted += refreshHandler;
+            this._fsWatcher.Renamed += (o, e) => DispatcherHelper.UIDispatcher.InvokeAsync(this.RefreshThemeCandidates);
             this._fsWatcher.EnableRaisingEvents = true;
             this.RaisePropertyChanged();
             this.IsConfigurationActive = true;
@@ -262,13 +266,13 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             {
                 return;
             }
-            await DispatcherHolder.BeginInvoke(() =>
+            await DispatcherHelper.UIDispatcher.InvokeAsync(() =>
             {
                 var ww = new WorkingWindow(
                     "changing timeline mode...", async () =>
                     {
                         await Task.Run(() => Setting.TweetDisplayMode.Value = newValue);
-                        await DispatcherHolder.BeginInvoke(async () =>
+                        await DispatcherHelper.UIDispatcher.InvokeAsync(async () =>
                         {
                             await Dispatcher.Yield(DispatcherPriority.Background);
                         });
@@ -967,37 +971,35 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                     Content = SettingFlipResources.KeyAssignDeleteContentFormat.SafeFormat(KeyAssignManager.CurrentProfile.Name),
                     CommonButtons = TaskDialogCommonButtons.OKCancel
                 }));
-            if (response.Response.Result == TaskDialogSimpleResult.Ok)
+            if (response.Response.Result != TaskDialogSimpleResult.Ok) return;
+            try
             {
-                try
+                var path = KeyAssignManager.CurrentProfile.GetFilePath(
+                    KeyAssignManager.KeyAssignsProfileDirectoryPath);
+                if (File.Exists(path))
                 {
-                    var path = KeyAssignManager.CurrentProfile.GetFilePath(
-                        KeyAssignManager.KeyAssignsProfileDirectoryPath);
-                    if (File.Exists(path))
-                    {
-                        File.Delete(path);
-                    }
-                    else
-                    {
-                        throw new InvalidOperationException("file " + path + " does not exist.");
-                    }
-                    KeyAssignEditorViewModel.ClearCurrentProfile();
+                    File.Delete(path);
                 }
-                catch (Exception ex)
+                else
                 {
-                    this.Messenger.RaiseSafe(() =>
-                        new TaskDialogMessage(new TaskDialogOptions
-                        {
-                            Title = SettingFlipResources.KeyAssignDeleteFailedTitle,
-                            MainIcon = VistaTaskDialogIcon.Error,
-                            MainInstruction = SettingFlipResources.KeyAssignDeleteFailedInst,
-                            Content = ex.Message,
-                            ExpandedInfo = ex.ToString(),
-                            CommonButtons = TaskDialogCommonButtons.Close
-                        }));
+                    throw new InvalidOperationException("file " + path + " does not exist.");
                 }
-                RefreshKeyAssignCandidates();
+                this.KeyAssignEditorViewModel.ClearCurrentProfile();
             }
+            catch (Exception ex)
+            {
+                this.Messenger.RaiseSafe(() =>
+                    new TaskDialogMessage(new TaskDialogOptions
+                    {
+                        Title = SettingFlipResources.KeyAssignDeleteFailedTitle,
+                        MainIcon = VistaTaskDialogIcon.Error,
+                        MainInstruction = SettingFlipResources.KeyAssignDeleteFailedInst,
+                        Content = ex.Message,
+                        ExpandedInfo = ex.ToString(),
+                        CommonButtons = TaskDialogCommonButtons.Close
+                    }));
+            }
+            this.RefreshKeyAssignCandidates();
         }
 
         #endregion

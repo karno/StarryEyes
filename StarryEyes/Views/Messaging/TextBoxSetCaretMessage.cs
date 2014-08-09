@@ -1,4 +1,5 @@
-﻿using Livet.Messaging;
+﻿using Livet;
+using Livet.Messaging;
 
 namespace StarryEyes.Views.Messaging
 {
@@ -11,7 +12,7 @@ namespace StarryEyes.Views.Messaging
         public TextBoxSetCaretMessage(string messageKey) : base(messageKey) { }
         public TextBoxSetCaretMessage(int caretIndex, int selectionLength)
         {
-            DispatcherHolder.VerifyAccess();
+            DispatcherHelper.UIDispatcher.VerifyAccess();
             this.CaretIndex = caretIndex;
             SelectionLength = selectionLength;
         }

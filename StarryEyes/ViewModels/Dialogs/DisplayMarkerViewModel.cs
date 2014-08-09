@@ -11,10 +11,12 @@ namespace StarryEyes.ViewModels.Dialogs
     {
         public static void ShowMarker(int displayIndex)
         {
-            DispatcherHolder.Enqueue(() => new DisplayMarkerWindow
-            {
-                DataContext = new DisplayMarkerViewModel(displayIndex)
-            }.Show());
+            DispatcherHelper.UIDispatcher.InvokeAsync(
+                () => new DisplayMarkerWindow
+                {
+                    DataContext = new DisplayMarkerViewModel(displayIndex)
+                }.Show()
+                );
         }
 
         private readonly int _left;

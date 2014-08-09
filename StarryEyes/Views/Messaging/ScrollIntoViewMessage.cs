@@ -1,4 +1,5 @@
-﻿using Livet.Messaging;
+﻿using Livet;
+using Livet.Messaging;
 
 namespace StarryEyes.Views.Messaging
 {
@@ -9,7 +10,7 @@ namespace StarryEyes.Views.Messaging
         public ScrollIntoViewMessage(string messageKey, int index)
             : base(messageKey)
         {
-            DispatcherHolder.VerifyAccess();
+            DispatcherHelper.UIDispatcher.VerifyAccess();
             _index = index;
         }
 

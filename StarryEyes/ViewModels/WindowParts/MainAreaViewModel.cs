@@ -65,7 +65,7 @@ namespace StarryEyes.ViewModels.WindowParts
 
         private void UpdateFocusFromModel(int newFocus)
         {
-            DispatcherHolder.Enqueue(() =>
+            DispatcherHelper.UIDispatcher.InvokeAsync(() =>
             {
                 _columns.ForEach(c => c.UpdateFocus());
                 RaisePropertyChanged(() => FocusedColumn);
@@ -155,7 +155,7 @@ namespace StarryEyes.ViewModels.WindowParts
         {
             var timeline = TimelineActionTargetOverride ?? FocusedColumn.FocusedTab;
             if (timeline == null) return;
-            DispatcherHolder.Enqueue(() => action(timeline));
+            DispatcherHelper.UIDispatcher.InvokeAsync(() => action(timeline));
         }
 
         internal void ExecuteStatusAction(Action<StatusViewModel> status)

@@ -33,7 +33,7 @@ namespace StarryEyes.Views.Dialogs
 
         private void UpdateLabel(string label)
         {
-            Dispatcher.BeginInvoke(new Action(() => DetailText.Text = label));
+            Dispatcher.InvokeAsync(() => DetailText.Text = label);
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 using System.Windows.Interactivity;
 
 namespace StarryEyes.Views.Behaviors
@@ -22,14 +21,14 @@ namespace StarryEyes.Views.Behaviors
         {
             var listBox = sender as ListBox;
             if (listBox == null || listBox.SelectedItem == null) return;
-            listBox.Dispatcher.BeginInvoke(new Action(() =>
+            listBox.Dispatcher.InvokeAsync(() =>
             {
                 listBox.UpdateLayout();
                 if (listBox.SelectedItem != null)
                 {
                     listBox.ScrollIntoView(listBox.SelectedItem);
                 }
-            }));
+            });
         }
 
     }

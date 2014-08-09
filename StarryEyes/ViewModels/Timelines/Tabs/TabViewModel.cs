@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Threading;
 using JetBrains.Annotations;
+using Livet;
 using Livet.EventListeners;
 using Livet.Messaging;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
@@ -136,7 +137,7 @@ namespace StarryEyes.ViewModels.Timelines.Tabs
             this._parent.FocusedTab = this;
             this._parent.Focus();
             // wait for completion of creating view
-            DispatcherHolder.Enqueue(this.SetFocus, DispatcherPriority.Input);
+            DispatcherHelper.UIDispatcher.InvokeAsync(this.SetFocus, DispatcherPriority.Input);
         }
 
         #region EditTabCommand

@@ -21,7 +21,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SettingFlips
             AutoUpdateService.UpdateStateChanged += () => this._isUpdateAvailable = true;
             _contributors = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
                 ContributionService.Contributors, c => new ContributorViewModel(c),
-                DispatcherHolder.Dispatcher);
+                DispatcherHelper.UIDispatcher);
             this.CompositeDisposable.Add(
                 _contributors.ListenCollectionChanged()
                              .Subscribe(_ => RaisePropertyChanged(() => IsDonated)));

@@ -183,7 +183,7 @@ namespace StarryEyes.ViewModels.Timelines
         {
             this._model = model;
             this._timeline = new ObservableCollection<StatusViewModel>();
-            DispatcherHolder.Enqueue(this.InitializeCollection, DispatcherPriority.Background);
+            DispatcherHelper.UIDispatcher.InvokeAsync(this.InitializeCollection, DispatcherPriority.Background);
             this.CompositeDisposable.Add(
                 new EventListener<Action<bool>>(
                     h => model.InvalidationStateChanged += h,
@@ -405,11 +405,12 @@ namespace StarryEyes.ViewModels.Timelines
             lock (this._timelineLock)
             {
                 var sts = this._model.Statuses.SynchronizedToArray(
-                    () => _listener = this._model.Statuses
-                                          .ListenCollectionChanged()
-                                          .Subscribe(e => DispatcherHolder.Enqueue(
-                                              () => this.ReflectCollectionChanged(e),
-                                              DispatcherPriority.Background)));
+                    () => _listener =
+                        this._model.Statuses
+                            .ListenCollectionChanged()
+                            .Subscribe(e => DispatcherHelper.UIDispatcher.InvokeAsync(
+                                () => this.ReflectCollectionChanged(e),
+                                DispatcherPriority.Background)));
                 var items = _timeline.ToArray();
                 this._timeline.Clear();
                 sts.OrderByDescending(s => s.Status.CreatedAt)
@@ -474,7 +475,7 @@ namespace StarryEyes.ViewModels.Timelines
             if (!disposing) return;
             Task.Run(async () =>
             {
-                var array = await DispatcherHolder.Dispatcher.BeginInvoke(() =>
+                var array = await DispatcherHelper.UIDispatcher.InvokeAsync(() =>
                 {
                     lock (this._timelineLock)
                     {

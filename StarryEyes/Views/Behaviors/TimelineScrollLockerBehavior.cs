@@ -344,7 +344,7 @@ namespace StarryEyes.Views.Behaviors
 
             // scroll to initial position (enforced)
             ScrollToVerticalOffset(offset);
-            // await Dispatcher.BeginInvoke(() => ScrollToVerticalOffset(offset), DispatcherPriority.Render);
+            // await Dispatcher.InvokeAsync(() => ScrollToVerticalOffset(offset), DispatcherPriority.Render);
 
             System.Diagnostics.Debug.WriteLine("# Registering new animation. (magic ignore?" + setMagicalIgnore + ")");
             // create animation
