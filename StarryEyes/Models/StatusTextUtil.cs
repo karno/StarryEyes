@@ -67,19 +67,31 @@ namespace StarryEyes.Models
         {
             if (String.IsNullOrEmpty(raw)) yield break;
             var escaped = ParsingExtension.EscapeEntity(raw);
+
+            // capture URL
             escaped = TwitterRegexPatterns.ValidUrl.Replace(escaped, m =>
-            {
-                // # => &sharp; (ハッシュタグで再識別されることを防ぐ)
-                var repl = m.Groups[TwitterRegexPatterns.ValidUrlGroupUrl].Value.Replace("#", "&sharp;");
-                return m.Groups[TwitterRegexPatterns.ValidUrlGroupBefore] + "<U>" + repl + "<";
-            });
-            escaped = TwitterRegexPatterns.ValidMentionOrList.Replace(
-                escaped,
-                m => m.Groups[TwitterRegexPatterns.ValidMentionOrListGroupBefore].Value +
-                     m.Groups[TwitterRegexPatterns.ValidMentionOrListGroupAt] +
-                     "<A>" + m.Groups[TwitterRegexPatterns.ValidMentionOrListGroupUsername].Value +
-                     m.Groups[TwitterRegexPatterns.ValidMentionOrListGroupList].Value + "<");
-            escaped = TwitterRegexPatterns.ValidHashtag.Replace(escaped, m => m.Groups[1] + "<H>" + m.Groups[1].Value + "<");
+                m.Groups[TwitterRegexPatterns.ValidUrlGroupBefore] + "<U>" +
+                    // # => &sharp; (ハッシュタグで再識別されることを防ぐ)
+                m.Groups[TwitterRegexPatterns.ValidUrlGroupUrl].Value.Replace("#", "&sharp;") +
+                "<");
+
+            // capture Mention
+            escaped = TwitterRegexPatterns.ValidMentionOrList.Replace(escaped, m =>
+                m.Groups[TwitterRegexPatterns.ValidMentionOrListGroupBefore].Value +
+                "<A>" +
+                m.Groups[TwitterRegexPatterns.ValidMentionOrListGroupAt].Value +
+                m.Groups[TwitterRegexPatterns.ValidMentionOrListGroupUsername].Value +
+                m.Groups[TwitterRegexPatterns.ValidMentionOrListGroupList].Value +
+                "<");
+
+            // capture Hashtag
+            escaped = TwitterRegexPatterns.ValidHashtag.Replace(escaped, m =>
+                m.Groups[TwitterRegexPatterns.ValidHashtagGroupBefore].Value +
+                "<H>" +
+                m.Groups[TwitterRegexPatterns.ValidHashtagGroupHash].Value +
+                m.Groups[TwitterRegexPatterns.ValidHashtagGroupTag].Value +
+                "<");
+
             var splitted = escaped.Split(new[] { '<' }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var s in splitted)
             {
