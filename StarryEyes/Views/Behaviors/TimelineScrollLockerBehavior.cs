@@ -11,7 +11,6 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Interactivity;
 using System.Windows.Threading;
-using Livet;
 using StarryEyes.Views.Utils;
 
 namespace StarryEyes.Views.Behaviors
@@ -91,7 +90,7 @@ namespace StarryEyes.Views.Behaviors
 
         // internal caches
         private readonly Queue<double> _scrollOffsetQueue = new Queue<double>();
-        private readonly DispatcherTimer _scrollTimer;
+        private readonly Timer _scrollTimer;
         private double _lastScrollOffset;
         private int _previousItemCount;
         private IDisposable _itemSourceCollectionChangeListener;
@@ -102,11 +101,10 @@ namespace StarryEyes.Views.Behaviors
         public TimelineScrollLockerBehavior()
         {
             if (DesignTimeUtil.IsInDesignMode) return;
-            _scrollTimer = new DispatcherTimer(
-                TimeSpan.FromMilliseconds(10),
-                DispatcherPriority.Render,
-                TimerCallback,
-                DispatcherHelper.UIDispatcher);
+            _scrollTimer = new Timer(
+                _ => TimerCallback(), null,
+                Timeout.InfiniteTimeSpan,
+                Timeout.InfiniteTimeSpan);
         }
 
         protected override void OnAttached()
@@ -258,9 +256,8 @@ namespace StarryEyes.Views.Behaviors
             lock (_scrollOffsetQueue)
             {
                 _scrollOffsetQueue.Clear();
-                _scrollTimer.Stop();
             }
-            _scrollTimer.Stop();
+            this.StopScrollTimer();
         }
 
         private static void ItemsSourceChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
@@ -372,18 +369,29 @@ namespace StarryEyes.Views.Behaviors
                 }
                 // ensure scroll to zero.
                 _scrollOffsetQueue.Enqueue(0);
-                _scrollTimer.Start();
+                RunScrollTimer();
             }
             this._isMagicIgnoreHolded = false;
+        }
+
+        private void RunScrollTimer()
+        {
+            _scrollTimer.Change(
+                TimeSpan.FromMilliseconds(10),
+                TimeSpan.FromMilliseconds(10));
+        }
+
+        private void StopScrollTimer()
+        {
+            _scrollTimer.Change(
+                Timeout.InfiniteTimeSpan,
+                Timeout.InfiniteTimeSpan);
         }
 
         /// <summary>
         /// Callback method.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        /// <remarks>THIS METHOD IS CALLED ON *DISPATCHER* !!</remarks>
-        private void TimerCallback(object sender, EventArgs e)
+        private void TimerCallback()
         {
             // run scroll animation
 
@@ -393,7 +401,7 @@ namespace StarryEyes.Views.Behaviors
                 // dequeue next one
                 if (_scrollOffsetQueue.Count == 0)
                 {
-                    _scrollTimer.Stop();
+                    StopScrollTimer();
                     System.Diagnostics.Debug.WriteLine("# Scroll completed. [magic ignore hold?" + _isMagicIgnoreHolded + "]");
                     // disable magical ignore
                     if (!this._isMagicIgnoreHolded)
@@ -405,7 +413,10 @@ namespace StarryEyes.Views.Behaviors
                 }
                 dequeuedOffset = this._scrollOffsetQueue.Dequeue();
             }
-            ScrollToVerticalOffset(dequeuedOffset);
+            // set scroll offset
+            this.Dispatcher.InvokeAsync(() =>
+                ScrollToVerticalOffset(dequeuedOffset),
+                DispatcherPriority.Render);
         }
 
         /// <summary>
