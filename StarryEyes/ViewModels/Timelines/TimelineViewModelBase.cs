@@ -33,6 +33,9 @@ namespace StarryEyes.ViewModels.Timelines
             App.ApplicationFinalize += () => _disposeWorker.Dispose();
         }
 
+        /// <summary>
+        /// maximum read-back count
+        /// </summary>
         private const int MaxReadCount = 5;
         private readonly object _timelineLock = new object();
         private readonly ObservableCollection<StatusViewModel> _timeline;
@@ -61,7 +64,7 @@ namespace StarryEyes.ViewModels.Timelines
                 if (_isLoading == value) return;
                 _isLoading = value;
                 RaisePropertyChanged();
-                RaisePropertyChanged(() => IsScrollLock);
+                RaisePropertyChanged(() => IsScrollLockEnabled);
                 RaisePropertyChanged(() => IsAnimationEnabled);
             }
         }
@@ -74,7 +77,7 @@ namespace StarryEyes.ViewModels.Timelines
                 if (_isMouseOver == value) return;
                 _isMouseOver = value;
                 RaisePropertyChanged();
-                RaisePropertyChanged(() => IsScrollLock);
+                RaisePropertyChanged(() => this.IsScrollLockEnabled);
             }
         }
 
@@ -86,7 +89,7 @@ namespace StarryEyes.ViewModels.Timelines
                 if (this._isScrollOnTop == value) return;
                 this._isScrollOnTop = value;
                 RaisePropertyChanged();
-                // RaisePropertyChanged(() => IsScrollLock);
+                // RaisePropertyChanged(() => IsScrollLockEnabled);
                 // revive auto trim
                 if (!this._model.IsAutoTrimEnabled)
                 {
@@ -119,7 +122,7 @@ namespace StarryEyes.ViewModels.Timelines
                 if (_isScrollLockExplicit == value) return;
                 _isScrollLockExplicit = value;
                 RaisePropertyChanged();
-                RaisePropertyChanged(() => IsScrollLock);
+                RaisePropertyChanged(() => this.IsScrollLockEnabled);
             }
         }
 
@@ -133,13 +136,13 @@ namespace StarryEyes.ViewModels.Timelines
             get { return Setting.ScrollLockStrategy.Value == ScrollLockStrategy.Explicit; }
         }
 
-        public bool IsScrollLock
+        public bool IsScrollLockEnabled
         {
             get
             {
                 if (this.IsLoading)
                 {
-                    // when loading, skip scroll-locking.
+                    // when (re)loading, skip scroll-locking.
                     return false;
                 }
                 switch (Setting.ScrollLockStrategy.Value)
@@ -172,7 +175,7 @@ namespace StarryEyes.ViewModels.Timelines
             {
                 if (this.IsLoading)
                 {
-                    // when loading, skip scroll-locking.
+                    // when (re)loading, skip scrolling action.
                     return false;
                 }
                 return Setting.IsScrollByPixel.Value && Setting.IsAnimateScrollToNewTweet.Value;
@@ -186,9 +189,34 @@ namespace StarryEyes.ViewModels.Timelines
             DispatcherHelper.UIDispatcher.InvokeAsync(this.InitializeCollection, DispatcherPriority.Background);
             this.CompositeDisposable.Add(
                 new EventListener<Action<bool>>(
-                    h => model.InvalidationStateChanged += h,
-                    h => model.InvalidationStateChanged -= h,
-                    s => this.IsLoading = s));
+                    h => model.IsLoadingChanged += h,
+                    h => model.IsLoadingChanged -= h,
+                    isLoading =>
+                    {
+                        if (isLoading)
+                        {
+                            // send immediate
+                            // ! MUST BE DispatcherPriority.Send ! 
+                            // for update binding value before beginning rendering.
+                            DispatcherHelper.UIDispatcher.InvokeAsync(() =>
+                            {
+                                this.IsLoading = true;
+                            }, DispatcherPriority.Send);
+                        }
+                        else
+                        {
+                            // wait for dispatcher
+                            DispatcherHelper.UIDispatcher.InvokeAsync(() =>
+                            {
+                                // this clause is invoked later, so re-check currrent value
+                                if (model.IsLoading == false)
+                                {
+                                    System.Diagnostics.Debug.WriteLine("INVALIDATION COMPLETED!");
+                                    this.IsLoading = false;
+                                }
+                            }, DispatcherPriority.ContextIdle);
+                        }
+                    }));
             this.CompositeDisposable.Add(() =>
             {
                 if (_listener != null) _listener.Dispose();
@@ -200,7 +228,7 @@ namespace StarryEyes.ViewModels.Timelines
                     .Subscribe(a => _timeline.ForEach(s => s.BindingAccounts = a)));
             this.CompositeDisposable.Add(
                 Setting.ScrollLockStrategy.ListenValueChanged(
-                    v => RaisePropertyChanged(() => IsScrollLock)));
+                    v => RaisePropertyChanged(() => this.IsScrollLockEnabled)));
             this.CompositeDisposable.Add(
                 Setting.IsAnimateScrollToNewTweet.ListenValueChanged(
                     v => RaisePropertyChanged(() => IsAnimationEnabled)));
@@ -211,17 +239,18 @@ namespace StarryEyes.ViewModels.Timelines
                         RaisePropertyChanged(() => ScrollUnit);
                         RaisePropertyChanged(() => IsAnimationEnabled);
                     }));
-            this.IsLoading = true;
             this._model.InvalidateTimeline();
         }
 
         public void ReadMore()
         {
             if (this.IsScrollOnTop || IsLoading) return;
-            ReadMore(this._model.Statuses
-                         .Select(s => s.Status.Id)
-                         .Append(long.MaxValue)
-                         .Min());
+            // get minimum status id in this timeline
+            var minId = this._model.Statuses
+                            .Select(s => s.Status.Id)
+                            .Append(long.MaxValue)
+                            .Min();
+            ReadMore(minId);
         }
 
         public void ReadMore(long id)
@@ -229,19 +258,16 @@ namespace StarryEyes.ViewModels.Timelines
             if (IsLoading) return;
             if (!this._model.IsAutoTrimEnabled)
             {
+                // check read-back count
                 if (_readCount >= MaxReadCount) return;
                 _readCount++;
             }
             else
             {
+                // disable auto trimming
                 this._model.IsAutoTrimEnabled = false;
             }
-            Task.Run(async () =>
-            {
-                this.IsLoading = true;
-                await ReadMoreCore(id == long.MaxValue ? (long?)null : id);
-                this.IsLoading = false;
-            });
+            Task.Run(async () => await ReadMoreCore(id == long.MaxValue ? (long?)null : id));
         }
 
         protected virtual async Task ReadMoreCore(long? id)

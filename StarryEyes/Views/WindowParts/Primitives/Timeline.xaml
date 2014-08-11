@@ -2091,7 +2091,7 @@
                                                                                        Mode=OneWayToSource}" />
                             <behaviors:TimelineScrollLockerBehavior IsAnimationEnabled="{Binding IsAnimationEnabled,
                                                                                                  Mode=OneWay}"
-                                                                    IsScrollLockEnabled="{Binding IsScrollLock,
+                                                                    IsScrollLockEnabled="{Binding IsScrollLockEnabled,
                                                                                                   Mode=OneWay}"
                                                                     IsScrollLockOnlyScrolled="{Binding IsScrollLockOnlyScrolled,
                                                                                                        Mode=OneWay}"

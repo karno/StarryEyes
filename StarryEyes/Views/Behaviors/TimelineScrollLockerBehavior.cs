@@ -73,6 +73,17 @@ namespace StarryEyes.Views.Behaviors
             DependencyProperty.Register("ItemsSource", typeof(IList), typeof(TimelineScrollLockerBehavior),
                                         new PropertyMetadata(null, ItemsSourceChanged));
 
+        private static void ItemsSourceChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
+        {
+            var behavior = dependencyObject as TimelineScrollLockerBehavior;
+            // sender is ScollLockerBehavior and that is attached.
+            if (behavior != null && behavior.AssociatedObject != null)
+            {
+                // call ItemsSourceChanged on the instance.
+                behavior.ItemsSourceChanged();
+            }
+        }
+
         /// <summary>
         /// Flag of scroll animation is enabled or disabled
         /// </summary>
@@ -124,130 +135,7 @@ namespace StarryEyes.Views.Behaviors
                     h => this.AssociatedObject.ScrollChanged += h,
                     h => this.AssociatedObject.ScrollChanged -= h)
                           .Select(p => p.EventArgs)
-                          .Subscribe(
-                              e =>
-                              {
-                                  // scroll events are caused by:
-                                  // + priority high
-                                  // * item addition -> hold position or execute animation if needed
-                                  // * user scroll -> stop animation and reflect that immediately.
-                                  // * scroll lock(animation) -> do nothing.
-                                  // - priority low
-
-                                  // get source
-                                  var source = ItemsSource;
-                                  if (source == null) return;
-
-                                  var itemCount = source.Count;
-                                  var verticalOffset = e.VerticalOffset;
-
-                                  // ***** check item is added or not *****
-
-                                  // check and update items count latch
-                                  if (_previousItemCount != itemCount)
-                                  {
-                                      // caused by item addition?
-                                      _previousItemCount = itemCount;
-
-                                      // if scroll extent is not changed or shrinked, nothing to do.
-                                      if (e.ExtentHeightChange <= 0)
-                                      {
-                                          _lastScrollOffset = verticalOffset;
-                                          return;
-                                      }
-
-                                      // calculate position should scroll to.
-                                      // e.VerticalOffset indicates illegal offset when timeline is invisible.
-                                      // var prevPosition = e.VerticalOffset + e.ExtentHeightChange;
-                                      var prevPosition = _lastScrollOffset + e.ExtentHeightChange;
-                                      if (prevPosition > e.ExtentHeight)
-                                      {
-                                          // too large to scroll -> use value from e.VerticalOffset
-                                          prevPosition = verticalOffset + e.ExtentHeightChange;
-                                      }
-
-                                      // scroll back to previous position
-
-                                      // ScrollLock AND !ScrollLockOnlyScrolled -> Lock
-                                      // ScrollLock AND ScrollLockOnlyScrolled AND _lastScrollOffset is not Zero -> Lock
-                                      if (IsScrollLockEnabled && (!IsScrollLockOnlyScrolled || _lastScrollOffset > TopLockThreshold))
-                                      {
-                                          if (IsScrollLockOnlyScrolled)
-                                          {
-                                              // when running animation, re-invoke animation from current position. 
-                                              lock (_scrollOffsetQueue)
-                                              {
-                                                  if (_scrollOffsetQueue.Count > 0)
-                                                  {
-                                                      System.Diagnostics.Debug.WriteLine("* Currently scrolling -> update animation.");
-                                                      // start animation with a ✨ magic ✨
-                                                      this.RunAnimation(prevPosition, true);
-                                                      return;
-                                                  }
-                                              }
-                                          }
-                                          // simply scrolled to previous position
-                                          System.Diagnostics.Debug.WriteLine("* Lock executed. offset: " + prevPosition + " / vertical extent size: " + e.ExtentHeight);
-                                          ScrollToVerticalOffset(prevPosition);
-                                      }
-                                      else if (IsAnimationEnabled)
-                                      {
-                                          System.Diagnostics.Debug.WriteLine("* Run animation! offset: " + prevPosition);
-                                          // animate to new position
-                                          this.RunAnimation(prevPosition);
-                                      }
-                                      return;
-                                  }
-
-                                  // ***** check is user scrolled or not ****
-
-                                  // _lastScrollOffset != e.VerticalOffset
-                                  if (Math.Abs(this._lastScrollOffset - verticalOffset) > TopLockThreshold)
-                                  {
-                                      if (_magicIgnoreUserScrollOnce)
-                                      {
-                                          // magic ignore once
-                                          if (!this._isMagicIgnoreHolded)
-                                          {
-                                              _magicIgnoreUserScrollOnce = false;
-                                              System.Diagnostics.Debug.WriteLine(
-                                                  "✨ MAGICAL IGNORE [RELEASE] ✨" +
-                                                  " LSO:" + this._lastScrollOffset + " / VO: " + verticalOffset);
-                                          }
-                                          else
-                                          {
-                                              System.Diagnostics.Debug.WriteLine(
-                                                  "✨ MAGICAL IGNORE [HOLD] ✨" +
-                                                  " LSO:" + this._lastScrollOffset + " / VO: " + verticalOffset);
-                                          }
-                                          this._lastScrollOffset = verticalOffset;
-                                          return;
-                                      }
-                                      System.Diagnostics.Debug.WriteLine(
-                                          "* User scroll detected." +
-                                          " LSO: " + this._lastScrollOffset + " / VO: " + verticalOffset);
-                                      // scrolled by user?
-                                      // -> abort animation, exit immediately
-                                      lock (_scrollOffsetQueue)
-                                      {
-                                          if (_scrollOffsetQueue.Count > 0)
-                                          {
-                                              System.Diagnostics.Debug.WriteLine(" -> Scroll stopped by user-interaction.");
-                                              _scrollOffsetQueue.Clear();
-                                          }
-                                      }
-                                      // write back last scroll offset and item count
-                                      this._lastScrollOffset = verticalOffset;
-                                      this._previousItemCount = itemCount;
-                                      return;
-                                  }
-
-                                  // ***** or maybe caused by scroll animation *****
-                                  // -> do nothing.
-
-                                  return;
-
-                              }));
+                          .Subscribe(this.ScrollChanged));
         }
 
         protected override void OnDetaching()
@@ -260,15 +148,136 @@ namespace StarryEyes.Views.Behaviors
             this.StopScrollTimer();
         }
 
-        private static void ItemsSourceChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
+        /// <summary>
+        /// Handle scroll changed
+        /// </summary>
+        /// <param name="e">scrollchanged event arguments</param>
+        private void ScrollChanged(ScrollChangedEventArgs e)
         {
-            var behavior = dependencyObject as TimelineScrollLockerBehavior;
-            // sender is ScollLockerBehavior and that is attached.
-            if (behavior != null && behavior.AssociatedObject != null)
+            // scroll events are caused by:
+            // + priority high
+            // * item addition -> hold position or execute animation if needed
+            // * user scroll -> stop animation and reflect that immediately.
+            // * scroll lock(animation) -> do nothing.
+            // - priority low
+
+            // get source
+            var source = ItemsSource;
+            if (source == null) return;
+
+            var itemCount = source.Count;
+            var verticalOffset = e.VerticalOffset;
+
+            // ***** check item is added or not *****
+
+            // check and update items count latch
+            if (_previousItemCount != itemCount)
             {
-                // call ItemsSourceChanged on the instance.
-                behavior.ItemsSourceChanged();
+                // caused by item addition?
+                _previousItemCount = itemCount;
+
+                // if scroll extent is not changed or shrinked, nothing to do.
+                if (e.ExtentHeightChange <= 0)
+                {
+                    _lastScrollOffset = verticalOffset;
+                    return;
+                }
+
+                // calculate position should scroll to.
+                // e.VerticalOffset indicates illegal offset when timeline is invisible.
+                // var prevPosition = e.VerticalOffset + e.ExtentHeightChange;
+                var prevPosition = _lastScrollOffset + e.ExtentHeightChange;
+                if (prevPosition > e.ExtentHeight)
+                {
+                    // too large to scroll -> use value from e.VerticalOffset
+                    prevPosition = verticalOffset + e.ExtentHeightChange;
+                }
+
+                // scroll back to previous position
+
+                // ScrollLock AND !ScrollLockOnlyScrolled -> Lock
+                // ScrollLock AND ScrollLockOnlyScrolled AND _lastScrollOffset is not Zero -> Lock
+                if (IsScrollLockEnabled && (!IsScrollLockOnlyScrolled || _lastScrollOffset > TopLockThreshold))
+                {
+                    if (IsScrollLockOnlyScrolled)
+                    {
+                        // when running animation, re-invoke animation from current position. 
+                        lock (_scrollOffsetQueue)
+                        {
+                            if (_scrollOffsetQueue.Count > 0)
+                            {
+                                System.Diagnostics.Debug.WriteLine("* Currently scrolling -> update animation.");
+                                // start animation with a ✨ magic ✨
+                                this.RunAnimation(prevPosition, true);
+                                return;
+                            }
+                        }
+                    }
+                    // simply scrolled to previous position
+                    System.Diagnostics.Debug.WriteLine("* Lock executed. offset: " + prevPosition + " / vertical extent size: " + e.ExtentHeight);
+                    ScrollToVerticalOffset(prevPosition);
+                }
+                else if (IsAnimationEnabled)
+                {
+                    System.Diagnostics.Debug.WriteLine("* Run animation! offset: " + prevPosition);
+                    // animate to new position
+                    this.RunAnimation(prevPosition);
+                }
+                else
+                {
+                    // simply update last offset.
+                    _lastScrollOffset = verticalOffset;
+                }
+                return;
             }
+
+            // ***** check is user scrolled or not ****
+
+            // _lastScrollOffset != e.VerticalOffset
+            if (Math.Abs(_lastScrollOffset - verticalOffset) > TopLockThreshold)
+            {
+                if (_magicIgnoreUserScrollOnce)
+                {
+                    // magic ignore once
+                    if (!_isMagicIgnoreHolded)
+                    {
+                        _magicIgnoreUserScrollOnce = false;
+                        System.Diagnostics.Debug.WriteLine(
+                            "✨ MAGICAL IGNORE [RELEASE] ✨" +
+                            " LSO:" + _lastScrollOffset + " / VO: " + verticalOffset);
+                    }
+                    else
+                    {
+                        System.Diagnostics.Debug.WriteLine(
+                            "✨ MAGICAL IGNORE [HOLD] ✨" +
+                            " LSO:" + _lastScrollOffset + " / VO: " + verticalOffset);
+                    }
+                    _lastScrollOffset = verticalOffset;
+                    return;
+                }
+                System.Diagnostics.Debug.WriteLine(
+                    "* User scroll detected." +
+                    " LSO: " + _lastScrollOffset + " / VO: " + verticalOffset);
+                // scrolled by user?
+                // -> abort animation, exit immediately
+                lock (_scrollOffsetQueue)
+                {
+                    if (_scrollOffsetQueue.Count > 0)
+                    {
+                        System.Diagnostics.Debug.WriteLine(" -> Scroll stopped by user-interaction.");
+                        _scrollOffsetQueue.Clear();
+                    }
+                }
+                // write back last scroll offset and item count
+                _lastScrollOffset = verticalOffset;
+                _previousItemCount = itemCount;
+                return;
+            }
+
+            // ***** or maybe caused by scroll animation *****
+            // -> do nothing.
+
+            return;
         }
 
         /// <summary>

@@ -26,23 +26,23 @@ namespace StarryEyes.Models.Timelines
 
         private IDisposable _timelineListener;
         private bool _isAutoTrimEnabled;
-        private bool _isInvalidating;
+        private bool _isLoading;
 
         private readonly AVLTree<long> _statusIdCache;
         private readonly ObservableSynchronizedCollectionEx<StatusModel> _statuses;
 
-        public bool IsInvalidating
+        public bool IsLoading
         {
-            get { return _isInvalidating; }
+            get { return this._isLoading; }
+            protected set
+            {
+                if (this._isLoading == value) return;
+                this._isLoading = value;
+                this.IsLoadingChanged.SafeInvoke(value);
+            }
         }
 
-        public event Action<bool> InvalidationStateChanged;
-
-        protected virtual void OnInvalidationStateChanged(bool invalidationState)
-        {
-            _isInvalidating = invalidationState;
-            this.InvalidationStateChanged.SafeInvoke(invalidationState);
-        }
+        public event Action<bool> IsLoadingChanged;
 
         public ObservableSynchronizedCollectionEx<StatusModel> Statuses
         {
@@ -172,10 +172,29 @@ namespace StarryEyes.Models.Timelines
 
         public async Task ReadMore(long? maxId)
         {
-            await this.Fetch(maxId, TimelineChunkCount)
-                      .Where(this.CheckAcceptStatus)
-                      .SelectMany(s => this.AddStatus(s, false).ToObservable())
-                      .LastOrDefaultAsync();
+            await this.ReadMore(maxId, true);
+        }
+
+        private async Task ReadMore(long? maxId, bool setLoadingFlag)
+        {
+            try
+            {
+                if (setLoadingFlag)
+                {
+                    this.IsLoading = true;
+                }
+                await this.Fetch(maxId, TimelineChunkCount)
+                          .Where(this.CheckAcceptStatus)
+                          .SelectMany(s => this.AddStatus(s, false).ToObservable())
+                          .LastOrDefaultAsync();
+            }
+            finally
+            {
+                if (setLoadingFlag)
+                {
+                    this.IsLoading = false;
+                }
+            }
         }
 
         private int _trimCount;
@@ -241,9 +260,11 @@ namespace StarryEyes.Models.Timelines
                 var complete = false;
                 try
                 {
-                    this.OnInvalidationStateChanged(true);
+                    this.IsLoading = true;
                     if (this.PreInvalidateTimeline())
                     {
+                        // when PreInvalidateTimeline is finished correctly,
+                        // reserve to down loading flag.
                         complete = true;
                     }
                     // invalidate and fetch statuses
@@ -252,13 +273,14 @@ namespace StarryEyes.Models.Timelines
                         this._statusIdCache.Clear();
                         this.Statuses.Clear();
                     }
-                    await this.ReadMore(null);
+                    // do not change loading flag in inner method
+                    await this.ReadMore(null, false);
                 }
                 finally
                 {
                     if (complete)
                     {
-                        this.OnInvalidationStateChanged(false);
+                        this.IsLoading = false;
                     }
                 }
             });
