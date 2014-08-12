@@ -52,9 +52,6 @@ namespace StarryEyes.Anomaly.TwitterApi
                 var ex = new TwitterApiException(resp.StatusCode, rstr);
                 try
                 {
-                    var eflg = json.errors();
-                    var cflg = json.errors[0].code();
-                    var mflg = json.errors[0].message();
                     if (json.errors() && json.errors[0].code() && json.errors[0].message())
                     {
                         ex = new TwitterApiException(resp.StatusCode,

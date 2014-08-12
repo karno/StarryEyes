@@ -17,9 +17,9 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
         {
             this.Id = ((string)json.id_str).ParseLong();
             this.ScreenName = ParsingExtension.ResolveEntity(json.screen_name);
-            this.Name = json.name;
-            this.Description = json.description;
-            this.Location = json.location;
+            this.Name = ParsingExtension.ResolveEntity(json.name);
+            this.Description = ParsingExtension.ResolveEntity(json.description);
+            this.Location = ParsingExtension.ResolveEntity(json.location);
             this.Url = json.url;
             this.IsDefaultProfileImage = json.default_profile_image;
             this.ProfileImageUri = ((string)json.profile_image_url).ParseUri();
@@ -234,7 +234,7 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
         public string GetEntityAidedDescription(bool showFullUrl = false)
         {
             var builder = new StringBuilder();
-            var escaped = ParsingExtension.EscapeEntity(this.Description ?? String.Empty);
+            var escaped = this.Description ?? String.Empty;
             TwitterEntity prevEntity = null;
             foreach (var entity in this.DescriptionEntities.Guard().OrderBy(e => e.StartIndex))
             {
