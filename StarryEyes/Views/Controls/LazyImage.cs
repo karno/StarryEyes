@@ -166,7 +166,7 @@ namespace StarryEyes.Views.Controls
 
         private static void PushLoadTask(Uri source, Subject<byte[]> resultSubject)
         {
-            var maxLoadStackSize = Setting.ImageLoadStackMaxSize.Value;
+            var maxLoadStackSize = Setting.ImageMaxLoadStackSize.Value;
             lock (_loadStack)
             {
                 _loadStack.AddLast(Tuple.Create(source, resultSubject));
@@ -287,7 +287,7 @@ namespace StarryEyes.Views.Controls
         private static void PushDecodeTask(Uri uriSource, LazyImage targetImage,
             byte[] bytes, int dpw, int dph)
         {
-            var maxDecodeStackSize = Setting.ImageDecodeStackMaxSize.Value;
+            var maxDecodeStackSize = Setting.ImageMaxDecodeStackSize.Value;
             lock (_decodeStack)
             {
                 _decodeStack.AddLast(Tuple.Create(uriSource, targetImage, bytes, dpw, dph));
