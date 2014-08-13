@@ -15,6 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using JetBrains.Annotations;
 using Livet;
+using StarryEyes.Settings;
 
 namespace StarryEyes.Views.Controls
 {
@@ -158,14 +159,22 @@ namespace StarryEyes.Views.Controls
 
         #region Image Loader
 
-        private static readonly ConcurrentStack<Tuple<Uri, Subject<byte[]>>> _loadStack =
-            new ConcurrentStack<Tuple<Uri, Subject<byte[]>>>();
+        private static readonly LinkedList<Tuple<Uri, Subject<byte[]>>> _loadStack =
+            new LinkedList<Tuple<Uri, Subject<byte[]>>>();
 
         private static int _loadThreadConcurrency;
 
         private static void PushLoadTask(Uri source, Subject<byte[]> resultSubject)
         {
-            _loadStack.Push(Tuple.Create(source, resultSubject));
+            var maxLoadStackSize = Setting.ImageLoadStackMaxSize.Value;
+            lock (_loadStack)
+            {
+                _loadStack.AddLast(Tuple.Create(source, resultSubject));
+                while (_loadStack.Count > maxLoadStackSize)
+                {
+                    _loadStack.RemoveFirst();
+                }
+            }
             if (Interlocked.Increment(ref _loadThreadConcurrency) > MaxReceiveConcurrency)
             {
                 Interlocked.Decrement(ref _loadThreadConcurrency);
@@ -178,15 +187,18 @@ namespace StarryEyes.Views.Controls
         private static void RunNextLoadTask()
         {
             Tuple<Uri, Subject<byte[]>> item;
-            if (!_loadStack.TryPop(out item))
+            lock (_loadStack)
             {
-                Interlocked.Decrement(ref _loadThreadConcurrency);
+                if (_loadStack.Count == 0)
+                {
+                    Interlocked.Decrement(ref _loadThreadConcurrency);
+                    return;
+                }
+                item = _loadStack.First.Value;
+                _loadStack.RemoveFirst();
             }
-            else
-            {
-                Task.Run(async () => await LoadBytes(item.Item1, item.Item2))
-                    .ContinueWith(_ => RunNextLoadTask());
-            }
+            Task.Run(async () => await LoadBytes(item.Item1, item.Item2))
+                .ContinueWith(_ => RunNextLoadTask());
         }
 
         private static async Task LoadBytes(Uri source, Subject<byte[]> subject)
@@ -267,15 +279,23 @@ namespace StarryEyes.Views.Controls
             _decoderThread.Start();
         }
 
-        private static readonly ConcurrentStack<Tuple<Uri, LazyImage, byte[], int, int>> _decodeStack =
-            new ConcurrentStack<Tuple<Uri, LazyImage, byte[], int, int>>();
+        private static readonly LinkedList<Tuple<Uri, LazyImage, byte[], int, int>> _decodeStack =
+            new LinkedList<Tuple<Uri, LazyImage, byte[], int, int>>();
 
         private static readonly ManualResetEventSlim _decodeSignal = new ManualResetEventSlim();
 
         private static void PushDecodeTask(Uri uriSource, LazyImage targetImage,
             byte[] bytes, int dpw, int dph)
         {
-            _decodeStack.Push(Tuple.Create(uriSource, targetImage, bytes, dpw, dph));
+            var maxDecodeStackSize = Setting.ImageDecodeStackMaxSize.Value;
+            lock (_decodeStack)
+            {
+                _decodeStack.AddLast(Tuple.Create(uriSource, targetImage, bytes, dpw, dph));
+                while (_decodeStack.Count > maxDecodeStackSize)
+                {
+                    _decodeStack.RemoveFirst();
+                }
+            }
             _decodeSignal.Set();
         }
 
@@ -297,10 +317,19 @@ namespace StarryEyes.Views.Controls
                 _decodeSignal.Reset();
 
                 // uri, LazyImage, dpw, dph
-                Tuple<Uri, LazyImage, byte[], int, int> item;
-
-                while (_decodeStack.TryPop(out item))
+                while (true)
                 {
+                    Tuple<Uri, LazyImage, byte[], int, int> item;
+                    lock (_decodeStack)
+                    {
+                        if (_decodeStack.Count == 0)
+                        {
+                            break;
+                        }
+                        item = _decodeStack.First.Value;
+                        _decodeStack.RemoveFirst();
+                    }
+
                     // create image
                     var b = CreateImage(item.Item3, item.Item4, item.Item5);
 

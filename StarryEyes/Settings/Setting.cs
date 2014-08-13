@@ -276,6 +276,12 @@ namespace StarryEyes.Settings
         public static readonly SettingItemStruct<bool> DisableGeoLocationService =
             new SettingItemStruct<bool>("DisableGeoLocationService", false);
 
+        public static readonly SettingItemStruct<int> ImageMaxLoadStackSize =
+            new SettingItemStruct<int>("ImageMaxLoadStackSize", 64);
+
+        public static readonly SettingItemStruct<int> ImageMaxDecodeStackSize =
+            new SettingItemStruct<int>("ImageMaxDecodeStackSize", 128);
+
         public static readonly SettingItemStruct<int> EventDisplayMinimumMSec =
             new SettingItemStruct<int>("EventDisplayMinimumMSec", 200);
 
