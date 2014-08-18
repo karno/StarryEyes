@@ -169,10 +169,10 @@ namespace StarryEyes.Views.Controls
             var maxLoadStackSize = Setting.ImageMaxLoadStackSize.Value;
             lock (_loadStack)
             {
-                _loadStack.AddLast(Tuple.Create(source, resultSubject));
+                _loadStack.AddFirst(Tuple.Create(source, resultSubject));
                 while (_loadStack.Count > maxLoadStackSize)
                 {
-                    _loadStack.RemoveFirst();
+                    _loadStack.RemoveLast();
                 }
             }
             if (Interlocked.Increment(ref _loadThreadConcurrency) > MaxReceiveConcurrency)
@@ -290,10 +290,10 @@ namespace StarryEyes.Views.Controls
             var maxDecodeStackSize = Setting.ImageMaxDecodeStackSize.Value;
             lock (_decodeStack)
             {
-                _decodeStack.AddLast(Tuple.Create(uriSource, targetImage, bytes, dpw, dph));
+                _decodeStack.AddFirst(Tuple.Create(uriSource, targetImage, bytes, dpw, dph));
                 while (_decodeStack.Count > maxDecodeStackSize)
                 {
-                    _decodeStack.RemoveFirst();
+                    _decodeStack.RemoveLast();
                 }
             }
             _decodeSignal.Set();
