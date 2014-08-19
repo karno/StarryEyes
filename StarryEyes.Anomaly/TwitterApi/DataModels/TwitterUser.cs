@@ -33,11 +33,11 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
             this.IsTranslator = json.is_translator;
             this.IsContributorsEnabled = json.contributors_enabled;
             this.IsGeoEnabled = json.geo_enabled;
-            this.StatusesCount = (long)json.statuses_count;
-            this.FollowingsCount = (long)json.friends_count;
-            this.FollowersCount = (long)json.followers_count;
-            this.FavoritesCount = (long)json.favourites_count;
-            this.ListedCount = (long)json.listed_count;
+            this.StatusesCount = (long)((double?)json.statuses_count ?? default(double));
+            this.FollowingsCount = (long)((double?)json.friends_count ?? default(double));
+            this.FollowersCount = (long)((double?)json.followers_count ?? default(double));
+            this.FavoritesCount = (long)((double?)json.favourites_count ?? default(double));
+            this.ListedCount = (long)((double?)json.listed_count ?? default(double));
             this.Language = json.lang;
             this.CreatedAt = ((string)json.created_at).ParseDateTime(ParsingExtension.TwitterDateTimeFormat);
             if (json.entities())
