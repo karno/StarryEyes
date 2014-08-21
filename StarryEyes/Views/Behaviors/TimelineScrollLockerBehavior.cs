@@ -108,6 +108,8 @@ namespace StarryEyes.Views.Behaviors
         // ✨ the magic ✨
         private volatile bool _magicIgnoreUserScrollOnce;
         private volatile bool _isMagicIgnoreHolded;
+        // wait for dispatcher
+        private volatile bool _isDispatcherAffected;
 
         public TimelineScrollLockerBehavior()
         {
@@ -116,6 +118,7 @@ namespace StarryEyes.Views.Behaviors
                 _ => TimerCallback(), null,
                 Timeout.InfiniteTimeSpan,
                 Timeout.InfiniteTimeSpan);
+            _isDispatcherAffected = true;
         }
 
         protected override void OnAttached()
@@ -405,6 +408,7 @@ namespace StarryEyes.Views.Behaviors
             // run scroll animation
 
             double dequeuedOffset;
+            var lastItemOfQueue = false;
             lock (_scrollOffsetQueue)
             {
                 // dequeue next one
@@ -421,11 +425,23 @@ namespace StarryEyes.Views.Behaviors
                     return;
                 }
                 dequeuedOffset = this._scrollOffsetQueue.Dequeue();
+                if (_scrollOffsetQueue.Count == 0)
+                {
+                    lastItemOfQueue = true;
+                }
             }
+
+            // skip invocation if dispatcher is not responding 
+            // (unless next target is not the final destination)
+            if (!_isDispatcherAffected && !lastItemOfQueue) return;
+            _isDispatcherAffected = false;
+
             // set scroll offset
             this.Dispatcher.InvokeAsync(() =>
-                ScrollToVerticalOffset(dequeuedOffset),
-                DispatcherPriority.Render);
+            {
+                ScrollToVerticalOffset(dequeuedOffset);
+                _isDispatcherAffected = true;
+            }, DispatcherPriority.Render);
         }
 
         /// <summary>
