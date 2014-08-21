@@ -548,6 +548,7 @@
     <Compile Include="Views\Controls\DropDownMenuButton.cs" />
     <Compile Include="Views\Controls\HotKeyTextBox.cs" />
     <Compile Include="Views\Controls\LazyImage.cs" />
+    <Compile Include="Views\Controls\ImageLoader.cs" />
     <Compile Include="Views\Controls\QueryEditor.cs" />
     <Compile Include="Views\Controls\QueryEditorResources\CompletionData.cs" />
     <Compile Include="Views\Controls\SuggestableTextBox.cs" />

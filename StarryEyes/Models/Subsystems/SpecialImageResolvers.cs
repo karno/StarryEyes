@@ -11,7 +11,7 @@ namespace StarryEyes.Models.Subsystems
                                                              RegexOptions.Compiled | RegexOptions.Singleline);
         public static void Initialize()
         {
-            LazyImage.RegisterSpecialResolverTable("pixiv", uri =>
+            ImageLoader.RegisterSpecialResolverTable("pixiv", uri =>
             {
                 try
                 {
