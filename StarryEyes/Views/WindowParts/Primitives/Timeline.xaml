@@ -45,6 +45,230 @@
                     </i:Interaction.Triggers>
                 </controls:LazyImage>
             </DataTemplate>
+            <ContextMenu x:Key="StatusContextMenu" DataContext="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineReply}" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToInvisibleConverter}}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <ei:CallMethodAction MethodName="SendReplyOrDirectMessage" TargetObject="{Binding}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </MenuItem>
+                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineSelectedReplyAll}" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibleConverter}}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <ei:CallMethodAction MethodName="ReplySelecteds" TargetObject="{Binding Parent}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </MenuItem>
+                <Separator />
+                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineSelect}" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToInvisibleConverter}}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <ei:CallMethodAction MethodName="ToggleSelect" TargetObject="{Binding}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </MenuItem>
+                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineUnselect}" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibleConverter}}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <ei:CallMethodAction MethodName="ToggleSelect" TargetObject="{Binding}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </MenuItem>
+                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineSelectedOperation}" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibleConverter}}">
+                    <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineSelectedFavorite}" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibleConverter}}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <ei:CallMethodAction MethodName="FavoriteSelecteds" TargetObject="{Binding Parent}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </MenuItem>
+                    <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineSelectedExtract}" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibleConverter}}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <ei:CallMethodAction MethodName="ExtractSelecteds" TargetObject="{Binding Parent}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </MenuItem>
+                    <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineSelectedUnselectAll}" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibleConverter}}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <ei:CallMethodAction MethodName="DeselectAll" TargetObject="{Binding Parent}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </MenuItem>
+                </MenuItem>
+                <Separator />
+                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineFavorite}" Visibility="{Binding CanFavoriteImmediate, Converter={StaticResource BooleanToVisibleConverter}}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <ei:CallMethodAction MethodName="ToggleFavoriteImmediate" TargetObject="{Binding}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </MenuItem>
+                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineFavoriteSelect}" Visibility="{Binding CanFavorite, Converter={StaticResource BooleanToVisibleConverter}}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <ei:CallMethodAction MethodName="ToggleFavorite" TargetObject="{Binding}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </MenuItem>
+
+                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineRetweet}" Visibility="{Binding CanRetweetImmediate, Converter={StaticResource BooleanToVisibleConverter}}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <ei:CallMethodAction MethodName="ToggleRetweetImmediate" TargetObject="{Binding}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </MenuItem>
+                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineRetweetSelect}" Visibility="{Binding CanRetweet, Converter={StaticResource BooleanToVisibleConverter}}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <ei:CallMethodAction MethodName="ToggleRetweet" TargetObject="{Binding}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </MenuItem>
+                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineQuote}" Visibility="{Binding IsDirectMessage, Converter={StaticResource BooleanToInvisibleConverter}}">
+                    <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineQuotePermalink}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <ei:CallMethodAction MethodName="QuotePermalink" TargetObject="{Binding}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </MenuItem>
+                    <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineQuoteUnofficialRetweet}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <ei:CallMethodAction MethodName="Quote" TargetObject="{Binding}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </MenuItem>
+                </MenuItem>
+                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineDelete}" Visibility="{Binding CanDelete, Converter={StaticResource BooleanToVisibleConverter}}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <ei:CallMethodAction MethodName="ConfirmDelete" TargetObject="{Binding}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </MenuItem>
+                <Separator />
+                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineThisTweet}" Visibility="{Binding IsDirectMessage, Converter={StaticResource BooleanToInvisibleConverter}}">
+                    <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineThisTweetOpenConversation}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <ei:CallMethodAction MethodName="ShowConversation" TargetObject="{Binding}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </MenuItem>
+                    <Separator />
+                    <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineThisTweetCopyBody}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <ei:CallMethodAction MethodName="CopyBody" TargetObject="{Binding}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </MenuItem>
+                    <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineThisTweetCopyPermalink}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <ei:CallMethodAction MethodName="CopyPermalink" TargetObject="{Binding}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </MenuItem>
+                    <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineThisTweetCopySTOT}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <ei:CallMethodAction MethodName="CopySTOT" TargetObject="{Binding}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </MenuItem>
+                    <Separator />
+                    <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineThisTweetOpenWeb}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <ei:CallMethodAction MethodName="OpenWeb" TargetObject="{Binding}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </MenuItem>
+                    <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineThisTweetOpenFavstar}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <ei:CallMethodAction MethodName="OpenFavstar" TargetObject="{Binding}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </MenuItem>
+                </MenuItem>
+                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineThisUser}">
+                    <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineThisUserProfile}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <ei:CallMethodAction MethodName="ShowUserProfile" TargetObject="{Binding}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </MenuItem>
+                    <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineThisUserDirectMessage}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <ei:CallMethodAction MethodName="DirectMessage" TargetObject="{Binding}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </MenuItem>
+                    <Separator />
+                    <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineThisUserOpenTwitter}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <ei:CallMethodAction MethodName="OpenUserDetailOnTwitter" TargetObject="{Binding}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </MenuItem>
+                    <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineThisUserOpenTwilog}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <ei:CallMethodAction MethodName="OpenUserTwilog" TargetObject="{Binding}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </MenuItem>
+                    <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineThisUserOpenFavstar}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <ei:CallMethodAction MethodName="OpenUserFavstar" TargetObject="{Binding}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </MenuItem>
+                    <Separator />
+                    <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineThisUserReportSpam}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <ei:CallMethodAction MethodName="ReportAsSpam" TargetObject="{Binding}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </MenuItem>
+                </MenuItem>
+                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineMute}" Visibility="{Binding IsDirectMessage, Converter={StaticResource BooleanToInvisibleConverter}}">
+                    <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineMuteUser}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <ei:CallMethodAction MethodName="MuteUser" TargetObject="{Binding}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </MenuItem>
+                    <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineMuteClient}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <ei:CallMethodAction MethodName="MuteClient" TargetObject="{Binding}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </MenuItem>
+                </MenuItem>
+                <Separator />
+                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineReceiveOlder}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <ei:CallMethodAction MethodName="ReceiveOlder" TargetObject="{Binding}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </MenuItem>
+            </ContextMenu>
             <DataTemplate x:Key="StatusItemTemplate" DataType="{x:Type statuses:StatusViewModel}">
                 <DataTemplate.Resources>
                     <SolidColorBrush x:Key="TweetBackgroundBrush" Color="{DynamicResource TweetDefaultBackground}" />
@@ -100,242 +324,17 @@
                     <SolidColorBrush x:Key="DeletePressedBackground" Color="{DynamicResource TweetDefaultDeleteButtonPressedBackground}" />
                     <SolidColorBrush x:Key="DeletePressedForeground" Color="{DynamicResource TweetDefaultDeleteButtonPressedForeground}" />
                 </DataTemplate.Resources>
-                <Grid Background="#00000000">
-                    <Grid.ContextMenu>
-                        <!--  ReSharper disable once Xaml.BindingWithContextNotResolved  -->
-                        <ContextMenu DataContext="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
-                            <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineReply}" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToInvisibleConverter}}">
-                                <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="Click">
-                                        <ei:CallMethodAction MethodName="SendReplyOrDirectMessage" TargetObject="{Binding}" />
-                                    </i:EventTrigger>
-                                </i:Interaction.Triggers>
-                            </MenuItem>
-                            <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineSelectedReplyAll}" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibleConverter}}">
-                                <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="Click">
-                                        <ei:CallMethodAction MethodName="ReplySelecteds" TargetObject="{Binding Parent}" />
-                                    </i:EventTrigger>
-                                </i:Interaction.Triggers>
-                            </MenuItem>
-                            <Separator />
-                            <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineSelect}" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToInvisibleConverter}}">
-                                <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="Click">
-                                        <ei:CallMethodAction MethodName="ToggleSelect" TargetObject="{Binding}" />
-                                    </i:EventTrigger>
-                                </i:Interaction.Triggers>
-                            </MenuItem>
-                            <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineUnselect}" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibleConverter}}">
-                                <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="Click">
-                                        <ei:CallMethodAction MethodName="ToggleSelect" TargetObject="{Binding}" />
-                                    </i:EventTrigger>
-                                </i:Interaction.Triggers>
-                            </MenuItem>
-                            <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineSelectedOperation}" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibleConverter}}">
-                                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineSelectedFavorite}" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibleConverter}}">
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="Click">
-                                            <ei:CallMethodAction MethodName="FavoriteSelecteds" TargetObject="{Binding Parent}" />
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                </MenuItem>
-                                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineSelectedExtract}" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibleConverter}}">
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="Click">
-                                            <ei:CallMethodAction MethodName="ExtractSelecteds" TargetObject="{Binding Parent}" />
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                </MenuItem>
-                                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineSelectedUnselectAll}" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibleConverter}}">
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="Click">
-                                            <ei:CallMethodAction MethodName="DeselectAll" TargetObject="{Binding Parent}" />
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                </MenuItem>
-                            </MenuItem>
-                            <Separator />
-                            <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineFavorite}" Visibility="{Binding CanFavoriteImmediate, Converter={StaticResource BooleanToVisibleConverter}}">
-                                <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="Click">
-                                        <ei:CallMethodAction MethodName="ToggleFavoriteImmediate" TargetObject="{Binding}" />
-                                    </i:EventTrigger>
-                                </i:Interaction.Triggers>
-                            </MenuItem>
-                            <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineFavoriteSelect}" Visibility="{Binding CanFavorite, Converter={StaticResource BooleanToVisibleConverter}}">
-                                <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="Click">
-                                        <ei:CallMethodAction MethodName="ToggleFavorite" TargetObject="{Binding}" />
-                                    </i:EventTrigger>
-                                </i:Interaction.Triggers>
-                            </MenuItem>
-
-                            <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineRetweet}" Visibility="{Binding CanRetweetImmediate, Converter={StaticResource BooleanToVisibleConverter}}">
-                                <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="Click">
-                                        <ei:CallMethodAction MethodName="ToggleRetweetImmediate" TargetObject="{Binding}" />
-                                    </i:EventTrigger>
-                                </i:Interaction.Triggers>
-                            </MenuItem>
-                            <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineRetweetSelect}" Visibility="{Binding CanRetweet, Converter={StaticResource BooleanToVisibleConverter}}">
-                                <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="Click">
-                                        <ei:CallMethodAction MethodName="ToggleRetweet" TargetObject="{Binding}" />
-                                    </i:EventTrigger>
-                                </i:Interaction.Triggers>
-                            </MenuItem>
-                            <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineQuote}" Visibility="{Binding IsDirectMessage, Converter={StaticResource BooleanToInvisibleConverter}}">
-                                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineQuotePermalink}">
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="Click">
-                                            <ei:CallMethodAction MethodName="QuotePermalink" TargetObject="{Binding}" />
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                </MenuItem>
-                                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineQuoteUnofficialRetweet}">
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="Click">
-                                            <ei:CallMethodAction MethodName="Quote" TargetObject="{Binding}" />
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                </MenuItem>
-                            </MenuItem>
-                            <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineDelete}" Visibility="{Binding CanDelete, Converter={StaticResource BooleanToVisibleConverter}}">
-                                <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="Click">
-                                        <ei:CallMethodAction MethodName="ConfirmDelete" TargetObject="{Binding}" />
-                                    </i:EventTrigger>
-                                </i:Interaction.Triggers>
-                            </MenuItem>
-                            <Separator />
-                            <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineThisTweet}" Visibility="{Binding IsDirectMessage, Converter={StaticResource BooleanToInvisibleConverter}}">
-                                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineThisTweetOpenConversation}">
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="Click">
-                                            <ei:CallMethodAction MethodName="ShowConversation" TargetObject="{Binding}" />
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                </MenuItem>
-                                <Separator />
-                                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineThisTweetCopyBody}">
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="Click">
-                                            <ei:CallMethodAction MethodName="CopyBody" TargetObject="{Binding}" />
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                </MenuItem>
-                                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineThisTweetCopyPermalink}">
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="Click">
-                                            <ei:CallMethodAction MethodName="CopyPermalink" TargetObject="{Binding}" />
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                </MenuItem>
-                                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineThisTweetCopySTOT}">
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="Click">
-                                            <ei:CallMethodAction MethodName="CopySTOT" TargetObject="{Binding}" />
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                </MenuItem>
-                                <Separator />
-                                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineThisTweetOpenWeb}">
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="Click">
-                                            <ei:CallMethodAction MethodName="OpenWeb" TargetObject="{Binding}" />
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                </MenuItem>
-                                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineThisTweetOpenFavstar}">
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="Click">
-                                            <ei:CallMethodAction MethodName="OpenFavstar" TargetObject="{Binding}" />
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                </MenuItem>
-                            </MenuItem>
-                            <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineThisUser}">
-                                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineThisUserProfile}">
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="Click">
-                                            <ei:CallMethodAction MethodName="ShowUserProfile" TargetObject="{Binding}" />
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                </MenuItem>
-                                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineThisUserDirectMessage}">
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="Click">
-                                            <ei:CallMethodAction MethodName="DirectMessage" TargetObject="{Binding}" />
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                </MenuItem>
-                                <Separator />
-                                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineThisUserOpenTwitter}">
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="Click">
-                                            <ei:CallMethodAction MethodName="OpenUserDetailOnTwitter" TargetObject="{Binding}" />
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                </MenuItem>
-                                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineThisUserOpenTwilog}">
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="Click">
-                                            <ei:CallMethodAction MethodName="OpenUserTwilog" TargetObject="{Binding}" />
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                </MenuItem>
-                                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineThisUserOpenFavstar}">
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="Click">
-                                            <ei:CallMethodAction MethodName="OpenUserFavstar" TargetObject="{Binding}" />
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                </MenuItem>
-                                <Separator />
-                                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineThisUserReportSpam}">
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="Click">
-                                            <ei:CallMethodAction MethodName="ReportAsSpam" TargetObject="{Binding}" />
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                </MenuItem>
-                            </MenuItem>
-                            <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineMute}" Visibility="{Binding IsDirectMessage, Converter={StaticResource BooleanToInvisibleConverter}}">
-                                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineMuteUser}">
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="Click">
-                                            <ei:CallMethodAction MethodName="MuteUser" TargetObject="{Binding}" />
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                </MenuItem>
-                                <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineMuteClient}">
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="Click">
-                                            <ei:CallMethodAction MethodName="MuteClient" TargetObject="{Binding}" />
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                </MenuItem>
-                            </MenuItem>
-                            <Separator />
-                            <MenuItem Header="{x:Static localize:MainAreaTimelineResources.TimelineReceiveOlder}">
-                                <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="Click">
-                                        <ei:CallMethodAction MethodName="ReceiveOlder" TargetObject="{Binding}" />
-                                    </i:EventTrigger>
-                                </i:Interaction.Triggers>
-                            </MenuItem>
-                        </ContextMenu>
-                    </Grid.ContextMenu>
+                <Grid x:Name="BaseGrid"
+                      Background="#00000000"
+                      ContextMenu="{StaticResource StatusContextMenu}"
+                      primitives:TimelineSwapResourcesBehavior.ResourceSet="Default">
                     <Border x:Name="SingleLineBorder"
                             Margin="0"
-                            Background="#00000000"
                             Padding="0"
                             RenderTransformOrigin="0.5,1"
                             Visibility="{Binding IsExpanded,
-                                                 Converter={StaticResource BooleanToInvisibleConverter}}"
-                            primitives:TimelineSwapResourcesBehavior.ResourceSet="Default">
+                                                 Converter={StaticResource BooleanToInvisibleConverter},
+                                                 FallbackValue=Collapsed}">
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="MouseLeftButtonUp">
                                 <ei:CallMethodAction MethodName="ToggleFocus" TargetObject="{Binding Mode=OneTime}" />
@@ -489,8 +488,8 @@
                             Padding="0"
                             RenderTransformOrigin="0.5,1"
                             Visibility="{Binding IsExpanded,
-                                                 Converter={StaticResource BooleanToVisibleConverter}}"
-                            primitives:TimelineSwapResourcesBehavior.ResourceSet="Default">
+                                                 Converter={StaticResource BooleanToVisibleConverter},
+                                                 FallbackValue=Collapsed}">
                         <Border.LayoutTransform>
                             <TransformGroup>
                                 <ScaleTransform />
@@ -1764,28 +1763,24 @@
                 </Grid>
                 <DataTemplate.Triggers>
                     <DataTrigger Binding="{Binding IsMyself, Mode=OneWay}" Value="True">
+                        <Setter TargetName="BaseGrid" Property="primitives:TimelineSwapResourcesBehavior.ResourceSet" Value="Myself" />
                         <Setter TargetName="MainBorder" Property="Background" Value="{DynamicResource TweetMyselfBackgroundBrush}" />
-                        <Setter TargetName="MainBorder" Property="primitives:TimelineSwapResourcesBehavior.ResourceSet" Value="Myself" />
                         <Setter TargetName="SingleLineBorder" Property="Background" Value="{DynamicResource TweetMyselfBackgroundBrush}" />
-                        <Setter TargetName="SingleLineBorder" Property="primitives:TimelineSwapResourcesBehavior.ResourceSet" Value="Myself" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding IsInReplyToMe, Mode=OneWay}" Value="True">
+                        <Setter TargetName="BaseGrid" Property="primitives:TimelineSwapResourcesBehavior.ResourceSet" Value="Mention" />
                         <Setter TargetName="MainBorder" Property="Background" Value="{DynamicResource TweetMentionBackgroundBrush}" />
-                        <Setter TargetName="MainBorder" Property="primitives:TimelineSwapResourcesBehavior.ResourceSet" Value="Mention" />
                         <Setter TargetName="SingleLineBorder" Property="Background" Value="{DynamicResource TweetMentionBackgroundBrush}" />
-                        <Setter TargetName="SingleLineBorder" Property="primitives:TimelineSwapResourcesBehavior.ResourceSet" Value="Mention" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding IsDirectMessage, Mode=OneTime}" Value="True">
+                        <Setter TargetName="BaseGrid" Property="primitives:TimelineSwapResourcesBehavior.ResourceSet" Value="Message" />
                         <Setter TargetName="MainBorder" Property="Background" Value="{DynamicResource TweetMessageBackgroundBrush}" />
-                        <Setter TargetName="MainBorder" Property="primitives:TimelineSwapResourcesBehavior.ResourceSet" Value="Message" />
                         <Setter TargetName="SingleLineBorder" Property="Background" Value="{DynamicResource TweetMessageBackgroundBrush}" />
-                        <Setter TargetName="SingleLineBorder" Property="primitives:TimelineSwapResourcesBehavior.ResourceSet" Value="Message" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding IsRetweet, Mode=OneTime}" Value="True">
+                        <Setter TargetName="BaseGrid" Property="primitives:TimelineSwapResourcesBehavior.ResourceSet" Value="Retweet" />
                         <Setter TargetName="MainBorder" Property="Background" Value="{DynamicResource TweetRetweetBackgroundBrush}" />
-                        <Setter TargetName="MainBorder" Property="primitives:TimelineSwapResourcesBehavior.ResourceSet" Value="Retweet" />
                         <Setter TargetName="SingleLineBorder" Property="Background" Value="{DynamicResource TweetRetweetBackgroundBrush}" />
-                        <Setter TargetName="SingleLineBorder" Property="primitives:TimelineSwapResourcesBehavior.ResourceSet" Value="Retweet" />
                     </DataTrigger>
                 </DataTemplate.Triggers>
             </DataTemplate>
