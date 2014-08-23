@@ -1154,7 +1154,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             }
         }
 
-        public async void Delete()
+        public void Delete()
         {
             TwitterAccount info;
             if (this.IsDirectMessage)
@@ -1170,17 +1170,20 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                 info = Setting.Accounts.Get(this.OriginalStatus.User.Id);
             }
             if (info == null) return;
-            var dreq = new DeletionRequest(this.OriginalStatus);
-            try
+            Task.Run(async () =>
             {
-                var result = await RequestQueue.EnqueueAsync(info, dreq);
-                StatusInbox.EnqueueRemoval(result.Id);
-            }
-            catch (Exception ex)
-            {
-                BackstageModel.RegisterEvent(new OperationFailedEvent(
-                    MainAreaTimelineResources.MsgTweetDeleteFailed, ex));
-            }
+                var dreq = new DeletionRequest(this.OriginalStatus);
+                try
+                {
+                    var result = await RequestQueue.EnqueueAsync(info, dreq);
+                    StatusInbox.EnqueueRemoval(result.Id);
+                }
+                catch (Exception ex)
+                {
+                    BackstageModel.RegisterEvent(new OperationFailedEvent(
+                        MainAreaTimelineResources.MsgTweetDeleteFailed, ex));
+                }
+            });
         }
 
         private bool _lastSelectState;
