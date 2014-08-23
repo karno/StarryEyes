@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Livet;
 using StarryEyes.Albireo;
+using StarryEyes.Albireo.Helpers;
 using StarryEyes.Models.Inputting;
 
 namespace StarryEyes.Models.Timelines.Tabs

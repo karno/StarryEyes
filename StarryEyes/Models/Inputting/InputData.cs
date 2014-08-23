@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reactive.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using JetBrains.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
@@ -218,7 +218,7 @@ namespace StarryEyes.Models.Inputting
         }
 
         [NotNull]
-        public IObservable<PostResult> Send()
+        public async Task<PostResult> SendAsync()
         {
             var existedTags = TwitterRegexPatterns.ValidHashtag.Matches(Text)
                                                   .OfType<Match>()
@@ -241,64 +241,81 @@ namespace StarryEyes.Models.Inputting
                 request = new TweetPostingRequest(Text + binds, InReplyTo,
                     AttachedGeoLocation, _attachedImage);
             }
-            var s = Observable.Defer(() => Observable.Start(() => _accounts.Guard().ToObservable()))
-                              .SelectMany(a => a)
-                              .SelectMany(a => SendInternal(a, request))
-                              .WaitForCompletion()
-                              .Select(r => r.ToLookup(t => t.Item3 == null))
-                              .Select(g =>
-                              {
-                                  InputData succ = null;
-                                  InputData fail = null;
-                                  Exception[] exs = null;
-                                  if (g.Contains(true))
-                                  {
-                                      succ = this.Clone();
-                                      // succeeded results
-                                      var succeeds = g[true].ToArray();
-                                      succ.AmendTargetTweets = succeeds.ToDictionary(t => t.Item1, t => t.Item2);
-                                      succ.Accounts = succeeds.Select(t => t.Item1);
-                                  }
-                                  if (g.Contains(false))
-                                  {
-                                      fail = this.Clone();
-                                      // failed results
-                                      var faileds = g[false].ToArray();
-                                      fail.Accounts = faileds.Select(t => t.Item1);
-                                      exs = faileds.Select(t => t.Item3).ToArray();
-                                  }
-                                  return new PostResult(succ, fail, exs);
-                              });
+
+            var posts = _accounts.Guard()
+                                 .Select(a => Tuple.Create(a, SendInternal(a, request)))
+                                 .ToArray();
+            var tasks = posts.Select(p => p.Item2).OfType<Task>().ToArray();
+            // wait for completion
+            Task.WaitAll(tasks);
+
+            var amendTargets = new Dictionary<TwitterAccount, TwitterStatus>();
+            var failedAccounts = new List<TwitterAccount>();
+            var exceptions = new List<Exception>();
+
+            foreach (var item in posts)
+            {
+                var account = item.Item1;
+                try
+                {
+                    var result = await item.Item2;
+                    amendTargets.Add(account, result);
+                }
+                catch (Exception ex)
+                {
+                    failedAccounts.Add(account);
+                    exceptions.Add(ex);
+                }
+            }
+            InputData successData = null, failedData = null;
+
+            if (amendTargets.Count > 0)
+            {
+                successData = this.Clone();
+                successData.AmendTargetTweets = amendTargets.ToArray();
+                successData.Accounts = amendTargets.Select(p => p.Key);
+            }
+
+            if (failedAccounts.Count > 0)
+            {
+                failedData = this.Clone();
+                failedData.Accounts = failedAccounts.ToArray();
+            }
+
+            var pr = new PostResult(successData, failedData, exceptions.ToArray());
+
+
             if (IsAmend)
             {
-                return AmendTargetTweets
-                    .ToObservable()
-                    .SelectMany(t => RequestQueue.Enqueue(t.Key, new DeletionRequest(t.Value)))
-                    .Select(_ => (PostResult)null)
-                    .Concat(s)
-                    .Where(r => r != null);
+                var amends = AmendTargetTweets
+                    .Select(pair => RequestQueue.EnqueueAsync(pair.Key, new DeletionRequest(pair.Value)))
+                    .OfType<Task>().ToArray();
+                Task.WaitAll(amends);
             }
-            return s;
+            return pr;
         }
 
         [NotNull]
-        private IObservable<Tuple<TwitterAccount, TwitterStatus, Exception>> SendInternal(
+        private async Task<TwitterStatus> SendInternal(
             [NotNull] TwitterAccount account, [NotNull] RequestBase<TwitterStatus> request)
         {
             if (account == null) throw new ArgumentNullException("account");
             if (request == null) throw new ArgumentNullException("request");
-            return RequestQueue.Enqueue(account, request)
-                               .Do(StatusInbox.Enqueue)
-                               .Select(s => Tuple.Create(account, s, (Exception)null))
-                               .Catch((Exception ex) =>
-                                   Observable.Return(Tuple.Create(account, (TwitterStatus)null, ex)));
+            return await Task.Run(async () =>
+            {
+                var status = await RequestQueue.EnqueueAsync(account, request);
+                StatusInbox.Enqueue(status);
+                return status;
+            });
         }
     }
 
     public class PostResult
     {
-        public PostResult(InputData succeededs, InputData faileds, IEnumerable<Exception> throwns)
+        public PostResult([CanBeNull] InputData succeededs, [CanBeNull] InputData faileds,
+            [NotNull] IEnumerable<Exception> throwns)
         {
+            if (throwns == null) throw new ArgumentNullException("throwns");
             Succeededs = succeededs;
             Faileds = faileds;
             Exceptions = throwns;
@@ -310,7 +327,7 @@ namespace StarryEyes.Models.Inputting
         [CanBeNull]
         public InputData Faileds { get; private set; }
 
-        [CanBeNull]
+        [NotNull]
         public IEnumerable<Exception> Exceptions { get; private set; }
     }
 

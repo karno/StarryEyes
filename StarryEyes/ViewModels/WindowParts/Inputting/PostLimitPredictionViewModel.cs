@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reactive.Linq;
 using Livet;
+using StarryEyes.Albireo.Helpers;
 using StarryEyes.Models.Inputting;
 using StarryEyes.Models.Subsystems;
 using StarryEyes.Settings;
@@ -13,8 +14,8 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
         public PostLimitPredictionViewModel()
         {
             this.CompositeDisposable.Add(
-                InputModel.AccountSelector.Accounts.ListenCollectionChanged()
-                          .Subscribe(_ => this.RaisePropertyChanged(() => IsPostLimitPredictionEnabled)));
+                InputModel.AccountSelector.Accounts.ListenCollectionChanged(
+                    _ => this.RaisePropertyChanged(() => IsPostLimitPredictionEnabled)));
             this.CompositeDisposable.Add(
                 Observable.Interval(TimeSpan.FromSeconds(5))
                           .Where(_ => IsPostLimitPredictionEnabled)

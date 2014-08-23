@@ -1,9 +1,8 @@
-﻿using System;
-using System.Linq;
-using System.Reactive.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Livet;
+using StarryEyes.Albireo.Helpers;
 using StarryEyes.Models.Subsystems;
 using StarryEyes.Settings;
 using StarryEyes.Views.Utils;
@@ -22,9 +21,8 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SettingFlips
             _contributors = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
                 ContributionService.Contributors, c => new ContributorViewModel(c),
                 DispatcherHelper.UIDispatcher);
-            this.CompositeDisposable.Add(
-                _contributors.ListenCollectionChanged()
-                             .Subscribe(_ => RaisePropertyChanged(() => IsDonated)));
+            this.CompositeDisposable.Add(_contributors.ListenCollectionChanged(
+                _ => RaisePropertyChanged(() => IsDonated)));
         }
 
         [UsedImplicitly]

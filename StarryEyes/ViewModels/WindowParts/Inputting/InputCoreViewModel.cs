@@ -4,15 +4,16 @@ using System.Device.Location;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reactive.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using JetBrains.Annotations;
 using Livet;
 using Livet.EventListeners;
 using Livet.Messaging.IO;
+using StarryEyes.Albireo.Helpers;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Globalization;
 using StarryEyes.Globalization.WindowParts;
@@ -57,33 +58,27 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                     InputModel.InputCore.BindingHashtags,
                     tag => new BindHashtagViewModel(tag, () => UnbindHashtag(tag)),
                     DispatcherHelper.UIDispatcher));
-            CompositeDisposable.Add(_bindingHashtags
-                                        .ListenCollectionChanged()
-                                        .Subscribe(_ =>
-                                        {
-                                            InputData.BoundTags = _bindingHashtags.Select(h => h.Hashtag).ToArray();
-                                            RaisePropertyChanged(() => IsBindingHashtagExisted);
-                                        }));
+            CompositeDisposable.Add(_bindingHashtags.ListenCollectionChanged(_ =>
+            {
+                InputData.BoundTags = _bindingHashtags.Select(h => h.Hashtag).ToArray();
+                RaisePropertyChanged(() => IsBindingHashtagExisted);
+            }));
             _bindableHashtagCandidates =
                 new DispatcherCollection<BindHashtagViewModel>(DispatcherHelper.UIDispatcher);
-            CompositeDisposable.Add(_bindableHashtagCandidates
-                                        .ListenCollectionChanged()
-                                        .Subscribe(_ => RaisePropertyChanged(() => IsBindableHashtagExisted)));
+            CompositeDisposable.Add(_bindableHashtagCandidates.ListenCollectionChanged(_ =>
+                RaisePropertyChanged(() => IsBindableHashtagExisted)));
 
-            CompositeDisposable.Add(_draftedInputs =
-                                    ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
+            CompositeDisposable.Add(
+                _draftedInputs = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
                     InputModel.InputCore.Drafts,
-                                        _ =>
-                                        new InputDataViewModel(this, _, vm => InputModel.InputCore.Drafts.Remove(vm)),
-                                        DispatcherHelper.UIDispatcher));
+                    _ => new InputDataViewModel(this, _, vm => InputModel.InputCore.Drafts.Remove(vm)),
+                    DispatcherHelper.UIDispatcher));
 
-            CompositeDisposable.Add(_draftedInputs
-                                        .ListenCollectionChanged()
-                                        .Subscribe(_ =>
-                                        {
-                                            RaisePropertyChanged(() => DraftCount);
-                                            RaisePropertyChanged(() => IsDraftsExisted);
-                                        }));
+            CompositeDisposable.Add(_draftedInputs.ListenCollectionChanged(_ =>
+            {
+                RaisePropertyChanged(() => DraftCount);
+                RaisePropertyChanged(() => IsDraftsExisted);
+            }));
 
             // listen setting changed
             CompositeDisposable.Add(
@@ -898,56 +893,56 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
 
         private void SendCore(InputData data)
         {
-            data.Send()
-                .Subscribe(r =>
+            Task.Run(async () =>
+            {
+                var r = await data.SendAsync();
+                if (r.Succeededs != null)
                 {
-                    if (r.Succeededs != null)
+                    InputModel.InputCore.LastPostedData = r.Succeededs;
+                    BackstageModel.RegisterEvent(new PostSucceededEvent(r.Succeededs));
+                }
+                if (r.Faileds != null)
+                {
+                    var message = this.AnalyzeFailedReason(r.Exceptions) ??
+                                  InputAreaResources.MsgTweetFailedReasonUnknown;
+                    var ed = r.Exceptions
+                              .Guard()
+                              .SelectMany(ex => EnumerableEx.Generate(
+                                  ex, e => e != null, e => e.InnerException, e => e))
+                              .Where(e => e != null)
+                              .Select(e => e.ToString())
+                              .JoinString(Environment.NewLine);
+                    if (Setting.ShowMessageOnTweetFailed.Value)
                     {
-                        InputModel.InputCore.LastPostedData = r.Succeededs;
-                        BackstageModel.RegisterEvent(new PostSucceededEvent(r.Succeededs));
-                    }
-                    if (r.Faileds != null)
-                    {
-                        var message = this.AnalyzeFailedReason(r.Exceptions) ??
-                                      InputAreaResources.MsgTweetFailedReasonUnknown;
-                        var ed = r.Exceptions
-                                  .Guard()
-                                  .SelectMany(ex => EnumerableEx.Generate(
-                                      ex, e => e != null, e => e.InnerException, e => e))
-                                  .Where(e => e != null)
-                                  .Select(e => e.ToString())
-                                  .JoinString(Environment.NewLine);
-                        if (Setting.ShowMessageOnTweetFailed.Value)
-                        {
-                            var resp = _parent.Messenger.GetResponseSafe(() =>
-                                new TaskDialogMessage(new TaskDialogOptions
-                                {
-                                    Title = InputAreaResources.MsgTweetFailedTitle,
-                                    MainIcon = VistaTaskDialogIcon.Error,
-                                    MainInstruction = InputAreaResources.MsgTweetFailedInst,
-                                    Content = InputAreaResources.MsgTweetFailedContentFormat.SafeFormat(message),
-                                    ExpandedInfo = ed,
-                                    FooterText = InputAreaResources.MsgTweetFailedFooter,
-                                    FooterIcon = VistaTaskDialogIcon.Information,
-                                    VerificationText = Resources.MsgDoNotShowAgain,
-                                    CommonButtons = TaskDialogCommonButtons.RetryCancel
-                                }));
-                            Setting.ShowMessageOnTweetFailed.Value =
-                                !resp.Response.VerificationChecked.GetValueOrDefault();
-                            if (resp.Response.Result == TaskDialogSimpleResult.Retry)
+                        var resp = _parent.Messenger.GetResponseSafe(() =>
+                            new TaskDialogMessage(new TaskDialogOptions
                             {
-                                this.SendCore(r.Faileds);
-                                return;
-                            }
-                        }
-                        else
+                                Title = InputAreaResources.MsgTweetFailedTitle,
+                                MainIcon = VistaTaskDialogIcon.Error,
+                                MainInstruction = InputAreaResources.MsgTweetFailedInst,
+                                Content = InputAreaResources.MsgTweetFailedContentFormat.SafeFormat(message),
+                                ExpandedInfo = ed,
+                                FooterText = InputAreaResources.MsgTweetFailedFooter,
+                                FooterIcon = VistaTaskDialogIcon.Information,
+                                VerificationText = Resources.MsgDoNotShowAgain,
+                                CommonButtons = TaskDialogCommonButtons.RetryCancel
+                            }));
+                        Setting.ShowMessageOnTweetFailed.Value =
+                            !resp.Response.VerificationChecked.GetValueOrDefault();
+                        if (resp.Response.Result == TaskDialogSimpleResult.Retry)
                         {
-                            BackstageModel.RegisterEvent(new PostFailedEvent(r.Faileds, message));
+                            this.SendCore(r.Faileds);
+                            return;
                         }
-                        // Send to draft
-                        InputModel.InputCore.Drafts.Add(r.Faileds);
                     }
-                });
+                    else
+                    {
+                        BackstageModel.RegisterEvent(new PostFailedEvent(r.Faileds, message));
+                    }
+                    // Send to draft
+                    InputModel.InputCore.Drafts.Add(r.Faileds);
+                }
+            });
         }
 
         private string AnalyzeFailedReason(IEnumerable<Exception> exceptions)

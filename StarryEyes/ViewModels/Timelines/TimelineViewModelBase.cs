@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Threading;
 using JetBrains.Annotations;
 using Livet;
 using Livet.EventListeners;
+using StarryEyes.Albireo.Helpers;
 using StarryEyes.Albireo.Threading;
 using StarryEyes.Globalization.WindowParts;
 using StarryEyes.Models.Inputting;
@@ -222,10 +222,12 @@ namespace StarryEyes.ViewModels.Timelines
                 if (_listener != null) _listener.Dispose();
             });
             this.CompositeDisposable.Add(
-                this.ListenPropertyChanged(() => this.CurrentAccounts)
-                    .ObserveOnDispatcher()
-                    .Select(_ => this.CurrentAccounts.ToArray())
-                    .Subscribe(a => _timeline.ForEach(s => s.BindingAccounts = a)));
+                this.ListenPropertyChanged(() => this.CurrentAccounts,
+                    e => DispatcherHelper.UIDispatcher.InvokeAsync(() =>
+                    {
+                        var a = this.CurrentAccounts.ToArray();
+                        this._timeline.ForEach(s => s.BindingAccounts = a);
+                    })));
             this.CompositeDisposable.Add(
                 Setting.ScrollLockStrategy.ListenValueChanged(
                     v => RaisePropertyChanged(() => this.IsScrollLockEnabled)));
@@ -431,12 +433,10 @@ namespace StarryEyes.ViewModels.Timelines
             lock (this._timelineLock)
             {
                 var sts = this._model.Statuses.SynchronizedToArray(
-                    () => _listener =
-                        this._model.Statuses
-                            .ListenCollectionChanged()
-                            .Subscribe(e => DispatcherHelper.UIDispatcher.InvokeAsync(
-                                () => this.ReflectCollectionChanged(e),
-                                DispatcherPriority.Background)));
+                    () => _listener = this._model.Statuses.ListenCollectionChanged(
+                        e => DispatcherHelper.UIDispatcher.InvokeAsync(
+                            () => this.ReflectCollectionChanged(e),
+                            DispatcherPriority.Background)));
                 var items = _timeline.ToArray();
                 this._timeline.Clear();
                 sts.OrderByDescending(s => s.Status.CreatedAt)

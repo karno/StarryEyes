@@ -4,6 +4,7 @@ using System.Collections.Specialized;
 using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
+using StarryEyes.Albireo.Helpers;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Databases;
@@ -23,7 +24,7 @@ namespace StarryEyes.Models.Subsystems
 
         public static void Initialize()
         {
-            Setting.Accounts.Collection.ListenCollectionChanged().Subscribe(AccountsChanged);
+            Setting.Accounts.Collection.ListenCollectionChanged(AccountsChanged);
             Setting.Accounts.Collection.ForEach(SetupAccount);
             StatusBroadcaster.BroadcastPoint
                              .Where(d => d.IsAdded)

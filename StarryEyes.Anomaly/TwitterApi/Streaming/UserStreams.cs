@@ -31,39 +31,42 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
                 try
                 {
                     // using GZip cause receiving elements delayed.
-                    var client = credential.CreateOAuthClient(useGZip: false);
-                    // disable connection timeout due to streaming specification
-                    client.Timeout = System.Threading.Timeout.InfiniteTimeSpan;
-                    var endpoint = EndpointUserStreams;
-                    if (!String.IsNullOrEmpty(param))
+                    using (var client = credential.CreateOAuthClient(useGZip: false))
                     {
-                        endpoint += "?" + param;
-                    }
-                    using (var stream = await client.GetStreamAsync(endpoint))
-                    using (var reader = new StreamReader(stream))
-                    {
-                        // reader.EndOfStream 
-                        while (!cancel.IsCancellationRequested)
+                        // disable connection timeout due to streaming specification
+                        client.Timeout = System.Threading.Timeout.InfiniteTimeSpan;
+                        client.MaxResponseContentBufferSize = 1024 * 16; // set buffer length as 16KB.
+                        var endpoint = EndpointUserStreams;
+                        if (!String.IsNullOrEmpty(param))
                         {
-                            var readLine = reader.ReadLineAsync();
-                            var delay = Task.Delay(TimeSpan.FromSeconds(ApiAccessProperties.StreamingTimeoutSec), cancel);
-                            if (await Task.WhenAny(readLine, delay) == delay)
+                            endpoint += "?" + param;
+                        }
+                        using (var stream = await client.GetStreamAsync(endpoint))
+                        using (var reader = new StreamReader(stream))
+                        {
+                            // reader.EndOfStream 
+                            while (!cancel.IsCancellationRequested)
                             {
-                                // timeout
-                                System.Diagnostics.Debug.WriteLine("#USERSTREAM# TIMEOUT.");
-                                break;
-                            }
-                            var line = readLine.Result;
-                            if (line == null)
-                            {
-                                // connection closed
-                                System.Diagnostics.Debug.WriteLine("#USERSTREAM# CONNECTION CLOSED.");
-                                break;
-                            }
-                            if (!String.IsNullOrEmpty(line))
-                            {
-                                // successfully completed
-                                observer.OnNext(line);
+                                var readLine = reader.ReadLineAsync();
+                                var delay = Task.Delay(TimeSpan.FromSeconds(ApiAccessProperties.StreamingTimeoutSec), cancel);
+                                if (await Task.WhenAny(readLine, delay) == delay)
+                                {
+                                    // timeout
+                                    System.Diagnostics.Debug.WriteLine("#USERSTREAM# TIMEOUT.");
+                                    break;
+                                }
+                                var line = readLine.Result;
+                                if (line == null)
+                                {
+                                    // connection closed
+                                    System.Diagnostics.Debug.WriteLine("#USERSTREAM# CONNECTION CLOSED.");
+                                    break;
+                                }
+                                if (!String.IsNullOrEmpty(line))
+                                {
+                                    // successfully completed
+                                    observer.OnNext(line);
+                                }
                             }
                         }
                     }
@@ -76,11 +79,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
                 }
 
                 System.Diagnostics.Debug.WriteLine("#USERSTREAM# disconnection detected. (CANCELLATION REQUEST? " + cancel.IsCancellationRequested + ")");
-                if (!cancel.IsCancellationRequested)
-                {
-                    System.Diagnostics.Debug.WriteLine("#USERSTREAM# notify disconnection to upper layer.");
-                    observer.OnCompleted();
-                }
+                observer.OnCompleted();
             }, cancel));
         }
     }

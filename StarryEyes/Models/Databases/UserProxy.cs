@@ -62,7 +62,7 @@ namespace StarryEyes.Models.Databases
             _userQueue.Enqueue(user.Id, user);
         }
 
-        public static async Task StoreUsersAsync(IEnumerable<TwitterUser> pendingUser)
+        private static async Task StoreUsersAsync(IEnumerable<TwitterUser> pendingUser)
         {
             var map = pendingUser.Select(Mapper.Map)
                                  .Select(UserInsertBatch.CreateBatch);

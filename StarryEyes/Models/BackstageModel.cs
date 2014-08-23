@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Linq;
-using System.Reactive.Linq;
 using Livet;
-using StarryEyes.Albireo;
+using StarryEyes.Albireo.Helpers;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages;
 using StarryEyes.Models.Backstages.TwitterEvents;
@@ -22,12 +21,11 @@ namespace StarryEyes.Models
 
         internal static void Initialize()
         {
-            Setting.Accounts.Collection.ListenCollectionChanged()
-                   .Subscribe(_ =>
-                   {
-                       _accounts.Clear();
-                       Setting.Accounts.Collection.ForEach(a => _accounts.Add(new BackstageAccountModel(a)));
-                   });
+            Setting.Accounts.Collection.ListenCollectionChanged(_ =>
+            {
+                _accounts.Clear();
+                Setting.Accounts.Collection.ForEach(a => _accounts.Add(new BackstageAccountModel(a)));
+            });
             Setting.Accounts.Collection.ForEach(a => _accounts.Add(new BackstageAccountModel(a)));
             ReceiveManager.UserStreamsConnectionStateChanged += UpdateConnectionState;
         }

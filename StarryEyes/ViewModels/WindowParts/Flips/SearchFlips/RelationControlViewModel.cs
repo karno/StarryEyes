@@ -311,21 +311,17 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
         private void DispatchRetweetSuppression(bool suppress, Action succeeded, Action<Exception> failed)
         {
             this.IsCommunicating = true;
-            RequestQueue.Enqueue(_source, new UpdateFriendshipsRequest(_target, suppress))
+            RequestQueue.EnqueueObservable(_source, new UpdateFriendshipsRequest(_target, suppress))
                         .Finally(() => this.IsCommunicating = false)
-                        .Subscribe(_ => { },
-                                   failed,
-                                   succeeded);
+                        .Subscribe(_ => { }, failed, succeeded);
         }
 
         private void DispatchAction(RelationKind work, Action succeeded, Action<Exception> failed)
         {
             this.IsCommunicating = true;
-            RequestQueue.Enqueue(_source, new UpdateRelationRequest(_target, work))
+            RequestQueue.EnqueueObservable(_source, new UpdateRelationRequest(_target, work))
                         .Finally(() => this.IsCommunicating = false)
-                        .Subscribe(_ => { },
-                                   failed,
-                                   succeeded);
+                        .Subscribe(_ => { }, failed, succeeded);
         }
 
         private void ShowTaskDialogMessage(TaskDialogOptions options)

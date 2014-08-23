@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reactive.Disposables;
 using System.Windows.Input;
 using JetBrains.Annotations;
 using Livet;
@@ -18,11 +17,11 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         {
             if (user == null) throw new ArgumentNullException("user");
             this.Model = UserModel.Get(user);
-            this.CompositeDisposable.Add(new CompositeDisposable(
+            this.CompositeDisposable.Add(
                 new EventListener<Action<TimelineIconResolution>>(
                     h => Setting.IconResolution.ValueChanged += h,
                     h => Setting.IconResolution.ValueChanged -= h,
-                    _ => this.RaisePropertyChanged(() => ProfileImageUriOptimized))));
+                    _ => this.RaisePropertyChanged(() => ProfileImageUriOptimized)));
         }
 
         public UserModel Model { get; private set; }

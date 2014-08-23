@@ -3,9 +3,9 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Reactive.Disposables;
-using System.Reactive.Linq;
 using System.Threading;
 using System.Windows.Threading;
+using StarryEyes.Albireo.Helpers;
 using StarryEyes.Hotfixes;
 
 // ReSharper disable once CheckNamespace
@@ -25,8 +25,8 @@ namespace StarryEyes
             _collection = collection;
 
             _disposables.Add(_collection);
-            _disposables.Add(_collection.ListenPropertyChanged().Subscribe(OnPropertyChanged));
-            _disposables.Add(_collection.ListenCollectionChanged().Subscribe(OnCollectionChanged));
+            _disposables.Add(_collection.ListenPropertyChanged(OnPropertyChanged));
+            _disposables.Add(_collection.ListenCollectionChanged(OnCollectionChanged));
         }
 
         /// <summary>

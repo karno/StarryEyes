@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reactive.Linq;
 using JetBrains.Annotations;
 using Livet;
-using StarryEyes.Albireo;
+using StarryEyes.Albireo.Helpers;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Timelines.Tabs;
@@ -96,14 +95,13 @@ namespace StarryEyes.Models.Inputting
         internal InputCoreModel()
         {
             CurrentInputData = new InputData(String.Empty);
-            _bindingHashtags.ListenCollectionChanged()
-                            .Subscribe(_ =>
-                            {
-                                if (_currentFocusTabModel != null)
-                                {
-                                    _currentFocusTabModel.BindingHashtags = _bindingHashtags.ToArray();
-                                }
-                            });
+            _bindingHashtags.ListenCollectionChanged(_ =>
+            {
+                if (_currentFocusTabModel != null)
+                {
+                    _currentFocusTabModel.BindingHashtags = _bindingHashtags.ToArray();
+                }
+            });
         }
 
         internal void ChangeFocusingTab(TabModel previous, TabModel replace)

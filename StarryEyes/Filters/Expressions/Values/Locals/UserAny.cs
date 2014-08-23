@@ -5,6 +5,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
 using StarryEyes.Albireo.Collections;
+using StarryEyes.Albireo.Helpers;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Settings;
 
@@ -98,10 +99,8 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 
         public override void BeginLifecycle()
         {
-            _disposables.Add(
-                Setting.Accounts.Collection
-                       .ListenCollectionChanged()
-                       .Subscribe(_ => this.RaiseReapplyFilter(null)));
+            _disposables.Add(Setting.Accounts.Collection.ListenCollectionChanged(
+                _ => this.RaiseReapplyFilter(null)));
             _disposables.Add(
                 Observable.FromEvent<RelationDataChangedInfo>(
                     h => AccountRelationData.AccountDataUpdatedStatic += h,

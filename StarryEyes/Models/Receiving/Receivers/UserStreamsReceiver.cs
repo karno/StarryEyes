@@ -7,7 +7,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using StarryEyes.Albireo;
+using StarryEyes.Albireo.Helpers;
 using StarryEyes.Anomaly.TwitterApi;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.DataModels.StreamModels;
@@ -141,8 +141,9 @@ namespace StarryEyes.Models.Receiving.Receivers
             this.CheckDisposed();
             this.ConnectionState = UserStreamsConnectionState.Connecting;
             Log("starting connection...");
+            var isConnectionActive = true;
             var con = this.Account.ConnectUserStreams(this._trackKeywords, this.Account.ReceiveRepliesAll,
-                                                      this.Account.ReceiveFollowingsActivity)
+                this.Account.ReceiveFollowingsActivity)
                           .Do(_ =>
                           {
                               if (this.ConnectionState != UserStreamsConnectionState.Connecting) return;
@@ -151,10 +152,14 @@ namespace StarryEyes.Models.Receiving.Receivers
                               Log("successfully connected.");
                           })
                           .SubscribeWithHandler(new HandleStreams(this),
-                                                this.HandleException,
-                                                this.Reconnect);
+                              ex => { if (isConnectionActive) this.HandleException(ex); },
+                              () => { if (isConnectionActive) this.Reconnect(); });
             _stateUpdater.UpdateState();
-            return con;
+            return Disposable.Create(() =>
+            {
+                isConnectionActive = false;
+                con.Dispose();
+            });
         }
 
         private void Log(string log)

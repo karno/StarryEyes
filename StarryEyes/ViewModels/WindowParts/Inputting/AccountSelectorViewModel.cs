@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
-using System.Reactive.Linq;
 using JetBrains.Annotations;
 using Livet;
+using StarryEyes.Albireo.Helpers;
 using StarryEyes.Globalization;
 using StarryEyes.Globalization.WindowParts;
 using StarryEyes.Models.Accounting;
@@ -46,28 +46,25 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                     a => new TwitterAccountViewModel(a),
                     DispatcherHelper.UIDispatcher));
             CompositeDisposable.Add(
-                InputModel.AccountSelector.Accounts.ListenCollectionChanged()
-                          .Subscribe(_ =>
-                          {
-                              RaisePropertyChanged(() => AuthInfoGridRowColumn);
-                              this.RaisePropertyChanged(() => AuthInfoScreenNames);
-                          }));
+                InputModel.AccountSelector.Accounts.ListenCollectionChanged(_ =>
+                {
+                    RaisePropertyChanged(() => AuthInfoGridRowColumn);
+                    this.RaisePropertyChanged(() => AuthInfoScreenNames);
+                }));
             CompositeDisposable.Add(this._accounts =
                 ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
                     InputModel.AccountSelector.Accounts,
                     account => new TwitterAccountViewModel(account),
                     DispatcherHelper.UIDispatcher));
-            CompositeDisposable.Add(this._accounts
-                .ListenCollectionChanged()
-                .Subscribe(_ =>
-                {
-                    this.RaisePropertyChanged(() => AuthInfoGridRowColumn);
-                    RaisePropertyChanged(() => IsBindingAuthInfoExisted);
-                }));
+            CompositeDisposable.Add(this._accounts.ListenCollectionChanged(_ =>
+            {
+                this.RaisePropertyChanged(() => AuthInfoGridRowColumn);
+                RaisePropertyChanged(() => IsBindingAuthInfoExisted);
+            }));
             CompositeDisposable.Add(
                 InputModel.AccountSelector.ListenPropertyChanged(
-                    () => InputModel.AccountSelector.IsSynchronizedWithTab)
-                          .Subscribe(_ => RaisePropertyChanged(() => IsSynchronizedWithTab)));
+                    () => InputModel.AccountSelector.IsSynchronizedWithTab,
+                    _ => RaisePropertyChanged(() => IsSynchronizedWithTab)));
         }
 
         public AccountSelectionFlipViewModel AccountSelectionFlip

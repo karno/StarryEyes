@@ -1,6 +1,7 @@
 ﻿using System;
 using Livet;
 using StarryEyes.Albireo;
+using StarryEyes.Albireo.Helpers;
 using StarryEyes.Models;
 using StarryEyes.Views.Messaging;
 

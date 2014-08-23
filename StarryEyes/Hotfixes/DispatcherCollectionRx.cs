@@ -6,10 +6,10 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Disposables;
-using System.Reactive.Linq;
 using System.Threading;
 using System.Windows.Threading;
 using Livet;
+using StarryEyes.Albireo.Helpers;
 
 namespace StarryEyes.Hotfixes
 {
@@ -56,37 +56,33 @@ namespace StarryEyes.Hotfixes
             Dispatcher = dispatcher;
             CollectionChangedDispatcherPriority = DispatcherPriority.Normal;
 
-            _disposables.Add(((INotifyPropertyChanged)collection)
-                                 .ListenPropertyChanged()
-                                 .Subscribe(e =>
-                                 {
-                                     if (!Dispatcher.CheckAccess())
-                                     {
-                                         Dispatcher.InvokeAsync(
-                                             () => OnPropertyChanged(e.PropertyName),
-                                             CollectionChangedDispatcherPriority);
-                                     }
-                                     else
-                                     {
-                                         OnPropertyChanged(e.PropertyName);
-                                     }
-                                 }));
+            _disposables.Add(((INotifyPropertyChanged)collection).ListenPropertyChanged(e =>
+            {
+                if (!Dispatcher.CheckAccess())
+                {
+                    Dispatcher.InvokeAsync(
+                        () => OnPropertyChanged(e.PropertyName),
+                        CollectionChangedDispatcherPriority);
+                }
+                else
+                {
+                    OnPropertyChanged(e.PropertyName);
+                }
+            }));
 
-            _disposables.Add(collection
-                                 .ListenCollectionChanged()
-                                 .Subscribe(e =>
-                                 {
-                                     if (!Dispatcher.CheckAccess())
-                                     {
-                                         Dispatcher.InvokeAsync(
-                                             () => OnCollectionChanged(e),
-                                             CollectionChangedDispatcherPriority);
-                                     }
-                                     else
-                                     {
-                                         OnCollectionChanged(e);
-                                     }
-                                 }));
+            _disposables.Add(collection.ListenCollectionChanged(e =>
+            {
+                if (!Dispatcher.CheckAccess())
+                {
+                    Dispatcher.InvokeAsync(
+                        () => OnCollectionChanged(e),
+                        CollectionChangedDispatcherPriority);
+                }
+                else
+                {
+                    OnCollectionChanged(e);
+                }
+            }));
         }
 
         /// <summary>

@@ -80,7 +80,7 @@ namespace StarryEyes.Models.Accounting
         public Uri UnreliableProfileImage { get; set; }
 
         [NotNull]
-        public TwitterUser GetPserudoUser()
+        public TwitterUser GetPseudoUser()
         {
             return new TwitterUser
             {

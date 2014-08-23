@@ -577,6 +577,9 @@
                                                 </EasingDoubleKeyFrame.EasingFunction>
                                             </EasingDoubleKeyFrame>
                                         </DoubleAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="LongTime" Storyboard.TargetProperty="(UIElement.Visibility)">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}" />
+                                        </ObjectAnimationUsingKeyFrames>
                                         <DoubleAnimationUsingKeyFrames Storyboard.TargetName="LongTime" Storyboard.TargetProperty="(UIElement.Opacity)">
                                             <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0">
                                                 <EasingDoubleKeyFrame.EasingFunction>
@@ -584,6 +587,9 @@
                                                 </EasingDoubleKeyFrame.EasingFunction>
                                             </EasingDoubleKeyFrame>
                                         </DoubleAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="LongTime" Storyboard.TargetProperty="(UIElement.Visibility)">
+                                            <DiscreteObjectKeyFrame KeyTime="0:0:0.1" Value="{x:Static Visibility.Hidden}" />
+                                        </ObjectAnimationUsingKeyFrames>
                                         <DoubleAnimationUsingKeyFrames Storyboard.TargetName="stackPanel" Storyboard.TargetProperty="(UIElement.Opacity)">
                                             <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0">
                                                 <EasingDoubleKeyFrame.EasingFunction>
@@ -591,6 +597,9 @@
                                                 </EasingDoubleKeyFrame.EasingFunction>
                                             </EasingDoubleKeyFrame>
                                         </DoubleAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="stackPanel" Storyboard.TargetProperty="(UIElement.Visibility)">
+                                            <DiscreteObjectKeyFrame KeyTime="0:0:0.1" Value="{x:Static Visibility.Hidden}" />
+                                        </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
                                 <VisualState x:Name="OnMouseOver">
@@ -609,6 +618,9 @@
                                                 </EasingDoubleKeyFrame.EasingFunction>
                                             </EasingDoubleKeyFrame>
                                         </DoubleAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="LongTime" Storyboard.TargetProperty="(UIElement.Visibility)">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}" />
+                                        </ObjectAnimationUsingKeyFrames>
                                         <DoubleAnimationUsingKeyFrames Storyboard.TargetName="ShortTime" Storyboard.TargetProperty="(UIElement.Opacity)">
                                             <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0">
                                                 <EasingDoubleKeyFrame.EasingFunction>
@@ -616,6 +628,9 @@
                                                 </EasingDoubleKeyFrame.EasingFunction>
                                             </EasingDoubleKeyFrame>
                                         </DoubleAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ShortTime" Storyboard.TargetProperty="(UIElement.Visibility)">
+                                            <DiscreteObjectKeyFrame KeyTime="0:0:0.1" Value="{x:Static Visibility.Hidden}" />
+                                        </ObjectAnimationUsingKeyFrames>
                                         <DoubleAnimationUsingKeyFrames Storyboard.TargetName="stackPanel" Storyboard.TargetProperty="(UIElement.Opacity)">
                                             <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="1">
                                                 <EasingDoubleKeyFrame.EasingFunction>
@@ -623,6 +638,9 @@
                                                 </EasingDoubleKeyFrame.EasingFunction>
                                             </EasingDoubleKeyFrame>
                                         </DoubleAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="stackPanel" Storyboard.TargetProperty="(UIElement.Visibility)">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}" />
+                                        </ObjectAnimationUsingKeyFrames>
                                         <ColorAnimationUsingKeyFrames Storyboard.TargetName="OverrideBorder" Storyboard.TargetProperty="(Panel.Background).(SolidColorBrush.Color)">
                                             <EasingColorKeyFrame KeyTime="0" Value="#0A000000" />
                                         </ColorAnimationUsingKeyFrames>
@@ -646,7 +664,6 @@
                                         </DoubleAnimationUsingKeyFrames>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ActionQuickView" Storyboard.TargetProperty="(UIElement.Visibility)">
                                             <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}" />
-                                            <DiscreteObjectKeyFrame KeyTime="0:0:0.1" Value="{x:Static Visibility.Visible}" />
                                         </ObjectAnimationUsingKeyFrames>
                                         <DoubleAnimationUsingKeyFrames Storyboard.TargetName="ActionQuickView" Storyboard.TargetProperty="(UIElement.Opacity)">
                                             <EasingDoubleKeyFrame KeyTime="0" Value="0" />
@@ -1194,7 +1211,8 @@
                                                                       Mode=OneTime,
                                                                       FallbackValue=0:00:00 - 0 Nil \'00,
                                                                       StringFormat=H:mm:ss - d MMM \\\'yy}"
-                                                       TextWrapping="NoWrap">
+                                                       TextWrapping="NoWrap"
+                                                       Visibility="Hidden">
                                                 <i:Interaction.Triggers>
                                                     <i:EventTrigger EventName="MouseLeftButtonDown">
                                                         <ei:CallMethodAction MethodName="OpenWeb" TargetObject="{Binding Mode=OneTime}" />
@@ -1207,7 +1225,8 @@
                                                         HorizontalAlignment="Right"
                                                         VerticalAlignment="Center"
                                                         Opacity="0"
-                                                        Orientation="Horizontal">
+                                                        Orientation="Horizontal"
+                                                        Visibility="Hidden">
                                                 <Button x:Name="FavAndRetweetButton"
                                                         Width="32"
                                                         Height="22"

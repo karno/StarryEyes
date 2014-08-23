@@ -93,7 +93,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Threading\LimitedTaskScheduler.cs" />
     <Compile Include="Threading\SerialTaskWorker.cs" />
-    <Compile Include="Util.cs" />
+    <Compile Include="Helpers\EventHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Disposables;
-using System.Reactive.Linq;
 using System.Threading.Tasks;
-using StarryEyes.Albireo;
+using StarryEyes.Albireo.Helpers;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Receiving.Receivers;
 using StarryEyes.Settings;
@@ -62,8 +61,7 @@ namespace StarryEyes.Models.Receiving.Managers
         public UserReceiveManager()
         {
             System.Diagnostics.Debug.WriteLine("UserReceiveManager initialized.");
-            Setting.Accounts.Collection.ListenCollectionChanged()
-                   .Subscribe(_ => Task.Run(() => this.NotifySettingChanged()));
+            Setting.Accounts.Collection.ListenCollectionChanged(_ => Task.Run(() => this.NotifySettingChanged()));
             App.UserInterfaceReady += this.NotifySettingChanged;
         }
 

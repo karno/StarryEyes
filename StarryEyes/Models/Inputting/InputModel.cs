@@ -5,6 +5,7 @@ using System.Reactive.Disposables;
 using JetBrains.Annotations;
 using Livet.EventListeners;
 using StarryEyes.Albireo;
+using StarryEyes.Albireo.Helpers;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Settings;
 

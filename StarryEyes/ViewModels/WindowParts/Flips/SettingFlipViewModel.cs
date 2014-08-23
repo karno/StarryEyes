@@ -17,6 +17,7 @@ using JetBrains.Annotations;
 using Livet;
 using Livet.Messaging;
 using Livet.Messaging.IO;
+using StarryEyes.Albireo.Helpers;
 using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Anomaly.Utils;
 using StarryEyes.Filters.Expressions;
@@ -1236,8 +1237,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             _parent = parent;
             this._account = account;
             _accounts = new DispatcherCollection<TwitterAccountViewModel>(DispatcherHelper.UIDispatcher);
-            Setting.Accounts.Collection.ListenCollectionChanged()
-                   .Subscribe(_ => RefreshCandidates());
+            this.CompositeDisposable.Add(Setting.Accounts.Collection.ListenCollectionChanged(_ => RefreshCandidates()));
             this.RefreshCandidates();
         }
 

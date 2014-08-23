@@ -11,6 +11,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Interactivity;
 using System.Windows.Threading;
+using StarryEyes.Albireo.Helpers;
 using StarryEyes.Views.Utils;
 
 namespace StarryEyes.Views.Behaviors
@@ -318,28 +319,27 @@ namespace StarryEyes.Views.Behaviors
         /// <returns>listener disposable</returns>
         private IDisposable ListenCollectionChange(IList source)
         {
-            return ((INotifyCollectionChanged)source).ListenCollectionChanged()
-                  .Subscribe(ev =>
-                  {
-                      if (this.AssociatedObject == null) return;
-                      if (ev.Action == NotifyCollectionChangedAction.Add)
-                      {
-                          // get virtualizing stack panel
-                          var vsp = this.AssociatedObject.FindVisualChild<VirtualizingStackPanel>();
-                          if (vsp != null)
-                          {
-                              var index = vsp.ItemContainerGenerator
-                                             .IndexFromGeneratorPosition(new GeneratorPosition(0, 0));
-                              // check new index is newer than the bottom item of current viewport items.
-                              if (ev.NewStartingIndex <= index)
-                              {
-                                  return;
-                              }
-                          }
-                      }
-                      // we should not scroll -> update items count.
-                      this._previousItemCount = source.Count;
-                  });
+            return ((INotifyCollectionChanged)source).ListenCollectionChanged(ev =>
+            {
+                if (this.AssociatedObject == null) return;
+                if (ev.Action == NotifyCollectionChangedAction.Add)
+                {
+                    // get virtualizing stack panel
+                    var vsp = this.AssociatedObject.FindVisualChild<VirtualizingStackPanel>();
+                    if (vsp != null)
+                    {
+                        var index = vsp.ItemContainerGenerator
+                                       .IndexFromGeneratorPosition(new GeneratorPosition(0, 0));
+                        // check new index is newer than the bottom item of current viewport items.
+                        if (ev.NewStartingIndex <= index)
+                        {
+                            return;
+                        }
+                    }
+                }
+                // we should not scroll -> update items count.
+                this._previousItemCount = source.Count;
+            });
         }
 
         /// <summary>

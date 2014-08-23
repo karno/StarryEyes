@@ -244,7 +244,7 @@ namespace StarryEyes.Models.Timelines.Statuses
                          return true;
                      }
                  })
-                 .Select(id => Observable.Start(() => StoreHelper.GetUser(id)))
+                 .Select(id => Observable.Start(() => StoreHelper.GetUserAsync(id)))
                  .Merge()
                  .SelectMany(_ => _)
                  .Subscribe(u =>
@@ -270,12 +270,6 @@ namespace StarryEyes.Models.Timelines.Statuses
             {
                 ifCacheIsDead(id);
             }
-        }
-
-        public void AddFavoritedUser(long userId)
-        {
-            StoreHelper.GetUser(userId)
-                       .Subscribe(this.AddFavoritedUser);
         }
 
         public async void AddFavoritedUser(TwitterUser user)
@@ -339,11 +333,6 @@ namespace StarryEyes.Models.Timelines.Statuses
 #pragma warning restore 4014
                 }
             }
-        }
-
-        public void AddRetweetedUser(long userId)
-        {
-            StoreHelper.GetUser(userId).Subscribe(this.AddRetweetedUser);
         }
 
         public async void AddRetweetedUser(TwitterUser user)

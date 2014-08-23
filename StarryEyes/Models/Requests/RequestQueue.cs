@@ -3,7 +3,6 @@ using System.Collections.Concurrent;
 using System.Net;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Threading;
 using System.Threading.Tasks;
 using StarryEyes.Albireo.Threading;
 using StarryEyes.Models.Accounting;
@@ -20,7 +19,41 @@ namespace StarryEyes.Models.Requests
             return _accountTaskFactories.GetOrAdd(account.Id, _ => LimitedTaskScheduler.GetTaskFactory(1));
         }
 
-        public static IObservable<T> Enqueue<T>(TwitterAccount account, RequestBase<T> request)
+        public static Task<T> EnqueueAsync<T>(TwitterAccount account, RequestBase<T> request)
+        {
+            return account.GetTaskFactory().StartNew(async () =>
+            {
+                var retryCount = 0;
+                do
+                {
+                    try
+                    {
+                        return await request.Send(account);
+                    }
+                    catch (WebException ex)
+                    {
+                        if (!CheckTemporaryError(ex) || retryCount >= request.RetryCount)
+                        {
+                            // request is something wrong.
+                            throw;
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        if (retryCount >= request.RetryCount)
+                        {
+                            // request is something wrong.
+                            throw;
+                        }
+                    }
+                    retryCount++;
+                    // wait retry delay
+                    await Task.Delay(TimeSpan.FromSeconds(request.RetryDelaySec));
+                } while (true);
+            }).Unwrap();
+        }
+
+        public static IObservable<T> EnqueueObservable<T>(TwitterAccount account, RequestBase<T> request)
         {
 #pragma warning disable 4014
             var subject = new Subject<T>();
@@ -57,7 +90,7 @@ namespace StarryEyes.Models.Requests
                     if (retryCount < request.RetryCount)
                     {
                         // wait retry delay
-                        await Task.Run(() => Thread.Sleep(TimeSpan.FromSeconds(request.RetryDelaySec)));
+                        await Task.Delay(TimeSpan.FromSeconds(request.RetryDelaySec));
                     }
                 } while (retryCount < request.RetryCount);
                 // throw last exception

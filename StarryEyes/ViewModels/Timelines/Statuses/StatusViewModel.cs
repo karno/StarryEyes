@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -11,6 +10,7 @@ using JetBrains.Annotations;
 using Livet;
 using Livet.Commands;
 using Livet.EventListeners;
+using StarryEyes.Albireo.Helpers;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.Utils;
 using StarryEyes.Filters;
@@ -53,12 +53,10 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         private UserViewModel _user;
         private bool _isInReplyToLoading;
         private bool _isInReplyToLoaded;
-        private readonly CompositeDisposable _disposables;
 
         public StatusViewModel(TimelineViewModelBase parent, StatusModel status,
             IEnumerable<long> initialBoundAccounts)
         {
-            this.CompositeDisposable.Add(_disposables = new CompositeDisposable());
             this._parent = parent;
             // get status model
             this.Model = status;
@@ -68,25 +66,23 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             this._bindingAccounts = initialBoundAccounts.Guard().ToArray();
 
             // initialize users information
-            this._disposables.Add(
+            this.CompositeDisposable.Add(
                 this._favoritedUsers = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
                     this.Model.FavoritedUsers, user => new UserViewModel(user),
                     DispatcherHelper.UIDispatcher, DispatcherPriority.Background));
-            this._disposables.Add(
-                this._favoritedUsers.ListenCollectionChanged()
-                    .Subscribe(_ =>
-                    {
-                        this.RaisePropertyChanged(() => this.IsFavorited);
-                        this.RaisePropertyChanged(() => this.IsFavoritedUserExists);
-                        this.RaisePropertyChanged(() => this.FavoriteCount);
-                    }));
-            this._disposables.Add(
+            this.CompositeDisposable.Add(
+                this._favoritedUsers.ListenCollectionChanged(_ =>
+                {
+                    this.RaisePropertyChanged(() => this.IsFavorited);
+                    this.RaisePropertyChanged(() => this.IsFavoritedUserExists);
+                    this.RaisePropertyChanged(() => this.FavoriteCount);
+                }));
+            this.CompositeDisposable.Add(
                 this._retweetedUsers = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
                     this.Model.RetweetedUsers, user => new UserViewModel(user),
                     DispatcherHelper.UIDispatcher, DispatcherPriority.Background));
-            this._disposables.Add(
-                this._retweetedUsers.ListenCollectionChanged()
-                    .Subscribe(_ =>
+            this.CompositeDisposable.Add(
+                this._retweetedUsers.ListenCollectionChanged(_ =>
                     {
                         this.RaisePropertyChanged(() => this.IsRetweeted);
                         this.RaisePropertyChanged(() => this.IsRetweetedUserExists);
@@ -95,26 +91,26 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
 
             if (this.RetweetedOriginalModel != null)
             {
-                this._disposables.Add(
-                    this.RetweetedOriginalModel.FavoritedUsers.ListenCollectionChanged()
-                        .Subscribe(_ => this.RaisePropertyChanged(() => this.IsFavorited)));
-                this._disposables.Add(
-                    this.RetweetedOriginalModel.RetweetedUsers.ListenCollectionChanged()
-                        .Subscribe(_ => this.RaisePropertyChanged(() => this.IsRetweeted)));
+                this.CompositeDisposable.Add(
+                    this.RetweetedOriginalModel.FavoritedUsers.ListenCollectionChanged(
+                        _ => this.RaisePropertyChanged(() => this.IsFavorited)));
+                this.CompositeDisposable.Add(
+                    this.RetweetedOriginalModel.RetweetedUsers.ListenCollectionChanged(
+                        _ => this.RaisePropertyChanged(() => this.IsRetweeted)));
             }
 
             // listen settings
-            this._disposables.Add(
+            this.CompositeDisposable.Add(
                 new EventListener<Action<bool>>(
                     h => Setting.AllowFavoriteMyself.ValueChanged += h,
                     h => Setting.AllowFavoriteMyself.ValueChanged -= h,
                     _ => this.RaisePropertyChanged(() => CanFavorite)));
-            this._disposables.Add(
+            this.CompositeDisposable.Add(
                 new EventListener<Action<bool>>(
                     h => Setting.ShowThumbnails.ValueChanged += h,
                     h => Setting.ShowThumbnails.ValueChanged -= h,
                     _ => this.RaisePropertyChanged(() => IsThumbnailAvailable)));
-            this._disposables.Add(
+            this.CompositeDisposable.Add(
                 new EventListener<Action<TweetDisplayMode>>(
                     h => Setting.TweetDisplayMode.ValueChanged += h,
                     h => Setting.TweetDisplayMode.ValueChanged -= h,
@@ -132,7 +128,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             {
                 lock (imgsubj)
                 {
-                    this._disposables.Add(
+                    this.CompositeDisposable.Add(
                         imgsubj
                             .Finally(() =>
                             {
@@ -229,8 +225,17 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         private UserViewModel CreateUserViewModel(TwitterUser user)
         {
             var uvm = new UserViewModel(user);
-            this._disposables.Add(uvm);
-            return uvm;
+            try
+            {
+                this.CompositeDisposable.Add(uvm);
+                return uvm;
+            }
+            catch (ObjectDisposedException)
+            {
+                // release all subscriptions
+                uvm.Dispose();
+                return uvm;
+            }
         }
 
         public string MultiLineText
@@ -620,7 +625,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             }
         }
 
-        private void LoadInReplyTo()
+        private async void LoadInReplyTo()
         {
             if (this._isInReplyToLoading || this._isInReplyToLoaded) return;
             var inReplyToStatusId = this.Status.InReplyToStatusId;
@@ -632,14 +637,17 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             }
             this._isInReplyToLoading = true;
             this.RaisePropertyChanged(() => this.IsInReplyToLoading);
-            StoreHelper.GetTweet(inReplyToStatusId.Value)
-                       .Subscribe(replyTo =>
-                       {
-                           this._inReplyTo = replyTo;
-                           this._isInReplyToLoaded = true;
-                           this._isInReplyToLoading = false;
-                           this.NotifyChangeReplyInfo();
-                       });
+            try
+            {
+                this._inReplyTo = await StoreHelper.GetTweetAsync(inReplyToStatusId.Value);
+                this._isInReplyToLoaded = true;
+                this._isInReplyToLoading = false;
+                this.NotifyChangeReplyInfo();
+            }
+            catch (Exception)
+            {
+                this._isInReplyToLoading = false;
+            }
         }
 
         #endregion
@@ -740,37 +748,49 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                 // disable on direct messages
                 return;
             }
-            Action<TwitterAccount> expected;
-            Action<TwitterAccount> onFail;
-            if (add)
+            Task.Run(() =>
             {
-                expected = a => Task.Run(() => this.Model.AddFavoritedUser(a.Id));
-                onFail = a => Task.Run(() => this.Model.RemoveFavoritedUser(a.Id));
-            }
-            else
-            {
-                expected = a => Task.Run(() => this.Model.RemoveFavoritedUser(a.Id));
-                onFail = a => Task.Run(() => this.Model.AddFavoritedUser(a.Id));
-            }
+                Action<TwitterAccount> expected;
+                Action<TwitterAccount> onFail;
+                if (add)
+                {
+                    expected = a => this.Model.AddFavoritedUser(a.GetPseudoUser());
+                    onFail = a => this.Model.RemoveFavoritedUser(a.Id);
+                }
+                else
+                {
+                    expected = a => this.Model.RemoveFavoritedUser(a.Id);
+                    onFail = a => this.Model.AddFavoritedUser(a.GetPseudoUser());
+                }
 
-            var freq = new FavoriteRequest(this.Status, add);
-            infos.ToObservable()
-                 .Do(expected)
-                 .Do(_ => this.RaisePropertyChanged(() => this.IsFavorited))
-                 .SelectMany(a => RequestQueue.Enqueue(a, freq)
-                                              .Catch((Exception ex) =>
-                                              {
-                                                  onFail(a);
-                                                  var desc = add
-                                                      ? MainAreaTimelineResources.MsgFavoriteFailed
-                                                      : MainAreaTimelineResources.MsgUnfavoriteFailed;
-                                                  BackstageModel.RegisterEvent(new OperationFailedEvent(
-                                                      desc + "(" + a.UnreliableScreenName + " -> " +
-                                                      this.Status.User.ScreenName + ")", ex));
-                                                  return Observable.Empty<TwitterStatus>();
-                                              }))
-                 .Do(_ => this.RaisePropertyChanged(() => this.IsFavorited))
-                 .Subscribe();
+                var request = new FavoriteRequest(this.Status, add);
+
+                // define working task
+                Func<TwitterAccount, Task> workTask = account => Task.Run(async () =>
+                {
+                    expected(account);
+                    try
+                    {
+                        await RequestQueue.EnqueueAsync(account, request);
+                    }
+                    catch (Exception ex)
+                    {
+                        onFail(account);
+                        var desc = add
+                            ? MainAreaTimelineResources.MsgFavoriteFailed
+                            : MainAreaTimelineResources.MsgUnfavoriteFailed;
+                        BackstageModel.RegisterEvent(new OperationFailedEvent(
+                            desc + "(" + account.UnreliableScreenName + " -> " +
+                            this.Status.User.ScreenName + ")", ex));
+                    }
+                });
+
+                // dispatch actions
+                Task.WaitAll(infos.Select(workTask).ToArray());
+
+                // notify changed
+                this.RaisePropertyChanged(() => IsFavorited);
+            });
         }
 
         public void Retweet(IEnumerable<TwitterAccount> infos, bool add)
@@ -780,36 +800,48 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                 // disable on direct messages
                 return;
             }
-            Action<TwitterAccount> expected;
-            Action<TwitterAccount> onFail;
-            if (add)
+            Task.Run(() =>
             {
-                expected = a => Task.Run(() => this.Model.AddRetweetedUser(a.Id));
-                onFail = a => Task.Run(() => this.Model.RemoveRetweetedUser(a.Id));
-            }
-            else
-            {
-                expected = a => Task.Run(() => this.Model.RemoveRetweetedUser(a.Id));
-                onFail = a => Task.Run(() => this.Model.AddRetweetedUser(a.Id));
-            }
-            var rreq = new RetweetRequest(this.Status, add);
-            infos.ToObservable()
-                 .Do(expected)
-                 .Do(_ => this.RaisePropertyChanged(() => this.IsRetweeted))
-                 .SelectMany(a => RequestQueue.Enqueue(a, rreq)
-                                              .Catch((Exception ex) =>
-                                              {
-                                                  onFail(a);
-                                                  var desc = add
-                                                      ? MainAreaTimelineResources.MsgRetweetFailed
-                                                      : MainAreaTimelineResources.MsgUnretweetFailed;
-                                                  BackstageModel.RegisterEvent(new OperationFailedEvent(
-                                                      desc + "(" + a.UnreliableScreenName + " -> " +
-                                                      this.Status.User.ScreenName + ")", ex));
-                                                  return Observable.Empty<TwitterStatus>();
-                                              }))
-                 .Do(_ => this.RaisePropertyChanged(() => this.IsRetweeted))
-                 .Subscribe();
+                Action<TwitterAccount> expected;
+                Action<TwitterAccount> onFail;
+                if (add)
+                {
+                    expected = a => this.Model.AddRetweetedUser(a.GetPseudoUser());
+                    onFail = a => this.Model.RemoveRetweetedUser(a.Id);
+                }
+                else
+                {
+                    expected = a => this.Model.RemoveRetweetedUser(a.Id);
+                    onFail = a => this.Model.AddRetweetedUser(a.GetPseudoUser());
+                }
+                var request = new RetweetRequest(this.Status, add);
+
+                // define working task
+                Func<TwitterAccount, Task> workTask = account => Task.Run(async () =>
+                {
+                    expected(account);
+                    try
+                    {
+                        await RequestQueue.EnqueueAsync(account, request);
+                    }
+                    catch (Exception ex)
+                    {
+                        onFail(account);
+                        var desc = add
+                            ? MainAreaTimelineResources.MsgRetweetFailed
+                            : MainAreaTimelineResources.MsgUnretweetFailed;
+                        BackstageModel.RegisterEvent(new OperationFailedEvent(
+                            desc + "(" + account.UnreliableScreenName + " -> " +
+                            this.Status.User.ScreenName + ")", ex));
+                    }
+                });
+
+                // dispatch actions
+                Task.WaitAll(infos.Select(workTask).ToArray());
+
+                // notify changed
+                this.RaisePropertyChanged(() => this.IsRetweeted);
+            });
         }
 
         public void ToggleFavoriteImmediate()
@@ -891,9 +923,9 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             if (!this.IsFavorited)
             {
                 var freq = new FavoriteRequest(this.Status, true);
-                accounts.Do(a => Task.Run(() => this.Model.AddFavoritedUser(a.Id)))
+                accounts.Do(a => Task.Run(() => this.Model.AddFavoritedUser(a.GetPseudoUser())))
                         .Do(_ => this.RaisePropertyChanged(() => this.IsFavorited))
-                        .SelectMany(a => RequestQueue.Enqueue(a, freq)
+                        .SelectMany(a => RequestQueue.EnqueueObservable(a, freq)
                                                      .Catch((Exception ex) =>
                                                      {
                                                          Task.Run(() => this.Model.RemoveFavoritedUser(a.Id));
@@ -905,9 +937,9 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             if (!this.IsRetweeted)
             {
                 var rreq = new RetweetRequest(this.Status, true);
-                accounts.Do(a => Task.Run(() => this.Model.AddRetweetedUser(a.Id)))
+                accounts.Do(a => Task.Run(() => this.Model.AddRetweetedUser(a.GetPseudoUser())))
                         .Do(_ => this.RaisePropertyChanged(() => this.IsRetweeted))
-                        .SelectMany(a => RequestQueue.Enqueue(a, rreq)
+                        .SelectMany(a => RequestQueue.EnqueueObservable(a, rreq)
                                                      .Catch((Exception ex) =>
                                                      {
                                                          Task.Run(() => this.Model.RemoveRetweetedUser(a.Id));
@@ -1122,7 +1154,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             }
         }
 
-        public void Delete()
+        public async void Delete()
         {
             TwitterAccount info;
             if (this.IsDirectMessage)
@@ -1139,10 +1171,16 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             }
             if (info == null) return;
             var dreq = new DeletionRequest(this.OriginalStatus);
-            RequestQueue.Enqueue(info, dreq)
-                        .Subscribe(_ => StatusInbox.EnqueueRemoval(_.Id),
-                            ex => BackstageModel.RegisterEvent(
-                                new OperationFailedEvent(MainAreaTimelineResources.MsgTweetDeleteFailed, ex)));
+            try
+            {
+                var result = await RequestQueue.EnqueueAsync(info, dreq);
+                StatusInbox.EnqueueRemoval(result.Id);
+            }
+            catch (Exception ex)
+            {
+                BackstageModel.RegisterEvent(new OperationFailedEvent(
+                    MainAreaTimelineResources.MsgTweetDeleteFailed, ex));
+            }
         }
 
         private bool _lastSelectState;
@@ -1202,15 +1240,15 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             var rreq = new UpdateRelationRequest(this.User.User, RelationKind.Block);
             accounts.ToObservable()
                     .SelectMany(a =>
-                        RequestQueue.Enqueue(a, rreq)
+                        RequestQueue.EnqueueObservable(a, rreq)
                                     .Do(r => BackstageModel.RegisterEvent(
-                                        new BlockedEvent(a.GetPserudoUser(), this.User.User))))
+                                        new BlockedEvent(a.GetPseudoUser(), this.User.User))))
                     .Merge(
-                        RequestQueue.Enqueue(reporter,
+                        RequestQueue.EnqueueObservable(reporter,
                             new UpdateRelationRequest(this.User.User, RelationKind.ReportAsSpam))
                                     .Do(r =>
                                         BackstageModel.RegisterEvent(
-                                            new BlockedEvent(reporter.GetPserudoUser(), this.User.User))))
+                                            new BlockedEvent(reporter.GetPseudoUser(), this.User.User))))
                     .Subscribe(
                         _ => { },
                         ex => BackstageModel.RegisterEvent(new InternalErrorEvent(ex.Message)), () =>

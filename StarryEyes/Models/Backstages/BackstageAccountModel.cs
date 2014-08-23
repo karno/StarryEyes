@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using StarryEyes.Albireo;
+using StarryEyes.Albireo.Helpers;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Globalization;
 using StarryEyes.Models.Accounting;
@@ -66,17 +66,20 @@ namespace StarryEyes.Models.Backstages
         {
             this._account = account;
             this.UpdateConnectionState();
-            StoreHelper.GetUser(this._account.Id)
-                       .Subscribe(
-                           u =>
-                           {
-                               _user = u;
-                               this.RaiseTwitterUserChanged();
-                           },
-                           ex => BackstageModel.RegisterEvent(new OperationFailedEvent(
-                               BackstageResources.GetAccountInfoFailedFormat.SafeFormat(
-                                   "@" + _account.UnreliableScreenName),
-                               ex)));
+            Task.Run(async () =>
+            {
+                try
+                {
+                    _user = await StoreHelper.GetUserAsync(this._account.Id);
+                    this.RaiseTwitterUserChanged();
+                }
+                catch (Exception ex)
+                {
+                    BackstageModel.RegisterEvent(new OperationFailedEvent(
+                        BackstageResources.GetAccountInfoFailedFormat.SafeFormat("@" + _account.UnreliableScreenName),
+                        ex));
+                }
+            });
         }
 
         internal void UpdateConnectionState()

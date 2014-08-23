@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reactive.Linq;
 using Livet;
+using StarryEyes.Albireo.Helpers;
 using StarryEyes.Models;
 using StarryEyes.Models.Timelines.Tabs;
 using StarryEyes.Settings;
@@ -30,8 +31,7 @@ namespace StarryEyes.ViewModels.WindowParts
                           .Select(_ => TabManager.CurrentFocusColumnIndex)
                           .Subscribe(UpdateFocusFromModel));
             CompositeDisposable.Add(
-                _columns.ListenCollectionChanged()
-                        .Subscribe(_ => _columns.ForEach(c => c.UpdateFocus())));
+                _columns.ListenCollectionChanged(_ => _columns.ForEach(c => c.UpdateFocus())));
             RegisterEvents();
         }
 

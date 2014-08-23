@@ -4,8 +4,8 @@ using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using JetBrains.Annotations;
-using StarryEyes.Albireo;
 using StarryEyes.Albireo.Collections;
+using StarryEyes.Albireo.Helpers;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Databases;
@@ -35,7 +35,7 @@ namespace StarryEyes.Models.Receiving
         /// </summary>
         internal static void Initialize()
         {
-            Setting.Accounts.Collection.ListenCollectionChanged().Subscribe(_ =>
+            Setting.Accounts.Collection.ListenCollectionChanged(_ =>
             {
                 InvalidateBlocks();
                 InvalidateMute();

@@ -52,9 +52,9 @@ namespace StarryEyes.Views.Controls
 
         public Guid Id { get; private set; }
 
-        private Uri _lastUri = null;
-        private int _lastDpw = 0;
-        private int _lastDph = 0;
+        private Uri _lastUri;
+        private int _lastDpw;
+        private int _lastDph;
 
         public LazyImage()
         {
