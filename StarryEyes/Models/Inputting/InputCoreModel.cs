@@ -52,7 +52,9 @@ namespace StarryEyes.Models.Inputting
                     _drafts.Add(_inputData);
                 }
                 _inputData = value;
-                _inputData.BoundTags = BindingHashtags.ToArray();
+                _inputData.BoundTags = _inputData.IsDirectMessage
+                    ? Enumerable.Empty<string>()
+                    : BindingHashtags.ToArray();
                 RaisePropertyChanged(() => CurrentInputData);
             }
         }
