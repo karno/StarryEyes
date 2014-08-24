@@ -406,7 +406,7 @@ namespace StarryEyes.Views.Controls
                         _decodeStack.AddFirst(item);
                         while (_decodeStack.Count > MaxDecodeQueueSize)
                         {
-                            _visualTable.TryRemove(_decodeStack.First.Value.Item1, out removal);
+                            _visualTable.TryRemove(_decodeStack.Last.Value.Item1, out removal);
                             _decodeStack.RemoveLast();
                         }
                         break;
