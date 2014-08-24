@@ -147,63 +147,76 @@ namespace StarryEyes.Views.Controls
 
         private static void QueueLoadTask(Uri source, Guid id)
         {
+            // _loadTable lock flag
             var locked = false;
 
             try
             {
                 // acquire lock of _loadTable.
                 Monitor.Enter(_loadTable, ref locked);
-                HashSet<Guid> set;
+
+                HashSet<Guid> set; // callback hashset
+                var queueingRequired = false; // Uri queue flag
+
+                // lookup callback hashset from loader table.
                 if (!_loadTable.TryGetValue(source, out set))
                 {
                     set = new HashSet<Guid>();
                     _loadTable[source] = set;
+                    queueingRequired = true; // set is not existed.
                 }
+
+                // acquire lock of internal set.
                 lock (set)
                 {
                     // release lock of _loadTable.
-                    locked = false;
                     Monitor.Exit(_loadTable);
+                    locked = false;
 
-                    if (set.Count == 0)
+                    // add current id to callback set.
+                    set.Add(id);
+
+                    if (!queueingRequired)
                     {
-                        // generated
-                        set.Add(id);
-                    }
-                    else
-                    {
-                        set.Add(id);
+                        // load action is already queued about this Uri. 
                         return;
                     }
                 }
             }
             finally
             {
+                // ensure lock of _loadTable is released.
                 if (locked)
                 {
                     Monitor.Exit(_loadTable);
                 }
             }
 
+            // removal item
+            Uri removal = null;
             lock (_loadStack)
             {
 #pragma warning disable 162
                 // ReSharper disable HeuristicUnreachableCode
+
+                // Leak lowest priority item of current queue.
                 switch (LoadStrategy)
                 {
                     case ImageProcessStrategy.FifoQueue:
                         _loadStack.AddLast(source);
-                        while (_loadStack.Count > MaxLoadQueueSize)
+                        if (_loadStack.Count > MaxLoadQueueSize)
                         {
-                            CleanInternalTables(_loadStack.First.Value);
+                            // check overflow
+                            removal = _loadStack.First.Value;
                             _loadStack.RemoveFirst();
                         }
                         break;
                     case ImageProcessStrategy.LifoStack:
                         _loadStack.AddFirst(source);
-                        while (_loadStack.Count > MaxLoadQueueSize)
+                        if (_loadStack.Count > MaxLoadQueueSize)
                         {
-                            CleanInternalTables(_loadStack.Last.Value);
+                            // check overflow
+                            removal = _loadStack.Last.Value;
                             _loadStack.RemoveLast();
                         }
                         break;
@@ -213,7 +226,12 @@ namespace StarryEyes.Views.Controls
                 // ReSharper restore HeuristicUnreachableCode
 #pragma warning restore 162
             }
+            if (removal != null)
+            {
+                CleanInternalTables(removal);
+            }
 
+            // check concurrency
             if (Interlocked.Increment(ref _loadThreadConcurrency) > MaxReceiveConcurrency)
             {
                 Interlocked.Decrement(ref _loadThreadConcurrency);
@@ -297,9 +315,11 @@ namespace StarryEyes.Views.Controls
         {
             if (imageBytes == null || imageBytes.Length == 0)
             {
+                // image is not loaded, or load failed
                 CleanInternalTables(uri);
                 return;
             }
+
             HashSet<Guid> set;
             lock (_loadTable)
             {
@@ -309,29 +329,28 @@ namespace StarryEyes.Views.Controls
                 }
                 _loadTable.Remove(uri);
             }
-            Guid[] idList;
+
+            // ensure synchronized
             lock (set)
             {
-                // ensure synchronization
-                idList = set.ToArray();
-            }
-            foreach (var id in idList)
-            {
-                // ensure image uri is not changed
-                Tuple<IImageVisual, Uri, int, int> tuple;
-                if (!_visualTable.TryGetValue(id, out tuple))
+                foreach (var id in set)
                 {
-                    continue;
-                }
-                if (tuple.Item1.Id != id || tuple.Item2 != uri)
-                {
-                    // remove item
-                    _visualTable.TryRemove(id, out tuple);
-                }
-                else
-                {
-                    QueueDecodeTask(id, uri, imageBytes,
-                        tuple.Item3, tuple.Item4);
+                    // ensure image uri is not changed
+                    Tuple<IImageVisual, Uri, int, int> tuple;
+                    if (!_visualTable.TryGetValue(id, out tuple))
+                    {
+                        continue;
+                    }
+                    if (tuple.Item1.Id != id || tuple.Item2 != uri)
+                    {
+                        // remove item
+                        _visualTable.TryRemove(id, out tuple);
+                    }
+                    else
+                    {
+                        QueueDecodeTask(id, uri, imageBytes,
+                            tuple.Item3, tuple.Item4);
+                    }
                 }
             }
         }
@@ -347,17 +366,16 @@ namespace StarryEyes.Views.Controls
                 }
                 _loadTable.Remove(uri);
             }
-            Guid[] ids;
+
+            // ensure synchronized
             lock (set)
             {
-                // ensure synchronization
-                ids = set.ToArray();
-            }
-            foreach (var id in ids)
-            {
-                // if failed, remove from visual table
-                Tuple<IImageVisual, Uri, int, int> tuple;
-                _visualTable.TryRemove(id, out tuple);
+                foreach (var id in set)
+                {
+                    // if failed, remove from visual table
+                    Tuple<IImageVisual, Uri, int, int> tuple;
+                    _visualTable.TryRemove(id, out tuple);
+                }
             }
         }
 
@@ -383,8 +401,7 @@ namespace StarryEyes.Views.Controls
         private static readonly ManualResetEventSlim _decodeSignal = new ManualResetEventSlim();
 
         private static void QueueDecodeTask(Guid targetId,
-            Uri uriSource, byte[] bytes,
-            int dpw, int dph)
+            Uri uriSource, byte[] bytes, int dpw, int dph)
         {
             lock (_decodeStack)
             {
@@ -396,7 +413,7 @@ namespace StarryEyes.Views.Controls
                 {
                     case ImageProcessStrategy.FifoQueue:
                         _decodeStack.AddLast(item);
-                        while (_decodeStack.Count > MaxDecodeQueueSize)
+                        if (_decodeStack.Count > MaxDecodeQueueSize)
                         {
                             _visualTable.TryRemove(_decodeStack.First.Value.Item1, out removal);
                             _decodeStack.RemoveFirst();
@@ -404,7 +421,7 @@ namespace StarryEyes.Views.Controls
                         break;
                     case ImageProcessStrategy.LifoStack:
                         _decodeStack.AddFirst(item);
-                        while (_decodeStack.Count > MaxDecodeQueueSize)
+                        if (_decodeStack.Count > MaxDecodeQueueSize)
                         {
                             _visualTable.TryRemove(_decodeStack.Last.Value.Item1, out removal);
                             _decodeStack.RemoveLast();

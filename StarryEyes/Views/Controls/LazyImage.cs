@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
@@ -114,7 +115,7 @@ namespace StarryEyes.Views.Controls
                 {
                     Id = Guid.NewGuid();
                     // resolve from ImageLoader
-                    ImageLoader.QueueLoadImage(this, uri, dpw, dph);
+                    Task.Run(() => ImageLoader.QueueLoadImage(this, uri, dpw, dph));
                 }
             }
             // ReSharper disable EmptyGeneralCatchClause
