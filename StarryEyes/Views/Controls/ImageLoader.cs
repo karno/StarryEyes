@@ -24,8 +24,9 @@ namespace StarryEyes.Views.Controls
         private static readonly Timer _expirationTimer;
 
         // Image process parameters
-        private const int MaxLoadQueueSize = 128;
-        private const int MaxDecodeQueueSize = 256;
+        private const int MaxLoadQueueSize = 256;
+        private const int MaxDecodeQueueSize = 512;
+        private const int MaxApplyImagePerOnce = 16;
         private const ImageProcessStrategy LoadStrategy = ImageProcessStrategy.LifoStack;
         private const ImageProcessStrategy DecodeStrategy = ImageProcessStrategy.LifoStack;
 
@@ -480,8 +481,7 @@ namespace StarryEyes.Views.Controls
                         tuple.Item2 == uri)
                     {
                         // push dispatcher queue
-                        DispatcherHelper.UIDispatcher.InvokeAsync(
-                            () => tuple.Item1.ApplyImage(uri, bitmap), DispatcherPriority.Background);
+                        ApplyImage(tuple.Item1, uri, bitmap);
                     }
 
                     // reset signal
@@ -520,6 +520,62 @@ namespace StarryEyes.Views.Controls
             catch
             {
                 return null;
+            }
+        }
+
+        #endregion
+
+        #region Apply images on UI thread
+
+        private static bool _waitingDispatcher;
+
+        private static readonly Stack<Tuple<IImageVisual, Uri, BitmapImage>> _applyQueue =
+            new Stack<Tuple<IImageVisual, Uri, BitmapImage>>();
+
+        private static void ApplyImage(IImageVisual target, Uri source, BitmapImage image)
+        {
+            lock (_applyQueue)
+            {
+                _applyQueue.Push(Tuple.Create(target, source, image));
+                if (_waitingDispatcher)
+                {
+                    return;
+                }
+                _waitingDispatcher = true;
+            }
+            // dispatch action
+            DispatcherHelper.UIDispatcher.InvokeAsync(ApplyImageOnDispatcher, DispatcherPriority.Render);
+        }
+
+        private static void ApplyImageOnDispatcher()
+        {
+            var list = new List<Tuple<IImageVisual, Uri, BitmapImage>>();
+
+            lock (_applyQueue)
+            {
+                for (var i = 0; i < MaxApplyImagePerOnce && _applyQueue.Count > 0; i++)
+                {
+                    list.Add(_applyQueue.Pop());
+                }
+            }
+
+            foreach (var tuple in list)
+            {
+                tuple.Item1.ApplyImage(tuple.Item2, tuple.Item3);
+            }
+
+            lock (_applyQueue)
+            {
+                if (_applyQueue.Count > 0)
+                {
+                    // re-dispatch action
+                    DispatcherHelper.UIDispatcher.InvokeAsync(ApplyImageOnDispatcher,
+                        DispatcherPriority.Render);
+                }
+                else
+                {
+                    _waitingDispatcher = false;
+                }
             }
         }
 
