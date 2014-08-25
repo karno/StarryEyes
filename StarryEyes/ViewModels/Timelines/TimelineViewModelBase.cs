@@ -131,11 +131,6 @@ namespace StarryEyes.ViewModels.Timelines
             get { return Setting.IsScrollByPixel.Value ? ScrollUnit.Pixel : ScrollUnit.Item; }
         }
 
-        public bool IsScrollLockExplicitEnabled
-        {
-            get { return Setting.ScrollLockStrategy.Value == ScrollLockStrategy.Explicit; }
-        }
-
         public bool IsScrollLockEnabled
         {
             get

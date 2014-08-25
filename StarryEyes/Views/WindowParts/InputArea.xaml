@@ -14,7 +14,7 @@
              xmlns:triggers="clr-namespace:StarryEyes.Views.Triggers"
              xmlns:utils="clr-namespace:StarryEyes.Views.Utils"
              xmlns:windowParts="clr-namespace:StarryEyes.Globalization.WindowParts"
-             x:Name="UserControl"
+             x:Name="InputAreaRoot"
              MaxHeight="200"
              d:DataContext="{d:DesignInstance Type={x:Type inputting:InputViewModel}}"
              d:DesignHeight="150"
@@ -50,12 +50,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
     <i:Interaction.Triggers>
-        <ei:DataTrigger Binding="{Binding IsOpening}" Value="True">
-            <ei:GoToStateAction StateName="OpenState" TargetObject="{Binding ElementName=UserControl}" />
-        </ei:DataTrigger>
-        <ei:DataTrigger Binding="{Binding IsOpening}" Value="False">
-            <ei:GoToStateAction StateName="CloseState" TargetObject="{Binding ElementName=UserControl}" />
-        </ei:DataTrigger>
+
         <l:InteractionMessageTrigger Messenger="{Binding Messenger}">
             <l:OpenFileDialogInteractionMessageAction />
         </l:InteractionMessageTrigger>
@@ -67,28 +62,14 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="183*" />
-            <ColumnDefinition Width="253*" />
+            <ColumnDefinition />
         </Grid.ColumnDefinitions>
         <VisualStateManager.VisualStateGroups>
-            <VisualStateGroup x:Name="ButtonSizeControl">
-                <VisualState x:Name="OpenState">
-                    <Storyboard>
-                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="ItemsControl" Storyboard.TargetProperty="(FrameworkElement.Width)">
-                            <EasingDoubleKeyFrame KeyTime="0" Value="48" />
-                        </DoubleAnimationUsingKeyFrames>
-                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="ItemsControl" Storyboard.TargetProperty="(FrameworkElement.Height)">
-                            <EasingDoubleKeyFrame KeyTime="0" Value="48" />
-                        </DoubleAnimationUsingKeyFrames>
-                    </Storyboard>
-                </VisualState>
-                <VisualState x:Name="CloseState" />
-            </VisualStateGroup>
             <VisualStateGroup x:Name="ImageAttachControl">
                 <VisualState x:Name="MouseOverState">
                     <Storyboard>
                         <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Border" Storyboard.TargetProperty="(UIElement.Opacity)">
-                            <EasingDoubleKeyFrame KeyTime="0" Value="0.4" />
+                            <DiscreteDoubleKeyFrame KeyTime="0" Value="0.4" />
                         </DoubleAnimationUsingKeyFrames>
                     </Storyboard>
                 </VisualState>
@@ -97,11 +78,23 @@
         </VisualStateManager.VisualStateGroups>
         <Grid Margin="4,0,0,0"
               HorizontalAlignment="Left"
-              VerticalAlignment="Top"
-              DataContext="{Binding AccountSelectorViewModel}">
+              VerticalAlignment="Top">
+            <Grid.Style>
+                <Style TargetType="{x:Type Grid}">
+                    <Setter Property="Width" Value="24" />
+                    <Setter Property="Height" Value="24" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsOpening}" Value="True">
+                            <Setter Property="Width" Value="48" />
+                            <Setter Property="Height" Value="48" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
             <Button HorizontalAlignment="Left"
                     VerticalAlignment="Top"
                     BorderThickness="0"
+                    DataContext="{Binding AccountSelectorViewModel}"
                     Focusable="False"
                     Padding="0"
                     Style="{DynamicResource MetroSquareUnfocusableFlatButton}">
@@ -117,10 +110,7 @@
                         <Run Text="{x:Static windowParts:InputAreaResources.ClickToSelectAccount}" />
                     </TextBlock>
                 </Button.ToolTip>
-                <ItemsControl x:Name="ItemsControl"
-                              Width="24"
-                              Height="24"
-                              FocusVisualStyle="{x:Null}"
+                <ItemsControl FocusVisualStyle="{x:Null}"
                               ItemsSource="{Binding Accounts}"
                               d:IsHidden="True">
                     <ItemsControl.ItemsPanel>
@@ -141,7 +131,7 @@
                     Background="#00000000"
                     BorderBrush="#A0E51400"
                     BorderThickness="4"
-                    Visibility="{Binding IsSynchronizedWithTab,
+                    Visibility="{Binding AccountSelectorViewModel.IsSynchronizedWithTab,
                                          Converter={StaticResource BooleanToInvisibleConverter}}">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="MouseLeftButtonDown">
@@ -155,7 +145,6 @@
         </Grid>
         <Grid x:Name="Default"
               Grid.Column="1"
-              Grid.ColumnSpan="2"
               Margin="4,0"
               Visibility="{Binding IsOpening,
                                    Converter={StaticResource BooleanToInvisibleConverter}}">
@@ -220,9 +209,7 @@
                 </Grid>
             </Border>
         </Grid>
-        <Grid x:Name="Opening"
-              Grid.Column="1"
-              Grid.ColumnSpan="2"
+        <Grid Grid.Column="1"
               Margin="4,0"
               Visibility="{Binding IsOpening,
                                    Converter={StaticResource BooleanToVisibleConverter}}">
