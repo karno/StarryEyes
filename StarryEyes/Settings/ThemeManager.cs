@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using JetBrains.Annotations;
-using StarryEyes.Albireo;
 using StarryEyes.Albireo.Helpers;
 using StarryEyes.Globalization.Models;
 using StarryEyes.Models;
@@ -93,6 +92,9 @@ namespace StarryEyes.Settings
         public static void ReloadCandidates()
         {
             var path = ThemeProfileDirectoryPath;
+
+            // clean-up previous
+            ThemeProfiles.Clear();
 
             // load all assigns.
             foreach (var file in Directory.EnumerateFiles(path, "*.xml"))

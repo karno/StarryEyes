@@ -753,6 +753,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         public void RefreshThemeCandidates()
         {
             _themeCandidateFiles.Clear();
+            ThemeManager.ReloadCandidates();
             ThemeManager.Themes.ForEach(f => _themeCandidateFiles.Add(f));
             this.RaisePropertyChanged(() => this.ThemeFileIndex);
             CurrentThemeChanged();
