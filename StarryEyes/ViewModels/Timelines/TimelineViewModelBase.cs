@@ -230,7 +230,11 @@ namespace StarryEyes.ViewModels.Timelines
                     })));
             this.CompositeDisposable.Add(
                 Setting.ScrollLockStrategy.ListenValueChanged(
-                    v => RaisePropertyChanged(() => this.IsScrollLockEnabled)));
+                    v =>
+                    {
+                        RaisePropertyChanged(() => this.IsScrollLockEnabled);
+                        RaisePropertyChanged(() => this.IsScrollLockOnlyScrolled);
+                    }));
             this.CompositeDisposable.Add(
                 Setting.IsAnimateScrollToNewTweet.ListenValueChanged(
                     v => RaisePropertyChanged(() => IsAnimationEnabled)));

@@ -7,7 +7,6 @@ using System.Reactive.Linq;
 using System.Threading;
 using System.Windows;
 using System.Xaml;
-using StarryEyes.Albireo;
 using StarryEyes.Albireo.Helpers;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Filters;
@@ -767,5 +766,4 @@ namespace StarryEyes.Settings
         FollowingsOnly,
     }
 
-    
 }
