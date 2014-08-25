@@ -177,72 +177,25 @@
                     </Setter.Value>
                 </Setter>
             </Style>
-            <Style x:Key="MetroCustomColorFlatButton" TargetType="{x:Type Button}">
+            <Style x:Key="MetroSimpleFlatButton" TargetType="{x:Type Button}">
                 <Setter Property="MinHeight" Value="25" />
-                <Setter Property="FontWeight" Value="Bold" />
                 <Setter Property="FontSize" Value="10" />
-                <Setter Property="Background" Value="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(starryEyes:CustomColorButtonHelper.DefaultBrush)}" />
+                <Setter Property="Background" Value="Transparent" />
                 <Setter Property="BorderBrush" Value="Transparent" />
-                <Setter Property="Padding" Value="5,6" />
-                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="Padding" Value="4" />
+                <Setter Property="BorderThickness" Value="0" />
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type Button}">
-                            <Grid>
-                                <VisualStateManager.VisualStateGroups>
-                                    <VisualStateGroup x:Name="CommonStates">
-                                        <VisualState x:Name="Normal" />
-                                        <VisualState x:Name="MouseOver">
-                                            <Storyboard>
-                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="MouseOverBorder" Storyboard.TargetProperty="(UIElement.Opacity)">
-                                                    <EasingDoubleKeyFrame KeyTime="0" Value="1" />
-                                                </DoubleAnimationUsingKeyFrames>
-                                            </Storyboard>
-                                        </VisualState>
-                                        <VisualState x:Name="Pressed">
-                                            <Storyboard>
-                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="PressedBorder" Storyboard.TargetProperty="(UIElement.Opacity)">
-                                                    <EasingDoubleKeyFrame KeyTime="0" Value="1" />
-                                                </DoubleAnimationUsingKeyFrames>
-                                            </Storyboard>
-                                        </VisualState>
-                                        <VisualState x:Name="Disabled">
-                                            <Storyboard>
-                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="DisabledVisualElement" Storyboard.TargetProperty="Opacity">
-                                                    <SplineDoubleKeyFrame KeyTime="0" Value="0.7" />
-                                                </DoubleAnimationUsingKeyFrames>
-                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="contentPresenter" Storyboard.TargetProperty="(UIElement.Opacity)">
-                                                    <EasingDoubleKeyFrame KeyTime="0" Value="0.3" />
-                                                </DoubleAnimationUsingKeyFrames>
-                                            </Storyboard>
-                                        </VisualState>
-                                    </VisualStateGroup>
-                                    <VisualStateGroup x:Name="FocusStates">
-                                        <VisualState x:Name="Focused" />
-                                        <VisualState x:Name="Unfocused" />
-                                    </VisualStateGroup>
-                                    <VisualStateGroup x:Name="ValidationStates" />
-                                </VisualStateManager.VisualStateGroups>
-                                <Border x:Name="Background" CornerRadius="0" />
-                                <Rectangle x:Name="DisabledVisualElement"
-                                           Fill="Black"
-                                           IsHitTestVisible="False"
-                                           Opacity="0" />
-                                <Border x:Name="MouseOverBorder"
-                                        Background="{Binding RelativeSource={RelativeSource TemplatedParent},
-                                                             Path=(starryEyes:CustomColorButtonHelper.HoverBrush)}"
-                                        Opacity="0" />
-                                <Border x:Name="PressedBorder"
-                                        Background="{Binding RelativeSource={RelativeSource TemplatedParent},
-                                                             Path=(starryEyes:CustomColorButtonHelper.PressedBrush)}"
-                                        Opacity="0" />
+                            <!--  create hittest  -->
+                            <Grid Background="#00000000">
+                                <Rectangle Fill="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Background}" />
                                 <ContentPresenter x:Name="contentPresenter"
                                                   Margin="{TemplateBinding Padding}"
                                                   HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                                   VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                                   Content="{TemplateBinding Content}"
-                                                  ContentTemplate="{TemplateBinding ContentTemplate}"
-                                                  RecognizesAccessKey="True" />
+                                                  ContentTemplate="{TemplateBinding ContentTemplate}" />
                             </Grid>
                         </ControlTemplate>
                     </Setter.Value>
