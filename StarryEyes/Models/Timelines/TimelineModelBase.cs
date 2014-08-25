@@ -184,8 +184,8 @@ namespace StarryEyes.Models.Timelines
                     this.IsLoading = true;
                 }
                 await this.Fetch(maxId, TimelineChunkCount)
-                          .Where(this.CheckAcceptStatus)
-                          .SelectMany(s => this.AddStatus(s, false).ToObservable())
+                          .Where(CheckAcceptStatus)
+                          .Select(s => AddStatus(s, false).ToObservable())
                           .LastOrDefaultAsync();
             }
             finally

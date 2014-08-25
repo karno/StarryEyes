@@ -268,12 +268,7 @@ namespace StarryEyes.ViewModels.Timelines
                 // disable auto trimming
                 this._model.IsAutoTrimEnabled = false;
             }
-            Task.Run(async () => await ReadMoreCore(id == long.MaxValue ? (long?)null : id));
-        }
-
-        protected virtual async Task ReadMoreCore(long? id)
-        {
-            await this._model.ReadMore(id);
+            Task.Run(() => _model.ReadMore(id == long.MaxValue ? (long?)null : id));
         }
 
         #region Selection Control
