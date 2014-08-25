@@ -809,10 +809,10 @@
                                         <ColumnDefinition />
                                     </Grid.ColumnDefinitions>
                                     <i:Interaction.Triggers>
-                                        <ei:DataTrigger Binding="{Binding Parent.IsSelectedStatusExisted, Mode=OneWay}" Value="True">
+                                        <ei:DataTrigger Binding="{Binding Parent.IsStatusSelected, Mode=OneWay}" Value="True">
                                             <ei:GoToStateAction StateName="Selected" />
                                         </ei:DataTrigger>
-                                        <ei:DataTrigger Binding="{Binding Parent.IsSelectedStatusExisted, Mode=OneWay}" Value="False">
+                                        <ei:DataTrigger Binding="{Binding Parent.IsStatusSelected, Mode=OneWay}" Value="False">
                                             <ei:GoToStateAction StateName="NotSelected" />
                                         </ei:DataTrigger>
                                     </i:Interaction.Triggers>
@@ -1906,10 +1906,10 @@
         </ResourceDictionary>
     </UserControl.Resources>
     <i:Interaction.Triggers>
-        <ei:DataTrigger Binding="{Binding IsSelectedStatusExisted}" Value="True">
+        <ei:DataTrigger Binding="{Binding IsStatusSelected}" Value="True">
             <ei:GoToStateAction StateName="Open" TargetObject="{Binding ElementName=TimelineRoot}" />
         </ei:DataTrigger>
-        <ei:DataTrigger Binding="{Binding IsSelectedStatusExisted}" Value="False">
+        <ei:DataTrigger Binding="{Binding IsStatusSelected}" Value="False">
             <ei:GoToStateAction StateName="Close" TargetObject="{Binding ElementName=TimelineRoot}" />
         </ei:DataTrigger>
     </i:Interaction.Triggers>

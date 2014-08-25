@@ -7,7 +7,6 @@ using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
 using Livet;
-using StarryEyes.Albireo;
 using StarryEyes.Albireo.Collections;
 using StarryEyes.Albireo.Helpers;
 using StarryEyes.Anomaly.TwitterApi.DataModels;

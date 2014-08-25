@@ -279,15 +279,14 @@ namespace StarryEyes.ViewModels.Timelines
 
         #region Selection Control
 
-        public bool IsSelectedStatusExisted
+        public bool IsStatusSelected
         {
             get { return this.Timeline.FirstOrDefault(_ => _.IsSelected) != null; }
         }
 
         public void OnSelectionUpdated()
         {
-            RaisePropertyChanged(() => IsSelectedStatusExisted);
-            // TODO: Impl
+            RaisePropertyChanged(() => this.IsStatusSelected);
         }
 
         private IEnumerable<StatusViewModel> SelectedStatuses
@@ -465,6 +464,10 @@ namespace StarryEyes.ViewModels.Timelines
                         case NotifyCollectionChangedAction.Remove:
                             var removal = this._timeline[e.OldStartingIndex];
                             this._timeline.RemoveAt(e.OldStartingIndex);
+                            if (removal.IsSelected)
+                            {
+                                OnSelectionUpdated();
+                            }
                             _disposeWorker.Queue(() => removal.Dispose());
                             break;
                         case NotifyCollectionChangedAction.Reset:
