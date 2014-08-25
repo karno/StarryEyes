@@ -24,7 +24,7 @@ namespace StarryEyes.Anomaly
                     GetInnerHandler(useGZip),
                     credential.OAuthConsumerKey, credential.OAuthConsumerSecret,
                     new AccessToken(credential.OAuthAccessToken, credential.OAuthAccessTokenSecret),
-                    optionalHeaders))
+                    optionalHeaders), true)
                 .SetUserAgent(ApiAccessProperties.UserAgent);
         }
 
@@ -39,7 +39,7 @@ namespace StarryEyes.Anomaly
                     GetInnerHandler(useGZip),
                     serviceProvider, realm, credential.OAuthConsumerKey, credential.OAuthConsumerSecret,
                     new AccessToken(credential.OAuthAccessToken, credential.OAuthAccessTokenSecret),
-                    optionalHeaders))
+                    optionalHeaders), true)
                     .SetUserAgent(ApiAccessProperties.UserAgent);
         }
 
