@@ -163,6 +163,7 @@ namespace StarryEyes.Views.Behaviors
 
         private void CommitSelect()
         {
+            if (_selectionStart == null) return;
             var point = this.AssociatedObject.GetPositionFromPoint(
                 Mouse.GetPosition(this.AssociatedObject), true);
             var highlight = new TextRange(_selectionStart, point);

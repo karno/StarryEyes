@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interactivity;
@@ -105,7 +106,11 @@ namespace StarryEyes.Views.Behaviors
                 {
                     this.BeforeDragDropCommand.Execute(null);
                 }
-                DragDrop.DoDragDrop(this.AssociatedObject, this.DragDropData, this.AllowedEffects);
+                try
+                {
+                    DragDrop.DoDragDrop(this.AssociatedObject, this.DragDropData, this.AllowedEffects);
+                }
+                catch (COMException) { } // avoid exception of "drag operation is already in progress"
                 if (this.AfterDragDropCommand != null)
                 {
                     this.AfterDragDropCommand.Execute(null);
