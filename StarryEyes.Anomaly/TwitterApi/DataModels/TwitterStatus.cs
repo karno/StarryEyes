@@ -292,7 +292,7 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
         /// <returns></returns>
         public override string ToString()
         {
-            return "@" + User.ScreenName + ": " + this.Text;
+            return "@" + User.ScreenName + ": " + this.GetEntityAidedText();
         }
 
         // override object.Equals
