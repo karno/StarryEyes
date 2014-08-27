@@ -131,8 +131,8 @@
                             <DataTemplate.Triggers>
                                 <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBoxItem}}}" Value="True">
                                     <Setter TargetName="Indicator" Property="Visibility" Value="Visible" />
-                                    <Setter TargetName="Indicator" Property="Fill" Value="#1BA1E2" />
-                                    <Setter TargetName="DisplayText" Property="Foreground" Value="#1BA1E2" />
+                                    <Setter TargetName="Indicator" Property="Fill" Value="{StaticResource MetroCyanBrush}" />
+                                    <Setter TargetName="DisplayText" Property="Foreground" Value="{StaticResource MetroCyanBrush}" />
                                     <Setter TargetName="DisplayText" Property="Margin" Value="6" />
                                 </DataTrigger>
                             </DataTemplate.Triggers>
@@ -207,7 +207,7 @@
                                                 <Button Grid.Column="2"
                                                         HorizontalAlignment="Right"
                                                         VerticalAlignment="Stretch"
-                                                        Background="#FFE51400"
+                                                        Background="{StaticResource MetroRedBrush}"
                                                         Content="{x:Static localize:SettingFlipResources.AccountDelete}"
                                                         Foreground="White"
                                                         Padding="8,0"
@@ -502,11 +502,11 @@
                                TextWrapping="Wrap">
                         <TextBlock.Style>
                             <Style TargetType="{x:Type TextBlock}">
-                                <Setter Property="Background" Value="#FF1BA1E2" />
+                                <Setter Property="Background" Value="{StaticResource MetroCyanBrush}" />
                                 <Setter Property="Text" Value="{x:Static localize:GeneralFlipResources.TabConfigQueryValid}" />
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding FoundError}" Value="True">
-                                        <Setter Property="Background" Value="#FFE51400" />
+                                        <Setter Property="Background" Value="{StaticResource MetroRedBrush}" />
                                         <Setter Property="Text" Value="{x:Static localize:GeneralFlipResources.TabConfigQueryContainsError}" />
                                     </DataTrigger>
                                 </Style.Triggers>

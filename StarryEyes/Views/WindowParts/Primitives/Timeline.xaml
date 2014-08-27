@@ -377,7 +377,7 @@
                           DataType="{x:Type statuses:StatusViewModel}"
                           Resources="{StaticResource StatusResource}">
                 <Grid x:Name="BaseGrid"
-                      Background="#00000000"
+                      Background="Transparent"
                       ContextMenu="{StaticResource StatusContextMenu}"
                       primitives:TimelineSwapResourcesBehavior.ResourceSet="Default">
                     <Border x:Name="SingleLineBorder"
@@ -431,7 +431,7 @@
                                     Width="8"
                                     HorizontalAlignment="Left"
                                     VerticalAlignment="Stretch"
-                                    Background="#00000000">
+                                    Background="Transparent">
                                 <i:Interaction.Triggers>
                                     <i:EventTrigger EventName="MouseLeftButtonDown">
                                         <ei:CallMethodAction MethodName="ToggleSelect" TargetObject="{Binding Mode=OneTime}" />
@@ -786,11 +786,11 @@
                         </VisualStateManager.VisualStateGroups>
                         <Border x:Name="BackHighlightBorder"
                                 Margin="0"
-                                Background="#00000000"
+                                Background="Transparent"
                                 Padding="0">
                             <Border x:Name="OverrideBorder"
                                     Margin="0"
-                                    Background="#00000000"
+                                    Background="Transparent"
                                     Padding="0">
                                 <i:Interaction.Triggers>
                                     <i:EventTrigger EventName="MouseLeftButtonUp">
@@ -825,7 +825,7 @@
                                             Margin="-8,-10,0,10"
                                             HorizontalAlignment="Stretch"
                                             VerticalAlignment="Top"
-                                            Background="#00000000"
+                                            Background="Transparent"
                                             Cursor="Hand"
                                             Visibility="Collapsed">
                                         <Border.LayoutTransform>
@@ -1024,7 +1024,7 @@
                                                 Margin="-8,-10,0,-10"
                                                 HorizontalAlignment="Stretch"
                                                 VerticalAlignment="Stretch"
-                                                Background="#00000000">
+                                                Background="Transparent">
                                             <i:Interaction.Triggers>
                                                 <i:EventTrigger EventName="MouseLeftButtonDown">
                                                     <ei:CallMethodAction MethodName="ToggleSelect" TargetObject="{Binding Mode=OneTime}" />
@@ -1980,7 +1980,7 @@
         <Border x:Name="MultiOperationBlock"
                 Height="40"
                 VerticalAlignment="Top"
-                Background="#00FFFFFF"
+                Background="Transparent"
                 DockPanel.Dock="Bottom"
                 Visibility="Collapsed">
             <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">

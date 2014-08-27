@@ -161,11 +161,11 @@
                            TextWrapping="Wrap">
                     <TextBlock.Style>
                         <Style TargetType="{x:Type TextBlock}">
-                            <Setter Property="Background" Value="#FF1BA1E2" />
+                            <Setter Property="Background" Value="{StaticResource MetroCyanBrush}" />
                             <Setter Property="Text" Value="{x:Static localize:GeneralFlipResources.TabConfigQueryValid}" />
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding FoundError}" Value="True">
-                                    <Setter Property="Background" Value="#FFE51400" />
+                                    <Setter Property="Background" Value="{StaticResource MetroCrimsonBrush}" />
                                     <Setter Property="Text" Value="{x:Static localize:GeneralFlipResources.TabConfigQueryContainsError}" />
                                 </DataTrigger>
                             </Style.Triggers>

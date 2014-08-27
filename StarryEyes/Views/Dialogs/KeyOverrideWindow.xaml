@@ -14,7 +14,7 @@
                       Title="Twitter API Key Registration"
                       Width="460"
                       Height="240"
-                      GlowBrush="#1BA1E2"
+                      GlowBrush="{StaticResource MetroCyanBrush}"
                       ResizeMode="NoResize"
                       ShowInTaskbar="False"
                       WindowStartupLocation="CenterOwner"

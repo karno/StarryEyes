@@ -316,7 +316,7 @@
         </Grid>
         <Grid Name="StatusGrid"
               Grid.Row="1"
-              Background="#00FFFFFF">
+              Background="Transparent">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="MouseLeftButtonDown">
                     <ei:CallMethodAction MethodName="ToggleShowBackstage" TargetObject="{Binding}" />

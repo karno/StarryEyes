@@ -14,7 +14,7 @@
                       Title="Add your account"
                       Width="340"
                       Height="140"
-                      GlowBrush="#1BA1E2"
+                      GlowBrush="{StaticResource MetroCyanBrush}"
                       ResizeMode="NoResize"
                       ShowIconOnTitleBar="False"
                       ShowInTaskbar="False"

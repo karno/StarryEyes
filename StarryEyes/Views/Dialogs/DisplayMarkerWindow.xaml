@@ -37,7 +37,7 @@
             <ei:CallMethodAction MethodName="Shown" TargetObject="{Binding}" />
         </i:EventTrigger>
     </i:Interaction.Triggers>
-    <Border Background="#FF111111"
+    <Border Background="#FF222222"
             BorderBrush="White"
             BorderThickness="1"
             CornerRadius="10">
@@ -45,6 +45,6 @@
                    VerticalAlignment="Center"
                    FontSize="16"
                    Foreground="White"
-                   Text="notifications are displayed into this display." />
+                   Text="notifications are displayed into this screen." />
     </Border>
 </Window>

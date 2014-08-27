@@ -91,8 +91,10 @@
                     </Style.Triggers>
                 </Style>
             </Grid.Style>
-            <Button HorizontalAlignment="Left"
-                    VerticalAlignment="Top"
+            <Button HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    HorizontalContentAlignment="Stretch"
+                    VerticalContentAlignment="Stretch"
                     BorderThickness="0"
                     DataContext="{Binding AccountSelectorViewModel}"
                     Focusable="False"
@@ -110,26 +112,41 @@
                         <Run Text="{x:Static windowParts:InputAreaResources.ClickToSelectAccount}" />
                     </TextBlock>
                 </Button.ToolTip>
-                <ItemsControl FocusVisualStyle="{x:Null}"
-                              ItemsSource="{Binding Accounts}"
-                              d:IsHidden="True">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <UniformGrid Columns="{Binding AuthInfoGridRowColumn}" Rows="{Binding AuthInfoGridRowColumn}" />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <controls:LazyImage RenderOptions.BitmapScalingMode="Fant" UriSource="{Binding ProfileImageUri}" />
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                <!--  Clickable border  -->
+                <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <Border.Style>
+                        <Style TargetType="{x:Type Border}">
+                            <Setter Property="Background" Value="Transparent" />
+                            <Setter Property="Opacity" Value="1.0" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsBoundAccountExists}" Value="False">
+                                    <Setter Property="Background" Value="{StaticResource MetroCyanBrush}" />
+                                    <Setter Property="Opacity" Value="0.4" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                    <ItemsControl FocusVisualStyle="{x:Null}"
+                                  ItemsSource="{Binding Accounts}"
+                                  d:IsHidden="True">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Columns="{Binding AuthInfoGridRowColumn}" Rows="{Binding AuthInfoGridRowColumn}" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <controls:LazyImage RenderOptions.BitmapScalingMode="Fant" UriSource="{Binding ProfileImageUri}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Border>
             </Button>
             <Border Grid.Column="0"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Stretch"
-                    Background="#00000000"
-                    BorderBrush="#A0E51400"
+                    Background="Transparent"
+                    BorderBrush="{StaticResource MetroCrimsonBrush}"
                     BorderThickness="4"
                     DataContext="{Binding AccountSelectorViewModel}"
                     Visibility="{Binding IsSynchronizedWithTab,
@@ -199,7 +216,7 @@
                                     <Setter Property="Background" Value="{DynamicResource GlobalKeyBrush}" />
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding IsWarningPostLimit}" Value="True">
-                                            <Setter Property="Background" Value="#FFE51400" />
+                                            <Setter Property="Background" Value="{StaticResource MetroRedBrush}" />
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
@@ -230,7 +247,7 @@
                     </Grid.RowDefinitions>
                     <DockPanel Grid.ColumnSpan="3"
                                Height="26"
-                               Background="#FFF09609"
+                               Background="{StaticResource MetroAmberBrush}"
                                DataContext="{Binding InputCoreViewModel}"
                                LastChildFill="True"
                                Visibility="{Binding IsInReplyToEnabled,
@@ -240,7 +257,7 @@
                               Margin="6"
                               VerticalAlignment="Center"
                               Data="F1 M 26.0556,21.9444L 22.0556,21.9444L 24.2778,24.1667L 21.6759,24.1667L 18.5,21.1018L 21.6759,17.9444L 24.2778,17.9444L 22.0556,20.1667L 26.0556,20.1667C 28.5101,20.1667 30.5,22.1565 30.5,24.6111C 30.5,27.0657 28.5101,29.0556 26.0555,29.0556L 24.7222,29.0556L 24.7222,27.2778L 26.0556,27.2778C 27.5283,27.2778 28.7222,26.0839 28.7222,24.6111C 28.7222,23.1384 27.5283,21.9444 26.0556,21.9444 Z "
-                              Fill="#FFFFFFFF"
+                              Fill="White"
                               Stretch="Fill" />
                         <Button Width="32"
                                 DockPanel.Dock="Right"
@@ -254,7 +271,7 @@
                             <Path Width="8"
                                   Height="8"
                                   Data="F1 M 21.2,20L 24,22.8L 26.7999,20.0001L 27.9999,21.2001L 25.2,24L 28,26.8L 26.8,28L 24,25.2L 21.2,28L 20,26.8L 22.8,24L 20,21.2L 21.2,20 Z "
-                                  Fill="#FFFFFFFF"
+                                  Fill="White"
                                   Stretch="Fill" />
                         </Button>
                         <TextBlock VerticalAlignment="Center" Foreground="White">
@@ -270,7 +287,7 @@
                                Grid.Column="0"
                                Grid.ColumnSpan="3"
                                Height="26"
-                               Background="#FFA05000"
+                               Background="{StaticResource MetroSiennaBrush}"
                                DataContext="{Binding InputCoreViewModel}"
                                LastChildFill="True"
                                Visibility="{Binding IsDirectMessageEnabled,
@@ -281,7 +298,7 @@
                               HorizontalAlignment="Center"
                               VerticalAlignment="Center"
                               Data="F1 M 22.32,29.58L 23.44,33.5L 18.96,29.58L 17.28,29.58L 17.28,19.5L 30.72,19.5L 30.72,29.58L 22.32,29.58 Z "
-                              Fill="#FFFFFFFF"
+                              Fill="White"
                               Stretch="Fill" />
                         <Button Width="32"
                                 DockPanel.Dock="Right"
@@ -295,7 +312,7 @@
                             <Path Width="8"
                                   Height="8"
                                   Data="F1 M 21.2,20L 24,22.8L 26.7999,20.0001L 27.9999,21.2001L 25.2,24L 28,26.8L 26.8,28L 24,25.2L 21.2,28L 20,26.8L 22.8,24L 20,21.2L 21.2,20 Z "
-                                  Fill="#FFFFFFFF"
+                                  Fill="White"
                                   Stretch="Fill" />
                         </Button>
                         <TextBlock VerticalAlignment="Center"
@@ -307,10 +324,10 @@
                                Grid.Column="0"
                                Grid.ColumnSpan="3"
                                Height="26"
-                               Background="#FFD80073"
+                               Background="{StaticResource MetroMagentaBrush}"
                                DataContext="{Binding AccountSelectorViewModel}"
                                LastChildFill="True"
-                               Visibility="{Binding IsBindingAuthInfoExisted,
+                               Visibility="{Binding IsBoundAccountExists,
                                                     Converter={StaticResource BooleanToInvisibleConverter}}">
                         <Path Width="14"
                               Height="13.2"
@@ -318,7 +335,7 @@
                               HorizontalAlignment="Center"
                               VerticalAlignment="Center"
                               Data="F1 M 24,17.7727C 25.2727,17.7727 31.6364,29.8636 31,30.5C 30.3636,31.1364 17.6364,31.1364 17,30.5C 16.3636,29.8636 22.7273,17.7727 24,17.7727 Z M 24,27.3182C 23.4728,27.3182 23.0454,27.7456 23.0454,28.2727C 23.0454,28.7999 23.4728,29.2273 24,29.2273C 24.5272,29.2273 24.9545,28.7999 24.9545,28.2727C 24.9545,27.7456 24.5272,27.3182 24,27.3182 Z M 23.0454,21.5909L 23.3636,26.6818L 24.6364,26.6818L 24.9545,21.5909L 23.0454,21.5909 Z "
-                              Fill="#FFFFFFFF"
+                              Fill="White"
                               Stretch="Fill" />
                         <TextBlock VerticalAlignment="Center"
                                    Foreground="White"
@@ -388,7 +405,7 @@
                             <Path Width="14.766"
                                   Height="12"
                                   Data="F1 M 871.18,611.587C 870.636,611.828 870.053,611.991 869.44,612.064C 870.065,611.689 870.546,611.095 870.772,610.388C 870.186,610.735 869.538,610.987 868.848,611.123C 868.295,610.534 867.508,610.166 866.637,610.166C 864.964,610.166 863.607,611.523 863.607,613.196C 863.607,613.433 863.634,613.664 863.686,613.886C 861.168,613.76 858.936,612.554 857.442,610.721C 857.181,611.168 857.032,611.689 857.032,612.244C 857.032,613.295 857.566,614.222 858.379,614.765C 857.883,614.75 857.416,614.613 857.007,614.386C 857.007,614.399 857.007,614.412 857.007,614.425C 857.007,615.892 858.051,617.117 859.437,617.395C 859.183,617.464 858.915,617.501 858.639,617.501C 858.444,617.501 858.254,617.482 858.069,617.447C 858.454,618.65 859.573,619.526 860.899,619.551C 859.862,620.363 858.556,620.848 857.136,620.848C 856.892,620.848 856.651,620.833 856.414,620.805C 857.754,621.665 859.347,622.166 861.058,622.166C 866.63,622.166 869.677,617.55 869.677,613.547C 869.677,613.416 869.674,613.285 869.668,613.155C 870.26,612.728 870.774,612.194 871.18,611.587 Z "
-                                  Fill="#FFCCCCCC"
+                                  Fill="White"
                                   Stretch="Fill" />
                         </Button>
                         <Button DockPanel.Dock="Right"
@@ -417,7 +434,7 @@
                                   Height="12"
                                   Margin="7,0"
                                   Data="F1 M 24,12C 26,12 33,26 32.8642,32L 35.7499,32.8568L 35.9999,36L 33,36L 15,36L 12,36L 12.25,32.8568L 15.1358,32C 15,26 22,12 24,12 Z M 24,14.75C 23.2062,14.75 21.4177,17.682 19.8448,21.2363L 26.0327,17.0625C 25.1868,15.6523 24.4403,14.75 24,14.75 Z M 29.1123,23.5517L 27.8822,20.6303L 17.5638,27.5902C 17.2319,28.8571 17.0201,30.0302 16.9858,31L 18.0698,31L 29.1123,23.5517 Z M 31.0141,31C 30.9789,30.0051 30.757,28.7962 30.4102,27.4916L 25.2087,31L 31.0141,31 Z "
-                                  Fill="#FFFA6800"
+                                  Fill="{StaticResource MetroOrangeBrush}"
                                   Stretch="Fill" />
                         </Grid>
                         <StackPanel Height="26"
@@ -703,7 +720,7 @@
                         <Grid>
                             <Image Source="{Binding Path=AttachedImage.Image}" Stretch="Uniform" />
                             <Border x:Name="Border"
-                                    Background="#FFE51400"
+                                    Background="{StaticResource MetroRedBrush}"
                                     Opacity="0">
                                 <Path Width="10"
                                       Height="10"
@@ -711,7 +728,7 @@
                                       HorizontalAlignment="Right"
                                       VerticalAlignment="Top"
                                       Data="F1 M 20.5,19L 24,22.5L 27.4999,19.0001L 28.9999,20.5001L 25.5,24L 29,27.5L 27.5,29L 24,25.5L 20.5,29L 19,27.5L 22.5,24L 19,20.5L 20.5,19 Z "
-                                      Fill="#FFFFFFFF"
+                                      Fill="White"
                                       Stretch="Fill" />
                             </Border>
                         </Grid>

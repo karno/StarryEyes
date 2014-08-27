@@ -81,7 +81,7 @@
                    VerticalAlignment="Top"
                    FontFamily="Segoe UI Semilight"
                    FontSize="64"
-                   Foreground="#FF1BA1E2"
+                   Foreground="{StaticResource MetroCyanBrush}"
                    Text="Krile STARRYEYES"
                    TextWrapping="Wrap" />
         <StackPanel Grid.Row="2"
@@ -105,19 +105,19 @@
                     <Path Width="10"
                           Height="12"
                           Data="F1 M 24,18.9231C 25.4548,18.9231 26.7667,19.535 27.6923,20.5154L 27.6923,18L 29.0769,19.3846L 29.0769,23.0769L 25.3846,23.0769L 24,21.6923L 26.5801,21.6923C 25.9463,20.9841 25.0252,20.5385 24,20.5385C 22.2447,20.5385 20.7946,21.8449 20.569,23.5385L 18.9438,23.5385C 19.177,20.9508 21.3517,18.9231 24,18.9231 Z M 24,27.4615C 25.7553,27.4615 27.2054,26.1551 27.431,24.4615L 29.0562,24.4615C 28.823,27.0492 26.6483,29.0769 24,29.0769C 22.5452,29.0769 21.2333,28.465 20.3077,27.4846L 20.3077,30L 18.9231,28.6154L 18.9231,24.9231L 22.6154,24.9231L 24,26.3077L 21.4199,26.3077C 22.0537,27.0159 22.9748,27.4615 24,27.4615 Z "
-                          Fill="#FF008A00"
+                          Fill="{StaticResource MetroEmeraldBrush}"
                           Stretch="Fill" />
                     <TextBlock Margin="4,0"
                                VerticalAlignment="Center"
                                FontSize="11"
-                               Foreground="#FF008A00"
+                               Foreground="{StaticResource MetroEmeraldBrush}"
                                Text="{x:Static windowParts:VersionInfoResources.UpdateRefreshingLabel}"
                                TextWrapping="Wrap" />
                 </StackPanel>
             </Border>
             <Border Margin="4,0"
                     VerticalAlignment="Center"
-                    Background="#FF1BA1E2"
+                    Background="{StaticResource MetroCyanBrush}"
                     Padding="4,2"
                     ToolTip="{x:Static windowParts:VersionInfoResources.UpdateLatestDescription}"
                     Visibility="{Binding IsUpdateIsNotExisted,
@@ -143,7 +143,7 @@
             </Border>
             <Border Margin="4,0"
                     VerticalAlignment="Center"
-                    Background="#FFFA6800"
+                    Background="{StaticResource MetroOrangeBrush}"
                     Padding="4,2"
                     ToolTip="{x:Static windowParts:VersionInfoResources.UpdateAvailableDescription}"
                     Visibility="{Binding IsUpdateExisted,

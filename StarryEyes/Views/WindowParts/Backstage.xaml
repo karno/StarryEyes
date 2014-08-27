@@ -58,7 +58,7 @@
                                                 Orientation="Vertical">
                                         <TextBlock Cursor="Hand"
                                                    FontSize="12"
-                                                   Foreground="#FF1BA1E2"
+                                                   Foreground="{StaticResource MetroCyanBrush}"
                                                    Text="{Binding User.ScreenName}">
                                             <i:Interaction.Triggers>
                                                 <i:EventTrigger EventName="MouseLeftButtonDown">
@@ -81,7 +81,7 @@
                                                         <Setter Property="Foreground" Value="{DynamicResource BaseColorForegroundBrush}" />
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding IsWarningPostLimit}" Value="True">
-                                                                <Setter Property="Foreground" Value="#FFE51400" />
+                                                                <Setter Property="Foreground" Value="{StaticResource MetroRedBrush}" />
                                                             </DataTrigger>
                                                         </Style.Triggers>
                                                     </Style>
@@ -91,7 +91,7 @@
                                             <TextBlock Text="{Binding MaxUpdate}" />
                                         </StackPanel>
                                         <StackPanel Orientation="Horizontal" Visibility="{Binding IsFallbacked, Converter={StaticResource BooleanToVisibleConverter}}">
-                                            <TextBlock Foreground="#FFE51400" Text="POST LIMITED" />
+                                            <TextBlock Foreground="{StaticResource MetroRedBrush}" Text="POST LIMITED" />
                                             <TextBlock Text=" UNTIL: " />
                                             <TextBlock Text="{Binding FallbackReleaseTime, StringFormat=HH:mm:ss}" />
                                         </StackPanel>
@@ -109,7 +109,7 @@
                                                         <Style.Triggers>
                                                             <Trigger Property="IsMouseOver" Value="True">
                                                                 <Setter Property="Text" Value="Reconnect" />
-                                                                <Setter Property="Foreground" Value="#FF1BA1E2" />
+                                                                <Setter Property="Foreground" Value="{StaticResource MetroCyanBrush}" />
                                                                 <Setter Property="TextDecorations" Value="Underline" />
                                                             </Trigger>
                                                         </Style.Triggers>

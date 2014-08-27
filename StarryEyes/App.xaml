@@ -11,6 +11,7 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Themes\MetroColors.xaml" />
                 <ResourceDictionary Source="Simple Styles.xaml" />
                 <ResourceDictionary Source="Themes\DesignTimeDefault.xaml" />
             </ResourceDictionary.MergedDictionaries>

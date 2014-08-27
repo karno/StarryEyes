@@ -5,7 +5,7 @@
         Title="Krile StarryEyes - Database Optimizer"
         Width="300"
         Height="100"
-        Background="#222222"
+        Background="#FF222222"
         IsEnabled="False"
         ResizeMode="NoResize"
         ShowInTaskbar="False"

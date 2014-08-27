@@ -40,27 +40,17 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                        .ForEach(InputModel.AccountSelector.Accounts.Add);
             };
             CompositeDisposable.Add(this.AccountSelectionFlip);
-            CompositeDisposable.Add(
+            CompositeDisposable.Add(_accounts =
                 ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
                     InputModel.AccountSelector.Accounts,
                     a => new TwitterAccountViewModel(a),
                     DispatcherHelper.UIDispatcher));
-            CompositeDisposable.Add(
-                InputModel.AccountSelector.Accounts.ListenCollectionChanged(_ =>
+            CompositeDisposable.Add(_accounts.ListenCollectionChanged(_ =>
                 {
                     RaisePropertyChanged(() => AuthInfoGridRowColumn);
-                    this.RaisePropertyChanged(() => AuthInfoScreenNames);
+                    RaisePropertyChanged(() => AuthInfoScreenNames);
+                    RaisePropertyChanged(() => IsBoundAccountExists);
                 }));
-            CompositeDisposable.Add(this._accounts =
-                ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
-                    InputModel.AccountSelector.Accounts,
-                    account => new TwitterAccountViewModel(account),
-                    DispatcherHelper.UIDispatcher));
-            CompositeDisposable.Add(this._accounts.ListenCollectionChanged(_ =>
-            {
-                this.RaisePropertyChanged(() => AuthInfoGridRowColumn);
-                RaisePropertyChanged(() => IsBindingAuthInfoExisted);
-            }));
             CompositeDisposable.Add(
                 InputModel.AccountSelector.ListenPropertyChanged(
                     () => InputModel.AccountSelector.IsSynchronizedWithTab,
@@ -77,7 +67,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             get { return this._accounts; }
         }
 
-        public bool IsBindingAuthInfoExisted
+        public bool IsBoundAccountExists
         {
             get { return this._accounts != null && this._accounts.Count > 0; }
         }

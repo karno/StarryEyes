@@ -1,0 +1,24 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:v="clr-namespace:StarryEyes.Views">
+    <SolidColorBrush x:Key="MetroLimeBrush" Color="{x:Static v:MetroColors.Lime}" />
+    <SolidColorBrush x:Key="MetroGreenBrush" Color="{x:Static v:MetroColors.Green}" />
+    <SolidColorBrush x:Key="MetroEmeraldBrush" Color="{x:Static v:MetroColors.Emerald}" />
+    <SolidColorBrush x:Key="MetroTealBrush" Color="{x:Static v:MetroColors.Teal}" />
+    <SolidColorBrush x:Key="MetroCyanBrush" Color="{x:Static v:MetroColors.Cyan}" />
+    <SolidColorBrush x:Key="MetroCobaltBrush" Color="{x:Static v:MetroColors.Cobalt}" />
+    <SolidColorBrush x:Key="MetroIndigoBrush" Color="{x:Static v:MetroColors.Indigo}" />
+    <SolidColorBrush x:Key="MetroVioletBrush" Color="{x:Static v:MetroColors.Violet}" />
+    <SolidColorBrush x:Key="MetroPinkBrush" Color="{x:Static v:MetroColors.Pink}" />
+    <SolidColorBrush x:Key="MetroMagentaBrush" Color="{x:Static v:MetroColors.Magenta}" />
+    <SolidColorBrush x:Key="MetroCrimsonBrush" Color="{x:Static v:MetroColors.Crimson}" />
+    <SolidColorBrush x:Key="MetroRedBrush" Color="{x:Static v:MetroColors.Red}" />
+    <SolidColorBrush x:Key="MetroOrangeBrush" Color="{x:Static v:MetroColors.Orange}" />
+    <SolidColorBrush x:Key="MetroAmberBrush" Color="{x:Static v:MetroColors.Amber}" />
+    <SolidColorBrush x:Key="MetroYellowBrush" Color="{x:Static v:MetroColors.Yellow}" />
+    <SolidColorBrush x:Key="MetroBrownBrush" Color="{x:Static v:MetroColors.Brown}" />
+    <SolidColorBrush x:Key="MetroOliveBrush" Color="{x:Static v:MetroColors.Olive}" />
+    <SolidColorBrush x:Key="MetroSteelBrush" Color="{x:Static v:MetroColors.Steel}" />
+    <SolidColorBrush x:Key="MetroMauveBrush" Color="{x:Static v:MetroColors.Mauve}" />
+    <SolidColorBrush x:Key="MetroSiennaBrush" Color="{x:Static v:MetroColors.Sienna}" />
+</ResourceDictionary>
