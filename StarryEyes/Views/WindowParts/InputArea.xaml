@@ -131,7 +131,8 @@
                     Background="#00000000"
                     BorderBrush="#A0E51400"
                     BorderThickness="4"
-                    Visibility="{Binding AccountSelectorViewModel.IsSynchronizedWithTab,
+                    DataContext="{Binding AccountSelectorViewModel}"
+                    Visibility="{Binding IsSynchronizedWithTab,
                                          Converter={StaticResource BooleanToInvisibleConverter}}">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="MouseLeftButtonDown">
@@ -143,8 +144,7 @@
                 </Border.ToolTip>
             </Border>
         </Grid>
-        <Grid x:Name="Default"
-              Grid.Column="1"
+        <Grid Grid.Column="1"
               Margin="4,0"
               Visibility="{Binding IsOpening,
                                    Converter={StaticResource BooleanToInvisibleConverter}}">
