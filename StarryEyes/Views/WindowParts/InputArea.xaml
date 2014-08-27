@@ -261,7 +261,7 @@
                             <TextBlock.Text>
                                 <MultiBinding StringFormat="@{0}: {1}">
                                     <Binding Path="InReplyTo.ScreenName" />
-                                    <Binding Converter="{StaticResource StringRemoveLineConverter}" Path="InReplyTo.Status.Text" />
+                                    <Binding Converter="{StaticResource StringRemoveLineConverter}" Path="InReplyTo.Text" />
                                 </MultiBinding>
                             </TextBlock.Text>
                         </TextBlock>

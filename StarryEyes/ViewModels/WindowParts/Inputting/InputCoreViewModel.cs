@@ -1000,7 +1000,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
 
         public string Text
         {
-            get { return this.Status.Text; }
+            get { return this.Status.GetEntityAidedText(); }
         }
 
         public TwitterStatus Status
