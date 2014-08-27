@@ -28,6 +28,9 @@
                 <ResourceDictionary Source="/Themes/FlipContent.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <utils:BooleanToVisibleConverter x:Key="BoolVisibleConverter" />
+            <Style TargetType="{x:Type xctk:IntegerUpDown}">
+                <Setter Property="Foreground" Value="{DynamicResource BaseColorForegroundBrush}" />
+            </Style>
         </ResourceDictionary>
     </UserControl.Resources>
     <flips:FlipContent IsOpen="{Binding IsConfigurationActive}"
@@ -94,7 +97,7 @@
                         </Style>
                     </ListBox.Resources>
                     <ListBox.ItemTemplate>
-                        <DataTemplate>
+                        <DataTemplate DataType="{x:Type TextBlock}">
                             <Grid Background="{DynamicResource BaseColorBackgroundBrush}">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />

@@ -40,6 +40,7 @@ using StarryEyes.ViewModels.Dialogs;
 using StarryEyes.ViewModels.WindowParts.Flips.SettingFlips;
 using StarryEyes.Views.Dialogs;
 using StarryEyes.Views.Messaging;
+using StarryEyes.Views.Utils;
 using StarryEyes.Views.WindowParts.Primitives;
 using Application = System.Windows.Application;
 
@@ -67,6 +68,15 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 {
                     Close();
                 }
+            }
+        }
+
+        // design-time support
+        public SettingFlipViewModel()
+        {
+            if (!DesignTimeUtil.IsInDesignMode)
+            {
+                throw new NotSupportedException("This method should be used in design time only.");
             }
         }
 
