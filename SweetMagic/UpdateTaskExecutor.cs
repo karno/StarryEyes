@@ -39,7 +39,7 @@ namespace SweetMagic
             }
         }
 
-        public async Task StartUpdate(CancellationToken ctoken)
+        public async Task<bool> StartUpdate()
         {
             this.NotifyProgress("Requesting update patch definition...");
             var dlstr = await this.DownloadString("http://krile.starwing.net/shared/update.xml", Encoding.UTF8);
@@ -90,9 +90,9 @@ namespace SweetMagic
                                         "Auto Update Error",
                                         MessageBoxButtons.OK,
                                         MessageBoxIcon.Error);
-                        this.NotifyProgress("restarting krile...");
+                        this.NotifyProgress("update failed.");
                         Thread.Sleep(100);
-                        return;
+                        return false;
                     }
                 }
             }
@@ -100,6 +100,7 @@ namespace SweetMagic
             this.NotifyProgress("update completed!");
             this.NotifyProgress("starting new binary, wait a moment...");
             Thread.Sleep(100);
+            return true;
         }
 
         public async Task<string> DownloadString(string url, Encoding encoding)

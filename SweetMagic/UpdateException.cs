@@ -4,16 +4,9 @@ namespace SweetMagic
 {
     public class UpdateException : Exception
     {
-        private readonly string _reason;
-
-        public UpdateException(string reason)
+        public UpdateException(string message)
+            : base(message)
         {
-            this._reason = reason;
-        }
-
-        public string Reason
-        {
-            get { return this._reason; }
         }
     }
 }

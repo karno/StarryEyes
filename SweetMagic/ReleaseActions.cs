@@ -131,7 +131,7 @@ namespace SweetMagic
                 if (resp == DialogResult.Cancel)
                 {
                     // cancelled.
-                    return;
+                    throw new UpdateException("Failed to apply patch.");
                 }
             }
             // failed, retrying...

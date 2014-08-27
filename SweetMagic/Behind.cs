@@ -8,7 +8,7 @@ namespace SweetMagic
 {
     public partial class Behind : Form
     {
-        private string _callbackPoint = null;
+        private string _callbackPoint;
 
         public Behind()
         {
@@ -41,9 +41,11 @@ namespace SweetMagic
             }
             try
             {
-                var process = new Process();
-                process.StartInfo = startInfo;
-                process.EnableRaisingEvents = true;
+                var process = new Process
+                {
+                    StartInfo = startInfo,
+                    EnableRaisingEvents = true
+                };
                 if (!process.Start())
                 {
                     throw new Exception("Startup faied");
@@ -91,14 +93,27 @@ namespace SweetMagic
             {
                 p.EnableRaisingEvents = true;
                 p.SynchronizingObject = this;
-                p.Exited += this.p_Exited;
+                p.Exited += (o, ev) => this.OnCompleteCoProcess(p);
             }
         }
 
-        void p_Exited(object sender, EventArgs e)
+        private void OnCompleteCoProcess(Process process)
         {
             try
             {
+                // check completed state
+                if (process.ExitCode != 0)
+                {
+                    // update failed
+                    try
+                    {
+                        // open official website
+                        Process.Start("http://krile.starwing.net/");
+                    }
+                    catch { }
+                    return;
+                }
+
                 // create "complete" file
                 File.Create(Path.Combine(Application.StartupPath, "kup.completed"));
                 var psi = new ProcessStartInfo(Path.Combine(this._callbackPoint, Program.CallbackFile))
@@ -111,6 +126,7 @@ namespace SweetMagic
             }
             finally
             {
+                process.Dispose();
                 Application.Exit();
             }
         }

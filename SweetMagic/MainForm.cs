@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -9,8 +8,6 @@ namespace SweetMagic
 {
     public partial class MainForm : Form
     {
-        readonly CancellationTokenSource _cancelSource = new CancellationTokenSource();
-
         public MainForm()
         {
             InitializeComponent();
@@ -36,7 +33,11 @@ namespace SweetMagic
             {
                 try
                 {
-                    await exec.StartUpdate(this._cancelSource.Token);
+                    if (!await exec.StartUpdate())
+                    {
+                        Application.Exit();
+                        Environment.Exit(-1);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -45,6 +46,7 @@ namespace SweetMagic
                     Environment.Exit(-1);
                 }
                 Application.Exit();
+                Environment.Exit(0);
             });
         }
     }
