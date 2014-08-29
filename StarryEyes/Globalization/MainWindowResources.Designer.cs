@@ -97,7 +97,7 @@ namespace StarryEyes.Globalization {
         }
         
         /// <summary>
-        ///   Uptime of Krile に類似しているローカライズされた文字列を検索します。
+        ///   Uptime of Krile (click to execute GC) に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string UpTime {
             get {

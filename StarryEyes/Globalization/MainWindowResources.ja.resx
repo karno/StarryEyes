@@ -130,6 +130,6 @@
     <value>1分間あたりのツイート受信数の目安です。</value>
   </data>
   <data name="UpTime" xml:space="preserve">
-    <value>Krileの起動時間です。</value>
+    <value>Krileの起動時間です。(クリックするとGCを実行します)</value>
   </data>
 </root>

@@ -453,6 +453,11 @@ namespace StarryEyes.ViewModels
             RaisePropertyChanged(() => StartupTime);
         }
 
+        public void ExecuteGC()
+        {
+            GC.Collect();
+        }
+
         #endregion
 
         #region Theme control

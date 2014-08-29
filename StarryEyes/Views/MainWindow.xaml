@@ -389,8 +389,14 @@
                 </StackPanel>
                 <StackPanel Grid.Column="4"
                             Margin="8"
+                            Background="Transparent"
                             Orientation="Horizontal"
                             ToolTip="{x:Static viewsResources:MainWindowResources.UpTime}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="MouseLeftButtonDown">
+                            <ei:CallMethodAction MethodName="ExecuteGC" TargetObject="{Binding}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
                     <Path Width="11"
                           Height="11"
                           Margin="0,2,4,0"

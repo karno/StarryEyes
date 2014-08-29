@@ -130,6 +130,6 @@
     <value>Estimated receiving tweets per seconds</value>
   </data>
   <data name="UpTime" xml:space="preserve">
-    <value>Uptime of Krile</value>
+    <value>Uptime of Krile (click to execute GC)</value>
   </data>
 </root>
