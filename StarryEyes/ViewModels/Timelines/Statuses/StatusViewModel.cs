@@ -44,6 +44,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         private readonly ReadOnlyDispatcherCollectionRx<UserViewModel> _favoritedUsers;
         private readonly TimelineViewModelBase _parent;
         private readonly ReadOnlyDispatcherCollectionRx<UserViewModel> _retweetedUsers;
+        private readonly ReadOnlyDispatcherCollectionRx<ThumbnailImageViewModel> _images;
         private readonly bool _isInReplyToExists;
         private long[] _bindingAccounts;
         private TwitterStatus _inReplyTo;
@@ -106,10 +107,14 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                     h => Setting.AllowFavoriteMyself.ValueChanged -= h,
                     _ => this.RaisePropertyChanged(() => CanFavorite)));
             this.CompositeDisposable.Add(
-                new EventListener<Action<bool>>(
-                    h => Setting.ShowThumbnails.ValueChanged += h,
-                    h => Setting.ShowThumbnails.ValueChanged -= h,
-                    _ => this.RaisePropertyChanged(() => IsThumbnailAvailable)));
+                new EventListener<Action<ThumbnailMode>>(
+                    h => Setting.ThumbnailMode.ValueChanged += h,
+                    h => Setting.ThumbnailMode.ValueChanged -= h,
+                    _ =>
+                    {
+                        this.RaisePropertyChanged(() => IsThumbnailAvailable);
+                        this.RaisePropertyChanged(() => IsThumbnailsAvailable);
+                    }));
             this.CompositeDisposable.Add(
                 new EventListener<Action<TweetDisplayMode>>(
                     h => Setting.TweetDisplayMode.ValueChanged += h,
@@ -122,24 +127,16 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             // when account is added/removed, all timelines are regenerated.
             // so, we don't have to listen any events which notify accounts addition/deletion.
 
+            this.CompositeDisposable.Add(_images = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
+                this.Model.Images, m => new ThumbnailImageViewModel(m), DispatcherHelper.UIDispatcher));
             // resolve images
-            var imgsubj = this.Model.ImagesSubject;
-            if (imgsubj != null)
+            this.CompositeDisposable.Add(_images.ListenCollectionChanged(_ =>
             {
-                lock (imgsubj)
-                {
-                    this.CompositeDisposable.Add(
-                        imgsubj
-                            .Finally(() =>
-                            {
-                                this.RaisePropertyChanged(() => this.Images);
-                                this.RaisePropertyChanged(() => this.ThumbnailImage);
-                                this.RaisePropertyChanged(() => this.IsImageAvailable);
-                                this.RaisePropertyChanged(() => this.IsThumbnailAvailable);
-                            })
-                            .Subscribe());
-                }
-            }
+                this.RaisePropertyChanged(() => this.ThumbnailImage);
+                this.RaisePropertyChanged(() => this.IsImageAvailable);
+                this.RaisePropertyChanged(() => this.IsThumbnailAvailable);
+                this.RaisePropertyChanged(() => this.IsThumbnailsAvailable);
+            }));
 
             // look-up in-reply-to
             this._isInReplyToExists = this.Status.InReplyToStatusId.HasValue && this.Status.InReplyToStatusId != 0;
@@ -457,19 +454,24 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             get { return this.Model.Images != null && this.Model.Images.Any(); }
         }
 
-        public IEnumerable<Uri> Images
+        public ReadOnlyDispatcherCollectionRx<ThumbnailImageViewModel> Images
         {
-            get { return this.Model.Images.Select(i => i.Item2); }
+            get { return _images; }
         }
 
         public bool IsThumbnailAvailable
         {
-            get { return this.IsImageAvailable && Setting.ShowThumbnails.Value; }
+            get { return this.IsImageAvailable && Setting.ThumbnailMode.Value == ThumbnailMode.Single; }
         }
 
-        public Uri ThumbnailImage
+        public bool IsThumbnailsAvailable
         {
-            get { return this.Model.Images != null ? this.Model.Images.Select(i => i.Item2).FirstOrDefault() : null; }
+            get { return this.IsImageAvailable && Setting.ThumbnailMode.Value == ThumbnailMode.All; }
+        }
+
+        public ThumbnailImageViewModel ThumbnailImage
+        {
+            get { return this.Model.Images != null ? this.Images.FirstOrDefault() : null; }
         }
 
         /// <summary>
@@ -535,23 +537,6 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             if (start < 0 || end < 0) return;
             var url = this.Status.Source.Substring(start + 1, end - start - 1);
             BrowserHelper.Open(url);
-        }
-
-        private const string TwitterImageHost = "pbs.twimg.com";
-
-        public void OpenThumbnailImage()
-        {
-            if (this.Model.Images == null) return;
-            var tuple = this.Model.Images.FirstOrDefault();
-            if (tuple == null) return;
-            if (tuple.Item1.Host == TwitterImageHost && Setting.OpenTwitterImageWithOriginalSize.Value)
-            {
-                BrowserHelper.Open(new Uri(tuple.Item1 + ":orig"));
-            }
-            else
-            {
-                BrowserHelper.Open(tuple.Item1);
-            }
         }
 
         #region Reply Control
@@ -1373,8 +1358,16 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                                 }
                             })
                             .ToArray();
-            if (links.Length <= value) return;
+            if (value < 0 || links.Length <= value) return;
             this.OpenLink(links[value]);
+        }
+
+        public void OpenNthThumbnail(string index)
+        {
+            int value;
+            if (!int.TryParse(index, out value)) value = 0;
+            if (value < 0 || this.Images.Count <= value) return;
+            this.Images[value].OpenImage();
         }
 
         #endregion
@@ -1409,5 +1402,47 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         }
 
         #endregion
+    }
+
+    public class ThumbnailImageViewModel : ViewModel
+    {
+        private readonly Uri _source;
+        private readonly Uri _display;
+
+        public ThumbnailImageViewModel(ThumbnailImage model)
+            : this(model.SourceUri, model.DisplayUri)
+        {
+
+        }
+
+        public ThumbnailImageViewModel(Uri source, Uri display)
+        {
+            this._source = source;
+            this._display = display;
+        }
+
+        public Uri SourceUri
+        {
+            get { return this._source; }
+        }
+
+        public Uri DisplayUri
+        {
+            get { return this._display; }
+        }
+
+        private const string TwitterImageHost = "pbs.twimg.com";
+
+        public void OpenImage()
+        {
+            if (_display.Host == TwitterImageHost && Setting.OpenTwitterImageWithOriginalSize.Value)
+            {
+                BrowserHelper.Open(new Uri(_display.OriginalString + ":orig"));
+            }
+            else
+            {
+                BrowserHelper.Open(_display);
+            }
+        }
     }
 }

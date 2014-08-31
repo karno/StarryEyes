@@ -443,7 +443,7 @@
     <value>常に一行表示</value>
   </data>
   <data name="TimelineDisplayType" xml:space="preserve">
-    <value>タイムラインの表示形式:</value>
+    <value>表示形式:</value>
   </data>
   <data name="TimelineIconQualityHigh" xml:space="preserve">
     <value>高(少し大きいサイズのアイコンを取得します。品質が向上することがありますが、通信量が若干増大します)</value>
@@ -461,7 +461,7 @@
     <value>最高(原寸大のアイコンを取得します。最高の品質となりますが、通信量が極端に増大します)</value>
   </data>
   <data name="TimelineIconQualityType" xml:space="preserve">
-    <value>タイムラインのアイコン品質:</value>
+    <value>アイコン品質:</value>
   </data>
   <data name="TimelineOpenTwitterPicWithOriginalSize" xml:space="preserve">
     <value>Twitterにアップロードされた画像のサムネイルをクリックした時に原寸で開く</value>
@@ -476,7 +476,7 @@
     <value>タイムライン上にマウスがあるときにロック</value>
   </data>
   <data name="TimelineScrollLockType" xml:space="preserve">
-    <value>タイムラインのスクロールロック:</value>
+    <value>スクロールロック:</value>
   </data>
   <data name="TimelineScrollLockUnlock" xml:space="preserve">
     <value>ロックしない</value>
@@ -612,5 +612,17 @@
   </data>
   <data name="TimelineDisplayMultiLineMixed" xml:space="preserve">
     <value>縮小複数行表示(フォーカス時に拡大)</value>
+  </data>
+  <data name="TimelineThumbnailAll" xml:space="preserve">
+    <value>すべて表示</value>
+  </data>
+  <data name="TimelineThumbnailNone" xml:space="preserve">
+    <value>なし</value>
+  </data>
+  <data name="TimelineThumbnailSingle" xml:space="preserve">
+    <value>最初の1枚だけ表示</value>
+  </data>
+  <data name="TimelineThumbnailType" xml:space="preserve">
+    <value>サムネイル:</value>
   </data>
 </root>

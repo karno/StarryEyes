@@ -29,9 +29,14 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
             this.Text = ParsingExtension.ResolveEntity(json.text);
             if (json.extended_entities())
             {
-                this.Entities = Enumerable.ToArray(Enumerable.Concat(
-                    TwitterEntity.GetEntities(json.entities),
-                    TwitterEntity.GetEntities(json.extended_entities)));
+                // get correctly typed entities array
+                var orgEntities = (TwitterEntity[])Enumerable.ToArray(TwitterEntity.GetEntities(json.entities));
+                var extEntities = (TwitterEntity[])Enumerable.ToArray(TwitterEntity.GetEntities(json.extended_entities));
+
+                // merge entities
+                this.Entities = orgEntities.Where(e => e.EntityType != EntityType.Media)
+                                           .Concat(extEntities) // extended entities contains media entities only.
+                                           .ToArray();
             }
             else if (json.entities())
             {

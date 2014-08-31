@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reactive.Linq;
 using System.Text.RegularExpressions;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
 
 namespace StarryEyes.Anomaly.Imaging
 {
@@ -99,28 +99,44 @@ namespace StarryEyes.Anomaly.Imaging
             return condition ? stringProvider() : null;
         }
 
-        public static IObservable<Tuple<Uri, Uri>> Resolve(string text)
+        /// <summary>
+        /// Get attached images in status. <para />
+        /// Returns tuples of (original_uri, image_uri).
+        /// </summary>
+        /// <param name="status"></param>
+        /// <returns></returns>
+        public static IEnumerable<Tuple<Uri, Uri>> ResolveImages(TwitterStatus status)
         {
-            return Observable.Defer(() => Observable.Start(() => UrlRegex.Matches(text).Cast<Match>()))
-                             .SelectMany(_ => _)
-                             .Select(s => s.Value)
-                             .Select(s =>
-                             {
-                                 if (SupportedExtents.Any(ext => s.EndsWith("." + ext)))
-                                 {
-                                     return new { original = s, resolved = s };
-                                 }
-                                 var key = ResolveTable.Keys.FirstOrDefault(s.StartsWith);
-                                 Func<string, string> resolver;
-                                 if (key != null && ResolveTable.TryGetValue(key, out resolver))
-                                 {
-                                     return new { original = s, resolved = resolver(s) };
-                                 }
-                                 return null;
-                             })
-                             .Where(t => t != null && t.resolved != null &&
-                                         Uri.IsWellFormedUriString(t.resolved, UriKind.Absolute))
-                             .Select(u => Tuple.Create(new Uri(u.original), new Uri(u.resolved)));
+            var result = new List<Tuple<string, string>>();
+
+            // pick attached images 
+            status.Entities.Guard()
+                  .Where(e => e.EntityType == EntityType.Media)
+                  .ForEach(e => result.Add(Tuple.Create(e.OriginalUrl, e.MediaUrl)));
+
+            // resolve url in status text
+            var matches = UrlRegex.Matches(status.GetEntityAidedText(EntityDisplayMode.MediaUri)).Cast<Match>();
+            matches.Select(m => m.Value).ForEach(s =>
+            {
+                if (SupportedExtents.Any(ext => s.EndsWith("." + ext)))
+                {
+                    result.Add(Tuple.Create(s, s));
+                }
+                else
+                {
+                    var key = ResolveTable.Keys.FirstOrDefault(s.StartsWith);
+                    Func<string, string> resolver;
+                    if (key != null && ResolveTable.TryGetValue(key, out resolver))
+                    {
+                        result.Add(Tuple.Create(s, resolver(s)));
+                    }
+                }
+            });
+
+            return result.Distinct(t => t.Item2)
+                         .Where(t => Uri.IsWellFormedUriString(t.Item1, UriKind.Absolute) &&
+                                     Uri.IsWellFormedUriString(t.Item2, UriKind.Absolute))
+                         .Select(t => Tuple.Create(new Uri(t.Item1), new Uri(t.Item2)));
         }
     }
 }

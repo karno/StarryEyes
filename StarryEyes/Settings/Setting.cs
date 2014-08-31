@@ -110,8 +110,8 @@ namespace StarryEyes.Settings
         public static readonly SettingItemStruct<bool> AllowFavoriteMyself =
             new SettingItemStruct<bool>("AllowFavoriteMyself", false);
 
-        public static readonly SettingItemStruct<bool> ShowThumbnails =
-            new SettingItemStruct<bool>("ShowThumbnails", true);
+        public static readonly SettingItemStruct<ThumbnailMode> ThumbnailMode =
+            new SettingItemStruct<ThumbnailMode>("ThumbnailMode", Settings.ThumbnailMode.All);
 
         public static readonly SettingItemStruct<bool> OpenTwitterImageWithOriginalSize =
             new SettingItemStruct<bool>("OpenTwitterImageWithOriginalSize", true);
@@ -764,6 +764,13 @@ namespace StarryEyes.Settings
         All,
         RelatedOnly,
         FollowingsOnly,
+    }
+
+    public enum ThumbnailMode
+    {
+        None,
+        Single,
+        All
     }
 
 }

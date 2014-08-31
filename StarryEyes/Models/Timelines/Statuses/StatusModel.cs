@@ -2,9 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reactive;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
@@ -138,32 +136,22 @@ namespace StarryEyes.Models.Timelines.Statuses
 
         private readonly object _retweetedsLock = new object();
 
+        private readonly ObservableSynchronizedCollectionEx<ThumbnailImage> _thumbnails =
+            new ObservableSynchronizedCollectionEx<ThumbnailImage>();
+
         private volatile bool _isFavoritedUsersLoaded;
         private volatile bool _isRetweetedUsersLoaded;
-
-        private Subject<Unit> _imagesSubject = new Subject<Unit>();
 
         private StatusModel(TwitterStatus status)
         {
             this.Status = status;
-            ImageResolver.Resolve(status.GetEntityAidedText(EntityDisplayMode.MediaUri))
-                         .Aggregate(new List<Tuple<Uri, Uri>>(), (l, i) =>
-                         {
-                             l.Add(i);
-                             return l;
-                         })
-                         .Finally(() =>
-                         {
-                             var subj = Interlocked.Exchange(ref this._imagesSubject, null);
-                             lock (subj)
-                             {
-                                 subj.OnCompleted();
-                                 // WE SHOULD NOT CALL Dispose METHOD !!!
-                                 // http://stackoverflow.com/questions/16540853/why-does-subjectt-dispose-does-not-dispose-current-suscriptions
-                                 // subj.Dispose();
-                             }
-                         })
-                         .Subscribe(l => this.Images = l);
+            Task.Run(() =>
+            {
+                foreach (var image in ImageResolver.ResolveImages(status))
+                {
+                    _thumbnails.Add(new ThumbnailImage(image));
+                }
+            });
         }
 
         private StatusModel(TwitterStatus status, StatusModel retweetedOriginal)
@@ -202,11 +190,12 @@ namespace StarryEyes.Models.Timelines.Statuses
             }
         }
 
-        public IEnumerable<Tuple<Uri, Uri>> Images { get; private set; }
-
-        public IObservable<Unit> ImagesSubject
+        /// <summary>
+        /// Image tuples. (original URI, display URI)
+        /// </summary>
+        public ObservableSynchronizedCollectionEx<ThumbnailImage> Images
         {
-            get { return this._imagesSubject; }
+            get { return _thumbnails; }
         }
 
         private void LoadFavoritedUsers()
@@ -472,6 +461,33 @@ namespace StarryEyes.Models.Timelines.Statuses
         public override int GetHashCode()
         {
             return this.Status.GetHashCode();
+        }
+    }
+
+    public class ThumbnailImage
+    {
+        private readonly Uri _display;
+        private readonly Uri _source;
+
+        public ThumbnailImage(Uri source, Uri display)
+        {
+            this._display = display;
+            this._source = source;
+        }
+
+        public ThumbnailImage(Tuple<Uri, Uri> sourceAndDisplay)
+            : this(sourceAndDisplay.Item1, sourceAndDisplay.Item2)
+        {
+        }
+
+        public Uri SourceUri
+        {
+            get { return this._source; }
+        }
+
+        public Uri DisplayUri
+        {
+            get { return this._display; }
         }
     }
 }

@@ -613,4 +613,16 @@ Are you sure?</value>
   <data name="TimelineDisplayMultiLineMixed" xml:space="preserve">
     <value>Compact multi line (focus to expand)</value>
   </data>
+  <data name="TimelineThumbnailAll" xml:space="preserve">
+    <value>Show all thumbnails</value>
+  </data>
+  <data name="TimelineThumbnailNone" xml:space="preserve">
+    <value>None</value>
+  </data>
+  <data name="TimelineThumbnailSingle" xml:space="preserve">
+    <value>Show first image only</value>
+  </data>
+  <data name="TimelineThumbnailType" xml:space="preserve">
+    <value>Thumbnails:</value>
+  </data>
 </root>

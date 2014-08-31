@@ -1527,5 +1527,41 @@ namespace StarryEyes.Globalization.WindowParts {
                 return ResourceManager.GetString("TimelineShowThumbnails", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Show all thumbnails に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string TimelineThumbnailAll {
+            get {
+                return ResourceManager.GetString("TimelineThumbnailAll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   None に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string TimelineThumbnailNone {
+            get {
+                return ResourceManager.GetString("TimelineThumbnailNone", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Show first image only に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string TimelineThumbnailSingle {
+            get {
+                return ResourceManager.GetString("TimelineThumbnailSingle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Thumbnails: に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string TimelineThumbnailType {
+            get {
+                return ResourceManager.GetString("TimelineThumbnailType", resourceCulture);
+            }
+        }
     }
 }

@@ -87,7 +87,7 @@
                 <ListBox x:Name="SettingCategories"
                          Width="180"
                          HorizontalContentAlignment="Stretch"
-                         SelectedIndex="0">
+                         SelectedIndex="1">
                     <ListBox.Resources>
                         <Style TargetType="{x:Type ListBoxItem}">
                             <Setter Property="Margin" Value="0" />
@@ -325,6 +325,7 @@
                                 <RowDefinition />
                                 <RowDefinition />
                                 <RowDefinition />
+                                <RowDefinition />
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
@@ -387,6 +388,23 @@
                                     <ComboBoxItem Content="{x:Static localize:SettingFlipResources.TimelineIconQualityNone}" />
                                 </ComboBox.Items>
                             </ComboBox>
+                            <TextBlock Grid.Row="3"
+                                       Grid.Column="0"
+                                       Margin="2,8,6,0"
+                                       HorizontalAlignment="Right"
+                                       VerticalAlignment="Center"
+                                       Text="{x:Static localize:SettingFlipResources.TimelineThumbnailType}" />
+                            <ComboBox Grid.Row="3"
+                                      Grid.Column="1"
+                                      Margin="0,8,0,0"
+                                      SelectedIndex="{Binding TimelineIconResolution,
+                                                              Mode=TwoWay}">
+                                <ComboBox.Items>
+                                    <ComboBoxItem Content="{x:Static localize:SettingFlipResources.TimelineThumbnailNone}" />
+                                    <ComboBoxItem Content="{x:Static localize:SettingFlipResources.TimelineThumbnailSingle}" />
+                                    <ComboBoxItem Content="{x:Static localize:SettingFlipResources.TimelineThumbnailAll}" />
+                                </ComboBox.Items>
+                            </ComboBox>
                         </Grid>
                         <CheckBox Margin="0,0,0,8"
                                   VerticalAlignment="Top"
@@ -401,15 +419,11 @@
                                   VerticalAlignment="Top"
                                   Content="{x:Static localize:SettingFlipResources.TimelineAllowFavoriteMyself}"
                                   IsChecked="{Binding IsAllowFavoriteMyself}" />
+
                         <CheckBox Margin="0,0,0,8"
                                   VerticalAlignment="Top"
-                                  Content="{x:Static localize:SettingFlipResources.TimelineShowThumbnails}"
-                                  IsChecked="{Binding ShowThumbnail}" />
-                        <CheckBox Margin="20,0,0,8"
-                                  VerticalAlignment="Top"
                                   Content="{x:Static localize:SettingFlipResources.TimelineOpenTwitterPicWithOriginalSize}"
-                                  IsChecked="{Binding OpenTwitterImageWithOriginalSize}"
-                                  IsEnabled="{Binding ShowThumbnail}" />
+                                  IsChecked="{Binding OpenTwitterImageWithOriginalSize}" />
                         <StackPanel Margin="0,8" Orientation="Horizontal">
                             <TextBlock Margin="0,0,4,0"
                                        VerticalAlignment="Center"

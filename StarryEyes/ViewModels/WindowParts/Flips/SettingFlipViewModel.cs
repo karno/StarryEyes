@@ -298,6 +298,16 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             set { Setting.ScrollLockStrategy.Value = (ScrollLockStrategy)value; }
         }
 
+        public int ThumbnailStrategy
+        {
+            get { return (int)Setting.ThumbnailMode.Value; }
+            set
+            {
+                Setting.ThumbnailMode.Value = (ThumbnailMode)value;
+                RaisePropertyChanged();
+            }
+        }
+
         public int TimelineIconResolution
         {
             get { return (int)Setting.IconResolution.Value; }
@@ -324,16 +334,6 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         {
             get { return Setting.AllowFavoriteMyself.Value; }
             set { Setting.AllowFavoriteMyself.Value = value; }
-        }
-
-        public bool ShowThumbnail
-        {
-            get { return Setting.ShowThumbnails.Value; }
-            set
-            {
-                Setting.ShowThumbnails.Value = value;
-                RaisePropertyChanged();
-            }
         }
 
         public bool OpenTwitterImageWithOriginalSize

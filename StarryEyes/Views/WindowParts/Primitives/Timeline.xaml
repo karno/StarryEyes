@@ -15,6 +15,7 @@
              xmlns:primitives="clr-namespace:StarryEyes.Views.WindowParts.Primitives"
              xmlns:starryEyes="clr-namespace:StarryEyes"
              xmlns:statuses="clr-namespace:StarryEyes.ViewModels.Timelines.Statuses"
+             xmlns:system="clr-namespace:System;assembly=System"
              xmlns:tabs="clr-namespace:StarryEyes.ViewModels.Timelines.Tabs"
              xmlns:utils="clr-namespace:StarryEyes.Views.Utils"
              x:Name="TimelineRoot"
@@ -1164,17 +1165,52 @@
                                                                          Converter={StaticResource BooleanToVisibleConverter}}">
                                                 <i:Interaction.Triggers>
                                                     <i:EventTrigger EventName="MouseLeftButtonDown">
-                                                        <ei:CallMethodAction MethodName="OpenThumbnailImage" TargetObject="{Binding Mode=OneTime}" />
+                                                        <ei:CallMethodAction MethodName="OpenImage" TargetObject="{Binding ThumbnailImage, Mode=OneWay}" />
                                                     </i:EventTrigger>
                                                 </i:Interaction.Triggers>
                                                 <controls:LazyImage Cursor="Hand"
                                                                     DecodePixelHeight="60"
                                                                     RenderOptions.BitmapScalingMode="HighQuality"
                                                                     Stretch="UniformToFill"
-                                                                    UriSource="{Binding ThumbnailImage,
+                                                                    UriSource="{Binding Path=ThumbnailImage.DisplayUri,
                                                                                         Mode=OneWay}" />
                                             </Border>
                                         </Grid>
+                                        <ItemsControl Margin="2,4,8,0"
+                                                      ItemsSource="{Binding Images}"
+                                                      Visibility="{Binding IsThumbnailsAvailable,
+                                                                           Converter={StaticResource BooleanToVisibleConverter}}">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <WrapPanel Orientation="Horizontal" />
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate DataType="{x:Type statuses:ThumbnailImageViewModel}">
+                                                    <Border Width="60"
+                                                            Height="60"
+                                                            Margin="8,8,0,0"
+                                                            HorizontalAlignment="Left"
+                                                            VerticalAlignment="Top"
+                                                            Background="#80808080"
+                                                            BorderBrush="{DynamicResource BaseColorForegroundBrush}"
+                                                            BorderThickness="1"
+                                                            Cursor="Hand">
+                                                        <i:Interaction.Triggers>
+                                                            <i:EventTrigger EventName="MouseLeftButtonDown">
+                                                                <ei:CallMethodAction MethodName="OpenImage" TargetObject="{Binding Mode=OneTime}" />
+                                                            </i:EventTrigger>
+                                                        </i:Interaction.Triggers>
+                                                        <controls:LazyImage Cursor="Hand"
+                                                                            DecodePixelHeight="60"
+                                                                            RenderOptions.BitmapScalingMode="HighQuality"
+                                                                            Stretch="UniformToFill"
+                                                                            UriSource="{Binding DisplayUri,
+                                                                                                Mode=OneWay}" />
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
                                         <Grid Margin="8,5,8,0">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="Auto" />
@@ -1183,8 +1219,8 @@
                                             <TextBlock x:Name="ShortTime"
                                                        Grid.ColumnSpan="1"
                                                        Height="Auto"
-                                                       Margin="2,0,4,0"
-                                                       VerticalAlignment="Center"
+                                                       Margin="2,2,4,0"
+                                                       VerticalAlignment="Top"
                                                        FontFamily="Segoe UI Semilight"
                                                        FontSize="10.667"
                                                        Foreground="{DynamicResource SubTextBrush}"
@@ -1197,8 +1233,8 @@
                                             <TextBlock x:Name="LongTime"
                                                        Grid.Column="0"
                                                        Height="Auto"
-                                                       Margin="2,0.906,4,0.906"
-                                                       VerticalAlignment="Center"
+                                                       Margin="2,2,4,0"
+                                                       VerticalAlignment="Top"
                                                        Cursor="Hand"
                                                        FontFamily="Segoe UI Semilight"
                                                        FontSize="10.667"
