@@ -1441,7 +1441,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             }
             else
             {
-                BrowserHelper.Open(_display);
+                BrowserHelper.Open(_source);
             }
         }
     }
