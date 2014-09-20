@@ -742,14 +742,14 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             {
                 if (_themeCache == null)
                 {
-                    _themeCache = Setting.Theme.Value ?? DefaultThemeProvider.DefaultThemeName;
+                    _themeCache = Setting.Theme.Value ?? BuiltInThemeProvider.DefaultThemeName;
                 }
                 return this._themeCandidateFiles.IndexOf(_themeCache);
             }
             set
             {
                 if (value < 0) return;
-                var name = DefaultThemeProvider.DefaultThemeName;
+                var name = BuiltInThemeProvider.DefaultThemeName;
                 if (value < this._themeCandidateFiles.Count)
                 {
                     name = this._themeCandidateFiles[value];
@@ -805,7 +805,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             {
                 return (ThemeFileIndex >= 0 && ThemeFileIndex < _themeCandidateFiles.Count
                     ? ThemeManager.GetTheme(_themeCandidateFiles[ThemeFileIndex])
-                    : null) ?? DefaultThemeProvider.GetDefault();
+                    : null) ?? BuiltInThemeProvider.GetDefault();
             }
         }
 

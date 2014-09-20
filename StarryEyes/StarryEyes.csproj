@@ -433,7 +433,7 @@
     <Compile Include="Settings\TabDescription.cs" />
     <Compile Include="Settings\ThemeManager.cs" />
     <Compile Include="Settings\Themes\ThemeColors.cs" />
-    <Compile Include="Settings\Themes\DefaultThemeProvider.cs" />
+    <Compile Include="Settings\Themes\BuiltInThemeProvider.cs" />
     <Compile Include="Settings\Themes\IResourceConfigurator.cs" />
     <Compile Include="Settings\Themes\SearchFlipTheme.cs" />
     <Compile Include="Settings\Themes\FontTheme.cs" />

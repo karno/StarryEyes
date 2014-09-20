@@ -36,7 +36,7 @@ namespace StarryEyes
             _startupTime = DateTime.Now;
 
             // create default theme xaml
-            // File.WriteAllText("default.xaml", DefaultThemeProvider.GetDefaultAsXaml());
+            // File.WriteAllText("default.xaml", BuiltInThemeProvider.ExportThemeAsXaml(BuiltInThemeProvider.GetDefault()));
             // Environment.Exit(0);
 
             // call pre-initializer
