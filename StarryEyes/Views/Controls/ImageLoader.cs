@@ -544,7 +544,7 @@ namespace StarryEyes.Views.Controls
                 _waitingDispatcher = true;
             }
             // dispatch action
-            DispatcherHelper.UIDispatcher.InvokeAsync(ApplyImageOnDispatcher, DispatcherPriority.Render);
+            DispatcherHelper.UIDispatcher.InvokeAsync(ApplyImageOnDispatcher, DispatcherPriority.Loaded);
         }
 
         private static void ApplyImageOnDispatcher()
@@ -570,7 +570,7 @@ namespace StarryEyes.Views.Controls
                 {
                     // re-dispatch action
                     DispatcherHelper.UIDispatcher.InvokeAsync(ApplyImageOnDispatcher,
-                        DispatcherPriority.Render);
+                        DispatcherPriority.Loaded);
                 }
                 else
                 {

@@ -177,6 +177,7 @@ namespace StarryEyes.Views.Behaviors
             // check and update items count latch
             if (_previousItemCount != itemCount)
             {
+
                 // caused by item addition?
                 _previousItemCount = itemCount;
 
@@ -365,8 +366,8 @@ namespace StarryEyes.Views.Behaviors
 
             // scroll to initial position (enforced)
             ScrollToVerticalOffset(offset);
-            // call via dispatcher causes flickers in timeline.
-            // await Dispatcher.InvokeAsync(() => ScrollToVerticalOffset(offset), DispatcherPriority.Render);
+            // above method should not call via dispatcher. It will causes flickers in timeline.
+
 
             System.Diagnostics.Debug.WriteLine("# Registering new animation. (magic ignore?" + setMagicalIgnore + ")");
             // create animation
@@ -433,7 +434,10 @@ namespace StarryEyes.Views.Behaviors
 
             // skip invocation if dispatcher is not responding 
             // (unless next target is not the final destination)
-            if (!_isDispatcherAffected && !lastItemOfQueue) return;
+            if (!_isDispatcherAffected && !lastItemOfQueue)
+            {
+                return;
+            }
             _isDispatcherAffected = false;
 
             // set scroll offset
@@ -441,7 +445,7 @@ namespace StarryEyes.Views.Behaviors
             {
                 ScrollToVerticalOffset(dequeuedOffset);
                 _isDispatcherAffected = true;
-            }, DispatcherPriority.Render);
+            }, DispatcherPriority.Loaded);
         }
 
         /// <summary>
