@@ -4,6 +4,7 @@ using System.Collections.Specialized;
 using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 using StarryEyes.Albireo.Helpers;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models.Accounting;
@@ -61,12 +62,17 @@ namespace StarryEyes.Models.Subsystems
             {
                 if (_dictionary.ContainsKey(info.Id)) return;
                 _dictionary.Add(info.Id, new LinkedList<TwitterStatus>());
-                StatusProxy.FetchStatuses(
+            }
+            Task.Run(async () =>
+            {
+                var result = await StatusProxy.FetchStatuses(
                     s => s.User.Id == info.Id,
                     "UserId = " + info.Id.ToString(CultureInfo.InvariantCulture),
-                    count: Setting.PostLimitPerWindow.Value)
-                           .Subscribe(PostDetected);
-            }
+                    count: Setting.PostLimitPerWindow.Value);
+                result
+                    .OrderBy(c => c.CreatedAt)
+                    .ForEach(PostDetected);
+            });
         }
 
         private static void RemoveAccount(TwitterAccount info)

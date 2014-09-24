@@ -36,6 +36,13 @@ namespace StarryEyes.Casket.Cruds
                        .SingleOrDefault() != 0;
         }
 
+        public Task<IEnumerable<DatabaseStatus>> GetStatusesAsync(IEnumerable<long> ids)
+        {
+            return Descriptor.QueryAsync<DatabaseStatus>(
+                this.CreateSql("Id IN @Ids"),
+                new { Ids = ids });
+        }
+
         public Task<IEnumerable<DatabaseStatus>> GetRetweetedStatusesAsync(long originalId)
         {
             return Descriptor.QueryAsync<DatabaseStatus>(

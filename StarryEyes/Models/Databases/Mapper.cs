@@ -275,6 +275,24 @@ namespace StarryEyes.Models.Databases
             };
         }
 
+        #endregion
+
+        #region map to object model(many)
+
+        public static IEnumerable<TwitterUser> MapMany([NotNull] IEnumerable<DatabaseUser> users,
+            [NotNull] Dictionary<long, UserDescEnts> dedic, [NotNull] Dictionary<long, UserUrlEnts> uedic)
+        {
+            if (users == null) throw new ArgumentNullException("users");
+            if (dedic == null) throw new ArgumentNullException("dedic");
+            if (uedic == null) throw new ArgumentNullException("uedic");
+            return users.Select(user => Map(user, Resolve(dedic, user.Id), Resolve(uedic, user.Id)));
+        }
+
+        public static IEnumerable<T> Resolve<T>(IDictionary<long, IEnumerable<T>> dictionary, long id)
+        {
+            IEnumerable<T> value;
+            return dictionary.TryGetValue(id, out value) ? value : Enumerable.Empty<T>();
+        }
 
         #endregion
     }

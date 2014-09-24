@@ -32,6 +32,15 @@ namespace StarryEyes.Casket.Cruds
                 new { Id = statusId });
         }
 
+        public async Task<Dictionary<long, IEnumerable<long>>> GetUsersDictionaryAsync(IEnumerable<long> statusIds)
+        {
+            return (await Descriptor.QueryAsync<DatabaseActivity>(
+                "select UserId from " + TableName + " where StatusId IN @Ids;",
+                new { Ids = statusIds.ToArray() }))
+                .GroupBy(e => e.StatusId)
+                .ToDictionary(e => e.Key, e => e.Select(d => d.UserId));
+        }
+
         public async Task InsertAsync(long statusId, long userId)
         {
             await base.InsertAsync(new DatabaseActivity

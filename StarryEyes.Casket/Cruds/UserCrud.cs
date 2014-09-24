@@ -49,6 +49,13 @@ namespace StarryEyes.Casket.Cruds
             }
         }
 
+        public async Task<IEnumerable<DatabaseUser>> GetUsersAsync(IEnumerable<long> ids)
+        {
+            return (await Descriptor.QueryAsync<DatabaseUser>(
+                this.CreateSql("Id IN @Ids"),
+                new { Ids = ids.ToArray() }));
+        }
+
         public async Task<IEnumerable<DatabaseUser>> GetUsersAsync(string partOfScreenName)
         {
             return await Descriptor.QueryAsync<DatabaseUser>(

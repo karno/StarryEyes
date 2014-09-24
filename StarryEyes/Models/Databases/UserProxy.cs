@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Linq;
-using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
@@ -99,14 +97,24 @@ namespace StarryEyes.Models.Databases
             return user == null ? null : await LoadUserAsync(user);
         }
 
-        public static async Task<IObservable<TwitterUser>> GetUsersAsync(string partOfScreenName)
+        public static async Task<IEnumerable<TwitterUser>> GetUsersAsync(IEnumerable<long> ids)
+        {
+            var targets = ids.ToArray();
+            var queued = _userQueue.Find(u => targets.Any(t => t == u.Id)).ToArray();
+            var dt = targets.Except(queued.Select(u => u.Id)).ToArray();
+            var dbu = await DatabaseUtil.RetryIfLocked(async () =>
+                await Database.UserCrud.GetUsersAsync(dt));
+            var resolved = await ResolveUsersAsync(dbu);
+            return queued.Concat(resolved);
+        }
+
+        public static async Task<IEnumerable<TwitterUser>> GetUsersAsync(string partOfScreenName)
         {
             var dbu = await DatabaseUtil.RetryIfLocked(async () =>
                 await Database.UserCrud.GetUsersAsync(partOfScreenName));
-            return LoadUsersAsync(dbu).Concat(
-                _userQueue.Find(u => u.ScreenName
-                                      .IndexOf(partOfScreenName, StringComparison.CurrentCultureIgnoreCase) >= 0)
-                          .ToObservable());
+            var resolved = await ResolveUsersAsync(dbu);
+            return resolved.Concat(_userQueue.Find(
+                u => u.ScreenName.IndexOf(partOfScreenName, StringComparison.CurrentCultureIgnoreCase) >= 0));
         }
 
         public static async Task<IEnumerable<Tuple<long, string>>> GetUsersFastAsync(string partOfScreenName, int count)
@@ -124,13 +132,17 @@ namespace StarryEyes.Models.Databases
             return resp.Guard().Select(d => Tuple.Create(d.Id, d.ScreenName));
         }
 
-
-        public static IObservable<TwitterUser> LoadUsersAsync([NotNull] IEnumerable<DatabaseUser> dbusers)
+        private static async Task<IEnumerable<TwitterUser>> ResolveUsersAsync(IEnumerable<DatabaseUser> users)
         {
-            if (dbusers == null) throw new ArgumentNullException("dbusers");
-            return dbusers
-                .ToObservable()
-                .SelectMany(s => LoadUserAsync(s).ToObservable());
+            var targets = users.ToArray();
+            var ids = targets.Select(u => u.Id).ToArray();
+            var desTask = DatabaseUtil.RetryIfLocked(async () =>
+                await Database.UserDescriptionEntityCrud.GetEntitiesDictionaryAsync(ids));
+            var uesTask = DatabaseUtil.RetryIfLocked(async () =>
+                await Database.UserUrlEntityCrud.GetEntitiesDictionaryAsync(ids));
+            var des = await desTask;
+            var ues = await uesTask;
+            return Mapper.MapMany(targets, des, ues);
         }
 
         private static async Task<TwitterUser> LoadUserAsync([NotNull] DatabaseUser user)

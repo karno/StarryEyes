@@ -161,6 +161,11 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 User = new UserViewModel(user);
                 this.CompositeDisposable.Add(User);
 
+                Setting.Accounts.Collection
+                       .Where(a => a.Id != user.Id)
+                       .Select(a => new RelationControlViewModel(this, a, user))
+                       .ForEach(RelationControls.Add);
+
                 this.CompositeDisposable.Add(this._statuses = new UserTimelineViewModel(this,
                     new UserTimelineModel(user.Id, TimelineType.User)));
                 this.RaisePropertyChanged(() => Statuses);
@@ -174,11 +179,6 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
 
                 this.CompositeDisposable.Add(this._followers = new UserFollowersViewModel(this));
                 this.RaisePropertyChanged(() => Followers);
-
-                Setting.Accounts.Collection
-                       .Where(a => a.Id != user.Id)
-                       .Select(a => new RelationControlViewModel(this, a, user))
-                       .ForEach(RelationControls.Add);
             }
             catch (Exception ex)
             {

@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using JetBrains.Annotations;
-using StarryEyes.Albireo;
 using StarryEyes.Albireo.Collections;
 using StarryEyes.Albireo.Helpers;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Anomaly.Utils;
 using StarryEyes.Filters;
 using StarryEyes.Filters.Expressions;
 using StarryEyes.Filters.Parsing;
@@ -228,6 +228,7 @@ namespace StarryEyes.Models.Timelines.Tabs
         protected override IObservable<TwitterStatus> Fetch(long? maxId, int? count)
         {
             return StatusProxy.FetchStatuses(this._filterFunc, this._filterSql, maxId, count)
+                              .ToObservable()
                               .Merge(_filterQuery != null
                                   ? _filterQuery.ReceiveSources(maxId)
                                   : Observable.Empty<TwitterStatus>());

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
 using Livet;
@@ -177,23 +176,17 @@ namespace StarryEyes.Models.Timelines
 
         private async Task ReadMore(long? maxId, bool setLoadingFlag)
         {
-            try
+            if (setLoadingFlag)
             {
-                if (setLoadingFlag)
-                {
-                    this.IsLoading = true;
-                }
-                await this.Fetch(maxId, TimelineChunkCount)
-                          .Where(CheckAcceptStatus)
-                          .Select(s => AddStatus(s, false).ToObservable())
-                          .LastOrDefaultAsync();
+                this.IsLoading = true;
             }
-            finally
+            await this.Fetch(maxId, TimelineChunkCount)
+                      .Where(CheckAcceptStatus)
+                      .Do(s => AddStatus(s, false))
+                      .LastOrDefaultAsync();
+            if (setLoadingFlag)
             {
-                if (setLoadingFlag)
-                {
-                    this.IsLoading = false;
-                }
+                this.IsLoading = false;
             }
         }
 

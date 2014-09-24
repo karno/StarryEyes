@@ -1243,11 +1243,18 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                         {
                             var tid = this.Status.User.Id;
                             var tidstr = tid.ToString(CultureInfo.InvariantCulture);
-                            StatusProxy.FetchStatuses(
-                                s => s.User.Id == tid ||
-                                     (s.RetweetedOriginal != null && s.RetweetedOriginal.User.Id == tid),
-                                "UserId = " + tidstr + " OR BaseUserId = " + tidstr)
-                                       .Subscribe(s => StatusInbox.EnqueueRemoval(s.Id));
+                            if (Setting.MuteBlockingUsers.Value)
+                            {
+                                // remove statuses of blocked user
+                                Task.Run(async () =>
+                                {
+                                    var removal = await StatusProxy.FetchStatuses(
+                                        s => s.User.Id == tid ||
+                                             (s.RetweetedOriginal != null && s.RetweetedOriginal.User.Id == tid),
+                                        "UserId = " + tidstr + " OR BaseUserId = " + tidstr);
+                                    removal.ForEach(s => StatusInbox.EnqueueRemoval(s.Id));
+                                });
+                            }
                         });
         }
 

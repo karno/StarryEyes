@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
-using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
@@ -204,11 +203,15 @@ namespace StarryEyes.Models.Databases
 
         #endregion
 
-        public static IObservable<TwitterStatus> FetchStatuses(
+        public static Task<IEnumerable<TwitterStatus>> FetchStatuses(
             Func<TwitterStatus, bool> predicate, string sql,
             long? maxId = null, int? count = null, bool applyMuteBlockFilter = true)
         {
-            var cache = FindCache(predicate, maxId, applyMuteBlockFilter);
+            if (count < 1)
+            {
+                throw new ArgumentOutOfRangeException("count");
+            }
+            var cacheReader = FindCache(predicate, maxId, applyMuteBlockFilter);
             if (maxId != null)
             {
                 var midc = "Id < " + maxId.Value.ToString(CultureInfo.InvariantCulture);
@@ -231,34 +234,30 @@ namespace StarryEyes.Models.Databases
             // find status and limit caches
             var read = Task.Run(async () =>
             {
-                var fetched = (await Database.StatusCrud.FetchAsync(sql)).ToArray();
+                var db = await Database.StatusCrud.FetchAsync(sql);
+                var fetched = (await LoadStatusesAsync(db))
+                    .OrderByDescending(d => d.Id)
+                    .ToArray();
 
-                var bcache = cache;
+                // await finding cache
+                var cachedStatus = (await cacheReader).OrderByDescending(d => d.Id).AsEnumerable();
+
                 if (count != null && fetched.Length == count)
                 {
-                    // if database can yield more results, limit cache results.
+                    // if database can yield more results, trim cached results
+                    // by maximum ID of database status.
 
-                    // find last id of database result
                     var lid = fetched[fetched.Length - 1].Id;
 
-                    // limiting cache result
-                    cache = Task.Run(async () =>
-                    {
-                        await Task.Yield();
-                        var ext = await bcache;
-                        return maxId != null
-                            ? ext.Where(s => s.Id > lid && s.Id < maxId)
-                            : ext.Where(s => s.Id > lid);
-                    });
+                    cachedStatus = cachedStatus.TakeWhile(d => d.Id < lid);
                 }
-                return fetched;
+                return cachedStatus.Concat(fetched)
+                                   .Distinct(d => d.Id)
+                                   .OrderByDescending(d => d.CreatedAt)
+                                   .AsEnumerable();
             });
             // ReSharper disable once PossibleMultipleEnumeration
-            return read.ToObservable()
-                       .SelectMany(_ => _)
-                       .SelectMany(s => LoadStatusAsync(s).ToObservable())
-                       .Merge(cache.ToObservable().SelectMany(_ => _))
-                       .Distinct(s => s.Id);
+            return read;
         }
 
         private static async Task<IEnumerable<TwitterStatus>> FindCache(
@@ -354,6 +353,98 @@ namespace StarryEyes.Models.Databases
                     anex);
             }
         }
+
+        private static async Task<IEnumerable<TwitterStatus>> LoadStatusesAsync([NotNull] IEnumerable<DatabaseStatus> dbstatus)
+        {
+            if (dbstatus == null) throw new ArgumentNullException("dbstatus");
+            var targets = dbstatus.ToArray();
+            var retweetOriginalIds = new HashSet<long>();
+            var targetUserIds = new HashSet<long>();
+            var entitiesTargetIds = new HashSet<long>();
+            var activitiesTargetIds = new HashSet<long>();
+            foreach (var status in targets)
+            {
+                targetUserIds.Add(status.UserId);
+                entitiesTargetIds.Add(status.Id);
+                switch (status.StatusType)
+                {
+                    case StatusType.Tweet:
+                        activitiesTargetIds.Add(status.Id);
+                        if (status.RetweetOriginalId != null)
+                        {
+                            Debug.Assert(status.RetweetOriginalUserId != null,
+                                "status.RetweetOriginalUserId != null");
+                            targetUserIds.Add(status.RetweetOriginalUserId.Value);
+                            retweetOriginalIds.Add(status.RetweetOriginalId.Value);
+                            entitiesTargetIds.Add(status.RetweetOriginalId.Value);
+                        }
+                        break;
+                    case StatusType.DirectMessage:
+                        Debug.Assert(status.InReplyToOrRecipientUserId != null,
+                            "status.InReplyToOrRecipientUserId != null");
+                        targetUserIds.Add(status.InReplyToOrRecipientUserId.Value);
+                        break;
+                }
+            }
+            // accessing database
+            var retweetsTask = DatabaseUtil.RetryIfLocked(async () =>
+                await Database.StatusCrud.GetStatusesAsync(retweetOriginalIds));
+            var usersTask = UserProxy.GetUsersAsync(targetUserIds);
+            var sesTask = DatabaseUtil.RetryIfLocked(async () =>
+                await Database.StatusEntityCrud.GetEntitiesDictionaryAsync(entitiesTargetIds));
+            var favdicTask = DatabaseUtil.RetryIfLocked(async () =>
+                await Database.FavoritesCrud.GetUsersDictionaryAsync(activitiesTargetIds));
+            var rtdicTask = DatabaseUtil.RetryIfLocked(async () =>
+                await Database.RetweetsCrud.GetUsersDictionaryAsync(activitiesTargetIds));
+            //var retweets = (await retweetsTask).ToDictionary(d => d.Id);
+            var rttmp = (await retweetsTask).ToArray();
+            var retweets = rttmp.ToDictionary(d => d.Id);
+            // var users = (await usersTask).ToDictionary(d => d.Id);
+            var utmp = (await usersTask).ToArray();
+            var users = utmp.ToDictionary(d => d.Id);
+            var ses = await sesTask;
+            var favdic = await favdicTask;
+            var rtdic = await rtdicTask;
+
+            // create status entity
+            var result = new List<TwitterStatus>();
+            foreach (var status in targets)
+            {
+                var ents = Mapper.Resolve(ses, status.Id);
+                switch (status.StatusType)
+                {
+                    case StatusType.Tweet:
+                        var favs = Mapper.Resolve(favdic, status.Id);
+                        var rts = Mapper.Resolve(rtdic, status.Id);
+                        if (status.RetweetOriginalId != null)
+                        {
+                            Debug.Assert(status.RetweetOriginalUserId != null,
+                                "status.RetweetOriginalUserId != null");
+                            var rtid = status.RetweetOriginalId.Value;
+                            var retweet = retweets[status.RetweetOriginalId.Value];
+                            var orig = Mapper.Map(retweet, Mapper.Resolve(ses, rtid),
+                                Mapper.Resolve(favdic, rtid), Mapper.Resolve(rtdic, rtid),
+                                users[status.RetweetOriginalUserId.Value]);
+                            result.Add(Mapper.Map(status, ents, favs, rts, orig, users[status.UserId]));
+                        }
+                        else
+                        {
+                            result.Add(Mapper.Map(status, ents, favs, rts, users[status.UserId]));
+                        }
+                        break;
+                    case StatusType.DirectMessage:
+                        Debug.Assert(status.InReplyToOrRecipientUserId != null,
+                                            "status.InReplyToOrRecipientUserId != null");
+                        result.Add(Mapper.Map(status, ents, users[status.UserId],
+                            users[status.InReplyToOrRecipientUserId.Value]));
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+            return result;
+        }
+
 
         #endregion
     }

@@ -30,6 +30,15 @@ namespace StarryEyes.Casket.Cruds
                 new { Id = parentId });
         }
 
+        public async Task<Dictionary<long, IEnumerable<T>>> GetEntitiesDictionaryAsync(IEnumerable<long> parentIds)
+        {
+            return (await Descriptor.QueryAsync<T>(
+                this.CreateSql("ParentId in @Ids"),
+                new { Ids = parentIds.ToArray() }))
+                .GroupBy(d => d.ParentId)
+                .ToDictionary(d => d.Key, d => d.AsEnumerable());
+        }
+
         public async Task DeleteAndInsertAsync(long parentId, IEnumerable<T> entities)
         {
             await Descriptor.ExecuteAllAsync(
