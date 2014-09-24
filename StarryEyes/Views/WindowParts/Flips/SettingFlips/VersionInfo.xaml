@@ -281,7 +281,7 @@
                        HorizontalAlignment="Left"
                        VerticalAlignment="Bottom"
                        TextWrapping="Wrap">
-                <Run Text="Bulit with" />
+                <Run Text="Built with" />
                 <Hyperlink NavigateUri="https://github.com/neuecc/AsyncOAuth">
                     <i:Interaction.Behaviors>
                         <behaviors:NavigateHyperlinkBehavior />
