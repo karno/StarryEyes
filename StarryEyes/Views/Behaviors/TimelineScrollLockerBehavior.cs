@@ -457,7 +457,14 @@ namespace StarryEyes.Views.Behaviors
         {
             System.Diagnostics.Debug.WriteLine("# Scroll to: " + offset + " by " + caller);
             this._lastScrollOffset = offset;
-            this.AssociatedObject.ScrollToVerticalOffset(offset);
+            if (offset < 1)
+            {
+                this.AssociatedObject.ScrollToTop();
+            }
+            else
+            {
+                this.AssociatedObject.ScrollToVerticalOffset(offset);
+            }
         }
     }
 }

@@ -526,6 +526,7 @@
     <Compile Include="Views\Behaviors\ListBoxSelectionChangeToScrollIntoViewBehavior.cs" />
     <Compile Include="Views\Behaviors\NavigateHyperlinkBehavior.cs" />
     <Compile Include="Views\Behaviors\TextBlockDragSelectBehavior.cs" />
+    <Compile Include="Views\Behaviors\TimelineScrollHandlerBehavior.cs" />
     <Compile Include="Views\Behaviors\TimelineScrollLockerBehavior.cs" />
     <Compile Include="Views\Behaviors\TimelineTriggerBehavior.cs" />
     <Compile Include="Views\Controls\DropDownMenuButton.cs" />

@@ -108,8 +108,6 @@
                                   VerticalScrollBarVisibility="Visible">
                         <i:Interaction.Behaviors>
                             <sebehavior:TimelineTriggerBehavior IsScrollOnBottom="{Binding IsScrollInBottom, Mode=OneWayToSource}" />
-                            <!--  Squared scrolling has been disabled due to problem of scrolling.  -->
-                            <!--  <sebehavior:SquaredScrollBehavior />  -->
                         </i:Interaction.Behaviors>
                         <ItemsPresenter />
                     </ScrollViewer>

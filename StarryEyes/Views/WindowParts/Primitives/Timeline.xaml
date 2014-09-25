@@ -2135,6 +2135,7 @@
                                   Style="{StaticResource TouchScrollViewerStyle}"
                                   VerticalScrollBarVisibility="Visible">
                         <i:Interaction.Behaviors>
+                            <behaviors:TimelineScrollHandlerBehavior />
                             <behaviors:TimelineTriggerBehavior IsMouseOver="{Binding IsMouseOver,
                                                                                      Mode=OneWayToSource}"
                                                                IsScrollOnBottom="{Binding IsScrollInBottom,
