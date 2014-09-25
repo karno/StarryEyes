@@ -161,6 +161,26 @@ namespace StarryEyes.Models.Databases
             return Mapper.Map(user, await ude, await uue);
         }
 
+
+        public static async Task<bool> ContainsAsync(RelationDataType type, long userId, long targetId)
+        {
+            switch (type)
+            {
+                case RelationDataType.Following:
+                    return await IsFollowingAsync(userId, targetId);
+                case RelationDataType.Follower:
+                    return await IsFollowerAsync(userId, targetId);
+                case RelationDataType.Blocking:
+                    return await IsBlockingAsync(userId, targetId);
+                case RelationDataType.NoRetweets:
+                    return await IsNoRetweetsAsync(userId, targetId);
+                case RelationDataType.Mutes:
+                    return await IsMutedAsync(userId, targetId);
+                default:
+                    throw new ArgumentOutOfRangeException("type");
+            }
+        }
+
         public static async Task<bool> IsFollowingAsync(long userId, long targetId)
         {
             return await DatabaseUtil.RetryIfLocked(async () =>
@@ -183,6 +203,37 @@ namespace StarryEyes.Models.Databases
         {
             return await DatabaseUtil.RetryIfLocked(async () =>
                 await Database.RelationCrud.IsNoRetweetsAsync(userId, targetId));
+        }
+
+        public static async Task<bool> IsMutedAsync(long userId, long targetId)
+        {
+            return await DatabaseUtil.RetryIfLocked(async () =>
+                await Database.RelationCrud.IsMutedAsync(userId, targetId));
+        }
+
+
+        public static async Task SetAsync(RelationDataType type, long userId, long targetId, bool value)
+        {
+            switch (type)
+            {
+                case RelationDataType.Following:
+                    await SetFollowingAsync(userId, targetId, value);
+                    return;
+                case RelationDataType.Follower:
+                    await SetFollowerAsync(userId, targetId, value);
+                    break;
+                case RelationDataType.Blocking:
+                    await SetBlockingAsync(userId, targetId, value);
+                    break;
+                case RelationDataType.NoRetweets:
+                    await SetNoRetweetsAsync(userId, targetId, value);
+                    break;
+                case RelationDataType.Mutes:
+                    await SetMutedAsync(userId, targetId, value);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException("type");
+            }
         }
 
         public static async Task SetFollowingAsync(long userId, long targetId, bool following)
@@ -209,6 +260,62 @@ namespace StarryEyes.Models.Databases
                 await Database.RelationCrud.SetNoRetweetsAsync(userId, targetId, suppressing));
         }
 
+        public static async Task SetMutedAsync(long userId, long targetId, bool muted)
+        {
+            await DatabaseUtil.RetryIfLocked(async () =>
+                await Database.RelationCrud.SetMutedAsync(userId, targetId, muted));
+        }
+
+
+        public static async Task AddAsync(RelationDataType type, long userId, IEnumerable<long> targetIds)
+        {
+            switch (type)
+            {
+                case RelationDataType.Following:
+                    await AddFollowingsAsync(userId, targetIds);
+                    break;
+                case RelationDataType.Follower:
+                    await AddFollowersAsync(userId, targetIds);
+                    break;
+                case RelationDataType.Blocking:
+                    await AddBlockingsAsync(userId, targetIds);
+                    break;
+                case RelationDataType.NoRetweets:
+                    await AddNoRetweetsAsync(userId, targetIds);
+                    break;
+                case RelationDataType.Mutes:
+                    await AddMutesAsync(userId, targetIds);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException("type");
+            }
+        }
+
+        public static async Task RemoveAsync(RelationDataType type, long userId, IEnumerable<long> removalIds)
+        {
+            switch (type)
+            {
+                case RelationDataType.Following:
+                    await RemoveFollowingsAsync(userId, removalIds);
+                    break;
+                case RelationDataType.Follower:
+                    await RemoveFollowersAsync(userId, removalIds);
+                    break;
+                case RelationDataType.Blocking:
+                    await RemoveBlockingsAsync(userId, removalIds);
+                    break;
+                case RelationDataType.NoRetweets:
+                    await RemoveNoRetweetsAsync(userId, removalIds);
+                    break;
+                case RelationDataType.Mutes:
+                    await RemoveMutesAsync(userId, removalIds);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException("type");
+            }
+        }
+
+
         public static async Task AddFollowingsAsync(long userId, IEnumerable<long> targetIds)
         {
             await DatabaseUtil.RetryIfLocked(async () =>
@@ -220,6 +327,7 @@ namespace StarryEyes.Models.Databases
             await DatabaseUtil.RetryIfLocked(async () =>
                 await Database.RelationCrud.RemoveFollowingsAsync(userId, removals));
         }
+
 
         public static async Task AddFollowersAsync(long userId, IEnumerable<long> targetIds)
         {
@@ -233,6 +341,7 @@ namespace StarryEyes.Models.Databases
                 await Database.RelationCrud.RemoveFollowersAsync(userId, removals));
         }
 
+
         public static async Task AddBlockingsAsync(long userId, IEnumerable<long> targetIds)
         {
             await DatabaseUtil.RetryIfLocked(async () =>
@@ -245,16 +354,50 @@ namespace StarryEyes.Models.Databases
                 await Database.RelationCrud.RemoveBlockingsAsync(userId, removals));
         }
 
-        public static async Task AddNoRetweetssAsync(long userId, IEnumerable<long> targetIds)
+
+        public static async Task AddNoRetweetsAsync(long userId, IEnumerable<long> targetIds)
         {
             await DatabaseUtil.RetryIfLocked(async () =>
                 await Database.RelationCrud.AddNoRetweetsAsync(userId, targetIds));
         }
 
-        public static async Task RemoveNoRetweetssAsync(long userId, IEnumerable<long> removals)
+        public static async Task RemoveNoRetweetsAsync(long userId, IEnumerable<long> removals)
         {
             await DatabaseUtil.RetryIfLocked(async () =>
                 await Database.RelationCrud.RemoveNoRetweetsAsync(userId, removals));
+        }
+
+
+        public static async Task AddMutesAsync(long userId, IEnumerable<long> targetIds)
+        {
+            await DatabaseUtil.RetryIfLocked(async () =>
+                await Database.RelationCrud.AddMutesAsync(userId, targetIds));
+        }
+
+        public static async Task RemoveMutesAsync(long userId, IEnumerable<long> removals)
+        {
+            await DatabaseUtil.RetryIfLocked(async () =>
+                await Database.RelationCrud.RemoveMutesAsync(userId, removals));
+        }
+
+
+        public static async Task<IEnumerable<long>> GetAsync(RelationDataType type, long userId)
+        {
+            switch (type)
+            {
+                case RelationDataType.Following:
+                    return await GetFollowingsAsync(userId);
+                case RelationDataType.Follower:
+                    return await GetFollowersAsync(userId);
+                case RelationDataType.Blocking:
+                    return await GetBlockingsAsync(userId);
+                case RelationDataType.NoRetweets:
+                    return await GetNoRetweetsAsync(userId);
+                case RelationDataType.Mutes:
+                    return await GetMutesAsync(userId);
+                default:
+                    throw new ArgumentOutOfRangeException("type");
+            }
         }
 
         public static async Task<IEnumerable<long>> GetFollowingsAsync(long userId)
@@ -281,6 +424,32 @@ namespace StarryEyes.Models.Databases
                 await Database.RelationCrud.GetNoRetweetsAsync(userId));
         }
 
+        public static async Task<IEnumerable<long>> GetMutesAsync(long userId)
+        {
+            return await DatabaseUtil.RetryIfLocked(async () =>
+                await Database.RelationCrud.GetMutesAsync(userId));
+        }
+
+
+        public static async Task<IEnumerable<long>> GetAllAsync(RelationDataType type)
+        {
+            switch (type)
+            {
+                case RelationDataType.Following:
+                    return await GetFollowingsAllAsync();
+                case RelationDataType.Follower:
+                    return await GetFollowersAllAsync();
+                case RelationDataType.Blocking:
+                    return await GetBlockingsAllAsync();
+                case RelationDataType.NoRetweets:
+                    return await GetNoRetweetsAllAsync();
+                case RelationDataType.Mutes:
+                    return await GetMutesAllAsync();
+                default:
+                    throw new ArgumentOutOfRangeException("type");
+            }
+        }
+
         public static async Task<IEnumerable<long>> GetFollowingsAllAsync()
         {
             return await DatabaseUtil.RetryIfLocked(async () =>
@@ -305,5 +474,37 @@ namespace StarryEyes.Models.Databases
                 await Database.RelationCrud.GetNoRetweetsAllAsync());
         }
 
+        public static async Task<IEnumerable<long>> GetMutesAllAsync()
+        {
+            return await DatabaseUtil.RetryIfLocked(async () =>
+                await Database.RelationCrud.GetMutesAllAsync());
+        }
+    }
+
+    /// <summary>
+    /// Describe relation types
+    /// </summary>
+    public enum RelationDataType
+    {
+        /// <summary>
+        /// Following users
+        /// </summary>
+        Following,
+        /// <summary>
+        /// Follower users
+        /// </summary>
+        Follower,
+        /// <summary>
+        /// Blocking users
+        /// </summary>
+        Blocking,
+        /// <summary>
+        /// Retweet suppressed users
+        /// </summary>
+        NoRetweets,
+        /// <summary>
+        /// Muted users
+        /// </summary>
+        Mutes
     }
 }

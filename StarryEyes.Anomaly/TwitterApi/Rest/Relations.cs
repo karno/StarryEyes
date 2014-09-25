@@ -10,16 +10,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 {
     public static class Relations
     {
-        public static async Task<IEnumerable<long>> GetNoRetweetsIdsAsync(
-            this IOAuthCredential credential)
-        {
-            if (credential == null) throw new ArgumentNullException("credential");
-            var client = credential.CreateOAuthClient();
-            var respStr = await client.GetStringAsync(new ApiAccess("friendships/no_retweets/ids.json"));
-            return await Task.Run(() => ((dynamic[])DynamicJson.Parse(respStr)).Select(d => (long)d));
-        }
-
-        #region FriendsIds
+        #region Friends
 
         public static Task<ICursorResult<IEnumerable<long>>> GetFriendsIdsAsync(
             this IOAuthCredential credential, long userId,
@@ -56,7 +47,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #endregion
 
-        #region FollowersIds
+        #region Followers
 
         public static Task<ICursorResult<IEnumerable<long>>> GetFollowersIdsAsync(
             this IOAuthCredential credential, long userId,
@@ -89,6 +80,38 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             var client = credential.CreateOAuthClient();
             var response = await client.GetAsync(new ApiAccess("followers/ids.json", param));
             return await response.ReadAsCursoredIdsAsync();
+        }
+
+        #endregion
+
+        #region Others
+
+        public static async Task<IEnumerable<long>> GetNoRetweetsIdsAsync(
+            this IOAuthCredential credential)
+        {
+            if (credential == null) throw new ArgumentNullException("credential");
+            var client = credential.CreateOAuthClient();
+            var respStr = await client.GetStringAsync(new ApiAccess("friendships/no_retweets/ids.json"));
+            return await Task.Run(() => ((dynamic[])DynamicJson.Parse(respStr)).Select(d => (long)d));
+        }
+
+        public static async Task<ICursorResult<IEnumerable<long>>> GetMuteIdsAsync(
+            this IOAuthCredential credential, long cursor = -1)
+        {
+            if (credential == null) throw new ArgumentNullException("credential");
+            var param = new Dictionary<string, object>
+            {
+                {"cursor", cursor}
+            }.ParametalizeForGet();
+            var client = credential.CreateOAuthClient();
+            return await Task.Run(async () =>
+            {
+                var respStr = await client.GetStringAsync(new ApiAccess("mutes/users/ids.json", param));
+                var parsed = DynamicJson.Parse(respStr);
+                var ids = ((dynamic[])parsed.ids).Select(d => (long)d);
+                return new CursorResult<IEnumerable<long>>(ids,
+                    parsed.previous_cursor_str, parsed.next_cursor_str);
+            });
         }
 
         #endregion
@@ -196,27 +219,31 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
         #region Update friendships
 
         public static Task<TwitterFriendship> UpdateFriendshipAsync(
-            this IOAuthCredential credential, long userId, bool showRetweet)
+            this IOAuthCredential credential, long userId,
+            bool? enableDeviceNotifications, bool? showRetweet)
         {
             if (credential == null) throw new ArgumentNullException("credential");
-            return UpdateFriendshipCoreAsync(credential, userId, null, showRetweet);
+            return UpdateFriendshipCoreAsync(credential, userId, null, enableDeviceNotifications, showRetweet);
         }
 
         public static Task<TwitterFriendship> UpdateFriendshipAsync(
-            this IOAuthCredential credential, string screenName, bool showRetweet)
+            this IOAuthCredential credential, string screenName,
+            bool? enableDeviceNotifications, bool? showRetweet)
         {
             if (credential == null) throw new ArgumentNullException("credential");
             if (screenName == null) throw new ArgumentNullException("screenName");
-            return UpdateFriendshipCoreAsync(credential, null, screenName, showRetweet);
+            return UpdateFriendshipCoreAsync(credential, null, screenName, enableDeviceNotifications, showRetweet);
         }
 
         private static async Task<TwitterFriendship> UpdateFriendshipCoreAsync(
-            IOAuthCredential credential, long? userId, string screenName, bool showRetweet)
+            IOAuthCredential credential, long? userId, string screenName,
+            bool? enableDeviceNotifications, bool? showRetweet)
         {
             var param = new Dictionary<string, object>
             {
                 {"user_id", userId},
                 {"screen_name", screenName},
+                {"device", enableDeviceNotifications},
                 {"retweets", showRetweet},
             }.ParametalizeForPost();
             var client = credential.CreateOAuthClient();
@@ -226,5 +253,37 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #endregion
 
+        #region Mutes
+
+        public static Task<TwitterUser> UpdateMuteAsync(this IOAuthCredential credential,
+            long userId, bool mute)
+        {
+            if (credential == null) throw new ArgumentNullException("credential");
+            return UpdateMuteCoreAsync(credential, userId, null, mute);
+        }
+
+        public static Task<TwitterUser> UpdateMuteAsync(
+            this IOAuthCredential credential, string screenName, bool mute)
+        {
+            if (credential == null) throw new ArgumentNullException("credential");
+            if (screenName == null) throw new ArgumentNullException("screenName");
+            return UpdateMuteCoreAsync(credential, null, screenName, mute);
+        }
+
+        private static async Task<TwitterUser> UpdateMuteCoreAsync(
+            IOAuthCredential credential, long? userId, string screenName, bool mute)
+        {
+            var param = new Dictionary<string, object>
+            {
+                {"user_id", userId},
+                {"screen_name", screenName},
+            }.ParametalizeForPost();
+            var endpoint = mute ? "mutes/users/create" : "mutes/users/destroy";
+            var client = credential.CreateOAuthClient();
+            var response = await client.PostAsync(new ApiAccess(endpoint), param);
+            return await response.ReadAsUserAsync();
+        }
+
+        #endregion
     }
 }

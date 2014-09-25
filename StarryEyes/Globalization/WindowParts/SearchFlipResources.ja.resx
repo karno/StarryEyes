@@ -127,13 +127,19 @@
     <value>ブロックできませんでした。</value>
   </data>
   <data name="MsgErrorBlockTitle" xml:space="preserve">
-    <value>ブロック エラー</value>
+    <value>ブロックエラー</value>
   </data>
   <data name="MsgErrorFollowInst" xml:space="preserve">
     <value>フォローできませんでした。</value>
   </data>
   <data name="MsgErrorFollowTitle" xml:space="preserve">
-    <value>フォロー エラー</value>
+    <value>フォローエラー</value>
+  </data>
+  <data name="MsgErrorMuteInst" xml:space="preserve">
+    <value>ミュートできませんでした。</value>
+  </data>
+  <data name="MsgErrorMuteTitle" xml:space="preserve">
+    <value>ミュートエラー</value>
   </data>
   <data name="MsgErrorReportSpamInst" xml:space="preserve">
     <value>スパム報告できませんでした。</value>
@@ -151,13 +157,19 @@
     <value>ブロックを解除できませんでした。</value>
   </data>
   <data name="MsgErrorUnblockTitle" xml:space="preserve">
-    <value>アンブロック エラー</value>
+    <value>アンブロックエラー</value>
   </data>
   <data name="MsgErrorUnfollowInst" xml:space="preserve">
     <value>フォローを解除できませんでした。</value>
   </data>
   <data name="MsgErrorUnfollowTitle" xml:space="preserve">
-    <value>フォロー解除 エラー</value>
+    <value>フォロー解除エラー</value>
+  </data>
+  <data name="MsgErrorUnmuteInst" xml:space="preserve">
+    <value>ミュートを解除できませんでした。</value>
+  </data>
+  <data name="MsgErrorUnmuteTitle" xml:space="preserve">
+    <value>ミュート解除エラー</value>
   </data>
   <data name="MsgErrorUnsuppressRetweetsInst" xml:space="preserve">
     <value>リツイート非表示を解除できませんでした。</value>

@@ -354,6 +354,7 @@
     <Compile Include="Models\Receiving\Receivers\ListMemberReceiver.cs" />
     <Compile Include="Models\Requests\UpdateFriendshipsRequest.cs" />
     <Compile Include="Models\Inputting\InputSetting.cs" />
+    <Compile Include="Models\Requests\UpdateMuteRequest.cs" />
     <Compile Include="Models\Subsystems\AutoUpdateService.cs" />
     <Compile Include="Models\Subsystems\ContributionService.cs" />
     <Compile Include="Models\Subsystems\Notifications\Audio\AudioCache.cs" />

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Text.RegularExpressions;
-using StarryEyes.Albireo;
 using StarryEyes.Albireo.Helpers;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Globalization.Filters;

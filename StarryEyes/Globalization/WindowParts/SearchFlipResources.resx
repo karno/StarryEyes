@@ -135,6 +135,12 @@
   <data name="MsgErrorFollowTitle" xml:space="preserve">
     <value>Follow error</value>
   </data>
+  <data name="MsgErrorMuteInst" xml:space="preserve">
+    <value>Mute failed.</value>
+  </data>
+  <data name="MsgErrorMuteTitle" xml:space="preserve">
+    <value>Mute error</value>
+  </data>
   <data name="MsgErrorReportSpamInst" xml:space="preserve">
     <value>Spam report failed.</value>
   </data>
@@ -158,6 +164,12 @@
   </data>
   <data name="MsgErrorUnfollowTitle" xml:space="preserve">
     <value>Unfollow error</value>
+  </data>
+  <data name="MsgErrorUnmuteInst" xml:space="preserve">
+    <value>Unmute failed.</value>
+  </data>
+  <data name="MsgErrorUnmuteTitle" xml:space="preserve">
+    <value>Unmute error</value>
   </data>
   <data name="MsgErrorUnsuppressRetweetsInst" xml:space="preserve">
     <value>Unsuppressing retweets failed.</value>

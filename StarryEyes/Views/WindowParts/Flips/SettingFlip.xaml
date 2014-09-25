@@ -87,7 +87,7 @@
                 <ListBox x:Name="SettingCategories"
                          Width="180"
                          HorizontalContentAlignment="Stretch"
-                         SelectedIndex="1">
+                         SelectedIndex="0">
                     <ListBox.Resources>
                         <Style TargetType="{x:Type ListBoxItem}">
                             <Setter Property="Margin" Value="0" />
@@ -528,7 +528,7 @@
                         </TextBlock.Style>
                     </TextBlock>
                     <StackPanel Grid.Row="4" Orientation="Vertical">
-                        <CheckBox Margin="16,0,16,8"
+                        <CheckBox Margin="16,0,16,4"
                                   Content="{x:Static localize:SettingFlipResources.MuteUseLightweightMute}"
                                   IsChecked="{Binding UseLightweightMute}" />
                         <TextBlock Margin="16,0,16,12"
@@ -536,13 +536,16 @@
                                    TextWrapping="Wrap" />
                         <GroupBox Margin="16,0,16,16" Header="{x:Static localize:SettingFlipResources.MuteDetailSettings}">
                             <StackPanel>
-                                <TextBlock Margin="16,8" Text="{x:Static localize:SettingFlipResources.MuteDetailDescription}" />
-                                <CheckBox Margin="16,8"
+                                <TextBlock Margin="16,8,16,4" Text="{x:Static localize:SettingFlipResources.MuteDetailDescription}" />
+                                <CheckBox Margin="16,4"
                                           Content="{x:Static localize:SettingFlipResources.MuteBlockingUsers}"
                                           IsChecked="{Binding IsMuteBlockingUsers}" />
-                                <CheckBox Margin="16,8,16,16"
+                                <CheckBox Margin="16,4"
                                           Content="{x:Static localize:SettingFlipResources.MuteNoRetweets}"
                                           IsChecked="{Binding IsMuteNoRetweetUsersRetweet}" />
+                                <CheckBox Margin="16,4,16,8"
+                                          Content="{x:Static localize:SettingFlipResources.MuteOfficialMutedUsers}"
+                                          IsChecked="{Binding IsMuteOfficialMutes}" />
                             </StackPanel>
                         </GroupBox>
 

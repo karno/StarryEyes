@@ -38,6 +38,7 @@ namespace StarryEyes.Models.Receiving.Receivers
             var newFollowers = new List<long>();
             var newBlockings = new List<long>();
             var newNoRetweets = new List<long>();
+            var newMutes = new List<long>();
 
             // get followings / followers
             await Observable.Merge(
@@ -48,15 +49,18 @@ namespace StarryEyes.Models.Receiving.Receivers
                 this._account.RetrieveAllCursor((a, c) => a.GetBlockingsIdsAsync(c))
                     .Do(newBlockings.Add),
                 this._account.GetNoRetweetsIdsAsync().ToObservable()
-                    .Do(newNoRetweets.Add)
+                    .Do(newNoRetweets.Add),
+                this._account.RetrieveAllCursor((c, i) => c.GetMuteIdsAsync(i))
+                    .Do(newMutes.Add)
                 ).ToTask();
 
             // update relation data after receiving relations are completed.
             await Task.WhenAll(
-                reldata.SetFollowingsAsync(newFollowings),
-                reldata.SetFollowersAsync(newFollowers),
-                reldata.SetBlockingsAsync(newBlockings),
-                reldata.SetNoRetweetsAsync(newNoRetweets));
+                reldata.Followings.SetAsync(newFollowings),
+                reldata.Followers.SetAsync(newFollowers),
+                reldata.Blockings.SetAsync(newBlockings),
+                reldata.NoRetweets.SetAsync(newNoRetweets),
+                reldata.Mutes.SetAsync(newMutes));
         }
     }
 }

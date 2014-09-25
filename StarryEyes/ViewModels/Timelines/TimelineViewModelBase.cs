@@ -206,7 +206,6 @@ namespace StarryEyes.ViewModels.Timelines
                                 // this clause is invoked later, so re-check currrent value
                                 if (model.IsLoading == false)
                                 {
-                                    System.Diagnostics.Debug.WriteLine("INVALIDATION COMPLETED!");
                                     this.IsLoading = false;
                                 }
                             }, DispatcherPriority.ContextIdle);

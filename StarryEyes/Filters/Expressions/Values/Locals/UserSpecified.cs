@@ -79,7 +79,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
             {
                 if (_adata == null)
                     return new List<long>(); // returns empty list
-                return new AVLTree<long>(_adata.Followings);
+                return new AVLTree<long>(_adata.Followings.Items);
             }
         }
 
@@ -89,7 +89,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
             {
                 if (_adata == null)
                     return new List<long>();
-                return new AVLTree<long>(_adata.Followers);
+                return new AVLTree<long>(_adata.Followers.Items);
             }
         }
 
@@ -99,7 +99,17 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
             {
                 if (_adata == null)
                     return new List<long>();
-                return new AVLTree<long>(_adata.Blockings);
+                return new AVLTree<long>(_adata.Blockings.Items);
+            }
+        }
+
+        public override IReadOnlyCollection<long> Mutes
+        {
+            get
+            {
+                if (_adata == null)
+                    return new List<long>();
+                return new AVLTree<long>(_adata.Mutes.Items);
             }
         }
 
@@ -126,6 +136,11 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
         public override string BlockingsSql
         {
             get { return "(select TargetId from Blockings where UserId = " + UserId + ")"; }
+        }
+
+        public override string MutesSql
+        {
+            get { return "(select TargetId from Mutes where UserId = " + UserId + ")"; }
         }
 
         public override string ToQuery()

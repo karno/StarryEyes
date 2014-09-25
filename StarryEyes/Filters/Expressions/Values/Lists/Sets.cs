@@ -20,7 +20,7 @@ namespace StarryEyes.Filters.Expressions.Values.Lists
         {
             _listInfo = new ListInfo(userScreenName, listSlug);
             _watcher = new ListWatcher(_listInfo);
-            _watcher.OnListMemberUpdated += this.RaiseReapplyFilter;
+            _watcher.OnListMemberUpdated += this.RaiseInvalidateFilter;
         }
 
         public override string ToQuery()

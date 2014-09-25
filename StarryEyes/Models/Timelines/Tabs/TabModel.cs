@@ -66,9 +66,9 @@ namespace StarryEyes.Models.Timelines.Tabs
                 }
                 else
                 {
-                    this._filterQuery.Deactivate();
-                    this._filterQuery.InvalidateRequired -= this.QueueInvalidateTimeline;
                     MuteBlockManager.RefreshTimelineRequired -= this.QueueInvalidateTimeline;
+                    this._filterQuery.InvalidateRequired -= this.QueueInvalidateTimeline;
+                    this._filterQuery.Deactivate();
                 }
             }
         }
@@ -95,8 +95,8 @@ namespace StarryEyes.Models.Timelines.Tabs
                 }
                 if (old != null)
                 {
-                    old.Deactivate();
                     old.InvalidateRequired -= this.QueueInvalidateTimeline;
+                    old.Deactivate();
                 }
             }
         }

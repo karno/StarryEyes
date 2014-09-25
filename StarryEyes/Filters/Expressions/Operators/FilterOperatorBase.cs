@@ -81,10 +81,10 @@ namespace StarryEyes.Filters.Expressions.Operators
             set
             {
                 if (_value != null)
-                    _value.ReapplyRequested -= this.RaiseReapplyFilter;
+                    _value.InvalidateRequested -= this.RaiseInvalidateFilter;
                 _value = value;
                 if (_value != null)
-                    _value.ReapplyRequested += this.RaiseReapplyFilter;
+                    _value.InvalidateRequested += this.RaiseInvalidateFilter;
             }
         }
 
@@ -121,10 +121,10 @@ namespace StarryEyes.Filters.Expressions.Operators
             set
             {
                 if (_leftValue != null)
-                    _leftValue.ReapplyRequested -= this.RaiseReapplyFilter;
+                    _leftValue.InvalidateRequested -= this.RaiseInvalidateFilter;
                 _leftValue = value;
                 if (_leftValue != null)
-                    _leftValue.ReapplyRequested += this.RaiseReapplyFilter;
+                    _leftValue.InvalidateRequested += this.RaiseInvalidateFilter;
             }
         }
 
@@ -134,10 +134,10 @@ namespace StarryEyes.Filters.Expressions.Operators
             set
             {
                 if (_rightValue != null)
-                    _rightValue.ReapplyRequested -= this.RaiseReapplyFilter;
+                    _rightValue.InvalidateRequested -= this.RaiseInvalidateFilter;
                 _rightValue = value;
                 if (_rightValue != null)
-                    _rightValue.ReapplyRequested += this.RaiseReapplyFilter;
+                    _rightValue.InvalidateRequested += this.RaiseInvalidateFilter;
             }
         }
 

@@ -35,7 +35,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
                 var following = new AVLTree<long>(
                     Setting.Accounts
                            .Collection
-                           .SelectMany(a => a.RelationData.Followings));
+                           .SelectMany(a => a.RelationData.Followings.Items));
                 return following;
             }
         }
@@ -47,7 +47,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
                 var followers = new AVLTree<long>(
                     Setting.Accounts
                            .Collection
-                           .SelectMany(a => a.RelationData.Followers));
+                           .SelectMany(a => a.RelationData.Followers.Items));
                 return followers;
             }
         }
@@ -59,8 +59,20 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
                 var blockings = new AVLTree<long>(
                     Setting.Accounts
                            .Collection
-                           .SelectMany(a => a.RelationData.Blockings));
+                           .SelectMany(a => a.RelationData.Blockings.Items));
                 return blockings;
+            }
+        }
+
+        public override IReadOnlyCollection<long> Mutes
+        {
+            get
+            {
+                var mutes = new AVLTree<long>(
+                    Setting.Accounts
+                           .Collection
+                           .SelectMany(a => a.RelationData.Mutes.Items));
+                return mutes;
             }
         }
 
@@ -90,6 +102,11 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
         public override string BlockingsSql
         {
             get { return "(select TargetId from Blockings)"; }
+        }
+
+        public override string MutesSql
+        {
+            get { return "(select TargetId from Mutes)"; }
         }
 
         public override string ToQuery()

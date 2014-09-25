@@ -516,6 +516,12 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             set { Setting.MuteNoRetweets.Value = value; }
         }
 
+        public bool IsMuteOfficialMutes
+        {
+            get { return Setting.MuteOfficialMutes.Value; }
+            set { Setting.MuteOfficialMutes.Value = value; }
+        }
+
         #endregion
 
         #region Input property

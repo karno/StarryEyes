@@ -96,6 +96,7 @@ namespace StarryEyes.Casket.Cruds
         private readonly RelationCrudBase _followers;
         private readonly RelationCrudBase _blockings;
         private readonly RelationCrudBase _noRetweets;
+        private readonly RelationCrudBase _mutes;
 
         public RelationCrud()
         {
@@ -103,6 +104,7 @@ namespace StarryEyes.Casket.Cruds
             _followers = new RelationCrudBase("Followers");
             _blockings = new RelationCrudBase("Blockings");
             _noRetweets = new RelationCrudBase("NoRetweets");
+            _mutes = new RelationCrudBase("Mutes");
         }
 
         public async Task InitializeAsync(IDatabaseConnectionDescriptor descriptor)
@@ -111,7 +113,8 @@ namespace StarryEyes.Casket.Cruds
                 this._followings.InitializeAsync(descriptor),
                 this._followers.InitializeAsync(descriptor),
                 this._blockings.InitializeAsync(descriptor),
-                this._noRetweets.InitializeAsync(descriptor));
+                this._noRetweets.InitializeAsync(descriptor),
+                this._mutes.InitializeAsync(descriptor));
         }
 
         public async Task<bool> IsFollowingAsync(long userId, long targetId)
@@ -132,6 +135,11 @@ namespace StarryEyes.Casket.Cruds
         public async Task<bool> IsNoRetweetsAsync(long userId, long targetId)
         {
             return await _noRetweets.ContainsAsync(userId, targetId);
+        }
+
+        public async Task<bool> IsMutedAsync(long userId, long targetId)
+        {
+            return await _mutes.ContainsAsync(userId, targetId);
         }
 
         public async Task SetFollowingAsync(long userId, long targetId, bool following)
@@ -182,6 +190,18 @@ namespace StarryEyes.Casket.Cruds
             }
         }
 
+        public async Task SetMutedAsync(long userId, long targetId, bool isMuted)
+        {
+            if (isMuted)
+            {
+                await _mutes.AddOrUpdateAsync(userId, targetId);
+            }
+            else
+            {
+                await _mutes.DeleteAsync(userId, targetId);
+            }
+        }
+
         public async Task AddFollowingsAsync(long userId, IEnumerable<long> targetIds)
         {
             await _followings.AddOrUpdateAllAsync(userId, targetIds);
@@ -222,13 +242,24 @@ namespace StarryEyes.Casket.Cruds
             await _noRetweets.DeleteAllAsync(userId, removals);
         }
 
+        public async Task AddMutesAsync(long userId, IEnumerable<long> targetIds)
+        {
+            await _mutes.AddOrUpdateAllAsync(userId, targetIds);
+        }
+
+        public async Task RemoveMutesAsync(long userId, IEnumerable<long> removals)
+        {
+            await _mutes.DeleteAllAsync(userId, removals);
+        }
+
         public async Task DropUserAsync(long userId)
         {
             await Task.Run(() => Task.WaitAll(
                 _followings.DropUserAsync(userId),
                 _followers.DropUserAsync(userId),
                 _blockings.DropUserAsync(userId),
-                _noRetweets.DropUserAsync(userId)));
+                _noRetweets.DropUserAsync(userId),
+                _mutes.DropUserAsync(userId)));
         }
 
         public async Task DropAllAsync()
@@ -237,7 +268,8 @@ namespace StarryEyes.Casket.Cruds
                 _followings.DropAllAsync(),
                 _followers.DropAllAsync(),
                 _blockings.DropAllAsync(),
-                _noRetweets.DropAllAsync()));
+                _noRetweets.DropAllAsync(),
+                _mutes.DropAllAsync()));
         }
 
         public async Task<IEnumerable<long>> GetFollowingsAsync(long userId)
@@ -260,6 +292,11 @@ namespace StarryEyes.Casket.Cruds
             return await _noRetweets.GetUsersAsync(userId);
         }
 
+        public async Task<IEnumerable<long>> GetMutesAsync(long userId)
+        {
+            return await _mutes.GetUsersAsync(userId);
+        }
+
         public async Task<IEnumerable<long>> GetFollowingsAllAsync()
         {
             return await this._followings.GetUsersAllAsync();
@@ -278,6 +315,11 @@ namespace StarryEyes.Casket.Cruds
         public async Task<IEnumerable<long>> GetNoRetweetsAllAsync()
         {
             return await _noRetweets.GetUsersAllAsync();
+        }
+
+        public async Task<IEnumerable<long>> GetMutesAllAsync()
+        {
+            return await _mutes.GetUsersAllAsync();
         }
     }
 }

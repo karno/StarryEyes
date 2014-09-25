@@ -237,13 +237,13 @@ namespace StarryEyes.Models.Timelines
 
         #region Invalidate whole timeline
 
-        private const int InvalidateSec = 2;
+        private const int QueueInvalidationWaitSec = 2;
         private int _invlatch;
 
         protected void QueueInvalidateTimeline()
         {
             var stamp = Interlocked.Increment(ref this._invlatch);
-            Observable.Timer(TimeSpan.FromSeconds(InvalidateSec))
+            Observable.Timer(TimeSpan.FromSeconds(QueueInvalidationWaitSec))
                       .Subscribe(_ =>
                       {
                           if (Interlocked.CompareExchange(ref this._invlatch, 0, stamp) == stamp)

@@ -304,8 +304,8 @@
     <value>ブロックしているユーザーをミュートする [推奨]</value>
   </data>
   <data name="MuteDetailDescription" xml:space="preserve">
-    <value>以下の設定は、Twitter Webで非表示となるツイートをKrileでも非表示にする設定となります。
-特別な理由がない限り、チェックをつけておくことを推奨します。</value>
+    <value>以下の設定は、Twitter公式サイトなどで非表示となるツイートをKrileでどう取り扱うか指定するものです。
+特別な理由がない限り、すべてチェックをつけておくことを推奨します。</value>
   </data>
   <data name="MuteDetailSettings" xml:space="preserve">
     <value>ミュートの詳細設定</value>
@@ -624,5 +624,8 @@
   </data>
   <data name="TimelineThumbnailType" xml:space="preserve">
     <value>サムネイル:</value>
+  </data>
+  <data name="MuteOfficialMutedUsers" xml:space="preserve">
+    <value>Twitter公式サイトでミュート指定したユーザをミュートする [推奨]</value>
   </data>
 </root>

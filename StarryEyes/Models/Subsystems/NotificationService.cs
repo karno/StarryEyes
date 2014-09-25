@@ -152,7 +152,7 @@ namespace StarryEyes.Models.Subsystems
 
         internal static void NotifyFollowed(TwitterUser source, TwitterUser target)
         {
-            if (MuteBlockManager.IsBlocked(source)) return;
+            if (MuteBlockManager.IsBlocked(source) || MuteBlockManager.IsOfficialMuted(source)) return;
             if (!NotificationLatch.CheckSetPositive(
                 NotificationLatchTarget.Follow, source.Id, target.Id)) return;
             Head.NotifyFollowed(source, target);
@@ -160,7 +160,7 @@ namespace StarryEyes.Models.Subsystems
 
         internal static void NotifyUnfollowed(TwitterUser source, TwitterUser target)
         {
-            if (MuteBlockManager.IsBlocked(source)) return;
+            if (MuteBlockManager.IsBlocked(source) || MuteBlockManager.IsOfficialMuted(source)) return;
             if (!NotificationLatch.CheckSetNegative(
                 NotificationLatchTarget.Follow, source.Id, target.Id)) return;
             Head.NotifyUnfollowed(source, target);
@@ -168,7 +168,7 @@ namespace StarryEyes.Models.Subsystems
 
         internal static void NotifyBlocked(TwitterUser source, TwitterUser target)
         {
-            if (MuteBlockManager.IsBlocked(source)) return;
+            if (MuteBlockManager.IsBlocked(source) || MuteBlockManager.IsOfficialMuted(source)) return;
             if (!NotificationLatch.CheckSetPositive(
                 NotificationLatchTarget.Block, source.Id, target.Id)) return;
             Head.NotifyBlocked(source, target);
@@ -176,7 +176,7 @@ namespace StarryEyes.Models.Subsystems
 
         internal static void NotifyUnblocked(TwitterUser source, TwitterUser target)
         {
-            if (MuteBlockManager.IsBlocked(source)) return;
+            if (MuteBlockManager.IsBlocked(source) || MuteBlockManager.IsOfficialMuted(source)) return;
             if (!NotificationLatch.CheckSetNegative(
                 NotificationLatchTarget.Block, source.Id, target.Id)) return;
             Head.NotifyUnblocked(source, target);
@@ -184,7 +184,7 @@ namespace StarryEyes.Models.Subsystems
 
         internal static void NotifyFavorited(TwitterUser source, TwitterStatus status)
         {
-            if (MuteBlockManager.IsBlocked(source)) return;
+            if (MuteBlockManager.IsBlocked(source) || MuteBlockManager.IsOfficialMuted(source)) return;
             if (!NotificationLatch.CheckSetPositive(
                 NotificationLatchTarget.Favorite, source.Id, status.Id)) return;
             Task.Run(() => UserProxy.StoreUser(source));
@@ -200,7 +200,7 @@ namespace StarryEyes.Models.Subsystems
 
         internal static void NotifyUnfavorited(TwitterUser source, TwitterStatus status)
         {
-            if (MuteBlockManager.IsBlocked(source)) return;
+            if (MuteBlockManager.IsBlocked(source) || MuteBlockManager.IsOfficialMuted(source)) return;
             if (!NotificationLatch.CheckSetNegative(
                 NotificationLatchTarget.Favorite, source.Id, status.Id)) return;
             Task.Run(() => StatusModel.UpdateStatusInfo(
@@ -215,7 +215,7 @@ namespace StarryEyes.Models.Subsystems
 
         internal static void NotifyRetweeted(TwitterUser source, TwitterStatus original, TwitterStatus retweet)
         {
-            if (MuteBlockManager.IsBlocked(source)) return;
+            if (MuteBlockManager.IsBlocked(source) || MuteBlockManager.IsOfficialMuted(source)) return;
             if (!Setting.NotifyBackfilledTweets.Value &&
                 retweet.CreatedAt < App.StartupDateTime)
             {
@@ -253,7 +253,7 @@ namespace StarryEyes.Models.Subsystems
 
         internal static void NotifyUserUpdated(TwitterUser source)
         {
-            if (MuteBlockManager.IsBlocked(source)) return;
+            if (MuteBlockManager.IsBlocked(source) || MuteBlockManager.IsOfficialMuted(source)) return;
             Head.NotifyUserUpdated(source);
         }
 

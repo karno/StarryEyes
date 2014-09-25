@@ -115,6 +115,24 @@ namespace StarryEyes.Globalization.WindowParts {
         }
         
         /// <summary>
+        ///   Mute failed. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgErrorMuteInst {
+            get {
+                return ResourceManager.GetString("MsgErrorMuteInst", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Mute error に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgErrorMuteTitle {
+            get {
+                return ResourceManager.GetString("MsgErrorMuteTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Spam report failed. に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string MsgErrorReportSpamInst {
@@ -183,6 +201,24 @@ namespace StarryEyes.Globalization.WindowParts {
         public static string MsgErrorUnfollowTitle {
             get {
                 return ResourceManager.GetString("MsgErrorUnfollowTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Unmute failed. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgErrorUnmuteInst {
+            get {
+                return ResourceManager.GetString("MsgErrorUnmuteInst", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Unmute error に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgErrorUnmuteTitle {
+            get {
+                return ResourceManager.GetString("MsgErrorUnmuteTitle", resourceCulture);
             }
         }
         

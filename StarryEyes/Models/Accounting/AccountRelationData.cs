@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using StarryEyes.Albireo;
 using StarryEyes.Albireo.Collections;
 using StarryEyes.Albireo.Helpers;
 using StarryEyes.Models.Databases;
@@ -16,29 +15,51 @@ namespace StarryEyes.Models.Accounting
     {
         public static event Action<RelationDataChangedInfo> AccountDataUpdatedStatic;
 
-        private static void OnAccountDataUpdatedStatic(RelationDataChangedInfo obj)
-        {
-            var handler = AccountDataUpdatedStatic;
-            if (handler != null) handler(obj);
-        }
-
+        private readonly AccountRelationDataChunk _followings;
         /// <summary>
-        /// Integrated event for trigger any AccountRelationData changed.
+        /// Following info
         /// </summary>
-        public event Action<RelationDataChangedInfo> AccountDataUpdated;
-
-        private void OnAccountDataUpdated(long targetUser, bool isAdded, RelationDataChange change)
+        public AccountRelationDataChunk Followings
         {
-            var rdci = new RelationDataChangedInfo
-            {
-                AccountUserId = this.AccountId,
-                IsIdAdded = isAdded,
-                TargetUserId = targetUser,
-                Change = change
-            };
-            this.AccountDataUpdated.SafeInvoke(rdci);
-            OnAccountDataUpdatedStatic(rdci);
+            get { return this._followings; }
         }
+
+        private readonly AccountRelationDataChunk _followers;
+        /// <summary>
+        /// Follower info
+        /// </summary>
+        public AccountRelationDataChunk Followers
+        {
+            get { return this._followers; }
+        }
+
+        private readonly AccountRelationDataChunk _blockings;
+        /// <summary>
+        /// Blocking info
+        /// </summary>
+        public AccountRelationDataChunk Blockings
+        {
+            get { return this._blockings; }
+        }
+
+        private readonly AccountRelationDataChunk _noRetweets;
+        /// <summary>
+        /// No Retweets info
+        /// </summary>
+        public AccountRelationDataChunk NoRetweets
+        {
+            get { return this._noRetweets; }
+        }
+
+        private readonly AccountRelationDataChunk _mutes;
+        /// <summary>
+        /// Mutes info
+        /// </summary>
+        public AccountRelationDataChunk Mutes
+        {
+            get { return this._mutes; }
+        }
+
 
         private readonly long _accountId;
         /// <summary>
@@ -50,447 +71,178 @@ namespace StarryEyes.Models.Accounting
         }
 
         /// <summary>
+        /// Integrated event for trigger any AccountRelationData changed.
+        /// </summary>
+        public event Action<RelationDataChangedInfo> AccountDataUpdated;
+
+        /// <summary>
         /// Initialize account data info
         /// </summary>
         /// <param name="accountId">bound account id</param>
         public AccountRelationData(long accountId)
         {
             this._accountId = accountId;
-            // load data from db
-            InitializeCollection(() => UserProxy.GetFollowingsAsync(accountId),
-                                 _followingLocker, _followings.Add,
-                                 id => this.OnAccountDataUpdated(id, true, RelationDataChange.Following));
-            InitializeCollection(() => UserProxy.GetFollowersAsync(accountId),
-                                 _followersLocker, _followers.Add,
-                                 id => this.OnAccountDataUpdated(id, true, RelationDataChange.Follower));
-            InitializeCollection(() => UserProxy.GetBlockingsAsync(accountId),
-                                 _blockingsLocker, _blockings.Add,
-                                 id => this.OnAccountDataUpdated(id, true, RelationDataChange.Blocking));
-            InitializeCollection(() => UserProxy.GetNoRetweetsAsync(accountId),
-                                 _noRetweetsLocker, _noRetweets.Add,
-                                 id => this.OnAccountDataUpdated(id, true, RelationDataChange.NoRetweets));
+            this._followings = new AccountRelationDataChunk(this, RelationDataType.Following);
+            this._followers = new AccountRelationDataChunk(this, RelationDataType.Follower);
+            this._blockings = new AccountRelationDataChunk(this, RelationDataType.Blocking);
+            this._noRetweets = new AccountRelationDataChunk(this, RelationDataType.NoRetweets);
+            this._mutes = new AccountRelationDataChunk(this, RelationDataType.Mutes);
+            this._followings.AccountDataUpdated += this.PropagateEvent;
+            this._followers.AccountDataUpdated += this.PropagateEvent;
+            this._blockings.AccountDataUpdated += this.PropagateEvent;
+            this.NoRetweets.AccountDataUpdated += this.PropagateEvent;
+            this._mutes.AccountDataUpdated += this.PropagateEvent;
         }
 
-        private void InitializeCollection(Func<Task<IEnumerable<long>>> reader,
-                                          object locker, Action<long> adder, Action<long> postcall)
+        private void PropagateEvent(RelationDataChangedInfo e)
         {
-            Task.Run(async () =>
-            {
-                var items = (await reader()).Memoize();
-                lock (locker)
-                {
-                    items.ForEach(adder);
-                }
-                items.ForEach(postcall);
-            });
+            this.AccountDataUpdated.SafeInvoke(e);
+            AccountDataUpdatedStatic.SafeInvoke(e);
         }
+    }
 
-        private readonly object _followingLocker = new object();
-        private readonly AVLTree<long> _followings = new AVLTree<long>();
+    public class AccountRelationDataChunk
+    {
+        private readonly AccountRelationData _parent;
+        private readonly RelationDataType _type;
+
+        private readonly object _collectionLock = new object();
+        private readonly AVLTree<long> _collection = new AVLTree<long>();
 
         /// <summary>
-        /// Get all followings.
+        /// Integrated event for trigger any AccountRelationData changed.
         /// </summary>
-        public IEnumerable<long> Followings
+        public event Action<RelationDataChangedInfo> AccountDataUpdated;
+
+        private void RaiseAccountDataUpdated(IEnumerable<long> targetUsers, bool isAdded)
+        {
+            var rdci = new RelationDataChangedInfo
+            {
+                AccountUserId = this._parent.AccountId,
+                IsIdAdded = isAdded,
+                TargetUserIds = targetUsers,
+                Type = _type
+            };
+            this.AccountDataUpdated.SafeInvoke(rdci);
+        }
+
+        public AccountRelationDataChunk(AccountRelationData parent, RelationDataType type)
+        {
+            this._parent = parent;
+            this._type = type;
+            Task.Run(() => this.InitializeCollection());
+        }
+
+        private async Task InitializeCollection()
+        {
+            Task<IEnumerable<long>> reader;
+            switch (_type)
+            {
+                case RelationDataType.Following:
+                    reader = UserProxy.GetFollowingsAsync(this._parent.AccountId);
+                    break;
+                case RelationDataType.Follower:
+                    reader = UserProxy.GetFollowersAsync(this._parent.AccountId);
+                    break;
+                case RelationDataType.Blocking:
+                    reader = UserProxy.GetBlockingsAsync(this._parent.AccountId);
+                    break;
+                case RelationDataType.NoRetweets:
+                    reader = UserProxy.GetNoRetweetsAsync(this._parent.AccountId);
+                    break;
+                case RelationDataType.Mutes:
+                    reader = UserProxy.GetMutesAsync(this._parent.AccountId);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+            await this.AddAsync(await reader);
+        }
+
+        public IEnumerable<long> Items
         {
             get
             {
-                lock (this._followingLocker)
+                lock (_collectionLock)
                 {
-                    return this._followings.ToArray();
+                    return _collection.ToArray();
                 }
             }
         }
 
         /// <summary>
-        /// Check is following user(a.k.a. friends)
+        /// Check contains specified user.
         /// </summary>
-        /// <param name="id">his/her Id</param>
-        /// <returns>if true, you have followed him/her.</returns>
-        public bool IsFollowing(long id)
+        /// <param name="id">user id</param>
+        /// <returns>if contains specified user, return true.</returns>
+        public bool Contains(long id)
         {
-            lock (this._followingLocker)
+            lock (_collectionLock)
             {
-                return this._followings.Contains(id);
+                return this._collection.Contains(id);
             }
         }
 
         /// <summary>
-        /// Add/remove following user
+        /// Add/remove user id in this container.
         /// </summary>
         /// <param name="id">target user's id</param>
-        /// <param name="isAdded">flag of follow/remove</param>
-        public async Task SetFollowingAsync(long id, bool isAdded)
+        /// <param name="value">flag for add or remove</param>
+        public async Task SetAsync(long id, bool value)
         {
-            lock (this._followingLocker)
+            lock (_collectionLock)
             {
-                if (isAdded)
+                var result = value ? this._collection.AddDistinct(id) : this._collection.Remove(id);
+                if (!result)
                 {
-                    this._followings.Add(id);
-                }
-                else
-                {
-                    this._followings.Remove(id);
+                    // not changed
+                    return;
                 }
             }
-            await UserProxy.SetFollowingAsync(_accountId, id, isAdded);
-            this.OnAccountDataUpdated(id, isAdded, RelationDataChange.Following);
+            await UserProxy.SetAsync(_type, this._parent.AccountId, id, value);
+            this.RaiseAccountDataUpdated(new[] { id }, value);
         }
 
         /// <summary>
-        /// Set following ids
+        /// Overwrite all elements by specified ids.
         /// </summary>
-        /// <param name="ids">following ids</param>
-        /// <returns>asynchronous operation</returns>
-        public async Task SetFollowingsAsync(IEnumerable<long> ids)
+        /// <param name="ids">new ids</param>
+        public async Task SetAsync(IEnumerable<long> ids)
         {
-            var arg = ids.ToArray();
-            long[] followings;
-            lock (this._followingLocker)
+            var items = ids.ToArray();
+            long[] currents;
+            lock (_collectionLock)
             {
-                followings = _followings.ToArray();
+                currents = _collection.ToArray();
             }
-            var news = arg.Except(followings).ToArray();
-            var olds = followings.Except(arg).ToArray();
-            await Task.WhenAll(
-                RemoveFollowingsAsync(olds),
-                AddFollowingsAsync(news));
+            var news = items.Except(currents).ToArray();
+            var olds = currents.Except(items).ToArray();
+            await RemoveAsync(olds);
+            await AddAsync(news);
         }
 
-        /// <summary>
-        /// Add following users
-        /// </summary>
-        /// <param name="ids">target users' ids</param>
-        public async Task AddFollowingsAsync(IEnumerable<long> ids)
+        private async Task AddAsync(IEnumerable<long> items)
         {
-            var m = ids.Memoize();
-            lock (this._followingLocker)
+            var m = items.ToArray();
+            lock (_collectionLock)
             {
-                m.ForEach(this._followings.Add);
+                m = m.Where(i => _collection.AddDistinct(i)).ToArray();
             }
-            await UserProxy.AddFollowingsAsync(_accountId, m);
-            m.ForEach(id => this.OnAccountDataUpdated(id, true, RelationDataChange.Following));
+            if (m.Length == 0) return;
+            await UserProxy.AddAsync(_type, _parent.AccountId, m);
+            this.RaiseAccountDataUpdated(m, true);
         }
 
-        /// <summary>
-        /// Remove following users
-        /// </summary>
-        /// <param name="ids">target users' ids</param>
-        public async Task RemoveFollowingsAsync(IEnumerable<long> ids)
+        private async Task RemoveAsync(IEnumerable<long> items)
         {
-            var m = ids.Memoize();
-            lock (this._followingLocker)
+            var m = items.ToArray();
+            lock (_collectionLock)
             {
-                m.ForEach(i => this._followings.Remove(i));
+                m = m.Where(i => _collection.Remove(i)).ToArray();
             }
-            await UserProxy.RemoveFollowingsAsync(_accountId, m);
-            m.ForEach(id => this.OnAccountDataUpdated(id, false, RelationDataChange.Following));
-        }
-
-        private readonly object _followersLocker = new object();
-        private readonly AVLTree<long> _followers = new AVLTree<long>();
-
-        /// <summary>
-        /// Get all followers.
-        /// </summary>
-        public IEnumerable<long> Followers
-        {
-            get
-            {
-                lock (this._followersLocker)
-                {
-                    return this._followers.ToArray();
-                }
-            }
-        }
-
-        /// <summary>
-        /// Check is followed user(a.k.a. follower)
-        /// </summary>
-        /// <param name="id">his/her id</param>
-        /// <returns>if true, you are followed by him/her.</returns>
-        public bool IsFollowedBy(long id)
-        {
-            lock (this._followersLocker)
-            {
-                return this._followers.Contains(id);
-            }
-        }
-
-        /// <summary>
-        /// Add/remove follower user
-        /// </summary>
-        /// <param name="id">target user's id</param>
-        /// <param name="isAdded">flag of followed/removed</param>
-        public async Task SetFollowerAsync(long id, bool isAdded)
-        {
-            lock (this._followersLocker)
-            {
-                if (isAdded)
-                {
-                    this._followers.Add(id);
-                }
-                else
-                {
-                    this._followers.Remove(id);
-                }
-            }
-            await UserProxy.SetFollowerAsync(_accountId, id, isAdded);
-            this.OnAccountDataUpdated(id, isAdded, RelationDataChange.Follower);
-        }
-
-        /// <summary>
-        /// Set follower ids
-        /// </summary>
-        /// <param name="ids">follower ids</param>
-        /// <returns>asynchronous operation</returns>
-        public async Task SetFollowersAsync(IEnumerable<long> ids)
-        {
-            var arg = ids.ToArray();
-            long[] followers;
-            lock (this._followersLocker)
-            {
-                followers = _followers.ToArray();
-            }
-            var news = arg.Except(followers).ToArray();
-            var olds = followers.Except(arg).ToArray();
-            await Task.WhenAll(
-                RemoveFollowersAsync(olds),
-                AddFollowersAsync(news));
-        }
-
-        /// <summary>
-        /// Add follower users
-        /// </summary>
-        /// <param name="ids">target users' ids</param>
-        public async Task AddFollowersAsync(IEnumerable<long> ids)
-        {
-            var m = ids.Memoize();
-            lock (this._followersLocker)
-            {
-                m.ForEach(this._followers.Add);
-            }
-            await UserProxy.AddFollowersAsync(_accountId, m);
-            m.ForEach(id => this.OnAccountDataUpdated(id, true, RelationDataChange.Follower));
-        }
-
-        /// <summary>
-        /// Remove follower users
-        /// </summary>
-        /// <param name="ids">target users' ids</param>
-        public async Task RemoveFollowersAsync(IEnumerable<long> ids)
-        {
-            var m = ids.Memoize();
-            lock (this._followersLocker)
-            {
-                m.ForEach(i => this._followers.Remove(i));
-            }
-            await UserProxy.RemoveFollowersAsync(_accountId, m);
-            m.ForEach(id => this.OnAccountDataUpdated(id, false, RelationDataChange.Follower));
-        }
-
-        private readonly object _blockingsLocker = new object();
-        private readonly AVLTree<long> _blockings = new AVLTree<long>();
-
-        /// <summary>
-        /// Get all blockings
-        /// </summary>
-        public IEnumerable<long> Blockings
-        {
-            get
-            {
-                lock (_blockingsLocker)
-                {
-                    return this._blockings.ToArray();
-                }
-            }
-        }
-
-        /// <summary>
-        /// Check someone is blocked me
-        /// </summary>
-        /// <param name="id">his/her id</param>
-        /// <returns>if true, he/she has been blocked me.</returns>
-        public bool IsBlocking(long id)
-        {
-            lock (this._blockingsLocker)
-            {
-                return this._blockings.Contains(id);
-            }
-        }
-
-        /// <summary>
-        /// Add/remove blocking user
-        /// </summary>
-        /// <param name="id">target user's id</param>
-        /// <param name="isAdded">flag of blocked/unblocked</param>
-        public async Task SetBlockingAsync(long id, bool isAdded)
-        {
-            lock (this._blockingsLocker)
-            {
-                if (isAdded)
-                {
-                    this._blockings.Add(id);
-                }
-                else
-                {
-                    this._blockings.Remove(id);
-                }
-            }
-            await UserProxy.SetBlockingAsync(_accountId, id, isAdded);
-            this.OnAccountDataUpdated(id, isAdded, RelationDataChange.Blocking);
-        }
-
-        /// <summary>
-        /// Set blocking ids
-        /// </summary>
-        /// <param name="ids">blocking ids</param>
-        /// <returns>asynchronous operation</returns>
-        public async Task SetBlockingsAsync(IEnumerable<long> ids)
-        {
-            var arg = ids.ToArray();
-            long[] blockings;
-            lock (this._blockingsLocker)
-            {
-                blockings = _blockings.ToArray();
-            }
-            var news = arg.Except(blockings).ToArray();
-            var olds = blockings.Except(arg).ToArray();
-            await Task.WhenAll(
-                RemoveBlockingsAsync(olds),
-                AddBlockingsAsync(news));
-        }
-
-        /// <summary>
-        /// Add blocking users
-        /// </summary>
-        /// <param name="ids">target users' ids</param>
-        public async Task AddBlockingsAsync(IEnumerable<long> ids)
-        {
-            var m = ids.Memoize();
-            lock (this._blockingsLocker)
-            {
-                m.ForEach(this._blockings.Add);
-            }
-            await UserProxy.AddBlockingsAsync(_accountId, m);
-            m.ForEach(id => this.OnAccountDataUpdated(id, true, RelationDataChange.Blocking));
-        }
-
-        /// <summary>
-        /// Remove blocking users
-        /// </summary>
-        /// <param name="ids">target users' ids</param>
-        public async Task RemoveBlockingsAsync(IEnumerable<long> ids)
-        {
-            var m = ids.Memoize();
-            lock (this._blockingsLocker)
-            {
-                m.ForEach(i => this._blockings.Remove(i));
-            }
-            await UserProxy.RemoveBlockingsAsync(_accountId, m);
-            m.ForEach(id => this.OnAccountDataUpdated(id, false, RelationDataChange.Blocking));
-        }
-
-        private readonly object _noRetweetsLocker = new object();
-        private readonly AVLTree<long> _noRetweets = new AVLTree<long>();
-
-        /// <summary>
-        /// Get all users whose retweet is suppressed.
-        /// </summary>
-        public IEnumerable<long> NoRetweets
-        {
-            get
-            {
-                lock (_noRetweetsLocker)
-                {
-                    return this._noRetweets.ToArray();
-                }
-            }
-        }
-
-        /// <summary>
-        /// Check someone is blocked me
-        /// </summary>
-        /// <param name="id">his/her id</param>
-        /// <returns>if true, he/she has been blocked me.</returns>
-        public bool IsNoRetweets(long id)
-        {
-            lock (this._noRetweetsLocker)
-            {
-                return this._noRetweets.Contains(id);
-            }
-        }
-
-        /// <summary>
-        /// Add/remove blocking user
-        /// </summary>
-        /// <param name="id">target user's id</param>
-        /// <param name="isAdded">flag of blocked/unblocked</param>
-        public async Task SetNoRetweetsAsync(long id, bool isAdded)
-        {
-            lock (this._noRetweetsLocker)
-            {
-                if (isAdded)
-                {
-                    this._noRetweets.Add(id);
-                }
-                else
-                {
-                    this._noRetweets.Remove(id);
-                }
-            }
-            await UserProxy.SetNoRetweetsAsync(_accountId, id, isAdded);
-            this.OnAccountDataUpdated(id, isAdded, RelationDataChange.NoRetweets);
-        }
-
-        /// <summary>
-        /// Set no retweet ids
-        /// </summary>
-        /// <param name="ids">no retweet ids</param>
-        /// <returns>asynchronous operation</returns>
-        public async Task SetNoRetweetsAsync(IEnumerable<long> ids)
-        {
-            var arg = ids.ToArray();
-            long[] noRetweets;
-            lock (this._noRetweetsLocker)
-            {
-                noRetweets = _noRetweets.ToArray();
-            }
-            var news = arg.Except(noRetweets).ToArray();
-            var olds = noRetweets.Except(arg).ToArray();
-            await Task.WhenAll(
-                RemoveNoRetweetsAsync(olds),
-                AddNoRetweetsAsync(news));
-        }
-
-        /// <summary>
-        /// Add blocking users
-        /// </summary>
-        /// <param name="ids">target users' ids</param>
-        public async Task AddNoRetweetsAsync(IEnumerable<long> ids)
-        {
-            var m = ids.Memoize();
-            lock (this._noRetweetsLocker)
-            {
-                m.ForEach(this._noRetweets.Add);
-            }
-            await UserProxy.AddNoRetweetssAsync(_accountId, m);
-            m.ForEach(id => this.OnAccountDataUpdated(id, true, RelationDataChange.NoRetweets));
-        }
-
-        /// <summary>
-        /// Remove blocking users
-        /// </summary>
-        /// <param name="ids">target users' ids</param>
-        public async Task RemoveNoRetweetsAsync(IEnumerable<long> ids)
-        {
-            var m = ids.Memoize();
-            lock (this._noRetweetsLocker)
-            {
-                m.ForEach(i => this._noRetweets.Remove(i));
-            }
-            await UserProxy.RemoveNoRetweetssAsync(_accountId, m);
-            m.ForEach(id => this.OnAccountDataUpdated(id, false, RelationDataChange.NoRetweets));
+            if (m.Length == 0) return;
+            await UserProxy.RemoveAsync(_type, _parent.AccountId, m);
+            this.RaiseAccountDataUpdated(m, false);
         }
     }
 
@@ -502,7 +254,7 @@ namespace StarryEyes.Models.Accounting
         /// <summary>
         /// Change description
         /// </summary>
-        public RelationDataChange Change { get; set; }
+        public RelationDataType Type { get; set; }
 
         /// <summary>
         /// Flag of user is added or removed
@@ -510,9 +262,9 @@ namespace StarryEyes.Models.Accounting
         public bool IsIdAdded { get; set; }
 
         /// <summary>
-        /// target user's id
+        /// target user's id collection
         /// </summary>
-        public long TargetUserId { get; set; }
+        public IEnumerable<long> TargetUserIds { get; set; }
 
         /// <summary>
         /// Acted account user's id
@@ -521,30 +273,9 @@ namespace StarryEyes.Models.Accounting
 
         public override string ToString()
         {
-            return this.Change.ToString() + " " + this.AccountUserId + " => " + this.TargetUserId;
+            return this.Type + " " + this.AccountUserId + " => " +
+                   this.TargetUserIds.Select(s => s.ToString()).JoinString(", ");
         }
     }
 
-    /// <summary>
-    /// Describe changed data
-    /// </summary>
-    public enum RelationDataChange
-    {
-        /// <summary>
-        /// Following users is updated
-        /// </summary>
-        Following,
-        /// <summary>
-        /// Follower users is updated
-        /// </summary>
-        Follower,
-        /// <summary>
-        /// Blocking users is updated
-        /// </summary>
-        Blocking,
-        /// <summary>
-        /// Retweet suppression user is updated
-        /// </summary>
-        NoRetweets,
-    }
 }

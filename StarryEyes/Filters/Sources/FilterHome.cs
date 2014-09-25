@@ -33,7 +33,7 @@ namespace StarryEyes.Filters.Sources
             var ads = accounts.Select(a => a.Id.ToString(CultureInfo.InvariantCulture))
                               .JoinString(",");
             var userMention = ((int)EntityType.UserMentions).ToString(CultureInfo.InvariantCulture);
-            var followings = accounts.SelectMany(a => a.RelationData.Followings)
+            var followings = accounts.SelectMany(a => a.RelationData.Followings.Items)
                                      .Select(id => id.ToString(CultureInfo.InvariantCulture))
                                      .JoinString(",");
             var mytweets = "UserId in (" + ads + ")";
@@ -55,7 +55,7 @@ namespace StarryEyes.Filters.Sources
                 return false;
             return datas.Any(account =>
                              status.User.Id == account.Id ||
-                             account.RelationData.IsFollowing(status.User.Id) ||
+                             account.RelationData.Followings.Contains(status.User.Id) ||
                              FilterSystemUtil.InReplyToUsers(status).Contains(account.Id));
         }
 

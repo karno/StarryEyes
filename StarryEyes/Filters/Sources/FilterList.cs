@@ -38,6 +38,7 @@ namespace StarryEyes.Filters.Sources
                 this._receiverScreenName = splited[0];
             }
             _watcher = new ListWatcher(_listInfo);
+            System.Diagnostics.Debug.WriteLine("#INVALIDATION: List Information Loaded");
             _watcher.OnListMemberUpdated += this.RaiseInvalidateRequired;
         }
 

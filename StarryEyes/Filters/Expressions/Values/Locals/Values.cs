@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models.Accounting;
+using StarryEyes.Models.Databases;
 
 namespace StarryEyes.Filters.Expressions.Values.Locals
 {
@@ -19,8 +20,8 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
         private void ExpressionReapplyRequested(RelationDataChangedInfo obj)
         {
             if (obj != null) return;
-            System.Diagnostics.Debug.WriteLine("local user reapply");
-            this.RaiseReapplyFilter();
+            System.Diagnostics.Debug.WriteLine("#INVALIDATION: from Local User");
+            this.RaiseInvalidateFilter();
         }
 
         public override IEnumerable<FilterExpressionType> SupportedTypes
@@ -83,9 +84,10 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 
         private void ExpressionReapplyRequested(RelationDataChangedInfo obj)
         {
-            if (obj == null || obj.Change == RelationDataChange.Following)
+            if (obj == null || obj.Type == RelationDataType.Following)
             {
-                this.RaiseReapplyFilter();
+                System.Diagnostics.Debug.WriteLine("#INVALIDATION: from Local User Following updated");
+                this.RaiseInvalidateFilter();
             }
         }
 
@@ -133,9 +135,10 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 
         private void ExpressionReapplyRequested(RelationDataChangedInfo obj)
         {
-            if (obj == null || obj.Change == RelationDataChange.Follower)
+            if (obj == null || obj.Type == RelationDataType.Follower)
             {
-                this.RaiseReapplyFilter();
+                System.Diagnostics.Debug.WriteLine("#INVALIDATION: from Local User Follower updated");
+                this.RaiseInvalidateFilter();
             }
         }
 
@@ -183,9 +186,10 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 
         private void ExpressionReapplyRequested(RelationDataChangedInfo obj)
         {
-            if (obj == null || obj.Change == RelationDataChange.Blocking)
+            if (obj == null || obj.Type == RelationDataType.Blocking)
             {
-                this.RaiseReapplyFilter();
+                System.Diagnostics.Debug.WriteLine("#INVALIDATION: from Local User Blocking updated");
+                this.RaiseInvalidateFilter();
             }
         }
 

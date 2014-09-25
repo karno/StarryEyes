@@ -27,6 +27,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
         private bool _isFollowedBack;
         private bool _isBlocking;
         private bool _isNoRetweets;
+        private bool _isMutes;
 
         public string SourceUserScreenName
         {
@@ -98,16 +99,26 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             }
         }
 
+        public bool IsMutes
+        {
+            get { return this._isMutes; }
+            set
+            {
+                this._isMutes = value;
+                RaisePropertyChanged();
+            }
+        }
+
         public RelationControlViewModel(UserInfoViewModel parent, TwitterAccount source, TwitterUser target)
         {
             this._parent = parent;
             this._source = source;
             this._target = target;
             var rds = source.RelationData;
-            this.IsFollowing = rds.IsFollowing(target.Id);
-            this.IsFollowedBack = rds.IsFollowedBy(target.Id);
-            this.IsBlocking = rds.IsBlocking(target.Id);
-            this.IsNoRetweets = rds.IsNoRetweets(target.Id);
+            this.IsFollowing = rds.Followings.Contains(target.Id);
+            this.IsFollowedBack = rds.Followers.Contains(target.Id);
+            this.IsBlocking = rds.Blockings.Contains(target.Id);
+            this.IsNoRetweets = rds.NoRetweets.Contains(target.Id);
             Task.Run(() => this.GetFriendship(rds));
         }
 
@@ -120,23 +131,30 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 if (this.IsFollowing != fs.IsSourceFollowingTarget)
                 {
                     this.IsFollowing = fs.IsSourceFollowingTarget;
-                    await rds.SetFollowingAsync(this._target.Id, fs.IsSourceFollowingTarget);
+                    await rds.Followings.SetAsync(this._target.Id, fs.IsSourceFollowingTarget);
                 }
                 if (this.IsFollowedBack != fs.IsTargetFollowingSource)
                 {
                     this.IsFollowedBack = fs.IsTargetFollowingSource;
-                    await rds.SetFollowerAsync(_target.Id, fs.IsTargetFollowingSource);
+                    await rds.Followers.SetAsync(_target.Id, fs.IsTargetFollowingSource);
                 }
                 if (this.IsBlocking != fs.IsBlocking)
                 {
                     this.IsBlocking = fs.IsBlocking;
-                    await rds.SetBlockingAsync(_target.Id, fs.IsBlocking);
+                    await rds.Blockings.SetAsync(_target.Id, fs.IsBlocking);
                 }
                 var nort = !fs.IsWantRetweets.GetValueOrDefault(true);
                 if (this.IsNoRetweets != nort)
                 {
                     this.IsNoRetweets = nort;
-                    await rds.SetNoRetweetsAsync(_target.Id, nort);
+                    await rds.NoRetweets.SetAsync(_target.Id, nort);
+                }
+
+                var mute = !fs.IsMuting.GetValueOrDefault(false);
+                if (this.IsMutes != mute)
+                {
+                    this.IsMutes = mute;
+                    await rds.Mutes.SetAsync(_target.Id, mute);
                 }
                 // ReSharper restore InvertIf
             }
@@ -154,7 +172,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 () =>
                 {
                     this.IsFollowing = true;
-                    Task.Run(() => _source.RelationData.SetFollowingAsync(_target.Id, true));
+                    Task.Run(() => _source.RelationData.Followings.SetAsync(_target.Id, true));
                 },
                 ex => ShowTaskDialogMessage(new TaskDialogOptions
                 {
@@ -174,7 +192,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 () =>
                 {
                     this.IsFollowing = false;
-                    Task.Run(() => _source.RelationData.SetFollowingAsync(_target.Id, false));
+                    Task.Run(() => _source.RelationData.Followings.SetAsync(_target.Id, false));
                 },
                 ex => ShowTaskDialogMessage(new TaskDialogOptions
                 {
@@ -195,8 +213,8 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 {
                     this.IsFollowing = false;
                     this.IsBlocking = true;
-                    Task.Run(() => _source.RelationData.SetFollowingAsync(_target.Id, false));
-                    Task.Run(() => _source.RelationData.SetBlockingAsync(_target.Id, true));
+                    Task.Run(() => _source.RelationData.Followings.SetAsync(_target.Id, false));
+                    Task.Run(() => _source.RelationData.Blockings.SetAsync(_target.Id, true));
                 },
                 ex => ShowTaskDialogMessage(new TaskDialogOptions
                 {
@@ -216,7 +234,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 () =>
                 {
                     this.IsBlocking = false;
-                    Task.Run(() => _source.RelationData.SetBlockingAsync(_target.Id, false));
+                    Task.Run(() => _source.RelationData.Blockings.SetAsync(_target.Id, false));
                 },
                 ex => ShowTaskDialogMessage(new TaskDialogOptions
                 {
@@ -236,7 +254,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 () =>
                 {
                     this.IsNoRetweets = true;
-                    Task.Run(() => _source.RelationData.SetNoRetweetsAsync(_target.Id, true));
+                    Task.Run(() => _source.RelationData.NoRetweets.SetAsync(_target.Id, true));
                 },
                 ex => ShowTaskDialogMessage(new TaskDialogOptions
                 {
@@ -256,13 +274,53 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 () =>
                 {
                     this.IsNoRetweets = false;
-                    Task.Run(() => _source.RelationData.SetNoRetweetsAsync(_target.Id, false));
+                    Task.Run(() => _source.RelationData.NoRetweets.SetAsync(_target.Id, false));
                 },
                 ex => ShowTaskDialogMessage(new TaskDialogOptions
                 {
                     Title = SearchFlipResources.MsgErrorUnsuppressRetweetsTitle,
                     MainIcon = VistaTaskDialogIcon.Error,
                     MainInstruction = SearchFlipResources.MsgErrorUnsuppressRetweetsInst,
+                    Content = GetExceptionDescription(ex),
+                    CommonButtons = TaskDialogCommonButtons.Close,
+                }));
+        }
+
+        [UsedImplicitly]
+        public void Mute()
+        {
+            this.DispatchMute(
+                true,
+                () =>
+                {
+                    this.IsMutes = true;
+                    Task.Run(() => _source.RelationData.Mutes.SetAsync(_target.Id, true));
+                },
+                ex => ShowTaskDialogMessage(new TaskDialogOptions
+                {
+                    Title = SearchFlipResources.MsgErrorMuteTitle,
+                    MainIcon = VistaTaskDialogIcon.Error,
+                    MainInstruction = SearchFlipResources.MsgErrorMuteInst,
+                    Content = GetExceptionDescription(ex),
+                    CommonButtons = TaskDialogCommonButtons.Close,
+                }));
+        }
+
+        [UsedImplicitly]
+        public void Unmute()
+        {
+            this.DispatchMute(
+                false,
+                () =>
+                {
+                    this.IsMutes = false;
+                    Task.Run(() => _source.RelationData.Mutes.SetAsync(_target.Id, false));
+                },
+                ex => ShowTaskDialogMessage(new TaskDialogOptions
+                {
+                    Title = SearchFlipResources.MsgErrorUnmuteTitle,
+                    MainIcon = VistaTaskDialogIcon.Error,
+                    MainInstruction = SearchFlipResources.MsgErrorUnmuteInst,
                     Content = GetExceptionDescription(ex),
                     CommonButtons = TaskDialogCommonButtons.Close,
                 }));
@@ -311,7 +369,15 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
         private void DispatchRetweetSuppression(bool suppress, Action succeeded, Action<Exception> failed)
         {
             this.IsCommunicating = true;
-            RequestQueue.EnqueueObservable(_source, new UpdateFriendshipsRequest(_target, suppress))
+            RequestQueue.EnqueueObservable(_source, new UpdateFriendshipsRequest(_target, null, suppress))
+                        .Finally(() => this.IsCommunicating = false)
+                        .Subscribe(_ => { }, failed, succeeded);
+        }
+
+        private void DispatchMute(bool mute, Action succeeded, Action<Exception> failed)
+        {
+            this.IsCommunicating = true;
+            RequestQueue.EnqueueObservable(_source, new UpdateMuteRequest(_target, mute))
                         .Finally(() => this.IsCommunicating = false)
                         .Subscribe(_ => { }, failed, succeeded);
         }

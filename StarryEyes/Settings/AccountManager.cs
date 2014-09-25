@@ -84,7 +84,7 @@ namespace StarryEyes.Settings
                 return this.Get(id);
             }
             var followings = Setting.Accounts.Collection
-                                    .Where(a => a.RelationData.IsFollowing(id))
+                                    .Where(a => a.RelationData.Followings.Contains(id))
                                     .ToArray();
             return followings.Length == 0
                        ? this.GetRandomOne()

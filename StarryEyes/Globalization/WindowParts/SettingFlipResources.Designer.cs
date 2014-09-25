@@ -926,6 +926,15 @@ namespace StarryEyes.Globalization.WindowParts {
         }
         
         /// <summary>
+        ///   Mute users you specified on twitter official [recommended] に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MuteOfficialMutedUsers {
+            get {
+                return ResourceManager.GetString("MuteOfficialMutedUsers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Reset changes に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string MuteReset {

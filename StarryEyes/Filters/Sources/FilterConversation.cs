@@ -60,6 +60,7 @@ namespace StarryEyes.Filters.Sources
             finally
             {
                 _isPreparing = false;
+                System.Diagnostics.Debug.WriteLine("#INVALIDATION: Conversation Loaded");
                 this.RaiseInvalidateRequired();
             }
         }

@@ -625,4 +625,7 @@ Are you sure?</value>
   <data name="TimelineThumbnailType" xml:space="preserve">
     <value>Thumbnails:</value>
   </data>
+  <data name="MuteOfficialMutedUsers" xml:space="preserve">
+    <value>Mute users you specified on twitter official [recommended]</value>
+  </data>
 </root>
