@@ -123,22 +123,22 @@ namespace StarryEyes.Casket.Connections
             return descriptor
                 .GetTaskFactory(false)
                 .StartNew(() =>
-            {
-                using (descriptor.AcquireReadLock())
                 {
-                    try
+                    using (descriptor.AcquireReadLock())
                     {
-                        using (var con = descriptor.GetConnection())
+                        try
                         {
-                            return con.Query<T>(query, param);
+                            using (var con = descriptor.GetConnection())
+                            {
+                                return con.Query<T>(query, param);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            throw WrapException(ex, "QueryAsync", query);
                         }
                     }
-                    catch (Exception ex)
-                    {
-                        throw WrapException(ex, "QueryAsync", query);
-                    }
-                }
-            });
+                });
         }
 
         internal static SqliteCrudException WrapException(Exception exception, string command, string query)

@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Models.Databases;
@@ -49,6 +51,24 @@ namespace StarryEyes.Models.Stores
                 UserProxy.StoreUser(user);
             }
             return user;
+        }
+
+        public static async Task<IEnumerable<TwitterUser>> GetUsersAsync(IEnumerable<long> ids)
+        {
+            var target = ids.ToArray();
+            var users = (await UserProxy.GetUsersAsync(target)).ToList();
+            var needFetch = target.Except(users.Select(u => u.Id));
+            foreach (var id in needFetch)
+            {
+                var acc = Setting.Accounts.GetRelatedOne(id);
+                if (acc != null)
+                {
+                    var user = await acc.ShowUserAsync(id);
+                    UserProxy.StoreUser(user);
+                    users.Add(user);
+                }
+            }
+            return users;
         }
     }
 }

@@ -191,12 +191,12 @@ namespace StarryEyes.Models.Databases
                 IEnumerable<long> favadd, favremove, rtadd, rtremove;
                 _favoriteQueue.GetDirtyActivity(status.Id, out favadd, out favremove);
                 _retweetQueue.GetDirtyActivity(status.Id, out rtadd, out rtremove);
-                var favorers = await DatabaseUtil.RetryIfLocked(
+                var favorers = DatabaseUtil.RetryIfLocked(
                     async () => await Database.FavoritesCrud.GetUsersAsync(status.Id));
-                var retweeters = await DatabaseUtil.RetryIfLocked(
+                var retweeters = DatabaseUtil.RetryIfLocked(
                     async () => await Database.RetweetsCrud.GetUsersAsync(status.Id));
-                status.FavoritedUsers = favorers.Guard().Concat(favadd).Except(favremove).ToArray();
-                status.RetweetedUsers = retweeters.Guard().Concat(rtadd).Except(rtremove).ToArray();
+                status.FavoritedUsers = (await favorers).Guard().Concat(favadd).Except(favremove).ToArray();
+                status.RetweetedUsers = (await retweeters).Guard().Concat(rtadd).Except(rtremove).ToArray();
             }
             return status;
         }
@@ -358,6 +358,10 @@ namespace StarryEyes.Models.Databases
         {
             if (dbstatus == null) throw new ArgumentNullException("dbstatus");
             var targets = dbstatus.ToArray();
+            if (targets.Length == 0)
+            {
+                return Enumerable.Empty<TwitterStatus>();
+            }
             var retweetOriginalIds = new HashSet<long>();
             var targetUserIds = new HashSet<long>();
             var entitiesTargetIds = new HashSet<long>();
@@ -396,12 +400,8 @@ namespace StarryEyes.Models.Databases
                 await Database.FavoritesCrud.GetUsersDictionaryAsync(activitiesTargetIds));
             var rtdicTask = DatabaseUtil.RetryIfLocked(async () =>
                 await Database.RetweetsCrud.GetUsersDictionaryAsync(activitiesTargetIds));
-            //var retweets = (await retweetsTask).ToDictionary(d => d.Id);
-            var rttmp = (await retweetsTask).ToArray();
-            var retweets = rttmp.ToDictionary(d => d.Id);
-            // var users = (await usersTask).ToDictionary(d => d.Id);
-            var utmp = (await usersTask).ToArray();
-            var users = utmp.ToDictionary(d => d.Id);
+            var retweets = (await retweetsTask).ToDictionary(d => d.Id);
+            var users = (await usersTask).ToDictionary(d => d.Id);
             var ses = await sesTask;
             var favdic = await favdicTask;
             var rtdic = await rtdicTask;

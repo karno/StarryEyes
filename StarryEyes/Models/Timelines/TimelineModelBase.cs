@@ -6,7 +6,6 @@ using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Livet;
-using StarryEyes.Albireo.Collections;
 using StarryEyes.Albireo.Helpers;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models.Receiving;
@@ -27,7 +26,7 @@ namespace StarryEyes.Models.Timelines
         private bool _isAutoTrimEnabled;
         private bool _isLoading;
 
-        private readonly AVLTree<long> _statusIdCache;
+        private readonly HashSet<long> _statusIdCache;
         private readonly ObservableSynchronizedCollectionEx<StatusModel> _statuses;
 
         public bool IsLoading
@@ -67,7 +66,7 @@ namespace StarryEyes.Models.Timelines
 
         public TimelineModelBase()
         {
-            this._statusIdCache = new AVLTree<long>();
+            this._statusIdCache = new HashSet<long>();
             this._statuses = new ObservableSynchronizedCollectionEx<StatusModel>();
         }
 
@@ -108,24 +107,42 @@ namespace StarryEyes.Models.Timelines
 
         private async Task<bool> AddStatus(TwitterStatus status, bool isNewArrival)
         {
-            lock (this._statusIdCache)
+            if (!this.CheckStatusAdd(status, false))
             {
-                if (this._statusIdCache.Contains(status.Id))
-                {
-                    return false;
-                }
+                return false;
             }
+
             var model = await StatusModel.Get(status);
             return this.AddStatus(model, isNewArrival);
         }
 
         protected virtual bool AddStatus(StatusModel model, bool isNewArrival)
         {
-            // estimate point
+            if (!this.CheckStatusAdd(model.Status, true))
+            {
+                return false;
+            }
+
             var stamp = model.Status.CreatedAt;
+            this.Statuses.Insert(
+                i => i.TakeWhile(s => s.Status.CreatedAt > stamp).Count(),
+                model);
+            // check auto trim
+            if (this.IsAutoTrimEnabled &&
+                this._statusIdCache.Count > TimelineChunkCount + TimelineChunkCountBounce &&
+                Interlocked.Exchange(ref this._trimCount, 1) == 0)
+            {
+                this.TrimTimeline();
+            }
+            return true;
+        }
+
+        private bool CheckStatusAdd(TwitterStatus status, bool actualAdd)
+        {
+            var stamp = status.CreatedAt;
             if (this.IsAutoTrimEnabled)
             {
-                // check status will not be trimmed
+                // check whether status is in trimmed place or not.
                 StatusModel lastModel;
                 if (this.Statuses.TryIndexOf(TimelineChunkCount, out lastModel) &&
                     lastModel != null &&
@@ -137,20 +154,12 @@ namespace StarryEyes.Models.Timelines
             }
             lock (this._statusIdCache)
             {
-                if (!this._statusIdCache.AddDistinct(model.Status.Id))
+                if (actualAdd
+                    ? !this._statusIdCache.Add(status.Id)
+                    : this._statusIdCache.Contains(status.Id))
                 {
                     return false;
                 }
-            }
-            this.Statuses.Insert(
-                i => i.TakeWhile(s => s.Status.CreatedAt > stamp).Count(),
-                model);
-            // check auto trim
-            if (this.IsAutoTrimEnabled &&
-                this._statusIdCache.Count > TimelineChunkCount + TimelineChunkCountBounce &&
-                Interlocked.Exchange(ref this._trimCount, 1) == 0)
-            {
-                this.TrimTimeline();
             }
             return true;
         }

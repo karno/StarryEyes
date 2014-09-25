@@ -100,6 +100,10 @@ namespace StarryEyes.Models.Databases
         public static async Task<IEnumerable<TwitterUser>> GetUsersAsync(IEnumerable<long> ids)
         {
             var targets = ids.ToArray();
+            if (targets.Length == 0)
+            {
+                return Enumerable.Empty<TwitterUser>();
+            }
             var queued = _userQueue.Find(u => targets.Any(t => t == u.Id)).ToArray();
             var dt = targets.Except(queued.Select(u => u.Id)).ToArray();
             var dbu = await DatabaseUtil.RetryIfLocked(async () =>
@@ -135,6 +139,10 @@ namespace StarryEyes.Models.Databases
         private static async Task<IEnumerable<TwitterUser>> ResolveUsersAsync(IEnumerable<DatabaseUser> users)
         {
             var targets = users.ToArray();
+            if (targets.Length == 0)
+            {
+                return Enumerable.Empty<TwitterUser>();
+            }
             var ids = targets.Select(u => u.Id).ToArray();
             var desTask = DatabaseUtil.RetryIfLocked(async () =>
                 await Database.UserDescriptionEntityCrud.GetEntitiesDictionaryAsync(ids));

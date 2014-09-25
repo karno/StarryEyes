@@ -2,7 +2,6 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
@@ -214,36 +213,44 @@ namespace StarryEyes.Models.Timelines.Statuses
             }
         }
 
-        private static void LoadUsers(long[] users, object lockObject,
+        private static void LoadUsers(IEnumerable<long> users,
+            object lockObject,
             IDictionary<long, TwitterUser> dictionary,
             IList<TwitterUser> target)
         {
-            users.Distinct()
-                 .Reverse()
-                 .Where(id =>
-                 {
-                     lock (lockObject)
-                     {
-                         if (dictionary.ContainsKey(id))
-                         {
-                             return false;
-                         }
-                         // acquire position
-                         dictionary.Add(id, null);
-                         return true;
-                     }
-                 })
-                 .Select(id => Observable.Start(() => StoreHelper.GetUserAsync(id)))
-                 .Merge()
-                 .SelectMany(_ => _)
-                 .Subscribe(u =>
-                 {
-                     lock (lockObject)
-                     {
-                         dictionary[u.Id] = u;
-                     }
-                     target.Insert(0, u);
-                 });
+            var source = users.Reverse().ToArray();
+            Task.Run(async () =>
+            {
+                var loadSource = new HashSet<long>();
+                lock (lockObject)
+                {
+                    foreach (var userId in source)
+                    {
+                        // check dictionary not contains the id
+                        if (dictionary.ContainsKey(userId)) continue;
+                        // acquire position
+                        dictionary.Add(userId, null);
+                        loadSource.Add(userId);
+                    }
+                }
+                var ud = (await StoreHelper.GetUsersAsync(loadSource)).ToDictionary(u => u.Id);
+                lock (lockObject)
+                {
+                    foreach (var userId in source)
+                    {
+                        TwitterUser user;
+                        if (!dictionary.TryGetValue(userId, out user) || user != null)
+                        {
+                            // user is not in dictionary or
+                            // user is already loaded => skip adding
+                            continue;
+                        }
+                        var nu = ud[userId];
+                        dictionary[userId] = nu;
+                        target.Insert(0, nu);
+                    }
+                }
+            });
         }
 
         public static void UpdateStatusInfo(long id,
