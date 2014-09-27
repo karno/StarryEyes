@@ -283,6 +283,24 @@ namespace StarryEyes.ViewModels
                 this.ReInitTabs();
             }
 
+            // check cleanup parameter
+            if (Setting.AutoCleanupTweets.Value &&
+                Setting.AutoCleanupThreshold.Value < 0)
+            {
+                var msg = this.Messenger.GetResponseSafe(() =>
+                    new TaskDialogMessage(new TaskDialogOptions
+                    {
+                        Title = AppInitResources.MsgCleanupConfigTitle,
+                        MainIcon = VistaTaskDialogIcon.Information,
+                        MainInstruction = AppInitResources.MsgCleanupConfigInst,
+                        Content = AppInitResources.MsgCleanupConfigContent,
+                        ExpandedInfo = AppInitResources.MsgCleanupConfigExInfo,
+                        CommonButtons = TaskDialogCommonButtons.YesNo
+                    }));
+                Setting.AutoCleanupTweets.Value = msg.Response.Result == TaskDialogSimpleResult.Yes;
+                Setting.AutoCleanupThreshold.Value = 100000;
+            }
+
             // check execution properties
             if (Setting.ShowStartupConfigurationWarning.Value)
             {

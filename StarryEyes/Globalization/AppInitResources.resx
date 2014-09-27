@@ -276,4 +276,26 @@ Generate default tabs?</value>
   <data name="MsgTabWarningTitle" xml:space="preserve">
     <value>Tab Warning</value>
   </data>
+  <data name="MsgDbCleanupFailedInst" xml:space="preserve">
+    <value>Krile Database Cleanup</value>
+  </data>
+  <data name="MsgDbCleanupFailedTitle" xml:space="preserve">
+    <value>Database cleanup failed</value>
+  </data>
+  <data name="MsgCleanupConfigContent" xml:space="preserve">
+    <value>Krile stores received status in local database.
+Cleaning database will improve performance and reduce disk consumption.
+If you enable this, Krile will cleanup old tweets in every startup.
+Enable it?</value>
+  </data>
+  <data name="MsgCleanupConfigExInfo" xml:space="preserve">
+    <value>As default, leave latest 100,000 records.
+You can change this threshold or enable/disable cleanup feature from settings.</value>
+  </data>
+  <data name="MsgCleanupConfigInst" xml:space="preserve">
+    <value>Tweet automatic cleanup is available.</value>
+  </data>
+  <data name="MsgCleanupConfigTitle" xml:space="preserve">
+    <value>Cleanup Tweets</value>
+  </data>
 </root>

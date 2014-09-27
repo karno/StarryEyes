@@ -119,6 +119,12 @@ namespace StarryEyes.Settings
         public static readonly SettingItem<string> SearchLanguage =
             new SettingItem<string>("SearchLanguage", Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName);
 
+        public static readonly SettingItemStruct<bool> AutoCleanupTweets =
+            new SettingItemStruct<bool>("AutoCleanupTweets", true);
+
+        public static readonly SettingItemStruct<int> AutoCleanupThreshold =
+            new SettingItemStruct<int>("AutoCleanupThreshold", -1);
+
         #endregion
 
         #region Themes and Key Assigns

@@ -66,7 +66,7 @@ namespace StarryEyes.Casket.Cruds
         public async Task<IEnumerable<DatabaseUser>> GetUsersFastAsync(string firstMatchScreenName, int count)
         {
             return await Descriptor.QueryAsync<DatabaseUser>(
-                this.CreateSql("LOWER(ScreenName) like @Match order by ScreenName limit " + count),
+                this.CreateSql(string.Format("LOWER(ScreenName) like @Match order by ScreenName limit {0}", count)),
                 new { Match = firstMatchScreenName.ToLower() + "%" });
         }
 

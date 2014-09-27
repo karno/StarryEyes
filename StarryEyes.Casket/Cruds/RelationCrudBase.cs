@@ -26,7 +26,7 @@ namespace StarryEyes.Casket.Cruds
 
         internal async Task DropTableAsync()
         {
-            await Descriptor.ExecuteAsync("drop table " + TableName);
+            await Descriptor.ExecuteAsync(string.Format("drop table {0};", this.TableName));
         }
 
         public async Task<bool> ContainsAsync(long userId, long targetId)
@@ -51,7 +51,7 @@ namespace StarryEyes.Casket.Cruds
         public async Task DeleteAsync(long userId, long targetId)
         {
             await Descriptor.ExecuteAsync(
-                "delete from " + TableName + " where UserId = @UserId and TargetId = @TargetId;",
+                string.Format("delete from {0} where UserId = @UserId and TargetId = @TargetId;", this.TableName),
                 new { UserId = userId, TargetId = targetId });
         }
 
@@ -60,7 +60,7 @@ namespace StarryEyes.Casket.Cruds
             var tids = targetId.Select(i => i.ToString(CultureInfo.InvariantCulture)).JoinString(",");
             if (String.IsNullOrEmpty(tids)) return;
             await Descriptor.ExecuteAsync(
-                "delete from " + TableName + " where UserId = @UserId and TargetId in (" + tids + ");",
+                string.Format("delete from {0} where UserId = @UserId and TargetId in ({1});", this.TableName, tids),
                 new { UserId = userId });
         }
 
@@ -80,13 +80,13 @@ namespace StarryEyes.Casket.Cruds
         public async Task DropUserAsync(long userId)
         {
             await Descriptor.ExecuteAsync(
-                "delete from " + TableName + " where UserId = @UserId;",
+                string.Format("delete from {0} where UserId = @UserId;", this.TableName),
                 new { UserId = userId });
         }
 
         public async Task DropAllAsync()
         {
-            await Descriptor.ExecuteAsync("delete from " + TableName + ";");
+            await Descriptor.ExecuteAsync(string.Format("delete from {0};", this.TableName));
         }
     }
 

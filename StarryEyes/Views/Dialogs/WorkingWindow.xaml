@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:my="http://metro.mahapps.com/winfx/xaml/controls"
         Title="Krile StarryEyes - Database Optimizer"
-        Width="300"
+        Width="320"
         Height="100"
         Background="#FF222222"
         IsEnabled="False"

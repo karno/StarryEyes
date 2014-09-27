@@ -55,6 +55,23 @@ namespace StarryEyes.Casket.Cruds
             return await Descriptor.QueryAsync<DatabaseStatus>(sql, null);
         }
 
+        public async Task DeleteOldStatusAsync(int keepStatusCount)
+        {
+            await Descriptor.ExecuteAsync(
+                string.Format(
+                    "DELETE FROM {0} WHERE Id IN (SELECT Id FROM {0} ORDER BY CreatedAt DESC LIMIT -1 OFFSET @Offset);",
+                    this.TableName),
+                new { Offset = keepStatusCount });
+        }
+
+        public async Task DeleteOrphanedRetweetAsync()
+        {
+            await Descriptor.ExecuteAsync(
+                string.Format("DELETE FROM {0} WHERE RetweetOriginalid IS NOT NULL AND " +
+                              "RetweetOriginalId NOT IN (SELECT Id FROM {0});",
+                    this.TableName));
+        }
+
         public async Task<long?> GetInReplyToAsync(long id)
         {
             return (await Descriptor.QueryAsync<long?>(

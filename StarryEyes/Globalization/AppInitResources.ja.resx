@@ -281,4 +281,26 @@ Windowsの設定を変更することで、この問題を回避できる可能�
   <data name="MsgTabWarningTitle" xml:space="preserve">
     <value>タブ情報の警告</value>
   </data>
+  <data name="MsgDbCleanupFailedInst" xml:space="preserve">
+    <value>Krile データベースのクリーンアップ</value>
+  </data>
+  <data name="MsgDbCleanupFailedTitle" xml:space="preserve">
+    <value>データベースのクリーンアップに失敗しました。</value>
+  </data>
+  <data name="MsgCleanupConfigContent" xml:space="preserve">
+    <value>Krileはローカル データベースにツイートを蓄積することで動作しています。
+この機能を使って古いツイートを削除することで、パフォーマンスが向上したり、ディスク領域の消費を抑えることができます。
+設定を有効にした場合、次回以降の起動時に毎回自動的に古いツイートが削除されます。
+自動クリーンアップを使用しますか？</value>
+  </data>
+  <data name="MsgCleanupConfigExInfo" xml:space="preserve">
+    <value>通常、直近の10万ツイートを残して消去するように設定されています。
+何件残すか、または、自動クリーンアップを使うかどうかは設定ページから変更することができます。</value>
+  </data>
+  <data name="MsgCleanupConfigInst" xml:space="preserve">
+    <value>ツイートの自動クリーンアップが利用できます。</value>
+  </data>
+  <data name="MsgCleanupConfigTitle" xml:space="preserve">
+    <value>ツイートのクリーンアップ</value>
+  </data>
 </root>

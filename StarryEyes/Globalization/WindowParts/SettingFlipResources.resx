@@ -628,4 +628,13 @@ Are you sure?</value>
   <data name="MuteOfficialMutedUsers" xml:space="preserve">
     <value>Mute users you specified on twitter official [recommended]</value>
   </data>
+  <data name="TimelineAutoCleanup" xml:space="preserve">
+    <value>Auto cleanup old tweets</value>
+  </data>
+  <data name="TimelineAutoCleanupDescription" xml:space="preserve">
+    <value>Note: Deletion will be performed if a twice as many tweet as this number is stored.</value>
+  </data>
+  <data name="TimelineAutoCleanupThreshold" xml:space="preserve">
+    <value>Number of leaving status: </value>
+  </data>
 </root>

@@ -32,12 +32,20 @@ namespace StarryEyes.Casket.Cruds
                 new { Id = statusId });
         }
 
-        public async Task<Dictionary<long, IEnumerable<long>>> GetUsersDictionaryAsync(IEnumerable<long> statusIds)
+        public async Task<Dictionary<long, IEnumerable<long>>> GetUsersDictionaryAsync(
+            IEnumerable<long> statusIds)
         {
             return (await Descriptor.QueryAsync<DatabaseActivity>(
                 this.CreateSql("StatusId IN @Ids"), new { Ids = statusIds.ToArray() }))
                 .GroupBy(e => e.StatusId)
                 .ToDictionary(e => e.Key, e => e.Select(d => d.UserId));
+        }
+
+        public async Task DeleteNotExistsAsync(string statusTableName)
+        {
+            await Descriptor.ExecuteAsync(
+                string.Format("DELETE FROM {0} WHERE NOT EXISTS (SELECT Id FROM {1} WHERE {1}.Id = {0}.StatusId);",
+                    this.TableName, statusTableName));
         }
 
         public async Task InsertAsync(long statusId, long userId)
@@ -52,7 +60,7 @@ namespace StarryEyes.Casket.Cruds
         public async Task DeleteAsync(long statusId, long userId)
         {
             await Descriptor.ExecuteAsync(
-                "delete from " + this.TableName + " where StatusId = @Sid and UserId = @Uid;",
+                string.Format("delete from {0} where StatusId = @Sid and UserId = @Uid;", this.TableName),
                 new { Sid = statusId, Uid = userId });
         }
 

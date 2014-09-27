@@ -80,8 +80,12 @@ namespace StarryEyes
                 Environment.Exit(0);
             }
 
+            // Cleanup database if required.
+            AppInitializer.CleanupTweetsIfRequired();
+
             // Optimize database when user specified to do so in pre-execution dialog.
             AppInitializer.OptimizeDatabaseIfRequired();
+
 
             // Apply theme
             InitializeTheme();

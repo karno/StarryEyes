@@ -628,4 +628,13 @@
   <data name="MuteOfficialMutedUsers" xml:space="preserve">
     <value>Twitter公式サイトでミュート指定したユーザをミュートする [推奨]</value>
   </data>
+  <data name="TimelineAutoCleanup" xml:space="preserve">
+    <value>古いツイートを自動的に削除</value>
+  </data>
+  <data name="TimelineAutoCleanupDescription" xml:space="preserve">
+    <value>注: ここで設定した数値の2倍以上のツイートが保持されている場合に削除を実行します。</value>
+  </data>
+  <data name="TimelineAutoCleanupThreshold" xml:space="preserve">
+    <value>残すツイートの個数: </value>
+  </data>
 </root>

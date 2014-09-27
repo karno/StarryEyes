@@ -49,8 +49,8 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
         protected string CreateSql(string whereClause)
         {
             return String.IsNullOrEmpty(whereClause)
-                       ? "select * from " + this.TableName + ";"
-                       : "select * from " + this.TableName + " where " + whereClause + ";";
+                ? string.Format("select * from {0};", this.TableName)
+                : string.Format("select * from {0} where {1};", this.TableName, whereClause);
         }
 
         #endregion
@@ -89,8 +89,8 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
 
         protected async Task CreateIndexAsync(string indexName, string column, bool unique)
         {
-            await Descriptor.ExecuteAsync("CREATE " + (unique ? "UNIQUE " : "") + "INDEX IF NOT EXISTS " +
-                               indexName + " ON " + TableName + "(" + column + ")");
+            await Descriptor.ExecuteAsync(string.Format("CREATE {0} IF NOT EXISTS {1} ON {2}({3})",
+                    (unique ? "UNIQUE INDEX" : "INDEX"), indexName, this.TableName, column));
         }
 
         public virtual async Task<T> GetAsync(long key)
@@ -118,7 +118,8 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
 
         public async Task AlterAsync(string newTableName)
         {
-            await Descriptor.ExecuteAsync("ALTER TABLE " + this._tableName + " RENAME TO " + newTableName + ";");
+            await Descriptor.ExecuteAsync(string.Format("ALTER TABLE {0} RENAME TO {1};",
+                _tableName, newTableName));
         }
     }
 }

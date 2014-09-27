@@ -46,15 +46,15 @@ namespace StarryEyes.Casket.Cruds
             var uids = removalUserIds.Select(i => i.ToString(CultureInfo.InvariantCulture)).JoinString(",");
             if (String.IsNullOrEmpty(uids)) return;
             await Descriptor.ExecuteAsync(
-                "delete from " + TableName + " where " +
-                "ListId = @listId and UserId in (" + uids + ");",
+                string.Format("delete from {0} where " + "ListId = @listId and UserId in ({1});", this.TableName, uids),
                 new { listId });
         }
 
         public async Task DeleteUserAsync(long listId, long userId)
         {
-            await Descriptor.ExecuteAsync("delete from " + TableName + "where " +
-                                    "ListId = @listId and UserId = @userId", new { listId, userId });
+            await Descriptor.ExecuteAsync(
+                string.Format("delete from {0} where " + "ListId = @listId and UserId = @userId", this.TableName),
+                new { listId, userId });
         }
 
         public async Task RemoveUnspecifiedUsersAsync(long listId, IEnumerable<long> users)
@@ -63,14 +63,14 @@ namespace StarryEyes.Casket.Cruds
             if (String.IsNullOrEmpty(uids))
             {
                 await Descriptor.ExecuteAsync(
-                    "delete from " + TableName + " where ListId = @listId;",
+                    string.Format("delete from {0} where ListId = @listId;", this.TableName),
                     new { listId });
             }
             else
             {
                 await Descriptor.ExecuteAsync(
-                    "delete from " + TableName + " where " +
-                    "ListId = @listId and UserId not in (" + uids + ");",
+                    string.Format("delete from {0} where " + "ListId = @listId and UserId not in ({1});",
+                        this.TableName, uids),
                     new { listId });
             }
         }

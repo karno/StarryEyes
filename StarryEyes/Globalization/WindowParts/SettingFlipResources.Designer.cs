@@ -1322,6 +1322,33 @@ namespace StarryEyes.Globalization.WindowParts {
         }
         
         /// <summary>
+        ///   Auto cleanup old tweets に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string TimelineAutoCleanup {
+            get {
+                return ResourceManager.GetString("TimelineAutoCleanup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Note: Deletion will be performed if a twice as many tweet as this number is stored. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string TimelineAutoCleanupDescription {
+            get {
+                return ResourceManager.GetString("TimelineAutoCleanupDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Number of leaving status:  に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string TimelineAutoCleanupThreshold {
+            get {
+                return ResourceManager.GetString("TimelineAutoCleanupThreshold", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Always expanded (default) に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string TimelineDisplayExpanded {

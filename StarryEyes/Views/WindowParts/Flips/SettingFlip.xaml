@@ -406,7 +406,7 @@
                                 </ComboBox.Items>
                             </ComboBox>
                         </Grid>
-                        <CheckBox Margin="0,0,0,8"
+                        <CheckBox Margin="0,8,0,8"
                                   VerticalAlignment="Top"
                                   Content="{x:Static localize:SettingFlipResources.TimelineScrollByPixel}"
                                   IsChecked="{Binding IsScrollByPixel}" />
@@ -424,7 +424,32 @@
                                   VerticalAlignment="Top"
                                   Content="{x:Static localize:SettingFlipResources.TimelineOpenTwitterPicWithOriginalSize}"
                                   IsChecked="{Binding OpenTwitterImageWithOriginalSize}" />
-                        <StackPanel Margin="0,8" Orientation="Horizontal">
+                        <StackPanel Margin="0,4,0,8" Orientation="Horizontal">
+                            <CheckBox Margin="0,0,12,0"
+                                      VerticalAlignment="Center"
+                                      Content="{x:Static localize:SettingFlipResources.TimelineAutoCleanup}"
+                                      IsChecked="{Binding AutoCleanupStatuses}" />
+                            <Grid Margin="0" Visibility="{Binding AutoCleanupStatuses, Converter={StaticResource BoolVisibleConverter}}">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="1*" />
+                                    <RowDefinition Height="1*" />
+                                </Grid.RowDefinitions>
+                                <StackPanel Grid.Row="0"
+                                            VerticalAlignment="Center"
+                                            Orientation="Horizontal">
+                                    <TextBlock Margin="0,4"
+                                               VerticalAlignment="Center"
+                                               Text="{x:Static localize:SettingFlipResources.TimelineAutoCleanupThreshold}" />
+                                    <xctk:IntegerUpDown Width="120"
+                                                        Minimum="0"
+                                                        Value="{Binding AutoCleanupThreshold}" />
+                                </StackPanel>
+                                <TextBlock Grid.Row="1"
+                                           Margin="0,4"
+                                           Text="{x:Static localize:SettingFlipResources.TimelineAutoCleanupDescription}" />
+                            </Grid>
+                        </StackPanel>
+                        <StackPanel Margin="0,0,0,8" Orientation="Horizontal">
                             <TextBlock Margin="0,0,4,0"
                                        VerticalAlignment="Center"
                                        Text="{x:Static localize:SettingFlipResources.TimelineSearchLanguage}" />

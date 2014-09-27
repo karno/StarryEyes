@@ -243,6 +243,21 @@ namespace StarryEyes.Casket
         {
             await _descriptor.ExecuteAsync(query);
         }
+
+        public static async Task CleanupOldStatusesAsync(int threshold, Action<Tuple<int, int>> progressNotifier = null)
+        {
+            var n = progressNotifier ?? (_ => { });
+            n(Tuple.Create(1, 5));
+            await StatusCrud.DeleteOldStatusAsync(threshold);
+            n(Tuple.Create(2, 5));
+            await StatusCrud.DeleteOrphanedRetweetAsync();
+            n(Tuple.Create(3, 5));
+            await StatusEntityCrud.DeleteNotExistsAsync(StatusCrud.TableName);
+            n(Tuple.Create(4, 5));
+            await FavoritesCrud.DeleteNotExistsAsync(StatusCrud.TableName);
+            n(Tuple.Create(5, 5));
+            await RetweetsCrud.DeleteNotExistsAsync(StatusCrud.TableName);
+        }
     }
 
     public class StatusInsertBatch

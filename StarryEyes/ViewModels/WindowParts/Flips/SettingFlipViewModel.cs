@@ -92,6 +92,14 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                     Setting.Accounts.Collection,
                     a => new TwitterAccountConfigurationViewModel(this, a),
                     DispatcherHelper.UIDispatcher));
+
+            // setting paramter propagation
+
+            this.CompositeDisposable.Add(Setting.AutoCleanupTweets.ListenValueChanged(
+                _ => RaisePropertyChanged(() => AutoCleanupStatuses)));
+            this.CompositeDisposable.Add(Setting.AutoCleanupThreshold.ListenValueChanged(
+                _ => RaisePropertyChanged(() => AutoCleanupThreshold)));
+
         }
 
         private void StartSetting(ISubject<Unit> subject)
@@ -397,6 +405,26 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 {
                     return SettingFlipResources.TimelineSearchLanguageInvalid;
                 }
+            }
+        }
+
+        public bool AutoCleanupStatuses
+        {
+            get { return Setting.AutoCleanupTweets.Value; }
+            set
+            {
+                Setting.AutoCleanupTweets.Value = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public int AutoCleanupThreshold
+        {
+            get { return Math.Max(Setting.AutoCleanupThreshold.Value, 0); }
+            set
+            {
+                Setting.AutoCleanupThreshold.Value = Math.Max(value, 0);
+                RaisePropertyChanged();
             }
         }
 

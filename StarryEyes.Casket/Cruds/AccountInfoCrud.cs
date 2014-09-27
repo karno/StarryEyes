@@ -22,7 +22,7 @@ namespace StarryEyes.Casket.Cruds
 
         public async Task DropAllAsync()
         {
-            await Descriptor.ExecuteAsync("delete from " + TableName + ";");
+            await Descriptor.ExecuteAsync(string.Format("delete from {0};", this.TableName));
         }
     }
 }

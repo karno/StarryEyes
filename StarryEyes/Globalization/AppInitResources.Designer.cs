@@ -70,6 +70,46 @@ namespace StarryEyes.Globalization {
         }
         
         /// <summary>
+        ///   Krile stores received status in local database.
+        ///Cleaning database will improve performance and reduce disk consumption.
+        ///If you enable this, Krile will cleanup old tweets in every startup.
+        ///Enable it? に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgCleanupConfigContent {
+            get {
+                return ResourceManager.GetString("MsgCleanupConfigContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   As default, leave latest 100,000 records.
+        ///You can change this threshold or enable/disable cleanup feature from settings. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgCleanupConfigExInfo {
+            get {
+                return ResourceManager.GetString("MsgCleanupConfigExInfo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Tweet automatic cleanup is available. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgCleanupConfigInst {
+            get {
+                return ResourceManager.GetString("MsgCleanupConfigInst", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cleanup Tweets に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgCleanupConfigTitle {
+            get {
+                return ResourceManager.GetString("MsgCleanupConfigTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Changing database path is a debug feature, you should not use this option as part of customize for daily use. に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string MsgDatabasePathWarningContent {
@@ -102,6 +142,24 @@ namespace StarryEyes.Globalization {
         public static string MsgDatabasePathWarningTitle {
             get {
                 return ResourceManager.GetString("MsgDatabasePathWarningTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Krile Database Cleanup に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgDbCleanupFailedInst {
+            get {
+                return ResourceManager.GetString("MsgDbCleanupFailedInst", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Database cleanup failed に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MsgDbCleanupFailedTitle {
+            get {
+                return ResourceManager.GetString("MsgDbCleanupFailedTitle", resourceCulture);
             }
         }
         
