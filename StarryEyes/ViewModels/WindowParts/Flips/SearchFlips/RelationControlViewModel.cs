@@ -150,7 +150,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                     await rds.NoRetweets.SetAsync(_target.Id, nort);
                 }
 
-                var mute = !fs.IsMuting.GetValueOrDefault(false);
+                var mute = fs.IsMuting.GetValueOrDefault(false);
                 if (this.IsMutes != mute)
                 {
                     this.IsMutes = mute;
