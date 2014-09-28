@@ -397,7 +397,7 @@
                             <ComboBox Grid.Row="3"
                                       Grid.Column="1"
                                       Margin="0,8,0,0"
-                                      SelectedIndex="{Binding TimelineIconResolution,
+                                      SelectedIndex="{Binding ThumbnailStrategy,
                                                               Mode=TwoWay}">
                                 <ComboBox.Items>
                                     <ComboBoxItem Content="{x:Static localize:SettingFlipResources.TimelineThumbnailNone}" />
