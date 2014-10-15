@@ -249,7 +249,7 @@ namespace StarryEyes
             ServicePointManager.DefaultConnectionLimit = Int32.MaxValue; // Limit Break!
 
             // declare security protocol explicitly
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3;
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
         }
 
         private static void InitializeSubsystemsBeforeSettingsLoaded()
