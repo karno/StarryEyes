@@ -395,7 +395,7 @@ namespace StarryEyes.Models.Receiving.Receivers
                 if (this._currentBackOffMode == BackOffMode.NetworkError)
                 {
                     // wait count is raised linearly.
-                    this._currentBackOffMode += 250;
+                    this._currentBackOffWaitCount += 250;
                 }
                 else
                 {
