@@ -249,7 +249,15 @@ namespace StarryEyes
             ServicePointManager.DefaultConnectionLimit = Int32.MaxValue; // Limit Break!
 
             // declare security protocol explicitly
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls;
+
+            // if operating system supports more secure protocol, use it.
+            var osv = Environment.OSVersion.Version;
+            if (osv.Major == 6 && osv.Minor >= 1)
+            {
+                // TLS 1.2 is supported on Windows 7(NT 6.1) or later.
+                ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12;
+            }
         }
 
         private static void InitializeSubsystemsBeforeSettingsLoaded()
