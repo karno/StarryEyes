@@ -31,12 +31,15 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SettingFlips
 
         private void ConfirmOnUnsaved()
         {
+            if (_isChanged)
+            {
 
+            }
         }
 
         public void Save()
         {
-
+            _isChanged = false;
         }
 
         private void SaveCore(string fileName)

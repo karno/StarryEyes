@@ -191,7 +191,7 @@ namespace StarryEyes.Models.Timelines
             }
             await this.Fetch(maxId, TimelineChunkCount)
                       .Where(CheckAcceptStatus)
-                      .Do(s => AddStatus(s, false))
+                      .Select(s => AddStatus(s, false))
                       .LastOrDefaultAsync();
             if (setLoadingFlag)
             {
