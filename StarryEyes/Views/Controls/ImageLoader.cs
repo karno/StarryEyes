@@ -52,9 +52,9 @@ namespace StarryEyes.Views.Controls
 
         #region Image cache
 
-        private const int MaxCacheCount = 256;
+        private const int MaxCacheCount = 512;
 
-        private static readonly TimeSpan CacheExpiration = TimeSpan.FromMinutes(30);
+        private static readonly TimeSpan CacheExpiration = TimeSpan.FromMinutes(15);
 
         private static readonly LinkedList<Tuple<Uri, byte[], DateTime>> _cacheList =
             new LinkedList<Tuple<Uri, byte[], DateTime>>();
