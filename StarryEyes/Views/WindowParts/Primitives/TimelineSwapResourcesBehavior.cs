@@ -16,7 +16,7 @@ namespace StarryEyes.Views.WindowParts.Primitives
         private static void ResourceSetChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
         {
             var fe = o as FrameworkElement;
-            if (fe == null || e.OldValue == e.NewValue) return;
+            if (fe == null || e.OldValue == e.NewValue || (int)e.NewValue == -1) return;
             fe.Resources.MergedDictionaries.Add(TimelineResourceSets[(int)e.NewValue]);
             if (e.OldValue != null && (int)e.OldValue >= 0)
             {

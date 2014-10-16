@@ -84,15 +84,6 @@ namespace StarryEyes.ViewModels.Timelines.Tabs
             }
         }
 
-        /// <summary>
-        /// design time support method.
-        /// </summary>
-        [UsedImplicitly]
-        public TabViewModel()
-            : base(null)
-        {
-        }
-
         public TabViewModel(ColumnViewModel parent, TabModel model)
             : base(model)
         {
@@ -143,6 +134,7 @@ namespace StarryEyes.ViewModels.Timelines.Tabs
         #region EditTabCommand
         private Livet.Commands.ViewModelCommand _editTabCommand;
 
+        [UsedImplicitly]
         public Livet.Commands.ViewModelCommand EditTabCommand
         {
             get { return this._editTabCommand ?? (this._editTabCommand = new Livet.Commands.ViewModelCommand(this.EditTab)); }
@@ -162,6 +154,7 @@ namespace StarryEyes.ViewModels.Timelines.Tabs
         #region CopyTabCommand
         private Livet.Commands.ViewModelCommand _copyTabCommand;
 
+        [UsedImplicitly]
         public Livet.Commands.ViewModelCommand CopyTabCommand
         {
             get { return this._copyTabCommand ?? (this._copyTabCommand = new Livet.Commands.ViewModelCommand(this.CopyTab)); }
@@ -195,6 +188,7 @@ namespace StarryEyes.ViewModels.Timelines.Tabs
         #region CloseTabCommand
         private Livet.Commands.ViewModelCommand _closeTabCommand;
 
+        [UsedImplicitly]
         public Livet.Commands.ViewModelCommand CloseTabCommand
         {
             get { return this._closeTabCommand ?? (this._closeTabCommand = new Livet.Commands.ViewModelCommand(this.CloseTab)); }

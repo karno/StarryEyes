@@ -13,9 +13,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:metrocontrols="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
              xmlns:primitives="clr-namespace:StarryEyes.Views.WindowParts.Primitives"
-             xmlns:starryEyes="clr-namespace:StarryEyes"
              xmlns:statuses="clr-namespace:StarryEyes.ViewModels.Timelines.Statuses"
-             xmlns:system="clr-namespace:System;assembly=System"
              xmlns:tabs="clr-namespace:StarryEyes.ViewModels.Timelines.Tabs"
              xmlns:utils="clr-namespace:StarryEyes.Views.Utils"
              x:Name="TimelineRoot"
@@ -320,11 +318,12 @@
                     </i:Interaction.Triggers>
                 </MenuItem>
             </ContextMenu>
+
             <ResourceDictionary x:Key="StatusResource">
-                <SolidColorBrush x:Key="TweetBackgroundBrush" Color="{DynamicResource TweetDefaultBackground}" />
+                <!--  <SolidColorBrush x:Key="TweetBackgroundBrush" Color="{DynamicResource TweetDefaultBackground}" />  -->
                 <SolidColorBrush x:Key="TweetForegroundBrush" Color="{DynamicResource TweetDefaultForeground}" />
-                <SolidColorBrush x:Key="TweetHighlightBackgroundBrush" Color="{DynamicResource TweetDefaultHighlightBackground}" />
-                <SolidColorBrush x:Key="TweetHighlightForegroundBrush" Color="{DynamicResource TweetDefaultHighlightForeground}" />
+                <!--  <SolidColorBrush x:Key="TweetHighlightBackgroundBrush" Color="{DynamicResource TweetDefaultHighlightBackground}" />  -->
+                <!--  <SolidColorBrush x:Key="TweetHighlightForegroundBrush" Color="{DynamicResource TweetDefaultHighlightForeground}" />  -->
                 <SolidColorBrush x:Key="KeyTextBrush" Color="{DynamicResource TweetDefaultKeyText}" />
                 <SolidColorBrush x:Key="SubTextBrush" Color="{DynamicResource TweetDefaultSubText}" />
                 <SolidColorBrush x:Key="HyperlinkTextBrush" Color="{DynamicResource TweetDefaultHyperlinkText}" />
@@ -374,6 +373,7 @@
                 <SolidColorBrush x:Key="DeletePressedBackground" Color="{DynamicResource TweetDefaultDeleteButtonPressedBackground}" />
                 <SolidColorBrush x:Key="DeletePressedForeground" Color="{DynamicResource TweetDefaultDeleteButtonPressedForeground}" />
             </ResourceDictionary>
+
             <DataTemplate x:Key="StatusItemTemplate"
                           DataType="{x:Type statuses:StatusViewModel}"
                           Resources="{StaticResource StatusResource}">
