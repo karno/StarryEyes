@@ -6,7 +6,6 @@ using System.Reactive.Disposables;
 using System.Reactive.Subjects;
 using System.Threading;
 using JetBrains.Annotations;
-using StarryEyes.Albireo;
 using StarryEyes.Albireo.Helpers;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Timelines.Tabs;
@@ -18,6 +17,8 @@ namespace StarryEyes.Models
 {
     public static class MainWindowModel
     {
+        private static volatile bool _isUserInterfaceReady;
+
         public static bool SuppressCloseConfirmation { get; set; }
 
         public static bool SuppressKeyAssigns { get; set; }
@@ -36,12 +37,6 @@ namespace StarryEyes.Models
                     handler(options);
                 }
             };
-        }
-
-        public static event Action<bool> WindowCommandsDisplayChanged;
-        public static void SetShowMainWindowCommands(bool show)
-        {
-            WindowCommandsDisplayChanged.SafeInvoke(show);
         }
 
         private static void RegisterKeyAssigns()
@@ -83,23 +78,7 @@ namespace StarryEyes.Models
 
         #endregion
 
-        public static event Action<AccountSelectDescription> AccountSelectActionRequested;
-        public static void ExecuteAccountSelectAction(
-            AccountSelectionAction action, IEnumerable<TwitterAccount> defaultSelected,
-            Action<IEnumerable<TwitterAccount>> after)
-        {
-            ExecuteAccountSelectAction(new AccountSelectDescription
-            {
-                AccountSelectionAction = action,
-                SelectionAccounts = defaultSelected,
-                Callback = after
-            });
-        }
-
-        public static void ExecuteAccountSelectAction(AccountSelectDescription desc)
-        {
-            AccountSelectActionRequested.SafeInvoke(desc);
-        }
+        #region State control
 
         private static readonly LinkedList<string> _stateStack = new LinkedList<string>();
         public static event Action StateStringChanged;
@@ -141,6 +120,36 @@ namespace StarryEyes.Models
             StateStringChanged.SafeInvoke();
         }
 
+        #endregion
+
+        #region Account selection
+
+        public static event Action<AccountSelectDescription> AccountSelectActionRequested;
+        public static void ExecuteAccountSelectAction(
+            AccountSelectionAction action, IEnumerable<TwitterAccount> defaultSelected,
+            Action<IEnumerable<TwitterAccount>> after)
+        {
+            ExecuteAccountSelectAction(new AccountSelectDescription
+            {
+                AccountSelectionAction = action,
+                SelectionAccounts = defaultSelected,
+                Callback = after
+            });
+        }
+
+        public static void ExecuteAccountSelectAction(AccountSelectDescription desc)
+        {
+            AccountSelectActionRequested.SafeInvoke(desc);
+        }
+
+        #endregion
+
+        public static event Action<bool> WindowCommandsDisplayChanged;
+        public static void SetShowMainWindowCommands(bool show)
+        {
+            WindowCommandsDisplayChanged.SafeInvoke(show);
+        }
+
         public static event Action<Tuple<TabModel, ISubject<Unit>>> TabConfigureRequested;
         public static IObservable<Unit> ShowTabConfigure(TabModel model)
         {
@@ -174,16 +183,13 @@ namespace StarryEyes.Models
         }
 
         public static event Action<bool> BackstageTransitionRequested;
-
         public static void TransitionBackstage(bool open)
         {
             BackstageTransitionRequested.SafeInvoke(open);
         }
 
-        private static volatile bool _isUserInterfaceReady;
         private static readonly ConcurrentQueue<TaskDialogOptions> _taskDialogQueue = new ConcurrentQueue<TaskDialogOptions>();
         public static event Action<TaskDialogOptions> TaskDialogRequested;
-
         public static void ShowTaskDialog(TaskDialogOptions options)
         {
             if (!_isUserInterfaceReady)

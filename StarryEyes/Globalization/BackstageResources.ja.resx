@@ -138,9 +138,6 @@
   <data name="TrackLimitFormat" xml:space="preserve">
     <value>{0} 件のツイートを受信できませんでした。 {1} のタイムラインが速すぎます。</value>
   </data>
-  <data name="UpdateAvailable" xml:space="preserve">
-    <value>新しいバージョンのKrileが利用可能です。次回起動時に更新されます。</value>
-  </data>
   <data name="UserStreamDisconnectedFormat" xml:space="preserve">
     <value>User Streamsが切断されました({0}): {1}</value>
   </data>

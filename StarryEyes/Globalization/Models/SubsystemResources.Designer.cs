@@ -115,6 +115,51 @@ namespace StarryEyes.Globalization.Models {
         }
         
         /// <summary>
+        ///   &amp;Update に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string UpdateAvailableButtonImmediate {
+            get {
+                return ResourceManager.GetString("UpdateAvailableButtonImmediate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   &amp;Later に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string UpdateAvailableButtonLater {
+            get {
+                return ResourceManager.GetString("UpdateAvailableButtonLater", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Update will be completed in a minute. Update right now? に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string UpdateAvailableContent {
+            get {
+                return ResourceManager.GetString("UpdateAvailableContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   New version of Krile is available. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string UpdateAvailableInst {
+            get {
+                return ResourceManager.GetString("UpdateAvailableInst", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Krile Automatic Update に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string UpdateAvailableTitle {
+            get {
+                return ResourceManager.GetString("UpdateAvailableTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Remove update folder located in user data directory. に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string UpdateCompleteErrorContent {

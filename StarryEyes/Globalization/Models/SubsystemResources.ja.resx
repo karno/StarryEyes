@@ -135,6 +135,21 @@
   <data name="TwitterConfigurationReceiveError" xml:space="preserve">
     <value>Twitter API構成情報の受信に失敗しました。</value>
   </data>
+  <data name="UpdateAvailableButtonImmediate" xml:space="preserve">
+    <value>今すぐ更新(&amp;U)</value>
+  </data>
+  <data name="UpdateAvailableButtonLater" xml:space="preserve">
+    <value>後で(&amp;L)</value>
+  </data>
+  <data name="UpdateAvailableContent" xml:space="preserve">
+    <value>更新はすぐに完了します。今すぐ更新しますか？</value>
+  </data>
+  <data name="UpdateAvailableInst" xml:space="preserve">
+    <value>新しいバージョンのKrileを利用できます。</value>
+  </data>
+  <data name="UpdateAvailableTitle" xml:space="preserve">
+    <value>Krileの自動更新</value>
+  </data>
   <data name="UpdateCompleteErrorContent" xml:space="preserve">
     <value>ユーザーデータディレクトリに存在するupdateフォルダを手動で削除してください。</value>
   </data>

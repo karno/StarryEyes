@@ -321,7 +321,6 @@
     <Compile Include="Models\Backstages\NotificationEvents\TrackLimitEvent.cs" />
     <Compile Include="Models\Backstages\NotificationEvents\ThirdpartyEvents\FavstarTrophyEvent.cs" />
     <Compile Include="Models\Backstages\SystemEvents\ThemeProfileNotFoundEvent.cs" />
-    <Compile Include="Models\Backstages\SystemEvents\UpdateAvailableEvent.cs" />
     <Compile Include="Models\Backstages\SystemEvents\UserStreamsDisconnectedEvent.cs" />
     <Compile Include="Models\Backstages\TwitterEvents\BlockedEvent.cs" />
     <Compile Include="Models\Backstages\TwitterEvents\FavoritedEvent.cs" />

@@ -9,19 +9,23 @@ using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using StarryEyes.Albireo;
 using StarryEyes.Albireo.Helpers;
 using StarryEyes.Globalization.Models;
 using StarryEyes.Models.Backstages.NotificationEvents;
-using StarryEyes.Models.Backstages.SystemEvents;
-using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
+using TaskDialogInterop;
 using Application = System.Windows.Application;
+using TaskDialog = StarryEyes.Nightmare.Windows.TaskDialog;
+using TaskDialogCommonButtons = StarryEyes.Nightmare.Windows.TaskDialogCommonButtons;
+using TaskDialogOptions = StarryEyes.Nightmare.Windows.TaskDialogOptions;
+using VistaTaskDialogIcon = StarryEyes.Nightmare.Windows.VistaTaskDialogIcon;
 
 namespace StarryEyes.Models.Subsystems
 {
     public static class AutoUpdateService
     {
+        private static bool _isUpdateNotified = false;
+
         private static string _patcherUri;
         private static string _patcherSignUri;
 
@@ -122,7 +126,9 @@ namespace StarryEyes.Models.Subsystems
                     {
                         Directory.Delete(App.LocalUpdateStorePath, true);
                     }
-                    catch { }
+                    catch
+                    {
+                    }
                     throw;
                 }
             }
@@ -204,8 +210,8 @@ namespace StarryEyes.Models.Subsystems
                     {
                         // remove "read-only" attribute
                         directory.GetFiles("*", SearchOption.AllDirectories)
-                            .Where(file => file.Attributes.HasFlag(FileAttributes.ReadOnly))
-                            .ForEach(f => f.Attributes ^= FileAttributes.ReadOnly);
+                                 .Where(file => file.Attributes.HasFlag(FileAttributes.ReadOnly))
+                                 .ForEach(f => f.Attributes ^= FileAttributes.ReadOnly);
 
                         // delete directory
                         directory.Delete(true);
@@ -255,19 +261,49 @@ namespace StarryEyes.Models.Subsystems
             }
         }
 
-        public static void StartSchedule()
+        internal static void StartSchedule(bool initial = true)
         {
             var rand = new Random(Environment.TickCount);
-            var next = 3 + 6 * rand.NextDouble();
-            Observable.Timer(TimeSpan.FromHours(next))
-                      .Subscribe(async _ =>
-                      {
-                          if (await CheckPrepareUpdate(App.Version))
-                          {
-                              BackstageModel.RegisterEvent(new UpdateAvailableEvent());
-                          }
-                          StartSchedule();
-                      });
+            // first startup -> 36 seconds later
+            var next = initial ? 0.01 : 3 + 6 * rand.NextDouble();
+            Observable
+                .Timer(TimeSpan.FromHours(next))
+                .Subscribe(async _ =>
+                {
+                    if (await CheckPrepareUpdate(App.Version))
+                    {
+                        if (_isUpdateNotified) return;
+                        _isUpdateNotified = true;
+                        var option = new TaskDialogOptions
+                        {
+                            Title = SubsystemResources.UpdateAvailableTitle,
+                            MainIcon = VistaTaskDialogIcon.Information,
+                            MainInstruction = SubsystemResources.UpdateAvailableInst,
+                            Content = SubsystemResources.UpdateAvailableContent,
+                            CustomButtons = new[]
+                            {
+                                SubsystemResources.UpdateAvailableButtonImmediate,
+                                SubsystemResources.UpdateAvailableButtonLater
+                            },
+                            Callback = (dialog, args, data) =>
+                            {
+                                if (args.Notification == VistaTaskDialogNotification.ButtonClicked &&
+                                    args.ButtonIndex == 0)
+                                {
+                                    // update immediately
+                                    StartUpdate(App.Version);
+
+                                }
+                                return false;
+                            }
+                        };
+                        MainWindowModel.ShowTaskDialog(option);
+                    }
+                    else
+                    {
+                        StartSchedule(false);
+                    }
+                });
         }
     }
 }

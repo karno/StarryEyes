@@ -138,9 +138,6 @@
   <data name="TrackLimitFormat" xml:space="preserve">
     <value>{0} tweets had dropped. {1}'s timeline is too fast.</value>
   </data>
-  <data name="UpdateAvailable" xml:space="preserve">
-    <value>New version of Krile is available. It will available on next start.</value>
-  </data>
   <data name="UserStreamDisconnectedFormat" xml:space="preserve">
     <value>User Streams is disconnected({0}): {1}</value>
   </data>

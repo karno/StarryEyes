@@ -135,6 +135,21 @@
   <data name="TwitterConfigurationReceiveError" xml:space="preserve">
     <value>Failed receiving twitter api configuration.</value>
   </data>
+  <data name="UpdateAvailableButtonImmediate" xml:space="preserve">
+    <value>&amp;Update</value>
+  </data>
+  <data name="UpdateAvailableButtonLater" xml:space="preserve">
+    <value>&amp;Later</value>
+  </data>
+  <data name="UpdateAvailableContent" xml:space="preserve">
+    <value>Update will be completed in a minute. Update right now?</value>
+  </data>
+  <data name="UpdateAvailableInst" xml:space="preserve">
+    <value>New version of Krile is available.</value>
+  </data>
+  <data name="UpdateAvailableTitle" xml:space="preserve">
+    <value>Krile Automatic Update</value>
+  </data>
   <data name="UpdateCompleteErrorContent" xml:space="preserve">
     <value>Remove update folder located in user data directory.</value>
   </data>

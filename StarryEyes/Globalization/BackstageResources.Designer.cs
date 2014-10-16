@@ -124,15 +124,6 @@ namespace StarryEyes.Globalization {
         }
         
         /// <summary>
-        ///   New version of Krile is available. It will available on next start. に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        public static string UpdateAvailable {
-            get {
-                return ResourceManager.GetString("UpdateAvailable", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   User Streams is disconnected({0}): {1} に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string UserStreamDisconnectedFormat {
