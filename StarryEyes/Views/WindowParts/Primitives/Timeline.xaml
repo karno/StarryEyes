@@ -27,6 +27,7 @@
         <ResourceDictionary>
             <utils:BooleanToVisibleConverter x:Key="BooleanToVisibleConverter" />
             <utils:BooleanToInvisibleConverter x:Key="BooleanToInvisibleConverter" />
+            <utils:BooleanInversionConverter x:Key="BooleanInversionConverter" />
             <DataTemplate x:Key="UserItemTemplate" DataType="{x:Type statuses:UserViewModel}">
                 <controls:LazyImage Width="20"
                                     Height="20"
@@ -383,9 +384,12 @@
                       primitives:TimelineSwapResourcesBehavior.ResourceSet="Default">
                     <Border x:Name="SingleLineBorder"
                             Margin="0"
+                            IsHitTestVisible="{Binding IsExpanded,
+                                                       Converter={StaticResource BooleanInversionConverter}}"
                             Padding="0"
                             RenderTransformOrigin="0.5,1"
                             Visibility="{Binding IsExpanded,
+                                                 Mode=OneWay,
                                                  Converter={StaticResource BooleanToInvisibleConverter},
                                                  FallbackValue=Collapsed}">
                         <i:Interaction.Triggers>
@@ -538,9 +542,11 @@
                     </Border>
                     <Border x:Name="MainBorder"
                             Margin="0"
+                            IsHitTestVisible="{Binding IsExpanded}"
                             Padding="0"
                             RenderTransformOrigin="0.5,1"
                             Visibility="{Binding IsExpanded,
+                                                 Mode=OneWay,
                                                  Converter={StaticResource BooleanToVisibleConverter},
                                                  FallbackValue=Collapsed}">
                         <Border.LayoutTransform>
@@ -580,6 +586,16 @@
                             <VisualStateGroup x:Name="StatusSelection">
                                 <VisualState x:Name="Selected">
                                     <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="CheckBoxBorder" Storyboard.TargetProperty="Visibility">
+                                            <DiscreteObjectKeyFrame KeyTime="0:0:0.0">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <Visibility>Visible</Visibility>
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <BooleanAnimationUsingKeyFrames Storyboard.TargetName="CheckBoxBorder" Storyboard.TargetProperty="IsHitTestVisible">
+                                            <DiscreteBooleanKeyFrame KeyTime="0:0:0.0" Value="True" />
+                                        </BooleanAnimationUsingKeyFrames>
                                         <DoubleAnimationUsingKeyFrames Storyboard.TargetName="CheckBoxBorder" Storyboard.TargetProperty="(FrameworkElement.Width)">
                                             <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="24">
                                                 <EasingDoubleKeyFrame.EasingFunction>
@@ -610,6 +626,16 @@
                                         <DoubleAnimationUsingKeyFrames Storyboard.TargetName="PseudoSpaceBorder" Storyboard.TargetProperty="(FrameworkElement.Width)">
                                             <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0" />
                                         </DoubleAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="CheckBoxBorder" Storyboard.TargetProperty="Visibility">
+                                            <DiscreteObjectKeyFrame KeyTime="0:0:0.1">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <Visibility>Collapsed</Visibility>
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <BooleanAnimationUsingKeyFrames Storyboard.TargetName="CheckBoxBorder" Storyboard.TargetProperty="IsHitTestVisible">
+                                            <DiscreteBooleanKeyFrame KeyTime="0:0:0.1" Value="False" />
+                                        </BooleanAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
                             </VisualStateGroup>
@@ -643,16 +669,19 @@
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="LongTime" Storyboard.TargetProperty="(UIElement.Visibility)">
                                             <DiscreteObjectKeyFrame KeyTime="0:0:0.1" Value="{x:Static Visibility.Hidden}" />
                                         </ObjectAnimationUsingKeyFrames>
-                                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="stackPanel" Storyboard.TargetProperty="(UIElement.Opacity)">
+                                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="CommandButtonRootPanel" Storyboard.TargetProperty="(UIElement.Opacity)">
                                             <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0">
                                                 <EasingDoubleKeyFrame.EasingFunction>
                                                     <ExponentialEase EasingMode="EaseOut" Exponent="10" />
                                                 </EasingDoubleKeyFrame.EasingFunction>
                                             </EasingDoubleKeyFrame>
                                         </DoubleAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="stackPanel" Storyboard.TargetProperty="(UIElement.Visibility)">
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="CommandButtonRootPanel" Storyboard.TargetProperty="(UIElement.Visibility)">
                                             <DiscreteObjectKeyFrame KeyTime="0:0:0.1" Value="{x:Static Visibility.Hidden}" />
                                         </ObjectAnimationUsingKeyFrames>
+                                        <BooleanAnimationUsingKeyFrames Storyboard.TargetName="CommandButtonRootPanel" Storyboard.TargetProperty="IsHitTestVisible">
+                                            <DiscreteBooleanKeyFrame KeyTime="0:0:0.1" Value="False" />
+                                        </BooleanAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
                                 <VisualState x:Name="OnMouseOver">
@@ -684,16 +713,19 @@
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ShortTime" Storyboard.TargetProperty="(UIElement.Visibility)">
                                             <DiscreteObjectKeyFrame KeyTime="0:0:0.1" Value="{x:Static Visibility.Hidden}" />
                                         </ObjectAnimationUsingKeyFrames>
-                                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="stackPanel" Storyboard.TargetProperty="(UIElement.Opacity)">
+                                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="CommandButtonRootPanel" Storyboard.TargetProperty="(UIElement.Opacity)">
                                             <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="1">
                                                 <EasingDoubleKeyFrame.EasingFunction>
                                                     <ExponentialEase EasingMode="EaseOut" Exponent="10" />
                                                 </EasingDoubleKeyFrame.EasingFunction>
                                             </EasingDoubleKeyFrame>
                                         </DoubleAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="stackPanel" Storyboard.TargetProperty="(UIElement.Visibility)">
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="CommandButtonRootPanel" Storyboard.TargetProperty="(UIElement.Visibility)">
                                             <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}" />
                                         </ObjectAnimationUsingKeyFrames>
+                                        <BooleanAnimationUsingKeyFrames Storyboard.TargetName="CommandButtonRootPanel" Storyboard.TargetProperty="IsHitTestVisible">
+                                            <DiscreteBooleanKeyFrame KeyTime="0:0:0.1" Value="True" />
+                                        </BooleanAnimationUsingKeyFrames>
                                         <ColorAnimationUsingKeyFrames Storyboard.TargetName="OverrideBorder" Storyboard.TargetProperty="(Panel.Background).(SolidColorBrush.Color)">
                                             <EasingColorKeyFrame KeyTime="0" Value="#0A000000" />
                                         </ColorAnimationUsingKeyFrames>
@@ -999,7 +1031,9 @@
                                                 Margin="0"
                                                 HorizontalAlignment="Left"
                                                 VerticalAlignment="Center"
-                                                Background="{x:Null}">
+                                                Background="{x:Null}"
+                                                IsHitTestVisible="False"
+                                                Visibility="Collapsed">
                                             <Viewbox x:Name="viewbox"
                                                      Width="18"
                                                      Height="18"
@@ -1252,11 +1286,12 @@
                                                     </i:EventTrigger>
                                                 </i:Interaction.Triggers>
                                             </TextBlock>
-                                            <StackPanel x:Name="stackPanel"
+                                            <StackPanel x:Name="CommandButtonRootPanel"
                                                         Grid.Column="1"
                                                         Height="21"
                                                         HorizontalAlignment="Right"
                                                         VerticalAlignment="Center"
+                                                        IsHitTestVisible="False"
                                                         Opacity="0"
                                                         Orientation="Horizontal"
                                                         Visibility="Hidden">
@@ -1614,7 +1649,8 @@
                                         <StackPanel x:Name="ActionQuickView"
                                                     Height="Auto"
                                                     Margin="7,0"
-                                                    Orientation="Horizontal">
+                                                    Orientation="Horizontal"
+                                                    Visibility="Visible">
                                             <StackPanel.LayoutTransform>
                                                 <TransformGroup>
                                                     <ScaleTransform />
@@ -2103,8 +2139,6 @@
                       ItemsSource="{Binding Timeline,
                                             Mode=OneWay}"
                       UseLayoutRounding="True"
-                      VirtualizingPanel.CacheLength="3"
-                      VirtualizingPanel.CacheLengthUnit="Page"
                       VirtualizingPanel.IsVirtualizing="True"
                       VirtualizingPanel.ScrollUnit="{Binding ScrollUnit}"
                       VirtualizingPanel.VirtualizationMode="Recycling">

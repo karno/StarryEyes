@@ -284,9 +284,6 @@
             <Grid x:Name="MainAreaGrid"
                   Background="{DynamicResource BaseColorBackgroundBrush}"
                   RenderTransformOrigin="0.5,0.5">
-                <Grid.LayoutTransform>
-                    <RotateTransform x:Name="Rotation" Angle="0" CenterX="0.5" CenterY="0.5" />
-                </Grid.LayoutTransform>
                 <Grid.RenderTransform>
                     <TransformGroup>
                         <ScaleTransform />
