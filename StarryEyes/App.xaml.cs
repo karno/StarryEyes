@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows;
 using System.Windows.Threading;
@@ -166,9 +167,11 @@ namespace StarryEyes
                 builder.AppendLine("Krile STARRYEYES #" + FormattedVersion + " - " + DateTime.Now);
                 builder.AppendLine("User ID: " + _userId);
                 builder.AppendLine(Environment.OSVersion + " " + (Environment.Is64BitProcess ? "x64" : "x86"));
+                builder.AppendLine("Built on: " + Assembly.GetExecutingAssembly().ImageRuntimeVersion + ", " +
+                                   "running on: " + RuntimeEnvironment.GetSystemVersion());
                 builder.AppendLine("execution mode: " + ExecutionMode + ", " +
-                    "multicore JIT: " + IsMulticoreJitEnabled + ", " +
-                    "hardware rendering: " + IsHardwareRenderingEnabled);
+                                   "multicore JIT: " + IsMulticoreJitEnabled + ", " +
+                                   "hardware rendering: " + IsHardwareRenderingEnabled);
                 var uptime = DateTime.Now - _startupTime;
                 builder.AppendLine("application uptime: " + ((int)uptime.TotalHours).ToString("00") +
                                    uptime.ToString("\\:mm\\:ss"));
@@ -189,17 +192,27 @@ namespace StarryEyes
                     sw.WriteLine(builder.ToString());
                 }
                 var apppath = Path.GetDirectoryName(Environment.GetCommandLineArgs()[0]);
-                var psi = new ProcessStartInfo
-                {
-                    Arguments = tpath,
-                    UseShellExecute = true,
-                    FileName = Path.Combine(apppath, App.FeedbackAppName)
-                };
                 try
                 {
-                    Process.Start(psi);
+                    if (apppath == null)
+                    {
+                        throw new NullReferenceException("apppath is null");
+                    }
+                    Process.Start(new ProcessStartInfo
+                    {
+                        Arguments = tpath,
+                        UseShellExecute = true,
+                        FileName = Path.Combine(apppath, App.FeedbackAppName)
+                    });
                 }
-                catch { }
+                catch (Exception iex)
+                {
+                    MessageBox.Show(
+                        "Failed to launch error reporter!" + Environment.NewLine +
+                        "Crash log: " + tpath + Environment.NewLine +
+                        "Error: " + iex.Message,
+                        "Krile STARRYEYES", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
 #endif
             }
             finally
