@@ -19,7 +19,7 @@
         d:DataContext="{d:DesignInstance dialogs:AddNewKeyAssignDialogViewModel}"
         mc:Ignorable="d">
     <Window.Resources>
-        <utils:BooleanInverterConverter x:Key="BooleanInverterConverter" />
+        <utils:BooleanInversionConverter x:Key="BooleanInverterConverter" />
         <utils:BooleanToInvisibleConverter x:Key="BooleanToInvisibleConverter" />
     </Window.Resources>
     <i:Interaction.Triggers>

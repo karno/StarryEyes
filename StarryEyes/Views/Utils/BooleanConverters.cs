@@ -28,7 +28,7 @@ namespace StarryEyes.Views.Utils
         }
     }
 
-    public class BooleanInverterConverter : TwoWayConverter<bool, bool>
+    public class BooleanInversionConverter : TwoWayConverter<bool, bool>
     {
         protected override bool ToTarget(bool input, object parameter)
         {
