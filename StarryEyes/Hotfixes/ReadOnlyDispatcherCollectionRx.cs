@@ -24,7 +24,6 @@ namespace StarryEyes
 
             _collection = collection;
 
-            _disposables.Add(_collection);
             _disposables.Add(_collection.ListenPropertyChanged(OnPropertyChanged));
             _disposables.Add(_collection.ListenCollectionChanged(OnCollectionChanged));
         }
@@ -122,6 +121,8 @@ namespace StarryEyes
                         i.Dispose();
                     }
                 }
+
+                _collection.Dispose();
             }
             _disposed = true;
         }

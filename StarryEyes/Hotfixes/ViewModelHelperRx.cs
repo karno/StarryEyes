@@ -5,10 +5,11 @@ using System.Collections.Specialized;
 using System.Globalization;
 using System.Windows.Threading;
 using Livet;
-using Livet.EventListeners;
+using StarryEyes.Albireo.Helpers;
 using StarryEyes.Hotfixes;
 
 // ReSharper disable CheckNamespace
+
 namespace StarryEyes
 // ReSharper restore CheckNamespace
 {
@@ -17,8 +18,9 @@ namespace StarryEyes
     /// </summary>
     public static class ViewModelHelperRx
     {
-        public static ReadOnlyDispatcherCollectionRx<TViewModel> CreateReadOnlyDispatcherCollectionRx<TModel, TViewModel>
-            (ObservableSynchronizedCollectionEx<TModel> source, Func<TModel, TViewModel> converter, Dispatcher dispatcher, DispatcherPriority priority = DispatcherPriority.Normal)
+        public static ReadOnlyDispatcherCollectionRx<TViewModel> CreateReadOnlyDispatcherCollectionRx
+            <TModel, TViewModel>(ObservableSynchronizedCollectionEx<TModel> source, Func<TModel, TViewModel> converter,
+                Dispatcher dispatcher, DispatcherPriority priority = DispatcherPriority.Normal)
         {
             if (source == null) throw new ArgumentNullException("source");
 
@@ -28,7 +30,8 @@ namespace StarryEyes
             }
 
             var sourceAsNotifyCollection = source as INotifyCollectionChanged;
-            if (sourceAsNotifyCollection == null) throw new ArgumentException("sourceがINotifyCollectionChangedを実装していません");
+            if (sourceAsNotifyCollection == null)
+                throw new ArgumentException("sourceがINotifyCollectionChangedを実装していません");
 
             var initCollection = new ObservableCollection<TViewModel>();
             var target = new DispatcherCollectionRx<TViewModel>(initCollection, dispatcher)
@@ -52,7 +55,7 @@ namespace StarryEyes
             INotifyCollectionChanged source, Func<TModel, TViewModel> converter,
             DispatcherCollectionRx<TViewModel> target)
         {
-            return new CollectionChangedEventListener(source, (o, e) =>
+            return source.ListenCollectionChanged(e =>
                 DispatcherHelper.UIDispatcher.InvokeAsync(() =>
                 {
                     if (e.NewItems != null && e.NewItems.Count >= 2)
