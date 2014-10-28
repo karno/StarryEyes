@@ -382,8 +382,17 @@
                       Background="Transparent"
                       ContextMenu="{StaticResource StatusContextMenu}"
                       primitives:TimelineSwapResourcesBehavior.ResourceSet="Default">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="MouseLeftButtonUp">
+                            <ei:CallMethodAction MethodName="ToggleFocus" TargetObject="{Binding Mode=OneTime}" />
+                        </i:EventTrigger>
+                        <l:InteractionMessageTrigger Messenger="{Binding Messenger, Mode=OneTime}">
+                            <mbehaviors:BringIntoViewInteractionMessageAction />
+                        </l:InteractionMessageTrigger>
+                    </i:Interaction.Triggers>
                     <Border x:Name="SingleLineBorder"
                             Margin="0"
+                            Background="Transparent"
                             IsHitTestVisible="{Binding IsExpanded,
                                                        Converter={StaticResource BooleanInversionConverter}}"
                             Padding="0"
@@ -392,14 +401,6 @@
                                                  Mode=OneWay,
                                                  Converter={StaticResource BooleanToInvisibleConverter},
                                                  FallbackValue=Collapsed}">
-                        <i:Interaction.Triggers>
-                            <i:EventTrigger EventName="MouseLeftButtonUp">
-                                <ei:CallMethodAction MethodName="ToggleFocus" TargetObject="{Binding Mode=OneTime}" />
-                            </i:EventTrigger>
-                            <l:InteractionMessageTrigger Messenger="{Binding Messenger, Mode=OneTime}">
-                                <mbehaviors:BringIntoViewInteractionMessageAction />
-                            </l:InteractionMessageTrigger>
-                        </i:Interaction.Triggers>
                         <Grid MinHeight="24">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="64" />
@@ -465,6 +466,7 @@
                                        Margin="8,0,0,0"
                                        VerticalAlignment="Center"
                                        Foreground="{DynamicResource TweetForegroundBrush}"
+                                       IsHitTestVisible="False"
                                        Text="{Binding SingleLineText}"
                                        TextTrimming="CharacterEllipsis"
                                        TextWrapping="NoWrap"
@@ -474,6 +476,7 @@
                                        Margin="8,0,0,0"
                                        VerticalAlignment="Center"
                                        Foreground="{DynamicResource TweetForegroundBrush}"
+                                       IsHitTestVisible="False"
                                        Text="{Binding MultiLineText}"
                                        TextWrapping="Wrap"
                                        Visibility="{Binding IsSingleLine,
@@ -481,6 +484,7 @@
                             <StackPanel Grid.Column="3"
                                         Width="Auto"
                                         Margin="4,0"
+                                        IsHitTestVisible="False"
                                         Orientation="Horizontal"
                                         Visibility="{Binding IsFavoritedUserExists,
                                                              Mode=OneWay,
@@ -572,9 +576,6 @@
                             <i:EventTrigger EventName="MouseLeave">
                                 <ei:GoToStateAction StateName="Default" />
                             </i:EventTrigger>
-                            <l:InteractionMessageTrigger Messenger="{Binding Messenger, Mode=OneTime}">
-                                <mbehaviors:BringIntoViewInteractionMessageAction />
-                            </l:InteractionMessageTrigger>
                             <ei:DataTrigger Binding="{Binding IsFocused, Mode=OneWay}" Value="True">
                                 <ei:GoToStateAction StateName="Focused" />
                             </ei:DataTrigger>
@@ -825,11 +826,7 @@
                                     Margin="0"
                                     Background="Transparent"
                                     Padding="0">
-                                <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="MouseLeftButtonUp">
-                                        <ei:CallMethodAction MethodName="ToggleFocus" TargetObject="{Binding Mode=OneTime}" />
-                                    </i:EventTrigger>
-                                </i:Interaction.Triggers>
+
                                 <Grid Width="Auto"
                                       Height="Auto"
                                       Margin="8,10,0,10">
