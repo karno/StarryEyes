@@ -18,7 +18,9 @@ namespace StarryEyes.Views.Behaviors
 {
     public class TimelineScrollLockerBehavior : Behavior<ScrollViewer>
     {
-        private const double TopLockThreshold = 0.9;
+        private const double ScrollEpsilonPixel = 10.0;
+        private const double ScrollEpsilonItem = 1.0;
+
 
         private readonly CompositeDisposable _disposables = new CompositeDisposable();
 
@@ -38,8 +40,8 @@ namespace StarryEyes.Views.Behaviors
         /// Dependency property for flag of scroll lock is enabled or disabled.
         /// </summary>
         public static readonly DependencyProperty IsScrollLockEnabledProperty =
-            DependencyProperty.Register("IsScrollLockEnabled", typeof(bool),
-                                        typeof(TimelineScrollLockerBehavior), new PropertyMetadata(false));
+            DependencyProperty.Register("IsScrollLockEnabled", typeof(bool), typeof(TimelineScrollLockerBehavior),
+                new PropertyMetadata(false));
 
         /// <summary>
         /// Flag of scroll lock is enabled only scroll position is not zero. <para />
@@ -72,11 +74,11 @@ namespace StarryEyes.Views.Behaviors
         /// </summary>
         public static readonly DependencyProperty ItemsSourceProperty =
             DependencyProperty.Register("ItemsSource", typeof(IList), typeof(TimelineScrollLockerBehavior),
-                                        new PropertyMetadata(null, ItemsSourceChanged));
+                new PropertyMetadata(null, ItemsSourceChanged));
 
-        private static void ItemsSourceChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
+        private static void ItemsSourceChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
         {
-            var behavior = dependencyObject as TimelineScrollLockerBehavior;
+            var behavior = source as TimelineScrollLockerBehavior;
             // sender is ScollLockerBehavior and that is attached.
             if (behavior != null && behavior.AssociatedObject != null)
             {
@@ -98,19 +100,36 @@ namespace StarryEyes.Views.Behaviors
         /// Dependency property for flag of scroll animation is enabled or disabled.
         /// </summary>
         public static readonly DependencyProperty IsAnimationEnabledProperty =
-            DependencyProperty.Register("IsAnimationEnabled", typeof(bool), typeof(TimelineScrollLockerBehavior), new PropertyMetadata(true));
+            DependencyProperty.Register("IsAnimationEnabled", typeof(bool), typeof(TimelineScrollLockerBehavior),
+                new PropertyMetadata(true));
+
+        /// <summary>
+        /// Current applied scroll unit
+        /// </summary>
+        public ScrollUnit CurrentScrollUnit
+        {
+            get { return (ScrollUnit)GetValue(CurrentScrollUnitProperty); }
+            set { SetValue(CurrentScrollUnitProperty, value); }
+        }
+
+        /// <summary>
+        /// Dependency property for current scroll unit
+        /// </summary>
+        public static readonly DependencyProperty CurrentScrollUnitProperty =
+            DependencyProperty.Register("CurrentScrollUnit", typeof(ScrollUnit), typeof(TimelineScrollLockerBehavior),
+                new PropertyMetadata(ScrollUnit.Pixel));
+
 
         // internal caches
         private readonly Queue<double> _scrollOffsetQueue = new Queue<double>();
         private readonly Timer _scrollTimer;
-        private double _lastScrollOffset;
+        private readonly LinkedList<double> _lastScrollOffsets = new LinkedList<double>();
         private int _previousItemCount;
         private IDisposable _itemSourceCollectionChangeListener;
-        // ✨ the magic ✨
-        private volatile bool _magicIgnoreUserScrollOnce;
-        private volatile bool _isMagicIgnoreHolded;
         // wait for dispatcher
         private volatile bool _isDispatcherAffected;
+        // scroll animation synchronize latch
+        private volatile bool _isScrollAnimating;
 
         public TimelineScrollLockerBehavior()
         {
@@ -172,6 +191,13 @@ namespace StarryEyes.Views.Behaviors
             var itemCount = source.Count;
             var verticalOffset = e.VerticalOffset;
 
+            var epsilon = ScrollEpsilonItem;
+            if (this.CurrentScrollUnit == ScrollUnit.Pixel)
+            {
+                epsilon = ScrollEpsilonPixel;
+            }
+
+
             // ***** check item is added or not *****
 
             // check and update items count latch
@@ -184,14 +210,18 @@ namespace StarryEyes.Views.Behaviors
                 // if scroll extent is not changed or shrinked, nothing to do.
                 if (e.ExtentHeightChange <= 0)
                 {
-                    _lastScrollOffset = verticalOffset;
+                    _lastScrollOffsets.AddFirst(verticalOffset);
                     return;
                 }
 
                 // calculate position should scroll to.
                 // e.VerticalOffset indicates illegal offset when timeline is invisible.
                 // var prevPosition = e.VerticalOffset + e.ExtentHeightChange;
-                var prevPosition = _lastScrollOffset + e.ExtentHeightChange;
+
+                var firstNode = _lastScrollOffsets.First;
+                var lastScrollOffset = firstNode != null ? firstNode.Value : 0;
+
+                var prevPosition = lastScrollOffset + e.ExtentHeightChange;
                 if (prevPosition > e.ExtentHeight)
                 {
                     // too large to scroll -> use value from e.VerticalOffset
@@ -202,7 +232,7 @@ namespace StarryEyes.Views.Behaviors
 
                 // ScrollLock AND !ScrollLockOnlyScrolled -> Lock
                 // ScrollLock AND ScrollLockOnlyScrolled AND _lastScrollOffset is not Zero -> Lock
-                if (IsScrollLockEnabled && (!IsScrollLockOnlyScrolled || _lastScrollOffset > TopLockThreshold))
+                if (IsScrollLockEnabled && (!IsScrollLockOnlyScrolled || lastScrollOffset > epsilon))
                 {
                     if (IsScrollLockOnlyScrolled)
                     {
@@ -212,8 +242,8 @@ namespace StarryEyes.Views.Behaviors
                             if (_scrollOffsetQueue.Count > 0)
                             {
                                 System.Diagnostics.Debug.WriteLine("* Currently scrolling -> update animation.");
-                                // start animation with a ✨ magic ✨
-                                this.RunAnimation(prevPosition, true);
+                                // start animation
+                                this.RunAnimation(prevPosition);
                                 return;
                             }
                         }
@@ -231,58 +261,54 @@ namespace StarryEyes.Views.Behaviors
                 else
                 {
                     // simply update last offset.
-                    _lastScrollOffset = verticalOffset;
+                    _lastScrollOffsets.Clear();
+                    _lastScrollOffsets.AddFirst(verticalOffset);
                 }
                 return;
             }
 
             // ***** check is user scrolled or not ****
 
-            // _lastScrollOffset != e.VerticalOffset
-            if (Math.Abs(_lastScrollOffset - verticalOffset) > TopLockThreshold)
+            if (_isScrollAnimating)
             {
-                if (_magicIgnoreUserScrollOnce)
+                // lastScrollOffset != e.VerticalOffset
+                while (_lastScrollOffsets.Count > 0)
                 {
-                    // magic ignore once
-                    if (!_isMagicIgnoreHolded)
+                    var offset = _lastScrollOffsets.Last.Value;
+                    System.Diagnostics.Debug.WriteLine("% DQLO: " + offset + " / " + verticalOffset + ", eps: " + epsilon);
+                    if (Math.Abs(offset - verticalOffset) < epsilon)
                     {
-                        _magicIgnoreUserScrollOnce = false;
-                        System.Diagnostics.Debug.WriteLine(
-                            "✨ MAGICAL IGNORE [RELEASE] ✨" +
-                            " LSO:" + _lastScrollOffset + " / VO: " + verticalOffset);
+                        System.Diagnostics.Debug.WriteLine("% Check.");
+                        // scrolled by animation
+                        if (offset < 1)
+                        {
+                            System.Diagnostics.Debug.WriteLine("% finished scrolling.");
+                            _isScrollAnimating = false;
+                        }
+                        return;
                     }
-                    else
-                    {
-                        System.Diagnostics.Debug.WriteLine(
-                            "✨ MAGICAL IGNORE [HOLD] ✨" +
-                            " LSO:" + _lastScrollOffset + " / VO: " + verticalOffset);
-                    }
-                    _lastScrollOffset = verticalOffset;
-                    return;
+                    _lastScrollOffsets.RemoveLast();
                 }
-                System.Diagnostics.Debug.WriteLine(
-                    "* User scroll detected." +
-                    " LSO: " + _lastScrollOffset + " / VO: " + verticalOffset);
-                // scrolled by user?
-                // -> abort animation, exit immediately
-                lock (_scrollOffsetQueue)
-                {
-                    if (_scrollOffsetQueue.Count > 0)
-                    {
-                        System.Diagnostics.Debug.WriteLine(" -> Scroll stopped by user-interaction.");
-                        _scrollOffsetQueue.Clear();
-                    }
-                }
-                // write back last scroll offset and item count
-                _lastScrollOffset = verticalOffset;
-                _previousItemCount = itemCount;
-                return;
+                _isScrollAnimating = false;
             }
 
-            // ***** or maybe caused by scroll animation *****
-            // -> do nothing.
+            // scroll by user-interaction
 
-            return;
+            System.Diagnostics.Debug.WriteLine("* User scroll detected.");
+
+            // scrolled by user?
+            // -> abort animation, exit immediately
+            lock (_scrollOffsetQueue)
+            {
+                if (_scrollOffsetQueue.Count > 0)
+                {
+                    System.Diagnostics.Debug.WriteLine(" -> Scroll stopped by user-interaction.");
+                    _scrollOffsetQueue.Clear();
+                }
+            }
+            // write back last scroll offset and item count
+            _lastScrollOffsets.AddFirst(verticalOffset);
+            _previousItemCount = itemCount;
         }
 
         /// <summary>
@@ -347,8 +373,7 @@ namespace StarryEyes.Views.Behaviors
         /// Run scroll animation (to position 0).
         /// </summary>
         /// <param name="offset">beginning scroll offset</param>
-        /// <param name="setMagicalIgnore">set magical ignore flag</param>
-        private void RunAnimation(double offset, bool setMagicalIgnore = false)
+        private void RunAnimation(double offset)
         {
             // clear old animation queue
             lock (_scrollOffsetQueue)
@@ -356,20 +381,14 @@ namespace StarryEyes.Views.Behaviors
                 _scrollOffsetQueue.Clear();
             }
 
-            System.Diagnostics.Debug.WriteLine("# New animation started. VO: " + offset);
-
-            if (setMagicalIgnore)
-            {
-                this._isMagicIgnoreHolded = true;
-                _magicIgnoreUserScrollOnce = true;
-            }
+            this._isScrollAnimating = true;
 
             // scroll to initial position (enforced)
             ScrollToVerticalOffset(offset);
             // above method should not call via dispatcher. It will causes flickers in timeline.
 
+            System.Diagnostics.Debug.WriteLine("# Registering new animation.");
 
-            System.Diagnostics.Debug.WriteLine("# Registering new animation. (magic ignore?" + setMagicalIgnore + ")");
             // create animation
             // callback method is called every 10 milliseconds.
             // scroll is should be completed in 60 msec.
@@ -384,7 +403,6 @@ namespace StarryEyes.Views.Behaviors
                 _scrollOffsetQueue.Enqueue(0);
                 RunScrollTimer();
             }
-            this._isMagicIgnoreHolded = false;
         }
 
         private void RunScrollTimer()
@@ -416,13 +434,8 @@ namespace StarryEyes.Views.Behaviors
                 if (_scrollOffsetQueue.Count == 0)
                 {
                     StopScrollTimer();
-                    System.Diagnostics.Debug.WriteLine("# Scroll completed. [magic ignore hold?" + _isMagicIgnoreHolded + "]");
+                    System.Diagnostics.Debug.WriteLine("# Scroll completed.");
                     // disable magical ignore
-                    if (!this._isMagicIgnoreHolded)
-                    {
-                        this._magicIgnoreUserScrollOnce = false;
-                    }
-
                     return;
                 }
                 dequeuedOffset = this._scrollOffsetQueue.Dequeue();
@@ -456,13 +469,14 @@ namespace StarryEyes.Views.Behaviors
         private void ScrollToVerticalOffset(double offset, [CallerMemberName]string caller = "[not provided]")
         {
             System.Diagnostics.Debug.WriteLine("# Scroll to: " + offset + " by " + caller);
-            this._lastScrollOffset = offset;
             if (offset < 1)
             {
+                _lastScrollOffsets.AddFirst(0);
                 this.AssociatedObject.ScrollToTop();
             }
             else
             {
+                _lastScrollOffsets.AddFirst(offset);
                 this.AssociatedObject.ScrollToVerticalOffset(offset);
             }
         }
