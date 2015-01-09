@@ -18,6 +18,9 @@ namespace StarryEyes.Anomaly.Imaging
         private static readonly Dictionary<string, Func<string, string>> ResolveTable =
             new Dictionary<string, Func<string, string>>
             {
+                {"http://totori.dip.jp", s => "http://totori.dip.jp/totori_vita.jpg"},
+                {"http://twitpic.com/d250g2", s => "http://d250g2.com/d250g2.jpg"},
+                {"http://d250g2.com", s => "http://d250g2.com/d250g2.jpg"},
                 {
                     "http://twitpic.com/",
                     s => PreCheck(s.Length > 19, () => "http://twitpic.com/show/full/" + s.Substring(19))
