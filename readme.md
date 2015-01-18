@@ -16,3 +16,12 @@ See LICENSE.TXT for more detail.
 
 (C)2013 Karno.  
 And other contributors have some rights of code fragments. see the commit log for more detail.
+
+## Branch "illumine"
+
+"illumine" is a branch for renovating Krile StarryEyes.
+on illumine branch, we don't guarantee stability and compatibility from the older versions.
+
+We strongly recommend not to use any deliverables from branch "illumine" with your main accounts.
+
+You should install illumine Krile as standalone mode, or may lose setting files.
