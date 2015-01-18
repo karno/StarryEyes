@@ -84,7 +84,7 @@ namespace StarryEyes.Filters.Sources
         protected override IObservable<TwitterStatus> ReceiveSink(long? maxId)
         {
             return this.GetAccount()
-                       .GetListTimelineAsync(this._listInfo.Slug, this._listInfo.OwnerScreenName, maxId: maxId)
+                       .GetListTimelineAsync(_listInfo.ToListParameter(), maxId: maxId)
                        .ToObservable();
         }
 

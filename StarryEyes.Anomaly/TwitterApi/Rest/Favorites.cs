@@ -1,71 +1,87 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest.Infrastructure;
+using StarryEyes.Anomaly.TwitterApi.Rest.Parameter;
 
 namespace StarryEyes.Anomaly.TwitterApi.Rest
 {
     public static class Favorites
     {
-        public static Task<IEnumerable<TwitterStatus>> GetFavoritesAsync(
-            this IOAuthCredential credential, long userId,
-            int? count = null, long? sinceId = null, long? maxId = null)
-        {
-            if (credential == null) throw new ArgumentNullException("credential");
-            return GetFavoritesCoreAsync(credential, userId, null, count, sinceId, maxId);
-        }
+        #region favorites/list
 
         public static Task<IEnumerable<TwitterStatus>> GetFavoritesAsync(
-            this IOAuthCredential credential, string screenName,
+            [NotNull] this IOAuthCredential credential, [CanBeNull] UserParameter targetUser,
             int? count = null, long? sinceId = null, long? maxId = null)
         {
-            if (credential == null) throw new ArgumentNullException("credential");
-            if (screenName == null) throw new ArgumentNullException("screenName");
-            return GetFavoritesCoreAsync(credential, null, screenName, count, sinceId, maxId);
+            return credential.GetFavoritesAsync(targetUser, count, sinceId, maxId, CancellationToken.None);
         }
 
-        private static async Task<IEnumerable<TwitterStatus>> GetFavoritesCoreAsync(
-            IOAuthCredential credential, long? userId, string screenName,
-            int? count, long? sinceId, long? maxId)
+        public static async Task<IEnumerable<TwitterStatus>> GetFavoritesAsync(
+            [NotNull] this IOAuthCredential credential, [CanBeNull] UserParameter targetUser,
+            int? count, long? sinceId, long? maxId,
+            CancellationToken cancellationToken)
         {
+            if (credential == null) throw new ArgumentNullException("credential");
             var param = new Dictionary<string, object>
             {
-                {"user_id", userId},
-                {"screen_name", screenName},
                 {"count", count},
                 {"since_id", sinceId},
                 {"max_id", maxId},
-            }.ParametalizeForGet();
-            var client = credential.CreateOAuthClient();
-            var response = await client.GetAsync(new ApiAccess("favorites/list.json", param));
+            }.ApplyParameter(targetUser);
+            var response = await credential.GetAsync("favorites/list.json", param, cancellationToken);
             return await response.ReadAsStatusCollectionAsync();
         }
 
+        #endregion
+
+        #region favorites/create
+
+        public static Task<TwitterStatus> CreateFavoriteAsync(
+            [NotNull] this IOAuthCredential credential, long id)
+        {
+            if (credential == null) throw new ArgumentNullException("credential");
+            return credential.CreateFavoriteAsync(id, CancellationToken.None);
+        }
+
         public static async Task<TwitterStatus> CreateFavoriteAsync(
-            this IOAuthCredential credential, long id)
+            [NotNull] this IOAuthCredential credential, long id, CancellationToken cancellationToken)
         {
             if (credential == null) throw new ArgumentNullException("credential");
             var param = new Dictionary<string, object>
             {
                 {"id", id}
-            }.ParametalizeForPost();
-            var client = credential.CreateOAuthClient();
-            var response = await client.PostAsync(new ApiAccess("favorites/create.json"), param);
+            };
+            var response = await credential.PostAsync("favorites/create.json", param, cancellationToken);
             return await response.ReadAsStatusAsync();
         }
 
+        #endregion
+
+        #region favorites/destroy
+
+        public static Task<TwitterStatus> DestroyFavoriteAsync(
+            [NotNull] this IOAuthCredential credential, long id)
+        {
+            if (credential == null) throw new ArgumentNullException("credential");
+            return credential.DestroyFavoriteAsync(id, CancellationToken.None);
+        }
+
         public static async Task<TwitterStatus> DestroyFavoriteAsync(
-            this IOAuthCredential credential, long id)
+            [NotNull] this IOAuthCredential credential, long id, CancellationToken cancellationToken)
         {
             if (credential == null) throw new ArgumentNullException("credential");
             var param = new Dictionary<string, object>
             {
                 {"id", id}
-            }.ParametalizeForPost();
-            var client = credential.CreateOAuthClient();
-            var response = await client.PostAsync(new ApiAccess("favorites/destroy.json"), param);
+            };
+            var response = await credential.PostAsync("favorites/destroy.json", param, cancellationToken);
             return await response.ReadAsStatusAsync();
         }
+
+        #endregion
     }
 }

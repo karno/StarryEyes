@@ -4,6 +4,7 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
+using StarryEyes.Anomaly.TwitterApi.Rest.Parameter;
 using StarryEyes.Anomaly.Utils;
 using StarryEyes.Globalization.Filters;
 using StarryEyes.Models.Accounting;
@@ -60,17 +61,12 @@ namespace StarryEyes.Filters.Sources
 
         protected override IObservable<TwitterStatus> ReceiveSink(long? maxId)
         {
-            Func<TwitterAccount, Task<IEnumerable<TwitterStatus>>> uif;
-            if (_targetIdOrScreenName.StartsWith("#"))
-            {
-                uif = a => a.GetUserTimelineAsync(Int64.Parse(_targetIdOrScreenName.Substring(1)),
-                    includeRetweets: true);
-            }
-            else
-            {
-                uif = a => a.GetUserTimelineAsync(_targetIdOrScreenName,
-                    includeRetweets: true);
-            }
+            var parameter = _targetIdOrScreenName.StartsWith("#")
+                ? new UserParameter(Int64.Parse(_targetIdOrScreenName.Substring(1)))
+                : new UserParameter(_targetIdOrScreenName);
+
+            Func<TwitterAccount, Task<IEnumerable<TwitterStatus>>> uif =
+                a => a.GetUserTimelineAsync(parameter, includeRetweets: true);
             return Observable.Start(() => Setting.Accounts.GetRandomOne())
                              .Where(a => a != null)
                              .SelectMany(a => uif(a).ToObservable());

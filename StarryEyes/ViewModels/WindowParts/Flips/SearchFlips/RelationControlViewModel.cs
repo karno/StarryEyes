@@ -8,6 +8,7 @@ using Livet;
 using StarryEyes.Anomaly.TwitterApi;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
+using StarryEyes.Anomaly.TwitterApi.Rest.Parameter;
 using StarryEyes.Globalization.WindowParts;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Requests;
@@ -127,7 +128,8 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             try
             {
                 // ReSharper disable InvertIf
-                var fs = await _source.ShowFriendshipAsync(_source.Id, _target.Id);
+                var fs = await _source.ShowFriendshipAsync(
+                    new UserParameter(_source.Id), new UserParameter(_target.Id));
                 if (this.IsFollowing != fs.IsSourceFollowingTarget)
                 {
                     this.IsFollowing = fs.IsSourceFollowingTarget;

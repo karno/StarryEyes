@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
+using StarryEyes.Anomaly.TwitterApi.Rest.Parameter;
 using StarryEyes.Models.Accounting;
 
 namespace StarryEyes.Models.Requests
@@ -23,7 +24,7 @@ namespace StarryEyes.Models.Requests
 
         public override Task<TwitterUser> Send(TwitterAccount account)
         {
-            return account.UpdateMuteAsync(_userId, _mute);
+            return account.UpdateMuteAsync(new UserParameter(_userId), _mute);
         }
     }
 }

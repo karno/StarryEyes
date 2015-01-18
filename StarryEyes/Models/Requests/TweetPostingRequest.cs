@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using StarryEyes.Anomaly.TwitterApi;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
+using StarryEyes.Anomaly.TwitterApi.Rest.Parameter;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents.PostEvents;
 using StarryEyes.Settings;
@@ -54,22 +55,20 @@ namespace StarryEyes.Models.Requests
             {
                 try
                 {
+                    var param = new StatusParameter(
+                        _status, _inReplyTo,
+                        account.MarkMediaAsPossiblySensitive ? true : (bool?)null,
+                        latlong);
                     TwitterStatus result;
                     if (_attachedImageBin != null)
                     {
-                        result = await acc.UpdateWithMediaAsync(
-                            this._status,
-                            new[] { this._attachedImageBin },
-                            account.MarkMediaAsPossiblySensitive ? true : (bool?)null, // Inherit property
-                            this._inReplyTo,
-                            latlong);
+                        result = await acc.UpdateWithMedia2Async(
+                            param,
+                            new[] { _attachedImageBin });
                     }
                     else
                     {
-                        result = await acc.UpdateAsync(
-                            this._status,
-                            this._inReplyTo,
-                            latlong);
+                        result = await acc.UpdateAsync(param);
                     }
                     BackstageModel.NotifyFallbackState(acc, false);
                     return result;

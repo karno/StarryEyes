@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
+using StarryEyes.Anomaly.TwitterApi.Rest.Parameter;
 using StarryEyes.Models.Accounting;
 
 namespace StarryEyes.Models.Requests
@@ -27,15 +28,15 @@ namespace StarryEyes.Models.Requests
             switch (_kind)
             {
                 case RelationKind.Follow:
-                    return account.CreateFriendshipAsync(_userId);
+                    return account.CreateFriendshipAsync(new UserParameter(_userId));
                 case RelationKind.Unfollow:
-                    return account.DestroyFriendshipAsync(_userId);
+                    return account.DestroyFriendshipAsync(new UserParameter(_userId));
                 case RelationKind.Block:
-                    return account.CreateBlockAsync(_userId);
+                    return account.CreateBlockAsync(new UserParameter(_userId));
                 case RelationKind.ReportAsSpam:
-                    return account.ReportSpamAsync(_userId);
+                    return account.ReportSpamAsync(new UserParameter(_userId));
                 case RelationKind.Unblock:
-                    return account.DestroyBlockAsync(_userId);
+                    return account.DestroyBlockAsync(new UserParameter(_userId));
                 default:
                     throw new ArgumentOutOfRangeException();
             }

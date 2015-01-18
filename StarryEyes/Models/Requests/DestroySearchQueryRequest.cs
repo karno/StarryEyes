@@ -1,11 +1,11 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Models.Accounting;
 
 namespace StarryEyes.Models.Requests
 {
-    public sealed class DestroySearchQueryRequest : RequestBase<Tuple<long, string>>
+    public sealed class DestroySearchQueryRequest : RequestBase<TwitterSavedSearch>
     {
         private readonly long _id;
 
@@ -14,7 +14,7 @@ namespace StarryEyes.Models.Requests
             _id = id;
         }
 
-        public override Task<Tuple<long, string>> Send(TwitterAccount account)
+        public override Task<TwitterSavedSearch> Send(TwitterAccount account)
         {
             return account.DestroySavedSearchAsync(_id);
         }

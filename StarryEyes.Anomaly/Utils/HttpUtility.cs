@@ -8,6 +8,22 @@ namespace StarryEyes.Anomaly.Utils
     public static class HttpUtility
     {
         /// <summary>
+        /// <para>Concatenate URL string.</para>
+        /// <para> a: http://example.com/, b: index.html => http://example.com/index.html </para>
+        /// <para> a: http://example.com, b: /index.html => http://example.com/index.html </para>
+        /// <para> a: http://example.com/, b: /index.html => http://example.com/index.html </para>
+        /// </summary>
+        /// <param name="a">prefix of URL</param>
+        /// <param name="b">suffix of URL</param>
+        /// <returns></returns>
+        public static string ConcatUrl(string a, string b)
+        {
+            var af = a.EndsWith("/");
+            var bf = b.StartsWith("/");
+            return af ^ bf ? a + b : af ? a + b.Substring(1) : a + "/" + b;
+        }
+
+        /// <summary>
         /// Encode string with URL encoding method by UTF8
         /// </summary>
         /// <remarks>

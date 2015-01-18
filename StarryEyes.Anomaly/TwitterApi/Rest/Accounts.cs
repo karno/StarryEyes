@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest.Infrastructure;
 
@@ -9,23 +11,46 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 {
     public static class Accounts
     {
+        #region account/verify_credentials
+
+        public static Task<TwitterUser> VerifyCredentialAsync(
+            [NotNull] this IOAuthCredential credential)
+        {
+            if (credential == null) throw new ArgumentNullException("credential");
+            return credential.VerifyCredentialAsync(CancellationToken.None);
+        }
+
         public static async Task<TwitterUser> VerifyCredentialAsync(
-            this IOAuthCredential credential)
+            [NotNull] this IOAuthCredential credential, CancellationToken cancellationToken)
         {
             if (credential == null) throw new ArgumentNullException("credential");
             var param = new Dictionary<string, object>
             {
                 {"skip_status", true}
-            }.ParametalizeForGet();
-            var client = credential.CreateOAuthClient();
-            var response = await client.GetAsync(new ApiAccess("account/verify_credentials.json", param));
-            return await response.ReadAsUserAsync();
+            };
+            var resp = await credential.GetAsync(
+                "account/verify_credentials.json", param, cancellationToken);
+            return await resp.ReadAsUserAsync();
+        }
+
+        #endregion
+
+        #region account/update_profile
+
+        public static Task<TwitterUser> UpdateProfileAsync(
+            [NotNull] this IOAuthCredential credential,
+            [CanBeNull] string name = null, [CanBeNull] string url = null, [CanBeNull] string location = null,
+            [CanBeNull] string description = null)
+        {
+            if (credential == null) throw new ArgumentNullException("credential");
+            return credential.UpdateProfileAsync(name, url, location, description,
+                CancellationToken.None);
         }
 
         public static async Task<TwitterUser> UpdateProfileAsync(
-            this IOAuthCredential credential,
-            string name = null, string url = null,
-            string location = null, string description = null)
+            [NotNull] this IOAuthCredential credential,
+            [CanBeNull] string name, [CanBeNull] string url, [CanBeNull] string location, [CanBeNull] string description,
+            CancellationToken cancellationToken)
         {
             if (credential == null) throw new ArgumentNullException("credential");
             var param = new Dictionary<string, object>
@@ -35,15 +60,28 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
                 {"location", location},
                 {"description", description},
                 {"skip_status", true},
-            }.ParametalizeForPost();
-            var client = credential.CreateOAuthClient();
-            var response = await client.PostAsync(new ApiAccess("account/update_profile.json"), param);
-            return await response.ReadAsUserAsync();
+            };
+            var resp = await credential.PostAsync(
+                "account/update_profile.json",
+                param, cancellationToken);
+            return await resp.ReadAsUserAsync();
+        }
+
+        #endregion
+
+        #region account/update_profile_image
+
+        public static Task<TwitterUser> UpdateProfileImageAsync(
+            [NotNull] this IOAuthCredential credential, [NotNull] byte[] image)
+        {
+            if (credential == null) throw new ArgumentNullException("credential");
+            if (image == null) throw new ArgumentNullException("image");
+            return credential.UpdateProfileImageAsync(image, CancellationToken.None);
         }
 
         public static async Task<TwitterUser> UpdateProfileImageAsync(
-            this IOAuthCredential credential,
-            byte[] image)
+            [NotNull] this IOAuthCredential credential, [NotNull] byte[] image,
+            CancellationToken cancellationToken)
         {
             if (credential == null) throw new ArgumentNullException("credential");
             if (image == null) throw new ArgumentNullException("image");
@@ -52,9 +90,12 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
                 {new StringContent("true"), "skip_status"},
                 {new ByteArrayContent(image), "image", "image.png"}
             };
-            var client = credential.CreateOAuthClient();
-            var response = await client.PostAsync(new ApiAccess("account/update_profile_image.json"), content);
-            return await response.ReadAsUserAsync();
+            var resp = await credential.PostAsync(
+                "account/update_profile_image.json",
+                content, cancellationToken);
+            return await resp.ReadAsUserAsync();
         }
+
+        #endregion
     }
 }

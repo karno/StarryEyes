@@ -6,6 +6,7 @@ using System.Reactive.Linq;
 using System.Threading;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
+using StarryEyes.Anomaly.TwitterApi.Rest.Parameter;
 using StarryEyes.Anomaly.Utils;
 using StarryEyes.Filters;
 using StarryEyes.Filters.Expressions;
@@ -131,11 +132,10 @@ namespace StarryEyes.Models.Timelines.SearchFlips
                 var acc = Setting.Accounts.GetRandomOne();
                 if (acc == null) return Observable.Empty<TwitterStatus>();
                 System.Diagnostics.Debug.WriteLine("SEARCHPANE SEARCH QUERY: " + this._query);
-                return acc.SearchAsync(this._query, maxId: maxId, count: count,
+                var param = new SearchParameter(this._query, maxId: maxId, count: count,
                     lang: String.IsNullOrWhiteSpace(Setting.SearchLanguage.Value) ? null : Setting.SearchLanguage.Value,
-                    locale: String.IsNullOrWhiteSpace(Setting.SearchLocale.Value) ? null : Setting.SearchLocale.Value)
-                          .ToObservable()
-                          .Do(StatusInbox.Enqueue);
+                    locale: String.IsNullOrWhiteSpace(Setting.SearchLocale.Value) ? null : Setting.SearchLocale.Value);
+                return acc.SearchAsync(param).ToObservable().Do(StatusInbox.Enqueue);
             }
             return StatusProxy.FetchStatuses(this._filterFunc, this._filterSql, maxId, count)
                               .ToObservable()

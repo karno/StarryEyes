@@ -46,7 +46,7 @@ namespace StarryEyes.Models.Receiving.Receivers
                 return;
             }
 
-            (await authInfo.GetListTimelineAsync(this._listInfo.Slug, this._listInfo.OwnerScreenName))
+            (await authInfo.GetListTimelineAsync(_listInfo.ToListParameter()))
                 .ForEach(StatusInbox.Enqueue);
         }
     }

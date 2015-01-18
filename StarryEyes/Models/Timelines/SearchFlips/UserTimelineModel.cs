@@ -1,6 +1,7 @@
 ﻿using System;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
+using StarryEyes.Anomaly.TwitterApi.Rest.Parameter;
 using StarryEyes.Anomaly.Utils;
 using StarryEyes.Settings;
 
@@ -30,14 +31,14 @@ namespace StarryEyes.Models.Timelines.SearchFlips
 
         protected override IObservable<TwitterStatus> Fetch(long? maxId, int? count)
         {
-            var account = Setting.Accounts.GetRelatedOne(this._userId);
-            switch (this._type)
+            var account = Setting.Accounts.GetRelatedOne(_userId);
+            switch (_type)
             {
                 case TimelineType.User:
-                    return account.GetUserTimelineAsync(this._userId, count, maxId: maxId, includeRetweets: true)
+                    return account.GetUserTimelineAsync(new UserParameter(_userId), count, maxId: maxId, includeRetweets: true)
                                   .ToObservable();
                 case TimelineType.Favorites:
-                    return account.GetFavoritesAsync(this._userId, count, maxId: maxId).ToObservable();
+                    return account.GetFavoritesAsync(new UserParameter(_userId), count, maxId: maxId).ToObservable();
                 default:
                     throw new ArgumentOutOfRangeException();
             }

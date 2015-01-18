@@ -1,4 +1,5 @@
 ﻿using System;
+using StarryEyes.Anomaly.TwitterApi.Rest.Parameter;
 
 namespace StarryEyes.Models.Receiving
 {
@@ -49,6 +50,11 @@ namespace StarryEyes.Models.Receiving
         public override string ToString()
         {
             return this.OwnerScreenName + "/" + this.Slug;
+        }
+
+        public ListParameter ToListParameter()
+        {
+            return new ListParameter(OwnerScreenName, Slug);
         }
     }
 }

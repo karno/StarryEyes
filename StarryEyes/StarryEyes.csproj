@@ -956,9 +956,9 @@
       <Project>{316927de-96c9-47c8-947d-b6d8a8da1e14}</Project>
       <Name>StarryEyes.Casket</Name>
     </ProjectReference>
-    <ProjectReference Include="..\StarryEyes.Fragments\StarryEyes.Fragments.csproj">
-      <Project>{9f6dbea1-0c36-4d92-835e-b42b14b84d73}</Project>
-      <Name>StarryEyes.Fragments</Name>
+    <ProjectReference Include="..\StarryEyes.Fragment\StarryEyes.Fragment.csproj">
+      <Project>{CDFD9752-7E33-4E14-92FE-307981DBEC2D}</Project>
+      <Name>StarryEyes.Fragment</Name>
     </ProjectReference>
     <ProjectReference Include="..\StarryEyes.Nightmare\StarryEyes.Nightmare.csproj">
       <Project>{3A78CEB3-A112-4A66-8724-BFF2BFA9182B}</Project>

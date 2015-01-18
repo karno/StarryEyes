@@ -3,6 +3,7 @@ using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using StarryEyes.Anomaly.TwitterApi.Rest;
+using StarryEyes.Anomaly.TwitterApi.Rest.Parameter;
 using StarryEyes.Anomaly.Utils;
 using StarryEyes.Globalization;
 using StarryEyes.Globalization.Models;
@@ -42,9 +43,9 @@ namespace StarryEyes.Models.Receiving.Receivers
 
             // get followings / followers
             await Observable.Merge(
-                this._account.RetrieveAllCursor((a, c) => a.GetFriendsIdsAsync(this._account.Id, c))
+                this._account.RetrieveAllCursor((a, c) => a.GetFriendsIdsAsync(new UserParameter(_account.Id), c))
                     .Do(newFollowings.Add),
-                this._account.RetrieveAllCursor((a, c) => a.GetFollowersIdsAsync(this._account.Id, c))
+                this._account.RetrieveAllCursor((a, c) => a.GetFollowersIdsAsync(new UserParameter(_account.Id), c))
                     .Do(newFollowers.Add),
                 this._account.RetrieveAllCursor((a, c) => a.GetBlockingsIdsAsync(c))
                     .Do(newBlockings.Add),

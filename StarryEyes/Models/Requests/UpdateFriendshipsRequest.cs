@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
+using StarryEyes.Anomaly.TwitterApi.Rest.Parameter;
 using StarryEyes.Models.Accounting;
 
 namespace StarryEyes.Models.Requests
@@ -25,7 +26,7 @@ namespace StarryEyes.Models.Requests
 
         public override Task<TwitterFriendship> Send(TwitterAccount account)
         {
-            return account.UpdateFriendshipAsync(_userId, _deviceNotifications, _showRetweets);
+            return account.UpdateFriendshipAsync(new UserParameter(_userId), _deviceNotifications, _showRetweets);
         }
     }
 }

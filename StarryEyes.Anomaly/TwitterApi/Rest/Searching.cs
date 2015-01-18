@@ -1,88 +1,119 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using StarryEyes.Anomaly.Ext;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest.Infrastructure;
+using StarryEyes.Anomaly.TwitterApi.Rest.Parameter;
 
 namespace StarryEyes.Anomaly.TwitterApi.Rest
 {
     public static class Searching
     {
-        public static async Task<IEnumerable<TwitterStatus>> SearchAsync(
-            this IOAuthCredential credential, string query,
-            string geoCode = null, string lang = null, string locale = null,
-            SearchResultType resultType = SearchResultType.Mixed,
-            int? count = null, DateTime? untilDate = null,
-            long? sinceId = null, long? maxId = null)
+        #region search/tweets
+
+        public static Task<IEnumerable<TwitterStatus>> SearchAsync(
+            [NotNull] this IOAuthCredential credential, [NotNull] SearchParameter query)
         {
             if (credential == null) throw new ArgumentNullException("credential");
             if (query == null) throw new ArgumentNullException("query");
-            var param = new Dictionary<string, object>
-            {
-                {"q", query},
-                {"geocode", geoCode},
-                {"lang", lang},
-                {"locale", locale},
-                {"result_type", resultType.ToString().ToLower()},
-                {"count", count},
-                {"until", untilDate != null ? untilDate.Value.ToString("yyyy-MM-dd") : null},
-                {"since_id", sinceId},
-                {"max_id", maxId},
-            }.ParametalizeForGet();
-            var client = credential.CreateOAuthClient();
-            var response = await client.GetAsync(new ApiAccess("search/tweets.json", param));
+
+            return credential.SearchAsync(query, CancellationToken.None);
+        }
+
+        public static async Task<IEnumerable<TwitterStatus>> SearchAsync(
+            [NotNull] this IOAuthCredential credential, [NotNull] SearchParameter query,
+            CancellationToken cancellationToken)
+        {
+            if (credential == null) throw new ArgumentNullException("credential");
+            if (query == null) throw new ArgumentNullException("query");
+
+            var response = await credential.GetAsync("search/tweets.json",
+                query.ToDictionary(), cancellationToken);
             return await response.ReadAsStatusCollectionAsync();
         }
 
-        public static async Task<IEnumerable<Tuple<long, string>>> GetSavedSearchesAsync(
-            this IOAuthCredential credential)
+        #endregion
+
+        #region saved_searches/list
+
+        public static Task<IEnumerable<TwitterSavedSearch>> GetSavedSearchesAsync(
+            [NotNull] this IOAuthCredential credential)
         {
             if (credential == null) throw new ArgumentNullException("credential");
-            var client = credential.CreateOAuthClient();
-            var respStr = await client.GetStringAsync(new ApiAccess("saved_searches/list.json"));
+            return credential.GetSavedSearchesAsync(CancellationToken.None);
+        }
+
+        public static async Task<IEnumerable<TwitterSavedSearch>> GetSavedSearchesAsync(
+            [NotNull] this IOAuthCredential credential, CancellationToken cancellationToken)
+        {
+            if (credential == null) throw new ArgumentNullException("credential");
+            var respStr = await credential.GetStringAsync("saved_searches/list.json",
+                new Dictionary<string, object>(), cancellationToken);
             return await Task.Run(() =>
             {
                 var parsed = DynamicJson.Parse(respStr);
-                return (((dynamic[])parsed).Select(
-                    item => Tuple.Create(Int64.Parse((string)item.id_str), (string)item.query)));
-            });
+                return ((dynamic[])parsed).Select(
+                    item => new TwitterSavedSearch(item));
+            }, cancellationToken);
         }
 
-        public static async Task<Tuple<long, string>> SaveSearchAsync(
-            this IOAuthCredential credential, string query)
+        #endregion
+
+        #region saved_searches/create
+
+        public static Task<TwitterSavedSearch> SaveSearchAsync(
+            [NotNull] this IOAuthCredential credential, [NotNull] string query)
+        {
+            if (credential == null) throw new ArgumentNullException("credential");
+            if (query == null) throw new ArgumentNullException("query");
+            return credential.SaveSearchAsync(query, CancellationToken.None);
+
+        }
+
+        public static async Task<TwitterSavedSearch> SaveSearchAsync(
+            [NotNull] this IOAuthCredential credential, [NotNull] string query,
+            CancellationToken cancellationToken)
         {
             if (credential == null) throw new ArgumentNullException("credential");
             if (query == null) throw new ArgumentNullException("query");
             var param = new Dictionary<string, object>
             {
                 {"query", query}
-            }.ParametalizeForPost();
-            var client = credential.CreateOAuthClient();
-            var response = await client.PostAsync(new ApiAccess("saved_searches/create.json"), param);
+            };
+            var response = await credential.PostAsync("saved_searches/create.json",
+                param, cancellationToken);
             var respStr = await response.ReadAsStringAsync();
-            return await Task.Run(() =>
-            {
-                var json = DynamicJson.Parse(respStr);
-                return Tuple.Create(Int64.Parse(json.id_str), json.query);
-            });
+            return await Task.Run(() => new TwitterSavedSearch(DynamicJson.Parse(respStr)),
+                cancellationToken);
         }
 
-        public static async Task<Tuple<long, string>> DestroySavedSearchAsync(
-            this IOAuthCredential credential, long id)
+        #endregion
+
+        #region saved_searches/destroy
+
+        public static Task<TwitterSavedSearch> DestroySavedSearchAsync(
+            [NotNull] this IOAuthCredential credential, long id)
         {
             if (credential == null) throw new ArgumentNullException("credential");
-            var param = new Dictionary<string, object>().ParametalizeForPost();
-            var client = credential.CreateOAuthClient();
-            var response = await client.PostAsync(new ApiAccess("saved_searches/destroy/" + id + ".json"), param);
-            var respStr = await response.ReadAsStringAsync();
-            return await Task.Run(() =>
-            {
-                var json = DynamicJson.Parse(respStr);
-                return Tuple.Create(Int64.Parse(json.id_str), json.query);
-            });
+            return credential.DestroySavedSearchAsync(id, CancellationToken.None);
         }
+
+        public static async Task<TwitterSavedSearch> DestroySavedSearchAsync(
+            [NotNull] this IOAuthCredential credential, long id, CancellationToken cancellationToken)
+        {
+            if (credential == null) throw new ArgumentNullException("credential");
+            var response = await credential.PostAsync("saved_searches/destroy/" + id + ".json",
+                new Dictionary<string, object>(), cancellationToken);
+            var respStr = await response.ReadAsStringAsync();
+            return await Task.Run(() => new TwitterSavedSearch(DynamicJson.Parse(respStr)),
+                cancellationToken);
+        }
+
+        #endregion
     }
 
     public enum SearchResultType

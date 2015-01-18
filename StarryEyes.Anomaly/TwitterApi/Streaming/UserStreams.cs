@@ -6,13 +6,12 @@ using System.Net.Http;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using StarryEyes.Anomaly.Utils;
 
 namespace StarryEyes.Anomaly.TwitterApi.Streaming
 {
     public static class UserStreams
     {
-        private const string EndpointUserStreams = "https://userstream.twitter.com/1.1/user.json";
-
         public static IObservable<string> ConnectUserStreams(
             this IOAuthCredential credential, IEnumerable<string> tracks,
             bool repliesAll = false, bool followingsActivity = false)
@@ -38,7 +37,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
                     // disable connection timeout due to streaming specification
                     client.Timeout = Timeout.InfiniteTimeSpan;
                     client.MaxResponseContentBufferSize = 1024 * 16; // set buffer length as 16KB.
-                    var endpoint = EndpointUserStreams;
+                    var endpoint = HttpUtility.ConcatUrl(ApiAccessProperties.UserStreamsEndpoint, "user.json");
                     if (!String.IsNullOrEmpty(param))
                     {
                         endpoint += "?" + param;

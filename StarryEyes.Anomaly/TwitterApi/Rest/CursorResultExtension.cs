@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Subjects;
+using System.Threading;
 using System.Threading.Tasks;
 using StarryEyes.Anomaly.TwitterApi.Rest.Infrastructure;
 
 namespace StarryEyes.Anomaly.TwitterApi.Rest
 {
-    public static class Cursoring
+    public static class CursorResultExtension
     {
         public static IObservable<T> RetrieveAllCursor<T>(
             this IOAuthCredential credential,
@@ -38,6 +39,39 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
                     subject.OnError(ex);
                 }
             });
+            return subject;
+        }
+
+        public static IObservable<T> RetrieveAllCursor<T>(
+            this IOAuthCredential credential, CancellationToken cancellationToken,
+            Func<IOAuthCredential, long, CancellationToken, Task<ICursorResult<IEnumerable<T>>>> reader)
+        {
+            if (credential == null) throw new ArgumentNullException("credential");
+            if (reader == null) throw new ArgumentNullException("reader");
+            long cursor = -1;
+            var subject = new Subject<T>();
+            Task.Run(async () =>
+            {
+                try
+                {
+                    while (true)
+                    {
+                        var cr = await reader(credential, cursor, cancellationToken);
+                        cr.Result.ForEach(subject.OnNext);
+                        if (!cr.CanReadNext)
+                        {
+                            break;
+                        }
+                        cursor = cr.NextCursor;
+                        cancellationToken.ThrowIfCancellationRequested();
+                    }
+                    subject.OnCompleted();
+                }
+                catch (Exception ex)
+                {
+                    subject.OnError(ex);
+                }
+            }, cancellationToken);
             return subject;
         }
     }

@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using StarryEyes.Anomaly.TwitterApi.Rest;
+using StarryEyes.Anomaly.TwitterApi.Rest.Parameter;
 using StarryEyes.Globalization;
 using StarryEyes.Globalization.Models;
 using StarryEyes.Models.Accounting;
@@ -33,7 +34,7 @@ namespace StarryEyes.Models.Receiving.Receivers
 
         protected override async Task DoReceive()
         {
-            (await this._account.GetUserTimelineAsync(this._account.Id, 100, includeRetweets: true))
+            (await this._account.GetUserTimelineAsync(new UserParameter(_account.Id), 100, includeRetweets: true))
                 .ForEach(StatusInbox.Enqueue);
         }
     }
