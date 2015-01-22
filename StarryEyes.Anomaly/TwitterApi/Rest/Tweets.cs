@@ -194,21 +194,23 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #endregion
 
-        #region statuses/update_with_media2(media/upload)
+        #region statuses/update_with_media(media/upload + update)
 
-        public static Task<TwitterStatus> UpdateWithMedia2Async(
+        public static Task<TwitterStatus> UpdateWithMediaAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] StatusParameter status,
-           [NotNull] IEnumerable<byte[]> images)
+           [NotNull] IEnumerable<byte[]> images, [CanBeNull] IProgress<int> progressNotificatorOrNull)
         {
             if (credential == null) throw new ArgumentNullException("credential");
             if (status == null) throw new ArgumentNullException("status");
             if (images == null) throw new ArgumentNullException("images");
-            return credential.UpdateWithMedia2Async(status, images, CancellationToken.None);
+            return credential.UpdateWithMediaAsync(status, images,
+                progressNotificatorOrNull, CancellationToken.None);
         }
 
-        public static async Task<TwitterStatus> UpdateWithMedia2Async(
+        public static async Task<TwitterStatus> UpdateWithMediaAsync(
             [NotNull]this IOAuthCredential credential, [NotNull] StatusParameter status,
-            [NotNull] IEnumerable<byte[]> images, CancellationToken cancellationToken)
+            [NotNull] IEnumerable<byte[]> images, [CanBeNull] IProgress<int> progressNotificatorOrNull,
+            CancellationToken cancellationToken)
         {
             if (credential == null) throw new ArgumentNullException("credential");
             if (status == null) throw new ArgumentNullException("status");
@@ -217,6 +219,10 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             foreach (var image in images)
             {
                 ids.Add(await credential.UploadMediaAsync(image, cancellationToken));
+                if (progressNotificatorOrNull != null)
+                {
+                    progressNotificatorOrNull.Report(ids.Count);
+                }
             }
             status.MediaIds = ids.ToArray();
             return await credential.UpdateAsync(status, cancellationToken);

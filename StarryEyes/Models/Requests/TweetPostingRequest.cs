@@ -62,9 +62,8 @@ namespace StarryEyes.Models.Requests
                     TwitterStatus result;
                     if (_attachedImageBin != null)
                     {
-                        result = await acc.UpdateWithMedia2Async(
-                            param,
-                            new[] { _attachedImageBin });
+                        result = await acc.UpdateWithMediaAsync(
+                            param, new[] { _attachedImageBin }, null);
                     }
                     else
                     {
