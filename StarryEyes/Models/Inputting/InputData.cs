@@ -239,7 +239,7 @@ namespace StarryEyes.Models.Inputting
             else
             {
                 request = new TweetPostingRequest(Text + binds, InReplyTo,
-                    AttachedGeoLocation, _attachedImage);
+                    AttachedGeoLocation, new[] { _attachedImage });
             }
 
             var posts = _accounts.Guard()

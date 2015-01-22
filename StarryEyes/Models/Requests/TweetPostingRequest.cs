@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using StarryEyes.Anomaly.TwitterApi;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
@@ -26,23 +28,23 @@ namespace StarryEyes.Models.Requests
         private readonly string _status;
         private readonly long? _inReplyTo;
         private readonly GeoLocationInfo _geoInfo;
-        private readonly byte[] _attachedImageBin;
+        private readonly IList<byte[]> _attachedImages;
 
         public TweetPostingRequest(string status,
             TwitterStatus inReplyTo, GeoLocationInfo geoInfo,
-            byte[] attachedImageBytes)
+            IEnumerable<byte[]> attachedImages)
             : this(status, inReplyTo == null ? (long?)null : inReplyTo.Id,
-                geoInfo, attachedImageBytes)
+                geoInfo, attachedImages)
         {
         }
 
         public TweetPostingRequest(string status, long? inReplyTo,
-            GeoLocationInfo geoInfo, byte[] attachedImageBytes)
+            GeoLocationInfo geoInfo, IEnumerable<byte[]> attachedImages)
         {
             _status = status;
             _inReplyTo = inReplyTo;
             _geoInfo = geoInfo;
-            _attachedImageBin = attachedImageBytes;
+            _attachedImages = attachedImages.ToArray();
         }
 
         public override async Task<TwitterStatus> Send(TwitterAccount account)
@@ -60,10 +62,10 @@ namespace StarryEyes.Models.Requests
                         account.MarkMediaAsPossiblySensitive ? true : (bool?)null,
                         latlong);
                     TwitterStatus result;
-                    if (_attachedImageBin != null)
+                    if (_attachedImages != null)
                     {
                         result = await acc.UpdateWithMediaAsync(
-                            param, new[] { _attachedImageBin }, null);
+                            param, _attachedImages, null);
                     }
                     else
                     {
