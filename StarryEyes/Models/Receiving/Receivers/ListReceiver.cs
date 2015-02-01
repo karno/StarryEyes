@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using StarryEyes.Anomaly.TwitterApi;
 using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Globalization;
 using StarryEyes.Globalization.Models;
@@ -46,7 +47,7 @@ namespace StarryEyes.Models.Receiving.Receivers
                 return;
             }
 
-            (await authInfo.GetListTimelineAsync(_listInfo.ToListParameter()))
+            (await authInfo.GetListTimelineAsync(ApiAccessProperties.Default, _listInfo.ToListParameter()))
                 .ForEach(StatusInbox.Enqueue);
         }
     }

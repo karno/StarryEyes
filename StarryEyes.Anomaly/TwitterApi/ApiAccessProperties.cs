@@ -1,72 +1,83 @@
 ﻿
-
-using System;
-
 namespace StarryEyes.Anomaly.TwitterApi
 {
+    /// <summary>
+    /// Describe basic properties for accessing API.
+    /// </summary>
+    public interface IApiAccessProperties
+    {
+        string Endpoint { get; }
+
+        string UserAgent { get; }
+
+        bool UseGZip { get; }
+    }
+
+    /// <summary>
+    /// Provide default API access propeties.
+    /// </summary>
     public static class ApiAccessProperties
     {
-        private const string DefaultApiEndpoint = "https://api.twitter.com/1.1/";
-        private const string DefaultUploadEndpoint = "https://upload.twitter.com/1.1/";
-        private const string DefaultUserStreamsEndpoint = "https://userstream.twitter.com/1.1/";
+        private const string DefaultEndpoint = "https://api.twitter.com/1.1/";
+        private const string DefaultEndpointForUpload = "https://upload.twitter.com/1.1/";
+        private const string DefaultEndpointForUserStreams = "https://userstream.twitter.com/1.1/";
 
-        private const string DefaultUserAgent =
-            "Krile/StarryEyes (Windows;.NET Framework 4.5) - SarryEyes.Anomaly with AsyncOAuth";
+        private const string DefaultUserAgent = "StarryEyes.Anomaly/2.0 (Krile/3.0;StarryEyes Illumine)";
 
-        private const int DefaultStreamTimeoutSec = 90;
+        private static IApiAccessProperties _default;
 
-        private static string _apiEndpoint = DefaultApiEndpoint;
-        private static string _uploadEndpoint = DefaultUploadEndpoint;
-        private static string _userStreamsEndpoint = DefaultUserStreamsEndpoint;
-        private static string _userAgent;
-        private static int? _streamTimeoutSec;
-
-        /// <summary>
-        /// API endpoint for accessing twitter.
-        /// if set this property as null or empty, reset to default endpoint.
-        /// </summary>
-        public static string ApiEndpoint
+        public static IApiAccessProperties Default
         {
-            get { return _apiEndpoint; }
-            set { _apiEndpoint = !string.IsNullOrEmpty(value) ? value : DefaultApiEndpoint; }
+            get { return _default ?? (_default = new DefaultApiAccessProperties(DefaultEndpoint)); }
         }
 
-        /// <summary>
-        /// API endpoint for uploading medias.
-        /// if set this property as null or empty, reset to default endpoint.
-        /// </summary>
-        public static string UploadEndpoint
+        private static IApiAccessProperties _defaultForUpload;
+
+        public static IApiAccessProperties DefaultForUpload
         {
-            get { return _uploadEndpoint; }
-            set { _uploadEndpoint = !String.IsNullOrEmpty(value) ? value : DefaultUploadEndpoint; }
+            get
+            {
+                return _defaultForUpload ??
+                       (_defaultForUpload = new DefaultApiAccessProperties(DefaultEndpointForUpload));
+            }
         }
 
-        /// <summary>
-        /// API endpoint for receiving user-streams.
-        /// if set this property as null or empty, reset to default endpoint.
-        /// </summary>
-        public static string UserStreamsEndpoint
+        private static IApiAccessProperties _defaultForUserStreams;
+
+        public static IApiAccessProperties DefaultForUserStreams
         {
-            get { return _userStreamsEndpoint; }
-            set { _userStreamsEndpoint = !String.IsNullOrEmpty(value) ? value : DefaultUserStreamsEndpoint; }
+            get
+            {
+                return _defaultForUserStreams ??
+                       (_defaultForUserStreams = new DefaultApiAccessProperties(DefaultEndpointForUserStreams, false));
+            }
         }
 
-        /// <summary>
-        /// User agent for accessing twitter.
-        /// </summary>
-        public static string UserAgent
+        private sealed class DefaultApiAccessProperties : IApiAccessProperties
         {
-            get { return _userAgent ?? DefaultUserAgent; }
-            set { _userAgent = !string.IsNullOrEmpty(value) ? value : null; }
-        }
+            private readonly string _endpoint;
+            private readonly bool _useGZip;
 
-        /// <summary>
-        /// Timeout seconds used in streaming connection.
-        /// </summary>
-        public static int StreamingTimeoutSec
-        {
-            get { return _streamTimeoutSec ?? DefaultStreamTimeoutSec; }
-            set { _streamTimeoutSec = value == 0 ? (int?)null : value; }
+            public DefaultApiAccessProperties(string endpoint, bool useGZip = true)
+            {
+                _endpoint = endpoint;
+                _useGZip = useGZip;
+            }
+
+            public string Endpoint
+            {
+                get { return _endpoint; }
+            }
+
+            public string UserAgent
+            {
+                get { return DefaultUserAgent; }
+            }
+
+            public bool UseGZip
+            {
+                get { return _useGZip; }
+            }
         }
     }
 }

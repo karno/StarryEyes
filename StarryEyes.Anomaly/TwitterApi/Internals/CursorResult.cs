@@ -1,16 +1,8 @@
 ﻿using System;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
 
-namespace StarryEyes.Anomaly.TwitterApi.Rest.Infrastructure
+namespace StarryEyes.Anomaly.TwitterApi.Internals
 {
-    public interface ICursorResult<out T>
-    {
-        T Result { get; }
-        long PreviousCursor { get; }
-        long NextCursor { get; }
-        bool CanReadNext { get; }
-        bool CanReadPrevious { get; }
-    }
-
     /// <summary>
     /// Describe cursored result of API Access.
     /// </summary>

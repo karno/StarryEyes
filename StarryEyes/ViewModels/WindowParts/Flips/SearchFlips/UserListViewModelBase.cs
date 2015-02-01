@@ -5,8 +5,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Livet;
+using StarryEyes.Anomaly.TwitterApi;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
-using StarryEyes.Anomaly.TwitterApi.Rest.Infrastructure;
 using StarryEyes.Globalization;
 using StarryEyes.Globalization.WindowParts;
 using StarryEyes.Models.Accounting;
@@ -116,7 +117,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 }
                 try
                 {
-                    var users = await info.LookupUserAsync(ids);
+                    var users = await info.LookupUserAsync(ApiAccessProperties.Default, ids);
                     await DispatcherHelper.UIDispatcher.InvokeAsync(
                         () => users.ForEach(u => Users.Add(new UserResultItemViewModel(u))));
                     this.IsLoading = false;

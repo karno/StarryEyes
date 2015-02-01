@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using StarryEyes.Anomaly.Ext;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
-using StarryEyes.Anomaly.TwitterApi.Rest.Infrastructure;
-using StarryEyes.Anomaly.TwitterApi.Rest.Parameter;
-using StarryEyes.Anomaly.Utils;
+using StarryEyes.Anomaly.TwitterApi.Internals;
+using StarryEyes.Anomaly.TwitterApi.Rest.Parameters;
 
 namespace StarryEyes.Anomaly.TwitterApi.Rest
 {
@@ -18,31 +16,31 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
         #region statuses/show
 
         public static Task<long?> GetMyRetweetIdOfStatusAsync(
-            [NotNull] this IOAuthCredential credential, long id)
+            [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties, long id)
         {
             if (credential == null) throw new ArgumentNullException("credential");
-            return credential.GetMyRetweetIdOfStatusAsync(id, CancellationToken.None);
+            if (properties == null) throw new ArgumentNullException("properties");
+            return credential.GetMyRetweetIdOfStatusAsync(properties, id, CancellationToken.None);
         }
 
 
         public static async Task<long?> GetMyRetweetIdOfStatusAsync(
-            [NotNull] this IOAuthCredential credential, long id,
-            CancellationToken cancellationToken)
+            [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
+            long id, CancellationToken cancellationToken)
         {
             if (credential == null) throw new ArgumentNullException("credential");
+            if (properties == null) throw new ArgumentNullException("properties");
             var param = new Dictionary<string, object>
             {
                 {"id", id},
                 {"include_my_retweet", true}
             };
-            var respStr = await credential.GetStringAsync("statuses/show.json", param, cancellationToken);
-            return await Task.Run(() =>
+            return await credential.GetAsync(properties, "statuses/show.json", param, async resp =>
             {
-                var graph = DynamicJson.Parse(respStr);
-                return ((bool)graph.current_user_retweet())
-                    ? Int64.Parse(graph.current_user_retweet.id_str)
-                    : null;
-            }, cancellationToken);
+                var json = await resp.ReadAsStringAsync().ConfigureAwait(false);
+                var graph = DynamicJson.Parse(json);
+                return ((bool)graph.current_user_retweet()) ? Int64.Parse(graph.current_user_retweet.id_str) : null;
+            }, cancellationToken).ConfigureAwait(false);
         }
 
         #endregion
@@ -50,30 +48,23 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
         #region statuses/retweets/:id
 
         public static Task<IEnumerable<TwitterUser>> GetRetweetsAsync(
-            [NotNull] this IOAuthCredential credential, long id, int? count = null)
+            [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
+            long id, int? count = null)
         {
             if (credential == null) throw new ArgumentNullException("credential");
-            return credential.GetRetweetsAsync(id, count, CancellationToken.None);
+            if (properties == null) throw new ArgumentNullException("properties");
+            return credential.GetRetweetsAsync(properties, id, count, CancellationToken.None);
         }
 
         public static async Task<IEnumerable<TwitterUser>> GetRetweetsAsync(
-            [NotNull] this IOAuthCredential credential, long id, int? count, CancellationToken cancellationToken)
+            [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
+            long id, int? count, CancellationToken cancellationToken)
         {
             if (credential == null) throw new ArgumentNullException("credential");
-            /*
-            for future compatibility
-            var param = new Dictionary<string, object>
-            {
-                {"id", id},
-                {"count", count},
-            }.ParametalizeForGet();
-            var client = credential.CreateOAuthClient();
-            var response = client.GetAsync(new ApiAccess("statuses/retweets.json", param)
-            */
+            if (properties == null) throw new ArgumentNullException("properties");
             var param = new Dictionary<string, object> { { "count", count } };
-            var response = await credential.GetAsync("statuses/retweets/" + id + ".json",
-                param, cancellationToken);
-            return await response.ReadAsUserCollectionAsync();
+            return await credential.GetAsync(properties, "statuses/retweets/" + id + ".json", param,
+                ResultHandlers.ReadAsUserCollectionAsync, cancellationToken).ConfigureAwait(false);
         }
 
         #endregion
@@ -81,24 +72,27 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
         #region retweeter/ids
 
         public static Task<ICursorResult<IEnumerable<long>>> GetRetweeterIdsAsync(
-            this IOAuthCredential credential, long id, long cursor = -1)
+            this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
+            long id, long cursor = -1)
         {
             if (credential == null) throw new ArgumentNullException("credential");
-            return credential.GetRetweeterIdsAsync(id, cursor, CancellationToken.None);
+            if (properties == null) throw new ArgumentNullException("properties");
+            return credential.GetRetweeterIdsAsync(properties, id, cursor, CancellationToken.None);
         }
 
         public static async Task<ICursorResult<IEnumerable<long>>> GetRetweeterIdsAsync(
-            this IOAuthCredential credential, long id, long cursor,
-            CancellationToken cancellationToken)
+            this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
+            long id, long cursor, CancellationToken cancellationToken)
         {
             if (credential == null) throw new ArgumentNullException("credential");
+            if (properties == null) throw new ArgumentNullException("properties");
             var param = new Dictionary<string, object>
             {
                 {"id", id},
                 {"cursor", cursor}
             };
-            var response = await credential.GetAsync("retweeters/ids.json", param, cancellationToken);
-            return await response.ReadAsCursoredIdsAsync();
+            return await credential.GetAsync(properties, "retweeters/ids.json", param,
+                ResultHandlers.ReadAsCursoredIdsAsync, cancellationToken).ConfigureAwait(false);
         }
 
         #endregion
@@ -106,24 +100,25 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
         #region statuses/show
 
         public static Task<TwitterStatus> ShowTweetAsync(
-            [NotNull] this IOAuthCredential credential, long id)
+            [NotNull] this IOAuthCredential credential, IApiAccessProperties properties, long id)
         {
             if (credential == null) throw new ArgumentNullException("credential");
-            return credential.ShowTweetAsync(id, CancellationToken.None);
+            return credential.ShowTweetAsync(properties, id, CancellationToken.None);
         }
 
 
         public static async Task<TwitterStatus> ShowTweetAsync(
-            [NotNull] this IOAuthCredential credential, long id,
-            CancellationToken cancellationToken)
+            [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
+            long id, CancellationToken cancellationToken)
         {
             if (credential == null) throw new ArgumentNullException("credential");
+            if (properties == null) throw new ArgumentNullException("properties");
             var param = new Dictionary<string, object>
             {
                 {"id", id},
             };
-            var response = await credential.GetAsync("statuses/show.json", param, cancellationToken);
-            return await response.ReadAsStatusAsync();
+            return await credential.GetAsync(properties, "statuses/show.json", param,
+                ResultHandlers.ReadAsStatusAsync, cancellationToken).ConfigureAwait(false);
         }
 
         #endregion
@@ -131,140 +126,79 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
         #region statuses/update
 
         public static Task<TwitterStatus> UpdateAsync(
-            [NotNull] this IOAuthCredential credential, [NotNull] StatusParameter status)
+            [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
+            [NotNull] StatusParameter status)
         {
             if (credential == null) throw new ArgumentNullException("credential");
+            if (properties == null) throw new ArgumentNullException("properties");
             if (status == null) throw new ArgumentNullException("status");
-            return credential.UpdateAsync(status, CancellationToken.None);
+            return credential.UpdateAsync(properties, status, CancellationToken.None);
         }
 
         public static async Task<TwitterStatus> UpdateAsync(
-            [NotNull] this IOAuthCredential credential, [NotNull] StatusParameter status,
-            CancellationToken cancellationToken)
+            [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
+            [NotNull] StatusParameter status, CancellationToken cancellationToken)
         {
             if (credential == null) throw new ArgumentNullException("credential");
+            if (properties == null) throw new ArgumentNullException("properties");
             if (status == null) throw new ArgumentNullException("status");
-            var response = await credential.PostAsync("statuses/update.json",
-                status.ToDictionary(), cancellationToken);
-            return await response.ReadAsStatusAsync();
+            return await credential.PostAsync(properties, "statuses/update.json", status.ToDictionary(),
+                ResultHandlers.ReadAsStatusAsync, cancellationToken).ConfigureAwait(false);
         }
 
         #endregion
 
-        #region statuses/update_with_media
+        #region media/upload
 
-        [Obsolete]
-        public static Task<TwitterStatus> UpdateWithMediaAsync(
-            [NotNull] this IOAuthCredential credential, [NotNull] string status, [NotNull] IEnumerable<byte[]> images,
-            bool? possiblySensitive = false, long? inReplyToStatusId = null,
-            [CanBeNull] Tuple<double, double> geoLatLong = null, string placeId = null, bool? displayCoordinates = null)
+        public static Task<long> UploadMediaAsync([NotNull] this IOAuthCredential credential,
+            [NotNull] IApiAccessProperties properties, [NotNull] byte[] image)
         {
             if (credential == null) throw new ArgumentNullException("credential");
-            if (status == null) throw new ArgumentNullException("status");
-            if (images == null) throw new ArgumentNullException("images");
-            return credential.UpdateWithMediaAsync(status, images, possiblySensitive, inReplyToStatusId, geoLatLong,
-                placeId, displayCoordinates, CancellationToken.None);
+            if (properties == null) throw new ArgumentNullException("properties");
+            if (image == null) throw new ArgumentNullException("image");
+            return credential.UploadMediaAsync(properties, image, CancellationToken.None);
         }
 
-        [Obsolete]
-        public static async Task<TwitterStatus> UpdateWithMediaAsync(
-            [NotNull] this IOAuthCredential credential, [NotNull] string status, [NotNull] IEnumerable<byte[]> images,
-            bool? possiblySensitive, long? inReplyToStatusId, [CanBeNull] Tuple<double, double> geoLatLong,
-            [CanBeNull] string placeId, bool? displayCoordinates, CancellationToken cancellationToken)
-        {
-            if (credential == null) throw new ArgumentNullException("credential");
-            if (status == null) throw new ArgumentNullException("status");
-            if (images == null) throw new ArgumentNullException("images");
-            var param = new Dictionary<string, object>
-            {
-                {"status", status},
-                {"possibly_sensitive", possiblySensitive},
-                {"in_reply_to_status_id", inReplyToStatusId},
-                {"lat", geoLatLong != null ? geoLatLong.Item1 : (double?) null},
-                {"long", geoLatLong != null ? geoLatLong.Item2 : (double?) null},
-                {"place_id", placeId},
-                {"display_coordinates", displayCoordinates}
-            }.Where(kvp => kvp.Value != null);
-            var content = new MultipartFormDataContent();
-            param.ForEach(kvp => content.Add(new StringContent(kvp.Value.ToString()), kvp.Key));
-            images.ForEach((b, i) => content.Add(new ByteArrayContent(b), "media[]", "image_" + i + ".png"));
-            var response = await credential.PostAsync("statuses/update_with_media.json", content, cancellationToken);
-            return await response.ReadAsStatusAsync();
-        }
-
-        #endregion
-
-        #region statuses/update_with_media(media/upload + update)
-
-        public static Task<TwitterStatus> UpdateWithMediaAsync(
-            [NotNull] this IOAuthCredential credential, [NotNull] StatusParameter status,
-           [NotNull] IEnumerable<byte[]> images, [CanBeNull] IProgress<int> progressNotificatorOrNull)
-        {
-            if (credential == null) throw new ArgumentNullException("credential");
-            if (status == null) throw new ArgumentNullException("status");
-            if (images == null) throw new ArgumentNullException("images");
-            return credential.UpdateWithMediaAsync(status, images,
-                progressNotificatorOrNull, CancellationToken.None);
-        }
-
-        public static async Task<TwitterStatus> UpdateWithMediaAsync(
-            [NotNull]this IOAuthCredential credential, [NotNull] StatusParameter status,
-            [NotNull] IEnumerable<byte[]> images, [CanBeNull] IProgress<int> progressNotificatorOrNull,
-            CancellationToken cancellationToken)
-        {
-            if (credential == null) throw new ArgumentNullException("credential");
-            if (status == null) throw new ArgumentNullException("status");
-            if (images == null) throw new ArgumentNullException("images");
-            var ids = new List<long>();
-            foreach (var image in images)
-            {
-                ids.Add(await credential.UploadMediaAsync(image, cancellationToken));
-                if (progressNotificatorOrNull != null)
-                {
-                    progressNotificatorOrNull.Report(ids.Count);
-                }
-            }
-            status.MediaIds = ids.ToArray();
-            return await credential.UpdateAsync(status, cancellationToken);
-        }
 
         public static async Task<long> UploadMediaAsync([NotNull] this IOAuthCredential credential,
-           [NotNull] byte[] image, CancellationToken cancellationToken)
+            [NotNull] IApiAccessProperties properties, [NotNull] byte[] image, CancellationToken cancellationToken)
         {
             if (credential == null) throw new ArgumentNullException("credential");
+            if (properties == null) throw new ArgumentNullException("properties");
             if (image == null) throw new ArgumentNullException("image");
             var content = new MultipartFormDataContent
             {
                 {new ByteArrayContent(image), "media", System.IO.Path.GetRandomFileName() + ".png"}
             };
 
-            var client = credential.CreateOAuthClient();
-            var resp = await client.PostAsync(HttpUtility.ConcatUrl(
-                ApiAccessProperties.UploadEndpoint, "media/upload.json"),
-                content, cancellationToken);
-            var json = await resp.ReadAsStringAsync();
-            return await Task.Run(() => long.Parse(DynamicJson.Parse(json).media_id_string),
-                cancellationToken);
+            return await credential.PostAsync(properties, "media/upload.json", content, async resp =>
+            {
+                var json = await resp.ReadAsStringAsync().ConfigureAwait(false);
+                return long.Parse(DynamicJson.Parse(json).media_id_string);
+            }, cancellationToken).ConfigureAwait(false);
         }
 
         #endregion
 
         #region statuses/destroy/:id
 
-        public static Task<TwitterStatus> DestroyAsync([NotNull] this IOAuthCredential credential, long id)
+        public static Task<TwitterStatus> DestroyAsync([NotNull] this IOAuthCredential credential,
+            [NotNull] IApiAccessProperties properties, long id)
         {
             if (credential == null) throw new ArgumentNullException("credential");
-            return credential.DestroyAsync(id, CancellationToken.None);
+            if (properties == null) throw new ArgumentNullException("properties");
+            return credential.DestroyAsync(properties, id, CancellationToken.None);
         }
 
 
-        public static async Task<TwitterStatus> DestroyAsync([NotNull] this IOAuthCredential credential, long id,
-           CancellationToken cancellationToken)
+        public static async Task<TwitterStatus> DestroyAsync([NotNull] this IOAuthCredential credential,
+            [NotNull] IApiAccessProperties properties, long id, CancellationToken cancellationToken)
         {
             if (credential == null) throw new ArgumentNullException("credential");
-            var response = await credential.PostAsync(("statuses/destroy/" + id + ".json"),
-                new Dictionary<string, object>(), cancellationToken);
-            return await response.ReadAsStatusAsync();
+            if (properties == null) throw new ArgumentNullException("properties");
+            return await credential.PostAsync(properties, "statuses/destroy/" + id + ".json",
+                new Dictionary<string, object>(), ResultHandlers.ReadAsStatusAsync, cancellationToken)
+                                   .ConfigureAwait(false);
         }
 
         #endregion
@@ -272,21 +206,25 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
         #region statuses/retweet/:id
 
         public static Task<TwitterStatus> RetweetAsync(
-            [NotNull] this IOAuthCredential credential, long id)
+            [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties, long id)
         {
             if (credential == null) throw new ArgumentNullException("credential");
-            return credential.RetweetAsync(id, CancellationToken.None);
+            if (properties == null) throw new ArgumentNullException("properties");
+            return credential.RetweetAsync(properties, id, CancellationToken.None);
         }
 
         public static async Task<TwitterStatus> RetweetAsync(
-            [NotNull] this IOAuthCredential credential, long id, CancellationToken cancellationToken)
+            [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
+            long id, CancellationToken cancellationToken)
         {
             if (credential == null) throw new ArgumentNullException("credential");
-            var response = await credential.PostAsync("statuses/retweet/" + id + ".json",
-                new Dictionary<string, object>(), cancellationToken);
-            return await response.ReadAsStatusAsync();
+            if (properties == null) throw new ArgumentNullException("properties");
+            return await credential.PostAsync(properties, "statuses/retweet/" + id + ".json",
+                new Dictionary<string, object>(), ResultHandlers.ReadAsStatusAsync, cancellationToken)
+                                   .ConfigureAwait(false);
         }
 
         #endregion
     }
 }
+

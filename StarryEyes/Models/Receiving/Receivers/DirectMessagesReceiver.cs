@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using StarryEyes.Anomaly.TwitterApi;
 using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Globalization;
 using StarryEyes.Globalization.Models;
@@ -34,9 +35,9 @@ namespace StarryEyes.Models.Receiving.Receivers
         protected override async Task DoReceive()
         {
             await Task.WhenAll(
-                Task.Run(async () => (await this._account.GetDirectMessagesAsync(50))
+                Task.Run(async () => (await this._account.GetDirectMessagesAsync(ApiAccessProperties.Default, 50))
                     .ForEach(StatusInbox.Enqueue)),
-                Task.Run(async () => (await this._account.GetSentDirectMessagesAsync(50))
+                Task.Run(async () => (await this._account.GetSentDirectMessagesAsync(ApiAccessProperties.Default, count: 50))
                     .ForEach(StatusInbox.Enqueue)));
         }
     }

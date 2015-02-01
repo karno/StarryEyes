@@ -1,6 +1,8 @@
 ﻿using System;
-using System.Reactive.Concurrency;
-using System.Reactive.Linq;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
+using JetBrains.Annotations;
 using StarryEyes.Anomaly.Ext;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.DataModels.StreamModels;
@@ -8,29 +10,54 @@ using StarryEyes.Anomaly.Utils;
 
 namespace StarryEyes.Anomaly.TwitterApi.Streaming
 {
-    public static class StreamingConnector
+    internal static class UserStreamEngine
     {
-        public static IDisposable SubscribeWithHandler(this IObservable<string> streamElements,
-                                                        IStreamHandler handler, Action<Exception> onError = null,
-                                                        Action onCompleted = null)
+        public static async Task Run([NotNull] Stream stream, [NotNull] IStreamHandler handler,
+            TimeSpan readTimeout, CancellationToken cancellationToken)
         {
-            if (streamElements == null) throw new ArgumentNullException("streamElements");
+            if (stream == null) throw new ArgumentNullException("stream");
             if (handler == null) throw new ArgumentNullException("handler");
-            return streamElements
-                .Where(s => !String.IsNullOrWhiteSpace(s))
-                .ObserveOn(TaskPoolScheduler.Default)
-                .Select(s => DynamicJson.Parse(s))
-                .Subscribe(
-                    s => DispatchStreamingElements(s, handler),
-                    onError ?? (ex => { }),
-                    onCompleted ?? (() => { }));
+            using (var reader = new CancellableStreamReader(stream))
+            {
+                while (true)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    /* 
+                     * NOTE: performance information
+                     * Creating CancellationTokenSource each time is faster than using Task.Delay.
+                     * Simpler way always defeats complex and confusing one.
+                     */
+                    // create timeout cancellation token source
+                    using (var tokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken))
+                    {
+                        tokenSource.CancelAfter(readTimeout);
+                        // execute read line
+                        var line = (await reader.ReadLineAsync(tokenSource.Token).ConfigureAwait(false));
+                        if (line == null)
+                        {
+                            System.Diagnostics.Debug.WriteLine("#USERSTREAM# CONNECTION CLOSED.");
+                            break;
+                        }
+
+                        // skip empty response
+                        if (String.IsNullOrWhiteSpace(line)) continue;
+
+                        // read operation completed successfully
+                        Task.Run(() => DispatchStreamingElements(line, handler), cancellationToken)
+                            .ConfigureAwait(false);
+                    }
+                }
+            }
         }
 
-        private static void DispatchStreamingElements(dynamic element, IStreamHandler handler)
+        private static void DispatchStreamingElements(string line, IStreamHandler handler)
         {
             var type = "initialize";
             try
             {
+                var element = DynamicJson.Parse(line);
+
                 // element.foo() -> element.IsDefined("foo")
                 if (element.text())
                 {
@@ -183,8 +210,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
             }
             catch (Exception ex)
             {
-                string elemstr = element.ToString();
-                System.Diagnostics.Debug.WriteLine("!exception thrown!" + Environment.NewLine + elemstr);
+                System.Diagnostics.Debug.WriteLine("!exception thrown!" + Environment.NewLine + line);
                 handler.OnExceptionThrownDuringParsing(new Exception("type:" + type, ex));
             }
         }

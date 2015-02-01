@@ -238,8 +238,9 @@ namespace StarryEyes.Models.Inputting
             }
             else
             {
+                var image = _attachedImage == null ? null : new[] { _attachedImage };
                 request = new TweetPostingRequest(Text + binds, InReplyTo,
-                    AttachedGeoLocation, new[] { _attachedImage });
+                    AttachedGeoLocation, image);
             }
 
             var posts = _accounts.Guard()

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using StarryEyes.Anomaly.TwitterApi;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
-using StarryEyes.Anomaly.TwitterApi.Rest.Parameter;
+using StarryEyes.Anomaly.TwitterApi.Rest.Parameters;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents.PostEvents;
 using StarryEyes.Settings;
@@ -44,7 +44,7 @@ namespace StarryEyes.Models.Requests
             _status = status;
             _inReplyTo = inReplyTo;
             _geoInfo = geoInfo;
-            _attachedImages = attachedImages.ToArray();
+            _attachedImages = attachedImages == null ? null : attachedImages.ToArray();
         }
 
         public override async Task<TwitterStatus> Send(TwitterAccount account)
@@ -61,16 +61,16 @@ namespace StarryEyes.Models.Requests
                         _status, _inReplyTo,
                         account.MarkMediaAsPossiblySensitive ? true : (bool?)null,
                         latlong);
-                    TwitterStatus result;
                     if (_attachedImages != null)
                     {
-                        result = await acc.UpdateWithMediaAsync(
-                            param, _attachedImages, null);
+                        var ids = new List<long>();
+                        foreach (var img in _attachedImages)
+                        {
+                            ids.Add(await acc.UploadMediaAsync(ApiAccessProperties.DefaultForUpload, img));
+                        }
+                        param.MediaIds = ids.ToArray();
                     }
-                    else
-                    {
-                        result = await acc.UpdateAsync(param);
-                    }
+                    var result = await acc.UpdateAsync(ApiAccessProperties.Default, param);
                     BackstageModel.NotifyFallbackState(acc, false);
                     return result;
                 }

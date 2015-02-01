@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using StarryEyes.Albireo.Helpers;
+using StarryEyes.Anomaly.TwitterApi;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
-using StarryEyes.Anomaly.TwitterApi.Rest.Parameter;
+using StarryEyes.Anomaly.TwitterApi.Rest.Parameters;
 using StarryEyes.Globalization;
 using StarryEyes.Globalization.Models;
 using StarryEyes.Models.Accounting;
@@ -24,8 +25,8 @@ namespace StarryEyes.Models.Receiving.Receivers
 
         public ListMemberReceiver(TwitterAccount auth, ListInfo listInfo)
         {
-            this._auth = auth;
-            this._listInfo = listInfo;
+            _auth = auth;
+            _listInfo = listInfo;
         }
 
         protected override string ReceiverName
@@ -64,7 +65,7 @@ namespace StarryEyes.Models.Receiving.Receivers
 
         private async Task<TwitterList> ReceiveListDescription(TwitterAccount account, ListInfo info)
         {
-            return await account.ShowListAsync(info.ToListParameter());
+            return await account.ShowListAsync(ApiAccessProperties.Default, info.ToListParameter());
         }
 
         private async Task<IEnumerable<long>> ReceiveListMembers(TwitterAccount account, long listId)
@@ -73,7 +74,7 @@ namespace StarryEyes.Models.Receiving.Receivers
             long cursor = -1;
             do
             {
-                var result = await account.GetListMembersAsync(new ListParameter(listId), cursor);
+                var result = await account.GetListMembersAsync(ApiAccessProperties.Default, new ListParameter(listId), cursor);
                 memberList.AddRange(result.Result
                           .Do(u => Task.Run(() => UserProxy.StoreUser(u)))
                           .Select(u => u.Id));

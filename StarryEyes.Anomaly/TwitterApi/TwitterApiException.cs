@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using StarryEyes.Anomaly.Ext;
 
@@ -11,14 +12,14 @@ namespace StarryEyes.Anomaly.TwitterApi
         public TwitterApiException(HttpStatusCode statusCode, string message, int code)
             : base(message)
         {
-            this.StatusCode = statusCode;
-            this.TwitterErrorCode = code;
+            StatusCode = statusCode;
+            TwitterErrorCode = code;
         }
 
         public TwitterApiException(HttpStatusCode statusCode, string message)
             : base(message)
         {
-            this.StatusCode = statusCode;
+            StatusCode = statusCode;
         }
 
         public HttpStatusCode StatusCode { get; private set; }
@@ -27,9 +28,11 @@ namespace StarryEyes.Anomaly.TwitterApi
 
         public override string ToString()
         {
-            if (this.TwitterErrorCode.HasValue)
+            if (TwitterErrorCode.HasValue)
             {
-                return this.TwitterErrorCode.Value + ": " + Message;
+                // HTTP XXX/Twitter YYY: ERROR DESCRIPTION
+                return string.Format("HTTP {0}/Twitter {1}: {2}",
+                    StatusCode, TwitterErrorCode.Value, Message);
             }
             return InnerException.ToString();
         }
@@ -42,7 +45,8 @@ namespace StarryEyes.Anomaly.TwitterApi
         {
         }
 
-        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, System.Threading.CancellationToken cancellationToken)
+        protected override async Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var resp = await base.SendAsync(request, cancellationToken);
             if (!resp.IsSuccessStatusCode)
@@ -55,10 +59,13 @@ namespace StarryEyes.Anomaly.TwitterApi
                     if (json.errors() && json.errors[0].code() && json.errors[0].message())
                     {
                         ex = new TwitterApiException(resp.StatusCode,
-                                                      json.errors[0].message, (int)json.errors[0].code);
+                            json.errors[0].message, (int)json.errors[0].code);
                     }
                 }
-                catch { }
+                catch
+                {
+                    // ignore parse exception 
+                }
                 throw ex;
             }
             return resp.EnsureSuccessStatusCode();

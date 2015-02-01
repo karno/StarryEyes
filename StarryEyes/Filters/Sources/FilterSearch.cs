@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Reactive.Linq;
 using StarryEyes.Albireo.Collections;
+using StarryEyes.Anomaly.TwitterApi;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
-using StarryEyes.Anomaly.TwitterApi.Rest.Parameter;
+using StarryEyes.Anomaly.TwitterApi.Rest.Parameters;
 using StarryEyes.Anomaly.Utils;
 using StarryEyes.Models.Receiving;
 using StarryEyes.Settings;
@@ -16,7 +17,7 @@ namespace StarryEyes.Filters.Sources
         private readonly string _query;
         public FilterSearch(string query)
         {
-            this._query = query;
+            _query = query;
         }
 
         public override Func<TwitterStatus, bool> GetEvaluator()
@@ -49,7 +50,7 @@ namespace StarryEyes.Filters.Sources
                 );
             return Observable.Start(() => Setting.Accounts.GetRandomOne())
                              .Where(a => a != null)
-                             .SelectMany(a => a.SearchAsync(param)
+                             .SelectMany(a => a.SearchAsync(ApiAccessProperties.Default, param)
                                                .ToObservable())
                              .Do(s =>
                              {

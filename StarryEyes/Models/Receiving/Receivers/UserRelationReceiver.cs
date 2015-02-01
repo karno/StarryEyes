@@ -2,8 +2,10 @@
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
+using StarryEyes.Anomaly.TwitterApi;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
-using StarryEyes.Anomaly.TwitterApi.Rest.Parameter;
+using StarryEyes.Anomaly.TwitterApi.Rest.Parameters;
 using StarryEyes.Anomaly.Utils;
 using StarryEyes.Globalization;
 using StarryEyes.Globalization.Models;
@@ -43,15 +45,15 @@ namespace StarryEyes.Models.Receiving.Receivers
 
             // get followings / followers
             await Observable.Merge(
-                this._account.RetrieveAllCursor((a, c) => a.GetFriendsIdsAsync(new UserParameter(_account.Id), c))
+                _account.RetrieveAllCursor((a, c) => a.GetFriendsIdsAsync(ApiAccessProperties.Default, new UserParameter(_account.Id), c))
                     .Do(newFollowings.Add),
-                this._account.RetrieveAllCursor((a, c) => a.GetFollowersIdsAsync(new UserParameter(_account.Id), c))
+                _account.RetrieveAllCursor((a, c) => a.GetFollowersIdsAsync(ApiAccessProperties.Default, new UserParameter(_account.Id), c))
                     .Do(newFollowers.Add),
-                this._account.RetrieveAllCursor((a, c) => a.GetBlockingsIdsAsync(c))
+                _account.RetrieveAllCursor((a, c) => a.GetBlockingsIdsAsync(ApiAccessProperties.Default, c))
                     .Do(newBlockings.Add),
-                this._account.GetNoRetweetsIdsAsync().ToObservable()
+                _account.GetNoRetweetsIdsAsync(ApiAccessProperties.Default).ToObservable()
                     .Do(newNoRetweets.Add),
-                this._account.RetrieveAllCursor((c, i) => c.GetMuteIdsAsync(i))
+                _account.RetrieveAllCursor((c, i) => c.GetMuteIdsAsync(ApiAccessProperties.Default, i))
                     .Do(newMutes.Add)
                 ).ToTask();
 

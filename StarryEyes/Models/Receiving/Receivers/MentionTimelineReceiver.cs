@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using StarryEyes.Anomaly.TwitterApi;
 using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Globalization;
 using StarryEyes.Globalization.Models;
@@ -30,7 +31,7 @@ namespace StarryEyes.Models.Receiving.Receivers
 
         protected override async Task DoReceive()
         {
-            (await this._account.GetMentionsAsync(100))
+            (await this._account.GetMentionsAsync(ApiAccessProperties.Default, 100))
                 .ForEach(StatusInbox.Enqueue);
         }
     }

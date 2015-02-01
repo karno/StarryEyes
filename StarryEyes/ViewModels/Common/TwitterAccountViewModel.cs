@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Livet;
+using StarryEyes.Anomaly.TwitterApi;
 using StarryEyes.Anomaly.TwitterApi.Rest;
+using StarryEyes.Anomaly.TwitterApi.Rest.Parameters;
 using StarryEyes.Anomaly.Utils;
 using StarryEyes.Models.Accounting;
 
@@ -36,7 +38,8 @@ namespace StarryEyes.ViewModels.Common
                     {
                         try
                         {
-                            var user = await this._account.ShowUserAsync(this._account.Id);
+                            var user = await this._account.ShowUserAsync(ApiAccessProperties.Default,
+                                new UserParameter(this._account.Id));
                             this._account.UnreliableProfileImage = user.ProfileImageUri.ChangeImageSize(ImageSize.Original);
                             this.RaisePropertyChanged(() => this.ProfileImageUri);
                         }

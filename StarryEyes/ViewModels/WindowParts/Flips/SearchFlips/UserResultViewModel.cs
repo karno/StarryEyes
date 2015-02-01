@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Livet;
+using StarryEyes.Anomaly.TwitterApi;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Globalization;
@@ -109,7 +110,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 var page = Interlocked.Increment(ref _currentPageCount);
                 try
                 {
-                    var result = await account.SearchUserAsync(this.Query, count: 100, page: page);
+                    var result = await account.SearchUserAsync(ApiAccessProperties.Default, this.Query, count: 100, page: page);
                     var twitterUsers = result as TwitterUser[] ?? result.ToArray();
                     if (!twitterUsers.Any())
                     {

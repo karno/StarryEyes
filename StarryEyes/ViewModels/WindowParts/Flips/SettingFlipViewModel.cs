@@ -18,7 +18,9 @@ using Livet;
 using Livet.Messaging;
 using Livet.Messaging.IO;
 using StarryEyes.Albireo.Helpers;
+using StarryEyes.Anomaly.TwitterApi;
 using StarryEyes.Anomaly.TwitterApi.Rest;
+using StarryEyes.Anomaly.TwitterApi.Rest.Parameters;
 using StarryEyes.Anomaly.Utils;
 using StarryEyes.Filters.Expressions;
 using StarryEyes.Filters.Parsing;
@@ -1363,7 +1365,8 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                     {
                         try
                         {
-                            var user = await this._account.ShowUserAsync(this._account.Id);
+                            var user = await this._account.ShowUserAsync(ApiAccessProperties.Default,
+                                new UserParameter(this._account.Id));
                             this._account.UnreliableProfileImage = user.ProfileImageUri.ChangeImageSize(ImageSize.Original);
                             this.RaisePropertyChanged(() => ProfileImage);
                         }

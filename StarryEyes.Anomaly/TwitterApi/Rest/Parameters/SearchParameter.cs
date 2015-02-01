@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
 
-namespace StarryEyes.Anomaly.TwitterApi.Rest.Parameter
+namespace StarryEyes.Anomaly.TwitterApi.Rest.Parameters
 {
     public sealed class SearchParameter : ParameterBase
     {

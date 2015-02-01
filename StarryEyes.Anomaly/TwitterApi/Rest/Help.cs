@@ -2,28 +2,30 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using StarryEyes.Anomaly.Ext;
+using JetBrains.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Anomaly.TwitterApi.Internals;
 
 namespace StarryEyes.Anomaly.TwitterApi.Rest
 {
     public static class Help
     {
-        public static async Task<TwitterConfiguration> GetConfigurationAsync(this IOAuthCredential credential)
+        public static Task<TwitterConfiguration> GetConfigurationAsync(
+            [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties)
         {
             if (credential == null) throw new ArgumentNullException("credential");
-            var json = await credential.GetStringAsync("help/configuration.json",
-                new Dictionary<string, object>(), CancellationToken.None);
-            return new TwitterConfiguration(DynamicJson.Parse(json));
+            if (properties == null) throw new ArgumentNullException("properties");
+            return credential.GetConfigurationAsync(properties, CancellationToken.None);
         }
 
         public static async Task<TwitterConfiguration> GetConfigurationAsync(
-            this IOAuthCredential credential, CancellationToken cancellationToken)
+            [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
+            CancellationToken cancellationToken)
         {
             if (credential == null) throw new ArgumentNullException("credential");
-            var json = await credential.GetStringAsync("help/configuration.json",
-                new Dictionary<string, object>(), cancellationToken);
-            return new TwitterConfiguration(DynamicJson.Parse(json));
+            return await credential.GetAsync(properties, "help/configuration.json",
+                new Dictionary<string, object>(), ResultHandlers.ReadAsConfigurationAsync,
+                cancellationToken).ConfigureAwait(false);
         }
     }
 }

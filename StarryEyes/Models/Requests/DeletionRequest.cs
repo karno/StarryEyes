@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using StarryEyes.Anomaly.TwitterApi;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Models.Accounting;
@@ -24,8 +25,8 @@ namespace StarryEyes.Models.Requests
         public override Task<TwitterStatus> Send(TwitterAccount account)
         {
             return this._type == StatusType.Tweet
-                       ? account.DestroyAsync(this._id)
-                       : account.DestroyDirectMessageAsync(this._id);
+                       ? account.DestroyAsync(ApiAccessProperties.Default, this._id)
+                       : account.DestroyDirectMessageAsync(ApiAccessProperties.Default, this._id);
         }
     }
 }

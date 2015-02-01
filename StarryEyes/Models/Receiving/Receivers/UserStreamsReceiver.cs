@@ -141,24 +141,37 @@ namespace StarryEyes.Models.Receiving.Receivers
             this.CheckDisposed();
             this.ConnectionState = UserStreamsConnectionState.Connecting;
             Log("starting connection...");
-            var isConnectionActive = true;
-            var con = this.Account.ConnectUserStreams(this._trackKeywords, this.Account.ReceiveRepliesAll,
-                this.Account.ReceiveFollowingsActivity)
-                          .Do(_ =>
-                          {
-                              if (this.ConnectionState != UserStreamsConnectionState.Connecting) return;
-                              this.ConnectionState = UserStreamsConnectionState.Connected;
-                              this.ResetErrorParams();
-                              Log("successfully connected.");
-                          })
-                          .SubscribeWithHandler(new HandleStreams(this),
-                              ex => { if (isConnectionActive) this.HandleException(ex); },
-                              () => { if (isConnectionActive) this.Reconnect(); });
-            _stateUpdater.UpdateState();
+            var cancellation = new CancellationTokenSource();
+            Task.Run(async () =>
+            {
+                try
+                {
+                    await this.Account.ConnectUserStreams(ApiAccessProperties.DefaultForUserStreams,
+                        new HandleStreams(this), TimeSpan.FromSeconds(90), cancellation.Token, _trackKeywords,
+                        this.Account.ReceiveRepliesAll, this.Account.ReceiveFollowingsActivity);
+                }
+                catch (Exception ex)
+                {
+                    Log("EXCEPTION! " + ex);
+                    if (!cancellation.IsCancellationRequested)
+                    {
+                        this.HandleException(ex);
+                    }
+                }
+                finally
+                {
+                    Log("disconnected.");
+                    if (!cancellation.IsCancellationRequested)
+                    {
+                        Log("executing reconnection...");
+                        this.Reconnect();
+                    }
+                }
+            }, cancellation.Token).ConfigureAwait(false);
             return Disposable.Create(() =>
             {
-                isConnectionActive = false;
-                con.Dispose();
+                cancellation.Cancel();
+                cancellation.Dispose();
             });
         }
 

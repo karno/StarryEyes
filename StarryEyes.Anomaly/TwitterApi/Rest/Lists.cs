@@ -4,8 +4,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
-using StarryEyes.Anomaly.TwitterApi.Rest.Infrastructure;
-using StarryEyes.Anomaly.TwitterApi.Rest.Parameter;
+using StarryEyes.Anomaly.TwitterApi.Internals;
+using StarryEyes.Anomaly.TwitterApi.Rest.Parameters;
 
 namespace StarryEyes.Anomaly.TwitterApi.Rest
 {
@@ -14,20 +14,23 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
         #region lists/show
 
         public static Task<TwitterList> ShowListAsync(
-            [NotNull] this IOAuthCredential credential, [NotNull] ListParameter targetList)
+            [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
+            [NotNull] ListParameter targetList)
         {
             if (credential == null) throw new ArgumentNullException("credential");
+            if (properties == null) throw new ArgumentNullException("properties");
             if (targetList == null) throw new ArgumentNullException("targetList");
-            return credential.ShowListAsync(targetList, CancellationToken.None);
+            return credential.ShowListAsync(properties, targetList, CancellationToken.None);
         }
 
         public static async Task<TwitterList> ShowListAsync(
-            [NotNull] this IOAuthCredential credential, [NotNull] ListParameter targetList,
-            CancellationToken cancellationToken)
+            [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
+            [NotNull] ListParameter targetList, CancellationToken cancellationToken)
         {
             if (credential == null) throw new ArgumentNullException("credential");
-            var response = await credential.GetAsync("lists/show.json", targetList.ToDictionary(), cancellationToken);
-            return await response.ReadAsListAsync();
+            if (properties == null) throw new ArgumentNullException("properties");
+            return await credential.GetAsync(properties, "lists/show.json", targetList.ToDictionary(),
+                ResultHandlers.ReadAsListAsync, cancellationToken).ConfigureAwait(false);
         }
 
         #endregion
@@ -35,22 +38,23 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
         #region lists/list
 
         public static Task<IEnumerable<TwitterList>> GetListsAsync(
-            [NotNull] this IOAuthCredential credential, [NotNull] ListParameter targetList)
+            [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
+            [NotNull] ListParameter targetList)
         {
             if (credential == null) throw new ArgumentNullException("credential");
             if (targetList == null) throw new ArgumentNullException("targetList");
-            return credential.GetListsAsync(targetList, CancellationToken.None);
+            return credential.GetListsAsync(properties, targetList, CancellationToken.None);
         }
 
         public static async Task<IEnumerable<TwitterList>> GetListsAsync(
-            [NotNull] this IOAuthCredential credential, [NotNull] ListParameter targetList,
-            CancellationToken cancellationToken)
+            [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
+            [NotNull] ListParameter targetList, CancellationToken cancellationToken)
         {
             if (credential == null) throw new ArgumentNullException("credential");
             if (targetList == null) throw new ArgumentNullException("targetList");
 
-            var response = await credential.GetAsync("lists/list.json", targetList.ToDictionary(), cancellationToken);
-            return await response.ReadAsListCollectionAsync();
+            return await credential.GetAsync(properties, "lists/list.json", targetList.ToDictionary(),
+                ResultHandlers.ReadAsListCollectionAsync, cancellationToken).ConfigureAwait(false);
         }
 
         #endregion
@@ -58,20 +62,23 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
         #region lists/statuses
 
         public static Task<IEnumerable<TwitterStatus>> GetListTimelineAsync(
-            [NotNull] this IOAuthCredential credential, [NotNull] ListParameter listTarget,
-            long? sinceId = null, long? maxId = null, int? count = null, bool? includeRts = null)
+            [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
+            [NotNull] ListParameter listTarget, long? sinceId = null, long? maxId = null,
+            int? count = null, bool? includeRts = null)
         {
             if (credential == null) throw new ArgumentNullException("credential");
-            return GetListTimelineAsync(credential, listTarget, sinceId, maxId, count, includeRts,
+            if (properties == null) throw new ArgumentNullException("properties");
+            return credential.GetListTimelineAsync(properties, listTarget, sinceId, maxId, count, includeRts,
                 CancellationToken.None);
         }
 
         public static async Task<IEnumerable<TwitterStatus>> GetListTimelineAsync(
-            [NotNull] this IOAuthCredential credential, [NotNull] ListParameter listTarget,
-            long? sinceId, long? maxId, int? count, bool? includeRts,
+            [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
+            [NotNull] ListParameter listTarget, long? sinceId, long? maxId, int? count, bool? includeRts,
             CancellationToken cancellationToken)
         {
             if (credential == null) throw new ArgumentNullException("credential");
+            if (properties == null) throw new ArgumentNullException("properties");
             var param = new Dictionary<string, object>()
             {
                 {"since_id", sinceId},
@@ -79,8 +86,8 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
                 {"count", count},
                 {"include_rts", includeRts},
             }.ApplyParameter(listTarget);
-            var response = await credential.GetAsync("lists/statuses.json", param, cancellationToken);
-            return await response.ReadAsStatusCollectionAsync();
+            return await credential.GetAsync(properties, "lists/statuses.json", param,
+                ResultHandlers.ReadAsStatusCollectionAsync, cancellationToken).ConfigureAwait(false);
         }
 
         #endregion
@@ -88,27 +95,29 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
         #region Memberships
 
         public static Task<ICursorResult<IEnumerable<TwitterUser>>> GetListMembersAsync(
-            [NotNull] this IOAuthCredential credential, [NotNull] ListParameter targetList,
-            long? cursor = null)
+            [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
+            [NotNull] ListParameter targetList, long? cursor = null)
         {
             if (credential == null) throw new ArgumentNullException("credential");
+            if (properties == null) throw new ArgumentNullException("properties");
             if (targetList == null) throw new ArgumentNullException("targetList");
-            return GetListMembersAsync(credential, targetList, cursor, CancellationToken.None);
+            return credential.GetListMembersAsync(properties, targetList, cursor, CancellationToken.None);
         }
 
         public static async Task<ICursorResult<IEnumerable<TwitterUser>>> GetListMembersAsync(
-            [NotNull] this IOAuthCredential credential, [NotNull] ListParameter targetList,
-            long? cursor, CancellationToken cancellationToken)
+            [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
+            [NotNull] ListParameter targetList, long? cursor, CancellationToken cancellationToken)
         {
             if (credential == null) throw new ArgumentNullException("credential");
+            if (properties == null) throw new ArgumentNullException("properties");
             if (targetList == null) throw new ArgumentNullException("targetList");
             var param = new Dictionary<string, object>()
             {
                 {"cursor", cursor},
                 {"skip_status", true},
             }.ApplyParameter(targetList);
-            var response = await credential.GetAsync("lists/members.json", param, cancellationToken);
-            return await response.ReadAsCursoredUsersAsync();
+            return await credential.GetAsync(properties, "lists/members.json", param,
+                ResultHandlers.ReadAsCursoredUsersAsync, cancellationToken).ConfigureAwait(false);
         }
 
         #endregion

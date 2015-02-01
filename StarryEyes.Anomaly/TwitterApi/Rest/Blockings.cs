@@ -4,8 +4,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
-using StarryEyes.Anomaly.TwitterApi.Rest.Infrastructure;
-using StarryEyes.Anomaly.TwitterApi.Rest.Parameter;
+using StarryEyes.Anomaly.TwitterApi.Internals;
+using StarryEyes.Anomaly.TwitterApi.Rest.Parameters;
 
 namespace StarryEyes.Anomaly.TwitterApi.Rest
 {
@@ -14,19 +14,23 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
         #region blocks/ids
 
         public static Task<ICursorResult<IEnumerable<long>>> GetBlockingsIdsAsync(
-            [NotNull] this IOAuthCredential credential, long cursor)
+            [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
+            long cursor)
         {
             if (credential == null) throw new ArgumentNullException("credential");
-            return credential.GetBlockingsIdsAsync(cursor, CancellationToken.None);
+            if (properties == null) throw new ArgumentNullException("properties");
+            return credential.GetBlockingsIdsAsync(properties, cursor, CancellationToken.None);
         }
 
         public static async Task<ICursorResult<IEnumerable<long>>> GetBlockingsIdsAsync(
-            [NotNull] this IOAuthCredential credential, long cursor, CancellationToken cancellationToken)
+            [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
+            long cursor, CancellationToken cancellationToken)
         {
             if (credential == null) throw new ArgumentNullException("credential");
+            if (properties == null) throw new ArgumentNullException("properties");
             var param = new Dictionary<string, object> { { "cursor", cursor } };
-            var resp = await credential.GetAsync("blocks/ids.json", param, cancellationToken);
-            return await resp.ReadAsCursoredIdsAsync();
+            return await credential.GetAsync(properties, "blocks/ids.json", param,
+                ResultHandlers.ReadAsCursoredIdsAsync, cancellationToken).ConfigureAwait(false);
         }
 
         #endregion
@@ -34,22 +38,25 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
         #region blocks/create
 
         public static Task<TwitterUser> CreateBlockAsync(
-            [NotNull] this IOAuthCredential credential, [NotNull] UserParameter targetUser)
+            [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
+            [NotNull] UserParameter targetUser)
         {
             if (credential == null) throw new ArgumentNullException("credential");
+            if (properties == null) throw new ArgumentNullException("properties");
             if (targetUser == null) throw new ArgumentNullException("targetUser");
-            return credential.CreateBlockAsync(targetUser, CancellationToken.None);
+            return credential.CreateBlockAsync(properties, targetUser, CancellationToken.None);
         }
 
         public static async Task<TwitterUser> CreateBlockAsync(
-            [NotNull] this IOAuthCredential credential, [NotNull] UserParameter targetUser,
+            [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
+            [NotNull] UserParameter targetUser,
             CancellationToken cancellationToken)
         {
             if (credential == null) throw new ArgumentNullException("credential");
+            if (properties == null) throw new ArgumentNullException("properties");
             if (targetUser == null) throw new ArgumentNullException("targetUser");
-            var resp = await credential.PostAsync("blocks/create.json",
-                targetUser.ToDictionary(), cancellationToken);
-            return await resp.ReadAsUserAsync();
+            return await credential.PostAsync(properties, "blocks/create.json", targetUser.ToDictionary(),
+                ResultHandlers.ReadAsUserAsync, cancellationToken).ConfigureAwait(false);
         }
 
         #endregion
@@ -57,22 +64,25 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
         #region blocks/destroy
 
         public static Task<TwitterUser> DestroyBlockAsync(
-            [NotNull] this IOAuthCredential credential, [NotNull] UserParameter targetUser)
+            [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
+            [NotNull] UserParameter targetUser)
         {
             if (credential == null) throw new ArgumentNullException("credential");
+            if (properties == null) throw new ArgumentNullException("properties");
             if (targetUser == null) throw new ArgumentNullException("targetUser");
-            return credential.DestroyBlockAsync(targetUser, CancellationToken.None);
+            return credential.DestroyBlockAsync(properties, targetUser, CancellationToken.None);
         }
 
         public static async Task<TwitterUser> DestroyBlockAsync(
-            [NotNull] this IOAuthCredential credential, [NotNull] UserParameter targetUser,
+            [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
+            [NotNull] UserParameter targetUser,
             CancellationToken cancellationToken)
         {
             if (credential == null) throw new ArgumentNullException("credential");
+            if (properties == null) throw new ArgumentNullException("properties");
             if (targetUser == null) throw new ArgumentNullException("targetUser");
-            var resp = await credential.PostAsync("blocks/destroy.json",
-                targetUser.ToDictionary(), cancellationToken);
-            return await resp.ReadAsUserAsync();
+            return await credential.PostAsync(properties, "blocks/destroy.json", targetUser.ToDictionary(),
+                ResultHandlers.ReadAsUserAsync, cancellationToken).ConfigureAwait(false);
         }
 
         #endregion
@@ -80,22 +90,24 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
         #region users/report_spam
 
         public static Task<TwitterUser> ReportSpamAsync(
-            [NotNull] this IOAuthCredential credential, [NotNull] UserParameter targetUser)
+            [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
+            [NotNull] UserParameter targetUser)
         {
             if (credential == null) throw new ArgumentNullException("credential");
+            if (properties == null) throw new ArgumentNullException("properties");
             if (targetUser == null) throw new ArgumentNullException("targetUser");
-            return credential.ReportSpamAsync(targetUser, CancellationToken.None);
+            return credential.ReportSpamAsync(properties, targetUser, CancellationToken.None);
         }
 
         public static async Task<TwitterUser> ReportSpamAsync(
-            [NotNull] this IOAuthCredential credential, [NotNull] UserParameter targetUser,
-            CancellationToken cancellationToken)
+            [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
+            [NotNull] UserParameter targetUser, CancellationToken cancellationToken)
         {
             if (credential == null) throw new ArgumentNullException("credential");
+            if (properties == null) throw new ArgumentNullException("properties");
             if (targetUser == null) throw new ArgumentNullException("targetUser");
-            var resp = await credential.PostAsync("users/report_spam.json",
-                targetUser.ToDictionary(), cancellationToken);
-            return await resp.ReadAsUserAsync();
+            return await credential.PostAsync(properties, "users/report_spam.json", targetUser.ToDictionary(),
+                ResultHandlers.ReadAsUserAsync, cancellationToken).ConfigureAwait(false);
         }
 
         #endregion

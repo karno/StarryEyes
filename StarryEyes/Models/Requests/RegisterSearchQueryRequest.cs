@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using StarryEyes.Anomaly.TwitterApi;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Models.Accounting;
@@ -16,7 +17,7 @@ namespace StarryEyes.Models.Requests
 
         public override Task<TwitterSavedSearch> Send(TwitterAccount account)
         {
-            return account.SaveSearchAsync(_query);
+            return account.SaveSearchAsync(ApiAccessProperties.Default, _query);
         }
     }
 }

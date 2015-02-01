@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
+using StarryEyes.Anomaly.TwitterApi;
 using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Globalization.Models;
 using StarryEyes.Models.Backstages.NotificationEvents;
@@ -55,7 +56,7 @@ namespace StarryEyes.Models.Subsystems
             }
             try
             {
-                var config = await account.GetConfigurationAsync();
+                var config = await account.GetConfigurationAsync(ApiAccessProperties.Default);
                 HttpUrlLength = config.ShortUrlLength;
                 HttpsUrlLength = config.ShortUrlLengthHttps;
                 MediaUrlLength = config.CharactersReservedPerMedia;

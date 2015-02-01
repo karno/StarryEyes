@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace StarryEyes.Anomaly.TwitterApi.Rest.Parameter
+namespace StarryEyes.Anomaly.TwitterApi.Rest.Parameters
 {
     public sealed class UserParameter : ParameterBase
     {

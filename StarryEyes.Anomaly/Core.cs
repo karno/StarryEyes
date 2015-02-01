@@ -13,7 +13,7 @@ namespace StarryEyes.Anomaly
 
         public static void Initialize()
         {
-            // init oauth util
+            // initialize OAuth hash function
             OAuthUtility.ComputeHash = (key, buffer) =>
             {
                 using (var hmac = new HMACSHA1(key))

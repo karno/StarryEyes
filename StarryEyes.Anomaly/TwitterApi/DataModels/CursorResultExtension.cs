@@ -4,9 +4,8 @@ using System.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
-using StarryEyes.Anomaly.TwitterApi.Rest.Infrastructure;
 
-namespace StarryEyes.Anomaly.TwitterApi.Rest
+namespace StarryEyes.Anomaly.TwitterApi.DataModels
 {
     public static class CursorResultExtension
     {

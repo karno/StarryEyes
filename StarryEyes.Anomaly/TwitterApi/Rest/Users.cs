@@ -6,7 +6,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
-using StarryEyes.Anomaly.TwitterApi.Rest.Infrastructure;
+using StarryEyes.Anomaly.TwitterApi.Internals;
+using StarryEyes.Anomaly.TwitterApi.Rest.Parameters;
 
 namespace StarryEyes.Anomaly.TwitterApi.Rest
 {
@@ -15,43 +16,50 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
         #region users/lookup
 
         public static Task<IEnumerable<TwitterUser>> LookupUserAsync(
-            [NotNull] this IOAuthCredential credential, [NotNull] IEnumerable<long> userIds)
+            [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
+            [NotNull] IEnumerable<long> userIds)
+        {
+            if (credential == null) throw new ArgumentNullException("credential");
+            if (properties == null) throw new ArgumentNullException("properties");
+            if (userIds == null) throw new ArgumentNullException("userIds");
+            return credential.LookupUserAsync(properties, userIds, CancellationToken.None);
+        }
+
+        public static Task<IEnumerable<TwitterUser>> LookupUserAsync(
+            [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
+            [NotNull] IEnumerable<string> screenNames)
+        {
+            if (credential == null) throw new ArgumentNullException("credential");
+            if (properties == null) throw new ArgumentNullException("properties");
+            if (screenNames == null) throw new ArgumentNullException("screenNames");
+            return credential.LookupUserAsync(properties, screenNames, CancellationToken.None);
+        }
+
+        public static Task<IEnumerable<TwitterUser>> LookupUserAsync(
+            [NotNull] this IOAuthCredential credential, IApiAccessProperties properties,
+            [NotNull] IEnumerable<long> userIds, CancellationToken cancellationToken)
         {
             if (credential == null) throw new ArgumentNullException("credential");
             if (userIds == null) throw new ArgumentNullException("userIds");
-            return credential.LookupUserAsync(userIds, CancellationToken.None);
+            return LookupUserCoreAsync(credential, properties, userIds, null, cancellationToken);
         }
 
         public static Task<IEnumerable<TwitterUser>> LookupUserAsync(
-            [NotNull] this IOAuthCredential credential, [NotNull] IEnumerable<string> screenNames)
+            [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
+            [NotNull] IEnumerable<string> screenNames, CancellationToken cancellationToken)
         {
             if (credential == null) throw new ArgumentNullException("credential");
+            if (properties == null) throw new ArgumentNullException("properties");
             if (screenNames == null) throw new ArgumentNullException("screenNames");
-            return credential.LookupUserAsync(screenNames, CancellationToken.None);
-        }
-
-        public static Task<IEnumerable<TwitterUser>> LookupUserAsync(
-            [NotNull] this IOAuthCredential credential, [NotNull] IEnumerable<long> userIds,
-            CancellationToken cancellationToken)
-        {
-            if (credential == null) throw new ArgumentNullException("credential");
-            if (userIds == null) throw new ArgumentNullException("userIds");
-            return LookupUserCoreAsync(credential, userIds, null, cancellationToken);
-        }
-
-        public static Task<IEnumerable<TwitterUser>> LookupUserAsync(
-            [NotNull] this IOAuthCredential credential, [NotNull] IEnumerable<string> screenNames,
-            CancellationToken cancellationToken)
-        {
-            if (credential == null) throw new ArgumentNullException("credential");
-            if (screenNames == null) throw new ArgumentNullException("screenNames");
-            return LookupUserCoreAsync(credential, null, screenNames, cancellationToken);
+            return LookupUserCoreAsync(credential, properties, null, screenNames, cancellationToken);
         }
 
         private static async Task<IEnumerable<TwitterUser>> LookupUserCoreAsync(
-            IOAuthCredential credential, IEnumerable<long> userIds, IEnumerable<string> screenNames,
-            CancellationToken cancellationToken)
+            [NotNull] IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
+            IEnumerable<long> userIds, IEnumerable<string> screenNames, CancellationToken cancellationToken)
         {
+            if (credential == null) throw new ArgumentNullException("credential");
+            if (properties == null) throw new ArgumentNullException("properties");
             var userIdsString = userIds == null
                 ? null
                 : userIds.Select(s => s.ToString(CultureInfo.InvariantCulture))
@@ -61,8 +69,8 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
                 {"user_id", userIdsString},
                 {"screen_name", screenNames == null ? null : screenNames.JoinString(",")},
             };
-            var resp = await credential.GetAsync("users/lookup.json", param, cancellationToken);
-            return await resp.ReadAsUserCollectionAsync();
+            return await credential.GetAsync(properties, "users/lookup.json", param,
+                ResultHandlers.ReadAsUserCollectionAsync, cancellationToken).ConfigureAwait(false);
         }
 
         #endregion
@@ -70,19 +78,21 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
         #region users/search
 
         public static Task<IEnumerable<TwitterUser>> SearchUserAsync(
-            [NotNull] this IOAuthCredential credential, [NotNull] string query,
-            int? page = null, int? count = null)
+            [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
+            [NotNull] string query, int? page = null, int? count = null)
         {
             if (credential == null) throw new ArgumentNullException("credential");
+            if (properties == null) throw new ArgumentNullException("properties");
             if (query == null) throw new ArgumentNullException("query");
-            return credential.SearchUserAsync(query, page, count, CancellationToken.None);
+            return credential.SearchUserAsync(properties, query, page, count, CancellationToken.None);
         }
 
         public static async Task<IEnumerable<TwitterUser>> SearchUserAsync(
-            [NotNull] this IOAuthCredential credential, [NotNull] string query,
-            int? page, int? count, CancellationToken cancellationToken)
+            [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
+            [NotNull] string query, int? page, int? count, CancellationToken cancellationToken)
         {
             if (credential == null) throw new ArgumentNullException("credential");
+            if (properties == null) throw new ArgumentNullException("properties");
             if (query == null) throw new ArgumentNullException("query");
             var param = new Dictionary<string, object>
             {
@@ -90,8 +100,8 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
                 {"page", page},
                 {"count", count},
             };
-            var resp = await credential.GetAsync("users/search.json", param, cancellationToken);
-            return await resp.ReadAsUserCollectionAsync();
+            return await credential.GetAsync(properties, "users/search.json", param,
+                ResultHandlers.ReadAsUserCollectionAsync, cancellationToken).ConfigureAwait(false);
         }
 
         #endregion
@@ -99,49 +109,25 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
         #region users/show
 
         public static Task<TwitterUser> ShowUserAsync(
-            [NotNull] this IOAuthCredential credential, long userId)
+            [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
+            [NotNull] UserParameter parameter)
         {
             if (credential == null) throw new ArgumentNullException("credential");
-            return credential.ShowUserAsync(userId, CancellationToken.None);
+            if (properties == null) throw new ArgumentNullException("properties");
+            if (parameter == null) throw new ArgumentNullException("parameter");
+            return credential.ShowUserAsync(properties, parameter, CancellationToken.None);
         }
 
-        public static Task<TwitterUser> ShowUserAsync(
-            [NotNull] this IOAuthCredential credential, [NotNull] string screenName)
+        public static async Task<TwitterUser> ShowUserAsync(
+            [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
+            [NotNull] UserParameter parameter, CancellationToken cancellationToken)
         {
             if (credential == null) throw new ArgumentNullException("credential");
-            if (screenName == null) throw new ArgumentNullException("screenName");
-            return credential.ShowUserAsync(screenName, CancellationToken.None);
-        }
-
-        public static Task<TwitterUser> ShowUserAsync(
-            [NotNull] this IOAuthCredential credential, long userId,
-            CancellationToken cancellationToken)
-        {
-            if (credential == null) throw new ArgumentNullException("credential");
-            return ShowUserCoreAsync(credential, userId, null, cancellationToken);
-        }
-
-        public static Task<TwitterUser> ShowUserAsync(
-            [NotNull] this IOAuthCredential credential, [NotNull] string screenName,
-            CancellationToken cancellationToken)
-        {
-            if (credential == null) throw new ArgumentNullException("credential");
-            if (screenName == null) throw new ArgumentNullException("screenName");
-            return ShowUserCoreAsync(credential, null, screenName, cancellationToken);
-        }
-
-        private static async Task<TwitterUser> ShowUserCoreAsync(
-            IOAuthCredential credential, long? userId, string screenName,
-            CancellationToken cancellationToken)
-        {
-            var param = new Dictionary<string, object>
-            {
-                {"user_id", userId},
-                {"screen_name", screenName},
-            };
-
-            var resp = await credential.GetAsync("users/show.json", param, cancellationToken);
-            return await resp.ReadAsUserAsync();
+            if (properties == null) throw new ArgumentNullException("properties");
+            if (parameter == null) throw new ArgumentNullException("parameter");
+            var param = parameter.ToDictionary();
+            return await credential.GetAsync(properties, "users/show.json", param,
+                ResultHandlers.ReadAsUserAsync, cancellationToken).ConfigureAwait(false);
         }
 
         #endregion

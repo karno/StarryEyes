@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using StarryEyes.Anomaly.TwitterApi;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
-using StarryEyes.Anomaly.TwitterApi.Rest.Infrastructure;
-using StarryEyes.Anomaly.TwitterApi.Rest.Parameter;
+using StarryEyes.Anomaly.TwitterApi.Rest.Parameters;
 using StarryEyes.Globalization.WindowParts;
 using StarryEyes.Models.Accounting;
 
@@ -22,7 +23,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
 
         protected override Task<ICursorResult<IEnumerable<long>>> GetUsersApiImpl(TwitterAccount info, long id, long cursor)
         {
-            return info.GetFriendsIdsAsync(new UserParameter(id), cursor);
+            return info.GetFriendsIdsAsync(ApiAccessProperties.Default, new UserParameter(id), cursor);
         }
     }
 }

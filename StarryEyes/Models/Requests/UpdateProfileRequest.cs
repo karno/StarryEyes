@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using StarryEyes.Anomaly.TwitterApi;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Models.Accounting;
@@ -17,7 +18,7 @@ namespace StarryEyes.Models.Requests
 
         public override Task<TwitterUser> Send(TwitterAccount account)
         {
-            return account.UpdateProfileAsync(Name, Url, Location, DescriptionText);
+            return account.UpdateProfileAsync(ApiAccessProperties.Default, Name, Url, Location, DescriptionText);
         }
     }
 }

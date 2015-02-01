@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using StarryEyes.Anomaly.TwitterApi;
 using StarryEyes.Anomaly.TwitterApi.Rest;
-using StarryEyes.Anomaly.TwitterApi.Rest.Parameter;
+using StarryEyes.Anomaly.TwitterApi.Rest.Parameters;
 using StarryEyes.Globalization;
 using StarryEyes.Globalization.Models;
 using StarryEyes.Models.Backstages.NotificationEvents;
@@ -46,7 +47,7 @@ namespace StarryEyes.Models.Receiving.Receivers
             var param = new SearchParameter(_query,
                 lang: String.IsNullOrWhiteSpace(Setting.SearchLanguage.Value) ? null : Setting.SearchLanguage.Value,
                 locale: String.IsNullOrWhiteSpace(Setting.SearchLocale.Value) ? null : Setting.SearchLocale.Value);
-            (await account.SearchAsync(param))
+            (await account.SearchAsync(ApiAccessProperties.Default, param))
                 .Do(s =>
                 {
                     lock (_receiveCaches)

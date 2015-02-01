@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using Livet;
+using StarryEyes.Anomaly.TwitterApi;
 using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Globalization;
 using StarryEyes.Globalization.WindowParts;
@@ -91,7 +92,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             this.IsSearchCandidateAvailable = true;
             try
             {
-                var searches = await aid.GetSavedSearchesAsync();
+                var searches = await aid.GetSavedSearchesAsync(ApiAccessProperties.Default);
                 searches.ForEach(s => this._searchCandidates.Add(
                     new SearchCandidateItemViewModel(this, aid, s.Id, s.Query)));
             }
@@ -155,7 +156,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
         {
             try
             {
-                await this._account.DestroySavedSearchAsync(_id);
+                await this._account.DestroySavedSearchAsync(ApiAccessProperties.Default, _id);
             }
             catch (Exception ex)
             {

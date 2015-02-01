@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Globalization;
 using System.Net;
-using StarryEyes.Anomaly.TwitterApi;
 using StarryEyes.Models;
 using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Settings;
@@ -59,8 +58,10 @@ namespace StarryEyes
         public static void ApplyBaseProperties()
         {
             // when set null or empty string, apply defaults.
+            /* TODO: RESTORE THIS FEATURE.
             ApiAccessProperties.UserAgent = Setting.UserAgent.Value;
             ApiAccessProperties.ApiEndpoint = Setting.ApiProxy.Value;
+            */
         }
     }
 }

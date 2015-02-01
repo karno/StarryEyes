@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using StarryEyes.Anomaly.TwitterApi;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
+using StarryEyes.Anomaly.TwitterApi.Rest.Parameters;
 using StarryEyes.Models.Databases;
 using StarryEyes.Models.Receiving.Handling;
 using StarryEyes.Settings;
@@ -21,7 +23,7 @@ namespace StarryEyes.Models.Stores
             {
                 var acc = Setting.Accounts.GetRandomOne();
                 if (acc == null) return null;
-                status = await acc.ShowTweetAsync(id);
+                status = await acc.ShowTweetAsync(ApiAccessProperties.Default, id);
                 StatusInbox.Enqueue(status);
             }
             return status;
@@ -34,7 +36,7 @@ namespace StarryEyes.Models.Stores
             {
                 var acc = Setting.Accounts.GetRelatedOne(id);
                 if (acc == null) return null;
-                user = await acc.ShowUserAsync(id);
+                user = await acc.ShowUserAsync(ApiAccessProperties.Default, new UserParameter(id));
                 UserProxy.StoreUser(user);
             }
             return user;
@@ -47,7 +49,7 @@ namespace StarryEyes.Models.Stores
             {
                 var acc = Setting.Accounts.GetRandomOne();
                 if (acc == null) return null;
-                user = await acc.ShowUserAsync(screenName);
+                user = await acc.ShowUserAsync(ApiAccessProperties.Default, new UserParameter(screenName));
                 UserProxy.StoreUser(user);
             }
             return user;
@@ -63,7 +65,7 @@ namespace StarryEyes.Models.Stores
                 var acc = Setting.Accounts.GetRelatedOne(id);
                 if (acc != null)
                 {
-                    var user = await acc.ShowUserAsync(id);
+                    var user = await acc.ShowUserAsync(ApiAccessProperties.Default, new UserParameter(id));
                     UserProxy.StoreUser(user);
                     users.Add(user);
                 }

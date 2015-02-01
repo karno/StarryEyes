@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using StarryEyes.Anomaly.TwitterApi;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Anomaly.Utils;
@@ -84,7 +85,7 @@ namespace StarryEyes.Filters.Sources
         protected override IObservable<TwitterStatus> ReceiveSink(long? maxId)
         {
             return this.GetAccount()
-                       .GetListTimelineAsync(_listInfo.ToListParameter(), maxId: maxId)
+                       .GetListTimelineAsync(ApiAccessProperties.Default, _listInfo.ToListParameter(), maxId: maxId)
                        .ToObservable();
         }
 

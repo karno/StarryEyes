@@ -1,105 +1,74 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using StarryEyes.Anomaly.Utils;
 
 namespace StarryEyes.Anomaly.TwitterApi.Streaming
 {
     public static class UserStreams
     {
-        public static IObservable<string> ConnectUserStreams(
-            this IOAuthCredential credential, IEnumerable<string> tracks,
-            bool repliesAll = false, bool followingsActivity = false)
+        public static async Task ConnectUserStreams(
+            [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
+            [NotNull] IStreamHandler handler, TimeSpan readTimeout, CancellationToken cancellationToken,
+            [CanBeNull] IEnumerable<string> tracksOrNull = null, bool repliesAll = false,
+            bool followingsActivity = false)
         {
-            var filteredTracks = tracks != null
-                                     ? tracks.Where(t => !String.IsNullOrEmpty(t))
-                                             .Distinct()
-                                             .JoinString(",")
-                                     : null;
+            if (credential == null) throw new ArgumentNullException("credential");
+            if (properties == null) throw new ArgumentNullException("properties");
+            if (handler == null) throw new ArgumentNullException("handler");
+
+            var filteredTracks =
+                tracksOrNull != null
+                    ? tracksOrNull.Where(t => !String.IsNullOrEmpty(t.Trim())).Distinct().JoinString(",")
+                    : null;
+
+            // bulid parameter
             var param = new Dictionary<string, object>
             {
-                {"track", String.IsNullOrEmpty(filteredTracks) ? null : filteredTracks },
+                {"track", String.IsNullOrEmpty(filteredTracks) ? null : filteredTracks},
                 {"replies", repliesAll ? "all" : null},
                 {"include_followings_activity", followingsActivity ? "true" : null}
             }.ParametalizeForGet();
-            return Observable.Create<string>((observer, cancel) => Task.Run(async () =>
+            var endpoint = HttpUtility.ConcatUrl(properties.Endpoint, "user.json");
+            if (String.IsNullOrEmpty(param))
+            {
+                endpoint += "?" + param;
+            }
+
+            await Task.Run(async () =>
             {
                 HttpClient client = null;
                 try
                 {
-                    // using GZip cause receiving elements delayed.
+                    // prepare HttpClient
                     client = credential.CreateOAuthClient(useGZip: false);
-                    // disable connection timeout due to streaming specification
+                    // set parameters for receiving UserStreams.
                     client.Timeout = Timeout.InfiniteTimeSpan;
-                    client.MaxResponseContentBufferSize = 1024 * 16; // set buffer length as 16KB.
-                    var endpoint = HttpUtility.ConcatUrl(ApiAccessProperties.UserStreamsEndpoint, "user.json");
-                    if (!String.IsNullOrEmpty(param))
+                    client.MaxResponseContentBufferSize = 1024 * 16;
+                    // begin connection
+                    using (var resp = await client.GetAsync(endpoint, HttpCompletionOption.ResponseHeadersRead,
+                        cancellationToken).ConfigureAwait(false))
+                    using (var stream = await resp.Content.ReadAsStreamAsync().ConfigureAwait(false))
                     {
-                        endpoint += "?" + param;
+                        // run user stream engine
+                        await
+                            UserStreamEngine.Run(stream, handler, readTimeout, cancellationToken).ConfigureAwait(false);
                     }
-                    using (var stream = await client.GetStreamAsync(endpoint))
-                    using (var reader = new StreamReader(stream))
-                    {
-                        try
-                        {
-                            // reader.EndOfStream 
-                            while (!cancel.IsCancellationRequested)
-                            {
-                                var readLine = reader.ReadLineAsync();
-                                var delay = Task.Delay(TimeSpan.FromSeconds(ApiAccessProperties.StreamingTimeoutSec),
-                                    cancel);
-                                if (await Task.WhenAny(readLine, delay) == delay)
-                                {
-                                    // timeout
-                                    System.Diagnostics.Debug.WriteLine("#USERSTREAM# TIMEOUT.");
-                                    break;
-                                }
-                                var line = readLine.Result;
-                                if (line == null)
-                                {
-                                    // connection closed
-                                    System.Diagnostics.Debug.WriteLine("#USERSTREAM# CONNECTION CLOSED.");
-                                    break;
-                                }
-                                if (!String.IsNullOrEmpty(line))
-                                {
-                                    // successfully completed
-                                    observer.OnNext(line);
-                                }
-                            }
-                        }
-                        finally
-                        {
-                            // cancel pending requests
-                            client.CancelPendingRequests();
-                            client.Dispose();
-                            client = null;
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine("#USERSTREAM# error detected: " + ex.Message);
-                    observer.OnError(ex);
-                    return;
                 }
                 finally
                 {
                     if (client != null)
                     {
+                        // cancel pending requests
                         client.CancelPendingRequests();
                         client.Dispose();
                     }
                 }
-
-                System.Diagnostics.Debug.WriteLine("#USERSTREAM# disconnection detected. (CANCELLATION REQUEST? " + cancel.IsCancellationRequested + ")");
-                observer.OnCompleted();
-            }, cancel));
+            }, cancellationToken).ConfigureAwait(false);
         }
     }
 }

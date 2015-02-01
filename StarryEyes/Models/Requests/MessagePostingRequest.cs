@@ -1,7 +1,8 @@
 ﻿using System.Threading.Tasks;
+using StarryEyes.Anomaly.TwitterApi;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
-using StarryEyes.Anomaly.TwitterApi.Rest.Parameter;
+using StarryEyes.Anomaly.TwitterApi.Rest.Parameters;
 using StarryEyes.Models.Accounting;
 
 namespace StarryEyes.Models.Requests
@@ -24,7 +25,7 @@ namespace StarryEyes.Models.Requests
 
         public override Task<TwitterStatus> Send(TwitterAccount account)
         {
-            return account.SendDirectMessageAsync(new UserParameter(_id), _text);
+            return account.SendDirectMessageAsync(ApiAccessProperties.Default, new UserParameter(_id), _text);
         }
     }
 }
