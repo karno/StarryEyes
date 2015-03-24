@@ -60,7 +60,6 @@ namespace StarryEyes.Models.Accounting
             get { return this._mutes; }
         }
 
-
         private readonly long _accountId;
         /// <summary>
         /// Bound account Id

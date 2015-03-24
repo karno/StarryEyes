@@ -41,11 +41,12 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings\ITwitterAccount.cs" />
-    <Compile Include="Settings\Setting.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Composites\" />
     <Folder Include="Network\Pollers\" />
     <Folder Include="Network\Requests\" />
+    <Folder Include="Storage\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\StarryEyes.Albireo\StarryEyes.Albireo.csproj">

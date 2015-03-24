@@ -19,6 +19,8 @@ namespace StarryEyes.Models.Accounting
         {
             Id = 0;
             UnreliableScreenName = String.Empty;
+            OAuthAccessToken = String.Empty;
+            OAuthAccessTokenSecret = String.Empty;
         }
 
         public TwitterAccount(long id, string screenName, [NotNull] AccessToken token)

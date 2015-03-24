@@ -83,6 +83,4 @@ namespace StarryEyes.Illumine.Settings
         /// </summary>
         bool ReceiveActivitiesFromFollowings { get; set; }
     }
-
-
 }
