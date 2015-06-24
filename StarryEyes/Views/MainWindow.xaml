@@ -1,18 +1,15 @@
 ﻿<controls:MetroWindow x:Class="StarryEyes.Views.MainWindow"
                       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                      xmlns:behaviours="http://metro.mahapps.com/winfx/xaml/shared"
                       xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
                       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                       xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
                       xmlns:flips="clr-namespace:StarryEyes.Views.WindowParts.Flips"
-                      xmlns:hotfixes="clr-namespace:StarryEyes.Hotfixes"
                       xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
                       xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                       xmlns:sebehaviors="clr-namespace:StarryEyes.Views.Messaging.Behaviors"
                       xmlns:settings="clr-namespace:StarryEyes.Settings"
-                      xmlns:starryEyes="clr-namespace:StarryEyes"
                       xmlns:triggers="clr-namespace:StarryEyes.Views.Triggers"
                       xmlns:utils="clr-namespace:StarryEyes.Views.Utils"
                       xmlns:viewsResources="clr-namespace:StarryEyes.Globalization"
@@ -66,13 +63,6 @@
     <controls:MetroWindow.DataContext>
         <vm:MainWindowViewModel />
     </controls:MetroWindow.DataContext>
-    <i:Interaction.Behaviors>
-        <!--  injecting HitTestHotFixBehavior  -->
-        <behaviours:BorderlessWindowBehavior />
-        <behaviours:WindowsSettingBehaviour />
-        <behaviours:GlowWindowBehavior />
-        <hotfixes:HitTestHotfixBehavior />
-    </i:Interaction.Behaviors>
     <i:Interaction.Triggers>
         <!--  WindowのContentRenderedイベントのタイミングでViewModelのInitializeメソッドが呼ばれます  -->
         <i:EventTrigger EventName="ContentRendered">

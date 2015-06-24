@@ -321,7 +321,6 @@
     <Compile Include="Helpers\TwitterRegexPatterns.cs" />
     <Compile Include="Hotfixes\DispatcherCollectionRx.cs" />
     <Compile Include="Hotfixes\DispatcherExtension.cs" />
-    <Compile Include="Hotfixes\HitTestHotfixBehavior.cs" />
     <Compile Include="Hotfixes\MessengerHotfix.cs" />
     <Compile Include="Hotfixes\ReadOnlyDispatcherCollectionRx.cs" />
     <Compile Include="Hotfixes\ViewModelHelperRx.cs" />
