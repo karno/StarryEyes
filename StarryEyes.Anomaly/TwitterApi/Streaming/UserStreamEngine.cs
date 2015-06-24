@@ -120,6 +120,8 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
                 {
                     type = "withheld";
                     // TODO: Not implemented.(???)
+                    System.Diagnostics.Debug.WriteLine("!unknown event!:withheld" + Environment.NewLine +
+                                                       element.ToString());
                     return;
                 }
                 if (element.disconnect())
@@ -137,6 +139,8 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
                 {
                     type = "warning";
                     // TODO: Not implemented.(stall warning)
+                    System.Diagnostics.Debug.WriteLine("!unknown event!:warning" + Environment.NewLine +
+                                                       element.ToString());
                     return;
                 }
                 if (element.friends())
@@ -203,12 +207,17 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
                             return;
                         case "favorited_retweet":
                             // TODO: unknown event. 
+                            System.Diagnostics.Debug.WriteLine("!unknown event!:" + ev + Environment.NewLine +
+                                                               element.ToString());
                             return;
                         default:
+                            System.Diagnostics.Debug.WriteLine("!unknown event!:" + ev + Environment.NewLine +
+                                                               element.ToString());
                             handler.OnExceptionThrownDuringParsing(new Exception("Unknown event: " + ev + " / " + element.ToString()));
                             return;
                     }
                 }
+                System.Diagnostics.Debug.WriteLine("!unknown element!" + Environment.NewLine + element.ToString());
                 handler.OnExceptionThrownDuringParsing(new Exception("Unknown data: " + element.ToString()));
             }
             catch (Exception ex)
