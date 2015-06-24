@@ -102,23 +102,22 @@ namespace StarryEyes.Anomaly.TwitterApi.Internals
 
         public static Task<ICursorResult<IEnumerable<long>>> ReadAsCursoredIdsAsync(HttpResponseMessage response)
         {
-            return ReadAsCursoredAsync(response, d => (long)d);
+            return ReadAsCursoredAsync(response, json => json.ids, d => (long)d);
         }
 
         public static Task<ICursorResult<IEnumerable<TwitterUser>>> ReadAsCursoredUsersAsync(HttpResponseMessage response)
         {
-            return ReadAsCursoredAsync(response, d => new TwitterUser(d));
+            return ReadAsCursoredAsync(response, json => json.users, d => new TwitterUser(d));
         }
 
         private static async Task<ICursorResult<IEnumerable<T>>> ReadAsCursoredAsync<T>(
-                    HttpResponseMessage response, Func<dynamic, T> instantiator)
+                    HttpResponseMessage response, Func<dynamic, dynamic> selector, Func<dynamic, T> instantiator)
         {
             return await Task.Run(async () =>
             {
                 var json = await response.ReadAsStringAsync().ConfigureAwait(false);
                 var parsed = DynamicJson.Parse(json);
-                var converteds = ((dynamic[])parsed.users)
-                    .Select(d => (T)instantiator(d));
+                var converteds = ((dynamic[])selector(parsed)).Select(d => (T)instantiator(d));
                 return new CursorResult<IEnumerable<T>>(converteds,
                     parsed.previous_cursor_str, parsed.next_cursor_str);
             }).ConfigureAwait(false);

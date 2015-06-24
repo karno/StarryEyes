@@ -118,7 +118,8 @@ namespace StarryEyes.Models.Receiving.Receivers
             this._stateUpdater.UpdateState("@" + _account.UnreliableScreenName + ": " +
                                            ReceivingResources.UserStreamReconnecting);
             this.CleanupConnection();
-            Task.Run(() => this._currentConnection.Add(this.ConnectCore()));
+            _currentConnection.Add(this.ConnectCore());
+            this._stateUpdater.UpdateState();
         }
 
         private void Disconnect()
@@ -170,6 +171,7 @@ namespace StarryEyes.Models.Receiving.Receivers
             }, cancellation.Token).ConfigureAwait(false);
             return Disposable.Create(() =>
             {
+                Log("disconnected(caused by disposing connection).");
                 cancellation.Cancel();
                 cancellation.Dispose();
             });
