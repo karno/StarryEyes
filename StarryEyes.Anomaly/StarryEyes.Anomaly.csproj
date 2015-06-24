@@ -90,6 +90,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Artery\ArteryEngine.cs" />
+    <Compile Include="Artery\Internals\AnonymousReceiveManager.cs" />
+    <Compile Include="Artery\Internals\UserReceiveManager.cs" />
+    <Compile Include="Artery\ReceiveManager.cs" />
+    <Compile Include="Artery\Receivers\ReceiverBase.cs" />
     <Compile Include="Core.cs" />
     <Compile Include="Ext\BearerMessageHandler.cs" />
     <Compile Include="Imaging\ImageResolver.cs" />
