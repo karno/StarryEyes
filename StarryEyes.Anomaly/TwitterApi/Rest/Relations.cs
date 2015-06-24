@@ -13,7 +13,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
     {
         #region friends/ids
 
-        public static Task<ICursorResult<IEnumerable<long>>> GetFriendsIdsAsync(
+        public static Task<IApiResult<ICursorResult<IEnumerable<long>>>> GetFriendsIdsAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             [CanBeNull] UserParameter nullableTargetUser, long? cursor = null, int? count = null)
         {
@@ -22,7 +22,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return credential.GetFriendsIdsAsync(properties, nullableTargetUser, cursor, count, CancellationToken.None);
         }
 
-        public static async Task<ICursorResult<IEnumerable<long>>> GetFriendsIdsAsync(
+        public static async Task<IApiResult<ICursorResult<IEnumerable<long>>>> GetFriendsIdsAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             [CanBeNull] UserParameter nullableTargetUser, long? cursor, int? count, CancellationToken cancellationToken)
         {
@@ -41,7 +41,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region followers/ids
 
-        public static Task<ICursorResult<IEnumerable<long>>> GetFollowersIdsAsync(
+        public static Task<IApiResult<ICursorResult<IEnumerable<long>>>> GetFollowersIdsAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             [CanBeNull] UserParameter nullableTargetUser, long? cursor = null, int? count = null)
         {
@@ -50,7 +50,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return credential.GetFollowersIdsAsync(properties, nullableTargetUser, cursor, count, CancellationToken.None);
         }
 
-        public static async Task<ICursorResult<IEnumerable<long>>> GetFollowersIdsAsync(
+        public static async Task<IApiResult<ICursorResult<IEnumerable<long>>>> GetFollowersIdsAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             [CanBeNull] UserParameter nullableTargetUser, long? cursor, int? count, CancellationToken cancellationToken)
         {
@@ -69,7 +69,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region friendships/no_retweets/ids
 
-        public static Task<IEnumerable<long>> GetNoRetweetsIdsAsync(
+        public static Task<IApiResult<IEnumerable<long>>> GetNoRetweetsIdsAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties)
         {
             if (credential == null) throw new ArgumentNullException("credential");
@@ -77,7 +77,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return credential.GetNoRetweetsIdsAsync(properties, CancellationToken.None);
         }
 
-        public static async Task<IEnumerable<long>> GetNoRetweetsIdsAsync(
+        public static async Task<IApiResult<IEnumerable<long>>> GetNoRetweetsIdsAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             CancellationToken cancellationToken)
         {
@@ -91,7 +91,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region mutes/users/ids
 
-        public static Task<ICursorResult<IEnumerable<long>>> GetMuteIdsAsync(
+        public static Task<IApiResult<ICursorResult<IEnumerable<long>>>> GetMuteIdsAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             long? cursor = null)
         {
@@ -100,7 +100,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return credential.GetMuteIdsAsync(properties, cursor, CancellationToken.None);
         }
 
-        public static async Task<ICursorResult<IEnumerable<long>>> GetMuteIdsAsync(
+        public static async Task<IApiResult<ICursorResult<IEnumerable<long>>>> GetMuteIdsAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             long? cursor, CancellationToken cancellationToken)
         {
@@ -118,7 +118,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region friendships/create
 
-        public static Task<TwitterUser> CreateFriendshipAsync(
+        public static Task<IApiResult<TwitterUser>> CreateFriendshipAsync(
             [NotNull] this IOAuthCredential credential, IApiAccessProperties properties,
             [NotNull] UserParameter targetUser)
         {
@@ -127,7 +127,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return credential.CreateFriendshipAsync(properties, targetUser, CancellationToken.None);
         }
 
-        public static async Task<TwitterUser> CreateFriendshipAsync(
+        public static async Task<IApiResult<TwitterUser>> CreateFriendshipAsync(
             [NotNull] this IOAuthCredential credential, IApiAccessProperties properties,
             [NotNull] UserParameter targetUser, CancellationToken cancellationToken)
         {
@@ -141,7 +141,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region friendships/destroy
 
-        public static Task<TwitterUser> DestroyFriendshipAsync(
+        public static Task<IApiResult<TwitterUser>> DestroyFriendshipAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             [NotNull] UserParameter targetUser)
         {
@@ -151,7 +151,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return credential.DestroyFriendshipAsync(properties, targetUser, CancellationToken.None);
         }
 
-        public static async Task<TwitterUser> DestroyFriendshipAsync(
+        public static async Task<IApiResult<TwitterUser>> DestroyFriendshipAsync(
             [NotNull] this IOAuthCredential credential, IApiAccessProperties properties,
             [NotNull] UserParameter targetUser, CancellationToken cancellationToken)
         {
@@ -165,7 +165,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region friendships/show
 
-        public static Task<TwitterFriendship> ShowFriendshipAsync(
+        public static Task<IApiResult<TwitterFriendship>> ShowFriendshipAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             [NotNull] UserParameter sourceUser, [NotNull] UserParameter targetUser)
         {
@@ -176,7 +176,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return credential.ShowFriendshipAsync(properties, sourceUser, targetUser, CancellationToken.None);
         }
 
-        public static async Task<TwitterFriendship> ShowFriendshipAsync(
+        public static async Task<IApiResult<TwitterFriendship>> ShowFriendshipAsync(
             [NotNull] this IOAuthCredential credential, IApiAccessProperties properties,
             [NotNull] UserParameter sourceUser, [NotNull] UserParameter targetUser, CancellationToken cancellationToken)
         {
@@ -194,7 +194,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region friendships/update
 
-        public static Task<TwitterFriendship> UpdateFriendshipAsync(
+        public static Task<IApiResult<TwitterFriendship>> UpdateFriendshipAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             [NotNull] UserParameter screenName, bool? enableDeviceNotifications, bool? showRetweet)
         {
@@ -206,7 +206,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
                 CancellationToken.None);
         }
 
-        public static async Task<TwitterFriendship> UpdateFriendshipAsync(
+        public static async Task<IApiResult<TwitterFriendship>> UpdateFriendshipAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             [NotNull] UserParameter screenName, bool? enableDeviceNotifications, bool? showRetweet,
             CancellationToken cancellationToken)
@@ -228,7 +228,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region mutes/users/[create|destroy]
 
-        public static Task<TwitterUser> UpdateMuteAsync(
+        public static Task<IApiResult<TwitterUser>> UpdateMuteAsync(
             [NotNull] this IOAuthCredential credential, IApiAccessProperties properties,
             [NotNull] UserParameter targetUser, bool mute)
         {
@@ -237,7 +237,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return credential.UpdateMuteAsync(properties, targetUser, mute, CancellationToken.None);
         }
 
-        public static async Task<TwitterUser> UpdateMuteAsync(
+        public static async Task<IApiResult<TwitterUser>> UpdateMuteAsync(
             [NotNull] this IOAuthCredential credential, IApiAccessProperties properties,
             [NotNull] UserParameter targetUser, bool mute, CancellationToken cancellationToken)
         {

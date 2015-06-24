@@ -13,7 +13,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
     {
         #region statuses/home_timeline
 
-        public static Task<IEnumerable<TwitterStatus>> GetHomeTimelineAsync(
+        public static Task<IApiResult<IEnumerable<TwitterStatus>>> GetHomeTimelineAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             int? count = null, long? sinceId = null, long? maxId = null)
         {
@@ -22,7 +22,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return credential.GetHomeTimelineAsync(properties, count, sinceId, maxId, CancellationToken.None);
         }
 
-        public static async Task<IEnumerable<TwitterStatus>> GetHomeTimelineAsync(
+        public static async Task<IApiResult<IEnumerable<TwitterStatus>>> GetHomeTimelineAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             int? count, long? sinceId, long? maxId, CancellationToken cancellationToken)
         {
@@ -42,7 +42,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region statuses/user_timeline
 
-        public static Task<IEnumerable<TwitterStatus>> GetUserTimelineAsync(
+        public static Task<IApiResult<IEnumerable<TwitterStatus>>> GetUserTimelineAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             [NotNull] UserParameter targetUser, int? count = null, long? sinceId = null, long? maxId = null,
             bool? excludeReplies = null, bool? includeRetweets = null)
@@ -55,7 +55,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
                 CancellationToken.None);
         }
 
-        public static async Task<IEnumerable<TwitterStatus>> GetUserTimelineAsync(
+        public static async Task<IApiResult<IEnumerable<TwitterStatus>>> GetUserTimelineAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             [NotNull] UserParameter targetUser, int? count, long? sinceId, long? maxId,
             bool? excludeReplies, bool? includeRetweets, CancellationToken cancellationToken)
@@ -79,7 +79,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region statuses/mentions_timeline
 
-        public static Task<IEnumerable<TwitterStatus>> GetMentionsAsync(
+        public static Task<IApiResult<IEnumerable<TwitterStatus>>> GetMentionsAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             int? count = null, long? sinceId = null, long? maxId = null, bool? includeRetweets = null)
         {
@@ -89,7 +89,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
                 includeRetweets, CancellationToken.None);
         }
 
-        public static async Task<IEnumerable<TwitterStatus>> GetMentionsAsync(
+        public static async Task<IApiResult<IEnumerable<TwitterStatus>>> GetMentionsAsync(
             [NotNull] this IOAuthCredential credential, IApiAccessProperties properties,
             int? count, long? sinceId, long? maxId, bool? includeRetweets,
             CancellationToken cancellationToken)
@@ -110,7 +110,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region statuses/retweets_of_me
 
-        public static Task<IEnumerable<TwitterStatus>> GetRetweetsOfMeAsync(
+        public static Task<IApiResult<IEnumerable<TwitterStatus>>> GetRetweetsOfMeAsync(
             [NotNull] this IOAuthCredential credential, IApiAccessProperties properties,
             int? count = null, long? sinceId = null, long? maxId = null)
         {
@@ -119,7 +119,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return credential.GetRetweetsOfMeAsync(properties, count, sinceId, maxId, CancellationToken.None);
         }
 
-        public static async Task<IEnumerable<TwitterStatus>> GetRetweetsOfMeAsync(
+        public static async Task<IApiResult<IEnumerable<TwitterStatus>>> GetRetweetsOfMeAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             int? count, long? sinceId, long? maxId, CancellationToken cancellationToken)
         {

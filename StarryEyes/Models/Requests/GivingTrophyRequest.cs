@@ -19,11 +19,11 @@ namespace StarryEyes.Models.Requests
         }
 
 #pragma warning disable 1998
-        public override async Task<bool> Send(TwitterAccount account)
+        public override async Task<IApiResult<bool>> Send(TwitterAccount account)
 #pragma warning restore 1998
         {
             // not implemented yet.
-            return false;
+            return null;
         }
     }
 }

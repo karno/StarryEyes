@@ -13,7 +13,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
     {
         #region favorites/list
 
-        public static Task<IEnumerable<TwitterStatus>> GetFavoritesAsync(
+        public static Task<IApiResult<IEnumerable<TwitterStatus>>> GetFavoritesAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             [CanBeNull] UserParameter targetUser, int? count = null, long? sinceId = null, long? maxId = null)
         {
@@ -21,7 +21,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return credential.GetFavoritesAsync(properties, targetUser, count, sinceId, maxId, CancellationToken.None);
         }
 
-        public static async Task<IEnumerable<TwitterStatus>> GetFavoritesAsync(
+        public static async Task<IApiResult<IEnumerable<TwitterStatus>>> GetFavoritesAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             [CanBeNull] UserParameter targetUser, int? count, long? sinceId, long? maxId,
             CancellationToken cancellationToken)
@@ -42,7 +42,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region favorites/create
 
-        public static Task<TwitterStatus> CreateFavoriteAsync(
+        public static Task<IApiResult<TwitterStatus>> CreateFavoriteAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties, long id)
         {
             if (credential == null) throw new ArgumentNullException("credential");
@@ -50,7 +50,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return credential.CreateFavoriteAsync(properties, id, CancellationToken.None);
         }
 
-        public static async Task<TwitterStatus> CreateFavoriteAsync(
+        public static async Task<IApiResult<TwitterStatus>> CreateFavoriteAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             long id, CancellationToken cancellationToken)
         {
@@ -68,14 +68,14 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region favorites/destroy
 
-        public static Task<TwitterStatus> DestroyFavoriteAsync(
+        public static Task<IApiResult<TwitterStatus>> DestroyFavoriteAsync(
             [NotNull] this IOAuthCredential credential, IApiAccessProperties properties, long id)
         {
             if (credential == null) throw new ArgumentNullException("credential");
             return credential.DestroyFavoriteAsync(properties, id, CancellationToken.None);
         }
 
-        public static async Task<TwitterStatus> DestroyFavoriteAsync(
+        public static async Task<IApiResult<TwitterStatus>> DestroyFavoriteAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             long id, CancellationToken cancellationToken)
         {

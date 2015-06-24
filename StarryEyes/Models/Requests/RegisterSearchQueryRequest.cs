@@ -15,7 +15,7 @@ namespace StarryEyes.Models.Requests
             _query = query;
         }
 
-        public override Task<TwitterSavedSearch> Send(TwitterAccount account)
+        public override Task<IApiResult<TwitterSavedSearch>> Send(TwitterAccount account)
         {
             return account.SaveSearchAsync(ApiAccessProperties.Default, _query);
         }

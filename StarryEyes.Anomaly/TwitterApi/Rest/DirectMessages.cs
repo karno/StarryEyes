@@ -13,7 +13,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
     {
         #region direct_messages
 
-        public static Task<IEnumerable<TwitterStatus>> GetDirectMessagesAsync(
+        public static Task<IApiResult<IEnumerable<TwitterStatus>>> GetDirectMessagesAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             int? count = null, long? sinceId = null, long? maxId = null)
         {
@@ -21,7 +21,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return credential.GetDirectMessagesAsync(properties, count, sinceId, maxId, CancellationToken.None);
         }
 
-        public static async Task<IEnumerable<TwitterStatus>> GetDirectMessagesAsync(
+        public static async Task<IApiResult<IEnumerable<TwitterStatus>>> GetDirectMessagesAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             int? count, long? sinceId, long? maxId, CancellationToken cancellationToken)
         {
@@ -41,7 +41,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region direct_messages/sent
 
-        public static Task<IEnumerable<TwitterStatus>> GetSentDirectMessagesAsync(
+        public static Task<IApiResult<IEnumerable<TwitterStatus>>> GetSentDirectMessagesAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             int? count = null, long? sinceId = null, long? maxId = null, int? page = null)
         {
@@ -49,7 +49,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return credential.GetSentDirectMessagesAsync(properties, count, sinceId, maxId, page, CancellationToken.None);
         }
 
-        public static async Task<IEnumerable<TwitterStatus>> GetSentDirectMessagesAsync(
+        public static async Task<IApiResult<IEnumerable<TwitterStatus>>> GetSentDirectMessagesAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             int? count, long? sinceId, long? maxId, int? page, CancellationToken cancellationToken)
         {
@@ -70,7 +70,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region direct_messages/show
 
-        public static Task<TwitterStatus> ShowDirectMessageAsync(
+        public static Task<IApiResult<TwitterStatus>> ShowDirectMessageAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties, long id)
         {
             if (properties == null) throw new ArgumentNullException("properties");
@@ -78,7 +78,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
         }
 
 
-        public static async Task<TwitterStatus> ShowDirectMessageAsync(
+        public static async Task<IApiResult<TwitterStatus>> ShowDirectMessageAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             long id, CancellationToken cancellationToken)
         {
@@ -96,7 +96,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region direct_messages/new
 
-        public static Task<TwitterStatus> SendDirectMessageAsync(
+        public static Task<IApiResult<TwitterStatus>> SendDirectMessageAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             [NotNull] UserParameter recipient, [NotNull] string text)
         {
@@ -104,7 +104,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return credential.SendDirectMessageAsync(properties, recipient, text, CancellationToken.None);
         }
 
-        public static async Task<TwitterStatus> SendDirectMessageAsync(
+        public static async Task<IApiResult<TwitterStatus>> SendDirectMessageAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             [NotNull] UserParameter recipient, [NotNull] string text,
             CancellationToken cancellationToken)
@@ -125,14 +125,14 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region direct_messages/destroy
 
-        public static Task<TwitterStatus> DestroyDirectMessageAsync(
+        public static Task<IApiResult<TwitterStatus>> DestroyDirectMessageAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties, long id)
         {
             if (properties == null) throw new ArgumentNullException("properties");
             return credential.DestroyDirectMessageAsync(properties, id, CancellationToken.None);
         }
 
-        public static async Task<TwitterStatus> DestroyDirectMessageAsync(
+        public static async Task<IApiResult<TwitterStatus>> DestroyDirectMessageAsync(
             [NotNull] this IOAuthCredential credential, IApiAccessProperties properties, long id,
             CancellationToken cancellationToken)
         {

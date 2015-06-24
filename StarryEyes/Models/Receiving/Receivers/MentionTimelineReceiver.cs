@@ -31,7 +31,7 @@ namespace StarryEyes.Models.Receiving.Receivers
 
         protected override async Task DoReceive()
         {
-            (await this._account.GetMentionsAsync(ApiAccessProperties.Default, 100))
+            (await this._account.GetMentionsAsync(ApiAccessProperties.Default, 100)).Result
                 .ForEach(StatusInbox.Enqueue);
         }
     }

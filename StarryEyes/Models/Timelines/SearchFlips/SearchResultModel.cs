@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using System.Threading;
 using StarryEyes.Anomaly.TwitterApi;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
@@ -136,7 +137,10 @@ namespace StarryEyes.Models.Timelines.SearchFlips
                 var param = new SearchParameter(this._query, maxId: maxId, count: count,
                     lang: String.IsNullOrWhiteSpace(Setting.SearchLanguage.Value) ? null : Setting.SearchLanguage.Value,
                     locale: String.IsNullOrWhiteSpace(Setting.SearchLocale.Value) ? null : Setting.SearchLocale.Value);
-                return acc.SearchAsync(ApiAccessProperties.Default, param).ToObservable().Do(StatusInbox.Enqueue);
+                return acc.SearchAsync(ApiAccessProperties.Default, param)
+                          .ToObservable()
+                          .SelectMany(s => s.Result)
+                          .Do(StatusInbox.Enqueue);
             }
             return StatusProxy.FetchStatuses(this._filterFunc, this._filterSql, maxId, count)
                               .ToObservable()

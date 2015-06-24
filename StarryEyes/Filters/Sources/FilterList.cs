@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Linq;
+using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using StarryEyes.Anomaly.TwitterApi;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
-using StarryEyes.Anomaly.Utils;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Receiving;
 using StarryEyes.Settings;
@@ -86,7 +87,7 @@ namespace StarryEyes.Filters.Sources
         {
             return this.GetAccount()
                        .GetListTimelineAsync(ApiAccessProperties.Default, _listInfo.ToListParameter(), maxId: maxId)
-                       .ToObservable();
+                       .ToObservable().SelectMany(s => s.Result);
         }
 
         private TwitterAccount GetAccount()

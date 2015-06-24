@@ -13,7 +13,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
     {
         #region account/verify_credentials
 
-        public static Task<TwitterUser> VerifyCredentialAsync(
+        public static Task<IApiResult<TwitterUser>> VerifyCredentialAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties)
         {
             if (credential == null) throw new ArgumentNullException("credential");
@@ -21,7 +21,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return credential.VerifyCredentialAsync(properties, CancellationToken.None);
         }
 
-        public static async Task<TwitterUser> VerifyCredentialAsync(
+        public static async Task<IApiResult<TwitterUser>> VerifyCredentialAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             CancellationToken cancellationToken)
         {
@@ -40,7 +40,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region account/update_profile
 
-        public static Task<TwitterUser> UpdateProfileAsync(
+        public static Task<IApiResult<TwitterUser>> UpdateProfileAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             [CanBeNull] string name = null, [CanBeNull] string url = null, [CanBeNull] string location = null,
             [CanBeNull] string description = null)
@@ -51,7 +51,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
                 CancellationToken.None);
         }
 
-        public static async Task<TwitterUser> UpdateProfileAsync(
+        public static async Task<IApiResult<TwitterUser>> UpdateProfileAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             [CanBeNull] string name, [CanBeNull] string url, [CanBeNull] string location, [CanBeNull] string description,
             CancellationToken cancellationToken)
@@ -74,7 +74,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region account/update_profile_image
 
-        public static Task<TwitterUser> UpdateProfileImageAsync(
+        public static Task<IApiResult<TwitterUser>> UpdateProfileImageAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             [NotNull] byte[] image)
         {
@@ -84,7 +84,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return credential.UpdateProfileImageAsync(properties, image, CancellationToken.None);
         }
 
-        public static async Task<TwitterUser> UpdateProfileImageAsync(
+        public static async Task<IApiResult<TwitterUser>> UpdateProfileImageAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             [NotNull] byte[] image, CancellationToken cancellationToken)
         {

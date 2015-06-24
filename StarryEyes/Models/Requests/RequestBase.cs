@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models.Accounting;
 
 namespace StarryEyes.Models.Requests
@@ -23,6 +24,6 @@ namespace StarryEyes.Models.Requests
         /// Send request.
         /// </summary>
         /// <returns></returns>
-        public abstract Task<T> Send(TwitterAccount account);
+        public abstract Task<IApiResult<T>> Send(TwitterAccount account);
     }
 }

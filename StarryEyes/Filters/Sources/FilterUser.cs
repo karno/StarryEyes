@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using StarryEyes.Anomaly.TwitterApi;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Anomaly.TwitterApi.Rest.Parameters;
-using StarryEyes.Anomaly.Utils;
 using StarryEyes.Globalization.Filters;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Settings;
@@ -66,11 +66,12 @@ namespace StarryEyes.Filters.Sources
                 ? new UserParameter(Int64.Parse(_targetIdOrScreenName.Substring(1)))
                 : new UserParameter(_targetIdOrScreenName);
 
-            Func<TwitterAccount, Task<IEnumerable<TwitterStatus>>> uif =
+            Func<TwitterAccount, Task<IApiResult<IEnumerable<TwitterStatus>>>> uif =
                 a => a.GetUserTimelineAsync(ApiAccessProperties.Default, parameter);
             return Observable.Start(() => Setting.Accounts.GetRandomOne())
                              .Where(a => a != null)
-                             .SelectMany(a => uif(a).ToObservable());
+                             .SelectMany(a => uif(a).ToObservable())
+                             .SelectMany(a => a.Result);
         }
     }
 }

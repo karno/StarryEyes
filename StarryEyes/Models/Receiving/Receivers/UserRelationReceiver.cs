@@ -6,7 +6,6 @@ using StarryEyes.Anomaly.TwitterApi;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Anomaly.TwitterApi.Rest.Parameters;
-using StarryEyes.Anomaly.Utils;
 using StarryEyes.Globalization;
 using StarryEyes.Globalization.Models;
 using StarryEyes.Models.Accounting;
@@ -51,7 +50,7 @@ namespace StarryEyes.Models.Receiving.Receivers
                     .Do(newFollowers.Add),
                 _account.RetrieveAllCursor((a, c) => a.GetBlockingsIdsAsync(ApiAccessProperties.Default, c))
                     .Do(newBlockings.Add),
-                _account.GetNoRetweetsIdsAsync(ApiAccessProperties.Default).ToObservable()
+                _account.GetNoRetweetsIdsAsync(ApiAccessProperties.Default).ToObservable().SelectMany(s => s.Result)
                     .Do(newNoRetweets.Add),
                 _account.RetrieveAllCursor((c, i) => c.GetMuteIdsAsync(ApiAccessProperties.Default, i))
                     .Do(newMutes.Add)

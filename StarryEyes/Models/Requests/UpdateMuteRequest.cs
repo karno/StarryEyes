@@ -23,7 +23,7 @@ namespace StarryEyes.Models.Requests
             this._mute = mute;
         }
 
-        public override Task<TwitterUser> Send(TwitterAccount account)
+        public override Task<IApiResult<TwitterUser>> Send(TwitterAccount account)
         {
             return account.UpdateMuteAsync(ApiAccessProperties.Default,
                 new UserParameter(_userId), _mute);

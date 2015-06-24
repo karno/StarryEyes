@@ -110,7 +110,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 var page = Interlocked.Increment(ref _currentPageCount);
                 try
                 {
-                    var result = await account.SearchUserAsync(ApiAccessProperties.Default, this.Query, count: 100, page: page);
+                    var result = (await account.SearchUserAsync(ApiAccessProperties.Default, this.Query, count: 100, page: page)).Result;
                     var twitterUsers = result as TwitterUser[] ?? result.ToArray();
                     if (!twitterUsers.Any())
                     {

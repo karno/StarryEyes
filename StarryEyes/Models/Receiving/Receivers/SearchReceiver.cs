@@ -47,7 +47,7 @@ namespace StarryEyes.Models.Receiving.Receivers
             var param = new SearchParameter(_query,
                 lang: String.IsNullOrWhiteSpace(Setting.SearchLanguage.Value) ? null : Setting.SearchLanguage.Value,
                 locale: String.IsNullOrWhiteSpace(Setting.SearchLocale.Value) ? null : Setting.SearchLocale.Value);
-            (await account.SearchAsync(ApiAccessProperties.Default, param))
+            (await account.SearchAsync(ApiAccessProperties.Default, param)).Result
                 .Do(s =>
                 {
                     lock (_receiveCaches)

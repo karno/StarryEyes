@@ -93,7 +93,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             try
             {
                 var searches = await aid.GetSavedSearchesAsync(ApiAccessProperties.Default);
-                searches.ForEach(s => this._searchCandidates.Add(
+                searches.Result.ForEach(s => this._searchCandidates.Add(
                     new SearchCandidateItemViewModel(this, aid, s.Id, s.Query)));
             }
             catch (Exception ex)

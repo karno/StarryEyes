@@ -15,7 +15,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
     {
         #region users/lookup
 
-        public static Task<IEnumerable<TwitterUser>> LookupUserAsync(
+        public static Task<IApiResult<IEnumerable<TwitterUser>>> LookupUserAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             [NotNull] IEnumerable<long> userIds)
         {
@@ -25,7 +25,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return credential.LookupUserAsync(properties, userIds, CancellationToken.None);
         }
 
-        public static Task<IEnumerable<TwitterUser>> LookupUserAsync(
+        public static Task<IApiResult<IEnumerable<TwitterUser>>> LookupUserAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             [NotNull] IEnumerable<string> screenNames)
         {
@@ -35,7 +35,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return credential.LookupUserAsync(properties, screenNames, CancellationToken.None);
         }
 
-        public static Task<IEnumerable<TwitterUser>> LookupUserAsync(
+        public static Task<IApiResult<IEnumerable<TwitterUser>>> LookupUserAsync(
             [NotNull] this IOAuthCredential credential, IApiAccessProperties properties,
             [NotNull] IEnumerable<long> userIds, CancellationToken cancellationToken)
         {
@@ -44,7 +44,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return LookupUserCoreAsync(credential, properties, userIds, null, cancellationToken);
         }
 
-        public static Task<IEnumerable<TwitterUser>> LookupUserAsync(
+        public static Task<IApiResult<IEnumerable<TwitterUser>>> LookupUserAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             [NotNull] IEnumerable<string> screenNames, CancellationToken cancellationToken)
         {
@@ -54,7 +54,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return LookupUserCoreAsync(credential, properties, null, screenNames, cancellationToken);
         }
 
-        private static async Task<IEnumerable<TwitterUser>> LookupUserCoreAsync(
+        private static async Task<IApiResult<IEnumerable<TwitterUser>>> LookupUserCoreAsync(
             [NotNull] IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             IEnumerable<long> userIds, IEnumerable<string> screenNames, CancellationToken cancellationToken)
         {
@@ -77,7 +77,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region users/search
 
-        public static Task<IEnumerable<TwitterUser>> SearchUserAsync(
+        public static Task<IApiResult<IEnumerable<TwitterUser>>> SearchUserAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             [NotNull] string query, int? page = null, int? count = null)
         {
@@ -87,7 +87,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return credential.SearchUserAsync(properties, query, page, count, CancellationToken.None);
         }
 
-        public static async Task<IEnumerable<TwitterUser>> SearchUserAsync(
+        public static async Task<IApiResult<IEnumerable<TwitterUser>>> SearchUserAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             [NotNull] string query, int? page, int? count, CancellationToken cancellationToken)
         {
@@ -108,7 +108,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region users/show
 
-        public static Task<TwitterUser> ShowUserAsync(
+        public static Task<IApiResult<TwitterUser>> ShowUserAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             [NotNull] UserParameter parameter)
         {
@@ -118,7 +118,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return credential.ShowUserAsync(properties, parameter, CancellationToken.None);
         }
 
-        public static async Task<TwitterUser> ShowUserAsync(
+        public static async Task<IApiResult<TwitterUser>> ShowUserAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             [NotNull] UserParameter parameter, CancellationToken cancellationToken)
         {

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using StarryEyes.Albireo.Collections;
 using StarryEyes.Anomaly.TwitterApi;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Anomaly.TwitterApi.Rest.Parameters;
-using StarryEyes.Anomaly.Utils;
 using StarryEyes.Models.Receiving;
 using StarryEyes.Settings;
 
@@ -52,6 +52,7 @@ namespace StarryEyes.Filters.Sources
                              .Where(a => a != null)
                              .SelectMany(a => a.SearchAsync(ApiAccessProperties.Default, param)
                                                .ToObservable())
+                             .SelectMany(s => s.Result)
                              .Do(s =>
                              {
                                  lock (_acceptIds)

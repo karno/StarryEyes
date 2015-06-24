@@ -28,7 +28,7 @@ namespace StarryEyes.Models.Requests
             _add = add;
         }
 
-        public override async Task<TwitterStatus> Send(TwitterAccount account)
+        public override async Task<IApiResult<TwitterStatus>> Send(TwitterAccount account)
         {
             var acc = account;
             do

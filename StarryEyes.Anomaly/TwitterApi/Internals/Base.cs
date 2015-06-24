@@ -4,13 +4,14 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
+using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.Utils;
 
 namespace StarryEyes.Anomaly.TwitterApi.Internals
 {
     internal static class Base
     {
-        public static async Task<T> PostAsync<T>([NotNull] this IOAuthCredential credential,
+        public static async Task<IApiResult<T>> PostAsync<T>([NotNull] this IOAuthCredential credential,
            [NotNull] IApiAccessProperties properties, [NotNull] string path,
            [NotNull] HttpContent content, [NotNull] Func<HttpResponseMessage, Task<T>> converter,
            CancellationToken cancellationToken)
@@ -24,11 +25,11 @@ namespace StarryEyes.Anomaly.TwitterApi.Internals
             using (var resp = await client.PostAsync(properties, path, content,
                 cancellationToken).ConfigureAwait(false))
             {
-                return await converter(resp).ConfigureAwait(false);
+                return await converter(resp).ToApiResult(resp).ConfigureAwait(false);
             }
         }
 
-        public static async Task<T> PostAsync<T>([NotNull] this IOAuthCredential credential,
+        public static async Task<IApiResult<T>> PostAsync<T>([NotNull] this IOAuthCredential credential,
            [NotNull] IApiAccessProperties properties, [NotNull] string path,
            [NotNull] Dictionary<string, object> parameter,
            [NotNull] Func<HttpResponseMessage, Task<T>> converter,
@@ -43,11 +44,11 @@ namespace StarryEyes.Anomaly.TwitterApi.Internals
             using (var resp = await client.PostAsync(properties, path, parameter,
                 cancellationToken).ConfigureAwait(false))
             {
-                return await converter(resp).ConfigureAwait(false);
+                return await converter(resp).ToApiResult(resp).ConfigureAwait(false);
             }
         }
 
-        public static async Task<T> GetAsync<T>([NotNull] this IOAuthCredential credential,
+        public static async Task<IApiResult<T>> GetAsync<T>([NotNull] this IOAuthCredential credential,
            [NotNull] IApiAccessProperties properties, [NotNull] string path,
            [NotNull] Dictionary<string, object> parameter,
            [NotNull] Func<HttpResponseMessage, Task<T>> converter,
@@ -61,8 +62,16 @@ namespace StarryEyes.Anomaly.TwitterApi.Internals
             using (var resp = await client.GetAsync(properties, path, parameter,
                 cancellationToken).ConfigureAwait(false))
             {
-                return await converter(resp).ConfigureAwait(false);
+                return await converter(resp).ToApiResult(resp).ConfigureAwait(false);
             }
+        }
+
+        private static async Task<IApiResult<T>> ToApiResult<T>([NotNull] this Task<T> result,
+            [NotNull] HttpResponseMessage msg)
+        {
+            if (result == null) throw new ArgumentNullException("result");
+            if (msg == null) throw new ArgumentNullException("msg");
+            return ApiResult.Create(await result.ConfigureAwait(false), msg);
         }
 
         private static Task<HttpResponseMessage> GetAsync([NotNull] this HttpClient client,

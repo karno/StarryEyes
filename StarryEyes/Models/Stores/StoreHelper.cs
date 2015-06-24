@@ -23,7 +23,7 @@ namespace StarryEyes.Models.Stores
             {
                 var acc = Setting.Accounts.GetRandomOne();
                 if (acc == null) return null;
-                status = await acc.ShowTweetAsync(ApiAccessProperties.Default, id);
+                status = (await acc.ShowTweetAsync(ApiAccessProperties.Default, id)).Result;
                 StatusInbox.Enqueue(status);
             }
             return status;
@@ -36,7 +36,7 @@ namespace StarryEyes.Models.Stores
             {
                 var acc = Setting.Accounts.GetRelatedOne(id);
                 if (acc == null) return null;
-                user = await acc.ShowUserAsync(ApiAccessProperties.Default, new UserParameter(id));
+                user = (await acc.ShowUserAsync(ApiAccessProperties.Default, new UserParameter(id))).Result;
                 UserProxy.StoreUser(user);
             }
             return user;
@@ -49,7 +49,7 @@ namespace StarryEyes.Models.Stores
             {
                 var acc = Setting.Accounts.GetRandomOne();
                 if (acc == null) return null;
-                user = await acc.ShowUserAsync(ApiAccessProperties.Default, new UserParameter(screenName));
+                user = (await acc.ShowUserAsync(ApiAccessProperties.Default, new UserParameter(screenName))).Result;
                 UserProxy.StoreUser(user);
             }
             return user;
@@ -65,7 +65,7 @@ namespace StarryEyes.Models.Stores
                 var acc = Setting.Accounts.GetRelatedOne(id);
                 if (acc != null)
                 {
-                    var user = await acc.ShowUserAsync(ApiAccessProperties.Default, new UserParameter(id));
+                    var user = (await acc.ShowUserAsync(ApiAccessProperties.Default, new UserParameter(id))).Result;
                     UserProxy.StoreUser(user);
                     users.Add(user);
                 }

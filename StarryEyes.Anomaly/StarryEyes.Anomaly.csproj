@@ -94,6 +94,7 @@
     <Compile Include="Ext\BearerMessageHandler.cs" />
     <Compile Include="Imaging\ImageResolver.cs" />
     <Compile Include="OAuthCredentialExtension.cs" />
+    <Compile Include="TwitterApi\DataModels\IApiResult.cs" />
     <Compile Include="TwitterApi\DataModels\StreamModels\StreamDisconnect.cs" />
     <Compile Include="TwitterApi\DataModels\TwitterActivity.cs" />
     <Compile Include="TwitterApi\DataModels\TwitterConfiguration.cs" />
@@ -107,6 +108,7 @@
     <Compile Include="Ext\OAuthEchoMessageHandler.cs" />
     <Compile Include="IOAuthCredential.cs" />
     <Compile Include="TwitterApi\ApiAccessProperties.cs" />
+    <Compile Include="TwitterApi\Internals\ApiResult.cs" />
     <Compile Include="TwitterApi\Rest\Accounts.cs" />
     <Compile Include="TwitterApi\Internals\Base.cs" />
     <Compile Include="TwitterApi\Rest\Blockings.cs" />

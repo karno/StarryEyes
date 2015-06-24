@@ -36,7 +36,7 @@ namespace StarryEyes.Models.Receiving.Receivers
         protected override async Task DoReceive()
         {
             (await this._account.GetUserTimelineAsync(ApiAccessProperties.Default,
-                new UserParameter(_account.Id), 100, includeRetweets: true))
+                new UserParameter(_account.Id), 100, includeRetweets: true)).Result
                 .ForEach(StatusInbox.Enqueue);
         }
     }

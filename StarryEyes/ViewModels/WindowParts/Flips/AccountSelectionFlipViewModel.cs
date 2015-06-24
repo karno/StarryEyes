@@ -128,8 +128,8 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                     {
                         try
                         {
-                            var user = await this._account.ShowUserAsync(ApiAccessProperties.Default,
-                                        new UserParameter(this._account.Id));
+                            var user = (await this._account.ShowUserAsync(ApiAccessProperties.Default,
+                                        new UserParameter(this._account.Id))).Result;
                             this._account.UnreliableProfileImage = user.ProfileImageUri.ChangeImageSize(ImageSize.Original);
                             this.RaisePropertyChanged(() => ProfileImageUri);
                         }

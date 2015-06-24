@@ -16,7 +16,7 @@ namespace StarryEyes.Models.Requests
 
         public string DescriptionText { get; set; }
 
-        public override Task<TwitterUser> Send(TwitterAccount account)
+        public override Task<IApiResult<TwitterUser>> Send(TwitterAccount account)
         {
             return account.UpdateProfileAsync(ApiAccessProperties.Default, Name, Url, Location, DescriptionText);
         }

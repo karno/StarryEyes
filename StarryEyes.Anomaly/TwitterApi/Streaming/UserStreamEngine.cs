@@ -10,6 +10,9 @@ using StarryEyes.Anomaly.Utils;
 
 namespace StarryEyes.Anomaly.TwitterApi.Streaming
 {
+    /// <summary>
+    /// Streaming Engine Handler
+    /// </summary>
     internal static class UserStreamEngine
     {
         public static async Task Run([NotNull] Stream stream, [NotNull] IStreamHandler handler,
@@ -44,14 +47,14 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
                         if (String.IsNullOrWhiteSpace(line)) continue;
 
                         // read operation completed successfully
-                        Task.Run(() => DispatchStreamingElements(line, handler), cancellationToken)
+                        Task.Run(() => ParseStreamLine(line, handler), cancellationToken)
                             .ConfigureAwait(false);
                     }
                 }
             }
         }
 
-        private static void DispatchStreamingElements(string line, IStreamHandler handler)
+        private static void ParseStreamLine(string line, IStreamHandler handler)
         {
             var type = "initialize";
             try

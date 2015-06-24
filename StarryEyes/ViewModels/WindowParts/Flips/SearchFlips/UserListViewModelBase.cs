@@ -119,7 +119,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 {
                     var users = await info.LookupUserAsync(ApiAccessProperties.Default, ids);
                     await DispatcherHelper.UIDispatcher.InvokeAsync(
-                        () => users.ForEach(u => Users.Add(new UserResultItemViewModel(u))));
+                        () => users.Result.ForEach(u => Users.Add(new UserResultItemViewModel(u))));
                     this.IsLoading = false;
                 }
                 catch (Exception ex)

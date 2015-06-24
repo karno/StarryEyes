@@ -28,7 +28,7 @@ namespace StarryEyes.Models.Requests
             this._createRetweet = createRetweet;
         }
 
-        public override async Task<TwitterStatus> Send(TwitterAccount account)
+        public override async Task<IApiResult<TwitterStatus>> Send(TwitterAccount account)
         {
             // ReSharper disable RedundantIfElseBlock
             if (_createRetweet)
@@ -60,7 +60,7 @@ namespace StarryEyes.Models.Requests
                             }
                         }
                     }
-                    var id = await acc.GetMyRetweetIdOfStatusAsync(ApiAccessProperties.Default, _id);
+                    var id = (await acc.GetMyRetweetIdOfStatusAsync(ApiAccessProperties.Default, _id)).Result;
                     if (id.HasValue)
                     {
                         // already retweeted.
@@ -73,7 +73,7 @@ namespace StarryEyes.Models.Requests
             else
             {
                 // get retweet id
-                var id = await account.GetMyRetweetIdOfStatusAsync(ApiAccessProperties.Default, _id);
+                var id = (await account.GetMyRetweetIdOfStatusAsync(ApiAccessProperties.Default, _id)).Result;
                 if (!id.HasValue)
                 {
                     // retweet is not existed.

@@ -65,7 +65,7 @@ namespace StarryEyes.Models.Receiving.Receivers
 
         private async Task<TwitterList> ReceiveListDescription(TwitterAccount account, ListInfo info)
         {
-            return await account.ShowListAsync(ApiAccessProperties.Default, info.ToListParameter());
+            return (await account.ShowListAsync(ApiAccessProperties.Default, info.ToListParameter())).Result;
         }
 
         private async Task<IEnumerable<long>> ReceiveListMembers(TwitterAccount account, long listId)
@@ -75,10 +75,10 @@ namespace StarryEyes.Models.Receiving.Receivers
             do
             {
                 var result = await account.GetListMembersAsync(ApiAccessProperties.Default, new ListParameter(listId), cursor);
-                memberList.AddRange(result.Result
+                memberList.AddRange(result.Result.Result
                           .Do(u => Task.Run(() => UserProxy.StoreUser(u)))
                           .Select(u => u.Id));
-                cursor = result.NextCursor;
+                cursor = result.Result.NextCursor;
             } while (cursor != 0);
             return memberList;
         }

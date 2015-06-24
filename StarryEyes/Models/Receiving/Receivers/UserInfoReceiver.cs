@@ -32,8 +32,8 @@ namespace StarryEyes.Models.Receiving.Receivers
 
         protected override async Task DoReceive()
         {
-            var user = await this._account.ShowUserAsync(ApiAccessProperties.Default,
-                new UserParameter(this._account.Id));
+            var user = (await this._account.ShowUserAsync(ApiAccessProperties.Default,
+                new UserParameter(this._account.Id))).Result;
             this._account.UnreliableScreenName = user.ScreenName;
             this._account.UnreliableProfileImage = user.ProfileImageUri.ChangeImageSize(ImageSize.Original);
             UserProxy.StoreUser(user);

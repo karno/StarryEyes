@@ -47,7 +47,7 @@ namespace StarryEyes.Models.Requests
             _attachedImages = attachedImages == null ? null : attachedImages.ToArray();
         }
 
-        public override async Task<TwitterStatus> Send(TwitterAccount account)
+        public override async Task<IApiResult<TwitterStatus>> Send(TwitterAccount account)
         {
             var latlong = _geoInfo == null ? null : Tuple.Create(_geoInfo.Latitude, _geoInfo.Longitude);
             Exception thrown;
@@ -66,7 +66,7 @@ namespace StarryEyes.Models.Requests
                         var ids = new List<long>();
                         foreach (var img in _attachedImages)
                         {
-                            ids.Add(await acc.UploadMediaAsync(ApiAccessProperties.DefaultForUpload, img));
+                            ids.Add((await acc.UploadMediaAsync(ApiAccessProperties.DefaultForUpload, img)).Result);
                         }
                         param.MediaIds = ids.ToArray();
                     }

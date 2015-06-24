@@ -13,7 +13,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
     {
         #region search/tweets
 
-        public static Task<IEnumerable<TwitterStatus>> SearchAsync(
+        public static Task<IApiResult<IEnumerable<TwitterStatus>>> SearchAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             [NotNull] SearchParameter query)
         {
@@ -24,7 +24,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return credential.SearchAsync(properties, query, CancellationToken.None);
         }
 
-        public static async Task<IEnumerable<TwitterStatus>> SearchAsync(
+        public static async Task<IApiResult<IEnumerable<TwitterStatus>>> SearchAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             [NotNull] SearchParameter query, CancellationToken cancellationToken)
         {
@@ -40,7 +40,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region saved_searches/list
 
-        public static Task<IEnumerable<TwitterSavedSearch>> GetSavedSearchesAsync(
+        public static Task<IApiResult<IEnumerable<TwitterSavedSearch>>> GetSavedSearchesAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties)
         {
             if (credential == null) throw new ArgumentNullException("credential");
@@ -48,7 +48,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return credential.GetSavedSearchesAsync(properties, CancellationToken.None);
         }
 
-        public static async Task<IEnumerable<TwitterSavedSearch>> GetSavedSearchesAsync(
+        public static async Task<IApiResult<IEnumerable<TwitterSavedSearch>>> GetSavedSearchesAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             CancellationToken cancellationToken)
         {
@@ -62,7 +62,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region saved_searches/create
 
-        public static Task<TwitterSavedSearch> SaveSearchAsync(
+        public static Task<IApiResult<TwitterSavedSearch>> SaveSearchAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties, [NotNull] string query)
         {
             if (credential == null) throw new ArgumentNullException("credential");
@@ -72,7 +72,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         }
 
-        public static async Task<TwitterSavedSearch> SaveSearchAsync(
+        public static async Task<IApiResult<TwitterSavedSearch>> SaveSearchAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             [NotNull] string query, CancellationToken cancellationToken)
         {
@@ -91,7 +91,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region saved_searches/destroy
 
-        public static Task<TwitterSavedSearch> DestroySavedSearchAsync(
+        public static Task<IApiResult<TwitterSavedSearch>> DestroySavedSearchAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties, long id)
         {
             if (credential == null) throw new ArgumentNullException("credential");
@@ -99,7 +99,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return credential.DestroySavedSearchAsync(properties, id, CancellationToken.None);
         }
 
-        public static async Task<TwitterSavedSearch> DestroySavedSearchAsync(
+        public static async Task<IApiResult<TwitterSavedSearch>> DestroySavedSearchAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             long id, CancellationToken cancellationToken)
         {

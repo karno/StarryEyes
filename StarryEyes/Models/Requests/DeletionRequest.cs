@@ -22,7 +22,7 @@ namespace StarryEyes.Models.Requests
             _type = type;
         }
 
-        public override Task<TwitterStatus> Send(TwitterAccount account)
+        public override Task<IApiResult<TwitterStatus>> Send(TwitterAccount account)
         {
             return this._type == StatusType.Tweet
                        ? account.DestroyAsync(ApiAccessProperties.Default, this._id)

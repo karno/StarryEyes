@@ -23,7 +23,7 @@ namespace StarryEyes.Models.Requests
             _text = text;
         }
 
-        public override Task<TwitterStatus> Send(TwitterAccount account)
+        public override Task<IApiResult<TwitterStatus>> Send(TwitterAccount account)
         {
             return account.SendDirectMessageAsync(ApiAccessProperties.Default, new UserParameter(_id), _text);
         }

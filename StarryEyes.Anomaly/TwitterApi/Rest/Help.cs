@@ -10,7 +10,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 {
     public static class Help
     {
-        public static Task<TwitterConfiguration> GetConfigurationAsync(
+        public static Task<IApiResult<TwitterConfiguration>> GetConfigurationAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties)
         {
             if (credential == null) throw new ArgumentNullException("credential");
@@ -18,7 +18,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return credential.GetConfigurationAsync(properties, CancellationToken.None);
         }
 
-        public static async Task<TwitterConfiguration> GetConfigurationAsync(
+        public static async Task<IApiResult<TwitterConfiguration>> GetConfigurationAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             CancellationToken cancellationToken)
         {

@@ -21,9 +21,9 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             get { return SearchFlipResources.MsgUserFollowers; }
         }
 
-        protected override Task<ICursorResult<IEnumerable<long>>> GetUsersApiImpl(TwitterAccount info, long id, long cursor)
+        protected override async Task<ICursorResult<IEnumerable<long>>> GetUsersApiImpl(TwitterAccount info, long id, long cursor)
         {
-            return info.GetFollowersIdsAsync(ApiAccessProperties.Default, new UserParameter(id), cursor);
+            return (await info.GetFollowersIdsAsync(ApiAccessProperties.Default, new UserParameter(id), cursor)).Result;
         }
     }
 }

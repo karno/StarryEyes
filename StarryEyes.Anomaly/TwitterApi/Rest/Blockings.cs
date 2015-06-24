@@ -13,7 +13,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
     {
         #region blocks/ids
 
-        public static Task<ICursorResult<IEnumerable<long>>> GetBlockingsIdsAsync(
+        public static Task<IApiResult<ICursorResult<IEnumerable<long>>>> GetBlockingsIdsAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             long cursor)
         {
@@ -22,7 +22,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return credential.GetBlockingsIdsAsync(properties, cursor, CancellationToken.None);
         }
 
-        public static async Task<ICursorResult<IEnumerable<long>>> GetBlockingsIdsAsync(
+        public static async Task<IApiResult<ICursorResult<IEnumerable<long>>>> GetBlockingsIdsAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             long cursor, CancellationToken cancellationToken)
         {
@@ -37,7 +37,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region blocks/create
 
-        public static Task<TwitterUser> CreateBlockAsync(
+        public static Task<IApiResult<TwitterUser>> CreateBlockAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             [NotNull] UserParameter targetUser)
         {
@@ -47,7 +47,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return credential.CreateBlockAsync(properties, targetUser, CancellationToken.None);
         }
 
-        public static async Task<TwitterUser> CreateBlockAsync(
+        public static async Task<IApiResult<TwitterUser>> CreateBlockAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             [NotNull] UserParameter targetUser,
             CancellationToken cancellationToken)
@@ -63,7 +63,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region blocks/destroy
 
-        public static Task<TwitterUser> DestroyBlockAsync(
+        public static Task<IApiResult<TwitterUser>> DestroyBlockAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             [NotNull] UserParameter targetUser)
         {
@@ -73,7 +73,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return credential.DestroyBlockAsync(properties, targetUser, CancellationToken.None);
         }
 
-        public static async Task<TwitterUser> DestroyBlockAsync(
+        public static async Task<IApiResult<TwitterUser>> DestroyBlockAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             [NotNull] UserParameter targetUser,
             CancellationToken cancellationToken)
@@ -89,7 +89,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region users/report_spam
 
-        public static Task<TwitterUser> ReportSpamAsync(
+        public static Task<IApiResult<TwitterUser>> ReportSpamAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             [NotNull] UserParameter targetUser)
         {
@@ -99,7 +99,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return credential.ReportSpamAsync(properties, targetUser, CancellationToken.None);
         }
 
-        public static async Task<TwitterUser> ReportSpamAsync(
+        public static async Task<IApiResult<TwitterUser>> ReportSpamAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             [NotNull] UserParameter targetUser, CancellationToken cancellationToken)
         {

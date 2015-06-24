@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using StarryEyes.Anomaly.TwitterApi;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Anomaly.TwitterApi.Rest.Parameters;
-using StarryEyes.Anomaly.Utils;
 using StarryEyes.Settings;
 
 namespace StarryEyes.Models.Timelines.SearchFlips
@@ -36,10 +37,11 @@ namespace StarryEyes.Models.Timelines.SearchFlips
             switch (_type)
             {
                 case TimelineType.User:
-                    return account.GetUserTimelineAsync(ApiAccessProperties.Default, new UserParameter(_userId), count, maxId: maxId, includeRetweets: true)
-                                  .ToObservable();
+                    return account.GetUserTimelineAsync(ApiAccessProperties.Default, new UserParameter(_userId), count,
+                            maxId: maxId, includeRetweets: true).ToObservable().SelectMany(s => s.Result);
                 case TimelineType.Favorites:
-                    return account.GetFavoritesAsync(ApiAccessProperties.Default, new UserParameter(_userId), count, maxId: maxId).ToObservable();
+                    return account.GetFavoritesAsync(ApiAccessProperties.Default, new UserParameter(_userId), count,
+                            maxId: maxId).ToObservable().SelectMany(s => s.Result);
                 default:
                     throw new ArgumentOutOfRangeException();
             }

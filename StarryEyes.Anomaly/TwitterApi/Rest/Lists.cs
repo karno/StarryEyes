@@ -13,7 +13,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
     {
         #region lists/show
 
-        public static Task<TwitterList> ShowListAsync(
+        public static Task<IApiResult<TwitterList>> ShowListAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             [NotNull] ListParameter targetList)
         {
@@ -23,7 +23,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return credential.ShowListAsync(properties, targetList, CancellationToken.None);
         }
 
-        public static async Task<TwitterList> ShowListAsync(
+        public static async Task<IApiResult<TwitterList>> ShowListAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             [NotNull] ListParameter targetList, CancellationToken cancellationToken)
         {
@@ -37,7 +37,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region lists/list
 
-        public static Task<IEnumerable<TwitterList>> GetListsAsync(
+        public static Task<IApiResult<IEnumerable<TwitterList>>> GetListsAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             [NotNull] ListParameter targetList)
         {
@@ -46,7 +46,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return credential.GetListsAsync(properties, targetList, CancellationToken.None);
         }
 
-        public static async Task<IEnumerable<TwitterList>> GetListsAsync(
+        public static async Task<IApiResult<IEnumerable<TwitterList>>> GetListsAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             [NotNull] ListParameter targetList, CancellationToken cancellationToken)
         {
@@ -61,7 +61,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region lists/statuses
 
-        public static Task<IEnumerable<TwitterStatus>> GetListTimelineAsync(
+        public static Task<IApiResult<IEnumerable<TwitterStatus>>> GetListTimelineAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             [NotNull] ListParameter listTarget, long? sinceId = null, long? maxId = null,
             int? count = null, bool? includeRts = null)
@@ -72,7 +72,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
                 CancellationToken.None);
         }
 
-        public static async Task<IEnumerable<TwitterStatus>> GetListTimelineAsync(
+        public static async Task<IApiResult<IEnumerable<TwitterStatus>>> GetListTimelineAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             [NotNull] ListParameter listTarget, long? sinceId, long? maxId, int? count, bool? includeRts,
             CancellationToken cancellationToken)
@@ -94,7 +94,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region Memberships
 
-        public static Task<ICursorResult<IEnumerable<TwitterUser>>> GetListMembersAsync(
+        public static Task<IApiResult<ICursorResult<IEnumerable<TwitterUser>>>> GetListMembersAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             [NotNull] ListParameter targetList, long? cursor = null)
         {
@@ -104,7 +104,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return credential.GetListMembersAsync(properties, targetList, cursor, CancellationToken.None);
         }
 
-        public static async Task<ICursorResult<IEnumerable<TwitterUser>>> GetListMembersAsync(
+        public static async Task<IApiResult<ICursorResult<IEnumerable<TwitterUser>>>> GetListMembersAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             [NotNull] ListParameter targetList, long? cursor, CancellationToken cancellationToken)
         {

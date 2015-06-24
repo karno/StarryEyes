@@ -15,7 +15,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
     {
         #region statuses/show
 
-        public static Task<long?> GetMyRetweetIdOfStatusAsync(
+        public static Task<IApiResult<long?>> GetMyRetweetIdOfStatusAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties, long id)
         {
             if (credential == null) throw new ArgumentNullException("credential");
@@ -24,7 +24,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
         }
 
 
-        public static async Task<long?> GetMyRetweetIdOfStatusAsync(
+        public static async Task<IApiResult<long?>> GetMyRetweetIdOfStatusAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             long id, CancellationToken cancellationToken)
         {
@@ -35,19 +35,20 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
                 {"id", id},
                 {"include_my_retweet", true}
             };
-            return await credential.GetAsync(properties, "statuses/show.json", param, async resp =>
-            {
-                var json = await resp.ReadAsStringAsync().ConfigureAwait(false);
-                var graph = DynamicJson.Parse(json);
-                return ((bool)graph.current_user_retweet()) ? Int64.Parse(graph.current_user_retweet.id_str) : null;
-            }, cancellationToken).ConfigureAwait(false);
+            return await credential.GetAsync(properties, "statuses/show.json", param,
+                (Func<HttpResponseMessage, Task<long?>>)(async resp =>
+                {
+                    var json = await resp.ReadAsStringAsync().ConfigureAwait(false);
+                    var graph = DynamicJson.Parse(json);
+                    return ((bool)graph.current_user_retweet()) ? Int64.Parse(graph.current_user_retweet.id_str) : null;
+                }), cancellationToken).ConfigureAwait(false);
         }
 
         #endregion
 
         #region statuses/retweets/:id
 
-        public static Task<IEnumerable<TwitterUser>> GetRetweetsAsync(
+        public static Task<IApiResult<IEnumerable<TwitterUser>>> GetRetweetsAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             long id, int? count = null)
         {
@@ -56,7 +57,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return credential.GetRetweetsAsync(properties, id, count, CancellationToken.None);
         }
 
-        public static async Task<IEnumerable<TwitterUser>> GetRetweetsAsync(
+        public static async Task<IApiResult<IEnumerable<TwitterUser>>> GetRetweetsAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             long id, int? count, CancellationToken cancellationToken)
         {
@@ -71,7 +72,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region retweeter/ids
 
-        public static Task<ICursorResult<IEnumerable<long>>> GetRetweeterIdsAsync(
+        public static Task<IApiResult<ICursorResult<IEnumerable<long>>>> GetRetweeterIdsAsync(
             this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             long id, long cursor = -1)
         {
@@ -80,7 +81,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return credential.GetRetweeterIdsAsync(properties, id, cursor, CancellationToken.None);
         }
 
-        public static async Task<ICursorResult<IEnumerable<long>>> GetRetweeterIdsAsync(
+        public static async Task<IApiResult<ICursorResult<IEnumerable<long>>>> GetRetweeterIdsAsync(
             this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             long id, long cursor, CancellationToken cancellationToken)
         {
@@ -99,7 +100,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region statuses/show
 
-        public static Task<TwitterStatus> ShowTweetAsync(
+        public static Task<IApiResult<TwitterStatus>> ShowTweetAsync(
             [NotNull] this IOAuthCredential credential, IApiAccessProperties properties, long id)
         {
             if (credential == null) throw new ArgumentNullException("credential");
@@ -107,7 +108,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
         }
 
 
-        public static async Task<TwitterStatus> ShowTweetAsync(
+        public static async Task<IApiResult<TwitterStatus>> ShowTweetAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             long id, CancellationToken cancellationToken)
         {
@@ -125,7 +126,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region statuses/update
 
-        public static Task<TwitterStatus> UpdateAsync(
+        public static Task<IApiResult<TwitterStatus>> UpdateAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             [NotNull] StatusParameter status)
         {
@@ -135,7 +136,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return credential.UpdateAsync(properties, status, CancellationToken.None);
         }
 
-        public static async Task<TwitterStatus> UpdateAsync(
+        public static async Task<IApiResult<TwitterStatus>> UpdateAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             [NotNull] StatusParameter status, CancellationToken cancellationToken)
         {
@@ -150,7 +151,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region media/upload
 
-        public static Task<long> UploadMediaAsync([NotNull] this IOAuthCredential credential,
+        public static Task<IApiResult<dynamic>> UploadMediaAsync([NotNull] this IOAuthCredential credential,
             [NotNull] IApiAccessProperties properties, [NotNull] byte[] image)
         {
             if (credential == null) throw new ArgumentNullException("credential");
@@ -160,7 +161,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
         }
 
 
-        public static async Task<long> UploadMediaAsync([NotNull] this IOAuthCredential credential,
+        public static async Task<IApiResult<dynamic>> UploadMediaAsync([NotNull] this IOAuthCredential credential,
             [NotNull] IApiAccessProperties properties, [NotNull] byte[] image, CancellationToken cancellationToken)
         {
             if (credential == null) throw new ArgumentNullException("credential");
@@ -182,7 +183,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region statuses/destroy/:id
 
-        public static Task<TwitterStatus> DestroyAsync([NotNull] this IOAuthCredential credential,
+        public static Task<IApiResult<TwitterStatus>> DestroyAsync([NotNull] this IOAuthCredential credential,
             [NotNull] IApiAccessProperties properties, long id)
         {
             if (credential == null) throw new ArgumentNullException("credential");
@@ -191,7 +192,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
         }
 
 
-        public static async Task<TwitterStatus> DestroyAsync([NotNull] this IOAuthCredential credential,
+        public static async Task<IApiResult<TwitterStatus>> DestroyAsync([NotNull] this IOAuthCredential credential,
             [NotNull] IApiAccessProperties properties, long id, CancellationToken cancellationToken)
         {
             if (credential == null) throw new ArgumentNullException("credential");
@@ -205,7 +206,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         #region statuses/retweet/:id
 
-        public static Task<TwitterStatus> RetweetAsync(
+        public static Task<IApiResult<TwitterStatus>> RetweetAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties, long id)
         {
             if (credential == null) throw new ArgumentNullException("credential");
@@ -213,7 +214,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return credential.RetweetAsync(properties, id, CancellationToken.None);
         }
 
-        public static async Task<TwitterStatus> RetweetAsync(
+        public static async Task<IApiResult<TwitterStatus>> RetweetAsync(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
             long id, CancellationToken cancellationToken)
         {

@@ -25,7 +25,7 @@ namespace StarryEyes.Models.Requests
             _showRetweets = showRetweets;
         }
 
-        public override Task<TwitterFriendship> Send(TwitterAccount account)
+        public override Task<IApiResult<TwitterFriendship>> Send(TwitterAccount account)
         {
             return account.UpdateFriendshipAsync(ApiAccessProperties.Default,
                 new UserParameter(_userId), _deviceNotifications, _showRetweets);

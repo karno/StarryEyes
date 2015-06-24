@@ -35,9 +35,9 @@ namespace StarryEyes.Models.Receiving.Receivers
         protected override async Task DoReceive()
         {
             await Task.WhenAll(
-                Task.Run(async () => (await this._account.GetDirectMessagesAsync(ApiAccessProperties.Default, 50))
+                Task.Run(async () => (await this._account.GetDirectMessagesAsync(ApiAccessProperties.Default, 50)).Result
                     .ForEach(StatusInbox.Enqueue)),
-                Task.Run(async () => (await this._account.GetSentDirectMessagesAsync(ApiAccessProperties.Default, count: 50))
+                Task.Run(async () => (await this._account.GetSentDirectMessagesAsync(ApiAccessProperties.Default, count: 50)).Result
                     .ForEach(StatusInbox.Enqueue)));
         }
     }

@@ -24,7 +24,7 @@ namespace StarryEyes.Models.Requests
             _kind = kind;
         }
 
-        public override Task<TwitterUser> Send(TwitterAccount account)
+        public override Task<IApiResult<TwitterUser>> Send(TwitterAccount account)
         {
             switch (_kind)
             {

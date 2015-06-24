@@ -28,7 +28,7 @@ namespace StarryEyes.Models.Requests
                 {
                     try
                     {
-                        return await request.Send(account);
+                        return (await request.Send(account)).Result;
                     }
                     catch (WebException ex)
                     {
@@ -65,7 +65,7 @@ namespace StarryEyes.Models.Requests
                 {
                     try
                     {
-                        var result = await request.Send(account);
+                        var result = (await request.Send(account)).Result;
                         Task.Run(() =>
                         {
                             subject.OnNext(result);

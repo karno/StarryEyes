@@ -2,10 +2,10 @@
 using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using StarryEyes.Anomaly.TwitterApi;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
-using StarryEyes.Anomaly.Utils;
 
 namespace StarryEyes.Filters.Sources
 {
@@ -39,7 +39,10 @@ namespace StarryEyes.Filters.Sources
         protected override IObservable<TwitterStatus> ReceiveSink(long? maxId)
         {
             return Observable.Defer(() => GetAccountsFromString(_screenName).ToObservable())
-                .SelectMany(a => a.GetDirectMessagesAsync(ApiAccessProperties.Default, count: 50, maxId: maxId).ToObservable());
+                             .SelectMany(
+                                 a => a.GetDirectMessagesAsync(ApiAccessProperties.Default, count: 50, maxId: maxId)
+                                       .ToObservable())
+                             .SelectMany(s => s.Result);
         }
 
         public override string FilterKey
