@@ -58,9 +58,9 @@ namespace StarryEyes.Models.Databases
             // extracting retweeted status
             var store = statuses.SelectMany(s =>
             {
-                if (s.RetweetedOriginal != null)
+                if (s.RetweetedStatus != null)
                 {
-                    return new[] { s.RetweetedOriginal, s };
+                    return new[] { s.RetweetedStatus, s };
                 }
                 return new[] { s };
             }).Select(s => StatusInsertBatch.CreateBatch(Mapper.Map(s), Mapper.Map(s.User)));
@@ -138,7 +138,7 @@ namespace StarryEyes.Models.Databases
                 var rts = await DatabaseUtil.RetryIfLocked(
                     async () => await Database.StatusCrud.GetRetweetedStatusesAsync(originalId));
                 return rts.Select(r => r.Id)
-                          .Concat(_statusQueue.Find(s => s.RetweetedOriginalId == originalId)
+                          .Concat(_statusQueue.Find(s => s.RetweetedStatusId == originalId)
                                               .Select(s => s.Id));
             }
             catch (Exception ex)

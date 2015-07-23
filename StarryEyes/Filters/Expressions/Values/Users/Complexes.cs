@@ -54,7 +54,7 @@ namespace StarryEyes.Filters.Expressions.Values.Users
 
         public override Func<TwitterStatus, long> GetNumericValueProvider()
         {
-            return _ => _.RetweetedOriginal != null ? _.User.Id : -1;
+            return _ => _.RetweetedStatus != null ? _.User.Id : -1;
         }
 
         public override string GetNumericSqlQuery()
@@ -64,7 +64,7 @@ namespace StarryEyes.Filters.Expressions.Values.Users
 
         public override Func<TwitterStatus, string> GetStringValueProvider()
         {
-            return _ => _.RetweetedOriginal != null ? _.User.ScreenName : String.Empty;
+            return _ => _.RetweetedStatus != null ? _.User.ScreenName : String.Empty;
         }
 
         public override string GetStringSqlQuery()

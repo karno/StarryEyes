@@ -126,19 +126,19 @@ namespace StarryEyes.Models.Receiving
             if (status == null) throw new ArgumentNullException("status");
             if (_muteBlockedUsers &&
                 (IsBlocked(status.User) ||
-                 (status.RetweetedOriginal != null && IsBlocked(status.RetweetedOriginal.User))))
+                 (status.RetweetedStatus != null && IsBlocked(status.RetweetedStatus.User))))
             {
                 // blocked user
                 return true;
             }
             if (_muteOfficialMutes &&
                 (IsOfficialMuted(status.User) ||
-                 (status.RetweetedOriginal != null && IsOfficialMuted(status.RetweetedOriginal.User))))
+                 (status.RetweetedStatus != null && IsOfficialMuted(status.RetweetedStatus.User))))
             {
                 // official muted user
                 return true;
             }
-            if (status.RetweetedOriginal != null &&
+            if (status.RetweetedStatus != null &&
                 _muteNoRetweets && IsNoRetweet(status.User))
             {
                 // no retweet specified

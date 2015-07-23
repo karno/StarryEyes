@@ -16,14 +16,14 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
 
         public TwitterStatus([NotNull] TwitterUser user, [NotNull] string text)
         {
-            this.GenerateFromJson = false;
+            this.GeneratedFromJson = false;
             this.User = user;
             this.Text = text;
         }
 
         public TwitterStatus(dynamic json)
         {
-            this.GenerateFromJson = true;
+            this.GeneratedFromJson = true;
             this.Id = ((string)json.id_str).ParseLong();
             this.CreatedAt = ((string)json.created_at).ParseDateTime(ParsingExtension.TwitterDateTimeFormat);
             this.Text = ParsingExtension.ResolveEntity(json.text);
@@ -72,12 +72,18 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
                 }
                 if (json.retweeted_status())
                 {
-                    var original = new TwitterStatus(json.retweeted_status);
-                    this.RetweetedOriginal = original;
-                    this.RetweetedOriginalId = original.Id;
+                    var retweeted = new TwitterStatus(json.retweeted_status);
+                    this.RetweetedStatus = retweeted;
+                    this.RetweetedStatusId = retweeted.Id;
                     // merge text and entities
-                    this.Text = original.Text;
-                    this.Entities = original.Entities.Guard().ToArray();
+                    this.Text = retweeted.Text;
+                    this.Entities = retweeted.Entities.Guard().ToArray();
+                }
+                if (json.quoted_status())
+                {
+                    var quoted = new TwitterStatus(json.quoted_status);
+                    this.QuotedStatus = quoted;
+                    this.QuotedStatusId = quoted.Id;
                 }
                 if (json.coordinates() && json.coordinates != null)
                 {
@@ -87,36 +93,36 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
             }
         }
 
-        public bool GenerateFromJson { get; private set; }
+        public bool GeneratedFromJson { get; private set; }
 
         /// <summary>
-        /// Numerical ID of this tweet/message.
+        /// Sequential ID of this tweet/message.
         /// </summary>
         public long Id { get; set; }
 
         /// <summary>
-        /// Type whether this status is tweet or message.
+        /// The flag indicated whether this status is a tweet or a message.
         /// </summary>
         public StatusType StatusType { get; set; }
 
         /// <summary>
-        /// User of this tweet/message.
+        /// Author of this tweet/message.
         /// </summary>
         [NotNull]
         public TwitterUser User { get; private set; }
 
         /// <summary>
-        /// Body of this tweet/message. Escape sequences are already resolved.
+        /// Body of this tweet/message. Escape characters are already resolved.
         /// </summary>
         [NotNull]
         public string Text { get; private set; }
 
         /// <summary>
-        /// Created at of this tweet/message.
+        /// Created timestamp of this tweet/message.
         /// </summary>
         public DateTime CreatedAt { get; set; }
 
-        #region Status property
+        #region Property for statuses
 
         /// <summary>
         /// Source of this tweet. (a.k.a. via, from, ...)
@@ -125,45 +131,55 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
         public string Source { get; set; }
 
         /// <summary>
-        /// Status ID which replied this tweet.
+        /// Status ID that is replied from this tweet.
         /// </summary>
         public long? InReplyToStatusId { get; set; }
 
         /// <summary>
-        /// User ID which replied this tweet.
+        /// User ID that is replied from this tweet.
         /// </summary>
         public long? InReplyToUserId { get; set; }
 
         /// <summary>
-        /// User screen name which replied this tweet.
+        /// User screen name that is replied from this tweet.
         /// </summary>
         [CanBeNull]
         public string InReplyToScreenName { get; set; }
 
         /// <summary>
-        /// Tweet Id which retweeted as this.
-        /// </summary>
-        public long? RetweetedOriginalId { get; set; }
-
-        /// <summary>
-        /// Geographic point, represents longitude.
-        /// </summary>
-        public double? Longitude { get; set; }
-
-        /// <summary>
-        /// Geographic point, represents latitude.
+        /// Latitude of geographic point that is associated with this status.
         /// </summary>
         public double? Latitude { get; set; }
 
         /// <summary>
-        /// Status which represents original of this(retweeted) tweet
+        /// Longitude of geographic point that is associated with this status.
+        /// </summary>
+        public double? Longitude { get; set; }
+
+        /// <summary>
+        /// The id of the status that is retweeted by this status
+        /// </summary>
+        public long? RetweetedStatusId { get; set; }
+
+        /// <summary>
+        /// The status that is retweeted by this status
         /// </summary>
         [CanBeNull]
-        public TwitterStatus RetweetedOriginal { get; set; }
+        public TwitterStatus RetweetedStatus { get; set; }
 
+        /// <summary>
+        /// The id of the status that is quoted by this status
+        /// </summary>
+        public long? QuotedStatusId { get; set; }
+
+        /// <summary>
+        /// The status that is quoted by this status
+        /// </summary>
+        [CanBeNull]
+        public TwitterStatus QuotedStatus { get; set; }
         #endregion
 
-        #region Direct messages property
+        #region Properties for direct messages
 
         /// <summary>
         /// Recipient of this message. (ONLY FOR DIRECT MESSAGE)
@@ -173,7 +189,7 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
 
         #endregion
 
-        #region Activity Controller
+        #region Properties for additional information
 
         /// <summary>
         /// Favorited users IDs.
@@ -190,17 +206,23 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
         #endregion
 
         /// <summary>
-        /// Entities of this tweet
+        /// Entity objects of this tweet
         /// </summary>
         [CanBeNull]
         public TwitterEntity[] Entities { get; set; }
 
+        /// <summary>
+        /// Web URL for accessing this status
+        /// </summary>
         [NotNull]
         public string Permalink
         {
             get { return String.Format(TwitterStatusUrl, User.ScreenName, Id); }
         }
 
+        /// <summary>
+        /// Favstar URL for accessing this status
+        /// </summary>
         [NotNull]
         public string FavstarPermalink
         {
@@ -218,6 +240,11 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
         }
         // ReSharper restore InconsistentNaming
 
+        /// <summary>
+        /// Get entity-applied text
+        /// </summary>
+        /// <param name="displayMode">switch of replacer text</param>
+        /// <returns></returns>
         [NotNull]
         public string GetEntityAidedText(EntityDisplayMode displayMode = EntityDisplayMode.DisplayText)
         {
@@ -225,10 +252,10 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
             {
                 var builder = new StringBuilder();
                 var status = this;
-                if (status.RetweetedOriginal != null)
+                if (status.RetweetedStatus != null)
                 {
                     // change target
-                    status = status.RetweetedOriginal;
+                    status = status.RetweetedStatus;
                 }
                 foreach (var description in TextEntityResolver.ParseText(status))
                 {
@@ -292,9 +319,8 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
         }
 
         /// <summary>
-        /// Represent tweet with format: &quot;@user: text&quot;
+        /// Get formatted tweet: &quot;@user: text&quot;
         /// </summary>
-        /// <returns></returns>
         public override string ToString()
         {
             return "@" + User.ScreenName + ": " + this.GetEntityAidedText();

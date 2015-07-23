@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace StarryEyes.Anomaly.TwitterApi.Streaming
 {
-    public sealed class CancellableStreamReader : IDisposable
+    internal sealed class CancellableStreamReader : IDisposable
     {
         private const int BufferLength = 1024;
 

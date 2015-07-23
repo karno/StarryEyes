@@ -73,14 +73,14 @@ namespace StarryEyes.Models.Databases
         public static Tuple<DatabaseStatus, StatusEnts> Map([NotNull] TwitterStatus status)
         {
             if (status == null) throw new ArgumentNullException("status");
-            var orig = status.RetweetedOriginal ?? status;
+            var orig = status.RetweetedStatus ?? status;
             var dbs = new DatabaseStatus
             {
                 CreatedAt = status.CreatedAt,
                 Id = status.Id,
-                BaseId = status.RetweetedOriginalId ?? status.Id,
-                RetweetId = status.RetweetedOriginal != null ? status.Id : (long?)null,
-                RetweetOriginalId = status.RetweetedOriginalId,
+                BaseId = status.RetweetedStatusId ?? status.Id,
+                RetweetId = status.RetweetedStatus != null ? status.Id : (long?)null,
+                RetweetOriginalId = status.RetweetedStatusId,
                 InReplyToOrRecipientScreenName = status.Recipient != null ? status.Recipient.ScreenName : status.InReplyToScreenName,
                 InReplyToStatusId = orig.InReplyToStatusId,
                 InReplyToOrRecipientUserId = status.Recipient != null ? status.Recipient.Id : orig.InReplyToUserId,
@@ -93,8 +93,8 @@ namespace StarryEyes.Models.Databases
                 Text = status.Text,
                 UserId = status.User.Id,
                 BaseUserId = orig.User.Id,
-                RetweeterId = status.RetweetedOriginal != null ? status.User.Id : (long?)null,
-                RetweetOriginalUserId = status.RetweetedOriginal != null ? status.RetweetedOriginal.User.Id : (long?)null
+                RetweeterId = status.RetweetedStatus != null ? status.User.Id : (long?)null,
+                RetweetOriginalUserId = status.RetweetedStatus != null ? status.RetweetedStatus.User.Id : (long?)null
             };
             var ent = status.Entities.Guard().Select(e => Map<DatabaseStatusEntity>(status.Id, e));
             return Tuple.Create(dbs, ent);
@@ -235,8 +235,8 @@ namespace StarryEyes.Models.Databases
                 InReplyToUserId = status.InReplyToOrRecipientUserId,
                 Latitude = status.Latitude,
                 Longitude = status.Longitude,
-                RetweetedOriginal = originalStatus,
-                RetweetedOriginalId = originalStatus.Id,
+                RetweetedStatus = originalStatus,
+                RetweetedStatusId = originalStatus.Id,
                 RetweetedUsers = retweeters.Guard().ToArray(),
                 Source = status.Source,
                 StatusType = StatusType.Tweet,

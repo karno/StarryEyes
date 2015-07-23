@@ -113,7 +113,7 @@ namespace StarryEyes.Models.Subsystems.Notifications.UI
                     type = NotificationType.Normal;
                 }
 
-                if (status.RetweetedOriginal != null && CheckMyself(status.RetweetedOriginal))
+                if (status.RetweetedStatus != null && CheckMyself(status.RetweetedStatus))
                 {
                     // suppress status which retweets our tweet
                     // -> notify as "our status is retweeted"

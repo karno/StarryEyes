@@ -52,6 +52,11 @@ namespace StarryEyes.Anomaly.Utils
                 : DateTime.MinValue;
         }
 
+        public static DateTime ParseTwitterDateTime(this string s)
+        {
+            return s.ParseDateTime(TwitterDateTimeFormat);
+        }
+
         public static DateTime ParseUnixTime(this string s)
         {
             if (s == null) return DateTime.MinValue;

@@ -37,7 +37,7 @@ namespace StarryEyes.Filters.Expressions.Values.Statuses
 
         public override Func<TwitterStatus, bool> GetBooleanValueProvider()
         {
-            return _ => _.RetweetedOriginal != null;
+            return _ => _.RetweetedStatus != null;
         }
 
         public override string GetBooleanSqlQuery()

@@ -54,13 +54,13 @@ namespace StarryEyes.Models.Timelines.Statuses
         {
             return GetIfCacheIsAlive(status.Id) ?? await _loader.StartNew(async () =>
             {
-                if (status.GenerateFromJson)
+                if (status.GeneratedFromJson)
                 {
                     status = await StatusProxy.SyncStatusActivityAsync(status);
                 }
-                var rto = status.RetweetedOriginal == null
+                var rto = status.RetweetedStatus == null
                               ? null
-                              : await Get(status.RetweetedOriginal);
+                              : await Get(status.RetweetedStatus);
                 var lockerobj = _generateLock.GetOrAdd(status.Id, new object());
                 try
                 {
@@ -270,9 +270,9 @@ namespace StarryEyes.Models.Timelines.Statuses
 
         public async void AddFavoritedUser(TwitterUser user)
         {
-            if (this.Status.RetweetedOriginal != null)
+            if (this.Status.RetweetedStatus != null)
             {
-                var status = await Get(this.Status.RetweetedOriginal);
+                var status = await Get(this.Status.RetweetedStatus);
                 status.AddFavoritedUser(user);
             }
             else
@@ -304,9 +304,9 @@ namespace StarryEyes.Models.Timelines.Statuses
 
         public async void RemoveFavoritedUser(long userId)
         {
-            if (this.Status.RetweetedOriginal != null)
+            if (this.Status.RetweetedStatus != null)
             {
-                var status = await Get(this.Status.RetweetedOriginal);
+                var status = await Get(this.Status.RetweetedStatus);
                 status.RemoveFavoritedUser(userId);
             }
             else
@@ -333,9 +333,9 @@ namespace StarryEyes.Models.Timelines.Statuses
 
         public async void AddRetweetedUser(TwitterUser user)
         {
-            if (this.Status.RetweetedOriginal != null)
+            if (this.Status.RetweetedStatus != null)
             {
-                var status = await Get(this.Status.RetweetedOriginal);
+                var status = await Get(this.Status.RetweetedStatus);
                 status.AddRetweetedUser(user);
             }
             else
@@ -366,9 +366,9 @@ namespace StarryEyes.Models.Timelines.Statuses
 
         public async void RemoveRetweetedUser(long userId)
         {
-            if (this.Status.RetweetedOriginal != null)
+            if (this.Status.RetweetedStatus != null)
             {
-                var status = await Get(this.Status.RetweetedOriginal);
+                var status = await Get(this.Status.RetweetedStatus);
                 status.RemoveRetweetedUser(userId);
             }
             else
@@ -397,9 +397,9 @@ namespace StarryEyes.Models.Timelines.Statuses
         public bool IsFavorited(params long[] ids)
         {
             if (ids.Length == 0) return false;
-            if (this.Status.RetweetedOriginal != null)
+            if (this.Status.RetweetedStatus != null)
             {
-                throw new NotSupportedException("You must create another model indicating RetweetedOriginal status.");
+                throw new NotSupportedException("You must create another model indicating RetweetedStatus status.");
             }
             lock (this._favoritedsLock)
             {
@@ -410,9 +410,9 @@ namespace StarryEyes.Models.Timelines.Statuses
         public bool IsRetweeted(params long[] ids)
         {
             if (ids.Length == 0) return false;
-            if (this.Status.RetweetedOriginal != null)
+            if (this.Status.RetweetedStatus != null)
             {
-                throw new NotSupportedException("You must create another model indicating RetweetedOriginal status.");
+                throw new NotSupportedException("You must create another model indicating RetweetedStatus status.");
             }
             lock (this._retweetedsLock)
             {

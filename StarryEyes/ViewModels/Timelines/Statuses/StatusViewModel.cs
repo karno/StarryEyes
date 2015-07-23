@@ -168,7 +168,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         /// </summary>
         public TwitterStatus Status
         {
-            get { return this.Model.Status.RetweetedOriginal ?? this.Model.Status; }
+            get { return this.Model.Status.RetweetedStatus ?? this.Model.Status; }
         }
 
         public IEnumerable<long> BindingAccounts
@@ -190,7 +190,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             get
             {
                 return this._user ??
-                       (this._user = CreateUserViewModel((this.Status.RetweetedOriginal ?? this.Status).User));
+                       (this._user = CreateUserViewModel((this.Status.RetweetedStatus ?? this.Status).User));
             }
         }
 
@@ -282,7 +282,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
 
         public bool IsRetweet
         {
-            get { return this.OriginalStatus.RetweetedOriginal != null; }
+            get { return this.OriginalStatus.RetweetedStatus != null; }
         }
 
         public bool IsFavorited
@@ -1250,7 +1250,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                                 {
                                     var removal = await StatusProxy.FetchStatuses(
                                         s => s.User.Id == tid ||
-                                             (s.RetweetedOriginal != null && s.RetweetedOriginal.User.Id == tid),
+                                             (s.RetweetedStatus != null && s.RetweetedStatus.User.Id == tid),
                                         "UserId = " + tidstr + " OR BaseUserId = " + tidstr);
                                     removal.ForEach(s => StatusInbox.EnqueueRemoval(s.Id));
                                 });

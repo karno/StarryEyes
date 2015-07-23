@@ -3,19 +3,21 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
+using StarryEyes.Anomaly.Artery.Streams.Notifications;
+using StarryEyes.Anomaly.Artery.Streams.Notifications.Events;
 using StarryEyes.Anomaly.Ext;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
-using StarryEyes.Anomaly.TwitterApi.DataModels.StreamModels;
+using StarryEyes.Anomaly.TwitterApi.Streaming;
 using StarryEyes.Anomaly.Utils;
 
-namespace StarryEyes.Anomaly.TwitterApi.Streaming
+namespace StarryEyes.Anomaly.Artery.Streams
 {
     /// <summary>
     /// Streaming Engine Handler
     /// </summary>
     internal static class UserStreamEngine
     {
-        public static async Task Run([NotNull] Stream stream, [NotNull] IStreamHandler handler,
+        public static async Task Run([NotNull] Stream stream, [NotNull] IOldStreamHandler handler,
             TimeSpan readTimeout, CancellationToken cancellationToken)
         {
             if (stream == null) throw new ArgumentNullException("stream");
@@ -54,7 +56,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
             }
         }
 
-        private static void ParseStreamLine(string line, IStreamHandler handler)
+        private static void ParseStreamLine(string line, IOldStreamHandler handler)
         {
             var type = "initialize";
             try
@@ -83,21 +85,19 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
                     if (element.delete.status())
                     {
                         // status is deleted
-                        handler.OnDeleted(new StreamDelete
-                        {
-                            Id = Int64.Parse(element.delete.status.id_str),
-                            UserId = Int64.Parse(element.delete.status.user_id_str)
-                        });
+                        handler.OnDeleted(new StreamDelete(
+                            Int64.Parse(element.delete.status.id_str),
+                            Int64.Parse(element.delete.status.user_id_str),
+                            element.delete.timestamp_ms));
                     }
                     if (element.delete.direct_message())
                     {
                         // message is deleted
-                        handler.OnDeleted(new StreamDelete
-                        {
-                            Id = Int64.Parse(element.delete.direct_message.id_str),
+                        handler.OnDeleted(new StreamDelete(
+                            Int64.Parse(element.delete.status.id_str),
                             // UserId = Int64.Parse(element.delete.status.user_id_str) // user_id_str field is not exist.
-                            UserId = Int64.Parse(element.delete.direct_message.user_id.ToString())
-                        });
+                            Int64.Parse(element.delete.direct_message.user_id.ToString()),
+                            element.delete.timestamp_ms));
                     }
                     return;
                 }
@@ -110,10 +110,8 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
                 if (element.limit())
                 {
                     type = "tracklimit";
-                    handler.OnTrackLimit(new StreamTrackLimit
-                    {
-                        UndeliveredCount = (long)element.limit.track
-                    });
+                    handler.OnTrackLimit(new StreamLimit((long)element.limit.track,
+                        element.limit.timestamp_ms));
                     return;
                 }
                 if (element.status_withheld() || element.user_withheld())
@@ -127,12 +125,10 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
                 if (element.disconnect())
                 {
                     type = "discon";
-                    handler.OnDisconnect(new StreamDisconnect
-                    {
-                        Code = (DisconnectCode)element.disconnect.code,
-                        Reason = element.disconnect.reason,
-                        StreamName = element.disconnect.stream_name
-                    });
+                    handler.OnDisconnect(new StreamDisconnect(
+                        (DisconnectCode)element.disconnect.code,
+                        element.disconnect.stream_name, element.disconnect.reason,
+                         element.disconnect.timestamp_ms));
                     return;
                 }
                 if (element.warning())
@@ -146,10 +142,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
                 if (element.friends())
                 {
                     type = "friends";
-                    handler.OnEnumerationReceived(new StreamEnumeration
-                    {
-                        Friends = (long[])element.friends
-                    });
+                    handler.OnEnumerationReceived(new StreamEnumeration((long[])element.friends));
                     return;
                 }
                 if (element.IsDefined("event"))
@@ -161,31 +154,21 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
                     {
                         case "favorite":
                         case "unfavorite":
-                            handler.OnStatusActivity(new StreamStatusActivity
-                            {
-                                Target = new TwitterUser(element.target),
-                                Source = new TwitterUser(element.source),
-                                Event = StreamStatusActivity.ToEnumEvent(ev),
-                                EventRawString = ev,
-                                Status = new TwitterStatus(element.target_object),
-                                CreatedAt =
-                                    ((string)element.created_at).ParseDateTime(ParsingExtension.TwitterDateTimeFormat),
-                            });
+                            handler.OnStatusActivity(new StreamStatusEvent(
+                                new TwitterUser(element.source),
+                                new TwitterUser(element.target),
+                                new TwitterStatus(element.target_object), ev,
+                                ((string)element.created_at).ParseTwitterDateTime()));
                             return;
                         case "block":
                         case "unblock":
                         case "follow":
                         case "unfollow":
                         case "user_update":
-                            handler.OnUserActivity(new StreamUserActivity
-                            {
-                                Target = new TwitterUser(element.target),
-                                Source = new TwitterUser(element.source),
-                                Event = StreamUserActivity.ToEnumEvent(ev),
-                                EventRawString = ev,
-                                CreatedAt =
-                                    ((string)element.created_at).ParseDateTime(ParsingExtension.TwitterDateTimeFormat),
-                            });
+                            handler.OnUserActivity(new StreamUserEvent(
+                                new TwitterUser(element.source),
+                                new TwitterUser(element.target), ev,
+                                ((string)element.created_at).ParseTwitterDateTime()));
                             return;
                         case "list_created":
                         case "list_destroyed":
@@ -194,16 +177,10 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
                         case "list_member_removed":
                         case "list_user_subscribed":
                         case "list_user_unsubscribed":
-                            handler.OnListActivity(new StreamListActivity
-                            {
-                                Target = new TwitterUser(element.target),
-                                Source = new TwitterUser(element.source),
-                                Event = StreamListActivity.ToEnumEvent(ev),
-                                EventRawString = ev,
-                                List = new TwitterList(element.target_object),
-                                CreatedAt =
-                                    ((string)element.created_at).ParseDateTime(ParsingExtension.TwitterDateTimeFormat),
-                            });
+                            handler.OnListActivity(new StreamListEvent(
+                                new TwitterUser(element.source), new TwitterUser(element.target),
+                                new TwitterList(element.target_object), ev,
+                                ((string)element.created_at).ParseTwitterDateTime()));
                             return;
                         case "favorited_retweet":
                             // TODO: unknown event. 

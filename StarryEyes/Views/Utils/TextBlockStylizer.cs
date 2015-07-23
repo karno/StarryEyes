@@ -65,9 +65,9 @@ namespace StarryEyes.Views.Utils
                 }
 
                 // generate contents
-                if (status.RetweetedOriginal != null)
+                if (status.RetweetedStatus != null)
                 {
-                    status = status.RetweetedOriginal;
+                    status = status.RetweetedStatus;
                 }
                 GenerateInlines(o, status.Text, status.Entities)
                     .ForEach(textBlock.Inlines.Add);

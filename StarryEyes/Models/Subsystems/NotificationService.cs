@@ -55,9 +55,9 @@ namespace StarryEyes.Models.Subsystems
 
         internal static void NotifyReceived(TwitterStatus status)
         {
-            if (status.RetweetedOriginal != null)
+            if (status.RetweetedStatus != null)
             {
-                NotifyRetweeted(status.User, status.RetweetedOriginal, status);
+                NotifyRetweeted(status.User, status.RetweetedStatus, status);
             }
             Head.NotifyReceived(status);
         }
@@ -100,7 +100,7 @@ namespace StarryEyes.Models.Subsystems
         {
             List<TabModel> removal;
             // ignore retweet which mentions me
-            var isMention = status.RetweetedOriginal == null &&
+            var isMention = status.RetweetedStatus == null &&
                             FilterSystemUtil.InReplyToUsers(status)
                                             .Intersect(Setting.Accounts.Ids)
                                             .Any();
@@ -232,12 +232,12 @@ namespace StarryEyes.Models.Subsystems
 
         internal static void NotifyDeleted(long statusId, TwitterStatus deleted)
         {
-            if (deleted != null && deleted.RetweetedOriginal != null)
+            if (deleted != null && deleted.RetweetedStatus != null)
             {
                 Task.Run(() => StatusModel.UpdateStatusInfo(
-                    deleted.RetweetedOriginal.Id,
+                    deleted.RetweetedStatus.Id,
                     model => model.RemoveRetweetedUser(deleted.User.Id),
-                    _ => StatusProxy.RemoveRetweeter(deleted.RetweetedOriginal.Id,
+                    _ => StatusProxy.RemoveRetweeter(deleted.RetweetedStatus.Id,
                         deleted.User.Id)));
             }
             Head.NotifyDeleted(statusId, deleted);

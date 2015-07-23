@@ -37,7 +37,7 @@ namespace StarryEyes.Filters
 
         public static TwitterStatus GetOriginal(this TwitterStatus status)
         {
-            return status.RetweetedOriginal ?? status;
+            return status.RetweetedStatus ?? status;
         }
 
         public static FilterOperatorBase And(this FilterOperatorBase left, FilterOperatorBase right)

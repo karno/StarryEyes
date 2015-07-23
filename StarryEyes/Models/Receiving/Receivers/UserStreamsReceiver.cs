@@ -8,9 +8,11 @@ using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using StarryEyes.Albireo.Helpers;
+using StarryEyes.Anomaly.Artery.Streams;
+using StarryEyes.Anomaly.Artery.Streams.Notifications;
+using StarryEyes.Anomaly.Artery.Streams.Notifications.Events;
 using StarryEyes.Anomaly.TwitterApi;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
-using StarryEyes.Anomaly.TwitterApi.DataModels.StreamModels;
 using StarryEyes.Anomaly.TwitterApi.Streaming;
 using StarryEyes.Globalization;
 using StarryEyes.Globalization.Models;
@@ -183,7 +185,7 @@ namespace StarryEyes.Models.Receiving.Receivers
             BehaviorLogger.Log("STRM", _account.UnreliableScreenName + ": " + log);
         }
 
-        class HandleStreams : IStreamHandler
+        class HandleStreams : IOldStreamHandler
         {
             private readonly UserStreamsReceiver _parent;
 
@@ -212,47 +214,47 @@ namespace StarryEyes.Models.Receiving.Receivers
             {
             }
 
-            public void OnListActivity(StreamListActivity item)
+            public void OnListActivity(StreamListEvent item)
             {
                 // TODO: Implementation
             }
 
-            public void OnStatusActivity(StreamStatusActivity item)
+            public void OnStatusActivity(StreamStatusEvent item)
             {
                 switch (item.Event)
                 {
-                    case StreamStatusActivityEvent.Unknown:
-                        BackstageModel.RegisterEvent(new UnknownEvent(item.Source, item.EventRawString));
+                    case StatusEvents.Unknown:
+                        BackstageModel.RegisterEvent(new UnknownEvent(item.Source, item.RawEvent));
                         break;
-                    case StreamStatusActivityEvent.Favorite:
-                        NotificationService.NotifyFavorited(item.Source, item.Status);
+                    case StatusEvents.Favorite:
+                        NotificationService.NotifyFavorited(item.Source, item.TargetObject);
                         break;
-                    case StreamStatusActivityEvent.Unfavorite:
-                        NotificationService.NotifyUnfavorited(item.Source, item.Status);
+                    case StatusEvents.Unfavorite:
+                        NotificationService.NotifyUnfavorited(item.Source, item.TargetObject);
                         break;
                 }
-                if (item.Status != null)
+                if (item.TargetObject != null)
                 {
-                    StatusInbox.Enqueue(item.Status);
+                    StatusInbox.Enqueue(item.TargetObject);
                 }
             }
 
-            public void OnTrackLimit(StreamTrackLimit item)
+            public void OnTrackLimit(StreamLimit item)
             {
                 NotificationService.NotifyLimitationInfoGot(this._parent.Account, (int)item.UndeliveredCount);
             }
 
-            public async void OnUserActivity(StreamUserActivity item)
+            public async void OnUserActivity(StreamUserEvent item)
             {
                 var active = item.Source.Id == this._parent.Account.Id;
                 var passive = item.Target.Id == this._parent.Account.Id;
                 var reldata = this._parent.Account.RelationData;
                 switch (item.Event)
                 {
-                    case StreamUserActivityEvent.Unknown:
-                        BackstageModel.RegisterEvent(new UnknownEvent(item.Source, item.EventRawString));
+                    case UserEvents.Unknown:
+                        BackstageModel.RegisterEvent(new UnknownEvent(item.Source, item.RawEvent));
                         break;
-                    case StreamUserActivityEvent.Follow:
+                    case UserEvents.Follow:
                         if (active)
                         {
                             await reldata.Followings.SetAsync(item.Target.Id, true);
@@ -263,7 +265,7 @@ namespace StarryEyes.Models.Receiving.Receivers
                         }
                         NotificationService.NotifyFollowed(item.Source, item.Target);
                         break;
-                    case StreamUserActivityEvent.Unfollow:
+                    case UserEvents.Unfollow:
                         if (active)
                         {
                             await reldata.Followings.SetAsync(item.Target.Id, false);
@@ -274,7 +276,7 @@ namespace StarryEyes.Models.Receiving.Receivers
                         }
                         NotificationService.NotifyUnfollowed(item.Source, item.Target);
                         break;
-                    case StreamUserActivityEvent.Block:
+                    case UserEvents.Block:
                         if (active)
                         {
                             await reldata.Followings.SetAsync(item.Target.Id, false);
@@ -287,14 +289,14 @@ namespace StarryEyes.Models.Receiving.Receivers
                         }
                         NotificationService.NotifyBlocked(item.Source, item.Target);
                         break;
-                    case StreamUserActivityEvent.Unblock:
+                    case UserEvents.Unblock:
                         if (active)
                         {
                             await reldata.Blockings.SetAsync(item.Target.Id, false);
                         }
                         NotificationService.NotifyUnblocked(item.Source, item.Target);
                         break;
-                    case StreamUserActivityEvent.UserUpdate:
+                    case UserEvents.UserUpdate:
                         NotificationService.NotifyUserUpdated(item.Source);
                         break;
                 }

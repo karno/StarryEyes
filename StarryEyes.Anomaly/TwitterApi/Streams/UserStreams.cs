@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
+using StarryEyes.Anomaly.Artery.Streams;
 using StarryEyes.Anomaly.Utils;
 
 namespace StarryEyes.Anomaly.TwitterApi.Streaming
@@ -13,7 +14,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
     {
         public static async Task ConnectUserStreams(
             [NotNull] this IOAuthCredential credential, [NotNull] IApiAccessProperties properties,
-            [NotNull] IStreamHandler handler, TimeSpan readTimeout, CancellationToken cancellationToken,
+            [NotNull] IOldStreamHandler handler, TimeSpan readTimeout, CancellationToken cancellationToken,
             [CanBeNull] IEnumerable<string> tracksOrNull = null, bool repliesAll = false,
             bool followingsActivity = false)
         {
@@ -55,8 +56,8 @@ namespace StarryEyes.Anomaly.TwitterApi.Streaming
                     using (var stream = await resp.Content.ReadAsStreamAsync().ConfigureAwait(false))
                     {
                         // run user stream engine
-                        await
-                            UserStreamEngine.Run(stream, handler, readTimeout, cancellationToken).ConfigureAwait(false);
+                        await UserStreamEngine.Run(stream, handler, readTimeout, cancellationToken)
+                                              .ConfigureAwait(false);
                     }
                 }
                 finally

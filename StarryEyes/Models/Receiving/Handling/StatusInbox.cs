@@ -56,9 +56,9 @@ namespace StarryEyes.Models.Receiving.Handling
         {
             if (status == null) throw new ArgumentNullException("status");
             // store original status first
-            if (status.RetweetedOriginal != null)
+            if (status.RetweetedStatus != null)
             {
-                Enqueue(status.RetweetedOriginal);
+                Enqueue(status.RetweetedStatus);
             }
             _queue.Enqueue(new StatusNotification(status));
             _signal.Set();
@@ -87,8 +87,8 @@ namespace StarryEyes.Models.Receiving.Handling
                         }
                         // check registered as removed or not
                         var removed = IsRegisteredAsRemoved(status.Id) ||
-                                      (status.RetweetedOriginalId != null &&
-                                      IsRegisteredAsRemoved(status.RetweetedOriginalId.Value));
+                                      (status.RetweetedStatusId != null &&
+                                      IsRegisteredAsRemoved(status.RetweetedStatusId.Value));
                         // check status is registered as removed or already received
                         if (removed || !await StatusReceived(status))
                         {
