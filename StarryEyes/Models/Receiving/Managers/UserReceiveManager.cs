@@ -17,6 +17,7 @@ namespace StarryEyes.Models.Receiving.Managers
         private readonly IDictionary<long, UserReceiveBundle> _bundles =
             new Dictionary<long, UserReceiveBundle>();
 
+
         public event Action TrackRearranged;
 
         public event Action<TwitterAccount> ConnectionStateChanged;

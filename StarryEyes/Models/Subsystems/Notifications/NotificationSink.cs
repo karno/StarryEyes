@@ -40,6 +40,16 @@ namespace StarryEyes.Models.Subsystems.Notifications
             BackstageModel.RegisterEvent(new UnblockedEvent(source, target));
         }
 
+        public void NotifyMuted(TwitterUser source, TwitterUser target)
+        {
+            BackstageModel.RegisterEvent(new MutedEvent(source, target));
+        }
+
+        public void NotifyUnmuted(TwitterUser source, TwitterUser target)
+        {
+            BackstageModel.RegisterEvent(new UnmutedEvent(source, target));
+        }
+
         public void NotifyFavorited(TwitterUser source, TwitterStatus status)
         {
             BackstageModel.RegisterEvent(new FavoritedEvent(source, status));

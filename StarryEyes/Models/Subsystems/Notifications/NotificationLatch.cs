@@ -8,7 +8,7 @@ namespace StarryEyes.Models.Subsystems.Notifications
 {
     public static class NotificationLatch
     {
-        private const int BlockCount = 3;
+        private const int BlockCount = 4;
 
         private static readonly object _syncRoot = new object();
 
@@ -144,6 +144,7 @@ namespace StarryEyes.Models.Subsystems.Notifications
         Follow,
         Block,
         Favorite,
+        Mute
     }
 
 }

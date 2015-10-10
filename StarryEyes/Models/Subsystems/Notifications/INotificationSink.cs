@@ -18,6 +18,10 @@ namespace StarryEyes.Models.Subsystems.Notifications
 
         void NotifyUnblocked(TwitterUser source, TwitterUser target);
 
+        void NotifyMuted(TwitterUser source, TwitterUser target);
+
+        void NotifyUnmuted(TwitterUser source, TwitterUser target);
+
         void NotifyFavorited(TwitterUser source, TwitterStatus status);
 
         void NotifyUnfavorited(TwitterUser source, TwitterStatus status);

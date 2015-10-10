@@ -230,7 +230,7 @@ namespace StarryEyes
 
         public const string AppShortName = "Krile";
 
-        public const string AppFullName = "Krile STARRYEYES";
+        public const string AppFullName = "Krile STARRYBlend";
 
         internal static readonly string ConsumerKey = "oReH15myW0cPq7pHNvAMGw";
 

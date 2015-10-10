@@ -171,6 +171,16 @@ namespace StarryEyes.Models.Subsystems.Notifications.UI
                 return false;
             }
 
+            public bool NotifyMuted(TwitterUser source, TwitterUser target)
+            {
+                return false;
+            }
+
+            public bool NotifyUnmuted(TwitterUser source, TwitterUser target)
+            {
+                return false;
+            }
+
             public bool NotifyFavorited(TwitterUser source, TwitterStatus status)
             {
                 if (Setting.NotifyFavorite.Value &&

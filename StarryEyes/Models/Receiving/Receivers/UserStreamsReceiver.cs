@@ -3,15 +3,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
-using System.Reactive.Disposables;
-using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using StarryEyes.Albireo.Helpers;
 using StarryEyes.Anomaly.TwitterApi;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
-using StarryEyes.Anomaly.TwitterApi.DataModels.StreamModels;
-using StarryEyes.Anomaly.TwitterApi.Streaming;
+using StarryEyes.Anomaly.TwitterApi.DataModels.Streams;
+using StarryEyes.Anomaly.TwitterApi.DataModels.Streams.Events;
+using StarryEyes.Anomaly.TwitterApi.DataModels.Streams.Internals;
+using StarryEyes.Anomaly.TwitterApi.Streams;
 using StarryEyes.Globalization;
 using StarryEyes.Globalization.Models;
 using StarryEyes.Models.Accounting;
@@ -23,12 +22,6 @@ using StarryEyes.Models.Subsystems;
 
 namespace StarryEyes.Models.Receiving.Receivers
 {
-    /// <summary>
-    /// Provides connecting User Streams.
-    /// </summary>
-    /// <remarks>
-    /// This class includes error handling strategy.
-    /// </remarks>
     public sealed class UserStreamsReceiver : IDisposable
     {
         public const int MaxTrackingKeywordBytes = 60;
@@ -36,57 +29,32 @@ namespace StarryEyes.Models.Receiving.Receivers
         private const int HardErrorRetryMaxCount = 3;
 
         private bool _isEnabled;
-        private string[] _trackKeywords = new string[0];
-        private UserStreamsConnectionState _state = UserStreamsConnectionState.Disconnected;
-        private readonly StateUpdater _stateUpdater;
-
-        private readonly TwitterAccount _account;
-        private CompositeDisposable _currentConnection = new CompositeDisposable();
-
-        public event Action StateChanged;
-
-        public TwitterAccount Account
-        {
-            get { return this._account; }
-        }
-
         public bool IsEnabled
         {
-            get { return this._isEnabled; }
+            get { return _isEnabled; }
             set
             {
-                if (this._isEnabled == value)
+                if (_isEnabled != value)
                 {
-                    return;
-                }
-                this._isEnabled = value;
-                if (!value)
-                {
-                    this.Disconnect();
-                }
-                else if (this.ConnectionState == UserStreamsConnectionState.Disconnected ||
-                         this.ConnectionState == UserStreamsConnectionState.WaitForReconnection)
-                {
-                    this.Reconnect();
+                    _isEnabled = value;
+                    Reconnect();
                 }
             }
         }
 
-        public IEnumerable<string> TrackKeywords
-        {
-            get { return this._trackKeywords ?? Enumerable.Empty<string>(); }
-            set
-            {
-                var prev = this._trackKeywords;
-                this._trackKeywords = (value ?? Enumerable.Empty<string>()).ToArray();
-                if (prev.Length != this._trackKeywords.Length ||
-                    prev.Any(s => !this._trackKeywords.Contains(s)))
-                {
-                    // change keywords list
-                    this.Reconnect();
-                }
-            }
-        }
+        private readonly TimeSpan _userStreamTimeout = TimeSpan.FromSeconds(70);
+        private CancellationTokenSource _cancellationTokenSource;
+
+        private bool _disposed;
+
+        private readonly TwitterAccount _account;
+        private readonly IStreamHandler _handler;
+
+        #region Connection State Management / Notification
+
+        private UserStreamsConnectionState _state = UserStreamsConnectionState.Disconnected;
+        public event Action StateChanged;
+        private readonly StateUpdater _stateUpdater;
 
         public UserStreamsConnectionState ConnectionState
         {
@@ -102,386 +70,421 @@ namespace StarryEyes.Models.Receiving.Receivers
             }
         }
 
+        #endregion
+
+        #region error handling/backoff constants
+
+        private const int MaxHardErrorCount = 3;
+
+        private const int ProtocolErrorInitialWait = 5000; // 5 sec
+
+        private const int ProtocolErrorMaxWait = 320000; // 320 sec
+
+        private const int NetworkErrorInitialWait = 250; // 0.25 sec
+
+        private const int NetworkErrorMaxWait = 16000; // 16 sec
+
+        #endregion
+
+        private BackoffMode _backoffMode = BackoffMode.None;
+
+        private long _backoffWait = 0;
+
+        private int _hardErrorCount = 0;
+
+        #region User Stream properties
+
+        private string[] _trackKeywords;
+        /// <summary>
+        /// Track keywords
+        /// </summary>
+        public IEnumerable<string> TrackKeywords
+        {
+            get { return _trackKeywords ?? Enumerable.Empty<string>(); }
+            set
+            {
+                // automatic reconnect
+                var prev = _trackKeywords;
+                _trackKeywords = (value ?? Enumerable.Empty<string>()).ToArray();
+                if (prev == null ||
+                    prev.Length != _trackKeywords.Length ||
+                    prev.Any(s => _trackKeywords.Contains(s)))
+                {
+                    Task.Run(() => Reconnect());
+                }
+            }
+        }
+
+        /// <summary>
+        /// replies=all flag
+        /// </summary>
+        public bool RepliesAll { get; set; }
+
+        /// <summary>
+        /// include_followings_activity flag
+        /// </summary>
+        public bool IncludeFollowingsActivities { get; set; }
+
+        #endregion
+
         public UserStreamsReceiver(TwitterAccount account)
         {
-            this._stateUpdater = new StateUpdater();
-            this._account = account;
+            _stateUpdater = new StateUpdater();
+            _handler = InitializeHandler();
+            _account = account;
+            _cancellationTokenSource = null;
+            ConnectionState = UserStreamsConnectionState.Disconnected;
+        }
+
+        private IStreamHandler InitializeHandler()
+        {
+            var handler = StreamHandler.Create(StatusInbox.Enqueue,
+                ex =>
+                {
+                    BehaviorLogger.Log("U/S", _account.UnreliableScreenName + ":" + ex.ToString());
+                    BackstageModel.RegisterEvent(new StreamDecodeFailedEvent(_account.UnreliableScreenName, ex));
+                });
+            handler.AddHandler<StreamDelete>(d => StatusInbox.EnqueueRemoval(d.Id));
+            handler.AddHandler<StreamDisconnect>(
+                d => BackstageModel.RegisterEvent(new UserStreamsDisconnectedEvent(_account, d.Reason)));
+            handler.AddHandler<StreamLimit>(
+                limit => NotificationService.NotifyLimitationInfoGot(_account, (int)limit.UndeliveredCount));
+            handler.AddHandler<StreamStatusEvent>(s =>
+            {
+                switch (s.Event)
+                {
+                    case StatusEvents.Unknown:
+                        BackstageModel.RegisterEvent(new UnknownEvent(s.Source, s.RawEvent));
+                        break;
+                    case StatusEvents.Favorite:
+                        NotificationService.NotifyFavorited(s.Source, s.TargetObject);
+                        break;
+                    case StatusEvents.Unfavorite:
+                        NotificationService.NotifyUnfavorited(s.Source, s.TargetObject);
+                        break;
+                    case StatusEvents.FavoriteRetweet:
+                        NotificationService.NotifyFavorited(s.Source, s.TargetObject);
+                        break;
+                    case StatusEvents.RetweetRetweet:
+                        NotificationService.NotifyRetweeted(s.Source, s.TargetObject.RetweetedOriginal, s.TargetObject);
+                        break;
+                    case StatusEvents.Quote:
+                        // do nothing
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+                if (s.TargetObject != null)
+                {
+                    StatusInbox.Enqueue(s.TargetObject);
+                }
+            });
+            handler.AddHandler<StreamUserEvent>(async item =>
+            {
+                var active = item.Source.Id == _account.Id;
+                var passive = item.Target.Id == _account.Id;
+                var reldata = _account.RelationData;
+                switch (item.Event)
+                {
+                    case UserEvents.Unknown:
+                        BackstageModel.RegisterEvent(new UnknownEvent(item.Source, item.RawEvent));
+                        break;
+                    case UserEvents.Follow:
+                        if (active)
+                        {
+                            await reldata.Followings.SetAsync(item.Target.Id, true).ConfigureAwait(false);
+                        }
+                        if (passive)
+                        {
+                            await reldata.Followers.SetAsync(item.Source.Id, true).ConfigureAwait(false);
+                        }
+                        NotificationService.NotifyFollowed(item.Source, item.Target);
+                        break;
+                    case UserEvents.Unfollow:
+                        if (active)
+                        {
+                            await reldata.Followings.SetAsync(item.Target.Id, false).ConfigureAwait(false);
+                        }
+                        if (passive)
+                        {
+                            await reldata.Followers.SetAsync(item.Source.Id, false).ConfigureAwait(false);
+                        }
+                        NotificationService.NotifyUnfollowed(item.Source, item.Target);
+                        break;
+                    case UserEvents.Block:
+                        if (active)
+                        {
+                            await reldata.Followings.SetAsync(item.Target.Id, false).ConfigureAwait(false);
+                            await reldata.Followers.SetAsync(item.Target.Id, false).ConfigureAwait(false);
+                            await reldata.Blockings.SetAsync(item.Target.Id, true).ConfigureAwait(false);
+                        }
+                        if (passive)
+                        {
+                            await reldata.Followers.SetAsync(item.Target.Id, false).ConfigureAwait(false);
+                        }
+                        NotificationService.NotifyBlocked(item.Source, item.Target);
+                        break;
+                    case UserEvents.Unblock:
+                        if (active)
+                        {
+                            await reldata.Blockings.SetAsync(item.Target.Id, false).ConfigureAwait(false);
+                        }
+                        NotificationService.NotifyUnblocked(item.Source, item.Target);
+                        break;
+                    case UserEvents.UserUpdate:
+                        NotificationService.NotifyUserUpdated(item.Source);
+                        break;
+                    case UserEvents.Mute:
+                        if (active)
+                        {
+                            await reldata.Mutes.SetAsync(item.Target.Id, true).ConfigureAwait(false);
+                        }
+                        NotificationService.NotifyBlocked(item.Source, item.Target);
+                        break;
+                    case UserEvents.UnMute:
+                        if (active)
+                        {
+                            await reldata.Mutes.SetAsync(item.Target.Id, false).ConfigureAwait(false);
+                        }
+                        NotificationService.NotifyUnblocked(item.Source, item.Target);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            });
+            return handler;
+        }
+
+        public void Connect()
+        {
+            Connect(CancellationToken.None);
         }
 
         public void Reconnect()
         {
-            if (!this.IsEnabled)
+            if (_disposed)
             {
-                this.Disconnect();
                 return;
             }
             this._stateUpdater.UpdateState("@" + _account.UnreliableScreenName + ": " +
                                            ReceivingResources.UserStreamReconnecting);
-            this.CleanupConnection();
-            Task.Run(() => this._currentConnection.Add(this.ConnectCore()));
+            Task.Run(() => Connect());
         }
 
-        private void Disconnect()
+        /// <summary>
+        /// Begin receiving streams
+        /// </summary>
+        /// <param name="token">cancellation token</param>
+        /// <returns>DateTime.MaxValue</returns>
+        public void Connect(CancellationToken token)
         {
-            Log("disconnecting...");
-            this.ConnectionState = UserStreamsConnectionState.Disconnected;
-            this.CleanupConnection();
-            Log("successfully disconnected.");
+            // create new token and swap for old one.
+            var cts = CancellationTokenSource.CreateLinkedTokenSource(token);
+            var oldcts = Interlocked.Exchange(ref _cancellationTokenSource, cts);
+
+            // cancel previous connection
+            try
+            {
+                oldcts?.Cancel();
+            }
+            catch
+            {
+                // ignored
+            }
+            finally
+            {
+                oldcts?.Dispose();
+            }
+
+            if (!_isEnabled)
+            {
+                _stateUpdater.UpdateState();
+                ConnectionState = UserStreamsConnectionState.Disconnected;
+                return;
+            }
+
+            this._stateUpdater.UpdateState("@" + _account.UnreliableScreenName + ": " +
+                                           ReceivingResources.UserStreamReconnecting);
+
+            // call ExecuteInternalAsync asynchronously with created token
+            Task.Run(async () =>
+            {
+                try
+                {
+                    await ConnectInternalAsync(cts.Token).ConfigureAwait(false);
+                }
+                catch
+                {
+                    // ignored
+                }
+            }, cts.Token);
         }
 
-        private void CleanupConnection()
+        private async Task ConnectInternalAsync(CancellationToken cancellationToken)
         {
-            Log("cleaning previous connection...");
-            Interlocked.Exchange(ref this._currentConnection, new CompositeDisposable())
-                       .Dispose();
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                ConnectionState = UserStreamsConnectionState.Connecting;
+                try
+                {
+                    await UserStreams.Connect(_account, ParseLine, _userStreamTimeout, cancellationToken, TrackKeywords,
+                            RepliesAll, IncludeFollowingsActivities).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    ConnectionState = UserStreamsConnectionState.WaitForReconnection;
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        break;
+                    }
+                    if (await HandleException(ex).ConfigureAwait(false))
+                    {
+                        // if handled: continue running
+                        continue;
+                    }
+                    ConnectionState = UserStreamsConnectionState.Disconnected;
+                    throw;
+                }
+            }
+            ConnectionState = UserStreamsConnectionState.Disconnected;
         }
 
-        private IDisposable ConnectCore()
+        private void ParseLine(string json)
         {
-            this.CheckDisposed();
-            this.ConnectionState = UserStreamsConnectionState.Connecting;
-            Log("starting connection...");
-            var isConnectionActive = true;
-            var con = this.Account.ConnectUserStreams(this._trackKeywords, this.Account.ReceiveRepliesAll,
-                this.Account.ReceiveFollowingsActivity)
-                          .Do(_ =>
-                          {
-                              if (this.ConnectionState != UserStreamsConnectionState.Connecting) return;
-                              this.ConnectionState = UserStreamsConnectionState.Connected;
-                              this.ResetErrorParams();
-                              Log("successfully connected.");
-                          })
-                          .SubscribeWithHandler(new HandleStreams(this),
-                              ex => { if (isConnectionActive) this.HandleException(ex); },
-                              () => { if (isConnectionActive) this.Reconnect(); });
+            // reset counts
+            _hardErrorCount = 0;
             _stateUpdater.UpdateState();
-            return Disposable.Create(() =>
-            {
-                isConnectionActive = false;
-                con.Dispose();
-            });
+            ConnectionState = UserStreamsConnectionState.Connected;
+            UserStreamParser.ParseStreamLine(json, _handler);
         }
 
-        private void Log(string log)
+        private async Task<bool> HandleException(Exception ex)
         {
-            Debug.WriteLine("*USERSTREAMS* " + _account.UnreliableScreenName + ": " + log);
-            BehaviorLogger.Log("STRM", _account.UnreliableScreenName + ": " + log);
-        }
-
-        class HandleStreams : IStreamHandler
-        {
-            private readonly UserStreamsReceiver _parent;
-
-            public HandleStreams(UserStreamsReceiver parent)
+            Log("Exception on User Stream Receiver: " + Environment.NewLine + ex);
+            var tx = ex as TwitterApiException;
+            if (tx != null)
             {
-                Debug.WriteLine("*USERSTREAMS* " + parent._account.UnreliableScreenName + ": Successufully subscribed.");
-                this._parent = parent;
-            }
-
-            public void OnStatus(TwitterStatus status)
-            {
-                StatusInbox.Enqueue(status);
-            }
-
-            public void OnDeleted(StreamDelete item)
-            {
-                StatusInbox.EnqueueRemoval(item.Id);
-            }
-
-            public void OnDisconnect(StreamDisconnect streamDisconnect)
-            {
-                BackstageModel.RegisterEvent(new UserStreamsDisconnectedEvent(this._parent.Account, streamDisconnect.Reason));
-            }
-
-            public void OnEnumerationReceived(StreamEnumeration item)
-            {
-            }
-
-            public void OnListActivity(StreamListActivity item)
-            {
-                // TODO: Implementation
-            }
-
-            public void OnStatusActivity(StreamStatusActivity item)
-            {
-                switch (item.Event)
-                {
-                    case StreamStatusActivityEvent.Unknown:
-                        BackstageModel.RegisterEvent(new UnknownEvent(item.Source, item.EventRawString));
-                        break;
-                    case StreamStatusActivityEvent.Favorite:
-                        NotificationService.NotifyFavorited(item.Source, item.Status);
-                        break;
-                    case StreamStatusActivityEvent.Unfavorite:
-                        NotificationService.NotifyUnfavorited(item.Source, item.Status);
-                        break;
-                }
-                if (item.Status != null)
-                {
-                    StatusInbox.Enqueue(item.Status);
-                }
-            }
-
-            public void OnTrackLimit(StreamTrackLimit item)
-            {
-                NotificationService.NotifyLimitationInfoGot(this._parent.Account, (int)item.UndeliveredCount);
-            }
-
-            public async void OnUserActivity(StreamUserActivity item)
-            {
-                var active = item.Source.Id == this._parent.Account.Id;
-                var passive = item.Target.Id == this._parent.Account.Id;
-                var reldata = this._parent.Account.RelationData;
-                switch (item.Event)
-                {
-                    case StreamUserActivityEvent.Unknown:
-                        BackstageModel.RegisterEvent(new UnknownEvent(item.Source, item.EventRawString));
-                        break;
-                    case StreamUserActivityEvent.Follow:
-                        if (active)
-                        {
-                            await reldata.Followings.SetAsync(item.Target.Id, true);
-                        }
-                        if (passive)
-                        {
-                            await reldata.Followers.SetAsync(item.Source.Id, true);
-                        }
-                        NotificationService.NotifyFollowed(item.Source, item.Target);
-                        break;
-                    case StreamUserActivityEvent.Unfollow:
-                        if (active)
-                        {
-                            await reldata.Followings.SetAsync(item.Target.Id, false);
-                        }
-                        if (passive)
-                        {
-                            await reldata.Followers.SetAsync(item.Source.Id, false);
-                        }
-                        NotificationService.NotifyUnfollowed(item.Source, item.Target);
-                        break;
-                    case StreamUserActivityEvent.Block:
-                        if (active)
-                        {
-                            await reldata.Followings.SetAsync(item.Target.Id, false);
-                            await reldata.Followers.SetAsync(item.Target.Id, false);
-                            await reldata.Blockings.SetAsync(item.Target.Id, true);
-                        }
-                        if (passive)
-                        {
-                            await reldata.Followers.SetAsync(item.Target.Id, false);
-                        }
-                        NotificationService.NotifyBlocked(item.Source, item.Target);
-                        break;
-                    case StreamUserActivityEvent.Unblock:
-                        if (active)
-                        {
-                            await reldata.Blockings.SetAsync(item.Target.Id, false);
-                        }
-                        NotificationService.NotifyUnblocked(item.Source, item.Target);
-                        break;
-                    case StreamUserActivityEvent.UserUpdate:
-                        NotificationService.NotifyUserUpdated(item.Source);
-                        break;
-                }
-            }
-
-            public void OnExceptionThrownDuringParsing(Exception ex)
-            {
-                _parent.Log("user streams: unknown data received.");
-                ex.ToString()
-                  .Split(new[] { "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries)
-                  .Select(s => "> " + s)
-                  .ForEach(_parent.Log);
-                BackstageModel.RegisterEvent(new StreamDecodeFailedEvent(
-            _parent.Account.UnreliableScreenName, ex));
-            }
-        }
-
-        #region Error handlers
-
-        private BackOffMode _currentBackOffMode = BackOffMode.None;
-        private long _currentBackOffWaitCount;
-        private int _hardErrorRetryCount;
-
-        private void ResetErrorParams()
-        {
-            this._currentBackOffMode = BackOffMode.None;
-            this._currentBackOffWaitCount = 0;
-            this._hardErrorRetryCount = 0;
-        }
-
-        private void HandleException(Exception ex)
-        {
-            // log exception
-            Log("EXCEPTION THROWN!");
-            ex.ToString()
-              .Split(new[] { "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries)
-              .ForEach(this.Log);
-            this.CleanupConnection();
-            var tae = ex as TwitterApiException;
-            if (tae != null)
-            {
-                Log("Twitter API Exception [error: " + (int)tae.StatusCode + " / code: " + tae.TwitterErrorCode + "]");
+                // protocol error
+                Log($"Twitter API Exception: [status-code: {tx.StatusCode} twitter-code: {tx.TwitterErrorCode}]");
                 _stateUpdater.UpdateState(_account.UnreliableScreenName +
                                           ReceivingResources.UserStreamDisconnectedFormat.SafeFormat(
-                                              (int)tae.StatusCode, tae.TwitterErrorCode));
-                switch (tae.StatusCode)
+                                              (int)tx.StatusCode, tx.TwitterErrorCode));
+                _handler.OnMessage(new StreamErrorMessage(_account, tx.StatusCode, tx.TwitterErrorCode));
+                switch (tx.StatusCode)
                 {
                     case HttpStatusCode.Unauthorized:
-                        // ERR: Unauthorized, invalid OAuth request?
-                        Log(">>> Authorization failed.");
-                        if (this.CheckHardError())
+                        Log("Authorization failed.");
+                        if (_hardErrorCount > MaxHardErrorCount)
                         {
-                            Log(">>> Too many failure is detected. Abort.");
-                            this.RaiseDisconnectedByError(ReceivingResources.DisconnectedAuthError);
-                            return;
+                            return false;
                         }
                         break;
                     case HttpStatusCode.Forbidden:
                     case HttpStatusCode.NotFound:
-                        Log(">>> Endpoint forbidden.");
-                        if (this.CheckHardError())
+                        Log("Endpoint not found / not accessible.");
+                        if (_hardErrorCount > MaxHardErrorCount)
                         {
-                            Log(">>> Too many failure is detected. Abort.");
-                            this.RaiseDisconnectedByError(ReceivingResources.DisconnectedEndpointError);
-                            return;
+                            return false;
                         }
                         break;
                     case HttpStatusCode.NotAcceptable:
                     case HttpStatusCode.RequestEntityTooLarge:
-                        Log(">>> Arguments could not be accepted.");
-                        this.RaiseDisconnectedByError(
-                            ReceivingResources.DisconnectedTrackErrorFormat.SafeFormat(
-                                this._trackKeywords.JoinString(", ")));
-                        return;
+                        Log("Specified argument could not be accepted.");
+                        return false;
                     case HttpStatusCode.RequestedRangeNotSatisfiable:
-                        Log(">>> Permission denied or parameter error.");
-                        this.RaiseDisconnectedByError(ReceivingResources.DisconnectedRangeError);
-                        return;
-                    case (HttpStatusCode)420:
-                        // ERR: Too many connections
-                        // (other client is already connected?)
-                        Log(">>> Rate limited.(too many connected)");
-                        this.RaiseDisconnectedByError(ReceivingResources.DisconnectedLimitError);
-                        return;
+                        Log("Permission denied / Parameter out of range");
+                        return false;
+                    case (HttpStatusCode)420: // Too many connections
+                        Log("Too many connections are established.");
+                        return false;
                 }
-                Log(">>> general protocol error.)");
-                // else -> backoff
-                if (this._currentBackOffMode == BackOffMode.ProtocolError)
+                // general protocol error
+                if (_backoffMode == BackoffMode.ProtocolError)
                 {
-                    // wait count is raised exponentially.
-                    this._currentBackOffWaitCount *= 2;
+                    // exponential backoff
+                    _backoffWait *= 2;
                 }
                 else
                 {
-                    this._currentBackOffWaitCount = 5000;
-                    this._currentBackOffMode = BackOffMode.ProtocolError;
+                    _backoffWait = ProtocolErrorInitialWait;
+                    _backoffMode = BackoffMode.ProtocolError;
                 }
-                // max wait is 320 sec.
-                if (this._currentBackOffWaitCount >= 320000)
+                if (_backoffWait >= ProtocolErrorMaxWait)
                 {
-                    Log(">>> Protocol backoff threshold exceeded.");
-                    this.RaiseDisconnectedByError(ReceivingResources.DisconnectedProtocolError);
+                    Log("Protocol backoff limit exceeded.");
                     _stateUpdater.UpdateState(_account.UnreliableScreenName + ": " +
                                               ReceivingResources.ConnectFailedByProtocol);
-                    return;
+                    return false;
                 }
             }
             else
             {
-                Log(">>> general network error.)");
                 // network error
-                // -> backoff
-                if (this._currentBackOffMode == BackOffMode.NetworkError)
+                if (_backoffMode == BackoffMode.NetworkError)
                 {
-                    // wait count is raised linearly.
-                    this._currentBackOffWaitCount += 250;
+                    // linear backoff
+                    _backoffWait += NetworkErrorInitialWait;
                 }
                 else
                 {
-                    // wait starts 250ms
-                    this._currentBackOffWaitCount = 250;
-                    this._currentBackOffMode = BackOffMode.NetworkError;
+                    _backoffWait = NetworkErrorInitialWait;
+                    _backoffMode = BackoffMode.NetworkError;
                 }
-                // max wait is 16 sec.
-                if (this._currentBackOffWaitCount >= 16000)
+                if (_backoffWait >= NetworkErrorMaxWait)
                 {
-                    Log(">>> Network backoff threshold exceeded.");
-                    this.RaiseDisconnectedByError(ReceivingResources.DisconnectedNetworkError);
+                    Log("Network backoff limit exceeded.");
                     _stateUpdater.UpdateState(_account.UnreliableScreenName + ": " +
                                               ReceivingResources.ConnectFailedByNetwork);
-                    return;
+                    return false;
                 }
             }
-            Log(">>> wait for reconnection... (" + _currentBackOffWaitCount + " ms)");
-            // parsing error, auto-reconnect
+            Log($"Waiting reconnection... [{_backoffWait} ms]");
             _stateUpdater.UpdateState(_account.UnreliableScreenName + ": " +
-                                      ReceivingResources.ReconnectingFormat.SafeFormat(_currentBackOffWaitCount));
-            this._currentConnection.Add(
-                Observable.Timer(TimeSpan.FromMilliseconds(this._currentBackOffWaitCount))
-                          .Subscribe(_ => this.Reconnect()));
+                                      ReceivingResources.ReconnectingFormat.SafeFormat(_backoffWait));
+            _handler.OnMessage(new StreamWaitMessage(_account, _backoffWait));
+            await Task.Delay(TimeSpan.FromMilliseconds(_backoffWait)).ConfigureAwait(false);
+            return true;
         }
 
-        private bool CheckHardError()
+        private void Log(string body)
         {
-            this._hardErrorRetryCount++;
-            if (this._hardErrorRetryCount > HardErrorRetryMaxCount)
+            var splitEach = body.Split('\r', '\n').Select(t => t.Trim()).Where(t => !String.IsNullOrEmpty(t));
+            foreach (var text in splitEach)
             {
-                return true;
-            }
-            return false;
-        }
-
-        private void RaiseDisconnectedByError(string description)
-        {
-            this.CleanupConnection();
-            Debug.WriteLine("*** USER STREAM DISCONNECT ***" + Environment.NewLine + description);
-            var discone = new UserStreamsDisconnectedEvent(this.Account, description);
-            BackstageModel.RegisterEvent(discone);
-            this.ConnectionState = UserStreamsConnectionState.WaitForReconnection;
-            this._currentConnection.Add(
-                Observable.Timer(TimeSpan.FromMinutes(5))
-                          .Do(_ => BackstageModel.RemoveEvent(discone))
-                          .Subscribe(_ =>
-                          {
-                              if (this.ConnectionState == UserStreamsConnectionState.WaitForReconnection)
-                              {
-                                  this.Reconnect();
-                              }
-                          }));
-        }
-
-        #endregion
-
-        private void CheckDisposed()
-        {
-            if (this._disposed)
-            {
-                throw new ObjectDisposedException("UserStreamsReceiver");
+                Debug.WriteLine("[USER-STREAMS] " + text);
+                _handler.Log(text);
             }
         }
 
         public void Dispose()
         {
             this.Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         ~UserStreamsReceiver()
         {
-            this.Dispose(false);
+            Dispose(false);
         }
 
-        private bool _disposed;
         private void Dispose(bool disposing)
         {
-            this._disposed = true;
-            if (!disposing) return;
-            this.IsEnabled = false;
-            this.StateChanged = null;
+            if (!_disposed)
+            {
+                _disposed = true;
+            }
+            try
+            {
+                _cancellationTokenSource?.Cancel();
+            }
+            finally
+            {
+                _cancellationTokenSource?.Dispose();
+            }
         }
     }
 
-    enum BackOffMode
+    internal enum BackoffMode
     {
         None,
         NetworkError,

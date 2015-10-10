@@ -212,10 +212,7 @@ namespace StarryEyes.Models
                 nd = MainWindowModel.SetState(status);
             }
             var pd = Interlocked.Exchange(ref _disposable, nd);
-            if (pd != null)
-            {
-                pd.Dispose();
-            }
+            pd?.Dispose();
         }
     }
 

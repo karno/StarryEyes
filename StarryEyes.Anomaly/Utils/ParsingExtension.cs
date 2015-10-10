@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Xml.Linq;
 using JetBrains.Annotations;
 
 namespace StarryEyes.Anomaly.Utils
@@ -11,250 +10,161 @@ namespace StarryEyes.Anomaly.Utils
     {
         public const string TwitterDateTimeFormat = "ddd MMM d HH':'mm':'ss zzz yyyy";
 
-        #region for String
-
-        public static bool ParseBool(this string s, bool def)
+        /// <summary>
+        /// Parse text as bool
+        /// </summary>
+        /// <param name="s">convert value</param>
+        /// <param name="@default">default value if string is null or unacceptable value</param>
+        /// <returns>converted value</returns>
+        public static bool ParseBool([CanBeNull] this string s, bool @default = false)
         {
             if (s == null)
             {
-                return def;
+                return @default;
             }
-            return def ? s.ToLower() != "false" : s.ToLower() == "true";
+            return @default ? s.ToLower() != "false" : s.ToLower() == "true";
         }
 
-        public static long ParseLong(this string s)
+        /// <summary>
+        /// Parse string as long
+        /// </summary>
+        public static long ParseLong([CanBeNull] this string s)
         {
             long v;
             return long.TryParse(s, out v) ? v : 0;
         }
 
-        public static long? ParseNullableId(this string s)
+        /// <summary>
+        /// Parse nullable id
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static long? ParseNullableId([CanBeNull] this string s)
         {
             long v;
-            return long.TryParse(s, out v) && v != 0 ? v : (long?)null;
+            if (s != null && Int64.TryParse(s, out v) && v != 0)
+            {
+                return v;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Parse date time
+        /// </summary>
+        public static DateTime ParseDateTime([CanBeNull] this string s)
+        {
+            return s.ParseDateTime(DateTime.MinValue);
         }
 
 
-        public static DateTime ParseDateTime(this string s)
+        /// <summary>
+        /// Parse date time
+        /// </summary>
+        public static DateTime ParseDateTime([CanBeNull] this string s, DateTime @default)
         {
             DateTime dt;
-            return DateTime.TryParse(s, out dt) ? dt : DateTime.MinValue;
+            if (s != null && DateTime.TryParse(s, out dt))
+            {
+                return dt;
+            }
+            return @default;
         }
 
-        public static DateTime ParseDateTime(this string s, string format)
+        /// <summary>
+        /// Parse date time
+        /// </summary>
+        public static DateTime ParseDateTime([CanBeNull] this string s, [NotNull] string format)
         {
-            DateTime dt;
-            return DateTime.TryParseExact(s,
-                format,
-                System.Globalization.DateTimeFormatInfo.InvariantInfo,
-                System.Globalization.DateTimeStyles.None, out dt)
-                ? dt
-                : DateTime.MinValue;
+            if (format == null) throw new ArgumentNullException(nameof(format));
+
+            return s.ParseDateTime(format, DateTime.MinValue);
         }
 
-        public static DateTime ParseUnixTime(this string s)
+        /// <summary>
+        /// Parse date time
+        /// </summary>
+        public static DateTime ParseDateTime([CanBeNull] this string s,
+            [NotNull] string format, DateTime @default)
+        {
+            if (format == null) throw new ArgumentNullException(nameof(format));
+
+            DateTime dt;
+            if (s != null &&
+                DateTime.TryParseExact(s, format,
+                    System.Globalization.DateTimeFormatInfo.InvariantInfo,
+                    System.Globalization.DateTimeStyles.None, out dt))
+            {
+                return dt;
+            }
+            return @default;
+        }
+
+        /// <summary>
+        /// Parse date time by twitter default format
+        /// </summary>
+        public static DateTime ParseTwitterDateTime([CanBeNull] this string s)
+        {
+            return s.ParseDateTime(TwitterDateTimeFormat);
+        }
+
+        /// <summary>
+        /// Parse string as unix serial time
+        /// </summary>
+        public static DateTime ParseUnixTime([CanBeNull] this string s)
         {
             if (s == null) return DateTime.MinValue;
             return UnixEpoch.GetDateTimeByUnixEpoch(s.ParseLong());
         }
 
-        public static TimeSpan ParseUtcOffset(this string s)
-        {
-            int seconds;
-            int.TryParse(s, out seconds);
-            return new TimeSpan(0, 0, seconds);
-        }
-
-        public static Uri ParseUri(this string s)
+        /// <summary>
+        /// Parse uri
+        /// </summary>
+        public static Uri ParseUri([CanBeNull] this string s)
         {
             Uri ret;
-            if (Uri.TryCreate(s, UriKind.RelativeOrAbsolute, out ret))
+            if (s != null && Uri.TryCreate(s, UriKind.RelativeOrAbsolute, out ret))
+            {
                 return ret;
+            }
             return null;
         }
 
-        public static Uri ParseUriAbsolute(this string s)
+        /// <summary>
+        /// Parse uri as absolute uri
+        /// </summary>
+        public static Uri ParseUriAbsolute([CanBeNull] this string s)
         {
             var ret = s.ParseUri();
-            if (ret == null || !ret.IsAbsoluteUri) return null;
+            if (ret == null || !ret.IsAbsoluteUri)
+            {
+                return null;
+            }
             return ret;
         }
 
-        #endregion
-
-        #region for Element
-
-        public static string ParseString(this XElement e)
-        {
-            return e == null ? null : ResolveEntity(e.Value);
-        }
-
-        public static bool ParseBool(this XElement e, bool def = false)
-        {
-            return ParseBool(e == null ? null : e.Value, def);
-        }
-
-        public static long ParseLong(this XElement e)
-        {
-            return ParseLong(e == null ? null : e.Value);
-        }
-
-        public static DateTime ParseDateTime(this XElement e)
-        {
-            return ParseDateTime(e == null ? null : e.Value);
-        }
-
-        public static DateTime ParseDateTime(this XElement e, string format)
-        {
-            return ParseDateTime(e == null ? null : e.Value, format);
-        }
-
-        public static DateTime ParseUnixTime(this XElement e)
-        {
-            return ParseUnixTime(e == null ? null : e.Value);
-        }
-
-        public static TimeSpan ParseUtcOffset(this XElement e)
-        {
-            return ParseUtcOffset(e == null ? null : e.Value);
-        }
-
-        public static Uri ParseUri(this XElement e)
-        {
-            return e.ParseString().ParseUri();
-        }
-
-        #endregion
-
-        #region for Attributes
-
-        public static string ParseString(this XAttribute e)
-        {
-            return e == null ? null : ResolveEntity(e.Value);
-        }
-
-        public static bool ParseBool(this XAttribute e, bool def = false)
-        {
-            return ParseBool(e == null ? null : e.Value, def);
-        }
-
-        public static long ParseLong(this XAttribute e)
-        {
-            return ParseLong(e == null ? null : e.Value);
-        }
-
-        public static DateTime ParseDateTime(this XAttribute e)
-        {
-            return ParseDateTime(e == null ? null : e.Value);
-        }
-
-        public static DateTime ParseDateTime(this XAttribute e, string format)
-        {
-            return ParseDateTime(e == null ? null : e.Value, format);
-        }
-
-        public static DateTime ParseUnixTime(this XAttribute e)
-        {
-            return ParseUnixTime(e == null ? null : e.Value);
-        }
-
-        public static TimeSpan ParseUtcOffset(this XAttribute e)
-        {
-            return ParseUtcOffset(e == null ? null : e.Value);
-        }
-
-        public static Uri ParseUri(this XAttribute e)
-        {
-            var uri = e.ParseString();
-            try
-            {
-                if (String.IsNullOrEmpty(uri))
-                    return null;
-                return new Uri(uri);
-            }
-            catch (UriFormatException)
-            {
-                return null;
-            }
-        }
-
-        #endregion
-
-        #region for XText
-
-        public static string ParseString(this XText e)
-        {
-            return e == null ? null : ResolveEntity(e.Value);
-        }
-
-        public static bool ParseBool(this XText e, bool def = false)
-        {
-            return ParseBool(e == null ? null : e.Value, def);
-        }
-
-        public static long ParseLong(this XText e)
-        {
-            return ParseLong(e == null ? null : e.Value);
-        }
-
-        public static DateTime ParseDateTime(this XText e)
-        {
-            return ParseDateTime(e == null ? null : e.Value);
-        }
-
-        public static DateTime ParseDateTime(this XText e, string format)
-        {
-            return ParseDateTime(e == null ? null : e.Value, format);
-        }
-
-        public static DateTime ParseUnixTime(this XText e)
-        {
-            return ParseUnixTime(e == null ? null : e.Value);
-        }
-
-        public static TimeSpan ParseUtcOffset(this XText e)
-        {
-            return ParseUtcOffset(e == null ? null : e.Value);
-        }
-
-        public static Uri ParseUri(this XText e)
-        {
-            var uri = e.ParseString();
-            try
-            {
-                if (String.IsNullOrEmpty(uri))
-                    return null;
-                return new Uri(uri);
-            }
-            catch (UriFormatException)
-            {
-                return null;
-            }
-        }
-
-        #endregion
-
-        #region for General Text
-
-        public static string ResolveEntity([NotNull] string text)
+        /// <summary>
+        /// Resolve entity-escaped string
+        /// </summary>
+        public static string ResolveEntity([CanBeNull] string text)
         {
             return text
                 // .Replace("&quot;", "\"")
-                .Replace("&lt;", "<")
-                .Replace("&gt;", ">")
-                .Replace("&amp;", "&");
+                ?.Replace("&lt;", "<")
+                 .Replace("&gt;", ">")
+                 .Replace("&amp;", "&");
         }
 
-        public static string EscapeEntity([NotNull] string text)
+        /// <summary>
+        /// Escape string with entities
+        /// </summary>
+        public static string EscapeEntity([CanBeNull] string text)
         {
             return text
-                .Replace("&", "&amp;")
-                .Replace(">", "&gt;")
-                .Replace("<", "&lt;");
+                ?.Replace("&", "&amp;")
+                 .Replace(">", "&gt;")
+                 .Replace("<", "&lt;");
             // .Replace("\"", "&quot;")
         }
-
-        #endregion
     }
 }
-

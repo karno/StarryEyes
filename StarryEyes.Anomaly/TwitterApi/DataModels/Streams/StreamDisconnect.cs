@@ -1,13 +1,39 @@
-﻿
-namespace StarryEyes.Anomaly.TwitterApi.DataModels.StreamModels
+﻿namespace StarryEyes.Anomaly.TwitterApi.DataModels.Streams
 {
-    public class StreamDisconnect
+    /// <summary>
+    /// Disconnect notices
+    /// </summary>
+    /// <remarks>
+    /// This message indicates: current stream is disconnected from twitter.
+    /// 
+    /// This element is supported by: (generic) streams, user streams, site streams.
+    /// </remarks>
+    public sealed class StreamDisconnect : StreamMessage
     {
-        public DisconnectCode Code { get; set; }
+        public StreamDisconnect(DisconnectCode code, string streamName,
+            string reason, string timestampMs)
+            : base(timestampMs)
+        {
+            Code = code;
+            StreamName = streamName;
+            Reason = reason;
+        }
 
-        public string StreamName { get; set; }
+        /// <summary>
+        /// Disconnection code<para />
+        /// You can cast this value to int if required.
+        /// </summary>
+        public DisconnectCode Code { get; }
 
-        public string Reason { get; set; }
+        /// <summary>
+        /// Disconnected stream name
+        /// </summary>
+        public string StreamName { get; }
+
+        /// <summary>
+        /// Disconnection reason
+        /// </summary>
+        public string Reason { get; }
     }
 
     public enum DisconnectCode

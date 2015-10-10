@@ -104,7 +104,16 @@ namespace StarryEyes.Casket
             var asm = Assembly.GetExecutingAssembly();
             asm.DefinedTypes.Where(t => t.IsClass && !t.IsAbstract && t.IsSubclassOf(typeof(SQLiteFunction)))
                .Where(t => t.GetCustomAttribute<SQLiteFunctionAttribute>() != null)
-               .ForEach(SQLiteFunction.RegisterFunction);
+               .ForEach(t =>
+               {
+                   try
+                   {
+                       SQLiteFunction.RegisterFunction(t);
+                   }
+                   catch
+                   {
+                   }
+               });
 
             // initialize tables
             var tasks = new Task[] { };

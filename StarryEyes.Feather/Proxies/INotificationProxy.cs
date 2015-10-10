@@ -80,6 +80,22 @@ namespace StarryEyes.Feather.Proxies
         bool NotifyUnblocked(TwitterUser source, TwitterUser target);
 
         /// <summary>
+        /// The user muted someone.
+        /// </summary>
+        /// <param name="source">source user</param>
+        /// <param name="target">target user</param>
+        /// <returns>return true to trap notification</returns>
+        bool NotifyMuted(TwitterUser source, TwitterUser target);
+
+        /// <summary>
+        /// The user cancelled muting someone.
+        /// </summary>
+        /// <param name="source">source user</param>
+        /// <param name="target">target user</param>
+        /// <returns>return true to trap notification</returns>
+        bool NotifyUnmuted(TwitterUser source, TwitterUser target);
+
+        /// <summary>
         /// The user favorited the tweet.
         /// </summary>
         /// <param name="source">source user</param>
