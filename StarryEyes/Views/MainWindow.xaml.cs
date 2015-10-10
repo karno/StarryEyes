@@ -1,7 +1,9 @@
-﻿using MahApps.Metro.Controls;
+﻿using System;
+using MahApps.Metro.Controls;
 using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
 using StarryEyes.ViewModels;
+using Application = System.Windows.Application;
 using ThemeManager = StarryEyes.Settings.ThemeManager;
 
 namespace StarryEyes.Views
@@ -46,6 +48,11 @@ namespace StarryEyes.Views
                 Setting.LastWindowPosition.Value = this.GetWindowPlacement();
                 Setting.LastWindowState.Value = this.WindowState;
             }
+        }
+
+        private void OnClosed(object sender, EventArgs e)
+        {
+            Application.Current.Shutdown();
         }
     }
 }

@@ -20,6 +20,7 @@
                       Height="750"
                       Background="{DynamicResource BaseColorBackgroundBrush}"
                       Closing="OnClosing"
+                      Closed="OnClosed"
                       GlowBrush="{DynamicResource AccentColorBrush}"
                       IconBitmapScalingMode="HighQuality"
                       IconEdgeMode="Unspecified"

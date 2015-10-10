@@ -24,9 +24,7 @@ namespace StarryEyes.Models.Receiving.Receivers
 {
     public sealed class UserStreamsReceiver : IDisposable
     {
-        public const int MaxTrackingKeywordBytes = 60;
         public const int MaxTrackingKeywordCounts = 100;
-        private const int HardErrorRetryMaxCount = 3;
 
         private bool _isEnabled;
         public bool IsEnabled
@@ -43,6 +41,7 @@ namespace StarryEyes.Models.Receiving.Receivers
         }
 
         private readonly TimeSpan _userStreamTimeout = TimeSpan.FromSeconds(70);
+        private readonly CancellationTokenSource _receiverTokenSource;
         private CancellationTokenSource _cancellationTokenSource;
 
         private bool _disposed;
@@ -131,6 +130,7 @@ namespace StarryEyes.Models.Receiving.Receivers
         {
             _stateUpdater = new StateUpdater();
             _handler = InitializeHandler();
+            _receiverTokenSource = new CancellationTokenSource();
             _account = account;
             _cancellationTokenSource = null;
             ConnectionState = UserStreamsConnectionState.Disconnected;
@@ -255,11 +255,6 @@ namespace StarryEyes.Models.Receiving.Receivers
             return handler;
         }
 
-        public void Connect()
-        {
-            Connect(CancellationToken.None);
-        }
-
         public void Reconnect()
         {
             if (_disposed)
@@ -268,7 +263,7 @@ namespace StarryEyes.Models.Receiving.Receivers
             }
             this._stateUpdater.UpdateState("@" + _account.UnreliableScreenName + ": " +
                                            ReceivingResources.UserStreamReconnecting);
-            Task.Run(() => Connect());
+            Connect(_receiverTokenSource.Token);
         }
 
         /// <summary>
@@ -276,7 +271,7 @@ namespace StarryEyes.Models.Receiving.Receivers
         /// </summary>
         /// <param name="token">cancellation token</param>
         /// <returns>DateTime.MaxValue</returns>
-        public void Connect(CancellationToken token)
+        private void Connect(CancellationToken token)
         {
             // create new token and swap for old one.
             var cts = CancellationTokenSource.CreateLinkedTokenSource(token);
@@ -296,7 +291,7 @@ namespace StarryEyes.Models.Receiving.Receivers
                 oldcts?.Dispose();
             }
 
-            if (!_isEnabled)
+            if (!_isEnabled || token.IsCancellationRequested)
             {
                 _stateUpdater.UpdateState();
                 ConnectionState = UserStreamsConnectionState.Disconnected;
@@ -476,10 +471,12 @@ namespace StarryEyes.Models.Receiving.Receivers
             try
             {
                 _cancellationTokenSource?.Cancel();
+                _receiverTokenSource.Cancel();
             }
             finally
             {
                 _cancellationTokenSource?.Dispose();
+                _receiverTokenSource.Dispose();
             }
         }
     }
