@@ -246,8 +246,6 @@ namespace StarryEyes.Models.Inputting
                                  .Select(a => Tuple.Create(a, SendInternal(a, request)))
                                  .ToArray();
             var tasks = posts.Select(p => p.Item2).OfType<Task>().ToArray();
-            // wait for completion
-            Task.WaitAll(tasks);
 
             var amendTargets = new Dictionary<TwitterAccount, TwitterStatus>();
             var failedAccounts = new List<TwitterAccount>();
