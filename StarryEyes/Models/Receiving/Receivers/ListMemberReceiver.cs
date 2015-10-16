@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using StarryEyes.Albireo;
 using StarryEyes.Albireo.Helpers;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest;
@@ -24,8 +23,8 @@ namespace StarryEyes.Models.Receiving.Receivers
 
         public ListMemberReceiver(TwitterAccount auth, ListInfo listInfo)
         {
-            this._auth = auth;
-            this._listInfo = listInfo;
+            _auth = auth;
+            _listInfo = listInfo;
         }
 
         protected override string ReceiverName
@@ -43,28 +42,28 @@ namespace StarryEyes.Models.Receiving.Receivers
             if (_listId == null)
             {
                 // get description
-                var list = (await ReceiveListDescription(_auth, _listInfo));
-                await ListProxy.SetListDescription(list);
+                var list = await ReceiveListDescription(_auth, _listInfo).ConfigureAwait(false);
+                await ListProxy.SetListDescription(list).ConfigureAwait(false);
                 _listId = list.Id;
             }
             // if list data is not found, abort receiving timeline.
             if (_listId == null) return;
             var id = _listId.Value;
-            var users = (await ReceiveListMembers(_auth, id)).OrderBy(l => l).ToArray();
-            var oldUsers = (await ListProxy.GetListMembers(id)).OrderBy(l => l).ToArray();
+            var users = (await ReceiveListMembers(_auth, id).ConfigureAwait(false)).OrderBy(l => l).ToArray();
+            var oldUsers = (await ListProxy.GetListMembers(id).ConfigureAwait(false)).OrderBy(l => l).ToArray();
             if (users.SequenceEqual(oldUsers))
             {
                 // not changed
                 return;
             }
             // commit changes
-            await ListProxy.SetListMembers(id, users);
+            await ListProxy.SetListMembers(id, users).ConfigureAwait(false);
             ListMemberChanged.SafeInvoke();
         }
 
-        private async Task<TwitterList> ReceiveListDescription(TwitterAccount account, ListInfo info)
+        private Task<TwitterList> ReceiveListDescription(TwitterAccount account, ListInfo info)
         {
-            return await account.ShowListAsync(info.OwnerScreenName, info.Slug);
+            return account.ShowListAsync(info.OwnerScreenName, info.Slug);
         }
 
         private async Task<IEnumerable<long>> ReceiveListMembers(TwitterAccount account, long listId)
@@ -73,7 +72,7 @@ namespace StarryEyes.Models.Receiving.Receivers
             long cursor = -1;
             do
             {
-                var result = await account.GetListMembersAsync(listId, cursor);
+                var result = await account.GetListMembersAsync(listId, cursor).ConfigureAwait(false);
                 memberList.AddRange(result.Result
                           .Do(u => Task.Run(() => UserProxy.StoreUser(u)))
                           .Select(u => u.Id));

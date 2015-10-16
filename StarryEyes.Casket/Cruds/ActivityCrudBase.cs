@@ -20,9 +20,9 @@ namespace StarryEyes.Casket.Cruds
 
         internal override async Task InitializeAsync(IDatabaseConnectionDescriptor descriptor)
         {
-            await base.InitializeAsync(descriptor);
-            await this.CreateIndexAsync(_tableName + "_SID", "StatusId", false);
-            await this.CreateIndexAsync(_tableName + "_UID", "UserId", false);
+            await base.InitializeAsync(descriptor).ConfigureAwait(false);
+            await CreateIndexAsync(_tableName + "_SID", "StatusId", false).ConfigureAwait(false);
+            await CreateIndexAsync(_tableName + "_UID", "UserId", false).ConfigureAwait(false);
         }
 
         public Task<IEnumerable<long>> GetUsersAsync(long statusId)
@@ -36,35 +36,35 @@ namespace StarryEyes.Casket.Cruds
             IEnumerable<long> statusIds)
         {
             return (await Descriptor.QueryAsync<DatabaseActivity>(
-                this.CreateSql("StatusId IN @Ids"), new { Ids = statusIds.ToArray() }))
+                CreateSql("StatusId IN @Ids"), new { Ids = statusIds.ToArray() }).ConfigureAwait(false))
                 .GroupBy(e => e.StatusId)
                 .ToDictionary(e => e.Key, e => e.Select(d => d.UserId));
         }
 
-        public async Task DeleteNotExistsAsync(string statusTableName)
+        public Task DeleteNotExistsAsync(string statusTableName)
         {
-            await Descriptor.ExecuteAsync(
+            return Descriptor.ExecuteAsync(
                 string.Format("DELETE FROM {0} WHERE NOT EXISTS (SELECT Id FROM {1} WHERE {1}.Id = {0}.StatusId);",
-                    this.TableName, statusTableName));
+                    TableName, statusTableName));
         }
 
-        public async Task InsertAsync(long statusId, long userId)
+        public Task InsertAsync(long statusId, long userId)
         {
-            await base.InsertAsync(new DatabaseActivity
+            return base.InsertAsync(new DatabaseActivity
             {
                 StatusId = statusId,
                 UserId = userId
             });
         }
 
-        public async Task DeleteAsync(long statusId, long userId)
+        public Task DeleteAsync(long statusId, long userId)
         {
-            await Descriptor.ExecuteAsync(
-                string.Format("delete from {0} where StatusId = @Sid and UserId = @Uid;", this.TableName),
+            return Descriptor.ExecuteAsync(
+                string.Format("delete from {0} where StatusId = @Sid and UserId = @Uid;", TableName),
                 new { Sid = statusId, Uid = userId });
         }
 
-        public async Task InsertAllAsync(IEnumerable<Tuple<long, long>> items)
+        public Task InsertAllAsync(IEnumerable<Tuple<long, long>> items)
         {
             var inserters = items.Select(i => Tuple.Create(
                 TableInserter,
@@ -73,15 +73,15 @@ namespace StarryEyes.Casket.Cruds
                     StatusId = i.Item1,
                     UserId = i.Item2
                 }));
-            await Descriptor.ExecuteAllAsync(inserters);
+            return Descriptor.ExecuteAllAsync(inserters);
         }
 
-        public async Task DeleteAllAsync(IEnumerable<Tuple<long, long>> items)
+        public Task DeleteAllAsync(IEnumerable<Tuple<long, long>> items)
         {
             var deleters = items.Select(i => Tuple.Create(
-                "delete from " + this.TableName + " where StatusId = @Sid and UserId = @Uid;",
+                "delete from " + TableName + " where StatusId = @Sid and UserId = @Uid;",
                 (object)new { Sid = i.Item1, Uid = i.Item2 }));
-            await Descriptor.ExecuteAllAsync(deleters);
+            return Descriptor.ExecuteAllAsync(deleters);
         }
     }
 }

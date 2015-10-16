@@ -25,6 +25,11 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SettingFlips
                 _ => RaisePropertyChanged(() => IsDonated)));
         }
 
+        public string ApplicationName
+        {
+            get { return App.AppFullName; }
+        }
+
         [UsedImplicitly]
         public void CheckUpdate()
         {

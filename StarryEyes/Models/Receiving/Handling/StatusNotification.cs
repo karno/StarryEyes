@@ -51,7 +51,7 @@ namespace StarryEyes.Models.Receiving.Handling
     {
         public static async Task<StatusModelNotification> FromStatusNotification(StatusNotification notification, bool isNew)
         {
-            var model = notification.Status == null ? null : await StatusModel.Get(notification.Status);
+            var model = notification.Status == null ? null : await StatusModel.Get(notification.Status).ConfigureAwait(false);
             return new StatusModelNotification(model, notification.IsAdded, isNew, notification.StatusId);
         }
 

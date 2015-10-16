@@ -31,12 +31,12 @@ namespace StarryEyes.Models.Timelines
 
         public bool IsLoading
         {
-            get { return this._isLoading; }
+            get { return _isLoading; }
             protected set
             {
-                if (this._isLoading == value) return;
-                this._isLoading = value;
-                this.IsLoadingChanged.SafeInvoke(value);
+                if (_isLoading == value) return;
+                _isLoading = value;
+                IsLoadingChanged.SafeInvoke(value);
             }
         }
 
@@ -44,30 +44,30 @@ namespace StarryEyes.Models.Timelines
 
         public ObservableSynchronizedCollectionEx<StatusModel> Statuses
         {
-            get { return this._statuses; }
+            get { return _statuses; }
         }
 
         public bool IsAutoTrimEnabled
         {
-            get { return this._isAutoTrimEnabled; }
+            get { return _isAutoTrimEnabled; }
             set
             {
-                if (value == this.IsAutoTrimEnabled)
+                if (value == IsAutoTrimEnabled)
                 {
                     return;
                 }
-                this._isAutoTrimEnabled = value;
+                _isAutoTrimEnabled = value;
                 if (value)
                 {
-                    this.TrimTimeline();
+                    TrimTimeline();
                 }
             }
         }
 
         public TimelineModelBase()
         {
-            this._statusIdCache = new HashSet<long>();
-            this._statuses = new ObservableSynchronizedCollectionEx<StatusModel>();
+            _statusIdCache = new HashSet<long>();
+            _statuses = new ObservableSynchronizedCollectionEx<StatusModel>();
         }
 
         #region Status Global Receiver Control
@@ -77,62 +77,62 @@ namespace StarryEyes.Models.Timelines
         /// </summary>
         protected bool IsSubscribeBroadcaster
         {
-            get { return this._timelineListener != null; }
+            get { return _timelineListener != null; }
             set
             {
-                if (value == this.IsSubscribeBroadcaster) return;
+                if (value == IsSubscribeBroadcaster) return;
                 var ncd = value ? new CompositeDisposable() : null;
-                var old = Interlocked.Exchange(ref this._timelineListener, ncd);
+                var old = Interlocked.Exchange(ref _timelineListener, ncd);
                 if (old != null)
                 {
                     old.Dispose();
                 }
                 if (ncd == null) return;
                 // create timeline composition
-                ncd.Add(StatusBroadcaster.BroadcastPoint.Subscribe(this.AcceptStatus));
+                ncd.Add(StatusBroadcaster.BroadcastPoint.Subscribe(AcceptStatus));
             }
         }
 
         private void AcceptStatus(StatusModelNotification n)
         {
-            if (n.IsAdded && n.StatusModel != null && this.CheckAcceptStatus(n.StatusModel.Status))
+            if (n.IsAdded && n.StatusModel != null && CheckAcceptStatus(n.StatusModel.Status))
             {
-                this.AddStatus(n.StatusModel, n.IsNew);
+                AddStatus(n.StatusModel, n.IsNew);
             }
             else
             {
-                this.RemoveStatus(n.StatusId);
+                RemoveStatus(n.StatusId);
             }
         }
 
         private async Task<bool> AddStatus(TwitterStatus status, bool isNewArrival)
         {
-            if (!this.CheckStatusAdd(status, false))
+            if (!CheckStatusAdd(status, false))
             {
                 return false;
             }
 
-            var model = await StatusModel.Get(status);
-            return this.AddStatus(model, isNewArrival);
+            var model = await StatusModel.Get(status).ConfigureAwait(false);
+            return AddStatus(model, isNewArrival);
         }
 
         protected virtual bool AddStatus(StatusModel model, bool isNewArrival)
         {
-            if (!this.CheckStatusAdd(model.Status, true))
+            if (!CheckStatusAdd(model.Status, true))
             {
                 return false;
             }
 
             var stamp = model.Status.CreatedAt;
-            this.Statuses.Insert(
+            Statuses.Insert(
                 i => i.TakeWhile(s => s.Status.CreatedAt > stamp).Count(),
                 model);
             // check auto trim
-            if (this.IsAutoTrimEnabled &&
-                this._statusIdCache.Count > TimelineChunkCount + TimelineChunkCountBounce &&
-                Interlocked.Exchange(ref this._trimCount, 1) == 0)
+            if (IsAutoTrimEnabled &&
+                _statusIdCache.Count > TimelineChunkCount + TimelineChunkCountBounce &&
+                Interlocked.Exchange(ref _trimCount, 1) == 0)
             {
-                this.TrimTimeline();
+                TrimTimeline();
             }
             return true;
         }
@@ -140,11 +140,11 @@ namespace StarryEyes.Models.Timelines
         private bool CheckStatusAdd(TwitterStatus status, bool actualAdd)
         {
             var stamp = status.CreatedAt;
-            if (this.IsAutoTrimEnabled)
+            if (IsAutoTrimEnabled)
             {
                 // check whether status is in trimmed place or not.
                 StatusModel lastModel;
-                if (this.Statuses.TryIndexOf(TimelineChunkCount, out lastModel) &&
+                if (Statuses.TryIndexOf(TimelineChunkCount, out lastModel) &&
                     lastModel != null &&
                     lastModel.Status.CreatedAt > stamp)
                 {
@@ -152,11 +152,11 @@ namespace StarryEyes.Models.Timelines
                     return false;
                 }
             }
-            lock (this._statusIdCache)
+            lock (_statusIdCache)
             {
                 if (actualAdd
-                    ? !this._statusIdCache.Add(status.Id)
-                    : this._statusIdCache.Contains(status.Id))
+                    ? !_statusIdCache.Add(status.Id)
+                    : _statusIdCache.Contains(status.Id))
                 {
                     return false;
                 }
@@ -166,12 +166,12 @@ namespace StarryEyes.Models.Timelines
 
         protected virtual void RemoveStatus(long id)
         {
-            lock (this._statusIdCache)
+            lock (_statusIdCache)
             {
-                if (!this._statusIdCache.Remove(id)) return;
+                if (!_statusIdCache.Remove(id)) return;
             }
             // remove
-            this.Statuses.RemoveWhere(s => s.Status.Id == id);
+            Statuses.RemoveWhere(s => s.Status.Id == id);
         }
 
         #endregion
@@ -180,22 +180,22 @@ namespace StarryEyes.Models.Timelines
 
         public async Task ReadMore(long? maxId)
         {
-            await this.ReadMore(maxId, true);
+            await ReadMore(maxId, true).ConfigureAwait(false);
         }
 
         private async Task ReadMore(long? maxId, bool setLoadingFlag)
         {
             if (setLoadingFlag)
             {
-                this.IsLoading = true;
+                IsLoading = true;
             }
-            await this.Fetch(maxId, TimelineChunkCount)
+            await Fetch(maxId, TimelineChunkCount)
                       .Where(CheckAcceptStatus)
                       .Select(s => AddStatus(s, false))
                       .LastOrDefaultAsync();
             if (setLoadingFlag)
             {
-                this.IsLoading = false;
+                IsLoading = false;
             }
         }
 
@@ -204,15 +204,15 @@ namespace StarryEyes.Models.Timelines
         {
             Task.Run(() =>
             {
-                if (!this._isAutoTrimEnabled) return;
-                if (this.Statuses.Count <= TimelineChunkCount) return;
+                if (!_isAutoTrimEnabled) return;
+                if (Statuses.Count <= TimelineChunkCount) return;
                 try
                 {
                     StatusModel last;
-                    if (!this.Statuses.TryIndexOf(TimelineChunkCount, out last) || last == null) return;
+                    if (!Statuses.TryIndexOf(TimelineChunkCount, out last) || last == null) return;
                     var lastCreatedAt = last.Status.CreatedAt;
                     var removedIds = new List<long>();
-                    this.Statuses.RemoveWhere(t =>
+                    Statuses.RemoveWhere(t =>
                     {
                         if (t.Status.CreatedAt < lastCreatedAt)
                         {
@@ -221,14 +221,14 @@ namespace StarryEyes.Models.Timelines
                         }
                         return false;
                     });
-                    lock (this._statusIdCache)
+                    lock (_statusIdCache)
                     {
-                        removedIds.ForEach(id => this._statusIdCache.Remove(id));
+                        removedIds.ForEach(id => _statusIdCache.Remove(id));
                     }
                 }
                 finally
                 {
-                    Interlocked.Exchange(ref this._trimCount, 0);
+                    Interlocked.Exchange(ref _trimCount, 0);
                 }
             });
         }
@@ -242,13 +242,13 @@ namespace StarryEyes.Models.Timelines
 
         protected void QueueInvalidateTimeline()
         {
-            var stamp = Interlocked.Increment(ref this._invlatch);
+            var stamp = Interlocked.Increment(ref _invlatch);
             Observable.Timer(TimeSpan.FromSeconds(QueueInvalidationWaitSec))
                       .Subscribe(_ =>
                       {
-                          if (Interlocked.CompareExchange(ref this._invlatch, 0, stamp) == stamp)
+                          if (Interlocked.CompareExchange(ref _invlatch, 0, stamp) == stamp)
                           {
-                              this.InvalidateTimeline();
+                              InvalidateTimeline();
                           }
                       });
         }
@@ -256,33 +256,33 @@ namespace StarryEyes.Models.Timelines
         public void InvalidateTimeline()
         {
             // clear queued invalidates
-            Interlocked.Increment(ref this._invlatch);
+            Interlocked.Increment(ref _invlatch);
             Task.Run(async () =>
             {
                 var complete = false;
                 try
                 {
-                    this.IsLoading = true;
-                    if (this.PreInvalidateTimeline())
+                    IsLoading = true;
+                    if (PreInvalidateTimeline())
                     {
                         // when PreInvalidateTimeline is finished correctly,
                         // reserve to down loading flag.
                         complete = true;
                     }
                     // invalidate and fetch statuses
-                    lock (this._statusIdCache)
+                    lock (_statusIdCache)
                     {
-                        this._statusIdCache.Clear();
-                        this.Statuses.Clear();
+                        _statusIdCache.Clear();
+                        Statuses.Clear();
                     }
                     // do not change loading flag in inner method
-                    await this.ReadMore(null, false);
+                    await ReadMore(null, false).ConfigureAwait(false);
                 }
                 finally
                 {
                     if (complete)
                     {
-                        this.IsLoading = false;
+                        IsLoading = false;
                     }
                 }
             });
@@ -322,23 +322,23 @@ namespace StarryEyes.Models.Timelines
 
         public void Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
         }
 
         ~TimelineModelBase()
         {
-            this.Dispose(false);
+            Dispose(false);
         }
 
         protected virtual void Dispose(bool disposing)
         {
             if (!disposing) return;
-            this.IsSubscribeBroadcaster = false;
-            lock (this._statusIdCache)
+            IsSubscribeBroadcaster = false;
+            lock (_statusIdCache)
             {
-                this._statusIdCache.Clear();
+                _statusIdCache.Clear();
             }
-            this.Statuses.Clear();
+            Statuses.Clear();
         }
 
         protected enum TimelineModelState

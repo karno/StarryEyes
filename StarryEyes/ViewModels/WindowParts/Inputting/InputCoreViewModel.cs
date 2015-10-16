@@ -50,11 +50,11 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
 
         public InputCoreViewModel(InputViewModel parent)
         {
-            this._parent = parent;
-            this._provider = new InputAreaSuggestItemProvider();
+            _parent = parent;
+            _provider = new InputAreaSuggestItemProvider();
 
             CompositeDisposable.Add(
-                this._bindingHashtags = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
+                _bindingHashtags = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
                     InputModel.InputCore.BindingHashtags,
                     tag => new BindHashtagViewModel(tag, () => UnbindHashtag(tag)),
                     DispatcherHelper.UIDispatcher));
@@ -104,7 +104,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             {
                 try
                 {
-                    Directory.Delete(this._tempDir, true);
+                    Directory.Delete(_tempDir, true);
                 }
                 // ReSharper disable once EmptyGeneralCatchClause
                 catch (Exception)
@@ -118,8 +118,8 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             CompositeDisposable.Add(watcher = new ClipboardWatcher());
             watcher.ClipboardChanged += (o, e) => RaisePropertyChanged(() => IsClipboardContentImage);
             watcher.StartWatching();
-            Setting.DisableGeoLocationService.ValueChanged += this.UpdateGeoLocationService;
-            this.UpdateGeoLocationService(Setting.DisableGeoLocationService.Value);
+            Setting.DisableGeoLocationService.ValueChanged += UpdateGeoLocationService;
+            UpdateGeoLocationService(Setting.DisableGeoLocationService.Value);
         }
 
         private void UpdateGeoLocationService(bool isEnabled)
@@ -174,7 +174,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
 
         private void InputDataChanged()
         {
-            this.RaisePropertyChanged(() => InputData);
+            RaisePropertyChanged(() => InputData);
             RaisePropertyChanged(() => InputText);
             RaisePropertyChanged(() => InReplyTo);
             RaisePropertyChanged(() => IsInReplyToEnabled);
@@ -193,7 +193,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
 
         public InputAreaSuggestItemProvider Provider
         {
-            get { return this._provider; }
+            get { return _provider; }
         }
 
         #region Text control
@@ -233,9 +233,9 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                     currentTextLength += TwitterConfigurationService.MediaUrlLength;
                 }
                 var tags = TwitterRegexPatterns.ValidHashtag.Matches(InputText)
-                                           .OfType<Match>()
-                                           .Select(_ => _.Groups[1].Value)
-                                           .ToArray();
+                                               .OfType<Match>()
+                                               .Select(_ => _.Groups[1].Value)
+                                               .ToArray();
                 if (InputModel.InputCore.BindingHashtags.Count > 0)
                 {
                     currentTextLength += InputModel.InputCore.BindingHashtags
@@ -269,14 +269,14 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
         private void EscapeUrl()
         {
             var escaped = StatusTextUtil.AutoEscape(InputText);
-            if (escaped == this.InputText) return;
-            this.InputData.Text = escaped;
-            this.RaisePropertyChanged(() => this.InputText);
-            this.UpdateHashtagCandidates();
-            this.UpdateTextCount();
+            if (escaped == InputText) return;
+            InputData.Text = escaped;
+            RaisePropertyChanged(() => InputText);
+            UpdateHashtagCandidates();
+            UpdateTextCount();
 
-            var diff = escaped.Length - this.InputText.Length;
-            this.SelectionStart += diff;
+            var diff = escaped.Length - InputText.Length;
+            SelectionStart += diff;
         }
 
         public bool CheckClearInput(string clearTo = "")
@@ -351,8 +351,8 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                     _inReplyToViewModelCache.Dispose();
                     _inReplyToViewModelCache = null;
                 }
-                return this._inReplyToViewModelCache ??
-                       (this._inReplyToViewModelCache = new InReplyToStatusViewModel(InputData.InReplyTo));
+                return _inReplyToViewModelCache ??
+                       (_inReplyToViewModelCache = new InReplyToStatusViewModel(InputData.InReplyTo));
             }
             set
             {
@@ -409,7 +409,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             }
             set
             {
-                this.InputData.MessageRecipient = value == null ? null : value.User;
+                InputData.MessageRecipient = value == null ? null : value.User;
                 var old = Interlocked.Exchange(ref _recipientViewModel, value);
                 if (old != null)
                 {
@@ -480,7 +480,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
 
         private void SetCursor(CursorPosition position)
         {
-            this._parent.Messenger.RaiseSafe(() => new TextBoxSetCaretMessage(
+            _parent.Messenger.RaiseSafe(() => new TextBoxSetCaretMessage(
                 position.Index < 0 ? InputText.Length : position.Index, position.SelectionLength));
         }
 
@@ -500,12 +500,12 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
 
         public DispatcherCollection<BindHashtagViewModel> BindableHashtagCandidates
         {
-            get { return this._bindableHashtagCandidates; }
+            get { return _bindableHashtagCandidates; }
         }
 
         public ReadOnlyDispatcherCollectionRx<BindHashtagViewModel> BindingHashtags
         {
-            get { return this._bindingHashtags; }
+            get { return _bindingHashtags; }
         }
 
         private void UpdateHashtagCandidates()
@@ -530,8 +530,8 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
         public void BindHashtag(string hashtag)
         {
             InputModel.BindHashtag(hashtag);
-            this.UpdateHashtagCandidates();
-            this.UpdateTextCount();
+            UpdateHashtagCandidates();
+            UpdateTextCount();
         }
 
         public void UnbindHashtag(string hashtag)
@@ -592,7 +592,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             }
 
             Setting.LastImageOpenDir.Value = Path.GetDirectoryName(m.Response[0]);
-            this.AttachImageFromPath(m.Response[0]);
+            AttachImageFromPath(m.Response[0]);
         }
 
         public void DetachImage()
@@ -614,7 +614,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                     encoder.Frames.Add(BitmapFrame.Create(image));
                     encoder.Save(fs);
                 }
-                this.AttachImageFromPath(tempPath);
+                AttachImageFromPath(tempPath);
             }
             catch (Exception ex)
             {
@@ -688,8 +688,8 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                     _description.DragOver += args =>
                     {
                         args.Effects = args.Data.GetData(DataFormats.FileDrop) != null
-                                           ? DragDropEffects.Link
-                                           : DragDropEffects.None;
+                            ? DragDropEffects.Link
+                            : DragDropEffects.None;
                         args.Handled = true;
                     };
                     _description.DragDrop += args =>
@@ -723,9 +723,9 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
         {
             get
             {
-                return this.InputData.AttachedGeoLocation != null
-                           ? new LocationDescriptionViewModel(this.InputData.AttachedGeoLocation)
-                           : null;
+                return InputData.AttachedGeoLocation != null
+                    ? new LocationDescriptionViewModel(InputData.AttachedGeoLocation)
+                    : null;
             }
             set
             {
@@ -765,7 +765,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
 
         public ReadOnlyDispatcherCollectionRx<InputDataViewModel> DraftedInputs
         {
-            get { return this._draftedInputs; }
+            get { return _draftedInputs; }
         }
 
         public bool IsDraftsExisted
@@ -810,17 +810,17 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             if (!CanSend)
             {
                 // could not send.
-                this.RaisePropertyChanged(() => CanSend);
-                this._parent.FocusToTextBox();
+                RaisePropertyChanged(() => CanSend);
+                _parent.FocusToTextBox();
                 return;
             }
-            if (!this.CheckInput())
+            if (!CheckInput())
             {
                 return;
             }
             SendCore(InputData);
             ClearInput();
-            this._parent.FocusToTextBox();
+            _parent.FocusToTextBox();
         }
 
         private bool CheckInput()
@@ -858,7 +858,10 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                 // filters screen names which were replied
                 var replies = TwitterRegexPatterns.ValidMentionOrList.Matches(InReplyTo.Status.Text)
                                                   .Cast<Match>()
-                                                  .Select(_ => _.Groups[TwitterRegexPatterns.ValidMentionOrListGroupUsername].Value.Substring(1))
+                                                  .Select(
+                                                      _ =>
+                                                          _.Groups[TwitterRegexPatterns.ValidMentionOrListGroupUsername
+                                                              ].Value.Substring(1))
                                                   .Where(_ => !String.IsNullOrEmpty(_))
                                                   .Distinct()
                                                   .ToArray();
@@ -895,7 +898,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
         {
             Task.Run(async () =>
             {
-                var r = await data.SendAsync();
+                var r = await data.SendAsync().ConfigureAwait(false);
                 if (r.Succeededs != null)
                 {
                     InputModel.InputCore.LastPostedData = r.Succeededs;
@@ -903,7 +906,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                 }
                 if (r.Faileds != null)
                 {
-                    var message = this.AnalyzeFailedReason(r.Exceptions) ??
+                    var message = AnalyzeFailedReason(r.Exceptions) ??
                                   InputAreaResources.MsgTweetFailedReasonUnknown;
                     var ed = r.Exceptions
                               .Guard()
@@ -931,7 +934,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                             !resp.Response.VerificationChecked.GetValueOrDefault();
                         if (resp.Response.Result == TaskDialogSimpleResult.Retry)
                         {
-                            this.SendCore(r.Faileds);
+                            SendCore(r.Faileds);
                             return;
                         }
                     }
@@ -985,27 +988,27 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
 
         public InReplyToStatusViewModel(TwitterStatus status)
         {
-            this._status = status;
+            _status = status;
         }
 
         public long Id
         {
-            get { return this.Status.Id; }
+            get { return Status.Id; }
         }
 
         public string ScreenName
         {
-            get { return this.Status.User.ScreenName; }
+            get { return Status.User.ScreenName; }
         }
 
         public string Text
         {
-            get { return this.Status.GetEntityAidedText(); }
+            get { return Status.GetEntityAidedText(); }
         }
 
         public TwitterStatus Status
         {
-            get { return this._status; }
+            get { return _status; }
         }
     }
 
@@ -1026,16 +1029,16 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
 
         public ImageDescriptionViewModel(BitmapImage image, ImageType sourceType)
         {
-            this._bitmap = image;
+            _bitmap = image;
             _byteArray = image.SaveToBytes(sourceType);
         }
 
         public byte[] ByteArray
         {
-            get { return this._byteArray; }
+            get { return _byteArray; }
             set
             {
-                this._byteArray = value;
+                _byteArray = value;
                 _bitmap = ImageUtil.CreateImage(value);
                 RaisePropertyChanged();
                 RaisePropertyChanged(() => Image);

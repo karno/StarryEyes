@@ -9,24 +9,24 @@ namespace StarryEyes.Models.Databases
     {
         public static async Task<IEnumerable<long>> GetAccountsAsync()
         {
-            return await Database.AccountInfoCrud.GetAllAsync();
+            return await Database.AccountInfoCrud.GetAllAsync().ConfigureAwait(false);
         }
 
         public static async Task AddAccountAsync(long id)
         {
-            await Database.AccountInfoCrud.InsertAsync(new DatabaseAccountInfo(id));
+            await Database.AccountInfoCrud.InsertAsync(new DatabaseAccountInfo(id)).ConfigureAwait(false);
         }
 
         public static async Task RemoveAccountAsync(long id)
         {
-            await Database.AccountInfoCrud.DeleteAsync(id);
-            await Database.RelationCrud.DropUserAsync(id);
+            await Database.AccountInfoCrud.DeleteAsync(id).ConfigureAwait(false);
+            await Database.RelationCrud.DropUserAsync(id).ConfigureAwait(false);
         }
 
         public static async Task RemoveAllAccountsAsync()
         {
-            await Database.AccountInfoCrud.DropAllAsync();
-            await Database.RelationCrud.DropAllAsync();
+            await Database.AccountInfoCrud.DropAllAsync().ConfigureAwait(false);
+            await Database.RelationCrud.DropAllAsync().ConfigureAwait(false);
         }
     }
 }

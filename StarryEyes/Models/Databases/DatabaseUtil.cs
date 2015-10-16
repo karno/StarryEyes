@@ -73,9 +73,9 @@ namespace StarryEyes.Models.Databases
         {
             await RetryIfLocked(async () =>
             {
-                await func();
+                await func().ConfigureAwait(false);
                 return 0;
-            }, waitMillisec);
+            }, waitMillisec).ConfigureAwait(false);
         }
 
         public static async Task<T> RetryIfLocked<T>(Func<Task<T>> func,
@@ -87,7 +87,7 @@ namespace StarryEyes.Models.Databases
             {
                 try
                 {
-                    return await func();
+                    return await func().ConfigureAwait(false);
                 }
                 catch (SQLiteException sqex)
                 {

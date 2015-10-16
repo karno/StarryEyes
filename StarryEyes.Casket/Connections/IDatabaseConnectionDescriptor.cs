@@ -52,7 +52,7 @@ namespace StarryEyes.Casket.Connections
                             throw WrapException(ex, "ExecuteAsync", query);
                         }
                     }
-                });
+                }, TaskCreationOptions.DenyChildAttach);
         }
 
         internal static Task<int> ExecuteAsync(this IDatabaseConnectionDescriptor descriptor,
@@ -80,7 +80,7 @@ namespace StarryEyes.Casket.Connections
                             throw WrapException(ex, "ExecuteAsyncWithParam", query);
                         }
                     }
-                });
+                }, TaskCreationOptions.DenyChildAttach);
         }
 
         internal static Task ExecuteAllAsync(this IDatabaseConnectionDescriptor descriptor,
@@ -113,7 +113,7 @@ namespace StarryEyes.Casket.Connections
                                 qnp.Select(q => q.Item1).JoinString(Environment.NewLine));
                         }
                     }
-                });
+                }, TaskCreationOptions.DenyChildAttach);
         }
 
         internal static Task<IEnumerable<T>> QueryAsync<T>(this IDatabaseConnectionDescriptor descriptor,
@@ -138,7 +138,7 @@ namespace StarryEyes.Casket.Connections
                             throw WrapException(ex, "QueryAsync", query);
                         }
                     }
-                });
+                }, TaskCreationOptions.DenyChildAttach);
         }
 
         internal static SqliteCrudException WrapException(Exception exception, string command, string query)

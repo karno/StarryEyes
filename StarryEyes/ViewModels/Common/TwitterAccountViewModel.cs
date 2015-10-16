@@ -13,45 +13,45 @@ namespace StarryEyes.ViewModels.Common
 
         public TwitterAccountViewModel(TwitterAccount account)
         {
-            this._account = account;
+            _account = account;
         }
 
         public long Id
         {
-            get { return this._account.Id; }
+            get { return _account.Id; }
         }
 
         public TwitterAccount Account
         {
-            get { return this._account; }
+            get { return _account; }
         }
 
         public Uri ProfileImageUri
         {
             get
             {
-                if (this._account.UnreliableProfileImage == null)
+                if (_account.UnreliableProfileImage == null)
                 {
                     Task.Run(async () =>
                     {
                         try
                         {
-                            var user = await this._account.ShowUserAsync(this._account.Id);
-                            this._account.UnreliableProfileImage = user.ProfileImageUri.ChangeImageSize(ImageSize.Original);
-                            this.RaisePropertyChanged(() => this.ProfileImageUri);
+                            var user = await _account.ShowUserAsync(_account.Id).ConfigureAwait(false);
+                            _account.UnreliableProfileImage = user.ProfileImageUri.ChangeImageSize(ImageSize.Original);
+                            RaisePropertyChanged(() => ProfileImageUri);
                         }
                         // ReSharper disable EmptyGeneralCatchClause
                         catch { }
                         // ReSharper restore EmptyGeneralCatchClause
                     });
                 }
-                return this._account.UnreliableProfileImage;
+                return _account.UnreliableProfileImage;
             }
         }
 
         public string ScreenName
         {
-            get { return this._account.UnreliableScreenName; }
+            get { return _account.UnreliableScreenName; }
         }
     }
 }

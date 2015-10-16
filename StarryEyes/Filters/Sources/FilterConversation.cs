@@ -27,14 +27,14 @@ namespace StarryEyes.Filters.Sources
             {
                 throw new ArgumentException("argument must be numeric value.");
             }
-            this._original = id;
+            _original = id;
             _statuses.Add(id);
         }
 
         public override void Activate()
         {
             base.Activate();
-            this.TraceBackConversations(this._original);
+            TraceBackConversations(_original);
         }
 
         private async void TraceBackConversations(long origin)
@@ -44,12 +44,12 @@ namespace StarryEyes.Filters.Sources
                 _isPreparing = true;
                 var queue = new Queue<long>();
                 var list = new List<long>();
-                queue.Enqueue(await this.FindHeadAsync(origin));
+                queue.Enqueue(await FindHeadAsync(origin).ConfigureAwait(false));
                 while (queue.Count > 0)
                 {
                     var cid = queue.Dequeue();
                     list.Add(cid);
-                    var ids = await StatusProxy.FindFromInReplyToAsync(cid);
+                    var ids = await StatusProxy.FindFromInReplyToAsync(cid).ConfigureAwait(false);
                     ids.ForEach(queue.Enqueue);
                 }
                 lock (_statuses)
@@ -61,15 +61,15 @@ namespace StarryEyes.Filters.Sources
             {
                 _isPreparing = false;
                 System.Diagnostics.Debug.WriteLine("#INVALIDATION: Conversation Loaded");
-                this.RaiseInvalidateRequired();
+                RaiseInvalidateRequired();
             }
         }
 
         private async Task<long> FindHeadAsync(long id)
         {
-            var irt = await StatusProxy.GetInReplyToAsync(id);
+            var irt = await StatusProxy.GetInReplyToAsync(id).ConfigureAwait(false);
             if (irt == null) return id;
-            return await this.FindHeadAsync(irt.Value);
+            return await FindHeadAsync(irt.Value).ConfigureAwait(false);
         }
 
         public override string FilterKey
@@ -79,12 +79,12 @@ namespace StarryEyes.Filters.Sources
 
         public override string FilterValue
         {
-            get { return this._original.ToString(CultureInfo.InvariantCulture); }
+            get { return _original.ToString(CultureInfo.InvariantCulture); }
         }
 
         public override Func<TwitterStatus, bool> GetEvaluator()
         {
-            return this.CheckConversation;
+            return CheckConversation;
         }
 
         public override string GetSqlQuery()

@@ -256,7 +256,7 @@ namespace StarryEyes.Models.Inputting
                 var account = item.Item1;
                 try
                 {
-                    var result = await item.Item2;
+                    var result = await item.Item2.ConfigureAwait(false);
                     amendTargets.Add(account, result);
                 }
                 catch (Exception ex)

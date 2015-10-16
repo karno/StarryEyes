@@ -44,36 +44,6 @@
             <ColumnDefinition />
             <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
-        <Viewbox Grid.Row="3"
-                 Grid.RowSpan="2"
-                 Grid.Column="1"
-                 HorizontalAlignment="Stretch"
-                 VerticalAlignment="Stretch">
-            <Grid>
-                <Image HorizontalAlignment="Stretch"
-                       VerticalAlignment="Stretch"
-                       RenderOptions.BitmapScalingMode="Fant"
-                       Stretch="None">
-                    <Image.Source>
-                        <BitmapImage UriSource="../../../../kriletan.png" />
-                    </Image.Source>
-                </Image>
-                <TextBlock Margin="0,0,30,30"
-                           HorizontalAlignment="Right"
-                           VerticalAlignment="Bottom"
-                           FontSize="28">
-                    <Run Text="Krile-tan, the official mascot" />
-                    <LineBreak />
-                    <Run Text="Illustrated by" />
-                    <Hyperlink NavigateUri="http://twitter.com/ichimy">
-                        <i:Interaction.Behaviors>
-                            <behaviors:NavigateHyperlinkBehavior />
-                        </i:Interaction.Behaviors>
-                        <Run Text="@ichimy" />
-                    </Hyperlink><Run Text="." />
-                </TextBlock>
-            </Grid>
-        </Viewbox>
 
         <TextBlock Grid.ColumnSpan="2"
                    Margin="0,-24,0,0"
@@ -82,7 +52,9 @@
                    FontFamily="Segoe UI Semilight"
                    FontSize="64"
                    Foreground="{StaticResource MetroCyanBrush}"
-                   Text="Krile STARRYEYES"
+                   Text="{Binding ApplicationName,
+                                  Mode=OneTime,
+                                  FallbackValue=BINDING_ERROR}"
                    TextWrapping="Wrap" />
         <StackPanel Grid.Row="2"
                     Grid.ColumnSpan="2"
@@ -168,23 +140,6 @@
                 </StackPanel>
             </Border>
         </StackPanel>
-        <TextBlock Grid.Row="4"
-                   Grid.ColumnSpan="2"
-                   Margin="0,0,0,10"
-                   HorizontalAlignment="Left"
-                   VerticalAlignment="Bottom"
-                   TextWrapping="Wrap">
-            <Run Text="(C) 2013 Karno. This software is licensed under" />
-            <Hyperlink>
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="Click">
-                        <ei:CallMethodAction MethodName="OpenLicense" TargetObject="{Binding}" />
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-                <Run Text="The MIT License" />
-            </Hyperlink>
-            <Run Text="." />
-        </TextBlock>
         <Grid Grid.Row="3">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -353,5 +308,52 @@
                 </Hyperlink><Run Text="." />
             </TextBlock>
         </Grid>
+        <Viewbox Grid.Row="3"
+                 Grid.RowSpan="2"
+                 Grid.Column="1"
+                 HorizontalAlignment="Stretch"
+                 VerticalAlignment="Stretch">
+            <Grid>
+                <Image HorizontalAlignment="Stretch"
+                       VerticalAlignment="Stretch"
+                       RenderOptions.BitmapScalingMode="Fant"
+                       Stretch="None">
+                    <Image.Source>
+                        <BitmapImage UriSource="../../../../kriletan.png" />
+                    </Image.Source>
+                </Image>
+                <TextBlock Margin="0,0,30,30"
+                           HorizontalAlignment="Right"
+                           VerticalAlignment="Bottom"
+                           FontSize="28">
+                    <Run Text="Krile-tan, the official mascot" />
+                    <LineBreak />
+                    <Run Text="Illustrated by" />
+                    <Hyperlink NavigateUri="http://twitter.com/ichimy">
+                        <i:Interaction.Behaviors>
+                            <behaviors:NavigateHyperlinkBehavior />
+                        </i:Interaction.Behaviors>
+                        <Run Text="@ichimy" />
+                    </Hyperlink><Run Text="." />
+                </TextBlock>
+            </Grid>
+        </Viewbox>
+        <TextBlock Grid.Row="4"
+                   Grid.ColumnSpan="2"
+                   Margin="0,0,0,10"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Bottom"
+                   TextWrapping="Wrap">
+            <Run Text="(C) 2013 Karno. This software is licensed under" />
+            <Hyperlink>
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="Click">
+                        <ei:CallMethodAction MethodName="OpenLicense" TargetObject="{Binding}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+                <Run Text="The MIT License" />
+            </Hyperlink>
+            <Run Text="." />
+        </TextBlock>
     </Grid>
 </UserControl>

@@ -16,29 +16,29 @@ namespace StarryEyes.Casket.Cruds
 
         internal override async Task InitializeAsync(IDatabaseConnectionDescriptor descriptor)
         {
-            await base.InitializeAsync(descriptor);
-            await this.CreateIndexAsync("ListFName", "FullName", false);
-            await this.CreateIndexAsync("ListUID", "UserId", false);
-            await this.CreateIndexAsync("ListSlug", "Slug", false);
+            await base.InitializeAsync(descriptor).ConfigureAwait(false);
+            await CreateIndexAsync("ListFName", "FullName", false).ConfigureAwait(false);
+            await CreateIndexAsync("ListUID", "UserId", false).ConfigureAwait(false);
+            await CreateIndexAsync("ListSlug", "Slug", false).ConfigureAwait(false);
         }
 
-        public async Task RegisterListAsync(DatabaseList list)
+        public Task RegisterListAsync(DatabaseList list)
         {
-            await this.InsertAsync(list);
+            return InsertAsync(list);
         }
 
         public async Task<DatabaseList> GetAsync(long userId, string slug)
         {
             return (await Descriptor.QueryAsync<DatabaseList>(
                 CreateSql("UserId = @userId and LOWER(Slug) = LOWER(@slug) limit 1"),
-                new { userId, slug })).FirstOrDefault();
+                new { userId, slug }).ConfigureAwait(false)).FirstOrDefault();
         }
 
-        public async Task<IEnumerable<DatabaseList>> FindOwnedListAsync(long userId)
+        public Task<IEnumerable<DatabaseList>> FindOwnedListAsync(long userId)
         {
-            return (await Descriptor.QueryAsync<DatabaseList>(
+            return Descriptor.QueryAsync<DatabaseList>(
                 CreateSql("UserId = @userId"),
-                new { userId }));
+                new { userId });
         }
     }
 }

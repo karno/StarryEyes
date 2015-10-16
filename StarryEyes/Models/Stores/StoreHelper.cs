@@ -16,12 +16,12 @@ namespace StarryEyes.Models.Stores
     {
         public static async Task<TwitterStatus> GetTweetAsync(long id)
         {
-            var status = await StatusProxy.GetStatusAsync(id);
+            var status = await StatusProxy.GetStatusAsync(id).ConfigureAwait(false);
             if (status == null)
             {
                 var acc = Setting.Accounts.GetRandomOne();
                 if (acc == null) return null;
-                status = await acc.ShowTweetAsync(id);
+                status = await acc.ShowTweetAsync(id).ConfigureAwait(false);
                 StatusInbox.Enqueue(status);
             }
             return status;
@@ -29,12 +29,12 @@ namespace StarryEyes.Models.Stores
 
         public static async Task<TwitterUser> GetUserAsync(long id)
         {
-            var user = await UserProxy.GetUserAsync(id);
+            var user = await UserProxy.GetUserAsync(id).ConfigureAwait(false);
             if (user == null)
             {
                 var acc = Setting.Accounts.GetRelatedOne(id);
                 if (acc == null) return null;
-                user = await acc.ShowUserAsync(id);
+                user = await acc.ShowUserAsync(id).ConfigureAwait(false);
                 UserProxy.StoreUser(user);
             }
             return user;
@@ -42,12 +42,12 @@ namespace StarryEyes.Models.Stores
 
         public static async Task<TwitterUser> GetUserAsync(string screenName)
         {
-            var user = await UserProxy.GetUserAsync(screenName);
+            var user = await UserProxy.GetUserAsync(screenName).ConfigureAwait(false);
             if (user == null)
             {
                 var acc = Setting.Accounts.GetRandomOne();
                 if (acc == null) return null;
-                user = await acc.ShowUserAsync(screenName);
+                user = await acc.ShowUserAsync(screenName).ConfigureAwait(false);
                 UserProxy.StoreUser(user);
             }
             return user;
@@ -56,14 +56,14 @@ namespace StarryEyes.Models.Stores
         public static async Task<IEnumerable<TwitterUser>> GetUsersAsync(IEnumerable<long> ids)
         {
             var target = ids.ToArray();
-            var users = (await UserProxy.GetUsersAsync(target)).ToList();
+            var users = (await UserProxy.GetUsersAsync(target).ConfigureAwait(false)).ToList();
             var needFetch = target.Except(users.Select(u => u.Id));
             foreach (var id in needFetch)
             {
                 var acc = Setting.Accounts.GetRelatedOne(id);
                 if (acc != null)
                 {
-                    var user = await acc.ShowUserAsync(id);
+                    var user = await acc.ShowUserAsync(id).ConfigureAwait(false);
                     UserProxy.StoreUser(user);
                     users.Add(user);
                 }

@@ -28,7 +28,7 @@ namespace StarryEyes.Models.Requests
                 {
                     try
                     {
-                        return await request.Send(account);
+                        return await request.Send(account).ConfigureAwait(false);
                     }
                     catch (WebException ex)
                     {
@@ -48,7 +48,7 @@ namespace StarryEyes.Models.Requests
                     }
                     retryCount++;
                     // wait retry delay
-                    await Task.Delay(TimeSpan.FromSeconds(request.RetryDelaySec));
+                    await Task.Delay(TimeSpan.FromSeconds(request.RetryDelaySec)).ConfigureAwait(false);
                 } while (true);
             }).Unwrap();
         }
@@ -65,7 +65,7 @@ namespace StarryEyes.Models.Requests
                 {
                     try
                     {
-                        var result = await request.Send(account);
+                        var result = await request.Send(account).ConfigureAwait(false);
                         Task.Run(() =>
                         {
                             subject.OnNext(result);
@@ -90,7 +90,7 @@ namespace StarryEyes.Models.Requests
                     if (retryCount < request.RetryCount)
                     {
                         // wait retry delay
-                        await Task.Delay(TimeSpan.FromSeconds(request.RetryDelaySec));
+                        await Task.Delay(TimeSpan.FromSeconds(request.RetryDelaySec)).ConfigureAwait(false);
                     }
                 } while (retryCount < request.RetryCount);
                 // throw last exception

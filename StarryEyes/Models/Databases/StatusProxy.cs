@@ -21,7 +21,7 @@ namespace StarryEyes.Models.Databases
         static StatusProxy()
         {
             _statusQueue = new TaskQueue<long, TwitterStatus>(200, TimeSpan.FromSeconds(30),
-                async s => await StoreStatusesAsync(s));
+                async s => await StoreStatusesAsync(s).ConfigureAwait(false));
             _favoriteQueue = new ActivityQueue(50, TimeSpan.FromSeconds(30),
                 s => Task.Run(() => Database.FavoritesCrud.InsertAllAsync(s)),
                 s => Task.Run(() => Database.FavoritesCrud.DeleteAllAsync(s)));
@@ -64,7 +64,7 @@ namespace StarryEyes.Models.Databases
                 }
                 return new[] { s };
             }).Select(s => StatusInsertBatch.CreateBatch(Mapper.Map(s), Mapper.Map(s.User)));
-            await DatabaseUtil.RetryIfLocked(async () => await Database.StoreStatuses(store));
+            await DatabaseUtil.RetryIfLocked(() => Database.StoreStatuses(store)).ConfigureAwait(false);
             StatisticsService.SetQueuedStatusCount(_statusQueue.Count);
         }
 
@@ -81,14 +81,14 @@ namespace StarryEyes.Models.Databases
                 _statusQueue.Remove(statusId);
 
                 // find retweets, remove from queue and concatenate id
-                var removals = (await GetRetweetedStatusIds(statusId))
+                var removals = (await GetRetweetedStatusIds(statusId).ConfigureAwait(false))
                     .Do(id => _statusQueue.Remove(id)) // remove from queue
                     .Concat(new[] { statusId }) // concat original id
                     .ToArray();
 
                 // remove status
-                await DatabaseUtil.RetryIfLocked(
-                    async () => await Database.StatusCrud.DeleteAllAsync(removals));
+                await DatabaseUtil.RetryIfLocked(() => Database.StatusCrud.DeleteAllAsync(removals))
+                                  .ConfigureAwait(false);
                 return removals;
             }
             catch (Exception ex)
@@ -102,7 +102,7 @@ namespace StarryEyes.Models.Databases
         {
             if (_statusQueue.Contains(id)) return true;
             return await DatabaseUtil.RetryIfLocked(
-                async () => await Database.StatusCrud.GetAsync(id)) != null;
+                () => Database.StatusCrud.GetAsync(id)).ConfigureAwait(false) != null;
         }
 
         public static async Task<TwitterStatus> GetStatusAsync(long id)
@@ -112,31 +112,29 @@ namespace StarryEyes.Models.Databases
             {
                 return cache;
             }
-            var status = await DatabaseUtil.RetryIfLocked(
-                async () => await Database.StatusCrud.GetAsync(id));
+            var status = await DatabaseUtil.RetryIfLocked(() =>
+            Database.StatusCrud.GetAsync(id)).ConfigureAwait(false);
             if (status == null) return null;
-            return await LoadStatusAsync(status);
+            return await LoadStatusAsync(status).ConfigureAwait(false);
         }
 
         public static async Task<long?> GetInReplyToAsync(long id)
         {
-            return await DatabaseUtil.RetryIfLocked(async () =>
+            return await DatabaseUtil.RetryIfLocked(() =>
             {
                 TwitterStatus cache;
-                if (_statusQueue.TryGetValue(id, out cache))
-                {
-                    return cache.InReplyToStatusId;
-                }
-                return await Database.StatusCrud.GetInReplyToAsync(id);
-            });
+                return _statusQueue.TryGetValue(id, out cache)
+                    ? Task.FromResult(cache.InReplyToStatusId)
+                    : Database.StatusCrud.GetInReplyToAsync(id);
+            }).ConfigureAwait(false);
         }
 
         public static async Task<IEnumerable<long>> GetRetweetedStatusIds(long originalId)
         {
             try
             {
-                var rts = await DatabaseUtil.RetryIfLocked(
-                    async () => await Database.StatusCrud.GetRetweetedStatusesAsync(originalId));
+                var rts = await DatabaseUtil.RetryIfLocked(() =>
+                    Database.StatusCrud.GetRetweetedStatusesAsync(originalId)).ConfigureAwait(false);
                 return rts.Select(r => r.Id)
                           .Concat(_statusQueue.Find(s => s.RetweetedOriginalId == originalId)
                                               .Select(s => s.Id));
@@ -150,8 +148,8 @@ namespace StarryEyes.Models.Databases
 
         public static async Task<IEnumerable<long>> FindFromInReplyToAsync(long inReplyTo)
         {
-            var replies = await DatabaseUtil.RetryIfLocked(
-                async () => await Database.StatusCrud.FindFromInReplyToAsync(inReplyTo));
+            var replies = await DatabaseUtil.RetryIfLocked(() =>
+            Database.StatusCrud.FindFromInReplyToAsync(inReplyTo)).ConfigureAwait(false);
             return replies.Concat(_statusQueue.Find(s => s.InReplyToStatusId == inReplyTo)
                                               .Select(s => s.Id));
         }
@@ -191,10 +189,10 @@ namespace StarryEyes.Models.Databases
                 IEnumerable<long> favadd, favremove, rtadd, rtremove;
                 _favoriteQueue.GetDirtyActivity(status.Id, out favadd, out favremove);
                 _retweetQueue.GetDirtyActivity(status.Id, out rtadd, out rtremove);
-                var favorers = DatabaseUtil.RetryIfLocked(
-                    async () => await Database.FavoritesCrud.GetUsersAsync(status.Id));
-                var retweeters = DatabaseUtil.RetryIfLocked(
-                    async () => await Database.RetweetsCrud.GetUsersAsync(status.Id));
+                var favorers = DatabaseUtil.RetryIfLocked(() =>
+                    Database.FavoritesCrud.GetUsersAsync(status.Id)).ConfigureAwait(false);
+                var retweeters = DatabaseUtil.RetryIfLocked(() =>
+                Database.RetweetsCrud.GetUsersAsync(status.Id)).ConfigureAwait(false);
                 status.FavoritedUsers = (await favorers).Guard().Concat(favadd).Except(favremove).ToArray();
                 status.RetweetedUsers = (await retweeters).Guard().Concat(rtadd).Except(rtremove).ToArray();
             }
@@ -234,13 +232,13 @@ namespace StarryEyes.Models.Databases
             // find status and limit caches
             var read = Task.Run(async () =>
             {
-                var db = await Database.StatusCrud.FetchAsync(sql);
-                var fetched = (await LoadStatusesAsync(db))
+                var db = await Database.StatusCrud.FetchAsync(sql).ConfigureAwait(false);
+                var fetched = (await LoadStatusesAsync(db).ConfigureAwait(false))
                     .OrderByDescending(d => d.Id)
                     .ToArray();
 
                 // await finding cache
-                var cachedStatus = (await cacheReader).OrderByDescending(d => d.Id).AsEnumerable();
+                var cachedStatus = (await cacheReader.ConfigureAwait(false)).OrderByDescending(d => d.Id).AsEnumerable();
 
                 if (count != null && fetched.Length == count)
                 {
@@ -273,7 +271,7 @@ namespace StarryEyes.Models.Databases
                 var op = predicate;
                 predicate = s => op(s) && !MuteBlockManager.IsUnwanted(s);
             }
-            return await Task.Run(() => _statusQueue.Find(predicate));
+            return await Task.Run(() => _statusQueue.Find(predicate)).ConfigureAwait(false);
         }
 
         #region Load from database
@@ -281,37 +279,37 @@ namespace StarryEyes.Models.Databases
         private static async Task<TwitterStatus> LoadStatusAsync([NotNull] DatabaseStatus dbstatus)
         {
             if (dbstatus == null) throw new ArgumentNullException("dbstatus");
-            return await DatabaseUtil.RetryIfLocked(async () =>
+            return await DatabaseUtil.RetryIfLocked(() =>
             {
                 switch (dbstatus.StatusType)
                 {
                     case StatusType.Tweet:
-                        return await LoadPublicStatusAsync(dbstatus);
+                        return LoadPublicStatusAsync(dbstatus);
                     case StatusType.DirectMessage:
-                        return await LoadDirectMessageAsync(dbstatus);
+                        return LoadDirectMessageAsync(dbstatus);
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
-            });
+            }).ConfigureAwait(false);
         }
 
         private static async Task<TwitterStatus> LoadPublicStatusAsync([NotNull] DatabaseStatus dbstatus)
         {
             if (dbstatus == null) throw new ArgumentNullException("dbstatus");
             var id = dbstatus.Id;
-            var user = DatabaseUtil.RetryIfLocked(async () =>
-                await UserProxy.GetUserAsync(dbstatus.UserId));
-            var se = DatabaseUtil.RetryIfLocked(async () =>
-                await Database.StatusEntityCrud.GetEntitiesAsync(id));
-            var favorers = DatabaseUtil.RetryIfLocked(async () =>
-                await Database.FavoritesCrud.GetUsersAsync(id));
-            var retweeters = DatabaseUtil.RetryIfLocked(async () =>
-                await Database.RetweetsCrud.GetUsersAsync(id));
+            var user = DatabaseUtil.RetryIfLocked(() =>
+                UserProxy.GetUserAsync(dbstatus.UserId)).ConfigureAwait(false);
+            var se = DatabaseUtil.RetryIfLocked(() =>
+                Database.StatusEntityCrud.GetEntitiesAsync(id)).ConfigureAwait(false);
+            var favorers = DatabaseUtil.RetryIfLocked(() =>
+                Database.FavoritesCrud.GetUsersAsync(id)).ConfigureAwait(false);
+            var retweeters = DatabaseUtil.RetryIfLocked(() =>
+                Database.RetweetsCrud.GetUsersAsync(id)).ConfigureAwait(false);
             try
             {
                 if (dbstatus.RetweetOriginalId != null)
                 {
-                    var orig = await GetStatusAsync(dbstatus.RetweetOriginalId.Value);
+                    var orig = await GetStatusAsync(dbstatus.RetweetOriginalId.Value).ConfigureAwait(false);
                     if (orig != null)
                     {
                         return Mapper.Map(dbstatus,
@@ -337,14 +335,12 @@ namespace StarryEyes.Models.Databases
             if (dbstatus.InReplyToOrRecipientUserId == null)
                 throw new ArgumentException("dbstatus.InReplyToUserOrRecipientId is must not be null.");
             var id = dbstatus.Id;
-            var user = UserProxy.GetUserAsync(dbstatus.UserId);
-            var recipient = UserProxy.GetUserAsync(dbstatus.InReplyToOrRecipientUserId.Value);
-            var se = Database.StatusEntityCrud.GetEntitiesAsync(id);
+            var user = UserProxy.GetUserAsync(dbstatus.UserId).ConfigureAwait(false);
+            var recipient = UserProxy.GetUserAsync(dbstatus.InReplyToOrRecipientUserId.Value).ConfigureAwait(false);
+            var se = DatabaseUtil.RetryIfLocked(() => Database.StatusEntityCrud.GetEntitiesAsync(id)).ConfigureAwait(false);
             try
             {
-                return Mapper.Map(dbstatus,
-                    await DatabaseUtil.RetryIfLocked(async () => await se),
-                    await user, await recipient);
+                return Mapper.Map(dbstatus, await se, await user, await recipient);
             }
             catch (ArgumentNullException anex)
             {
@@ -391,15 +387,15 @@ namespace StarryEyes.Models.Databases
                 }
             }
             // accessing database
-            var retweetsTask = DatabaseUtil.RetryIfLocked(async () =>
-                await Database.StatusCrud.GetStatusesAsync(retweetOriginalIds));
-            var usersTask = UserProxy.GetUsersAsync(targetUserIds);
-            var sesTask = DatabaseUtil.RetryIfLocked(async () =>
-                await Database.StatusEntityCrud.GetEntitiesDictionaryAsync(entitiesTargetIds));
-            var favdicTask = DatabaseUtil.RetryIfLocked(async () =>
-                await Database.FavoritesCrud.GetUsersDictionaryAsync(activitiesTargetIds));
-            var rtdicTask = DatabaseUtil.RetryIfLocked(async () =>
-                await Database.RetweetsCrud.GetUsersDictionaryAsync(activitiesTargetIds));
+            var retweetsTask = DatabaseUtil.RetryIfLocked(() =>
+                Database.StatusCrud.GetStatusesAsync(retweetOriginalIds)).ConfigureAwait(false);
+            var usersTask = UserProxy.GetUsersAsync(targetUserIds).ConfigureAwait(false);
+            var sesTask = DatabaseUtil.RetryIfLocked(() =>
+                Database.StatusEntityCrud.GetEntitiesDictionaryAsync(entitiesTargetIds)).ConfigureAwait(false);
+            var favdicTask = DatabaseUtil.RetryIfLocked(() =>
+                Database.FavoritesCrud.GetUsersDictionaryAsync(activitiesTargetIds)).ConfigureAwait(false);
+            var rtdicTask = DatabaseUtil.RetryIfLocked(() =>
+                Database.RetweetsCrud.GetUsersDictionaryAsync(activitiesTargetIds)).ConfigureAwait(false);
             var retweets = (await retweetsTask).ToDictionary(d => d.Id);
             var users = (await usersTask).ToDictionary(d => d.Id);
             var ses = await sesTask;

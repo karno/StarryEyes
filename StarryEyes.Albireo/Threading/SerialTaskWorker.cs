@@ -48,7 +48,7 @@ namespace StarryEyes.Albireo.Threading
                     }
                     if (task.WorkTask != null)
                     {
-                        await task.WorkTask();
+                        await task.WorkTask().ConfigureAwait(false);
                     }
                     if (task.WorkAction != null)
                     {

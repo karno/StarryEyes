@@ -38,14 +38,14 @@ namespace StarryEyes.Settings
 
         private async void SynchronizeDb()
         {
-            var accounts = (await AccountProxy.GetAccountsAsync()).ToArray();
+            var accounts = (await AccountProxy.GetAccountsAsync().ConfigureAwait(false)).ToArray();
             var registered = _accountCache.Keys.ToArray();
             var news = registered.Except(accounts).ToArray();
             var olds = accounts.Except(registered).ToArray();
             await Task.Run(() => Task.WaitAll(
                 olds.Select(AccountProxy.RemoveAccountAsync)
                     .Concat(news.Select(AccountProxy.AddAccountAsync))
-                    .ToArray()));
+                    .ToArray())).ConfigureAwait(false);
         }
 
         public IEnumerable<long> Ids
@@ -134,12 +134,12 @@ namespace StarryEyes.Settings
 
         private async Task AddAccountSub(long id)
         {
-            await AccountProxy.AddAccountAsync(id);
+            await AccountProxy.AddAccountAsync(id).ConfigureAwait(false);
         }
 
         private async Task RemoveAccountSub(long id)
         {
-            await AccountProxy.RemoveAccountAsync(id);
+            await AccountProxy.RemoveAccountAsync(id).ConfigureAwait(false);
         }
     }
 }

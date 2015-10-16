@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
-using StarryEyes.Albireo;
 using StarryEyes.Albireo.Collections;
 using StarryEyes.Albireo.Helpers;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
@@ -78,24 +77,24 @@ namespace StarryEyes.Filters
 
         public ListWatcher(ListInfo info)
         {
-            this._info = info;
+            _info = info;
             ReceiveManager.ListMemberChanged += OnListMemberChanged;
         }
 
         [NotNull]
         public AVLTree<long> Ids
         {
-            get { return this._ids; }
+            get { return _ids; }
         }
 
         public long ListId
         {
-            get { return this._listId; }
+            get { return _listId; }
         }
 
         private void OnListMemberChanged(ListInfo info)
         {
-            if (info.Equals(this._info))
+            if (info.Equals(_info))
             {
                 RefreshMembers();
             }
@@ -105,25 +104,25 @@ namespace StarryEyes.Filters
         {
             Task.Run(async () =>
             {
-                if (this.ListId == 0)
+                if (ListId == 0)
                 {
-                    var listDesc = await ListProxy.GetListDescription(_info);
+                    var listDesc = await ListProxy.GetListDescription(_info).ConfigureAwait(false);
                     if (listDesc != null)
                     {
-                        this._listId = listDesc.Id;
+                        _listId = listDesc.Id;
                     }
                 }
                 // list data is not found
-                if (this.ListId == 0) return;
+                if (ListId == 0) return;
 
-                var userIds = await ListProxy.GetListMembers(this.ListId);
+                var userIds = await ListProxy.GetListMembers(ListId).ConfigureAwait(false);
                 // user data is not found
                 if (userIds == null) return;
 
-                lock (this.Ids)
+                lock (Ids)
                 {
-                    this.Ids.Clear();
-                    userIds.ForEach(id => this.Ids.Add(id));
+                    Ids.Clear();
+                    userIds.ForEach(id => Ids.Add(id));
                 }
                 OnListMemberUpdated.SafeInvoke();
             });

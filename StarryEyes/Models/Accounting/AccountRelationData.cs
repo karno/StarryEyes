@@ -21,7 +21,7 @@ namespace StarryEyes.Models.Accounting
         /// </summary>
         public AccountRelationDataChunk Followings
         {
-            get { return this._followings; }
+            get { return _followings; }
         }
 
         private readonly AccountRelationDataChunk _followers;
@@ -30,7 +30,7 @@ namespace StarryEyes.Models.Accounting
         /// </summary>
         public AccountRelationDataChunk Followers
         {
-            get { return this._followers; }
+            get { return _followers; }
         }
 
         private readonly AccountRelationDataChunk _blockings;
@@ -39,7 +39,7 @@ namespace StarryEyes.Models.Accounting
         /// </summary>
         public AccountRelationDataChunk Blockings
         {
-            get { return this._blockings; }
+            get { return _blockings; }
         }
 
         private readonly AccountRelationDataChunk _noRetweets;
@@ -48,7 +48,7 @@ namespace StarryEyes.Models.Accounting
         /// </summary>
         public AccountRelationDataChunk NoRetweets
         {
-            get { return this._noRetweets; }
+            get { return _noRetweets; }
         }
 
         private readonly AccountRelationDataChunk _mutes;
@@ -57,7 +57,7 @@ namespace StarryEyes.Models.Accounting
         /// </summary>
         public AccountRelationDataChunk Mutes
         {
-            get { return this._mutes; }
+            get { return _mutes; }
         }
 
 
@@ -67,7 +67,7 @@ namespace StarryEyes.Models.Accounting
         /// </summary>
         public long AccountId
         {
-            get { return this._accountId; }
+            get { return _accountId; }
         }
 
         /// <summary>
@@ -81,22 +81,22 @@ namespace StarryEyes.Models.Accounting
         /// <param name="accountId">bound account id</param>
         public AccountRelationData(long accountId)
         {
-            this._accountId = accountId;
-            this._followings = new AccountRelationDataChunk(this, RelationDataType.Following);
-            this._followers = new AccountRelationDataChunk(this, RelationDataType.Follower);
-            this._blockings = new AccountRelationDataChunk(this, RelationDataType.Blocking);
-            this._noRetweets = new AccountRelationDataChunk(this, RelationDataType.NoRetweets);
-            this._mutes = new AccountRelationDataChunk(this, RelationDataType.Mutes);
-            this._followings.AccountDataUpdated += this.PropagateEvent;
-            this._followers.AccountDataUpdated += this.PropagateEvent;
-            this._blockings.AccountDataUpdated += this.PropagateEvent;
-            this.NoRetweets.AccountDataUpdated += this.PropagateEvent;
-            this._mutes.AccountDataUpdated += this.PropagateEvent;
+            _accountId = accountId;
+            _followings = new AccountRelationDataChunk(this, RelationDataType.Following);
+            _followers = new AccountRelationDataChunk(this, RelationDataType.Follower);
+            _blockings = new AccountRelationDataChunk(this, RelationDataType.Blocking);
+            _noRetweets = new AccountRelationDataChunk(this, RelationDataType.NoRetweets);
+            _mutes = new AccountRelationDataChunk(this, RelationDataType.Mutes);
+            _followings.AccountDataUpdated += PropagateEvent;
+            _followers.AccountDataUpdated += PropagateEvent;
+            _blockings.AccountDataUpdated += PropagateEvent;
+            NoRetweets.AccountDataUpdated += PropagateEvent;
+            _mutes.AccountDataUpdated += PropagateEvent;
         }
 
         private void PropagateEvent(RelationDataChangedInfo e)
         {
-            this.AccountDataUpdated.SafeInvoke(e);
+            AccountDataUpdated.SafeInvoke(e);
             AccountDataUpdatedStatic.SafeInvoke(e);
         }
     }
@@ -118,19 +118,19 @@ namespace StarryEyes.Models.Accounting
         {
             var rdci = new RelationDataChangedInfo
             {
-                AccountUserId = this._parent.AccountId,
+                AccountUserId = _parent.AccountId,
                 IsIdAdded = isAdded,
                 TargetUserIds = targetUsers,
                 Type = _type
             };
-            this.AccountDataUpdated.SafeInvoke(rdci);
+            AccountDataUpdated.SafeInvoke(rdci);
         }
 
         public AccountRelationDataChunk(AccountRelationData parent, RelationDataType type)
         {
-            this._parent = parent;
-            this._type = type;
-            Task.Run(() => this.InitializeCollection());
+            _parent = parent;
+            _type = type;
+            Task.Run(() => InitializeCollection());
         }
 
         private async Task InitializeCollection()
@@ -139,24 +139,24 @@ namespace StarryEyes.Models.Accounting
             switch (_type)
             {
                 case RelationDataType.Following:
-                    reader = UserProxy.GetFollowingsAsync(this._parent.AccountId);
+                    reader = UserProxy.GetFollowingsAsync(_parent.AccountId);
                     break;
                 case RelationDataType.Follower:
-                    reader = UserProxy.GetFollowersAsync(this._parent.AccountId);
+                    reader = UserProxy.GetFollowersAsync(_parent.AccountId);
                     break;
                 case RelationDataType.Blocking:
-                    reader = UserProxy.GetBlockingsAsync(this._parent.AccountId);
+                    reader = UserProxy.GetBlockingsAsync(_parent.AccountId);
                     break;
                 case RelationDataType.NoRetweets:
-                    reader = UserProxy.GetNoRetweetsAsync(this._parent.AccountId);
+                    reader = UserProxy.GetNoRetweetsAsync(_parent.AccountId);
                     break;
                 case RelationDataType.Mutes:
-                    reader = UserProxy.GetMutesAsync(this._parent.AccountId);
+                    reader = UserProxy.GetMutesAsync(_parent.AccountId);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-            await this.AddAsync(await reader);
+            await AddAsync(await reader.ConfigureAwait(false)).ConfigureAwait(false);
         }
 
         public IEnumerable<long> Items
@@ -179,7 +179,7 @@ namespace StarryEyes.Models.Accounting
         {
             lock (_collectionLock)
             {
-                return this._collection.Contains(id);
+                return _collection.Contains(id);
             }
         }
 
@@ -192,15 +192,15 @@ namespace StarryEyes.Models.Accounting
         {
             lock (_collectionLock)
             {
-                var result = value ? this._collection.AddDistinct(id) : this._collection.Remove(id);
+                var result = value ? _collection.AddDistinct(id) : _collection.Remove(id);
                 if (!result)
                 {
                     // not changed
                     return;
                 }
             }
-            await UserProxy.SetAsync(_type, this._parent.AccountId, id, value);
-            this.RaiseAccountDataUpdated(new[] { id }, value);
+            await UserProxy.SetAsync(_type, _parent.AccountId, id, value).ConfigureAwait(false);
+            RaiseAccountDataUpdated(new[] { id }, value);
         }
 
         /// <summary>
@@ -217,8 +217,8 @@ namespace StarryEyes.Models.Accounting
             }
             var news = items.Except(currents).ToArray();
             var olds = currents.Except(items).ToArray();
-            await RemoveAsync(olds);
-            await AddAsync(news);
+            await RemoveAsync(olds).ConfigureAwait(false);
+            await AddAsync(news).ConfigureAwait(false);
         }
 
         private async Task AddAsync(IEnumerable<long> items)
@@ -229,8 +229,8 @@ namespace StarryEyes.Models.Accounting
                 m = m.Where(i => _collection.AddDistinct(i)).ToArray();
             }
             if (m.Length == 0) return;
-            await UserProxy.AddAsync(_type, _parent.AccountId, m);
-            this.RaiseAccountDataUpdated(m, true);
+            await UserProxy.AddAsync(_type, _parent.AccountId, m).ConfigureAwait(false);
+            RaiseAccountDataUpdated(m, true);
         }
 
         private async Task RemoveAsync(IEnumerable<long> items)
@@ -241,8 +241,8 @@ namespace StarryEyes.Models.Accounting
                 m = m.Where(i => _collection.Remove(i)).ToArray();
             }
             if (m.Length == 0) return;
-            await UserProxy.RemoveAsync(_type, _parent.AccountId, m);
-            this.RaiseAccountDataUpdated(m, false);
+            await UserProxy.RemoveAsync(_type, _parent.AccountId, m).ConfigureAwait(false);
+            RaiseAccountDataUpdated(m, false);
         }
     }
 
@@ -273,8 +273,8 @@ namespace StarryEyes.Models.Accounting
 
         public override string ToString()
         {
-            return this.Type + " " + this.AccountUserId + " => " +
-                   this.TargetUserIds.Select(s => s.ToString()).JoinString(", ");
+            return Type + " " + AccountUserId + " => " +
+                   TargetUserIds.Select(s => s.ToString()).JoinString(", ");
         }
     }
 

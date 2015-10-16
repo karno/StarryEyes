@@ -255,7 +255,7 @@ namespace StarryEyes.Views.Controls
                 source = _loadStack.First.Value;
                 _loadStack.RemoveFirst();
             }
-            Task.Run(async () => await LoadBytes(source))
+            Task.Run(async () => await LoadBytes(source).ConfigureAwait(false))
                 .ContinueWith(_ => RunNextLoadTask());
         }
 
@@ -279,9 +279,9 @@ namespace StarryEyes.Views.Controls
                         errorCount++;
                         try
                         {
-                            using (var response = await client.GetAsync(source))
+                            using (var response = await client.GetAsync(source).ConfigureAwait(false))
                             {
-                                result = await response.Content.ReadAsByteArrayAsync();
+                                result = await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
                             }
                         }
                         catch (Exception ex)

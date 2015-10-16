@@ -80,16 +80,16 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
             get { return this._tableDeleter; }
         }
 
-        internal virtual async Task InitializeAsync(IDatabaseConnectionDescriptor descriptor)
+        internal virtual Task InitializeAsync(IDatabaseConnectionDescriptor descriptor)
         {
             // initialize descriptor
             _descriptor = descriptor;
-            await Descriptor.ExecuteAsync(TableCreator);
+            return Descriptor.ExecuteAsync(TableCreator);
         }
 
-        protected async Task CreateIndexAsync(string indexName, string column, bool unique)
+        protected Task CreateIndexAsync(string indexName, string column, bool unique)
         {
-            await Descriptor.ExecuteAsync(string.Format("CREATE {0} IF NOT EXISTS {1} ON {2}({3})",
+            return Descriptor.ExecuteAsync(string.Format("CREATE {0} IF NOT EXISTS {1} ON {2}({3})",
                     (unique ? "UNIQUE INDEX" : "INDEX"), indexName, this.TableName, column));
         }
 
@@ -97,28 +97,28 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
         {
             return (await Descriptor.QueryAsync<T>(
                 this.CreateSql("Id = @Id"),
-                new { Id = key })).SingleOrDefault();
+                new { Id = key }).ConfigureAwait(false)).SingleOrDefault();
         }
 
-        public virtual async Task InsertAsync(T item)
+        public virtual Task InsertAsync(T item)
         {
-            await Descriptor.ExecuteAsync(this.TableInserter, item);
+            return Descriptor.ExecuteAsync(this.TableInserter, item);
         }
 
-        public virtual async Task DeleteAsync(long key)
+        public virtual Task DeleteAsync(long key)
         {
-            await Descriptor.ExecuteAsync(this.TableDeleter, new { Id = key });
+            return Descriptor.ExecuteAsync(this.TableDeleter, new { Id = key });
         }
 
-        public virtual async Task DeleteAllAsync(IEnumerable<long> key)
+        public virtual Task DeleteAllAsync(IEnumerable<long> key)
         {
             var queries = key.Select(k => Tuple.Create(this.TableDeleter, (object)new { Id = k })).ToArray();
-            await Descriptor.ExecuteAllAsync(queries);
+            return Descriptor.ExecuteAllAsync(queries);
         }
 
-        public async Task AlterAsync(string newTableName)
+        public Task AlterAsync(string newTableName)
         {
-            await Descriptor.ExecuteAsync(string.Format("ALTER TABLE {0} RENAME TO {1};",
+            return Descriptor.ExecuteAsync(string.Format("ALTER TABLE {0} RENAME TO {1};",
                 _tableName, newTableName));
         }
     }

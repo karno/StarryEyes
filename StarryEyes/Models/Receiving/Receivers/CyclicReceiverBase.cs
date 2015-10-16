@@ -17,13 +17,13 @@ namespace StarryEyes.Models.Receiving.Receivers
         private readonly CompositeDisposable _disposable = new CompositeDisposable();
         protected CompositeDisposable CompositeDisposable
         {
-            get { return this._disposable; }
+            get { return _disposable; }
         }
 
         private bool _isDisposed;
         public bool IsDisposed
         {
-            get { return this._isDisposed; }
+            get { return _isDisposed; }
         }
 
         protected abstract string ReceiverName { get; }
@@ -32,30 +32,30 @@ namespace StarryEyes.Models.Receiving.Receivers
 
         protected CyclicReceiverBase()
         {
-            this.CompositeDisposable.Add(Observable.FromEvent(
+            CompositeDisposable.Add(Observable.FromEvent(
                 h => App.ApplicationFinalize += h,
                 h => App.ApplicationFinalize -= h)
-                .Subscribe(_ => this.Dispose()));
-            this.CompositeDisposable.Add(
+                .Subscribe(_ => Dispose()));
+            CompositeDisposable.Add(
                 Observable.Interval(TimeSpan.FromSeconds(1))
                           .ObserveOn(TaskPoolScheduler.Default)
-                          .Subscribe(_ => this.OnTimer()));
+                          .Subscribe(_ => OnTimer()));
         }
 
         private async void OnTimer()
         {
-            if (this._isDisposed) return;
-            if (Interlocked.Decrement(ref this._remainCountDown) > 0) return;
-            this._remainCountDown = this.IntervalSec;
+            if (_isDisposed) return;
+            if (Interlocked.Decrement(ref _remainCountDown) > 0) return;
+            _remainCountDown = IntervalSec;
             try
             {
                 await Task.Run(async () =>
                 {
                     using (MainWindowModel.SetState(ReceivingResources.ReceivingFormat.SafeFormat(ReceiverName)))
                     {
-                        await this.DoReceive();
+                        await DoReceive().ConfigureAwait(false);
                     }
-                });
+                }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -69,27 +69,27 @@ namespace StarryEyes.Models.Receiving.Receivers
 
         protected void AssertDisposed()
         {
-            if (this._isDisposed)
+            if (_isDisposed)
             {
-                throw new ObjectDisposedException(this.GetType().Name);
+                throw new ObjectDisposedException(GetType().Name);
             }
         }
 
         public void Dispose()
         {
-            if (this._isDisposed) return;
-            this._isDisposed = true;
-            this.Dispose(true);
+            if (_isDisposed) return;
+            _isDisposed = true;
+            Dispose(true);
         }
 
         ~CyclicReceiverBase()
         {
-            this.Dispose(false);
+            Dispose(false);
         }
 
         protected virtual void Dispose(bool disposing)
         {
-            this.CompositeDisposable.Dispose();
+            CompositeDisposable.Dispose();
         }
     }
 }

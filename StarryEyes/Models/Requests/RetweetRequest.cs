@@ -40,7 +40,7 @@ namespace StarryEyes.Models.Requests
                 {
                     try
                     {
-                        var result = await acc.RetweetAsync(_id);
+                        var result = await acc.RetweetAsync(_id).ConfigureAwait(false);
                         BackstageModel.NotifyFallbackState(acc, false);
                         return result;
                     }
@@ -60,7 +60,7 @@ namespace StarryEyes.Models.Requests
                             }
                         }
                     }
-                    var id = await acc.GetMyRetweetIdOfStatusAsync(_id);
+                    var id = await acc.GetMyRetweetIdOfStatusAsync(_id).ConfigureAwait(false);
                     if (id.HasValue)
                     {
                         // already retweeted.
@@ -73,14 +73,14 @@ namespace StarryEyes.Models.Requests
             else
             {
                 // get retweet id
-                var id = await account.GetMyRetweetIdOfStatusAsync(_id);
+                var id = await account.GetMyRetweetIdOfStatusAsync(_id).ConfigureAwait(false);
                 if (!id.HasValue)
                 {
                     // retweet is not existed.
                     return null;
                 }
                 // destroy retweet
-                return await account.DestroyAsync(id.Value);
+                return await account.DestroyAsync(id.Value).ConfigureAwait(false);
             }
             // ReSharper restore RedundantIfElseBlock
         }

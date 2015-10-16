@@ -38,40 +38,40 @@ namespace StarryEyes.Models.Backstages
 
         public TwitterAccount Account
         {
-            get { return this._account; }
+            get { return _account; }
         }
 
         public UserStreamsConnectionState ConnectionState
         {
-            get { return this._connectionState; }
+            get { return _connectionState; }
             private set
             {
-                if (this._connectionState == value) return;
-                this._connectionState = value;
-                this.RaiseConnectionStateChanged();
+                if (_connectionState == value) return;
+                _connectionState = value;
+                RaiseConnectionStateChanged();
             }
         }
 
         public TwitterUser User
         {
-            get { return this._user; }
+            get { return _user; }
         }
 
         public int CurrentPostCount
         {
-            get { return PostLimitPredictionService.GetCurrentWindowCount(this.Account.Id); }
+            get { return PostLimitPredictionService.GetCurrentWindowCount(Account.Id); }
         }
 
         public BackstageAccountModel(TwitterAccount account)
         {
-            this._account = account;
-            this.UpdateConnectionState();
+            _account = account;
+            UpdateConnectionState();
             Task.Run(async () =>
             {
                 try
                 {
-                    _user = await StoreHelper.GetUserAsync(this._account.Id);
-                    this.RaiseTwitterUserChanged();
+                    _user = await StoreHelper.GetUserAsync(_account.Id).ConfigureAwait(false);
+                    RaiseTwitterUserChanged();
                 }
                 catch (Exception ex)
                 {
@@ -84,12 +84,12 @@ namespace StarryEyes.Models.Backstages
 
         internal void UpdateConnectionState()
         {
-            this.ConnectionState = ReceiveManager.GetConnectionState(this.Account.Id);
+            ConnectionState = ReceiveManager.GetConnectionState(Account.Id);
         }
 
         public void Reconnect()
         {
-            ReceiveManager.ReconnectUserStreams(this.Account.Id);
+            ReceiveManager.ReconnectUserStreams(Account.Id);
         }
 
         public event Action FallbackStateUpdated;
@@ -107,10 +107,10 @@ namespace StarryEyes.Models.Backstages
 
         public void NotifyFallbackState(bool isFallbacked)
         {
-            if (!isFallbacked && !this.IsFallbacked) return;
+            if (!isFallbacked && !IsFallbacked) return;
             Task.Run(() =>
             {
-                this.IsFallbacked = isFallbacked;
+                IsFallbacked = isFallbacked;
                 if (isFallbacked)
                 {
                     // calc prediction
@@ -138,7 +138,7 @@ namespace StarryEyes.Models.Backstages
                                                    .Subscribe(_ =>
                                                    {
                                                        IsFallbacked = false;
-                                                       this.RaiseFallbackStateUpdated();
+                                                       RaiseFallbackStateUpdated();
                                                    });
                     }
                 }
@@ -155,7 +155,7 @@ namespace StarryEyes.Models.Backstages
                 {
                     BackstageModel.RegisterEvent(new PostLimitedEvent(Account, FallbackPredictedReleaseTime));
                 }
-                this.RaiseFallbackStateUpdated();
+                RaiseFallbackStateUpdated();
             });
         }
     }

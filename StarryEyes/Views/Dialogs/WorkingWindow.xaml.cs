@@ -19,16 +19,16 @@ namespace StarryEyes.Views.Dialogs
 
         public WorkingWindow(string description, Func<Action<string>, Task> work)
         {
-            this._work = work;
+            _work = work;
             InitializeComponent();
             DetailText.Text = description;
-            this.Loaded += DatabaseOptimizingWindow_Loaded;
+            Loaded += DatabaseOptimizingWindow_Loaded;
         }
 
         async void DatabaseOptimizingWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            await Task.Run(async () => await this._work(UpdateLabel));
-            this.Close();
+            await Task.Run(() => _work(UpdateLabel)).ConfigureAwait(false);
+            Close();
         }
 
         private void UpdateLabel(string label)

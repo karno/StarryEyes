@@ -140,7 +140,7 @@ namespace StarryEyes.Casket
 
         public static async Task ReInitializeAsync<T>(CrudBase<T> crudBase) where T : class
         {
-            await crudBase.InitializeAsync(_descriptor);
+            await crudBase.InitializeAsync(_descriptor).ConfigureAwait(false);
         }
 
         #region store in one transaction
@@ -175,7 +175,7 @@ namespace StarryEyes.Casket
                 UserDescriptionEntities = userDescriptionEntities,
                 UserUrlEntities = userUrlEntities
             };
-            await StoreStatuses(new[] { batch });
+            await StoreStatuses(new[] { batch }).ConfigureAwait(false);
         }
 
 
@@ -189,7 +189,7 @@ namespace StarryEyes.Casket
                 var userBatch = m.Select(b => b.UserInsertBatch)
                                        .Distinct(u => u.User.Id)
                                        .SelectMany(CreateQuery);
-                await StatusCrud.StoreCoreAsync(statusBatch.Concat(userBatch));
+                await StatusCrud.StoreCoreAsync(statusBatch.Concat(userBatch)).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -207,14 +207,14 @@ namespace StarryEyes.Casket
                 UserDescriptionEntities = userDescriptionEntities,
                 UserUrlEntities = userUrlEntities
             };
-            await StoreUsers(new[] { batch });
+            await StoreUsers(new[] { batch }).ConfigureAwait(false);
         }
 
         public static async Task StoreUsers(IEnumerable<UserInsertBatch> batches)
         {
             try
             {
-                await StatusCrud.StoreCoreAsync(batches.SelectMany(CreateQuery));
+                await StatusCrud.StoreCoreAsync(batches.SelectMany(CreateQuery)).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -243,29 +243,29 @@ namespace StarryEyes.Casket
                 );
         }
 
-        public static async Task VacuumTables()
+        public static Task VacuumTables()
         {
-            await _managementCrud.VacuumAsync();
+            return _managementCrud.VacuumAsync();
         }
 
-        public static async Task ExecuteAsync(string query)
+        public static Task ExecuteAsync(string query)
         {
-            await _descriptor.ExecuteAsync(query);
+            return _descriptor.ExecuteAsync(query);
         }
 
         public static async Task CleanupOldStatusesAsync(int threshold, Action<Tuple<int, int>> progressNotifier = null)
         {
             var n = progressNotifier ?? (_ => { });
             n(Tuple.Create(1, 5));
-            await StatusCrud.DeleteOldStatusAsync(threshold);
+            await StatusCrud.DeleteOldStatusAsync(threshold).ConfigureAwait(false);
             n(Tuple.Create(2, 5));
-            await StatusCrud.DeleteOrphanedRetweetAsync();
+            await StatusCrud.DeleteOrphanedRetweetAsync().ConfigureAwait(false);
             n(Tuple.Create(3, 5));
-            await StatusEntityCrud.DeleteNotExistsAsync(StatusCrud.TableName);
+            await StatusEntityCrud.DeleteNotExistsAsync(StatusCrud.TableName).ConfigureAwait(false);
             n(Tuple.Create(4, 5));
-            await FavoritesCrud.DeleteNotExistsAsync(StatusCrud.TableName);
+            await FavoritesCrud.DeleteNotExistsAsync(StatusCrud.TableName).ConfigureAwait(false);
             n(Tuple.Create(5, 5));
-            await RetweetsCrud.DeleteNotExistsAsync(StatusCrud.TableName);
+            await RetweetsCrud.DeleteNotExistsAsync(StatusCrud.TableName).ConfigureAwait(false);
         }
     }
 

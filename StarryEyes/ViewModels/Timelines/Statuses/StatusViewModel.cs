@@ -58,93 +58,93 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         public StatusViewModel(TimelineViewModelBase parent, StatusModel status,
             IEnumerable<long> initialBoundAccounts)
         {
-            this._parent = parent;
+            _parent = parent;
             // get status model
-            this.Model = status;
-            this.RetweetedOriginalModel = status.RetweetedOriginal;
+            Model = status;
+            RetweetedOriginalModel = status.RetweetedOriginal;
 
             // bind accounts 
-            this._bindingAccounts = initialBoundAccounts.Guard().ToArray();
+            _bindingAccounts = initialBoundAccounts.Guard().ToArray();
 
             // initialize users information
-            this.CompositeDisposable.Add(
-                this._favoritedUsers = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
-                    this.Model.FavoritedUsers, user => new UserViewModel(user),
+            CompositeDisposable.Add(
+                _favoritedUsers = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
+                    Model.FavoritedUsers, user => new UserViewModel(user),
                     DispatcherHelper.UIDispatcher, DispatcherPriority.Background));
-            this.CompositeDisposable.Add(
-                this._favoritedUsers.ListenCollectionChanged(_ =>
+            CompositeDisposable.Add(
+                _favoritedUsers.ListenCollectionChanged(_ =>
                 {
-                    this.RaisePropertyChanged(() => this.IsFavorited);
-                    this.RaisePropertyChanged(() => this.IsFavoritedUserExists);
-                    this.RaisePropertyChanged(() => this.FavoriteCount);
+                    RaisePropertyChanged(() => IsFavorited);
+                    RaisePropertyChanged(() => IsFavoritedUserExists);
+                    RaisePropertyChanged(() => FavoriteCount);
                 }));
-            this.CompositeDisposable.Add(
-                this._retweetedUsers = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
-                    this.Model.RetweetedUsers, user => new UserViewModel(user),
+            CompositeDisposable.Add(
+                _retweetedUsers = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
+                    Model.RetweetedUsers, user => new UserViewModel(user),
                     DispatcherHelper.UIDispatcher, DispatcherPriority.Background));
-            this.CompositeDisposable.Add(
-                this._retweetedUsers.ListenCollectionChanged(_ =>
+            CompositeDisposable.Add(
+                _retweetedUsers.ListenCollectionChanged(_ =>
                     {
-                        this.RaisePropertyChanged(() => this.IsRetweeted);
-                        this.RaisePropertyChanged(() => this.IsRetweetedUserExists);
-                        this.RaisePropertyChanged(() => this.RetweetCount);
+                        RaisePropertyChanged(() => IsRetweeted);
+                        RaisePropertyChanged(() => IsRetweetedUserExists);
+                        RaisePropertyChanged(() => RetweetCount);
                     }));
 
-            if (this.RetweetedOriginalModel != null)
+            if (RetweetedOriginalModel != null)
             {
-                this.CompositeDisposable.Add(
-                    this.RetweetedOriginalModel.FavoritedUsers.ListenCollectionChanged(
-                        _ => this.RaisePropertyChanged(() => this.IsFavorited)));
-                this.CompositeDisposable.Add(
-                    this.RetweetedOriginalModel.RetweetedUsers.ListenCollectionChanged(
-                        _ => this.RaisePropertyChanged(() => this.IsRetweeted)));
+                CompositeDisposable.Add(
+                    RetweetedOriginalModel.FavoritedUsers.ListenCollectionChanged(
+                        _ => RaisePropertyChanged(() => IsFavorited)));
+                CompositeDisposable.Add(
+                    RetweetedOriginalModel.RetweetedUsers.ListenCollectionChanged(
+                        _ => RaisePropertyChanged(() => IsRetweeted)));
             }
 
             // listen settings
-            this.CompositeDisposable.Add(
+            CompositeDisposable.Add(
                 new EventListener<Action<bool>>(
                     h => Setting.AllowFavoriteMyself.ValueChanged += h,
                     h => Setting.AllowFavoriteMyself.ValueChanged -= h,
-                    _ => this.RaisePropertyChanged(() => CanFavorite)));
-            this.CompositeDisposable.Add(
+                    _ => RaisePropertyChanged(() => CanFavorite)));
+            CompositeDisposable.Add(
                 new EventListener<Action<ThumbnailMode>>(
                     h => Setting.ThumbnailMode.ValueChanged += h,
                     h => Setting.ThumbnailMode.ValueChanged -= h,
                     _ =>
                     {
-                        this.RaisePropertyChanged(() => IsThumbnailAvailable);
-                        this.RaisePropertyChanged(() => IsThumbnailsAvailable);
+                        RaisePropertyChanged(() => IsThumbnailAvailable);
+                        RaisePropertyChanged(() => IsThumbnailsAvailable);
                     }));
-            this.CompositeDisposable.Add(
+            CompositeDisposable.Add(
                 new EventListener<Action<TweetDisplayMode>>(
                     h => Setting.TweetDisplayMode.ValueChanged += h,
                     h => Setting.TweetDisplayMode.ValueChanged -= h,
                     _ =>
                     {
-                        this.RaisePropertyChanged(() => IsExpanded);
-                        this.RaisePropertyChanged(() => IsSingleLine);
+                        RaisePropertyChanged(() => IsExpanded);
+                        RaisePropertyChanged(() => IsSingleLine);
                     }));
             // when account is added/removed, all timelines are regenerated.
             // so, we don't have to listen any events which notify accounts addition/deletion.
 
-            this.CompositeDisposable.Add(_images = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
-                this.Model.Images, m => new ThumbnailImageViewModel(m), DispatcherHelper.UIDispatcher));
+            CompositeDisposable.Add(_images = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
+                Model.Images, m => new ThumbnailImageViewModel(m), DispatcherHelper.UIDispatcher));
             // resolve images
-            this.CompositeDisposable.Add(_images.ListenCollectionChanged(_ =>
+            CompositeDisposable.Add(_images.ListenCollectionChanged(_ =>
             {
-                this.RaisePropertyChanged(() => this.ThumbnailImage);
-                this.RaisePropertyChanged(() => this.IsImageAvailable);
-                this.RaisePropertyChanged(() => this.IsThumbnailAvailable);
-                this.RaisePropertyChanged(() => this.IsThumbnailsAvailable);
+                RaisePropertyChanged(() => ThumbnailImage);
+                RaisePropertyChanged(() => IsImageAvailable);
+                RaisePropertyChanged(() => IsThumbnailAvailable);
+                RaisePropertyChanged(() => IsThumbnailsAvailable);
             }));
 
             // look-up in-reply-to
-            this._isInReplyToExists = this.Status.InReplyToStatusId.HasValue && this.Status.InReplyToStatusId != 0;
+            _isInReplyToExists = Status.InReplyToStatusId.HasValue && Status.InReplyToStatusId != 0;
         }
 
         public TimelineViewModelBase Parent
         {
-            get { return this._parent; }
+            get { return _parent; }
         }
 
         /// <summary>
@@ -160,7 +160,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         /// </summary>
         public TwitterStatus OriginalStatus
         {
-            get { return this.Model.Status; }
+            get { return Model.Status; }
         }
 
         /// <summary>
@@ -168,20 +168,20 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         /// </summary>
         public TwitterStatus Status
         {
-            get { return this.Model.Status.RetweetedOriginal ?? this.Model.Status; }
+            get { return Model.Status.RetweetedOriginal ?? Model.Status; }
         }
 
         public IEnumerable<long> BindingAccounts
         {
-            get { return this._bindingAccounts; }
+            get { return _bindingAccounts; }
             set
             {
-                this._bindingAccounts = (value as long[]) ?? value.ToArray();
+                _bindingAccounts = (value as long[]) ?? value.ToArray();
                 // raise property changed
-                this.RaisePropertyChanged();
-                this.RaisePropertyChanged(() => this.IsFavorited);
-                this.RaisePropertyChanged(() => this.IsRetweeted);
-                this.RaisePropertyChanged(() => this.IsMyselfStrict);
+                RaisePropertyChanged();
+                RaisePropertyChanged(() => IsFavorited);
+                RaisePropertyChanged(() => IsRetweeted);
+                RaisePropertyChanged(() => IsMyselfStrict);
             }
         }
 
@@ -189,8 +189,8 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         {
             get
             {
-                return this._user ??
-                       (this._user = CreateUserViewModel((this.Status.RetweetedOriginal ?? this.Status).User));
+                return _user ??
+                       (_user = CreateUserViewModel((Status.RetweetedOriginal ?? Status).User));
             }
         }
 
@@ -198,11 +198,11 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         {
             get
             {
-                if (!this.IsRetweet)
+                if (!IsRetweet)
                 {
                     return null;
                 }
-                return this._retweeter ?? (this._retweeter = CreateUserViewModel(this.OriginalStatus.User));
+                return _retweeter ?? (_retweeter = CreateUserViewModel(OriginalStatus.User));
 
             }
         }
@@ -211,11 +211,11 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         {
             get
             {
-                if (!this.IsDirectMessage)
+                if (!IsDirectMessage)
                 {
                     return null;
                 }
-                return this._recipient ?? (this._recipient = CreateUserViewModel(this.Status.Recipient));
+                return _recipient ?? (_recipient = CreateUserViewModel(Status.Recipient));
             }
         }
 
@@ -224,7 +224,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             var uvm = new UserViewModel(user);
             try
             {
-                this.CompositeDisposable.Add(uvm);
+                CompositeDisposable.Add(uvm);
                 return uvm;
             }
             catch (ObjectDisposedException)
@@ -237,61 +237,61 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
 
         public string MultiLineText
         {
-            get { return this.Status.GetEntityAidedText(); }
+            get { return Status.GetEntityAidedText(); }
         }
 
         public string SingleLineText
         {
-            get { return this.Status.GetEntityAidedText().Replace('\n', ' ').Replace("\r", ""); }
+            get { return Status.GetEntityAidedText().Replace('\n', ' ').Replace("\r", ""); }
         }
 
         public bool IsRetweetedUserExists
         {
-            get { return this._retweetedUsers.Count > 0; }
+            get { return _retweetedUsers.Count > 0; }
         }
 
         public int RetweetCount
         {
-            get { return this.RetweetedUsers.Count; }
+            get { return RetweetedUsers.Count; }
         }
 
         public ReadOnlyDispatcherCollectionRx<UserViewModel> RetweetedUsers
         {
-            get { return this._retweetedUsers; }
+            get { return _retweetedUsers; }
         }
 
         public bool IsFavoritedUserExists
         {
-            get { return this._favoritedUsers.Count > 0; }
+            get { return _favoritedUsers.Count > 0; }
         }
 
         public int FavoriteCount
         {
-            get { return this.FavoritedUsers.Count; }
+            get { return FavoritedUsers.Count; }
         }
 
         public ReadOnlyDispatcherCollectionRx<UserViewModel> FavoritedUsers
         {
-            get { return this._favoritedUsers; }
+            get { return _favoritedUsers; }
         }
 
         public bool IsDirectMessage
         {
-            get { return this.Status.StatusType == StatusType.DirectMessage; }
+            get { return Status.StatusType == StatusType.DirectMessage; }
         }
 
         public bool IsRetweet
         {
-            get { return this.OriginalStatus.RetweetedOriginal != null; }
+            get { return OriginalStatus.RetweetedOriginal != null; }
         }
 
         public bool IsFavorited
         {
             get
             {
-                return this.RetweetedOriginalModel != null
-                    ? this.RetweetedOriginalModel.IsFavorited(this._bindingAccounts)
-                    : this.Model.IsFavorited(this._bindingAccounts);
+                return RetweetedOriginalModel != null
+                    ? RetweetedOriginalModel.IsFavorited(_bindingAccounts)
+                    : Model.IsFavorited(_bindingAccounts);
             }
         }
 
@@ -299,80 +299,80 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         {
             get
             {
-                return this.RetweetedOriginalModel != null
-                    ? this.RetweetedOriginalModel.IsRetweeted(this._bindingAccounts)
-                    : this.Model.IsRetweeted(this._bindingAccounts);
+                return RetweetedOriginalModel != null
+                    ? RetweetedOriginalModel.IsRetweeted(_bindingAccounts)
+                    : Model.IsRetweeted(_bindingAccounts);
             }
         }
 
         public bool CanFavoriteAndRetweet
         {
-            get { return this.CanFavoriteImmediate && this.CanRetweetImmediate; }
+            get { return CanFavoriteImmediate && CanRetweetImmediate; }
         }
 
         public bool CanFavorite
         {
-            get { return !this.IsDirectMessage && (Setting.AllowFavoriteMyself.Value || !this.IsMyself); }
+            get { return !IsDirectMessage && (Setting.AllowFavoriteMyself.Value || !IsMyself); }
         }
 
         public bool CanFavoriteImmediate
         {
-            get { return this.CanFavorite; }
+            get { return CanFavorite; }
         }
 
         public bool CanRetweet
         {
-            get { return !this.IsDirectMessage && !this.Status.User.IsProtected; }
+            get { return !IsDirectMessage && !Status.User.IsProtected; }
         }
 
         public bool CanRetweetImmediate
         {
-            get { return this.CanRetweet && !this.IsMyselfStrict; }
+            get { return CanRetweet && !IsMyselfStrict; }
         }
 
         public bool CanDelete
         {
-            get { return this.IsDirectMessage || Setting.Accounts.Contains(this.OriginalStatus.User.Id); }
+            get { return IsDirectMessage || Setting.Accounts.Contains(OriginalStatus.User.Id); }
         }
 
         public bool IsMyself
         {
-            get { return Setting.Accounts.Contains(this.OriginalStatus.User.Id); }
+            get { return Setting.Accounts.Contains(OriginalStatus.User.Id); }
         }
 
         public bool IsMyselfStrict
         {
-            get { return this.CheckUserIsBind(this.Status.User.Id); }
+            get { return CheckUserIsBind(Status.User.Id); }
         }
 
         private bool CheckUserIsBind(long id)
         {
-            return this._bindingAccounts.Length == 1 && this._bindingAccounts[0] == id;
+            return _bindingAccounts.Length == 1 && _bindingAccounts[0] == id;
         }
 
         public bool IsInReplyToMe
         {
             get
             {
-                return FilterSystemUtil.InReplyToUsers(this.Status)
+                return FilterSystemUtil.InReplyToUsers(Status)
                                        .Any(Setting.Accounts.Contains);
             }
         }
 
         public bool IsFocused
         {
-            get { return this._parent.FocusedStatus == this; }
+            get { return _parent.FocusedStatus == this; }
         }
 
         public bool IsSelected
         {
-            get { return this._isSelected; }
+            get { return _isSelected; }
             set
             {
-                if (this._isSelected == value || this.Parent == null) return;
-                this._isSelected = value;
-                this.RaisePropertyChanged(() => this.IsSelected);
-                this.Parent.OnSelectionUpdated();
+                if (_isSelected == value || Parent == null) return;
+                _isSelected = value;
+                RaisePropertyChanged(() => IsSelected);
+                Parent.OnSelectionUpdated();
             }
         }
 
@@ -414,44 +414,44 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
 
         public bool IsSourceVisible
         {
-            get { return this.Status.StatusType != StatusType.DirectMessage; }
+            get { return Status.StatusType != StatusType.DirectMessage; }
         }
 
         public bool IsSourceIsLink
         {
-            get { return this.Status.Source != null && this.Status.Source.Contains("<a href"); }
+            get { return Status.Source != null && Status.Source.Contains("<a href"); }
         }
 
         public string SourceText
         {
             get
             {
-                if (this.Status.Source == null)
+                if (Status.Source == null)
                 {
                     return String.Empty;
                 }
-                if (!this.IsSourceIsLink)
+                if (!IsSourceIsLink)
                 {
-                    return this.Status.Source;
+                    return Status.Source;
                 }
-                var start = this.Status.Source.IndexOf(">", StringComparison.Ordinal);
-                var end = this.Status.Source.IndexOf("<", start + 1, StringComparison.Ordinal);
+                var start = Status.Source.IndexOf(">", StringComparison.Ordinal);
+                var end = Status.Source.IndexOf("<", start + 1, StringComparison.Ordinal);
                 if (start >= 0 && end >= 0)
                 {
-                    return this.Status.Source.Substring(start + 1, end - start - 1);
+                    return Status.Source.Substring(start + 1, end - start - 1);
                 }
-                return this.Status.Source;
+                return Status.Source;
             }
         }
 
         public DateTime CreatedAt
         {
-            get { return this.Status.CreatedAt; }
+            get { return Status.CreatedAt; }
         }
 
         public bool IsImageAvailable
         {
-            get { return this.Model.Images != null && this.Model.Images.Any(); }
+            get { return Model.Images != null && Model.Images.Any(); }
         }
 
         public ReadOnlyDispatcherCollectionRx<ThumbnailImageViewModel> Images
@@ -461,17 +461,17 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
 
         public bool IsThumbnailAvailable
         {
-            get { return this.IsImageAvailable && Setting.ThumbnailMode.Value == ThumbnailMode.Single; }
+            get { return IsImageAvailable && Setting.ThumbnailMode.Value == ThumbnailMode.Single; }
         }
 
         public bool IsThumbnailsAvailable
         {
-            get { return this.IsImageAvailable && Setting.ThumbnailMode.Value == ThumbnailMode.All; }
+            get { return IsImageAvailable && Setting.ThumbnailMode.Value == ThumbnailMode.All; }
         }
 
         public ThumbnailImageViewModel ThumbnailImage
         {
-            get { return this.Model.Images != null ? this.Images.FirstOrDefault() : null; }
+            get { return Model.Images != null ? Images.FirstOrDefault() : null; }
         }
 
         /// <summary>
@@ -481,61 +481,61 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
 
         public void RaiseFocusedChanged()
         {
-            this.RaisePropertyChanged(() => this.IsFocused);
-            this.RaisePropertyChanged(() => this.IsExpanded);
-            if (this.IsFocused)
+            RaisePropertyChanged(() => IsFocused);
+            RaisePropertyChanged(() => IsExpanded);
+            if (IsFocused)
             {
-                this.LoadInReplyTo();
+                LoadInReplyTo();
             }
         }
 
         public void ShowUserProfile()
         {
-            SearchFlipModel.RequestSearch(this.User.ScreenName, SearchMode.UserScreenName);
+            SearchFlipModel.RequestSearch(User.ScreenName, SearchMode.UserScreenName);
         }
 
         public void ShowRetweeterProfile()
         {
-            SearchFlipModel.RequestSearch(this.Retweeter.ScreenName, SearchMode.UserScreenName);
+            SearchFlipModel.RequestSearch(Retweeter.ScreenName, SearchMode.UserScreenName);
         }
 
         public void ShowRecipientProfile()
         {
-            SearchFlipModel.RequestSearch(this.Recipient.ScreenName, SearchMode.UserScreenName);
+            SearchFlipModel.RequestSearch(Recipient.ScreenName, SearchMode.UserScreenName);
         }
 
         public void OpenWeb()
         {
-            BrowserHelper.Open(this.Status.Permalink);
+            BrowserHelper.Open(Status.Permalink);
         }
 
         public void OpenFavstar()
         {
-            BrowserHelper.Open(this.Status.FavstarPermalink);
+            BrowserHelper.Open(Status.FavstarPermalink);
         }
 
         public void OpenUserDetailOnTwitter()
         {
-            this.User.OpenUserDetailOnTwitter();
+            User.OpenUserDetailOnTwitter();
         }
 
         public void OpenUserFavstar()
         {
-            this.User.OpenUserFavstar();
+            User.OpenUserFavstar();
         }
 
         public void OpenUserTwilog()
         {
-            this.User.OpenUserTwilog();
+            User.OpenUserTwilog();
         }
 
         public void OpenSourceLink()
         {
-            if (this.Status.Source == null || !this.IsSourceIsLink) return;
-            var start = this.Status.Source.IndexOf("\"", StringComparison.Ordinal);
-            var end = this.Status.Source.IndexOf("\"", start + 1, StringComparison.Ordinal);
+            if (Status.Source == null || !IsSourceIsLink) return;
+            var start = Status.Source.IndexOf("\"", StringComparison.Ordinal);
+            var end = Status.Source.IndexOf("\"", start + 1, StringComparison.Ordinal);
             if (start < 0 || end < 0) return;
-            var url = this.Status.Source.Substring(start + 1, end - start - 1);
+            var url = Status.Source.Substring(start + 1, end - start - 1);
             BrowserHelper.Open(url);
         }
 
@@ -543,42 +543,42 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
 
         private void NotifyChangeReplyInfo()
         {
-            this.RaisePropertyChanged(() => this.IsInReplyToExists);
-            this.RaisePropertyChanged(() => this.IsInReplyToLoaded);
-            this.RaisePropertyChanged(() => this.IsInReplyToLoading);
-            this.RaisePropertyChanged(() => this.IsInReplyToAvailable);
-            this.RaisePropertyChanged(() => this.InReplyToUserImage);
-            this.RaisePropertyChanged(() => this.InReplyToUserName);
-            this.RaisePropertyChanged(() => this.InReplyToUserScreenName);
-            this.RaisePropertyChanged(() => this.InReplyToBody);
+            RaisePropertyChanged(() => IsInReplyToExists);
+            RaisePropertyChanged(() => IsInReplyToLoaded);
+            RaisePropertyChanged(() => IsInReplyToLoading);
+            RaisePropertyChanged(() => IsInReplyToAvailable);
+            RaisePropertyChanged(() => InReplyToUserImage);
+            RaisePropertyChanged(() => InReplyToUserName);
+            RaisePropertyChanged(() => InReplyToUserScreenName);
+            RaisePropertyChanged(() => InReplyToBody);
         }
 
         public bool IsInReplyToExists
         {
-            get { return this._isInReplyToExists; }
+            get { return _isInReplyToExists; }
         }
 
         public bool IsInReplyToLoaded
         {
-            get { return this._isInReplyToLoaded; }
+            get { return _isInReplyToLoaded; }
         }
 
         public bool IsInReplyToLoading
         {
-            get { return this._isInReplyToLoading; }
+            get { return _isInReplyToLoading; }
         }
 
         public bool IsInReplyToAvailable
         {
-            get { return this._inReplyTo != null; }
+            get { return _inReplyTo != null; }
         }
 
         public Uri InReplyToUserImage
         {
             get
             {
-                if (this._inReplyTo == null) return null;
-                return this._inReplyTo.User.ProfileImageUri;
+                if (_inReplyTo == null) return null;
+                return _inReplyTo.User.ProfileImageUri;
             }
         }
 
@@ -586,8 +586,8 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         {
             get
             {
-                if (this._inReplyTo == null) return null;
-                return this._inReplyTo.User.Name;
+                if (_inReplyTo == null) return null;
+                return _inReplyTo.User.Name;
             }
         }
 
@@ -595,9 +595,9 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         {
             get
             {
-                if (this._inReplyTo == null)
-                    return this.Status.InReplyToScreenName;
-                return this._inReplyTo.User.ScreenName;
+                if (_inReplyTo == null)
+                    return Status.InReplyToScreenName;
+                return _inReplyTo.User.ScreenName;
             }
         }
 
@@ -605,33 +605,33 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         {
             get
             {
-                if (this._inReplyTo == null) return null;
-                return this._inReplyTo.Text;
+                if (_inReplyTo == null) return null;
+                return _inReplyTo.Text;
             }
         }
 
         private async void LoadInReplyTo()
         {
-            if (this._isInReplyToLoading || this._isInReplyToLoaded) return;
-            var inReplyToStatusId = this.Status.InReplyToStatusId;
+            if (_isInReplyToLoading || _isInReplyToLoaded) return;
+            var inReplyToStatusId = Status.InReplyToStatusId;
             if (inReplyToStatusId == null)
             {
-                this._isInReplyToLoaded = true;
-                this.RaisePropertyChanged(() => this.IsInReplyToLoaded);
+                _isInReplyToLoaded = true;
+                RaisePropertyChanged(() => IsInReplyToLoaded);
                 return;
             }
-            this._isInReplyToLoading = true;
-            this.RaisePropertyChanged(() => this.IsInReplyToLoading);
+            _isInReplyToLoading = true;
+            RaisePropertyChanged(() => IsInReplyToLoading);
             try
             {
-                this._inReplyTo = await StoreHelper.GetTweetAsync(inReplyToStatusId.Value);
-                this._isInReplyToLoaded = true;
-                this._isInReplyToLoading = false;
-                this.NotifyChangeReplyInfo();
+                _inReplyTo = await StoreHelper.GetTweetAsync(inReplyToStatusId.Value).ConfigureAwait(false);
+                _isInReplyToLoaded = true;
+                _isInReplyToLoading = false;
+                NotifyChangeReplyInfo();
             }
             catch (Exception)
             {
-                this._isInReplyToLoading = false;
+                _isInReplyToLoading = false;
             }
         }
 
@@ -643,11 +643,11 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
 
         public string SelectedText
         {
-            get { return this._selectedText ?? String.Empty; }
+            get { return _selectedText ?? String.Empty; }
             set
             {
-                this._selectedText = value;
-                this.RaisePropertyChanged();
+                _selectedText = value;
+                RaisePropertyChanged();
             }
         }
 
@@ -656,7 +656,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             // ReSharper disable EmptyGeneralCatchClause
             try
             {
-                Clipboard.SetText(this.SelectedText);
+                Clipboard.SetText(SelectedText);
             }
             catch
             {
@@ -666,24 +666,24 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
 
         public void SetTextToInputBox()
         {
-            InputModel.InputCore.SetText(InputSetting.Create(this.SelectedText));
+            InputModel.InputCore.SetText(InputSetting.Create(SelectedText));
         }
 
         public void FindOnKrile()
         {
-            SearchFlipModel.RequestSearch(this.SelectedText, SearchMode.Local);
+            SearchFlipModel.RequestSearch(SelectedText, SearchMode.Local);
         }
 
         public void FindOnTwitter()
         {
-            SearchFlipModel.RequestSearch(this.SelectedText, SearchMode.Web);
+            SearchFlipModel.RequestSearch(SelectedText, SearchMode.Web);
         }
 
         private const string GoogleUrl = @"http://www.google.com/search?q={0}";
 
         public void FindOnGoogle()
         {
-            var encoded = HttpUtility.UrlEncode(this.SelectedText);
+            var encoded = HttpUtility.UrlEncode(SelectedText);
             var url = String.Format(GoogleUrl, encoded);
             BrowserHelper.Open(url);
         }
@@ -694,17 +694,17 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
 
         public void CopyBody()
         {
-            this.SetClipboard(this.Status.GetEntityAidedText(EntityDisplayMode.LinkUri));
+            SetClipboard(Status.GetEntityAidedText(EntityDisplayMode.LinkUri));
         }
 
         public void CopyPermalink()
         {
-            this.SetClipboard(this.Status.Permalink);
+            SetClipboard(Status.Permalink);
         }
 
         public void CopySTOT()
         {
-            this.SetClipboard(this.Status.STOTString);
+            SetClipboard(Status.STOTString);
         }
 
         private void SetClipboard(string value)
@@ -715,7 +715,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             }
             catch (Exception ex)
             {
-                this.Parent.Messenger.RaiseSafe(() => new TaskDialogMessage(new TaskDialogOptions
+                Parent.Messenger.RaiseSafe(() => new TaskDialogMessage(new TaskDialogOptions
                 {
                     Title = MainAreaTimelineResources.MsgClipboardErrorTitle,
                     MainIcon = VistaTaskDialogIcon.Error,
@@ -739,16 +739,16 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                 Action<TwitterAccount> onFail;
                 if (add)
                 {
-                    expected = a => this.Model.AddFavoritedUser(a.GetPseudoUser());
-                    onFail = a => this.Model.RemoveFavoritedUser(a.Id);
+                    expected = a => Model.AddFavoritedUser(a.GetPseudoUser());
+                    onFail = a => Model.RemoveFavoritedUser(a.Id);
                 }
                 else
                 {
-                    expected = a => this.Model.RemoveFavoritedUser(a.Id);
-                    onFail = a => this.Model.AddFavoritedUser(a.GetPseudoUser());
+                    expected = a => Model.RemoveFavoritedUser(a.Id);
+                    onFail = a => Model.AddFavoritedUser(a.GetPseudoUser());
                 }
 
-                var request = new FavoriteRequest(this.Status, add);
+                var request = new FavoriteRequest(Status, add);
 
                 // define working task
                 Func<TwitterAccount, Task> workTask = account => Task.Run(async () =>
@@ -756,7 +756,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                     expected(account);
                     try
                     {
-                        await RequestQueue.EnqueueAsync(account, request);
+                        await RequestQueue.EnqueueAsync(account, request).ConfigureAwait(false);
                     }
                     catch (Exception ex)
                     {
@@ -766,7 +766,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                             : MainAreaTimelineResources.MsgUnfavoriteFailed;
                         BackstageModel.RegisterEvent(new OperationFailedEvent(
                             desc + "(" + account.UnreliableScreenName + " -> " +
-                            this.Status.User.ScreenName + ")", ex));
+                            Status.User.ScreenName + ")", ex));
                     }
                 });
 
@@ -774,7 +774,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                 Task.WaitAll(infos.Select(workTask).ToArray());
 
                 // notify changed
-                this.RaisePropertyChanged(() => IsFavorited);
+                RaisePropertyChanged(() => IsFavorited);
             });
         }
 
@@ -791,15 +791,15 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                 Action<TwitterAccount> onFail;
                 if (add)
                 {
-                    expected = a => this.Model.AddRetweetedUser(a.GetPseudoUser());
-                    onFail = a => this.Model.RemoveRetweetedUser(a.Id);
+                    expected = a => Model.AddRetweetedUser(a.GetPseudoUser());
+                    onFail = a => Model.RemoveRetweetedUser(a.Id);
                 }
                 else
                 {
-                    expected = a => this.Model.RemoveRetweetedUser(a.Id);
-                    onFail = a => this.Model.AddRetweetedUser(a.GetPseudoUser());
+                    expected = a => Model.RemoveRetweetedUser(a.Id);
+                    onFail = a => Model.AddRetweetedUser(a.GetPseudoUser());
                 }
-                var request = new RetweetRequest(this.Status, add);
+                var request = new RetweetRequest(Status, add);
 
                 // define working task
                 Func<TwitterAccount, Task> workTask = account => Task.Run(async () =>
@@ -807,7 +807,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                     expected(account);
                     try
                     {
-                        await RequestQueue.EnqueueAsync(account, request);
+                        await RequestQueue.EnqueueAsync(account, request).ConfigureAwait(false);
                     }
                     catch (Exception ex)
                     {
@@ -817,7 +817,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                             : MainAreaTimelineResources.MsgUnretweetFailed;
                         BackstageModel.RegisterEvent(new OperationFailedEvent(
                             desc + "(" + account.UnreliableScreenName + " -> " +
-                            this.Status.User.ScreenName + ")", ex));
+                            Status.User.ScreenName + ")", ex));
                     }
                 });
 
@@ -825,56 +825,56 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                 Task.WaitAll(infos.Select(workTask).ToArray());
 
                 // notify changed
-                this.RaisePropertyChanged(() => this.IsRetweeted);
+                RaisePropertyChanged(() => IsRetweeted);
             });
         }
 
         public void ToggleFavoriteImmediate()
         {
-            if (!this.AssertQuickActionEnabled()) return;
-            if (this.IsDirectMessage)
+            if (!AssertQuickActionEnabled()) return;
+            if (IsDirectMessage)
             {
-                this.NotifyQuickActionFailed(
+                NotifyQuickActionFailed(
                     MainAreaTimelineResources.MsgProhibitFavorite,
                     MainAreaTimelineResources.MsgProhibitFavoriteDirectMessage);
                 return;
             }
-            if (!this.CanFavoriteImmediate && !this.IsFavorited)
+            if (!CanFavoriteImmediate && !IsFavorited)
             {
-                this.NotifyQuickActionFailed(
+                NotifyQuickActionFailed(
                     MainAreaTimelineResources.MsgProhibitFavorite,
                     MainAreaTimelineResources.MsgProhibitFavoriteMyself);
                 return;
             }
-            this.Favorite(this.GetImmediateAccounts(), !this.IsFavorited);
+            Favorite(GetImmediateAccounts(), !IsFavorited);
         }
 
         public void ToggleRetweetImmediate()
         {
-            if (!this.AssertQuickActionEnabled()) return;
-            if (!this.CanRetweetImmediate)
+            if (!AssertQuickActionEnabled()) return;
+            if (!CanRetweetImmediate)
             {
-                if (this.IsMyselfStrict)
+                if (IsMyselfStrict)
                 {
-                    this.NotifyQuickActionFailed(
+                    NotifyQuickActionFailed(
                         MainAreaTimelineResources.MsgProhibitRetweet,
                         MainAreaTimelineResources.MsgProhibitRetweetMyself);
                 }
                 else
                 {
-                    this.NotifyQuickActionFailed(
+                    NotifyQuickActionFailed(
                         MainAreaTimelineResources.MsgProhibitRetweet,
                         MainAreaTimelineResources.MsgProhibitRetweetDirectMessage);
                 }
                 return;
             }
-            this.Retweet(this.GetImmediateAccounts(), !this.IsRetweeted);
+            Retweet(GetImmediateAccounts(), !IsRetweeted);
         }
 
         private bool AssertQuickActionEnabled()
         {
-            if (this.BindingAccounts.Any()) return true;
-            this.NotifyQuickActionFailed(
+            if (BindingAccounts.Any()) return true;
+            NotifyQuickActionFailed(
                 MainAreaTimelineResources.MsgQuickActionAccountIsNotSelected,
                 MainAreaTimelineResources.MsgQuickActionAccountIsNotSelectedDetail);
             return false;
@@ -882,7 +882,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
 
         private void NotifyQuickActionFailed(string main, string body)
         {
-            this.Parent.Messenger.RaiseSafe(() =>
+            Parent.Messenger.RaiseSafe(() =>
                 new TaskDialogMessage(new TaskDialogOptions
                 {
                     Title = MainAreaTimelineResources.MsgQuickActionFailedTitle,
@@ -901,36 +901,36 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                 // disable on direct messages
                 return;
             }
-            if (!this.AssertQuickActionEnabled()) return;
-            var accounts = this.GetImmediateAccounts()
+            if (!AssertQuickActionEnabled()) return;
+            var accounts = GetImmediateAccounts()
                                .ToObservable()
                                .Publish();
-            if (!this.IsFavorited)
+            if (!IsFavorited)
             {
-                var freq = new FavoriteRequest(this.Status, true);
-                accounts.Do(a => Task.Run(() => this.Model.AddFavoritedUser(a.GetPseudoUser())))
-                        .Do(_ => this.RaisePropertyChanged(() => this.IsFavorited))
+                var freq = new FavoriteRequest(Status, true);
+                accounts.Do(a => Task.Run(() => Model.AddFavoritedUser(a.GetPseudoUser())))
+                        .Do(_ => RaisePropertyChanged(() => IsFavorited))
                         .SelectMany(a => RequestQueue.EnqueueObservable(a, freq)
                                                      .Catch((Exception ex) =>
                                                      {
-                                                         Task.Run(() => this.Model.RemoveFavoritedUser(a.Id));
+                                                         Task.Run(() => Model.RemoveFavoritedUser(a.Id));
                                                          return Observable.Empty<TwitterStatus>();
                                                      }))
-                        .Do(_ => this.RaisePropertyChanged(() => this.IsFavorited))
+                        .Do(_ => RaisePropertyChanged(() => IsFavorited))
                         .Subscribe();
             }
-            if (!this.IsRetweeted)
+            if (!IsRetweeted)
             {
-                var rreq = new RetweetRequest(this.Status, true);
-                accounts.Do(a => Task.Run(() => this.Model.AddRetweetedUser(a.GetPseudoUser())))
-                        .Do(_ => this.RaisePropertyChanged(() => this.IsRetweeted))
+                var rreq = new RetweetRequest(Status, true);
+                accounts.Do(a => Task.Run(() => Model.AddRetweetedUser(a.GetPseudoUser())))
+                        .Do(_ => RaisePropertyChanged(() => IsRetweeted))
                         .SelectMany(a => RequestQueue.EnqueueObservable(a, rreq)
                                                      .Catch((Exception ex) =>
                                                      {
-                                                         Task.Run(() => this.Model.RemoveRetweetedUser(a.Id));
+                                                         Task.Run(() => Model.RemoveRetweetedUser(a.Id));
                                                          return Observable.Empty<TwitterStatus>();
                                                      }))
-                        .Do(_ => this.RaisePropertyChanged(() => this.IsRetweeted))
+                        .Do(_ => RaisePropertyChanged(() => IsRetweeted))
                         .Subscribe();
             }
             accounts.Connect();
@@ -938,26 +938,26 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
 
         private IEnumerable<TwitterAccount> GetImmediateAccounts()
         {
-            return Setting.Accounts.Collection.Where(a => this._bindingAccounts.Contains(a.Id));
+            return Setting.Accounts.Collection.Where(a => _bindingAccounts.Contains(a.Id));
         }
 
         public void ToggleSelect()
         {
-            this.IsSelected = !this.IsSelected;
+            IsSelected = !IsSelected;
         }
 
         public void ToggleFavorite()
         {
-            if (!this.CanFavorite)
+            if (!CanFavorite)
             {
-                this.NotifyQuickActionFailed(
+                NotifyQuickActionFailed(
                     MainAreaTimelineResources.MsgProhibitFavorite,
-                    this.IsDirectMessage
+                    IsDirectMessage
                         ? MainAreaTimelineResources.MsgProhibitFavoriteDirectMessage
                         : MainAreaTimelineResources.MsgProhibitFavoriteMyself);
                 return;
             }
-            var model = this.RetweetedOriginalModel ?? this.Model;
+            var model = RetweetedOriginalModel ?? Model;
             var favoriteds =
                 Setting.Accounts.Collection
                        .Where(a => model.IsFavorited(a.Id))
@@ -971,23 +971,23 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                         infos as TwitterAccount[] ?? infos.ToArray();
                     var adds = accounts.Except(favoriteds);
                     var rmvs = favoriteds.Except(accounts);
-                    this.Favorite(adds, true);
-                    this.Favorite(rmvs, false);
+                    Favorite(adds, true);
+                    Favorite(rmvs, false);
                 });
         }
 
         public void ToggleRetweet()
         {
-            if (!this.CanRetweet)
+            if (!CanRetweet)
             {
-                this.NotifyQuickActionFailed(
+                NotifyQuickActionFailed(
                     MainAreaTimelineResources.MsgProhibitRetweet,
-                    this.IsDirectMessage
+                    IsDirectMessage
                         ? MainAreaTimelineResources.MsgProhibitRetweetDirectMessage
                         : MainAreaTimelineResources.MsgProhibitRetweetMyself);
                 return;
             }
-            var model = this.RetweetedOriginalModel ?? this.Model;
+            var model = RetweetedOriginalModel ?? Model;
             var retweeteds = Setting.Accounts.Collection
                                     .Where(a => model.IsRetweeted(a.Id))
                                     .ToArray();
@@ -1002,8 +1002,8 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                         authenticateInfos.Except(retweeteds);
                     var rmvs =
                         retweeteds.Except(authenticateInfos);
-                    this.Retweet(adds, true);
-                    this.Retweet(rmvs, false);
+                    Retweet(adds, true);
+                    Retweet(rmvs, false);
                 });
         }
 
@@ -1012,11 +1012,11 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         {
             if (IsDirectMessage)
             {
-                this.DirectMessage();
+                DirectMessage();
             }
             else
             {
-                this.Reply();
+                Reply();
             }
         }
 
@@ -1024,22 +1024,22 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         {
             if (IsDirectMessage)
             {
-                this.DirectMessage(body);
+                DirectMessage(body);
             }
             else
             {
-                this.Reply(body);
+                Reply(body);
             }
         }
 
         private void Reply()
         {
-            if (this.IsSelected)
+            if (IsSelected)
             {
-                this.Parent.ReplySelecteds();
+                Parent.ReplySelecteds();
                 return;
             }
-            InputModel.InputCore.SetText(InputSetting.CreateReply(this.Status));
+            InputModel.InputCore.SetText(InputSetting.CreateReply(Status));
         }
 
         private void Reply(string body)
@@ -1047,13 +1047,13 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             // from key assign
             if (String.IsNullOrEmpty(body))
             {
-                this.Reply();
+                Reply();
                 return;
             }
             try
             {
-                var formatted = String.Format(body, this.User.ScreenName, this.User.Name);
-                InputModel.InputCore.SetText(InputSetting.CreateReply(this.Status, formatted, false));
+                var formatted = String.Format(body, User.ScreenName, User.Name);
+                InputModel.InputCore.SetText(InputSetting.CreateReply(Status, formatted, false));
             }
             catch (Exception ex)
             {
@@ -1068,8 +1068,8 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                 // disable on direct messages
                 return;
             }
-            var setting = InputSetting.CreateReply(this.Status,
-                " RT @" + this.User.ScreenName + ": " + this.Status.GetEntityAidedText(EntityDisplayMode.LinkUri),
+            var setting = InputSetting.CreateReply(Status,
+                " RT @" + User.ScreenName + ": " + Status.GetEntityAidedText(EntityDisplayMode.LinkUri),
                 false);
             setting.CursorPosition = CursorPosition.Begin;
             InputModel.InputCore.SetText(setting);
@@ -1082,8 +1082,8 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                 // disable on direct messages
                 return;
             }
-            var setting = InputSetting.Create(this.Model.GetSuitableReplyAccount(),
-                " " + this.Status.Permalink);
+            var setting = InputSetting.Create(Model.GetSuitableReplyAccount(),
+                " " + Status.Permalink);
             setting.CursorPosition = CursorPosition.Begin;
             InputModel.InputCore.SetText(setting);
         }
@@ -1091,17 +1091,17 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         public void DirectMessage()
         {
             InputModel.InputCore.SetText(
-                InputSetting.CreateDirectMessage(this.Model.GetSuitableReplyAccount(),
-                    this.Status.User));
+                InputSetting.CreateDirectMessage(Model.GetSuitableReplyAccount(),
+                    Status.User));
         }
 
         public void DirectMessage(string body)
         {
             try
             {
-                var formatted = String.Format(body, this.User.ScreenName, this.User.Name);
+                var formatted = String.Format(body, User.ScreenName, User.Name);
                 InputModel.InputCore.SetText(InputSetting.CreateDirectMessage(
-                    this.Model.GetSuitableReplyAccount(), this.Status.User, formatted));
+                    Model.GetSuitableReplyAccount(), Status.User, formatted));
             }
             catch (Exception ex)
             {
@@ -1120,7 +1120,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                 footer = MainAreaTimelineResources.MsgDeleteFooterWithKeyFormat
                                                   .SafeFormat(amendkey.GetKeyDescribeString());
             }
-            var response = this.Parent.Messenger.GetResponseSafe(() =>
+            var response = Parent.Messenger.GetResponseSafe(() =>
                 new TaskDialogMessage(new TaskDialogOptions
                 {
                     Title = MainAreaTimelineResources.MsgDeleteTitle,
@@ -1135,32 +1135,32 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                 }));
             if (response.Response.CustomButtonResult == 0)
             {
-                this.Delete();
+                Delete();
             }
         }
 
         public void Delete()
         {
             TwitterAccount info;
-            if (this.IsDirectMessage)
+            if (IsDirectMessage)
             {
-                var ids = this.Status.Recipient == null
-                    ? new[] { this.Status.User.Id }
-                    : new[] { this.Status.User.Id, this.Status.Recipient.Id };
+                var ids = Status.Recipient == null
+                    ? new[] { Status.User.Id }
+                    : new[] { Status.User.Id, Status.Recipient.Id };
                 info = ids
                     .Select(Setting.Accounts.Get).FirstOrDefault(_ => _ != null);
             }
             else
             {
-                info = Setting.Accounts.Get(this.OriginalStatus.User.Id);
+                info = Setting.Accounts.Get(OriginalStatus.User.Id);
             }
             if (info == null) return;
             Task.Run(async () =>
             {
-                var dreq = new DeletionRequest(this.OriginalStatus);
+                var dreq = new DeletionRequest(OriginalStatus);
                 try
                 {
-                    var result = await RequestQueue.EnqueueAsync(info, dreq);
+                    var result = await RequestQueue.EnqueueAsync(info, dreq).ConfigureAwait(false);
                     StatusInbox.EnqueueRemoval(result.Id);
                 }
                 catch (Exception ex)
@@ -1175,42 +1175,42 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
 
         public void ToggleFocus()
         {
-            var psel = this._lastSelectState;
-            this._lastSelectState = this.IsSelected;
-            if (psel != this.IsSelected) return;
+            var psel = _lastSelectState;
+            _lastSelectState = IsSelected;
+            if (psel != IsSelected) return;
             // toggle focus
-            this.Parent.FocusedStatus =
-                this.Parent.FocusedStatus == this ? null : this;
-            if (this.Parent.FocusedStatus == this)
+            Parent.FocusedStatus =
+                Parent.FocusedStatus == this ? null : this;
+            if (Parent.FocusedStatus == this)
             {
-                this.LoadInReplyTo();
+                LoadInReplyTo();
             }
-            this.Parent.Focus();
+            Parent.Focus();
         }
 
         [UsedImplicitly]
         public void Focus()
         {
-            this.Parent.FocusedStatus = this;
-            this.LoadInReplyTo();
-            this.Parent.Focus();
+            Parent.FocusedStatus = this;
+            LoadInReplyTo();
+            Parent.Focus();
         }
 
         public void ShowConversation()
         {
-            SearchFlipModel.RequestSearch("?from conv:\"" + this.Status.Id + "\"", SearchMode.Local);
-            this.Parent.FocusedStatus = null;
+            SearchFlipModel.RequestSearch("?from conv:\"" + Status.Id + "\"", SearchMode.Local);
+            Parent.FocusedStatus = null;
         }
 
         public void ReportAsSpam()
         {
-            var response = this.Parent.Messenger.GetResponseSafe(() =>
+            var response = Parent.Messenger.GetResponseSafe(() =>
                 new TaskDialogMessage(new TaskDialogOptions
                 {
                     Title = MainAreaTimelineResources.MsgReportAsSpamTitle,
                     MainIcon = VistaTaskDialogIcon.Warning,
                     MainInstruction = MainAreaTimelineResources.MsgReportAsSpamInstFormat
-                                                               .SafeFormat("@" + this.Status.User.ScreenName),
+                                                               .SafeFormat("@" + Status.User.ScreenName),
                     Content = MainAreaTimelineResources.MsgReportAsSpamContent,
                     CustomButtons = new[]
                     {
@@ -1225,23 +1225,23 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             var accounts = Setting.Accounts.Collection.ToArray();
             var reporter = accounts.FirstOrDefault();
             if (reporter == null) return;
-            var rreq = new UpdateRelationRequest(this.User.User, RelationKind.Block);
+            var rreq = new UpdateRelationRequest(User.User, RelationKind.Block);
             accounts.ToObservable()
                     .SelectMany(a =>
                         RequestQueue.EnqueueObservable(a, rreq)
                                     .Do(r => BackstageModel.RegisterEvent(
-                                        new BlockedEvent(a.GetPseudoUser(), this.User.User))))
+                                        new BlockedEvent(a.GetPseudoUser(), User.User))))
                     .Merge(
                         RequestQueue.EnqueueObservable(reporter,
-                            new UpdateRelationRequest(this.User.User, RelationKind.ReportAsSpam))
+                            new UpdateRelationRequest(User.User, RelationKind.ReportAsSpam))
                                     .Do(r =>
                                         BackstageModel.RegisterEvent(
-                                            new BlockedEvent(reporter.GetPseudoUser(), this.User.User))))
+                                            new BlockedEvent(reporter.GetPseudoUser(), User.User))))
                     .Subscribe(
                         _ => { },
                         ex => BackstageModel.RegisterEvent(new InternalErrorEvent(ex.Message)), () =>
                         {
-                            var tid = this.Status.User.Id;
+                            var tid = Status.User.Id;
                             var tidstr = tid.ToString(CultureInfo.InvariantCulture);
                             if (Setting.MuteBlockingUsers.Value)
                             {
@@ -1251,7 +1251,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                                     var removal = await StatusProxy.FetchStatuses(
                                         s => s.User.Id == tid ||
                                              (s.RetweetedOriginal != null && s.RetweetedOriginal.User.Id == tid),
-                                        "UserId = " + tidstr + " OR BaseUserId = " + tidstr);
+                                        "UserId = " + tidstr + " OR BaseUserId = " + tidstr).ConfigureAwait(false);
                                     removal.ForEach(s => StatusInbox.EnqueueRemoval(s.Id));
                                 });
                             }
@@ -1261,9 +1261,9 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         [UsedImplicitly]
         public void MuteKeyword()
         {
-            if (String.IsNullOrWhiteSpace(this.SelectedText))
+            if (String.IsNullOrWhiteSpace(SelectedText))
             {
-                this.Parent.Messenger.RaiseSafe(() =>
+                Parent.Messenger.RaiseSafe(() =>
                     new TaskDialogMessage(new TaskDialogOptions
                     {
                         Title = MainAreaTimelineResources.MsgMuteKeywordTitle,
@@ -1275,52 +1275,52 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                 return;
             }
             var response = QueryMuteMessage(MainAreaTimelineResources.MsgMuteKeywordTitle,
-                MainAreaTimelineResources.MsgMuteKeywordInstFormat.SafeFormat(this.SelectedText),
+                MainAreaTimelineResources.MsgMuteKeywordInstFormat.SafeFormat(SelectedText),
                 MainAreaTimelineResources.MsgMuteKeywordContent);
             if (response.Response.CustomButtonResult != 0) return;
-            System.Diagnostics.Debug.WriteLine("Mute: " + this.Status.User.ScreenName);
+            System.Diagnostics.Debug.WriteLine("Mute: " + Status.User.ScreenName);
             Setting.Muteds.AddPredicate(new FilterOperatorContains
             {
                 LeftValue = new StatusText(),
-                RightValue = new StringValue(this.SelectedText)
+                RightValue = new StringValue(SelectedText)
             });
         }
 
         public void MuteUser()
         {
             var response = QueryMuteMessage(MainAreaTimelineResources.MsgMuteUserTitle,
-                MainAreaTimelineResources.MsgMuteUserInstFormat.SafeFormat("@" + this.Status.User.ScreenName),
+                MainAreaTimelineResources.MsgMuteUserInstFormat.SafeFormat("@" + Status.User.ScreenName),
                 MainAreaTimelineResources.MsgMuteUserContent);
             if (response.Response.CustomButtonResult != 0) return;
-            System.Diagnostics.Debug.WriteLine("Mute: " + this.Status.User.ScreenName);
+            System.Diagnostics.Debug.WriteLine("Mute: " + Status.User.ScreenName);
             Setting.Muteds.AddPredicate(new FilterOperatorEquals
             {
                 LeftValue = new UserId(),
-                RightValue = new NumericValue(this.Status.User.Id)
+                RightValue = new NumericValue(Status.User.Id)
             }.Or(new FilterOperatorEquals
             {
                 LeftValue = new RetweeterId(),
-                RightValue = new NumericValue(this.Status.User.Id)
+                RightValue = new NumericValue(Status.User.Id)
             }));
         }
 
         public void MuteClient()
         {
             var response = QueryMuteMessage(MainAreaTimelineResources.MsgMuteClientTitle,
-                MainAreaTimelineResources.MsgMuteClientInstFormat.SafeFormat("@" + this.SourceText),
+                MainAreaTimelineResources.MsgMuteClientInstFormat.SafeFormat("@" + SourceText),
                 MainAreaTimelineResources.MsgMuteClientContent);
             if (response.Response.CustomButtonResult != 0) return;
-            System.Diagnostics.Debug.WriteLine("Mute: " + this.Status.Source);
+            System.Diagnostics.Debug.WriteLine("Mute: " + Status.Source);
             Setting.Muteds.AddPredicate(new FilterOperatorContains
             {
                 LeftValue = new StatusSource(),
-                RightValue = new StringValue(this.SourceText)
+                RightValue = new StringValue(SourceText)
             });
         }
 
         private TaskDialogMessage QueryMuteMessage(string title, string inst, string content)
         {
-            return this.Parent.Messenger.GetResponseSafe(() =>
+            return Parent.Messenger.GetResponseSafe(() =>
                 new TaskDialogMessage(new TaskDialogOptions
                 {
                     Title = title,
@@ -1338,14 +1338,14 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         [UsedImplicitly]
         public void ReceiveOlder()
         {
-            this.Parent.ReadMore(this.Status.Id);
+            Parent.ReadMore(Status.Id);
         }
 
         public void OpenNthLink(string index)
         {
             int value;
             if (!int.TryParse(index, out value)) value = 0;
-            var links = this.Status.Entities
+            var links = Status.Entities
                             .Guard()
                             .Distinct(e => e.StartIndex) // ignore extended_entities
                             .OrderBy(e => e.StartIndex)
@@ -1366,15 +1366,15 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                             })
                             .ToArray();
             if (value < 0 || links.Length <= value) return;
-            this.OpenLink(links[value]);
+            OpenLink(links[value]);
         }
 
         public void OpenNthThumbnail(string index)
         {
             int value;
             if (!int.TryParse(index, out value)) value = 0;
-            if (value < 0 || this.Images.Count <= value) return;
-            this.Images[value].OpenImage();
+            if (value < 0 || Images.Count <= value) return;
+            Images[value].OpenImage();
         }
 
         #endregion
@@ -1387,7 +1387,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         {
             get
             {
-                return this._openLinkCommand ?? (this._openLinkCommand = new ListenerCommand<string>(this.OpenLink));
+                return _openLinkCommand ?? (_openLinkCommand = new ListenerCommand<string>(OpenLink));
             }
         }
 
@@ -1424,18 +1424,18 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
 
         public ThumbnailImageViewModel(Uri source, Uri display)
         {
-            this._source = source;
-            this._display = display;
+            _source = source;
+            _display = display;
         }
 
         public Uri SourceUri
         {
-            get { return this._source; }
+            get { return _source; }
         }
 
         public Uri DisplayUri
         {
-            get { return this._display; }
+            get { return _display; }
         }
 
         private const string TwitterImageHost = "pbs.twimg.com";

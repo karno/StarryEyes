@@ -56,11 +56,11 @@ namespace StarryEyes.Models.Timelines.Statuses
             {
                 if (status.GenerateFromJson)
                 {
-                    status = await StatusProxy.SyncStatusActivityAsync(status);
+                    status = await StatusProxy.SyncStatusActivityAsync(status).ConfigureAwait(false);
                 }
                 var rto = status.RetweetedOriginal == null
                               ? null
-                              : await Get(status.RetweetedOriginal);
+                              : await Get(status.RetweetedOriginal).ConfigureAwait(false);
                 var lockerobj = _generateLock.GetOrAdd(status.Id, new object());
                 try
                 {
@@ -94,7 +94,7 @@ namespace StarryEyes.Models.Timelines.Statuses
 #pragma warning restore 4014
                     // ReSharper restore InvertIf
                 }
-            }).Unwrap();
+            }).Unwrap().ConfigureAwait(false);
         }
 
         public static void CollectGarbages()
@@ -143,7 +143,7 @@ namespace StarryEyes.Models.Timelines.Statuses
 
         private StatusModel(TwitterStatus status)
         {
-            this.Status = status;
+            Status = status;
             Task.Run(() =>
             {
                 foreach (var image in ImageResolver.ResolveImages(status))
@@ -156,7 +156,7 @@ namespace StarryEyes.Models.Timelines.Statuses
         private StatusModel(TwitterStatus status, StatusModel retweetedOriginal)
             : this(status)
         {
-            this.RetweetedOriginal = retweetedOriginal;
+            RetweetedOriginal = retweetedOriginal;
         }
 
         public TwitterStatus Status { get; private set; }
@@ -167,12 +167,12 @@ namespace StarryEyes.Models.Timelines.Statuses
         {
             get
             {
-                if (!this._isFavoritedUsersLoaded)
+                if (!_isFavoritedUsersLoaded)
                 {
-                    this._isFavoritedUsersLoaded = true;
-                    _factory.StartNew(this.LoadFavoritedUsers);
+                    _isFavoritedUsersLoaded = true;
+                    _factory.StartNew(LoadFavoritedUsers);
                 }
-                return this._favoritedUsers;
+                return _favoritedUsers;
             }
         }
 
@@ -180,12 +180,12 @@ namespace StarryEyes.Models.Timelines.Statuses
         {
             get
             {
-                if (!this._isRetweetedUsersLoaded)
+                if (!_isRetweetedUsersLoaded)
                 {
-                    this._isRetweetedUsersLoaded = true;
-                    _factory.StartNew(this.LoadRetweetedUsers);
+                    _isRetweetedUsersLoaded = true;
+                    _factory.StartNew(LoadRetweetedUsers);
                 }
-                return this._retweetedUsers;
+                return _retweetedUsers;
             }
         }
 
@@ -199,17 +199,17 @@ namespace StarryEyes.Models.Timelines.Statuses
 
         private void LoadFavoritedUsers()
         {
-            if (this.Status.FavoritedUsers != null && this.Status.FavoritedUsers.Length > 0)
+            if (Status.FavoritedUsers != null && Status.FavoritedUsers.Length > 0)
             {
-                LoadUsers(this.Status.FavoritedUsers, _favoritedsLock, _favoritedUsersDic, _favoritedUsers);
+                LoadUsers(Status.FavoritedUsers, _favoritedsLock, _favoritedUsersDic, _favoritedUsers);
             }
         }
 
         private void LoadRetweetedUsers()
         {
-            if (this.Status.RetweetedUsers != null && this.Status.RetweetedUsers.Length > 0)
+            if (Status.RetweetedUsers != null && Status.RetweetedUsers.Length > 0)
             {
-                LoadUsers(this.Status.RetweetedUsers, _retweetedsLock, _retweetedUsersDic, _retweetedUsers);
+                LoadUsers(Status.RetweetedUsers, _retweetedsLock, _retweetedUsersDic, _retweetedUsers);
             }
         }
 
@@ -233,7 +233,7 @@ namespace StarryEyes.Models.Timelines.Statuses
                         loadSource.Add(userId);
                     }
                 }
-                var ud = (await StoreHelper.GetUsersAsync(loadSource)).ToDictionary(u => u.Id);
+                var ud = (await StoreHelper.GetUsersAsync(loadSource).ConfigureAwait(false)).ToDictionary(u => u.Id);
                 lock (lockObject)
                 {
                     foreach (var userId in source)
@@ -270,20 +270,20 @@ namespace StarryEyes.Models.Timelines.Statuses
 
         public async void AddFavoritedUser(TwitterUser user)
         {
-            if (this.Status.RetweetedOriginal != null)
+            if (Status.RetweetedOriginal != null)
             {
-                var status = await Get(this.Status.RetweetedOriginal);
+                var status = await Get(Status.RetweetedOriginal).ConfigureAwait(false);
                 status.AddFavoritedUser(user);
             }
             else
             {
                 var added = false;
-                lock (this._favoritedsLock)
+                lock (_favoritedsLock)
                 {
-                    if (!this._favoritedUsersDic.ContainsKey(user.Id))
+                    if (!_favoritedUsersDic.ContainsKey(user.Id))
                     {
-                        this._favoritedUsersDic.Add(user.Id, user);
-                        this.Status.FavoritedUsers = this.Status.FavoritedUsers
+                        _favoritedUsersDic.Add(user.Id, user);
+                        Status.FavoritedUsers = Status.FavoritedUsers
                                                       .Guard()
                                                       .Append(user.Id)
                                                       .Distinct()
@@ -293,9 +293,9 @@ namespace StarryEyes.Models.Timelines.Statuses
                 }
                 if (added)
                 {
-                    this._favoritedUsers.Add(user);
+                    _favoritedUsers.Add(user);
 #pragma warning disable 4014
-                    StatusProxy.AddFavoritor(this.Status.Id, user.Id);
+                    StatusProxy.AddFavoritor(Status.Id, user.Id);
                     StatusBroadcaster.Republish(this);
 #pragma warning restore 4014
                 }
@@ -304,27 +304,27 @@ namespace StarryEyes.Models.Timelines.Statuses
 
         public async void RemoveFavoritedUser(long userId)
         {
-            if (this.Status.RetweetedOriginal != null)
+            if (Status.RetweetedOriginal != null)
             {
-                var status = await Get(this.Status.RetweetedOriginal);
+                var status = await Get(Status.RetweetedOriginal).ConfigureAwait(false);
                 status.RemoveFavoritedUser(userId);
             }
             else
             {
                 TwitterUser remove;
-                lock (this._favoritedsLock)
+                lock (_favoritedsLock)
                 {
-                    if (this._favoritedUsersDic.TryGetValue(userId, out remove))
+                    if (_favoritedUsersDic.TryGetValue(userId, out remove))
                     {
-                        this._favoritedUsersDic.Remove(userId);
-                        this.Status.FavoritedUsers = this.Status.FavoritedUsers.Guard().Except(new[] { userId }).ToArray();
+                        _favoritedUsersDic.Remove(userId);
+                        Status.FavoritedUsers = Status.FavoritedUsers.Guard().Except(new[] { userId }).ToArray();
                     }
                 }
                 if (remove != null)
                 {
-                    this._favoritedUsers.Remove(remove);
+                    _favoritedUsers.Remove(remove);
 #pragma warning disable 4014
-                    StatusProxy.RemoveFavoritor(this.Status.Id, userId);
+                    StatusProxy.RemoveFavoritor(Status.Id, userId);
                     StatusBroadcaster.Republish(this);
 #pragma warning restore 4014
                 }
@@ -333,20 +333,20 @@ namespace StarryEyes.Models.Timelines.Statuses
 
         public async void AddRetweetedUser(TwitterUser user)
         {
-            if (this.Status.RetweetedOriginal != null)
+            if (Status.RetweetedOriginal != null)
             {
-                var status = await Get(this.Status.RetweetedOriginal);
+                var status = await Get(Status.RetweetedOriginal).ConfigureAwait(false);
                 status.AddRetweetedUser(user);
             }
             else
             {
                 var added = false;
-                lock (this._retweetedsLock)
+                lock (_retweetedsLock)
                 {
-                    if (!this._retweetedUsersDic.ContainsKey(user.Id))
+                    if (!_retweetedUsersDic.ContainsKey(user.Id))
                     {
-                        this._retweetedUsersDic.Add(user.Id, user);
-                        this.Status.RetweetedUsers = this.Status.RetweetedUsers.Guard()
+                        _retweetedUsersDic.Add(user.Id, user);
+                        Status.RetweetedUsers = Status.RetweetedUsers.Guard()
                                                       .Append(user.Id)
                                                       .Distinct()
                                                       .ToArray();
@@ -355,9 +355,9 @@ namespace StarryEyes.Models.Timelines.Statuses
                 }
                 if (added)
                 {
-                    this._retweetedUsers.Add(user);
+                    _retweetedUsers.Add(user);
 #pragma warning disable 4014
-                    StatusProxy.AddRetweeter(this.Status.Id, user.Id);
+                    StatusProxy.AddRetweeter(Status.Id, user.Id);
                     StatusBroadcaster.Republish(this);
 #pragma warning restore 4014
                 }
@@ -366,28 +366,28 @@ namespace StarryEyes.Models.Timelines.Statuses
 
         public async void RemoveRetweetedUser(long userId)
         {
-            if (this.Status.RetweetedOriginal != null)
+            if (Status.RetweetedOriginal != null)
             {
-                var status = await Get(this.Status.RetweetedOriginal);
+                var status = await Get(Status.RetweetedOriginal).ConfigureAwait(false);
                 status.RemoveRetweetedUser(userId);
             }
             else
             {
                 TwitterUser remove;
-                lock (this._retweetedsLock)
+                lock (_retweetedsLock)
                 {
-                    if (this._retweetedUsersDic.TryGetValue(userId, out remove))
+                    if (_retweetedUsersDic.TryGetValue(userId, out remove))
                     {
-                        this._retweetedUsersDic.Remove(userId);
-                        this.Status.RetweetedUsers = this.Status.RetweetedUsers.Guard().Except(new[] { userId }).ToArray();
+                        _retweetedUsersDic.Remove(userId);
+                        Status.RetweetedUsers = Status.RetweetedUsers.Guard().Except(new[] { userId }).ToArray();
                     }
                 }
                 if (remove != null)
                 {
-                    this._retweetedUsers.Remove(remove);
+                    _retweetedUsers.Remove(remove);
                     // update persistent info
 #pragma warning disable 4014
-                    StatusProxy.RemoveRetweeter(this.Status.Id, userId);
+                    StatusProxy.RemoveRetweeter(Status.Id, userId);
                     StatusBroadcaster.Republish(this);
 #pragma warning restore 4014
                 }
@@ -397,40 +397,40 @@ namespace StarryEyes.Models.Timelines.Statuses
         public bool IsFavorited(params long[] ids)
         {
             if (ids.Length == 0) return false;
-            if (this.Status.RetweetedOriginal != null)
+            if (Status.RetweetedOriginal != null)
             {
                 throw new NotSupportedException("You must create another model indicating RetweetedOriginal status.");
             }
-            lock (this._favoritedsLock)
+            lock (_favoritedsLock)
             {
-                return ids.All(this._favoritedUsersDic.ContainsKey);
+                return ids.All(_favoritedUsersDic.ContainsKey);
             }
         }
 
         public bool IsRetweeted(params long[] ids)
         {
             if (ids.Length == 0) return false;
-            if (this.Status.RetweetedOriginal != null)
+            if (Status.RetweetedOriginal != null)
             {
                 throw new NotSupportedException("You must create another model indicating RetweetedOriginal status.");
             }
-            lock (this._retweetedsLock)
+            lock (_retweetedsLock)
             {
-                return ids.All(this._retweetedUsersDic.ContainsKey);
+                return ids.All(_retweetedUsersDic.ContainsKey);
             }
         }
 
         [CanBeNull]
         public IEnumerable<TwitterAccount> GetSuitableReplyAccount()
         {
-            var uid = this.Status.InReplyToUserId.GetValueOrDefault();
-            if (this.Status.StatusType == StatusType.DirectMessage)
+            var uid = Status.InReplyToUserId.GetValueOrDefault();
+            if (Status.StatusType == StatusType.DirectMessage)
             {
-                if (this.Status.Recipient == null)
+                if (Status.Recipient == null)
                 {
                     throw new ArgumentException("Inconsistent status state: Recipient is not spcified in spite of status is direct message.");
                 }
-                uid = this.Status.Recipient.Id;
+                uid = Status.Recipient.Id;
             }
             var account = Setting.Accounts.Get(uid);
             return account != null ? new[] { BacktrackFallback(account) } : null;
@@ -462,12 +462,12 @@ namespace StarryEyes.Models.Timelines.Statuses
                 return false;
             }
 
-            return this.Status.Id == another.Status.Id;
+            return Status.Id == another.Status.Id;
         }
 
         public override int GetHashCode()
         {
-            return this.Status.GetHashCode();
+            return Status.GetHashCode();
         }
     }
 
@@ -478,8 +478,8 @@ namespace StarryEyes.Models.Timelines.Statuses
 
         public ThumbnailImage(Uri source, Uri display)
         {
-            this._display = display;
-            this._source = source;
+            _display = display;
+            _source = source;
         }
 
         public ThumbnailImage(Tuple<Uri, Uri> sourceAndDisplay)
@@ -489,12 +489,12 @@ namespace StarryEyes.Models.Timelines.Statuses
 
         public Uri SourceUri
         {
-            get { return this._source; }
+            get { return _source; }
         }
 
         public Uri DisplayUri
         {
-            get { return this._display; }
+            get { return _display; }
         }
     }
 }

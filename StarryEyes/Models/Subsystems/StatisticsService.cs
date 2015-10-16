@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using StarryEyes.Albireo;
 using StarryEyes.Albireo.Helpers;
 using StarryEyes.Casket;
 using StarryEyes.Models.Databases;
@@ -67,7 +66,8 @@ namespace StarryEyes.Models.Subsystems
         {
             try
             {
-                _estimatedGrossTweetCount = (int)(await StatusProxy.GetCountAsync()) + _queuedStatusesCount;
+                var dbcount = (int)(await StatusProxy.GetCountAsync().ConfigureAwait(false));
+                _estimatedGrossTweetCount = dbcount + _queuedStatusesCount;
             }
             catch (SqliteCrudException) { }
             catch (SQLiteException) { }
@@ -103,7 +103,7 @@ namespace StarryEyes.Models.Subsystems
 
                 // update statistics params
                 var previousGross = _estimatedGrossTweetCount;
-                await UpdateTweetCount();
+                await UpdateTweetCount().ConfigureAwait(false);
                 var delta = _estimatedGrossTweetCount - previousGross;
                 System.Diagnostics.Debug.WriteLine("status count: " + _estimatedGrossTweetCount + ", delta: " + delta);
 

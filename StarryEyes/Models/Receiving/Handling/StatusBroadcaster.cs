@@ -49,14 +49,14 @@ namespace StarryEyes.Models.Receiving.Handling
         internal static async void Enqueue([NotNull] StatusNotification status)
         {
             if (status == null) throw new ArgumentNullException("status");
-            _queue.Enqueue(await StatusModelNotification.FromStatusNotification(status, true));
+            _queue.Enqueue(await StatusModelNotification.FromStatusNotification(status, true).ConfigureAwait(false));
             _signal.Set();
         }
 
         public static async void Republish([NotNull] TwitterStatus status)
         {
             if (status == null) throw new ArgumentNullException("status");
-            Republish(await StatusModel.Get(status));
+            Republish(await StatusModel.Get(status).ConfigureAwait(false));
         }
 
         public static void Republish([NotNull] StatusModel status)

@@ -90,7 +90,7 @@ namespace StarryEyes.Models.Receiving.Handling
                                       (status.RetweetedOriginalId != null &&
                                       IsRegisteredAsRemoved(status.RetweetedOriginalId.Value));
                         // check status is registered as removed or already received
-                        if (removed || !await StatusReceived(status))
+                        if (removed || !await StatusReceived(status).ConfigureAwait(false))
                         {
                             continue;
                         }
@@ -117,7 +117,7 @@ namespace StarryEyes.Models.Receiving.Handling
             if (status == null) throw new ArgumentNullException("status");
             try
             {
-                if (await CheckAlreadyExisted(status.Id))
+                if (await CheckAlreadyExisted(status.Id).ConfigureAwait(false))
                 {
                     // already received
                     return false;
@@ -161,7 +161,7 @@ namespace StarryEyes.Models.Receiving.Handling
                 return true; // already existed
             }
             // check with database
-            return await StatusProxy.IsStatusExistsAsync(id);
+            return await StatusProxy.IsStatusExistsAsync(id).ConfigureAwait(false);
         }
 
         private static long GetTimestampFromSnowflakeId(long id)
@@ -182,7 +182,7 @@ namespace StarryEyes.Models.Receiving.Handling
             Task.Run(async () =>
             {
                 // find removed statuses
-                var removeds = await StatusProxy.RemoveStatusAsync(statusId);
+                var removeds = await StatusProxy.RemoveStatusAsync(statusId).ConfigureAwait(false);
 
                 // notify removed ids
                 foreach (var removed in removeds)

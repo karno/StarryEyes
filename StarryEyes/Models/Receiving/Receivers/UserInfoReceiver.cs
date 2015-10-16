@@ -15,7 +15,7 @@ namespace StarryEyes.Models.Receiving.Receivers
 
         public UserInfoReceiver(TwitterAccount account)
         {
-            this._account = account;
+            _account = account;
         }
 
         protected override string ReceiverName
@@ -30,9 +30,9 @@ namespace StarryEyes.Models.Receiving.Receivers
 
         protected override async Task DoReceive()
         {
-            var user = await this._account.ShowUserAsync(this._account.Id);
-            this._account.UnreliableScreenName = user.ScreenName;
-            this._account.UnreliableProfileImage = user.ProfileImageUri.ChangeImageSize(ImageSize.Original);
+            var user = await _account.ShowUserAsync(_account.Id).ConfigureAwait(false);
+            _account.UnreliableScreenName = user.ScreenName;
+            _account.UnreliableProfileImage = user.ProfileImageUri.ChangeImageSize(ImageSize.Original);
             UserProxy.StoreUser(user);
         }
     }

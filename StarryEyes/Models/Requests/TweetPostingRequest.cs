@@ -47,7 +47,7 @@ namespace StarryEyes.Models.Requests
         public override async Task<TwitterStatus> Send(TwitterAccount account)
         {
             var latlong = _geoInfo == null ? null : Tuple.Create(_geoInfo.Latitude, _geoInfo.Longitude);
-            Exception thrown;
+            Exception lastThrown;
             // make retweet
             var acc = account;
             do
@@ -58,25 +58,24 @@ namespace StarryEyes.Models.Requests
                     if (_attachedImageBin != null)
                     {
                         result = await acc.UpdateWithMediaAsync(
-                            this._status,
-                            new[] { this._attachedImageBin },
+                            _status,
+                            new[] { _attachedImageBin },
                             account.MarkMediaAsPossiblySensitive ? true : (bool?)null, // Inherit property
-                            this._inReplyTo,
-                            latlong);
+                            _inReplyTo,
+                            latlong).ConfigureAwait(false);
                     }
                     else
                     {
                         result = await acc.UpdateAsync(
-                            this._status,
-                            this._inReplyTo,
-                            latlong);
+                            _status,
+                            _inReplyTo,
+                            latlong).ConfigureAwait(false);
                     }
                     BackstageModel.NotifyFallbackState(acc, false);
                     return result;
                 }
                 catch (TwitterApiException tae)
                 {
-                    thrown = tae;
                     if (tae.Message.Contains(LimitMessage))
                     {
                         BackstageModel.NotifyFallbackState(acc, true);
@@ -86,13 +85,14 @@ namespace StarryEyes.Models.Requests
                             var prev = acc;
                             acc = Setting.Accounts.Get(acc.FallbackAccountId.Value);
                             BackstageModel.RegisterEvent(new FallbackedEvent(prev, acc));
+                            lastThrown = tae;
                             continue;
                         }
                     }
+                    throw;
                 }
-                throw thrown;
-            } while (acc != null && acc.Id != account.Id);
-            throw thrown;
+            } while (acc != null && acc.Id != account.Id); // fallback
+            throw lastThrown;
         }
     }
 
