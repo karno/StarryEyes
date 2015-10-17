@@ -43,19 +43,21 @@ namespace StarryEyes.Nightmare.Windows.Forms
 
         private static Screen Wrap(WinForms.Screen screen)
         {
-            if (screen == null)
-                return null;
-            else
-                return new Screen(screen);
+            return screen == null ? null : new Screen(screen);
         }
 
         private readonly WinForms.Screen _original;
+        private readonly uint _dpiX;
+        private readonly uint _dpiY;
 
         private Screen(WinForms.Screen wfScreen)
         {
             if (wfScreen == null)
                 throw new ArgumentNullException("wfScreen");
-            this._original = wfScreen;
+            _original = wfScreen;
+            var monitor = NativeMethods.MonitorFromPoint(
+                new System.Drawing.Point((int)WorkingArea.Left, (int)WorkingArea.Top), 2);
+            NativeMethods.GetDpiForMonitor(monitor, DpiType.Effective, out _dpiX, out _dpiY);
         }
 
         /// <summary>
@@ -63,7 +65,23 @@ namespace StarryEyes.Nightmare.Windows.Forms
         /// </summary>
         public int BitsPerPixel
         {
-            get { return this._original.BitsPerPixel; }
+            get { return _original.BitsPerPixel; }
+        }
+
+        /// <summary>
+        /// Horizontal DPI (base: 96)
+        /// </summary>
+        public uint DpiX
+        {
+            get { return _dpiX; }
+        }
+
+        /// <summary>
+        /// Vertical DPI (base: 96)
+        /// </summary>
+        public uint DpiY
+        {
+            get { return _dpiY; }
         }
 
         /// <summary>
@@ -74,10 +92,10 @@ namespace StarryEyes.Nightmare.Windows.Forms
             get
             {
                 return new Rect(
-                      this._original.Bounds.Left,
-                      this._original.Bounds.Top,
-                      this._original.Bounds.Width,
-                      this._original.Bounds.Bottom);
+                      _original.Bounds.Left,
+                      _original.Bounds.Top,
+                      _original.Bounds.Width,
+                      _original.Bounds.Bottom);
             }
         }
 
@@ -89,10 +107,10 @@ namespace StarryEyes.Nightmare.Windows.Forms
             get
             {
                 return new Rect(
-                      this._original.WorkingArea.X,
-                      this._original.WorkingArea.Y,
-                      this._original.WorkingArea.Width,
-                      this._original.WorkingArea.Height);
+                      _original.WorkingArea.X,
+                      _original.WorkingArea.Y,
+                      _original.WorkingArea.Width,
+                      _original.WorkingArea.Height);
             }
         }
 
@@ -101,7 +119,7 @@ namespace StarryEyes.Nightmare.Windows.Forms
         /// </summary>
         public string DeviceName
         {
-            get { return this._original.DeviceName; }
+            get { return _original.DeviceName; }
         }
 
         /// <summary>
@@ -109,7 +127,7 @@ namespace StarryEyes.Nightmare.Windows.Forms
         /// </summary>
         public bool IsPrimary
         {
-            get { return this._original.Primary; }
+            get { return _original.Primary; }
         }
     }
 }

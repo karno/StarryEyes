@@ -67,6 +67,16 @@ namespace StarryEyes.Nightmare.Windows
 
         [DllImport("gdi32.dll")]
         public static extern bool DeleteObject(IntPtr hObject);
+
+        //https://msdn.microsoft.com/en-us/library/windows/desktop/dd145062(v=vs.85).aspx
+        [DllImport("User32.dll")]
+        internal static extern IntPtr MonitorFromPoint([In]System.Drawing.Point pt, [In]uint dwFlags);
+
+        //https://msdn.microsoft.com/en-us/library/windows/desktop/dn280510(v=vs.85).aspx
+        [DllImport("Shcore.dll")]
+        internal static extern IntPtr GetDpiForMonitor([In] IntPtr hmonitor, [In] DpiType dpiType,
+            [Out] out uint dpiX, [Out] out uint dpiY);
+
     }
 
     #region Data structures
@@ -110,4 +120,11 @@ namespace StarryEyes.Nightmare.Windows
 
     #endregion
     // ReSharper restore InconsistentNaming
+
+    public enum DpiType
+    {
+        Effective = 0,
+        Angular = 1,
+        Raw = 2,
+    }
 }

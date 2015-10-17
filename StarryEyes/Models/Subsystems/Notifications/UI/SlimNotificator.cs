@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using StarryEyes.Albireo;
 using StarryEyes.Albireo.Helpers;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.ViewModels.Notifications;

@@ -94,10 +94,10 @@ namespace StarryEyes.ViewModels.Notifications
         public NormalNotificatorViewModel(
             Color background, TwitterUser user, string header, string description)
         {
-            this._background = background;
-            this._user = user;
-            this._header = header;
-            this._description = description;
+            _background = background;
+            _user = user;
+            _header = header;
+            _description = description;
             // acquire slot
             lock (Slots)
             {
@@ -132,8 +132,10 @@ namespace StarryEyes.ViewModels.Notifications
                 return;
             }
 
-            _left = (int)((bound.Width - ww * (this._slotIndex / ipl + 1)) + bound.Left);
-            _top = (int)((bound.Height - wh * (this._slotIndex % ipl + 1)) + bound.Top);
+            bound.Width *= 96.0 / screen.DpiX;
+            bound.Height *= 96.0 / screen.DpiY;
+            _left = (int)((bound.Width - ww * (_slotIndex / ipl + 1)) + bound.Left);
+            _top = (int)((bound.Height - wh * (_slotIndex % ipl + 1)) + bound.Top);
             System.Diagnostics.Debug.WriteLine("#N - " + _slotIndex + " / " + _left + ", " + _top);
         }
 
@@ -149,17 +151,17 @@ namespace StarryEyes.ViewModels.Notifications
 
         public Color Background
         {
-            get { return this._background; }
+            get { return _background; }
         }
 
         public Brush BackgroundBrush
         {
-            get { return new SolidColorBrush(this.Background).ToFrozen(); }
+            get { return new SolidColorBrush(Background).ToFrozen(); }
         }
 
         public TwitterUser User
         {
-            get { return this._user; }
+            get { return _user; }
         }
 
         public Uri UserImage
@@ -169,12 +171,12 @@ namespace StarryEyes.ViewModels.Notifications
 
         public string Header
         {
-            get { return this._header; }
+            get { return _header; }
         }
 
         public string Description
         {
-            get { return this._description; }
+            get { return _description; }
         }
 
         [UsedImplicitly]
@@ -183,7 +185,7 @@ namespace StarryEyes.ViewModels.Notifications
             Observable.Timer(TimeSpan.FromSeconds(3))
                       .Subscribe(_ =>
                       {
-                          this.Messenger.RaiseSafe(() => new WindowActionMessage(WindowAction.Close));
+                          Messenger.RaiseSafe(() => new WindowActionMessage(WindowAction.Close));
                           ReleaseSlot();
                       });
         }
@@ -194,7 +196,7 @@ namespace StarryEyes.ViewModels.Notifications
             {
                 Slots[_slotIndex] = false;
             }
-            this.Dispose();
+            Dispose();
         }
     }
 }

@@ -24,12 +24,12 @@ namespace StarryEyes.ViewModels.Dialogs
 
         public int Left
         {
-            get { return this._left; }
+            get { return _left; }
         }
 
         public int Top
         {
-            get { return this._top; }
+            get { return _top; }
         }
 
         private DisplayMarkerViewModel(int displayIndex)
@@ -38,14 +38,16 @@ namespace StarryEyes.ViewModels.Dialogs
             if (screen == null) return;
             var warea = screen.WorkingArea;
             if (warea.Width < 1 || warea.Height < 1) return;
-            this._left = (int)((warea.Width - 300) / 2 + warea.Left);
-            this._top = (int)((warea.Height - 60) / 2 + warea.Top);
+            warea.Width *= 96.0 / screen.DpiX;
+            warea.Height *= 96.0 / screen.DpiY;
+            _left = (int)((warea.Width - 300) / 2 + warea.Left);
+            _top = (int)((warea.Height - 60) / 2 + warea.Top);
         }
 
         public void Shown()
         {
             Observable.Timer(TimeSpan.FromSeconds(1))
-                      .Subscribe(_ => this.Messenger.RaiseSafe(() =>
+                      .Subscribe(_ => Messenger.RaiseSafe(() =>
                           new WindowActionMessage(WindowAction.Close)));
 
         }

@@ -15,11 +15,11 @@ namespace StarryEyes.Views.Dialogs
 
         private void DisplayMarkerWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
-            var vm = this.DataContext as DisplayMarkerViewModel;
+            var vm = DataContext as DisplayMarkerViewModel;
             if (vm != null)
             {
-                this.Left = vm.Left;
-                this.Top = vm.Top;
+                Left = vm.Left;
+                Top = vm.Top;
             }
         }
     }

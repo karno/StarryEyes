@@ -74,13 +74,15 @@ namespace StarryEyes.ViewModels.Notifications
 
         private SlimNotificatorViewModel(NotificationData data)
         {
-            this._data = data;
+            _data = data;
             var screen = NotificationUtil.GetNotifyTargetScreen();
             if (screen == null) return;
             var bound = screen.WorkingArea;
             if (bound == Rect.Empty) return; // empty data
+            bound.Width *= 96.0 / screen.DpiX;
+            bound.Height *= 96.0 / screen.DpiY;
             _width = (int)(bound.Width * 0.7);
-            _left = (int)(bound.Left + (bound.Width - this._width) / 2.0);
+            _left = (int)(bound.Left + (bound.Width - _width) / 2.0);
             _top = (int)(bound.Bottom - 24);
         }
 
@@ -137,9 +139,9 @@ namespace StarryEyes.ViewModels.Notifications
         {
             get
             {
-                return this._data.SourceUser != null
-                    ? this._data.SourceUser.ProfileImageUri
-                    : this._data.TargetStatus.User.ProfileImageUri;
+                return _data.SourceUser != null
+                    ? _data.SourceUser.ProfileImageUri
+                    : _data.TargetStatus.User.ProfileImageUri;
             }
         }
 
@@ -173,7 +175,7 @@ namespace StarryEyes.ViewModels.Notifications
         public void Shown()
         {
             Observable.Timer(TimeSpan.FromSeconds(3.1))
-                      .Subscribe(_ => this.Messenger.RaiseSafe(() => new WindowActionMessage(WindowAction.Close)));
+                      .Subscribe(_ => Messenger.RaiseSafe(() => new WindowActionMessage(WindowAction.Close)));
             Observable.Timer(TimeSpan.FromSeconds(0.1))
                       .Subscribe(_ => ShowNext());
         }
