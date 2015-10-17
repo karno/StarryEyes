@@ -57,14 +57,14 @@ namespace StarryEyes.Models.Receiving.Receivers
 
         public UserStreamsConnectionState ConnectionState
         {
-            get { return this._state; }
+            get { return _state; }
             private set
             {
-                if (this._state == value)
+                if (_state == value)
                 {
                     return;
                 }
-                this._state = value;
+                _state = value;
                 StateChanged.SafeInvoke();
             }
         }
@@ -113,16 +113,6 @@ namespace StarryEyes.Models.Receiving.Receivers
                 }
             }
         }
-
-        /// <summary>
-        /// replies=all flag
-        /// </summary>
-        public bool RepliesAll { get; set; }
-
-        /// <summary>
-        /// include_followings_activity flag
-        /// </summary>
-        public bool IncludeFollowingsActivities { get; set; }
 
         #endregion
 
@@ -261,7 +251,7 @@ namespace StarryEyes.Models.Receiving.Receivers
             {
                 return;
             }
-            this._stateUpdater.UpdateState("@" + _account.UnreliableScreenName + ": " +
+            _stateUpdater.UpdateState("@" + _account.UnreliableScreenName + ": " +
                                            ReceivingResources.UserStreamReconnecting);
             Connect(_receiverTokenSource.Token);
         }
@@ -298,7 +288,7 @@ namespace StarryEyes.Models.Receiving.Receivers
                 return;
             }
 
-            this._stateUpdater.UpdateState("@" + _account.UnreliableScreenName + ": " +
+            _stateUpdater.UpdateState("@" + _account.UnreliableScreenName + ": " +
                                            ReceivingResources.UserStreamReconnecting);
 
             // call ExecuteInternalAsync asynchronously with created token
@@ -323,7 +313,7 @@ namespace StarryEyes.Models.Receiving.Receivers
                 try
                 {
                     await UserStreams.Connect(_account, ParseLine, _userStreamTimeout, cancellationToken, TrackKeywords,
-                            RepliesAll, IncludeFollowingsActivities).ConfigureAwait(false);
+                        _account.ReceiveRepliesAll, _account.ReceiveFollowingsActivity).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
@@ -453,7 +443,7 @@ namespace StarryEyes.Models.Receiving.Receivers
 
         public void Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
 

@@ -60,7 +60,6 @@ namespace StarryEyes.Anomaly.TwitterApi.Streams
                     client = credential.CreateOAuthClient(useGZip: false);
                     // set parameters for receiving UserStreams.
                     client.Timeout = Timeout.InfiniteTimeSpan;
-                    // client.MaxResponseContentBufferSize = 1024 * 2;
                     // begin connection
                     using (var resp = await client.GetAsync(endpoint, HttpCompletionOption.ResponseHeadersRead,
                         cancellationToken).ConfigureAwait(false))
