@@ -16,11 +16,11 @@ namespace StarryEyes.Models.Databases
 {
     public static class StatusProxy
     {
-        private static readonly TaskQueue<long, TwitterStatus> _statusQueue;
+        private static readonly DatabaseWriterQueue<long, TwitterStatus> _statusQueue;
 
         static StatusProxy()
         {
-            _statusQueue = new TaskQueue<long, TwitterStatus>(200, TimeSpan.FromSeconds(30),
+            _statusQueue = new DatabaseWriterQueue<long, TwitterStatus>(200, TimeSpan.FromSeconds(30),
                 async s => await StoreStatusesAsync(s).ConfigureAwait(false));
             _favoriteQueue = new ActivityQueue(50, TimeSpan.FromSeconds(30),
                 s => Task.Run(() => Database.FavoritesCrud.InsertAllAsync(s)),
@@ -30,7 +30,7 @@ namespace StarryEyes.Models.Databases
                 s => Task.Run(() => Database.RetweetsCrud.DeleteAllAsync(s)));
             App.ApplicationFinalize += () =>
             {
-                _statusQueue.Writeback();
+                _statusQueue.Dispose();
                 _favoriteQueue.Writeback();
                 _retweetQueue.Writeback();
             };

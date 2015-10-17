@@ -13,13 +13,13 @@ namespace StarryEyes.Models.Databases
 {
     public static class UserProxy
     {
-        private static readonly TaskQueue<long, TwitterUser> _userQueue;
+        private static readonly DatabaseWriterQueue<long, TwitterUser> _userQueue;
 
         static UserProxy()
         {
-            _userQueue = new TaskQueue<long, TwitterUser>(50, TimeSpan.FromSeconds(30),
+            _userQueue = new DatabaseWriterQueue<long, TwitterUser>(50, TimeSpan.FromSeconds(30),
                 async u => await StoreUsersAsync(u).ConfigureAwait(false));
-            App.ApplicationFinalize += () => _userQueue.Writeback();
+            App.ApplicationFinalize += () => _userQueue.Dispose();
         }
 
         public static long GetId(string screenName)

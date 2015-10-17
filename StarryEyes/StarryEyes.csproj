@@ -363,6 +363,7 @@
     <Compile Include="Models\Backstages\TwitterEvents\UnmutedEvent.cs" />
     <Compile Include="Models\Databases\AccountProxy.cs" />
     <Compile Include="Models\Databases\Caching\ActivityQueue.cs" />
+    <Compile Include="Models\Databases\Caching\DatabaseWriterQueue.cs" />
     <Compile Include="Models\Databases\DatabaseException.cs" />
     <Compile Include="Models\Databases\Caching\TaskQueue.cs" />
     <Compile Include="Models\Databases\DatabaseMigrator.cs" />
