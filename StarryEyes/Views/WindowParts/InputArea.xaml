@@ -50,7 +50,6 @@
         </ResourceDictionary>
     </UserControl.Resources>
     <i:Interaction.Triggers>
-
         <l:InteractionMessageTrigger Messenger="{Binding Messenger}">
             <l:OpenFileDialogInteractionMessageAction />
         </l:InteractionMessageTrigger>
@@ -64,18 +63,7 @@
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
-        <VisualStateManager.VisualStateGroups>
-            <VisualStateGroup x:Name="ImageAttachControl">
-                <VisualState x:Name="MouseOverState">
-                    <Storyboard>
-                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Border" Storyboard.TargetProperty="(UIElement.Opacity)">
-                            <DiscreteDoubleKeyFrame KeyTime="0" Value="0.4" />
-                        </DoubleAnimationUsingKeyFrames>
-                    </Storyboard>
-                </VisualState>
-                <VisualState x:Name="MouseOutState" />
-            </VisualStateGroup>
-        </VisualStateManager.VisualStateGroups>
+
         <Grid Margin="4,0,0,0"
               HorizontalAlignment="Left"
               VerticalAlignment="Top">
@@ -381,6 +369,103 @@
                             </DataTemplate>
                         </controls:SuggestableTextBox.ListItemTemplate>
                     </controls:SuggestableTextBox>
+                    <ItemsControl Grid.Row="1"
+                                  Grid.Column="1"
+                                  FocusVisualStyle="{x:Null}"
+                                  ItemsSource="{Binding InputCoreViewModel.AttachedImages}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="{x:Type inputting:ImageDescriptionViewModel}">
+                                <Grid>
+                                    <VisualStateManager.VisualStateGroups>
+                                        <VisualStateGroup x:Name="ImageAttachControl">
+                                            <VisualState x:Name="MouseOverState">
+                                                <Storyboard>
+                                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Border" Storyboard.TargetProperty="(UIElement.Opacity)">
+                                                        <DiscreteDoubleKeyFrame KeyTime="0" Value="0.4" />
+                                                    </DoubleAnimationUsingKeyFrames>
+                                                </Storyboard>
+                                            </VisualState>
+                                            <VisualState x:Name="MouseOutState" />
+                                        </VisualStateGroup>
+                                    </VisualStateManager.VisualStateGroups>
+                                    <Border MinWidth="40"
+                                            MinHeight="40"
+                                            MaxWidth="100"
+                                            MaxHeight="100"
+                                            Margin="4"
+                                            HorizontalAlignment="Left"
+                                            VerticalAlignment="Center"
+                                            BorderThickness="1"
+                                            ToolTip="{x:Static windowParts:InputAreaResources.ClickToRemoveImage}">
+                                        <Border.Background>
+                                            <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}" />
+                                        </Border.Background>
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="MouseLeftButtonDown">
+                                                <ei:CallMethodAction MethodName="DetachImage" TargetObject="{Binding Mode=OneWay}" />
+                                            </i:EventTrigger>
+                                            <i:EventTrigger EventName="MouseEnter">
+                                                <ei:GoToStateAction StateName="MouseOverState" />
+                                            </i:EventTrigger>
+                                            <i:EventTrigger EventName="MouseLeave">
+                                                <ei:GoToStateAction StateName="MouseOutState" />
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                        <Border.BorderBrush>
+                                            <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ActiveBorderColorKey}}" />
+                                        </Border.BorderBrush>
+                                        <Grid>
+                                            <Image Source="{Binding Path=Image}" Stretch="Uniform" />
+                                            <Border x:Name="Border"
+                                                    Background="{StaticResource MetroRedBrush}"
+                                                    Opacity="0">
+                                                <Path Width="10"
+                                                      Height="10"
+                                                      Margin="0,6,6,0"
+                                                      HorizontalAlignment="Right"
+                                                      VerticalAlignment="Top"
+                                                      Data="F1 M 20.5,19L 24,22.5L 27.4999,19.0001L 28.9999,20.5001L 25.5,24L 29,27.5L 27.5,29L 24,25.5L 20.5,29L 19,27.5L 22.5,24L 19,20.5L 20.5,19 Z "
+                                                      Fill="White"
+                                                      Stretch="Fill" />
+                                            </Border>
+                                        </Grid>
+                                    </Border>
+
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <DockPanel Grid.Row="1"
+                               Grid.Column="2"
+                               MinWidth="32"
+                               LastChildFill="False">
+                        <Button Height="26"
+                                DockPanel.Dock="Top"
+                                Focusable="False"
+                                Style="{DynamicResource MetroSquareUnfocusableFlatButton}">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="Click">
+                                    <ei:CallMethodAction MethodName="CloseInput" TargetObject="{Binding Mode=OneWay}" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                            <Path Width="8"
+                                  Height="8"
+                                  Data="F1 M 21.2,20L 24,22.8L 26.7999,20.0001L 27.9999,21.2001L 25.2,24L 28,26.8L 26.8,28L 24,25.2L 21.2,28L 20,26.8L 22.8,24L 20,21.2L 21.2,20 Z "
+                                  Fill="{DynamicResource BaseColorForegroundBrush}"
+                                  Stretch="Fill" />
+                        </Button>
+                        <TextBlock Margin="4"
+                                   DockPanel.Dock="Bottom"
+                                   Foreground="DimGray"
+                                   Text="{Binding InputCoreViewModel.RemainTextCount}"
+                                   TextAlignment="Right"
+                                   TextWrapping="Wrap" />
+                    </DockPanel>
                     <DockPanel Grid.Row="2"
                                Grid.Column="0"
                                Grid.ColumnSpan="3"
@@ -472,7 +557,7 @@
                                                TextWrapping="Wrap" />
                                 </StackPanel>
                             </controls:DropDownMenuButton>
-                            <Grid Visibility="{Binding IsImageAttached, Converter={StaticResource BooleanToInvisibleConverter}}">
+                            <Grid Visibility="{Binding CanAttachImage, Converter={StaticResource BooleanToVisibleConverter}}">
                                 <Button Name="ImageAttachOptionButton"
                                         Width="40"
                                         Style="{StaticResource MetroSquareUnfocusableFlatButton}"
@@ -660,79 +745,6 @@
                             </ItemsControl>
                         </DockPanel>
                     </DockPanel>
-                    <DockPanel Grid.Row="1"
-                               Grid.Column="2"
-                               MinWidth="32"
-                               LastChildFill="False">
-                        <Button Height="26"
-                                DockPanel.Dock="Top"
-                                Focusable="False"
-                                Style="{DynamicResource MetroSquareUnfocusableFlatButton}">
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="Click">
-                                    <ei:CallMethodAction MethodName="CloseInput" TargetObject="{Binding Mode=OneWay}" />
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-                            <Path Width="8"
-                                  Height="8"
-                                  Data="F1 M 21.2,20L 24,22.8L 26.7999,20.0001L 27.9999,21.2001L 25.2,24L 28,26.8L 26.8,28L 24,25.2L 21.2,28L 20,26.8L 22.8,24L 20,21.2L 21.2,20 Z "
-                                  Fill="{DynamicResource BaseColorForegroundBrush}"
-                                  Stretch="Fill" />
-                        </Button>
-                        <TextBlock Margin="4"
-                                   DockPanel.Dock="Bottom"
-                                   Foreground="DimGray"
-                                   Text="{Binding InputCoreViewModel.RemainTextCount}"
-                                   TextAlignment="Right"
-                                   TextWrapping="Wrap" />
-                    </DockPanel>
-                    <Border Grid.Row="1"
-                            Grid.Column="1"
-                            MinWidth="40"
-                            MinHeight="40"
-                            MaxWidth="100"
-                            MaxHeight="100"
-                            Margin="4"
-                            HorizontalAlignment="Left"
-                            VerticalAlignment="Center"
-                            BorderThickness="1"
-                            DataContext="{Binding InputCoreViewModel}"
-                            ToolTip="{x:Static windowParts:InputAreaResources.ClickToRemoveImage}"
-                            Visibility="{Binding IsImageAttached,
-                                                 Converter={StaticResource BooleanToVisibleConverter}}">
-                        <Border.Background>
-                            <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}" />
-                        </Border.Background>
-                        <i:Interaction.Triggers>
-                            <i:EventTrigger EventName="MouseLeftButtonDown">
-                                <ei:CallMethodAction MethodName="DetachImage" TargetObject="{Binding Mode=OneWay}" />
-                            </i:EventTrigger>
-                            <i:EventTrigger EventName="MouseEnter">
-                                <ei:GoToStateAction StateName="MouseOverState" />
-                            </i:EventTrigger>
-                            <i:EventTrigger EventName="MouseLeave">
-                                <ei:GoToStateAction StateName="MouseOutState" />
-                            </i:EventTrigger>
-                        </i:Interaction.Triggers>
-                        <Border.BorderBrush>
-                            <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ActiveBorderColorKey}}" />
-                        </Border.BorderBrush>
-                        <Grid>
-                            <Image Source="{Binding Path=AttachedImage.Image}" Stretch="Uniform" />
-                            <Border x:Name="Border"
-                                    Background="{StaticResource MetroRedBrush}"
-                                    Opacity="0">
-                                <Path Width="10"
-                                      Height="10"
-                                      Margin="0,6,6,0"
-                                      HorizontalAlignment="Right"
-                                      VerticalAlignment="Top"
-                                      Data="F1 M 20.5,19L 24,22.5L 27.4999,19.0001L 28.9999,20.5001L 25.5,24L 29,27.5L 27.5,29L 24,25.5L 20.5,29L 19,27.5L 22.5,24L 19,20.5L 20.5,19 Z "
-                                      Fill="White"
-                                      Stretch="Fill" />
-                            </Border>
-                        </Grid>
-                    </Border>
                 </Grid>
             </Border>
         </Grid>

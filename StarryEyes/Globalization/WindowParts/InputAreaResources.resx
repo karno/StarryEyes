@@ -264,4 +264,7 @@ Do you want to retry?</value>
   <data name="UrlAutoEscapeEnabled" xml:space="preserve">
     <value>URL auto-link avoidance is enabled (Insert zero-width space before TLD of URL without schemes.)</value>
   </data>
+  <data name="StatusImageLoading" xml:space="preserve">
+    <value>Loading attached image...</value>
+  </data>
 </root>

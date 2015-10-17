@@ -40,6 +40,8 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
         private readonly ReadOnlyDispatcherCollectionRx<BindHashtagViewModel> _bindingHashtags;
         private readonly ReadOnlyDispatcherCollectionRx<InputDataViewModel> _draftedInputs;
         private readonly InputAreaSuggestItemProvider _provider;
+        private ReadOnlyDispatcherCollection<ImageDescriptionViewModel> _images;
+        private IDisposable _imageListener;
 
         private GeoCoordinateWatcher _geoWatcher;
         private UserViewModel _recipientViewModel;
@@ -52,7 +54,6 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
         {
             _parent = parent;
             _provider = new InputAreaSuggestItemProvider();
-
             CompositeDisposable.Add(
                 _bindingHashtags = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
                     InputModel.InputCore.BindingHashtags,
@@ -120,6 +121,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             watcher.StartWatching();
             Setting.DisableGeoLocationService.ValueChanged += UpdateGeoLocationService;
             UpdateGeoLocationService(Setting.DisableGeoLocationService.Value);
+            InputDataChanged();
         }
 
         private void UpdateGeoLocationService(bool isEnabled)
@@ -174,6 +176,18 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
 
         private void InputDataChanged()
         {
+            var images = ViewModelHelper.CreateReadOnlyDispatcherCollection(InputData.AttachedImages,
+                b => new ImageDescriptionViewModel(InputData, b), DispatcherHelper.UIDispatcher);
+            var imageListener = images.ListenCollectionChanged(_ =>
+            {
+                RaisePropertyChanged(() => IsImageAttached);
+                RaisePropertyChanged(() => CanSaveToDraft);
+                RaisePropertyChanged(() => CanAttachImage);
+                UpdateTextCount();
+            });
+            Interlocked.Exchange(ref _images, images)?.Dispose();
+            Interlocked.Exchange(ref _imageListener, imageListener)?.Dispose();
+            RaisePropertyChanged(() => AttachedImages);
             RaisePropertyChanged(() => InputData);
             RaisePropertyChanged(() => InputText);
             RaisePropertyChanged(() => InReplyTo);
@@ -181,7 +195,6 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             RaisePropertyChanged(() => DirectMessageTo);
             RaisePropertyChanged(() => IsDirectMessageEnabled);
             RaisePropertyChanged(() => IsBindHashtagEnabled);
-            RaisePropertyChanged(() => AttachedImage);
             RaisePropertyChanged(() => IsImageAttached);
             RaisePropertyChanged(() => AttachedLocation);
             RaisePropertyChanged(() => IsLocationAttached);
@@ -547,29 +560,22 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
 
         public bool IsImageAttached
         {
-            get { return InputData.AttachedImage != null; }
+            get { return InputData.AttachedImages.Count > 0; }
         }
 
-        public ImageDescriptionViewModel AttachedImage
+        public bool CanAttachImage
         {
-            get
-            {
-                return InputData.AttachedImage != null
-                    ? new ImageDescriptionViewModel(InputData.AttachedImage)
-                    : null;
-            }
-            set
-            {
-                InputData.AttachedImage = value == null ? null : value.ByteArray;
-                RaisePropertyChanged(() => AttachedImage);
-                RaisePropertyChanged(() => IsImageAttached);
-                RaisePropertyChanged(() => CanSaveToDraft);
-                UpdateTextCount();
-            }
+            get { return InputData.AttachedImages.Count < 4; }
+        }
+
+        public ReadOnlyDispatcherCollection<ImageDescriptionViewModel> AttachedImages
+        {
+            get { return _images; }
         }
 
         public void AttachImage()
         {
+            if (!CanAttachImage) return;
             var dir = Setting.LastImageOpenDir.Value;
             if (!Directory.Exists(dir))
             {
@@ -595,11 +601,6 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             AttachImageFromPath(m.Response[0]);
         }
 
-        public void DetachImage()
-        {
-            AttachedImage = null;
-        }
-
         [UsedImplicitly]
         public void AttachClipboardImage()
         {
@@ -622,16 +623,22 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             }
         }
 
-        private void AttachImageFromPath(string file)
+        private async void AttachImageFromPath(string file)
         {
+            var state = new StateUpdater();
             try
             {
-                AttachedImage = new ImageDescriptionViewModel(file);
+                state.UpdateState(InputAreaResources.StatusImageLoading);
+                var bytes = await Task.Run(() => File.ReadAllBytes(file));
+                InputData.AttachedImages.Add(bytes);
             }
             catch (Exception ex)
             {
                 ShowImageAttachErrorMessage(ex);
-                AttachedImage = null;
+            }
+            finally
+            {
+                state.UpdateState();
             }
         }
 
@@ -697,7 +704,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                         var files = args.Data.GetData(DataFormats.FileDrop) as string[];
                         if (files != null && files.Length > 0)
                         {
-                            AttachedImage = new ImageDescriptionViewModel(files[0]);
+                            AttachImageFromPath(files[0]);
                         }
                     };
                 }
@@ -1014,23 +1021,14 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
 
     public class ImageDescriptionViewModel : ViewModel
     {
+        private readonly InputData _data;
         private BitmapImage _bitmap;
         private byte[] _byteArray;
 
-        public ImageDescriptionViewModel(string filePath)
-            : this(File.ReadAllBytes(filePath))
+        public ImageDescriptionViewModel(InputData data, byte[] image)
         {
-        }
-
-        public ImageDescriptionViewModel(byte[] image)
-        {
+            _data = data;
             ByteArray = image;
-        }
-
-        public ImageDescriptionViewModel(BitmapImage image, ImageType sourceType)
-        {
-            _bitmap = image;
-            _byteArray = image.SaveToBytes(sourceType);
         }
 
         public byte[] ByteArray
@@ -1048,6 +1046,11 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
         public BitmapImage Image
         {
             get { return _bitmap; }
+        }
+
+        public void DetachImage()
+        {
+            _data.AttachedImages.Remove(_byteArray);
         }
     }
 

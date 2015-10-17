@@ -72,14 +72,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                 KeyAssignAction.Create("Amend", this.InputCoreViewModel.AmendLastPosted),
                 KeyAssignAction.Create("AttachImage", () =>
                 {
-                    if (this.InputCoreViewModel.IsLocationAttached)
-                    {
-                        this.InputCoreViewModel.DetachImage();
-                    }
-                    else
-                    {
-                        this.InputCoreViewModel.AttachImage();
-                    }
+                    this.InputCoreViewModel.AttachImage();
                 }),
                 KeyAssignAction.Create("ToggleEscape", () =>
                 {

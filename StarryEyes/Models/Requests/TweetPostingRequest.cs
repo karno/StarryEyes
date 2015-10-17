@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using StarryEyes.Anomaly.TwitterApi;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
@@ -25,23 +27,23 @@ namespace StarryEyes.Models.Requests
         private readonly string _status;
         private readonly long? _inReplyTo;
         private readonly GeoLocationInfo _geoInfo;
-        private readonly byte[] _attachedImageBin;
+        private readonly byte[][] _attachedImageBins;
 
         public TweetPostingRequest(string status,
             TwitterStatus inReplyTo, GeoLocationInfo geoInfo,
-            byte[] attachedImageBytes)
+            IEnumerable<byte[]> attachedImageBytes)
             : this(status, inReplyTo == null ? (long?)null : inReplyTo.Id,
                 geoInfo, attachedImageBytes)
         {
         }
 
         public TweetPostingRequest(string status, long? inReplyTo,
-            GeoLocationInfo geoInfo, byte[] attachedImageBytes)
+            GeoLocationInfo geoInfo, IEnumerable<byte[]> attachedImageBytes)
         {
             _status = status;
             _inReplyTo = inReplyTo;
             _geoInfo = geoInfo;
-            _attachedImageBin = attachedImageBytes;
+            _attachedImageBins = attachedImageBytes.ToArray();
         }
 
         public override async Task<TwitterStatus> Send(TwitterAccount account)
@@ -55,22 +57,18 @@ namespace StarryEyes.Models.Requests
                 try
                 {
                     TwitterStatus result;
-                    if (_attachedImageBin != null)
+                    var idList = new List<long>();
+                    if (_attachedImageBins.Length > 0)
                     {
-                        result = await acc.UpdateWithMediaAsync(
-                            _status,
-                            new[] { _attachedImageBin },
-                            account.MarkMediaAsPossiblySensitive ? true : (bool?)null, // Inherit property
-                            _inReplyTo,
-                            latlong).ConfigureAwait(false);
+                        foreach (var bin in _attachedImageBins)
+                        {
+                            idList.Add(await acc.UploadMediaAsync(bin));
+                        }
                     }
-                    else
-                    {
-                        result = await acc.UpdateAsync(
-                            _status,
-                            _inReplyTo,
-                            latlong).ConfigureAwait(false);
-                    }
+                    result = await acc.UpdateAsync(
+                        _status,
+                        _inReplyTo,
+                        latlong, mediaIds: idList.ToArray()).ConfigureAwait(false);
                     BackstageModel.NotifyFallbackState(acc, false);
                     return result;
                 }

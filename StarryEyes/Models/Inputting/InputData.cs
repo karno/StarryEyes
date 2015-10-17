@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using JetBrains.Annotations;
+using Livet;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Helpers;
 using StarryEyes.Models.Accounting;
@@ -17,10 +18,11 @@ namespace StarryEyes.Models.Inputting
 {
     public class InputData
     {
+        private readonly DispatcherCollection<byte[]> _attachedImages =
+            new DispatcherCollection<byte[]>(DispatcherHelper.UIDispatcher);
         private TwitterAccount[] _accounts;
         private string _initText;
         private string _text;
-        private byte[] _attachedImage;
         private GeoLocationInfo _geoInfo;
         private string[] _boundTags;
         private Dictionary<TwitterAccount, TwitterStatus> _amendTweets =
@@ -44,8 +46,8 @@ namespace StarryEyes.Models.Inputting
                 // when amending tweet,
                 // sending direct message, or
                 // replying someone (if configured so that).
-                return !this.IsAmend && !this.IsDirectMessage &&
-                       (!Setting.SuppressTagBindingInReply.Value || this._inReplyTo == null);
+                return !IsAmend && !IsDirectMessage &&
+                       (!Setting.SuppressTagBindingInReply.Value || _inReplyTo == null);
             }
         }
 
@@ -58,7 +60,7 @@ namespace StarryEyes.Models.Inputting
         {
             get
             {
-                return AttachedImage != null ||
+                return _attachedImages?.Count > 0 ||
                        _text != _initText && !String.IsNullOrEmpty(
                            _text.Replace("\t", "")
                                 .Replace("\r", "")
@@ -115,7 +117,7 @@ namespace StarryEyes.Models.Inputting
             {
                 if (value != null)
                 {
-                    if (this.IsDirectMessage)
+                    if (IsDirectMessage)
                     {
                         throw new InvalidOperationException(
                             "Could not set InReplyTo when InputData is in DirectMessage mode.");
@@ -140,7 +142,7 @@ namespace StarryEyes.Models.Inputting
                     throw new InvalidOperationException(
                         "Could not set MessageRecipient when InReplyTo is already set.");
                 }
-                if (AttachedGeoLocation != null || AttachedImage != null)
+                if (AttachedGeoLocation != null || AttachedImages.Count > 0)
                 {
                     throw new InvalidOperationException(
                         "Could not set MessageRecipient when image or location is attached.");
@@ -180,22 +182,10 @@ namespace StarryEyes.Models.Inputting
             }
         }
 
-        [CanBeNull]
-        public byte[] AttachedImage
+        [NotNull]
+        public DispatcherCollection<byte[]> AttachedImages
         {
-            get { return _attachedImage; }
-            set
-            {
-                if (value != null)
-                {
-                    if (IsDirectMessage)
-                    {
-                        throw new InvalidOperationException(
-                            "Could not attach image when InputData is in DirectMessage mode.");
-                    }
-                }
-                _attachedImage = value;
-            }
+            get { return _attachedImages; }
         }
 
         #endregion
@@ -203,11 +193,10 @@ namespace StarryEyes.Models.Inputting
         [NotNull]
         private InputData Clone()
         {
-            return new InputData(_initText)
+            var newdata = new InputData(_initText)
             {
                 _accounts = _accounts == null ? null : _accounts.ToArray(),
                 _amendTweets = _amendTweets.ToDictionary(p => p.Key, p => p.Value),
-                _attachedImage = _attachedImage,
                 _boundTags = _boundTags,
                 _geoInfo = _geoInfo,
                 _inReplyTo = _inReplyTo,
@@ -215,6 +204,11 @@ namespace StarryEyes.Models.Inputting
                 _messageRecipient = _messageRecipient,
                 _text = _text
             };
+            foreach (var image in _attachedImages)
+            {
+                newdata.AttachedImages.Add(image);
+            }
+            return newdata;
         }
 
         [NotNull]
@@ -239,13 +233,12 @@ namespace StarryEyes.Models.Inputting
             else
             {
                 request = new TweetPostingRequest(Text + binds, InReplyTo,
-                    AttachedGeoLocation, _attachedImage);
+                    AttachedGeoLocation, _attachedImages);
             }
 
             var posts = _accounts.Guard()
                                  .Select(a => Tuple.Create(a, SendInternal(a, request)))
                                  .ToArray();
-            var tasks = posts.Select(p => p.Item2).OfType<Task>().ToArray();
 
             var amendTargets = new Dictionary<TwitterAccount, TwitterStatus>();
             var failedAccounts = new List<TwitterAccount>();
@@ -269,14 +262,14 @@ namespace StarryEyes.Models.Inputting
 
             if (amendTargets.Count > 0)
             {
-                successData = this.Clone();
+                successData = Clone();
                 successData.AmendTargetTweets = amendTargets.ToArray();
                 successData.Accounts = amendTargets.Select(p => p.Key);
             }
 
             if (failedAccounts.Count > 0)
             {
-                failedData = this.Clone();
+                failedData = Clone();
                 failedData.Accounts = failedAccounts.ToArray();
             }
 

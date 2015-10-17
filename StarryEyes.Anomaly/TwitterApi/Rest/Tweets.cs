@@ -26,8 +26,8 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             {
                 var graph = DynamicJson.Parse(respStr);
                 return ((bool)graph.current_user_retweet())
-                           ? Int64.Parse(graph.current_user_retweet.id_str)
-                           : null;
+                    ? Int64.Parse(graph.current_user_retweet.id_str)
+                    : null;
             });
         }
 
@@ -83,10 +83,14 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         public static async Task<TwitterStatus> UpdateAsync(
             this IOAuthCredential credential, string status, long? inReplyToStatusId = null,
-            Tuple<double, double> geoLatLong = null, string placeId = null, bool? displayCoordinates = null)
+            Tuple<double, double> geoLatLong = null, string placeId = null,
+            bool? displayCoordinates = null, long[] mediaIds = null)
         {
             if (credential == null) throw new ArgumentNullException("credential");
             if (status == null) throw new ArgumentNullException("status");
+            var mediaIdStr = mediaIds != null
+                ? String.Join(",", mediaIds.Select(s => s.ToString()))
+                : null;
             var param = new Dictionary<string, object>
             {
                 {"status", status},
@@ -94,36 +98,27 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
                 {"lat", geoLatLong != null ? geoLatLong.Item1 : (double?) null},
                 {"long", geoLatLong != null ? geoLatLong.Item2 : (double?) null},
                 {"place_id", placeId},
-                {"display_coordinates", displayCoordinates}
+                {"display_coordinates", displayCoordinates},
+                {"media_ids", String.IsNullOrEmpty(mediaIdStr) ? null : mediaIdStr}
             }.ParametalizeForPost();
             var client = credential.CreateOAuthClient(useGZip: false);
             var response = await client.PostAsync(new ApiAccess("statuses/update.json"), param);
             return await response.ReadAsStatusAsync();
         }
 
-        public static async Task<TwitterStatus> UpdateWithMediaAsync(
-            this IOAuthCredential credential, string status, IEnumerable<byte[]> images,
-            bool? possiblySensitive = false, long? inReplyToStatusId = null,
-            Tuple<double, double> geoLatLong = null, string placeId = null, bool? displayCoordinates = null)
+        public static async Task<long> UploadMediaAsync(this IOAuthCredential credential, byte[] image)
         {
             if (credential == null) throw new ArgumentNullException("credential");
-            if (status == null) throw new ArgumentNullException("status");
-            var param = new Dictionary<string, object>
+            if (image == null) throw new ArgumentNullException("image");
+            var content = new MultipartFormDataContent
             {
-                {"status", status},
-                {"possibly_sensitive", possiblySensitive},
-                {"in_reply_to_status_id", inReplyToStatusId},
-                {"lat", geoLatLong != null ? geoLatLong.Item1 : (double?) null},
-                {"long", geoLatLong != null ? geoLatLong.Item2 : (double?) null},
-                {"place_id", placeId},
-                {"display_coordinates", displayCoordinates}
-            }.Where(kvp => kvp.Value != null);
-            var content = new MultipartFormDataContent();
-            param.ForEach(kvp => content.Add(new StringContent(kvp.Value.ToString()), kvp.Key));
-            images.ForEach((b, i) => content.Add(new ByteArrayContent(b), "media[]", "image_" + i + ".png"));
+                {new ByteArrayContent(image), "media", System.IO.Path.GetRandomFileName() + ".png"}
+            };
+
             var client = credential.CreateOAuthClient();
-            var response = await client.PostAsync(new ApiAccess("statuses/update_with_media.json"), content);
-            return await response.ReadAsStatusAsync();
+            var response = await client.PostAsync("https://upload.twitter.com/1.1/media/upload.json", content);
+            var json = await response.ReadAsStringAsync();
+            return long.Parse(DynamicJson.Parse(json).media_id_string);
         }
 
         public static async Task<TwitterStatus> DestroyAsync(
@@ -145,5 +140,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             var response = await client.PostAsync(new ApiAccess("statuses/retweet/" + id + ".json"), param);
             return await response.ReadAsStatusAsync();
         }
+
+
     }
 }

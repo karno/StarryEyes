@@ -264,4 +264,7 @@
   <data name="UrlAutoEscapeEnabled" xml:space="preserve">
     <value>URLリンク化自動回避を行います(スキームのないURLのTLDの前にゼロ幅スペースが自動挿入されます)。</value>
   </data>
+  <data name="StatusImageLoading" xml:space="preserve">
+    <value>添付画像を読み込んでいます...</value>
+  </data>
 </root>
