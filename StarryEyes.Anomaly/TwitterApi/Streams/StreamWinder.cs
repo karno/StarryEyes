@@ -66,23 +66,14 @@ namespace StarryEyes.Anomaly.TwitterApi.Streams
         {
             if (collection == null) throw new ArgumentNullException(nameof(collection));
             if (parser == null) throw new ArgumentNullException(nameof(parser));
-            const TaskCreationOptions option = TaskCreationOptions.DenyChildAttach | TaskCreationOptions.LongRunning;
+            const TaskCreationOptions option = TaskCreationOptions.DenyChildAttach |
+                                               TaskCreationOptions.LongRunning;
             Task.Factory.StartNew(() =>
             {
                 try
                 {
-                    while (!collection.IsCompleted && !token.IsCancellationRequested)
+                    foreach (var item in collection.GetConsumingEnumerable(token))
                     {
-                        string item;
-                        try
-                        {
-                            item = collection.Take();
-                        }
-                        catch (InvalidOperationException)
-                        {
-                            // BlockingCollection is completed.
-                            break;
-                        }
                         parser(item);
                     }
                 }
