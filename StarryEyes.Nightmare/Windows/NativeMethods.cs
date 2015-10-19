@@ -72,6 +72,9 @@ namespace StarryEyes.Nightmare.Windows
         [DllImport("User32.dll")]
         internal static extern IntPtr MonitorFromPoint([In]System.Drawing.Point pt, [In]uint dwFlags);
 
+        [DllImport("gdi32.dll", CharSet = CharSet.Auto, SetLastError = true, ExactSpelling = true)]
+        public static extern int GetDeviceCaps(IntPtr hDC, int nIndex);
+
         //https://msdn.microsoft.com/en-us/library/windows/desktop/dn280510(v=vs.85).aspx
         [DllImport("Shcore.dll")]
         internal static extern IntPtr GetDpiForMonitor([In] IntPtr hmonitor, [In] DpiType dpiType,
@@ -120,6 +123,20 @@ namespace StarryEyes.Nightmare.Windows
 
     #endregion
     // ReSharper restore InconsistentNaming
+
+    public enum DeviceCap
+    {
+        /// <summary>
+        /// Logical pixels inch in X
+        /// </summary>
+        LOGPIXELSX = 88,
+        /// <summary>
+        /// Logical pixels inch in Y
+        /// </summary>
+        LOGPIXELSY = 90
+
+        // Other constants may be founded on pinvoke.net
+    }
 
     public enum DpiType
     {

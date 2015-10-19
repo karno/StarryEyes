@@ -1,12 +1,16 @@
 ﻿using System;
+using System.Drawing;
 using System.Linq;
 using System.Windows;
+using Point = System.Windows.Point;
 using WinForms = System.Windows.Forms;
 
 namespace StarryEyes.Nightmare.Windows.Forms
 {
     public class Screen
     {
+        private static readonly Version Windows8 = new Version(6, 2, 9200, 0);
+
         /// <summary>
         /// Get all screens.
         /// </summary>
@@ -55,9 +59,22 @@ namespace StarryEyes.Nightmare.Windows.Forms
             if (wfScreen == null)
                 throw new ArgumentNullException("wfScreen");
             _original = wfScreen;
-            var monitor = NativeMethods.MonitorFromPoint(
-                new System.Drawing.Point((int)WorkingArea.Left, (int)WorkingArea.Top), 2);
-            NativeMethods.GetDpiForMonitor(monitor, DpiType.Effective, out _dpiX, out _dpiY);
+
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT &&
+                Environment.OSVersion.Version >= Windows8)
+            {
+                var monitor = NativeMethods.MonitorFromPoint(
+                    new System.Drawing.Point((int)WorkingArea.Left, (int)WorkingArea.Top), 2);
+                NativeMethods.GetDpiForMonitor(monitor, DpiType.Effective, out _dpiX, out _dpiY);
+            }
+            else
+            {
+                var g = Graphics.FromHwnd(IntPtr.Zero);
+                var desktop = g.GetHdc();
+
+                _dpiX = (uint)NativeMethods.GetDeviceCaps(desktop, (int)DeviceCap.LOGPIXELSX);
+                _dpiY = (uint)NativeMethods.GetDeviceCaps(desktop, (int)DeviceCap.LOGPIXELSY);
+            }
         }
 
         /// <summary>
