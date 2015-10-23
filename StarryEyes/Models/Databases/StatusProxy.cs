@@ -56,14 +56,10 @@ namespace StarryEyes.Models.Databases
         private static async Task StoreStatusesAsync(IEnumerable<TwitterStatus> statuses)
         {
             // extracting retweeted status
-            var store = statuses.SelectMany(s =>
-            {
-                if (s.RetweetedOriginal != null)
-                {
-                    return new[] { s.RetweetedOriginal, s };
-                }
-                return new[] { s };
-            }).Select(s => StatusInsertBatch.CreateBatch(Mapper.Map(s), Mapper.Map(s.User)));
+            var store = statuses.SelectMany(s => s.RetweetedOriginal != null
+                ? new[] { s.RetweetedOriginal, s }
+                : new[] { s })
+                                .Select(s => StatusInsertBatch.CreateBatch(Mapper.Map(s), Mapper.Map(s.User)));
             await DatabaseUtil.RetryIfLocked(() => Database.StoreStatuses(store)).ConfigureAwait(false);
             StatisticsService.SetQueuedStatusCount(_statusQueue.Count);
         }
