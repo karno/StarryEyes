@@ -17,13 +17,22 @@ namespace StarryEyes.Anomaly.Utils
         public static string SurrogatedSubstring([NotNull] this string str, int startIndex, int length = -1)
         {
             if (str == null) throw new ArgumentNullException("str");
-            var ss = str.Substring(0, startIndex).UnsurrogatedLength();
-            if (length == -1)
+            try
             {
-                return str.Substring(ss);
+                var ss = str.Substring(0, startIndex).UnsurrogatedLength();
+                if (length == -1)
+                {
+                    return str.Substring(ss);
+                }
+                var sl = str.Substring(ss, length).UnsurrogatedLength();
+                return str.Substring(ss, sl);
             }
-            var sl = str.Substring(ss, length).UnsurrogatedLength();
-            return str.Substring(ss, sl);
+            catch (ArgumentOutOfRangeException aoex)
+            {
+                throw new ArgumentOutOfRangeException(
+                    "Exception has thrown during slicing text: " + str + " with " + startIndex + "-" + length,
+                    aoex);
+            }
         }
 
         /// <summary>

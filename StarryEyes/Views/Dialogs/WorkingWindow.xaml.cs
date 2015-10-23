@@ -27,7 +27,8 @@ namespace StarryEyes.Views.Dialogs
 
         async void DatabaseOptimizingWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            await Task.Run(() => _work(UpdateLabel)).ConfigureAwait(false);
+            // we should not .ConfigureAwait(false)
+            await Task.Run(() => _work(UpdateLabel));
             Close();
         }
 
