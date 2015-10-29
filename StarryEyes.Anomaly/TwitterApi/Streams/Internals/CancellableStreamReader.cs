@@ -35,6 +35,10 @@ namespace StarryEyes.Anomaly.TwitterApi.Streams.Internals
 
         private bool _hasDisposed;
 
+        private StringBuilder _recycledStringBuilder;
+
+        private double _recycleThreshold = BufferLength * 2;
+
         public CancellableStreamReader(Stream stream)
             : this(stream, Encoding.UTF8)
         {
@@ -58,7 +62,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Streams.Internals
             }
             // if _bufferedLength == 0, hit to end of stream in previous read.
             if (_bufferedLength == 0) return null;
-            StringBuilder builder = null;
+            var builder = _recycledStringBuilder;
             do
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -68,7 +72,6 @@ namespace StarryEyes.Anomaly.TwitterApi.Streams.Internals
                     // hit to End of Stream and internal buffer is empty.
                     if (_bufferedLength == 0 && builder == null) return null;
                 }
-                cancellationToken.ThrowIfCancellationRequested();
 
                 // check next char is '\n' if before trailing char of line is '\r'.
                 if (_skipNextLineFeed && _bufferCursor < _bufferedLength && _buffer[_bufferCursor] == '\n')
@@ -84,8 +87,9 @@ namespace StarryEyes.Anomaly.TwitterApi.Streams.Internals
                     if (_buffer[i] != '\r' && _buffer[i] != '\n') continue;
 
                     // build return string, not contains line-feed char.
-                    var rets = builder?.Append(_buffer, _bufferCursor, i - _bufferCursor).ToString() ??
-                               new String(_buffer, _bufferCursor, i - _bufferCursor);
+                    var retstr = builder == null || builder.Length == 0
+                        ? new String(_buffer, _bufferCursor, i - _bufferCursor)
+                        : GetStringAndRecycle(builder.Append(_buffer, _bufferCursor, i - _bufferCursor));
 
                     // point next char
                     _bufferCursor = i + 1;
@@ -100,7 +104,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Streams.Internals
                             _bufferCursor++;
                         }
                     }
-                    return rets;
+                    return retstr;
                 }
 
                 // buffer not contains '\r' or '\n'.
@@ -112,7 +116,37 @@ namespace StarryEyes.Anomaly.TwitterApi.Streams.Internals
                 // buffer cursor hit to end
                 _bufferCursor = _bufferedLength;
             } while (_bufferedLength != 0); // _bufferedLength = 0 => End of Stream, break.
-            return builder.ToString();
+
+            // build result
+            return GetStringAndRecycle(builder);
+        }
+
+        private string GetStringAndRecycle(StringBuilder builder)
+        {
+            var result = builder.ToString();
+            // update recycle threshold
+            if (result.Length > _buffer.Length)
+            {
+                _recycleThreshold = _recycleThreshold > result.Length
+                    ? _recycleThreshold * 0.9 + result.Length * 0.1
+                    : _recycleThreshold * 0.5 + result.Length * 0.5;
+            }
+            // decide recycling builder or not
+            if (_recycledStringBuilder == builder &&
+                builder.Capacity > _recycleThreshold * 4)
+            {
+                // builder is too large? => not to recycle
+                _recycledStringBuilder = null;
+            }
+            else
+            {
+                // prepare for recycling StringBuilder
+                builder.Clear();
+                _recycledStringBuilder = builder;
+            }
+            _recycledStringBuilder = builder;
+            _recycledStringBuilder.Clear();
+            return result;
         }
 
         private async Task ReceiveToBufferAsync(CancellationToken cancellationToken)

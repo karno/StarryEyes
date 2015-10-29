@@ -336,8 +336,9 @@ namespace StarryEyes.Models.Receiving.Receivers
 
         private void ParseLine(string json)
         {
-            // reset counts
+            // reset error count and backoff flag
             _hardErrorCount = 0;
+            _backoffMode = BackoffMode.None;
             _stateUpdater.UpdateState();
             ConnectionState = UserStreamsConnectionState.Connected;
             UserStreamParser.ParseStreamLine(json, _handler);
