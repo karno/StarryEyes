@@ -47,9 +47,13 @@ namespace StarryEyes.Models.Databases.Caching
                     }
                     return value;
                 });
-            if (addItem)
+            if (addItem && !_collection.IsAddingCompleted)
             {
-                _collection.Add(new KeyValuePair<TKey, TValue>(key, value));
+                try
+                {
+                    _collection.Add(new KeyValuePair<TKey, TValue>(key, value));
+                }
+                catch (InvalidOperationException) { } // adding completed
             }
         }
 
