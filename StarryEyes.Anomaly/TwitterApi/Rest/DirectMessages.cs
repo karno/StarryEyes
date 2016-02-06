@@ -18,6 +18,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
                 {"count", count},
                 {"since_id", sinceId},
                 {"max_id", maxId},
+                {"full_text", true},
             }.ParametalizeForGet();
             var client = credential.CreateOAuthClient();
             var response = await client.GetAsync(new ApiAccess("direct_messages.json", param));
@@ -35,6 +36,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
                 {"since_id", sinceId},
                 {"max_id", maxId},
                 {"page", page},
+                {"full_text", true},
             }.ParametalizeForGet();
             var client = credential.CreateOAuthClient();
             var response = await client.GetAsync(new ApiAccess("direct_messages/sent.json", param));
@@ -47,7 +49,8 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             if (credential == null) throw new ArgumentNullException("credential");
             var param = new Dictionary<string, object>
             {
-                {"id", id}
+                {"id", id},
+                {"full_text", true},
             }.ParametalizeForGet();
             var client = credential.CreateOAuthClient();
             var response = await client.GetAsync(new ApiAccess("direct_messages/show.json", param));

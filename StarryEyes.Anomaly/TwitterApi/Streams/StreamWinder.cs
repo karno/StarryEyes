@@ -30,28 +30,24 @@ namespace StarryEyes.Anomaly.TwitterApi.Streams
                     // start parser worker thread
                     StartParserWorker(parseCollection, parser, localToken);
 
-                    string line = null;
                     while (true)
                     {
                         // set read timeout(add epsilon time to timeout (100 msec))
                         tokenSource.CancelAfter(readTimeout + TimeSpan.FromTicks(10000 * 100));
 
-                        // execute reading next line
-                        var readLineTask = reader.ReadLineAsync(localToken);
+                        // execute reading next line and await completion
+                        var line = await reader.ReadLineAsync(localToken).ConfigureAwait(false);
+
+                        localToken.ThrowIfCancellationRequested();
+
+                        // disable timer
+                        tokenSource.CancelAfter(Timeout.InfiniteTimeSpan);
 
                         // send previous line to subsequent stage
                         if (!String.IsNullOrWhiteSpace(line))
                         {
                             parseCollection.Add(line, localToken);
                         }
-
-                        // await received line
-                        line = await readLineTask.ConfigureAwait(false);
-
-                        localToken.ThrowIfCancellationRequested();
-
-                        // disable timer
-                        tokenSource.CancelAfter(Timeout.InfiniteTimeSpan);
 
                         if (line == null)
                         {
