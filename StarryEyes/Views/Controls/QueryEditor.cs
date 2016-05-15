@@ -380,7 +380,8 @@ namespace StarryEyes.Views.Controls
                 new CompletionData("to", QueryCompletionResources.VariableTo),
                 new CompletionData("favs", QueryCompletionResources.VariableFavorites),
                 new CompletionData("rts", QueryCompletionResources.VariableRetweets),
-                new CompletionData("list", QueryCompletionResources.VariableList)
+                new CompletionData("list", QueryCompletionResources.VariableList),
+                new CompletionData("has_media", QueryCompletionResources.VariableHasMedia),
             };
         }
 

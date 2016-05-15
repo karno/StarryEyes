@@ -216,6 +216,9 @@
   <data name="VariableFavorites" xml:space="preserve">
     <value>[Num/Set] Favorited count/favorited user ids</value>
   </data>
+  <data name="VariableHasMedia" xml:space="preserve">
+    <value>[Boolean]  Tweet has media</value>
+  </data>
   <data name="VariableId" xml:space="preserve">
     <value>[Numeric] ID of tweet</value>
   </data>
