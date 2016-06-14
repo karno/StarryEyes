@@ -327,7 +327,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
 
         public bool CanRetweetImmediate
         {
-            get { return CanRetweet && !IsMyselfStrict; }
+            get { return CanRetweet; }
         }
 
         public bool CanDelete
