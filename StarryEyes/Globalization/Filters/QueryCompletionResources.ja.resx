@@ -216,6 +216,9 @@
   <data name="VariableFavorites" xml:space="preserve">
     <value>[Num/Set] 被お気に入り登録数/お気に入り登録済みユーザー</value>
   </data>
+  <data name="VariableHasMedia" xml:space="preserve">
+    <value>[Boolean] ツイートにメディアが添付されているか</value>
+  </data>
   <data name="VariableId" xml:space="preserve">
     <value>[Numeric] ツイートのID</value>
   </data>
