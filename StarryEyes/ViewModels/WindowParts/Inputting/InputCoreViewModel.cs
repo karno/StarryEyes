@@ -802,7 +802,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                 {
                     return false; // send account is not found.
                 }
-                if (TextCount > TwitterConfigurationService.TextMaxLength)
+                if (TextCount > TwitterConfigurationService.TextMaxLength * 2) // rough limit
                     return false;
                 return IsImageAttached || !String.IsNullOrEmpty(
                     InputText.Replace("\t", "")

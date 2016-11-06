@@ -26,26 +26,13 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
             this.GenerateFromJson = true;
             this.Id = ((string)json.id_str).ParseLong();
             this.CreatedAt = ((string)json.created_at).ParseDateTime(ParsingExtension.TwitterDateTimeFormat);
-            this.Text = ParsingExtension.ResolveEntity(json.text);
-            if (json.extended_entities())
-            {
-                // get correctly typed entities array
-                var orgEntities = (TwitterEntity[])Enumerable.ToArray(TwitterEntity.GetEntities(json.entities));
-                var extEntities = (TwitterEntity[])Enumerable.ToArray(TwitterEntity.GetEntities(json.extended_entities));
 
-                // merge entities
-                this.Entities = orgEntities.Where(e => e.EntityType != EntityType.Media)
-                                           .Concat(extEntities) // extended entities contains media entities only.
-                                           .ToArray();
-            }
-            else if (json.entities())
+            SetTextAndEntities(json);
+            if (json.extended_tweet())
             {
-                this.Entities = Enumerable.ToArray(TwitterEntity.GetEntities(json.entities));
+                SetTextAndEntities(json.extended_tweet);
             }
-            else
-            {
-                this.Entities = new TwitterEntity[0];
-            }
+
             if (json.recipient())
             {
                 // THIS IS DIRECT MESSAGE!
@@ -84,6 +71,38 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
                     this.Longitude = (double)json.coordinates.coordinates[0];
                     this.Latitude = (double)json.coordinates.coordinates[1];
                 }
+            }
+        }
+
+        private void SetTextAndEntities(dynamic root)
+        {
+            if (root.full_text())
+            {
+                this.Text = ParsingExtension.ResolveEntity(root.full_text);
+            }
+            else if (root.text())
+            {
+                this.Text = ParsingExtension.ResolveEntity(root.text);
+            }
+            if (root.extended_entities())
+            {
+                // get correctly typed entities array
+                var orgEntities = (TwitterEntity[])Enumerable.ToArray(TwitterEntity.GetEntities(root.entities));
+                var extEntities = (TwitterEntity[])Enumerable.ToArray(TwitterEntity.GetEntities(root.extended_entities));
+
+                // merge entities
+                this.Entities = orgEntities
+                    .Where(e => e.EntityType != EntityType.Media)
+                    .Concat(extEntities) // extended entities contains media entities only.
+                    .ToArray();
+            }
+            else if (root.entities())
+            {
+                this.Entities = Enumerable.ToArray(TwitterEntity.GetEntities(root.entities));
+            }
+            else
+            {
+                this.Entities = new TwitterEntity[0];
             }
         }
 
