@@ -29,6 +29,12 @@ namespace StarryEyes.Anomaly.Utils
                     yield return new TextEntityDescription(ParsingExtension.ResolveEntity(
                         escaped.SurrogatedSubstring(endIndex, entity.StartIndex - endIndex)));
                 }
+                if (escaped.Length < entity.StartIndex || escaped.Length < entity.EndIndex)
+                {
+                    // Twitter rarely give entities of extended_tweet for text of compatibility mode.
+                    // We need paranoiac test here.
+                    continue;
+                }
                 // get entitied text
                 var body = ParsingExtension.ResolveEntity(escaped.SurrogatedSubstring(
                     entity.StartIndex, entity.EndIndex - entity.StartIndex));
