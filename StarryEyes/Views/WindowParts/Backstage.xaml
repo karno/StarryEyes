@@ -151,7 +151,7 @@
                                 <StackPanel Grid.Column="1" Orientation="Horizontal">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="MouseLeftButtonDown">
-                                            <ei:CallMethodAction MethodName="OpenEventSourceUserProfile" TargetObject="{Binding}" />
+                                            <ei:CallMethodAction MethodName="OpenEventDetail" TargetObject="{Binding}" />
                                         </i:EventTrigger>
                                     </i:Interaction.Triggers>
                                     <Image Width="16"
