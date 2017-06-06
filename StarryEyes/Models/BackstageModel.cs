@@ -80,7 +80,7 @@ namespace StarryEyes.Models
             if (tev == null) return;
             lock (_twitterEvents.SyncRoot)
             {
-                if(Setting.Accounts.Ids.Contains(tev.Source.Id) || Setting.Accounts.Ids.Contains(tev.TargetUser.Id))
+                if(tev.IsLocalUserInvolved)
                     _twitterEvents.Insert(0, tev);
                 if (_twitterEvents.Count > TwitterEventMaxHoldCount)
                     _twitterEvents.RemoveAt(_twitterEvents.Count - 1);
