@@ -1,3 +1,6 @@
 [submodule "MahApps.Metro"]
 	path = MahApps.Metro
 	url = git://github.com/karno/MahApps.Metro.git
+[submodule "Cadena"]
+	path = Cadena
+	url = https://github.com/karno/Cadena.git
