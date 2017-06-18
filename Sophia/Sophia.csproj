@@ -1,0 +1,111 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{73B52837-2EA0-40D3-B635-AD8E80BE0921}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Sophia</RootNamespace>
+    <AssemblyName>Sophia</AssemblyName>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="JetBrains.Annotations, Version=10.4.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <HintPath>..\packages\JetBrains.Annotations.10.4.0\lib\net\JetBrains.Annotations.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="TaskDialog, Version=1.7.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\WPFTaskDialog.1.7.1\lib\net40-Client\TaskDialog.dll</HintPath>
+    </Reference>
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Behaviors\DragStartBehavior.cs" />
+    <Compile Include="Behaviors\DropAcceptBehavior.cs" />
+    <Compile Include="Behaviors\HideFromTaskSwitcherBehavior.cs" />
+    <Compile Include="Behaviors\ListBoxSelectionChangeToScrollIntoViewBehavior.cs" />
+    <Compile Include="Collections\DispatcherObservableCollectionWrapper.cs" />
+    <Compile Include="Collections\SynchronizedObservableCollection.cs" />
+    <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
+    <Compile Include="Converters\ConverterBase.cs" />
+    <Compile Include="Converters\EnumerableExistsToVisibilityConverter.cs" />
+    <Compile Include="IWeakEvent.cs" />
+    <Compile Include="Messaging\Actions\IO\FileAction.cs" />
+    <Compile Include="Messaging\Actions\IO\FolderBrowserAction.cs" />
+    <Compile Include="Messaging\Actions\IO\OpenFileAction.cs" />
+    <Compile Include="Messaging\Actions\IO\SaveFileAction.cs" />
+    <Compile Include="Messaging\Actions\MessageActionBase.cs" />
+    <Compile Include="Messaging\Actions\UI\BringIntoViewAction.cs" />
+    <Compile Include="Messaging\Actions\UI\GoToStateAction.cs" />
+    <Compile Include="Messaging\Actions\UI\OpenWindowAction.cs" />
+    <Compile Include="Messaging\Actions\UI\ScrollIntoViewAction.cs" />
+    <Compile Include="Messaging\Actions\UI\TaskDialogAction.cs" />
+    <Compile Include="Messaging\Actions\UI\TextBoxCaretAction.cs" />
+    <Compile Include="Messaging\Actions\UI\WindowAction.cs" />
+    <Compile Include="Messaging\Core\MessageEventArgs.cs" />
+    <Compile Include="Messaging\Core\Messenger.cs" />
+    <Compile Include="Messaging\IO\FileMessage.cs" />
+    <Compile Include="Messaging\IO\FolderBrowserMessage.cs" />
+    <Compile Include="Messaging\IO\OpenFileMessage.cs" />
+    <Compile Include="Messaging\IO\SaveFileMessage.cs" />
+    <Compile Include="Messaging\MessageBase.cs" />
+    <Compile Include="Messaging\MessageTrigger.cs" />
+    <Compile Include="Messaging\ResponsiveMessageBase.cs" />
+    <Compile Include="Messaging\UI\BringIntoViewMessage.cs" />
+    <Compile Include="Messaging\UI\GoToStateMessage.cs" />
+    <Compile Include="Messaging\UI\OpenWindowMessage.cs" />
+    <Compile Include="Messaging\UI\ScrollIntoViewMessage.cs" />
+    <Compile Include="Messaging\UI\TaskDialogMessage.cs" />
+    <Compile Include="Messaging\UI\TextBoxCaretMessage.cs" />
+    <Compile Include="Messaging\UI\WindowMessage.cs" />
+    <Compile Include="NotificationObject.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utilities\DependencyObjectHelper.cs" />
+    <Compile Include="Utilities\DesignTimeHelper.cs" />
+    <Compile Include="Utilities\Disposable.cs" />
+    <Compile Include="Utilities\NotificationObjectHelper.cs" />
+    <Compile Include="ViewModel.cs" />
+    <Compile Include="Windows\DropAcceptDescription.cs" />
+    <Compile Include="Windows\InsertionAdorner.cs" />
+    <Compile Include="Windows\NativeMethods.cs" />
+    <Compile Include="Windows\WindowInfo.cs" />
+    <Compile Include="_Internals\WeakEvent.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

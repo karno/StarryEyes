@@ -59,8 +59,8 @@ namespace StarryEyes.Models.Timelines.Statuses
                     status = await StatusProxy.SyncStatusActivityAsync(status).ConfigureAwait(false);
                 }
                 var rto = status.RetweetedOriginal == null
-                              ? null
-                              : await Get(status.RetweetedOriginal).ConfigureAwait(false);
+                    ? null
+                    : await Get(status.RetweetedOriginal).ConfigureAwait(false);
                 var lockerobj = _generateLock.GetOrAdd(status.Id, new object());
                 try
                 {
@@ -115,7 +115,7 @@ namespace StarryEyes.Models.Timelines.Statuses
             }
         }
 
-        #endregion
+        #endregion Static members
 
         private readonly TaskFactory _factory = LimitedTaskScheduler.GetTaskFactory(8);
 
@@ -317,7 +317,7 @@ namespace StarryEyes.Models.Timelines.Statuses
                     if (_favoritedUsersDic.TryGetValue(userId, out remove))
                     {
                         _favoritedUsersDic.Remove(userId);
-                        Status.FavoritedUsers = Status.FavoritedUsers.Guard().Except(new[] { userId }).ToArray();
+                        Status.FavoritedUsers = Status.FavoritedUsers.Guard().Except(new[] {userId}).ToArray();
                     }
                 }
                 if (remove != null)
@@ -379,7 +379,7 @@ namespace StarryEyes.Models.Timelines.Statuses
                     if (_retweetedUsersDic.TryGetValue(userId, out remove))
                     {
                         _retweetedUsersDic.Remove(userId);
-                        Status.RetweetedUsers = Status.RetweetedUsers.Guard().Except(new[] { userId }).ToArray();
+                        Status.RetweetedUsers = Status.RetweetedUsers.Guard().Except(new[] {userId}).ToArray();
                     }
                 }
                 if (remove != null)
@@ -428,12 +428,13 @@ namespace StarryEyes.Models.Timelines.Statuses
             {
                 if (Status.Recipient == null)
                 {
-                    throw new ArgumentException("Inconsistent status state: Recipient is not spcified in spite of status is direct message.");
+                    throw new ArgumentException(
+                        "Inconsistent status state: Recipient is not spcified in spite of status is direct message.");
                 }
                 uid = Status.Recipient.Id;
             }
             var account = Setting.Accounts.Get(uid);
-            return account != null ? new[] { BacktrackFallback(account) } : null;
+            return account != null ? new[] {BacktrackFallback(account)} : null;
         }
 
         public static TwitterAccount BacktrackFallback(TwitterAccount account)

@@ -88,7 +88,8 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
             {
                 // get correctly typed entities array
                 var orgEntities = (TwitterEntity[])Enumerable.ToArray(TwitterEntity.GetEntities(root.entities));
-                var extEntities = (TwitterEntity[])Enumerable.ToArray(TwitterEntity.GetEntities(root.extended_entities));
+                var extEntities =
+                    (TwitterEntity[])Enumerable.ToArray(TwitterEntity.GetEntities(root.extended_entities));
 
                 // merge entities
                 this.Entities = orgEntities
@@ -180,7 +181,7 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
         [CanBeNull]
         public TwitterStatus RetweetedOriginal { get; set; }
 
-        #endregion
+        #endregion Status property
 
         #region Direct messages property
 
@@ -190,7 +191,7 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
         [CanBeNull]
         public TwitterUser Recipient { get; set; }
 
-        #endregion
+        #endregion Direct messages property
 
         #region Activity Controller
 
@@ -206,7 +207,7 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
         [CanBeNull]
         public long[] RetweetedUsers { get; set; }
 
-        #endregion
+        #endregion Activity Controller
 
         /// <summary>
         /// Entities of this tweet
@@ -230,10 +231,7 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
         [NotNull]
         public string STOTString
         {
-            get
-            {
-                return "@" + this.User.ScreenName + ": " + this.Text + " [" + this.Permalink + "]";
-            }
+            get { return "@" + this.User.ScreenName + ": " + this.Text + " [" + this.Permalink + "]"; }
         }
         // ReSharper restore InconsistentNaming
 
@@ -345,6 +343,7 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
         /// Status is normal tweet.
         /// </summary>
         Tweet,
+
         /// <summary>
         /// Status is direct message.
         /// </summary>
