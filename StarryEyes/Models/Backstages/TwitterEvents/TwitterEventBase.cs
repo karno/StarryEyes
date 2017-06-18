@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Linq;
 using System.Windows.Media;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Settings;
 using StarryEyes.Views;
 
 namespace StarryEyes.Models.Backstages.TwitterEvents
@@ -30,6 +32,8 @@ namespace StarryEyes.Models.Backstages.TwitterEvents
         {
             get { return _targetStatus; }
         }
+
+        public bool IsLocalUserInvolved => Setting.Accounts.Ids.Contains(Source.Id) || Setting.Accounts.Ids.Contains(TargetUser.Id);
 
         public TwitterEventBase(TwitterUser source, TwitterUser target)
         {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,6 +8,7 @@ using System.Windows.Threading;
 using Livet;
 using StarryEyes.Models;
 using StarryEyes.Models.Backstages;
+using StarryEyes.Models.Backstages.TwitterEvents;
 using StarryEyes.Settings;
 using StarryEyes.ViewModels.WindowParts.Backstages;
 using StarryEyes.Views.Utils;
@@ -148,7 +150,11 @@ namespace StarryEyes.ViewModels.WindowParts
                     ev = _waitingEvents.Dequeue();
                 }
                 CurrentEvent = new BackstageEventViewModel(ev);
-                ShowCurrentEvent = true;
+
+                var tev = ev as TwitterEventBase;
+                if (tev != null && tev.IsLocalUserInvolved)
+                    ShowCurrentEvent = true;
+
                 Thread.Sleep(Math.Max(Setting.EventDisplayMinimumMSec.Value, 100));
                 lock (_syncLock)
                 {
