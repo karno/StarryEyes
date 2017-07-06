@@ -152,8 +152,10 @@ namespace StarryEyes.ViewModels.WindowParts
                 CurrentEvent = new BackstageEventViewModel(ev);
 
                 var tev = ev as TwitterEventBase;
-                if (tev != null && tev.IsLocalUserInvolved)
-                    ShowCurrentEvent = true;
+                if (tev == null || !tev.IsLocalUserInvolved)
+                    return;
+
+                ShowCurrentEvent = true;
 
                 Thread.Sleep(Math.Max(Setting.EventDisplayMinimumMSec.Value, 100));
                 lock (_syncLock)
