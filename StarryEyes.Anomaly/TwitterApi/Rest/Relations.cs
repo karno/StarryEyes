@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using StarryEyes.Anomaly.Ext;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest.Infrastructure;
+using StarryEyes.Anomaly.Utils;
 
 namespace StarryEyes.Anomaly.TwitterApi.Rest
 {
@@ -38,7 +39,8 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
                 {"user_id", userId},
                 {"screen_name", screenName},
                 {"cursor", cursor},
-                {"count", count}
+                {"count", count},
+                {"stringify_ids", "true"}
             }.ParametalizeForGet();
             var client = credential.CreateOAuthClient();
             var response = await client.GetAsync(new ApiAccess("friends/ids.json", param));
@@ -75,7 +77,8 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
                 {"user_id", userId},
                 {"screen_name", screenName},
                 {"cursor", cursor},
-                {"count", count}
+                {"count", count},
+                {"stringify_ids", "true"}
             }.ParametalizeForGet();
             var client = credential.CreateOAuthClient();
             var response = await client.GetAsync(new ApiAccess("followers/ids.json", param));
@@ -90,9 +93,13 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             this IOAuthCredential credential)
         {
             if (credential == null) throw new ArgumentNullException("credential");
+            var param = new Dictionary<string, object>
+            {
+                {"stringify_ids", "true"}
+            }.ParametalizeForGet();
             var client = credential.CreateOAuthClient();
-            var respStr = await client.GetStringAsync(new ApiAccess("friendships/no_retweets/ids.json"));
-            return await Task.Run(() => ((dynamic[])DynamicJson.Parse(respStr)).Select(d => (long)d));
+            var respStr = await client.GetStringAsync(new ApiAccess("friendships/no_retweets/ids.json", param));
+            return await Task.Run(() => ((string[])DynamicJson.Parse(respStr)).Select(s => s.ParseLong()));
         }
 
         public static async Task<ICursorResult<IEnumerable<long>>> GetMuteIdsAsync(
@@ -101,14 +108,15 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             if (credential == null) throw new ArgumentNullException("credential");
             var param = new Dictionary<string, object>
             {
-                {"cursor", cursor}
+                {"cursor", cursor},
+                {"stringify_ids", "true"}
             }.ParametalizeForGet();
             var client = credential.CreateOAuthClient();
             return await Task.Run(async () =>
             {
                 var respStr = await client.GetStringAsync(new ApiAccess("mutes/users/ids.json", param));
                 var parsed = DynamicJson.Parse(respStr);
-                var ids = ((dynamic[])parsed.ids).Select(d => (long)d);
+                var ids = ((string[])parsed.ids).Select(s => s.ParseLong());
                 return new CursorResult<IEnumerable<long>>(ids,
                     parsed.previous_cursor_str, parsed.next_cursor_str);
             });

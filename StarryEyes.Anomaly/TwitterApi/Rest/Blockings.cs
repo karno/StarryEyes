@@ -16,6 +16,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             var param = new Dictionary<string, object>
             {
                 {"cursor", cursor},
+                {"stringify_ids", "true"}
             }.ParametalizeForGet();
             var client = credential.CreateOAuthClient();
             var response = await client.GetAsync(new ApiAccess("blocks/ids.json", param));

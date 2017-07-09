@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using StarryEyes.Anomaly.Ext;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Anomaly.Utils;
 
 namespace StarryEyes.Anomaly.TwitterApi.Rest.Infrastructure
 {
@@ -85,8 +86,8 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest.Infrastructure
             {
                 var json = await response.ReadAsStringAsync();
                 var parsed = DynamicJson.Parse(json);
-                var converteds = ((dynamic[])parsed.ids)
-                    .Select(d => (long)d);
+                var converteds = ((string[])parsed.ids)
+                    .Select(s => s.ParseLong());
                 return new CursorResult<IEnumerable<long>>(
                     converteds,
                     parsed.previous_cursor_str, parsed.next_cursor_str);
