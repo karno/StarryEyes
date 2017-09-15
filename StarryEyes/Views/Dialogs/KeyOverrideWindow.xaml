@@ -80,7 +80,7 @@
                        Margin="8"
                        HorizontalAlignment="Left"
                        VerticalAlignment="Center"
-                       TextWrapping="Wrap"><Run Language="ja-jp" Text="Consumer Sectret" />
+                       TextWrapping="Wrap"><Run Language="ja-jp" Text="Consumer Secret" />
             </TextBlock>
             <TextBox Grid.Row="0"
                      Grid.Column="1"
