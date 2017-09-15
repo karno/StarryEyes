@@ -85,7 +85,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
         public static async Task<TwitterStatus> UpdateAsync(
             this IOAuthCredential credential, string status, long? inReplyToStatusId = null,
             Tuple<double, double> geoLatLong = null, string placeId = null,
-            bool? displayCoordinates = null, long[] mediaIds = null)
+            bool? displayCoordinates = null, long[] mediaIds = null, bool extendedTweet = true)
         {
             if (credential == null) throw new ArgumentNullException("credential");
             if (status == null) throw new ArgumentNullException("status");
@@ -100,7 +100,8 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
                 {"long", geoLatLong != null ? geoLatLong.Item2 : (double?) null},
                 {"place_id", placeId},
                 {"display_coordinates", displayCoordinates},
-                {"media_ids", String.IsNullOrEmpty(mediaIdStr) ? null : mediaIdStr}
+                {"media_ids", String.IsNullOrEmpty(mediaIdStr) ? null : mediaIdStr},
+                {"tweet_mode", extendedTweet ? "extended" : null }
             }.ParametalizeForPost();
             var client = credential.CreateOAuthClient(useGZip: false);
             var response = await client.PostAsync(new ApiAccess("statuses/update.json"), param);

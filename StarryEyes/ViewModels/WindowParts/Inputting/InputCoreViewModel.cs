@@ -604,6 +604,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
         [UsedImplicitly]
         public void AttachClipboardImage()
         {
+            if (!CanAttachImage) return;
             try
             {
                 BitmapSource image;
