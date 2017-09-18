@@ -15,7 +15,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             string geoCode = null, string lang = null, string locale = null,
             SearchResultType resultType = SearchResultType.Mixed,
             int? count = null, DateTime? untilDate = null,
-            long? sinceId = null, long? maxId = null)
+            long? sinceId = null, long? maxId = null, bool extendedTweet = true)
         {
             if (credential == null) throw new ArgumentNullException("credential");
             if (query == null) throw new ArgumentNullException("query");
@@ -30,6 +30,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
                 {"until", untilDate != null ? untilDate.Value.ToString("yyyy-MM-dd") : null},
                 {"since_id", sinceId},
                 {"max_id", maxId},
+                {"tweet_mode", extendedTweet ? "extended" : null }
             }.ParametalizeForGet();
             var client = credential.CreateOAuthClient();
             var response = await client.GetAsync(new ApiAccess("search/tweets.json", param));

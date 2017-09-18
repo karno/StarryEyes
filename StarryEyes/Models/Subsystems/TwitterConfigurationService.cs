@@ -15,7 +15,7 @@ namespace StarryEyes.Models.Subsystems
         // default values
         private static int _httpUrlLength = 22;
         private static int _httpsUrlLength = 23;
-        private static int _mediaUrlLength = 23;
+        private static int _mediaUrlLength = 0; // media url -> 0 (extended_tweet)
 
         public static int HttpUrlLength
         {

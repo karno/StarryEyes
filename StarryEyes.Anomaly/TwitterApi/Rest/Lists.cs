@@ -87,37 +87,40 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         public static Task<IEnumerable<TwitterStatus>> GetListTimelineAsync(
             this IOAuthCredential credential, long listId,
-            long? sinceId = null, long? maxId = null, int? count = null, bool? includeRts = null)
+            long? sinceId = null, long? maxId = null, int? count = null, bool? includeRts = null,
+            bool extendedTweet = true)
         {
             if (credential == null) throw new ArgumentNullException("credential");
             return GetListTimelineCoreAsync(
-                credential, listId, null, null, null, sinceId, maxId, count, includeRts);
+                credential, listId, null, null, null, sinceId, maxId, count, includeRts, extendedTweet);
         }
 
         public static Task<IEnumerable<TwitterStatus>> GetListTimelineAsync(
             this IOAuthCredential credential, string slug, long userId,
-            long? sinceId = null, long? maxId = null, int? count = null, bool? includeRts = null)
+            long? sinceId = null, long? maxId = null, int? count = null, bool? includeRts = null,
+            bool extendedTweet = true)
         {
             if (credential == null) throw new ArgumentNullException("credential");
             if (slug == null) throw new ArgumentNullException("slug");
             return GetListTimelineCoreAsync(
-                credential, null, slug, userId, null, sinceId, maxId, count, includeRts);
+                credential, null, slug, userId, null, sinceId, maxId, count, includeRts, extendedTweet);
         }
 
         public static Task<IEnumerable<TwitterStatus>> GetListTimelineAsync(
             this IOAuthCredential credential, string slug, string screenName,
-            long? sinceId = null, long? maxId = null, int? count = null, bool? includeRts = null)
+            long? sinceId = null, long? maxId = null, int? count = null, bool? includeRts = null,
+            bool extendedTweet = true)
         {
             if (credential == null) throw new ArgumentNullException("credential");
             if (slug == null) throw new ArgumentNullException("slug");
             if (screenName == null) throw new ArgumentNullException("screenName");
             return GetListTimelineCoreAsync(
-                credential, null, slug, null, screenName, sinceId, maxId, count, includeRts);
+                credential, null, slug, null, screenName, sinceId, maxId, count, includeRts, extendedTweet);
         }
 
         public static async Task<IEnumerable<TwitterStatus>> GetListTimelineCoreAsync(
             IOAuthCredential credential, long? listId, string slug, long? userId, string screenName,
-            long? sinceId, long? maxId, int? count, bool? includeRts)
+            long? sinceId, long? maxId, int? count, bool? includeRts, bool extendedTweet)
         {
             var param = new Dictionary<string, object>()
             {
@@ -129,6 +132,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
                 {"max_id", maxId},
                 {"count", count},
                 {"include_rts", includeRts},
+                {"tweet_mode", extendedTweet ? "extended" : null}
             }.ParametalizeForGet();
             var client = credential.CreateOAuthClient();
             var response = await client.GetAsync(new ApiAccess("lists/statuses.json", param));

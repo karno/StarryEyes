@@ -70,12 +70,13 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
         }
 
         public static async Task<TwitterStatus> ShowTweetAsync(
-            this IOAuthCredential credential, long id)
+            this IOAuthCredential credential, long id, bool extendedTweet = true)
         {
             if (credential == null) throw new ArgumentNullException("credential");
             var param = new Dictionary<string, object>
             {
                 {"id", id},
+                {"tweet_mode", extendedTweet ? "extended" : null}
             }.ParametalizeForGet();
             var client = credential.CreateOAuthClient();
             var response = await client.GetAsync(new ApiAccess("statuses/show.json", param));
@@ -85,7 +86,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
         public static async Task<TwitterStatus> UpdateAsync(
             this IOAuthCredential credential, string status, long? inReplyToStatusId = null,
             Tuple<double, double> geoLatLong = null, string placeId = null,
-            bool? displayCoordinates = null, long[] mediaIds = null)
+            bool? displayCoordinates = null, long[] mediaIds = null, bool extendedTweet = true)
         {
             if (credential == null) throw new ArgumentNullException("credential");
             if (status == null) throw new ArgumentNullException("status");
@@ -100,7 +101,8 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
                 {"long", geoLatLong != null ? geoLatLong.Item2 : (double?) null},
                 {"place_id", placeId},
                 {"display_coordinates", displayCoordinates},
-                {"media_ids", String.IsNullOrEmpty(mediaIdStr) ? null : mediaIdStr}
+                {"media_ids", String.IsNullOrEmpty(mediaIdStr) ? null : mediaIdStr},
+                {"tweet_mode", extendedTweet ? "extended" : null }
             }.ParametalizeForPost();
             var client = credential.CreateOAuthClient(useGZip: false);
             var response = await client.PostAsync(new ApiAccess("statuses/update.json"), param);
@@ -123,20 +125,26 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
         }
 
         public static async Task<TwitterStatus> DestroyAsync(
-            this IOAuthCredential credential, long id)
+            this IOAuthCredential credential, long id, bool extendedTweet = true)
         {
             if (credential == null) throw new ArgumentNullException("credential");
-            var param = new Dictionary<string, object>().ParametalizeForPost();
+            var param = new Dictionary<string, object>
+            {
+                {"tweet_mode", extendedTweet ? "extended" : null}
+            }.ParametalizeForPost();
             var client = credential.CreateOAuthClient();
             var response = await client.PostAsync(new ApiAccess("statuses/destroy/" + id + ".json"), param);
             return await response.ReadAsStatusAsync();
         }
 
         public static async Task<TwitterStatus> RetweetAsync(
-            this IOAuthCredential credential, long id)
+            this IOAuthCredential credential, long id, bool extendedTweet = true)
         {
             if (credential == null) throw new ArgumentNullException("credential");
-            var param = new Dictionary<string, object>().ParametalizeForPost();
+            var param = new Dictionary<string, object>
+            {
+                {"tweet_mode", extendedTweet ? "extended" : null}
+            }.ParametalizeForPost();
             var client = credential.CreateOAuthClient();
             var response = await client.PostAsync(new ApiAccess("statuses/retweet/" + id + ".json"), param);
             return await response.ReadAsStatusAsync();
