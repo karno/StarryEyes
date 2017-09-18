@@ -1,5 +1,4 @@
-﻿
-namespace StarryEyes.Nightmare.Windows
+﻿namespace StarryEyes.Nightmare.Windows
 {
     public class TaskDialogResult
     {
@@ -13,35 +12,35 @@ namespace StarryEyes.Nightmare.Windows
         /// Gets the <see cref="TaskDialogSimpleResult"/> of the TaskDialog.
         /// 
         /// </summary>
-        public TaskDialogSimpleResult Result { get; private set; }
+        public TaskDialogSimpleResult Result { get; }
 
         /// <summary>
         /// Gets a value indicating whether or not the verification checkbox
         ///             was checked. A null value indicates that the checkbox wasn't shown.
         /// 
         /// </summary>
-        public bool? VerificationChecked { get; private set; }
+        public bool? VerificationChecked { get; }
 
         /// <summary>
         /// Gets the zero-based index of the radio button that was clicked.
         ///             A null value indicates that no radio button was clicked.
         /// 
         /// </summary>
-        public int? RadioButtonResult { get; private set; }
+        public int? RadioButtonResult { get; }
 
         /// <summary>
         /// Gets the zero-based index of the command button that was clicked.
         ///             A null value indicates that no command button was clicked.
         /// 
         /// </summary>
-        public int? CommandButtonResult { get; private set; }
+        public int? CommandButtonResult { get; }
 
         /// <summary>
         /// Gets the zero-based index of the custom button that was clicked.
         ///             A null value indicates that no custom button was clicked.
         /// 
         /// </summary>
-        public int? CustomButtonResult { get; private set; }
+        public int? CustomButtonResult { get; }
 
         static TaskDialogResult()
         {
@@ -60,14 +59,15 @@ namespace StarryEyes.Nightmare.Windows
         /// 
         /// </summary>
         /// <param name="result">The simple TaskDialog result.</param><param name="verificationChecked">Wether the verification checkbox was checked.</param><param name="radioButtonResult">The radio button result, if any.</param><param name="commandButtonResult">The command button result, if any.</param><param name="customButtonResult">The custom button result, if any.</param>
-        internal TaskDialogResult(TaskDialogInterop.TaskDialogSimpleResult result, bool? verificationChecked = null, int? radioButtonResult = null, int? commandButtonResult = null, int? customButtonResult = null)
+        internal TaskDialogResult(TaskDialogInterop.TaskDialogSimpleResult result, bool? verificationChecked = null,
+            int? radioButtonResult = null, int? commandButtonResult = null, int? customButtonResult = null)
             : this()
         {
-            this.Result = (TaskDialogSimpleResult)result;
-            this.VerificationChecked = verificationChecked;
-            this.RadioButtonResult = radioButtonResult;
-            this.CommandButtonResult = commandButtonResult;
-            this.CustomButtonResult = customButtonResult;
+            Result = (TaskDialogSimpleResult)result;
+            VerificationChecked = verificationChecked;
+            RadioButtonResult = radioButtonResult;
+            CommandButtonResult = commandButtonResult;
+            CustomButtonResult = customButtonResult;
         }
     }
 

@@ -14,18 +14,12 @@ namespace StarryEyes.Nightmare.Windows.Forms
         /// <summary>
         /// Get all screens.
         /// </summary>
-        public static Screen[] AllScreens
-        {
-            get { return WinForms.Screen.AllScreens.Select(Wrap).ToArray(); }
-        }
+        public static Screen[] AllScreens => WinForms.Screen.AllScreens.Select(Wrap).ToArray();
 
         /// <summary>
         /// Get primary screen.
         /// </summary>
-        public static Screen PrimaryScreen
-        {
-            get { return Wrap(WinForms.Screen.PrimaryScreen); }
-        }
+        public static Screen PrimaryScreen => Wrap(WinForms.Screen.PrimaryScreen);
 
         /// <summary>
         /// Get screen which contains specific window.
@@ -56,9 +50,7 @@ namespace StarryEyes.Nightmare.Windows.Forms
 
         private Screen(WinForms.Screen wfScreen)
         {
-            if (wfScreen == null)
-                throw new ArgumentNullException("wfScreen");
-            _original = wfScreen;
+            _original = wfScreen ?? throw new ArgumentNullException(nameof(wfScreen));
 
             if (Environment.OSVersion.Platform == PlatformID.Win32NT &&
                 Environment.OSVersion.Version >= Windows8)
@@ -80,71 +72,44 @@ namespace StarryEyes.Nightmare.Windows.Forms
         /// <summary>
         /// Bits per pixel of this screen.
         /// </summary>
-        public int BitsPerPixel
-        {
-            get { return _original.BitsPerPixel; }
-        }
+        public int BitsPerPixel => _original.BitsPerPixel;
 
         /// <summary>
         /// Horizontal DPI (base: 96)
         /// </summary>
-        public uint DpiX
-        {
-            get { return _dpiX; }
-        }
+        public uint DpiX => _dpiX;
 
         /// <summary>
         /// Vertical DPI (base: 96)
         /// </summary>
-        public uint DpiY
-        {
-            get { return _dpiY; }
-        }
+        public uint DpiY => _dpiY;
 
         /// <summary>
         /// Bounds of this screen.
         /// </summary>
-        public Rect Bounds
-        {
-            get
-            {
-                return new Rect(
-                      _original.Bounds.Left,
-                      _original.Bounds.Top,
-                      _original.Bounds.Width,
-                      _original.Bounds.Bottom);
-            }
-        }
+        public Rect Bounds => new Rect(
+            _original.Bounds.Left,
+            _original.Bounds.Top,
+            _original.Bounds.Width,
+            _original.Bounds.Bottom);
 
         /// <summary>
         /// Working area of this screen.
         /// </summary>
-        public Rect WorkingArea
-        {
-            get
-            {
-                return new Rect(
-                      _original.WorkingArea.X,
-                      _original.WorkingArea.Y,
-                      _original.WorkingArea.Width,
-                      _original.WorkingArea.Height);
-            }
-        }
+        public Rect WorkingArea => new Rect(
+            _original.WorkingArea.X,
+            _original.WorkingArea.Y,
+            _original.WorkingArea.Width,
+            _original.WorkingArea.Height);
 
         /// <summary>
         /// Device name of this screen.
         /// </summary>
-        public string DeviceName
-        {
-            get { return _original.DeviceName; }
-        }
+        public string DeviceName => _original.DeviceName;
 
         /// <summary>
         /// Whether this screen is primary or not.
         /// </summary>
-        public bool IsPrimary
-        {
-            get { return _original.Primary; }
-        }
+        public bool IsPrimary => _original.Primary;
     }
 }

@@ -6,25 +6,13 @@ namespace StarryEyes.Nightmare.Windows
 {
     public static class SystemInformation
     {
-        public static string ComputerName
-        {
-            get { return WinForms.SystemInformation.ComputerName; }
-        }
+        public static string ComputerName => WinForms.SystemInformation.ComputerName;
 
-        public static string UserName
-        {
-            get { return WinForms.SystemInformation.UserName; }
-        }
+        public static string UserName => WinForms.SystemInformation.UserName;
 
-        public static bool MouseButtonsSwapped
-        {
-            get { return WinForms.SystemInformation.MouseButtonsSwapped; }
-        }
+        public static bool MouseButtonsSwapped => WinForms.SystemInformation.MouseButtonsSwapped;
 
-        public static int MouseWheelScrollDelta
-        {
-            get { return WinForms.SystemInformation.MouseWheelScrollDelta; }
-        }
+        public static int MouseWheelScrollDelta => WinForms.SystemInformation.MouseWheelScrollDelta;
 
         public static uint DesktopHeapSize
         {
@@ -38,8 +26,8 @@ namespace StarryEyes.Nightmare.Windows
                 try
                 {
                     var buffer = new byte[4]; // unsigned long(32bit)
-                    uint n;
-                    if (!NativeMethods.GetUserObjectInformation(hDesktop, NativeMethods.UOI_HEAPSIZE, buffer, sizeof(byte) * 4, out n))
+                    if (!NativeMethods.GetUserObjectInformation(hDesktop, NativeMethods.UOI_HEAPSIZE, buffer,
+                        sizeof(byte) * 4, out uint _))
                     {
                         throw new Win32Exception();
                     }

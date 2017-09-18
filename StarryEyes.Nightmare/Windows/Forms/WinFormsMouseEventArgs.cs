@@ -5,86 +5,72 @@ using WinForms = System.Windows.Forms;
 namespace StarryEyes.Nightmare.Windows.Forms
 {
     /// <summary>
-    /// System.Windows.Forms.MouseEventHandlerのラッパ実装です。
+    /// Wrapper of System.Windows.Forms.MouseEventHandler
     /// </summary>
     public delegate void WinFormsMouseEventHandler(object sender, WinFormsMouseEventArgs e);
 
     /// <summary>
-    /// System.Windows.Forms.MouseEventArgsのWPFラッパ実装です。
+    /// Wrapper of System.Windows.Forms.MouseEventArgs
     /// </summary>
     public class WinFormsMouseEventArgs : EventArgs
     {
-        private WinForms.MouseEventArgs eventArgs;
+        private readonly WinForms.MouseEventArgs _eventArgs;
 
         public WinFormsMouseEventArgs(WinForms.MouseEventArgs e)
         {
-            this.eventArgs = e;
+            _eventArgs = e;
         }
 
         /// <summary>
-        /// マウスのどのボタンが押されたかを示す値を取得します。 
+        /// Get the value of which button is pressed on the mouse.
         /// </summary>
         public MouseButtons Button
         {
             get
             {
                 var mb = MouseButtons.None;
-                if (this.eventArgs.Button.HasFlag(WinForms.MouseButtons.Left))
+                if (_eventArgs.Button.HasFlag(WinForms.MouseButtons.Left))
                     mb |= MouseButtons.Left;
-                if (this.eventArgs.Button.HasFlag(WinForms.MouseButtons.Middle))
+                if (_eventArgs.Button.HasFlag(WinForms.MouseButtons.Middle))
                     mb |= MouseButtons.Middle;
-                if (this.eventArgs.Button.HasFlag(WinForms.MouseButtons.Right))
+                if (_eventArgs.Button.HasFlag(WinForms.MouseButtons.Right))
                     mb |= MouseButtons.Right;
-                if (this.eventArgs.Button.HasFlag(WinForms.MouseButtons.XButton1))
+                if (_eventArgs.Button.HasFlag(WinForms.MouseButtons.XButton1))
                     mb |= MouseButtons.XButton1;
-                if (this.eventArgs.Button.HasFlag(WinForms.MouseButtons.XButton2))
+                if (_eventArgs.Button.HasFlag(WinForms.MouseButtons.XButton2))
                     mb |= MouseButtons.XButton2;
                 return mb;
             }
         }
 
         /// <summary>
-        /// マウス ボタンが押されて離された回数を取得します。 
+        /// Get the counts of clicking the mouse button.
         /// </summary>
-        public int Clicks
-        {
-            get { return this.eventArgs.Clicks; }
-        }
+        public int Clicks => _eventArgs.Clicks;
 
         /// <summary>
-        /// マウス ホイールの回転回数を表す符合付きの数値を取得します。マウス ホイールのノッチ 1 つ分が 1 移動量に相当します。 
+        /// Get the value of wheel rotation. This property returns a signed value.
+        /// One notch of the mouse wheel corresponds to one movement amount.
         /// </summary>
-        public int Delta
-        {
-            get { return this.eventArgs.Delta; }
-        }
+        public int Delta => _eventArgs.Delta;
 
         /// <summary>
-        /// マウス イベント生成時のマウスの位置を取得します。(System.Windows.Pointに変換されています。)
+        /// Get the position of the mouse when this event occurred.
         /// </summary>
-        public Point Location
-        {
-            get { return new Point(this.eventArgs.X, this.eventArgs.Y); }
-        }
+        public Point Location => new Point(_eventArgs.X, _eventArgs.Y);
 
         /// <summary>
-        /// マウス イベント生成時のマウスの x 座標を取得します。 
+        /// Gets the X position  of the mouse when this event occurred.
         /// </summary>
-        public int X
-        {
-            get { return this.eventArgs.X; }
-        }
+        public int X => _eventArgs.X;
 
         /// <summary>
-        /// マウス イベント生成時のマウスの y 座標を取得します。 
+        /// Gets the Y position  of the mouse when this event occurred.
         /// </summary>
-        public int Y
-        {
-            get { return this.eventArgs.Y; }
-        }
+        public int Y => _eventArgs.Y;
     }
 
-    [Flags()]
+    [Flags]
     public enum MouseButtons
     {
         None = 0,

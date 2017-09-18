@@ -8,81 +8,30 @@ namespace StarryEyes.Nightmare.Windows.Forms
     /// </summary>
     public class NotifyIcon : IDisposable
     {
-        private WinForms.NotifyIcon notifyIcon;
+        private readonly WinForms.NotifyIcon _notifyIcon;
 
         public NotifyIcon()
         {
-            this.notifyIcon = new WinForms.NotifyIcon();
-            // イベントの接続
-            this.notifyIcon.BalloonTipClicked += (_, e) =>
-            {
-                var btc = this.BalloonTipClicked;
-                if (btc != null)
-                    btc(this, e);
-            };
-            this.notifyIcon.BalloonTipClosed += (_, e) =>
-            {
-                var btc = this.BalloonTipClosed;
-                if (btc != null)
-                    btc(this, e);
-            };
-            this.notifyIcon.BalloonTipShown += (_, e) =>
-            {
-                var bts = this.BalloonTipShown;
-                if (bts != null)
-                    bts(this, e);
-            };
+            _notifyIcon = new WinForms.NotifyIcon();
+            _notifyIcon.BalloonTipClicked += (_, e) => BalloonTipClicked?.Invoke(this, e);
+            _notifyIcon.BalloonTipClosed += (_, e) => BalloonTipClosed?.Invoke(this, e);
+            _notifyIcon.BalloonTipShown += (_, e) => BalloonTipShown?.Invoke(this, e);
 
-            this.notifyIcon.MouseClick += (_, e) =>
-            {
-                var mc = this.MouseClick;
-                if (mc != null)
-                {
-                    mc(this, new WinFormsMouseEventArgs(e));
-                }
-            };
-            this.notifyIcon.MouseDoubleClick += (_, e) =>
-            {
-                var mdc = this.MouseDoubleClick;
-                if (mdc != null)
-                {
-                    mdc(this, new WinFormsMouseEventArgs(e));
-                }
-            };
-            this.notifyIcon.MouseDown += (_, e) =>
-            {
-                var md = this.MouseDown;
-                if (md != null)
-                {
-                    md(this, new WinFormsMouseEventArgs(e));
-                }
-            };
-            this.notifyIcon.MouseMove += (_, e) =>
-            {
-                var mm = this.MouseMove;
-                if (mm != null)
-                {
-                    mm(this, new WinFormsMouseEventArgs(e));
-                }
-            };
-            this.notifyIcon.MouseUp += (_, e) =>
-            {
-                var mu = this.MouseUp;
-                if (mu != null)
-                {
-                    mu(this, new WinFormsMouseEventArgs(e));
-                }
-            };
+            _notifyIcon.MouseClick += (_, e) => MouseClick?.Invoke(this, new WinFormsMouseEventArgs(e));
+            _notifyIcon.MouseDoubleClick += (_, e) => MouseDoubleClick?.Invoke(this, new WinFormsMouseEventArgs(e));
+            _notifyIcon.MouseDown += (_, e) => MouseDown?.Invoke(this, new WinFormsMouseEventArgs(e));
+            _notifyIcon.MouseMove += (_, e) => MouseMove?.Invoke(this, new WinFormsMouseEventArgs(e));
+            _notifyIcon.MouseUp += (_, e) => MouseUp?.Invoke(this, new WinFormsMouseEventArgs(e));
         }
 
         /// <summary>
-        /// NotifyIcon に関連付けられているバルーン ヒントに表示するアイコンを取得または設定します。 
+        /// Gets or sets the icon to display in the balloon hint associated with the notify icon.
         /// </summary>
         public NotifyIconToolTipIcon BalloonTipIcon
         {
             get
             {
-                switch (this.notifyIcon.BalloonTipIcon)
+                switch (_notifyIcon.BalloonTipIcon)
                 {
                     case WinForms.ToolTipIcon.Error:
                         return NotifyIconToolTipIcon.Error;
@@ -99,109 +48,112 @@ namespace StarryEyes.Nightmare.Windows.Forms
                 switch (value)
                 {
                     case NotifyIconToolTipIcon.Error:
-                        this.notifyIcon.BalloonTipIcon = WinForms.ToolTipIcon.Error;
+                        _notifyIcon.BalloonTipIcon = WinForms.ToolTipIcon.Error;
                         break;
                     case NotifyIconToolTipIcon.Info:
-                        this.notifyIcon.BalloonTipIcon = WinForms.ToolTipIcon.Info;
+                        _notifyIcon.BalloonTipIcon = WinForms.ToolTipIcon.Info;
                         break;
                     case NotifyIconToolTipIcon.Warning:
-                        this.notifyIcon.BalloonTipIcon = WinForms.ToolTipIcon.Warning;
+                        _notifyIcon.BalloonTipIcon = WinForms.ToolTipIcon.Warning;
                         break;
                     default:
-                        this.notifyIcon.BalloonTipIcon = WinForms.ToolTipIcon.None;
+                        _notifyIcon.BalloonTipIcon = WinForms.ToolTipIcon.None;
                         break;
                 }
             }
         }
 
         /// <summary>
-        /// NotifyIcon に関連付けられているバルーン ヒントに表示するテキストを取得または設定します。 
+        /// Gets or sets the text to display in the balloon hint associated with the notify icon.
         /// </summary>
         public string BalloonTipText
         {
-            get { return this.notifyIcon.BalloonTipText; }
-            set { this.notifyIcon.BalloonTipText = value; }
+            get => _notifyIcon.BalloonTipText;
+            set => _notifyIcon.BalloonTipText = value;
         }
 
         /// <summary>
-        /// NotifyIcon で表示されるバルーン ヒントのタイトルを取得または設定します。 
+        /// Gets or sets the title of the balloon hint displayed in the notify icon.
         /// </summary>
         public string BalloonTipTitle
         {
-            get { return this.notifyIcon.BalloonTipTitle; }
-            set { this.notifyIcon.BalloonTipTitle = value; }
+            get => _notifyIcon.BalloonTipTitle;
+            set => _notifyIcon.BalloonTipTitle = value;
         }
 
         /// <summary>
-        /// マウス ポインタが通知領域アイコンの上にあるときに表示されるツールヒント テキストを取得または設定します。 
+        /// Gets or sets the tool-tip text to be displayed when the mouse pointer is over the notify icon.
         /// </summary>
         public string Text
         {
-            get { return this.notifyIcon.Text; }
-            set { this.notifyIcon.Text = value; }
+            get => _notifyIcon.Text;
+            set => _notifyIcon.Text = value;
         }
 
         /// <summary>
-        /// アイコンをタスクバーの通知領域に表示するかどうかを示す値を取得または設定します。 
+        /// Gets or sets the visibility of the notify icon.
         /// </summary>
         public bool IsVisible
         {
-            get { return this.notifyIcon.Visible; }
-            set { this.notifyIcon.Visible = value; }
-        }
-
-        public WinFormsIcon Icon
-        {
-            get { return new WinFormsIcon(this.notifyIcon.Icon); }
-            set { this.notifyIcon.Icon = value.IconInstance; }
+            get => _notifyIcon.Visible;
+            set => _notifyIcon.Visible = value;
         }
 
         /// <summary>
-        /// バルーン ヒントがクリックされたときに発生します。 
+        /// Gets or sets of the notify icon that displayed on notification area.
+        /// </summary>
+        public WinFormsIcon Icon
+        {
+            get => new WinFormsIcon(_notifyIcon.Icon);
+            set => _notifyIcon.Icon = value.IconInstance;
+        }
+
+        /// <summary>
+        /// Occurs when the balloon hint is clicked.
         /// </summary>
         public event EventHandler BalloonTipClicked;
 
         /// <summary>
-        /// ユーザーがバルーン ヒントを閉じたときに発生します。 
+        /// Occurs when the balloon hint is closed.
         /// </summary>
         public event EventHandler BalloonTipClosed;
 
         /// <summary>
-        /// 画面にバルーン ヒントが表示されたときに発生します。 
+        /// Occurs when the balloon hint is shown.
         /// </summary>
         public event EventHandler BalloonTipShown;
 
         /// <summary>
-        /// ユーザーがマウスで NotifyIcon をクリックすると発生します。 
+        /// Occurs when the user clicking the notify icon.
         /// </summary>
         public event WinFormsMouseEventHandler MouseClick;
 
         /// <summary>
-        /// ユーザーがマウスで NotifyIcon をダブルクリックすると発生します。 
+        /// Occurs when the user double-clicking the notify icon.
         /// </summary>
         public event WinFormsMouseEventHandler MouseDoubleClick;
 
         /// <summary>
-        /// ポインタがタスクバーの通知領域のアイコンの上にあるときに、マウス ボタンを押すと発生します。 
+        /// Occurs when the mouse button is pressed while the mouse pointer is over the notify icon.
         /// </summary>
         public event WinFormsMouseEventHandler MouseDown;
 
         /// <summary>
-        /// ポインタがタスクバーの通知領域のアイコンの上にあるときに、マウスを移動すると発生します。 
+        /// Occurs when the mouse cursor is moved while the mouse pointer is over the notify icon.
         /// </summary>
         public event WinFormsMouseEventHandler MouseMove;
 
         /// <summary>
-        /// ポインタがタスクバーの通知領域のアイコンの上にあるときに、マウス ボタンを離すと発生します。 
+        /// Occurs when the mouse button is released while the mouse pointer is over the notify icon.
         /// </summary>
         public event WinFormsMouseEventHandler MouseUp;
 
         /// <summary>
-        /// リソースを解放します。
+        /// Release all resources.
         /// </summary>
         public void Dispose()
         {
-            notifyIcon.Dispose();
+            _notifyIcon.Dispose();
         }
     }
 

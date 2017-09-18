@@ -8,6 +8,7 @@ namespace StarryEyes.Nightmare.Windows
     {
         // constants
         internal const uint GENERIC_READ = 0x80000000;
+
         internal const int UOI_HEAPSIZE = 5;
         internal const int WM_DRAWCLIPBOARD = 0x0308;
         internal const int WM_CHANGECBCHAIN = 0x030D;
@@ -15,14 +16,14 @@ namespace StarryEyes.Nightmare.Windows
 
         [DllImport("user32.dll", SetLastError = true)]
         internal static extern IntPtr OpenInputDesktop(uint dwFlags, bool fInherit,
-          uint dwDesiredAccess);
+            uint dwDesiredAccess);
 
         [DllImport("user32.dll", SetLastError = true)]
         internal static extern bool CloseDesktop(IntPtr hDesktop);
 
         [DllImport("user32.dll", SetLastError = true)]
         internal static extern bool GetUserObjectInformation(IntPtr hObj, int nIndex,
-          [Out] byte[] pvInfo, uint nLength, out uint lpnLengthNeeded);
+            [Out] byte[] pvInfo, uint nLength, out uint lpnLengthNeeded);
 
         internal static IntPtr GetWindowLongPtr(IntPtr hWnd, int nIndex)
         {
@@ -51,10 +52,10 @@ namespace StarryEyes.Nightmare.Windows
         private static extern IntPtr SetWindowLong32(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
 
         [DllImport("user32.dll")]
-        internal extern static bool GetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpWndPl);
+        internal static extern bool GetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpWndPl);
 
         [DllImport("user32.dll")]
-        internal extern static bool SetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpWndPl);
+        internal static extern bool SetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpWndPl);
 
         [DllImport("user32.dll")]
         internal static extern int SendMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
@@ -70,7 +71,7 @@ namespace StarryEyes.Nightmare.Windows
 
         //https://msdn.microsoft.com/en-us/library/windows/desktop/dd145062(v=vs.85).aspx
         [DllImport("User32.dll")]
-        internal static extern IntPtr MonitorFromPoint([In]System.Drawing.Point pt, [In]uint dwFlags);
+        internal static extern IntPtr MonitorFromPoint([In] System.Drawing.Point pt, [In] uint dwFlags);
 
         [DllImport("gdi32.dll", CharSet = CharSet.Auto, SetLastError = true, ExactSpelling = true)]
         public static extern int GetDeviceCaps(IntPtr hDC, int nIndex);
@@ -79,7 +80,6 @@ namespace StarryEyes.Nightmare.Windows
         [DllImport("Shcore.dll")]
         internal static extern IntPtr GetDpiForMonitor([In] IntPtr hmonitor, [In] DpiType dpiType,
             [Out] out uint dpiX, [Out] out uint dpiY);
-
     }
 
     #region Data structures
@@ -89,12 +89,14 @@ namespace StarryEyes.Nightmare.Windows
     {
         public int x;
         public int y;
+
         public POINT(int x, int y)
         {
             this.x = x;
             this.y = y;
         }
     }
+
     [StructLayout(LayoutKind.Sequential)]
     internal struct RECT
     {
@@ -102,6 +104,7 @@ namespace StarryEyes.Nightmare.Windows
         public int top;
         public int right;
         public int bottom;
+
         public RECT(int left, int top, int right, int bottom)
         {
             this.left = left;
@@ -110,6 +113,7 @@ namespace StarryEyes.Nightmare.Windows
             this.bottom = bottom;
         }
     }
+
     [StructLayout(LayoutKind.Sequential)]
     internal struct WINDOWPLACEMENT
     {
@@ -121,7 +125,8 @@ namespace StarryEyes.Nightmare.Windows
         public RECT rcNormalPosition;
     }
 
-    #endregion
+    #endregion Data structures
+
     // ReSharper restore InconsistentNaming
 
     public enum DeviceCap
@@ -130,6 +135,7 @@ namespace StarryEyes.Nightmare.Windows
         /// Logical pixels inch in X
         /// </summary>
         LOGPIXELSX = 88,
+
         /// <summary>
         /// Logical pixels inch in Y
         /// </summary>

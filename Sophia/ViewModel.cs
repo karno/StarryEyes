@@ -12,7 +12,7 @@ namespace Sophia
 
         public Messenger Messenger { get; } = new Messenger();
 
-        public ViewModel()
+        protected ViewModel()
         {
             _disposables = new List<IDisposable> { Messenger };
         }
@@ -21,7 +21,14 @@ namespace Sophia
         {
             lock (_disposables)
             {
-                _disposables.Add(disposable);
+                if (_disposed)
+                {
+                    disposable.Dispose();
+                }
+                else
+                {
+                    _disposables.Add(disposable);
+                }
             }
         }
 
@@ -39,6 +46,7 @@ namespace Sophia
         protected virtual void Dispose(bool disposing)
         {
             if (_disposed) return;
+            _disposed = true;
             if (disposing)
             {
                 lock (_disposables)
@@ -47,9 +55,9 @@ namespace Sophia
                     {
                         disposable.Dispose();
                     }
+                    _disposables.Clear();
                 }
             }
-            _disposed = true;
         }
     }
 }

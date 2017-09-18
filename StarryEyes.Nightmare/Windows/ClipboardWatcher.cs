@@ -27,22 +27,19 @@ namespace StarryEyes.Nightmare.Windows
             };
         }
 
-        public bool IsWatching
-        {
-            get { return this._isWatching; }
-        }
+        public bool IsWatching => _isWatching;
 
         public void StartWatching()
         {
-            if (this.IsWatching) return;
-            this._isWatching = true;
+            if (IsWatching) return;
+            _isWatching = true;
             _watcher.StartWatching();
         }
 
         public void StopWatching()
         {
-            if (!this.IsWatching) return;
-            this._isWatching = false;
+            if (!IsWatching) return;
+            _isWatching = false;
             _watcher.StopWatching();
         }
 
@@ -66,22 +63,22 @@ namespace StarryEyes.Nightmare.Windows
             }
         }
 
-        private class ClipboardShadowWatcher : Form
+        private sealed class ClipboardShadowWatcher : Form
         {
-            private IntPtr nextHandle = IntPtr.Zero;
+            private IntPtr _nextHandle = IntPtr.Zero;
             public event Action DrawClipboard;
 
             public void StartWatching()
             {
-                if (nextHandle != IntPtr.Zero) return;
-                nextHandle = NativeMethods.SetClipboardViewer(this.Handle);
+                if (_nextHandle != IntPtr.Zero) return;
+                _nextHandle = NativeMethods.SetClipboardViewer(Handle);
             }
 
             public void StopWatching()
             {
-                if (nextHandle == IntPtr.Zero) return;
-                NativeMethods.ChangeClipboardChain(this.Handle, nextHandle);
-                nextHandle = IntPtr.Zero;
+                if (_nextHandle == IntPtr.Zero) return;
+                NativeMethods.ChangeClipboardChain(Handle, _nextHandle);
+                _nextHandle = IntPtr.Zero;
             }
 
             protected override void WndProc(ref Message m)
@@ -89,21 +86,17 @@ namespace StarryEyes.Nightmare.Windows
                 switch (m.Msg)
                 {
                     case NativeMethods.WM_DRAWCLIPBOARD:
-                        NativeMethods.SendMessage(nextHandle, m.Msg, m.WParam, m.LParam);
-                        var handler = DrawClipboard;
-                        if (handler != null)
-                        {
-                            handler();
-                        }
+                        NativeMethods.SendMessage(_nextHandle, m.Msg, m.WParam, m.LParam);
+                        DrawClipboard?.Invoke();
                         break;
                     case NativeMethods.WM_CHANGECBCHAIN:
-                        if (m.WParam == nextHandle)
+                        if (m.WParam == _nextHandle)
                         {
-                            nextHandle = m.LParam;
+                            _nextHandle = m.LParam;
                         }
                         else
                         {
-                            NativeMethods.SendMessage(nextHandle, m.Msg, m.WParam, m.LParam);
+                            NativeMethods.SendMessage(_nextHandle, m.Msg, m.WParam, m.LParam);
                         }
                         break;
                 }

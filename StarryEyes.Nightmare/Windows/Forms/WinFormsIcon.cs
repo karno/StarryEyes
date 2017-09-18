@@ -13,17 +13,16 @@ namespace StarryEyes.Nightmare.Windows.Forms
     /// </summary>
     public class WinFormsIcon : IDisposable
     {
-        private Icon winFormsIcon;
-        internal Icon IconInstance { get { return this.winFormsIcon; } }
+        internal readonly Icon IconInstance;
 
         public WinFormsIcon(Stream stream)
         {
-            this.winFormsIcon = new Icon(stream);
+            IconInstance = new Icon(stream);
         }
 
         public WinFormsIcon(string file)
         {
-            this.winFormsIcon = new Icon(file);
+            IconInstance = new Icon(file);
         }
 
         public WinFormsIcon(BitmapImage image)
@@ -31,13 +30,13 @@ namespace StarryEyes.Nightmare.Windows.Forms
             var width = image.PixelWidth;
             var height = image.PixelHeight;
             var stride = width * ((image.Format.BitsPerPixel + 7) / 8);
-            IntPtr ptr = Marshal.AllocHGlobal(height * stride);
+            var ptr = Marshal.AllocHGlobal(height * stride);
             try
             {
                 image.CopyPixels(new Int32Rect(0, 0, width, height), ptr, height * stride, stride);
                 using (var bitmap = new Bitmap(width, height, stride, PixelFormat.Format32bppArgb, ptr))
                 {
-                    this.winFormsIcon = Icon.FromHandle(bitmap.GetHicon());
+                    IconInstance = Icon.FromHandle(bitmap.GetHicon());
                 }
             }
             finally
@@ -48,12 +47,12 @@ namespace StarryEyes.Nightmare.Windows.Forms
 
         internal WinFormsIcon(Icon icon)
         {
-            this.winFormsIcon = icon;
+            IconInstance = icon;
         }
 
         public void Dispose()
         {
-            this.winFormsIcon.Dispose();
+            IconInstance.Dispose();
         }
     }
 }
