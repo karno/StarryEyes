@@ -78,7 +78,7 @@ namespace StarryEyes
             }
         }
 
-        #endregion
+        #endregion pre-initialize application
 
         #region initialize application
 
@@ -287,7 +287,7 @@ namespace StarryEyes
             CacheStore.Initialize();
         }
 
-        #endregion
+        #endregion initialize application
 
         #region Tweet cleanup
 
@@ -341,7 +341,7 @@ namespace StarryEyes
             }
         }
 
-        #endregion
+        #endregion Tweet cleanup
 
         #region Database optimization
 
@@ -377,7 +377,7 @@ namespace StarryEyes
             }
         }
 
-        #endregion
+        #endregion Database optimization
 
         #region post-initialize application
 
@@ -405,7 +405,7 @@ namespace StarryEyes
             BackstageModel.Initialize();
         }
 
-        #endregion
+        #endregion post-initialize application
 
         #region Mutex control
 
@@ -443,7 +443,7 @@ namespace StarryEyes
             catch (ObjectDisposedException) { }
         }
 
-        #endregion
+        #endregion Mutex control
 
         #region Confirmation messages
 
@@ -490,7 +490,7 @@ namespace StarryEyes
             }
 
         }
-        #endregion
+        #endregion Confirmation messages
 
         #region Fail messages
 
@@ -557,7 +557,7 @@ namespace StarryEyes
             }
         }
 
-        #endregion
+        #endregion Fail messages
 
         private static TaskDialogResult ShowMessage(TaskDialogOptions option)
         {
