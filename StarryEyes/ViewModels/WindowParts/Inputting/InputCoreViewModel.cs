@@ -241,10 +241,12 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             get
             {
                 var currentTextLength = StatusTextUtil.CountText(InputText);
-                if (IsImageAttached)
-                {
-                    currentTextLength += TwitterConfigurationService.MediaUrlLength;
-                }
+                /*if (IsImageAttached)
+                 * {
+                 *    currentTextLength += TwitterConfigurationService.MediaUrlLength;
+                 * } 
+                 * media url is no longer counted.
+                */ 
                 var tags = TwitterRegexPatterns.ValidHashtag.Matches(InputText)
                                                .OfType<Match>()
                                                .Select(_ => _.Groups[1].Value)
