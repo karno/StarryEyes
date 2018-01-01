@@ -228,7 +228,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             }
         }
 
-        private void UpdateTextCount()
+        public void UpdateTextCount()
         {
             RaisePropertyChanged(() => TextCount);
             RaisePropertyChanged(() => RemainTextCount);

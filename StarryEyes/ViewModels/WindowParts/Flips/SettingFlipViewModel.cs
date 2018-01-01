@@ -601,7 +601,11 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         public bool NewTextCounting
         {
             get { return Setting.NewTextCounting.Value; }
-            set { Setting.NewTextCounting.Value = value; }
+            set
+            {
+                Setting.NewTextCounting.Value = value;
+                _parent.InputViewModel.InputCoreViewModel.UpdateTextCount();
+            }
         }
 
         #endregion
