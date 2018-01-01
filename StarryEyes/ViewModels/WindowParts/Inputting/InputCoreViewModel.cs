@@ -255,7 +255,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                 {
                     currentTextLength += InputModel.InputCore.BindingHashtags
                                                    .Except(tags)
-                                                   .Select(_ => _.Length + 1)
+                                                   .Select(_ => StatusTextUtil.GetLength(_) + 1)
                                                    .Sum();
                 }
                 return currentTextLength;
@@ -264,7 +264,12 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
 
         public int RemainTextCount
         {
-            get { return TwitterConfigurationService.TextMaxLength - TextCount; }
+            get
+            {
+                return Setting.NewTextCounting.Value ?
+                    TwitterConfigurationService.NewTextMaxLength - TextCount :
+                    TwitterConfigurationService.TextMaxLength - TextCount;
+            }
         }
 
         public bool IsUrlAutoEsacpeEnabled
