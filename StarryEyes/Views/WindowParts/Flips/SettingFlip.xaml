@@ -616,6 +616,9 @@
                         <CheckBox Margin="0,8"
                                   Content="{x:Static localize:SettingFlipResources.InputRestorePreviousStashed}"
                                   IsChecked="{Binding RestorePreviousStashed}" />
+                        <CheckBox Margin="0,8"
+                                  Content="{x:Static localize:SettingFlipResources.InputNewTextCounting}"
+                                  IsChecked="{Binding NewTextCounting}" />
                         <StackPanel Margin="0,8" Orientation="Horizontal">
                             <TextBlock Margin="0,0,8,0"
                                        VerticalAlignment="Center"
