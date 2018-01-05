@@ -598,6 +598,16 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             set { Setting.SuppressTagBindingInReply.Value = value; }
         }
 
+        public bool NewTextCounting
+        {
+            get { return Setting.NewTextCounting.Value; }
+            set
+            {
+                Setting.NewTextCounting.Value = value;
+                _parent.InputViewModel.InputCoreViewModel.UpdateTextCount();
+            }
+        }
+
         #endregion
 
         #region Notification and confirmation property

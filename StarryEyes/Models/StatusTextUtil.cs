@@ -5,6 +5,7 @@ using System.Linq;
 using StarryEyes.Anomaly.Utils;
 using StarryEyes.Helpers;
 using StarryEyes.Models.Subsystems;
+using StarryEyes.Settings;
 
 namespace StarryEyes.Models
 {
@@ -29,8 +30,15 @@ namespace StarryEyes.Models
                                        : TwitterConfigurationService.HttpUrlLength;
                                }
                                var resolved = ParsingExtension.ResolveEntity(s.Text);
-                               // count with cosidering surrogate pairs
-                               return new StringInfo(resolved).LengthInTextElements;
+                               if (!Setting.NewTextCounting.Value)
+                               {
+                                   // count with cosidering surrogate pairs
+                                   return new StringInfo(resolved).LengthInTextElements;
+                               }
+                               else
+                               {
+                                   return GetLength(resolved);
+                               }
                            })
                            .Sum();
         }
@@ -58,6 +66,30 @@ namespace StarryEyes.Models
             if (pidx1 <= 0) return domain; // invalid data
             var pidx2 = domain.LastIndexOf('.', pidx1 - 1);
             return domain.Insert(pidx2 <= 0 ? pidx1 : pidx2, "\u200c");
+        }
+
+        public static int GetLength(string text)
+        {
+            var length = 0;
+            foreach (var character in text)
+            {
+                if (char.IsLowSurrogate(character)) continue;
+                if (IsHalfWeight(character))
+                {
+                    length += 1;
+                    continue;
+                }
+                length += 2;
+            }
+            return length;
+        }
+
+        private static bool IsHalfWeight(char character)
+        {
+            return 0 <= character && character <= 4351 ||
+                8192 <= character && character <= 8205 ||
+                8208 <= character && character <= 8223 ||
+                8242 <= character && character <= 8247;
         }
 
         /// <summary>

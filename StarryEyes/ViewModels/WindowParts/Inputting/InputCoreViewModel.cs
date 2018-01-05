@@ -228,7 +228,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             }
         }
 
-        private void UpdateTextCount()
+        public void UpdateTextCount()
         {
             RaisePropertyChanged(() => TextCount);
             RaisePropertyChanged(() => RemainTextCount);
@@ -241,10 +241,12 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             get
             {
                 var currentTextLength = StatusTextUtil.CountText(InputText);
-                if (IsImageAttached)
-                {
-                    currentTextLength += TwitterConfigurationService.MediaUrlLength;
-                }
+                /*if (IsImageAttached)
+                 * {
+                 *    currentTextLength += TwitterConfigurationService.MediaUrlLength;
+                 * } 
+                 * media url is no longer counted.
+                */ 
                 var tags = TwitterRegexPatterns.ValidHashtag.Matches(InputText)
                                                .OfType<Match>()
                                                .Select(_ => _.Groups[1].Value)
@@ -253,7 +255,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                 {
                     currentTextLength += InputModel.InputCore.BindingHashtags
                                                    .Except(tags)
-                                                   .Select(_ => _.Length + 1)
+                                                   .Select(_ => StatusTextUtil.GetLength(_) + 1)
                                                    .Sum();
                 }
                 return currentTextLength;
@@ -262,7 +264,12 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
 
         public int RemainTextCount
         {
-            get { return TwitterConfigurationService.TextMaxLength - TextCount; }
+            get
+            {
+                return Setting.NewTextCounting.Value ?
+                    TwitterConfigurationService.NewTextMaxLength - TextCount :
+                    TwitterConfigurationService.TextMaxLength - TextCount;
+            }
         }
 
         public bool IsUrlAutoEsacpeEnabled

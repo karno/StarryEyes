@@ -11,11 +11,12 @@ namespace StarryEyes.Models.Subsystems
     public static class TwitterConfigurationService
     {
         public const int TextMaxLength = 140;
+        public const int NewTextMaxLength = 280;
 
         // default values
         private static int _httpUrlLength = 22;
         private static int _httpsUrlLength = 23;
-        private static int _mediaUrlLength = 0; // media url -> 0 (extended_tweet)
+        private static int _mediaUrlLength = 23;
 
         public static int HttpUrlLength
         {
