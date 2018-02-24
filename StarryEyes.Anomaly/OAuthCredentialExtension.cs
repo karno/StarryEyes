@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using AsyncOAuth;
+using Cadena;
 using StarryEyes.Anomaly.Ext;
 using StarryEyes.Anomaly.TwitterApi;
 
@@ -20,11 +21,11 @@ namespace StarryEyes.Anomaly
             bool useGZip = true)
         {
             return new HttpClient(
-                new OAuthMessageHandler(
-                    GetInnerHandler(useGZip),
-                    credential.OAuthConsumerKey, credential.OAuthConsumerSecret,
-                    new AccessToken(credential.OAuthAccessToken, credential.OAuthAccessTokenSecret),
-                    optionalHeaders), true)
+                    new OAuthMessageHandler(
+                        GetInnerHandler(useGZip),
+                        credential.OAuthConsumerKey, credential.OAuthConsumerSecret,
+                        new AccessToken(credential.OAuthAccessToken, credential.OAuthAccessTokenSecret),
+                        optionalHeaders), true)
                 .SetUserAgent(ApiAccessProperties.UserAgent);
         }
 
@@ -35,12 +36,12 @@ namespace StarryEyes.Anomaly
             bool useGZip = true)
         {
             return new HttpClient(
-                new OAuthEchoMessageHandler(
-                    GetInnerHandler(useGZip),
-                    serviceProvider, realm, credential.OAuthConsumerKey, credential.OAuthConsumerSecret,
-                    new AccessToken(credential.OAuthAccessToken, credential.OAuthAccessTokenSecret),
-                    optionalHeaders), true)
-                    .SetUserAgent(ApiAccessProperties.UserAgent);
+                    new OAuthEchoMessageHandler(
+                        GetInnerHandler(useGZip),
+                        serviceProvider, realm, credential.OAuthConsumerKey, credential.OAuthConsumerSecret,
+                        new AccessToken(credential.OAuthAccessToken, credential.OAuthAccessTokenSecret),
+                        optionalHeaders), true)
+                .SetUserAgent(ApiAccessProperties.UserAgent);
         }
 
         public static HttpClient SetUserAgent(this HttpClient client, string userAgent)

@@ -1,19 +1,13 @@
 ﻿using System;
-using StarryEyes.Albireo;
+using Cadena.Data;
 using StarryEyes.Albireo.Helpers;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.ViewModels.Notifications;
 
 namespace StarryEyes.Models.Subsystems.Notifications.UI
 {
     public class NormalNotificator : IUINotificator
     {
-        private static readonly NormalNotificator _instance = new NormalNotificator();
-
-        public static NormalNotificator Instance
-        {
-            get { return _instance; }
-        }
+        public static NormalNotificator Instance { get; } = new NormalNotificator();
 
         static NormalNotificator()
         {

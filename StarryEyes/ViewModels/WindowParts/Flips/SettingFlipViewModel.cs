@@ -8,18 +8,20 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using Cadena.Api.Parameters;
+using Cadena.Api.Rest;
+using Cadena.Util;
 using JetBrains.Annotations;
 using Livet;
 using Livet.Messaging;
 using Livet.Messaging.IO;
 using StarryEyes.Albireo.Helpers;
-using StarryEyes.Anomaly.TwitterApi.Rest;
-using StarryEyes.Anomaly.Utils;
 using StarryEyes.Filters.Expressions;
 using StarryEyes.Filters.Parsing;
 using StarryEyes.Globalization;
@@ -83,49 +85,48 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         public SettingFlipViewModel(MainWindowViewModel parent)
         {
             _parent = parent;
-            this.CompositeDisposable.Add(Observable.FromEvent<ISubject<Unit>>(
-                h => MainWindowModel.SettingRequested += h,
-                h => MainWindowModel.SettingRequested -= h)
-                                                   .Subscribe(this.StartSetting));
-            this.CompositeDisposable.Add(
-                this._accounts = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
+            CompositeDisposable.Add(Observable.FromEvent<ISubject<Unit>>(
+                                                  h => MainWindowModel.SettingRequested += h,
+                                                  h => MainWindowModel.SettingRequested -= h)
+                                              .Subscribe(StartSetting));
+            CompositeDisposable.Add(
+                _accounts = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
                     Setting.Accounts.Collection,
                     a => new TwitterAccountConfigurationViewModel(this, a),
                     DispatcherHelper.UIDispatcher));
 
             // setting paramter propagation
 
-            this.CompositeDisposable.Add(Setting.AutoCleanupTweets.ListenValueChanged(
+            CompositeDisposable.Add(Setting.AutoCleanupTweets.ListenValueChanged(
                 _ => RaisePropertyChanged(() => AutoCleanupStatuses)));
-            this.CompositeDisposable.Add(Setting.AutoCleanupThreshold.ListenValueChanged(
+            CompositeDisposable.Add(Setting.AutoCleanupThreshold.ListenValueChanged(
                 _ => RaisePropertyChanged(() => AutoCleanupThreshold)));
-
         }
 
         private void StartSetting(ISubject<Unit> subject)
         {
             // ensure close before starting setting
-            this.IsConfigurationActive = false;
+            IsConfigurationActive = false;
 
-            this.RefreshKeyAssignCandidates();
-            this.RefreshThemeCandidates();
-            this.ResetFilter();
-            this.KeyAssignEditorViewModel.RefreshRegisteredActions();
-            this._completeCallback = subject;
-            this._fsWatcher = new FileSystemWatcher(ThemeManager.ThemeProfileDirectoryPath, "*.xml")
+            RefreshKeyAssignCandidates();
+            RefreshThemeCandidates();
+            ResetFilter();
+            KeyAssignEditorViewModel.RefreshRegisteredActions();
+            _completeCallback = subject;
+            _fsWatcher = new FileSystemWatcher(ThemeManager.ThemeProfileDirectoryPath, "*.xml")
             {
                 NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName |
                                NotifyFilters.DirectoryName | NotifyFilters.Size
             };
             var refreshHandler = new FileSystemEventHandler(
-                    (o, e) => DispatcherHelper.UIDispatcher.InvokeAsync(this.RefreshThemeCandidates));
-            this._fsWatcher.Changed += refreshHandler;
-            this._fsWatcher.Created += refreshHandler;
-            this._fsWatcher.Deleted += refreshHandler;
-            this._fsWatcher.Renamed += (o, e) => DispatcherHelper.UIDispatcher.InvokeAsync(this.RefreshThemeCandidates);
-            this._fsWatcher.EnableRaisingEvents = true;
-            this.RaisePropertyChanged();
-            this.IsConfigurationActive = true;
+                (o, e) => DispatcherHelper.UIDispatcher.InvokeAsync(RefreshThemeCandidates));
+            _fsWatcher.Changed += refreshHandler;
+            _fsWatcher.Created += refreshHandler;
+            _fsWatcher.Deleted += refreshHandler;
+            _fsWatcher.Renamed += (o, e) => DispatcherHelper.UIDispatcher.InvokeAsync(RefreshThemeCandidates);
+            _fsWatcher.EnableRaisingEvents = true;
+            RaisePropertyChanged();
+            IsConfigurationActive = true;
         }
 
         public bool IsPowerUser
@@ -134,7 +135,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             set
             {
                 Setting.IsPowerUser.Value = value;
-                this.RaisePropertyChanged();
+                RaisePropertyChanged();
             }
         }
 
@@ -177,10 +178,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         private readonly ReadOnlyDispatcherCollectionRx<TwitterAccountConfigurationViewModel> _accounts;
 
-        public ReadOnlyDispatcherCollectionRx<TwitterAccountConfigurationViewModel> Accounts
-        {
-            get { return this._accounts; }
-        }
+        public ReadOnlyDispatcherCollectionRx<TwitterAccountConfigurationViewModel> Accounts => _accounts;
 
         [UsedImplicitly]
         public void AddNewAccount()
@@ -204,7 +202,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             }
             var auth = new AuthorizationViewModel();
             auth.AuthorizeObservable.Subscribe(Setting.Accounts.Collection.Add);
-            this._parent.Messenger.RaiseSafe(() =>
+            _parent.Messenger.RaiseSafe(() =>
                 new TransitionMessage(typeof(AuthorizationWindow), auth, TransitionMode.Modal, null));
         }
 
@@ -220,7 +218,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                     Resources.MsgButtonCancel
                 }
                 : new[] { SettingFlipResources.AccountButtonSetKey, Resources.MsgButtonCancel };
-            var resp = this.Messenger.GetResponseSafe(() =>
+            var resp = Messenger.GetResponseSafe(() =>
                 new TaskDialogMessage(new TaskDialogOptions
                 {
                     Title = reconf
@@ -239,7 +237,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 case 0:
                     // reconf
                     var kovm = new KeyOverrideViewModel();
-                    this._parent.Messenger.RaiseSafe(() =>
+                    _parent.Messenger.RaiseSafe(() =>
                         new TransitionMessage(typeof(KeyOverrideWindow), kovm, TransitionMode.Modal, null));
                     break;
                 case 1:
@@ -262,7 +260,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             }
         }
 
-        #endregion
+        #endregion Account control
 
         #region Timeline property
 
@@ -270,10 +268,10 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public int TweetDisplayMode
         {
-            get { return this._tweetDisplayMode; }
+            get { return _tweetDisplayMode; }
             set
             {
-                this._tweetDisplayMode = value;
+                _tweetDisplayMode = value;
                 Task.Run(() => ChangeDisplayOfTimeline((TweetDisplayMode)value));
                 RaisePropertyChanged();
             }
@@ -374,15 +372,24 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 return new[]
                 {
                     "", "aa", "ab", "ae", "af", "ak", "am", "an", "ar", "as", "av", "ay", "az", "ba", "be", "bg", "bh",
-                    "bi", "bm", "bn", "bo", "br", "bs", "ca", "ce", "ch", "co", "cr", "cs", "cu", "cv", "cy", "da", "de",
-                    "dv", "dz", "ee", "el", "en", "eo", "es", "et", "eu", "fa", "ff", "fi", "fj", "fo", "fr", "fy", "ga",
-                    "gd", "gl", "gn", "gu", "gv", "ha", "he", "hi", "ho", "hr", "ht", "hu", "hy", "hz", "ia", "id", "ie",
-                    "ig", "ii", "ik", "io", "is", "it", "iu", "ja", "jv", "ka", "kg", "ki", "kj", "kk", "kl", "km", "kn",
-                    "ko", "kr", "ks", "ku", "kv", "kw", "ky", "la", "lb", "lg", "li", "ln", "lo", "lt", "lu", "lv", "mg",
-                    "mh", "mi", "mk", "ml", "mn", "mr", "ms", "mt", "my", "na", "nb", "nd", "ne", "ng", "nl", "nn", "no",
-                    "nr", "nv", "ny", "oc", "oj", "om", "or", "os", "pa", "pi", "pl", "ps", "pt", "qu", "rm", "rn", "ro",
-                    "ru", "rw", "sa", "sc", "sd", "se", "sg", "si", "sk", "sl", "sm", "sn", "so", "sq", "sr", "ss", "st",
-                    "su", "sv", "sw", "ta", "te", "tg", "th", "ti", "tk", "tl", "tn", "to", "tr", "ts", "tt", "tw", "ty",
+                    "bi", "bm", "bn", "bo", "br", "bs", "ca", "ce", "ch", "co", "cr", "cs", "cu", "cv", "cy", "da",
+                    "de",
+                    "dv", "dz", "ee", "el", "en", "eo", "es", "et", "eu", "fa", "ff", "fi", "fj", "fo", "fr", "fy",
+                    "ga",
+                    "gd", "gl", "gn", "gu", "gv", "ha", "he", "hi", "ho", "hr", "ht", "hu", "hy", "hz", "ia", "id",
+                    "ie",
+                    "ig", "ii", "ik", "io", "is", "it", "iu", "ja", "jv", "ka", "kg", "ki", "kj", "kk", "kl", "km",
+                    "kn",
+                    "ko", "kr", "ks", "ku", "kv", "kw", "ky", "la", "lb", "lg", "li", "ln", "lo", "lt", "lu", "lv",
+                    "mg",
+                    "mh", "mi", "mk", "ml", "mn", "mr", "ms", "mt", "my", "na", "nb", "nd", "ne", "ng", "nl", "nn",
+                    "no",
+                    "nr", "nv", "ny", "oc", "oj", "om", "or", "os", "pa", "pi", "pl", "ps", "pt", "qu", "rm", "rn",
+                    "ro",
+                    "ru", "rw", "sa", "sc", "sd", "se", "sg", "si", "sk", "sl", "sm", "sn", "so", "sq", "sr", "ss",
+                    "st",
+                    "su", "sv", "sw", "ta", "te", "tg", "th", "ti", "tk", "tl", "tn", "to", "tr", "ts", "tt", "tw",
+                    "ty",
                     "ug", "uk", "ur", "uz", "ve", "vi", "vo", "wa", "wo", "xh", "yi", "yo", "za", "zh", "zu"
                 };
             }
@@ -428,7 +435,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             }
         }
 
-        #endregion
+        #endregion Timeline property
 
         #region Mute filter editor property
 
@@ -449,7 +456,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 RaisePropertyChanged();
                 Observable.Timer(TimeSpan.FromMilliseconds(100))
                           .Where(_ => _currentQueryString == value)
-                          .Subscribe(_ => this.CheckCompileFilters(value));
+                          .Subscribe(_ => CheckCompileFilters(value));
             }
         }
 
@@ -500,7 +507,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             _currentQueryString = Setting.Muteds.Value.ToQuery();
             _lastCommit = null;
             FoundError = false;
-            this.RaisePropertyChanged(() => QueryString);
+            RaisePropertyChanged(() => QueryString);
         }
 
         #region OpenQueryReferenceCommand
@@ -511,11 +518,11 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         {
             get
             {
-                if (this._openQueryReferenceCommand == null)
+                if (_openQueryReferenceCommand == null)
                 {
-                    this._openQueryReferenceCommand = new Livet.Commands.ViewModelCommand(OpenQueryReference);
+                    _openQueryReferenceCommand = new Livet.Commands.ViewModelCommand(OpenQueryReference);
                 }
-                return this._openQueryReferenceCommand;
+                return _openQueryReferenceCommand;
             }
         }
 
@@ -524,7 +531,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             BrowserHelper.Open(App.QueryReferenceUrl);
         }
 
-        #endregion
+        #endregion OpenQueryReferenceCommand
 
         public bool UseLightweightMute
         {
@@ -550,7 +557,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             set { Setting.MuteOfficialMutes.Value = value; }
         }
 
-        #endregion
+        #endregion Mute filter editor property
 
         #region Input property
 
@@ -608,7 +615,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             }
         }
 
-        #endregion
+        #endregion Input property
 
         #region Notification and confirmation property
 
@@ -723,7 +730,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 }));
         }
 
-        #endregion
+        #endregion Notification and confirmation property
 
         #region Theme property
 
@@ -752,7 +759,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         [UsedImplicitly]
         public void SelectBackgroundImage()
         {
-            var resp = this.Messenger.GetResponseSafe(() =>
+            var resp = Messenger.GetResponseSafe(() =>
             {
                 var msg = new OpeningFileSelectionMessage
                 {
@@ -773,10 +780,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         private readonly ObservableCollection<string> _themeCandidateFiles = new ObservableCollection<string>();
 
-        public ObservableCollection<string> ThemeCandidateFiles
-        {
-            get { return _themeCandidateFiles; }
-        }
+        public ObservableCollection<string> ThemeCandidateFiles => _themeCandidateFiles;
 
         private string _themeCache;
 
@@ -788,19 +792,19 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 {
                     _themeCache = Setting.Theme.Value ?? BuiltInThemeProvider.DefaultThemeName;
                 }
-                return this._themeCandidateFiles.IndexOf(_themeCache);
+                return _themeCandidateFiles.IndexOf(_themeCache);
             }
             set
             {
                 if (value < 0) return;
                 var name = BuiltInThemeProvider.DefaultThemeName;
-                if (value < this._themeCandidateFiles.Count)
+                if (value < _themeCandidateFiles.Count)
                 {
-                    name = this._themeCandidateFiles[value];
+                    name = _themeCandidateFiles[value];
                 }
                 _themeCache = name;
                 CurrentThemeChanged();
-                this.RaisePropertyChanged();
+                RaisePropertyChanged();
             }
         }
 
@@ -809,7 +813,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             _themeCandidateFiles.Clear();
             ThemeManager.ReloadCandidates();
             ThemeManager.Themes.ForEach(f => _themeCandidateFiles.Add(f));
-            this.RaisePropertyChanged(() => this.ThemeFileIndex);
+            RaisePropertyChanged(() => ThemeFileIndex);
             CurrentThemeChanged();
         }
 
@@ -823,7 +827,9 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                     Arguments = "/n, " + ThemeManager.ThemeProfileDirectoryPath,
                 });
             }
-            catch { }
+            catch
+            {
+            }
         }
 
         public void ShowThemeEditor()
@@ -848,8 +854,8 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             get
             {
                 return (ThemeFileIndex >= 0 && ThemeFileIndex < _themeCandidateFiles.Count
-                    ? ThemeManager.GetTheme(_themeCandidateFiles[ThemeFileIndex])
-                    : null) ?? BuiltInThemeProvider.GetDefault();
+                           ? ThemeManager.GetTheme(_themeCandidateFiles[ThemeFileIndex])
+                           : null) ?? BuiltInThemeProvider.GetDefault();
             }
         }
 
@@ -869,47 +875,47 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public Brush GlobalForeground
         {
-            get { return new SolidColorBrush(this.CurrentConfiguringTheme.BaseColor.Foreground); }
+            get { return new SolidColorBrush(CurrentConfiguringTheme.BaseColor.Foreground); }
         }
 
         public Brush GlobalBackground
         {
-            get { return new SolidColorBrush(this.CurrentConfiguringTheme.BaseColor.Background); }
+            get { return new SolidColorBrush(CurrentConfiguringTheme.BaseColor.Background); }
         }
 
         public Brush GlobalKeyBrush
         {
-            get { return new SolidColorBrush(this.CurrentConfiguringTheme.GlobalKeyColor); }
+            get { return new SolidColorBrush(CurrentConfiguringTheme.GlobalKeyColor); }
         }
 
         public Brush CurrentThemeBorder
         {
-            get { return new SolidColorBrush(this.CurrentConfiguringTheme.GlobalKeyColor); }
+            get { return new SolidColorBrush(CurrentConfiguringTheme.GlobalKeyColor); }
         }
 
         public Brush TitleBackground
         {
-            get { return new SolidColorBrush(this.CurrentConfiguringTheme.TitleBarColor.Background); }
+            get { return new SolidColorBrush(CurrentConfiguringTheme.TitleBarColor.Background); }
         }
 
         public Brush TitleForeground
         {
-            get { return new SolidColorBrush(this.CurrentConfiguringTheme.TitleBarColor.Foreground); }
+            get { return new SolidColorBrush(CurrentConfiguringTheme.TitleBarColor.Foreground); }
         }
 
         public Brush ActiveTabForeground
         {
-            get { return new SolidColorBrush(this.CurrentConfiguringTheme.TabColor.Focused); }
+            get { return new SolidColorBrush(CurrentConfiguringTheme.TabColor.Focused); }
         }
 
         public Brush InactiveTabForeground
         {
-            get { return new SolidColorBrush(this.CurrentConfiguringTheme.TabColor.Default); }
+            get { return new SolidColorBrush(CurrentConfiguringTheme.TabColor.Default); }
         }
 
         public Brush TabUnreadCountForeground
         {
-            get { return new SolidColorBrush(this.CurrentConfiguringTheme.TabColor.UnreadCount); }
+            get { return new SolidColorBrush(CurrentConfiguringTheme.TabColor.UnreadCount); }
         }
 
         public BitmapImage WallpaperImage
@@ -942,9 +948,9 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             get { return (255 - Math.Min(255, Setting.BackgroundImageTransparency.Value)) / 255.0; }
         }
 
-        #endregion
+        #endregion for theme preview
 
-        #endregion
+        #endregion Theme property
 
         #region Key assign property
 
@@ -952,7 +958,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public KeyAssignEditorViewModel KeyAssignEditorViewModel
         {
-            get { return this._keyAssignEditorViewModel; }
+            get { return _keyAssignEditorViewModel; }
         }
 
         private readonly ObservableCollection<string> _keyAssignCandidateFiles =
@@ -960,7 +966,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public ObservableCollection<string> KeyAssignCandidateFiles
         {
-            get { return this._keyAssignCandidateFiles; }
+            get { return _keyAssignCandidateFiles; }
         }
 
         public int KeyAssignFile
@@ -968,19 +974,19 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             get
             {
                 var fn = Setting.KeyAssign.Value ?? DefaultAssignProvider.DefaultAssignName;
-                return this._keyAssignCandidateFiles.IndexOf(fn);
+                return _keyAssignCandidateFiles.IndexOf(fn);
             }
             set
             {
                 if (value < 0) return; // ignore setting
                 var name = DefaultAssignProvider.DefaultAssignName;
-                if (value < this._keyAssignCandidateFiles.Count)
+                if (value < _keyAssignCandidateFiles.Count)
                 {
-                    name = this._keyAssignCandidateFiles[value];
+                    name = _keyAssignCandidateFiles[value];
                 }
                 Setting.KeyAssign.Value = name;
-                this._keyAssignEditorViewModel.Profile = KeyAssignManager.CurrentProfile;
-                this.RaisePropertyChanged();
+                _keyAssignEditorViewModel.Profile = KeyAssignManager.CurrentProfile;
+                RaisePropertyChanged();
             }
         }
 
@@ -989,15 +995,15 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             _keyAssignCandidateFiles.Clear();
             KeyAssignManager.ReloadCandidates();
             KeyAssignManager.LoadedProfiles.ForEach(f => _keyAssignCandidateFiles.Add(f));
-            this.RaisePropertyChanged(() => KeyAssignFile);
-            this._keyAssignEditorViewModel.Commit();
-            this._keyAssignEditorViewModel.Profile = KeyAssignManager.CurrentProfile;
+            RaisePropertyChanged(() => KeyAssignFile);
+            _keyAssignEditorViewModel.Commit();
+            _keyAssignEditorViewModel.Profile = KeyAssignManager.CurrentProfile;
         }
 
         [UsedImplicitly]
         public void AddNewKeyAssign()
         {
-            var response = this.Messenger.GetResponseSafe(() => new TransitionMessage(typeof(AddNewKeyAssignWindow),
+            var response = Messenger.GetResponseSafe(() => new TransitionMessage(typeof(AddNewKeyAssignWindow),
                 new AddNewKeyAssignDialogViewModel(), TransitionMode.Modal));
             var tranvm = (AddNewKeyAssignDialogViewModel)response.TransitionViewModel;
             if (tranvm.Result)
@@ -1018,13 +1024,15 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         [UsedImplicitly]
         public void DeleteCurrentKeyAssign()
         {
-            var response = this.Messenger.GetResponseSafe(() =>
+            var response = Messenger.GetResponseSafe(() =>
                 new TaskDialogMessage(new TaskDialogOptions
                 {
                     Title = SettingFlipResources.KeyAssignDeleteTitle,
                     MainIcon = VistaTaskDialogIcon.Warning,
                     MainInstruction = SettingFlipResources.KeyAssignDeleteInst,
-                    Content = SettingFlipResources.KeyAssignDeleteContentFormat.SafeFormat(KeyAssignManager.CurrentProfile.Name),
+                    Content =
+                        SettingFlipResources.KeyAssignDeleteContentFormat.SafeFormat(
+                            KeyAssignManager.CurrentProfile.Name),
                     CommonButtons = TaskDialogCommonButtons.OKCancel
                 }));
             if (response.Response.Result != TaskDialogSimpleResult.Ok) return;
@@ -1040,11 +1048,11 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 {
                     throw new InvalidOperationException("file " + path + " does not exist.");
                 }
-                this.KeyAssignEditorViewModel.ClearCurrentProfile();
+                KeyAssignEditorViewModel.ClearCurrentProfile();
             }
             catch (Exception ex)
             {
-                this.Messenger.RaiseSafe(() =>
+                Messenger.RaiseSafe(() =>
                     new TaskDialogMessage(new TaskDialogOptions
                     {
                         Title = SettingFlipResources.KeyAssignDeleteFailedTitle,
@@ -1055,10 +1063,10 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                         CommonButtons = TaskDialogCommonButtons.Close
                     }));
             }
-            this.RefreshKeyAssignCandidates();
+            RefreshKeyAssignCandidates();
         }
 
-        #endregion
+        #endregion Key assign property
 
         #region Outer and third party property
 
@@ -1068,7 +1076,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             set { Setting.ExternalBrowserPath.Value = value; }
         }
 
-        #endregion
+        #endregion Outer and third party property
 
         #region proxy configuration
 
@@ -1080,8 +1088,8 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             set
             {
                 Setting.WebProxyType.Value = (WebProxyConfiguration)value;
-                this.RaisePropertyChanged();
-                this.RaisePropertyChanged(() => ExplicitSetProxy);
+                RaisePropertyChanged();
+                RaisePropertyChanged(() => ExplicitSetProxy);
             }
         }
 
@@ -1115,11 +1123,11 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             {
                 Setting.WebProxyBypassList.Value =
                     (value ?? String.Empty).Split(new[] { Environment.NewLine },
-                                                  StringSplitOptions.RemoveEmptyEntries);
+                        StringSplitOptions.RemoveEmptyEntries);
             }
         }
 
-        #endregion
+        #endregion Web proxy
 
         public string ApiProxy
         {
@@ -1127,7 +1135,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             set { Setting.ApiProxy.Value = value; }
         }
 
-        #endregion
+        #endregion proxy configuration
 
         #region High-level configuration
 
@@ -1236,15 +1244,17 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 Process.Start(psi);
                 Application.Current.Shutdown();
             }
-            catch { }
+            catch
+            {
+            }
         }
 
-        #endregion
+        #endregion High-level configuration
 
         public void Close()
         {
             if (!IsConfigurationActive) return;
-            this.IsConfigurationActive = false;
+            IsConfigurationActive = false;
 
             // refresh mute filter
             if (_isDirtyState)
@@ -1255,7 +1265,9 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                     newFilter.GetEvaluator(); // validate types
                     _lastCommit = newFilter;
                 }
-                catch { }
+                catch
+                {
+                }
             }
             if (_lastCommit != null)
             {
@@ -1266,7 +1278,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             _accounts.ForEach(a => a.CommitChanges());
 
             // dispose fswatcher
-            this._fsWatcher.Dispose();
+            _fsWatcher.Dispose();
 
             // update theme
             ApplyTheme();
@@ -1290,50 +1302,42 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         public TwitterAccountConfigurationViewModel(SettingFlipViewModel parent, TwitterAccount account)
         {
             _parent = parent;
-            this._account = account;
+            _account = account;
             _accounts = new DispatcherCollection<TwitterAccountViewModel>(DispatcherHelper.UIDispatcher);
-            this.CompositeDisposable.Add(Setting.Accounts.Collection.ListenCollectionChanged(_ => RefreshCandidates()));
-            this.RefreshCandidates();
+            CompositeDisposable.Add(Setting.Accounts.Collection.ListenCollectionChanged(_ => RefreshCandidates()));
+            RefreshCandidates();
         }
 
         private void RefreshCandidates()
         {
             _accounts.Clear();
             Setting.Accounts.Collection
-                   .Where(a => a.Id != this.Account.Id)
+                   .Where(a => a.Id != Account.Id)
                    .ForEach(a => _accounts.Add(new TwitterAccountViewModel(a)));
-            this.RaisePropertyChanged(() => CanFallback);
-            this.RaisePropertyChanged(() => FallbackAccount);
+            RaisePropertyChanged(() => CanFallback);
+            RaisePropertyChanged(() => FallbackAccount);
         }
 
-        public TwitterAccount Account
-        {
-            get { return this._account; }
-        }
+        public TwitterAccount Account => _account;
 
         private readonly DispatcherCollection<TwitterAccountViewModel> _accounts;
-        public DispatcherCollection<TwitterAccountViewModel> Accounts
-        {
-            get { return this._accounts; }
-        }
 
-        public bool CanFallback
-        {
-            get { return Accounts.Count > 0; }
-        }
+        public DispatcherCollection<TwitterAccountViewModel> Accounts => _accounts;
+
+        public bool CanFallback => Accounts.Count > 0;
 
         public bool IsFallbackEnabled
         {
-            get { return this.Account.FallbackAccountId != null; }
+            get { return Account.FallbackAccountId != null; }
             set
             {
                 if (value == IsFallbackEnabled) return;
-                this.Account.FallbackAccountId =
+                Account.FallbackAccountId =
                     value
-                        ? (long?)this.Accounts.Select(a => a.Id).FirstOrDefault()
+                        ? (long?)Accounts.Select(a => a.Id).FirstOrDefault()
                         : null;
-                this.RaisePropertyChanged();
-                this.RaisePropertyChanged(() => FallbackAccount);
+                RaisePropertyChanged();
+                RaisePropertyChanged(() => FallbackAccount);
             }
         }
 
@@ -1341,106 +1345,108 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         {
             get
             {
-                return this.Account.FallbackAccountId == null
-                           ? null
-                           : this.Accounts.FirstOrDefault(a => a.Id == this.Account.FallbackAccountId);
+                return Account.FallbackAccountId == null
+                    ? null
+                    : Accounts.FirstOrDefault(a => a.Id == Account.FallbackAccountId);
             }
             set
             {
                 if (value == null)
                 {
-                    this.Account.FallbackAccountId = null;
+                    Account.FallbackAccountId = null;
                 }
                 else
                 {
-                    this.Account.FallbackAccountId = value.Id;
+                    Account.FallbackAccountId = value.Id;
                 }
             }
         }
 
-        public long Id
-        {
-            get { return this.Account.Id; }
-        }
+        public long Id => Account.Id;
 
         public Uri ProfileImage
         {
             get
             {
-                if (this._account.UnreliableProfileImage == null)
+                if (_account.UnreliableProfileImage == null)
                 {
                     Task.Run(async () =>
                     {
                         try
                         {
-                            var user = await this._account.ShowUserAsync(this._account.Id);
-                            this._account.UnreliableProfileImage = user.ProfileImageUri.ChangeImageSize(ImageSize.Original);
-                            this.RaisePropertyChanged(() => ProfileImage);
+                            var user = await _account
+                                .CreateAccessor().ShowUserAsync(new UserParameter(_account.Id),
+                                    CancellationToken.None);
+                            _account.UnreliableProfileImage =
+                                user.Result.ProfileImageUri.ChangeImageSize(ImageSize.Original);
+                            RaisePropertyChanged(() => ProfileImage);
                         }
-                        catch { }
+                        catch
+                        {
+                        }
                     });
                 }
-                return this.Account.UnreliableProfileImage;
+                return Account.UnreliableProfileImage;
             }
         }
 
         public string ScreenName
         {
-            get { return this.Account.UnreliableScreenName; }
+            get { return Account.UnreliableScreenName; }
         }
 
         public long? FallbackAccountId
         {
-            get { return this.Account.FallbackAccountId; }
-            set { this.Account.FallbackAccountId = value; }
+            get { return Account.FallbackAccountId; }
+            set { Account.FallbackAccountId = value; }
         }
 
         public bool FallbackFavorites
         {
-            get { return this.Account.IsFallbackFavorite; }
-            set { this.Account.IsFallbackFavorite = value; }
+            get { return Account.IsFallbackFavorite; }
+            set { Account.IsFallbackFavorite = value; }
         }
 
         public bool IsUserStreamsEnabled
         {
-            get { return this.Account.IsUserStreamsEnabled; }
+            get { return Account.IsUserStreamsEnabled; }
             set
             {
                 if (IsUserStreamsEnabled == value) return;
-                this.Account.IsUserStreamsEnabled = value;
-                this.RaisePropertyChanged();
-                this._isConnectionPropertyHasChanged = true;
+                Account.IsUserStreamsEnabled = value;
+                RaisePropertyChanged();
+                _isConnectionPropertyHasChanged = true;
             }
         }
 
         public bool ReceiveRepliesAll
         {
-            get { return this.Account.ReceiveRepliesAll; }
+            get { return Account.ReceiveRepliesAll; }
             set
             {
                 if (ReceiveRepliesAll == value) return;
-                this.Account.ReceiveRepliesAll = value;
-                this.RaisePropertyChanged();
-                this._isConnectionPropertyHasChanged = true;
+                Account.ReceiveRepliesAll = value;
+                RaisePropertyChanged();
+                _isConnectionPropertyHasChanged = true;
             }
         }
 
         public bool ReceiveFollowingsActivity
         {
-            get { return this.Account.ReceiveFollowingsActivity; }
+            get { return Account.ReceiveFollowingsActivity; }
             set
             {
                 if (ReceiveFollowingsActivity == value) return;
-                this.Account.ReceiveFollowingsActivity = value;
-                this.RaisePropertyChanged();
-                this._isConnectionPropertyHasChanged = true;
+                Account.ReceiveFollowingsActivity = value;
+                RaisePropertyChanged();
+                _isConnectionPropertyHasChanged = true;
             }
         }
 
         public bool IsMarkMediaAsPossiblySensitive
         {
-            get { return this.Account.MarkMediaAsPossiblySensitive; }
-            set { this.Account.MarkMediaAsPossiblySensitive = value; }
+            get { return Account.MarkMediaAsPossiblySensitive; }
+            set { Account.MarkMediaAsPossiblySensitive = value; }
         }
 
         [UsedImplicitly]
@@ -1451,7 +1457,9 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 {
                     Title = SettingFlipResources.AccountUnauthorizeTitle,
                     MainIcon = VistaTaskDialogIcon.Warning,
-                    MainInstruction = SettingFlipResources.AccountUnauthorizeInstFormat.SafeFormat("@" + ScreenName),
+                    MainInstruction =
+                        SettingFlipResources
+                            .AccountUnauthorizeInstFormat.SafeFormat("@" + ScreenName),
                     Content = SettingFlipResources.AccountUnauthorizeContent,
                     FooterIcon = VistaTaskDialogIcon.Information,
                     FooterText = SettingFlipResources.AccountUnauthorizeFooter,
@@ -1465,9 +1473,9 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public void CommitChanges()
         {
-            var flag = this._isConnectionPropertyHasChanged;
+            var flag = _isConnectionPropertyHasChanged;
             // down flags
-            this._isConnectionPropertyHasChanged = false;
+            _isConnectionPropertyHasChanged = false;
 
             // if property has changed, reconnect streams
             if (flag)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
+using Cadena.Data;
+using StarryEyes.Helpers;
 
 namespace StarryEyes.Filters.Expressions.Values.Statuses
 {
@@ -31,10 +32,7 @@ namespace StarryEyes.Filters.Expressions.Values.Statuses
     {
         public override IEnumerable<FilterExpressionType> SupportedTypes
         {
-            get
-            {
-                yield return FilterExpressionType.Numeric;
-            }
+            get { yield return FilterExpressionType.Numeric; }
         }
 
         public override Func<TwitterStatus, long> GetNumericValueProvider()

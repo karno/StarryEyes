@@ -24,19 +24,19 @@ namespace StarryEyes.Anomaly.TwitterApi.Streams
         private readonly Action<StreamParseException> _exceptionHandler;
         private readonly Dictionary<Type, Action<StreamMessage>> _notificationHandlers;
 
-        [CanBeNull]
+        [CanBeNullAttribute]
         private readonly Action<string> _logHandler;
 
-        public static StreamHandler Create([NotNull] Action<TwitterStatus> statusHandler,
-            [NotNull] Action<StreamParseException> exceptionHandler)
+        public static StreamHandler Create([CanBeNull] Action<TwitterStatus> statusHandler,
+            [CanBeNull] Action<StreamParseException> exceptionHandler)
         {
             if (statusHandler == null) throw new ArgumentNullException(nameof(statusHandler));
             if (exceptionHandler == null) throw new ArgumentNullException(nameof(exceptionHandler));
             return new StreamHandler(statusHandler, exceptionHandler, null);
         }
 
-        public static StreamHandler Create([NotNull] Action<TwitterStatus> statusHandler,
-            [NotNull] Action<StreamParseException> exceptionHandler, [NotNull] Action<string> logHandler)
+        public static StreamHandler Create([CanBeNull] Action<TwitterStatus> statusHandler,
+            [CanBeNull] Action<StreamParseException> exceptionHandler, [CanBeNull] Action<string> logHandler)
         {
             if (statusHandler == null) throw new ArgumentNullException(nameof(statusHandler));
             if (exceptionHandler == null) throw new ArgumentNullException(nameof(exceptionHandler));
@@ -44,8 +44,8 @@ namespace StarryEyes.Anomaly.TwitterApi.Streams
             return new StreamHandler(statusHandler, exceptionHandler, logHandler);
         }
 
-        private StreamHandler([NotNull] Action<TwitterStatus> statusHandler,
-            [NotNull] Action<StreamParseException> exceptionHandler, [CanBeNull] Action<string> logHandler)
+        private StreamHandler([CanBeNull] Action<TwitterStatus> statusHandler,
+            [CanBeNull] Action<StreamParseException> exceptionHandler, [CanBeNullAttribute] Action<string> logHandler)
         {
             if (statusHandler == null) throw new ArgumentNullException(nameof(statusHandler));
             if (exceptionHandler == null) throw new ArgumentNullException(nameof(exceptionHandler));

@@ -7,19 +7,16 @@ namespace StarryEyes.Filters.Expressions.Values
 {
     public abstract class ValueBase : FilterOperatorBase
     {
-        protected override string OperatorString
-        {
-            get { return this.ToQuery(); }
-        }
+        protected override string OperatorString => this.ToQuery();
 
         public override StringComparison GetStringComparison()
         {
             return StringComparison.CurrentCultureIgnoreCase;
         }
 
-        protected static string Coalesce(string sql, [NotNull] string defaultValue)
+        protected static string Coalesce(string sql, [CanBeNull] string defaultValue)
         {
-            if (defaultValue == null) throw new ArgumentNullException("defaultValue");
+            if (defaultValue == null) throw new ArgumentNullException(nameof(defaultValue));
             return CoalesceSql(sql, "'" + defaultValue + "'");
         }
 
@@ -28,9 +25,9 @@ namespace StarryEyes.Filters.Expressions.Values
             return CoalesceSql(sql, defaultValue.ToString(CultureInfo.InvariantCulture));
         }
 
-        private static string CoalesceSql(string sql, [NotNull] string defaultSql)
+        private static string CoalesceSql(string sql, [CanBeNull] string defaultSql)
         {
-            if (defaultSql == null) throw new ArgumentNullException("defaultSql");
+            if (defaultSql == null) throw new ArgumentNullException(nameof(defaultSql));
             return "coalesce(" + sql + ", " + defaultSql + ")";
         }
     }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
+using Cadena.Data;
 using StarryEyes.Filters.Expressions.Values.Immediates;
 using StarryEyes.Globalization.Filters;
 
@@ -22,17 +22,14 @@ namespace StarryEyes.Filters.Expressions.Operators
         public static string Unwrap(this string wrapped)
         {
             return wrapped.StartsWith("'") && !wrapped.StartsWith("''")
-                       ? wrapped.Substring(1, wrapped.Length - 2)
-                       : wrapped;
+                ? wrapped.Substring(1, wrapped.Length - 2)
+                : wrapped;
         }
     }
 
     public class OperatorStringStartsWith : FilterTwoValueOperator
     {
-        protected override string OperatorString
-        {
-            get { return "startswith"; }
-        }
+        protected override string OperatorString => "startswith";
 
         public override IEnumerable<FilterExpressionType> SupportedTypes
         {
@@ -55,17 +52,16 @@ namespace StarryEyes.Filters.Expressions.Operators
         public override string GetBooleanSqlQuery()
         {
             return GetStringComparison() == StringComparison.CurrentCultureIgnoreCase
-                ? "LOWER(" + LeftValue.GetStringSqlQuery() + ") LIKE LOWER('" + RightValue.GetStringSqlQuery().Unwrap() + "%') escape '\\'"
-                : LeftValue.GetStringSqlQuery() + " LIKE '" + RightValue.GetStringSqlQuery().Unwrap() + "%' escape '\\'";
+                ? "LOWER(" + LeftValue.GetStringSqlQuery() + ") LIKE LOWER('" +
+                  RightValue.GetStringSqlQuery().Unwrap() + "%') escape '\\'"
+                : LeftValue.GetStringSqlQuery() + " LIKE '" + RightValue.GetStringSqlQuery().Unwrap() +
+                  "%' escape '\\'";
         }
     }
 
     public class OperatorStringEndsWith : FilterTwoValueOperator
     {
-        protected override string OperatorString
-        {
-            get { return "endswith"; }
-        }
+        protected override string OperatorString => "endswith";
 
         public override IEnumerable<FilterExpressionType> SupportedTypes
         {
@@ -88,17 +84,16 @@ namespace StarryEyes.Filters.Expressions.Operators
         public override string GetBooleanSqlQuery()
         {
             return GetStringComparison() == StringComparison.CurrentCultureIgnoreCase
-                ? "LOWER(" + LeftValue.GetStringSqlQuery() + ") LIKE LOWER('%" + RightValue.GetStringSqlQuery().Unwrap() + "') escape '\\'"
-                : LeftValue.GetStringSqlQuery() + " LIKE '%" + RightValue.GetStringSqlQuery().Unwrap() + "' escape '\\'";
+                ? "LOWER(" + LeftValue.GetStringSqlQuery() + ") LIKE LOWER('%" +
+                  RightValue.GetStringSqlQuery().Unwrap() + "') escape '\\'"
+                : LeftValue.GetStringSqlQuery() + " LIKE '%" + RightValue.GetStringSqlQuery().Unwrap() +
+                  "' escape '\\'";
         }
     }
 
     public class OperatorStringRegex : FilterTwoValueOperator
     {
-        protected override string OperatorString
-        {
-            get { return "regex"; }
-        }
+        protected override string OperatorString => "regex";
 
         public override IEnumerable<FilterExpressionType> SupportedTypes
         {
@@ -108,10 +103,10 @@ namespace StarryEyes.Filters.Expressions.Operators
         public override Func<TwitterStatus, bool> GetBooleanValueProvider()
         {
             // pre-check regular expressions
-            var sv = this.RightValue as StringValue;
+            var sv = RightValue as StringValue;
             if (sv != null)
             {
-                this.AssertRegex(sv);
+                AssertRegex(sv);
                 var haystack = LeftValue.GetStringValueProvider();
                 // optimize by pre-compiling
                 var needleRegex = new Regex(sv.Value, RegexOptions.Compiled);
@@ -177,20 +172,11 @@ namespace StarryEyes.Filters.Expressions.Operators
 
     public class OperatorCaseful : FilterSingleValueOperator
     {
-        protected override string OperatorString
-        {
-            get
-            {
-                return "caseful";
-            }
-        }
+        protected override string OperatorString => "caseful";
 
         public override IEnumerable<FilterExpressionType> SupportedTypes
         {
-            get
-            {
-                yield return FilterExpressionType.String;
-            }
+            get { yield return FilterExpressionType.String; }
         }
 
         public override Func<TwitterStatus, string> GetStringValueProvider()

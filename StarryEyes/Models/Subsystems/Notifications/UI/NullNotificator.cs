@@ -1,4 +1,4 @@
-﻿using StarryEyes.Anomaly.TwitterApi.DataModels;
+﻿using Cadena.Data;
 
 namespace StarryEyes.Models.Subsystems.Notifications.UI
 {
@@ -6,23 +6,34 @@ namespace StarryEyes.Models.Subsystems.Notifications.UI
     {
         private static readonly NullNotificator _nullNotificator = new NullNotificator();
 
-        public static NullNotificator Instance
+        public static NullNotificator Instance => _nullNotificator;
+
+        private NullNotificator()
         {
-            get { return _nullNotificator; }
         }
 
-        private NullNotificator() { }
+        public void StatusReceived(TwitterStatus status)
+        {
+        }
 
-        public void StatusReceived(TwitterStatus status) { }
+        public void MentionReceived(TwitterStatus status)
+        {
+        }
 
-        public void MentionReceived(TwitterStatus status) { }
+        public void MessageReceived(TwitterStatus status)
+        {
+        }
 
-        public void MessageReceived(TwitterStatus status) { }
+        public void Followed(TwitterUser source, TwitterUser target)
+        {
+        }
 
-        public void Followed(TwitterUser source, TwitterUser target) { }
+        public void Favorited(TwitterUser source, TwitterStatus target)
+        {
+        }
 
-        public void Favorited(TwitterUser source, TwitterStatus target) { }
-
-        public void Retweeted(TwitterUser source, TwitterStatus original, TwitterStatus retweet) { }
+        public void Retweeted(TwitterUser source, TwitterStatus original, TwitterStatus retweet)
+        {
+        }
     }
 }

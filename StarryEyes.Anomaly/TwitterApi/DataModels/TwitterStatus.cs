@@ -14,18 +14,19 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
         public const string TwitterStatusUrl = "https://twitter.com/{0}/status/{1}";
         public const string FavstarStatusUrl = "http://favstar.fm/users/{0}/status/{1}";
 
-        public TwitterStatus([NotNull] TwitterUser user, [NotNull] string text)
+        public TwitterStatus([@CanBeNull] TwitterUser user, [@CanBeNull] string text)
         {
-            this.GenerateFromJson = false;
-            this.User = user;
-            this.Text = text;
+            GenerateFromJson = false;
+            User = user;
+            Text = text;
         }
 
-        public TwitterStatus(dynamic json)
+        public TwitterStatus(Cadena.Data.TwitterStatus cts)
         {
-            this.GenerateFromJson = true;
-            this.Id = ((string)json.id_str).ParseLong();
-            this.CreatedAt = ((string)json.created_at).ParseDateTime(ParsingExtension.TwitterDateTimeFormat);
+            GenerateFromJson = true;
+            Id = cts.Id;
+            CreatedAt = cts.CreatedAt;
+
 
             SetTextAndEntities(json);
             if (json.extended_tweet())
@@ -36,40 +37,93 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
             if (json.recipient())
             {
                 // THIS IS DIRECT MESSAGE!
-                this.StatusType = StatusType.DirectMessage;
-                this.User = new TwitterUser(json.sender);
-                this.Recipient = new TwitterUser(json.recipient);
+                StatusType = StatusType.DirectMessage;
+                User = new TwitterUser(json.sender);
+                Recipient = new TwitterUser(json.recipient);
             }
             else
             {
-                this.StatusType = StatusType.Tweet;
-                this.User = new TwitterUser(json.user);
-                this.Source = json.source;
+                StatusType = StatusType.Tweet;
+                User = new TwitterUser(json.user);
+                Source = json.source;
                 if (json.in_reply_to_status_id_str())
                 {
-                    this.InReplyToStatusId = ((string)json.in_reply_to_status_id_str).ParseNullableId();
+                    InReplyToStatusId = ((string)json.in_reply_to_status_id_str).ParseNullableId();
                 }
                 if (json.in_reply_to_user_id_str())
                 {
-                    this.InReplyToUserId = ((string)json.in_reply_to_user_id_str).ParseNullableId();
+                    InReplyToUserId = ((string)json.in_reply_to_user_id_str).ParseNullableId();
                 }
                 if (json.in_reply_to_screen_name())
                 {
-                    this.InReplyToScreenName = json.in_reply_to_screen_name;
+                    InReplyToScreenName = json.in_reply_to_screen_name;
                 }
                 if (json.retweeted_status())
                 {
                     var original = new TwitterStatus(json.retweeted_status);
-                    this.RetweetedOriginal = original;
-                    this.RetweetedOriginalId = original.Id;
+                    RetweetedOriginal = original;
+                    RetweetedOriginalId = original.Id;
                     // merge text and entities
-                    this.Text = original.Text;
-                    this.Entities = original.Entities.Guard().ToArray();
+                    Text = original.Text;
+                    Entities = original.Entities.Guard().ToArray();
                 }
                 if (json.coordinates() && json.coordinates != null)
                 {
-                    this.Longitude = (double)json.coordinates.coordinates[0];
-                    this.Latitude = (double)json.coordinates.coordinates[1];
+                    Longitude = (double)json.coordinates.coordinates[0];
+                    Latitude = (double)json.coordinates.coordinates[1];
+                }
+            }
+        }
+
+        public TwitterStatus(dynamic json)
+        {
+            GenerateFromJson = true;
+            Id = ((string)json.id_str).ParseLong();
+            CreatedAt = ((string)json.created_at).ParseDateTime(ParsingExtension.TwitterDateTimeFormat);
+
+            SetTextAndEntities(json);
+            if (json.extended_tweet())
+            {
+                SetTextAndEntities(json.extended_tweet);
+            }
+
+            if (json.recipient())
+            {
+                // THIS IS DIRECT MESSAGE!
+                StatusType = StatusType.DirectMessage;
+                User = new TwitterUser(json.sender);
+                Recipient = new TwitterUser(json.recipient);
+            }
+            else
+            {
+                StatusType = StatusType.Tweet;
+                User = new TwitterUser(json.user);
+                Source = json.source;
+                if (json.in_reply_to_status_id_str())
+                {
+                    InReplyToStatusId = ((string)json.in_reply_to_status_id_str).ParseNullableId();
+                }
+                if (json.in_reply_to_user_id_str())
+                {
+                    InReplyToUserId = ((string)json.in_reply_to_user_id_str).ParseNullableId();
+                }
+                if (json.in_reply_to_screen_name())
+                {
+                    InReplyToScreenName = json.in_reply_to_screen_name;
+                }
+                if (json.retweeted_status())
+                {
+                    var original = new TwitterStatus(json.retweeted_status);
+                    RetweetedOriginal = original;
+                    RetweetedOriginalId = original.Id;
+                    // merge text and entities
+                    Text = original.Text;
+                    Entities = original.Entities.Guard().ToArray();
+                }
+                if (json.coordinates() && json.coordinates != null)
+                {
+                    Longitude = (double)json.coordinates.coordinates[0];
+                    Latitude = (double)json.coordinates.coordinates[1];
                 }
             }
         }
@@ -78,31 +132,32 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
         {
             if (root.full_text())
             {
-                this.Text = ParsingExtension.ResolveEntity(root.full_text);
+                Text = ParsingExtension.ResolveEntity(root.full_text);
             }
             else if (root.text())
             {
-                this.Text = ParsingExtension.ResolveEntity(root.text);
+                Text = ParsingExtension.ResolveEntity(root.text);
             }
             if (root.extended_entities())
             {
                 // get correctly typed entities array
                 var orgEntities = (TwitterEntity[])Enumerable.ToArray(TwitterEntity.GetEntities(root.entities));
-                var extEntities = (TwitterEntity[])Enumerable.ToArray(TwitterEntity.GetEntities(root.extended_entities));
+                var extEntities =
+                    (TwitterEntity[])Enumerable.ToArray(TwitterEntity.GetEntities(root.extended_entities));
 
                 // merge entities
-                this.Entities = orgEntities
+                Entities = orgEntities
                     .Where(e => e.EntityType != EntityType.Media)
                     .Concat(extEntities) // extended entities contains media entities only.
                     .ToArray();
             }
             else if (root.entities())
             {
-                this.Entities = Enumerable.ToArray(TwitterEntity.GetEntities(root.entities));
+                Entities = Enumerable.ToArray(TwitterEntity.GetEntities(root.entities));
             }
             else
             {
-                this.Entities = new TwitterEntity[0];
+                Entities = new TwitterEntity[0];
             }
         }
 
@@ -121,13 +176,13 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
         /// <summary>
         /// User of this tweet/message.
         /// </summary>
-        [NotNull]
+        [@CanBeNull]
         public TwitterUser User { get; private set; }
 
         /// <summary>
         /// Body of this tweet/message. Escape sequences are already resolved.
         /// </summary>
-        [NotNull]
+        [@CanBeNull]
         public string Text { get; private set; }
 
         /// <summary>
@@ -140,7 +195,7 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
         /// <summary>
         /// Source of this tweet. (a.k.a. via, from, ...)
         /// </summary>
-        [CanBeNull]
+        [CanBeNullAttribute]
         public string Source { get; set; }
 
         /// <summary>
@@ -156,7 +211,7 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
         /// <summary>
         /// User screen name which replied this tweet.
         /// </summary>
-        [CanBeNull]
+        [CanBeNullAttribute]
         public string InReplyToScreenName { get; set; }
 
         /// <summary>
@@ -177,67 +232,64 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
         /// <summary>
         /// Status which represents original of this(retweeted) tweet
         /// </summary>
-        [CanBeNull]
+        [CanBeNullAttribute]
         public TwitterStatus RetweetedOriginal { get; set; }
 
-        #endregion
+        #endregion Status property
 
         #region Direct messages property
 
         /// <summary>
         /// Recipient of this message. (ONLY FOR DIRECT MESSAGE)
         /// </summary>
-        [CanBeNull]
+        [CanBeNullAttribute]
         public TwitterUser Recipient { get; set; }
 
-        #endregion
+        #endregion Direct messages property
 
         #region Activity Controller
 
         /// <summary>
         /// Favorited users IDs.
         /// </summary>
-        [CanBeNull]
+        [CanBeNullAttribute]
         public long[] FavoritedUsers { get; set; }
 
         /// <summary>
         /// Retweeted users IDs.
         /// </summary>
-        [CanBeNull]
+        [CanBeNullAttribute]
         public long[] RetweetedUsers { get; set; }
 
-        #endregion
+        #endregion Activity Controller
 
         /// <summary>
         /// Entities of this tweet
         /// </summary>
-        [CanBeNull]
+        [CanBeNullAttribute]
         public TwitterEntity[] Entities { get; set; }
 
-        [NotNull]
+        [@CanBeNull]
         public string Permalink
         {
             get { return String.Format(TwitterStatusUrl, User.ScreenName, Id); }
         }
 
-        [NotNull]
+        [@CanBeNull]
         public string FavstarPermalink
         {
             get { return String.Format(FavstarStatusUrl, User.ScreenName, Id); }
         }
 
         // ReSharper disable InconsistentNaming
-        [NotNull]
+        [@CanBeNull]
         public string STOTString
         {
-            get
-            {
-                return "@" + this.User.ScreenName + ": " + this.Text + " [" + this.Permalink + "]";
-            }
+            get { return "@" + User.ScreenName + ": " + Text + " [" + Permalink + "]"; }
         }
         // ReSharper restore InconsistentNaming
 
-        [NotNull]
+        [@CanBeNull]
         public string GetEntityAidedText(EntityDisplayMode displayMode = EntityDisplayMode.DisplayText)
         {
             try
@@ -316,7 +368,7 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
         /// <returns></returns>
         public override string ToString()
         {
-            return "@" + User.ScreenName + ": " + this.GetEntityAidedText();
+            return "@" + User.ScreenName + ": " + GetEntityAidedText();
         }
 
         // override object.Equals
@@ -326,7 +378,7 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
             {
                 return false;
             }
-            return this.Id == ((TwitterStatus)obj).Id;
+            return Id == ((TwitterStatus)obj).Id;
         }
 
         // override object.GetHashCode
@@ -345,6 +397,7 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
         /// Status is normal tweet.
         /// </summary>
         Tweet,
+
         /// <summary>
         /// Status is direct message.
         /// </summary>

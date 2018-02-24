@@ -1,4 +1,4 @@
-﻿using StarryEyes.Anomaly.TwitterApi.DataModels;
+﻿using Cadena.Data;
 
 namespace StarryEyes.Models.Timelines.Statuses
 {

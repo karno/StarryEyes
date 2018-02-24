@@ -18,14 +18,16 @@ namespace StarryEyes.Settings.Themes
         /// <summary>
         /// Private constructor
         /// </summary>
-        private FontTheme() { }
+        private FontTheme()
+        {
+        }
 
         /// <summary>
         /// Construct class with parameter.
         /// </summary>
         /// <param name="fontFamily">font family</param>
         /// <param name="fontSize">font size</param>
-        public FontTheme([NotNull] FontFamily fontFamily, double fontSize)
+        public FontTheme([CanBeNull] FontFamily fontFamily, double fontSize)
         {
             if (fontFamily == null) throw new ArgumentNullException("fontFamily");
             this._fontFamily = fontFamily;
@@ -67,8 +69,8 @@ namespace StarryEyes.Settings.Themes
             {
                 var culture = XmlLanguage.GetLanguage(CultureInfo.CurrentCulture.IetfLanguageTag);
                 return _fontFamily.FamilyNames.ContainsKey(culture)
-                           ? _fontFamily.FamilyNames[culture]
-                           : _fontFamily.FamilyNames.Select(l => l.Value).FirstOrDefault();
+                    ? _fontFamily.FamilyNames[culture]
+                    : _fontFamily.FamilyNames.Select(l => l.Value).FirstOrDefault();
             }
             set
             {
@@ -83,7 +85,7 @@ namespace StarryEyes.Settings.Themes
         /// <summary>
         /// Font family
         /// </summary>
-        [IgnoreDataMember, NotNull]
+        [IgnoreDataMember, CanBeNull]
         public FontFamily FontFamily
         {
             get { return _fontFamily; }
@@ -105,7 +107,7 @@ namespace StarryEyes.Settings.Themes
         /// <summary>
         /// Create clone
         /// </summary>
-        [NotNull]
+        [CanBeNull]
         public FontTheme Clone()
         {
             return new FontTheme

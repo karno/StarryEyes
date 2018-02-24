@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Cadena.Data;
+using Cadena.Data.Entities;
 using JetBrains.Annotations;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Settings;
 
@@ -30,9 +31,10 @@ namespace StarryEyes.Models.Inputting
             };
         }
 
-        public static InputSetting CreateReply([NotNull] TwitterStatus inReplyTo, string body = null, bool addMentions = true)
+        public static InputSetting CreateReply([CanBeNull] TwitterStatus inReplyTo, string body = null,
+            bool addMentions = true)
         {
-            if (inReplyTo == null) throw new ArgumentNullException("inReplyTo");
+            if (inReplyTo == null) throw new ArgumentNullException(nameof(inReplyTo));
             var reply = GetSuitableReplyAccount(inReplyTo);
             var except = reply == null ? new[] { inReplyTo.User.Id } : new[] { reply.Id, inReplyTo.User.Id };
             var mention = String.Empty;
@@ -41,8 +43,8 @@ namespace StarryEyes.Models.Inputting
                 mention = "@" + inReplyTo.User.ScreenName + " " +
                           inReplyTo.Entities
                                    .Guard()
-                                   .Where(e => e.EntityType == EntityType.UserMentions)
-                                   .Where(e => !except.Contains(e.UserId.GetValueOrDefault()))
+                                   .OfType<TwitterUserMentionEntity>()
+                                   .Where(e => !except.Contains(e.Id))
                                    .Select(e => e.DisplayText)
                                    .Distinct()
                                    .Select(s => "@" + s + " ")
@@ -57,9 +59,9 @@ namespace StarryEyes.Models.Inputting
             };
         }
 
-        public static InputSetting CreateDirectMessage([NotNull] TwitterUser recipient, string body = null)
+        public static InputSetting CreateDirectMessage([CanBeNull] TwitterUser recipient, string body = null)
         {
-            if (recipient == null) throw new ArgumentNullException("recipient");
+            if (recipient == null) throw new ArgumentNullException(nameof(recipient));
             return new InputSetting
             {
                 Recipient = recipient,
@@ -68,9 +70,9 @@ namespace StarryEyes.Models.Inputting
         }
 
         public static InputSetting CreateDirectMessage(
-            IEnumerable<TwitterAccount> accounts, [NotNull] TwitterUser recipient, string body = null)
+            IEnumerable<TwitterAccount> accounts, [CanBeNull] TwitterUser recipient, string body = null)
         {
-            if (recipient == null) throw new ArgumentNullException("recipient");
+            if (recipient == null) throw new ArgumentNullException(nameof(recipient));
             return new InputSetting
             {
                 Accounts = accounts,
@@ -88,18 +90,18 @@ namespace StarryEyes.Models.Inputting
             }
             var replyTargets = status.Entities
                                      .Guard()
-                                     .Where(e => e.EntityType == EntityType.UserMentions && e.UserId != null)
-                                     .Select(e => e.UserId.GetValueOrDefault())
+                                     .OfType<TwitterUserMentionEntity>()
+                                     .Select(e => e.Id)
                                      .ToArray();
             var account = Setting.Accounts.Collection
                                  .FirstOrDefault(a => replyTargets.Contains(a.Id));
             return account != null ? BacktrackFallback(account) : null;
         }
 
-        [NotNull]
-        private static TwitterAccount BacktrackFallback([NotNull] TwitterAccount account)
+        [CanBeNull]
+        private static TwitterAccount BacktrackFallback([CanBeNull] TwitterAccount account)
         {
-            if (account == null) throw new ArgumentNullException("account");
+            if (account == null) throw new ArgumentNullException(nameof(account));
             if (!Setting.IsBacktrackFallback.Value)
             {
                 return account;
@@ -128,7 +130,7 @@ namespace StarryEyes.Models.Inputting
         public IEnumerable<TwitterAccount> Accounts
         {
             get { return this._accounts; }
-            set { this._accounts = value == null ? null : value.ToArray(); }
+            set { this._accounts = value?.ToArray(); }
         }
 
         [CanBeNull]
@@ -162,7 +164,7 @@ namespace StarryEyes.Models.Inputting
             }
         }
 
-        [NotNull]
+        [CanBeNull]
         public CursorPosition CursorPosition { get; set; }
 
         public bool SetFocusToInputArea { get; set; }

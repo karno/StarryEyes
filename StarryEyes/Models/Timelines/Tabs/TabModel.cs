@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
+using Cadena.Data;
 using JetBrains.Annotations;
 using StarryEyes.Albireo.Collections;
 using StarryEyes.Albireo.Helpers;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
-using StarryEyes.Anomaly.Utils;
 using StarryEyes.Filters;
 using StarryEyes.Filters.Expressions;
 using StarryEyes.Filters.Parsing;
@@ -38,64 +38,63 @@ namespace StarryEyes.Models.Timelines.Tabs
                 NotifyNewArrivals = false,
             };
             var cf = TabManager.CurrentFocusTab;
-            if (cf != null)
-            {
-                cf.BindingAccounts.ForEach(model.BindingAccounts.Add);
-            }
+            cf?.BindingAccounts.ForEach(model.BindingAccounts.Add);
             return model;
         }
 
         private bool _isActivated;
+
         /// <summary>
         /// Set this tab is activated(connected stream, receive invalidate info, etc...)
         /// </summary>
         public bool IsActivated
         {
-            get { return this._isActivated; }
+            get { return _isActivated; }
             set
             {
-                if (value == this._isActivated) return;
-                this._isActivated = value;
-                this.IsSubscribeBroadcaster = value;
-                if (this._filterQuery == null) return;
+                if (value == _isActivated) return;
+                _isActivated = value;
+                IsSubscribeBroadcaster = value;
+                if (_filterQuery == null) return;
                 if (value)
                 {
-                    this._filterQuery.Activate();
-                    this._filterQuery.InvalidateRequired += this.QueueInvalidateTimeline;
-                    MuteBlockManager.RefreshTimelineRequired += this.QueueInvalidateTimeline;
+                    _filterQuery.Activate();
+                    _filterQuery.InvalidateRequired += QueueInvalidateTimeline;
+                    MuteBlockManager.RefreshTimelineRequired += QueueInvalidateTimeline;
                 }
                 else
                 {
-                    MuteBlockManager.RefreshTimelineRequired -= this.QueueInvalidateTimeline;
-                    this._filterQuery.InvalidateRequired -= this.QueueInvalidateTimeline;
-                    this._filterQuery.Deactivate();
+                    MuteBlockManager.RefreshTimelineRequired -= QueueInvalidateTimeline;
+                    _filterQuery.InvalidateRequired -= QueueInvalidateTimeline;
+                    _filterQuery.Deactivate();
                 }
             }
         }
 
         private FilterQuery _filterQuery;
+
         /// <summary>
         /// Represents filter query. This property CAN BE NULL.
         /// </summary>
         public FilterQuery FilterQuery
         {
-            get { return this._filterQuery; }
+            get { return _filterQuery; }
             set
             {
                 if ((value == null && _filterQuery == null) || (value != null && value.Equals(_filterQuery))) return;
-                var old = this._filterQuery;
-                this._filterQuery = value;
-                this._isQueryStringValid = false;
-                this.QueueInvalidateTimeline();
-                if (!this._isActivated) return;
-                if (this._filterQuery != null)
+                var old = _filterQuery;
+                _filterQuery = value;
+                _isQueryStringValid = false;
+                QueueInvalidateTimeline();
+                if (!_isActivated) return;
+                if (_filterQuery != null)
                 {
-                    this._filterQuery.Activate();
-                    this._filterQuery.InvalidateRequired += this.QueueInvalidateTimeline;
+                    _filterQuery.Activate();
+                    _filterQuery.InvalidateRequired += QueueInvalidateTimeline;
                 }
                 if (old != null)
                 {
-                    old.InvalidateRequired -= this.QueueInvalidateTimeline;
+                    old.InvalidateRequired -= QueueInvalidateTimeline;
                     old.Deactivate();
                 }
             }
@@ -113,31 +112,31 @@ namespace StarryEyes.Models.Timelines.Tabs
 
         public string Name
         {
-            get { return String.IsNullOrWhiteSpace(this._name) ? EmptyTabName : this._name; }
-            set { this._name = value; }
+            get { return String.IsNullOrWhiteSpace(_name) ? EmptyTabName : _name; }
+            set { _name = value; }
         }
 
-        [NotNull]
+        [CanBeNull]
         public ICollection<long> BindingAccounts
         {
-            get { return new NotifyCollection<long>(this._bindingAccountIds, this.OnUpdateBoundAccounts); }
+            get { return new NotifyCollection<long>(_bindingAccountIds, OnUpdateBoundAccounts); }
         }
 
-        [NotNull]
+        [CanBeNull]
         public IEnumerable<string> BindingHashtags
         {
-            get { return this._bindingHashtags ?? Enumerable.Empty<string>(); }
+            get { return _bindingHashtags ?? Enumerable.Empty<string>(); }
             set
             {
-                if (value.SequenceEqual(this._bindingHashtags)) return; // equal
-                this._bindingHashtags = value.Guard().ToList();
+                if (value.SequenceEqual(_bindingHashtags)) return; // equal
+                _bindingHashtags = value.Guard().ToList();
                 TabManager.Save();
             }
         }
 
         private void OnUpdateBoundAccounts()
         {
-            this.BindingAccountsChanged.SafeInvoke();
+            BindingAccountsChanged.SafeInvoke();
             TabManager.Save();
         }
 
@@ -149,11 +148,11 @@ namespace StarryEyes.Models.Timelines.Tabs
 
         public string RawQueryString
         {
-            get { return this._rawQueryString; }
+            get { return _rawQueryString; }
             set
             {
-                this._rawQueryString = value;
-                this._isQueryStringValid = false;
+                _rawQueryString = value;
+                _isQueryStringValid = false;
             }
         }
 
@@ -164,21 +163,23 @@ namespace StarryEyes.Models.Timelines.Tabs
             {
                 if (RawQueryString != null)
                 {
-                    if (!this._isQueryStringValid &&
-                        QueryCompiler.Compile(this.RawQueryString).ToQuery() == this.FilterQuery.ToQuery())
+                    if (!_isQueryStringValid &&
+                        QueryCompiler.Compile(RawQueryString).ToQuery() == FilterQuery.ToQuery())
                     {
-                        this._isQueryStringValid = true;
+                        _isQueryStringValid = true;
                     }
                     return RawQueryString;
                 }
             }
-            catch { }
-            RawQueryString = this.FilterQuery != null ? this.FilterQuery.ToQuery() : String.Empty;
-            this._isQueryStringValid = true;
+            catch
+            {
+            }
+            RawQueryString = FilterQuery != null ? FilterQuery.ToQuery() : String.Empty;
+            _isQueryStringValid = true;
             return RawQueryString;
         }
 
-        #endregion
+        #endregion Tab Parameters
 
         #region Filtering Control
 
@@ -187,23 +188,23 @@ namespace StarryEyes.Models.Timelines.Tabs
 
         protected override bool PreInvalidateTimeline()
         {
-            if (this._filterQuery == null)
+            if (_filterQuery == null)
             {
-                this._filterSql = FilterExpressionBase.ContradictionSql;
-                this._filterFunc = FilterExpressionBase.Contradiction;
+                _filterSql = FilterExpressionBase.ContradictionSql;
+                _filterFunc = FilterExpressionBase.Contradiction;
                 return true;
             }
-            this._filterSql = this._filterQuery.GetSqlQuery();
-            this._filterFunc = this._filterQuery.GetEvaluator();
-            return !this._filterQuery.IsPreparing;
+            _filterSql = _filterQuery.GetSqlQuery();
+            _filterFunc = _filterQuery.GetEvaluator();
+            return !_filterQuery.IsPreparing;
         }
 
         protected override bool CheckAcceptStatusCore(TwitterStatus status)
         {
-            return this._filterFunc(status);
+            return _filterFunc(status);
         }
 
-        #endregion
+        #endregion Filtering Control
 
         #region Notification Chain
 
@@ -214,8 +215,8 @@ namespace StarryEyes.Models.Timelines.Tabs
             var result = base.AddStatus(model, isNewArrival);
             if (result && isNewArrival)
             {
-                this.OnNewStatusArrival.SafeInvoke(model.Status);
-                if (this.NotifyNewArrivals)
+                OnNewStatusArrival.SafeInvoke(model.Status);
+                if (NotifyNewArrivals)
                 {
                     NotificationService.NotifyNewArrival(model.Status, this);
                 }
@@ -223,12 +224,13 @@ namespace StarryEyes.Models.Timelines.Tabs
             return result;
         }
 
-        #endregion
+        #endregion Notification Chain
 
         protected override IObservable<TwitterStatus> Fetch(long? maxId, int? count)
         {
-            return StatusProxy.FetchStatuses(this._filterFunc, this._filterSql, maxId, count)
+            return StatusProxy.FetchStatuses(_filterFunc, _filterSql, maxId, count)
                               .ToObservable()
+                              .SelectMany(o => o)
                               .Merge(_filterQuery != null
                                   ? _filterQuery.ReceiveSources(maxId)
                                   : Observable.Empty<TwitterStatus>());
@@ -238,7 +240,7 @@ namespace StarryEyes.Models.Timelines.Tabs
         {
             base.Dispose(disposing);
             // dispose filter
-            this.IsActivated = false;
+            IsActivated = false;
         }
     }
 }

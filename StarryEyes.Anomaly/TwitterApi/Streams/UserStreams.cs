@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Cadena;
 using JetBrains.Annotations;
 
 namespace StarryEyes.Anomaly.TwitterApi.Streams
@@ -23,9 +24,9 @@ namespace StarryEyes.Anomaly.TwitterApi.Streams
         /// <param name="repliesAll">repliesAll parameter</param>
         /// <param name="followingsActivity">include_followings_activity parameter</param>
         /// <returns></returns>
-        public static async Task Connect([NotNull] IOAuthCredential credential,
-            [NotNull] Action<string> parser, TimeSpan readTimeout, CancellationToken cancellationToken,
-            [CanBeNull] IEnumerable<string> tracksOrNull = null, bool repliesAll = false,
+        public static async Task Connect([@CanBeNull] IOAuthCredential credential,
+            [@CanBeNull] Action<string> parser, TimeSpan readTimeout, CancellationToken cancellationToken,
+            [CanBeNullAttribute] IEnumerable<string> tracksOrNull = null, bool repliesAll = false,
             bool followingsActivity = false)
         {
             if (credential == null) throw new ArgumentNullException(nameof(credential));

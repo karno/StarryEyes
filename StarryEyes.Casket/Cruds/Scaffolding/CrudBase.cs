@@ -17,7 +17,7 @@ namespace StarryEyes.Casket.Cruds.Scaffolding
 
         private IDatabaseConnectionDescriptor _descriptor;
 
-        [NotNull]
+        [CanBeNull]
         protected IDatabaseConnectionDescriptor Descriptor
         {
             get

@@ -79,6 +79,17 @@ namespace StarryEyes.Anomaly.TwitterApi.DataModels
             }
         }
 
+        public static IEnumerable<TwitterEntity> ConvertEntities(
+            IEnumerable<Cadena.Data.Entities.TwitterEntity> entities)
+        {
+            
+        }
+
+        private static TwitterEntity ConvertEntity(Cadena.Data.Entities.TwitterEntity entity)
+        {
+            
+        }
+
         /// <summary>
         /// Type of this entity.
         /// </summary>

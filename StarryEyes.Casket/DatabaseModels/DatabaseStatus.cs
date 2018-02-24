@@ -1,5 +1,5 @@
 ﻿using System;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
+using Cadena.Data;
 using StarryEyes.Casket.Cruds.Scaffolding;
 
 namespace StarryEyes.Casket.DatabaseModels
@@ -16,6 +16,8 @@ namespace StarryEyes.Casket.DatabaseModels
 
         public long? RetweetOriginalId { get; set; }
 
+        public long? QuoteId { get; set; }
+
         public StatusType StatusType { get; set; }
 
         public long UserId { get; set; }
@@ -25,6 +27,8 @@ namespace StarryEyes.Casket.DatabaseModels
         public long? RetweeterId { get; set; }
 
         public long? RetweetOriginalUserId { get; set; }
+
+        public long? QuoteUserId { get; set; }
 
         public string EntityAidedText { get; set; }
 
@@ -48,5 +52,9 @@ namespace StarryEyes.Casket.DatabaseModels
         public double? Longitude { get; set; }
 
         public double? Latitude { get; set; }
+
+        public int? DisplayTextRangeBegin { get; set; }
+
+        public int? DisplayTextRangeEnd { get; set; }
     }
 }

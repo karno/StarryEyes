@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
+using System.Threading;
+using Cadena.Api.Parameters;
+using Cadena.Api.Rest;
+using Cadena.Data;
 using StarryEyes.Albireo.Collections;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
-using StarryEyes.Anomaly.TwitterApi.Rest;
-using StarryEyes.Anomaly.Utils;
 using StarryEyes.Models.Receiving;
 using StarryEyes.Settings;
 
@@ -13,9 +15,10 @@ namespace StarryEyes.Filters.Sources
     {
         private readonly AVLTree<long> _acceptIds = new AVLTree<long>();
         private readonly string _query;
+
         public FilterSearch(string query)
         {
-            this._query = query;
+            _query = query;
         }
 
         public override Func<TwitterStatus, bool> GetEvaluator()
@@ -38,16 +41,19 @@ namespace StarryEyes.Filters.Sources
         protected override IObservable<TwitterStatus> ReceiveSink(long? maxId)
         {
             System.Diagnostics.Debug.WriteLine("RECEIVESINK SEARCH QUERY: " + _query);
+            var sp = new SearchParameter(_query, maxId: maxId,
+                lang: String.IsNullOrWhiteSpace(Setting.SearchLanguage.Value)
+                    ? null
+                    : Setting.SearchLanguage.Value,
+                locale: String.IsNullOrWhiteSpace(Setting.SearchLocale.Value)
+                    ? null
+                    : Setting.SearchLocale.Value);
             return Observable.Start(() => Setting.Accounts.GetRandomOne())
                              .Where(a => a != null)
-                             .SelectMany(a => a.SearchAsync(_query, maxId: maxId,
-                                 lang: String.IsNullOrWhiteSpace(Setting.SearchLanguage.Value)
-                                     ? null
-                                     : Setting.SearchLanguage.Value,
-                                 locale: String.IsNullOrWhiteSpace(Setting.SearchLocale.Value)
-                                     ? null
-                                     : Setting.SearchLocale.Value)
+                             .SelectMany(a => a.CreateAccessor().SearchAsync(
+                                                   sp, CancellationToken.None)
                                                .ToObservable())
+                             .SelectMany(s => s.Result)
                              .Do(s =>
                              {
                                  lock (_acceptIds)
@@ -58,6 +64,7 @@ namespace StarryEyes.Filters.Sources
         }
 
         private bool _isActivated;
+
         public override void Activate()
         {
             if (_isActivated) return;
@@ -72,15 +79,8 @@ namespace StarryEyes.Filters.Sources
             ReceiveManager.UnregisterSearchQuery(_query, _acceptIds);
         }
 
-        public override string FilterKey
-        {
-            get { return "search"; }
-        }
+        public override string FilterKey => "search";
 
-        public override string FilterValue
-        {
-            get { return _query; }
-        }
-
+        public override string FilterValue => _query;
     }
 }

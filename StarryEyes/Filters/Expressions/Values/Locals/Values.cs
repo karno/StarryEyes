@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
+using Cadena.Data;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Databases;
 
@@ -13,15 +13,15 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 
         public LocalUser(UserExpressionBase expression)
         {
-            this._expression = expression;
-            expression.ReapplyRequested += this.ExpressionReapplyRequested;
+            _expression = expression;
+            expression.ReapplyRequested += ExpressionReapplyRequested;
         }
 
         private void ExpressionReapplyRequested(RelationDataChangedInfo obj)
         {
             if (obj != null) return;
             System.Diagnostics.Debug.WriteLine("#INVALIDATION: from Local User");
-            this.RaiseInvalidateFilter();
+            RaiseInvalidateFilter();
         }
 
         public override IEnumerable<FilterExpressionType> SupportedTypes
@@ -78,8 +78,8 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 
         public LocalUserFollowing(UserExpressionBase expression)
         {
-            this._expression = expression;
-            expression.ReapplyRequested += this.ExpressionReapplyRequested;
+            _expression = expression;
+            expression.ReapplyRequested += ExpressionReapplyRequested;
         }
 
         private void ExpressionReapplyRequested(RelationDataChangedInfo obj)
@@ -87,7 +87,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
             if (obj == null || obj.Type == RelationDataType.Following)
             {
                 System.Diagnostics.Debug.WriteLine("#INVALIDATION: from Local User Following updated");
-                this.RaiseInvalidateFilter();
+                RaiseInvalidateFilter();
             }
         }
 
@@ -129,8 +129,8 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 
         public LocalUserFollowers(UserExpressionBase expression)
         {
-            this._expression = expression;
-            expression.ReapplyRequested += this.ExpressionReapplyRequested;
+            _expression = expression;
+            expression.ReapplyRequested += ExpressionReapplyRequested;
         }
 
         private void ExpressionReapplyRequested(RelationDataChangedInfo obj)
@@ -138,7 +138,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
             if (obj == null || obj.Type == RelationDataType.Follower)
             {
                 System.Diagnostics.Debug.WriteLine("#INVALIDATION: from Local User Follower updated");
-                this.RaiseInvalidateFilter();
+                RaiseInvalidateFilter();
             }
         }
 
@@ -180,8 +180,8 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 
         public LocalUserBlockings(UserExpressionBase expression)
         {
-            this._expression = expression;
-            expression.ReapplyRequested += this.ExpressionReapplyRequested;
+            _expression = expression;
+            expression.ReapplyRequested += ExpressionReapplyRequested;
         }
 
         private void ExpressionReapplyRequested(RelationDataChangedInfo obj)
@@ -189,7 +189,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
             if (obj == null || obj.Type == RelationDataType.Blocking)
             {
                 System.Diagnostics.Debug.WriteLine("#INVALIDATION: from Local User Blocking updated");
-                this.RaiseInvalidateFilter();
+                RaiseInvalidateFilter();
             }
         }
 
@@ -231,20 +231,17 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 
         public UserSet(ICollection<ValueBase> values)
         {
-            this._values = values;
+            _values = values;
         }
 
         public override IEnumerable<FilterExpressionType> SupportedTypes
         {
-            get
-            {
-                yield return FilterExpressionType.Set;
-            }
+            get { yield return FilterExpressionType.Set; }
         }
 
         public override Func<TwitterStatus, IReadOnlyCollection<long>> GetSetValueProvider()
         {
-            var cache = this._values
+            var cache = _values
                 .Select(v => v.GetNumericValueProvider()(null)) // ok since the values must be LocalUser
                 .ToArray();
             return _ => cache;
@@ -252,12 +249,12 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 
         public override string GetSetSqlQuery()
         {
-            return "(select " + string.Join(" union select ", this._values.Select(v => v.GetNumericSqlQuery())) + ")";
+            return "(select " + string.Join(" union select ", _values.Select(v => v.GetNumericSqlQuery())) + ")";
         }
 
         public override void BeginLifecycle()
         {
-            foreach (var v in this._values)
+            foreach (var v in _values)
             {
                 v.BeginLifecycle();
             }
@@ -265,7 +262,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 
         public override void EndLifecycle()
         {
-            foreach (var v in this._values)
+            foreach (var v in _values)
             {
                 v.EndLifecycle();
             }
@@ -273,7 +270,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 
         public override string ToQuery()
         {
-            return "[" + string.Join(", ", this._values.Select(v => v.ToQuery())) + "]";
+            return "[" + string.Join(", ", _values.Select(v => v.ToQuery())) + "]";
         }
     }
 }

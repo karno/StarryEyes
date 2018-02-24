@@ -4,6 +4,7 @@ using System.Data.SQLite;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using StarryEyes.Casket.Connections;
 using StarryEyes.Casket.Cruds;
 using StarryEyes.Casket.Cruds.Scaffolding;
@@ -30,65 +31,29 @@ namespace StarryEyes.Casket
 
         private static bool _isInitialized;
 
-        public static AccountInfoCrud AccountInfoCrud
-        {
-            get { return _accountInfoCrud; }
-        }
+        public static AccountInfoCrud AccountInfoCrud => _accountInfoCrud;
 
-        public static StatusCrud StatusCrud
-        {
-            get { return _statusCrud; }
-        }
+        public static StatusCrud StatusCrud => _statusCrud;
 
-        public static StatusEntityCrud StatusEntityCrud
-        {
-            get { return _statusEntityCrud; }
-        }
+        public static StatusEntityCrud StatusEntityCrud => _statusEntityCrud;
 
-        public static UserCrud UserCrud
-        {
-            get { return _userCrud; }
-        }
+        public static UserCrud UserCrud => _userCrud;
 
-        public static UserDescriptionEntityCrud UserDescriptionEntityCrud
-        {
-            get { return _userDescEntityCrud; }
-        }
+        public static UserDescriptionEntityCrud UserDescriptionEntityCrud => _userDescEntityCrud;
 
-        public static UserUrlEntityCrud UserUrlEntityCrud
-        {
-            get { return _userUrlEntityCrud; }
-        }
+        public static UserUrlEntityCrud UserUrlEntityCrud => _userUrlEntityCrud;
 
-        public static ListCrud ListCrud
-        {
-            get { return _listCrud; }
-        }
+        public static ListCrud ListCrud => _listCrud;
 
-        public static ListUserCrud ListUserCrud
-        {
-            get { return _listUserCrud; }
-        }
+        public static ListUserCrud ListUserCrud => _listUserCrud;
 
-        public static FavoritesCrud FavoritesCrud
-        {
-            get { return _favoritesCrud; }
-        }
+        public static FavoritesCrud FavoritesCrud => _favoritesCrud;
 
-        public static RetweetsCrud RetweetsCrud
-        {
-            get { return _retweetsCrud; }
-        }
+        public static RetweetsCrud RetweetsCrud => _retweetsCrud;
 
-        public static RelationCrud RelationCrud
-        {
-            get { return _relationCrud; }
-        }
+        public static RelationCrud RelationCrud => _relationCrud;
 
-        public static ManagementCrud ManagementCrud
-        {
-            get { return _managementCrud; }
-        }
+        public static ManagementCrud ManagementCrud => _managementCrud;
 
         public static void Initialize(IDatabaseConnectionDescriptor descriptor)
         {
@@ -160,24 +125,6 @@ namespace StarryEyes.Casket
         private static readonly string _userUrlEntityInserter =
             SentenceGenerator.GetTableInserter<DatabaseUserUrlEntity>();
 
-        public static async Task StoreStatus(
-            DatabaseStatus status,
-            IEnumerable<DatabaseStatusEntity> statusEntities,
-            DatabaseUser user,
-            IEnumerable<DatabaseUserDescriptionEntity> userDescriptionEntities,
-            IEnumerable<DatabaseUserUrlEntity> userUrlEntities)
-        {
-            var batch = new StatusInsertBatch
-            {
-                Status = status,
-                StatusEntities = statusEntities,
-                User = user,
-                UserDescriptionEntities = userDescriptionEntities,
-                UserUrlEntities = userUrlEntities
-            };
-            await StoreStatuses(new[] { batch }).ConfigureAwait(false);
-        }
-
 
         public static async Task StoreStatuses(IEnumerable<StatusInsertBatch> batches)
         {
@@ -185,29 +132,17 @@ namespace StarryEyes.Casket
             {
                 var m = batches.Memoize();
                 var statusBatch = m.Distinct(b => b.Status.Id)
-                                         .SelectMany(CreateQuery);
-                var userBatch = m.Select(b => b.UserInsertBatch)
-                                       .Distinct(u => u.User.Id)
-                                       .SelectMany(CreateQuery);
+                                   .SelectMany(CreateQuery);
+                var userBatch = m.SelectMany(b => new[] { b.UserInsertBatch, b.RecipientInsertBatch })
+                                 .Where(b => b != null)
+                                 .Distinct(u => u.User.Id)
+                                 .SelectMany(CreateQuery);
                 await StatusCrud.StoreCoreAsync(statusBatch.Concat(userBatch)).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine("# FAIL> storing statuses." + Environment.NewLine + ex);
             }
-        }
-
-        public static async Task StoreUser(DatabaseUser user,
-            IEnumerable<DatabaseUserDescriptionEntity> userDescriptionEntities,
-            IEnumerable<DatabaseUserUrlEntity> userUrlEntities)
-        {
-            var batch = new UserInsertBatch
-            {
-                User = user,
-                UserDescriptionEntities = userDescriptionEntities,
-                UserUrlEntities = userUrlEntities
-            };
-            await StoreUsers(new[] { batch }).ConfigureAwait(false);
         }
 
         public static async Task StoreUsers(IEnumerable<UserInsertBatch> batches)
@@ -222,7 +157,7 @@ namespace StarryEyes.Casket
             }
         }
 
-        #endregion
+        #endregion store in one transaction
 
         private static IEnumerable<Tuple<string, object>> CreateQuery(StatusInsertBatch batch)
         {
@@ -240,7 +175,7 @@ namespace StarryEyes.Casket
                 batch.UserDescriptionEntities.Select(e => Tuple.Create(_userDescEntityInserter, (object)e)),
                 new[] { _userUrlEntityCrud.CreateDeleter(batch.User.Id) },
                 batch.UserUrlEntities.Select(e => Tuple.Create(_userUrlEntityInserter, (object)e))
-                );
+            );
         }
 
         public static Task VacuumTables()
@@ -272,47 +207,39 @@ namespace StarryEyes.Casket
     public class StatusInsertBatch
     {
         public static StatusInsertBatch CreateBatch(
-            Tuple<DatabaseStatus, IEnumerable<DatabaseStatusEntity>> status,
-            Tuple<DatabaseUser, IEnumerable<DatabaseUserDescriptionEntity>, IEnumerable<DatabaseUserUrlEntity>> user)
+            [NotNull] Tuple<DatabaseStatus, IEnumerable<DatabaseStatusEntity>> status,
+            [NotNull]
+            Tuple<DatabaseUser, IEnumerable<DatabaseUserDescriptionEntity>, IEnumerable<DatabaseUserUrlEntity>> user,
+            [CanBeNull]
+            Tuple<DatabaseUser, IEnumerable<DatabaseUserDescriptionEntity>, IEnumerable<DatabaseUserUrlEntity>>
+                recipient)
         {
+            if (status == null) throw new ArgumentNullException(nameof(status));
+            if (user == null) throw new ArgumentNullException(nameof(user));
             return new StatusInsertBatch
             {
                 Status = status.Item1,
                 StatusEntities = status.Item2,
-                User = user.Item1,
-                UserDescriptionEntities = user.Item2,
-                UserUrlEntities = user.Item3
+                UserInsertBatch = UserInsertBatch.CreateBatch(user),
+                RecipientInsertBatch = recipient != null ? UserInsertBatch.CreateBatch(recipient) : null
             };
         }
 
         public StatusInsertBatch()
         {
             UserInsertBatch = new UserInsertBatch();
+            RecipientInsertBatch = null;
         }
 
         public DatabaseStatus Status { get; set; }
 
         public IEnumerable<DatabaseStatusEntity> StatusEntities { get; set; }
 
+        [NotNull]
         public UserInsertBatch UserInsertBatch { get; set; }
 
-        public DatabaseUser User
-        {
-            get { return UserInsertBatch.User; }
-            set { UserInsertBatch.User = value; }
-        }
-
-        public IEnumerable<DatabaseUserDescriptionEntity> UserDescriptionEntities
-        {
-            get { return UserInsertBatch.UserDescriptionEntities; }
-            set { UserInsertBatch.UserDescriptionEntities = value; }
-        }
-
-        public IEnumerable<DatabaseUserUrlEntity> UserUrlEntities
-        {
-            get { return UserInsertBatch.UserUrlEntities; }
-            set { UserInsertBatch.UserUrlEntities = value; }
-        }
+        [CanBeNull]
+        public UserInsertBatch RecipientInsertBatch { get; set; }
     }
 
     public class UserInsertBatch

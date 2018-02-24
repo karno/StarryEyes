@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
+using Cadena.Data;
 
 namespace StarryEyes.Filters.Expressions.Operators
 {
     public sealed class FilterOperatorPlus : FilterTwoValueOperator
     {
-        protected override string OperatorString
-        {
-            get { return "+"; }
-        }
+        protected override string OperatorString => "+";
 
         public override IEnumerable<FilterExpressionType> SupportedTypes
         {
@@ -61,10 +58,7 @@ namespace StarryEyes.Filters.Expressions.Operators
 
     public sealed class FilterOperatorMinus : FilterTwoValueOperator
     {
-        protected override string OperatorString
-        {
-            get { return "-"; }
-        }
+        protected override string OperatorString => "-";
 
         public override IEnumerable<FilterExpressionType> SupportedTypes
         {
@@ -108,10 +102,7 @@ namespace StarryEyes.Filters.Expressions.Operators
             return "-" + Value.ToQuery();
         }
 
-        protected override string OperatorString
-        {
-            get { return "-"; }
-        }
+        protected override string OperatorString => "-";
 
         public override Func<TwitterStatus, long> GetNumericValueProvider()
         {
@@ -132,10 +123,7 @@ namespace StarryEyes.Filters.Expressions.Operators
 
     public sealed class FilterOperatorProduct : FilterTwoValueOperator
     {
-        protected override string OperatorString
-        {
-            get { return "*"; }
-        }
+        protected override string OperatorString => "*";
 
         public override IEnumerable<FilterExpressionType> SupportedTypes
         {
@@ -174,17 +162,11 @@ namespace StarryEyes.Filters.Expressions.Operators
 
     public sealed class FilterOperatorDivide : FilterTwoValueOperator
     {
-        protected override string OperatorString
-        {
-            get { return "/"; }
-        }
+        protected override string OperatorString => "/";
 
         public override IEnumerable<FilterExpressionType> SupportedTypes
         {
-            get
-            {
-                yield return FilterExpressionType.Numeric;
-            }
+            get { yield return FilterExpressionType.Numeric; }
         }
 
         public override Func<TwitterStatus, long> GetNumericValueProvider()

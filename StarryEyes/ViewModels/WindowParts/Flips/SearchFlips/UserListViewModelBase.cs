@@ -4,9 +4,9 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Cadena.Api.Rest;
+using Cadena.Data;
 using Livet;
-using StarryEyes.Anomaly.TwitterApi.Rest;
-using StarryEyes.Anomaly.TwitterApi.Rest.Infrastructure;
 using StarryEyes.Globalization;
 using StarryEyes.Globalization.WindowParts;
 using StarryEyes.Models.Accounting;
@@ -22,62 +22,59 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
 
         private readonly UserInfoViewModel _parent;
 
-        public UserInfoViewModel Parent
-        {
-            get { return this._parent; }
-        }
+        public UserInfoViewModel Parent => _parent;
 
-        private readonly ObservableCollection<UserResultItemViewModel> _users = new ObservableCollection<UserResultItemViewModel>();
+        private readonly ObservableCollection<UserResultItemViewModel> _users =
+            new ObservableCollection<UserResultItemViewModel>();
 
-        public ObservableCollection<UserResultItemViewModel> Users
-        {
-            get { return this._users; }
-        }
+        public ObservableCollection<UserResultItemViewModel> Users => _users;
 
         private readonly List<long> _userIds = new List<long>();
 
         public UserListViewModelBase(UserInfoViewModel parent)
         {
-            this._parent = parent;
-            this.ReadMore();
+            _parent = parent;
+            ReadMore();
         }
 
-        protected abstract Task<ICursorResult<IEnumerable<long>>> GetUsersApiImpl(TwitterAccount info, long id, long cursor);
+        protected abstract Task<ICursorResult<IEnumerable<long>>> GetUsersApiImpl(TwitterAccount info, long id,
+            long cursor);
 
         private bool _isLoading;
         private bool _isScrollInBottom;
 
         public bool IsLoading
         {
-            get { return this._isLoading; }
+            get { return _isLoading; }
             set
             {
-                this._isLoading = value;
-                this.RaisePropertyChanged();
+                _isLoading = value;
+                RaisePropertyChanged();
             }
         }
 
         public bool IsScrollInBottom
         {
-            get { return this._isScrollInBottom; }
+            get { return _isScrollInBottom; }
             set
             {
-                if (this._isScrollInBottom == value) return;
-                this._isScrollInBottom = value;
-                this.RaisePropertyChanged();
+                if (_isScrollInBottom == value) return;
+                _isScrollInBottom = value;
+                RaisePropertyChanged();
                 if (value)
                 {
-                    this.ReadMore();
+                    ReadMore();
                 }
             }
         }
 
         private int _currentPageCount = -1;
         private bool _isDeferLoadEnabled = true;
+
         private void ReadMore()
         {
-            if (!_isDeferLoadEnabled || this.IsLoading) return;
-            this.IsLoading = true;
+            if (!_isDeferLoadEnabled || IsLoading) return;
+            IsLoading = true;
             Task.Run(async () =>
             {
                 var info = Setting.Accounts.GetRandomOne();
@@ -88,7 +85,8 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                         {
                             Title = SearchFlipResources.MsgUserInfoLoadErrorTitle,
                             MainIcon = VistaTaskDialogIcon.Error,
-                            MainInstruction = SearchFlipResources.MsgUserInfoLoadErrorInstFormat.SafeFormat(UserListName),
+                            MainInstruction =
+                                SearchFlipResources.MsgUserInfoLoadErrorInstFormat.SafeFormat(UserListName),
                             Content = SearchFlipResources.MsgUserInfoLoadErrorAccountIsNotExist,
                             CommonButtons = TaskDialogCommonButtons.Close,
                         }));
@@ -100,12 +98,12 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 {
                     // backward page count
                     Interlocked.Decrement(ref _currentPageCount);
-                    var result = await this.ReadMoreIds();
+                    var result = await ReadMoreIds();
                     IsLoading = false;
                     if (result)
                     {
                         // new users fetched
-                        this.ReadMore();
+                        ReadMore();
                     }
                     else
                     {
@@ -116,10 +114,11 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                 }
                 try
                 {
-                    var users = await info.LookupUserAsync(ids);
+                    var users = await info.CreateAccessor().LookupUserAsync(ids, CancellationToken.None);
                     await DispatcherHelper.UIDispatcher.InvokeAsync(
-                        () => users.ForEach(u => Users.Add(new UserResultItemViewModel(u))));
-                    this.IsLoading = false;
+                        () => users.Result.ForEach(
+                            u => Users.Add(new UserResultItemViewModel(u))));
+                    IsLoading = false;
                 }
                 catch (Exception ex)
                 {
@@ -128,7 +127,8 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                         {
                             Title = SearchFlipResources.MsgUserInfoLoadErrorTitle,
                             MainIcon = VistaTaskDialogIcon.Error,
-                            MainInstruction = SearchFlipResources.MsgUserInfoLoadErrorInstFormat.SafeFormat(UserListName),
+                            MainInstruction =
+                                SearchFlipResources.MsgUserInfoLoadErrorInstFormat.SafeFormat(UserListName),
                             Content = ex.Message,
                             CommonButtons = TaskDialogCommonButtons.Close,
                         }));
@@ -137,16 +137,17 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
         }
 
         private long _cursor = -1;
+
         private async Task<bool> ReadMoreIds()
         {
             try
             {
-                if (this._cursor == 0) return false;
-                var account = Setting.Accounts.GetRelatedOne(this._parent.User.User.Id);
+                if (_cursor == 0) return false;
+                var account = Setting.Accounts.GetRelatedOne(_parent.User.User.Id);
                 if (account == null) return false;
-                var friends = await this.GetUsersApiImpl(account, _parent.User.User.Id, this._cursor);
+                var friends = await GetUsersApiImpl(account, _parent.User.User.Id, _cursor);
                 friends.Result.ForEach(_userIds.Add);
-                this._cursor = friends.NextCursor;
+                _cursor = friends.NextCursor;
                 return true;
             }
             catch (Exception ex)
@@ -156,7 +157,8 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                     {
                         Title = SearchFlipResources.MsgUserInfoLoadErrorTitle,
                         MainIcon = VistaTaskDialogIcon.Error,
-                        MainInstruction = SearchFlipResources.MsgUserInfoLoadErrorInstFormat.SafeFormat(UserListName),
+                        MainInstruction =
+                            SearchFlipResources.MsgUserInfoLoadErrorInstFormat.SafeFormat(UserListName),
                         Content = ex.Message,
                         CommonButtons = TaskDialogCommonButtons.Close,
                     }));

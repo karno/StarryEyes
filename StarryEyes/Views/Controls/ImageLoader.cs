@@ -62,7 +62,7 @@ namespace StarryEyes.Views.Controls
         private static readonly Dictionary<Uri, LinkedListNode<Tuple<Uri, byte[], DateTime>>> _cacheTable =
             new Dictionary<Uri, LinkedListNode<Tuple<Uri, byte[], DateTime>>>();
 
-        private static bool GetCache([NotNull] Uri uri, out byte[] cache)
+        private static bool GetCache([CanBeNull] Uri uri, out byte[] cache)
         {
             cache = null;
             if (uri == null) throw new ArgumentNullException("uri");
@@ -89,7 +89,7 @@ namespace StarryEyes.Views.Controls
             return true;
         }
 
-        private static void SetCache([NotNull] Uri uri, [NotNull]byte[] imageByte)
+        private static void SetCache([CanBeNull] Uri uri, [CanBeNull]byte[] imageByte)
         {
             lock (_cacheList)
             {
@@ -590,7 +590,7 @@ namespace StarryEyes.Views.Controls
         {
             private Stream _stream;
 
-            public WrappingStream([NotNull] Stream stream)
+            public WrappingStream([CanBeNull] Stream stream)
             {
                 if (stream == null) throw new ArgumentNullException("stream");
                 this._stream = stream;

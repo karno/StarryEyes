@@ -1,6 +1,6 @@
 ﻿using System;
+using Cadena.Data;
 using StarryEyes.Albireo.Helpers;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Casket;
 using StarryEyes.Filters.Expressions.Operators;
 
@@ -30,7 +30,7 @@ namespace StarryEyes.Filters.Expressions
 
         protected void RaiseInvalidateFilter()
         {
-            this.InvalidateRequested.SafeInvoke();
+            InvalidateRequested.SafeInvoke();
         }
     }
 
@@ -59,10 +59,10 @@ namespace StarryEyes.Filters.Expressions
             set
             {
                 if (_operator != null)
-                    _operator.InvalidateRequested -= this.RaiseInvalidateFilter;
+                    _operator.InvalidateRequested -= RaiseInvalidateFilter;
                 _operator = value;
                 if (_operator != null)
-                    _operator.InvalidateRequested += this.RaiseInvalidateFilter;
+                    _operator.InvalidateRequested += RaiseInvalidateFilter;
             }
         }
 
@@ -73,12 +73,12 @@ namespace StarryEyes.Filters.Expressions
 
         public string GetSqlQuery()
         {
-            return this.Operator == null ? "1" : this.Operator.GetBooleanSqlQuery();
+            return Operator == null ? "1" : Operator.GetBooleanSqlQuery();
         }
 
         public Func<TwitterStatus, bool> GetEvaluator()
         {
-            return this.Operator == null ? Tautology : this.Operator.GetBooleanValueProvider();
+            return Operator == null ? Tautology : Operator.GetBooleanValueProvider();
         }
 
         public override void BeginLifecycle()

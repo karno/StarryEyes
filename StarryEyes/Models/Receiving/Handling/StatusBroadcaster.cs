@@ -2,8 +2,8 @@
 using System.Collections.Concurrent;
 using System.Reactive.Subjects;
 using System.Threading;
+using Cadena.Data;
 using JetBrains.Annotations;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models.Subsystems;
 using StarryEyes.Models.Timelines.Statuses;
 
@@ -26,10 +26,7 @@ namespace StarryEyes.Models.Receiving.Handling
 
         private static volatile bool _isHaltRequested;
 
-        public static IObservable<StatusModelNotification> BroadcastPoint
-        {
-            get { return _broadcastSubject; }
-        }
+        public static IObservable<StatusModelNotification> BroadcastPoint => _broadcastSubject;
 
         static StatusBroadcaster()
         {
@@ -46,22 +43,22 @@ namespace StarryEyes.Models.Receiving.Handling
             _pumpThread.Start();
         }
 
-        internal static async void Enqueue([NotNull] StatusNotification status)
+        internal static async void Enqueue([CanBeNull] StatusNotification status)
         {
-            if (status == null) throw new ArgumentNullException("status");
+            if (status == null) throw new ArgumentNullException(nameof(status));
             _queue.Enqueue(await StatusModelNotification.FromStatusNotification(status, true).ConfigureAwait(false));
             _signal.Set();
         }
 
-        public static async void Republish([NotNull] TwitterStatus status)
+        public static async void Republish([CanBeNull] TwitterStatus status)
         {
-            if (status == null) throw new ArgumentNullException("status");
+            if (status == null) throw new ArgumentNullException(nameof(status));
             Republish(await StatusModel.Get(status).ConfigureAwait(false));
         }
 
-        public static void Republish([NotNull] StatusModel status)
+        public static void Republish([CanBeNull] StatusModel status)
         {
-            if (status == null) throw new ArgumentNullException("status");
+            if (status == null) throw new ArgumentNullException(nameof(status));
             _queue.Enqueue(new StatusModelNotification(status, true, false));
             _signal.Set();
         }
@@ -74,7 +71,7 @@ namespace StarryEyes.Models.Receiving.Handling
                 _signal.Reset();
                 while (_queue.TryDequeue(out notification) && !_isHaltRequested)
                 {
-                    var status = notification.StatusModel == null ? null : notification.StatusModel.Status;
+                    var status = notification.StatusModel?.Status;
                     var added = notification.IsAdded && status != null;
                     if (added && MuteBlockManager.IsUnwanted(status))
                     {

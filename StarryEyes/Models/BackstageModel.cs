@@ -4,6 +4,7 @@ using Livet;
 using StarryEyes.Albireo.Helpers;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages;
+using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Models.Backstages.TwitterEvents;
 using StarryEyes.Models.Receiving;
 using StarryEyes.Settings;
@@ -30,19 +31,17 @@ namespace StarryEyes.Models
             ReceiveManager.UserStreamsConnectionStateChanged += UpdateConnectionState;
         }
 
-        static void UpdateConnectionState(TwitterAccount account)
+        static void UpdateConnectionState(long id)
         {
-            var avm = _accounts.FirstOrDefault(vm => vm.Account.Id == account.Id);
-            if (avm != null)
-            {
-                avm.UpdateConnectionState();
-            }
+            var avm = _accounts.FirstOrDefault(vm => vm.Account.Id == id);
+            avm?.UpdateConnectionState();
         }
 
         #region Account and connection state management
 
         private static readonly ObservableSynchronizedCollectionEx<BackstageAccountModel> _accounts =
             new ObservableSynchronizedCollectionEx<BackstageAccountModel>();
+
         public static ObservableSynchronizedCollectionEx<BackstageAccountModel> Accounts
         {
             get { return _accounts; }
@@ -57,7 +56,7 @@ namespace StarryEyes.Models
             }
         }
 
-        #endregion
+        #endregion Account and connection state management
 
         #region Event management
 
@@ -65,6 +64,7 @@ namespace StarryEyes.Models
 
         private static readonly ObservableSynchronizedCollectionEx<TwitterEventBase> _twitterEvents =
             new ObservableSynchronizedCollectionEx<TwitterEventBase>();
+
         public static ObservableSynchronizedCollectionEx<TwitterEventBase> TwitterEvents
         {
             get { return _twitterEvents; }
@@ -80,7 +80,7 @@ namespace StarryEyes.Models
             if (tev == null) return;
             lock (_twitterEvents.SyncRoot)
             {
-                if(tev.IsLocalUserInvolved)
+                if (tev.IsLocalUserInvolved)
                     _twitterEvents.Insert(0, tev);
                 if (_twitterEvents.Count > TwitterEventMaxHoldCount)
                     _twitterEvents.RemoveAt(_twitterEvents.Count - 1);
@@ -97,12 +97,18 @@ namespace StarryEyes.Models
             }
         }
 
-        #endregion
+        #endregion Event management
 
         public static event Action CloseBackstage;
+
         public static void RaiseCloseBackstage()
         {
             CloseBackstage.SafeInvoke();
+        }
+
+        public static void NotifyException(Exception ex)
+        {
+            RegisterEvent(new OperationFailedEvent("FAIL", ex));
         }
     }
 }

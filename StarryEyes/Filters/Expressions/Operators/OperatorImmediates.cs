@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
+using Cadena.Data;
 
 namespace StarryEyes.Filters.Expressions.Operators
 {
     public class FilterNegate : FilterSingleValueOperator
     {
-        protected override string OperatorString
-        {
-            get { return "!"; }
-        }
+        protected override string OperatorString => "!";
 
         public override IEnumerable<FilterExpressionType> SupportedTypes
         {
@@ -38,19 +35,11 @@ namespace StarryEyes.Filters.Expressions.Operators
     /// </summary>
     public class FilterBracket : FilterSingleValueOperator
     {
-        protected override string OperatorString
-        {
-            get { return "()"; }
-        }
+        protected override string OperatorString => "()";
 
-        public override IEnumerable<FilterExpressionType> SupportedTypes
-        {
-            get
-            {
-                return Value == null ? new[] { FilterExpressionType.Boolean, FilterExpressionType.Set } :
-                    Value.SupportedTypes;
-            }
-        }
+        public override IEnumerable<FilterExpressionType> SupportedTypes => Value == null
+            ? new[] { FilterExpressionType.Boolean, FilterExpressionType.Set }
+            : Value.SupportedTypes;
 
         public override Func<TwitterStatus, bool> GetBooleanValueProvider()
         {
@@ -82,35 +71,35 @@ namespace StarryEyes.Filters.Expressions.Operators
 
         public override string GetBooleanSqlQuery()
         {
-            return this.Value == null ? "1" : "(" + this.Value.GetBooleanSqlQuery() + ")";
+            return Value == null ? "1" : "(" + Value.GetBooleanSqlQuery() + ")";
         }
 
         public override string GetNumericSqlQuery()
         {
-            return this.Value == null ? "1" : "(" + this.Value.GetNumericSqlQuery() + ")";
+            return Value == null ? "1" : "(" + Value.GetNumericSqlQuery() + ")";
         }
 
         public override string GetSetSqlQuery()
         {
-            return this.Value == null ? "1" : this.Value.GetSetSqlQuery();
+            return Value == null ? "1" : Value.GetSetSqlQuery();
         }
 
         public override string GetStringSqlQuery()
         {
-            return this.Value == null ? "1" : this.Value.GetStringSqlQuery();
+            return Value == null ? "1" : Value.GetStringSqlQuery();
         }
 
         public override string ToQuery()
         {
-            if (this.Value == null)
+            if (Value == null)
             {
                 return "()";
             }
-            if (this.Value is FilterBracket)
+            if (Value is FilterBracket)
             {
-                return this.Value.ToQuery();
+                return Value.ToQuery();
             }
-            return "(" + this.Value.ToQuery() + ")";
+            return "(" + Value.ToQuery() + ")";
         }
     }
 }

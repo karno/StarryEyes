@@ -2,20 +2,25 @@
 using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
-using StarryEyes.Anomaly.TwitterApi.Rest;
-using StarryEyes.Anomaly.Utils;
+using System.Reactive.Threading.Tasks;
+using System.Threading;
+using Cadena.Api.Rest;
+using Cadena.Data;
+using StarryEyes.Casket.DatabaseModels;
 
 namespace StarryEyes.Filters.Sources
 {
     public class FilterMentions : FilterSourceBase
     {
         private readonly string _screenName;
-        public FilterMentions() { }
+
+        public FilterMentions()
+        {
+        }
 
         public FilterMentions(string screenName)
         {
-            this._screenName = screenName;
+            _screenName = screenName;
         }
 
         public override Func<TwitterStatus, bool> GetEvaluator()
@@ -41,17 +46,15 @@ namespace StarryEyes.Filters.Sources
         protected override IObservable<TwitterStatus> ReceiveSink(long? maxId)
         {
             return Observable.Defer(() => GetAccountsFromString(_screenName).ToObservable())
-                .SelectMany(a => a.GetMentionsAsync(count: 50, maxId: maxId).ToObservable());
+                             .SelectMany(a => a
+                                 .CreateAccessor()
+                                 .GetMentionsAsync(50, null, includeRetweets: false, maxId: maxId,
+                                     cancellationToken: CancellationToken.None).ToObservable())
+                             .SelectMany(o => o.Result);
         }
 
-        public override string FilterKey
-        {
-            get { return "mentions"; }
-        }
+        public override string FilterKey => "mentions";
 
-        public override string FilterValue
-        {
-            get { return _screenName; }
-        }
+        public override string FilterValue => _screenName;
     }
 }

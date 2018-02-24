@@ -1,5 +1,5 @@
-﻿using StarryEyes.Anomaly;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
+﻿using Cadena;
+using Cadena.Data;
 using StarryEyes.Feather.Proxies;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;

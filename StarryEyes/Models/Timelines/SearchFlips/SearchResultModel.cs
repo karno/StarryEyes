@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using System.Threading;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
-using StarryEyes.Anomaly.TwitterApi.Rest;
-using StarryEyes.Anomaly.Utils;
+using Cadena.Api.Parameters;
+using Cadena.Api.Rest;
+using Cadena.Data;
 using StarryEyes.Filters;
 using StarryEyes.Filters.Expressions;
 using StarryEyes.Filters.Parsing;
@@ -25,58 +26,52 @@ namespace StarryEyes.Models.Timelines.SearchFlips
         private string _filterSql = FilterExpressionBase.ContradictionSql;
         private Func<TwitterStatus, bool> _filterFunc = FilterExpressionBase.Contradiction;
 
-        public string Query
-        {
-            get { return _query; }
-        }
+        public string Query => _query;
 
         public SearchResultModel(string query, SearchOption option)
         {
-            this._query = query;
-            this._option = option;
+            _query = query;
+            _option = option;
             if (option != SearchOption.Web)
             {
-                this.IsSubscribeBroadcaster = true;
+                IsSubscribeBroadcaster = true;
             }
-            this.PrepareFilter();
+            PrepareFilter();
         }
 
         private void PrepareFilter()
         {
             var disposable = new CompositeDisposable();
             var prev = Interlocked.Exchange(ref _previousFilterListener, disposable);
-            if (prev != null)
-            {
-                prev.Dispose();
-            }
-            switch (this._option)
+            prev?.Dispose();
+            switch (_option)
             {
                 case SearchOption.Web:
-                    this._filterFunc = FilterExpressionBase.Tautology;
+                    _filterFunc = FilterExpressionBase.Tautology;
                     break;
                 case SearchOption.Query:
                     try
                     {
-                        var fq = QueryCompiler.Compile(this._query);
+                        var fq = QueryCompiler.Compile(_query);
                         _filterQuery = fq;
                         fq.Activate();
                         disposable.Add(Disposable.Create(fq.Deactivate));
                         disposable.Add(Observable.FromEvent(
-                            h => fq.InvalidateRequired += h,
-                            h => fq.InvalidateRequired -= h)
-                                                 .Subscribe(r => this.QueueInvalidateTimeline()));
+                                                     h => fq.InvalidateRequired += h,
+                                                     h => fq.InvalidateRequired -= h)
+                                                 .Subscribe(r => QueueInvalidateTimeline()));
                     }
                     catch
                     {
                         _filterQuery = null;
-                        this._filterFunc = FilterExpressionBase.Contradiction;
-                        this._filterSql = FilterExpressionBase.ContradictionSql;
+                        _filterFunc = FilterExpressionBase.Contradiction;
+                        _filterSql = FilterExpressionBase.ContradictionSql;
                     }
                     break;
                 default:
-                    var splitted = this._query.Split(new[] { " ", "\t", "　" },
-                                       StringSplitOptions.RemoveEmptyEntries)
-                                .Distinct().ToArray();
+                    var splitted = _query.Split(new[] { " ", "\t", "　" },
+                                             StringSplitOptions.RemoveEmptyEntries)
+                                         .Distinct().ToArray();
                     var positive = splitted.Where(s => !s.StartsWith("-")).ToArray();
                     var negative = splitted.Where(s => s.StartsWith("-")).Select(s => s.Substring(1)).ToArray();
                     var filter = new Func<TwitterStatus, bool>(
@@ -85,22 +80,24 @@ namespace StarryEyes.Models.Timelines.SearchFlips
                                                     .IndexOf(s, StringComparison.CurrentCultureIgnoreCase) >= 0) &&
                             !negative.Any(s => status.GetEntityAidedText(EntityDisplayMode.LinkUri)
                                                      .IndexOf(s, StringComparison.CurrentCultureIgnoreCase) >= 0));
-                    var psql = positive.Select(s => "LOWER(EntityAidedText) like LOWER('%" + s + "%')").JoinString(" OR ");
-                    var nsql = negative.Select(s => "LOWER(EntityAidedText) not like LOWER('%" + s + "%')").JoinString(" AND ");
+                    var psql = positive.Select(s => "LOWER(EntityAidedText) like LOWER('%" + s + "%')")
+                                       .JoinString(" OR ");
+                    var nsql = negative.Select(s => "LOWER(EntityAidedText) not like LOWER('%" + s + "%')")
+                                       .JoinString(" AND ");
                     var sql = psql.SqlConcatAnd(nsql);
                     var ctab = TabManager.CurrentFocusTab;
-                    var ctf = ctab != null ? ctab.FilterQuery : null;
+                    var ctf = ctab?.FilterQuery;
                     if (_option == SearchOption.CurrentTab && ctf != null)
                     {
                         // add current tab filter
-                        this._filterSql = sql.SqlConcatAnd(ctf.GetSqlQuery());
+                        _filterSql = sql.SqlConcatAnd(ctf.GetSqlQuery());
                         var func = ctf.GetEvaluator();
-                        this._filterFunc = s => func(s) && filter(s);
+                        _filterFunc = s => func(s) && filter(s);
                     }
                     else
                     {
-                        this._filterSql = sql;
-                        this._filterFunc = filter;
+                        _filterSql = sql;
+                        _filterFunc = filter;
                     }
                     break;
             }
@@ -108,12 +105,13 @@ namespace StarryEyes.Models.Timelines.SearchFlips
 
         private IDisposable _previousFilterListener;
         private FilterQuery _filterQuery;
+
         protected override bool PreInvalidateTimeline()
         {
             if (_option == SearchOption.Query && _filterQuery != null)
             {
-                this._filterFunc = _filterQuery.GetEvaluator();
-                this._filterSql = _filterQuery.GetSqlQuery();
+                _filterFunc = _filterQuery.GetEvaluator();
+                _filterSql = _filterQuery.GetSqlQuery();
                 return !_filterQuery.IsPreparing;
             }
             return true;
@@ -121,7 +119,7 @@ namespace StarryEyes.Models.Timelines.SearchFlips
 
         protected override bool CheckAcceptStatusCore(TwitterStatus status)
         {
-            return this._filterFunc(status);
+            return _filterFunc(status);
         }
 
         protected override IObservable<TwitterStatus> Fetch(long? maxId, int? count)
@@ -130,17 +128,25 @@ namespace StarryEyes.Models.Timelines.SearchFlips
             {
                 var acc = Setting.Accounts.GetRandomOne();
                 if (acc == null) return Observable.Empty<TwitterStatus>();
-                System.Diagnostics.Debug.WriteLine("SEARCHPANE SEARCH QUERY: " + this._query);
-                return acc.SearchAsync(this._query, maxId: maxId, count: count,
-                    lang: String.IsNullOrWhiteSpace(Setting.SearchLanguage.Value) ? null : Setting.SearchLanguage.Value,
-                    locale: String.IsNullOrWhiteSpace(Setting.SearchLocale.Value) ? null : Setting.SearchLocale.Value)
+                System.Diagnostics.Debug.WriteLine("SEARCHPANE SEARCH QUERY: " + _query);
+                var param = new SearchParameter(_query, maxId: maxId, count: count,
+                    lang: String.IsNullOrWhiteSpace(Setting.SearchLanguage.Value)
+                        ? null
+                        : Setting.SearchLanguage.Value,
+                    locale: String.IsNullOrWhiteSpace(Setting.SearchLocale.Value)
+                        ? null
+                        : Setting.SearchLocale.Value);
+                return acc.CreateAccessor()
+                          .SearchAsync(param, CancellationToken.None)
                           .ToObservable()
+                          .SelectMany(s => s.Result)
                           .Do(StatusInbox.Enqueue);
             }
-            return StatusProxy.FetchStatuses(this._filterFunc, this._filterSql, maxId, count)
+            return StatusProxy.FetchStatuses(_filterFunc, _filterSql, maxId, count)
                               .ToObservable()
-                              .Merge(this._filterQuery != null
-                                  ? this._filterQuery.ReceiveSources(maxId)
+                              .SelectMany(s => s)
+                              .Merge(_filterQuery != null
+                                  ? _filterQuery.ReceiveSources(maxId)
                                   : Observable.Empty<TwitterStatus>());
         }
 
@@ -152,11 +158,12 @@ namespace StarryEyes.Models.Timelines.SearchFlips
                 case SearchOption.CurrentTab:
                     var pan = SplitPositiveNegativeQuery(_query);
                     var query = pan.Item1.Select(s => "text contains " + s.EscapeForQuery().Quote())
-                                   .Concat(pan.Item2.Select(s => "!(text contains " + s.EscapeForQuery().Quote() + ")"))
+                                   .Concat(
+                                       pan.Item2.Select(s => "!(text contains " + s.EscapeForQuery().Quote() + ")"))
                                    .JoinString("&&");
                     var ctab = TabManager.CurrentFocusTab;
-                    var ctf = ctab != null ? ctab.FilterQuery : null;
-                    if (this._option != SearchOption.CurrentTab || ctf == null)
+                    var ctf = ctab?.FilterQuery;
+                    if (_option != SearchOption.CurrentTab || ctf == null)
                     {
                         return "where " + query;
                     }
@@ -172,9 +179,9 @@ namespace StarryEyes.Models.Timelines.SearchFlips
                     };
                     return nfq.ToQuery();
                 case SearchOption.Query:
-                    return this._filterQuery == null ? "!()" : this._query;
+                    return _filterQuery == null ? "!()" : _query;
                 case SearchOption.Web:
-                    return "from search:" + this._query.EscapeForQuery().Quote() + " where ()";
+                    return "from search:" + _query.EscapeForQuery().Quote() + " where ()";
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -182,9 +189,8 @@ namespace StarryEyes.Models.Timelines.SearchFlips
 
         public static Tuple<IEnumerable<string>, IEnumerable<string>> SplitPositiveNegativeQuery(string query)
         {
-
             var splitted = query.Split(new[] { " ", "\t", "　" },
-                                       StringSplitOptions.RemoveEmptyEntries)
+                                    StringSplitOptions.RemoveEmptyEntries)
                                 .Distinct().ToArray();
             var positive = splitted.Where(s => !s.StartsWith("-")).ToArray();
             var negative = splitted.Where(s => s.StartsWith("-")).Select(s => s.Substring(1)).ToArray();
@@ -201,14 +207,17 @@ namespace StarryEyes.Models.Timelines.SearchFlips
         /// Search local store by keyword.
         /// </summary>
         Local,
+
         /// <summary>
         /// Search from tabs only
         /// </summary>
         CurrentTab,
+
         /// <summary>
         /// Search local store by query.
         /// </summary>
         Query,
+
         /// <summary>
         /// Search on web by keyword.
         /// </summary>

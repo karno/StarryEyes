@@ -8,7 +8,7 @@ namespace StarryEyes.Views.Adorners
 {
     public class InsertionAdorner : AdornerBase
     {
-        public InsertionAdorner([NotNull] UIElement adornedElement, bool lastItem = false)
+        public InsertionAdorner([CanBeNull] UIElement adornedElement, bool lastItem = false)
             : base(adornedElement)
         {
             var ctrl = CreateCursor();

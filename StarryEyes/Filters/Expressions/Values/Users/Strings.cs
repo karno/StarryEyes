@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
+using Cadena.Data;
+using StarryEyes.Helpers;
 
 namespace StarryEyes.Filters.Expressions.Values.Users
 {
@@ -13,7 +14,7 @@ namespace StarryEyes.Filters.Expressions.Values.Users
 
         public override Func<TwitterStatus, string> GetStringValueProvider()
         {
-            return _ => _.GetOriginal().User.ScreenName;
+            return s => s.GetOriginal().User.ScreenName;
         }
 
         public override string GetStringSqlQuery()
@@ -36,7 +37,7 @@ namespace StarryEyes.Filters.Expressions.Values.Users
 
         public override Func<TwitterStatus, string> GetStringValueProvider()
         {
-            return _ => _.GetOriginal().User.Name;
+            return s => s.GetOriginal().User.Name;
         }
 
         public override string GetStringSqlQuery()
@@ -59,7 +60,7 @@ namespace StarryEyes.Filters.Expressions.Values.Users
 
         public override Func<TwitterStatus, string> GetStringValueProvider()
         {
-            return _ => _.GetOriginal().User.Description;
+            return s => s.GetOriginal().User.Description;
         }
 
         public override string GetStringSqlQuery()
@@ -82,7 +83,7 @@ namespace StarryEyes.Filters.Expressions.Values.Users
 
         public override Func<TwitterStatus, string> GetStringValueProvider()
         {
-            return _ => _.GetOriginal().User.Location;
+            return s => s.GetOriginal().User.Location;
         }
 
         public override string GetStringSqlQuery()
@@ -105,7 +106,7 @@ namespace StarryEyes.Filters.Expressions.Values.Users
 
         public override Func<TwitterStatus, string> GetStringValueProvider()
         {
-            return _ => _.GetOriginal().User.Language;
+            return s => s.GetOriginal().User.Language;
         }
 
         public override string GetStringSqlQuery()
@@ -128,7 +129,7 @@ namespace StarryEyes.Filters.Expressions.Values.Users
 
         public override Func<TwitterStatus, string> GetStringValueProvider()
         {
-            return _ => _.RetweetedOriginal != null ? _.User.ScreenName : String.Empty;
+            return s => s.RetweetedStatus != null ? s.User.ScreenName : String.Empty;
         }
 
         public override string GetStringSqlQuery()
@@ -151,7 +152,7 @@ namespace StarryEyes.Filters.Expressions.Values.Users
 
         public override Func<TwitterStatus, string> GetStringValueProvider()
         {
-            return _ => _.RetweetedOriginal != null ? _.User.Name : String.Empty;
+            return s => s.RetweetedStatus != null ? s.User.Name : String.Empty;
         }
 
         public override string GetStringSqlQuery()
@@ -174,7 +175,7 @@ namespace StarryEyes.Filters.Expressions.Values.Users
 
         public override Func<TwitterStatus, string> GetStringValueProvider()
         {
-            return _ => _.RetweetedOriginal != null ? _.User.Description : String.Empty;
+            return s => s.RetweetedStatus != null ? s.User.Description : String.Empty;
         }
 
         public override string GetStringSqlQuery()
@@ -197,7 +198,7 @@ namespace StarryEyes.Filters.Expressions.Values.Users
 
         public override Func<TwitterStatus, string> GetStringValueProvider()
         {
-            return _ => _.RetweetedOriginal != null ? _.User.Location : String.Empty;
+            return s => s.RetweetedStatus != null ? s.User.Location : String.Empty;
         }
 
         public override string GetStringSqlQuery()
@@ -220,7 +221,7 @@ namespace StarryEyes.Filters.Expressions.Values.Users
 
         public override Func<TwitterStatus, string> GetStringValueProvider()
         {
-            return _ => _.RetweetedOriginal != null ? _.User.Language : String.Empty;
+            return s => s.RetweetedStatus != null ? s.User.Language : String.Empty;
         }
 
         public override string GetStringSqlQuery()

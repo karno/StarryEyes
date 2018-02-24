@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
-using StarryEyes.Anomaly;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
+using Cadena;
+using Cadena.Data;
 using StarryEyes.Feather.Injections;
 
 namespace StarryEyes.Feather.Proxies
@@ -150,10 +150,12 @@ namespace StarryEyes.Feather.Proxies
         /// Dispatch notification as normal status.
         /// </summary>
         Normal,
+
         /// <summary>
         /// Dispatch notification as status mention to me.
         /// </summary>
         Mention,
+
         /// <summary>
         /// Dispatch notification as private message.
         /// </summary>

@@ -1,25 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
+using Cadena.Data;
 
 namespace StarryEyes.Filters.Expressions.Operators
 {
     public class FilterOperatorEquals : FilterTwoValueOperator
     {
-        protected override string OperatorString
-        {
-            get { return "=="; }
-        }
+        protected override string OperatorString => "==";
 
-        protected virtual string SqlOperator
-        {
-            get { return " = "; }
-        }
+        protected virtual string SqlOperator => " = ";
 
         public override Func<TwitterStatus, bool> GetBooleanValueProvider()
         {
-            switch (this.GetArgumentIntersectTypes())
+            switch (GetArgumentIntersectTypes())
             {
                 case FilterExpressionType.Boolean:
                     var lbp = LeftValue.GetBooleanValueProvider();
@@ -41,7 +35,7 @@ namespace StarryEyes.Filters.Expressions.Operators
         public override string GetBooleanSqlQuery()
         {
             Func<FilterOperatorBase, string> converter;
-            switch (this.GetArgumentIntersectTypes())
+            switch (GetArgumentIntersectTypes())
             {
                 case FilterExpressionType.Boolean:
                     converter = f => f.GetBooleanSqlQuery();
@@ -50,7 +44,7 @@ namespace StarryEyes.Filters.Expressions.Operators
                     converter = f => f.GetNumericSqlQuery();
                     break;
                 case FilterExpressionType.String:
-                    if (this.GetStringComparison() == StringComparison.CurrentCultureIgnoreCase)
+                    if (GetStringComparison() == StringComparison.CurrentCultureIgnoreCase)
                     {
                         converter = f => "LOWER(" + f.GetStringSqlQuery() + ")";
                     }
@@ -91,7 +85,7 @@ namespace StarryEyes.Filters.Expressions.Operators
                     FilterExpressionType.Numeric,
                     FilterExpressionType.String
                 },
-                this.ToQuery());
+                ToQuery());
         }
 
         public override IEnumerable<FilterExpressionType> SupportedTypes
@@ -102,18 +96,9 @@ namespace StarryEyes.Filters.Expressions.Operators
 
     public class FilterOperatorNotEquals : FilterOperatorEquals
     {
-        protected override string OperatorString
-        {
-            get
-            {
-                return "!=";
-            }
-        }
+        protected override string OperatorString => "!=";
 
-        protected override string SqlOperator
-        {
-            get { return " <> "; }
-        }
+        protected override string SqlOperator => " <> ";
 
         public override Func<TwitterStatus, bool> GetBooleanValueProvider()
         {

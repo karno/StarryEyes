@@ -5,9 +5,9 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Cadena.Data;
 using Livet;
 using StarryEyes.Albireo.Helpers;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models.Receiving;
 using StarryEyes.Models.Receiving.Handling;
 using StarryEyes.Models.Timelines.Statuses;
@@ -174,7 +174,7 @@ namespace StarryEyes.Models.Timelines
             Statuses.RemoveWhere(s => s.Status.Id == id);
         }
 
-        #endregion
+        #endregion Status Global Receiver Control
 
         #region Read more and trimming
 
@@ -190,9 +190,9 @@ namespace StarryEyes.Models.Timelines
                 IsLoading = true;
             }
             await Fetch(maxId, TimelineChunkCount)
-                      .Where(CheckAcceptStatus)
-                      .Select(s => AddStatus(s, false))
-                      .LastOrDefaultAsync();
+                .Where(CheckAcceptStatus)
+                .Select(s => AddStatus(s, false))
+                .LastOrDefaultAsync();
             if (setLoadingFlag)
             {
                 IsLoading = false;
@@ -200,6 +200,7 @@ namespace StarryEyes.Models.Timelines
         }
 
         private int _trimCount;
+
         private void TrimTimeline()
         {
             Task.Run(() =>
@@ -233,7 +234,7 @@ namespace StarryEyes.Models.Timelines
             });
         }
 
-        #endregion
+        #endregion Read more and trimming
 
         #region Invalidate whole timeline
 
@@ -288,7 +289,7 @@ namespace StarryEyes.Models.Timelines
             });
         }
 
-        #endregion
+        #endregion Invalidate whole timeline
 
         #region Focusing
 
@@ -299,7 +300,7 @@ namespace StarryEyes.Models.Timelines
             FocusRequired.SafeInvoke();
         }
 
-        #endregion
+        #endregion Focusing
 
         #region Abstract Methods
 
@@ -318,7 +319,7 @@ namespace StarryEyes.Models.Timelines
 
         protected abstract IObservable<TwitterStatus> Fetch(long? maxId, int? count);
 
-        #endregion
+        #endregion Abstract Methods
 
         public void Dispose()
         {

@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
-using StarryEyes.Anomaly.TwitterApi.Rest;
+using Cadena.Api.Parameters;
+using Cadena.Api.Rest;
+using Cadena.Data;
 using StarryEyes.Models.Databases;
 using StarryEyes.Models.Receiving.Handling;
 using StarryEyes.Settings;
@@ -21,7 +23,8 @@ namespace StarryEyes.Models.Stores
             {
                 var acc = Setting.Accounts.GetRandomOne();
                 if (acc == null) return null;
-                status = await acc.ShowTweetAsync(id).ConfigureAwait(false);
+                status = (await acc.CreateAccessor().ShowTweetAsync(id, CancellationToken.None)
+                                   .ConfigureAwait(false)).Result;
                 StatusInbox.Enqueue(status);
             }
             return status;
@@ -34,7 +37,9 @@ namespace StarryEyes.Models.Stores
             {
                 var acc = Setting.Accounts.GetRelatedOne(id);
                 if (acc == null) return null;
-                user = await acc.ShowUserAsync(id).ConfigureAwait(false);
+
+                user = (await acc.CreateAccessor().ShowUserAsync(new UserParameter(id), CancellationToken.None)
+                                 .ConfigureAwait(false)).Result;
                 UserProxy.StoreUser(user);
             }
             return user;
@@ -47,7 +52,8 @@ namespace StarryEyes.Models.Stores
             {
                 var acc = Setting.Accounts.GetRandomOne();
                 if (acc == null) return null;
-                user = await acc.ShowUserAsync(screenName).ConfigureAwait(false);
+                user = (await acc.CreateAccessor().ShowUserAsync(new UserParameter(screenName), CancellationToken.None)
+                                 .ConfigureAwait(false)).Result;
                 UserProxy.StoreUser(user);
             }
             return user;
@@ -63,7 +69,8 @@ namespace StarryEyes.Models.Stores
                 var acc = Setting.Accounts.GetRelatedOne(id);
                 if (acc != null)
                 {
-                    var user = await acc.ShowUserAsync(id).ConfigureAwait(false);
+                    var user = (await acc.CreateAccessor().ShowUserAsync(new UserParameter(id), CancellationToken.None)
+                                         .ConfigureAwait(false)).Result;
                     UserProxy.StoreUser(user);
                     users.Add(user);
                 }

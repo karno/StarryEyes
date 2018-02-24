@@ -1,5 +1,8 @@
 ﻿using System.Collections.Generic;
-using StarryEyes.Models.Receiving.Receivers;
+using Cadena.Api.Parameters;
+using Cadena.Engine.CyclicReceivers.Timelines;
+using StarryEyes.Models.Accounting;
+using StarryEyes.Models.Receiving.Handling;
 
 namespace StarryEyes.Models.Receiving.Managers
 {
@@ -18,48 +21,50 @@ namespace StarryEyes.Models.Receiving.Managers
 
         public void RegisterSearchQuery(string query, ICollection<long> receiveCache)
         {
-            lock (this._searchLocker)
+            lock (_searchLocker)
             {
-                if (this._searchReferenceCount.ContainsKey(query))
+                if (_searchReferenceCount.ContainsKey(query))
                 {
-                    this._searchReferenceCount[query]++;
+                    _searchReferenceCount[query]++;
                 }
                 else
                 {
                     var list = new List<ICollection<long>>();
-                    this._receiveCaches.Add(query, list);
-                    this._searchReferenceCount.Add(query, 1);
-                    var receiver = new SearchReceiver(query, list);
-                    this._searchReceiverResolver.Add(query, receiver);
+                    _receiveCaches.Add(query, list);
+                    _searchReferenceCount.Add(query, 1);
+                    var receiver = new SearchReceiver(new RandomAccountAccessor(), StatusInbox.Enqueue,
+                        BackstageModel.NotifyException, new SearchParameter(query, count: 100));
+                    _searchReceiverResolver.Add(query, receiver);
+                    ReceiveManager.ReceiveEngine.RegisterReceiver(receiver);
                 }
             }
-            lock (this._receiveCaches[query])
+            lock (_receiveCaches[query])
             {
-                this._receiveCaches[query].Add(receiveCache);
+                _receiveCaches[query].Add(receiveCache);
             }
         }
 
         public void UnregisterSearchQuery(string query, ICollection<long> receiveCache)
         {
-            lock (this._searchLocker)
+            lock (_searchLocker)
             {
-                if (!this._searchReferenceCount.ContainsKey(query))
+                if (!_searchReferenceCount.ContainsKey(query))
                 {
                     return;
                 }
                 lock (_receiveCaches[query])
                 {
-                    this._receiveCaches[query].Remove(receiveCache);
+                    _receiveCaches[query].Remove(receiveCache);
                 }
-                if (--this._searchReferenceCount[query] != 0)
+                if (--_searchReferenceCount[query] != 0)
                 {
                     return;
                 }
-                this._receiveCaches.Remove(query);
-                this._searchReferenceCount.Remove(query);
-                var receiver = this._searchReceiverResolver[query];
-                this._searchReceiverResolver.Remove(query);
-                receiver.Dispose();
+                _receiveCaches.Remove(query);
+                _searchReferenceCount.Remove(query);
+                var receiver = _searchReceiverResolver[query];
+                _searchReceiverResolver.Remove(query);
+                ReceiveManager.ReceiveEngine.UnregisterReceiver(receiver);
             }
         }
     }

@@ -2,14 +2,13 @@
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using Cadena.Data;
 using StarryEyes.Albireo.Helpers;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Globalization;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Models.Backstages.NotificationEvents.PostEvents;
 using StarryEyes.Models.Receiving;
-using StarryEyes.Models.Receiving.Receivers;
 using StarryEyes.Models.Stores;
 using StarryEyes.Models.Subsystems;
 using StarryEyes.Settings;
@@ -36,10 +35,7 @@ namespace StarryEyes.Models.Backstages
             TwitterUserChanged.SafeInvoke();
         }
 
-        public TwitterAccount Account
-        {
-            get { return _account; }
-        }
+        public TwitterAccount Account => _account;
 
         public UserStreamsConnectionState ConnectionState
         {
@@ -52,15 +48,9 @@ namespace StarryEyes.Models.Backstages
             }
         }
 
-        public TwitterUser User
-        {
-            get { return _user; }
-        }
+        public TwitterUser User => _user;
 
-        public int CurrentPostCount
-        {
-            get { return PostLimitPredictionService.GetCurrentWindowCount(Account.Id); }
-        }
+        public int CurrentPostCount => PostLimitPredictionService.GetCurrentWindowCount(Account.Id);
 
         public BackstageAccountModel(TwitterAccount account)
         {
@@ -130,10 +120,7 @@ namespace StarryEyes.Models.Backstages
                         FallbackPredictedReleaseTime = oldest.CreatedAt +
                                                        TimeSpan.FromSeconds(Setting.PostWindowTimeSec.Value);
                         // create timer
-                        if (_prevScheduled != null)
-                        {
-                            _prevScheduled.Dispose();
-                        }
+                        _prevScheduled?.Dispose();
                         _prevScheduled = Observable.Timer(FallbackPredictedReleaseTime)
                                                    .Subscribe(_ =>
                                                    {

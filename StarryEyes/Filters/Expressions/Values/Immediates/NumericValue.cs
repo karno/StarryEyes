@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
+using Cadena.Data;
 
 namespace StarryEyes.Filters.Expressions.Values.Immediates
 {
@@ -11,7 +11,7 @@ namespace StarryEyes.Filters.Expressions.Values.Immediates
 
         public NumericValue(long value)
         {
-            this._value = value;
+            _value = value;
         }
 
         public override IEnumerable<FilterExpressionType> SupportedTypes

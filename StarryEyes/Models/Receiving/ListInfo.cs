@@ -1,15 +1,18 @@
 ﻿using System;
+using Cadena.Api.Parameters;
 
 namespace StarryEyes.Models.Receiving
 {
     public class ListInfo : IEquatable<ListInfo>, IComparable<ListInfo>, IComparable
     {
-        public ListInfo() { }
+        public ListInfo()
+        {
+        }
 
         public ListInfo(string screenName, string slug)
         {
-            this.OwnerScreenName = screenName;
-            this.Slug = slug;
+            OwnerScreenName = screenName;
+            Slug = slug;
         }
 
         public string Slug { get; set; }
@@ -18,37 +21,42 @@ namespace StarryEyes.Models.Receiving
 
         public override bool Equals(object obj)
         {
-            return this.Equals(obj as ListInfo);
+            return Equals(obj as ListInfo);
         }
 
         public bool Equals(ListInfo other)
         {
             if (other == null) return false;
-            return other.OwnerScreenName.Equals(this.OwnerScreenName, StringComparison.CurrentCultureIgnoreCase) &&
-                   other.Slug.Equals(this.Slug, StringComparison.CurrentCultureIgnoreCase);
+            return other.OwnerScreenName.Equals(OwnerScreenName, StringComparison.CurrentCultureIgnoreCase) &&
+                   other.Slug.Equals(Slug, StringComparison.CurrentCultureIgnoreCase);
         }
 
         public override int GetHashCode()
         {
-            return this.OwnerScreenName.GetHashCode() ^ this.Slug.GetHashCode();
+            return OwnerScreenName.GetHashCode() ^ Slug.GetHashCode();
         }
 
         public int CompareTo(object obj)
         {
-            return this.CompareTo((ListInfo)obj);
+            return CompareTo((ListInfo)obj);
         }
 
         public int CompareTo(ListInfo other)
         {
             return String.Compare(
-                this.OwnerScreenName + "/" + this.Slug,
+                OwnerScreenName + "/" + Slug,
                 other.OwnerScreenName + "/" + other.Slug,
                 StringComparison.Ordinal);
         }
 
         public override string ToString()
         {
-            return this.OwnerScreenName + "/" + this.Slug;
+            return OwnerScreenName + "/" + Slug;
+        }
+
+        public ListParameter ToParameter()
+        {
+            return new ListParameter(OwnerScreenName, Slug);
         }
     }
 }

@@ -1,16 +1,18 @@
 ﻿using System;
-using System.Globalization;
 using System.Net;
-using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using Cadena.Api;
+using Cadena.Api.Parameters;
+using Cadena.Api.Rest;
+using Cadena.Data;
+using Cadena.Engine;
+using Cadena.Engine.Requests;
 using JetBrains.Annotations;
 using Livet;
-using StarryEyes.Anomaly.TwitterApi;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
-using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Globalization.WindowParts;
 using StarryEyes.Models.Accounting;
-using StarryEyes.Models.Requests;
+using StarryEyes.Models.Subsystems;
 using StarryEyes.Nightmare.Windows;
 using StarryEyes.Views.Messaging;
 
@@ -29,97 +31,91 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
         private bool _isNoRetweets;
         private bool _isMutes;
 
-        public string SourceUserScreenName
-        {
-            get { return this._source.UnreliableScreenName; }
-        }
+        public string SourceUserScreenName => _source.UnreliableScreenName;
 
-        public Uri SourceUserProfileImage
-        {
-            get { return this._source.UnreliableProfileImage; }
-        }
+        public Uri SourceUserProfileImage => _source.UnreliableProfileImage;
 
         public bool IsCommunicating
         {
-            get { return this._isCommunicating; }
+            get => _isCommunicating;
             set
             {
-                this._isCommunicating = value;
-                this.RaisePropertyChanged();
+                _isCommunicating = value;
+                RaisePropertyChanged();
             }
         }
 
         public bool Enabled
         {
-            get { return this._enabled; }
+            get => _enabled;
             set
             {
-                this._enabled = value;
-                this.RaisePropertyChanged();
+                _enabled = value;
+                RaisePropertyChanged();
             }
         }
 
         public bool IsFollowing
         {
-            get { return this._isFollowing; }
+            get => _isFollowing;
             set
             {
-                this._isFollowing = value;
-                this.RaisePropertyChanged();
+                _isFollowing = value;
+                RaisePropertyChanged();
             }
         }
 
         public bool IsFollowedBack
         {
-            get { return this._isFollowedBack; }
+            get => _isFollowedBack;
             set
             {
-                this._isFollowedBack = value;
-                this.RaisePropertyChanged();
+                _isFollowedBack = value;
+                RaisePropertyChanged();
             }
         }
 
         public bool IsBlocking
         {
-            get { return this._isBlocking; }
+            get => _isBlocking;
             set
             {
-                this._isBlocking = value;
-                this.RaisePropertyChanged();
+                _isBlocking = value;
+                RaisePropertyChanged();
             }
         }
 
         public bool IsNoRetweets
         {
-            get { return this._isNoRetweets; }
+            get => _isNoRetweets;
             set
             {
-                this._isNoRetweets = value;
+                _isNoRetweets = value;
                 RaisePropertyChanged();
             }
         }
 
         public bool IsMutes
         {
-            get { return this._isMutes; }
+            get => _isMutes;
             set
             {
-                this._isMutes = value;
+                _isMutes = value;
                 RaisePropertyChanged();
             }
         }
 
         public RelationControlViewModel(UserInfoViewModel parent, TwitterAccount source, TwitterUser target)
         {
-            this._parent = parent;
-            this._source = source;
-            this._target = target;
+            _parent = parent;
+            _source = source;
+            _target = target;
             var rds = source.RelationData;
-            this.IsFollowing = rds.Followings.Contains(target.Id);
-            this.IsFollowedBack = rds.Followers.Contains(target.Id);
-            this.IsBlocking = rds.Blockings.Contains(target.Id);
-            this.IsNoRetweets = rds.NoRetweets.Contains(target.Id);
-            Task.Run(() => this.GetFriendship(rds));
+            IsFollowing = rds.Followings.Contains(target.Id);
+            IsFollowedBack = rds.Followers.Contains(target.Id);
+            IsBlocking = rds.Blockings.Contains(target.Id);
+            IsNoRetweets = rds.NoRetweets.Contains(target.Id);
+            Task.Run(() => GetFriendship(rds));
         }
 
         private async void GetFriendship(AccountRelationData rds)
@@ -127,51 +123,52 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             try
             {
                 // ReSharper disable InvertIf
-                var fs = await _source.ShowFriendshipAsync(_source.Id, _target.Id);
-                if (this.IsFollowing != fs.IsSourceFollowingTarget)
+                var fs = (await _source.CreateAccessor().ShowFriendshipAsync(new UserParameter(_source.Id),
+                    new UserParameter(_target.Id), CancellationToken.None)).Result;
+                if (IsFollowing != fs.IsSourceFollowingTarget)
                 {
-                    this.IsFollowing = fs.IsSourceFollowingTarget;
-                    await rds.Followings.SetAsync(this._target.Id, fs.IsSourceFollowingTarget);
+                    IsFollowing = fs.IsSourceFollowingTarget;
+                    await rds.Followings.SetAsync(_target.Id, fs.IsSourceFollowingTarget);
                 }
-                if (this.IsFollowedBack != fs.IsTargetFollowingSource)
+                if (IsFollowedBack != fs.IsTargetFollowingSource)
                 {
-                    this.IsFollowedBack = fs.IsTargetFollowingSource;
+                    IsFollowedBack = fs.IsTargetFollowingSource;
                     await rds.Followers.SetAsync(_target.Id, fs.IsTargetFollowingSource);
                 }
-                if (this.IsBlocking != fs.IsBlocking)
+                if (IsBlocking != fs.IsBlocking)
                 {
-                    this.IsBlocking = fs.IsBlocking;
+                    IsBlocking = fs.IsBlocking;
                     await rds.Blockings.SetAsync(_target.Id, fs.IsBlocking);
                 }
                 var nort = !fs.IsWantRetweets.GetValueOrDefault(true);
-                if (this.IsNoRetweets != nort)
+                if (IsNoRetweets != nort)
                 {
-                    this.IsNoRetweets = nort;
+                    IsNoRetweets = nort;
                     await rds.NoRetweets.SetAsync(_target.Id, nort);
                 }
 
                 var mute = fs.IsMuting.GetValueOrDefault(false);
-                if (this.IsMutes != mute)
+                if (IsMutes != mute)
                 {
-                    this.IsMutes = mute;
+                    IsMutes = mute;
                     await rds.Mutes.SetAsync(_target.Id, mute);
                 }
                 // ReSharper restore InvertIf
             }
             catch (Exception)
             {
-                this.Enabled = false;
+                Enabled = false;
             }
         }
 
         [UsedImplicitly]
         public void Follow()
         {
-            this.DispatchAction(
-                RelationKind.Follow,
+            DispatchAction(
+                Relationships.Follow,
                 () =>
                 {
-                    this.IsFollowing = true;
+                    IsFollowing = true;
                     Task.Run(() => _source.RelationData.Followings.SetAsync(_target.Id, true));
                 },
                 ex => ShowTaskDialogMessage(new TaskDialogOptions
@@ -180,18 +177,18 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                     MainIcon = VistaTaskDialogIcon.Error,
                     MainInstruction = SearchFlipResources.MsgErrorFollowInst,
                     Content = GetExceptionDescription(ex),
-                    CommonButtons = TaskDialogCommonButtons.Close,
+                    CommonButtons = TaskDialogCommonButtons.Close
                 }));
         }
 
         [UsedImplicitly]
         public void Remove()
         {
-            this.DispatchAction(
-                RelationKind.Unfollow,
+            DispatchAction(
+                Relationships.Unfollow,
                 () =>
                 {
-                    this.IsFollowing = false;
+                    IsFollowing = false;
                     Task.Run(() => _source.RelationData.Followings.SetAsync(_target.Id, false));
                 },
                 ex => ShowTaskDialogMessage(new TaskDialogOptions
@@ -200,19 +197,19 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                     MainIcon = VistaTaskDialogIcon.Error,
                     MainInstruction = SearchFlipResources.MsgErrorUnfollowInst,
                     Content = GetExceptionDescription(ex),
-                    CommonButtons = TaskDialogCommonButtons.Close,
+                    CommonButtons = TaskDialogCommonButtons.Close
                 }));
         }
 
         [UsedImplicitly]
         public void Block()
         {
-            this.DispatchAction(
-                RelationKind.Block,
+            DispatchAction(
+                Relationships.Block,
                 () =>
                 {
-                    this.IsFollowing = false;
-                    this.IsBlocking = true;
+                    IsFollowing = false;
+                    IsBlocking = true;
                     Task.Run(() => _source.RelationData.Followings.SetAsync(_target.Id, false));
                     Task.Run(() => _source.RelationData.Blockings.SetAsync(_target.Id, true));
                 },
@@ -222,18 +219,18 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                     MainIcon = VistaTaskDialogIcon.Error,
                     MainInstruction = SearchFlipResources.MsgErrorBlockInst,
                     Content = GetExceptionDescription(ex),
-                    CommonButtons = TaskDialogCommonButtons.Close,
+                    CommonButtons = TaskDialogCommonButtons.Close
                 }));
         }
 
         [UsedImplicitly]
         public void Unblock()
         {
-            this.DispatchAction(
-                RelationKind.Unblock,
+            DispatchAction(
+                Relationships.Unblock,
                 () =>
                 {
-                    this.IsBlocking = false;
+                    IsBlocking = false;
                     Task.Run(() => _source.RelationData.Blockings.SetAsync(_target.Id, false));
                 },
                 ex => ShowTaskDialogMessage(new TaskDialogOptions
@@ -242,18 +239,18 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                     MainIcon = VistaTaskDialogIcon.Error,
                     MainInstruction = SearchFlipResources.MsgErrorUnblockInst,
                     Content = GetExceptionDescription(ex),
-                    CommonButtons = TaskDialogCommonButtons.Close,
+                    CommonButtons = TaskDialogCommonButtons.Close
                 }));
         }
 
         [UsedImplicitly]
         public void SuppressRetweets()
         {
-            this.DispatchRetweetSuppression(
+            DispatchRetweetSuppression(
                 true,
                 () =>
                 {
-                    this.IsNoRetweets = true;
+                    IsNoRetweets = true;
                     Task.Run(() => _source.RelationData.NoRetweets.SetAsync(_target.Id, true));
                 },
                 ex => ShowTaskDialogMessage(new TaskDialogOptions
@@ -262,18 +259,18 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                     MainIcon = VistaTaskDialogIcon.Error,
                     MainInstruction = SearchFlipResources.MsgErrorSuppressRetweetsInst,
                     Content = GetExceptionDescription(ex),
-                    CommonButtons = TaskDialogCommonButtons.Close,
+                    CommonButtons = TaskDialogCommonButtons.Close
                 }));
         }
 
         [UsedImplicitly]
         public void UnsuppressRetweets()
         {
-            this.DispatchRetweetSuppression(
+            DispatchRetweetSuppression(
                 false,
                 () =>
                 {
-                    this.IsNoRetweets = false;
+                    IsNoRetweets = false;
                     Task.Run(() => _source.RelationData.NoRetweets.SetAsync(_target.Id, false));
                 },
                 ex => ShowTaskDialogMessage(new TaskDialogOptions
@@ -282,18 +279,18 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                     MainIcon = VistaTaskDialogIcon.Error,
                     MainInstruction = SearchFlipResources.MsgErrorUnsuppressRetweetsInst,
                     Content = GetExceptionDescription(ex),
-                    CommonButtons = TaskDialogCommonButtons.Close,
+                    CommonButtons = TaskDialogCommonButtons.Close
                 }));
         }
 
         [UsedImplicitly]
         public void Mute()
         {
-            this.DispatchMute(
+            DispatchMute(
                 true,
                 () =>
                 {
-                    this.IsMutes = true;
+                    IsMutes = true;
                     Task.Run(() => _source.RelationData.Mutes.SetAsync(_target.Id, true));
                 },
                 ex => ShowTaskDialogMessage(new TaskDialogOptions
@@ -302,18 +299,18 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                     MainIcon = VistaTaskDialogIcon.Error,
                     MainInstruction = SearchFlipResources.MsgErrorMuteInst,
                     Content = GetExceptionDescription(ex),
-                    CommonButtons = TaskDialogCommonButtons.Close,
+                    CommonButtons = TaskDialogCommonButtons.Close
                 }));
         }
 
         [UsedImplicitly]
         public void Unmute()
         {
-            this.DispatchMute(
+            DispatchMute(
                 false,
                 () =>
                 {
-                    this.IsMutes = false;
+                    IsMutes = false;
                     Task.Run(() => _source.RelationData.Mutes.SetAsync(_target.Id, false));
                 },
                 ex => ShowTaskDialogMessage(new TaskDialogOptions
@@ -322,19 +319,19 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                     MainIcon = VistaTaskDialogIcon.Error,
                     MainInstruction = SearchFlipResources.MsgErrorUnmuteInst,
                     Content = GetExceptionDescription(ex),
-                    CommonButtons = TaskDialogCommonButtons.Close,
+                    CommonButtons = TaskDialogCommonButtons.Close
                 }));
         }
 
         [UsedImplicitly]
         public void ReportForSpam()
         {
-            this.DispatchAction(
-                RelationKind.ReportAsSpam,
+            DispatchAction(
+                Relationships.ReportAsSpam,
                 () =>
                 {
-                    this.IsFollowing = false;
-                    this.IsBlocking = true;
+                    IsFollowing = false;
+                    IsBlocking = true;
                 },
                 ex => ShowTaskDialogMessage(new TaskDialogOptions
                 {
@@ -342,7 +339,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                     MainIcon = VistaTaskDialogIcon.Error,
                     MainInstruction = SearchFlipResources.MsgErrorReportSpamInst,
                     Content = GetExceptionDescription(ex),
-                    CommonButtons = TaskDialogCommonButtons.Close,
+                    CommonButtons = TaskDialogCommonButtons.Close
                 }));
         }
 
@@ -353,9 +350,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             {
                 return "Twitter API Error: " + tex.Message + Environment.NewLine +
                        "HTTP Status Code: " + tex.StatusCode + Environment.NewLine +
-                       "Twitter Error Code: " + (tex.TwitterErrorCode.HasValue
-                           ? tex.TwitterErrorCode.Value.ToString(CultureInfo.InvariantCulture)
-                           : "None");
+                       "Twitter Error Code: " + (tex.TwitterErrorCode?.ToString() ?? "None");
             }
             var wex = ex as WebException;
             if (wex != null)
@@ -368,31 +363,44 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
 
         private void DispatchRetweetSuppression(bool suppress, Action succeeded, Action<Exception> failed)
         {
-            this.IsCommunicating = true;
-            RequestQueue.EnqueueObservable(_source, new UpdateFriendshipsRequest(_target, null, suppress))
-                        .Finally(() => this.IsCommunicating = false)
-                        .Subscribe(_ => { }, failed, succeeded);
+            DispatchRequest(new UpdateFriendshipRequest(_source.CreateAccessor(),
+                new UserParameter(_target.Id), null, suppress), succeeded, failed);
         }
 
         private void DispatchMute(bool mute, Action succeeded, Action<Exception> failed)
         {
-            this.IsCommunicating = true;
-            RequestQueue.EnqueueObservable(_source, new UpdateMuteRequest(_target, mute))
-                        .Finally(() => this.IsCommunicating = false)
-                        .Subscribe(_ => { }, failed, succeeded);
+            DispatchRequest(new UpdateMuteRequest(_source.CreateAccessor(),
+                new UserParameter(_target.Id), mute), succeeded, failed);
         }
 
-        private void DispatchAction(RelationKind work, Action succeeded, Action<Exception> failed)
+        private void DispatchAction(Relationships relation, Action succeeded, Action<Exception> failed)
         {
-            this.IsCommunicating = true;
-            RequestQueue.EnqueueObservable(_source, new UpdateRelationRequest(_target, work))
-                        .Finally(() => this.IsCommunicating = false)
-                        .Subscribe(_ => { }, failed, succeeded);
+            DispatchRequest(new UpdateRelationRequest(_source.CreateAccessor(),
+                new UserParameter(_target.Id), relation), succeeded, failed);
+        }
+
+        private async void DispatchRequest<T>(IRequest<T> request, Action succeeded,
+            Action<Exception> failed)
+        {
+            IsCommunicating = true;
+            try
+            {
+                await RequestManager.Enqueue(request).ConfigureAwait(false);
+                succeeded();
+            }
+            catch (Exception ex)
+            {
+                failed(ex);
+            }
+            finally
+            {
+                IsCommunicating = false;
+            }
         }
 
         private void ShowTaskDialogMessage(TaskDialogOptions options)
         {
-            this._parent.Parent.Messenger.RaiseSafe(() => new TaskDialogMessage(options));
+            _parent.Parent.Messenger.RaiseSafe(() => new TaskDialogMessage(options));
         }
     }
 }

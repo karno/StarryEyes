@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
+using Cadena.Data;
 using StarryEyes.Filters.Expressions;
 using StarryEyes.Globalization.Filters;
 using StarryEyes.Models.Timelines.Tabs;
@@ -16,18 +16,20 @@ namespace StarryEyes.Filters.Sources
 
         private TabModel _tab;
 
-        public FilterLocal() { }
+        public FilterLocal()
+        {
+        }
 
         public FilterLocal(string tabName)
         {
-            this._tabName = tabName;
-            this.ResolveTabReference();
+            _tabName = tabName;
+            ResolveTabReference();
         }
 
         public override Func<TwitterStatus, bool> GetEvaluator()
         {
             ResolveTabReference();
-            return _tab == null || _tab.FilterQuery == null
+            return _tab?.FilterQuery == null
                 ? FilterExpressionBase.Tautology
                 : _tab.FilterQuery.GetEvaluator();
         }
@@ -35,20 +37,14 @@ namespace StarryEyes.Filters.Sources
         public override string GetSqlQuery()
         {
             ResolveTabReference();
-            return _tab == null || _tab.FilterQuery == null
+            return _tab?.FilterQuery == null
                 ? "1"
                 : _tab.FilterQuery.GetSqlQuery();
         }
 
-        public override string FilterKey
-        {
-            get { return "local"; }
-        }
+        public override string FilterKey => "local";
 
-        public override string FilterValue
-        {
-            get { return _tabName; }
-        }
+        public override string FilterValue => _tabName;
 
         private void ResolveTabReference()
         {
@@ -66,8 +62,8 @@ namespace StarryEyes.Filters.Sources
                 }
 
                 _tab = TabManager.GetColumnInfoData()
-                    .SelectMany(c => c.Tabs)
-                    .FirstOrDefault(t => t.Name == _tabName);
+                                 .SelectMany(c => c.Tabs)
+                                 .FirstOrDefault(t => t.Name == _tabName);
 
                 if (_tab == null)
                 {
@@ -76,12 +72,11 @@ namespace StarryEyes.Filters.Sources
             }
 
             if (EnumerableEx.Return(this)
-                .Expand(f => f._tab != null && f._tab.FilterQuery != null
-                    ? f._tab.FilterQuery.Sources.OfType<FilterLocal>()
-                    : Enumerable.Empty<FilterLocal>()
-                )
-                .Skip(1)
-                .Any(f => f._tab == _tab)
+                            .Expand(f => f._tab?.FilterQuery?.Sources.OfType<FilterLocal>() ??
+                                         Enumerable.Empty<FilterLocal>()
+                            )
+                            .Skip(1)
+                            .Any(f => f._tab == _tab)
             )
             {
                 throw new ArgumentException(FilterObjectResources.FilterLocalTabIsRecursion);

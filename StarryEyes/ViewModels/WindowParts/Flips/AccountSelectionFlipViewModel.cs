@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using Cadena.Api.Parameters;
+using Cadena.Api.Rest;
+using Cadena.Util;
 using Livet;
-using StarryEyes.Albireo;
 using StarryEyes.Albireo.Helpers;
-using StarryEyes.Anomaly.TwitterApi.Rest;
-using StarryEyes.Anomaly.Utils;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Settings;
 
@@ -19,13 +20,14 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
     {
         public AccountSelectionFlipViewModel()
         {
-            this.CompositeDisposable.Add(_accounts = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
+            CompositeDisposable.Add(_accounts = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
                 Setting.Accounts.Collection,
                 account => new SelectableAccountViewModel(this, account, RaiseSelectedAccountsChanged),
                 DispatcherHelper.UIDispatcher));
         }
 
         private string _selectionReason;
+
         /// <summary>
         /// Reason of selecting account
         /// </summary>
@@ -40,6 +42,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         }
 
         private readonly ReadOnlyDispatcherCollectionRx<SelectableAccountViewModel> _accounts;
+
         public ReadOnlyDispatcherCollectionRx<SelectableAccountViewModel> Accounts
         {
             get { return _accounts; }
@@ -59,16 +62,14 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                     .Where(i => i.IsSelected)
                     .Select(_ => _.TwitterAccount);
             }
-            set
-            {
-                SetSelectedAccountIds(value.Guard().Select(i => i.Id));
-            }
+            set { SetSelectedAccountIds(value.Guard().Select(i => i.Id)); }
         }
 
         public event Action SelectedAccountsChanged;
+
         private void RaiseSelectedAccountsChanged()
         {
-            this.SelectedAccountsChanged.SafeInvoke();
+            SelectedAccountsChanged.SafeInvoke();
         }
     }
 
@@ -78,74 +79,81 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
     public class SelectableAccountViewModel : ViewModel
     {
         private readonly TwitterAccount _account;
+
         public TwitterAccount TwitterAccount
         {
-            get { return this._account; }
+            get { return _account; }
         }
 
         private readonly AccountSelectionFlipViewModel _parent;
 
         private readonly Action _onSelectionChanged;
 
-        public SelectableAccountViewModel(AccountSelectionFlipViewModel parent, TwitterAccount account, Action onSelectionChanged)
+        public SelectableAccountViewModel(AccountSelectionFlipViewModel parent, TwitterAccount account,
+            Action onSelectionChanged)
         {
-            this._parent = parent;
-            this._account = account;
-            this._onSelectionChanged = onSelectionChanged;
+            _parent = parent;
+            _account = account;
+            _onSelectionChanged = onSelectionChanged;
         }
 
         private bool _isSelected;
+
         public bool IsSelected
         {
             get { return _isSelected; }
             set
             {
-                if (this._isSelected == value) return;
-                this._isSelected = value;
-                this.RaisePropertyChanged(() => this.IsSelected);
-                this._onSelectionChanged();
+                if (_isSelected == value) return;
+                _isSelected = value;
+                RaisePropertyChanged(() => IsSelected);
+                _onSelectionChanged();
             }
         }
 
         public long Id
         {
-            get { return this._account.Id; }
+            get { return _account.Id; }
         }
 
         public string ScreenName
         {
-            get { return this._account.UnreliableScreenName; }
+            get { return _account.UnreliableScreenName; }
         }
 
         public Uri ProfileImageUri
         {
             get
             {
-                if (this._account.UnreliableProfileImage == null)
+                if (_account.UnreliableProfileImage == null)
                 {
                     Task.Run(async () =>
                     {
                         try
                         {
-                            var user = await this._account.ShowUserAsync(this._account.Id);
-                            this._account.UnreliableProfileImage = user.ProfileImageUri.ChangeImageSize(ImageSize.Original);
-                            this.RaisePropertyChanged(() => ProfileImageUri);
+                            var user = await _account.CreateAccessor().ShowUserAsync(
+                                new UserParameter(_account.Id), CancellationToken.None);
+                            _account.UnreliableProfileImage =
+                                user.Result.ProfileImageUri.ChangeImageSize(ImageSize.Original);
+                            RaisePropertyChanged(() => ProfileImageUri);
                         }
-                        catch { }
+                        catch
+                        {
+                        }
                     });
                 }
-                return this._account.UnreliableProfileImage;
+                return _account.UnreliableProfileImage;
             }
         }
 
         public void ToggleSelection()
         {
-            this.IsSelected = !IsSelected;
+            IsSelected = !IsSelected;
         }
 
         public void SelectExcepted()
         {
-            _parent.SelectedAccounts = new[] { this._account };
+            _parent.SelectedAccounts = new[] { _account };
         }
     }
 }

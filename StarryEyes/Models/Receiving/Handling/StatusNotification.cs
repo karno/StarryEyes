@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
+using Cadena.Data;
 using JetBrains.Annotations;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models.Timelines.Statuses;
 
 namespace StarryEyes.Models.Receiving.Handling
@@ -10,48 +10,50 @@ namespace StarryEyes.Models.Receiving.Handling
     {
         public StatusNotification(long id)
         {
-            this.Status = null;
-            this.StatusId = id;
-            this.IsAdded = false;
-            this.IsNew = false;
+            Status = null;
+            StatusId = id;
+            IsAdded = false;
+            IsNew = false;
         }
 
-        public StatusNotification([NotNull] TwitterStatus status, bool added = true, bool isNew = true)
+        public StatusNotification([CanBeNull] TwitterStatus status, bool added = true, bool isNew = true)
         {
-            if (status == null) throw new ArgumentNullException("status");
-            this.Status = status;
-            this.StatusId = status.Id;
-            this.IsAdded = added;
-            this.IsNew = isNew;
+            Status = status ?? throw new ArgumentNullException(nameof(status));
+            StatusId = status.Id;
+            IsAdded = added;
+            IsNew = isNew;
         }
 
         /// <summary>
         /// Notify this status as new tweet
         /// </summary>
-        public bool IsNew { get; private set; }
+        public bool IsNew { get; }
 
         /// <summary>
         /// Flag for determine new receive notification or deleted notification
         /// </summary>
-        public bool IsAdded { get; private set; }
+        public bool IsAdded { get; }
 
         /// <summary>
         /// Target status id
         /// </summary>
-        public long StatusId { get; private set; }
+        public long StatusId { get; }
 
         /// <summary>
         /// Target status
         /// </summary>
         [CanBeNull]
-        public TwitterStatus Status { get; private set; }
+        public TwitterStatus Status { get; }
     }
 
     public class StatusModelNotification
     {
-        public static async Task<StatusModelNotification> FromStatusNotification(StatusNotification notification, bool isNew)
+        public static async Task<StatusModelNotification> FromStatusNotification(StatusNotification notification,
+            bool isNew)
         {
-            var model = notification.Status == null ? null : await StatusModel.Get(notification.Status).ConfigureAwait(false);
+            var model = notification.Status == null
+                ? null
+                : await StatusModel.Get(notification.Status).ConfigureAwait(false);
             return new StatusModelNotification(model, notification.IsAdded, isNew, notification.StatusId);
         }
 
@@ -67,19 +69,19 @@ namespace StarryEyes.Models.Receiving.Handling
 
         private StatusModelNotification(StatusModel model, bool isAdded, bool isNew, long statusId)
         {
-            this.IsNew = isNew;
-            this.IsAdded = isAdded;
-            this.StatusId = statusId;
-            this.StatusModel = model;
+            IsNew = isNew;
+            IsAdded = isAdded;
+            StatusId = statusId;
+            StatusModel = model;
         }
 
-        public bool IsNew { get; private set; }
+        public bool IsNew { get; }
 
-        public bool IsAdded { get; private set; }
+        public bool IsAdded { get; }
 
-        public long StatusId { get; private set; }
+        public long StatusId { get; }
 
         [CanBeNull]
-        public StatusModel StatusModel { get; private set; }
+        public StatusModel StatusModel { get; }
     }
 }

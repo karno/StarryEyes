@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
-using StarryEyes.Anomaly.TwitterApi.Rest;
+using System.Threading;
+using Cadena.Api.Rest;
 using StarryEyes.Globalization.Models;
 using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Settings;
@@ -14,27 +15,12 @@ namespace StarryEyes.Models.Subsystems
         public const int NewTextMaxLength = 280;
 
         // default values
-        private static int _httpUrlLength = 22;
-        private static int _httpsUrlLength = 23;
-        private static int _mediaUrlLength = 23;
 
-        public static int HttpUrlLength
-        {
-            get { return _httpUrlLength; }
-            private set { _httpUrlLength = value; }
-        }
+        public static int HttpUrlLength { get; private set; } = 22;
 
-        public static int HttpsUrlLength
-        {
-            get { return _httpsUrlLength; }
-            private set { _httpsUrlLength = value; }
-        }
+        public static int HttpsUrlLength { get; private set; } = 23;
 
-        public static int MediaUrlLength
-        {
-            get { return _mediaUrlLength; }
-            private set { _mediaUrlLength = value; }
-        }
+        public static int MediaUrlLength { get; private set; } = 23;
 
         internal static void Initialize()
         {
@@ -56,14 +42,16 @@ namespace StarryEyes.Models.Subsystems
             }
             try
             {
-                var config = await account.GetConfigurationAsync().ConfigureAwait(false);
+                var config = (await account.CreateAccessor().GetConfigurationAsync(CancellationToken.None)
+                                           .ConfigureAwait(false)).Result;
                 HttpUrlLength = config.ShortUrlLength;
                 HttpsUrlLength = config.ShortUrlLengthHttps;
                 MediaUrlLength = config.CharactersReservedPerMedia;
             }
             catch (Exception ex)
             {
-                BackstageModel.RegisterEvent(new OperationFailedEvent(SubsystemResources.TwitterConfigurationReceiveError, ex));
+                BackstageModel.RegisterEvent(
+                    new OperationFailedEvent(SubsystemResources.TwitterConfigurationReceiveError, ex));
                 // execute later
                 Observable.Timer(TimeSpan.FromMinutes(5))
                           .ObserveOn(TaskPoolScheduler.Default)

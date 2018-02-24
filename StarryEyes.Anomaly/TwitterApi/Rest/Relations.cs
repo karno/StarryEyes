@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Cadena;
 using StarryEyes.Anomaly.Ext;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest.Infrastructure;
@@ -36,18 +37,18 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
         {
             var param = new Dictionary<string, object>
             {
-                {"user_id", userId},
-                {"screen_name", screenName},
-                {"cursor", cursor},
-                {"count", count},
-                {"stringify_ids", "true"}
+                { "user_id", userId },
+                { "screen_name", screenName },
+                { "cursor", cursor },
+                { "count", count },
+                { "stringify_ids", "true" }
             }.ParametalizeForGet();
             var client = credential.CreateOAuthClient();
             var response = await client.GetAsync(new ApiAccess("friends/ids.json", param));
             return await response.ReadAsCursoredIdsAsync();
         }
 
-        #endregion
+        #endregion Friends
 
         #region Followers
 
@@ -74,18 +75,18 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
         {
             var param = new Dictionary<string, object>
             {
-                {"user_id", userId},
-                {"screen_name", screenName},
-                {"cursor", cursor},
-                {"count", count},
-                {"stringify_ids", "true"}
+                { "user_id", userId },
+                { "screen_name", screenName },
+                { "cursor", cursor },
+                { "count", count },
+                { "stringify_ids", "true" }
             }.ParametalizeForGet();
             var client = credential.CreateOAuthClient();
             var response = await client.GetAsync(new ApiAccess("followers/ids.json", param));
             return await response.ReadAsCursoredIdsAsync();
         }
 
-        #endregion
+        #endregion Followers
 
         #region Others
 
@@ -95,7 +96,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             if (credential == null) throw new ArgumentNullException("credential");
             var param = new Dictionary<string, object>
             {
-                {"stringify_ids", "true"}
+                { "stringify_ids", "true" }
             }.ParametalizeForGet();
             var client = credential.CreateOAuthClient();
             var respStr = await client.GetStringAsync(new ApiAccess("friendships/no_retweets/ids.json", param));
@@ -108,8 +109,8 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             if (credential == null) throw new ArgumentNullException("credential");
             var param = new Dictionary<string, object>
             {
-                {"cursor", cursor},
-                {"stringify_ids", "true"}
+                { "cursor", cursor },
+                { "stringify_ids", "true" }
             }.ParametalizeForGet();
             var client = credential.CreateOAuthClient();
             return await Task.Run(async () =>
@@ -122,7 +123,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             });
         }
 
-        #endregion
+        #endregion Others
 
         #region Follow
 
@@ -146,15 +147,15 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
         {
             var param = new Dictionary<string, object>
             {
-                {"user_id", userId},
-                {"screen_name", screenName},
+                { "user_id", userId },
+                { "screen_name", screenName },
             }.ParametalizeForPost();
             var client = credential.CreateOAuthClient();
             var response = await client.PostAsync(new ApiAccess("friendships/create.json"), param);
             return await response.ReadAsUserAsync();
         }
 
-        #endregion
+        #endregion Follow
 
         #region Remove
 
@@ -178,15 +179,15 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
         {
             var param = new Dictionary<string, object>
             {
-                {"user_id", userId},
-                {"screen_name", screenName},
+                { "user_id", userId },
+                { "screen_name", screenName },
             }.ParametalizeForPost();
             var client = credential.CreateOAuthClient();
             var response = await client.PostAsync(new ApiAccess("friendships/destroy.json"), param);
             return await response.ReadAsUserAsync();
         }
 
-        #endregion
+        #endregion Remove
 
         #region Show friendships
 
@@ -208,21 +209,21 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
 
         public static async Task<TwitterFriendship> ShowFriendshipCoreAsync(
             IOAuthCredential credential, long? sourceId, string sourceScreenName,
-                long? targetId, string targetScreenName)
+            long? targetId, string targetScreenName)
         {
             var param = new Dictionary<string, object>
             {
-                {"source_id", sourceId},
-                {"source_screen_name", sourceScreenName},
-                {"target_id", targetId},
-                {"target_screen_name", targetScreenName},
+                { "source_id", sourceId },
+                { "source_screen_name", sourceScreenName },
+                { "target_id", targetId },
+                { "target_screen_name", targetScreenName },
             }.ParametalizeForGet();
             var client = credential.CreateOAuthClient();
             var response = await client.GetAsync(new ApiAccess("friendships/show.json", param));
             return await response.ReadAsFriendshipAsync();
         }
 
-        #endregion
+        #endregion Show friendships
 
         #region Update friendships
 
@@ -249,17 +250,17 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
         {
             var param = new Dictionary<string, object>
             {
-                {"user_id", userId},
-                {"screen_name", screenName},
-                {"device", enableDeviceNotifications},
-                {"retweets", showRetweet},
+                { "user_id", userId },
+                { "screen_name", screenName },
+                { "device", enableDeviceNotifications },
+                { "retweets", showRetweet },
             }.ParametalizeForPost();
             var client = credential.CreateOAuthClient();
             var response = await client.PostAsync(new ApiAccess("friendships/update.json"), param);
             return await response.ReadAsFriendshipAsync();
         }
 
-        #endregion
+        #endregion Update friendships
 
         #region Mutes
 
@@ -283,8 +284,8 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
         {
             var param = new Dictionary<string, object>
             {
-                {"user_id", userId},
-                {"screen_name", screenName},
+                { "user_id", userId },
+                { "screen_name", screenName },
             }.ParametalizeForPost();
             var endpoint = mute ? "mutes/users/create" : "mutes/users/destroy";
             var client = credential.CreateOAuthClient();
@@ -292,6 +293,6 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return await response.ReadAsUserAsync();
         }
 
-        #endregion
+        #endregion Mutes
     }
 }

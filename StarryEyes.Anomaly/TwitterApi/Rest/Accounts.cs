@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Cadena;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest.Infrastructure;
 
@@ -15,7 +16,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             if (credential == null) throw new ArgumentNullException("credential");
             var param = new Dictionary<string, object>
             {
-                {"skip_status", true}
+                { "skip_status", true }
             }.ParametalizeForGet();
             var client = credential.CreateOAuthClient();
             var response = await client.GetAsync(new ApiAccess("account/verify_credentials.json", param));
@@ -30,11 +31,11 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             if (credential == null) throw new ArgumentNullException("credential");
             var param = new Dictionary<string, object>
             {
-                {"name", name},
-                {"url", url},
-                {"location", location},
-                {"description", description},
-                {"skip_status", true},
+                { "name", name },
+                { "url", url },
+                { "location", location },
+                { "description", description },
+                { "skip_status", true },
             }.ParametalizeForPost();
             var client = credential.CreateOAuthClient();
             var response = await client.PostAsync(new ApiAccess("account/update_profile.json"), param);
@@ -49,8 +50,8 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             if (image == null) throw new ArgumentNullException("image");
             var content = new MultipartFormDataContent
             {
-                {new StringContent("true"), "skip_status"},
-                {new ByteArrayContent(image), "image", "image.png"}
+                { new StringContent("true"), "skip_status" },
+                { new ByteArrayContent(image), "image", "image.png" }
             };
             var client = credential.CreateOAuthClient();
             var response = await client.PostAsync(new ApiAccess("account/update_profile_image.json"), content);

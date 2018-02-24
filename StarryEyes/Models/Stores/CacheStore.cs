@@ -4,7 +4,8 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Reactive.Linq;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
+using Cadena.Data;
+using Cadena.Data.Entities;
 using StarryEyes.Models.Receiving.Handling;
 
 namespace StarryEyes.Models.Stores
@@ -72,7 +73,7 @@ namespace StarryEyes.Models.Stores
         {
             status.Entities
                   .Guard()
-                  .Where(e => e.EntityType == EntityType.Hashtags)
+                  .OfType<TwitterHashtagEntity>()
                   .Select(e => e.DisplayText)
                   .ForEach(RegisterHashtag);
         }
@@ -105,6 +106,6 @@ namespace StarryEyes.Models.Stores
             }
         }
 
-        #endregion
+        #endregion Hashtag cache
     }
 }

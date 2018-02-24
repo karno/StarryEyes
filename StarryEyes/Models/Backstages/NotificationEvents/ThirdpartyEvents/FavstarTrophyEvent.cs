@@ -1,4 +1,4 @@
-﻿using StarryEyes.Anomaly.TwitterApi.DataModels;
+﻿using Cadena.Data;
 using StarryEyes.Views;
 
 namespace StarryEyes.Models.Backstages.NotificationEvents.ThirdpartyEvents
@@ -12,20 +12,11 @@ namespace StarryEyes.Models.Backstages.NotificationEvents.ThirdpartyEvents
             Status = status;
         }
 
-        public override string Title
-        {
-            get { return "TROPHY"; }
-        }
+        public override string Title => "TROPHY";
 
-        public override string Detail
-        {
-            get { return "Successfully picked it as tweet of the day: " + Status; }
-        }
+        public override string Detail => "Successfully picked it as tweet of the day: " + Status;
 
-        public override System.Windows.Media.Color Background
-        {
-            get { return MetroColors.Pink; }
-        }
+        public override System.Windows.Media.Color Background => MetroColors.Pink;
     }
 
     public class TrophyFailedEvent : BackstageEventBase
@@ -39,19 +30,10 @@ namespace StarryEyes.Models.Backstages.NotificationEvents.ThirdpartyEvents
             Response = response;
         }
 
-        public override string Title
-        {
-            get { return "TROPHY FAILED"; }
-        }
+        public override string Title => "TROPHY FAILED";
 
-        public override string Detail
-        {
-            get { return Response; }
-        }
+        public override string Detail => Response;
 
-        public override System.Windows.Media.Color Background
-        {
-            get { return MetroColors.Red; }
-        }
+        public override System.Windows.Media.Color Background => MetroColors.Red;
     }
 }

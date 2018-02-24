@@ -39,14 +39,14 @@ namespace StarryEyes.Settings.Themes
             set { UnreadCount = value.ToColor(); }
         }
 
-        #endregion
+        #endregion Serialization properties
 
         private FontTheme _tabFont;
 
         /// <summary>
         /// Tab font
         /// </summary>
-        [DataMember(Order = 0), NotNull]
+        [DataMember(Order = 0), CanBeNull]
         public FontTheme TabFont
         {
             get { return _tabFont ?? (_tabFont = FontTheme.Default); }

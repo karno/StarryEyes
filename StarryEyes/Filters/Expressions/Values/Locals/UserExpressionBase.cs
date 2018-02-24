@@ -33,13 +33,17 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 
         public abstract string ToQuery();
 
-        public virtual void BeginLifecycle() { }
+        public virtual void BeginLifecycle()
+        {
+        }
 
-        public virtual void EndLifecycle() { }
+        public virtual void EndLifecycle()
+        {
+        }
 
         protected void RaiseReapplyFilter(RelationDataChangedInfo relInfo)
         {
-            this.ReapplyRequested.SafeInvoke(relInfo);
+            ReapplyRequested.SafeInvoke(relInfo);
         }
 
         public event Action<RelationDataChangedInfo> ReapplyRequested;

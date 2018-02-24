@@ -13,7 +13,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Streams
     /// </summary>
     internal static class StreamWinder
     {
-        public static async Task Run([NotNull] Stream stream, [NotNull] Action<string> parser,
+        public static async Task Run([CanBeNull] Stream stream, [CanBeNull] Action<string> parser,
                TimeSpan readTimeout, CancellationToken cancellationToken)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
@@ -62,8 +62,8 @@ namespace StarryEyes.Anomaly.TwitterApi.Streams
             }
         }
 
-        private static void StartParserWorker([NotNull] BlockingCollection<string> collection,
-            [NotNull] Action<string> parser, CancellationToken token)
+        private static void StartParserWorker([CanBeNull] BlockingCollection<string> collection,
+            [CanBeNull] Action<string> parser, CancellationToken token)
         {
             if (collection == null) throw new ArgumentNullException(nameof(collection));
             if (parser == null) throw new ArgumentNullException(nameof(parser));

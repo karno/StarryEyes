@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Cadena.Data;
+using Cadena.Data.Entities;
 using JetBrains.Annotations;
 using StarryEyes.Albireo.Collections;
 using StarryEyes.Albireo.Helpers;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Filters.Expressions.Operators;
 using StarryEyes.Models.Databases;
 using StarryEyes.Models.Receiving;
@@ -20,23 +21,15 @@ namespace StarryEyes.Filters
             {
                 if (status.Recipient == null)
                 {
-                    throw new ArgumentException("Inconsistent status state: Recipient is not spcified in spite of status is direct message.");
+                    throw new ArgumentException(
+                        "Inconsistent status state: Recipient is not spcified in spite of status is direct message.");
                 }
                 return new[] { status.Recipient.Id };
             }
-            if (status.Entities == null)
-            {
-                return Enumerable.Empty<long>();
-            }
             return status.Entities
-                         .Where(e => e.EntityType == EntityType.UserMentions)
-                         .Select(e => e.UserId ?? 0)
+                         .OfType<TwitterUserMentionEntity>()
+                         .Select(e => e.Id)
                          .Where(id => id != 0);
-        }
-
-        public static TwitterStatus GetOriginal(this TwitterStatus status)
-        {
-            return status.RetweetedOriginal ?? status;
         }
 
         public static FilterOperatorBase And(this FilterOperatorBase left, FilterOperatorBase right)
@@ -71,7 +64,6 @@ namespace StarryEyes.Filters
         private readonly ListInfo _info;
         public event Action OnListMemberUpdated;
 
-        private readonly AVLTree<long> _ids = new AVLTree<long>();
         private long _listId;
         private bool _isActivated;
 
@@ -81,16 +73,10 @@ namespace StarryEyes.Filters
             ReceiveManager.ListMemberChanged += OnListMemberChanged;
         }
 
-        [NotNull]
-        public AVLTree<long> Ids
-        {
-            get { return _ids; }
-        }
+        [CanBeNull]
+        public AVLTree<long> Ids { get; } = new AVLTree<long>();
 
-        public long ListId
-        {
-            get { return _listId; }
-        }
+        public long ListId => _listId;
 
         private void OnListMemberChanged(ListInfo info)
         {

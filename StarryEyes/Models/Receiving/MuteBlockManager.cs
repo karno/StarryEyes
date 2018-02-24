@@ -4,10 +4,10 @@ using System.Globalization;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using Cadena.Data;
 using JetBrains.Annotations;
 using StarryEyes.Albireo.Collections;
 using StarryEyes.Albireo.Helpers;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Databases;
 using StarryEyes.Settings;
@@ -110,7 +110,6 @@ namespace StarryEyes.Models.Receiving
                     var r = rtIdFindTarget.Aggregate(String.Empty,
                         (c, t) => c.SqlConcatAnd("RetweeterId NOT IN (select TargetId from " + t + ")"));
                     exceptSql = "RetweeterId IS NULL".SqlConcatOr(r);
-
                 }
                 else
                 {
@@ -121,24 +120,24 @@ namespace StarryEyes.Models.Receiving
             }
         }
 
-        public static bool IsUnwanted([NotNull] TwitterStatus status)
+        public static bool IsUnwanted([CanBeNull] TwitterStatus status)
         {
-            if (status == null) throw new ArgumentNullException("status");
+            if (status == null) throw new ArgumentNullException(nameof(status));
             if (_muteBlockedUsers &&
                 (IsBlocked(status.User) ||
-                 (status.RetweetedOriginal != null && IsBlocked(status.RetweetedOriginal.User))))
+                 (status.RetweetedStatus != null && IsBlocked(status.RetweetedStatus.User))))
             {
                 // blocked user
                 return true;
             }
             if (_muteOfficialMutes &&
                 (IsOfficialMuted(status.User) ||
-                 (status.RetweetedOriginal != null && IsOfficialMuted(status.RetweetedOriginal.User))))
+                 (status.RetweetedStatus != null && IsOfficialMuted(status.RetweetedStatus.User))))
             {
                 // official muted user
                 return true;
             }
-            if (status.RetweetedOriginal != null &&
+            if (status.RetweetedStatus != null &&
                 _muteNoRetweets && IsNoRetweet(status.User))
             {
                 // no retweet specified
@@ -147,16 +146,16 @@ namespace StarryEyes.Models.Receiving
             return IsMuted(status);
         }
 
-        public static bool IsMuted([NotNull] TwitterStatus status)
+        public static bool IsMuted([CanBeNull] TwitterStatus status)
         {
-            if (status == null) throw new ArgumentNullException("status");
+            if (status == null) throw new ArgumentNullException(nameof(status));
             CheckUpdateMutes();
             return _muteFilter(status);
         }
 
-        public static bool IsBlocked([NotNull] TwitterUser user)
+        public static bool IsBlocked([CanBeNull] TwitterUser user)
         {
-            if (user == null) throw new ArgumentNullException("user");
+            if (user == null) throw new ArgumentNullException(nameof(user));
             return IsBlocked(user.Id);
         }
 
@@ -169,9 +168,9 @@ namespace StarryEyes.Models.Receiving
             }
         }
 
-        public static bool IsNoRetweet([NotNull] TwitterUser user)
+        public static bool IsNoRetweet([CanBeNull] TwitterUser user)
         {
-            if (user == null) throw new ArgumentNullException("user");
+            if (user == null) throw new ArgumentNullException(nameof(user));
             return IsNoRetweet(user.Id);
         }
 
@@ -184,9 +183,9 @@ namespace StarryEyes.Models.Receiving
             }
         }
 
-        public static bool IsOfficialMuted([NotNull] TwitterUser user)
+        public static bool IsOfficialMuted([CanBeNull] TwitterUser user)
         {
-            if (user == null) throw new ArgumentNullException("user");
+            if (user == null) throw new ArgumentNullException(nameof(user));
             return IsOfficialMuted(user.Id);
         }
 
@@ -248,8 +247,8 @@ namespace StarryEyes.Models.Receiving
                                 .JoinString(",");
             _muteFilter = s => !Setting.Accounts.Contains(s.User.Id) && eval(s);
             _muteSqlQuery = String.IsNullOrEmpty(sql)
-                                ? string.Empty
-                                : "(UserId IN (" + accIds + ") OR NOT (" + sql + "))";
+                ? string.Empty
+                : "(UserId IN (" + accIds + ") OR NOT (" + sql + "))";
         }
 
         private static void UpdateBlocks()
@@ -259,24 +258,21 @@ namespace StarryEyes.Models.Receiving
             Setting.Accounts
                    .Collection
                    .Select(a => a.RelationData)
-                // listen block change info
+                   // listen block change info
                    .Do(r => disposables.Add(
                        Observable.FromEvent<RelationDataChangedInfo>(
-                           h => r.AccountDataUpdated += h,
-                           h => r.AccountDataUpdated -= h)
+                                     h => r.AccountDataUpdated += h,
+                                     h => r.AccountDataUpdated -= h)
                                  .Where(info => info.Type == RelationDataType.Blocking)
                                  .Subscribe(_ => InvalidateBlocks())))
-                // select blocked users
+                   // select blocked users
                    .SelectMany(r => r.Blockings.Items)
                    .ForEach(repl.Add);
             _blockingUserIds = repl;
 
             var prev = _blockingDisposable;
             _blockingDisposable = disposables;
-            if (prev != null)
-            {
-                prev.Dispose();
-            }
+            prev?.Dispose();
         }
 
         private static void UpdateNoRetweets()
@@ -286,24 +282,21 @@ namespace StarryEyes.Models.Receiving
             Setting.Accounts
                    .Collection
                    .Select(a => a.RelationData)
-                // listen no retweet change info
+                   // listen no retweet change info
                    .Do(r => disposables.Add(
                        Observable.FromEvent<RelationDataChangedInfo>(
-                           h => r.AccountDataUpdated += h,
-                           h => r.AccountDataUpdated -= h)
+                                     h => r.AccountDataUpdated += h,
+                                     h => r.AccountDataUpdated -= h)
                                  .Where(info => info.Type == RelationDataType.NoRetweets)
                                  .Subscribe(_ => InvalidateNoRetweets())))
-                // select no retweet users
+                   // select no retweet users
                    .SelectMany(r => r.NoRetweets.Items)
                    .ForEach(repl.Add);
             _noRetweetUserIds = repl;
 
             var prev = _noRetweetDisposable;
             _noRetweetDisposable = disposables;
-            if (prev != null)
-            {
-                prev.Dispose();
-            }
+            prev?.Dispose();
         }
 
         private static void UpdateOfficialMutes()
@@ -313,24 +306,21 @@ namespace StarryEyes.Models.Receiving
             Setting.Accounts
                    .Collection
                    .Select(a => a.RelationData)
-                // listen no retweet change info
+                   // listen no retweet change info
                    .Do(r => disposables.Add(
                        Observable.FromEvent<RelationDataChangedInfo>(
-                           h => r.AccountDataUpdated += h,
-                           h => r.AccountDataUpdated -= h)
+                                     h => r.AccountDataUpdated += h,
+                                     h => r.AccountDataUpdated -= h)
                                  .Where(info => info.Type == RelationDataType.Mutes)
                                  .Subscribe(_ => InvalidateOfficialMutes())))
-                // select no retweet users
+                   // select no retweet users
                    .SelectMany(r => r.Mutes.Items)
                    .ForEach(repl.Add);
             _officialMuteUserIds = repl;
 
             var prev = _officialMuteDisposable;
             _officialMuteDisposable = disposables;
-            if (prev != null)
-            {
-                prev.Dispose();
-            }
+            prev?.Dispose();
         }
 
         private static void InvalidateMute()

@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using StarryEyes.Albireo;
+using Cadena.Engine;
 using StarryEyes.Albireo.Helpers;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Receiving.Managers;
-using StarryEyes.Models.Receiving.Receivers;
 
 namespace StarryEyes.Models.Receiving
 {
@@ -16,7 +15,9 @@ namespace StarryEyes.Models.Receiving
         private static UserReceiveManager _userReceiveManager;
         private static StreamTrackReceiveManager _streamTrackReceiveManager;
 
-        public static event Action<TwitterAccount> UserStreamsConnectionStateChanged;
+        public static readonly ReceiveEngine ReceiveEngine = new ReceiveEngine();
+
+        public static event Action<long> UserStreamsConnectionStateChanged;
 
         public static event Action<ListInfo> ListMemberChanged;
 
@@ -29,8 +30,9 @@ namespace StarryEyes.Models.Receiving
             _listMemberReceiveManager = new ListMemberReceiveManager();
             _listMemberReceiveManager.ListMemberChanged += li => ListMemberChanged.SafeInvoke(li);
             _streamTrackReceiveManager = new StreamTrackReceiveManager(_userReceiveManager);
-            _userReceiveManager.ConnectionStateChanged += arg => UserStreamsConnectionStateChanged.SafeInvoke(arg);
+            _userReceiveManager.ConnectionStateChanged += arg => UserStreamsConnectionStateChanged?.Invoke(arg.Id);
             BehaviorLogger.Log("RM", "init.");
+            ReceiveEngine.Begin();
         }
 
         public static void RegisterSearchQuery(string query, ICollection<long> receiveCache)
@@ -62,13 +64,13 @@ namespace StarryEyes.Models.Receiving
         public static void RegisterList(string receiver, ListInfo info)
         {
             RegisterListMember(receiver, info);
-            _listReceiveManager.StartReceive(receiver, info);
+            _listReceiveManager.StartReceive(info, receiver);
         }
 
         public static void RegisterList(TwitterAccount authInfo, ListInfo info)
         {
             RegisterListMember(authInfo, info);
-            _listReceiveManager.StartReceive(authInfo, info);
+            _listReceiveManager.StartReceive(info, authInfo);
         }
 
         public static void RegisterListMember(ListInfo info)
@@ -111,5 +113,14 @@ namespace StarryEyes.Models.Receiving
         {
             return _userReceiveManager.GetConnectionState(id);
         }
+    }
+
+    public enum UserStreamsConnectionState
+    {
+        Invalid = -1,
+        Disconnected,
+        Connecting,
+        Connected,
+        Waiting
     }
 }

@@ -4,8 +4,8 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Cadena.Data;
 using JetBrains.Annotations;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Casket;
 using StarryEyes.Casket.DatabaseModels;
 using StarryEyes.Models.Databases.Caching;
@@ -56,10 +56,10 @@ namespace StarryEyes.Models.Databases
         private static async Task StoreStatusesAsync(IEnumerable<TwitterStatus> statuses)
         {
             // extracting retweeted status
-            var store = statuses.SelectMany(s => s.RetweetedOriginal != null
-                ? new[] { s.RetweetedOriginal, s }
-                : new[] { s })
-                                .Select(s => StatusInsertBatch.CreateBatch(Mapper.Map(s), Mapper.Map(s.User)));
+            var store = statuses.SelectMany(s => new[] { s, s.RetweetedStatus, s.QuotedStatus })
+                                .Where(s => s != null)
+                                .Select(s => StatusInsertBatch.CreateBatch(Mapper.Map(s), Mapper.Map(s.User),
+                                    s.Recipient != null ? Mapper.Map(s.Recipient) : null));
             await DatabaseUtil.RetryIfLocked(() => Database.StoreStatuses(store)).ConfigureAwait(false);
             StatisticsService.SetQueuedStatusCount(_statusQueue.Count);
         }
@@ -89,7 +89,7 @@ namespace StarryEyes.Models.Databases
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine(ex);
+                Debug.WriteLine(ex);
                 return Enumerable.Empty<long>();
             }
         }
@@ -98,7 +98,7 @@ namespace StarryEyes.Models.Databases
         {
             if (_statusQueue.Contains(id)) return true;
             return await DatabaseUtil.RetryIfLocked(
-                () => Database.StatusCrud.GetAsync(id)).ConfigureAwait(false) != null;
+                       () => Database.StatusCrud.GetAsync(id)).ConfigureAwait(false) != null;
         }
 
         public static async Task<TwitterStatus> GetStatusAsync(long id)
@@ -109,7 +109,7 @@ namespace StarryEyes.Models.Databases
                 return cache;
             }
             var status = await DatabaseUtil.RetryIfLocked(() =>
-            Database.StatusCrud.GetAsync(id)).ConfigureAwait(false);
+                Database.StatusCrud.GetAsync(id)).ConfigureAwait(false);
             if (status == null) return null;
             return await LoadStatusAsync(status).ConfigureAwait(false);
         }
@@ -130,14 +130,15 @@ namespace StarryEyes.Models.Databases
             try
             {
                 var rts = await DatabaseUtil.RetryIfLocked(() =>
-                    Database.StatusCrud.GetRetweetedStatusesAsync(originalId)).ConfigureAwait(false);
+                                                Database.StatusCrud.GetRetweetedStatusesAsync(originalId))
+                                            .ConfigureAwait(false);
                 return rts.Select(r => r.Id)
-                          .Concat(_statusQueue.Find(s => s.RetweetedOriginalId == originalId)
+                          .Concat(_statusQueue.Find(s => s.RetweetedStatus?.Id == originalId)
                                               .Select(s => s.Id));
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine(ex);
+                Debug.WriteLine(ex);
                 return Enumerable.Empty<long>();
             }
         }
@@ -145,12 +146,13 @@ namespace StarryEyes.Models.Databases
         public static async Task<IEnumerable<long>> FindFromInReplyToAsync(long inReplyTo)
         {
             var replies = await DatabaseUtil.RetryIfLocked(() =>
-            Database.StatusCrud.FindFromInReplyToAsync(inReplyTo)).ConfigureAwait(false);
+                                                Database.StatusCrud.FindFromInReplyToAsync(inReplyTo))
+                                            .ConfigureAwait(false);
             return replies.Concat(_statusQueue.Find(s => s.InReplyToStatusId == inReplyTo)
                                               .Select(s => s.Id));
         }
 
-        #endregion
+        #endregion Store and remove statuses
 
         #region Favorites and retweets
 
@@ -188,14 +190,14 @@ namespace StarryEyes.Models.Databases
                 var favorers = DatabaseUtil.RetryIfLocked(() =>
                     Database.FavoritesCrud.GetUsersAsync(status.Id)).ConfigureAwait(false);
                 var retweeters = DatabaseUtil.RetryIfLocked(() =>
-                Database.RetweetsCrud.GetUsersAsync(status.Id)).ConfigureAwait(false);
+                    Database.RetweetsCrud.GetUsersAsync(status.Id)).ConfigureAwait(false);
                 status.FavoritedUsers = (await favorers).Guard().Concat(favadd).Except(favremove).ToArray();
                 status.RetweetedUsers = (await retweeters).Guard().Concat(rtadd).Except(rtremove).ToArray();
             }
             return status;
         }
 
-        #endregion
+        #endregion Favorites and retweets
 
         public static Task<IEnumerable<TwitterStatus>> FetchStatuses(
             Func<TwitterStatus, bool> predicate, string sql,
@@ -203,7 +205,7 @@ namespace StarryEyes.Models.Databases
         {
             if (count < 1)
             {
-                throw new ArgumentOutOfRangeException("count");
+                throw new ArgumentOutOfRangeException(nameof(count));
             }
             var cacheReader = FindCache(predicate, maxId, applyMuteBlockFilter);
             if (maxId != null)
@@ -234,7 +236,8 @@ namespace StarryEyes.Models.Databases
                     .ToArray();
 
                 // await finding cache
-                var cachedStatus = (await cacheReader.ConfigureAwait(false)).OrderByDescending(d => d.Id).AsEnumerable();
+                var cachedStatus = (await cacheReader.ConfigureAwait(false))
+                    .OrderByDescending(d => d.Id).AsEnumerable();
 
                 if (count != null && fetched.Length == count)
                 {
@@ -272,9 +275,9 @@ namespace StarryEyes.Models.Databases
 
         #region Load from database
 
-        private static async Task<TwitterStatus> LoadStatusAsync([NotNull] DatabaseStatus dbstatus)
+        private static async Task<TwitterStatus> LoadStatusAsync([CanBeNull] DatabaseStatus dbstatus)
         {
-            if (dbstatus == null) throw new ArgumentNullException("dbstatus");
+            if (dbstatus == null) throw new ArgumentNullException(nameof(dbstatus));
             return await DatabaseUtil.RetryIfLocked(() =>
             {
                 switch (dbstatus.StatusType)
@@ -289,9 +292,9 @@ namespace StarryEyes.Models.Databases
             }).ConfigureAwait(false);
         }
 
-        private static async Task<TwitterStatus> LoadPublicStatusAsync([NotNull] DatabaseStatus dbstatus)
+        private static async Task<TwitterStatus> LoadPublicStatusAsync([CanBeNull] DatabaseStatus dbstatus)
         {
-            if (dbstatus == null) throw new ArgumentNullException("dbstatus");
+            if (dbstatus == null) throw new ArgumentNullException(nameof(dbstatus));
             var id = dbstatus.Id;
             var user = DatabaseUtil.RetryIfLocked(() =>
                 UserProxy.GetUserAsync(dbstatus.UserId)).ConfigureAwait(false);
@@ -303,37 +306,41 @@ namespace StarryEyes.Models.Databases
                 Database.RetweetsCrud.GetUsersAsync(id)).ConfigureAwait(false);
             try
             {
-                if (dbstatus.RetweetOriginalId != null)
+                if (dbstatus.RetweetOriginalId != null || dbstatus.QuoteId != null)
                 {
-                    var orig = await GetStatusAsync(dbstatus.RetweetOriginalId.Value).ConfigureAwait(false);
-                    if (orig != null)
-                    {
-                        return Mapper.Map(dbstatus,
-                            await se,
-                            await favorers,
-                            await retweeters,
-                            orig, await user);
-                    }
+                    var orig = dbstatus.RetweetOriginalId == null
+                        ? null
+                        : await GetStatusAsync(dbstatus.RetweetOriginalId.Value).ConfigureAwait(false);
+                    var quote = dbstatus.QuoteId == null
+                        ? null
+                        : await GetStatusAsync(dbstatus.QuoteId.Value).ConfigureAwait(false);
+                    return Mapper.Map(dbstatus,
+                        await se,
+                        await favorers,
+                        await retweeters,
+                        orig, quote, await user);
                 }
                 return Mapper.Map(dbstatus, await se, await favorers, await retweeters, await user);
             }
             catch (ArgumentNullException anex)
             {
                 throw new DatabaseConsistencyException(
-                    "Lacking required data in database.(mode: PS, status ID " + dbstatus.Id + ", user ID " + dbstatus.UserId + ")",
+                    "Lacking required data in database.(mode: PS, status ID " + dbstatus.Id + ", user ID " +
+                    dbstatus.UserId + ")",
                     anex);
             }
         }
 
-        private static async Task<TwitterStatus> LoadDirectMessageAsync([NotNull] DatabaseStatus dbstatus)
+        private static async Task<TwitterStatus> LoadDirectMessageAsync([CanBeNull] DatabaseStatus dbstatus)
         {
-            if (dbstatus == null) throw new ArgumentNullException("dbstatus");
+            if (dbstatus == null) throw new ArgumentNullException(nameof(dbstatus));
             if (dbstatus.InReplyToOrRecipientUserId == null)
                 throw new ArgumentException("dbstatus.InReplyToUserOrRecipientId is must not be null.");
             var id = dbstatus.Id;
             var user = UserProxy.GetUserAsync(dbstatus.UserId).ConfigureAwait(false);
             var recipient = UserProxy.GetUserAsync(dbstatus.InReplyToOrRecipientUserId.Value).ConfigureAwait(false);
-            var se = DatabaseUtil.RetryIfLocked(() => Database.StatusEntityCrud.GetEntitiesAsync(id)).ConfigureAwait(false);
+            var se = DatabaseUtil.RetryIfLocked(() => Database.StatusEntityCrud.GetEntitiesAsync(id))
+                                 .ConfigureAwait(false);
             try
             {
                 return Mapper.Map(dbstatus, await se, await user, await recipient);
@@ -341,20 +348,22 @@ namespace StarryEyes.Models.Databases
             catch (ArgumentNullException anex)
             {
                 throw new DatabaseConsistencyException(
-                    "Lacking required data in database.(mode: DM, status ID " + dbstatus.Id + ", user ID " + dbstatus.UserId + ")",
+                    "Lacking required data in database.(mode: DM, status ID " + dbstatus.Id + ", user ID " +
+                    dbstatus.UserId + ")",
                     anex);
             }
         }
 
-        private static async Task<IEnumerable<TwitterStatus>> LoadStatusesAsync([NotNull] IEnumerable<DatabaseStatus> dbstatus)
+        private static async Task<IEnumerable<TwitterStatus>> LoadStatusesAsync(
+            [CanBeNull] IEnumerable<DatabaseStatus> dbstatus)
         {
-            if (dbstatus == null) throw new ArgumentNullException("dbstatus");
+            if (dbstatus == null) throw new ArgumentNullException(nameof(dbstatus));
             var targets = dbstatus.ToArray();
             if (targets.Length == 0)
             {
                 return Enumerable.Empty<TwitterStatus>();
             }
-            var retweetOriginalIds = new HashSet<long>();
+            var additionalStatusIds = new HashSet<long>();
             var targetUserIds = new HashSet<long>();
             var entitiesTargetIds = new HashSet<long>();
             var activitiesTargetIds = new HashSet<long>();
@@ -371,8 +380,16 @@ namespace StarryEyes.Models.Databases
                             Debug.Assert(status.RetweetOriginalUserId != null,
                                 "status.RetweetOriginalUserId != null");
                             targetUserIds.Add(status.RetweetOriginalUserId.Value);
-                            retweetOriginalIds.Add(status.RetweetOriginalId.Value);
+                            additionalStatusIds.Add(status.RetweetOriginalId.Value);
                             entitiesTargetIds.Add(status.RetweetOriginalId.Value);
+                        }
+                        if (status.QuoteId != null)
+                        {
+                            Debug.Assert(status.QuoteUserId != null,
+                                "status.QuoteUserId != null");
+                            targetUserIds.Add(status.QuoteUserId.Value);
+                            additionalStatusIds.Add(status.QuoteId.Value);
+                            entitiesTargetIds.Add(status.QuoteId.Value);
                         }
                         break;
                     case StatusType.DirectMessage:
@@ -383,16 +400,21 @@ namespace StarryEyes.Models.Databases
                 }
             }
             // accessing database
-            var retweetsTask = DatabaseUtil.RetryIfLocked(() =>
-                Database.StatusCrud.GetStatusesAsync(retweetOriginalIds)).ConfigureAwait(false);
+            var additionalStatusesTask = DatabaseUtil.RetryIfLocked(() =>
+                                                         Database.StatusCrud.GetStatusesAsync(additionalStatusIds))
+                                                     .ConfigureAwait(false);
             var usersTask = UserProxy.GetUsersAsync(targetUserIds).ConfigureAwait(false);
             var sesTask = DatabaseUtil.RetryIfLocked(() =>
-                Database.StatusEntityCrud.GetEntitiesDictionaryAsync(entitiesTargetIds)).ConfigureAwait(false);
+                                          Database.StatusEntityCrud.GetEntitiesDictionaryAsync(entitiesTargetIds))
+                                      .ConfigureAwait(false);
             var favdicTask = DatabaseUtil.RetryIfLocked(() =>
-                Database.FavoritesCrud.GetUsersDictionaryAsync(activitiesTargetIds)).ConfigureAwait(false);
+                                             Database.FavoritesCrud.GetUsersDictionaryAsync(activitiesTargetIds))
+                                         .ConfigureAwait(false);
             var rtdicTask = DatabaseUtil.RetryIfLocked(() =>
-                Database.RetweetsCrud.GetUsersDictionaryAsync(activitiesTargetIds)).ConfigureAwait(false);
-            var retweets = (await retweetsTask).ToDictionary(d => d.Id);
+                                            Database.RetweetsCrud.GetUsersDictionaryAsync(activitiesTargetIds))
+                                        .ConfigureAwait(false);
+
+            var addstatus = (await additionalStatusesTask).ToDictionary(d => d.Id);
             var users = (await usersTask).ToDictionary(d => d.Id);
             var ses = await sesTask;
             var favdic = await favdicTask;
@@ -408,16 +430,28 @@ namespace StarryEyes.Models.Databases
                     case StatusType.Tweet:
                         var favs = Mapper.Resolve(favdic, status.Id);
                         var rts = Mapper.Resolve(rtdic, status.Id);
-                        if (status.RetweetOriginalId != null)
+                        if (status.RetweetOriginalId != null || status.QuoteId != null)
                         {
-                            Debug.Assert(status.RetweetOriginalUserId != null,
-                                "status.RetweetOriginalUserId != null");
-                            var rtid = status.RetweetOriginalId.Value;
-                            var retweet = retweets[status.RetweetOriginalId.Value];
-                            var orig = Mapper.Map(retweet, Mapper.Resolve(ses, rtid),
-                                Mapper.Resolve(favdic, rtid), Mapper.Resolve(rtdic, rtid),
-                                users[status.RetweetOriginalUserId.Value]);
-                            result.Add(Mapper.Map(status, ents, favs, rts, orig, users[status.UserId]));
+                            TwitterStatus retweet = null;
+                            if (status.RetweetOriginalId != null && status.RetweetOriginalUserId != null)
+                            {
+                                var rtid = status.RetweetOriginalId.Value;
+                                var r = addstatus[status.RetweetOriginalId.Value];
+                                retweet = Mapper.Map(r, Mapper.Resolve(ses, rtid),
+                                    Mapper.Resolve(favdic, rtid), Mapper.Resolve(rtdic, rtid),
+                                    users[status.RetweetOriginalUserId.Value]);
+                            }
+                            TwitterStatus quote = null;
+                            if (status.QuoteId != null && status.QuoteUserId != null)
+                            {
+                                var qid = status.QuoteId.Value;
+                                var q = addstatus[status.QuoteId.Value];
+                                quote = Mapper.Map(q, Mapper.Resolve(ses, qid),
+                                    Mapper.Resolve(favdic, qid), Mapper.Resolve(rtdic, qid),
+                                    users[status.QuoteUserId.Value]);
+                            }
+
+                            result.Add(Mapper.Map(status, ents, favs, rts, retweet, quote, users[status.UserId]));
                         }
                         else
                         {
@@ -426,7 +460,7 @@ namespace StarryEyes.Models.Databases
                         break;
                     case StatusType.DirectMessage:
                         Debug.Assert(status.InReplyToOrRecipientUserId != null,
-                                            "status.InReplyToOrRecipientUserId != null");
+                            "status.InReplyToOrRecipientUserId != null");
                         result.Add(Mapper.Map(status, ents, users[status.UserId],
                             users[status.InReplyToOrRecipientUserId.Value]));
                         break;
@@ -437,7 +471,6 @@ namespace StarryEyes.Models.Databases
             return result;
         }
 
-
-        #endregion
+        #endregion Load from database
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Cadena;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest.Infrastructure;
 
@@ -49,7 +50,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return await response.ReadAsListAsync();
         }
 
-        #endregion
+        #endregion Show list data
 
         #region Lists
 
@@ -81,7 +82,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return await response.ReadAsListCollectionAsync();
         }
 
-        #endregion
+        #endregion Lists
 
         #region Statuses
 
@@ -139,7 +140,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return await response.ReadAsStatusCollectionAsync();
         }
 
-        #endregion
+        #endregion Statuses
 
         #region Memberships
 
@@ -191,6 +192,6 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return await response.ReadAsCursoredUsersAsync();
         }
 
-        #endregion
+        #endregion Memberships
     }
 }

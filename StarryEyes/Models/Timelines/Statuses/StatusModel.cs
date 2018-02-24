@@ -4,11 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
+using Cadena.Data;
 using Livet;
 using StarryEyes.Albireo.Threading;
-using StarryEyes.Anomaly.Imaging;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
+using StarryEyes.Helpers;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Databases;
 using StarryEyes.Models.Receiving.Handling;
@@ -27,10 +26,7 @@ namespace StarryEyes.Models.Timelines.Statuses
         private static readonly ConcurrentDictionary<long, object> _generateLock =
             new ConcurrentDictionary<long, object>();
 
-        public static int CachedObjectsCount
-        {
-            get { return _staticCache.Count; }
-        }
+        public static int CachedObjectsCount => _staticCache.Count;
 
         public static StatusModel GetIfCacheIsAlive(long id)
         {
@@ -58,9 +54,9 @@ namespace StarryEyes.Models.Timelines.Statuses
                 {
                     status = await StatusProxy.SyncStatusActivityAsync(status).ConfigureAwait(false);
                 }
-                var rto = status.RetweetedOriginal == null
-                              ? null
-                              : await Get(status.RetweetedOriginal).ConfigureAwait(false);
+                var rto = status.RetweetedStatus == null
+                    ? null
+                    : await Get(status.RetweetedStatus).ConfigureAwait(false);
                 var lockerobj = _generateLock.GetOrAdd(status.Id, new object());
                 try
                 {
@@ -115,7 +111,7 @@ namespace StarryEyes.Models.Timelines.Statuses
             }
         }
 
-        #endregion
+        #endregion Static members
 
         private readonly TaskFactory _factory = LimitedTaskScheduler.GetTaskFactory(8);
 
@@ -156,12 +152,12 @@ namespace StarryEyes.Models.Timelines.Statuses
         private StatusModel(TwitterStatus status, StatusModel retweetedOriginal)
             : this(status)
         {
-            RetweetedOriginal = retweetedOriginal;
+            RetweetedStatus = retweetedOriginal;
         }
 
-        public TwitterStatus Status { get; private set; }
+        public TwitterStatus Status { get; }
 
-        public StatusModel RetweetedOriginal { get; private set; }
+        public StatusModel RetweetedStatus { get; }
 
         public ObservableSynchronizedCollectionEx<TwitterUser> FavoritedUsers
         {
@@ -192,10 +188,7 @@ namespace StarryEyes.Models.Timelines.Statuses
         /// <summary>
         /// Image tuples. (original URI, display URI)
         /// </summary>
-        public ObservableSynchronizedCollectionEx<ThumbnailImage> Images
-        {
-            get { return _thumbnails; }
-        }
+        public ObservableSynchronizedCollectionEx<ThumbnailImage> Images => _thumbnails;
 
         private void LoadFavoritedUsers()
         {
@@ -270,9 +263,9 @@ namespace StarryEyes.Models.Timelines.Statuses
 
         public async void AddFavoritedUser(TwitterUser user)
         {
-            if (Status.RetweetedOriginal != null)
+            if (Status.RetweetedStatus != null)
             {
-                var status = await Get(Status.RetweetedOriginal).ConfigureAwait(false);
+                var status = await Get(Status.RetweetedStatus).ConfigureAwait(false);
                 status.AddFavoritedUser(user);
             }
             else
@@ -304,9 +297,9 @@ namespace StarryEyes.Models.Timelines.Statuses
 
         public async void RemoveFavoritedUser(long userId)
         {
-            if (Status.RetweetedOriginal != null)
+            if (Status.RetweetedStatus != null)
             {
-                var status = await Get(Status.RetweetedOriginal).ConfigureAwait(false);
+                var status = await Get(Status.RetweetedStatus).ConfigureAwait(false);
                 status.RemoveFavoritedUser(userId);
             }
             else
@@ -333,9 +326,9 @@ namespace StarryEyes.Models.Timelines.Statuses
 
         public async void AddRetweetedUser(TwitterUser user)
         {
-            if (Status.RetweetedOriginal != null)
+            if (Status.RetweetedStatus != null)
             {
-                var status = await Get(Status.RetweetedOriginal).ConfigureAwait(false);
+                var status = await Get(Status.RetweetedStatus).ConfigureAwait(false);
                 status.AddRetweetedUser(user);
             }
             else
@@ -366,9 +359,9 @@ namespace StarryEyes.Models.Timelines.Statuses
 
         public async void RemoveRetweetedUser(long userId)
         {
-            if (Status.RetweetedOriginal != null)
+            if (Status.RetweetedStatus != null)
             {
-                var status = await Get(Status.RetweetedOriginal).ConfigureAwait(false);
+                var status = await Get(Status.RetweetedStatus).ConfigureAwait(false);
                 status.RemoveRetweetedUser(userId);
             }
             else
@@ -397,9 +390,9 @@ namespace StarryEyes.Models.Timelines.Statuses
         public bool IsFavorited(params long[] ids)
         {
             if (ids.Length == 0) return false;
-            if (Status.RetweetedOriginal != null)
+            if (Status.RetweetedStatus != null)
             {
-                throw new NotSupportedException("You must create another model indicating RetweetedOriginal status.");
+                throw new NotSupportedException("You must create another model indicating RetweetedStatus status.");
             }
             lock (_favoritedsLock)
             {
@@ -410,9 +403,9 @@ namespace StarryEyes.Models.Timelines.Statuses
         public bool IsRetweeted(params long[] ids)
         {
             if (ids.Length == 0) return false;
-            if (Status.RetweetedOriginal != null)
+            if (Status.RetweetedStatus != null)
             {
-                throw new NotSupportedException("You must create another model indicating RetweetedOriginal status.");
+                throw new NotSupportedException("You must create another model indicating RetweetedStatus status.");
             }
             lock (_retweetedsLock)
             {
@@ -420,7 +413,6 @@ namespace StarryEyes.Models.Timelines.Statuses
             }
         }
 
-        [CanBeNull]
         public IEnumerable<TwitterAccount> GetSuitableReplyAccount()
         {
             var uid = Status.InReplyToUserId.GetValueOrDefault();
@@ -428,7 +420,8 @@ namespace StarryEyes.Models.Timelines.Statuses
             {
                 if (Status.Recipient == null)
                 {
-                    throw new ArgumentException("Inconsistent status state: Recipient is not spcified in spite of status is direct message.");
+                    throw new ArgumentException(
+                        "Inconsistent status state: Recipient is not spcified in spite of status is direct message.");
                 }
                 uid = Status.Recipient.Id;
             }
@@ -487,14 +480,8 @@ namespace StarryEyes.Models.Timelines.Statuses
         {
         }
 
-        public Uri SourceUri
-        {
-            get { return _source; }
-        }
+        public Uri SourceUri => _source;
 
-        public Uri DisplayUri
-        {
-            get { return _display; }
-        }
+        public Uri DisplayUri => _display;
     }
 }

@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
+using Cadena.Api.Parameters;
+using Cadena.Api.Rest;
+using Cadena.Util;
 using Livet;
-using StarryEyes.Anomaly.TwitterApi.Rest;
-using StarryEyes.Anomaly.Utils;
 using StarryEyes.Models.Accounting;
 
 namespace StarryEyes.ViewModels.Common
@@ -16,15 +18,9 @@ namespace StarryEyes.ViewModels.Common
             _account = account;
         }
 
-        public long Id
-        {
-            get { return _account.Id; }
-        }
+        public long Id => _account.Id;
 
-        public TwitterAccount Account
-        {
-            get { return _account; }
-        }
+        public TwitterAccount Account => _account;
 
         public Uri ProfileImageUri
         {
@@ -36,12 +32,17 @@ namespace StarryEyes.ViewModels.Common
                     {
                         try
                         {
-                            var user = await _account.ShowUserAsync(_account.Id).ConfigureAwait(false);
-                            _account.UnreliableProfileImage = user.ProfileImageUri.ChangeImageSize(ImageSize.Original);
+                            var user = await _account
+                                .CreateAccessor().ShowUserAsync(new UserParameter(_account.Id), CancellationToken.None)
+                                .ConfigureAwait(false);
+                            _account.UnreliableProfileImage =
+                                user.Result.ProfileImageUri.ChangeImageSize(ImageSize.Original);
                             RaisePropertyChanged(() => ProfileImageUri);
                         }
                         // ReSharper disable EmptyGeneralCatchClause
-                        catch { }
+                        catch
+                        {
+                        }
                         // ReSharper restore EmptyGeneralCatchClause
                     });
                 }

@@ -1,29 +1,19 @@
 ﻿using System.Windows.Media;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
+using Cadena.Data;
 
 namespace StarryEyes.Models.Backstages.TwitterEvents
 {
     public sealed class UnfollowedEvent : TwitterEventBase
     {
         public UnfollowedEvent(TwitterUser source, TwitterUser target)
-            : base(source, target) { }
-
-        public override string Title
+            : base(source, target)
         {
-            get { return "UNFOLLOWED"; }
         }
 
-        public override string Detail
-        {
-            get { return Source.ScreenName + " -/-> " + TargetUser.ScreenName; }
-        }
+        public override string Title => "UNFOLLOWED";
 
-        public override Color Background
-        {
-            get
-            {
-                return Colors.DimGray;
-            }
-        }
+        public override string Detail => Source.ScreenName + " -/-> " + TargetUser.ScreenName;
+
+        public override Color Background => Colors.DimGray;
     }
 }

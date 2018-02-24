@@ -16,7 +16,7 @@ namespace StarryEyes.Anomaly.Utils
         /// <param name="s">convert value</param>
         /// <param name="@default">default value if string is null or unacceptable value</param>
         /// <returns>converted value</returns>
-        public static bool ParseBool([CanBeNull] this string s, bool @default = false)
+        public static bool ParseBool([CanBeNullAttribute] this string s, bool @default = false)
         {
             if (s == null)
             {
@@ -28,7 +28,7 @@ namespace StarryEyes.Anomaly.Utils
         /// <summary>
         /// Parse string as long
         /// </summary>
-        public static long ParseLong([CanBeNull] this string s)
+        public static long ParseLong([CanBeNullAttribute] this string s)
         {
             long v;
             return long.TryParse(s, out v) ? v : 0;
@@ -39,7 +39,7 @@ namespace StarryEyes.Anomaly.Utils
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
-        public static long? ParseNullableId([CanBeNull] this string s)
+        public static long? ParseNullableId([CanBeNullAttribute] this string s)
         {
             long v;
             if (s != null && Int64.TryParse(s, out v) && v != 0)
@@ -52,7 +52,7 @@ namespace StarryEyes.Anomaly.Utils
         /// <summary>
         /// Parse date time
         /// </summary>
-        public static DateTime ParseDateTime([CanBeNull] this string s)
+        public static DateTime ParseDateTime([CanBeNullAttribute] this string s)
         {
             return s.ParseDateTime(DateTime.MinValue);
         }
@@ -61,7 +61,7 @@ namespace StarryEyes.Anomaly.Utils
         /// <summary>
         /// Parse date time
         /// </summary>
-        public static DateTime ParseDateTime([CanBeNull] this string s, DateTime @default)
+        public static DateTime ParseDateTime([CanBeNullAttribute] this string s, DateTime @default)
         {
             DateTime dt;
             if (s != null && DateTime.TryParse(s, out dt))
@@ -74,7 +74,7 @@ namespace StarryEyes.Anomaly.Utils
         /// <summary>
         /// Parse date time
         /// </summary>
-        public static DateTime ParseDateTime([CanBeNull] this string s, [NotNull] string format)
+        public static DateTime ParseDateTime([CanBeNullAttribute] this string s, [CanBeNull] string format)
         {
             if (format == null) throw new ArgumentNullException(nameof(format));
 
@@ -84,8 +84,8 @@ namespace StarryEyes.Anomaly.Utils
         /// <summary>
         /// Parse date time
         /// </summary>
-        public static DateTime ParseDateTime([CanBeNull] this string s,
-            [NotNull] string format, DateTime @default)
+        public static DateTime ParseDateTime([CanBeNullAttribute] this string s,
+            [CanBeNull] string format, DateTime @default)
         {
             if (format == null) throw new ArgumentNullException(nameof(format));
 
@@ -103,7 +103,7 @@ namespace StarryEyes.Anomaly.Utils
         /// <summary>
         /// Parse date time by twitter default format
         /// </summary>
-        public static DateTime ParseTwitterDateTime([CanBeNull] this string s)
+        public static DateTime ParseTwitterDateTime([CanBeNullAttribute] this string s)
         {
             return s.ParseDateTime(TwitterDateTimeFormat);
         }
@@ -111,7 +111,7 @@ namespace StarryEyes.Anomaly.Utils
         /// <summary>
         /// Parse string as unix serial time
         /// </summary>
-        public static DateTime ParseUnixTime([CanBeNull] this string s)
+        public static DateTime ParseUnixTime([CanBeNullAttribute] this string s)
         {
             if (s == null) return DateTime.MinValue;
             return UnixEpoch.GetDateTimeByUnixEpoch(s.ParseLong());
@@ -120,7 +120,7 @@ namespace StarryEyes.Anomaly.Utils
         /// <summary>
         /// Parse uri
         /// </summary>
-        public static Uri ParseUri([CanBeNull] this string s)
+        public static Uri ParseUri([CanBeNullAttribute] this string s)
         {
             Uri ret;
             if (s != null && Uri.TryCreate(s, UriKind.RelativeOrAbsolute, out ret))
@@ -133,7 +133,7 @@ namespace StarryEyes.Anomaly.Utils
         /// <summary>
         /// Parse uri as absolute uri
         /// </summary>
-        public static Uri ParseUriAbsolute([CanBeNull] this string s)
+        public static Uri ParseUriAbsolute([CanBeNullAttribute] this string s)
         {
             var ret = s.ParseUri();
             if (ret == null || !ret.IsAbsoluteUri)
@@ -146,7 +146,7 @@ namespace StarryEyes.Anomaly.Utils
         /// <summary>
         /// Resolve entity-escaped string
         /// </summary>
-        public static string ResolveEntity([CanBeNull] string text)
+        public static string ResolveEntity([CanBeNullAttribute] string text)
         {
             return text
                 // .Replace("&quot;", "\"")
@@ -158,7 +158,7 @@ namespace StarryEyes.Anomaly.Utils
         /// <summary>
         /// Escape string with entities
         /// </summary>
-        public static string EscapeEntity([CanBeNull] string text)
+        public static string EscapeEntity([CanBeNullAttribute] string text)
         {
             return text
                 ?.Replace("&", "&amp;")

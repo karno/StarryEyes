@@ -1,5 +1,5 @@
 ﻿using System;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
+using Cadena.Data;
 using StarryEyes.Models.Receiving;
 
 namespace StarryEyes.Filters.Sources
@@ -7,9 +7,10 @@ namespace StarryEyes.Filters.Sources
     public class FilterTrack : FilterSourceBase
     {
         private readonly string _query;
+
         public FilterTrack(string query)
         {
-            this._query = query;
+            _query = query;
         }
 
         public override Func<TwitterStatus, bool> GetEvaluator()
@@ -23,6 +24,7 @@ namespace StarryEyes.Filters.Sources
         }
 
         private bool _isActivated;
+
         public override void Activate()
         {
             if (_isActivated) return;
@@ -37,14 +39,8 @@ namespace StarryEyes.Filters.Sources
             ReceiveManager.UnregisterStreamingQuery(_query);
         }
 
-        public override string FilterKey
-        {
-            get { return "track"; }
-        }
+        public override string FilterKey => "track";
 
-        public override string FilterValue
-        {
-            get { return _query; }
-        }
+        public override string FilterValue => _query;
     }
 }

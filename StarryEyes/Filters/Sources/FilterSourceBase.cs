@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Text.RegularExpressions;
+using Cadena.Data;
 using StarryEyes.Albireo.Helpers;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Globalization.Filters;
 using StarryEyes.Models;
 using StarryEyes.Models.Accounting;
@@ -25,7 +25,7 @@ namespace StarryEyes.Filters.Sources
 
         public abstract Func<TwitterStatus, bool> GetEvaluator();
 
-        public virtual bool IsPreparing { get { return false; } }
+        public virtual bool IsPreparing => false;
 
         public abstract string GetSqlQuery();
 
@@ -39,12 +39,16 @@ namespace StarryEyes.Filters.Sources
         /// <summary>
         /// Activate dependency receiving method.
         /// </summary>
-        public virtual void Activate() { }
+        public virtual void Activate()
+        {
+        }
 
         /// <summary>
         /// Deactivate dependency receiving method.
         /// </summary>
-        public virtual void Deactivate() { }
+        public virtual void Deactivate()
+        {
+        }
 
         /// <summary>
         /// Receive older tweets. <para />
@@ -85,10 +89,10 @@ namespace StarryEyes.Filters.Sources
             // *kar* => dakara
             var filtered =
                 new string(screenName.Where(c =>
-                                            (c >= 'A' && c <= 'Z') ||
-                                            (c >= 'a' && c <= 'z') ||
-                                            (c >= '0' && c <= '9') ||
-                                            c == '_' || c == '*')
+                                         (c >= 'A' && c <= 'Z') ||
+                                         (c >= 'a' && c <= 'z') ||
+                                         (c >= '0' && c <= '9') ||
+                                         c == '_' || c == '*')
                                      .ToArray());
             var pattern = filtered.Replace("*", ".*");
             return Setting.Accounts.Collection

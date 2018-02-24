@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
-using StarryEyes.Models.Receiving.Receivers;
 
 namespace StarryEyes.Models.Receiving.Managers
 {
     internal class StreamTrackReceiveManager
     {
+        public const int MaxTrackKeywordLength = 100;
+
         private readonly UserReceiveManager _receiveManager;
 
         private readonly object _trackLocker = new object();
@@ -28,57 +29,57 @@ namespace StarryEyes.Models.Receiving.Managers
 
         public StreamTrackReceiveManager(UserReceiveManager receiveManager)
         {
-            this._receiveManager = receiveManager;
-            this._receiveManager.TrackRearranged += this.UpdateTrackInfo;
+            _receiveManager = receiveManager;
+            _receiveManager.TrackRearranged += UpdateTrackInfo;
         }
 
         void UpdateTrackInfo()
         {
             string[] dang;
-            lock (this._trackLocker)
+            lock (_trackLocker)
             {
-                var allTracks = this._trackResolver.Keys.ToArray();
-                this._trackResolver.Clear();
-                var trackers = this._receiveManager.GetTrackers();
+                var allTracks = _trackResolver.Keys.ToArray();
+                _trackResolver.Clear();
+                var trackers = _receiveManager.GetTrackers();
                 foreach (var track in trackers)
                 {
                     var id = track.UserId;
-                    track.TrackKeywords.ForEach(k => this._trackResolver[k] = id);
+                    track.TrackKeywords.ForEach(k => _trackResolver[k] = id);
                 }
-                dang = allTracks.Except(this._trackResolver.Keys).ToArray();
+                dang = allTracks.Except(_trackResolver.Keys).ToArray();
             }
             if (dang.Length > 0)
             {
-                lock (this._danglingLocker)
+                lock (_danglingLocker)
                 {
-                    this._danglingKeywords.AddRange(dang);
-                    this.NotifyDangling();
+                    _danglingKeywords.AddRange(dang);
+                    NotifyDangling();
                 }
             }
         }
 
         public void AddTrackKeyword(string track)
         {
-            lock (this._addTrackLocker)
+            lock (_addTrackLocker)
             {
-                if (this._addTrackWaits == null)
+                if (_addTrackWaits == null)
                 {
-                    this._addTrackWaits = new List<string> { track };
+                    _addTrackWaits = new List<string> { track };
                     Observable.Timer(TimeSpan.FromSeconds(3))
                               .Subscribe(_ =>
                               {
                                   List<string> tracks;
-                                  lock (this._addTrackLocker)
+                                  lock (_addTrackLocker)
                                   {
-                                      tracks = this._addTrackWaits;
-                                      this._addTrackWaits = null;
+                                      tracks = _addTrackWaits;
+                                      _addTrackWaits = null;
                                   }
-                                  this.AddTrackKeywordCore(tracks.ToArray());
+                                  AddTrackKeywordCore(tracks.ToArray());
                               });
                 }
                 else
                 {
-                    this._addTrackWaits.Add(track);
+                    _addTrackWaits.Add(track);
                 }
             }
         }
@@ -86,42 +87,42 @@ namespace StarryEyes.Models.Receiving.Managers
         public void RemoveTrackKeyword(string track)
         {
             Observable.Timer(TimeSpan.FromSeconds(10))
-                      .Subscribe(_ => this.RemoveTrackKeywordCore(track));
+                      .Subscribe(_ => RemoveTrackKeywordCore(track));
         }
 
         private void AddTrackKeywordCore(string[] tracks)
         {
-            lock (this._trackLocker)
+            lock (_trackLocker)
             {
                 foreach (var track in tracks)
                 {
-                    if (this._trackReferenceCount.ContainsKey(track))
+                    if (_trackReferenceCount.ContainsKey(track))
                     {
-                        this._trackReferenceCount[track]++;
+                        _trackReferenceCount[track]++;
                         return;
                     }
                     BehaviorLogger.Log("TRACK", "add query: " + track);
                     System.Diagnostics.Debug.WriteLine("◎ track add: " + track);
-                    this._trackReferenceCount[track] = 1;
+                    _trackReferenceCount[track] = 1;
                 }
 
                 var trackList = new List<string>(tracks);
 
                 while (trackList.Count > 0)
                 {
-                    var tracker = this._receiveManager.GetSuitableKeywordTracker();
+                    var tracker = _receiveManager.GetSuitableKeywordTracker();
                     if (tracker == null)
                     {
-                        lock (this._danglingLocker)
+                        lock (_danglingLocker)
                         {
-                            this._danglingKeywords.AddRange(trackList);
+                            _danglingKeywords.AddRange(trackList);
                         }
-                        this.NotifyDangling();
+                        NotifyDangling();
                         return;
                     }
-                    var acceptableCount = UserStreamsReceiver.MaxTrackingKeywordCounts - tracker.TrackKeywords.Count();
+                    var acceptableCount = MaxTrackKeywordLength - tracker.TrackKeywords.Count();
                     var acceptables = trackList.Take(acceptableCount).ToArray();
-                    acceptables.ForEach(track => this._trackResolver[track] = tracker.UserId);
+                    acceptables.ForEach(track => _trackResolver[track] = tracker.UserId);
                     tracker.TrackKeywords = tracker.TrackKeywords.Concat(acceptables).ToArray();
                     trackList = trackList.Skip(acceptableCount).ToList();
                 }
@@ -130,38 +131,37 @@ namespace StarryEyes.Models.Receiving.Managers
 
         private void RemoveTrackKeywordCore(string track)
         {
-            lock (this._trackLocker)
+            lock (_trackLocker)
             {
-                if (!this._trackReferenceCount.ContainsKey(track) || --this._trackReferenceCount[track] > 0)
+                if (!_trackReferenceCount.ContainsKey(track) || --_trackReferenceCount[track] > 0)
                 {
                     return;
                 }
-                this._trackReferenceCount.Remove(track);
-                if (this._trackResolver.ContainsKey(track))
+                _trackReferenceCount.Remove(track);
+                if (_trackResolver.ContainsKey(track))
                 {
                     BehaviorLogger.Log("TRACK", "remove query: " + track);
-                    var id = this._trackResolver[track];
-                    this._trackResolver.Remove(track);
-                    var tracker = this._receiveManager.GetKeywordTrackerFromId(id);
+                    var id = _trackResolver[track];
+                    _trackResolver.Remove(track);
+                    var tracker = _receiveManager.GetKeywordTrackerFromId(id);
                     tracker.TrackKeywords = tracker.TrackKeywords.Except(new[] { track });
                     return;
                 }
             }
-            lock (this._danglingLocker)
+            lock (_danglingLocker)
             {
-                this._danglingKeywords.Remove(track);
+                _danglingKeywords.Remove(track);
             }
         }
 
         private void NotifyDangling()
         {
-            if (this._isDanglingNotified) return;
-            this._isDanglingNotified = true;
+            if (_isDanglingNotified) return;
+            _isDanglingNotified = true;
         }
 
         private void ResolveDanglings()
         {
         }
-
     }
 }

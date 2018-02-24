@@ -30,10 +30,7 @@ namespace StarryEyes.Views.Behaviors
         public bool IsScrollLockEnabled
         {
             get { return (bool)GetValue(IsScrollLockEnabledProperty); }
-            set
-            {
-                SetValue(IsScrollLockEnabledProperty, value);
-            }
+            set { SetValue(IsScrollLockEnabledProperty, value); }
         }
 
         /// <summary>
@@ -122,12 +119,16 @@ namespace StarryEyes.Views.Behaviors
 
         // internal caches
         private readonly Queue<double> _scrollOffsetQueue = new Queue<double>();
+
         private readonly Timer _scrollTimer;
         private readonly LinkedList<double> _lastScrollOffsets = new LinkedList<double>();
         private int _previousItemCount;
+
         private IDisposable _itemSourceCollectionChangeListener;
+
         // wait for dispatcher
         private volatile bool _isDispatcherAffected;
+
         // scroll animation synchronize latch
         private volatile bool _isScrollAnimating;
 
@@ -155,8 +156,8 @@ namespace StarryEyes.Views.Behaviors
 
             _disposables.Add(
                 Observable.FromEventPattern<ScrollChangedEventHandler, ScrollChangedEventArgs>(
-                    h => this.AssociatedObject.ScrollChanged += h,
-                    h => this.AssociatedObject.ScrollChanged -= h)
+                              h => this.AssociatedObject.ScrollChanged += h,
+                              h => this.AssociatedObject.ScrollChanged -= h)
                           .Select(p => p.EventArgs)
                           .Subscribe(this.ScrollChanged));
         }
@@ -203,7 +204,6 @@ namespace StarryEyes.Views.Behaviors
             // check and update items count latch
             if (_previousItemCount != itemCount)
             {
-
                 // caused by item addition?
                 _previousItemCount = itemCount;
 
@@ -249,7 +249,8 @@ namespace StarryEyes.Views.Behaviors
                         }
                     }
                     // simply scrolled to previous position
-                    System.Diagnostics.Debug.WriteLine("* Lock executed. offset: " + prevPosition + " / vertical extent size: " + e.ExtentHeight);
+                    System.Diagnostics.Debug.WriteLine("* Lock executed. offset: " + prevPosition +
+                                                       " / vertical extent size: " + e.ExtentHeight);
                     ScrollToVerticalOffset(prevPosition);
                 }
                 else if (IsAnimationEnabled)
@@ -275,7 +276,8 @@ namespace StarryEyes.Views.Behaviors
                 while (_lastScrollOffsets.Count > 0)
                 {
                     var offset = _lastScrollOffsets.Last.Value;
-                    System.Diagnostics.Debug.WriteLine("% DQLO: " + offset + " / " + verticalOffset + ", eps: " + epsilon);
+                    System.Diagnostics.Debug.WriteLine("% DQLO: " + offset + " / " + verticalOffset + ", eps: " +
+                                                       epsilon);
                     if (Math.Abs(offset - verticalOffset) < epsilon)
                     {
                         System.Diagnostics.Debug.WriteLine("% Check.");
@@ -294,7 +296,7 @@ namespace StarryEyes.Views.Behaviors
 
             // scroll by user-interaction
 
-            System.Diagnostics.Debug.WriteLine("* User scroll detected.");
+            // System.Diagnostics.Debug.WriteLine("* User scroll detected.");
 
             // scrolled by user?
             // -> abort animation, exit immediately
@@ -302,7 +304,7 @@ namespace StarryEyes.Views.Behaviors
             {
                 if (_scrollOffsetQueue.Count > 0)
                 {
-                    System.Diagnostics.Debug.WriteLine(" -> Scroll stopped by user-interaction.");
+                    // System.Diagnostics.Debug.WriteLine(" -> Scroll stopped by user-interaction.");
                     _scrollOffsetQueue.Clear();
                 }
             }
@@ -466,7 +468,7 @@ namespace StarryEyes.Views.Behaviors
         /// </summary>
         /// <param name="offset">target offset</param>
         /// <param name="caller">caller member name</param>
-        private void ScrollToVerticalOffset(double offset, [CallerMemberName]string caller = "[not provided]")
+        private void ScrollToVerticalOffset(double offset, [CallerMemberName] string caller = "[not provided]")
         {
             System.Diagnostics.Debug.WriteLine("# Scroll to: " + offset + " by " + caller);
             if (offset < 1)

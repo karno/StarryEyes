@@ -1,7 +1,7 @@
 ﻿using System;
+using Cadena;
+using Cadena.Data;
 using JetBrains.Annotations;
-using StarryEyes.Anomaly;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Feather.Proxies;
 
 namespace StarryEyes.Models.Subsystems.Notifications
@@ -12,10 +12,9 @@ namespace StarryEyes.Models.Subsystems.Notifications
 
         internal INotificationSink Next { get; set; }
 
-        public NotificationProxyWrapper([NotNull] INotificationProxy proxy)
+        public NotificationProxyWrapper([CanBeNull] INotificationProxy proxy)
         {
-            if (proxy == null) throw new ArgumentNullException(nameof(proxy));
-            _proxy = proxy;
+            _proxy = proxy ?? throw new ArgumentNullException(nameof(proxy));
         }
 
         public void NotifyReceived(TwitterStatus status)

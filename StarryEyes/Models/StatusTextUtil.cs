@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using StarryEyes.Anomaly.Utils;
+using Cadena.Util;
 using StarryEyes.Helpers;
 using StarryEyes.Models.Subsystems;
 using StarryEyes.Settings;
@@ -87,9 +87,9 @@ namespace StarryEyes.Models
         private static bool IsHalfWeight(char character)
         {
             return 0 <= character && character <= 4351 ||
-                8192 <= character && character <= 8205 ||
-                8208 <= character && character <= 8223 ||
-                8242 <= character && character <= 8247;
+                   8192 <= character && character <= 8205 ||
+                   8208 <= character && character <= 8223 ||
+                   8242 <= character && character <= 8247;
         }
 
         /// <summary>
@@ -103,8 +103,9 @@ namespace StarryEyes.Models
             // capture URL
             escaped = TwitterRegexPatterns.ValidUrl.Replace(escaped, m =>
                 m.Groups[TwitterRegexPatterns.ValidUrlGroupBefore] + "<U>" +
-                    // # => &sharp; (ハッシュタグで再識別されることを防ぐ)
-                m.Groups[TwitterRegexPatterns.ValidUrlGroupUrl].Value.Replace("#", "&sharp;") +
+                // # => &sharp; (ハッシュタグで再識別されることを防ぐ)
+                m.Groups[TwitterRegexPatterns.ValidUrlGroupUrl].Value
+                 .Replace("#", "&sharp;") +
                 "<");
 
             // capture Mention
@@ -163,9 +164,9 @@ namespace StarryEyes.Models
             Text = tkstr;
         }
 
-        public TokenKind Kind { get; set; }
+        public TokenKind Kind { get; }
 
-        public string Text { get; set; }
+        public string Text { get; }
     }
 
     public enum TokenKind

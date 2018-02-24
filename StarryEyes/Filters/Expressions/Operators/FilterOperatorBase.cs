@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
+using Cadena.Data;
 
 namespace StarryEyes.Filters.Expressions.Operators
 {
@@ -13,95 +13,90 @@ namespace StarryEyes.Filters.Expressions.Operators
 
         public virtual Func<TwitterStatus, bool> GetBooleanValueProvider()
         {
-            this.ThrowMismatchType(FilterExpressionType.Boolean);
-            return null;//unreachable code
+            ThrowMismatchType(FilterExpressionType.Boolean);
+            return null; //unreachable code
         }
 
         public virtual Func<TwitterStatus, long> GetNumericValueProvider()
         {
-            this.ThrowMismatchType(FilterExpressionType.Numeric);
-            return null;//unreachable code
+            ThrowMismatchType(FilterExpressionType.Numeric);
+            return null; //unreachable code
         }
 
         public virtual Func<TwitterStatus, string> GetStringValueProvider()
         {
-            this.ThrowMismatchType(FilterExpressionType.String);
-            return null;//unreachable code
+            ThrowMismatchType(FilterExpressionType.String);
+            return null; //unreachable code
         }
 
         public virtual Func<TwitterStatus, IReadOnlyCollection<long>> GetSetValueProvider()
         {
-            this.ThrowMismatchType(FilterExpressionType.Set);
-            return null;//unreachable code
+            ThrowMismatchType(FilterExpressionType.Set);
+            return null; //unreachable code
         }
 
         public virtual string GetBooleanSqlQuery()
         {
-            this.ThrowMismatchType(FilterExpressionType.Boolean);
-            return null;//unreachable code
+            ThrowMismatchType(FilterExpressionType.Boolean);
+            return null; //unreachable code
         }
 
         public virtual string GetNumericSqlQuery()
         {
-            this.ThrowMismatchType(FilterExpressionType.Numeric);
-            return null;//unreachable code
+            ThrowMismatchType(FilterExpressionType.Numeric);
+            return null; //unreachable code
         }
 
         public virtual string GetStringSqlQuery()
         {
-            this.ThrowMismatchType(FilterExpressionType.String);
-            return null;//unreachable code
+            ThrowMismatchType(FilterExpressionType.String);
+            return null; //unreachable code
         }
 
         public virtual string GetSetSqlQuery()
         {
-            this.ThrowMismatchType(FilterExpressionType.Set);
-            return null;//unreachable code
+            ThrowMismatchType(FilterExpressionType.Set);
+            return null; //unreachable code
         }
 
         public abstract StringComparison GetStringComparison();
 
         protected void ThrowMismatchType(FilterExpressionType type)
         {
-            throw FilterQueryException.CreateUnsupportedType(this.OperatorString, type, this.ToQuery());
+            throw FilterQueryException.CreateUnsupportedType(OperatorString, type, ToQuery());
         }
 
         protected void ThrowMismatchType(params FilterExpressionType[] types)
         {
-            throw FilterQueryException.CreateUnsupportedType(this.OperatorString, types, this.ToQuery());
+            throw FilterQueryException.CreateUnsupportedType(OperatorString, types, ToQuery());
         }
     }
 
     public abstract class FilterSingleValueOperator : FilterOperatorBase
     {
         private FilterOperatorBase _value;
+
         public FilterOperatorBase Value
         {
             get { return _value; }
             set
             {
                 if (_value != null)
-                    _value.InvalidateRequested -= this.RaiseInvalidateFilter;
+                    _value.InvalidateRequested -= RaiseInvalidateFilter;
                 _value = value;
                 if (_value != null)
-                    _value.InvalidateRequested += this.RaiseInvalidateFilter;
+                    _value.InvalidateRequested += RaiseInvalidateFilter;
             }
         }
 
         public override void BeginLifecycle()
         {
-            if (Value != null)
-            {
-                Value.BeginLifecycle();
-            }
+            Value?.BeginLifecycle();
         }
 
         public override void EndLifecycle()
         {
-            if (Value != null)
-            {
-                Value.EndLifecycle();
-            }
+            Value?.EndLifecycle();
         }
 
         public override StringComparison GetStringComparison()
@@ -121,10 +116,10 @@ namespace StarryEyes.Filters.Expressions.Operators
             set
             {
                 if (_leftValue != null)
-                    _leftValue.InvalidateRequested -= this.RaiseInvalidateFilter;
+                    _leftValue.InvalidateRequested -= RaiseInvalidateFilter;
                 _leftValue = value;
                 if (_leftValue != null)
-                    _leftValue.InvalidateRequested += this.RaiseInvalidateFilter;
+                    _leftValue.InvalidateRequested += RaiseInvalidateFilter;
             }
         }
 
@@ -134,10 +129,10 @@ namespace StarryEyes.Filters.Expressions.Operators
             set
             {
                 if (_rightValue != null)
-                    _rightValue.InvalidateRequested -= this.RaiseInvalidateFilter;
+                    _rightValue.InvalidateRequested -= RaiseInvalidateFilter;
                 _rightValue = value;
                 if (_rightValue != null)
-                    _rightValue.InvalidateRequested += this.RaiseInvalidateFilter;
+                    _rightValue.InvalidateRequested += RaiseInvalidateFilter;
             }
         }
 
@@ -161,7 +156,7 @@ namespace StarryEyes.Filters.Expressions.Operators
         public override StringComparison GetStringComparison()
         {
             return LeftValue.GetStringComparison() == StringComparison.CurrentCulture
-                || RightValue.GetStringComparison() == StringComparison.CurrentCulture
+                   || RightValue.GetStringComparison() == StringComparison.CurrentCulture
                 ? StringComparison.CurrentCulture
                 : StringComparison.CurrentCultureIgnoreCase;
         }

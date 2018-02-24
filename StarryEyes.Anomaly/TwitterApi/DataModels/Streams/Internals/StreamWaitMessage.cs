@@ -1,4 +1,6 @@
-﻿namespace StarryEyes.Anomaly.TwitterApi.DataModels.Streams.Internals
+﻿using Cadena;
+
+namespace StarryEyes.Anomaly.TwitterApi.DataModels.Streams.Internals
 {
     public sealed class StreamWaitMessage : InternalMessage
     {

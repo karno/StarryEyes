@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
+using Cadena.Data;
 using StarryEyes.Models.Databases;
 
 namespace StarryEyes.Filters.Expressions.Operators
@@ -11,10 +11,7 @@ namespace StarryEyes.Filters.Expressions.Operators
     /// </summary>
     public class FilterOperatorContains : FilterTwoValueOperator
     {
-        protected override string OperatorString
-        {
-            get { return "contains"; }
-        }
+        protected override string OperatorString => "contains";
 
         private bool CompareAsString()
         {
@@ -29,10 +26,10 @@ namespace StarryEyes.Filters.Expressions.Operators
 
         public override Func<TwitterStatus, bool> GetBooleanValueProvider()
         {
-            if (this.CompareAsString())
+            if (CompareAsString())
             {
-                var haystack = this.LeftValue.GetStringValueProvider();
-                var needle = this.RightValue.GetStringValueProvider();
+                var haystack = LeftValue.GetStringValueProvider();
+                var needle = RightValue.GetStringValueProvider();
                 return t =>
                 {
                     var h = haystack(t);
@@ -41,13 +38,13 @@ namespace StarryEyes.Filters.Expressions.Operators
                     return h.IndexOf(n, GetStringComparison()) >= 0;
                 };
             }
-            var lsp = this.LeftValue.GetSetValueProvider();
-            if (this.RightValue.SupportedTypes.Contains(FilterExpressionType.Numeric))
+            var lsp = LeftValue.GetSetValueProvider();
+            if (RightValue.SupportedTypes.Contains(FilterExpressionType.Numeric))
             {
-                var rnp = this.RightValue.GetNumericValueProvider();
+                var rnp = RightValue.GetNumericValueProvider();
                 return _ => lsp(_).Contains(rnp(_));
             }
-            var rsp = this.RightValue.GetSetValueProvider();
+            var rsp = RightValue.GetSetValueProvider();
             return _ =>
             {
                 var ls = lsp(_);
@@ -57,18 +54,20 @@ namespace StarryEyes.Filters.Expressions.Operators
 
         public override string GetBooleanSqlQuery()
         {
-            if (this.CompareAsString())
+            if (CompareAsString())
             {
-                return this.GetStringComparison() == StringComparison.CurrentCultureIgnoreCase
-                    ? "LOWER(" + this.LeftValue.GetStringSqlQuery() + ") LIKE LOWER('%" + this.RightValue.GetStringSqlQuery().Unwrap() + "%') escape '\\'"
-                    : this.LeftValue.GetStringSqlQuery() + " LIKE '%" + this.RightValue.GetStringSqlQuery().Unwrap() + "%' escape '\\'";
+                return GetStringComparison() == StringComparison.CurrentCultureIgnoreCase
+                    ? "LOWER(" + LeftValue.GetStringSqlQuery() + ") LIKE LOWER('%" +
+                      RightValue.GetStringSqlQuery().Unwrap() + "%') escape '\\'"
+                    : LeftValue.GetStringSqlQuery() + " LIKE '%" + RightValue.GetStringSqlQuery().Unwrap() +
+                      "%' escape '\\'";
             }
-            var lq = this.LeftValue.GetSetSqlQuery();
-            if (this.RightValue.SupportedTypes.Contains(FilterExpressionType.Numeric))
+            var lq = LeftValue.GetSetSqlQuery();
+            if (RightValue.SupportedTypes.Contains(FilterExpressionType.Numeric))
             {
-                return this.RightValue.GetNumericSqlQuery() + " IN " + lq;
+                return RightValue.GetNumericSqlQuery() + " IN " + lq;
             }
-            var rq = this.RightValue.GetSetSqlQuery();
+            var rq = RightValue.GetSetSqlQuery();
             // check intersection
             return "exists (" + lq.Unparenthesis() + " intersect " + rq.Unparenthesis() + ")";
         }
@@ -84,10 +83,7 @@ namespace StarryEyes.Filters.Expressions.Operators
     /// </summary>
     public class FilterOperatorContainedBy : FilterTwoValueOperator
     {
-        protected override string OperatorString
-        {
-            get { return "in"; }
-        }
+        protected override string OperatorString => "in";
 
         public override Func<TwitterStatus, bool> GetBooleanValueProvider()
         {

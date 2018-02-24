@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Cadena.Data;
 using StarryEyes.Albireo.Collections;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models.Databases;
 
 namespace StarryEyes.Filters.Sources
@@ -15,10 +15,8 @@ namespace StarryEyes.Filters.Sources
         private readonly AVLTree<long> _statuses = new AVLTree<long>();
 
         private bool _isPreparing;
-        public override bool IsPreparing
-        {
-            get { return _isPreparing; }
-        }
+
+        public override bool IsPreparing => _isPreparing;
 
         public FilterConversation(string sid)
         {
@@ -72,15 +70,9 @@ namespace StarryEyes.Filters.Sources
             return await FindHeadAsync(irt.Value).ConfigureAwait(false);
         }
 
-        public override string FilterKey
-        {
-            get { return "conv"; }
-        }
+        public override string FilterKey => "conv";
 
-        public override string FilterValue
-        {
-            get { return _original.ToString(CultureInfo.InvariantCulture); }
-        }
+        public override string FilterValue => _original.ToString(CultureInfo.InvariantCulture);
 
         public override Func<TwitterStatus, bool> GetEvaluator()
         {
@@ -94,7 +86,9 @@ namespace StarryEyes.Filters.Sources
             {
                 ids = _statuses.ToArray();
             }
-            System.Diagnostics.Debug.WriteLine("sql: " + "Id IN (" + ids.Select(i => i.ToString(CultureInfo.InvariantCulture)).JoinString(",") + ")");
+            System.Diagnostics.Debug.WriteLine("sql: " + "Id IN (" +
+                                               ids.Select(i => i.ToString(CultureInfo.InvariantCulture))
+                                                  .JoinString(",") + ")");
             return "Id IN (" + ids.Select(i => i.ToString(CultureInfo.InvariantCulture)).JoinString(",") + ")";
         }
 

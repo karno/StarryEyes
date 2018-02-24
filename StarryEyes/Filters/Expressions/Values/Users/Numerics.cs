@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
+using Cadena.Data;
+using StarryEyes.Helpers;
 
 namespace StarryEyes.Filters.Expressions.Values.Users
 {
@@ -13,7 +14,7 @@ namespace StarryEyes.Filters.Expressions.Values.Users
 
         public override Func<TwitterStatus, long> GetNumericValueProvider()
         {
-            return _ => _.GetOriginal().User.Id;
+            return s => s.GetOriginal().User.Id;
         }
 
         public override string GetNumericSqlQuery()
@@ -36,7 +37,7 @@ namespace StarryEyes.Filters.Expressions.Values.Users
 
         public override Func<TwitterStatus, long> GetNumericValueProvider()
         {
-            return _ => _.GetOriginal().User.StatusesCount;
+            return s => s.GetOriginal().User.StatusesCount;
         }
 
         public override string GetNumericSqlQuery()
@@ -59,7 +60,7 @@ namespace StarryEyes.Filters.Expressions.Values.Users
 
         public override Func<TwitterStatus, long> GetNumericValueProvider()
         {
-            return _ => _.GetOriginal().User.FollowingsCount;
+            return s => s.GetOriginal().User.FollowingsCount;
         }
 
         public override string GetNumericSqlQuery()
@@ -82,7 +83,7 @@ namespace StarryEyes.Filters.Expressions.Values.Users
 
         public override Func<TwitterStatus, long> GetNumericValueProvider()
         {
-            return _ => _.GetOriginal().User.FollowersCount;
+            return s => s.GetOriginal().User.FollowersCount;
         }
 
         public override string GetNumericSqlQuery()
@@ -105,7 +106,7 @@ namespace StarryEyes.Filters.Expressions.Values.Users
 
         public override Func<TwitterStatus, long> GetNumericValueProvider()
         {
-            return _ => _.GetOriginal().User.FavoritesCount;
+            return s => s.GetOriginal().User.FavoritesCount;
         }
 
         public override string GetNumericSqlQuery()
@@ -128,7 +129,7 @@ namespace StarryEyes.Filters.Expressions.Values.Users
 
         public override Func<TwitterStatus, long> GetNumericValueProvider()
         {
-            return _ => _.GetOriginal().User.ListedCount;
+            return s => s.GetOriginal().User.ListedCount;
         }
 
         public override string GetNumericSqlQuery()
@@ -151,7 +152,7 @@ namespace StarryEyes.Filters.Expressions.Values.Users
 
         public override Func<TwitterStatus, long> GetNumericValueProvider()
         {
-            return _ => _.RetweetedOriginal != null ? _.User.Id : -1;
+            return s => s.RetweetedStatus != null ? s.User.Id : -1;
         }
 
         public override string GetNumericSqlQuery()
@@ -174,7 +175,7 @@ namespace StarryEyes.Filters.Expressions.Values.Users
 
         public override Func<TwitterStatus, long> GetNumericValueProvider()
         {
-            return _ => _.RetweetedOriginal != null ? _.User.StatusesCount : -1;
+            return s => s.RetweetedStatus != null ? s.User.StatusesCount : -1;
         }
 
         public override string GetNumericSqlQuery()
@@ -197,7 +198,7 @@ namespace StarryEyes.Filters.Expressions.Values.Users
 
         public override Func<TwitterStatus, long> GetNumericValueProvider()
         {
-            return _ => _.RetweetedOriginal != null ? _.User.FollowingsCount : -1;
+            return s => s.RetweetedStatus != null ? s.User.FollowingsCount : -1;
         }
 
         public override string GetNumericSqlQuery()
@@ -220,7 +221,7 @@ namespace StarryEyes.Filters.Expressions.Values.Users
 
         public override Func<TwitterStatus, long> GetNumericValueProvider()
         {
-            return _ => _.RetweetedOriginal != null ? _.User.FollowersCount : -1;
+            return s => s.RetweetedStatus != null ? s.User.FollowersCount : -1;
         }
 
         public override string GetNumericSqlQuery()
@@ -243,7 +244,7 @@ namespace StarryEyes.Filters.Expressions.Values.Users
 
         public override Func<TwitterStatus, long> GetNumericValueProvider()
         {
-            return _ => _.RetweetedOriginal != null ? _.User.FavoritesCount : -1;
+            return s => s.RetweetedStatus != null ? s.User.FavoritesCount : -1;
         }
 
         public override string GetNumericSqlQuery()
@@ -266,7 +267,7 @@ namespace StarryEyes.Filters.Expressions.Values.Users
 
         public override Func<TwitterStatus, long> GetNumericValueProvider()
         {
-            return _ => _.RetweetedOriginal != null ? _.User.ListedCount : -1;
+            return s => s.RetweetedStatus != null ? s.User.ListedCount : -1;
         }
 
         public override string GetNumericSqlQuery()

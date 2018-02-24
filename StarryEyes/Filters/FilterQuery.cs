@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Reactive.Linq;
+using Cadena.Data;
 using StarryEyes.Albireo.Helpers;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Casket;
 using StarryEyes.Filters.Expressions;
 using StarryEyes.Filters.Parsing;
@@ -13,9 +13,10 @@ namespace StarryEyes.Filters
     public sealed class FilterQuery : IEquatable<FilterQuery>, IMultiplexPredicate<TwitterStatus>
     {
         public event Action InvalidateRequired;
+
         private void RaiseInvalidateRequired()
         {
-            this.InvalidateRequired.SafeInvoke();
+            InvalidateRequired.SafeInvoke();
         }
 
         public FilterSourceBase[] Sources { get; set; }
@@ -30,20 +31,20 @@ namespace StarryEyes.Filters
         public string ToQuery()
         {
             return "from " + Sources.GroupBy(s => s.FilterKey)
-                .Select(g => g.Distinct(_ => _.FilterValue).ToArray()) // remove duplicated query
-                .Select(fs =>
-                {
-                    if (fs.Length == 1 && String.IsNullOrEmpty(fs[0].FilterValue))
-                    {
-                        // if filter value is not specified, return filter key only.
-                        return fs[0].FilterKey;
-                    }
-                    return fs[0].FilterKey + ": " +
-                           fs.Select(f => f.FilterValue.EscapeForQuery().Quote())
-                             .JoinString(", ");
-                })
-                .JoinString(", ") +
-                " where " + PredicateTreeRoot.ToQuery();
+                                    .Select(g => g.Distinct(_ => _.FilterValue).ToArray()) // remove duplicated query
+                                    .Select(fs =>
+                                    {
+                                        if (fs.Length == 1 && String.IsNullOrEmpty(fs[0].FilterValue))
+                                        {
+                                            // if filter value is not specified, return filter key only.
+                                            return fs[0].FilterKey;
+                                        }
+                                        return fs[0].FilterKey + ": " +
+                                               fs.Select(f => f.FilterValue.EscapeForQuery().Quote())
+                                                 .JoinString(", ");
+                                    })
+                                    .JoinString(", ") +
+                   " where " + PredicateTreeRoot.ToQuery();
         }
 
         public IObservable<TwitterStatus> ReceiveSources(long? maxId)
@@ -55,8 +56,8 @@ namespace StarryEyes.Filters
         {
             var sourcesEvals = Sources.Select(s => s.GetEvaluator());
             var predEvals = PredicateTreeRoot != null
-                                ? PredicateTreeRoot.GetEvaluator()
-                                : FilterExpressionBase.Contradiction;
+                ? PredicateTreeRoot.GetEvaluator()
+                : FilterExpressionBase.Contradiction;
             return _ => sourcesEvals.Any(f => f(_)) && predEvals(_);
         }
 
@@ -67,8 +68,8 @@ namespace StarryEyes.Filters
                        .Select(s => s.GetSqlQuery())
                        .JoinString(" or ");
             var predicate = PredicateTreeRoot != null
-                       ? PredicateTreeRoot.GetSqlQuery()
-                       : String.Empty;
+                ? PredicateTreeRoot.GetSqlQuery()
+                : String.Empty;
             if (!String.IsNullOrEmpty(source))
             {
                 if (!String.IsNullOrEmpty(predicate))
@@ -78,14 +79,14 @@ namespace StarryEyes.Filters
                 return source;
             }
             return !String.IsNullOrEmpty(predicate)
-                       ? predicate
-                       : FilterExpressionBase.ContradictionSql;
+                ? predicate
+                : FilterExpressionBase.ContradictionSql;
         }
 
         public bool Equals(FilterQuery other)
         {
             if (other == null) return false;
-            return this.ToQuery() == other.ToQuery();
+            return ToQuery() == other.ToQuery();
         }
 
         // override object.Equals
@@ -107,35 +108,29 @@ namespace StarryEyes.Filters
 
         public void Activate()
         {
-            if (Sources != null)
+            Sources?.ForEach(s =>
             {
-                Sources.ForEach(s =>
-                {
-                    s.Activate();
-                    s.InvalidateRequired += this.RaiseInvalidateRequired;
-                });
-            }
-            if (this.PredicateTreeRoot != null)
+                s.Activate();
+                s.InvalidateRequired += RaiseInvalidateRequired;
+            });
+            if (PredicateTreeRoot != null)
             {
-                this.PredicateTreeRoot.BeginLifecycle();
-                this.PredicateTreeRoot.InvalidateRequested += this.RaiseInvalidateRequired;
+                PredicateTreeRoot.BeginLifecycle();
+                PredicateTreeRoot.InvalidateRequested += RaiseInvalidateRequired;
             }
         }
 
         public void Deactivate()
         {
-            if (Sources != null)
+            Sources?.ForEach(s =>
             {
-                Sources.ForEach(s =>
-                {
-                    s.InvalidateRequired -= this.RaiseInvalidateRequired;
-                    s.Deactivate();
-                });
-            }
-            if (this.PredicateTreeRoot != null)
+                s.InvalidateRequired -= RaiseInvalidateRequired;
+                s.Deactivate();
+            });
+            if (PredicateTreeRoot != null)
             {
-                this.PredicateTreeRoot.InvalidateRequested -= this.RaiseInvalidateRequired;
-                this.PredicateTreeRoot.EndLifecycle();
+                PredicateTreeRoot.InvalidateRequested -= RaiseInvalidateRequired;
+                PredicateTreeRoot.EndLifecycle();
             }
         }
     }

@@ -78,7 +78,7 @@ namespace StarryEyes
             }
         }
 
-        #endregion
+        #endregion pre-initialize application
 
         #region initialize application
 
@@ -263,7 +263,9 @@ namespace StarryEyes
         private static void InitializeSubsystemsBeforeSettingsLoaded()
         {
             // initialize anomaly twitter library core system
-            Anomaly.Core.Initialize();
+            // Anomaly.Core.Initialize();
+            // -> now, we got the power of the kingdom...
+            Cadena.CadenaInitializer.Initialize();
 
             // initialize special image handlers
             SpecialImageResolvers.Initialize();
@@ -287,7 +289,7 @@ namespace StarryEyes
             CacheStore.Initialize();
         }
 
-        #endregion
+        #endregion initialize application
 
         #region Tweet cleanup
 
@@ -323,7 +325,7 @@ namespace StarryEyes
 
                 // delete old status
                 await Database.CleanupOldStatusesAsync(threshold,
-                        t => state("cleaning tweets (" + t.Item1 + "/" + t.Item2 + ")..."));
+                    t => state("cleaning tweets (" + t.Item1 + "/" + t.Item2 + ")..."));
 
                 // require optimizing
                 _isDatabaseOptimizationRequired = true;
@@ -341,7 +343,7 @@ namespace StarryEyes
             }
         }
 
-        #endregion
+        #endregion Tweet cleanup
 
         #region Database optimization
 
@@ -377,7 +379,7 @@ namespace StarryEyes
             }
         }
 
-        #endregion
+        #endregion Database optimization
 
         #region post-initialize application
 
@@ -405,7 +407,7 @@ namespace StarryEyes
             BackstageModel.Initialize();
         }
 
-        #endregion
+        #endregion post-initialize application
 
         #region Mutex control
 
@@ -440,10 +442,12 @@ namespace StarryEyes
                 _appMutex.Dispose();
                 _appMutex = null;
             }
-            catch (ObjectDisposedException) { }
+            catch (ObjectDisposedException)
+            {
+            }
         }
 
-        #endregion
+        #endregion Mutex control
 
         #region Confirmation messages
 
@@ -488,9 +492,9 @@ namespace StarryEyes
                     }
                 });
             }
-
         }
-        #endregion
+
+        #endregion Confirmation messages
 
         #region Fail messages
 
@@ -499,7 +503,6 @@ namespace StarryEyes
         /// </summary>
         private static class FailMessages
         {
-
             public static void LaunchDuplicated()
             {
                 ShowMessage(new TaskDialogOptions
@@ -524,7 +527,7 @@ namespace StarryEyes
                     ExpandedInfo = ex.ToString(),
                     CommonButtons = TaskDialogCommonButtons.Close,
                     FooterIcon = VistaTaskDialogIcon.Information,
-                    FooterText = AppInitResources.MsgFailInitConfDirFooterText,
+                    FooterText = AppInitResources.MsgFailInitConfDirFooterText
                 });
             }
 
@@ -552,12 +555,12 @@ namespace StarryEyes
                     MainInstruction = AppInitResources.MsgFailGeneralProcessInst,
                     Content = AppInitResources.MsgFailGeneralProcessContent,
                     ExpandedInfo = ex.ToString(),
-                    CommonButtons = TaskDialogCommonButtons.Close,
+                    CommonButtons = TaskDialogCommonButtons.Close
                 });
             }
         }
 
-        #endregion
+        #endregion Fail messages
 
         private static TaskDialogResult ShowMessage(TaskDialogOptions option)
         {

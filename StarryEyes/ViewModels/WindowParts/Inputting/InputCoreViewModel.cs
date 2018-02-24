@@ -9,26 +9,24 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Imaging;
+using Cadena.Data;
 using JetBrains.Annotations;
 using Livet;
 using Livet.EventListeners;
 using Livet.Messaging.IO;
 using StarryEyes.Albireo.Helpers;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Globalization;
 using StarryEyes.Globalization.WindowParts;
 using StarryEyes.Helpers;
 using StarryEyes.Models;
 using StarryEyes.Models.Backstages.NotificationEvents.PostEvents;
 using StarryEyes.Models.Inputting;
-using StarryEyes.Models.Requests;
 using StarryEyes.Models.Subsystems;
 using StarryEyes.Nightmare.Windows;
 using StarryEyes.Properties;
 using StarryEyes.Settings;
 using StarryEyes.ViewModels.Timelines.Statuses;
 using StarryEyes.Views.Messaging;
-using Clipboard = System.Windows.Clipboard;
 
 namespace StarryEyes.ViewModels.WindowParts.Inputting
 {
@@ -163,7 +161,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             }
         }
 
-        [NotNull]
+        [CanBeNull]
         public InputData InputData
         {
             get { return InputModel.InputCore.CurrentInputData; }
@@ -211,7 +209,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
 
         #region Text control
 
-        [NotNull]
+        [CanBeNull]
         public string InputText
         {
             get { return InputData.Text; }
@@ -246,7 +244,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                  *    currentTextLength += TwitterConfigurationService.MediaUrlLength;
                  * } 
                  * media url is no longer counted.
-                */ 
+                */
                 var tags = TwitterRegexPatterns.ValidHashtag.Matches(InputText)
                                                .OfType<Match>()
                                                .Select(_ => _.Groups[1].Value)
@@ -266,9 +264,9 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
         {
             get
             {
-                return Setting.NewTextCounting.Value ?
-                    TwitterConfigurationService.NewTextMaxLength - TextCount :
-                    TwitterConfigurationService.TextMaxLength - TextCount;
+                return Setting.NewTextCounting.Value
+                    ? TwitterConfigurationService.NewTextMaxLength - TextCount
+                    : TwitterConfigurationService.TextMaxLength - TextCount;
             }
         }
 
@@ -352,7 +350,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             InputModel.InputCore.ClearInput(clearTo, sendDraftIfChanged);
         }
 
-        #endregion
+        #endregion Text control
 
         #region Replying/Messaging control
 
@@ -460,7 +458,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             DirectMessageTo = null;
         }
 
-        #endregion
+        #endregion Replying/Messaging control
 
         #region Cursoring control
 
@@ -504,7 +502,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                 position.Index < 0 ? InputText.Length : position.Index, position.SelectionLength));
         }
 
-        #endregion
+        #endregion Cursoring control
 
         #region Hashtag bind control
 
@@ -561,7 +559,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             UpdateTextCount();
         }
 
-        #endregion
+        #endregion Hashtag bind control
 
         #region Image attach control
 
@@ -592,7 +590,8 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                 new OpeningFileSelectionMessage
                 {
                     Filter =
-                        InputAreaResources.AttachImageDlgFilterImg + "|*.jpg;*.jpeg;*.jpe;*.png;*.gif;*.bmp;*.dib|" +
+                        InputAreaResources.AttachImageDlgFilterImg +
+                        "|*.jpg;*.jpeg;*.jpe;*.png;*.gif;*.bmp;*.dib|" +
                         InputAreaResources.AttachImageDlgFilterAll + "|*.*",
                     InitialDirectory = dir,
                     MultiSelect = false,
@@ -720,7 +719,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             }
         }
 
-        #endregion
+        #endregion Image attach control
 
         #region Location attach control
 
@@ -755,7 +754,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             get { return InputData.AttachedGeoLocation != null; }
         }
 
-        #endregion
+        #endregion Location attach control
 
         #region Amending control
 
@@ -774,7 +773,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             InputModel.InputCore.AmendLastPosted();
         }
 
-        #endregion
+        #endregion Amending control
 
         #region Drafting control
 
@@ -798,7 +797,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             get { return InputData.IsChanged; }
         }
 
-        #endregion
+        #endregion Drafting control
 
         #region Posting control
 
@@ -813,10 +812,10 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                 if (TextCount > TwitterConfigurationService.TextMaxLength * 2) // rough limit
                     return false;
                 return IsImageAttached || !String.IsNullOrEmpty(
-                    InputText.Replace("\t", "")
-                             .Replace("\r", "")
-                             .Replace("\n", "")
-                             .Replace(" ", ""));
+                           InputText.Replace("\t", "")
+                                    .Replace("\r", "")
+                                    .Replace("\n", "")
+                                    .Replace(" ", ""));
             }
         }
 
@@ -876,7 +875,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                                                   .Select(
                                                       _ =>
                                                           _.Groups[TwitterRegexPatterns.ValidMentionOrListGroupUsername
-                                                              ].Value.Substring(1))
+                                                          ].Value.Substring(1))
                                                   .Where(_ => !String.IsNullOrEmpty(_))
                                                   .Distinct()
                                                   .ToArray();
@@ -938,7 +937,9 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                                 Title = InputAreaResources.MsgTweetFailedTitle,
                                 MainIcon = VistaTaskDialogIcon.Error,
                                 MainInstruction = InputAreaResources.MsgTweetFailedInst,
-                                Content = InputAreaResources.MsgTweetFailedContentFormat.SafeFormat(message),
+                                Content =
+                                    InputAreaResources
+                                        .MsgTweetFailedContentFormat.SafeFormat(message),
                                 ExpandedInfo = ed,
                                 FooterText = InputAreaResources.MsgTweetFailedFooter,
                                 FooterIcon = VistaTaskDialogIcon.Information,
@@ -994,7 +995,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             return fmsg;
         }
 
-        #endregion
+        #endregion Posting control
     }
 
     public class InReplyToStatusViewModel : ViewModel
@@ -1069,7 +1070,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             Location = new GeoLocationInfo
             {
                 Latitude = geoCoordinate.Latitude,
-                Longitude = geoCoordinate.Longitude,
+                Longitude = geoCoordinate.Longitude
             };
         }
 
@@ -1079,5 +1080,16 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
         }
 
         public GeoLocationInfo Location { get; set; }
+    }
+
+    public class GeoLocationInfo
+    {
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
+
+        public Tuple<double, double> ToTuple()
+        {
+            return Tuple.Create(Latitude, Longitude);
+        }
     }
 }

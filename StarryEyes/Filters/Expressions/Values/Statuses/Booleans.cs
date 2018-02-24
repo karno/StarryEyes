@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.Globalization;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
+using Cadena.Data;
+using Cadena.Data.Entities;
 
 namespace StarryEyes.Filters.Expressions.Values.Statuses
 {
@@ -38,7 +38,7 @@ namespace StarryEyes.Filters.Expressions.Values.Statuses
 
         public override Func<TwitterStatus, bool> GetBooleanValueProvider()
         {
-            return _ => _.RetweetedOriginal != null;
+            return s => s.RetweetedStatus != null;
         }
 
         public override string GetBooleanSqlQuery()
@@ -56,10 +56,7 @@ namespace StarryEyes.Filters.Expressions.Values.Statuses
     {
         public override IEnumerable<FilterExpressionType> SupportedTypes
         {
-            get
-            {
-                yield return FilterExpressionType.Boolean;
-            }
+            get { yield return FilterExpressionType.Boolean; }
         }
 
         public override Func<TwitterStatus, bool> GetBooleanValueProvider()
@@ -68,7 +65,7 @@ namespace StarryEyes.Filters.Expressions.Values.Statuses
             {
                 foreach (var entity in st.Entities)
                 {
-                    if (entity.EntityType == EntityType.Media) return true;
+                    if (entity is TwitterMediaEntity) return true;
                 }
                 return false;
             };
@@ -76,7 +73,8 @@ namespace StarryEyes.Filters.Expressions.Values.Statuses
 
         public override string GetBooleanSqlQuery()
         {
-            return "(SELECT COUNT(Id) FROM StatusEntity WHERE StatusEntity.ParentId = Status.Id AND StatusEntity.EntityType = 0) > 0";
+            return
+                "(SELECT COUNT(Id) FROM StatusEntity WHERE StatusEntity.ParentId = Status.Id AND StatusEntity.EntityType = 0) > 0";
         }
 
         public override string ToQuery()

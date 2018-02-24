@@ -2,20 +2,24 @@
 using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
-using StarryEyes.Anomaly.TwitterApi.Rest;
-using StarryEyes.Anomaly.Utils;
+using System.Reactive.Threading.Tasks;
+using System.Threading;
+using Cadena.Api.Rest;
+using Cadena.Data;
 
 namespace StarryEyes.Filters.Sources
 {
     public class FilterMessages : FilterSourceBase
     {
         private readonly string _screenName;
-        public FilterMessages() { }
+
+        public FilterMessages()
+        {
+        }
 
         public FilterMessages(string screenName)
         {
-            this._screenName = screenName;
+            _screenName = screenName;
         }
 
         public override Func<TwitterStatus, bool> GetEvaluator()
@@ -38,17 +42,14 @@ namespace StarryEyes.Filters.Sources
         protected override IObservable<TwitterStatus> ReceiveSink(long? maxId)
         {
             return Observable.Defer(() => GetAccountsFromString(_screenName).ToObservable())
-                .SelectMany(a => a.GetDirectMessagesAsync(count: 50, maxId: maxId).ToObservable());
+                             .SelectMany(a => a
+                                 .CreateAccessor().GetDirectMessagesAsync(50, null, maxId, CancellationToken.None)
+                                 .ToObservable())
+                             .SelectMany(o => o.Result);
         }
 
-        public override string FilterKey
-        {
-            get { return "messages"; }
-        }
+        public override string FilterKey => "messages";
 
-        public override string FilterValue
-        {
-            get { return _screenName; }
-        }
+        public override string FilterValue => _screenName;
     }
 }

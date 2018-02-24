@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Reactive.Disposables;
 using StarryEyes.Settings;
@@ -18,6 +19,10 @@ namespace StarryEyes.Models
 
         internal static void Initialize()
         {
+#if DEBUG
+            _writer = s => Debug.WriteLine(s);
+            return;
+#endif
             if (!Setting.IsLoaded || !Setting.IsBehaviorLogEnabled.Value)
             {
                 return;
@@ -63,15 +68,14 @@ namespace StarryEyes.Models
             var writer = _writer;
             try
             {
-                if (writer != null)
-                {
-                    writer(DateTime.Now.ToString("yy/MM/dd HH:mm:ss") + " > " +
-                            String.Format("{0,-7}", tag) +
-                            " " + log);
-                }
+                writer?.Invoke(DateTime.Now.ToString("yy/MM/dd HH:mm:ss") + " > " +
+                               String.Format("{0,-7}", tag) +
+                               " " + log);
             }
             // ReSharper disable once EmptyGeneralCatchClause
-            catch { }
+            catch
+            {
+            }
         }
 
         static void Cleanup()

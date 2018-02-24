@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.30110.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2027
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarryEyes", "StarryEyes\StarryEyes.csproj", "{3BF1F46A-B095-40EC-A89D-A34EBBACA966}"
 EndProject
@@ -19,15 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Subsystems", "Subsystems", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Detective", "Detective\Detective.csproj", "{F26CDB6B-3D72-4240-BC11-CEB7351672F1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarryEyes.Anomaly", "StarryEyes.Anomaly\StarryEyes.Anomaly.csproj", "{564E23DE-AB35-45B6-B331-395C3943BC23}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{65C47B8C-93EE-4291-8870-E3092BE22DB5}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SweetMagic", "SweetMagic\SweetMagic.csproj", "{11F115EE-8D61-42F3-89CA-E75E591E4E49}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarryJs", "StarryJs\StarryJs.csproj", "{2C279B20-2AA2-4C6A-B7D0-B7BD143697F5}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarryEyes.Feather", "StarryEyes.Feather\StarryEyes.Feather.csproj", "{E47FA479-005C-4236-BAFB-ADD664535E59}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documents", "Documents", "{172DB1ED-7852-4054-AF55-7ECA74308444}"
 	ProjectSection(SolutionItems) = preProject
@@ -48,6 +40,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MahApps.Metro", "MahApps.Metro\MahApps.Metro\MahApps.Metro.csproj", "{5B1710D2-5DC8-4754-91B2-19165DE49B3D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MahApps.Metro.Resources", "MahApps.Metro\MahApps.Metro.Resources\MahApps.Metro.Resources.csproj", "{E708AC99-605B-42A0-8D20-ABCA8FE42DD2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cadena", "Cadena\Cadena\Cadena.csproj", "{7667032A-888C-4747-BD07-04696C6FC53C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarryEyes.Feather", "StarryEyes.Feather\StarryEyes.Feather.csproj", "{E47FA479-005C-4236-BAFB-ADD664535E59}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -71,22 +67,10 @@ Global
 		{F26CDB6B-3D72-4240-BC11-CEB7351672F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F26CDB6B-3D72-4240-BC11-CEB7351672F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F26CDB6B-3D72-4240-BC11-CEB7351672F1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{564E23DE-AB35-45B6-B331-395C3943BC23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{564E23DE-AB35-45B6-B331-395C3943BC23}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{564E23DE-AB35-45B6-B331-395C3943BC23}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{564E23DE-AB35-45B6-B331-395C3943BC23}.Release|Any CPU.Build.0 = Release|Any CPU
 		{11F115EE-8D61-42F3-89CA-E75E591E4E49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{11F115EE-8D61-42F3-89CA-E75E591E4E49}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{11F115EE-8D61-42F3-89CA-E75E591E4E49}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{11F115EE-8D61-42F3-89CA-E75E591E4E49}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2C279B20-2AA2-4C6A-B7D0-B7BD143697F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2C279B20-2AA2-4C6A-B7D0-B7BD143697F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2C279B20-2AA2-4C6A-B7D0-B7BD143697F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2C279B20-2AA2-4C6A-B7D0-B7BD143697F5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E47FA479-005C-4236-BAFB-ADD664535E59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E47FA479-005C-4236-BAFB-ADD664535E59}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E47FA479-005C-4236-BAFB-ADD664535E59}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E47FA479-005C-4236-BAFB-ADD664535E59}.Release|Any CPU.Build.0 = Release|Any CPU
 		{316927DE-96C9-47C8-947D-B6D8A8DA1E14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{316927DE-96C9-47C8-947D-B6D8A8DA1E14}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{316927DE-96C9-47C8-947D-B6D8A8DA1E14}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -107,6 +91,14 @@ Global
 		{E708AC99-605B-42A0-8D20-ABCA8FE42DD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E708AC99-605B-42A0-8D20-ABCA8FE42DD2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E708AC99-605B-42A0-8D20-ABCA8FE42DD2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7667032A-888C-4747-BD07-04696C6FC53C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7667032A-888C-4747-BD07-04696C6FC53C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7667032A-888C-4747-BD07-04696C6FC53C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7667032A-888C-4747-BD07-04696C6FC53C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E47FA479-005C-4236-BAFB-ADD664535E59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E47FA479-005C-4236-BAFB-ADD664535E59}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E47FA479-005C-4236-BAFB-ADD664535E59}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E47FA479-005C-4236-BAFB-ADD664535E59}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -114,10 +106,12 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{F26CDB6B-3D72-4240-BC11-CEB7351672F1} = {B2DF914A-A068-4FD0-8ED9-50743E1AFF71}
 		{11F115EE-8D61-42F3-89CA-E75E591E4E49} = {B2DF914A-A068-4FD0-8ED9-50743E1AFF71}
-		{60761FCD-DB0B-40CC-8645-441CE88349D7} = {B2DF914A-A068-4FD0-8ED9-50743E1AFF71}
-		{2C279B20-2AA2-4C6A-B7D0-B7BD143697F5} = {65C47B8C-93EE-4291-8870-E3092BE22DB5}
 		{41D14775-20AA-4CB2-9B8A-371599D2552F} = {21AD8FB0-D270-4940-BACE-B89842E2CBC5}
+		{60761FCD-DB0B-40CC-8645-441CE88349D7} = {B2DF914A-A068-4FD0-8ED9-50743E1AFF71}
 		{5B1710D2-5DC8-4754-91B2-19165DE49B3D} = {28BF4974-FFE2-4440-ABAB-674DC0C6AB4E}
 		{E708AC99-605B-42A0-8D20-ABCA8FE42DD2} = {28BF4974-FFE2-4440-ABAB-674DC0C6AB4E}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B2705275-4FF3-4FDF-AB6E-590A2E0A2E05}
 	EndGlobalSection
 EndGlobal

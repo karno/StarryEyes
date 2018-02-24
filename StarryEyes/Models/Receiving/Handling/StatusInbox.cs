@@ -4,8 +4,8 @@ using System.Data.SQLite;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Cadena.Data;
 using JetBrains.Annotations;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Casket;
 using StarryEyes.Models.Databases;
 using StarryEyes.Models.Timelines.Statuses;
@@ -52,13 +52,13 @@ namespace StarryEyes.Models.Receiving.Handling
             _pumpThread.Start();
         }
 
-        public static void Enqueue([NotNull] TwitterStatus status)
+        public static void Enqueue([CanBeNull] TwitterStatus status)
         {
-            if (status == null) throw new ArgumentNullException("status");
+            if (status == null) throw new ArgumentNullException(nameof(status));
             // store original status first
-            if (status.RetweetedOriginal != null)
+            if (status.RetweetedStatus != null)
             {
-                Enqueue(status.RetweetedOriginal);
+                Enqueue(status.RetweetedStatus);
             }
             _queue.Enqueue(new StatusNotification(status));
             _signal.Set();
@@ -87,8 +87,8 @@ namespace StarryEyes.Models.Receiving.Handling
                         }
                         // check registered as removed or not
                         var removed = IsRegisteredAsRemoved(status.Id) ||
-                                      (status.RetweetedOriginalId != null &&
-                                      IsRegisteredAsRemoved(status.RetweetedOriginalId.Value));
+                                      (status.RetweetedStatus != null &&
+                                       IsRegisteredAsRemoved(status.RetweetedStatus.Id));
                         // check status is registered as removed or already received
                         if (removed || !await StatusReceived(status).ConfigureAwait(false))
                         {
@@ -112,9 +112,9 @@ namespace StarryEyes.Models.Receiving.Handling
             _signal.Dispose();
         }
 
-        private static async Task<bool> StatusReceived([NotNull] TwitterStatus status)
+        private static async Task<bool> StatusReceived([CanBeNull] TwitterStatus status)
         {
-            if (status == null) throw new ArgumentNullException("status");
+            if (status == null) throw new ArgumentNullException(nameof(status));
             try
             {
                 if (await CheckAlreadyExisted(status.Id).ConfigureAwait(false))
@@ -125,8 +125,12 @@ namespace StarryEyes.Models.Receiving.Handling
                 StatusProxy.StoreStatus(status);
                 return true;
             }
-            catch (SqliteCrudException) { }
-            catch (SQLiteException) { }
+            catch (SqliteCrudException)
+            {
+            }
+            catch (SQLiteException)
+            {
+            }
 
             // when throw exception from database: retry.
 

@@ -15,8 +15,6 @@ using StarryEyes.Globalization;
 using StarryEyes.Models.Databases;
 using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
-using Application = System.Windows.Application;
-using ThemeManager = StarryEyes.Settings.ThemeManager;
 
 namespace StarryEyes
 {
@@ -25,7 +23,7 @@ namespace StarryEyes
     /// </summary>
     public partial class App
     {
-        private static readonly string DbVersion = "A";
+        private static readonly string DbVersion = "B";
         private static DateTime _startupTime;
         private static string _userId = String.Empty;
 
@@ -45,7 +43,8 @@ namespace StarryEyes
 
             // set exception handlers
             Current.DispatcherUnhandledException += (sender2, e2) => HandleException(e2.Exception);
-            AppDomain.CurrentDomain.UnhandledException += (sender2, e2) => HandleException(e2.ExceptionObject as Exception);
+            AppDomain.CurrentDomain.UnhandledException +=
+                (sender2, e2) => HandleException(e2.ExceptionObject as Exception);
 
             // set exit handler
             Current.Exit += (_, __) => AppFinalize(true);
@@ -74,7 +73,7 @@ namespace StarryEyes
             {
                 Database.Initialize(new DatabaseConnectionDescriptor(DatabaseFilePath));
             }
-            if (!this.CheckDatabase())
+            if (!CheckDatabase())
             {
                 // db migration failed
                 Current.Shutdown();
@@ -117,6 +116,11 @@ namespace StarryEyes
                     // base version
                     case "1.0":
                         DatabaseMigrator.MigrateToVersionA();
+                        DatabaseMigrator.MigrateToVersionB();
+                        Database.ManagementCrud.DatabaseVersion = DbVersion;
+                        return true;
+                    case "A":
+                        DatabaseMigrator.MigrateToVersionB();
                         Database.ManagementCrud.DatabaseVersion = DbVersion;
                         return true;
                 }
@@ -125,7 +129,7 @@ namespace StarryEyes
             return true;
         }
 
-        #endregion
+        #endregion Startup Subprocesses
 
         #region Finalize/Error handling
 
@@ -224,34 +228,23 @@ namespace StarryEyes
             Environment.Exit(-1);
         }
 
-        #endregion
+        #endregion Finalize/Error handling
 
         #region Definitions
 
         public const string AppShortName = "Krile";
 
-        public const string AppFullName = "Krile STARRYEYES";
+        public const string AppFullName = "Krile STARRYEYES supernova";
 
         internal static readonly string ConsumerKey = "oReH15myW0cPq7pHNvAMGw";
 
         internal static readonly string ConsumerSecret = "0BkDivB4cqdkKaTmXc8j2urtH9C4xApJBKZFvlb9dec";
 
-        public static bool IsOperatingSystemSupported
-        {
-            get { return Environment.OSVersion.Version.Major == 6; }
-        }
+        public static bool IsOperatingSystemSupported => Environment.OSVersion.Version.Major == 6;
 
-        [NotNull]
-        public static string ExeFilePath
-        {
-            get { return Process.GetCurrentProcess().MainModule.FileName; }
-        }
+        public static string ExeFilePath => Process.GetCurrentProcess().MainModule.FileName;
 
-        [NotNull]
-        public static string ExeFileDir
-        {
-            get { return Path.GetDirectoryName(ExeFilePath) ?? ExeFilePath + "_"; }
-        }
+        public static string ExeFileDir => Path.GetDirectoryName(ExeFilePath) ?? ExeFilePath + "_";
 
         public static ExecutionMode ExecutionMode
         {
@@ -311,34 +304,19 @@ namespace StarryEyes
                         ExpandedInfo = ex.ToString(),
                         CommonButtons = TaskDialogCommonButtons.Close,
                         FooterIcon = VistaTaskDialogIcon.Information,
-                        FooterText = AppInitResources.MsgReInstallKrile,
+                        FooterText = AppInitResources.MsgReInstallKrile
                     });
                     throw;
                 }
             }
         }
 
-        public static bool IsMulticoreJitEnabled
-        {
-            get
-            {
-                if (ConfigurationManager.AppSettings["UseMulticoreJIT"].ToLower() == "none")
-                    return false;
-                return true;
-            }
-        }
+        public static bool IsMulticoreJitEnabled => ConfigurationManager.AppSettings["UseMulticoreJIT"].ToLower() !=
+                                                    "none";
 
-        public static bool IsHardwareRenderingEnabled
-        {
-            get
-            {
-                if (ConfigurationManager.AppSettings["UseHardwareRendering"].ToLower() == "none")
-                    return false;
-                return true;
-            }
-        }
+        public static bool IsHardwareRenderingEnabled => ConfigurationManager
+                                                             .AppSettings["UseHardwareRendering"].ToLower() != "none";
 
-        [NotNull]
         public static string ConfigurationDirectoryPath
         {
             get
@@ -360,50 +338,23 @@ namespace StarryEyes
             }
         }
 
-        [NotNull]
-        public static string ConfigurationFilePath
-        {
-            get { return Path.Combine(ConfigurationDirectoryPath, ConfigurationFileName); }
-        }
+        public static string ConfigurationFilePath => Path.Combine(ConfigurationDirectoryPath, ConfigurationFileName);
 
-        [NotNull]
-        public static string DatabaseFilePath
-        {
-            get { return Path.Combine(DatabaseDirectoryPath, DatabaseFileName); }
-        }
+        public static string DatabaseFilePath => Path.Combine(DatabaseDirectoryPath, DatabaseFileName);
 
-        [NotNull]
-        public static string LockFilePath
-        {
-            get { return Path.Combine(ConfigurationDirectoryPath, LockFileName); }
-        }
+        public static string LockFilePath => Path.Combine(ConfigurationDirectoryPath, LockFileName);
 
-        public static string LocalUpdateStorePath
-        {
-            get { return Path.Combine(ConfigurationDirectoryPath, LocalUpdateStoreDirName); }
-        }
+        public static string LocalUpdateStorePath => Path.Combine(ConfigurationDirectoryPath, LocalUpdateStoreDirName);
 
-        public static string HashtagTempFilePath
-        {
-            get { return Path.Combine(ConfigurationDirectoryPath, HashtagCacheFileName); }
-        }
+        public static string HashtagTempFilePath => Path.Combine(ConfigurationDirectoryPath, HashtagCacheFileName);
 
-        public static string ListUserTempFilePath
-        {
-            get { return Path.Combine(ConfigurationDirectoryPath, ListCacheFileName); }
-        }
+        public static string ListUserTempFilePath => Path.Combine(ConfigurationDirectoryPath, ListCacheFileName);
 
         private static Version _version;
 
         [NotNull]
-        public static Version Version
-        {
-            get
-            {
-                return _version ??
-                       (_version = Assembly.GetEntryAssembly().GetName().Version);
-            }
-        }
+        public static Version Version => _version ??
+                                         (_version = Assembly.GetEntryAssembly().GetName().Version);
 
         [NotNull]
         public static string FormattedVersion
@@ -419,10 +370,7 @@ namespace StarryEyes
             }
         }
 
-        public static bool IsUnstableVersion
-        {
-            get { return Version.Revision != 0; }
-        }
+        public static bool IsUnstableVersion => Version.Revision != 0;
 
         public static readonly uint LeastDesktopHeapSize = 12 * 1024;
 
@@ -486,7 +434,7 @@ namespace StarryEyes
 
         public static readonly string LicenseUrl = "https://raw.github.com/karno/StarryEyes/master/LICENSE.TXT";
 
-        #endregion
+        #endregion Definitions
 
         #region Triggers
 
@@ -495,27 +443,27 @@ namespace StarryEyes
         /// (But UI is not prepared)
         /// </summary>
         public static event Action SystemReady;
+
         internal static void RaiseSystemReady()
         {
             Debug.WriteLine("# System ready.");
             var osr = SystemReady;
             SystemReady = null;
-            if (osr != null)
-                osr();
+            osr?.Invoke();
         }
 
         /// <summary>
         /// Call on user interfaces are ready
         /// </summary>
         public static event Action UserInterfaceReady;
+
         internal static void RaiseUserInterfaceReady()
         {
             // this method called by background thread.
             Debug.WriteLine("# UI ready.");
             var usr = UserInterfaceReady;
             UserInterfaceReady = null;
-            if (usr != null)
-                usr();
+            usr?.Invoke();
         }
 
         /// <summary>
@@ -523,6 +471,7 @@ namespace StarryEyes
         /// (On crash app, this handler won't call!)
         /// </summary>
         public static event Action ApplicationExit;
+
         internal static void RaiseApplicationExit()
         {
             Debug.WriteLine("# App exit.");
@@ -530,24 +479,23 @@ namespace StarryEyes
             File.Delete(LockFilePath);
             var apx = ApplicationExit;
             ApplicationExit = null;
-            if (apx != null)
-                apx();
+            apx?.Invoke();
         }
 
         /// <summary>
         /// Call on application is exit from user action or crashed
         /// </summary>
         public static event Action ApplicationFinalize;
+
         internal static void RaiseApplicationFinalize()
         {
             Debug.WriteLine("# App finalize.");
             var apf = ApplicationFinalize;
             ApplicationFinalize = null;
-            if (apf != null)
-                apf();
+            apf?.Invoke();
         }
 
-        #endregion
+        #endregion Triggers
 
         #region Themes
 
@@ -557,15 +505,17 @@ namespace StarryEyes
 
         private void InitializeTheme()
         {
-            ThemeManager.ThemeChanged += this.OnThemeChanged;
+            ThemeManager.ThemeChanged += OnThemeChanged;
             ThemeManager.Initialize();
 
             // unload design-time default theme
-            _prevThemeDict = Current.Resources.MergedDictionaries.FirstOrDefault(r => r.Source.ToString().EndsWith("DesignTimeDefault.xaml"));
+            _prevThemeDict =
+                Current.Resources.MergedDictionaries.FirstOrDefault(r => r
+                    .Source.ToString().EndsWith("DesignTimeDefault.xaml"));
 
             // initialization call
             OnThemeChanged();
-            // TODO: below codes are reserved for debugging
+            // TODO: below code is reserved for debugging
 #if THEME_TEST
                 Observable.Timer(TimeSpan.FromSeconds(10))
                           .ObserveOnDispatcher()
@@ -588,7 +538,6 @@ namespace StarryEyes
                                   : currentTheme.CreateResourceDictionary());
                           });
 #endif
-
         }
 
         /// <summary>
@@ -598,9 +547,7 @@ namespace StarryEyes
         {
             // apply new one
             var currentTheme = ThemeManager.CurrentTheme;
-            this.ApplyThemeResource(currentTheme == null
-                ? null
-                : currentTheme.CreateResourceDictionary());
+            ApplyThemeResource(currentTheme?.CreateResourceDictionary());
         }
 
         /// <summary>
@@ -620,7 +567,7 @@ namespace StarryEyes
             _prevThemeDict = dictionary;
         }
 
-        #endregion
+        #endregion Themes
 
         #region Static helper constants/methods
 
@@ -629,10 +576,10 @@ namespace StarryEyes
         public static T FindResource<T>(string name) where T : DispatcherObject
         {
             // ReSharper disable once RedundantNameQualifier
-            return Application.Current.TryFindResource(name) as T;
+            return Current.TryFindResource(name) as T;
         }
 
-        #endregion
+        #endregion Static helper constants/methods
     }
 
     public enum ExecutionMode
@@ -641,14 +588,15 @@ namespace StarryEyes
         /// Use Local folder for storing setting file
         /// </summary>
         Default,
+
         /// <summary>
         /// Use Roaming folder for storing setting file
         /// </summary>
         Roaming,
+
         /// <summary>
         /// Use application local folder for storing setting file
         /// </summary>
         Standalone,
     }
-
 }

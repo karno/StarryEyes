@@ -11,7 +11,7 @@ namespace StarryEyes.Views.Adorners
         protected AdornerLayer AdornerLayer { get; private set; }
         protected Grid Root { get; private set; }
 
-        protected AdornerBase([NotNull] UIElement adornedElement)
+        protected AdornerBase([CanBeNull] UIElement adornedElement)
             : base(adornedElement)
         {
             this.AdornerLayer = AdornerLayer.GetAdornerLayer(adornedElement);

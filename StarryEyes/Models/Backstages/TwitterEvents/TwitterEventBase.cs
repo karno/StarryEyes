@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Windows.Media;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
+using Cadena.Data;
 using StarryEyes.Settings;
 using StarryEyes.Views;
 
@@ -9,48 +9,30 @@ namespace StarryEyes.Models.Backstages.TwitterEvents
 {
     public abstract class TwitterEventBase : BackstageEventBase
     {
-        private readonly DateTime _createdAt;
-        public DateTime CreatedAt
-        {
-            get { return _createdAt; }
-        }
+        public DateTime CreatedAt { get; }
 
-        private readonly TwitterUser _source;
-        public TwitterUser Source
-        {
-            get { return _source; }
-        }
+        public TwitterUser Source { get; }
 
-        private readonly TwitterUser _targetUser;
-        public TwitterUser TargetUser
-        {
-            get { return _targetUser; }
-        }
+        public TwitterUser TargetUser { get; }
 
-        private readonly TwitterStatus _targetStatus;
-        public TwitterStatus TargetStatus
-        {
-            get { return _targetStatus; }
-        }
+        public TwitterStatus TargetStatus { get; }
 
-        public bool IsLocalUserInvolved => Setting.Accounts.Ids.Contains(Source.Id) || Setting.Accounts.Ids.Contains(TargetUser.Id);
+        public bool IsLocalUserInvolved => Setting.Accounts.Ids.Contains(Source.Id) ||
+                                           Setting.Accounts.Ids.Contains(TargetUser.Id);
 
         public TwitterEventBase(TwitterUser source, TwitterUser target)
         {
-            this._createdAt = DateTime.Now;
-            this._source = source;
-            this._targetUser = target;
+            CreatedAt = DateTime.Now;
+            Source = source;
+            TargetUser = target;
         }
 
         public TwitterEventBase(TwitterUser source, TwitterStatus target)
             : this(source, target.User)
         {
-            this._targetStatus = target;
+            TargetStatus = target;
         }
 
-        public override Color Background
-        {
-            get { return MetroColors.Cyan; }
-        }
+        public override Color Background => MetroColors.Cyan;
     }
 }

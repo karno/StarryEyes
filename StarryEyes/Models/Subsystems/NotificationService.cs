@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Cadena.Data;
 using JetBrains.Annotations;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Feather.Proxies;
 using StarryEyes.Filters;
 using StarryEyes.Models.Accounting;
@@ -29,7 +29,7 @@ namespace StarryEyes.Models.Subsystems
         private static NotificationProxyWrapper _tail;
         private static readonly INotificationSink _sink = new NotificationSink();
 
-        private static INotificationSink Head { get { return _head ?? _sink; } }
+        private static INotificationSink Head => _head ?? _sink;
 
         public static void Initialize()
         {
@@ -39,9 +39,9 @@ namespace StarryEyes.Models.Subsystems
             NotificationLatch.Initialize();
         }
 
-        public static void RegisterProxy([NotNull] NotificationProxyWrapper proxyWrapper)
+        public static void RegisterProxy([CanBeNull] NotificationProxyWrapper proxyWrapper)
         {
-            if (proxyWrapper == null) throw new ArgumentNullException("proxyWrapper");
+            if (proxyWrapper == null) throw new ArgumentNullException(nameof(proxyWrapper));
             if (_head == null)
             {
                 _head = proxyWrapper;
@@ -58,16 +58,17 @@ namespace StarryEyes.Models.Subsystems
 
         internal static void NotifyReceived(TwitterStatus status)
         {
-            if (status.RetweetedOriginal != null)
+            if (status.RetweetedStatus != null)
             {
-                NotifyRetweeted(status.User, status.RetweetedOriginal, status);
+                NotifyRetweeted(status.User, status.RetweetedStatus, status);
             }
             Head.NotifyReceived(status);
         }
 
         #region New Arrival Control
 
-        private static readonly Dictionary<long, List<TabModel>> _acceptingArrivals = new Dictionary<long, List<TabModel>>();
+        private static readonly Dictionary<long, List<TabModel>> _acceptingArrivals =
+            new Dictionary<long, List<TabModel>>();
 
         internal static void StartAcceptNewArrival(TwitterStatus status)
         {
@@ -103,7 +104,7 @@ namespace StarryEyes.Models.Subsystems
         {
             List<TabModel> removal;
             // ignore retweet which mentions me
-            var isMention = status.RetweetedOriginal == null &&
+            var isMention = status.RetweetedStatus == null &&
                             FilterSystemUtil.InReplyToUsers(status)
                                             .Intersect(Setting.Accounts.Ids)
                                             .Any();
@@ -148,7 +149,7 @@ namespace StarryEyes.Models.Subsystems
             Head.NotifyNewArrival(status, type, explicitSoundSource);
         }
 
-        #endregion
+        #endregion New Arrival Control
 
         internal static void NotifyFollowed(TwitterUser source, TwitterUser target)
         {
@@ -203,6 +204,7 @@ namespace StarryEyes.Models.Subsystems
                 return;
             Head.NotifyUnmuted(source, target);
         }
+
         internal static void NotifyFavorited(TwitterUser source, TwitterStatus status)
         {
             if (MuteBlockManager.IsBlocked(source) || MuteBlockManager.IsOfficialMuted(source)) return;
@@ -258,12 +260,12 @@ namespace StarryEyes.Models.Subsystems
 
         internal static void NotifyDeleted(long statusId, TwitterStatus deleted)
         {
-            if (deleted != null && deleted.RetweetedOriginal != null)
+            if (deleted?.RetweetedStatus != null)
             {
                 Task.Run(() => StatusModel.UpdateStatusInfo(
-                    deleted.RetweetedOriginal.Id,
+                    deleted.RetweetedStatus.Id,
                     model => model.RemoveRetweetedUser(deleted.User.Id),
-                    _ => StatusProxy.RemoveRetweeter(deleted.RetweetedOriginal.Id,
+                    _ => StatusProxy.RemoveRetweeter(deleted.RetweetedStatus.Id,
                         deleted.User.Id)));
             }
             Head.NotifyDeleted(statusId, deleted);
@@ -280,6 +282,6 @@ namespace StarryEyes.Models.Subsystems
             Head.NotifyUserUpdated(source);
         }
 
-        #endregion
+        #endregion Notification methods
     }
 }

@@ -1,4 +1,4 @@
-﻿using StarryEyes.Anomaly.TwitterApi.DataModels;
+﻿using Cadena.Data;
 using StarryEyes.Views;
 
 namespace StarryEyes.Models.Backstages.TwitterEvents
@@ -7,21 +7,13 @@ namespace StarryEyes.Models.Backstages.TwitterEvents
     {
         public MutedEvent(TwitterUser source, TwitterUser target)
             : base(source, target)
-        { }
-
-        public override string Title
         {
-            get { return "MUTED"; }
         }
 
-        public override string Detail
-        {
-            get { return Source.ScreenName + " -%-> " + TargetUser.ScreenName; }
-        }
+        public override string Title => "MUTED";
 
-        public override System.Windows.Media.Color Background
-        {
-            get { return MetroColors.Mauve; }
-        }
+        public override string Detail => Source.ScreenName + " -%-> " + TargetUser.ScreenName;
+
+        public override System.Windows.Media.Color Background => MetroColors.Mauve;
     }
 }

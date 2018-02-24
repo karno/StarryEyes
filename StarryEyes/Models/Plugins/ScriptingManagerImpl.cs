@@ -23,6 +23,7 @@ namespace StarryEyes.Models.Plugins
 
         private readonly ConcurrentDictionary<string, IScriptExecutor> _executors =
             new ConcurrentDictionary<string, IScriptExecutor>();
+
         private readonly ConcurrentDictionary<string, IScriptExecutor> _executorExtResolver =
             new ConcurrentDictionary<string, IScriptExecutor>();
 
@@ -37,41 +38,41 @@ namespace StarryEyes.Models.Plugins
             {
                 foreach (var file in Directory.GetFiles(targetPath, "*", SearchOption.TopDirectoryOnly))
                 {
-                    this.ExecuteFile(file);
+                    ExecuteFile(file);
                 }
             }
         }
 
-        public override bool RegisterExecutor([NotNull] IScriptExecutor executor)
+        public override bool RegisterExecutor([CanBeNull] IScriptExecutor executor)
         {
-            if (executor == null) throw new ArgumentNullException("executor");
-            if (this._executors.ContainsKey(executor.Name)) return false;
-            this._executors[executor.Name] = executor;
+            if (executor == null) throw new ArgumentNullException(nameof(executor));
+            if (_executors.ContainsKey(executor.Name)) return false;
+            _executors[executor.Name] = executor;
             executor.Extensions
-                    .Where(ext => !this._executorExtResolver.ContainsKey(ext))
-                    .ForEach(ext => this._executorExtResolver[ext] = executor);
+                    .Where(ext => !_executorExtResolver.ContainsKey(ext))
+                    .ForEach(ext => _executorExtResolver[ext] = executor);
             return true;
         }
 
         public override IEnumerable<IScriptExecutor> Executors
         {
-            get { return this._executors.Values.ToArray(); }
+            get { return _executors.Values.ToArray(); }
         }
 
         public override IScriptExecutor GetExecutor(string executorName)
         {
             IScriptExecutor executor;
-            return this._executors.TryGetValue(executorName, out executor)
-                       ? executor
-                       : null;
+            return _executors.TryGetValue(executorName, out executor)
+                ? executor
+                : null;
         }
 
-        public override bool ExecuteFile([NotNull] string filePath)
+        public override bool ExecuteFile([CanBeNull] string filePath)
         {
             if (filePath == null) throw new ArgumentNullException("filePath");
             var ext = Path.GetExtension(filePath).Trim(new[] { '.', ' ' });
             IScriptExecutor executor;
-            if (!this._executorExtResolver.TryGetValue(ext, out executor))
+            if (!_executorExtResolver.TryGetValue(ext, out executor))
             {
                 return false;
             }

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Windows.Input;
+using Cadena.Data;
+using Cadena.Util;
 using JetBrains.Annotations;
 using Livet;
 using Livet.EventListeners;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
-using StarryEyes.Anomaly.Utils;
 using StarryEyes.Models;
 using StarryEyes.Models.Timelines.Statuses;
 using StarryEyes.Settings;
@@ -13,23 +13,20 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
 {
     public class UserViewModel : ViewModel
     {
-        public UserViewModel([NotNull] TwitterUser user)
+        public UserViewModel([CanBeNull] TwitterUser user)
         {
-            if (user == null) throw new ArgumentNullException("user");
-            this.Model = UserModel.Get(user);
-            this.CompositeDisposable.Add(
+            if (user == null) throw new ArgumentNullException(nameof(user));
+            Model = UserModel.Get(user);
+            CompositeDisposable.Add(
                 new EventListener<Action<TimelineIconResolution>>(
                     h => Setting.IconResolution.ValueChanged += h,
                     h => Setting.IconResolution.ValueChanged -= h,
-                    _ => this.RaisePropertyChanged(() => ProfileImageUriOptimized)));
+                    _ => RaisePropertyChanged(() => ProfileImageUriOptimized)));
         }
 
-        public UserModel Model { get; private set; }
+        public UserModel Model { get; }
 
-        public TwitterUser User
-        {
-            get { return this.Model.User; }
-        }
+        public TwitterUser User => Model.User;
 
         public Uri ProfileImageUriOptimized
         {
@@ -42,51 +39,36 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                 switch (Setting.IconResolution.Value)
                 {
                     case TimelineIconResolution.Original:
-                        return this.ProfileImageUriOriginal;
+                        return ProfileImageUriOriginal;
                     case TimelineIconResolution.High:
-                        return this.ProfileImageUriLarge;
+                        return ProfileImageUriLarge;
                     case TimelineIconResolution.Optimized:
-                        return this.ProfileImageUriNormal;
+                        return ProfileImageUriNormal;
                     case TimelineIconResolution.Low:
-                        return this.ProfileImageUriMini;
+                        return ProfileImageUriMini;
                     case TimelineIconResolution.None:
                         return null;
                 }
-                return this.User.ProfileImageUri.ChangeImageSize(ImageSize.Original);
+                return User.ProfileImageUri.ChangeImageSize(ImageSize.Original);
             }
         }
 
-        public Uri ProfileImageUriOriginal
-        {
-            get { return this.User.ProfileImageUri.ChangeImageSize(ImageSize.Original); }
-        }
+        public Uri ProfileImageUriOriginal => User.ProfileImageUri.ChangeImageSize(ImageSize.Original);
 
-        public Uri ProfileImageUriLarge
-        {
-            get { return this.User.ProfileImageUri.ChangeImageSize(ImageSize.Bigger); }
-        }
+        public Uri ProfileImageUriLarge => User.ProfileImageUri.ChangeImageSize(ImageSize.Bigger);
 
-        public Uri ProfileImageUriNormal
-        {
-            get { return this.User.ProfileImageUri.ChangeImageSize(ImageSize.Normal); }
-        }
+        public Uri ProfileImageUriNormal => User.ProfileImageUri.ChangeImageSize(ImageSize.Normal);
 
-        public Uri ProfileImageUriMini
-        {
-            get { return this.User.ProfileImageUri.ChangeImageSize(ImageSize.Mini); }
-        }
+        public Uri ProfileImageUriMini => User.ProfileImageUri.ChangeImageSize(ImageSize.Mini);
 
-        public Uri BackgroundImageUri
-        {
-            get { return this.User.ProfileBackgroundImageUri; }
-        }
+        public Uri BackgroundImageUri => User.ProfileBackgroundImageUri;
 
         public Uri BannerImageUri
         {
             get
             {
-                if (this.User.ProfileBannerUri == null) return null;
-                var uri = this.User.ProfileBannerUri.OriginalString;
+                if (User.ProfileBannerUri == null) return null;
+                var uri = User.ProfileBannerUri.OriginalString;
                 if (!uri.EndsWith("/"))
                 {
                     uri += "/";
@@ -95,65 +77,44 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             }
         }
 
-        public Uri UserSubImageUri
-        {
-            get { return this.BannerImageUri ?? this.BackgroundImageUri; }
-        }
+        public Uri UserSubImageUri => BannerImageUri ?? BackgroundImageUri;
 
-        public bool IsProtected { get { return this.User.IsProtected; } }
+        public bool IsProtected => User.IsProtected;
 
-        public bool IsVerified { get { return this.User.IsVerified; } }
+        public bool IsVerified => User.IsVerified;
 
-        public bool IsTranslator { get { return this.User.IsTranslator; } }
+        public bool IsTranslator => User.IsTranslator;
 
-        public long StatusesCount { get { return this.User.StatusesCount; } }
+        public long StatusesCount => User.StatusesCount;
 
-        public long FollowingsCount { get { return this.User.FollowingsCount; } }
+        public long FollowingsCount => User.FollowingsCount;
 
-        public long FollowersCount { get { return this.User.FollowersCount; } }
+        public long FollowersCount => User.FollowersCount;
 
-        public long FavoritesCount { get { return this.User.FavoritesCount; } }
+        public long FavoritesCount => User.FavoritesCount;
 
-        public long ListedCount { get { return this.User.ListedCount; } }
+        public long ListedCount => User.ListedCount;
 
-        public DateTime CreatedAt { get { return this.User.CreatedAt; } }
+        public DateTime CreatedAt => User.CreatedAt;
 
-        public string Name
-        {
-            get { return this.User.Name; }
-        }
+        public string Name => User.Name;
 
-        public string ScreenName
-        {
-            get { return this.User.ScreenName; }
-        }
+        public string ScreenName => User.ScreenName;
 
-        public string Bio
-        {
-            get { return this.User.Description; }
-        }
+        public string Bio => User.Description;
 
-        public string Location
-        {
-            get { return this.User.Location; }
-        }
+        public string Location => User.Location;
 
-        public string Web
-        {
-            get { return this.User.GetEntityAidedUrl(); }
-        }
+        public string Web => User.GetEntityAidedUrl();
 
-        public bool IsWellformed
-        {
-            get { return Uri.IsWellFormedUriString(this.User.Url, UriKind.Absolute); }
-        }
+        public bool IsWellformed => Uri.IsWellFormedUriString(User.Url, UriKind.Absolute);
 
         public Uri WebUri
         {
             get
             {
                 Uri uri;
-                if (Uri.TryCreate(this.User.Url, UriKind.Absolute, out uri))
+                if (Uri.TryCreate(User.Url, UriKind.Absolute, out uri))
                 {
                     return uri;
                 }
@@ -163,9 +124,9 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
 
         public void OpenUserWeb()
         {
-            if (!String.IsNullOrWhiteSpace(this.Web))
+            if (!String.IsNullOrWhiteSpace(Web))
             {
-                BrowserHelper.Open(this.Web);
+                BrowserHelper.Open(Web);
             }
         }
 
@@ -173,33 +134,32 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         {
             if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
             {
-                this.OpenUserDetailOnTwitter();
+                OpenUserDetailOnTwitter();
             }
             else
             {
-                this.OpenUserDetailLocal();
+                OpenUserDetailLocal();
             }
         }
 
         public void OpenUserDetailLocal()
         {
-            SearchFlipModel.RequestSearch(this.ScreenName, SearchMode.UserScreenName);
+            SearchFlipModel.RequestSearch(ScreenName, SearchMode.UserScreenName);
         }
 
         public void OpenUserDetailOnTwitter()
         {
-            BrowserHelper.Open("http://twitter.com/" + this.ScreenName);
+            BrowserHelper.Open("http://twitter.com/" + ScreenName);
         }
 
         public void OpenUserFavstar()
         {
-            BrowserHelper.Open(this.User.FavstarUserPermalink);
+            BrowserHelper.Open(User.FavstarUserPermalink);
         }
 
         public void OpenUserTwilog()
         {
-            BrowserHelper.Open(this.User.TwilogUserPermalink);
+            BrowserHelper.Open(User.TwilogUserPermalink);
         }
-
     }
 }

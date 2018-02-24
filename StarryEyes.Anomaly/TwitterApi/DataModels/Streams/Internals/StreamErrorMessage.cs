@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using Cadena;
 
 namespace StarryEyes.Anomaly.TwitterApi.DataModels.Streams.Internals
 {

@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Threading;
+using Cadena.Data;
 using JetBrains.Annotations;
 using Livet;
 using Livet.EventListeners;
 using Livet.Messaging;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Filters;
 using StarryEyes.Filters.Parsing;
 using StarryEyes.Globalization.Filters;
@@ -26,50 +26,50 @@ namespace StarryEyes.ViewModels.Timelines.Tabs
 
         public TabModel Model
         {
-            get { return this._model; }
+            get { return _model; }
         }
 
         public string Name
         {
-            get { return this._model.Name; }
+            get { return _model.Name; }
             set
             {
-                this._model.Name = value;
-                this.RaisePropertyChanged();
+                _model.Name = value;
+                RaisePropertyChanged();
             }
         }
 
         public ColumnViewModel Parent
         {
-            get { return this._parent; }
+            get { return _parent; }
         }
 
         public bool IsFocused
         {
-            get { return this._parent.FocusedTab == this; }
+            get { return _parent.FocusedTab == this; }
         }
 
         protected override IEnumerable<long> CurrentAccounts
         {
-            get { return this._model.BindingAccounts; }
+            get { return _model.BindingAccounts; }
         }
 
         public int UnreadCount
         {
-            get { return this._unreadCount; }
+            get { return _unreadCount; }
             set
             {
-                var newValue = this.IsFocused || !this.Model.ShowUnreadCounts ? 0 : value;
-                if (this._unreadCount == newValue) return;
-                this._unreadCount = newValue;
-                this.RaisePropertyChanged();
-                this.RaisePropertyChanged(() => this.IsUnreadExisted);
+                var newValue = IsFocused || !Model.ShowUnreadCounts ? 0 : value;
+                if (_unreadCount == newValue) return;
+                _unreadCount = newValue;
+                RaisePropertyChanged();
+                RaisePropertyChanged(() => IsUnreadExisted);
             }
         }
 
         public bool IsUnreadExisted
         {
-            get { return this.UnreadCount > 0; }
+            get { return UnreadCount > 0; }
         }
 
         public bool IsNotifyNewArrivals
@@ -87,77 +87,88 @@ namespace StarryEyes.ViewModels.Timelines.Tabs
         public TabViewModel(ColumnViewModel parent, TabModel model)
             : base(model)
         {
-            this._parent = parent;
-            this._model = model;
-            this.CompositeDisposable.Add(
+            _parent = parent;
+            _model = model;
+            CompositeDisposable.Add(
                 new EventListener<Action<TwitterStatus>>(
                     h => _model.OnNewStatusArrival += h,
                     h => model.OnNewStatusArrival -= h,
-                    _ => this.UnreadCount++));
-            this.CompositeDisposable.Add(
+                    _ => UnreadCount++));
+            CompositeDisposable.Add(
                 new EventListener<Action>(
                     h => _model.BindingAccountsChanged += h,
                     h => _model.BindingAccountsChanged -= h,
-                    () => this.RaisePropertyChanged(() => this.CurrentAccounts)));
-            this.CompositeDisposable.Add(
+                    () => RaisePropertyChanged(() => CurrentAccounts)));
+            CompositeDisposable.Add(
                 new EventListener<Action>(
                     h => _model.FocusRequired += h,
                     h => _model.FocusRequired -= h,
-                    this.SetFocus));
+                    SetFocus));
             model.IsActivated = true;
         }
 
         public void SetFocus()
         {
-            this._parent.FocusedTab = this;
-            this._parent.Focus();
-            this.Messenger.RaiseSafe(() => new InteractionMessage("SetFocus"));
+            _parent.FocusedTab = this;
+            _parent.Focus();
+            Messenger.RaiseSafe(() => new InteractionMessage("SetFocus"));
         }
 
         internal void UpdateFocus()
         {
-            if (this.IsFocused)
+            if (IsFocused)
             {
-                this.UnreadCount = 0;
+                UnreadCount = 0;
             }
-            this.RaisePropertyChanged(() => this.IsFocused);
+            RaisePropertyChanged(() => IsFocused);
         }
 
         public override void GotFocus()
         {
-            this._parent.FocusedTab = this;
-            this._parent.Focus();
+            _parent.FocusedTab = this;
+            _parent.Focus();
             // wait for completion of creating view
-            DispatcherHelper.UIDispatcher.InvokeAsync(this.SetFocus, DispatcherPriority.Input);
+            DispatcherHelper.UIDispatcher.InvokeAsync(SetFocus, DispatcherPriority.Input);
         }
 
         #region EditTabCommand
+
         private Livet.Commands.ViewModelCommand _editTabCommand;
 
         [UsedImplicitly]
         public Livet.Commands.ViewModelCommand EditTabCommand
         {
-            get { return this._editTabCommand ?? (this._editTabCommand = new Livet.Commands.ViewModelCommand(this.EditTab)); }
+            get
+            {
+                return _editTabCommand ??
+                       (_editTabCommand = new Livet.Commands.ViewModelCommand(EditTab));
+            }
         }
 
         public void EditTab()
         {
-            MainWindowModel.ShowTabConfigure(this.Model)
+            MainWindowModel.ShowTabConfigure(Model)
                            .Subscribe(_ =>
                            {
-                               this.RaisePropertyChanged(() => Name);
-                               this.RaisePropertyChanged(() => IsNotifyNewArrivals);
+                               RaisePropertyChanged(() => Name);
+                               RaisePropertyChanged(() => IsNotifyNewArrivals);
                            });
         }
-        #endregion
+
+        #endregion EditTabCommand
 
         #region CopyTabCommand
+
         private Livet.Commands.ViewModelCommand _copyTabCommand;
 
         [UsedImplicitly]
         public Livet.Commands.ViewModelCommand CopyTabCommand
         {
-            get { return this._copyTabCommand ?? (this._copyTabCommand = new Livet.Commands.ViewModelCommand(this.CopyTab)); }
+            get
+            {
+                return _copyTabCommand ??
+                       (_copyTabCommand = new Livet.Commands.ViewModelCommand(CopyTab));
+            }
         }
 
         public void CopyTab()
@@ -166,16 +177,18 @@ namespace StarryEyes.ViewModels.Timelines.Tabs
             {
                 var model = new TabModel
                 {
-                    Name = this.Name,
-                    FilterQuery = this.Model.FilterQuery != null ? QueryCompiler.Compile(this.Model.FilterQuery.ToQuery()) : null,
-                    RawQueryString = this.Model.RawQueryString,
-                    BindingHashtags = this.Model.BindingHashtags.ToArray(),
-                    NotifyNewArrivals = this.Model.NotifyNewArrivals,
-                    ShowUnreadCounts = this.Model.ShowUnreadCounts,
-                    NotifySoundSource = this.Model.NotifySoundSource
+                    Name = Name,
+                    FilterQuery = Model.FilterQuery != null
+                        ? QueryCompiler.Compile(Model.FilterQuery.ToQuery())
+                        : null,
+                    RawQueryString = Model.RawQueryString,
+                    BindingHashtags = Model.BindingHashtags.ToArray(),
+                    NotifyNewArrivals = Model.NotifyNewArrivals,
+                    ShowUnreadCounts = Model.ShowUnreadCounts,
+                    NotifySoundSource = Model.NotifySoundSource
                 };
-                this.Model.BindingAccounts.ForEach(id => model.BindingAccounts.Add(id));
-                this.Parent.Model.CreateTab(model);
+                Model.BindingAccounts.ForEach(id => model.BindingAccounts.Add(id));
+                Parent.Model.CreateTab(model);
             }
             catch (FilterQueryException fqex)
             {
@@ -183,21 +196,22 @@ namespace StarryEyes.ViewModels.Timelines.Tabs
                     new OperationFailedEvent(QueryCompilerResources.QueryCompileFailed, fqex));
             }
         }
-        #endregion
+
+        #endregion CopyTabCommand
 
         #region CloseTabCommand
+
         private Livet.Commands.ViewModelCommand _closeTabCommand;
 
         [UsedImplicitly]
-        public Livet.Commands.ViewModelCommand CloseTabCommand
-        {
-            get { return this._closeTabCommand ?? (this._closeTabCommand = new Livet.Commands.ViewModelCommand(this.CloseTab)); }
-        }
+        public Livet.Commands.ViewModelCommand CloseTabCommand => _closeTabCommand ?? (_closeTabCommand =
+                                                                      new Livet.Commands.ViewModelCommand(CloseTab));
 
         public void CloseTab()
         {
-            this.Parent.CloseTab(this);
+            Parent.CloseTab(this);
         }
-        #endregion
+
+        #endregion CloseTabCommand
     }
 }

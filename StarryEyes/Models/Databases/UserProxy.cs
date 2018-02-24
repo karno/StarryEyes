@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Linq;
 using System.Threading.Tasks;
+using Cadena.Data;
 using JetBrains.Annotations;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Casket;
 using StarryEyes.Casket.DatabaseModels;
 using StarryEyes.Models.Databases.Caching;
@@ -58,6 +58,14 @@ namespace StarryEyes.Models.Databases
         public static void StoreUser(TwitterUser user)
         {
             _userQueue.Enqueue(user.Id, user);
+        }
+
+        public static void StoreUsers(IEnumerable<TwitterUser> users)
+        {
+            foreach (var user in users)
+            {
+                StoreUser(user);
+            }
         }
 
         private static async Task StoreUsersAsync(IEnumerable<TwitterUser> pendingUser)
@@ -124,7 +132,8 @@ namespace StarryEyes.Models.Databases
         public static async Task<IEnumerable<Tuple<long, string>>> GetUsersFastAsync(string partOfScreenName, int count)
         {
             var resp = await DatabaseUtil.RetryIfLocked(
-                () => Database.UserCrud.GetUsersFastAsync(partOfScreenName, count)).ConfigureAwait(false);
+                                             () => Database.UserCrud.GetUsersFastAsync(partOfScreenName, count))
+                                         .ConfigureAwait(false);
             return resp.Guard().Select(d => Tuple.Create(d.Id, d.ScreenName));
         }
 
@@ -132,7 +141,8 @@ namespace StarryEyes.Models.Databases
             string partOfScreenName, bool followingsOnly, int count)
         {
             var resp = await DatabaseUtil.RetryIfLocked(
-                () => Database.UserCrud.GetRelatedUsersFastAsync(partOfScreenName, followingsOnly, count)).ConfigureAwait(false);
+                () => Database.UserCrud.GetRelatedUsersFastAsync(partOfScreenName,
+                    followingsOnly, count)).ConfigureAwait(false);
             return resp.Guard().Select(d => Tuple.Create(d.Id, d.ScreenName));
         }
 
@@ -153,9 +163,9 @@ namespace StarryEyes.Models.Databases
             return Mapper.MapMany(targets, des, ues);
         }
 
-        private static async Task<TwitterUser> LoadUserAsync([NotNull] DatabaseUser user)
+        private static async Task<TwitterUser> LoadUserAsync([CanBeNull] DatabaseUser user)
         {
-            if (user == null) throw new ArgumentNullException("user");
+            if (user == null) throw new ArgumentNullException(nameof(user));
             var ude = Database.UserDescriptionEntityCrud.GetEntitiesAsync(user.Id).ConfigureAwait(false);
             var uue = Database.UserUrlEntityCrud.GetEntitiesAsync(user.Id).ConfigureAwait(false);
             return Mapper.Map(user, await ude, await uue);
@@ -177,7 +187,7 @@ namespace StarryEyes.Models.Databases
                 case RelationDataType.Mutes:
                     return IsMutedAsync(userId, targetId);
                 default:
-                    throw new ArgumentOutOfRangeException("type");
+                    throw new ArgumentOutOfRangeException(nameof(type));
             }
         }
 
@@ -227,7 +237,7 @@ namespace StarryEyes.Models.Databases
                 case RelationDataType.Mutes:
                     return SetMutedAsync(userId, targetId, value);
                 default:
-                    throw new ArgumentOutOfRangeException("type");
+                    throw new ArgumentOutOfRangeException(nameof(type));
             }
         }
 
@@ -277,7 +287,7 @@ namespace StarryEyes.Models.Databases
                 case RelationDataType.Mutes:
                     return AddMutesAsync(userId, targetIds);
                 default:
-                    throw new ArgumentOutOfRangeException("type");
+                    throw new ArgumentOutOfRangeException(nameof(type));
             }
         }
 
@@ -296,7 +306,7 @@ namespace StarryEyes.Models.Databases
                 case RelationDataType.Mutes:
                     return RemoveMutesAsync(userId, removalIds);
                 default:
-                    throw new ArgumentOutOfRangeException("type");
+                    throw new ArgumentOutOfRangeException(nameof(type));
             }
         }
 
@@ -381,7 +391,7 @@ namespace StarryEyes.Models.Databases
                 case RelationDataType.Mutes:
                     return GetMutesAsync(userId);
                 default:
-                    throw new ArgumentOutOfRangeException("type");
+                    throw new ArgumentOutOfRangeException(nameof(type));
             }
         }
 
@@ -431,7 +441,7 @@ namespace StarryEyes.Models.Databases
                 case RelationDataType.Mutes:
                     return GetMutesAllAsync();
                 default:
-                    throw new ArgumentOutOfRangeException("type");
+                    throw new ArgumentOutOfRangeException(nameof(type));
             }
         }
 

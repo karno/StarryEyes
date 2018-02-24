@@ -14,7 +14,7 @@ namespace StarryEyes.Anomaly.Utils
         /// <param name="length">surrogate-pair considered length</param>
         /// <returns>substring</returns>
         /// <remarks>This method cuts string with surrogate-pair considered parameters.</remarks>
-        public static string SurrogatedSubstring([NotNull] this string str, int startIndex, int length = -1)
+        public static string SurrogatedSubstring([CanBeNull] this string str, int startIndex, int length = -1)
         {
             if (str == null) throw new ArgumentNullException("str");
             try
@@ -40,7 +40,7 @@ namespace StarryEyes.Anomaly.Utils
         /// </summary>
         /// <param name="str">source string</param>
         /// <returns>invert surrogate-considered length</returns>
-        public static int UnsurrogatedLength([NotNull] this string str)
+        public static int UnsurrogatedLength([CanBeNull] this string str)
         {
             if (str == null) throw new ArgumentNullException("str");
             return str.Sum(c => Char.IsHighSurrogate(c) ? 2 : 1);
@@ -51,7 +51,7 @@ namespace StarryEyes.Anomaly.Utils
         /// </summary>
         /// <param name="str">source string</param>
         /// <returns>surrogate-considered length</returns>
-        public static int SurrogatedLength([NotNull] this string str)
+        public static int SurrogatedLength([CanBeNull] this string str)
         {
             if (str == null) throw new ArgumentNullException("str");
             return str.Sum(c => Char.IsHighSurrogate(c) ? 0 : 1);

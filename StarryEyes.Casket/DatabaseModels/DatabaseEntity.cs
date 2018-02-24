@@ -1,5 +1,4 @@
-﻿using StarryEyes.Anomaly.TwitterApi.DataModels;
-using StarryEyes.Casket.Cruds.Scaffolding;
+﻿using StarryEyes.Casket.Cruds.Scaffolding;
 
 namespace StarryEyes.Casket.DatabaseModels
 {
@@ -28,11 +27,25 @@ namespace StarryEyes.Casket.DatabaseModels
     }
 
     [DbName("StatusEntity")]
-    public sealed class DatabaseStatusEntity : DatabaseEntity { }
+    public sealed class DatabaseStatusEntity : DatabaseEntity
+    {
+    }
 
     [DbName("UserDescriptionEntity")]
-    public sealed class DatabaseUserDescriptionEntity : DatabaseEntity { }
+    public sealed class DatabaseUserDescriptionEntity : DatabaseEntity
+    {
+    }
 
     [DbName("UserUrlEntity")]
-    public sealed class DatabaseUserUrlEntity : DatabaseEntity { }
+    public sealed class DatabaseUserUrlEntity : DatabaseEntity
+    {
+    }
+
+    public enum EntityType
+    {
+        Media,
+        Urls,
+        UserMentions,
+        Hashtags
+    }
 }

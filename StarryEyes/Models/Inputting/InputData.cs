@@ -5,14 +5,16 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
+using Cadena.Api.Parameters;
+using Cadena.Data;
+using Cadena.Engine.Requests;
 using JetBrains.Annotations;
 using Livet;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Helpers;
 using StarryEyes.Models.Accounting;
-using StarryEyes.Models.Receiving.Handling;
-using StarryEyes.Models.Requests;
+using StarryEyes.Models.Subsystems;
 using StarryEyes.Settings;
+using StarryEyes.ViewModels.WindowParts.Inputting;
 
 namespace StarryEyes.Models.Inputting
 {
@@ -20,13 +22,16 @@ namespace StarryEyes.Models.Inputting
     {
         private readonly DispatcherCollection<byte[]> _attachedImages =
             new DispatcherCollection<byte[]>(DispatcherHelper.UIDispatcher);
+
         private TwitterAccount[] _accounts;
         private string _initText;
         private string _text;
         private GeoLocationInfo _geoInfo;
         private string[] _boundTags;
+
         private Dictionary<TwitterAccount, TwitterStatus> _amendTweets =
             new Dictionary<TwitterAccount, TwitterStatus>();
+
         private TwitterStatus _inReplyTo;
         private TwitterUser _messageRecipient;
 
@@ -38,63 +43,42 @@ namespace StarryEyes.Models.Inputting
 
         #region Constant properties
 
-        public bool IsTagBindEnabled
-        {
-            get
-            {
-                // suppress tag binding
-                // when amending tweet,
-                // sending direct message, or
-                // replying someone (if configured so that).
-                return !IsAmend && !IsDirectMessage &&
-                       (!Setting.SuppressTagBindingInReply.Value || _inReplyTo == null);
-            }
-        }
+        // suppress tag binding
+        // when amending tweet,
+        // sending direct message, or
+        // replying someone (if configured so that).
+        public bool IsTagBindEnabled => !IsAmend && !IsDirectMessage &&
+                                        (!Setting.SuppressTagBindingInReply.Value || _inReplyTo == null);
 
-        public bool IsDirectMessage
-        {
-            get { return _messageRecipient != null; }
-        }
+        public bool IsDirectMessage => _messageRecipient != null;
 
-        public bool IsChanged
-        {
-            get
-            {
-                return _attachedImages?.Count > 0 ||
-                       _text != _initText && !String.IsNullOrEmpty(
-                           _text.Replace("\t", "")
-                                .Replace("\r", "")
-                                .Replace("\n", "")
-                                .Replace(" ", "")
-                                .Replace("　", ""));
-            }
-        }
+        public bool IsChanged => _attachedImages?.Count > 0 ||
+                                 _text != _initText && !String.IsNullOrEmpty(
+                                     _text.Replace("\t", "")
+                                          .Replace("\r", "")
+                                          .Replace("\n", "")
+                                          .Replace(" ", "")
+                                          .Replace("　", ""));
 
-        public bool IsAmend
-        {
-            get { return _amendTweets.Count > 0; }
-        }
+        public bool IsAmend => _amendTweets.Count > 0;
 
-        #endregion
+        #endregion Constant properties
 
         #region Accessing properties
 
         [CanBeNull]
         public IEnumerable<TwitterAccount> Accounts
         {
-            get { return _accounts; }
-            set { _accounts = value == null ? null : value.ToArray(); }
+            get => _accounts;
+            set => _accounts = value?.ToArray();
         }
 
-        [NotNull]
+        [CanBeNull]
         public IEnumerable<string> BoundTags
         {
-            get
-            {
-                return IsDirectMessage && _boundTags != null
-                           ? _boundTags
-                           : Enumerable.Empty<string>();
-            }
+            get => IsDirectMessage && _boundTags != null
+                ? _boundTags
+                : Enumerable.Empty<string>();
             set
             {
                 var array = value.Guard().ToArray();
@@ -104,15 +88,15 @@ namespace StarryEyes.Models.Inputting
                         "Could not bind tags when InputData is in DirectMessage mode.");
                 }
                 _boundTags = IsDirectMessage
-                                 ? new string[0]
-                                 : value.Guard().ToArray();
+                    ? new string[0]
+                    : value.Guard().ToArray();
             }
         }
 
         [CanBeNull]
         public TwitterStatus InReplyTo
         {
-            get { return _inReplyTo; }
+            get => _inReplyTo;
             set
             {
                 if (value != null)
@@ -134,7 +118,7 @@ namespace StarryEyes.Models.Inputting
         [CanBeNull]
         public TwitterUser MessageRecipient
         {
-            get { return _messageRecipient; }
+            get => _messageRecipient;
             set
             {
                 if (InReplyTo != null)
@@ -142,7 +126,7 @@ namespace StarryEyes.Models.Inputting
                     throw new InvalidOperationException(
                         "Could not set MessageRecipient when InReplyTo is already set.");
                 }
-                if (AttachedGeoLocation != null || AttachedImages.Count > 0)
+                if (AttachedGeoLocation != null || (AttachedImages != null && AttachedImages.Count > 0))
                 {
                     throw new InvalidOperationException(
                         "Could not set MessageRecipient when image or location is attached.");
@@ -151,26 +135,25 @@ namespace StarryEyes.Models.Inputting
             }
         }
 
-        [NotNull]
+        [CanBeNull]
         public string Text
         {
-            get { return _text; }
+            get => _text;
             // ReSharper disable ConstantNullCoalescingCondition
-            set { _text = value ?? String.Empty; }
+            set => _text = value ?? String.Empty;
             // ReSharper restore ConstantNullCoalescingCondition
         }
 
-        [NotNull]
+        [CanBeNull]
         public IEnumerable<KeyValuePair<TwitterAccount, TwitterStatus>> AmendTargetTweets
         {
-            get { return _amendTweets.ToArray(); }
+            get => _amendTweets.ToArray();
             set { _amendTweets = value.Guard().ToDictionary(kvp => kvp.Key, kvp => kvp.Value); }
         }
 
-        [CanBeNull]
         public GeoLocationInfo AttachedGeoLocation
         {
-            get { return _geoInfo; }
+            get => _geoInfo;
             set
             {
                 if (value != null && IsDirectMessage)
@@ -182,20 +165,17 @@ namespace StarryEyes.Models.Inputting
             }
         }
 
-        [NotNull]
-        public DispatcherCollection<byte[]> AttachedImages
-        {
-            get { return _attachedImages; }
-        }
+        [CanBeNull]
+        public DispatcherCollection<byte[]> AttachedImages => _attachedImages;
 
-        #endregion
+        #endregion Accessing properties
 
-        [NotNull]
+        [CanBeNull]
         private InputData Clone()
         {
             var newdata = new InputData(_initText)
             {
-                _accounts = _accounts == null ? null : _accounts.ToArray(),
+                _accounts = _accounts?.ToArray(),
                 _amendTweets = _amendTweets.ToDictionary(p => p.Key, p => p.Value),
                 _boundTags = _boundTags,
                 _geoInfo = _geoInfo,
@@ -206,38 +186,16 @@ namespace StarryEyes.Models.Inputting
             };
             foreach (var image in _attachedImages)
             {
-                newdata.AttachedImages.Add(image);
+                newdata.AttachedImages?.Add(image);
             }
             return newdata;
         }
 
-        [NotNull]
+        [CanBeNull]
         public async Task<PostResult> SendAsync()
         {
-            var existedTags = TwitterRegexPatterns.ValidHashtag.Matches(Text)
-                                                  .OfType<Match>()
-                                                  .Select(_ => _.Groups[1].Value)
-                                                  .Distinct()
-                                                  .ToArray();
-            var binds = !IsTagBindEnabled
-                ? String.Empty
-                : _boundTags.Guard().Except(existedTags)
-                            .Distinct()
-                            .Select(t => " #" + t)
-                            .JoinString(String.Empty);
-            RequestBase<TwitterStatus> request;
-            if (IsDirectMessage)
-            {
-                request = new MessagePostingRequest(MessageRecipient, Text);
-            }
-            else
-            {
-                request = new TweetPostingRequest(Text + binds, InReplyTo,
-                    AttachedGeoLocation, _attachedImages);
-            }
-
             var posts = _accounts.Guard()
-                                 .Select(a => Tuple.Create(a, SendInternal(a, request)))
+                                 .Select(a => Tuple.Create(a, SendOnSingleAccount(a)))
                                  .ToArray();
 
             var amendTargets = new Dictionary<TwitterAccount, TwitterStatus>();
@@ -250,7 +208,7 @@ namespace StarryEyes.Models.Inputting
                 try
                 {
                     var result = await item.Item2.ConfigureAwait(false);
-                    amendTargets.Add(account, result);
+                    amendTargets.Add(account, result.Result);
                 }
                 catch (Exception ex)
                 {
@@ -276,50 +234,80 @@ namespace StarryEyes.Models.Inputting
             var pr = new PostResult(successData, failedData, exceptions.ToArray());
 
 
-            if (IsAmend)
+            if (IsAmend && AmendTargetTweets != null)
             {
                 var amends = AmendTargetTweets
-                    .Select(pair => RequestQueue.EnqueueAsync(pair.Key, new DeletionRequest(pair.Value)))
+                    .Select(pair => RequestManager.Enqueue(
+                        new DeleteStatusRequest(pair.Key.CreateAccessor(), pair.Value.Id,
+                            pair.Value.StatusType)))
                     .OfType<Task>().ToArray();
                 Task.WaitAll(amends);
             }
             return pr;
         }
 
-        [NotNull]
-        private async Task<TwitterStatus> SendInternal(
-            [NotNull] TwitterAccount account, [NotNull] RequestBase<TwitterStatus> request)
+        private async Task<IApiResult<TwitterStatus>> SendOnSingleAccount(TwitterAccount account)
         {
-            if (account == null) throw new ArgumentNullException("account");
-            if (request == null) throw new ArgumentNullException("request");
-            return await Task.Run(async () =>
+            var existedTags = TwitterRegexPatterns.ValidHashtag.Matches(Text)
+                                                  .OfType<Match>()
+                                                  .Select(_ => _.Groups[1].Value)
+                                                  .Distinct()
+                                                  .ToArray();
+            var binds = !IsTagBindEnabled
+                ? String.Empty
+                : _boundTags.Guard().Except(existedTags)
+                            .Distinct()
+                            .Select(t => " #" + t)
+                            .JoinString(String.Empty);
+            var accessor = account.CreateAccessor();
+            if (IsDirectMessage && MessageRecipient != null)
             {
-                var status = await RequestQueue.EnqueueAsync(account, request);
-                StatusInbox.Enqueue(status);
-                return status;
-            });
+                if (MessageRecipient == null)
+                {
+                    throw new InvalidOperationException("recipient is not specified. please re-set target recipient.");
+                }
+                var result = await RequestManager.Enqueue(new SendMessageRequest(accessor,
+                    new UserParameter(MessageRecipient.Id),
+                    Text));
+                return result;
+            }
+            if (_attachedImages.Count > 0)
+            {
+                // step 1: upload media
+                var mediaRequests = _attachedImages
+                    .Select(b => new UploadMediaRequest(accessor, b))
+                    .Select(async r => await RequestManager.Enqueue(r).ConfigureAwait(false));
+                var results = (await Task.WhenAll(mediaRequests)).Select(s => s.Result.MediaId).ToArray();
+                // step 2: send tweet
+                return await RequestManager.Enqueue(new TweetWithMediaRequest(accessor, Text + binds, results,
+                    account.MarkMediaAsPossiblySensitive, InReplyTo?.Id, AttachedGeoLocation?.ToTuple()));
+            }
+            else
+            {
+                return await RequestManager.Enqueue(new TweetRequest(accessor, Text + binds, InReplyTo?.Id,
+                    AttachedGeoLocation?.ToTuple()));
+            }
         }
     }
 
     public class PostResult
     {
         public PostResult([CanBeNull] InputData succeededs, [CanBeNull] InputData faileds,
-            [NotNull] IEnumerable<Exception> throwns)
+            [CanBeNull] IEnumerable<Exception> thrown)
         {
-            if (throwns == null) throw new ArgumentNullException("throwns");
             Succeededs = succeededs;
             Faileds = faileds;
-            Exceptions = throwns;
+            Exceptions = thrown ?? throw new ArgumentNullException(nameof(thrown));
         }
 
         [CanBeNull]
-        public InputData Succeededs { get; private set; }
+        public InputData Succeededs { get; }
 
         [CanBeNull]
-        public InputData Faileds { get; private set; }
+        public InputData Faileds { get; }
 
-        [NotNull]
-        public IEnumerable<Exception> Exceptions { get; private set; }
+        [CanBeNull]
+        public IEnumerable<Exception> Exceptions { get; }
     }
 
     public enum ImageType
@@ -395,11 +383,11 @@ namespace StarryEyes.Models.Inputting
             {
                 var table = new Dictionary<Type, ImageType>
                 {
-                    {typeof (BmpBitmapDecoder), ImageType.Bmp},
-                    {typeof (GifBitmapDecoder), ImageType.Gif},
-                    {typeof (JpegBitmapDecoder), ImageType.Jpg},
-                    {typeof (PngBitmapDecoder), ImageType.Png},
-                    {typeof (TiffBitmapDecoder), ImageType.Tiff},
+                    { typeof(BmpBitmapDecoder), ImageType.Bmp },
+                    { typeof(GifBitmapDecoder), ImageType.Gif },
+                    { typeof(JpegBitmapDecoder), ImageType.Jpg },
+                    { typeof(PngBitmapDecoder), ImageType.Png },
+                    { typeof(TiffBitmapDecoder), ImageType.Tiff }
                 };
                 var decoder = BitmapDecoder.Create(ms, BitmapCreateOptions.None, BitmapCacheOption.None);
                 return table.Where(imageType => decoder.GetType() == imageType.Key)

@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Windows;
 using System.Xaml;
+using Cadena.Data;
 using StarryEyes.Albireo.Helpers;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Filters;
 using StarryEyes.Filters.Expressions;
 using StarryEyes.Filters.Parsing;
@@ -57,7 +59,7 @@ namespace StarryEyes.Settings
                 },
                 new ColumnDescription
                 {
-                    Tabs = new[] {CommonTabBuilder.GenerateActivitiesTab()}
+                    Tabs = new[] { CommonTabBuilder.GenerateActivitiesTab() }
                         .Select(t => new TabDescription(t)).ToArray()
                 }
             };
@@ -68,7 +70,7 @@ namespace StarryEyes.Settings
             _columns.Value = null;
         }
 
-        #endregion
+        #endregion Tab and Columns
 
         #region Authentication and accounts
 
@@ -88,7 +90,7 @@ namespace StarryEyes.Settings
         public static readonly SettingItem<string> GlobalConsumerSecret =
             new SettingItem<string>("GlobalConsumerSecret", null);
 
-        #endregion
+        #endregion Authentication and accounts
 
         #region Timeline display and action
 
@@ -125,7 +127,7 @@ namespace StarryEyes.Settings
         public static readonly SettingItemStruct<int> AutoCleanupThreshold =
             new SettingItemStruct<int>("AutoCleanupThreshold", -1);
 
-        #endregion
+        #endregion Timeline display and action
 
         #region Themes and Key Assigns
 
@@ -141,7 +143,7 @@ namespace StarryEyes.Settings
         public static readonly SettingItem<string> KeyAssign =
             new SettingItem<string>("KeyAssign", null);
 
-        #endregion
+        #endregion Themes and Key Assigns
 
         #region Mutes
 
@@ -159,7 +161,7 @@ namespace StarryEyes.Settings
         public static readonly SettingItemStruct<bool> UseLightweightMute =
             new SettingItemStruct<bool>("UseLightweightMute", false);
 
-        #endregion
+        #endregion Mutes
 
         #region Input control
 
@@ -183,7 +185,8 @@ namespace StarryEyes.Settings
             new SettingItemStruct<bool>("WarnReplyFromThirdAccount", true);
 
         public static readonly SettingItemStruct<TweetBoxClosingAction> TweetBoxClosingAction =
-            new SettingItemStruct<TweetBoxClosingAction>("TweetBoxClosingAction", Settings.TweetBoxClosingAction.Confirm);
+            new SettingItemStruct<TweetBoxClosingAction>("TweetBoxClosingAction",
+                Settings.TweetBoxClosingAction.Confirm);
 
         public static readonly SettingItemStruct<bool> IsBacktrackFallback =
             new SettingItemStruct<bool>("IsBacktrackFallback", true);
@@ -197,7 +200,7 @@ namespace StarryEyes.Settings
         public static readonly SettingItemStruct<bool> NewTextCounting =
             new SettingItemStruct<bool>("NewTextCounting", false);
 
-        #endregion
+        #endregion Input control
 
         #region Outer and Third Party services
 
@@ -207,7 +210,7 @@ namespace StarryEyes.Settings
         public static readonly SettingItem<string> FavstarApiKey =
             new SettingItem<string>("FavstarApiKey", null);
 
-        #endregion
+        #endregion Outer and Third Party services
 
         #region Notification and Confirmations
 
@@ -244,7 +247,7 @@ namespace StarryEyes.Settings
         public static readonly SettingItemStruct<int> NotifyScreenIndex =
             new SettingItemStruct<int>("NotifyScreenIndex", -1);
 
-        #endregion
+        #endregion Notification and Confirmations
 
         #region High-level configurations
 
@@ -274,10 +277,35 @@ namespace StarryEyes.Settings
         public static readonly SettingItem<string[]> WebProxyBypassList =
             new SettingItem<string[]>("WebProxyBypassList", null);
 
-        #endregion
+        public static IWebProxy GetWebProxy()
+        {
+            switch (WebProxyType.Value)
+            {
+                case WebProxyConfiguration.Default:
+                    return WebRequest.GetSystemWebProxy();
+                case WebProxyConfiguration.None:
+                    return null;
+                case WebProxyConfiguration.Custom:
+                    return new WebProxy(
+                        new Uri("http://" + WebProxyHost.Value + ":" +
+                                WebProxyPort.Value.ToString(CultureInfo.InvariantCulture)),
+                        BypassWebProxyInLocal.Value,
+                        WebProxyBypassList.Value);
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        #endregion Web proxy configuration
 
         public static readonly SettingItem<string> ApiProxy =
             new SettingItem<string>("ApiProxy", null);
+
+        public static readonly SettingItem<string> ApiProxyStreaming =
+            new SettingItem<string>("ApiProxyStreaming", null);
+
+        public static readonly SettingItem<string> ApiProxyUpload =
+            new SettingItem<string>("ApiProxyUpload", null);
 
         public static readonly SettingItem<string> SearchLocale =
             new SettingItem<string>("SearchLocale", null);
@@ -321,7 +349,7 @@ namespace StarryEyes.Settings
         public static readonly SettingItemStruct<bool> IsBehaviorLogEnabled =
             new SettingItemStruct<bool>("IsBehaviorLogEnabled", false);
 
-        #endregion
+        #endregion High-level configurations
 
         #region Krile internal state
 
@@ -332,7 +360,8 @@ namespace StarryEyes.Settings
             new SettingItemStruct<WindowState>("LastWindowState", WindowState.Normal);
 
         public static readonly SettingItem<string> LastImageOpenDir =
-            new SettingItem<string>("LastImageOpenDir", Environment.GetFolderPath(Environment.SpecialFolder.MyPictures));
+            new SettingItem<string>("LastImageOpenDir",
+                Environment.GetFolderPath(Environment.SpecialFolder.MyPictures));
 
         public static readonly SettingItemStruct<int> SettingVersion =
             new SettingItemStruct<int>("SettingVersion", 1);
@@ -343,7 +372,7 @@ namespace StarryEyes.Settings
         public static readonly SettingItemStruct<bool> CheckDesktopHeap =
             new SettingItemStruct<bool>("CheckDesktopHeap", true);
 
-        #endregion
+        #endregion Krile internal state
 
         #region Setting infrastructure
 
@@ -395,7 +424,7 @@ namespace StarryEyes.Settings
                     {
                         Save();
                     }
-                    this.ValueChanged.SafeInvoke(value);
+                    ValueChanged.SafeInvoke(value);
                 }
             }
 
@@ -428,7 +457,7 @@ namespace StarryEyes.Settings
 
             public SettingItemBase(string name)
             {
-                this._name = name;
+                _name = name;
             }
 
             public string Name
@@ -448,8 +477,8 @@ namespace StarryEyes.Settings
             public IDisposable ListenValueChanged(Action<T> listener)
             {
                 return Observable.FromEvent<T>(
-                    h => ValueChanged += h,
-                    h => ValueChanged -= h)
+                                     h => ValueChanged += h,
+                                     h => ValueChanged -= h)
                                  .Subscribe(listener);
             }
         }
@@ -514,9 +543,9 @@ namespace StarryEyes.Settings
                 {
                     if (_valueCache != null) return _valueCache.Value;
                     object value;
-                    return _settingValueHolder.TryGetValue(this.Name, out value)
-                        ? (this._valueCache = (T)value).Value
-                        : (this._valueCache = this._defaultValue).Value;
+                    return _settingValueHolder.TryGetValue(Name, out value)
+                        ? (_valueCache = (T)value).Value
+                        : (_valueCache = _defaultValue).Value;
                 }
                 set
                 {
@@ -531,7 +560,7 @@ namespace StarryEyes.Settings
             }
         }
 
-        #endregion
+        #endregion Setting infrastructure
 
         /// <summary>
         /// The flag identifies newbies of Krile.
@@ -651,7 +680,7 @@ namespace StarryEyes.Settings
             return true;
         }
 
-        #endregion
+        #endregion Load settings
 
         #region Save settings
 
@@ -708,7 +737,7 @@ namespace StarryEyes.Settings
             }
         }
 
-        #endregion
+        #endregion Save settings
     }
 
     public enum TweetDisplayMode
@@ -784,5 +813,4 @@ namespace StarryEyes.Settings
         Single,
         All
     }
-
 }

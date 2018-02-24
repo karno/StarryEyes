@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
+using Cadena.Data;
+using StarryEyes.Casket.DatabaseModels;
+using StarryEyes.Helpers;
 
 namespace StarryEyes.Filters.Expressions.Values.Statuses
 {
@@ -20,9 +22,9 @@ namespace StarryEyes.Filters.Expressions.Values.Statuses
 
         public override Func<TwitterStatus, long> GetNumericValueProvider()
         {
-            return s => s.StatusType == StatusType.Tweet || s.Recipient == null ?
-                s.GetOriginal().InReplyToUserId.GetValueOrDefault(-1) :
-                s.Recipient.Id;
+            return s => s.StatusType == StatusType.Tweet || s.Recipient == null
+                ? s.GetOriginal().InReplyToUserId.GetValueOrDefault(-1)
+                : s.Recipient.Id;
         }
 
         public override string GetNumericSqlQuery()
@@ -32,9 +34,9 @@ namespace StarryEyes.Filters.Expressions.Values.Statuses
 
         public override Func<TwitterStatus, string> GetStringValueProvider()
         {
-            return s => s.StatusType == StatusType.Tweet || s.Recipient == null ?
-                s.GetOriginal().InReplyToScreenName ?? String.Empty :
-                s.Recipient.ScreenName;
+            return s => s.StatusType == StatusType.Tweet || s.Recipient == null
+                ? s.GetOriginal().InReplyToScreenName ?? String.Empty
+                : s.Recipient.ScreenName;
         }
 
         public override string GetStringSqlQuery()
@@ -44,9 +46,9 @@ namespace StarryEyes.Filters.Expressions.Values.Statuses
 
         public override Func<TwitterStatus, IReadOnlyCollection<long>> GetSetValueProvider()
         {
-            return s => s.StatusType == StatusType.Tweet || s.Recipient == null ?
-                FilterSystemUtil.InReplyToUsers(s.GetOriginal()).ToList() :
-                new[] { s.Recipient.Id }.ToList();
+            return s => s.StatusType == StatusType.Tweet || s.Recipient == null
+                ? FilterSystemUtil.InReplyToUsers(s.GetOriginal()).ToList()
+                : new[] { s.Recipient.Id }.ToList();
         }
 
         public override string GetSetSqlQuery()
@@ -78,7 +80,7 @@ namespace StarryEyes.Filters.Expressions.Values.Statuses
 
         public override Func<TwitterStatus, IReadOnlyCollection<long>> GetSetValueProvider()
         {
-            return _ => _.FavoritedUsers ?? new long[0];
+            return s => s.FavoritedUsers ?? new long[0];
         }
 
         public override string GetSetSqlQuery()
@@ -88,7 +90,7 @@ namespace StarryEyes.Filters.Expressions.Values.Statuses
 
         public override Func<TwitterStatus, long> GetNumericValueProvider()
         {
-            return _ => (_.FavoritedUsers ?? new long[0]).Length;
+            return s => (s.FavoritedUsers ?? new long[0]).Length;
         }
 
         public override string GetNumericSqlQuery()
@@ -115,7 +117,7 @@ namespace StarryEyes.Filters.Expressions.Values.Statuses
 
         public override Func<TwitterStatus, IReadOnlyCollection<long>> GetSetValueProvider()
         {
-            return _ => _.RetweetedUsers ?? new long[0];
+            return s => s.RetweetedUsers ?? new long[0];
         }
 
         public override string GetSetSqlQuery()
@@ -125,7 +127,7 @@ namespace StarryEyes.Filters.Expressions.Values.Statuses
 
         public override Func<TwitterStatus, long> GetNumericValueProvider()
         {
-            return _ => (_.RetweetedUsers ?? new long[0]).Length;
+            return s => (s.RetweetedUsers ?? new long[0]).Length;
         }
 
         public override string GetNumericSqlQuery()

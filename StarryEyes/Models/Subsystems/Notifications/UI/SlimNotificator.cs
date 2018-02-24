@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using Cadena.Data;
 using StarryEyes.Albireo.Helpers;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.ViewModels.Notifications;
 
 namespace StarryEyes.Models.Subsystems.Notifications.UI
@@ -34,7 +34,7 @@ namespace StarryEyes.Models.Subsystems.Notifications.UI
 
         public SlimNotificator()
         {
-            this._queues = new[]
+            _queues = new[]
             {
                 _urgentPriorityQueue,
                 _highPriorityQueue,
@@ -129,30 +129,30 @@ namespace StarryEyes.Models.Subsystems.Notifications.UI
     {
         public NotificationData(SlimNotificationKind kind, TwitterStatus targetStatus)
         {
-            this.Kind = kind;
-            this.TargetStatus = targetStatus;
+            Kind = kind;
+            TargetStatus = targetStatus;
         }
 
         public NotificationData(SlimNotificationKind kind, TwitterUser source, TwitterStatus targetStatus)
         {
-            this.Kind = kind;
-            this.SourceUser = source;
-            this.TargetStatus = targetStatus;
+            Kind = kind;
+            SourceUser = source;
+            TargetStatus = targetStatus;
         }
 
         public NotificationData(SlimNotificationKind kind, TwitterUser source, TwitterUser targetUser)
         {
-            this.Kind = kind;
-            this.SourceUser = source;
-            this.TargetUser = targetUser;
+            Kind = kind;
+            SourceUser = source;
+            TargetUser = targetUser;
         }
 
-        public SlimNotificationKind Kind { get; private set; }
+        public SlimNotificationKind Kind { get; }
 
-        public TwitterUser SourceUser { get; private set; }
+        public TwitterUser SourceUser { get; }
 
-        public TwitterStatus TargetStatus { get; private set; }
+        public TwitterStatus TargetStatus { get; }
 
-        public TwitterUser TargetUser { get; private set; }
+        public TwitterUser TargetUser { get; }
     }
 }

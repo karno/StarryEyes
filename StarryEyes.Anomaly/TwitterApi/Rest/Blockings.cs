@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Cadena;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest.Infrastructure;
 
@@ -23,7 +24,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return await response.ReadAsCursoredIdsAsync();
         }
 
-        #endregion
+        #endregion Blocking ids
 
         #region Block
 
@@ -55,7 +56,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return await response.ReadAsUserAsync();
         }
 
-        #endregion
+        #endregion Block
 
         #region Unblock
 
@@ -87,7 +88,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return await response.ReadAsUserAsync();
         }
 
-        #endregion
+        #endregion Unblock
 
         #region Report Spam
 
@@ -119,6 +120,6 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return await response.ReadAsUserAsync();
         }
 
-        #endregion
+        #endregion Report Spam
     }
 }

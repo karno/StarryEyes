@@ -95,7 +95,7 @@ namespace StarryEyes.Settings.Themes
         /// <summary>
         /// Krile Global Font
         /// </summary>
-        [DataMember(Order = 1), NotNull]
+        [DataMember(Order = 1), CanBeNull]
         public FontTheme GlobalFont
         {
             get { return _globalFont ?? (_globalFont = FontTheme.Default); }
@@ -141,7 +141,7 @@ namespace StarryEyes.Settings.Themes
         /// <summary>
         /// Theme description for user-flip
         /// </summary>
-        [DataMember(Order = 8), NotNull]
+        [DataMember(Order = 8), CanBeNull]
         public UserFlipTheme UserFlipColor
         {
             get { return _userFlipColor ?? (_userFlipColor = new UserFlipTheme()); }
@@ -151,7 +151,7 @@ namespace StarryEyes.Settings.Themes
         /// <summary>
         /// Theme description for tabs
         /// </summary>
-        [DataMember(Order = 9), NotNull]
+        [DataMember(Order = 9), CanBeNull]
         public TabTheme TabColor
         {
             get { return _tabColor ?? (_tabColor = new TabTheme()); }

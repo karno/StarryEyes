@@ -20,7 +20,7 @@ namespace StarryEyes.Models.Inputting
         private TabModel _currentFocusTab;
         private bool _isSynchronizedWithTab;
 
-        internal AccountSelectorModel([NotNull] InputCoreModel coreModel)
+        internal AccountSelectorModel([CanBeNull] InputCoreModel coreModel)
         {
             this._coreModel = coreModel;
             _isSynchronizedWithTab = true;
@@ -54,7 +54,7 @@ namespace StarryEyes.Models.Inputting
                 case NotifyCollectionChangedAction.Reset:
                     _currentFocusTab.BindingAccounts.Clear();
                     Accounts.Select(i => i.Id)
-                             .ForEach(_currentFocusTab.BindingAccounts.Add);
+                            .ForEach(_currentFocusTab.BindingAccounts.Add);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -101,13 +101,13 @@ namespace StarryEyes.Models.Inputting
             }
         }
 
-        [NotNull]
+        [CanBeNull]
         public ObservableSynchronizedCollectionEx<TwitterAccount> Accounts
         {
             get { return _accounts; }
         }
 
-        private void SetOverride([NotNull] IEnumerable<TwitterAccount> accounts)
+        private void SetOverride([CanBeNull] IEnumerable<TwitterAccount> accounts)
         {
             if (accounts == null) throw new ArgumentNullException("accounts");
             _isSynchronizedWithTab = false;
@@ -126,7 +126,7 @@ namespace StarryEyes.Models.Inputting
             else
             {
                 var exists = Accounts.Select(a => a.Id)
-                                      .OrderBy(a => a);
+                                     .OrderBy(a => a);
                 var provided = _currentFocusTab.BindingAccounts
                                                .OrderBy(a => a);
                 // if tab is not have same accounts...

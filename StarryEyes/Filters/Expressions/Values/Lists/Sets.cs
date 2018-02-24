@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Cadena.Data;
 using StarryEyes.Albireo.Collections;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Filters.Parsing;
 using StarryEyes.Models.Receiving;
 
@@ -20,7 +20,7 @@ namespace StarryEyes.Filters.Expressions.Values.Lists
         {
             _listInfo = new ListInfo(userScreenName, listSlug);
             _watcher = new ListWatcher(_listInfo);
-            _watcher.OnListMemberUpdated += this.RaiseInvalidateFilter;
+            _watcher.OnListMemberUpdated += RaiseInvalidateFilter;
         }
 
         public override string ToQuery()
@@ -31,10 +31,7 @@ namespace StarryEyes.Filters.Expressions.Values.Lists
 
         public override IEnumerable<FilterExpressionType> SupportedTypes
         {
-            get
-            {
-                yield return FilterExpressionType.Set;
-            }
+            get { yield return FilterExpressionType.Set; }
         }
 
         public override Func<TwitterStatus, IReadOnlyCollection<long>> GetSetValueProvider()

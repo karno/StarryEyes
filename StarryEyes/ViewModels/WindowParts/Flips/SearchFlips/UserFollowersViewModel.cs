@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
-using StarryEyes.Anomaly.TwitterApi.Rest;
-using StarryEyes.Anomaly.TwitterApi.Rest.Infrastructure;
+using Cadena.Api.Parameters;
+using Cadena.Api.Rest;
+using Cadena.Data;
 using StarryEyes.Globalization.WindowParts;
 using StarryEyes.Models.Accounting;
 
@@ -19,9 +21,12 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             get { return SearchFlipResources.MsgUserFollowers; }
         }
 
-        protected override Task<ICursorResult<IEnumerable<long>>> GetUsersApiImpl(TwitterAccount info, long id, long cursor)
+        protected override async Task<ICursorResult<IEnumerable<long>>> GetUsersApiImpl(TwitterAccount info, long id,
+            long cursor)
         {
-            return info.GetFollowersIdsAsync(id, cursor);
+            return (await info.CreateAccessor()
+                              .GetFollowersIdsAsync(new UserParameter(id), cursor, null, CancellationToken.None))
+                .Result;
         }
     }
 }

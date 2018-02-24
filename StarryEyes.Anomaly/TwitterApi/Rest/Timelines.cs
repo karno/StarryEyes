@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Cadena;
 using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Anomaly.TwitterApi.Rest.Infrastructure;
 
@@ -69,7 +70,7 @@ namespace StarryEyes.Anomaly.TwitterApi.Rest
             return await response.ReadAsStatusCollectionAsync();
         }
 
-        #endregion
+        #endregion User timeline
 
         public static async Task<IEnumerable<TwitterStatus>> GetMentionsAsync(
             this IOAuthCredential credential,

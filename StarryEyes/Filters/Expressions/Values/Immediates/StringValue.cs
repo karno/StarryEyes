@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
+using Cadena.Data;
 using StarryEyes.Filters.Expressions.Operators;
 using StarryEyes.Filters.Parsing;
 
@@ -12,40 +12,31 @@ namespace StarryEyes.Filters.Expressions.Values.Immediates
 
         public StringValue(string value)
         {
-            this._value = value;
+            _value = value;
         }
 
-        protected override string OperatorString
-        {
-            get { return this.Value.Quote(); }
-        }
+        protected override string OperatorString => Value.Quote();
 
         public override IEnumerable<FilterExpressionType> SupportedTypes
         {
-            get
-            {
-                yield return FilterExpressionType.String;
-            }
+            get { yield return FilterExpressionType.String; }
         }
 
-        public string Value
-        {
-            get { return this._value; }
-        }
+        public string Value => _value;
 
         public override Func<TwitterStatus, string> GetStringValueProvider()
         {
-            return _ => this.Value;
+            return _ => Value;
         }
 
         public override string GetStringSqlQuery()
         {
-            return this.Value.Escape().Wrap();
+            return Value.Escape().Wrap();
         }
 
         public override string ToQuery()
         {
-            return this.Value.EscapeForQuery().Quote();
+            return Value.EscapeForQuery().Quote();
         }
     }
 }

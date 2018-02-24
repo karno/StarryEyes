@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using StarryEyes.Anomaly;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
+using Cadena;
+using Cadena.Data;
 using StarryEyes.Feather.Proxies;
 using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Models.Subsystems.Notifications.Audio;
@@ -52,7 +52,7 @@ namespace StarryEyes.Models.Subsystems.Notifications.UI
                     file = App.EventWavFile;
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException("type");
+                    throw new ArgumentOutOfRangeException(nameof(type));
             }
             return Path.Combine(App.ExeFileDir, App.MediaDirectory, file);
         }
@@ -113,7 +113,7 @@ namespace StarryEyes.Models.Subsystems.Notifications.UI
                     type = NotificationType.Normal;
                 }
 
-                if (status.RetweetedOriginal != null && CheckMyself(status.RetweetedOriginal))
+                if (status.RetweetedStatus != null && CheckMyself(status.RetweetedStatus))
                 {
                     // suppress status which retweets our tweet
                     // -> notify as "our status is retweeted"
@@ -140,7 +140,7 @@ namespace StarryEyes.Models.Subsystems.Notifications.UI
                         GetNotificator().MessageReceived(status);
                         break;
                     default:
-                        throw new ArgumentOutOfRangeException("type");
+                        throw new ArgumentOutOfRangeException(nameof(type));
                 }
                 return false;
             }

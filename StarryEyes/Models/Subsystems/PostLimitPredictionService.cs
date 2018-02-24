@@ -5,8 +5,8 @@ using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using Cadena.Data;
 using StarryEyes.Albireo.Helpers;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Databases;
 using StarryEyes.Models.Receiving.Handling;
@@ -20,6 +20,7 @@ namespace StarryEyes.Models.Subsystems
     public static class PostLimitPredictionService
     {
         private static readonly object _dictLock = new object();
+
         private static readonly IDictionary<long, LinkedList<TwitterStatus>> _dictionary =
             new Dictionary<long, LinkedList<TwitterStatus>>();
 
@@ -35,8 +36,8 @@ namespace StarryEyes.Models.Subsystems
 
         private static void AccountsChanged(NotifyCollectionChangedEventArgs e)
         {
-            var added = e.NewItems != null ? e.NewItems[0] as TwitterAccount : null;
-            var removed = e.OldItems != null ? e.OldItems[0] as TwitterAccount : null;
+            var added = e.NewItems?[0] as TwitterAccount;
+            var removed = e.OldItems?[0] as TwitterAccount;
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
@@ -155,8 +156,8 @@ namespace StarryEyes.Models.Subsystems
             {
                 LinkedList<TwitterStatus> statuses;
                 return !_dictionary.TryGetValue(id, out statuses)
-                           ? Enumerable.Empty<TwitterStatus>()
-                           : statuses.ToArray();
+                    ? Enumerable.Empty<TwitterStatus>()
+                    : statuses.ToArray();
             }
         }
     }

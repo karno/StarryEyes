@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
+using Cadena.Api.Rest;
 using Livet;
-using StarryEyes.Anomaly.TwitterApi.Rest;
 using StarryEyes.Globalization;
 using StarryEyes.Globalization.WindowParts;
 using StarryEyes.Models;
@@ -16,12 +17,14 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
     public class SearchCandidateViewModel : ViewModel
     {
         private readonly SearchFlipViewModel _parent;
+
         public SearchFlipViewModel Parent
         {
             get { return _parent; }
         }
 
         private bool _isSearchCandidateAvailable;
+
         public bool IsSearchCandidateAvailable
         {
             get { return _isSearchCandidateAvailable; }
@@ -40,6 +43,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
         private long _currentId;
 
         private Uri _currentUserProfileImage;
+
         public Uri CurrentUserProfileImage
         {
             get { return _currentUserProfileImage; }
@@ -51,6 +55,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
         }
 
         private string _currentUserScreenName;
+
         public string CurrentUserScreenName
         {
             get { return _currentUserScreenName; }
@@ -63,6 +68,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
 
         private readonly ObservableCollection<SearchCandidateItemViewModel> _searchCandidates
             = new ObservableCollection<SearchCandidateItemViewModel>();
+
         public ObservableCollection<SearchCandidateItemViewModel> SearchCandidates
         {
             get { return _searchCandidates; }
@@ -77,23 +83,23 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             {
                 cid = ctab.BindingAccounts.First();
             }
-            if (this._currentId == cid) return;
-            this._currentId = cid;
-            this._searchCandidates.Clear();
-            var aid = Setting.Accounts.Get(this._currentId);
+            if (_currentId == cid) return;
+            _currentId = cid;
+            _searchCandidates.Clear();
+            var aid = Setting.Accounts.Get(_currentId);
             if (aid == null)
             {
-                this.IsSearchCandidateAvailable = false;
+                IsSearchCandidateAvailable = false;
                 return;
             }
-            this.CurrentUserScreenName = aid.UnreliableScreenName;
-            this.CurrentUserProfileImage = aid.UnreliableProfileImage;
-            this.IsSearchCandidateAvailable = true;
+            CurrentUserScreenName = aid.UnreliableScreenName;
+            CurrentUserProfileImage = aid.UnreliableProfileImage;
+            IsSearchCandidateAvailable = true;
             try
             {
-                var searches = await aid.GetSavedSearchesAsync();
-                searches.ForEach(s => this._searchCandidates.Add(
-                    new SearchCandidateItemViewModel(this, aid, s.Item1, s.Item2)));
+                var searches = await aid.CreateAccessor().GetSavedSearchesAsync(CancellationToken.None);
+                searches.Result.ForEach(s => _searchCandidates.Add(
+                    new SearchCandidateItemViewModel(this, aid, s.Id, s.Query)));
             }
             catch (Exception ex)
             {
@@ -116,14 +122,14 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             TwitterAccount account, long id, string query)
         {
             _parent = parent;
-            this._account = account;
+            _account = account;
             _id = id;
             _query = query;
         }
 
         public TwitterAccount TwitterAccount
         {
-            get { return this._account; }
+            get { return _account; }
         }
 
         public long Id
@@ -144,6 +150,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
         }
 
         #region RemoveCommand
+
         private Livet.Commands.ViewModelCommand _removeCommand;
 
         public Livet.Commands.ViewModelCommand RemoveCommand
@@ -155,13 +162,14 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
         {
             try
             {
-                await this._account.DestroySavedSearchAsync(_id);
+                await _account.CreateAccessor().DestroySavedSearchAsync(_id, CancellationToken.None);
             }
             catch (Exception ex)
             {
                 BackstageModel.RegisterEvent(new OperationFailedEvent(SearchFlipResources.InfoDeleteQueryFailed, ex));
             }
         }
-        #endregion
+
+        #endregion RemoveCommand
     }
 }

@@ -57,7 +57,6 @@ namespace StarryEyes.Models
                 KeyAssignAction.Create("MoveDown", () => SetTimelineFocusTo(TimelineFocusRequest.BelowStatus)),
                 KeyAssignAction.Create("MoveTop", () => SetTimelineFocusTo(TimelineFocusRequest.TopOfTimeline)),
                 KeyAssignAction.Create("MoveBottom", () => SetTimelineFocusTo(TimelineFocusRequest.BottomOfTimeline)));
-
         }
 
         #region Focus and timeline action control
@@ -76,7 +75,7 @@ namespace StarryEyes.Models
             TimelineFocusRequested.SafeInvoke(req);
         }
 
-        #endregion
+        #endregion Focus and timeline action control
 
         #region State control
 
@@ -96,9 +95,9 @@ namespace StarryEyes.Models
             }
         }
 
-        public static IDisposable SetState([NotNull] string state)
+        public static IDisposable SetState([CanBeNull] string state)
         {
-            if (state == null) throw new ArgumentNullException("state");
+            if (state == null) throw new ArgumentNullException(nameof(state));
             LinkedListNode<string> node;
             lock (_stateStack)
             {
@@ -120,11 +119,12 @@ namespace StarryEyes.Models
             StateStringChanged.SafeInvoke();
         }
 
-        #endregion
+        #endregion State control
 
         #region Account selection
 
         public static event Action<AccountSelectDescription> AccountSelectActionRequested;
+
         public static void ExecuteAccountSelectAction(
             AccountSelectionAction action, IEnumerable<TwitterAccount> defaultSelected,
             Action<IEnumerable<TwitterAccount>> after)
@@ -142,15 +142,17 @@ namespace StarryEyes.Models
             AccountSelectActionRequested.SafeInvoke(desc);
         }
 
-        #endregion
+        #endregion Account selection
 
         public static event Action<bool> WindowCommandsDisplayChanged;
+
         public static void SetShowMainWindowCommands(bool show)
         {
             WindowCommandsDisplayChanged.SafeInvoke(show);
         }
 
         public static event Action<Tuple<TabModel, ISubject<Unit>>> TabConfigureRequested;
+
         public static IObservable<Unit> ShowTabConfigure(TabModel model)
         {
             var notifier = new Subject<Unit>();
@@ -167,6 +169,7 @@ namespace StarryEyes.Models
         }
 
         public static event Action<ISubject<Unit>> SettingRequested;
+
         public static IObservable<Unit> ShowSetting()
         {
             var notifier = new Subject<Unit>();
@@ -183,13 +186,17 @@ namespace StarryEyes.Models
         }
 
         public static event Action<bool> BackstageTransitionRequested;
+
         public static void TransitionBackstage(bool open)
         {
             BackstageTransitionRequested.SafeInvoke(open);
         }
 
-        private static readonly ConcurrentQueue<TaskDialogOptions> _taskDialogQueue = new ConcurrentQueue<TaskDialogOptions>();
+        private static readonly ConcurrentQueue<TaskDialogOptions> _taskDialogQueue =
+            new ConcurrentQueue<TaskDialogOptions>();
+
         public static event Action<TaskDialogOptions> TaskDialogRequested;
+
         public static void ShowTaskDialog(TaskDialogOptions options)
         {
             if (!_isUserInterfaceReady)

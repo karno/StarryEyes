@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Cadena.Data;
 using JetBrains.Annotations;
 using Livet;
 using StarryEyes.Albireo.Helpers;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Timelines.Tabs;
 
@@ -26,26 +26,20 @@ namespace StarryEyes.Models.Inputting
 
         #region properties
 
-        [NotNull]
-        public ObservableSynchronizedCollectionEx<string> BindingHashtags
-        {
-            get { return _bindingHashtags; }
-        }
+        [CanBeNull]
+        public ObservableSynchronizedCollectionEx<string> BindingHashtags => _bindingHashtags;
 
-        [NotNull]
-        public ObservableSynchronizedCollectionEx<InputData> Drafts
-        {
-            get { return _drafts; }
-        }
+        [CanBeNull]
+        public ObservableSynchronizedCollectionEx<InputData> Drafts => _drafts;
 
-        [NotNull]
+        [CanBeNull]
         internal InputData CurrentInputData
         {
             get { return _inputData; }
             set
             {
                 if (value == _inputData) return;
-                if (value == null) throw new ArgumentNullException("value");
+                if (value == null) throw new ArgumentNullException(nameof(value));
                 if (_inputData != null && _inputData.IsChanged)
                 {
                     _drafts.Add(_inputData);
@@ -61,12 +55,12 @@ namespace StarryEyes.Models.Inputting
         [CanBeNull]
         public InputData LastPostedData
         {
-            get { return this._lastPostedData; }
+            get { return _lastPostedData; }
             internal set
             {
-                this._lastPostedData = value;
+                _lastPostedData = value;
                 RaisePropertyChanged(() => LastPostedData);
-                this.RaisePropertyChanged(() => CanAmend);
+                RaisePropertyChanged(() => CanAmend);
             }
         }
 
@@ -80,7 +74,7 @@ namespace StarryEyes.Models.Inputting
             get { return LastPostedData != null && CurrentInputData != LastPostedData; }
         }
 
-        #endregion
+        #endregion properties
 
         #region events
 
@@ -90,7 +84,7 @@ namespace StarryEyes.Models.Inputting
 
         internal event Action CloseRequest;
 
-        #endregion
+        #endregion events
 
         internal InputCoreModel()
         {
@@ -121,28 +115,28 @@ namespace StarryEyes.Models.Inputting
             _currentFocusTabModel = replace;
         }
 
-        public void SetText([NotNull] InputSetting setting)
+        public void SetText([CanBeNull] InputSetting setting)
         {
-            if (setting == null) throw new ArgumentNullException("setting");
+            if (setting == null) throw new ArgumentNullException(nameof(setting));
             if (setting.Recipient != null)
             {
-                this.SetDirectMessage(setting.Accounts, setting.Recipient, setting.SetFocusToInputArea);
+                SetDirectMessage(setting.Accounts, setting.Recipient, setting.SetFocusToInputArea);
             }
             else
             {
-                this.SetText(setting.Accounts,
-                              setting.Body,
-                              setting.InReplyTo,
-                              setting.CursorPosition,
-                              setting.SetFocusToInputArea);
+                SetText(setting.Accounts,
+                    setting.Body,
+                    setting.InReplyTo,
+                    setting.CursorPosition,
+                    setting.SetFocusToInputArea);
             }
         }
 
         private void SetText(IEnumerable<TwitterAccount> infos,
-                             string body,
-                             TwitterStatus inReplyTo,
-                             CursorPosition cursor,
-                             bool focusToInputArea)
+            string body,
+            TwitterStatus inReplyTo,
+            CursorPosition cursor,
+            bool focusToInputArea)
         {
             CurrentInputData = new InputData(body)
             {
@@ -157,10 +151,10 @@ namespace StarryEyes.Models.Inputting
         }
 
         private void SetDirectMessage(IEnumerable<TwitterAccount> infos,
-                                      [NotNull] TwitterUser recipient,
-                                      bool focusToInputArea)
+            [CanBeNull] TwitterUser recipient,
+            bool focusToInputArea)
         {
-            if (recipient == null) throw new ArgumentNullException("recipient");
+            if (recipient == null) throw new ArgumentNullException(nameof(recipient));
             CurrentInputData = new InputData(String.Empty)
             {
                 Accounts = infos,
@@ -177,7 +171,7 @@ namespace StarryEyes.Models.Inputting
         {
             if (LastPostedData != null)
             {
-                this.CurrentInputData = _lastPostedData;
+                CurrentInputData = _lastPostedData;
             }
         }
 
@@ -198,6 +192,5 @@ namespace StarryEyes.Models.Inputting
         {
             CloseRequest.SafeInvoke();
         }
-
     }
 }

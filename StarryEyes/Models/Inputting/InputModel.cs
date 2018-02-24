@@ -67,7 +67,7 @@ namespace StarryEyes.Models.Inputting
 
         #region Proxy methods for plugins
 
-        public static void SelectAccount([NotNull] IEnumerable<TwitterAccount> accounts)
+        public static void SelectAccount([CanBeNull] IEnumerable<TwitterAccount> accounts)
         {
             if (accounts == null) throw new ArgumentNullException("accounts");
             _accounts.Accounts.Clear();
@@ -76,7 +76,7 @@ namespace StarryEyes.Models.Inputting
                    .ForEach(a => _accounts.Accounts.Add(a));
         }
 
-        public static void SetText([NotNull] InputSetting setting)
+        public static void SetText([CanBeNull] InputSetting setting)
         {
             _core.SetText(setting);
         }

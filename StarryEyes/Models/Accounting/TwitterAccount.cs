@@ -1,9 +1,9 @@
 ﻿using System;
 using System.ComponentModel;
 using AsyncOAuth;
+using Cadena;
+using Cadena.Data;
 using JetBrains.Annotations;
-using StarryEyes.Anomaly;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
 using StarryEyes.Settings;
 
 namespace StarryEyes.Models.Accounting
@@ -19,17 +19,19 @@ namespace StarryEyes.Models.Accounting
         {
             Id = 0;
             UnreliableScreenName = String.Empty;
+            OAuthAccessToken = String.Empty;
+            OAuthAccessTokenSecret = String.Empty;
         }
 
-        public TwitterAccount(long id, string screenName, [NotNull] AccessToken token)
+        public TwitterAccount(long id, string screenName, [CanBeNull] AccessToken token)
         {
-            if (token == null) throw new ArgumentNullException("token");
-            this.Id = id;
-            this.UnreliableScreenName = screenName;
-            this.OAuthAccessToken = token.Key;
-            this.OAuthAccessTokenSecret = token.Secret;
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            Id = id;
+            UnreliableScreenName = screenName;
+            OAuthAccessToken = token.Key;
+            OAuthAccessTokenSecret = token.Secret;
             // default settings
-            this.IsUserStreamsEnabled = true;
+            IsUserStreamsEnabled = true;
         }
 
         /// <summary>
@@ -54,23 +56,23 @@ namespace StarryEyes.Models.Accounting
         /// <summary>
         /// Access token of this account.
         /// </summary>
-        [NotNull]
+        [CanBeNull]
         public string OAuthAccessToken { get; set; }
 
         /// <summary>
         /// Token secret of this account.
         /// </summary>
-        [NotNull]
+        [CanBeNull]
         public string OAuthAccessTokenSecret { get; set; }
 
-        #endregion
+        #endregion Authorization property
 
         #region Cache property
 
         /// <summary>
         /// Screen Name of user. This is a cache, so do not use this property for identifying user.
         /// </summary>
-        [NotNull]
+        [CanBeNull]
         public string UnreliableScreenName { get; set; }
 
         /// <summary>
@@ -79,51 +81,32 @@ namespace StarryEyes.Models.Accounting
         [CanBeNull]
         public Uri UnreliableProfileImage { get; set; }
 
-        [NotNull]
+        [CanBeNull]
         public TwitterUser GetPseudoUser()
         {
-            return new TwitterUser
-            {
-                ScreenName = UnreliableScreenName,
-                ProfileImageUri = UnreliableProfileImage,
-                Id = Id
-            };
+            return new TwitterUser(Id, UnreliableScreenName, UnreliableProfileImage);
         }
 
-        #endregion
+        #endregion Cache property
 
         #region Volatile Property
 
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public string OAuthConsumerKey
-        {
-            get
-            {
-                return this.OverridedConsumerKey ??
-                       Setting.GlobalConsumerKey.Value ??
-                       App.ConsumerKey;
-            }
-        }
+        public string OAuthConsumerKey => OverridedConsumerKey ??
+                                          Setting.GlobalConsumerKey.Value ??
+                                          App.ConsumerKey;
 
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public string OAuthConsumerSecret
-        {
-            get
-            {
-                return this.OverridedConsumerSecret ??
-                       Setting.GlobalConsumerSecret.Value ??
-                       App.ConsumerSecret;
-            }
-        }
+        public string OAuthConsumerSecret => OverridedConsumerSecret ??
+                                             Setting.GlobalConsumerSecret.Value ??
+                                             App.ConsumerSecret;
 
         private AccountRelationData _relationData;
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public AccountRelationData RelationData
-        {
-            get { return this._relationData ?? (this._relationData = new AccountRelationData(this.Id)); }
-        }
 
-        #endregion
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public AccountRelationData RelationData => _relationData ?? (_relationData = new AccountRelationData(Id));
+
+        #endregion Volatile Property
 
         #region Account configuration property
 
@@ -158,6 +141,35 @@ namespace StarryEyes.Models.Accounting
         /// </summary>
         public bool ReceiveFollowingsActivity { get; set; }
 
-        #endregion
+        #endregion Account configuration property
+
+        public ApiAccessor CreateAccessor(EndpointType endpoint = EndpointType.DefaultEndpoint, bool useGZip = true)
+        {
+            string E2N(string s) => String.IsNullOrEmpty(s) ? null : s;
+            string eps;
+            switch (endpoint)
+            {
+                case EndpointType.DefaultEndpoint:
+                    eps = E2N(Setting.ApiProxy.Value) ?? ApiAccessor.DefaultEndpoint;
+                    break;
+                case EndpointType.StreamEndpoint:
+                    eps = E2N(Setting.ApiProxyStreaming.Value) ?? ApiAccessor.DefaultEndpointForUserStreams;
+                    break;
+                case EndpointType.UploadEndpoint:
+                    eps = E2N(Setting.ApiProxyUpload.Value) ?? ApiAccessor.DefaultEndpointForUpload;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(endpoint), endpoint, null);
+            }
+            var ua = Setting.UserAgent.Value ?? ApiAccessor.DefaultUserAgent;
+            return new ApiAccessor(this, eps, Setting.GetWebProxy(), ua, useGZip);
+        }
+    }
+
+    public enum EndpointType
+    {
+        DefaultEndpoint,
+        StreamEndpoint,
+        UploadEndpoint
     }
 }

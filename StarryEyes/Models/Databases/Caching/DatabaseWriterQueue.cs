@@ -15,24 +15,23 @@ namespace StarryEyes.Models.Databases.Caching
         private readonly Func<IEnumerable<TValue>, Task> _writeback;
         private readonly Task _writerThread;
 
-        private readonly BlockingCollection<KeyValuePair<TKey, TValue>> _collection = new BlockingCollection<KeyValuePair<TKey, TValue>>();
+        private readonly BlockingCollection<KeyValuePair<TKey, TValue>> _collection =
+            new BlockingCollection<KeyValuePair<TKey, TValue>>();
+
         private readonly ConcurrentDictionary<TKey, TValue> _writeDictionary = new ConcurrentDictionary<TKey, TValue>();
 
         public DatabaseWriterQueue(int threshold, TimeSpan minInterval,
-            [NotNull] Func<IEnumerable<TValue>, Task> writeback)
+            [CanBeNull] Func<IEnumerable<TValue>, Task> writeback)
         {
-            if (writeback == null) throw new ArgumentNullException(nameof(writeback));
             _threshold = threshold;
             _minInterval = minInterval;
-            _writeback = writeback;
+            _writeback = writeback ?? throw new ArgumentNullException(nameof(writeback));
             _writerThread = Task.Factory.StartNew(WritebackWorker, CancellationToken.None,
-                TaskCreationOptions.DenyChildAttach | TaskCreationOptions.LongRunning, TaskScheduler.Default);
+                TaskCreationOptions.DenyChildAttach | TaskCreationOptions.LongRunning,
+                TaskScheduler.Default);
         }
 
-        public int Count
-        {
-            get { return _writeDictionary.Count; }
-        }
+        public int Count => _writeDictionary.Count;
 
         public void Enqueue(TKey key, TValue value)
         {
@@ -53,7 +52,9 @@ namespace StarryEyes.Models.Databases.Caching
                 {
                     _collection.Add(new KeyValuePair<TKey, TValue>(key, value));
                 }
-                catch (InvalidOperationException) { } // adding completed
+                catch (InvalidOperationException)
+                {
+                } // adding completed
             }
         }
 
@@ -114,7 +115,7 @@ namespace StarryEyes.Models.Databases.Caching
             catch (OperationCanceledException)
             {
                 // disposed
-            }    // ensure all items has stored before leaving process loop
+            } // ensure all items has stored before leaving process loop
             if (items.Count > 0)
             {
                 await _writeback(items.Select(p => p.Value)).ConfigureAwait(false);

@@ -1,7 +1,10 @@
 ﻿using System;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
-using StarryEyes.Anomaly.TwitterApi.Rest;
-using StarryEyes.Anomaly.Utils;
+using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
+using System.Threading;
+using Cadena.Api.Parameters;
+using Cadena.Api.Rest;
+using Cadena.Data;
 using StarryEyes.Settings;
 
 namespace StarryEyes.Models.Timelines.SearchFlips
@@ -13,8 +16,8 @@ namespace StarryEyes.Models.Timelines.SearchFlips
 
         public UserTimelineModel(long userId, TimelineType type)
         {
-            this._userId = userId;
-            this._type = type;
+            _userId = userId;
+            _type = type;
         }
 
         protected override bool PreInvalidateTimeline()
@@ -30,17 +33,25 @@ namespace StarryEyes.Models.Timelines.SearchFlips
 
         protected override IObservable<TwitterStatus> Fetch(long? maxId, int? count)
         {
-            var account = Setting.Accounts.GetRelatedOne(this._userId);
-            switch (this._type)
+            var account = Setting.Accounts.GetRelatedOne(_userId);
+            return Observable.Defer(() =>
             {
-                case TimelineType.User:
-                    return account.GetUserTimelineAsync(this._userId, count, maxId: maxId, includeRetweets: true)
-                                  .ToObservable();
-                case TimelineType.Favorites:
-                    return account.GetFavoritesAsync(this._userId, count, maxId: maxId).ToObservable();
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+                switch (_type)
+                {
+                    case TimelineType.User:
+                        return account.CreateAccessor()
+                                      .GetUserTimelineAsync(new UserParameter(_userId), count,
+                                          null, maxId, false, true, CancellationToken.None)
+                                      .ToObservable();
+                    case TimelineType.Favorites:
+                        return account.CreateAccessor()
+                                      .GetFavoritesAsync(new UserParameter(_userId), count,
+                                          null, maxId, CancellationToken.None)
+                                      .ToObservable();
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }).SelectMany(s => s.Result);
         }
     }
 

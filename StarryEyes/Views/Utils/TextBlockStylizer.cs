@@ -8,9 +8,10 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using Cadena.Data;
+using Cadena.Data.Entities;
+using Cadena.Util;
 using JetBrains.Annotations;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
-using StarryEyes.Anomaly.Utils;
 using StarryEyes.Helpers;
 using StarryEyes.Models;
 
@@ -49,31 +50,31 @@ namespace StarryEyes.Views.Utils
 
         public static readonly DependencyProperty TwitterStatusProperty =
             DependencyProperty.RegisterAttached(
-            "TwitterStatus",
-            typeof(TwitterStatus),
-            typeof(TextBlockStylizer),
-            new PropertyMetadata((o, e) =>
-            {
-                var status = (TwitterStatus)e.NewValue;
-                var textBlock = (TextBlock)o;
-
-                textBlock.Inlines.Clear();
-
-                if (status == null)
+                "TwitterStatus",
+                typeof(TwitterStatus),
+                typeof(TextBlockStylizer),
+                new PropertyMetadata((o, e) =>
                 {
-                    return;
-                }
+                    var status = (TwitterStatus)e.NewValue;
+                    var textBlock = (TextBlock)o;
 
-                // generate contents
-                if (status.RetweetedOriginal != null)
-                {
-                    status = status.RetweetedOriginal;
-                }
-                GenerateInlines(o, status.Text, status.Entities)
-                    .ForEach(textBlock.Inlines.Add);
-            }));
+                    textBlock.Inlines.Clear();
 
-        #endregion
+                    if (status == null)
+                    {
+                        return;
+                    }
+
+                    // generate contents
+                    if (status.RetweetedStatus != null)
+                    {
+                        status = status.RetweetedStatus;
+                    }
+                    GenerateInlines(o, status.Text, status.Entities)
+                        .ForEach(textBlock.Inlines.Add);
+                }));
+
+        #endregion Twitter Status
 
         #region Twitter Users
 
@@ -89,45 +90,44 @@ namespace StarryEyes.Views.Utils
 
         public static readonly DependencyProperty TwitterUserProperty =
             DependencyProperty.RegisterAttached(
-            "TwitterUser",
-            typeof(TwitterUser),
-            typeof(TextBlockStylizer),
-            new PropertyMetadata((o, e) =>
-            {
-                var user = (TwitterUser)e.NewValue;
-                var textBlock = (TextBlock)o;
-                var foreground = textBlock.Foreground;
-
-                textBlock.Inlines.Clear();
-
-                if (user == null)
+                "TwitterUser",
+                typeof(TwitterUser),
+                typeof(TextBlockStylizer),
+                new PropertyMetadata((o, e) =>
                 {
-                    return;
-                }
+                    var user = (TwitterUser)e.NewValue;
+                    var textBlock = (TextBlock)o;
+                    var foreground = textBlock.Foreground;
 
-                var desc = user.Description ?? String.Empty;
+                    textBlock.Inlines.Clear();
 
-                // filter and merge entities
-                var entities = user.DescriptionEntities == null
-                    ? null
-                    : user.DescriptionEntities.Where(ent => ent.EntityType == EntityType.Urls)
-                          .Concat(GetUserMentionEntities(desc));
-
-                // generate contents
-                GenerateInlines(o, desc, entities)
-                    .Select(inline =>
+                    if (user == null)
                     {
-                        var run = inline as Run;
-                        if (run != null)
-                        {
-                            run.Foreground = foreground;
-                        }
-                        return inline;
-                    })
-                    .ForEach(textBlock.Inlines.Add);
-            }));
+                        return;
+                    }
 
-        private static IEnumerable<TwitterEntity> GetUserMentionEntities([NotNull] string text)
+                    var desc = user.Description ?? String.Empty;
+
+                    // filter and merge entities
+                    var entities = user.DescriptionEntities
+                                       .OfType<TwitterUrlEntity>()
+                                       .Concat(GetUserMentionEntities(desc));
+
+                    // generate contents
+                    GenerateInlines(o, desc, entities)
+                        .Select(inline =>
+                        {
+                            var run = inline as Run;
+                            if (run != null)
+                            {
+                                run.Foreground = foreground;
+                            }
+                            return inline;
+                        })
+                        .ForEach(textBlock.Inlines.Add);
+                }));
+
+        private static IEnumerable<TwitterEntity> GetUserMentionEntities([CanBeNull] string text)
         {
             // entity indices uses escaped index
             var escaped = ParsingExtension.EscapeEntity(text);
@@ -143,17 +143,14 @@ namespace StarryEyes.Views.Utils
                     var index = m.Groups[TwitterRegexPatterns.ValidMentionOrListGroupAt].Index;
                     var scIndex = escaped.Substring(0, index).SurrogatedLength();
 
-                    return new TwitterEntity
-                    {
-                        EntityType = EntityType.UserMentions,
-                        DisplayText = display,
-                        StartIndex = scIndex,
-                        EndIndex = scIndex + display.SurrogatedLength()
-                    };
+                    return new TwitterUserMentionEntity(
+                        Tuple.Create(scIndex, scIndex + display.SurrogatedLength()),
+                        0, display, display
+                    );
                 });
         }
 
-        #endregion
+        #endregion Twitter Users
 
         #region Colors
 
@@ -191,12 +188,12 @@ namespace StarryEyes.Views.Utils
                 typeof(TextBlockStylizer),
                 new PropertyMetadata(Brushes.Black));
 
-        #endregion
+        #endregion Colors
 
         #region Common Entitied Text Utility
 
-        private static IEnumerable<Inline> GenerateInlines([NotNull] DependencyObject obj,
-            [NotNull] string text, [CanBeNull] IEnumerable<TwitterEntity> entities)
+        private static IEnumerable<Inline> GenerateInlines([CanBeNull] DependencyObject obj,
+            [CanBeNull] string text, [CanBeNullAttribute] IEnumerable<TwitterEntity> entities)
         {
             if (entities == null)
             {
@@ -208,37 +205,37 @@ namespace StarryEyes.Views.Utils
             }
             foreach (var description in TextEntityResolver.ParseText(text, entities))
             {
-                if (!description.IsEntityAvailable)
+                if (description.Entity == null)
                 {
                     yield return GenerateText(description.Text);
                 }
                 else
                 {
                     var entity = description.Entity;
-                    var display = entity.DisplayText;
-                    if (String.IsNullOrEmpty(display))
+                    if (entity is TwitterHashtagEntity he)
                     {
-                        display = entity.OriginalUrl;
+                        yield return GenerateHashtagLink(obj, he.DisplayText);
                     }
-                    switch (entity.EntityType)
+                    else if (entity is TwitterMediaEntity me)
                     {
-                        case EntityType.Hashtags:
-                            yield return GenerateHashtagLink(obj, display);
-                            break;
-                        case EntityType.Media:
-                        case EntityType.Urls:
-                            yield return GenerateLink(obj, display, ParsingExtension.ResolveEntity(entity.OriginalUrl));
-                            break;
-                        case EntityType.UserMentions:
-                            yield return
-                                GenerateUserLink(obj, display, ParsingExtension.ResolveEntity(entity.DisplayText));
-                            break;
+                        yield return GenerateLink(obj, me.DisplayText,
+                            ParsingExtension.ResolveEntity(me.MediaUrlHttps));
+                    }
+                    else if (entity is TwitterUrlEntity ue)
+                    {
+                        yield return GenerateLink(obj, ue.DisplayText,
+                            ParsingExtension.ResolveEntity(ue.ExpandedUrl));
+                    }
+                    else if (entity is TwitterUserMentionEntity re)
+                    {
+                        yield return GenerateUserLink(obj, re.DisplayText,
+                            ParsingExtension.ResolveEntity(re.DisplayText));
                     }
                 }
             }
         }
 
-        #endregion
+        #endregion Common Entitied Text Utility
 
         #region Generic Text
 
@@ -254,21 +251,21 @@ namespace StarryEyes.Views.Utils
 
         public static readonly DependencyProperty TextProperty =
             DependencyProperty.RegisterAttached(
-            "Text",
-            typeof(string),
-            typeof(TextBlockStylizer),
-            new PropertyMetadata((o, e) =>
-            {
-                var text = (string)e.NewValue;
-                var textBlock = (TextBlock)o;
+                "Text",
+                typeof(string),
+                typeof(TextBlockStylizer),
+                new PropertyMetadata((o, e) =>
+                {
+                    var text = (string)e.NewValue;
+                    var textBlock = (TextBlock)o;
 
-                textBlock.Inlines.Clear();
+                    textBlock.Inlines.Clear();
 
-                // generate contents
-                GenerateInlines(o, text).ForEach(textBlock.Inlines.Add);
-            }));
+                    // generate contents
+                    GenerateInlines(o, text).ForEach(textBlock.Inlines.Add);
+                }));
 
-        private static IEnumerable<Inline> GenerateInlines([NotNull] DependencyObject obj, [NotNull] string text)
+        private static IEnumerable<Inline> GenerateInlines([CanBeNull] DependencyObject obj, [CanBeNull] string text)
         {
             foreach (var tok in StatusTextUtil.Tokenize(text))
             {
@@ -295,7 +292,7 @@ namespace StarryEyes.Views.Utils
             }
         }
 
-        #endregion
+        #endregion Generic Text
 
         #region Link Navigation
 
@@ -311,14 +308,14 @@ namespace StarryEyes.Views.Utils
 
         public static readonly DependencyProperty LinkNavigationCommandProperty =
             DependencyProperty.RegisterAttached(
-            "LinkNavigationCommand",
-            typeof(ICommand),
-            typeof(TextBlockStylizer),
-            new PropertyMetadata(null));
+                "LinkNavigationCommand",
+                typeof(ICommand),
+                typeof(TextBlockStylizer),
+                new PropertyMetadata(null));
 
-        #endregion
+        #endregion Link Navigation
 
-        private static void SetForeBrushBinding([NotNull] FrameworkContentElement inline, [NotNull] object property)
+        private static void SetForeBrushBinding([CanBeNull] FrameworkContentElement inline, [CanBeNull] object property)
         {
             var binding = new Binding
             {
@@ -328,31 +325,30 @@ namespace StarryEyes.Views.Utils
             inline.SetBinding(TextElement.ForegroundProperty, binding);
         }
 
-        private static Inline GenerateText([NotNull] string surface)
+        private static Inline GenerateText([CanBeNull] string surface)
         {
             var run = new Run { Text = surface, Focusable = false };
             SetForeBrushBinding(run, ForegroundBrushProperty);
             return run;
         }
 
-        private static Inline GenerateLink([NotNull] DependencyObject obj,
-            [NotNull] string surface, [NotNull] string linkUrl)
+        private static Inline GenerateLink([CanBeNull] DependencyObject obj,
+            [CanBeNull] string surface, [CanBeNull] string linkUrl)
         {
             var hl = new Hyperlink { Focusable = false };
             hl.Inlines.Add(surface);
             hl.Command = new ProxyCommand(link =>
             {
                 var command = GetLinkNavigationCommand(obj);
-                if (command != null)
-                    command.Execute(link as string);
+                command?.Execute(link as string);
             });
             hl.CommandParameter = linkUrl;
             SetForeBrushBinding(hl, HyperlinkBrushProperty);
             return hl;
         }
 
-        private static Inline GenerateUserLink([NotNull] DependencyObject obj,
-            [NotNull] string surface, [NotNull] string userScreenName)
+        private static Inline GenerateUserLink([CanBeNull] DependencyObject obj,
+            [CanBeNull] string surface, [CanBeNull] string userScreenName)
         {
             if (surface.Length > 0 && surface[0] != '@' && surface[0] != '＠')
             {
@@ -362,7 +358,7 @@ namespace StarryEyes.Views.Utils
                 UserNavigation + userScreenName);
         }
 
-        private static Inline GenerateHashtagLink([NotNull] DependencyObject obj, [NotNull] string surface)
+        private static Inline GenerateHashtagLink([CanBeNull] DependencyObject obj, [CanBeNull] string surface)
         {
             if (surface.Length > 0 && surface[0] != '#' && surface[0] != '＃')
             {
@@ -375,9 +371,9 @@ namespace StarryEyes.Views.Utils
 
     public class ProxyCommand : ICommand
     {
-        public ProxyCommand([NotNull] Action<object> callback)
+        public ProxyCommand([CanBeNull] Action<object> callback)
         {
-            this._callback = callback;
+            _callback = callback;
         }
 
         public bool CanExecute(object parameter)

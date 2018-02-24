@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
-using StarryEyes.Anomaly.TwitterApi.Rest;
-using StarryEyes.Anomaly.Utils;
+using System.Reactive.Threading.Tasks;
+using System.Threading;
+using Cadena.Api.Rest;
+using Cadena.Data;
+using StarryEyes.Casket.DatabaseModels;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Databases;
 
@@ -14,11 +16,14 @@ namespace StarryEyes.Filters.Sources
     public class FilterHome : FilterSourceBase
     {
         private readonly string _screenName;
-        public FilterHome() { }
+
+        public FilterHome()
+        {
+        }
 
         public FilterHome(string screenName)
         {
-            this._screenName = screenName;
+            _screenName = screenName;
         }
 
         public override Func<TwitterStatus, bool> GetEvaluator()
@@ -54,25 +59,23 @@ namespace StarryEyes.Filters.Sources
             if (status.StatusType == StatusType.DirectMessage)
                 return false;
             return datas.Any(account =>
-                             status.User.Id == account.Id ||
-                             account.RelationData.Followings.Contains(status.User.Id) ||
-                             FilterSystemUtil.InReplyToUsers(status).Contains(account.Id));
+                status.User.Id == account.Id ||
+                account.RelationData.Followings.Contains(status.User.Id) ||
+                FilterSystemUtil.InReplyToUsers(status).Contains(account.Id));
         }
 
         protected override IObservable<TwitterStatus> ReceiveSink(long? maxId)
         {
             return Observable.Defer(() => GetAccountsFromString(_screenName).ToObservable())
-                             .SelectMany(a => a.GetHomeTimelineAsync(count: 50, maxId: maxId).ToObservable());
+                             .SelectMany(a => a
+                                 .CreateAccessor()
+                                 .GetHomeTimelineAsync(50, null, maxId,
+                                     CancellationToken.None).ToObservable())
+                             .SelectMany(o => o.Result);
         }
 
-        public override string FilterKey
-        {
-            get { return "home"; }
-        }
+        public override string FilterKey => "home";
 
-        public override string FilterValue
-        {
-            get { return _screenName; }
-        }
+        public override string FilterValue => _screenName;
     }
 }

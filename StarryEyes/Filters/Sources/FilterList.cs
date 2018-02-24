@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Linq;
-using StarryEyes.Anomaly.TwitterApi.DataModels;
-using StarryEyes.Anomaly.TwitterApi.Rest;
-using StarryEyes.Anomaly.Utils;
+using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
+using System.Threading;
+using Cadena.Api.Parameters;
+using Cadena.Api.Rest;
+using Cadena.Data;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Receiving;
 using StarryEyes.Settings;
@@ -30,16 +33,16 @@ namespace StarryEyes.Filters.Sources
             if (splited.Length == 2)
             {
                 _listInfo = new ListInfo(splited[0], splited[1]);
-                this._receiverScreenName = splited[0];
+                _receiverScreenName = splited[0];
             }
             else
             {
                 _listInfo = new ListInfo(splited[1], splited[2]);
-                this._receiverScreenName = splited[0];
+                _receiverScreenName = splited[0];
             }
             _watcher = new ListWatcher(_listInfo);
             System.Diagnostics.Debug.WriteLine("#INVALIDATION: List Information Loaded");
-            _watcher.OnListMemberUpdated += this.RaiseInvalidateRequired;
+            _watcher.OnListMemberUpdated += RaiseInvalidateRequired;
         }
 
         public override void Activate()
@@ -47,9 +50,9 @@ namespace StarryEyes.Filters.Sources
             if (_isActivated) return;
             _isActivated = true;
             _watcher.Activate();
-            if (!String.IsNullOrEmpty(this._receiverScreenName))
+            if (!String.IsNullOrEmpty(_receiverScreenName))
             {
-                ReceiveManager.RegisterList(this._receiverScreenName, _listInfo);
+                ReceiveManager.RegisterList(_receiverScreenName, _listInfo);
             }
             else
             {
@@ -69,46 +72,46 @@ namespace StarryEyes.Filters.Sources
         {
             return s =>
             {
+                if (_watcher?.Ids == null) return false;
                 lock (_watcher.Ids)
                 {
-                    return this._watcher.Ids.Contains(s.User.Id);
+                    return _watcher.Ids.Contains(s.User.Id);
                 }
             };
         }
 
         public override string GetSqlQuery()
         {
-            return "exists (select * from ListUser where ListId = " + _watcher.ListId + " and UserId = status.UserId limit 1)";
+            return "exists (select * from ListUser where ListId = " + _watcher.ListId +
+                   " and UserId = status.UserId limit 1)";
         }
 
         protected override IObservable<TwitterStatus> ReceiveSink(long? maxId)
         {
-            return this.GetAccount()
-                       .GetListTimelineAsync(this._listInfo.Slug, this._listInfo.OwnerScreenName, maxId: maxId)
-                       .ToObservable();
+            return GetAccount().CreateAccessor()
+                               .GetListTimelineAsync(new ListParameter(_listInfo.OwnerScreenName, _listInfo.Slug),
+                                   null, maxId, 100, true, CancellationToken.None)
+                               .ToObservable().SelectMany(o => o.Result);
         }
 
         private TwitterAccount GetAccount()
         {
             return Setting.Accounts.Collection
                           .FirstOrDefault(
-                              a => this._receiverScreenName.Equals(a.UnreliableScreenName,
+                              a => _receiverScreenName.Equals(a.UnreliableScreenName,
                                   StringComparison.CurrentCultureIgnoreCase)) ??
                    Setting.Accounts.GetRandomOne();
         }
 
-        public override string FilterKey
-        {
-            get { return "list"; }
-        }
+        public override string FilterKey => "list";
 
         public override string FilterValue
         {
             get
             {
-                return this._receiverScreenName == this._listInfo.OwnerScreenName
-                    ? this._listInfo.OwnerScreenName + "/" + this._listInfo.Slug
-                    : this._receiverScreenName + "/" + this._listInfo.OwnerScreenName + "/" + this._listInfo.Slug;
+                return _receiverScreenName == _listInfo.OwnerScreenName
+                    ? _listInfo.OwnerScreenName + "/" + _listInfo.Slug
+                    : _receiverScreenName + "/" + _listInfo.OwnerScreenName + "/" + _listInfo.Slug;
             }
         }
     }
