@@ -26,14 +26,14 @@ namespace StarryEyes.Settings
             {
                 throw new ArgumentNullException("settingItem");
             }
-            this._settingItem = settingItem;
+            _settingItem = settingItem;
             _accountObservableCollection = new ObservableSynchronizedCollectionEx<TwitterAccount>(_settingItem.Value);
             _accountCache = new ConcurrentDictionary<long, TwitterAccount>(
                 _accountObservableCollection.Distinct(a => a.Id).ToDictionary(a => a.Id));
             _accountObservableCollection.CollectionChanged += CollectionChanged;
             _random = new Random(Environment.TickCount);
             // initialize DB after system is available.
-            App.SystemReady += this.SynchronizeDb;
+            App.SystemReady += SynchronizeDb;
         }
 
         private async void SynchronizeDb()
@@ -66,7 +66,7 @@ namespace StarryEyes.Settings
         public TwitterAccount Get(long id)
         {
             TwitterAccount account;
-            return this._accountCache.TryGetValue(id, out account) ? account : null;
+            return _accountCache.TryGetValue(id, out account) ? account : null;
         }
 
         public TwitterAccount GetRandomOne()
@@ -74,26 +74,26 @@ namespace StarryEyes.Settings
             var accounts = _accountObservableCollection.ToArray();
             return accounts.Length == 0
                        ? null
-                       : accounts[this._random.Next(accounts.Length)];
+                       : accounts[_random.Next(accounts.Length)];
         }
 
         public TwitterAccount GetRelatedOne(long id)
         {
             if (Setting.Accounts.Contains(id))
             {
-                return this.Get(id);
+                return Get(id);
             }
             var followings = Setting.Accounts.Collection
                                     .Where(a => a.RelationData.Followings.Contains(id))
                                     .ToArray();
             return followings.Length == 0
-                       ? this.GetRandomOne()
-                       : followings[this._random.Next(followings.Length)];
+                       ? GetRandomOne()
+                       : followings[_random.Next(followings.Length)];
         }
 
         public void RemoveAccountFromId(long id)
         {
-            var acc = this.Get(id);
+            var acc = Get(id);
             if (acc != null) _accountObservableCollection.Remove(acc);
         }
 

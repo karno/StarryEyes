@@ -45,9 +45,9 @@ namespace StarryEyes.Models.Stores
             return user;
         }
 
-        public static async Task<TwitterUser> GetUserAsync(string screenName)
+        public static async Task<TwitterUser> GetUserAsync(string screenName, bool ignoreCache = false)
         {
-            var user = await UserProxy.GetUserAsync(screenName).ConfigureAwait(false);
+            var user = ignoreCache ? null : await UserProxy.GetUserAsync(screenName).ConfigureAwait(false);
             if (user == null)
             {
                 var acc = Setting.Accounts.GetRandomOne();

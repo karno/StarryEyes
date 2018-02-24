@@ -14,22 +14,18 @@ namespace StarryEyes.Models.Inputting
     {
         private readonly InputCoreModel _coreModel;
 
-        private readonly ObservableSynchronizedCollectionEx<TwitterAccount> _accounts =
-            new ObservableSynchronizedCollectionEx<TwitterAccount>();
-
         private TabModel _currentFocusTab;
-        private bool _isSynchronizedWithTab;
 
         internal AccountSelectorModel([CanBeNull] InputCoreModel coreModel)
         {
             this._coreModel = coreModel;
-            _isSynchronizedWithTab = true;
+            IsSynchronizedWithTab = true;
             Accounts.CollectionChanged += HandleCollectionChanged;
         }
 
         private void HandleCollectionChanged(object o, NotifyCollectionChangedEventArgs e)
         {
-            if (_currentFocusTab == null || !_isSynchronizedWithTab) return;
+            if (_currentFocusTab == null || !IsSynchronizedWithTab) return;
             var newItems = e.NewItems != null
                 ? e.NewItems.OfType<TwitterAccount>().Select(i => i.Id)
                 : Enumerable.Empty<long>();
@@ -62,10 +58,7 @@ namespace StarryEyes.Models.Inputting
             _coreModel.CurrentInputData.Accounts = Accounts.ToArray();
         }
 
-        public bool IsSynchronizedWithTab
-        {
-            get { return _isSynchronizedWithTab; }
-        }
+        public bool IsSynchronizedWithTab { get; private set; }
 
         [CanBeNull]
         public TabModel CurrentFocusTab
@@ -79,7 +72,7 @@ namespace StarryEyes.Models.Inputting
                 _currentFocusTab = value;
 
                 // synchronize accounts
-                if (_isSynchronizedWithTab)
+                if (IsSynchronizedWithTab)
                 {
                     // propagate accounts bound with tab as selected account.
                     SynchronizeWithTab();
@@ -101,16 +94,14 @@ namespace StarryEyes.Models.Inputting
             }
         }
 
-        [CanBeNull]
-        public ObservableSynchronizedCollectionEx<TwitterAccount> Accounts
-        {
-            get { return _accounts; }
-        }
+        [NotNull]
+        public ObservableSynchronizedCollectionEx<TwitterAccount> Accounts { get; } =
+            new ObservableSynchronizedCollectionEx<TwitterAccount>();
 
         private void SetOverride([CanBeNull] IEnumerable<TwitterAccount> accounts)
         {
-            if (accounts == null) throw new ArgumentNullException("accounts");
-            _isSynchronizedWithTab = false;
+            if (accounts == null) throw new ArgumentNullException(nameof(accounts));
+            IsSynchronizedWithTab = false;
             Accounts.Clear();
             accounts.ForEach(Accounts.Add);
             RaisePropertyChanged(() => IsSynchronizedWithTab);
@@ -118,7 +109,7 @@ namespace StarryEyes.Models.Inputting
 
         public void SynchronizeWithTab()
         {
-            _isSynchronizedWithTab = false; // suppress updating
+            IsSynchronizedWithTab = false; // suppress updating
             if (CurrentFocusTab == null)
             {
                 Accounts.Clear();
@@ -140,7 +131,7 @@ namespace StarryEyes.Models.Inputting
                 }
                 _coreModel.CurrentInputData.Accounts = Accounts.ToArray();
             }
-            _isSynchronizedWithTab = true;
+            IsSynchronizedWithTab = true;
             RaisePropertyChanged(() => IsSynchronizedWithTab);
         }
     }

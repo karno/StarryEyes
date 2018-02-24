@@ -164,7 +164,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
         [CanBeNull]
         public InputData InputData
         {
-            get { return InputModel.InputCore.CurrentInputData; }
+            get => InputModel.InputCore.CurrentInputData;
             set
             {
                 InputModel.InputCore.CurrentInputData = value;
@@ -202,17 +202,14 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             UpdateTextCount();
         }
 
-        public InputAreaSuggestItemProvider Provider
-        {
-            get { return _provider; }
-        }
+        public InputAreaSuggestItemProvider Provider => _provider;
 
         #region Text control
 
         [CanBeNull]
         public string InputText
         {
-            get { return InputData.Text; }
+            get => InputData.Text;
             set
             {
                 InputData.Text = value;
@@ -260,19 +257,13 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             }
         }
 
-        public int RemainTextCount
-        {
-            get
-            {
-                return Setting.NewTextCounting.Value
-                    ? TwitterConfigurationService.NewTextMaxLength - TextCount
-                    : TwitterConfigurationService.TextMaxLength - TextCount;
-            }
-        }
+        public int RemainTextCount => Setting.NewTextCounting.Value
+            ? TwitterConfigurationService.NewTextMaxLength - TextCount
+            : TwitterConfigurationService.TextMaxLength - TextCount;
 
         public bool IsUrlAutoEsacpeEnabled
         {
-            get { return Setting.IsUrlAutoEscapeEnabled.Value; }
+            get => Setting.IsUrlAutoEscapeEnabled.Value;
             set
             {
                 Setting.IsUrlAutoEscapeEnabled.Value = value;
@@ -394,10 +385,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             }
         }
 
-        public bool IsInReplyToEnabled
-        {
-            get { return InputData.InReplyTo != null; }
-        }
+        public bool IsInReplyToEnabled => InputData.InReplyTo != null;
 
         public void ClearInReplyTo()
         {
@@ -439,19 +427,10 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             }
         }
 
-        public bool IsBindHashtagEnabled
-        {
-            get
-            {
-                return InputData.MessageRecipient == null ||
-                       (InputData.InReplyTo == null || !Setting.SuppressTagBindingInReply.Value);
-            }
-        }
+        public bool IsBindHashtagEnabled => InputData.MessageRecipient == null ||
+                                            (InputData.InReplyTo == null || !Setting.SuppressTagBindingInReply.Value);
 
-        public bool IsDirectMessageEnabled
-        {
-            get { return InputData.MessageRecipient != null; }
-        }
+        public bool IsDirectMessageEnabled => InputData.MessageRecipient != null;
 
         public void ClearDirectMessage()
         {
@@ -468,7 +447,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
 
         public int SelectionStart
         {
-            get { return _selectionStart; }
+            get => _selectionStart;
             set
             {
                 _selectionStart = value;
@@ -478,7 +457,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
 
         public int SelectionLength
         {
-            get { return _selectionLength; }
+            get => _selectionLength;
             set
             {
                 _selectionLength = value;
@@ -488,7 +467,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
 
         public string SelectedText
         {
-            get { return _selectedText; }
+            get => _selectedText;
             set
             {
                 _selectedText = value;
@@ -506,25 +485,14 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
 
         #region Hashtag bind control
 
-        public bool IsBindableHashtagExisted
-        {
-            get { return _bindableHashtagCandidates != null && _bindableHashtagCandidates.Count > 0; }
-        }
+        public bool IsBindableHashtagExisted => _bindableHashtagCandidates != null &&
+                                                _bindableHashtagCandidates.Count > 0;
 
-        public bool IsBindingHashtagExisted
-        {
-            get { return _bindingHashtags != null && _bindingHashtags.Count > 0; }
-        }
+        public bool IsBindingHashtagExisted => _bindingHashtags != null && _bindingHashtags.Count > 0;
 
-        public DispatcherCollection<BindHashtagViewModel> BindableHashtagCandidates
-        {
-            get { return _bindableHashtagCandidates; }
-        }
+        public DispatcherCollection<BindHashtagViewModel> BindableHashtagCandidates => _bindableHashtagCandidates;
 
-        public ReadOnlyDispatcherCollectionRx<BindHashtagViewModel> BindingHashtags
-        {
-            get { return _bindingHashtags; }
-        }
+        public ReadOnlyDispatcherCollectionRx<BindHashtagViewModel> BindingHashtags => _bindingHashtags;
 
         private void UpdateHashtagCandidates()
         {
@@ -554,7 +522,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
 
         public void UnbindHashtag(string hashtag)
         {
-            InputModel.InputCore.BindingHashtags.Remove(hashtag);
+            InputModel.InputCore.BindingHashtags?.Remove(hashtag);
             UpdateHashtagCandidates();
             UpdateTextCount();
         }
@@ -563,20 +531,11 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
 
         #region Image attach control
 
-        public bool IsImageAttached
-        {
-            get { return InputData.AttachedImages.Count > 0; }
-        }
+        public bool IsImageAttached => InputData.AttachedImages.Count > 0;
 
-        public bool CanAttachImage
-        {
-            get { return InputData.AttachedImages.Count < 4; }
-        }
+        public bool CanAttachImage => InputData.AttachedImages.Count < 4;
 
-        public ReadOnlyDispatcherCollection<ImageDescriptionViewModel> AttachedImages
-        {
-            get { return _images; }
-        }
+        public ReadOnlyDispatcherCollection<ImageDescriptionViewModel> AttachedImages => _images;
 
         public void AttachImage()
         {
@@ -592,6 +551,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                     Filter =
                         InputAreaResources.AttachImageDlgFilterImg +
                         "|*.jpg;*.jpeg;*.jpe;*.png;*.gif;*.bmp;*.dib|" +
+                        "movie(beta)|*.mp4;*.mpg;*.avi|" +
                         InputAreaResources.AttachImageDlgFilterAll + "|*.*",
                     InitialDirectory = dir,
                     MultiSelect = false,
@@ -685,10 +645,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             }
         }
 
-        public bool IsClipboardContentImage
-        {
-            get { return Clipboard.ContainsImage(); }
-        }
+        public bool IsClipboardContentImage => Clipboard.ContainsImage();
 
         private DropAcceptDescription _description;
 
@@ -725,7 +682,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
 
         public bool IsLocationEnabled
         {
-            get { return _isLocationEnabled; }
+            get => _isLocationEnabled;
             set
             {
                 _isLocationEnabled = value;
@@ -735,12 +692,9 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
 
         public LocationDescriptionViewModel AttachedLocation
         {
-            get
-            {
-                return InputData.AttachedGeoLocation != null
-                    ? new LocationDescriptionViewModel(InputData.AttachedGeoLocation)
-                    : null;
-            }
+            get => InputData.AttachedGeoLocation != null
+                ? new LocationDescriptionViewModel(InputData.AttachedGeoLocation)
+                : null;
             set
             {
                 InputData.AttachedGeoLocation = value == null ? null : value.Location;
@@ -749,24 +703,15 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             }
         }
 
-        public bool IsLocationAttached
-        {
-            get { return InputData.AttachedGeoLocation != null; }
-        }
+        public bool IsLocationAttached => InputData.AttachedGeoLocation != null;
 
         #endregion Location attach control
 
         #region Amending control
 
-        public bool IsAmending
-        {
-            get { return InputModel.InputCore.IsAmending; }
-        }
+        public bool IsAmending => InputModel.InputCore.IsAmending;
 
-        public bool CanAmend
-        {
-            get { return InputModel.InputCore.LastPostedData != null && !IsAmending; }
-        }
+        public bool CanAmend => InputModel.InputCore.LastPostedData != null && !IsAmending;
 
         public void AmendLastPosted()
         {
@@ -777,25 +722,13 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
 
         #region Drafting control
 
-        public ReadOnlyDispatcherCollectionRx<InputDataViewModel> DraftedInputs
-        {
-            get { return _draftedInputs; }
-        }
+        public ReadOnlyDispatcherCollectionRx<InputDataViewModel> DraftedInputs => _draftedInputs;
 
-        public bool IsDraftsExisted
-        {
-            get { return _draftedInputs.Count > 0; }
-        }
+        public bool IsDraftsExisted => _draftedInputs.Count > 0;
 
-        public int DraftCount
-        {
-            get { return _draftedInputs.Count; }
-        }
+        public int DraftCount => _draftedInputs.Count;
 
-        public bool CanSaveToDraft
-        {
-            get { return InputData.IsChanged; }
-        }
+        public bool CanSaveToDraft => InputData.IsChanged;
 
         #endregion Drafting control
 
@@ -1007,25 +940,13 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             _status = status;
         }
 
-        public long Id
-        {
-            get { return Status.Id; }
-        }
+        public long Id => Status.Id;
 
-        public string ScreenName
-        {
-            get { return Status.User.ScreenName; }
-        }
+        public string ScreenName => Status.User.ScreenName;
 
-        public string Text
-        {
-            get { return Status.GetEntityAidedText(); }
-        }
+        public string Text => Status.GetEntityAidedText();
 
-        public TwitterStatus Status
-        {
-            get { return _status; }
-        }
+        public TwitterStatus Status => _status;
     }
 
     public class ImageDescriptionViewModel : ViewModel
@@ -1042,7 +963,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
 
         public byte[] ByteArray
         {
-            get { return _byteArray; }
+            get => _byteArray;
             set
             {
                 _byteArray = value;
@@ -1052,10 +973,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             }
         }
 
-        public BitmapImage Image
-        {
-            get { return _bitmap; }
-        }
+        public BitmapImage Image => _bitmap;
 
         public void DetachImage()
         {

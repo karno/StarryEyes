@@ -1348,6 +1348,11 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                                   {
                                       return TextBlockStylizer.HashtagNavigation + he.DisplayText;
                                   }
+                                  if (e is TwitterSymbolEntity se)
+                                  {
+                                      return TextBlockStylizer.SymbolNavigation + se.DisplayText;
+                                  }
+
                                   return null;
                               })
                               .Where(s => !String.IsNullOrEmpty(s))
@@ -1382,6 +1387,9 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                     SearchFlipModel.RequestSearch(param.Item2, SearchMode.UserScreenName);
                     break;
                 case LinkType.Hash:
+                    SearchFlipModel.RequestSearch(param.Item2, SearchMode.Web);
+                    break;
+                case LinkType.Symbol:
                     SearchFlipModel.RequestSearch(param.Item2, SearchMode.Web);
                     break;
                 case LinkType.Url:

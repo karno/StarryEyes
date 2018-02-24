@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Cadena.Data;
 using StarryEyes.Casket;
 using StarryEyes.Casket.DatabaseModels;
+using StarryEyes.Settings;
 
 namespace StarryEyes.Models.Databases
 {
@@ -27,6 +29,16 @@ namespace StarryEyes.Models.Databases
         {
             await Database.AccountInfoCrud.DropAllAsync().ConfigureAwait(false);
             await Database.RelationCrud.DropAllAsync().ConfigureAwait(false);
+        }
+
+        public static void UpdateUserInfoAsync(TwitterUser user)
+        {
+            var account = Setting.Accounts.Get(user.Id);
+            if (account != null)
+            {
+                account.UnreliableScreenName = user.ScreenName;
+                account.UnreliableProfileImage = user.ProfileImageUri;
+            }
         }
     }
 }

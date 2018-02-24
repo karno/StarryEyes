@@ -23,6 +23,8 @@ namespace StarryEyes.Views.Utils
 
         public const string HashtagNavigation = "hash://";
 
+        public const string SymbolNavigation = "symb://";
+
         public static Tuple<LinkType, string> ResolveInternalUrl(string iurl)
         {
             if (iurl.StartsWith(UserNavigation))
@@ -32,6 +34,10 @@ namespace StarryEyes.Views.Utils
             if (iurl.StartsWith(HashtagNavigation))
             {
                 return new Tuple<LinkType, string>(LinkType.Hash, iurl.Substring(HashtagNavigation.Length));
+            }
+            if (iurl.StartsWith(SymbolNavigation))
+            {
+                return new Tuple<LinkType, string>(LinkType.Symbol, iurl.Substring(SymbolNavigation.Length));
             }
             return new Tuple<LinkType, string>(LinkType.Url, iurl);
         }
@@ -193,7 +199,7 @@ namespace StarryEyes.Views.Utils
         #region Common Entitied Text Utility
 
         private static IEnumerable<Inline> GenerateInlines([CanBeNull] DependencyObject obj,
-            [CanBeNull] string text, [CanBeNullAttribute] IEnumerable<TwitterEntity> entities)
+            [CanBeNull] string text, [CanBeNull] IEnumerable<TwitterEntity> entities)
         {
             if (entities == null)
             {
@@ -215,6 +221,10 @@ namespace StarryEyes.Views.Utils
                     if (entity is TwitterHashtagEntity he)
                     {
                         yield return GenerateHashtagLink(obj, he.DisplayText);
+                    }
+                    else if (entity is TwitterSymbolEntity se)
+                    {
+                        yield return GenerateSymbolLink(obj, se.DisplayText);
                     }
                     else if (entity is TwitterMediaEntity me)
                     {
@@ -285,6 +295,9 @@ namespace StarryEyes.Views.Utils
                     case TokenKind.AtLink:
                         yield return GenerateUserLink(obj, tok.Text.Substring(1), tok.Text.Substring(1));
                         break;
+                    case TokenKind.Symbol:
+                        yield return GenerateSymbolLink(obj, tok.Text.Substring(1));
+                        break;
                     case TokenKind.Text:
                         yield return GenerateText(tok.Text);
                         break;
@@ -322,7 +335,7 @@ namespace StarryEyes.Views.Utils
                 RelativeSource = new RelativeSource(RelativeSourceMode.FindAncestor, typeof(TextBlock), 1),
                 Path = new PropertyPath(property)
             };
-            inline.SetBinding(TextElement.ForegroundProperty, binding);
+            inline?.SetBinding(TextElement.ForegroundProperty, binding);
         }
 
         private static Inline GenerateText([CanBeNull] string surface)
@@ -336,7 +349,7 @@ namespace StarryEyes.Views.Utils
             [CanBeNull] string surface, [CanBeNull] string linkUrl)
         {
             var hl = new Hyperlink { Focusable = false };
-            hl.Inlines.Add(surface);
+            hl.Inlines.Add(surface ?? String.Empty);
             hl.Command = new ProxyCommand(link =>
             {
                 var command = GetLinkNavigationCommand(obj);
@@ -350,7 +363,7 @@ namespace StarryEyes.Views.Utils
         private static Inline GenerateUserLink([CanBeNull] DependencyObject obj,
             [CanBeNull] string surface, [CanBeNull] string userScreenName)
         {
-            if (surface.Length > 0 && surface[0] != '@' && surface[0] != '＠')
+            if (!String.IsNullOrEmpty(surface) && surface[0] != '@' && surface[0] != '＠')
             {
                 surface = "@" + surface;
             }
@@ -360,12 +373,22 @@ namespace StarryEyes.Views.Utils
 
         private static Inline GenerateHashtagLink([CanBeNull] DependencyObject obj, [CanBeNull] string surface)
         {
-            if (surface.Length > 0 && surface[0] != '#' && surface[0] != '＃')
+            if (!String.IsNullOrEmpty(surface) && surface[0] != '#' && surface[0] != '＃')
             {
                 surface = "#" + surface;
             }
             return GenerateLink(obj, surface,
                 HashtagNavigation + surface);
+        }
+
+        private static Inline GenerateSymbolLink([CanBeNull] DependencyObject obj, [CanBeNull] string surface)
+        {
+            if (!String.IsNullOrEmpty(surface) && surface[0] != '$' && surface[0] != '＄')
+            {
+                surface = "$" + surface;
+            }
+            return GenerateLink(obj, surface,
+                SymbolNavigation + surface);
         }
     }
 
@@ -400,5 +423,6 @@ namespace StarryEyes.Views.Utils
         Url,
         User,
         Hash,
+        Symbol
     }
 }

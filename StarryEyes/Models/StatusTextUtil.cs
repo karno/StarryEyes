@@ -144,6 +144,9 @@ namespace StarryEyes.Models
                         case 'H':
                             yield return new TextToken(TokenKind.Hashtag, body);
                             break;
+                        case 'S':
+                            yield return new TextToken(TokenKind.Symbol, body);
+                            break;
                         default:
                             throw new InvalidOperationException("invalid grouping:" + kind);
                     }
@@ -175,5 +178,6 @@ namespace StarryEyes.Models
         Url,
         Hashtag,
         AtLink,
+        Symbol
     }
 }

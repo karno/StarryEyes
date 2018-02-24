@@ -2,36 +2,58 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Disposables;
+using Cadena.Data;
 using JetBrains.Annotations;
 using Livet.EventListeners;
 using StarryEyes.Albireo.Helpers;
 using StarryEyes.Models.Accounting;
+using StarryEyes.Models.Databases;
+using StarryEyes.Models.Receiving.Handling;
 using StarryEyes.Settings;
 
 namespace StarryEyes.Models.Inputting
 {
     public static class InputModel
     {
-        private static readonly CompositeDisposable _disposables;
-
         private static readonly AccountSelectorModel _accounts;
 
         private static readonly InputCoreModel _core;
 
         static InputModel()
         {
-            _disposables = new CompositeDisposable();
+            var disposables = new CompositeDisposable();
             _core = new InputCoreModel();
             _accounts = new AccountSelectorModel(_core);
 
             // link property changing
             var icmpc = new PropertyChangedEventListener(_core);
             icmpc.RegisterHandler(() => _core.CurrentInputData,
-                                (o, e) => _accounts.CurrentInputDataChanged());
-            _disposables.Add(icmpc);
+                (o, e) => _accounts.CurrentInputDataChanged());
+            disposables.Add(icmpc);
             SetEventPropagation();
 
-            App.ApplicationFinalize += () => _disposables.Dispose();
+            App.ApplicationFinalize += () => disposables.Dispose();
+        }
+
+        public static void Initialize()
+        {
+            StatusBroadcaster.BroadcastPoint.Subscribe(s =>
+            {
+                var status = s.StatusModel?.Status;
+                if (status != null)
+                {
+                    UpdateForUser(status.User);
+                    UpdateForUser(status.Recipient);
+                    UpdateForUser(status.RetweetedStatus?.User);
+                    UpdateForUser(status.QuotedStatus?.User);
+                }
+            }, _ => { }, () => { });
+        }
+
+        private static void UpdateForUser([CanBeNull] TwitterUser user)
+        {
+            if (user == null) return;
+            AccountProxy.UpdateUserInfoAsync(user);
         }
 
         #region composite events
@@ -49,27 +71,21 @@ namespace StarryEyes.Models.Inputting
 
         internal static event Action CloseRequest;
 
-        #endregion
+        #endregion composite events
 
         #region Internal Models
 
-        internal static AccountSelectorModel AccountSelector
-        {
-            get { return _accounts; }
-        }
+        internal static AccountSelectorModel AccountSelector => _accounts;
 
-        internal static InputCoreModel InputCore
-        {
-            get { return _core; }
-        }
+        internal static InputCoreModel InputCore => _core;
 
-        #endregion
+        #endregion Internal Models
 
         #region Proxy methods for plugins
 
         public static void SelectAccount([CanBeNull] IEnumerable<TwitterAccount> accounts)
         {
-            if (accounts == null) throw new ArgumentNullException("accounts");
+            if (accounts == null) throw new ArgumentNullException(nameof(accounts));
             _accounts.Accounts.Clear();
             Setting.Accounts.Collection
                    .Where(accounts.Contains)
@@ -107,6 +123,6 @@ namespace StarryEyes.Models.Inputting
             _core.BindingHashtags.Add(hashtag);
         }
 
-        #endregion
+        #endregion Proxy methods for plugins
     }
 }

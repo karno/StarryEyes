@@ -10,6 +10,7 @@ using Livet;
 using StarryEyes.Casket;
 using StarryEyes.Globalization;
 using StarryEyes.Models;
+using StarryEyes.Models.Inputting;
 using StarryEyes.Models.Plugins;
 using StarryEyes.Models.Receiving;
 using StarryEyes.Models.Receiving.Handling;
@@ -287,6 +288,8 @@ namespace StarryEyes
 
             // load cache manager
             CacheStore.Initialize();
+
+            InputModel.Initialize();
         }
 
         #endregion initialize application

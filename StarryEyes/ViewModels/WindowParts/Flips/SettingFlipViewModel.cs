@@ -1310,7 +1310,9 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         private void RefreshCandidates()
         {
+            var items = _accounts.ToArray();
             _accounts.Clear();
+            items.ForEach(i => i.Dispose());
             Setting.Accounts.Collection
                    .Where(a => a.Id != Account.Id)
                    .ForEach(a => _accounts.Add(new TwitterAccountViewModel(a)));
@@ -1328,7 +1330,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public bool IsFallbackEnabled
         {
-            get { return Account.FallbackAccountId != null; }
+            get => Account.FallbackAccountId != null;
             set
             {
                 if (value == IsFallbackEnabled) return;

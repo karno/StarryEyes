@@ -274,8 +274,9 @@ namespace StarryEyes.Models.Inputting
             if (_attachedImages.Count > 0)
             {
                 // step 1: upload media
+                var mac = account.CreateAccessor(EndpointType.UploadEndpoint);
                 var mediaRequests = _attachedImages
-                    .Select(b => new UploadMediaRequest(accessor, b))
+                    .Select(b => new UploadMediaRequest(mac, b))
                     .Select(async r => await RequestManager.Enqueue(r).ConfigureAwait(false));
                 var results = (await Task.WhenAll(mediaRequests)).Select(s => s.Result.MediaId).ToArray();
                 // step 2: send tweet

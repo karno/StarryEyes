@@ -16,14 +16,13 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
     public class AccountSelectorViewModel : ViewModel
     {
         private readonly InputViewModel _parent;
-        private readonly AccountSelectionFlipViewModel _accountSelectionFlip;
         private readonly ReadOnlyDispatcherCollectionRx<TwitterAccountViewModel> _accounts;
 
         public AccountSelectorViewModel(InputViewModel parent)
         {
             _parent = parent;
-            this._accountSelectionFlip = new AccountSelectionFlipViewModel();
-            this.AccountSelectionFlip.Closed += () =>
+            AccountSelectionFlip = new AccountSelectionFlipViewModel();
+            AccountSelectionFlip.Closed += () =>
             {
                 // After selection accounts, return focus to text box
                 // if input area is opened.
@@ -32,66 +31,51 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                     _parent.FocusToTextBox();
                 }
             };
-            this.AccountSelectionFlip.SelectedAccountsChanged += () =>
+            AccountSelectionFlip.SelectedAccountsChanged += () =>
             {
                 InputModel.AccountSelector.Accounts.Clear();
                 Setting.Accounts.Collection
                        .Where(a => AccountSelectionFlip.SelectedAccounts.Contains(a))
                        .ForEach(InputModel.AccountSelector.Accounts.Add);
             };
-            CompositeDisposable.Add(this.AccountSelectionFlip);
+            CompositeDisposable.Add(AccountSelectionFlip);
             CompositeDisposable.Add(_accounts =
                 ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
                     InputModel.AccountSelector.Accounts,
                     a => new TwitterAccountViewModel(a),
                     DispatcherHelper.UIDispatcher));
             CompositeDisposable.Add(_accounts.ListenCollectionChanged(_ =>
-                {
-                    RaisePropertyChanged(() => AuthInfoGridRowColumn);
-                    RaisePropertyChanged(() => AuthInfoScreenNames);
-                    RaisePropertyChanged(() => IsBoundAccountExists);
-                }));
+            {
+                RaisePropertyChanged(() => AuthInfoGridRowColumn);
+                RaisePropertyChanged(() => AuthInfoScreenNames);
+                RaisePropertyChanged(() => IsBoundAccountExists);
+            }));
             CompositeDisposable.Add(
                 InputModel.AccountSelector.ListenPropertyChanged(
                     () => InputModel.AccountSelector.IsSynchronizedWithTab,
                     _ => RaisePropertyChanged(() => IsSynchronizedWithTab)));
         }
 
-        public AccountSelectionFlipViewModel AccountSelectionFlip
-        {
-            get { return this._accountSelectionFlip; }
-        }
+        public AccountSelectionFlipViewModel AccountSelectionFlip { get; }
 
-        public ReadOnlyDispatcherCollectionRx<TwitterAccountViewModel> Accounts
-        {
-            get { return this._accounts; }
-        }
+        public ReadOnlyDispatcherCollectionRx<TwitterAccountViewModel> Accounts => _accounts;
 
-        public bool IsBoundAccountExists
-        {
-            get { return this._accounts != null && this._accounts.Count > 0; }
-        }
+        public bool IsBoundAccountExists => _accounts != null && _accounts.Count > 0;
 
-        public int AuthInfoGridRowColumn
-        {
-            get { return (int)Math.Ceiling(Math.Sqrt(Math.Max(this._accounts.Count, 1))); }
-        }
+        public int AuthInfoGridRowColumn => (int)Math.Ceiling(Math.Sqrt(Math.Max(_accounts.Count, 1)));
 
         public string AuthInfoScreenNames
         {
             get
             {
-                return this._accounts.Count == 0
+                return _accounts.Count == 0
                     ? InputAreaResources.AccountSelectorNotSelected
                     : InputAreaResources.AccountSelectorSelectedFormat.SafeFormat(
-                        this._accounts.Select(_ => _.ScreenName).JoinString(", "));
+                        _accounts.Select(_ => _.ScreenName).JoinString(", "));
             }
         }
 
-        public bool IsSynchronizedWithTab
-        {
-            get { return InputModel.AccountSelector.IsSynchronizedWithTab; }
-        }
+        public bool IsSynchronizedWithTab => InputModel.AccountSelector.IsSynchronizedWithTab;
 
         [UsedImplicitly]
         public void SynchronizeWithTab()

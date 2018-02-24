@@ -26,16 +26,16 @@ namespace StarryEyes.Models.Inputting
 
         #region properties
 
-        [CanBeNull]
+        [NotNull]
         public ObservableSynchronizedCollectionEx<string> BindingHashtags => _bindingHashtags;
 
-        [CanBeNull]
+        [NotNull]
         public ObservableSynchronizedCollectionEx<InputData> Drafts => _drafts;
 
-        [CanBeNull]
+        [NotNull]
         internal InputData CurrentInputData
         {
-            get { return _inputData; }
+            get => _inputData;
             set
             {
                 if (value == _inputData) return;
@@ -55,7 +55,7 @@ namespace StarryEyes.Models.Inputting
         [CanBeNull]
         public InputData LastPostedData
         {
-            get { return _lastPostedData; }
+            get => _lastPostedData;
             internal set
             {
                 _lastPostedData = value;
@@ -64,15 +64,9 @@ namespace StarryEyes.Models.Inputting
             }
         }
 
-        public bool IsAmending
-        {
-            get { return CurrentInputData.IsAmend; }
-        }
+        public bool IsAmending => CurrentInputData.IsAmend;
 
-        public bool CanAmend
-        {
-            get { return LastPostedData != null && CurrentInputData != LastPostedData; }
-        }
+        public bool CanAmend => LastPostedData != null && CurrentInputData != LastPostedData;
 
         #endregion properties
 
@@ -106,12 +100,9 @@ namespace StarryEyes.Models.Inputting
                 previous.BindingHashtags = _bindingHashtags.ToArray();
             }
             _bindingHashtags.Clear();
-            if (replace != null)
-            {
-                replace.BindingHashtags
-                       .ToArray()
-                       .ForEach(_bindingHashtags.Add);
-            }
+            replace?.BindingHashtags
+                   .ToArray()
+                   .ForEach(_bindingHashtags.Add);
             _currentFocusTabModel = replace;
         }
 
@@ -141,7 +132,7 @@ namespace StarryEyes.Models.Inputting
             CurrentInputData = new InputData(body)
             {
                 Accounts = infos,
-                InReplyTo = inReplyTo,
+                InReplyTo = inReplyTo
             };
             SetCursorRequest.SafeInvoke(cursor ?? CursorPosition.End);
             if (focusToInputArea)

@@ -154,7 +154,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
         {
             try
             {
-                var user = await StoreHelper.GetUserAsync(screenName);
+                var user = await StoreHelper.GetUserAsync(screenName, true);
                 // overwrite by oficially-provided screen name
                 _screenName = user.ScreenName;
                 RaisePropertyChanged(() => ScreenName);
@@ -303,7 +303,10 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                     SearchFlipModel.RequestSearch(param.Item2, SearchMode.UserScreenName);
                     break;
                 case LinkType.Hash:
-                    SearchFlipModel.RequestSearch("#" + param.Item2, SearchMode.Web);
+                    SearchFlipModel.RequestSearch(param.Item2, SearchMode.Web);
+                    break;
+                case LinkType.Symbol:
+                    SearchFlipModel.RequestSearch(param.Item2, SearchMode.Web);
                     break;
                 case LinkType.Url:
                     BrowserHelper.Open(param.Item2);

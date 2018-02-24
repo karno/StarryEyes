@@ -5,6 +5,7 @@ using Cadena.Api.Parameters;
 using Cadena.Api.Rest;
 using Cadena.Util;
 using Livet;
+using StarryEyes.Albireo.Helpers;
 using StarryEyes.Models.Accounting;
 
 namespace StarryEyes.ViewModels.Common
@@ -16,6 +17,11 @@ namespace StarryEyes.ViewModels.Common
         public TwitterAccountViewModel(TwitterAccount account)
         {
             _account = account;
+            CompositeDisposable.Add(account.ListenPropertyChanged(e =>
+            {
+                RaisePropertyChanged(() => ProfileImageUri);
+                RaisePropertyChanged(() => ScreenName);
+            }));
         }
 
         public long Id => _account.Id;
@@ -50,9 +56,6 @@ namespace StarryEyes.ViewModels.Common
             }
         }
 
-        public string ScreenName
-        {
-            get { return _account.UnreliableScreenName; }
-        }
+        public string ScreenName => _account.UnreliableScreenName;
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using AsyncOAuth;
 using Cadena;
 using Cadena.Data;
@@ -11,7 +12,7 @@ namespace StarryEyes.Models.Accounting
     /// <summary>
     /// Describe twitter authentication data.
     /// </summary>
-    public sealed class TwitterAccount : IOAuthCredential
+    public sealed class TwitterAccount : IOAuthCredential, INotifyPropertyChanged
     {
         // accessed from serializer
         [UsedImplicitly]
@@ -73,13 +74,31 @@ namespace StarryEyes.Models.Accounting
         /// Screen Name of user. This is a cache, so do not use this property for identifying user.
         /// </summary>
         [CanBeNull]
-        public string UnreliableScreenName { get; set; }
+        public string UnreliableScreenName
+        {
+            get => _unreliableScreenName;
+            set
+            {
+                if (_unreliableScreenName == value) return;
+                _unreliableScreenName = value;
+                OnPropertyChanged();
+            }
+        }
 
         /// <summary>
         /// Profile image of user. This is a cache property, so do not use this property for identifying user.
         /// </summary>
         [CanBeNull]
-        public Uri UnreliableProfileImage { get; set; }
+        public Uri UnreliableProfileImage
+        {
+            get => _unreliableProfileImage;
+            set
+            {
+                if (_unreliableProfileImage == value) return;
+                _unreliableProfileImage = value;
+                OnPropertyChanged();
+            }
+        }
 
         [CanBeNull]
         public TwitterUser GetPseudoUser()
@@ -102,6 +121,12 @@ namespace StarryEyes.Models.Accounting
                                              App.ConsumerSecret;
 
         private AccountRelationData _relationData;
+
+        [CanBeNull]
+        private string _unreliableScreenName;
+
+        [CanBeNull]
+        private Uri _unreliableProfileImage;
 
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public AccountRelationData RelationData => _relationData ?? (_relationData = new AccountRelationData(Id));
@@ -163,6 +188,14 @@ namespace StarryEyes.Models.Accounting
             }
             var ua = Setting.UserAgent.Value ?? ApiAccessor.DefaultUserAgent;
             return new ApiAccessor(this, eps, Setting.GetWebProxy(), ua, useGZip);
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyPropertyChangedInvocator]
+        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 

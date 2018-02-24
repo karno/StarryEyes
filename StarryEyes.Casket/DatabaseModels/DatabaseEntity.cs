@@ -46,6 +46,7 @@ namespace StarryEyes.Casket.DatabaseModels
         Media,
         Urls,
         UserMentions,
-        Hashtags
+        Hashtags,
+        Symbols
     }
 }

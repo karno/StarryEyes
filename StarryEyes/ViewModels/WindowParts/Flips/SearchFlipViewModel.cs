@@ -36,35 +36,35 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         {
             if (DesignTimeUtil.IsInDesignMode) return;
             _candidateViewModel = new SearchCandidateViewModel(this);
-            this.CompositeDisposable.Add(
+            CompositeDisposable.Add(
                 Observable.FromEvent(
                     h => KeyAssignManager.KeyAssignChanged += h,
                     h => KeyAssignManager.KeyAssignChanged -= h)
                           .Subscribe(_ => RaisePropertyChanged(() => SearchHintLabel)));
-            this.CompositeDisposable.Add(
+            CompositeDisposable.Add(
                 new EventListener<Action<string, SearchMode>>(
                     h => SearchFlipModel.SearchRequested += h,
                     h => SearchFlipModel.SearchRequested -= h,
                     (query, mode) =>
                     {
-                        this.Open();
+                        Open();
                         // to do nothing.
                         if (Text == query && SearchMode == mode) return;
                         Text = query;
                         if (SearchMode == mode)
                         {
-                            this.CommitSearch();
+                            CommitSearch();
                         }
                         else
                         {
                             SearchMode = mode;
                         }
                     }));
-            this.CompositeDisposable.Add(
+            CompositeDisposable.Add(
                 new EventListener<Action>(
                     h => InputModel.FocusRequest += h,
                     h => InputModel.FocusRequest -= h,
-                    this.CloseCore));
+                    CloseCore));
         }
 
         private bool _isSearchResultAvailable;
@@ -158,18 +158,18 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         private bool _displaySlimView;
         public bool DisplaySlimView
         {
-            get { return this._displaySlimView; }
+            get { return _displaySlimView; }
             set
             {
                 if (_displaySlimView == value) return;
-                this._displaySlimView = value;
+                _displaySlimView = value;
                 RaisePropertyChanged();
             }
         }
 
         public void NotifyResultWidthChanged(double width)
         {
-            this.DisplaySlimView = width < 572;
+            DisplaySlimView = width < 572;
         }
 
         #region Search options
@@ -219,7 +219,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             SearchMode = SearchMode.UserScreenName;
         }
 
-        #endregion
+        #endregion Search options
 
         private string _text;
         public string Text
@@ -341,7 +341,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public override void Open()
         {
-            if (this.IsVisible) return;
+            if (IsVisible) return;
             base.Open();
             SearchMode = SearchMode.CurrentTab;
             SearchCandidate.UpdateInfo();
@@ -349,7 +349,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public override void Close()
         {
-            if (!this.IsVisible) return;
+            if (!IsVisible) return;
             CloseCore();
             MainWindowModel.SetFocusTo(FocusRequest.Timeline);
         }
@@ -358,9 +358,9 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         {
             Text = String.Empty;
             IsSearchResultAvailable = false;
-            this.SearchResult = null;
-            this.UserResult = null;
-            this.UserInfo = null;
+            SearchResult = null;
+            UserResult = null;
+            UserInfo = null;
             base.Close();
             _backStack.Clear();
         }
@@ -369,7 +369,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public void FocusToSearchBox()
         {
-            this.Messenger.RaiseSafe(() => new InteractionMessage("FocusToTextBox"));
+            Messenger.RaiseSafe(() => new InteractionMessage("FocusToTextBox"));
         }
 
         public void GotFocusToSearchBox()
@@ -392,7 +392,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             }
         }
 
-        #endregion
+        #endregion Text box control
 
         private readonly Stack<Tuple<string, SearchMode>> _backStack = new Stack<Tuple<string, SearchMode>>();
         private string _previousCommit;
@@ -409,14 +409,14 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 IsSearchResultAvailable = false;
                 return;
             }
-            this.SearchResult = null;
-            this.UserResult = null;
-            this.UserInfo = null;
+            SearchResult = null;
+            UserResult = null;
+            UserInfo = null;
             if (IsQueryMode)
             {
                 try
                 {
-                    this.ShowSearchResult(new SearchResultModel(Text.Substring(1), SearchOption.Query));
+                    ShowSearchResult(new SearchResultModel(Text.Substring(1), SearchOption.Query));
                 }
                 catch (FilterQueryException)
                 {
@@ -430,19 +430,19 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 switch (SearchMode)
                 {
                     case SearchMode.CurrentTab:
-                        this.ShowSearchResult(new SearchResultModel(Text, SearchOption.CurrentTab));
+                        ShowSearchResult(new SearchResultModel(Text, SearchOption.CurrentTab));
                         break;
                     case SearchMode.Local:
-                        this.ShowSearchResult(new SearchResultModel(Text, SearchOption.Local));
+                        ShowSearchResult(new SearchResultModel(Text, SearchOption.Local));
                         break;
                     case SearchMode.Web:
-                        this.ShowSearchResult(new SearchResultModel(Text, SearchOption.Web));
+                        ShowSearchResult(new SearchResultModel(Text, SearchOption.Web));
                         break;
                     case SearchMode.UserWeb:
-                        this.UserResult = new UserResultViewModel(this, Text);
+                        UserResult = new UserResultViewModel(this, Text);
                         break;
                     case SearchMode.UserScreenName:
-                        this.UserInfo = new UserInfoViewModel(this, Text);
+                        UserInfo = new UserInfoViewModel(this, Text);
                         break;
                     default:
                         IsSearchResultAvailable = false;
@@ -460,10 +460,10 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         public void CloseResults()
         {
             IsSearchResultAvailable = false;
-            this.SearchResult = null;
-            this.UserResult = null;
-            this.UserInfo = null;
-            this.FocusToSearchBox();
+            SearchResult = null;
+            UserResult = null;
+            UserInfo = null;
+            FocusToSearchBox();
         }
 
         public void RewindStack()
@@ -472,18 +472,18 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             if (_backStack.Count <= 0)
             {
                 _backStack.Clear();
-                this.Close();
+                Close();
                 return;
             }
             var item = _backStack.Peek();
-            this.Text = item.Item1;
-            if (this.SearchMode == item.Item2)
+            Text = item.Item1;
+            if (SearchMode == item.Item2)
             {
-                this.CommitSearch();
+                CommitSearch();
             }
             else
             {
-                this.SearchMode = item.Item2;
+                SearchMode = item.Item2;
             }
         }
     }

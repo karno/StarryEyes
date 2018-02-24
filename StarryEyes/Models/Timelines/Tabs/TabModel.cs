@@ -116,16 +116,13 @@ namespace StarryEyes.Models.Timelines.Tabs
             set { _name = value; }
         }
 
-        [CanBeNull]
-        public ICollection<long> BindingAccounts
-        {
-            get { return new NotifyCollection<long>(_bindingAccountIds, OnUpdateBoundAccounts); }
-        }
+        public ICollection<long> BindingAccounts => new NotifyCollection<long>(_bindingAccountIds,
+            OnUpdateBoundAccounts);
 
-        [CanBeNull]
+        [NotNull]
         public IEnumerable<string> BindingHashtags
         {
-            get { return _bindingHashtags ?? Enumerable.Empty<string>(); }
+            get => _bindingHashtags ?? Enumerable.Empty<string>();
             set
             {
                 if (value.SequenceEqual(_bindingHashtags)) return; // equal

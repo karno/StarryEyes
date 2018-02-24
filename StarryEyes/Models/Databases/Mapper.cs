@@ -71,7 +71,7 @@ namespace StarryEyes.Models.Databases
             }
             else if (entity is TwitterMediaEntity me)
             {
-                et = EntityType.Hashtags;
+                et = EntityType.Media;
                 uid = me.Id;
             }
             else if (entity is TwitterHashtagEntity)
@@ -80,7 +80,7 @@ namespace StarryEyes.Models.Databases
             }
             else if (entity is TwitterSymbolEntity)
             {
-                et = EntityType.Hashtags;
+                et = EntityType.Symbols;
             }
             else if (entity is TwitterUserMentionEntity re)
             {
@@ -183,6 +183,8 @@ namespace StarryEyes.Models.Databases
                         entity.DisplayText);
                 case EntityType.Hashtags:
                     return new TwitterHashtagEntity(indices, entity.DisplayText);
+                case EntityType.Symbols:
+                    return new TwitterSymbolEntity(indices, entity.DisplayText);
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -222,7 +224,7 @@ namespace StarryEyes.Models.Databases
             var rts = retweeters?.ToArray() ?? new long[0];
             return new TwitterStatus(status.Id, user, status.Text, displayTextRange, status.CreatedAt,
                 ent.Select(Map).ToArray(), status.Source, status.InReplyToStatusId, status.InReplyToOrRecipientUserId,
-                favs.Length, rts.Length, status.InReplyToOrRecipientScreenName, coords, null, null);
+                favs, rts, status.InReplyToOrRecipientScreenName, coords, null, null);
         }
 
         public static TwitterStatus Map([CanBeNull] DatabaseStatus status, [CanBeNull] StatusEnts statusEntities,
@@ -267,7 +269,7 @@ namespace StarryEyes.Models.Databases
             var quote = isQuoted ? originalStatus : null;
             return new TwitterStatus(status.Id, user, status.Text, displayTextRange, status.CreatedAt,
                 ent.Select(Map).ToArray(), status.Source, status.InReplyToStatusId, status.InReplyToOrRecipientUserId,
-                favs.Length, rts.Length, status.InReplyToOrRecipientScreenName, coords, retweet, quote);
+                favs, rts, status.InReplyToOrRecipientScreenName, coords, retweet, quote);
         }
 
 
@@ -317,7 +319,7 @@ namespace StarryEyes.Models.Databases
             var rts = retweeters?.ToArray() ?? new long[0];
             return new TwitterStatus(status.Id, user, status.Text, displayTextRange, status.CreatedAt,
                 ent.Select(Map).ToArray(), status.Source, status.InReplyToStatusId, status.InReplyToOrRecipientUserId,
-                favs.Length, rts.Length, status.InReplyToOrRecipientScreenName, coords, retweet, quote);
+                favs, rts, status.InReplyToOrRecipientScreenName, coords, retweet, quote);
         }
 
 
