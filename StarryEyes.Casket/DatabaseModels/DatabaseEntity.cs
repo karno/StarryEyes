@@ -24,6 +24,8 @@ namespace StarryEyes.Casket.DatabaseModels
         public int StartIndex { get; set; }
 
         public int EndIndex { get; set; }
+
+        public MediaType? MediaType { get; set; }
     }
 
     [DbName("StatusEntity")]
@@ -48,5 +50,12 @@ namespace StarryEyes.Casket.DatabaseModels
         UserMentions,
         Hashtags,
         Symbols
+    }
+
+    public enum MediaType
+    {
+        Photo,
+        Video,
+        AnimatedGif
     }
 }

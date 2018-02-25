@@ -23,7 +23,7 @@ namespace StarryEyes
     /// </summary>
     public partial class App
     {
-        private static readonly string DbVersion = "B";
+        private static readonly string DbVersion = "C";
         private static DateTime _startupTime;
         private static string _userId = String.Empty;
 
@@ -117,10 +117,16 @@ namespace StarryEyes
                     case "1.0":
                         DatabaseMigrator.MigrateToVersionA();
                         DatabaseMigrator.MigrateToVersionB();
+                        DatabaseMigrator.MigrateToVersionC();
                         Database.ManagementCrud.DatabaseVersion = DbVersion;
                         return true;
                     case "A":
                         DatabaseMigrator.MigrateToVersionB();
+                        DatabaseMigrator.MigrateToVersionC();
+                        Database.ManagementCrud.DatabaseVersion = DbVersion;
+                        return true;
+                    case "B":
+                        DatabaseMigrator.MigrateToVersionC();
                         Database.ManagementCrud.DatabaseVersion = DbVersion;
                         return true;
                 }

@@ -18,14 +18,14 @@ namespace SweetMagic
             {
                 case "pack":
                 case "package":
-                    return new PackageAction(element.Attribute("url").Value);
+                    return new PackageAction(element.Attribute("url")?.Value);
                 case "exec":
                 case "execute":
                     var ap = element.Attribute("await"); // default true
-                    return new ExecuteAction(element.Attribute("path").Value,
-                                             ap == null || ap.Value.ToLower() != "false");
+                    return new ExecuteAction(element.Attribute("path")?.Value,
+                        ap == null || ap.Value.ToLower() != "false");
                 case "delete":
-                    return new DeleteAction(element.Attribute("path").Value);
+                    return new DeleteAction(element.Attribute("path")?.Value);
                 default:
                     throw new UpdateException("update action is not valid: " + element.Name);
             }
@@ -38,7 +38,7 @@ namespace SweetMagic
 
         protected void AssertPath(string path)
         {
-            if (path == null) throw new ArgumentNullException("path");
+            if (path == null) throw new ArgumentNullException(nameof(path));
             if (path.Contains("..") || path.Contains("%") ||
                 Path.GetInvalidPathChars().Any(path.Contains))
             {
@@ -52,18 +52,18 @@ namespace SweetMagic
     {
         public PackageAction(string url)
         {
-            this.Url = url;
+            Url = url;
         }
 
-        public string Url { get; set; }
+        public string Url { get; }
 
-        public async override Task DoWork(UpdateTaskExecutor executor)
+        public override async Task DoWork(UpdateTaskExecutor executor)
         {
             executor.NotifyProgress("downloading patch package...");
             byte[] file = null;
             for (var i = 0; i < 3; i++)
             {
-                file = await executor.DownloadBinary(this.Url);
+                file = await executor.DownloadBinary(Url);
                 if (file != null) break;
                 executor.NotifyProgress("<!> patch package download failed. awaiting server a few seconds...", false);
                 await Task.Run(() => Thread.Sleep(10000));
@@ -89,7 +89,7 @@ namespace SweetMagic
                 foreach (var entry in archive.Entries)
                 {
                     executor.NotifyProgress("patching " + entry.Name + "...");
-                    await this.Extract(entry, executor.BasePath);
+                    await Extract(entry, executor.BasePath);
                 }
                 executor.NotifyProgress("patch completed.");
             }

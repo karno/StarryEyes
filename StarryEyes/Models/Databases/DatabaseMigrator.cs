@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using System.Windows;
 using StarryEyes.Casket;
+using StarryEyes.Casket.Cruds.Scaffolding;
 using StarryEyes.Views.Dialogs;
 
 namespace StarryEyes.Models.Databases
@@ -71,7 +72,7 @@ namespace StarryEyes.Models.Databases
         }
 
         /// <summary>
-        /// Migrate to database version B
+        /// Migrate to database version C
         /// </summary>
         public static void MigrateToVersionB()
         {
@@ -110,6 +111,64 @@ namespace StarryEyes.Models.Databases
 
                 await Database.VacuumTables();
             }));
+        }
+
+        public static void MigrateToVersionC()
+        {
+            MigrateWorkCore(updateLabel => Task.Run(async () =>
+            {
+                const string statusEntityTable = "StatusEntity";
+                const string userDescriptionEntityTable = "UserDescriptionEntity";
+                const string userUrlEntityTable = "UserUrlEntity";
+                var tables = new[] { statusEntityTable, userDescriptionEntityTable, userUrlEntityTable };
+
+                int step = 1;
+                await MigrateToVersionCInternal(statusEntityTable, Database.StatusEntityCrud,
+                    $"step {step}/{tables.Length} :", updateLabel);
+                step++;
+                await MigrateToVersionCInternal(userDescriptionEntityTable, Database.UserDescriptionEntityCrud,
+                    $"step {step}/{tables.Length} :", updateLabel);
+                step++;
+                await MigrateToVersionCInternal(userUrlEntityTable, Database.UserUrlEntityCrud,
+                    $"step {step}/{tables.Length} :", updateLabel);
+                step++;
+            }));
+        }
+
+        private static async Task MigrateToVersionCInternal<T>(string tableName, CrudBase<T> crudProvider,
+            string step, Action<string> updateLabel) where T : class
+        {
+            var tempTableName = "TEMP_" + tableName;
+            updateLabel(step + "checking database...");
+
+            // drop table before migration (preventing errors).
+            await Database.ExecuteAsync("DROP TABLE IF EXISTS " + tempTableName + ";");
+
+            updateLabel(step + "optimizing...");
+
+            // vacuuming table
+            await Database.VacuumTables();
+
+            updateLabel(step + "preparing for migration...");
+
+            await crudProvider.AlterAsync(tempTableName);
+
+            // re-create table
+            await Database.ReInitializeAsync(crudProvider);
+
+            updateLabel(step + "migrating database...");
+
+            // insert all records
+            await Database.ExecuteAsync(
+                $"INSERT INTO {tableName}(Id, ParentId, EntityType, DisplayText, OriginalUrl, UserId, MediaUrl, StartIndex, EndIndex, MediaType) " +
+                " SELECT Id, ParentId, EntityType, DisplayText, OriginalUrl, UserId, MediaUrl, StartIndex, EndIndex, NULL " +
+                $" FROM {tempTableName};");
+
+            updateLabel(step + "cleaning up...");
+
+            await Database.ExecuteAsync("DROP TABLE " + tempTableName + ";");
+
+            await Database.VacuumTables();
         }
     }
 }

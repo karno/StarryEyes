@@ -6,6 +6,7 @@ using Cadena.Data.Entities;
 using Cadena.Util;
 using JetBrains.Annotations;
 using StarryEyes.Casket.DatabaseModels;
+using MediaType = Cadena.Data.Entities.MediaType;
 using StatusEnts = System.Collections.Generic.IEnumerable<StarryEyes.Casket.DatabaseModels.DatabaseStatusEntity>;
 using UserDescEnts =
     System.Collections.Generic.IEnumerable<StarryEyes.Casket.DatabaseModels.DatabaseUserDescriptionEntity>;
@@ -63,6 +64,7 @@ namespace StarryEyes.Models.Databases
             string murl = null;
             string ourl = null;
             long? uid = null;
+            var mt = (Casket.DatabaseModels.MediaType?)null;
             if (entity is TwitterUrlEntity ue)
             {
                 et = EntityType.Urls;
@@ -72,7 +74,21 @@ namespace StarryEyes.Models.Databases
             else if (entity is TwitterMediaEntity me)
             {
                 et = EntityType.Media;
+                murl = me.MediaUrlHttps;
+                ourl = me.ExpandedUrl;
                 uid = me.Id;
+                switch (me.MediaType)
+                {
+                    case MediaType.Photo:
+                        mt = Casket.DatabaseModels.MediaType.Photo;
+                        break;
+                    case MediaType.Video:
+                        mt = Casket.DatabaseModels.MediaType.Video;
+                        break;
+                    case MediaType.AnimatedGif:
+                        mt = Casket.DatabaseModels.MediaType.AnimatedGif;
+                        break;
+                }
             }
             else if (entity is TwitterHashtagEntity)
             {
@@ -101,7 +117,8 @@ namespace StarryEyes.Models.Databases
                 MediaUrl = murl,
                 OriginalUrl = ourl,
                 UserId = uid,
-                ParentId = parentId
+                ParentId = parentId,
+                MediaType = mt
             };
         }
 
@@ -173,9 +190,25 @@ namespace StarryEyes.Models.Databases
             switch (entity.EntityType)
             {
                 case EntityType.Media:
+                    MediaType mt;
+                    switch (entity.MediaType)
+                    {
+                        case Casket.DatabaseModels.MediaType.Photo:
+                            mt = MediaType.Photo;
+                            break;
+                        case Casket.DatabaseModels.MediaType.Video:
+                            mt = MediaType.Video;
+                            break;
+                        case Casket.DatabaseModels.MediaType.AnimatedGif:
+                            mt = MediaType.AnimatedGif;
+                            break;
+                        default:
+                            mt = MediaType.Unknown;
+                            break;
+                    }
                     return new TwitterMediaEntity(indices, entity.UserId ?? 0,
                         entity.MediaUrl, entity.MediaUrl, entity.OriginalUrl, entity.DisplayText, entity.OriginalUrl,
-                        MediaType.Unknown, null, null);
+                        mt, null, null);
                 case EntityType.Urls:
                     return new TwitterUrlEntity(indices, entity.OriginalUrl, entity.DisplayText, entity.OriginalUrl);
                 case EntityType.UserMentions:

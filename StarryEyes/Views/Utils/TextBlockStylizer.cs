@@ -229,7 +229,7 @@ namespace StarryEyes.Views.Utils
                     else if (entity is TwitterMediaEntity me)
                     {
                         yield return GenerateLink(obj, me.DisplayText,
-                            ParsingExtension.ResolveEntity(me.MediaUrlHttps));
+                            ParsingExtension.ResolveEntity(me.ExpandedUrl));
                     }
                     else if (entity is TwitterUrlEntity ue)
                     {
@@ -346,7 +346,7 @@ namespace StarryEyes.Views.Utils
         }
 
         private static Inline GenerateLink([CanBeNull] DependencyObject obj,
-            [CanBeNull] string surface, [CanBeNull] string linkUrl)
+            [CanBeNull] string surface, [NotNull] string linkUrl)
         {
             var hl = new Hyperlink { Focusable = false };
             hl.Inlines.Add(surface ?? String.Empty);
