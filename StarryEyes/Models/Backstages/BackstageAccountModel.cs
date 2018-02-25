@@ -3,7 +3,6 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Cadena.Data;
-using StarryEyes.Albireo.Helpers;
 using StarryEyes.Globalization;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Backstages.NotificationEvents;
@@ -25,14 +24,14 @@ namespace StarryEyes.Models.Backstages
 
         private void RaiseConnectionStateChanged()
         {
-            ConnectionStateChanged.SafeInvoke();
+            ConnectionStateChanged?.Invoke();
         }
 
         public event Action TwitterUserChanged;
 
         private void RaiseTwitterUserChanged()
         {
-            TwitterUserChanged.SafeInvoke();
+            TwitterUserChanged?.Invoke();
         }
 
         public TwitterAccount Account => _account;
@@ -86,7 +85,7 @@ namespace StarryEyes.Models.Backstages
 
         private void RaiseFallbackStateUpdated()
         {
-            FallbackStateUpdated.SafeInvoke();
+            FallbackStateUpdated?.Invoke();
         }
 
         public bool IsFallbacked { get; private set; }

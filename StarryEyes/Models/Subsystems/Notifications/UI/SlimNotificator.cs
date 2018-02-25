@@ -1,19 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using Cadena.Data;
-using StarryEyes.Albireo.Helpers;
 using StarryEyes.ViewModels.Notifications;
 
 namespace StarryEyes.Models.Subsystems.Notifications.UI
 {
     public class SlimNotificator : IUINotificator
     {
-        private static readonly SlimNotificator _instance = new SlimNotificator();
-
-        public static SlimNotificator Instance
-        {
-            get { return _instance; }
-        }
+        public static SlimNotificator Instance { get; } = new SlimNotificator();
 
         static SlimNotificator()
         {
@@ -66,7 +60,7 @@ namespace StarryEyes.Models.Subsystems.Notifications.UI
             {
                 _lowPriorityQueue.AddLast(new NotificationData(SlimNotificationKind.New, status));
             }
-            OnNewNotificationDataQueued.SafeInvoke();
+            OnNewNotificationDataQueued?.Invoke();
         }
 
         public void MentionReceived(TwitterStatus status)
@@ -75,7 +69,7 @@ namespace StarryEyes.Models.Subsystems.Notifications.UI
             {
                 _highPriorityQueue.AddLast(new NotificationData(SlimNotificationKind.Mention, status));
             }
-            OnNewNotificationDataQueued.SafeInvoke();
+            OnNewNotificationDataQueued?.Invoke();
         }
 
         public void MessageReceived(TwitterStatus status)
@@ -84,7 +78,7 @@ namespace StarryEyes.Models.Subsystems.Notifications.UI
             {
                 _urgentPriorityQueue.AddLast(new NotificationData(SlimNotificationKind.Message, status));
             }
-            OnNewNotificationDataQueued.SafeInvoke();
+            OnNewNotificationDataQueued?.Invoke();
         }
 
         public void Followed(TwitterUser source, TwitterUser target)
@@ -93,7 +87,7 @@ namespace StarryEyes.Models.Subsystems.Notifications.UI
             {
                 _middlePriorityQueue.AddLast(new NotificationData(SlimNotificationKind.Follow, source, target));
             }
-            OnNewNotificationDataQueued.SafeInvoke();
+            OnNewNotificationDataQueued?.Invoke();
         }
 
         public void Favorited(TwitterUser source, TwitterStatus target)
@@ -102,7 +96,7 @@ namespace StarryEyes.Models.Subsystems.Notifications.UI
             {
                 _middlePriorityQueue.AddLast(new NotificationData(SlimNotificationKind.Favorite, source, target));
             }
-            OnNewNotificationDataQueued.SafeInvoke();
+            OnNewNotificationDataQueued?.Invoke();
         }
 
         public void Retweeted(TwitterUser source, TwitterStatus original, TwitterStatus retweet)
@@ -111,7 +105,7 @@ namespace StarryEyes.Models.Subsystems.Notifications.UI
             {
                 _middlePriorityQueue.AddLast(new NotificationData(SlimNotificationKind.Retweet, source, original));
             }
-            OnNewNotificationDataQueued.SafeInvoke();
+            OnNewNotificationDataQueued?.Invoke();
         }
     }
 

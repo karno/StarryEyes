@@ -10,7 +10,6 @@ using System.Threading;
 using System.Windows;
 using System.Xaml;
 using Cadena.Data;
-using StarryEyes.Albireo.Helpers;
 using StarryEyes.Filters;
 using StarryEyes.Filters.Expressions;
 using StarryEyes.Filters.Parsing;
@@ -39,8 +38,8 @@ namespace StarryEyes.Settings
 
         internal static IEnumerable<ColumnDescription> Columns
         {
-            get { return _columns.Value ?? GenerateEmptyTabs(); }
-            set { _columns.Value = value.Guard().ToArray(); }
+            get => _columns.Value ?? GenerateEmptyTabs();
+            set => _columns.Value = value.Guard().ToArray();
         }
 
         private static IEnumerable<ColumnDescription> GenerateEmptyTabs()
@@ -79,10 +78,7 @@ namespace StarryEyes.Settings
 
         private static AccountManager _manager;
 
-        public static AccountManager Accounts
-        {
-            get { return _manager; }
-        }
+        public static AccountManager Accounts => _manager;
 
         public static readonly SettingItem<string> GlobalConsumerKey =
             new SettingItem<string>("GlobalConsumerKey", null);
@@ -379,21 +375,17 @@ namespace StarryEyes.Settings
         public class FilterSettingItem
         {
             private readonly bool _autoSave;
-            private readonly string _name;
             private Func<TwitterStatus, bool> _evaluatorCache;
 
             private FilterExpressionRoot _expression;
 
             public FilterSettingItem(string name, bool autoSave = true)
             {
-                _name = name;
+                Name = name;
                 _autoSave = autoSave;
             }
 
-            public string Name
-            {
-                get { return _name; }
-            }
+            public string Name { get; }
 
             public FilterExpressionRoot Value
             {
@@ -424,7 +416,7 @@ namespace StarryEyes.Settings
                     {
                         Save();
                     }
-                    ValueChanged.SafeInvoke(value);
+                    ValueChanged?.Invoke(value);
                 }
             }
 
@@ -443,27 +435,19 @@ namespace StarryEyes.Settings
                 Value = QueryCompiler.CompileFilters(Value.ToQuery() + " | " + query);
             }
 
-            public Func<TwitterStatus, bool> Evaluator
-            {
-                get { return _evaluatorCache ?? (_evaluatorCache = Value.GetEvaluator()); }
-            }
+            public Func<TwitterStatus, bool> Evaluator => _evaluatorCache ?? (_evaluatorCache = Value.GetEvaluator());
 
             public event Action<FilterExpressionBase> ValueChanged;
         }
 
         public abstract class SettingItemBase<T>
         {
-            private readonly string _name;
-
             public SettingItemBase(string name)
             {
-                _name = name;
+                Name = name;
             }
 
-            public string Name
-            {
-                get { return _name; }
-            }
+            public string Name { get; }
 
             public abstract T Value { get; set; }
 
@@ -471,7 +455,7 @@ namespace StarryEyes.Settings
 
             protected void RaiseValueChanged(T value)
             {
-                ValueChanged.SafeInvoke(value);
+                ValueChanged?.Invoke(value);
             }
 
             public IDisposable ListenValueChanged(Action<T> listener)
@@ -569,10 +553,7 @@ namespace StarryEyes.Settings
 
         public static bool IsLoaded { get; private set; }
 
-        private static string BackupFilePath
-        {
-            get { return App.ConfigurationFilePath + ".bak"; }
-        }
+        private static string BackupFilePath => App.ConfigurationFilePath + ".bak";
 
         #region Load settings
 
@@ -624,6 +605,7 @@ namespace StarryEyes.Settings
                 }
                 catch (Exception)
                 {
+                    // ignored
                 }
             }
 

@@ -6,7 +6,6 @@ using System.Reactive.Disposables;
 using System.Reactive.Subjects;
 using System.Threading;
 using JetBrains.Annotations;
-using StarryEyes.Albireo.Helpers;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Timelines.Tabs;
 using StarryEyes.Nightmare.Windows;
@@ -65,14 +64,14 @@ namespace StarryEyes.Models
 
         public static void SetFocusTo(FocusRequest req)
         {
-            FocusRequested.SafeInvoke(req);
+            FocusRequested?.Invoke(req);
         }
 
         public static event Action<TimelineFocusRequest> TimelineFocusRequested;
 
         public static void SetTimelineFocusTo(TimelineFocusRequest req)
         {
-            TimelineFocusRequested.SafeInvoke(req);
+            TimelineFocusRequested?.Invoke(req);
         }
 
         #endregion Focus and timeline action control
@@ -116,7 +115,7 @@ namespace StarryEyes.Models
 
         private static void RaiseStateStringChanged()
         {
-            StateStringChanged.SafeInvoke();
+            StateStringChanged?.Invoke();
         }
 
         #endregion State control
@@ -139,7 +138,7 @@ namespace StarryEyes.Models
 
         public static void ExecuteAccountSelectAction(AccountSelectDescription desc)
         {
-            AccountSelectActionRequested.SafeInvoke(desc);
+            AccountSelectActionRequested?.Invoke(desc);
         }
 
         #endregion Account selection
@@ -148,7 +147,7 @@ namespace StarryEyes.Models
 
         public static void SetShowMainWindowCommands(bool show)
         {
-            WindowCommandsDisplayChanged.SafeInvoke(show);
+            WindowCommandsDisplayChanged?.Invoke(show);
         }
 
         public static event Action<Tuple<TabModel, ISubject<Unit>>> TabConfigureRequested;
@@ -189,7 +188,7 @@ namespace StarryEyes.Models
 
         public static void TransitionBackstage(bool open)
         {
-            BackstageTransitionRequested.SafeInvoke(open);
+            BackstageTransitionRequested?.Invoke(open);
         }
 
         private static readonly ConcurrentQueue<TaskDialogOptions> _taskDialogQueue =
@@ -203,7 +202,7 @@ namespace StarryEyes.Models
             {
                 _taskDialogQueue.Enqueue(options);
             }
-            TaskDialogRequested.SafeInvoke(options);
+            TaskDialogRequested?.Invoke(options);
         }
     }
 

@@ -11,11 +11,11 @@
         <SolidColorBrush x:Key="ButtonMouseOverInnerBorderBrush" Color="{DynamicResource BaseColorForeground}" />
         <SolidColorBrush x:Key="ComboBoxMouseOverBorderBrush" Color="{DynamicResource BaseColorForeground}" />
         <SolidColorBrush x:Key="ComboBoxMouseOverInnerBorderBrush" Color="{DynamicResource BaseColorForeground}" />
-        
-        
+
+
         <SolidColorBrush x:Key="CheckBoxBackgroundBrush" Color="{DynamicResource BaseColorBackground}" />
         <SolidColorBrush x:Key="CheckBoxMouseOverBrush" Color="{DynamicResource BaseColorBackground}" />
-        
+
         <SolidColorBrush x:Key="FlatButtonPressedBackgroundBrush" Color="#222222" />
     -->
     <!--  Window Backgrounds  -->

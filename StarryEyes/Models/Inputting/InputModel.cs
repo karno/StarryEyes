@@ -5,7 +5,6 @@ using System.Reactive.Disposables;
 using Cadena.Data;
 using JetBrains.Annotations;
 using Livet.EventListeners;
-using StarryEyes.Albireo.Helpers;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Databases;
 using StarryEyes.Models.Receiving.Handling;
@@ -60,9 +59,9 @@ namespace StarryEyes.Models.Inputting
 
         private static void SetEventPropagation()
         {
-            _core.SetCursorRequest += arg => SetCursorRequest.SafeInvoke(arg);
-            _core.FocusRequest += () => FocusRequest.SafeInvoke();
-            _core.CloseRequest += () => CloseRequest.SafeInvoke();
+            _core.SetCursorRequest += arg => SetCursorRequest?.Invoke(arg);
+            _core.FocusRequest += () => FocusRequest?.Invoke();
+            _core.CloseRequest += () => CloseRequest?.Invoke();
         }
 
         internal static event Action<CursorPosition> SetCursorRequest;

@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Livet;
-using StarryEyes.Albireo;
-using StarryEyes.Albireo.Helpers;
 using StarryEyes.Models.Inputting;
 using StarryEyes.Settings;
 
@@ -13,22 +11,14 @@ namespace StarryEyes.Models.Timelines.Tabs
     {
         private static readonly Stack<TabModel> _closedTabsStack = new Stack<TabModel>();
 
-        private static readonly ObservableSynchronizedCollectionEx<ColumnModel> _columns =
-            new ObservableSynchronizedCollectionEx<ColumnModel>();
-
         private static int _currentFocusColumnIndex;
 
-        public static bool CanReviveTab
-        {
-            get { return _closedTabsStack.Count > 0; }
-        }
+        public static bool CanReviveTab => _closedTabsStack.Count > 0;
 
         public static event Action CurrentFocusColumnChanged;
 
-        public static ObservableSynchronizedCollectionEx<ColumnModel> Columns
-        {
-            get { return _columns; }
-        }
+        public static ObservableSynchronizedCollectionEx<ColumnModel> Columns { get; } =
+            new ObservableSynchronizedCollectionEx<ColumnModel>();
 
         static TabManager()
         {
@@ -90,7 +80,7 @@ namespace StarryEyes.Models.Timelines.Tabs
         /// </summary>
         public static int CurrentFocusColumnIndex
         {
-            get { return _currentFocusColumnIndex; }
+            get => _currentFocusColumnIndex;
             set
             {
                 if (_currentFocusColumnIndex == value) return;
@@ -111,16 +101,13 @@ namespace StarryEyes.Models.Timelines.Tabs
             {
                 InputModel.AccountSelector.CurrentFocusTab = col.Tabs[col.CurrentFocusTabIndex];
             }
-            CurrentFocusColumnChanged.SafeInvoke();
+            CurrentFocusColumnChanged?.Invoke();
         }
 
         /// <summary>
         ///     Check revivable tab is existed in closed tabs stack.
         /// </summary>
-        public static bool IsRevivableTabExsted
-        {
-            get { return _closedTabsStack.Count > 0; }
-        }
+        public static bool IsRevivableTabExsted => _closedTabsStack.Count > 0;
 
         /// <summary>
         ///     Get column info datas for persistence.
@@ -231,7 +218,7 @@ namespace StarryEyes.Models.Timelines.Tabs
             // ReSharper disable LocalizableElement
             if (columnIndex > Columns.Count) // column index is only for existed or new column
                 throw new ArgumentOutOfRangeException(
-                    "columnIndex",
+                    nameof(columnIndex),
                     "currently " + Columns.Count +
                     " columns are existed. so, you can't set this parameter as " +
                     columnIndex + ".");
@@ -332,7 +319,6 @@ namespace StarryEyes.Models.Timelines.Tabs
                     if (ccolumn.Tabs.Count == 0) return;
                     CloseTab(CurrentFocusColumnIndex, ccolumn.CurrentFocusTabIndex);
                 }));
-
         }
 
         /// <summary>
@@ -341,10 +327,10 @@ namespace StarryEyes.Models.Timelines.Tabs
         public static void CleanupColumn()
         {
             Columns.Select((c, i) => new { Column = c, Index = i })
-                .Where(t => t.Column.Tabs.Count == 0)
-                .Select(t => t.Index)
-                .OrderByDescending(i => i)
-                .ForEach(CloseColumn);
+                   .Where(t => t.Column.Tabs.Count == 0)
+                   .Select(t => t.Index)
+                   .OrderByDescending(i => i)
+                   .ForEach(CloseColumn);
             if (Columns.Count == 0)
             {
                 Columns.Add(new ColumnModel(Enumerable.Empty<TabModel>()));

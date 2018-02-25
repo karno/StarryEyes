@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using StarryEyes.Albireo.Helpers;
 using StarryEyes.Models.Accounting;
 
 namespace StarryEyes.Filters.Expressions.Values.Locals
@@ -43,7 +42,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
 
         protected void RaiseReapplyFilter(RelationDataChangedInfo relInfo)
         {
-            ReapplyRequested.SafeInvoke(relInfo);
+            ReapplyRequested?.Invoke(relInfo);
         }
 
         public event Action<RelationDataChangedInfo> ReapplyRequested;

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using StarryEyes.Albireo.Helpers;
 using StarryEyes.Casket;
 using StarryEyes.Models.Databases;
 
@@ -31,21 +30,12 @@ namespace StarryEyes.Models.Subsystems
         /// <summary>
         ///     Gross tweet count (ESTIMATED, not ACTUAL)
         /// </summary>
-        public static int EstimatedGrossTweetCount
-        {
-            get { return _estimatedGrossTweetCount; }
-        }
+        public static int EstimatedGrossTweetCount => _estimatedGrossTweetCount;
 
         /// <summary>
         ///     Tweets per seconds, estimated.
         /// </summary>
-        public static int TweetsPerMinutes
-        {
-            get
-            {
-                return _tweetsPerMinutes;
-            }
-        }
+        public static int TweetsPerMinutes => _tweetsPerMinutes;
 
         public static void Initialize()
         {
@@ -59,7 +49,7 @@ namespace StarryEyes.Models.Subsystems
                       });
             App.ApplicationFinalize += StopThread;
             Task.Factory.StartNew(UpdateStatisticWorkProc, TaskCreationOptions.LongRunning);
-            Task.Run(() => UpdateTweetCount());
+            Task.Run(UpdateTweetCount);
         }
 
         private static async Task UpdateTweetCount()
@@ -69,8 +59,12 @@ namespace StarryEyes.Models.Subsystems
                 var dbcount = (int)(await StatusProxy.GetCountAsync().ConfigureAwait(false));
                 _estimatedGrossTweetCount = dbcount + _queuedStatusesCount;
             }
-            catch (SqliteCrudException) { }
-            catch (SQLiteException) { }
+            catch (SqliteCrudException)
+            {
+            }
+            catch (SQLiteException)
+            {
+            }
         }
 
         private static void StopThread()
@@ -114,7 +108,7 @@ namespace StarryEyes.Models.Subsystems
 
                 Interlocked.Exchange(ref _tweetsPerMinutes, _tweetsCountArray.Sum());
 
-                StatisticsParamsUpdated.SafeInvoke();
+                StatisticsParamsUpdated?.Invoke();
             }
         }
 

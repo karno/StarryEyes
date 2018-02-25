@@ -9,7 +9,6 @@ using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using StarryEyes.Albireo.Helpers;
 using StarryEyes.Globalization.Models;
 using StarryEyes.Models.Backstages.NotificationEvents;
 using StarryEyes.Settings;
@@ -24,22 +23,16 @@ namespace StarryEyes.Models.Subsystems
 {
     public static class AutoUpdateService
     {
-        private static bool _isUpdateNotified = false;
+        private static bool _isUpdateNotified;
 
         private static string _patcherUri;
         private static string _patcherSignUri;
 
         public static event Action UpdateStateChanged;
 
-        private static string ExecutablePath
-        {
-            get { return Path.Combine(App.LocalUpdateStorePath, App.UpdaterFileName); }
-        }
+        private static string ExecutablePath => Path.Combine(App.LocalUpdateStorePath, App.UpdaterFileName);
 
-        private static string PostUpdateFilePath
-        {
-            get { return Path.Combine(App.LocalUpdateStorePath, App.PostUpdateFileName); }
-        }
+        private static string PostUpdateFilePath => Path.Combine(App.LocalUpdateStorePath, App.PostUpdateFileName);
 
         public static bool IsUpdateBinaryExisted()
         {
@@ -62,14 +55,11 @@ namespace StarryEyes.Models.Subsystems
                     verXml = await http.GetStringAsync(App.RemoteVersionXml);
                 }
                 var xdoc = XDocument.Load(new StringReader(verXml));
-                if (xdoc.Root == null)
-                {
-                    throw new Exception("could not read definition xml.");
-                }
-                _patcherUri = xdoc.Root.Attribute("patcher").Value;
-                _patcherSignUri = xdoc.Root.Attribute("sign").Value;
+                _patcherUri = xdoc.Root?.Attribute("patcher")?.Value ??
+                              throw new Exception("could not read definition xml.");
+                _patcherSignUri = xdoc.Root.Attribute("sign")?.Value;
                 var releases = xdoc.Root.Descendants("release");
-                var latest = releases.Select(r => Version.Parse(r.Attribute("version").Value))
+                var latest = releases.Select(r => Version.Parse(r?.Attribute("version")?.Value ?? "0.0"))
                                      .Where(v => Setting.AcceptUnstableVersion.Value || v.Revision <= 0)
                                      .OrderByDescending(v => v)
                                      .FirstOrDefault();
@@ -117,7 +107,7 @@ namespace StarryEyes.Models.Subsystems
                         }
                         File.WriteAllBytes(ExecutablePath, patcher);
                     }
-                    UpdateStateChanged.SafeInvoke();
+                    UpdateStateChanged?.Invoke();
                     return true;
                 }
                 catch
@@ -128,6 +118,7 @@ namespace StarryEyes.Models.Subsystems
                     }
                     catch
                     {
+                        // ignored
                     }
                     throw;
                 }
@@ -167,7 +158,7 @@ namespace StarryEyes.Models.Subsystems
                 {
                     Arguments = args,
                     UseShellExecute = true,
-                    WorkingDirectory = App.LocalUpdateStorePath,
+                    WorkingDirectory = App.LocalUpdateStorePath
                 };
                 MainWindowModel.SuppressCloseConfirmation = true;
                 Process.Start(startInfo);
@@ -194,6 +185,7 @@ namespace StarryEyes.Models.Subsystems
                 }
                 catch
                 {
+                    // ignored
                 }
             }
         }
@@ -292,7 +284,6 @@ namespace StarryEyes.Models.Subsystems
                                 {
                                     // update immediately
                                     StartUpdate(App.Version);
-
                                 }
                                 return false;
                             }

@@ -7,7 +7,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Cadena.Data;
 using Livet;
-using StarryEyes.Albireo.Helpers;
 using StarryEyes.Models.Receiving;
 using StarryEyes.Models.Receiving.Handling;
 using StarryEyes.Models.Timelines.Statuses;
@@ -31,25 +30,22 @@ namespace StarryEyes.Models.Timelines
 
         public bool IsLoading
         {
-            get { return _isLoading; }
+            get => _isLoading;
             protected set
             {
                 if (_isLoading == value) return;
                 _isLoading = value;
-                IsLoadingChanged.SafeInvoke(value);
+                IsLoadingChanged?.Invoke(value);
             }
         }
 
         public event Action<bool> IsLoadingChanged;
 
-        public ObservableSynchronizedCollectionEx<StatusModel> Statuses
-        {
-            get { return _statuses; }
-        }
+        public ObservableSynchronizedCollectionEx<StatusModel> Statuses => _statuses;
 
         public bool IsAutoTrimEnabled
         {
-            get { return _isAutoTrimEnabled; }
+            get => _isAutoTrimEnabled;
             set
             {
                 if (value == IsAutoTrimEnabled)
@@ -77,19 +73,15 @@ namespace StarryEyes.Models.Timelines
         /// </summary>
         protected bool IsSubscribeBroadcaster
         {
-            get { return _timelineListener != null; }
+            get => _timelineListener != null;
             set
             {
                 if (value == IsSubscribeBroadcaster) return;
                 var ncd = value ? new CompositeDisposable() : null;
                 var old = Interlocked.Exchange(ref _timelineListener, ncd);
-                if (old != null)
-                {
-                    old.Dispose();
-                }
-                if (ncd == null) return;
+                old?.Dispose();
                 // create timeline composition
-                ncd.Add(StatusBroadcaster.BroadcastPoint.Subscribe(AcceptStatus));
+                ncd?.Add(StatusBroadcaster.BroadcastPoint.Subscribe(AcceptStatus));
             }
         }
 
@@ -297,7 +289,7 @@ namespace StarryEyes.Models.Timelines
 
         public void RequestFocus()
         {
-            FocusRequired.SafeInvoke();
+            FocusRequired?.Invoke();
         }
 
         #endregion Focusing

@@ -311,11 +311,14 @@ namespace StarryEyes
             }
         }
 
-        public static bool IsMulticoreJitEnabled => ConfigurationManager.AppSettings["UseMulticoreJIT"].ToLower() !=
-                                                    "none";
+        public static bool IsMulticoreJitEnabled =>
+            ConfigurationManager.AppSettings["UseMulticoreJIT"].ToLower() != "none";
 
-        public static bool IsHardwareRenderingEnabled => ConfigurationManager
-                                                             .AppSettings["UseHardwareRendering"].ToLower() != "none";
+        public static bool IsHardwareRenderingEnabled =>
+            ConfigurationManager.AppSettings["UseHardwareRendering"].ToLower() != "none";
+
+        public static bool IsUnlockSafeModeForNewApiPolicy =>
+            ConfigurationManager.AppSettings["UnlockSafeModeForNewApiPolicy"].ToLower() == "yes";
 
         public static string ConfigurationDirectoryPath
         {

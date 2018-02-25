@@ -68,9 +68,8 @@ namespace StarryEyes.Models
             var writer = _writer;
             try
             {
-                writer?.Invoke(DateTime.Now.ToString("yy/MM/dd HH:mm:ss") + " > " +
-                               String.Format("{0,-7}", tag) +
-                               " " + log);
+                writer?.Invoke(
+                    $"{DateTime.Now:yy/MM/dd HH:mm:ss} > {tag,-7} {log}");
             }
             // ReSharper disable once EmptyGeneralCatchClause
             catch

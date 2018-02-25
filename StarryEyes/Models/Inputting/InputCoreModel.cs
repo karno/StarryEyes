@@ -134,10 +134,10 @@ namespace StarryEyes.Models.Inputting
                 Accounts = infos,
                 InReplyTo = inReplyTo
             };
-            SetCursorRequest.SafeInvoke(cursor ?? CursorPosition.End);
+            SetCursorRequest?.Invoke(cursor ?? CursorPosition.End);
             if (focusToInputArea)
             {
-                FocusRequest.SafeInvoke();
+                FocusRequest?.Invoke();
             }
         }
 
@@ -154,7 +154,7 @@ namespace StarryEyes.Models.Inputting
             // because text is always empty, setting cursor position can be skipped.
             if (focusToInputArea)
             {
-                FocusRequest.SafeInvoke();
+                FocusRequest?.Invoke();
             }
         }
 
@@ -181,7 +181,7 @@ namespace StarryEyes.Models.Inputting
 
         public void Close()
         {
-            CloseRequest.SafeInvoke();
+            CloseRequest?.Invoke();
         }
     }
 }

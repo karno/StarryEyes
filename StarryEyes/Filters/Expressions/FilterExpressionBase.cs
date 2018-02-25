@@ -1,6 +1,5 @@
 ﻿using System;
 using Cadena.Data;
-using StarryEyes.Albireo.Helpers;
 using StarryEyes.Casket;
 using StarryEyes.Filters.Expressions.Operators;
 
@@ -30,7 +29,7 @@ namespace StarryEyes.Filters.Expressions
 
         protected void RaiseInvalidateFilter()
         {
-            InvalidateRequested.SafeInvoke();
+            InvalidateRequested?.Invoke();
         }
     }
 
@@ -55,7 +54,7 @@ namespace StarryEyes.Filters.Expressions
 
         public FilterOperatorBase Operator
         {
-            get { return _operator; }
+            get => _operator;
             set
             {
                 if (_operator != null)
@@ -83,18 +82,12 @@ namespace StarryEyes.Filters.Expressions
 
         public override void BeginLifecycle()
         {
-            if (Operator != null)
-            {
-                Operator.BeginLifecycle();
-            }
+            Operator?.BeginLifecycle();
         }
 
         public override void EndLifecycle()
         {
-            if (Operator != null)
-            {
-                Operator.EndLifecycle();
-            }
+            Operator?.EndLifecycle();
         }
     }
 }

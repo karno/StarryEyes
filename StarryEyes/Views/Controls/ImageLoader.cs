@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
@@ -21,10 +20,9 @@ namespace StarryEyes.Views.Controls
 
         private const int LoadTimeoutMillisec = 3000;
 
-        private static readonly Timer _expirationTimer;
-
         // Image process parameters
         private const int MaxLoadQueueSize = 256;
+
         private const int MaxDecodeQueueSize = 512;
         private const int MaxApplyImagePerOnce = 16;
         private const ImageProcessStrategy LoadStrategy = ImageProcessStrategy.LifoStack;
@@ -32,9 +30,9 @@ namespace StarryEyes.Views.Controls
 
         static ImageLoader()
         {
-            _expirationTimer = new Timer(_ => RemoveExpiredCaches(), null,
+            var expirationTimer = new Timer(_ => RemoveExpiredCaches(), null,
                 TimeSpan.FromMinutes(5), TimeSpan.FromMinutes(5));
-            App.ApplicationFinalize += () => _expirationTimer.Dispose();
+            App.ApplicationFinalize += () => expirationTimer.Dispose();
             StartDecodeThread();
         }
 
@@ -48,7 +46,7 @@ namespace StarryEyes.Views.Controls
             return _specialTable.TryAdd(scheme, resolver);
         }
 
-        #endregion
+        #endregion Special resolver table
 
         #region Image cache
 
@@ -65,7 +63,7 @@ namespace StarryEyes.Views.Controls
         private static bool GetCache([CanBeNull] Uri uri, out byte[] cache)
         {
             cache = null;
-            if (uri == null) throw new ArgumentNullException("uri");
+            if (uri == null) throw new ArgumentNullException(nameof(uri));
             LinkedListNode<Tuple<Uri, byte[], DateTime>> data;
             lock (_cacheList)
             {
@@ -89,8 +87,9 @@ namespace StarryEyes.Views.Controls
             return true;
         }
 
-        private static void SetCache([CanBeNull] Uri uri, [CanBeNull]byte[] imageByte)
+        private static void SetCache([NotNull] Uri uri, [CanBeNull] byte[] imageByte)
         {
+            if (uri == null) throw new ArgumentNullException(nameof(uri));
             lock (_cacheList)
             {
                 // remove before adding data
@@ -134,7 +133,7 @@ namespace StarryEyes.Views.Controls
             }
         }
 
-        #endregion
+        #endregion Image cache
 
         #region Image Loader
 
@@ -259,8 +258,9 @@ namespace StarryEyes.Views.Controls
                 .ContinueWith(_ => RunNextLoadTask());
         }
 
-        private static async Task LoadBytes(Uri source)
+        private static async Task LoadBytes([NotNull] Uri source)
         {
+            if (source == null) throw new ArgumentNullException(nameof(source));
             var client = new HttpClient { Timeout = TimeSpan.FromMilliseconds(LoadTimeoutMillisec) };
             try
             {
@@ -380,7 +380,7 @@ namespace StarryEyes.Views.Controls
             }
         }
 
-        #endregion
+        #endregion Image Loader
 
         #region Image Decoder
 
@@ -523,7 +523,7 @@ namespace StarryEyes.Views.Controls
             }
         }
 
-        #endregion
+        #endregion Image Decoder
 
         #region Apply images on UI thread
 
@@ -579,7 +579,7 @@ namespace StarryEyes.Views.Controls
             }
         }
 
-        #endregion
+        #endregion Apply images on UI thread
 
         #region Wrapping Stream implementation
 
@@ -592,31 +592,21 @@ namespace StarryEyes.Views.Controls
 
             public WrappingStream([CanBeNull] Stream stream)
             {
-                if (stream == null) throw new ArgumentNullException("stream");
-                this._stream = stream;
+                _stream = stream ?? throw new ArgumentNullException(nameof(stream));
             }
 
-            public override bool CanRead
-            {
-                get { return this._stream != null && this._stream.CanRead; }
-            }
+            public override bool CanRead => _stream != null && _stream.CanRead;
 
-            public override bool CanSeek
-            {
-                get { return this._stream != null && this._stream.CanSeek; }
-            }
+            public override bool CanSeek => _stream != null && _stream.CanSeek;
 
-            public override bool CanWrite
-            {
-                get { return this._stream != null && this._stream.CanWrite; }
-            }
+            public override bool CanWrite => _stream != null && _stream.CanWrite;
 
             public override long Length
             {
                 get
                 {
-                    this.AssertDisposed();
-                    return this._stream.Length;
+                    AssertDisposed();
+                    return _stream.Length;
                 }
             }
 
@@ -624,104 +614,104 @@ namespace StarryEyes.Views.Controls
             {
                 get
                 {
-                    this.AssertDisposed();
-                    return this._stream.Position;
+                    AssertDisposed();
+                    return _stream.Position;
                 }
                 set
                 {
-                    this.AssertDisposed();
-                    this._stream.Position = value;
+                    AssertDisposed();
+                    _stream.Position = value;
                 }
             }
 
             public override IAsyncResult BeginRead(
                 byte[] buffer, int offset, int count, AsyncCallback callback, object state)
             {
-                this.AssertDisposed();
-                return this._stream.BeginRead(buffer, offset, count, callback, state);
+                AssertDisposed();
+                return _stream.BeginRead(buffer, offset, count, callback, state);
             }
 
             public override IAsyncResult BeginWrite(
                 byte[] buffer, int offset, int count, AsyncCallback callback, object state)
             {
-                this.AssertDisposed();
-                return this._stream.BeginWrite(buffer, offset, count, callback, state);
+                AssertDisposed();
+                return _stream.BeginWrite(buffer, offset, count, callback, state);
             }
 
             public override int EndRead(IAsyncResult asyncResult)
             {
-                this.AssertDisposed();
-                return this._stream.EndRead(asyncResult);
+                AssertDisposed();
+                return _stream.EndRead(asyncResult);
             }
 
             public override void EndWrite(IAsyncResult asyncResult)
             {
-                this.AssertDisposed();
-                this._stream.EndWrite(asyncResult);
+                AssertDisposed();
+                _stream.EndWrite(asyncResult);
             }
 
             public override void Flush()
             {
-                this.AssertDisposed();
-                this._stream.Flush();
+                AssertDisposed();
+                _stream.Flush();
             }
 
             public override int Read(byte[] buffer, int offset, int count)
             {
-                this.AssertDisposed();
-                return this._stream.Read(buffer, offset, count);
+                AssertDisposed();
+                return _stream.Read(buffer, offset, count);
             }
 
             public override int ReadByte()
             {
-                this.AssertDisposed();
-                return this._stream.ReadByte();
+                AssertDisposed();
+                return _stream.ReadByte();
             }
 
             public override long Seek(long offset, SeekOrigin origin)
             {
-                this.AssertDisposed();
-                return this._stream.Seek(offset, origin);
+                AssertDisposed();
+                return _stream.Seek(offset, origin);
             }
 
             public override void SetLength(long value)
             {
-                this.AssertDisposed();
-                this._stream.SetLength(value);
+                AssertDisposed();
+                _stream.SetLength(value);
             }
 
             public override void Write(byte[] buffer, int offset, int count)
             {
-                this.AssertDisposed();
-                this._stream.Write(buffer, offset, count);
+                AssertDisposed();
+                _stream.Write(buffer, offset, count);
             }
 
             public override void WriteByte(byte value)
             {
-                this.AssertDisposed();
-                this._stream.WriteByte(value);
+                AssertDisposed();
+                _stream.WriteByte(value);
             }
 
             protected override void Dispose(bool disposing)
             {
                 if (disposing)
                 {
-                    this._stream.Dispose();
-                    this._stream = null;
+                    _stream.Dispose();
+                    _stream = null;
                 }
                 base.Dispose(disposing);
             }
 
             private void AssertDisposed()
             {
-                if (this._stream == null)
+                if (_stream == null)
                 {
                     throw new ObjectDisposedException(GetType().Name);
                 }
             }
         }
 
-        #endregion
+        #endregion Wrapping Stream implementation
 
         private static readonly ConcurrentDictionary<Guid, Tuple<IImageVisual, Uri, int, int>> _visualTable =
             new ConcurrentDictionary<Guid, Tuple<IImageVisual, Uri, int, int>>();

@@ -50,25 +50,25 @@ namespace StarryEyes.Models.Receiving
             {
                 InvalidateMute();
                 System.Diagnostics.Debug.WriteLine("#INVALIDATION from mute word updated.");
-                RefreshTimelineRequired.SafeInvoke();
+                RefreshTimelineRequired?.Invoke();
             };
             Setting.MuteBlockingUsers.ValueChanged += _ =>
             {
                 _muteBlockedUsers = Setting.MuteBlockingUsers.Value;
                 System.Diagnostics.Debug.WriteLine("#INVALIDATION from mute user updated.");
-                RefreshTimelineRequired.SafeInvoke();
+                RefreshTimelineRequired?.Invoke();
             };
             Setting.MuteNoRetweets.ValueChanged += _ =>
             {
                 _muteNoRetweets = Setting.MuteNoRetweets.Value;
                 System.Diagnostics.Debug.WriteLine("#INVALIDATION from mute no retweets updated.");
-                RefreshTimelineRequired.SafeInvoke();
+                RefreshTimelineRequired?.Invoke();
             };
             Setting.MuteOfficialMutes.ValueChanged += _ =>
             {
                 _muteOfficialMutes = Setting.MuteOfficialMutes.Value;
                 System.Diagnostics.Debug.WriteLine("#INVALIDATION from official mute updated.");
-                RefreshTimelineRequired.SafeInvoke();
+                RefreshTimelineRequired?.Invoke();
             };
             // initialize value
             _muteBlockedUsers = Setting.MuteBlockingUsers.Value;

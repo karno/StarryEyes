@@ -1,7 +1,5 @@
 ﻿using System;
 using Livet;
-using StarryEyes.Albireo;
-using StarryEyes.Albireo.Helpers;
 using StarryEyes.Models;
 using StarryEyes.Views.Messaging;
 
@@ -12,9 +10,10 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         public event Action Closed;
 
         private bool _isVisible;
+
         public bool IsVisible
         {
-            get { return _isVisible; }
+            get => _isVisible;
             set
             {
                 _isVisible = value;
@@ -22,10 +21,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             }
         }
 
-        protected virtual bool IsWindowCommandsRelated
-        {
-            get { return true; }
-        }
+        protected virtual bool IsWindowCommandsRelated => true;
 
         public virtual void Open()
         {
@@ -35,19 +31,19 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 MainWindowModel.SetShowMainWindowCommands(false);
             }
             IsVisible = true;
-            this.Messenger.RaiseSafe(() => new GoToStateMessage("Open"));
+            Messenger.RaiseSafe(() => new GoToStateMessage("Open"));
         }
 
         public virtual void Close()
         {
             if (!IsVisible) return;
             IsVisible = false;
-            this.Messenger.RaiseSafe(() => new GoToStateMessage("Close"));
+            Messenger.RaiseSafe(() => new GoToStateMessage("Close"));
             if (IsWindowCommandsRelated)
             {
                 MainWindowModel.SetShowMainWindowCommands(true);
             }
-            this.Closed.SafeInvoke();
+            Closed?.Invoke();
         }
     }
 }

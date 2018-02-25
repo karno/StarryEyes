@@ -1,6 +1,4 @@
 ﻿using System;
-using StarryEyes.Albireo;
-using StarryEyes.Albireo.Helpers;
 
 namespace StarryEyes.Models
 {
@@ -10,7 +8,7 @@ namespace StarryEyes.Models
 
         public static void RequestSearch(string query, SearchMode mode)
         {
-            SearchRequested.SafeInvoke(query, mode);
+            SearchRequested?.Invoke(query, mode);
         }
     }
 
@@ -20,6 +18,6 @@ namespace StarryEyes.Models
         Local,
         Web,
         UserWeb,
-        UserScreenName,
+        UserScreenName
     }
 }

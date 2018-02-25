@@ -6,7 +6,6 @@ using System.Reactive.Threading.Tasks;
 using Cadena.Data;
 using JetBrains.Annotations;
 using StarryEyes.Albireo.Collections;
-using StarryEyes.Albireo.Helpers;
 using StarryEyes.Filters;
 using StarryEyes.Filters.Expressions;
 using StarryEyes.Filters.Parsing;
@@ -112,8 +111,8 @@ namespace StarryEyes.Models.Timelines.Tabs
 
         public string Name
         {
-            get { return String.IsNullOrWhiteSpace(_name) ? EmptyTabName : _name; }
-            set { _name = value; }
+            get => String.IsNullOrWhiteSpace(_name) ? EmptyTabName : _name;
+            set => _name = value;
         }
 
         public ICollection<long> BindingAccounts => new NotifyCollection<long>(_bindingAccountIds,
@@ -133,7 +132,7 @@ namespace StarryEyes.Models.Timelines.Tabs
 
         private void OnUpdateBoundAccounts()
         {
-            BindingAccountsChanged.SafeInvoke();
+            BindingAccountsChanged?.Invoke();
             TabManager.Save();
         }
 
@@ -145,7 +144,7 @@ namespace StarryEyes.Models.Timelines.Tabs
 
         public string RawQueryString
         {
-            get { return _rawQueryString; }
+            get => _rawQueryString;
             set
             {
                 _rawQueryString = value;
@@ -170,6 +169,7 @@ namespace StarryEyes.Models.Timelines.Tabs
             }
             catch
             {
+                // ignored
             }
             RawQueryString = FilterQuery != null ? FilterQuery.ToQuery() : String.Empty;
             _isQueryStringValid = true;
@@ -212,7 +212,7 @@ namespace StarryEyes.Models.Timelines.Tabs
             var result = base.AddStatus(model, isNewArrival);
             if (result && isNewArrival)
             {
-                OnNewStatusArrival.SafeInvoke(model.Status);
+                OnNewStatusArrival?.Invoke(model.Status);
                 if (NotifyNewArrivals)
                 {
                     NotificationService.NotifyNewArrival(model.Status, this);

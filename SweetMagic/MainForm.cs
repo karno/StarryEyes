@@ -28,7 +28,7 @@ namespace SweetMagic
             var ver = Version.Parse(args[0]);
             var pubkey = File.ReadAllText(args[1]);
             var exec = new UpdateTaskExecutor(ver, pubkey, args[2], int.Parse(args[3]), args[0].Count(c => c == '.') == 3);
-            exec.OnNotifyProgress += str => this.Invoke(new Action(() => this.logField.AppendText(str)));
+            exec.OnNotifyProgress += str => Invoke(new Action(() => logField.AppendText(str)));
             Task.Run(async () =>
             {
                 try

@@ -1,8 +1,9 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:d="http://schemas.microsoft.com/expression/interactivedesigner/2006"
-                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                    mc:Ignorable="d">
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/interactivedesigner/2006"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
 
     <!--  SimpleStyles.XAML には、独自のコントロールを作成するための簡単な開始地点となるコントロール形式のセットが定義されています  -->
 
@@ -79,10 +80,11 @@
             <Setter.Value>
                 <ControlTemplate>
                     <Border>
-                        <Rectangle Margin="2"
-                                   Stroke="#60000000"
-                                   StrokeDashArray="1 2"
-                                   StrokeThickness="1" />
+                        <Rectangle
+                            Margin="2"
+                            Stroke="#60000000"
+                            StrokeDashArray="1 2"
+                            StrokeThickness="1" />
                     </Border>
                 </ControlTemplate>
             </Setter.Value>
@@ -90,9 +92,10 @@
     </Style>
 
     <!--  Simple Button - このコントロールは各状態のブラシを設定します。これらのブラシは、静的リソースであるため、上記のリストに含まれている必要があります  -->
-    <Style x:Key="SimpleButton"
-           BasedOn="{x:Null}"
-           TargetType="{x:Type Button}">
+    <Style
+        x:Key="SimpleButton"
+        BasedOn="{x:Null}"
+        TargetType="{x:Type Button}">
         <Setter Property="FocusVisualStyle" Value="{DynamicResource SimpleButtonFocusVisual}" />
         <Setter Property="Background" Value="{DynamicResource NormalBrush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource NormalBorderBrush}" />
@@ -102,18 +105,20 @@
 
                     <!--  グリッドは、より多くの要素を追加して簡単にボタンをカスタマイズできるため、ルートとして使用します  -->
                     <Grid x:Name="Grid">
-                        <Border x:Name="Border"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                Padding="{TemplateBinding Padding}" />
+                        <Border
+                            x:Name="Border"
+                            Padding="{TemplateBinding Padding}"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}" />
 
                         <!--  コンテンツ プレゼンターではテキスト コンテンツなどがコントロールに置き換えられます  -->
                         <!--  テンプレートを編集せずにコントロールをパラメーター化できるため、バインドが役立ちます  -->
-                        <ContentPresenter Margin="{TemplateBinding Padding}"
-                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                          RecognizesAccessKey="True" />
+                        <ContentPresenter
+                            Margin="{TemplateBinding Padding}"
+                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                            RecognizesAccessKey="True" />
                     </Grid>
 
                     <!--  各状態では、テンプレートの枠線にブラシが設定されます  -->
@@ -145,10 +150,11 @@
             <Setter.Value>
                 <ControlTemplate>
                     <Border>
-                        <Rectangle Margin="15,0,0,0"
-                                   Stroke="#60000000"
-                                   StrokeDashArray="1 2"
-                                   StrokeThickness="1" />
+                        <Rectangle
+                            Margin="15,0,0,0"
+                            Stroke="#60000000"
+                            StrokeDashArray="1 2"
+                            StrokeThickness="1" />
                     </Border>
                 </ControlTemplate>
             </Setter.Value>
@@ -160,10 +166,11 @@
             <Setter.Value>
                 <ControlTemplate>
                     <Border>
-                        <Rectangle Margin="15,0,0,0"
-                                   Stroke="#60000000"
-                                   StrokeDashArray="1 2"
-                                   StrokeThickness="1" />
+                        <Rectangle
+                            Margin="15,0,0,0"
+                            Stroke="#60000000"
+                            StrokeDashArray="1 2"
+                            StrokeThickness="1" />
                     </Border>
                 </ControlTemplate>
             </Setter.Value>
@@ -184,21 +191,24 @@
                     <BulletDecorator Background="Transparent">
                         <BulletDecorator.Bullet>
                             <Grid Width="13" Height="13">
-                                <Border x:Name="Border"
-                                        Background="{TemplateBinding Background}"
-                                        BorderBrush="{TemplateBinding BorderBrush}"
-                                        BorderThickness="{TemplateBinding BorderThickness}" />
-                                <Path x:Name="CheckMark"
-                                      Data="M 0 0 L 13 13 M 0 13 L 13 0"
-                                      SnapsToDevicePixels="False"
-                                      Stroke="{DynamicResource GlyphBrush}"
-                                      StrokeThickness="2" />
+                                <Border
+                                    x:Name="Border"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}" />
+                                <Path
+                                    x:Name="CheckMark"
+                                    Data="M 0 0 L 13 13 M 0 13 L 13 0"
+                                    SnapsToDevicePixels="False"
+                                    Stroke="{DynamicResource GlyphBrush}"
+                                    StrokeThickness="2" />
                             </Grid>
                         </BulletDecorator.Bullet>
-                        <ContentPresenter Margin="{TemplateBinding Padding}"
-                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                          RecognizesAccessKey="True" />
+                        <ContentPresenter
+                            Margin="{TemplateBinding Padding}"
+                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                            RecognizesAccessKey="True" />
                     </BulletDecorator>
 
                     <!--  これは  Visibility を使用して、IsChecked の CheckMark を表示および非表示にします  -->
@@ -238,19 +248,22 @@
                     <BulletDecorator Background="Transparent">
                         <BulletDecorator.Bullet>
                             <Grid Width="13" Height="13">
-                                <Ellipse x:Name="Ellipse_Border"
-                                         Fill="{TemplateBinding Background}"
-                                         Stroke="{TemplateBinding BorderBrush}"
-                                         StrokeThickness="1" />
-                                <Ellipse x:Name="CheckMark"
-                                         Margin="4"
-                                         Fill="{DynamicResource GlyphBrush}" />
+                                <Ellipse
+                                    x:Name="Ellipse_Border"
+                                    Fill="{TemplateBinding Background}"
+                                    Stroke="{TemplateBinding BorderBrush}"
+                                    StrokeThickness="1" />
+                                <Ellipse
+                                    x:Name="CheckMark"
+                                    Margin="4"
+                                    Fill="{DynamicResource GlyphBrush}" />
                             </Grid>
                         </BulletDecorator.Bullet>
-                        <ContentPresenter Margin="{TemplateBinding Padding}"
-                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                          RecognizesAccessKey="True" />
+                        <ContentPresenter
+                            Margin="{TemplateBinding Padding}"
+                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                            RecognizesAccessKey="True" />
                     </BulletDecorator>
 
                     <ControlTemplate.Triggers>
@@ -277,26 +290,29 @@
     </Style>
 
     <!--  Simple Repeat Button - これは Simple ScrollBar で上下のボタンとして使用されます  -->
-    <Style x:Key="SimpleRepeatButton"
-           BasedOn="{x:Null}"
-           TargetType="{x:Type RepeatButton}"
-           d:IsControlPart="True">
+    <Style
+        x:Key="SimpleRepeatButton"
+        d:IsControlPart="True"
+        BasedOn="{x:Null}"
+        TargetType="{x:Type RepeatButton}">
         <Setter Property="Background" Value="{DynamicResource NormalBrush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource NormalBorderBrush}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type RepeatButton}">
                     <Grid>
-                        <Border x:Name="Border"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}" />
-                        <ContentPresenter x:Name="ContentPresenter"
-                                          HorizontalAlignment="Center"
-                                          VerticalAlignment="Center"
-                                          Content="{TemplateBinding Content}"
-                                          ContentTemplate="{TemplateBinding ContentTemplate}"
-                                          ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}" />
+                        <Border
+                            x:Name="Border"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}" />
+                        <ContentPresenter
+                            x:Name="ContentPresenter"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}" />
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsKeyboardFocused" Value="true">
@@ -321,23 +337,25 @@
     </Style>
 
     <!--  Simple Thumb -  Simple Thumb は Simple ScrollBar のドラッグ可能な部分です  -->
-    <Style x:Key="SimpleThumbStyle"
-           BasedOn="{x:Null}"
-           TargetType="{x:Type Thumb}"
-           d:IsControlPart="True">
+    <Style
+        x:Key="SimpleThumbStyle"
+        d:IsControlPart="True"
+        BasedOn="{x:Null}"
+        TargetType="{x:Type Thumb}">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Thumb}">
                     <Grid x:Name="Grid" Margin="0,0,0,0">
-                        <Rectangle x:Name="Rectangle"
-                                   Width="Auto"
-                                   Height="Auto"
-                                   HorizontalAlignment="Stretch"
-                                   VerticalAlignment="Stretch"
-                                   Fill="{DynamicResource NormalBrush}"
-                                   RadiusX="2"
-                                   RadiusY="2"
-                                   Stroke="{DynamicResource NormalBorderBrush}" />
+                        <Rectangle
+                            x:Name="Rectangle"
+                            Width="Auto"
+                            Height="Auto"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch"
+                            Fill="{DynamicResource NormalBrush}"
+                            RadiusX="2"
+                            RadiusY="2"
+                            Stroke="{DynamicResource NormalBorderBrush}" />
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsFocused" Value="True" />
@@ -351,9 +369,10 @@
     </Style>
 
     <!--  Simple ScrollRepeatButton Style - この RepeatButton は Simple ScrollBar の Simple Thumb の上下で使用されます。Simple ScrollBar に重なって表示されないように透明に設定されています  -->
-    <Style x:Key="SimpleScrollRepeatButtonStyle"
-           TargetType="{x:Type RepeatButton}"
-           d:IsControlPart="True">
+    <Style
+        x:Key="SimpleScrollRepeatButtonStyle"
+        d:IsControlPart="True"
+        TargetType="{x:Type RepeatButton}">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderBrush" Value="Transparent" />
         <Setter Property="IsTabStop" Value="false" />
@@ -362,9 +381,10 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type RepeatButton}">
                     <Grid>
-                        <Rectangle Fill="{TemplateBinding Background}"
-                                   Stroke="{TemplateBinding BorderBrush}"
-                                   StrokeThickness="{TemplateBinding BorderThickness}" />
+                        <Rectangle
+                            Fill="{TemplateBinding Background}"
+                            Stroke="{TemplateBinding BorderBrush}"
+                            StrokeThickness="{TemplateBinding BorderThickness}" />
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
@@ -379,55 +399,63 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ScrollBar}">
-                    <Grid x:Name="GridRoot"
-                          Width="{DynamicResource {x:Static SystemParameters.VerticalScrollBarWidthKey}}"
-                          Background="{TemplateBinding Background}">
+                    <Grid
+                        x:Name="GridRoot"
+                        Width="{DynamicResource {x:Static SystemParameters.VerticalScrollBarWidthKey}}"
+                        Background="{TemplateBinding Background}">
                         <Grid.RowDefinitions>
                             <RowDefinition MaxHeight="18" />
                             <RowDefinition Height="0.00001*" />
                             <RowDefinition MaxHeight="18" />
                         </Grid.RowDefinitions>
 
-                        <RepeatButton x:Name="DecreaseRepeat"
-                                      Command="ScrollBar.LineUpCommand"
-                                      Style="{DynamicResource SimpleRepeatButton}">
+                        <RepeatButton
+                            x:Name="DecreaseRepeat"
+                            Command="ScrollBar.LineUpCommand"
+                            Style="{DynamicResource SimpleRepeatButton}">
                             <Grid>
-                                <Path x:Name="DecreaseArrow"
-                                      Data="M 0 4 L 8 4 L 4 0 Z"
-                                      Stroke="{TemplateBinding Foreground}"
-                                      StrokeThickness="1" />
+                                <Path
+                                    x:Name="DecreaseArrow"
+                                    Data="M 0 4 L 8 4 L 4 0 Z"
+                                    Stroke="{TemplateBinding Foreground}"
+                                    StrokeThickness="1" />
                             </Grid>
                         </RepeatButton>
 
                         <!--  Track は両端をジャンプしてスクロールする Thumb と Repeat Button のサイズを変更する特殊なレイアウト コンテナーです  -->
-                        <Track x:Name="PART_Track"
-                               Grid.Row="1"
-                               IsDirectionReversed="true"
-                               Orientation="Vertical">
+                        <Track
+                            x:Name="PART_Track"
+                            Grid.Row="1"
+                            IsDirectionReversed="true"
+                            Orientation="Vertical">
                             <Track.Thumb>
                                 <Thumb Style="{DynamicResource SimpleThumbStyle}" />
                             </Track.Thumb>
                             <Track.IncreaseRepeatButton>
-                                <RepeatButton x:Name="PageUp"
-                                              Command="ScrollBar.PageDownCommand"
-                                              Style="{DynamicResource SimpleScrollRepeatButtonStyle}" />
+                                <RepeatButton
+                                    x:Name="PageUp"
+                                    Command="ScrollBar.PageDownCommand"
+                                    Style="{DynamicResource SimpleScrollRepeatButtonStyle}" />
                             </Track.IncreaseRepeatButton>
                             <Track.DecreaseRepeatButton>
-                                <RepeatButton x:Name="PageDown"
-                                              Command="ScrollBar.PageUpCommand"
-                                              Style="{DynamicResource SimpleScrollRepeatButtonStyle}" />
+                                <RepeatButton
+                                    x:Name="PageDown"
+                                    Command="ScrollBar.PageUpCommand"
+                                    Style="{DynamicResource SimpleScrollRepeatButtonStyle}" />
                             </Track.DecreaseRepeatButton>
                         </Track>
 
-                        <RepeatButton x:Name="IncreaseRepeat"
-                                      Grid.Row="2"
-                                      Command="ScrollBar.LineDownCommand"
-                                      Style="{DynamicResource SimpleRepeatButton}">
+                        <RepeatButton
+                            x:Name="IncreaseRepeat"
+                            Grid.Row="2"
+                            Command="ScrollBar.LineDownCommand"
+                            Style="{DynamicResource SimpleRepeatButton}">
                             <Grid>
-                                <Path x:Name="IncreaseArrow"
-                                      Data="M 0 0 L 4 4 L 8 0 Z"
-                                      Stroke="{TemplateBinding Foreground}"
-                                      StrokeThickness="1" />
+                                <Path
+                                    x:Name="IncreaseArrow"
+                                    Data="M 0 0 L 4 4 L 8 0 Z"
+                                    Stroke="{TemplateBinding Foreground}"
+                                    StrokeThickness="1" />
                             </Grid>
                         </RepeatButton>
                     </Grid>
@@ -466,9 +494,10 @@
         ScrollViewer は、ContentPresenter と水平および垂直の ScrollBar を持つグリッド コントロールです
         これは、ListBox、MenuItem、ComboBox、および TreeView で使用されます
     -->
-    <Style x:Key="SimpleScrollViewer"
-           BasedOn="{x:Null}"
-           TargetType="{x:Type ScrollViewer}">
+    <Style
+        x:Key="SimpleScrollViewer"
+        BasedOn="{x:Null}"
+        TargetType="{x:Type ScrollViewer}">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ScrollViewer}">
@@ -481,38 +510,37 @@
                             <RowDefinition Height="*" />
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
-                        <ScrollContentPresenter Grid.Row="0"
-                                                Grid.Column="0"
-                                                Margin="{TemplateBinding Padding}"
-                                                CanContentScroll="{TemplateBinding CanContentScroll}"
-                                                Content="{TemplateBinding Content}"
-                                                ContentTemplate="{TemplateBinding ContentTemplate}" />
+                        <ScrollContentPresenter
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            Margin="{TemplateBinding Padding}"
+                            CanContentScroll="{TemplateBinding CanContentScroll}"
+                            Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}" />
 
                         <!--  ScrollBars の表示はコントロールの実装で制御されます  -->
-                        <ScrollBar x:Name="PART_HorizontalScrollBar"
-                                   Grid.Row="1"
-                                   Grid.Column="0"
-                                   Maximum="{TemplateBinding ScrollableWidth}"
-                                   Minimum="0"
-                                   Orientation="Horizontal"
-                                   Style="{DynamicResource SimpleScrollBar}"
-                                   ViewportSize="{TemplateBinding ViewportWidth}"
-                                   Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}"
-                                   Value="{Binding Path=HorizontalOffset,
-                                                   Mode=OneWay,
-                                                   RelativeSource={RelativeSource TemplatedParent}}" />
-                        <ScrollBar x:Name="PART_VerticalScrollBar"
-                                   Grid.Row="0"
-                                   Grid.Column="1"
-                                   Maximum="{TemplateBinding ScrollableHeight}"
-                                   Minimum="0"
-                                   Orientation="Vertical"
-                                   Style="{DynamicResource SimpleScrollBar}"
-                                   ViewportSize="{TemplateBinding ViewportHeight}"
-                                   Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"
-                                   Value="{Binding Path=VerticalOffset,
-                                                   Mode=OneWay,
-                                                   RelativeSource={RelativeSource TemplatedParent}}" />
+                        <ScrollBar
+                            x:Name="PART_HorizontalScrollBar"
+                            Grid.Row="1"
+                            Grid.Column="0"
+                            Maximum="{TemplateBinding ScrollableWidth}"
+                            Minimum="0"
+                            Orientation="Horizontal"
+                            Style="{DynamicResource SimpleScrollBar}"
+                            ViewportSize="{TemplateBinding ViewportWidth}"
+                            Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}"
+                            Value="{Binding Path=HorizontalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}" />
+                        <ScrollBar
+                            x:Name="PART_VerticalScrollBar"
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            Maximum="{TemplateBinding ScrollableHeight}"
+                            Minimum="0"
+                            Orientation="Vertical"
+                            Style="{DynamicResource SimpleScrollBar}"
+                            ViewportSize="{TemplateBinding ViewportHeight}"
+                            Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"
+                            Value="{Binding Path=VerticalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}" />
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
@@ -531,13 +559,15 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ListBox}">
                     <Grid>
-                        <Border x:Name="Border"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}" />
-                        <ScrollViewer Margin="1"
-                                      Background="{TemplateBinding Background}"
-                                      Focusable="false"
-                                      Style="{DynamicResource SimpleScrollViewer}">
+                        <Border
+                            x:Name="Border"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}" />
+                        <ScrollViewer
+                            Margin="1"
+                            Background="{TemplateBinding Background}"
+                            Focusable="false"
+                            Style="{DynamicResource SimpleScrollViewer}">
 
                             <!--  StackPanel  は IsItemsHost を True に設定することで子の表示に使用されます  -->
                             <StackPanel Margin="2" IsItemsHost="true" />
@@ -560,19 +590,21 @@
 
     <!--  Simple ListBoxItem - これは ListBox の各アイテムに使用されます。アイテムのコンテンツは ContentPresenter で配置されます  -->
 
-    <Style x:Key="SimpleListBoxItem"
-           TargetType="{x:Type ListBoxItem}"
-           d:IsControlPart="True">
+    <Style
+        x:Key="SimpleListBoxItem"
+        d:IsControlPart="True"
+        TargetType="{x:Type ListBoxItem}">
         <Setter Property="SnapsToDevicePixels" Value="true" />
         <Setter Property="OverridesDefaultStyle" Value="true" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ListBoxItem}">
                     <Grid SnapsToDevicePixels="true">
-                        <Border x:Name="Border"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}" />
+                        <Border
+                            x:Name="Border"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}" />
                         <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
                     </Grid>
                     <ControlTemplate.Triggers>
@@ -594,21 +626,24 @@
     <!--  Simple Expander ToggleButton - このボタンはExpander コントロールによって使用されます。オンとオフが切り替えられると、Up_Arrow と Down_Arrow の表示が切り替えられます  -->
     <ControlTemplate x:Key="ExpanderToggleButton" TargetType="{x:Type ToggleButton}">
         <Grid>
-            <Rectangle x:Name="Rectangle"
-                       Margin="0,0,0,0"
-                       Fill="Transparent"
-                       Stroke="{DynamicResource NormalBorderBrush}" />
-            <Path x:Name="Up_Arrow"
-                  HorizontalAlignment="Center"
-                  VerticalAlignment="Center"
-                  Data="M 0 0 L 4 4 L 8 0 Z"
-                  Fill="{DynamicResource GlyphBrush}" />
-            <Path x:Name="Down_Arrow"
-                  HorizontalAlignment="Center"
-                  VerticalAlignment="Center"
-                  Data="M 0 4 L 4 0 L 8 4 Z"
-                  Fill="{DynamicResource GlyphBrush}"
-                  Visibility="Collapsed" />
+            <Rectangle
+                x:Name="Rectangle"
+                Margin="0,0,0,0"
+                Fill="Transparent"
+                Stroke="{DynamicResource NormalBorderBrush}" />
+            <Path
+                x:Name="Up_Arrow"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Data="M 0 0 L 4 4 L 8 0 Z"
+                Fill="{DynamicResource GlyphBrush}" />
+            <Path
+                x:Name="Down_Arrow"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Data="M 0 4 L 4 0 L 8 4 Z"
+                Fill="{DynamicResource GlyphBrush}"
+                Visibility="Collapsed" />
         </Grid>
         <ControlTemplate.Triggers>
             <Trigger Property="IsMouseOver" Value="true">
@@ -646,40 +681,43 @@
                             <RowDefinition Height="Auto" />
                             <RowDefinition x:Name="ContentRow" Height="*" />
                         </Grid.RowDefinitions>
-                        <Border x:Name="Border"
-                                Grid.Row="0"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="2,2,0,0">
+                        <Border
+                            x:Name="Border"
+                            Grid.Row="0"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="2,2,0,0">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="20" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
-                                <ToggleButton Background="{DynamicResource NormalBrush}"
-                                              IsChecked="{Binding Path=IsExpanded,
-                                                                  Mode=TwoWay,
-                                                                  RelativeSource={RelativeSource TemplatedParent}}"
-                                              OverridesDefaultStyle="True"
-                                              Template="{DynamicResource ExpanderToggleButton}" />
-                                <ContentPresenter Grid.Column="1"
-                                                  Margin="4"
-                                                  ContentSource="Header"
-                                                  RecognizesAccessKey="True" />
+                                <ToggleButton
+                                    Background="{DynamicResource NormalBrush}"
+                                    IsChecked="{Binding Path=IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                    OverridesDefaultStyle="True"
+                                    Template="{DynamicResource ExpanderToggleButton}" />
+                                <ContentPresenter
+                                    Grid.Column="1"
+                                    Margin="4"
+                                    ContentSource="Header"
+                                    RecognizesAccessKey="True" />
                             </Grid>
                         </Border>
-                        <Border x:Name="ExpandSite"
-                                Grid.Row="1"
-                                Background="{DynamicResource WindowBackgroundBrush}"
-                                BorderBrush="{DynamicResource SolidBorderBrush}"
-                                BorderThickness="1,0,1,1"
-                                CornerRadius="0,0,2,2"
-                                Visibility="Collapsed">
-                            <ContentPresenter Margin="{TemplateBinding Padding}"
-                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                              Focusable="false" />
+                        <Border
+                            x:Name="ExpandSite"
+                            Grid.Row="1"
+                            Background="{DynamicResource WindowBackgroundBrush}"
+                            BorderBrush="{DynamicResource SolidBorderBrush}"
+                            BorderThickness="1,0,1,1"
+                            CornerRadius="0,0,2,2"
+                            Visibility="Collapsed">
+                            <ContentPresenter
+                                Margin="{TemplateBinding Padding}"
+                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                Focusable="false" />
                         </Border>
                     </Grid>
                     <ControlTemplate.Triggers>
@@ -704,31 +742,34 @@
                 <ColumnDefinition />
                 <ColumnDefinition Width="20" />
             </Grid.ColumnDefinitions>
-            <Rectangle x:Name="Rectangle"
-                       Grid.ColumnSpan="2"
-                       Width="Auto"
-                       Height="Auto"
-                       HorizontalAlignment="Stretch"
-                       VerticalAlignment="Stretch"
-                       Fill="{DynamicResource NormalBrush}"
-                       RadiusX="5"
-                       RadiusY="5"
-                       Stroke="{DynamicResource NormalBorderBrush}" />
-            <Rectangle Grid.Column="0"
-                       Width="Auto"
-                       Height="Auto"
-                       HorizontalAlignment="Stretch"
-                       VerticalAlignment="Stretch"
-                       Fill="{DynamicResource WindowBackgroundBrush}"
-                       RadiusX="5"
-                       RadiusY="5"
-                       Stroke="{DynamicResource NormalBorderBrush}" />
-            <Path x:Name="Arrow"
-                  Grid.Column="1"
-                  HorizontalAlignment="Center"
-                  VerticalAlignment="Center"
-                  Data="M 0 0 L 4 4 L 8 0 Z"
-                  Fill="{DynamicResource GlyphBrush}" />
+            <Rectangle
+                x:Name="Rectangle"
+                Grid.ColumnSpan="2"
+                Width="Auto"
+                Height="Auto"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                Fill="{DynamicResource NormalBrush}"
+                RadiusX="5"
+                RadiusY="5"
+                Stroke="{DynamicResource NormalBorderBrush}" />
+            <Rectangle
+                Grid.Column="0"
+                Width="Auto"
+                Height="Auto"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                Fill="{DynamicResource WindowBackgroundBrush}"
+                RadiusX="5"
+                RadiusY="5"
+                Stroke="{DynamicResource NormalBorderBrush}" />
+            <Path
+                x:Name="Arrow"
+                Grid.Column="1"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Data="M 0 0 L 4 4 L 8 0 Z"
+                Fill="{DynamicResource GlyphBrush}" />
         </Grid>
         <ControlTemplate.Triggers>
             <Trigger Property="IsMouseOver" Value="true">
@@ -750,9 +791,10 @@
 
     <ControlTemplate x:Key="ComboBoxTextBox" TargetType="{x:Type TextBox}">
         <!--  これは PART_ContentHost と名前を付ける必要があります  -->
-        <Border x:Name="PART_ContentHost"
-                Background="{TemplateBinding Background}"
-                Focusable="False" />
+        <Border
+            x:Name="PART_ContentHost"
+            Background="{TemplateBinding Background}"
+            Focusable="False" />
     </ControlTemplate>
 
     <!--
@@ -769,56 +811,61 @@
                 <ControlTemplate TargetType="{x:Type ComboBox}">
                     <Grid>
                         <!--  ToggleButton は、IsDropDownOpen を切り替えるため ComboBox 自身にデータ バインドされています  -->
-                        <ToggleButton x:Name="ToggleButton"
-                                      Grid.Column="2"
-                                      ClickMode="Press"
-                                      Focusable="false"
-                                      IsChecked="{Binding Path=IsDropDownOpen,
-                                                          Mode=TwoWay,
-                                                          RelativeSource={RelativeSource TemplatedParent}}"
-                                      Template="{DynamicResource ComboBoxToggleButton}" />
-                        <ContentPresenter x:Name="ContentSite"
-                                          Margin="3,3,23,3"
-                                          HorizontalAlignment="Left"
-                                          VerticalAlignment="Center"
-                                          Content="{TemplateBinding SelectionBoxItem}"
-                                          ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
-                                          ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
-                                          IsHitTestVisible="False" />
+                        <ToggleButton
+                            x:Name="ToggleButton"
+                            Grid.Column="2"
+                            ClickMode="Press"
+                            Focusable="false"
+                            IsChecked="{Binding Path=IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                            Template="{DynamicResource ComboBoxToggleButton}" />
+                        <ContentPresenter
+                            x:Name="ContentSite"
+                            Margin="3,3,23,3"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            Content="{TemplateBinding SelectionBoxItem}"
+                            ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                            ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                            IsHitTestVisible="False" />
 
                         <!--  TextBox は PART_EditableTextBox と名前を付ける必要があります。それ以外の名前では、ComboBox で認識されません  -->
-                        <TextBox x:Name="PART_EditableTextBox"
-                                 Margin="3,3,23,3"
-                                 HorizontalAlignment="Left"
-                                 VerticalAlignment="Center"
-                                 Background="Transparent"
-                                 Focusable="True"
-                                 IsReadOnly="{TemplateBinding IsReadOnly}"
-                                 Style="{x:Null}"
-                                 Template="{DynamicResource ComboBoxTextBox}"
-                                 Visibility="Hidden" />
+                        <TextBox
+                            x:Name="PART_EditableTextBox"
+                            Margin="3,3,23,3"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            Background="Transparent"
+                            Focusable="True"
+                            IsReadOnly="{TemplateBinding IsReadOnly}"
+                            Style="{x:Null}"
+                            Template="{DynamicResource ComboBoxTextBox}"
+                            Visibility="Hidden" />
 
                         <!--  Popup には ComboBox のアイテム一覧が表示されます。IsOpen は、ComboBoxToggleButton を介して切り替えられる IsDropDownOpen にデータ バインドされています  -->
-                        <Popup x:Name="Popup"
-                               AllowsTransparency="True"
-                               Focusable="False"
-                               IsOpen="{TemplateBinding IsDropDownOpen}"
-                               Placement="Bottom"
-                               PopupAnimation="Slide">
-                            <Grid x:Name="DropDown"
-                                  MinWidth="{TemplateBinding ActualWidth}"
-                                  MaxHeight="{TemplateBinding MaxDropDownHeight}"
-                                  SnapsToDevicePixels="True">
-                                <Border x:Name="DropDownBorder"
-                                        Background="{DynamicResource WindowBackgroundBrush}"
-                                        BorderBrush="{DynamicResource SolidBorderBrush}"
-                                        BorderThickness="1" />
-                                <ScrollViewer Margin="4,6,4,6"
-                                              CanContentScroll="True"
-                                              HorizontalScrollBarVisibility="Auto"
-                                              SnapsToDevicePixels="True"
-                                              Style="{DynamicResource SimpleScrollViewer}"
-                                              VerticalScrollBarVisibility="Auto">
+                        <Popup
+                            x:Name="Popup"
+                            AllowsTransparency="True"
+                            Focusable="False"
+                            IsOpen="{TemplateBinding IsDropDownOpen}"
+                            Placement="Bottom"
+                            PopupAnimation="Slide">
+                            <Grid
+                                x:Name="DropDown"
+                                MinWidth="{TemplateBinding ActualWidth}"
+                                MaxHeight="{TemplateBinding MaxDropDownHeight}"
+                                SnapsToDevicePixels="True">
+                                <Border
+                                    x:Name="DropDownBorder"
+                                    Background="{DynamicResource WindowBackgroundBrush}"
+                                    BorderBrush="{DynamicResource SolidBorderBrush}"
+                                    BorderThickness="1" />
+                                <ScrollViewer
+                                    Margin="4,6,4,6"
+                                    CanContentScroll="True"
+                                    HorizontalScrollBarVisibility="Auto"
+                                    SnapsToDevicePixels="True"
+                                    Style="{DynamicResource SimpleScrollViewer}"
+                                    VerticalScrollBarVisibility="Auto">
 
                                     <!--  StackPanel は IsItemsHost を True に設定することで子の表示に使用されます  -->
                                     <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained" />
@@ -854,18 +901,20 @@
     </Style>
 
     <!--  Simple ComboBoxItem - これは ComboBox 内の各アイテムに使用されます。以下の各アイテムの選択された色を変更できます  -->
-    <Style x:Key="SimpleComboBoxItem"
-           TargetType="{x:Type ComboBoxItem}"
-           d:IsControlPart="True">
+    <Style
+        x:Key="SimpleComboBoxItem"
+        d:IsControlPart="True"
+        TargetType="{x:Type ComboBoxItem}">
         <Setter Property="SnapsToDevicePixels" Value="true" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ComboBoxItem}">
                     <Grid SnapsToDevicePixels="true">
-                        <Border x:Name="Border"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}" />
+                        <Border
+                            x:Name="Border"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}" />
                         <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
                     </Grid>
                     <ControlTemplate.Triggers>
@@ -896,19 +945,21 @@
                     <Grid>
 
                         <!--  この Border 枠線はトラックです。これは PART_Track と名前を付ける必要があります。  -->
-                        <Border x:Name="PART_Track"
-                                Background="{DynamicResource PressedBrush}"
-                                BorderBrush="{DynamicResource SolidBorderBrush}"
-                                BorderThickness="1"
-                                CornerRadius="2" />
+                        <Border
+                            x:Name="PART_Track"
+                            Background="{DynamicResource PressedBrush}"
+                            BorderBrush="{DynamicResource SolidBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="2" />
 
                         <!--  この Border は進行状況を表示します。コントロールが動作するには、PART_Indicator と名前を付ける必要があります  -->
-                        <Border x:Name="PART_Indicator"
-                                HorizontalAlignment="Left"
-                                Background="{DynamicResource MouseOverBrush}"
-                                BorderBrush="{DynamicResource NormalBorderBrush}"
-                                BorderThickness="1"
-                                CornerRadius="2" />
+                        <Border
+                            x:Name="PART_Indicator"
+                            HorizontalAlignment="Left"
+                            Background="{DynamicResource MouseOverBrush}"
+                            BorderBrush="{DynamicResource NormalBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="2" />
 
                     </Grid>
                 </ControlTemplate>
@@ -925,18 +976,20 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type TextBox}">
                     <Grid>
-                        <Border x:Name="Border"
-                                Background="{DynamicResource WindowBackgroundBrush}"
-                                BorderBrush="{DynamicResource SolidBorderBrush}"
-                                BorderThickness="1"
-                                CornerRadius="2"
-                                Padding="2">
+                        <Border
+                            x:Name="Border"
+                            Padding="2"
+                            Background="{DynamicResource WindowBackgroundBrush}"
+                            BorderBrush="{DynamicResource SolidBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="2">
 
                             <!--  実装により、Content が ScrollViewer に配置されます。コントロールが動作するには、PART_ContentHost と名前を付ける必要があります  -->
-                            <ScrollViewer x:Name="PART_ContentHost"
-                                          Margin="0"
-                                          Background="{TemplateBinding Background}"
-                                          Style="{DynamicResource SimpleScrollViewer}" />
+                            <ScrollViewer
+                                x:Name="PART_ContentHost"
+                                Margin="0"
+                                Background="{TemplateBinding Background}"
+                                Style="{DynamicResource SimpleScrollViewer}" />
 
                         </Border>
                     </Grid>
@@ -960,9 +1013,10 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Label}">
                     <Grid>
-                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                          RecognizesAccessKey="True" />
+                        <ContentPresenter
+                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                            RecognizesAccessKey="True" />
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsEnabled" Value="false" />
@@ -981,14 +1035,16 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Menu}">
                     <Grid>
-                        <Border x:Name="Border"
-                                Margin="1"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}" />
-                        <StackPanel Background="{TemplateBinding Background}"
-                                    ClipToBounds="True"
-                                    IsItemsHost="True"
-                                    Orientation="Horizontal" />
+                        <Border
+                            x:Name="Border"
+                            Margin="1"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}" />
+                        <StackPanel
+                            Background="{TemplateBinding Background}"
+                            ClipToBounds="True"
+                            IsItemsHost="True"
+                            Orientation="Horizontal" />
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsEnabled" Value="False">
@@ -1002,9 +1058,10 @@
     </Style>
 
     <!--  この BitmapEffect は Simple MenuItem によって使用されます  -->
-    <DropShadowBitmapEffect x:Key="PopupDropShadow"
-                            ShadowDepth="1.5"
-                            Softness="0.15" />
+    <DropShadowBitmapEffect
+        x:Key="PopupDropShadow"
+        ShadowDepth="1.5"
+        Softness="0.15" />
 
     <!--  Simple MenuItem - このテンプレートはトリガーを使用して、Role プロパティを介して設定される、4 つの異なるメニュー アイテムの配置を指定します  -->
     <Style x:Key="SimpleMenuItem" TargetType="{x:Type MenuItem}">
@@ -1015,10 +1072,11 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type MenuItem}">
-                    <Border x:Name="Border"
-                            Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}">
+                    <Border
+                        x:Name="Border"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}">
                         <Grid>
 
                             <!--
@@ -1026,64 +1084,72 @@
                                 各 MenuItem のアイコン、コンテンツ、矢印を揃えて配置するために、Grid ではサイズ共有が使用されます
                             -->
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"
-                                                  MinWidth="17"
-                                                  SharedSizeGroup="MenuItemIconColumnGroup" />
+                                <ColumnDefinition
+                                    Width="Auto"
+                                    MinWidth="17"
+                                    SharedSizeGroup="MenuItemIconColumnGroup" />
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" SharedSizeGroup="MenuItemIGTColumnGroup" />
                                 <ColumnDefinition Width="14" />
                             </Grid.ColumnDefinitions>
 
                             <!--  必要に応じてアイコンを表示する ContentPresenter  -->
-                            <ContentPresenter x:Name="Icon"
-                                              Margin="4,0,6,0"
-                                              VerticalAlignment="Center"
-                                              ContentSource="Icon" />
+                            <ContentPresenter
+                                x:Name="Icon"
+                                Margin="4,0,6,0"
+                                VerticalAlignment="Center"
+                                ContentSource="Icon" />
 
                             <!--  字形はチェック可能なメニューで必要な場合のチェック マークです  -->
-                            <Grid x:Name="GlyphPanel"
-                                  Margin="4,0,6,0"
-                                  VerticalAlignment="Center"
-                                  Visibility="Hidden">
-                                <Path x:Name="GlyphPanelpath"
-                                      VerticalAlignment="Center"
-                                      Data="M0,2 L0,4.8 L2.5,7.4 L7.1,2.8 L7.1,0 L2.5,4.6 z"
-                                      Fill="{TemplateBinding Foreground}"
-                                      FlowDirection="LeftToRight" />
+                            <Grid
+                                x:Name="GlyphPanel"
+                                Margin="4,0,6,0"
+                                VerticalAlignment="Center"
+                                Visibility="Hidden">
+                                <Path
+                                    x:Name="GlyphPanelpath"
+                                    VerticalAlignment="Center"
+                                    Data="M0,2 L0,4.8 L2.5,7.4 L7.1,2.8 L7.1,0 L2.5,4.6 z"
+                                    Fill="{TemplateBinding Foreground}"
+                                    FlowDirection="LeftToRight" />
                             </Grid>
 
                             <!--  メニュー テキストなどのコンテンツ  -->
-                            <ContentPresenter x:Name="HeaderHost"
-                                              Grid.Column="1"
-                                              Margin="{TemplateBinding Padding}"
-                                              ContentSource="Header"
-                                              RecognizesAccessKey="True" />
+                            <ContentPresenter
+                                x:Name="HeaderHost"
+                                Grid.Column="1"
+                                Margin="{TemplateBinding Padding}"
+                                ContentSource="Header"
+                                RecognizesAccessKey="True" />
 
                             <!--  メニューの次のレベルを指す矢印の描画パス  -->
-                            <Grid x:Name="ArrowPanel"
-                                  Grid.Column="3"
-                                  Margin="4,0,6,0"
-                                  VerticalAlignment="Center">
-                                <Path x:Name="ArrowPanelPath"
-                                      VerticalAlignment="Center"
-                                      Data="M0,0 L0,8 L4,4 z"
-                                      Fill="{TemplateBinding Foreground}" />
+                            <Grid
+                                x:Name="ArrowPanel"
+                                Grid.Column="3"
+                                Margin="4,0,6,0"
+                                VerticalAlignment="Center">
+                                <Path
+                                    x:Name="ArrowPanelPath"
+                                    VerticalAlignment="Center"
+                                    Data="M0,0 L0,8 L4,4 z"
+                                    Fill="{TemplateBinding Foreground}" />
                             </Grid>
 
                             <!--  Popup は、アイテムのレベルに応じて下または反対側に展開するメニュー本体です  -->
-                            <Popup x:Name="SubMenuPopup"
-                                   AllowsTransparency="true"
-                                   Focusable="false"
-                                   IsOpen="{Binding Path=IsSubmenuOpen,
-                                                    RelativeSource={RelativeSource TemplatedParent}}"
-                                   Placement="Right"
-                                   PopupAnimation="{DynamicResource {x:Static SystemParameters.MenuPopupAnimationKey}}"
-                                   VerticalOffset="-3">
+                            <Popup
+                                x:Name="SubMenuPopup"
+                                AllowsTransparency="true"
+                                Focusable="false"
+                                IsOpen="{Binding Path=IsSubmenuOpen, RelativeSource={RelativeSource TemplatedParent}}"
+                                Placement="Right"
+                                PopupAnimation="{DynamicResource {x:Static SystemParameters.MenuPopupAnimationKey}}"
+                                VerticalOffset="-3">
                                 <Grid x:Name="SubMenu">
-                                    <Border x:Name="SubMenuBorder"
-                                            Background="{DynamicResource WindowBackgroundBrush}"
-                                            BorderBrush="{DynamicResource SolidBorderBrush}"
-                                            BorderThickness="1" />
+                                    <Border
+                                        x:Name="SubMenuBorder"
+                                        Background="{DynamicResource WindowBackgroundBrush}"
+                                        BorderBrush="{DynamicResource SolidBorderBrush}"
+                                        BorderThickness="1" />
 
                                     <!--  StackPanel はメニューの子を保持します。これは IsItemsHost=True に設定されます  -->
                                     <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" />
@@ -1194,28 +1260,31 @@
                             TabPanel は選択されたときに TabItems の折り返しと再並べ替えを可能にするレイアウト コンテナーです
                             IsItemsHost = True とマークされているため、実装はこのコントロールの使用を認識しています
                         -->
-                        <TabPanel x:Name="HeaderPanel"
-                                  Grid.Row="0"
-                                  Margin="0,0,4,-1"
-                                  Panel.ZIndex="1"
-                                  Background="Transparent"
-                                  IsItemsHost="True"
-                                  KeyboardNavigation.TabIndex="1" />
+                        <TabPanel
+                            x:Name="HeaderPanel"
+                            Grid.Row="0"
+                            Margin="0,0,4,-1"
+                            Panel.ZIndex="1"
+                            Background="Transparent"
+                            IsItemsHost="True"
+                            KeyboardNavigation.TabIndex="1" />
 
-                        <Border x:Name="Border"
-                                Grid.Row="1"
-                                Background="{DynamicResource WindowBackgroundBrush}"
-                                BorderBrush="{DynamicResource SolidBorderBrush}"
-                                BorderThickness="1"
-                                CornerRadius="2"
-                                KeyboardNavigation.DirectionalNavigation="Contained"
-                                KeyboardNavigation.TabIndex="2"
-                                KeyboardNavigation.TabNavigation="Local">
+                        <Border
+                            x:Name="Border"
+                            Grid.Row="1"
+                            Background="{DynamicResource WindowBackgroundBrush}"
+                            BorderBrush="{DynamicResource SolidBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="2"
+                            KeyboardNavigation.DirectionalNavigation="Contained"
+                            KeyboardNavigation.TabIndex="2"
+                            KeyboardNavigation.TabNavigation="Local">
 
                             <!--  実装はコンテンツを切り替えます。このコントロールは PART_SelectedContentHost と名前を付ける必要があります  -->
-                            <ContentPresenter x:Name="PART_SelectedContentHost"
-                                              Margin="4"
-                                              ContentSource="SelectedContent" />
+                            <ContentPresenter
+                                x:Name="PART_SelectedContentHost"
+                                Margin="4"
+                                ContentSource="SelectedContent" />
 
                         </Border>
                     </Grid>
@@ -1233,25 +1302,28 @@
     </Style>
 
     <!--  Simple TabItem  -->
-    <Style x:Key="SimpleTabItem"
-           TargetType="{x:Type TabItem}"
-           d:IsControlPart="True">
+    <Style
+        x:Key="SimpleTabItem"
+        d:IsControlPart="True"
+        TargetType="{x:Type TabItem}">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type TabItem}">
                     <Grid>
-                        <Border x:Name="Border"
-                                Margin="0,0,-4,0"
-                                Background="{DynamicResource LightBrush}"
-                                BorderBrush="{DynamicResource SolidBorderBrush}"
-                                BorderThickness="1,1,1,1"
-                                CornerRadius="2,12,0,0">
-                            <ContentPresenter x:Name="ContentSite"
-                                              Margin="12,2,12,2"
-                                              HorizontalAlignment="Center"
-                                              VerticalAlignment="Center"
-                                              ContentSource="Header"
-                                              RecognizesAccessKey="True" />
+                        <Border
+                            x:Name="Border"
+                            Margin="0,0,-4,0"
+                            Background="{DynamicResource LightBrush}"
+                            BorderBrush="{DynamicResource SolidBorderBrush}"
+                            BorderThickness="1,1,1,1"
+                            CornerRadius="2,12,0,0">
+                            <ContentPresenter
+                                x:Name="ContentSite"
+                                Margin="12,2,12,2"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                ContentSource="Header"
+                                RecognizesAccessKey="True" />
                         </Border>
                     </Grid>
                     <ControlTemplate.Triggers>
@@ -1272,9 +1344,10 @@
     </Style>
 
     <!--  Simple Simple SliderThumb - Simple Simple SliderThumb はスライダーのドラッグ可能な領域です  -->
-    <Style x:Key="SimpleSliderThumb"
-           TargetType="{x:Type Thumb}"
-           d:IsControlPart="True">
+    <Style
+        x:Key="SimpleSliderThumb"
+        d:IsControlPart="True"
+        TargetType="{x:Type Thumb}">
         <Setter Property="SnapsToDevicePixels" Value="true" />
         <Setter Property="Height" Value="14" />
         <Setter Property="Width" Value="14" />
@@ -1282,10 +1355,11 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Thumb}">
                     <Grid>
-                        <Ellipse x:Name="Ellipse"
-                                 Fill="{DynamicResource NormalBrush}"
-                                 Stroke="{DynamicResource NormalBorderBrush}"
-                                 StrokeThickness="1" />
+                        <Ellipse
+                            x:Name="Ellipse"
+                            Fill="{DynamicResource NormalBrush}"
+                            Stroke="{DynamicResource NormalBorderBrush}"
+                            StrokeThickness="1" />
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
@@ -1319,20 +1393,22 @@
                         </Grid.RowDefinitions>
 
                         <!--  TickBar はスライダーの目盛りを表示します  -->
-                        <TickBar x:Name="TopTick"
-                                 Height="4"
-                                 Fill="{DynamicResource GlyphBrush}"
-                                 Placement="Top"
-                                 SnapsToDevicePixels="True"
-                                 Visibility="Collapsed" />
-                        <Border x:Name="Border"
-                                Grid.Row="1"
-                                Height="4"
-                                Margin="0"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="2" />
+                        <TickBar
+                            x:Name="TopTick"
+                            Height="4"
+                            Fill="{DynamicResource GlyphBrush}"
+                            Placement="Top"
+                            SnapsToDevicePixels="True"
+                            Visibility="Collapsed" />
+                        <Border
+                            x:Name="Border"
+                            Grid.Row="1"
+                            Height="4"
+                            Margin="0"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="2" />
 
                         <!--  この Track は RepeatButton と Thumb をレイアウトします  -->
                         <Track x:Name="PART_Track" Grid.Row="1">
@@ -1347,13 +1423,14 @@
                             </Track.DecreaseRepeatButton>
                         </Track>
 
-                        <TickBar x:Name="BottomTick"
-                                 Grid.Row="2"
-                                 Height="4"
-                                 Fill="{TemplateBinding Foreground}"
-                                 Placement="Bottom"
-                                 SnapsToDevicePixels="True"
-                                 Visibility="Collapsed" />
+                        <TickBar
+                            x:Name="BottomTick"
+                            Grid.Row="2"
+                            Height="4"
+                            Fill="{TemplateBinding Foreground}"
+                            Placement="Bottom"
+                            SnapsToDevicePixels="True"
+                            Visibility="Collapsed" />
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="TickPlacement" Value="TopLeft">
@@ -1394,18 +1471,20 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type TreeView}">
                     <Grid>
-                        <Border x:Name="Border"
-                                Background="{DynamicResource WindowBackgroundBrush}"
-                                BorderBrush="{DynamicResource SolidBorderBrush}"
-                                BorderThickness="1"
-                                CornerRadius="1">
-                            <ScrollViewer Background="{TemplateBinding Background}"
-                                          CanContentScroll="False"
-                                          Focusable="False"
-                                          HorizontalScrollBarVisibility="Auto"
-                                          Padding="4"
-                                          Style="{DynamicResource SimpleScrollViewer}"
-                                          VerticalScrollBarVisibility="Auto">
+                        <Border
+                            x:Name="Border"
+                            Background="{DynamicResource WindowBackgroundBrush}"
+                            BorderBrush="{DynamicResource SolidBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="1">
+                            <ScrollViewer
+                                Padding="4"
+                                Background="{TemplateBinding Background}"
+                                CanContentScroll="False"
+                                Focusable="False"
+                                HorizontalScrollBarVisibility="Auto"
+                                Style="{DynamicResource SimpleScrollViewer}"
+                                VerticalScrollBarVisibility="Auto">
                                 <ItemsPresenter />
                             </ScrollViewer>
                         </Border>
@@ -1416,29 +1495,33 @@
     </Style>
 
     <!--  Simple TreeViewItem ToggleButton - + および - ボタンで TreeViewItem を展開したり折りたたんだりします  -->
-    <Style x:Key="SimpleTreeViewItemToggleButton"
-           TargetType="{x:Type ToggleButton}"
-           d:IsControlPart="True">
+    <Style
+        x:Key="SimpleTreeViewItemToggleButton"
+        d:IsControlPart="True"
+        TargetType="{x:Type ToggleButton}">
         <Setter Property="Focusable" Value="False" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ToggleButton}">
-                    <Grid Width="15"
-                          Height="13"
-                          Background="Transparent">
-                        <Path x:Name="IsExpandedPath"
-                              Margin="1,1,1,1"
-                              HorizontalAlignment="Left"
-                              VerticalAlignment="Center"
-                              Data="M 0 4 L 8 4 L 4 8 Z"
-                              Fill="{DynamicResource GlyphBrush}"
-                              Visibility="Collapsed" />
-                        <Path x:Name="ExpandPath"
-                              Margin="1,1,1,1"
-                              HorizontalAlignment="Left"
-                              VerticalAlignment="Center"
-                              Data="M 4 0 L 8 4 L 4 8 Z"
-                              Fill="{DynamicResource GlyphBrush}" />
+                    <Grid
+                        Width="15"
+                        Height="13"
+                        Background="Transparent">
+                        <Path
+                            x:Name="IsExpandedPath"
+                            Margin="1,1,1,1"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            Data="M 0 4 L 8 4 L 4 8 Z"
+                            Fill="{DynamicResource GlyphBrush}"
+                            Visibility="Collapsed" />
+                        <Path
+                            x:Name="ExpandPath"
+                            Margin="1,1,1,1"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            Data="M 4 0 L 8 4 L 4 8 Z"
+                            Fill="{DynamicResource GlyphBrush}" />
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsChecked" Value="True">
@@ -1452,9 +1535,10 @@
     </Style>
 
     <!--  Simple TreeViewItem - Simple TreeViewItem テンプレートには、展開して子アイテムを表示する ItemsHost コントロールである Item および Body を表示するヘッダーがあります  -->
-    <Style x:Key="SimpleTreeViewItem"
-           TargetType="{x:Type TreeViewItem}"
-           d:IsControlPart="True">
+    <Style
+        x:Key="SimpleTreeViewItem"
+        d:IsControlPart="True"
+        TargetType="{x:Type TreeViewItem}">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="HorizontalContentAlignment" Value="{Binding Path=HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" />
         <Setter Property="VerticalContentAlignment" Value="{Binding Path=VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" />
@@ -1472,25 +1556,28 @@
                             <RowDefinition Height="Auto" />
                             <RowDefinition />
                         </Grid.RowDefinitions>
-                        <ToggleButton x:Name="Expander"
-                                      ClickMode="Press"
-                                      IsChecked="{Binding Path=IsExpanded,
-                                                          RelativeSource={RelativeSource TemplatedParent}}"
-                                      Style="{DynamicResource SimpleTreeViewItemToggleButton}" />
-                        <Border x:Name="Selection_Border"
-                                Grid.Column="1"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                Padding="{TemplateBinding Padding}">
-                            <ContentPresenter x:Name="PART_Header"
-                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                              ContentSource="Header" />
+                        <ToggleButton
+                            x:Name="Expander"
+                            ClickMode="Press"
+                            IsChecked="{Binding Path=IsExpanded, RelativeSource={RelativeSource TemplatedParent}}"
+                            Style="{DynamicResource SimpleTreeViewItemToggleButton}" />
+                        <Border
+                            x:Name="Selection_Border"
+                            Grid.Column="1"
+                            Padding="{TemplateBinding Padding}"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter
+                                x:Name="PART_Header"
+                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                ContentSource="Header" />
                         </Border>
-                        <ItemsPresenter x:Name="ItemsHost"
-                                        Grid.Row="1"
-                                        Grid.Column="1"
-                                        Grid.ColumnSpan="2" />
+                        <ItemsPresenter
+                            x:Name="ItemsHost"
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Grid.ColumnSpan="2" />
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsExpanded" Value="false">

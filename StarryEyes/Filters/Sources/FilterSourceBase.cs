@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Text.RegularExpressions;
 using Cadena.Data;
-using StarryEyes.Albireo.Helpers;
 using StarryEyes.Globalization.Filters;
 using StarryEyes.Models;
 using StarryEyes.Models.Accounting;
@@ -33,7 +32,7 @@ namespace StarryEyes.Filters.Sources
 
         protected virtual void RaiseInvalidateRequired()
         {
-            this.InvalidateRequired.SafeInvoke();
+            InvalidateRequired?.Invoke();
         }
 
         /// <summary>

@@ -59,6 +59,8 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         private bool _isInReplyToLoading;
         private bool _isInReplyToLoaded;
 
+        private bool IsSafeMode => App.IsUnlockSafeModeForNewApiPolicy;
+
         public StatusViewModel(TimelineViewModelBase parent, StatusModel status,
             IEnumerable<long> initialBoundAccounts)
         {
@@ -164,14 +166,11 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         /// <summary>
         ///     Represents status. (if this status is retweet, this property represents retweeted_original.)
         /// </summary>
-        public TwitterStatus Status
-        {
-            get { return Model.Status.RetweetedStatus ?? Model.Status; }
-        }
+        public TwitterStatus Status => Model.Status.RetweetedStatus ?? Model.Status;
 
         public IEnumerable<long> BindingAccounts
         {
-            get { return _bindingAccounts; }
+            get => _bindingAccounts;
             set
             {
                 _bindingAccounts = (value as long[]) ?? value.ToArray();
@@ -183,14 +182,8 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             }
         }
 
-        public UserViewModel User
-        {
-            get
-            {
-                return _user ??
-                       (_user = CreateUserViewModel((Status.RetweetedStatus ?? Status).User));
-            }
-        }
+        public UserViewModel User =>
+            _user ?? (_user = CreateUserViewModel((Status.RetweetedStatus ?? Status).User));
 
         public UserViewModel Retweeter
         {
@@ -232,138 +225,61 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             }
         }
 
-        public string MultiLineText
-        {
-            get { return Status.GetEntityAidedText(); }
-        }
+        public string MultiLineText => Status.GetEntityAidedText();
 
-        public string SingleLineText
-        {
-            get { return Status.GetEntityAidedText().Replace('\n', ' ').Replace("\r", ""); }
-        }
+        public string SingleLineText => Status.GetEntityAidedText().Replace('\n', ' ').Replace("\r", "");
 
-        public bool IsRetweetedUserExists
-        {
-            get { return _retweetedUsers.Count > 0; }
-        }
+        public bool IsRetweetedUserExists => _retweetedUsers.Count > 0;
 
-        public int RetweetCount
-        {
-            get { return RetweetedUsers.Count; }
-        }
+        public int RetweetCount => RetweetedUsers.Count;
 
-        public ReadOnlyDispatcherCollectionRx<UserViewModel> RetweetedUsers
-        {
-            get { return _retweetedUsers; }
-        }
+        public ReadOnlyDispatcherCollectionRx<UserViewModel> RetweetedUsers => _retweetedUsers;
 
-        public bool IsFavoritedUserExists
-        {
-            get { return _favoritedUsers.Count > 0; }
-        }
+        public bool IsFavoritedUserExists => _favoritedUsers.Count > 0;
 
-        public int FavoriteCount
-        {
-            get { return FavoritedUsers.Count; }
-        }
+        public int FavoriteCount => FavoritedUsers.Count;
 
-        public ReadOnlyDispatcherCollectionRx<UserViewModel> FavoritedUsers
-        {
-            get { return _favoritedUsers; }
-        }
+        public ReadOnlyDispatcherCollectionRx<UserViewModel> FavoritedUsers => _favoritedUsers;
 
-        public bool IsDirectMessage
-        {
-            get { return Status.StatusType == StatusType.DirectMessage; }
-        }
+        public bool IsDirectMessage => Status.StatusType == StatusType.DirectMessage;
 
-        public bool IsRetweet
-        {
-            get { return OriginalStatus.RetweetedStatus != null; }
-        }
+        public bool IsRetweet => OriginalStatus.RetweetedStatus != null;
 
-        public bool IsFavorited
-        {
-            get
-            {
-                return RetweetedStatusModel != null
-                    ? RetweetedStatusModel.IsFavorited(_bindingAccounts)
-                    : Model.IsFavorited(_bindingAccounts);
-            }
-        }
+        public bool IsFavorited => RetweetedStatusModel?.IsFavorited(_bindingAccounts) ??
+                                   Model.IsFavorited(_bindingAccounts);
 
-        public bool IsRetweeted
-        {
-            get
-            {
-                return RetweetedStatusModel != null
-                    ? RetweetedStatusModel.IsRetweeted(_bindingAccounts)
-                    : Model.IsRetweeted(_bindingAccounts);
-            }
-        }
+        public bool IsRetweeted => RetweetedStatusModel?.IsRetweeted(_bindingAccounts) ??
+                                   Model.IsRetweeted(_bindingAccounts);
 
-        public bool CanFavoriteAndRetweet
-        {
-            get { return CanFavoriteImmediate && CanRetweetImmediate; }
-        }
+        public bool CanFavoriteAndRetweet => !IsSafeMode && CanFavoriteImmediate && CanRetweetImmediate;
 
-        public bool CanFavorite
-        {
-            get { return !IsDirectMessage && (Setting.AllowFavoriteMyself.Value || !IsMyself); }
-        }
+        public bool CanFavorite => !IsDirectMessage && (Setting.AllowFavoriteMyself.Value || !IsMyself);
 
-        public bool CanFavoriteImmediate
-        {
-            get { return CanFavorite; }
-        }
+        public bool CanFavoriteImmediate => CanFavorite;
 
-        public bool CanRetweet
-        {
-            get { return !IsDirectMessage && !Status.User.IsProtected; }
-        }
+        public bool CanRetweet => !IsDirectMessage && !Status.User.IsProtected;
 
-        public bool CanRetweetImmediate
-        {
-            get { return CanRetweet; }
-        }
+        public bool CanRetweetImmediate => CanRetweet;
 
-        public bool CanDelete
-        {
-            get { return IsDirectMessage || Setting.Accounts.Contains(OriginalStatus.User.Id); }
-        }
+        public bool CanDelete => IsDirectMessage || Setting.Accounts.Contains(OriginalStatus.User.Id);
 
-        public bool IsMyself
-        {
-            get { return Setting.Accounts.Contains(OriginalStatus.User.Id); }
-        }
+        public bool IsMyself => Setting.Accounts.Contains(OriginalStatus.User.Id);
 
-        public bool IsMyselfStrict
-        {
-            get { return CheckUserIsBind(Status.User.Id); }
-        }
+        public bool IsMyselfStrict => CheckUserIsBind(Status.User.Id);
 
         private bool CheckUserIsBind(long id)
         {
             return _bindingAccounts.Length == 1 && _bindingAccounts[0] == id;
         }
 
-        public bool IsInReplyToMe
-        {
-            get
-            {
-                return FilterSystemUtil.InReplyToUsers(Status)
-                                       .Any(Setting.Accounts.Contains);
-            }
-        }
+        public bool IsInReplyToMe => FilterSystemUtil.InReplyToUsers(Status)
+                                                     .Any(Setting.Accounts.Contains);
 
-        public bool IsFocused
-        {
-            get { return _parent.FocusedStatus == this; }
-        }
+        public bool IsFocused => _parent.FocusedStatus == this;
 
         public bool IsSelected
         {
-            get { return _isSelected; }
+            get => _isSelected;
             set
             {
                 if (_isSelected == value || Parent == null) return;
@@ -409,15 +325,9 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             }
         }
 
-        public bool IsSourceVisible
-        {
-            get { return Status.StatusType != StatusType.DirectMessage; }
-        }
+        public bool IsSourceVisible => Status.StatusType != StatusType.DirectMessage;
 
-        public bool IsSourceIsLink
-        {
-            get { return Status.Source != null && Status.Source.Contains("<a href"); }
-        }
+        public bool IsSourceIsLink => Status.Source != null && Status.Source.Contains("<a href");
 
         public string SourceText
         {
@@ -441,35 +351,17 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             }
         }
 
-        public DateTime CreatedAt
-        {
-            get { return Status.CreatedAt; }
-        }
+        public DateTime CreatedAt => Status.CreatedAt;
 
-        public bool IsImageAvailable
-        {
-            get { return Model.Images != null && Model.Images.Any(); }
-        }
+        public bool IsImageAvailable => Model.Images != null && Model.Images.Any();
 
-        public ReadOnlyDispatcherCollectionRx<ThumbnailImageViewModel> Images
-        {
-            get { return _images; }
-        }
+        public ReadOnlyDispatcherCollectionRx<ThumbnailImageViewModel> Images => _images;
 
-        public bool IsThumbnailAvailable
-        {
-            get { return IsImageAvailable && Setting.ThumbnailMode.Value == ThumbnailMode.Single; }
-        }
+        public bool IsThumbnailAvailable => IsImageAvailable && Setting.ThumbnailMode.Value == ThumbnailMode.Single;
 
-        public bool IsThumbnailsAvailable
-        {
-            get { return IsImageAvailable && Setting.ThumbnailMode.Value == ThumbnailMode.All; }
-        }
+        public bool IsThumbnailsAvailable => IsImageAvailable && Setting.ThumbnailMode.Value == ThumbnailMode.All;
 
-        public ThumbnailImageViewModel ThumbnailImage
-        {
-            get { return Model.Images != null ? Images.FirstOrDefault() : null; }
-        }
+        public ThumbnailImageViewModel ThumbnailImage => Model.Images != null ? Images.FirstOrDefault() : null;
 
         /// <summary>
         ///     For animating helper
@@ -606,7 +498,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
 
         public string SelectedText
         {
-            get { return _selectedText ?? String.Empty; }
+            get => _selectedText ?? String.Empty;
             set
             {
                 _selectedText = value;
@@ -684,7 +576,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                     MainIcon = VistaTaskDialogIcon.Error,
                     MainInstruction = MainAreaTimelineResources.MsgClipboardErrorInst,
                     Content = ex.Message,
-                    CommonButtons = TaskDialogCommonButtons.Close,
+                    CommonButtons = TaskDialogCommonButtons.Close
                 }));
             }
         }
@@ -712,7 +604,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                 }
 
                 // define working task
-                Func<TwitterAccount, Task> workTask = account => Task.Run(async () =>
+                Task WorkTask(TwitterAccount account) => Task.Run(async () =>
                 {
                     expected(account);
                     try
@@ -727,14 +619,14 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                         var desc = add
                             ? MainAreaTimelineResources.MsgFavoriteFailed
                             : MainAreaTimelineResources.MsgUnfavoriteFailed;
-                        BackstageModel.RegisterEvent(new OperationFailedEvent(
-                            desc + "(" + account.UnreliableScreenName + " -> " +
-                            Status.User.ScreenName + ")", ex));
+                        BackstageModel.RegisterEvent(
+                            new OperationFailedEvent(
+                                desc + "(" + account.UnreliableScreenName + " -> " + Status.User.ScreenName + ")", ex));
                     }
                 });
 
                 // dispatch actions
-                Task.WaitAll(infos.Select(workTask).ToArray());
+                Task.WaitAll(infos.Select(WorkTask).ToArray());
 
                 // notify changed
                 RaisePropertyChanged(() => IsFavorited);
@@ -817,18 +709,11 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             if (!AssertQuickActionEnabled()) return;
             if (!CanRetweetImmediate)
             {
-                if (IsMyselfStrict)
-                {
-                    NotifyQuickActionFailed(
-                        MainAreaTimelineResources.MsgProhibitRetweet,
-                        MainAreaTimelineResources.MsgProhibitRetweetMyself);
-                }
-                else
-                {
-                    NotifyQuickActionFailed(
-                        MainAreaTimelineResources.MsgProhibitRetweet,
-                        MainAreaTimelineResources.MsgProhibitRetweetDirectMessage);
-                }
+                NotifyQuickActionFailed(
+                    MainAreaTimelineResources.MsgProhibitRetweet,
+                    IsMyselfStrict
+                        ? MainAreaTimelineResources.MsgProhibitRetweetMyself
+                        : MainAreaTimelineResources.MsgProhibitRetweetDirectMessage);
                 return;
             }
             Retweet(GetImmediateAccounts(), !IsRetweeted);
@@ -1189,7 +1074,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                         Resources.MsgButtonCancel
                     },
                     DefaultButtonIndex = 0,
-                    AllowDialogCancellation = true,
+                    AllowDialogCancellation = true
                 }));
             if (response.Response.CustomButtonResult != 0) return;
             // report as a spam

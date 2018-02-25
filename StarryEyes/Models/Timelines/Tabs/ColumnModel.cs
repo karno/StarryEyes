@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Livet;
-using StarryEyes.Albireo;
-using StarryEyes.Albireo.Helpers;
 using StarryEyes.Models.Inputting;
 
 namespace StarryEyes.Models.Timelines.Tabs
@@ -17,24 +15,24 @@ namespace StarryEyes.Models.Timelines.Tabs
 
         public event Action CurrentFocusTabChanged;
 
-        public ObservableSynchronizedCollectionEx<TabModel> Tabs
-        {
-            get { return this._tabs; }
-        }
+        public ObservableSynchronizedCollectionEx<TabModel> Tabs => _tabs;
 
         public int CurrentFocusTabIndex
         {
-            get { return this._currentFocusTabIndex; }
+            get => _currentFocusTabIndex;
             set
             {
-                if (value < 0 || value >= this._tabs.Count) return;
-                this._currentFocusTabIndex = value;
-                InputModel.AccountSelector.CurrentFocusTab = this._tabs[value];
-                CurrentFocusTabChanged.SafeInvoke();
+                if (value < 0 || value >= _tabs.Count) return;
+                _currentFocusTabIndex = value;
+                InputModel.AccountSelector.CurrentFocusTab = _tabs[value];
+                CurrentFocusTabChanged?.Invoke();
             }
         }
 
-        public ColumnModel() { }
+        public ColumnModel()
+        {
+        }
+
         public ColumnModel(params TabModel[] tabModels)
             : this(tabModels.AsEnumerable())
         {
@@ -42,24 +40,24 @@ namespace StarryEyes.Models.Timelines.Tabs
 
         public ColumnModel(IEnumerable<TabModel> tabModels)
         {
-            tabModels.ForEach(this._tabs.Add);
+            tabModels.ForEach(_tabs.Add);
         }
 
         public void CreateTab(TabModel info)
         {
-            this._tabs.Add(info);
-            this.CurrentFocusTabIndex = this._tabs.Count - 1;
+            _tabs.Add(info);
+            CurrentFocusTabIndex = _tabs.Count - 1;
             // commit changes
             TabManager.Save();
         }
 
         public void RemoveTab(int index)
         {
-            if (this._tabs.Count > 1)
+            if (_tabs.Count > 1)
             {
-                this.CurrentFocusTabIndex = index >= this._tabs.Count - 1 ? index - 1 : index;
+                CurrentFocusTabIndex = index >= _tabs.Count - 1 ? index - 1 : index;
             }
-            this._tabs.RemoveAt(index);
+            _tabs.RemoveAt(index);
             // commit changes
             TabManager.Save();
         }

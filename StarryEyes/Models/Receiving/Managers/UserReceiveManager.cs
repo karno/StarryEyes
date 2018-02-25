@@ -92,7 +92,7 @@ namespace StarryEyes.Models.Receiving.Managers
                 // add new users
                 accounts.Where(s => !_bundles.ContainsKey(s.Key))
                         .Select(s => new UserReceiveBundle(s.Value))
-                        .Do(s => s.StateChanged += arg => ConnectionStateChanged.SafeInvoke(arg))
+                        .Do(s => s.StateChanged += arg => ConnectionStateChanged?.Invoke(arg))
                         .ForEach(b => _bundles.Add(b.UserId, b));
 
                 // stop cancelled streamings
@@ -100,7 +100,7 @@ namespace StarryEyes.Models.Receiving.Managers
                         .Where(b => b.IsUserStreamsEnabled && !accounts[b.UserId].IsUserStreamsEnabled)
                         .Do(b => danglings.AddRange(b.TrackKeywords))
                         .Do(b => b.IsUserStreamsEnabled = false)
-                        .ForEach(b => b.TrackKeywords = null);
+                        .ForEach(b => b.TrackKeywords = new string[0]);
 
                 if (danglings.Count > 0)
                 {
@@ -132,7 +132,7 @@ namespace StarryEyes.Models.Receiving.Managers
                 }
             }
             if (!rearranged) return;
-            TrackRearranged.SafeInvoke();
+            TrackRearranged?.Invoke();
         }
         // ReSharper restore AccessToModifiedClosure
 
@@ -165,7 +165,6 @@ namespace StarryEyes.Models.Receiving.Managers
 
             public event Action<TwitterAccount> StateChanged;
 
-            [NotNull]
             public IEnumerable<string> TrackKeywords
             {
                 get => _userStreamsReceiver.TrackKeywords;

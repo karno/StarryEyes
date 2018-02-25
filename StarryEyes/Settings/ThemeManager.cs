@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using JetBrains.Annotations;
-using StarryEyes.Albireo.Helpers;
 using StarryEyes.Globalization.Models;
 using StarryEyes.Models;
 using StarryEyes.Models.Backstages.SystemEvents;
@@ -16,15 +15,10 @@ namespace StarryEyes.Settings
         private static readonly IDictionary<string, ThemeProfile> ThemeProfiles =
             new Dictionary<string, ThemeProfile>();
 
-        public static IEnumerable<string> Themes
-        {
-            get { return ThemeProfiles.Keys; }
-        }
+        public static IEnumerable<string> Themes => ThemeProfiles.Keys;
 
-        public static string ThemeProfileDirectoryPath
-        {
-            get { return Path.Combine(App.ConfigurationDirectoryPath, App.ThemeProfilesDirectory); }
-        }
+        public static string ThemeProfileDirectoryPath =>
+            Path.Combine(App.ConfigurationDirectoryPath, App.ThemeProfilesDirectory);
 
         public static event Action ThemeChanged;
 
@@ -34,7 +28,7 @@ namespace StarryEyes.Settings
 
             ReloadCandidates();
 
-            Setting.Theme.ValueChanged += _ => ThemeChanged.SafeInvoke();
+            Setting.Theme.ValueChanged += _ => ThemeChanged?.Invoke();
         }
 
         private static void Load(string file)
@@ -94,7 +88,6 @@ namespace StarryEyes.Settings
                 // set as default
                 Setting.Theme.Value = BuiltInThemeProvider.DefaultThemeName;
             }
-
         }
 
         public static void ReloadCandidates()

@@ -9,7 +9,7 @@ namespace StarryEyes.Models.Plugins.Injections
         private static void BindCore(object socket, object handler)
         {
             var method = socket.GetType().GetMethod("Bind", BindingFlags.NonPublic | BindingFlags.Instance);
-            method.Invoke(socket, new[] { handler });
+            method?.Invoke(socket, new[] { handler });
         }
 
         public static void Bind<T>(BridgeSocket<T> socket, Action<T> handler)

@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using StarryEyes.Albireo;
-using StarryEyes.Albireo.Helpers;
 using StarryEyes.Globalization;
 using StarryEyes.Globalization.Models;
 using StarryEyes.Models;
@@ -25,20 +23,12 @@ namespace StarryEyes.Settings
         private static readonly IDictionary<string, KeyAssignAction> Actions =
             new Dictionary<string, KeyAssignAction>();
 
-        public static IEnumerable<string> LoadedProfiles
-        {
-            get { return Profiles.Keys; }
-        }
+        public static IEnumerable<string> LoadedProfiles => Profiles.Keys;
 
-        public static IEnumerable<KeyAssignAction> RegisteredActions
-        {
-            get { return Actions.Values; }
-        }
+        public static IEnumerable<KeyAssignAction> RegisteredActions => Actions.Values;
 
-        public static string KeyAssignsProfileDirectoryPath
-        {
-            get { return Path.Combine(App.ConfigurationDirectoryPath, App.KeyAssignProfilesDirectory); }
-        }
+        public static string KeyAssignsProfileDirectoryPath => Path.Combine(App.ConfigurationDirectoryPath,
+            App.KeyAssignProfilesDirectory);
 
         public static event Action KeyAssignChanged;
 
@@ -50,7 +40,7 @@ namespace StarryEyes.Settings
             ReloadCandidates();
 
             // listen setting changed
-            Setting.KeyAssign.ValueChanged += _ => KeyAssignChanged.SafeInvoke();
+            Setting.KeyAssign.ValueChanged += _ => KeyAssignChanged?.Invoke();
         }
 
         public static void ReloadCandidates()
@@ -156,8 +146,6 @@ namespace StarryEyes.Settings
 
     public sealed class KeyAssignAction
     {
-        private readonly string _name;
-
         private readonly bool? _argumentRequired;
 
         private readonly Action<string> _callback;
@@ -179,35 +167,29 @@ namespace StarryEyes.Settings
 
         public KeyAssignAction(string name, Action<string> callback, bool? argumentRequired = null)
         {
-            _name = name;
+            Name = name;
             _callback = callback;
-            this._argumentRequired = argumentRequired;
+            _argumentRequired = argumentRequired;
         }
 
-        public string Name
-        {
-            get { return _name; }
-        }
+        public string Name { get; }
 
-        public bool? ArgumentRequired
-        {
-            get { return this._argumentRequired; }
-        }
+        public bool? ArgumentRequired => _argumentRequired;
 
         public void Invoke(string argument)
         {
-            if (this._argumentRequired != null && this._argumentRequired.Value == String.IsNullOrEmpty(argument))
+            if (_argumentRequired != null && _argumentRequired.Value == String.IsNullOrEmpty(argument))
             {
                 BackstageModel.RegisterEvent(new OperationFailedEvent(
-                    (this._argumentRequired.Value
+                    (_argumentRequired.Value
                         ? SettingModelResources.KeyAssignErrorArgumentRequiredFormat
                         : SettingModelResources.KeyAssignErrorArgumentUnsupportedFormat)
-                        .SafeFormat(Name),
+                    .SafeFormat(Name),
                     null));
             }
             else
             {
-                _callback(argument);
+                _callback?.Invoke(argument);
             }
         }
     }

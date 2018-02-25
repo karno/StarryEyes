@@ -42,18 +42,12 @@ namespace StarryEyes.Models
         private static readonly ObservableSynchronizedCollectionEx<BackstageAccountModel> _accounts =
             new ObservableSynchronizedCollectionEx<BackstageAccountModel>();
 
-        public static ObservableSynchronizedCollectionEx<BackstageAccountModel> Accounts
-        {
-            get { return _accounts; }
-        }
+        public static ObservableSynchronizedCollectionEx<BackstageAccountModel> Accounts => _accounts;
 
         public static void NotifyFallbackState(TwitterAccount account, bool isFallbacked)
         {
             var model = _accounts.FirstOrDefault(a => a.Account.Id == account.Id);
-            if (model != null)
-            {
-                model.NotifyFallbackState(isFallbacked);
-            }
+            model?.NotifyFallbackState(isFallbacked);
         }
 
         #endregion Account and connection state management
@@ -65,17 +59,14 @@ namespace StarryEyes.Models
         private static readonly ObservableSynchronizedCollectionEx<TwitterEventBase> _twitterEvents =
             new ObservableSynchronizedCollectionEx<TwitterEventBase>();
 
-        public static ObservableSynchronizedCollectionEx<TwitterEventBase> TwitterEvents
-        {
-            get { return _twitterEvents; }
-        }
+        public static ObservableSynchronizedCollectionEx<TwitterEventBase> TwitterEvents => _twitterEvents;
 
         public static event Action<BackstageEventBase> EventRegistered;
 
         public static void RegisterEvent(BackstageEventBase ev)
         {
             System.Diagnostics.Debug.WriteLine("EVENT: " + ev.Title + " - " + ev.Detail);
-            EventRegistered.SafeInvoke(ev);
+            EventRegistered?.Invoke(ev);
             var tev = ev as TwitterEventBase;
             if (tev == null) return;
             lock (_twitterEvents.SyncRoot)
@@ -103,7 +94,7 @@ namespace StarryEyes.Models
 
         public static void RaiseCloseBackstage()
         {
-            CloseBackstage.SafeInvoke();
+            CloseBackstage?.Invoke();
         }
 
         public static void NotifyException(Exception ex)

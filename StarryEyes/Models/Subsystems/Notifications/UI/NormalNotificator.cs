@@ -1,6 +1,5 @@
 ﻿using System;
 using Cadena.Data;
-using StarryEyes.Albireo.Helpers;
 using StarryEyes.ViewModels.Notifications;
 
 namespace StarryEyes.Models.Subsystems.Notifications.UI
@@ -28,32 +27,32 @@ namespace StarryEyes.Models.Subsystems.Notifications.UI
 
         public void StatusReceived(TwitterStatus status)
         {
-            OnStatusReceived.SafeInvoke(status);
+            OnStatusReceived?.Invoke(status);
         }
 
         public void MentionReceived(TwitterStatus status)
         {
-            OnMentionReceived.SafeInvoke(status);
+            OnMentionReceived?.Invoke(status);
         }
 
         public void MessageReceived(TwitterStatus status)
         {
-            OnMessageReceived.SafeInvoke(status);
+            OnMessageReceived?.Invoke(status);
         }
 
         public void Followed(TwitterUser source, TwitterUser target)
         {
-            OnUserFollowed.SafeInvoke(source, target);
+            OnUserFollowed?.Invoke(source, target);
         }
 
         public void Favorited(TwitterUser source, TwitterStatus target)
         {
-            OnFavorited.SafeInvoke(source, target);
+            OnFavorited?.Invoke(source, target);
         }
 
         public void Retweeted(TwitterUser source, TwitterStatus original, TwitterStatus retweet)
         {
-            OnRetweeted.SafeInvoke(source, original);
+            OnRetweeted?.Invoke(source, original);
         }
     }
 }

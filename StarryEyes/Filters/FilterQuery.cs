@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Reactive.Linq;
 using Cadena.Data;
-using StarryEyes.Albireo.Helpers;
 using StarryEyes.Casket;
 using StarryEyes.Filters.Expressions;
 using StarryEyes.Filters.Parsing;
@@ -16,7 +15,7 @@ namespace StarryEyes.Filters
 
         private void RaiseInvalidateRequired()
         {
-            InvalidateRequired.SafeInvoke();
+            InvalidateRequired?.Invoke();
         }
 
         public FilterSourceBase[] Sources { get; set; }

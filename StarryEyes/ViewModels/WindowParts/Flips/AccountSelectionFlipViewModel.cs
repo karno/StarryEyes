@@ -7,7 +7,6 @@ using Cadena.Api.Parameters;
 using Cadena.Api.Rest;
 using Cadena.Util;
 using Livet;
-using StarryEyes.Albireo.Helpers;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Settings;
 
@@ -20,7 +19,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
     {
         public AccountSelectionFlipViewModel()
         {
-            CompositeDisposable.Add(_accounts = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
+            CompositeDisposable.Add(Accounts = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
                 Setting.Accounts.Collection,
                 account => new SelectableAccountViewModel(this, account, RaiseSelectedAccountsChanged),
                 DispatcherHelper.UIDispatcher));
@@ -33,7 +32,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         /// </summary>
         public string SelectionReason
         {
-            get { return _selectionReason; }
+            get => _selectionReason;
             set
             {
                 _selectionReason = value;
@@ -41,12 +40,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             }
         }
 
-        private readonly ReadOnlyDispatcherCollectionRx<SelectableAccountViewModel> _accounts;
-
-        public ReadOnlyDispatcherCollectionRx<SelectableAccountViewModel> Accounts
-        {
-            get { return _accounts; }
-        }
+        public ReadOnlyDispatcherCollectionRx<SelectableAccountViewModel> Accounts { get; }
 
         public void SetSelectedAccountIds(IEnumerable<long> accountIds)
         {
@@ -69,7 +63,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         private void RaiseSelectedAccountsChanged()
         {
-            SelectedAccountsChanged.SafeInvoke();
+            SelectedAccountsChanged?.Invoke();
         }
     }
 
@@ -80,10 +74,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
     {
         private readonly TwitterAccount _account;
 
-        public TwitterAccount TwitterAccount
-        {
-            get { return _account; }
-        }
+        public TwitterAccount TwitterAccount => _account;
 
         private readonly AccountSelectionFlipViewModel _parent;
 
@@ -101,7 +92,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public bool IsSelected
         {
-            get { return _isSelected; }
+            get => _isSelected;
             set
             {
                 if (_isSelected == value) return;
@@ -111,15 +102,9 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             }
         }
 
-        public long Id
-        {
-            get { return _account.Id; }
-        }
+        public long Id => _account.Id;
 
-        public string ScreenName
-        {
-            get { return _account.UnreliableScreenName; }
-        }
+        public string ScreenName => _account.UnreliableScreenName;
 
         public Uri ProfileImageUri
         {
@@ -139,6 +124,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                         }
                         catch
                         {
+                            // ignored
                         }
                     });
                 }

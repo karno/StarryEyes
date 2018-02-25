@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Cadena.Engine;
-using StarryEyes.Albireo.Helpers;
 using StarryEyes.Models.Accounting;
 using StarryEyes.Models.Receiving.Managers;
 
@@ -28,7 +27,7 @@ namespace StarryEyes.Models.Receiving
             _searchReceiveManager = new SearchReceiveManager();
             _listReceiveManager = new ListReceiveManager();
             _listMemberReceiveManager = new ListMemberReceiveManager();
-            _listMemberReceiveManager.ListMemberChanged += li => ListMemberChanged.SafeInvoke(li);
+            _listMemberReceiveManager.ListMemberChanged += li => ListMemberChanged?.Invoke(li);
             _streamTrackReceiveManager = new StreamTrackReceiveManager(_userReceiveManager);
             _userReceiveManager.ConnectionStateChanged += arg => UserStreamsConnectionStateChanged?.Invoke(arg.Id);
             BehaviorLogger.Log("RM", "init.");

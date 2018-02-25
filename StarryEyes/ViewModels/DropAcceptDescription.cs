@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Windows;
-using StarryEyes.Albireo;
-using StarryEyes.Albireo.Helpers;
 
 namespace StarryEyes.ViewModels
 {
@@ -11,14 +9,14 @@ namespace StarryEyes.ViewModels
 
         public void OnDragOver(DragEventArgs dragEventArgs)
         {
-            DragOver.SafeInvoke(dragEventArgs);
+            DragOver?.Invoke(dragEventArgs);
         }
 
         public event Action<DragEventArgs> DragDrop;
 
         public void OnDrop(DragEventArgs dragEventArgs)
         {
-            DragDrop.SafeInvoke(dragEventArgs);
+            DragDrop?.Invoke(dragEventArgs);
         }
     }
 }

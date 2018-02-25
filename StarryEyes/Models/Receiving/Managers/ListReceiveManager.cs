@@ -244,11 +244,9 @@ namespace StarryEyes.Models.Receiving.Managers
                 }
                 foreach (var id in _members.ToArray())
                 {
-                    if (!newset.Remove(id))
-                    {
-                        _members.Remove(id);
-                        changed = true;
-                    }
+                    if (newset.Remove(id)) continue;
+                    _members.Remove(id);
+                    changed = true;
                 }
                 if (changed)
                 {

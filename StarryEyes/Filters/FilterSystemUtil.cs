@@ -6,7 +6,6 @@ using Cadena.Data;
 using Cadena.Data.Entities;
 using JetBrains.Annotations;
 using StarryEyes.Albireo.Collections;
-using StarryEyes.Albireo.Helpers;
 using StarryEyes.Filters.Expressions.Operators;
 using StarryEyes.Models.Databases;
 using StarryEyes.Models.Receiving;
@@ -110,7 +109,7 @@ namespace StarryEyes.Filters
                     Ids.Clear();
                     userIds.ForEach(id => Ids.Add(id));
                 }
-                OnListMemberUpdated.SafeInvoke();
+                OnListMemberUpdated?.Invoke();
             });
         }
 

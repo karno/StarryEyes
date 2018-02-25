@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using StarryEyes.Albireo.Collections;
-using StarryEyes.Albireo.Helpers;
 using StarryEyes.Models.Databases;
 
 namespace StarryEyes.Models.Accounting
@@ -16,59 +15,43 @@ namespace StarryEyes.Models.Accounting
         public static event Action<RelationDataChangedInfo> AccountDataUpdatedStatic;
 
         private readonly AccountRelationDataChunk _followings;
+
         /// <summary>
         /// Following info
         /// </summary>
-        public AccountRelationDataChunk Followings
-        {
-            get { return _followings; }
-        }
+        public AccountRelationDataChunk Followings => _followings;
 
         private readonly AccountRelationDataChunk _followers;
+
         /// <summary>
         /// Follower info
         /// </summary>
-        public AccountRelationDataChunk Followers
-        {
-            get { return _followers; }
-        }
+        public AccountRelationDataChunk Followers => _followers;
 
         private readonly AccountRelationDataChunk _blockings;
+
         /// <summary>
         /// Blocking info
         /// </summary>
-        public AccountRelationDataChunk Blockings
-        {
-            get { return _blockings; }
-        }
+        public AccountRelationDataChunk Blockings => _blockings;
 
-        private readonly AccountRelationDataChunk _noRetweets;
         /// <summary>
         /// No Retweets info
         /// </summary>
-        public AccountRelationDataChunk NoRetweets
-        {
-            get { return _noRetweets; }
-        }
+        public AccountRelationDataChunk NoRetweets { get; }
 
         private readonly AccountRelationDataChunk _mutes;
+
         /// <summary>
         /// Mutes info
         /// </summary>
-        public AccountRelationDataChunk Mutes
-        {
-            get { return _mutes; }
-        }
+        public AccountRelationDataChunk Mutes => _mutes;
 
 
-        private readonly long _accountId;
         /// <summary>
         /// Bound account Id
         /// </summary>
-        public long AccountId
-        {
-            get { return _accountId; }
-        }
+        public long AccountId { get; }
 
         /// <summary>
         /// Integrated event for trigger any AccountRelationData changed.
@@ -81,11 +64,11 @@ namespace StarryEyes.Models.Accounting
         /// <param name="accountId">bound account id</param>
         public AccountRelationData(long accountId)
         {
-            _accountId = accountId;
+            AccountId = accountId;
             _followings = new AccountRelationDataChunk(this, RelationDataType.Following);
             _followers = new AccountRelationDataChunk(this, RelationDataType.Follower);
             _blockings = new AccountRelationDataChunk(this, RelationDataType.Blocking);
-            _noRetweets = new AccountRelationDataChunk(this, RelationDataType.NoRetweets);
+            NoRetweets = new AccountRelationDataChunk(this, RelationDataType.NoRetweets);
             _mutes = new AccountRelationDataChunk(this, RelationDataType.Mutes);
             _followings.AccountDataUpdated += PropagateEvent;
             _followers.AccountDataUpdated += PropagateEvent;
@@ -96,8 +79,8 @@ namespace StarryEyes.Models.Accounting
 
         private void PropagateEvent(RelationDataChangedInfo e)
         {
-            AccountDataUpdated.SafeInvoke(e);
-            AccountDataUpdatedStatic.SafeInvoke(e);
+            AccountDataUpdated?.Invoke(e);
+            AccountDataUpdatedStatic?.Invoke(e);
         }
     }
 
@@ -123,14 +106,14 @@ namespace StarryEyes.Models.Accounting
                 TargetUserIds = targetUsers,
                 Type = _type
             };
-            AccountDataUpdated.SafeInvoke(rdci);
+            AccountDataUpdated?.Invoke(rdci);
         }
 
         public AccountRelationDataChunk(AccountRelationData parent, RelationDataType type)
         {
             _parent = parent;
             _type = type;
-            Task.Run(() => InitializeCollection());
+            Task.Run(InitializeCollection);
         }
 
         private async Task InitializeCollection()
@@ -277,5 +260,4 @@ namespace StarryEyes.Models.Accounting
                    TargetUserIds.Select(s => s.ToString()).JoinString(", ");
         }
     }
-
 }
