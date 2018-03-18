@@ -119,6 +119,8 @@ namespace StarryEyes.ViewModels.Notifications
                         return MetroColors.Amber;
                     case SlimNotificationKind.Retweet:
                         return MetroColors.Emerald;
+                    case SlimNotificationKind.Quote:
+                        return MetroColors.Olive;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
@@ -156,11 +158,14 @@ namespace StarryEyes.ViewModels.Notifications
                     case SlimNotificationKind.Message:
                         return RemoveLines(_data.TargetStatus.ToString());
                     case SlimNotificationKind.Follow:
-                        return RemoveLines("@" + _data.SourceUser.ScreenName + " follows @" + _data.TargetUser.ScreenName);
+                        return RemoveLines("@" + _data.SourceUser.ScreenName + " follows @" +
+                                           _data.TargetUser.ScreenName);
                     case SlimNotificationKind.Favorite:
                         return RemoveLines("@" + _data.SourceUser.ScreenName + " favorites " + _data.TargetStatus);
                     case SlimNotificationKind.Retweet:
                         return RemoveLines("@" + _data.SourceUser.ScreenName + " retweets " + _data.TargetStatus);
+                    case SlimNotificationKind.Quote:
+                        return RemoveLines("@" + _data.SourceUser.ScreenName + " quotes " + _data.TargetStatus);
                     default:
                         throw new ArgumentOutOfRangeException();
                 }

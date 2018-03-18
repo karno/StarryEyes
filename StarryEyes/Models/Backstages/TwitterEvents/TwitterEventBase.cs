@@ -27,10 +27,10 @@ namespace StarryEyes.Models.Backstages.TwitterEvents
             TargetUser = target;
         }
 
-        public TwitterEventBase(TwitterUser source, TwitterStatus target)
-            : this(source, target.User)
+        public TwitterEventBase(TwitterUser source, TwitterUser target, TwitterStatus targetStatus)
+            : this(source, target)
         {
-            TargetStatus = target;
+            TargetStatus = targetStatus;
         }
 
         public override Color Background => MetroColors.Cyan;

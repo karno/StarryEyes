@@ -62,6 +62,10 @@ namespace StarryEyes.Models.Subsystems
             {
                 NotifyRetweeted(status.User, status.RetweetedStatus, status);
             }
+            if (status.QuotedStatus != null)
+            {
+                NotifyQuoted(status.User, status.QuotedStatus, status);
+            }
             Head.NotifyReceived(status);
         }
 
@@ -256,6 +260,19 @@ namespace StarryEyes.Models.Subsystems
                     StatusBroadcaster.Republish(original);
                 }));
             Head.NotifyRetweeted(source, original, retweet);
+        }
+
+        internal static void NotifyQuoted(TwitterUser source, TwitterStatus original, TwitterStatus quote)
+        {
+            if (MuteBlockManager.IsBlocked(source) || MuteBlockManager.IsOfficialMuted(source)) return;
+            if (!Setting.NotifyBackfilledTweets.Value &&
+                quote.CreatedAt < App.StartupDateTime)
+            {
+                // backfilled tweets
+                return;
+            }
+            Task.Run(() => UserProxy.StoreUser(source));
+            Head.NotifyQuoted(source, original, quote);
         }
 
         internal static void NotifyDeleted(long statusId, TwitterStatus deleted)

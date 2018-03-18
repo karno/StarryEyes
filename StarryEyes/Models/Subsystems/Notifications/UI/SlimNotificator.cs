@@ -107,6 +107,15 @@ namespace StarryEyes.Models.Subsystems.Notifications.UI
             }
             OnNewNotificationDataQueued?.Invoke();
         }
+
+        public void Quoted(TwitterUser source, TwitterStatus original, TwitterStatus quote)
+        {
+            lock (_middlePriorityQueue)
+            {
+                _middlePriorityQueue.AddLast(new NotificationData(SlimNotificationKind.Quote, source, quote));
+            }
+            OnNewNotificationDataQueued?.Invoke();
+        }
     }
 
     public enum SlimNotificationKind
@@ -116,7 +125,8 @@ namespace StarryEyes.Models.Subsystems.Notifications.UI
         Message,
         Follow,
         Favorite,
-        Retweet
+        Retweet,
+        Quote
     }
 
     public class NotificationData

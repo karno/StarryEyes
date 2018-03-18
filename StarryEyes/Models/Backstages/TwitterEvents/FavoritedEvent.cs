@@ -7,7 +7,7 @@ namespace StarryEyes.Models.Backstages.TwitterEvents
     public sealed class FavoritedEvent : TwitterEventBase
     {
         public FavoritedEvent(TwitterUser source, TwitterStatus target)
-            : base(source, target)
+            : base(source, target.User, target)
         {
         }
 

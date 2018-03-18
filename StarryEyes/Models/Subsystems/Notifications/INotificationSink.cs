@@ -31,6 +31,9 @@ namespace StarryEyes.Models.Subsystems.Notifications
         void NotifyRetweeted([NotNull] TwitterUser source, [NotNull] TwitterStatus original,
             [NotNull] TwitterStatus retweet);
 
+        void NotifyQuoted([NotNull] TwitterUser source, [NotNull] TwitterStatus original,
+            [NotNull] TwitterStatus quote);
+
         void NotifyDeleted(long statusId, [CanBeNull] TwitterStatus deleted);
 
         void NotifyLimitationInfoGot([NotNull] IOAuthCredential account, int trackLimit);

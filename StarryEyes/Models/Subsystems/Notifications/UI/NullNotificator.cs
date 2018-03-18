@@ -35,5 +35,9 @@ namespace StarryEyes.Models.Subsystems.Notifications.UI
         public void Retweeted(TwitterUser source, TwitterStatus original, TwitterStatus retweet)
         {
         }
+
+        public void Quoted(TwitterUser source, TwitterStatus original, TwitterStatus quote)
+        {
+        }
     }
 }

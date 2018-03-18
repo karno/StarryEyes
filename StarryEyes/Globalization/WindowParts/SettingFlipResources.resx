@@ -358,6 +358,9 @@ Blocked users or no-retweet users are applied immediately as before.</value>
   <data name="NotifyRetweets" xml:space="preserve">
     <value>Notify my tweets are retweeted</value>
   </data>
+  <data name="NotifyQuotes" xml:space="preserve">
+    <value>Notify my tweets are quoted</value>
+  </data>
   <data name="NotifyShowMessageOnTweetFailed" xml:space="preserve">
     <value>Show message when post is failed</value>
   </data>

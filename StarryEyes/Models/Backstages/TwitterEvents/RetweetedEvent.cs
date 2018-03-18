@@ -6,7 +6,7 @@ namespace StarryEyes.Models.Backstages.TwitterEvents
     public sealed class RetweetedEvent : TwitterEventBase
     {
         public RetweetedEvent(TwitterUser source, TwitterStatus target)
-            : base(source, target)
+            : base(source, target.User, target)
         {
         }
 

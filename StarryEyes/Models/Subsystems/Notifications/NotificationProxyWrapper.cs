@@ -105,6 +105,15 @@ namespace StarryEyes.Models.Subsystems.Notifications
             }
         }
 
+        public void NotifyQuoted(TwitterUser source, TwitterStatus original, TwitterStatus quote)
+        {
+            if (!_proxy.NotifyQuoted(source, original, quote))
+            {
+                Next?.NotifyQuoted(source, original, quote);
+            }
+        }
+
+
         public void NotifyDeleted(long statusId, TwitterStatus deleted)
         {
             if (!_proxy.NotifyDeleted(statusId, deleted))

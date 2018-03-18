@@ -240,6 +240,9 @@ namespace StarryEyes.Settings
         public static readonly SettingItemStruct<bool> NotifyRetweet =
             new SettingItemStruct<bool>("NotifyRetweet", true);
 
+        public static readonly SettingItemStruct<bool> NotifyQuote =
+            new SettingItemStruct<bool>("NotifyQuote", true);
+
         public static readonly SettingItemStruct<int> NotifyScreenIndex =
             new SettingItemStruct<int>("NotifyScreenIndex", -1);
 

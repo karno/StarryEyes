@@ -6,6 +6,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Cadena;
 using Cadena.Api.Parameters;
+using Cadena.Data.Streams;
+using Cadena.Data.Streams.Events;
 using Cadena.Engine;
 using Cadena.Engine.CyclicReceivers.Relations;
 using Cadena.Engine.CyclicReceivers.Timelines;
@@ -13,7 +15,9 @@ using Cadena.Engine.StreamReceivers;
 using JetBrains.Annotations;
 using StarryEyes.Albireo.Helpers;
 using StarryEyes.Models.Accounting;
+using StarryEyes.Models.Backstages.TwitterEvents;
 using StarryEyes.Models.Receiving.Handling;
+using StarryEyes.Models.Subsystems;
 using StarryEyes.Settings;
 
 namespace StarryEyes.Models.Receiving.Managers
@@ -227,6 +231,76 @@ namespace StarryEyes.Models.Receiving.Managers
                     {
                         var handler = StreamHandler.Create(StatusInbox.Enqueue, BackstageModel.NotifyException,
                             _ => StateChanged?.Invoke(_account));
+                        handler.RegisterHandler<StreamStatusEvent>(se =>
+                        {
+                            switch (se.Event)
+                            {
+                                case StatusEvents.Unknown:
+                                    BackstageModel.RegisterEvent(new UnknownEvent(se.Source, se.RawEvent));
+                                    break;
+                                case StatusEvents.Favorite:
+                                    NotificationService.NotifyFavorited(se.Source, se.TargetObject);
+                                    break;
+                                case StatusEvents.Unfavorite:
+                                case StatusEvents.FavoriteRetweet:
+                                    NotificationService.NotifyUnfavorited(se.Source, se.TargetObject);
+                                    break;
+                                case StatusEvents.RetweetRetweet:
+                                    // maybe do nothing. (it will deliver as normal status.)
+                                    break;
+                                case StatusEvents.Quote:
+                                    if (se.TargetObject.QuotedStatus != null)
+                                    {
+                                        NotificationService.NotifyQuoted(se.Source,
+                                            se.TargetObject.QuotedStatus, se.TargetObject);
+                                    }
+                                    break;
+                                default:
+                                    throw new ArgumentOutOfRangeException();
+                            }
+                        });
+                        handler.RegisterHandler<StreamUserEvent>(ue =>
+                        {
+                            switch (ue.Event)
+                            {
+                                case UserEvents.Unknown:
+                                    BackstageModel.RegisterEvent(new UnknownEvent(ue.Source, ue.RawEvent));
+                                    break;
+                                case UserEvents.Follow:
+                                    NotificationService.NotifyFollowed(ue.Source, ue.Target);
+                                    break;
+                                case UserEvents.Unfollow:
+                                    NotificationService.NotifyUnfollowed(ue.Source, ue.Target);
+                                    break;
+                                case UserEvents.Block:
+                                    NotificationService.NotifyBlocked(ue.Source, ue.Target);
+                                    break;
+                                case UserEvents.Unblock:
+                                    NotificationService.NotifyUnblocked(ue.Source, ue.Target);
+                                    break;
+                                case UserEvents.Mute:
+                                    NotificationService.NotifyMuted(ue.Source, ue.Target);
+                                    break;
+                                case UserEvents.UnMute:
+                                    NotificationService.NotifyUnmuted(ue.Source, ue.Target);
+                                    break;
+                                case UserEvents.UserUpdate:
+                                    NotificationService.NotifyUserUpdated(ue.Source);
+                                    break;
+                                case UserEvents.UserDelete:
+                                case UserEvents.UserSuspend:
+                                    // do nothing
+                                    break;
+                                default:
+                                    throw new ArgumentOutOfRangeException();
+                            }
+                        });
+                        handler.RegisterHandler<StreamDelete>(de => NotificationService.NotifyDeleted(de.Id, null));
+                        handler.RegisterHandler<StreamLimit>(
+                            le => NotificationService.NotifyLimitationInfoGot(_account, (int)le.UndeliveredCount));
+
+                        // list handler is not used.
+
                         _userStreamsReceiver = new UserStreamReceiver(_streamAccessor, handler);
                         ReceiveManager.ReceiveEngine.RegisterReceiver(_userStreamsReceiver);
                     }

@@ -366,6 +366,7 @@
     <Compile Include="Models\Backstages\TwitterEvents\FavoritedEvent.cs" />
     <Compile Include="Models\Backstages\TwitterEvents\FollowedEvent.cs" />
     <Compile Include="Models\Backstages\TwitterEvents\MutedEvent.cs" />
+    <Compile Include="Models\Backstages\TwitterEvents\QuotedEvent.cs" />
     <Compile Include="Models\Backstages\TwitterEvents\RetweetedEvent.cs" />
     <Compile Include="Models\Backstages\TwitterEvents\TwitterEventBase.cs" />
     <Compile Include="Models\Backstages\TwitterEvents\UnblockedEvent.cs" />

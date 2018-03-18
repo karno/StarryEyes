@@ -208,6 +208,17 @@ namespace StarryEyes.Models.Subsystems.Notifications.UI
                 return false;
             }
 
+            public bool NotifyQuoted(TwitterUser source, TwitterStatus original, TwitterStatus quote)
+            {
+                if (Setting.NotifyRetweet.Value &&
+                    !CheckMyself(source) && CheckMyself(original))
+                {
+                    PlaySoundCore(GetSoundFilePath(NotifySoundType.Event));
+                    GetNotificator().Quoted(source, original, quote);
+                }
+                return false;
+            }
+
             public bool NotifyDeleted(long statusId, TwitterStatus deleted)
             {
                 return false;

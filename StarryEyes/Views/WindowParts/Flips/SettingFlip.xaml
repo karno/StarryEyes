@@ -776,6 +776,10 @@
                                     Margin="0,0,0,8"
                                     Content="{x:Static localize:SettingFlipResources.NotifyRetweets}"
                                     IsChecked="{Binding IsNotifyRetweets}" />
+                                <CheckBox
+                                    Margin="0,0,0,8"
+                                    Content="{x:Static localize:SettingFlipResources.NotifyQuotes}"
+                                    IsChecked="{Binding IsNotifyQuotes}" />
                                 <StackPanel Margin="0,0,0,8" Orientation="Horizontal">
                                     <TextBlock
                                         Margin="0,0,8,0"

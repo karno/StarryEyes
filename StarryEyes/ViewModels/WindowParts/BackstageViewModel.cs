@@ -140,7 +140,7 @@ namespace StarryEyes.ViewModels.WindowParts
 
                 var tev = ev as TwitterEventBase;
                 if (tev == null || !tev.IsLocalUserInvolved)
-                    return;
+                    continue;
 
                 ShowCurrentEvent = true;
 

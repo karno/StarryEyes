@@ -1070,6 +1070,15 @@ namespace StarryEyes.Globalization.WindowParts {
         }
         
         /// <summary>
+        ///   Notify my tweets are quoted に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string NotifyQuotes {
+            get {
+                return ResourceManager.GetString("NotifyQuotes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Notify my tweets are retweeted に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string NotifyRetweets {

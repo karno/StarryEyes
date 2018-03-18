@@ -121,6 +121,15 @@ namespace StarryEyes.Feather.Proxies
         bool NotifyRetweeted(TwitterUser source, TwitterStatus original, TwitterStatus retweet);
 
         /// <summary>
+        /// The user quoted the tweet.
+        /// </summary>
+        /// <param name="source">source user</param>
+        /// <param name="original">original tweet</param>
+        /// <param name="quote">quoted tweet</param>
+        /// <returns>return true to trap notification</returns>
+        bool NotifyQuoted(TwitterUser source, TwitterStatus original, TwitterStatus quote);
+
+        /// <summary>
         /// The status is deleted.
         /// </summary>
         /// <param name="statusId">deleted status Id</param>
