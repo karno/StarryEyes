@@ -69,6 +69,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
             {
                 if (User.ProfileBannerUri == null) return null;
                 var uri = User.ProfileBannerUri.OriginalString;
+                if (String.IsNullOrEmpty(uri)) return null;
                 if (!uri.EndsWith("/"))
                 {
                     uri += "/";
