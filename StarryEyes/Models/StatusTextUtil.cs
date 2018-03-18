@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using Cadena.Util;
 using StarryEyes.Helpers;
 using StarryEyes.Models.Subsystems;
-using StarryEyes.Settings;
 
 namespace StarryEyes.Models
 {
@@ -30,15 +28,7 @@ namespace StarryEyes.Models
                                        : TwitterConfigurationService.HttpUrlLength;
                                }
                                var resolved = ParsingExtension.ResolveEntity(s.Text);
-                               if (!Setting.NewTextCounting.Value)
-                               {
-                                   // count with cosidering surrogate pairs
-                                   return new StringInfo(resolved).LengthInTextElements;
-                               }
-                               else
-                               {
-                                   return GetLength(resolved);
-                               }
+                               return GetLength(resolved);
                            })
                            .Sum();
         }

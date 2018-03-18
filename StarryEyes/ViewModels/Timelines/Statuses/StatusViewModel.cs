@@ -890,7 +890,8 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                 Parent.ReplySelecteds();
                 return;
             }
-            InputModel.InputCore.SetText(InputSetting.CreateReply(Status));
+            InputModel.InputCore.SetText(InputSetting.CreateReply(Status,
+                addMentions: Setting.ShowMentioningStatusNameExplicitly.Value));
         }
 
         private void Reply(string body)

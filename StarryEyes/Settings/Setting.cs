@@ -193,8 +193,8 @@ namespace StarryEyes.Settings
         public static readonly SettingItemStruct<bool> ShowMessageOnTweetFailed =
             new SettingItemStruct<bool>("ShowMessageOnTweetFailed", true);
 
-        public static readonly SettingItemStruct<bool> NewTextCounting =
-            new SettingItemStruct<bool>("NewTextCounting", false);
+        public static readonly SettingItemStruct<bool> ShowMentioningStatusNameExplicitly =
+            new SettingItemStruct<bool>("ShowMentioningStatusNameExplcitly", true);
 
         #endregion Input control
 

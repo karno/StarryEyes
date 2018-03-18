@@ -315,7 +315,7 @@ namespace StarryEyes.Globalization.WindowParts {
         }
         
         /// <summary>
-        ///   High-Level Config に類似しているローカライズされた文字列を検索します。
+        ///   Extended Configuration に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string CategoryHighLevel {
             get {
@@ -378,7 +378,7 @@ namespace StarryEyes.Globalization.WindowParts {
         }
         
         /// <summary>
-        ///   Third Services に類似しているローカライズされた文字列を検索します。
+        ///   Third-party Services に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string CategoryThirdService {
             get {
@@ -396,7 +396,7 @@ namespace StarryEyes.Globalization.WindowParts {
         }
         
         /// <summary>
-        ///   Apply unstable patch [krile may become unstable by auto-updating] に類似しているローカライズされた文字列を検索します。
+        ///   Apply unstable patch [Krile may become unstable by auto-updating] に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string HighApplyUnstablePatch {
             get {
@@ -414,7 +414,7 @@ namespace StarryEyes.Globalization.WindowParts {
         }
         
         /// <summary>
-        ///   Disable geolocation service [this property may be changed by automatically] に類似しているローカライズされた文字列を検索します。
+        ///   Disable geo-location service [this property may be changed by automatically] に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string HighDisableGeolocationService {
             get {
@@ -513,7 +513,7 @@ namespace StarryEyes.Globalization.WindowParts {
         }
         
         /// <summary>
-        ///   Restart krile as maintenance mode に類似しているローカライズされた文字列を検索します。
+        ///   Restart krile with maintenance mode に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string HighRestartAsMaintenanceMode {
             get {
@@ -594,7 +594,7 @@ namespace StarryEyes.Globalization.WindowParts {
         }
         
         /// <summary>
-        ///   Backtrack fallbacked account when reply に類似しているローカライズされた文字列を検索します。
+        ///   Backtrack fallbacking account when reply に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string InputBacktrackFallback {
             get {
@@ -639,20 +639,20 @@ namespace StarryEyes.Globalization.WindowParts {
         }
         
         /// <summary>
-        ///   280 characters limit mode に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        public static string InputNewTextCounting {
-            get {
-                return ResourceManager.GetString("InputNewTextCounting", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Open stashed text automaticaly if exists に類似しているローカライズされた文字列を検索します。
+        ///   Open stashed text automatically if exists に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string InputRestorePreviousStashed {
             get {
                 return ResourceManager.GetString("InputRestorePreviousStashed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Show status name of mentioning target (use compatible-style reply) に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string InputShowMentioningStatusNameExplicitly {
+            get {
+                return ResourceManager.GetString("InputShowMentioningStatusNameExplicitly", resourceCulture);
             }
         }
         

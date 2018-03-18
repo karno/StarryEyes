@@ -591,14 +591,10 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             set => Setting.SuppressTagBindingInReply.Value = value;
         }
 
-        public bool NewTextCounting
+        public bool ShowMentioningStatusNameExplicitly
         {
-            get => Setting.NewTextCounting.Value;
-            set
-            {
-                Setting.NewTextCounting.Value = value;
-                _parent.InputViewModel.InputCoreViewModel.UpdateTextCount();
-            }
+            get => Setting.ShowMentioningStatusNameExplicitly.Value;
+            set => Setting.ShowMentioningStatusNameExplicitly.Value = value;
         }
 
         #endregion Input property

@@ -257,9 +257,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             }
         }
 
-        public int RemainTextCount => Setting.NewTextCounting.Value
-            ? TwitterConfigurationService.NewTextMaxLength - TextCount
-            : TwitterConfigurationService.TextMaxLength - TextCount;
+        public int RemainTextCount => TwitterConfigurationService.TextMaxLength - TextCount;
 
         public bool IsUrlAutoEsacpeEnabled
         {

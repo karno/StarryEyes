@@ -16,13 +16,17 @@ namespace StarryEyes.Models.Stores
         {
             StatusBroadcaster.BroadcastPoint
                              .Where(n => n.IsAdded)
-                             .Select(n => n.StatusModel.Status)
+                             .Select(n => n.StatusModel?.Status)
+                             .Where(s => s != null)
                              .Subscribe(RegisterStatus);
             try
             {
                 lock (_hashtagCache)
                 {
-                    LoadHashtagCache().ForEach(s => _hashtagCache.AddLast(s));
+                    LoadHashtagCache()
+                        .Select(s => s.Trim('#', '＃').Trim())
+                        .Distinct()
+                        .ForEach(s => _hashtagCache.AddLast(s));
                 }
             }
             catch
@@ -95,10 +99,11 @@ namespace StarryEyes.Models.Stores
 
         public static void RegisterHashtag(string tag)
         {
+            var trimmed = tag.Trim('#', '＃').Trim();
             lock (_hashtagCache)
             {
-                if (_hashtagCache.Any(s => s == tag)) return;
-                _hashtagCache.AddLast(tag);
+                if (_hashtagCache.Any(s => s == trimmed)) return;
+                _hashtagCache.AddLast(trimmed);
                 if (_hashtagCache.Count > HashtagMaxCount)
                 {
                     _hashtagCache.RemoveFirst();

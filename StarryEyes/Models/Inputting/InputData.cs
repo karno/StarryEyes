@@ -271,6 +271,7 @@ namespace StarryEyes.Models.Inputting
                     Text));
                 return result;
             }
+            bool autoPopulateReplyMetadata = !Setting.ShowMentioningStatusNameExplicitly.Value;
             if (_attachedImages.Count > 0)
             {
                 // step 1: upload media
@@ -281,13 +282,13 @@ namespace StarryEyes.Models.Inputting
                 var results = (await Task.WhenAll(mediaRequests)).Select(s => s.Result.MediaId).ToArray();
                 // step 2: send tweet
                 return await RequestManager.Enqueue(new TweetWithMediaRequest(accessor, Text + binds, results,
-                    account.MarkMediaAsPossiblySensitive, InReplyTo?.Id, AttachedGeoLocation?.ToTuple()));
-            }
-            else
-            {
-                return await RequestManager.Enqueue(new TweetRequest(accessor, Text + binds, InReplyTo?.Id,
+                    account.MarkMediaAsPossiblySensitive, InReplyTo?.Id, autoPopulateReplyMetadata,
                     AttachedGeoLocation?.ToTuple()));
             }
+
+            // image is not attached.
+            return await RequestManager.Enqueue(new TweetRequest(accessor, Text + binds, InReplyTo?.Id,
+                autoPopulateReplyMetadata, AttachedGeoLocation?.ToTuple()));
         }
     }
 

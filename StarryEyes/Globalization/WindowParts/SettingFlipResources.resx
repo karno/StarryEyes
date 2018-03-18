@@ -154,7 +154,7 @@
     <value>Accounts</value>
   </data>
   <data name="CategoryHighLevel" xml:space="preserve">
-    <value>High-Level Config</value>
+    <value>Extended Configuration</value>
   </data>
   <data name="CategoryInput" xml:space="preserve">
     <value>Input</value>
@@ -175,19 +175,19 @@
     <value>Theme</value>
   </data>
   <data name="CategoryThirdService" xml:space="preserve">
-    <value>Third Services</value>
+    <value>Third-party Services</value>
   </data>
   <data name="CategoryTimeline" xml:space="preserve">
     <value>Timeline</value>
   </data>
   <data name="HighApplyUnstablePatch" xml:space="preserve">
-    <value>Apply unstable patch [krile may become unstable by auto-updating]</value>
+    <value>Apply unstable patch [Krile may become unstable by auto-updating]</value>
   </data>
   <data name="HighDescription" xml:space="preserve">
     <value>Below configurations are targeting power users. How behavior of Krile is changed by each property, should read source codes.</value>
   </data>
   <data name="HighDisableGeolocationService" xml:space="preserve">
-    <value>Disable geolocation service [this property may be changed by automatically]</value>
+    <value>Disable geo-location service [this property may be changed by automatically]</value>
   </data>
   <data name="HighEventDisplayDuration" xml:space="preserve">
     <value>Event display time:</value>
@@ -220,7 +220,7 @@
     <value>REST API receive interval</value>
   </data>
   <data name="HighRestartAsMaintenanceMode" xml:space="preserve">
-    <value>Restart krile as maintenance mode</value>
+    <value>Restart krile with maintenance mode</value>
   </data>
   <data name="HighRestListInterval" xml:space="preserve">
     <value>List Timeline:</value>
@@ -241,7 +241,7 @@
     <value>When sending a reply to the reply to the account which is fall back from other account, falling back agency account is specified automatically.</value>
   </data>
   <data name="InputBacktrackFallback" xml:space="preserve">
-    <value>Backtrack fallbacked account when reply</value>
+    <value>Backtrack fallbacking account when reply</value>
   </data>
   <data name="InputCloseAction" xml:space="preserve">
     <value>Closing tweet box: </value>
@@ -256,13 +256,10 @@
     <value>Save into stash</value>
   </data>
   <data name="InputRestorePreviousStashed" xml:space="preserve">
-    <value>Open stashed text automaticaly if exists</value>
+    <value>Open stashed text automatically if exists</value>
   </data>
   <data name="InputSuppressTagBindInReply" xml:space="preserve">
     <value>Ignore bound tags when replying someone</value>
-  </data>
-  <data name="InputNewTextCounting" xml:space="preserve">
-    <value>280 characters limit mode</value>
   </data>
   <data name="KeyAssignAction" xml:space="preserve">
     <value>Action:</value>
@@ -639,5 +636,8 @@ Are you sure?</value>
   </data>
   <data name="TimelineAutoCleanupThreshold" xml:space="preserve">
     <value>Number of leaving status: </value>
+  </data>
+  <data name="InputShowMentioningStatusNameExplicitly" xml:space="preserve">
+    <value>Show status name of mentioning target (use compatible-style reply)</value>
   </data>
 </root>

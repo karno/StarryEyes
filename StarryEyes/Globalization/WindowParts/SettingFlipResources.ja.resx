@@ -261,9 +261,6 @@
   <data name="InputSuppressTagBindInReply" xml:space="preserve">
     <value>誰かに返信するときはバインドされているタグを無視する</value>
   </data>
-  <data name="InputNewTextCounting" xml:space="preserve">
-    <value>280文字モード</value>
-  </data>
   <data name="KeyAssignAction" xml:space="preserve">
     <value>アクション:</value>
   </data>
@@ -639,5 +636,8 @@
   </data>
   <data name="TimelineAutoCleanupThreshold" xml:space="preserve">
     <value>残すツイートの個数: </value>
+  </data>
+  <data name="InputShowMentioningStatusNameExplicitly" xml:space="preserve">
+    <value>リプライ時に返信先をテキストに含める (旧モードのリプライ)</value>
   </data>
 </root>
